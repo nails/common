@@ -1,0 +1,261 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+* Name:			Auth [forgotten password]
+*
+* Docs:			http://nails.shedcollective.org/docs/auth/
+*
+* Created:		14/10/2010
+* Modified:		04/04/2012
+*
+* Description:	This controller handles the resetting of a user's password
+* 
+*/
+
+
+class Forgotten_Password extends NAILS_Controller {
+	
+	
+	/**
+	 * Constructor
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function __construct()
+	{
+		parent::__construct();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load libraries
+		$this->load->library( 'form_validation' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load model
+		$this->load->model( 'auth_model' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load language files
+		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
+		
+		// --------------------------------------------------------------------------
+		
+		//	Specify a default title for this page
+		$this->data['page']->title = 'Reset your Password';
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Reset password form
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function index()
+	{
+		//	If user is logged in they shouldn't be accessing this method
+		if ( $this->user->is_logged_in() ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			redirect( '/' );
+			
+		endif;
+		
+		
+		//	If there's POST data attempt to validate the user
+		if ( $this->input->post() || $this->input->get( 'email' ) ) :
+			
+			//	Define vars
+			$_email = $this->input->post( 'email' );
+			
+			//	Override with the $_GET variable if POST failed to return anything.
+			//	Populate the $_POST var with some data so form validation continues
+			//	as normal, feels hacky but works.
+			
+			if ( ! $_email && $this->input->get( 'email' ) ) :
+			
+				$_POST['email']	= $this->input->get( 'email' );
+				
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Set rules
+			$this->form_validation->set_rules( 'email', 'email', 'xss_clean|required|valid_email' );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Override default messages
+			$this->form_validation->set_message( 'required',	lang( 'required' ) );
+			$this->form_validation->set_message( 'valid_email',	lang( 'valid_email' ) );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Run validation
+			if ( $this->form_validation->run() ) :
+				
+				//	Attempt to reset password
+				if ( $this->user->set_password_token( $_email ) ) :
+				
+					//	Set messages
+					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
+					$this->data['success']		= lang( 'forgotten_password_success' );
+					
+					// --------------------------------------------------------------------------
+					
+					//	Send email to user; load library
+					$this->load->library( 'emailer' );
+					
+					// --------------------------------------------------------------------------
+					
+					//	Define basic email data
+					$_data->to		= $this->data['reset_user']->email;
+					$_data->type_id	= 2; //	Forgotten password template
+					
+					// --------------------------------------------------------------------------
+					
+					//	Add data for the email view
+					$_code = explode( ':', $this->data['reset_user']->forgotten_password_code );
+					
+					$_data->data['first_name']				= title_case( $this->data['reset_user']->first_name );
+					$_data->data['forgotten_password_code']	= $_code[1];
+					
+					// --------------------------------------------------------------------------
+					
+					//	Send user the password reset email
+					$this->emailer->send_now( $_data );
+					
+				else :
+				
+					$this->data['error'] = lang( 'forgotten_password_code_not_set', $_email );
+					
+				endif;
+				
+			else :
+			
+				$this->data['error'] = lang( 'register_error' );
+				
+			endif;
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the views; using the auth_model view loader as we need to check if
+		//	an overload file exists which should be used instead
+		
+		$this->nails->load_view( 'structure/header',			'views/structure/header',					$this->data );
+		$this->nails->load_view( 'auth/password/forgotten',		'modules/auth/views/password/forgotten',	$this->data );
+		$this->nails->load_view( 'structure/footer',			'views/structure/footer',					$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Validate a code
+	 *
+	 * @access	private
+	 * @param	string	$code	The code to validate
+	 * @return	void
+	 * @author	Pablo
+	 */
+	public function _validate( $code )
+	{
+		//	Attempt to verify code
+		$_new_pw = $this->user->validate_password_token( $code );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Determine outcome of validation
+		if ( $_new_pw === 'EXPIRED' ) :
+		
+			//	Code has expired
+			$this->data['error'] = lang( 'forgotten_password_expired_code' );
+		
+		elseif ( $_new_pw === FALSE ) :
+		
+			//	Code was invalid
+			$this->data['error'] = lang( 'forgotten_password_invalid_code' );
+		
+		else :
+		
+			//	Everything worked!
+			$this->data['new_password'] = $_new_pw;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Set some flashdata for the login page when they go to it; just a little reminder
+			$this->session->set_flashdata( 'notice', '<strong>In case you forgot,</strong> your temporary password is <strong>' . $_new_pw . '</strong>. You won\'t be shown this message again.' );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Load the views; using the auth_model view loader as we need to check if
+			//	an overload file exists which should be used instead
+			
+			$this->nails->load_view( 'structure/header',				'views/structure/header',						$this->data );
+			$this->nails->load_view( 'auth/password/forgotten_reset',	'modules/auth/views/password/forgotten_reset',	$this->data );
+			$this->nails->load_view( 'structure/footer',				'views/structure/footer',						$this->data );
+			return;
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the views; using the auth_model view loader as we need to check if
+		//	an overload file exists which should be used instead
+		
+		$this->nails->load_view( 'structure/header',		'views/structure/header',					$this->data );
+		$this->nails->load_view( 'auth/password/forgotten',	'modules/auth/views/password/forgotten',	$this->data );
+		$this->nails->load_view( 'structure/footer',		'views/structure/footer',					$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Route requests to the right method
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function _remap( $method )
+	{
+		//	If you're logged in you shouldn't be accessing this method
+		if ( $this->user->is_logged_in() ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			redirect( '/' );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $method == 'index' ) :
+		
+			$this->index();
+			
+		else :
+		
+			$this->_validate( $method );
+			
+		endif;
+	}
+}
+
+/* End of file forgotten_password.php */
+/* Location: ./application/modules/auth/controllers/forgotten_password.php */

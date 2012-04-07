@@ -1,0 +1,287 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+* Name:			Auth [login]
+*
+* Docs:			http://nails.shedcollective.org/docs/auth/
+*
+* Created:		14/10/2010
+* Modified:		04/04/2012
+*
+* Description:	This module handles the login process for all users.
+* 
+*/
+
+
+class Login extends NAILS_Controller
+{
+	/**
+	 * Constructor
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function __construct()
+	{
+		parent::__construct();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load libraries
+		$this->load->library( 'form_validation' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load model
+		$this->load->model( 'auth_model' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load language files
+		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
+		
+		// --------------------------------------------------------------------------
+		
+		//	Where are we returning user to?
+		$this->data['return_to'] = $this->input->get( 'return_to' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Specify a default title for this page
+		$this->data['page']->title = 'Please Log In';
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Validate data and log the user in.
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function index()
+	{
+		//	If you're logged in you shouldn't be accessing this method
+		if ( $this->user->is_logged_in() ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', $this->user->active_user( 'email' ) ) );
+			redirect( '/' );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If there's POST data attempt to log user in
+		if ( $this->input->post() ) :
+		
+			//	Validate input
+			$this->form_validation->set_rules( 'email',		'Email',	'required|xss_clean|valid_email' );
+			$this->form_validation->set_rules( 'password',	'Password',	'required|xss_clean' );
+			
+			if ( $this->form_validation->run() == TRUE ) :
+			
+				//	Attempt the log in
+				$_email		= $this->input->post( 'email' );
+				$_password	= $this->input->post( 'password' );
+				$_remember	= $this->input->post( 'remember' );
+				
+				$_login = $this->auth_model->login( $_email, $_password, $_remember );
+				
+				if ( $_login ) :
+				
+					/**
+					 * User was recognised and permitted to log in. Final check to
+					 * determine whether they are using a temporary password or not.
+					 * 
+					 * $login will be an array containing the keys first_name, last_login, homepage;
+					 * the key temp_pw will be present if they are using a temporary password.
+					 * 
+					 **/
+					
+					if ( isset( $_login['temp_pw'] ) ) :
+					
+						/**
+						 * Temporary password detected, log user out and redirect to
+						 * temp password reset page.
+						 * 
+						 * temp_pw will be an array containing the user's ID and hash
+						 * 
+						 **/
+						
+						$_return_to	= ( $this->data['return_to'] ) ? '?return_to='.urlencode( $this->data['return_to'] ) : NULL;
+						
+						$this->auth_model->logout();
+						
+						redirect( 'auth/reset_password/' . $_login['temp_pw']['id'] . '/' . $_login['temp_pw']['hash'] . $_return_to );
+						return;
+					
+					else :
+					
+						//	Finally! Send this user on their merry way...
+						$_first_name	= $_login['first_name'];
+						
+						if ( $_login['last_login'] ) :
+						
+							$_last_login	=  nice_time( (int) $_login['last_login'] );
+							$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $_first_name, $_last_login ) ) );
+							
+						else :
+						
+							$this->session->set_flashdata( 'message', '<strong>Hey ' . $_first_name . '!</strong> Nice to see you again.' );
+						
+						endif;
+						
+						$_redirect = ( $this->data['return_to'] ) ? $this->data['return_to'] : $_login['homepage'];
+						
+						redirect( $_redirect );
+						return;
+					
+					endif;
+					
+				else :
+				
+					//	Login failed
+					$this->data['error'] = $this->auth_model->get_errors();
+				
+				endif;
+			
+			else :
+			
+				$this->data['error'] = lang( 'register_error' );
+				
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the views; using the auth_model view loader as we need to check if
+		//	an overload file exists which should be used instead
+		
+		$this->nails->load_view( 'structure/header',	'views/structure/header',			$this->data );
+		$this->nails->load_view( 'auth/login/form',		'modules/auth/views/login/form',	$this->data );
+		$this->nails->load_view( 'structure/footer',	'views/structure/footer',			$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Log a user in using hashes of their user ID and password; easy way of
+	 * automatically logging a user in from the likes of an email.
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function with_hashes()
+	{
+		$_hash['id']	= $this->uri->segment( 4 );
+		$_hash['pw']	= $this->uri->segment( 5 );
+		
+		if ( empty( $_hash['id'] ) || empty( $_hash['pw'] ) ) :
+			
+			show_error( 'Incomplete login credentials.' );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		/**
+		 * If the user is already logged in we need to check to see if we check to see if they are
+		 * attempting to login as themselves, if so we redirect, otherwise we log them out and try
+		 * again using the hashes.
+		 * 
+		 **/
+		if ( $this->user->is_logged_in() ) :
+		
+			if ( md5( active_user( 'id' ) ) == $_hash['id'] ) :
+			
+				//	We are attempting to log in as who we're already logged in as, redirect normally
+				if ( $this->data['return_to'] ) :
+				
+					redirect( $this->data['return_to'] );
+				
+				else :
+				
+					//	Nowhere to go? Send them to their default homepage
+					redirect( $this->user->active_user( 'group_homepage' ) );
+				
+				endif;
+			
+			else :
+			
+				//	We are logging in as someone else, log the current user out and try again
+				$this->auth_model->logout();
+				
+				redirect( preg_replace( '/^\//', '', $_SERVER['REQUEST_URI'] ) );
+			
+			endif;
+			
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		/**
+		 * The active user is a guest, we must look up the hashed user and log them in
+		 * if all is ok otherwise we report an error.
+		 * 
+		 **/
+		
+		$_user = $this->user->get_user_by_hashes( $_hash['id'], $_hash['pw'] );
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $_user ) :
+		
+			//	User was verified, log the user in
+			$this->user->set_login_data( $_user->id, $_user->email, $_user->group_id );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Say hello
+			$_welcome = lang( 'login_ok_welcome', array( $_user->first_name, nice_time( (int) $_user->last_login ) ) );
+			$this->session->set_flashdata( 'message', $_welcome );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Update their last login
+			$this->user->update_last_login( $_user->id );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Redirect user
+			if ( $this->data['return_to'] ) :
+			
+				//	We have somewhere we want to go
+				redirect( $this->data['return_to'] );
+			
+			else :
+			
+				//	Nowhere to go? Send them to their default homepage
+				redirect( $_user->group_homepage );
+			
+			endif;
+		
+		else :
+		
+			//	Bad lookup, invalid hash.
+			$this->session->set_flashdata( 'error', 'Auto-login failed.' );
+			redirect( '/' );
+		
+		endif;
+	}
+}
+
+/* End of file login.php */
+/* Location: ./application/modules/auth/controllers/login.php */
