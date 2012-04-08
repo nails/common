@@ -49,12 +49,14 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		//	Navigation options
 		$d->funcs['index']			= 'All Members';			//	Sub-nav function.
+		$d->funcs['user_access']	= 'Manage User Access';		//	Sub-nav function.
+
 		
 		// --------------------------------------------------------------------------
 		
 		//	Only announce the controller if the user has permisison to know about it
 		$_acl = active_user( 'acl' );
-		if ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE )
+		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE ) )
 			return NULL;
 		
 		// --------------------------------------------------------------------------
@@ -153,75 +155,6 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'accounts/overview',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Show all the interns
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function interns()
-	{
-		$this->data['page']->title = 'Members: Interns';
-		
-		//	Set intern group conditional
-		$this->group = 2;
-		
-		//	Execute main logic
-		$this->index();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Show all the employers
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function employers()
-	{
-		$this->data['page']->title = 'Members: Employer Managers';
-		
-		//	Set employer_manager group conditional
-		$this->group = 3;
-		
-		//	Execute main logic
-		$this->index();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Show all the employer team members
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function employers_team()
-	{
-		$this->data['page']->title = 'Members: Employer Team Members';
-		
-		//	Set intern group conditional
-		$this->group = 5;
-		
-		//	Execute main logic
-		$this->index();
 	}
 	
 	
@@ -1072,53 +1005,6 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	
 	/**
-	 * Helper func to direct actions to the right method
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function direct()
-	{
-		//	Return To var
-		$return_to = $this->input->get( 'return_to' );
-		$return_to = ( empty( $return_to ) ) ? 'admin/accounts' : $return_to;
-		
-		//	Check we have something to play with
-		$ids = $this->input->post( 'user_list' );
-		if ( $ids === FALSE ) :
-			$this->session->set_flashdata( 'error', lang( 'direct_no_ids' ) );
-			redirect( $return_to );
-		else :
-			
-			if ( ! is_array( $ids ) ) :
-				$this->session->set_flashdata( 'error', lang( 'direct_bad_data' ) );
-				redirect( $return_to );
-			else :
-				
-				//Woohoo! Let's do this
-				$this->session->set_flashdata( 'ids', $ids );
-				switch( $this->input->post( 'submit' ) ) :
-					
-					case lang( 'actions_edit' ) :	redirect( 'admin/accounts/edit/multiple?return_to='.urlencode( $return_to ) );		break;
-					case lang('actions_delete') :	redirect( 'admin/accounts/delete/multiple?return_to='.urlencode( $return_to ) );	break;
-					
-					default:
-						$this->session->set_flashdata( 'error', sprintf( lang( 'direct_unknown_action' ), $this->input->post( 'submit' ) ) );
-						redirect( $return_to );
-					break;
-					
-				endswitch;
-			endif;
-		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
 	 * Forecully activate a user
 	 *
 	 * @access	public
@@ -1243,137 +1129,108 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		redirect( $this->input->get( 'return_to' ) );
 	}
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	 public function sessions()
-	 {
-	 	switch ( $this->uri->segment( 4 ) ) :
-	 	
-	 		case 'force_logout' :	$this->_session_force_logout();	break;
-	 		default :				$this->_session_index();		break;
-	 	
-	 	endswitch;
-	 }
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	 public function rename_user_emails()
-	 {
-		if ( ENVIRONMENT == 'production' )
-			show_error( '<strong>WHAT ARE YOU DOING?!</strong><br /><br />Don\'t run this method on production servers.' );
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Manage suer ACL's
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Gary
+	 **/
+	public function user_access()
+	{
+		$this->data['groups'] = $this->user->get_groups();
 		
 		// --------------------------------------------------------------------------
 		
-	 	//	This function makes all email addresses random@shedcollective.org. KEEP COMMENTED UNLESS TESTING!
- 		if ( $this->input->post( 'go' ) ) :
- 		
- 			//	Load helper
- 			$this->load->helper( 'string' );
- 			
- 			// --------------------------------------------------------------------------
- 			
- 			$this->db->where('group_id = 2 OR group_id = 3');
- 			$users = $this->db->get( 'user' )->result();
- 			
- 			// --------------------------------------------------------------------------
- 			
- 			foreach( $users AS $u ) :
- 			
- 				$rand = random_string( 'alnum', 10 ) . '@gsdd.co.uk';
- 				
- 				$this->db->where( 'id', $u->id );
- 				$this->db->update( 'user', array( 'email' => $rand ) );
- 				
- 			endforeach;
- 			
- 			echo 'Done.';
- 		
- 		else:
- 		
- 			echo 'Are you sure?! This is a destructive update.';
- 			echo '<hr /><form method="post"><input type="submit" name="go" value="YES, I know what I\'m doing."></form>';
- 		
- 		endif;
-	 }
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	 //	Updates the score of every user in the DB, use with caution on larger databases.
-	 public function force_score_calculation()
-	 {	
- 		if ( $this->input->post( 'go' ) ) :
- 			
- 			$this->db->select( 'id' );
- 			$this->db->where( 'group_id', 2 );
- 			$users = $this->db->get( 'user' )->result();
- 			
- 			// --------------------------------------------------------------------------
- 			
- 			foreach( $users AS $u ) :
- 			
- 				$this->user->update_profile_score( $u->id );
- 				
- 			endforeach;
- 			
- 			echo 'Done.';
- 		
- 		else:
- 		
- 			echo 'This can take some time to complete. Please wait for the update to complete before leaving the page.';
- 			echo '<hr /><form method="post"><input type="submit" name="go" value="Gotya. I know what I\'m doing."></form>';
- 		
- 		endif;
-	 }
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	 private function _session_index()
-	 {
-	 	//	Get all sessions from DB
-	 	$this->db->order_by( 'last_activity', 'DESC' );
-	 	$this->data['sessions'] = $this->db->get( 'ci_sessions' )->result();
-	 	
-	 	// --------------------------------------------------------------------------
-	 	
-	 	//	Load libraries
-	 	$this->load->library( 'user_agent' );
-	 	
-	 	// --------------------------------------------------------------------------
-	 	
 		//	Load views
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'accounts/session/index',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
-	 }
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	 private function _session_force_logout()
-	 {
-		//	Remove all sessions except our own
-		$this->db->where( 'session_id !=', $this->session->userdata('session_id') );
-		$this->db->delete( 'ci_sessions' );
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'accounts/user_access',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Edit a group
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function edit_group()
+	{
+		$_gid = $this->uri->segment( 4, NULL );
 		
-		//	Clear everyone's remember me code except our own
-		$this->db->set( 'remember_code', NULL );
-		$this->db->where( 'id !=', active_user( 'id' ) );
-		$this->db->update( 'user' );
+		// --------------------------------------------------------------------------
 		
-		//	Redirect happy
-		$this->session->set_flashdata( 'success', '<strong>Boom!</strong> All users have been logged out of the system. It\'s just you now. Bit lonely, innit?' );
-		redirect( 'admin/accounts/sessions' );
-	 }
+		if ( $this->input->post() ) :
+		
+			$this->load->library( 'form_validation' );
+			
+			$this->form_validation->set_rules( 'display_name',			'Display Name',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'name',					'Slug',				'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',			'Description',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'default_homepage',		'Default Homepage', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'acl[]',					'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[superuser]',		'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin]',			'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[intern]',			'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[employer_manager]',	'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[employer_team]',	'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin][]',			'Permissions', 		'xss_clean' );
+			
+			if ( $this->form_validation->run() ) :
+			
+				$_data = array();
+				$_data['display_name']		= $this->input->post( 'display_name' );
+				$_data['name']				= $this->input->post( 'name' );
+				$_data['description']		= $this->input->post( 'description' );
+				$_data['default_homepage']	= $this->input->post( 'default_homepage' );
+				$_data['acl']				= serialize( $this->input->post( 'acl' ) );
+				
+				$this->user->update_group( $_gid, $_data );
+				
+				$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
+				redirect( 'admin/accounts/user_access' );
+				return;
+				
+			else :
+			
+				$this->data['error'] = validation_errors();
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->data['group'] = $this->user->get_group( $_gid );
+		
+		if ( ! $this->data['group'] ) :
+		
+			$this->session->set_flashdata( 'error', 'Group does not exist.' );
+			redirect( 'admin/accounts/user_access' );
+		
+		endif;
+		
+		$this->data['admin_modules'] = $this->_loaded_modules;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'accounts/edit_group',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
 }
 
 

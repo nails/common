@@ -102,8 +102,8 @@
 				</ul>
 			</td>
 			<td>
-				<?=anchor( 'admin/settings/edit_group/' . $group->id, 'Edit', 'class="a-button a-button-small"' )?>
-				<?=anchor( 'admin/settings/delete_group', 'Delete', 'class="a-button a-button-red a-button-small"' )?>
+				<?=anchor( 'admin/accounts/edit_group/' . $group->id, 'Edit', 'class="a-button a-button-small"' )?>
+				<?=anchor( 'admin/accounts/delete_group', 'Delete', 'class="a-button a-button-red a-button-small"' )?>
 			</td>
 		</tr>
 	

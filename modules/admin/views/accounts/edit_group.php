@@ -115,50 +115,8 @@
 						<td>
 							<?php
 								
-								$_checked = ( isset( $group->acl->superuser ) && $group->acl->superuser ) ? TRUE : FALSE;
+								$_checked = ( isset( $group->acl['superuser'] ) && $group->acl['superuser'] ) ? TRUE : FALSE;
 								echo form_checkbox( 'acl[superuser]', TRUE, set_checkbox( 'acl[superuser]', TRUE, $_checked ) );
-								
-							?>
-						</td>
-					</tr>
-					
-					<tr>
-						<td style="text-align:right;width:150px;">
-							<strong>Intern</strong>:
-						</td>
-						<td>
-							<?php
-								
-								$_checked = ( isset( $group->acl->intern ) && $group->acl->intern ) ? TRUE : FALSE;
-								echo form_checkbox( 'acl[intern]', TRUE, set_checkbox( 'acl[intern]', TRUE, $_checked ) );
-								
-							?>
-						</td>
-					</tr>
-					
-					<tr>
-						<td style="text-align:right;width:150px;">
-							<strong>Employer Manager</strong>:
-						</td>
-						<td>
-							<?php
-								
-								$_checked = ( isset( $group->acl->employer_manager ) && $group->acl->employer_manager ) ? TRUE : FALSE;
-								echo form_checkbox( 'acl[employer_manager]', TRUE, set_checkbox( 'acl[employer_manager]', TRUE, $_checked ) );
-								
-							?>
-						</td>
-					</tr>
-					
-					<tr>
-						<td style="text-align:right;width:150px;">
-							<strong>Employer Team Member</strong>:
-						</td>
-						<td>
-							<?php
-								
-								$_checked = ( isset( $group->acl->employer_team ) && $group->acl->employer_team ) ? TRUE : FALSE;
-								echo form_checkbox( 'acl[employer_team]', TRUE, set_checkbox( 'acl[employer_team]', TRUE, $_checked ) );
 								
 							?>
 						</td>
@@ -169,25 +127,25 @@
 			<hr />
 			
 			<p>
-				You can grant a group access to the administration area of Intern Avenue by selecting which admin modules they have
+				You can grant a group access to the administration area of <?=APP_NAME?> by selecting which admin modules they have
 				permission to access. <strong>It goes without saying that you should be careful with these options.</strong>
 			</p>
 			
 			<table class="blank">
 			
 				<tbody>
-				<?php foreach ( $admin_modules AS $module ) : ?>
+				<?php foreach ( $admin_modules AS $module => $detail ) : ?>
 					<tr>
 						<td style="text-align:right;width:150px;">
-							<strong><?=ucfirst( $module->name )?></strong>:
+							<strong><?=ucfirst( $detail->name )?></strong>:
 						</td>
 						<td>
 							<?php
 								
-								$_checked = ( isset( $group->acl['admin'] ) && array_search( $module->base_url , $group->acl['admin'] ) !== FALSE ) ? TRUE : FALSE;
-								echo form_checkbox( 'acl[admin][]', $module->base_url, set_checkbox( 'acl[admin][]', $module->base_url, $_checked ), 'class="admin_check"' );
+								$_checked = ( isset( $group->acl['admin'] ) && array_search( $module , $group->acl['admin'] ) !== FALSE ) ? TRUE : FALSE;
+								echo form_checkbox( 'acl[admin][]', $module, set_checkbox( 'acl[admin][]', $module, $_checked ), 'class="admin_check"' );
 								
-								if ( $module->base_url == 'dashboard' )
+								if ( $module == 'dashboard' )
 									echo '<small>If any admin module is selected this must also be selected.</small>';
 							?>
 						</td>

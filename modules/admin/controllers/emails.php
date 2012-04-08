@@ -16,7 +16,15 @@
 //	Include Admin_Controller; executes common admin functionality.
 require_once '_admin.php';
 
-class Emails extends Admin_Controller {
+/**
+ * OVERLOADING NAILS'S ADMIN MODULES
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+ 
+class NAILS_Emails extends Admin_Controller {
 	
 	
 	/**
@@ -30,20 +38,28 @@ class Emails extends Admin_Controller {
 	static function announce()
 	{
 		//	Configurations
-		$d->priority								= 14;						//	Module's order in nav (unique).
-		$d->name									= 'E-mail Management';		//	Display name.
-		$d->funcs['index']							= 'View Queued Messages';	//	Sub-nav function.
-		$d->funcs['sent']							= 'View Sent Messages';		//	Sub-nav function.
-		$d->funcs['log']							= 'View Message Log';		//	Sub-nav function.
-		$d->funcs['templates']						= 'Manage Templates';		//	Sub-nav function.
-		$d->funcs['campaigns']						= 'Manage Campaigns';		//	Sub-nav function.
+		$d->name				= 'Email Management';					//	Display name.
 		
-		$d->announce_to					= array();								//	Which groups can access this module.
-		$d->searchable					= FALSE;								//	Is module searchable?
+		// --------------------------------------------------------------------------
 		
-		//	Dynamic
-		$d->base_url		= basename( __FILE__, '.php' );	//	For link generation.
+		//	Navigation options
+		$d->funcs['index']		= 'View Queued Messages';	//	Sub-nav function.
+		$d->funcs['sent']		= 'View Sent Messages';		//	Sub-nav function.
+		$d->funcs['log']		= 'View Message Log';		//	Sub-nav function.
+		$d->funcs['templates']	= 'Manage Templates';		//	Sub-nav function.
+		$d->funcs['campaigns']	= 'Manage Campaigns';		//	Sub-nav function.
+
 		
+		// --------------------------------------------------------------------------
+		
+		//	Only announce the controller if the user has permisison to know about it
+		$_acl = active_user( 'acl' );
+		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE ) )
+			return NULL;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Hey user! Pick me! Pick me!
 		return $d;
 	}
 	
@@ -329,6 +345,43 @@ class Emails extends Admin_Controller {
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS'S ADMIN MODULES
+ * 
+ * The following block of code makes it simple to extend one of the core admin
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+
+	class Emails extends NAILS_Emails
+	{
+	}
+
+endif;
+
 
 /* End of file admin.php */
 /* Location: ./application/modules/admin/controllers/admin.php */

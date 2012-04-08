@@ -6,12 +6,9 @@
  * Docs:		http://nails.shedcollective.org/docs/users/
  *
  * Created:		28/03/2012
- * Modified:	28/03/2012
+ * Modified:	08/04/2012
  *
- * Description:	This model exists to force CI to load into memory the NAILS_Model class;
- *				Unless you load a model using load->model() this base class is not loaded
- *				so when NAILS_Controller comes to laod the user_model PHP cries and falls over.
- *				Took me an age to figure this one out...
+ * Description:	This model contains some basic common admin functionality.
  * 
  */
 
@@ -23,8 +20,21 @@ class Admin_Model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Constructor; set the defaults
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
 	public function __construct()
 	{
+		/**
+		 * Set the search paths to look for modules within; paths listed first
+		 * take priority over those listed after it.
+		 * 
+		 **/
 		$this->search_paths[] = FCPATH . APPPATH . 'modules/admin/controllers/';	//	Admin controllers specific for this app only.
 		$this->search_paths[] = NAILS_PATH . 'modules/admin/controllers/';
 	}
@@ -33,6 +43,16 @@ class Admin_Model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Look for modules which reside within the search paths; execute the announcer
+	 * if it's there and return it's details (no response means the suer doesn't have
+	 * permission to execute this module
+	 *
+	 * @access	public
+	 * @param	string	$module	The name of the module to search for
+	 * @return	array
+	 * @author	Pablo
+	 **/
 	public function find_module( $module )
 	{
 		$_out = array();
@@ -60,7 +80,7 @@ class Admin_Model extends NAILS_Model
 		endforeach;
 		
 		// --------------------------------------------------------------------------
-		//dump('-----------');
+		
 		return $_out;
 	}
 	
@@ -68,6 +88,14 @@ class Admin_Model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Execute the module announcer if it exists
+	 *
+	 * @access	public
+	 * @param	string	$class	The name of the class we're announcing
+	 * @return	array
+	 * @author	Pablo
+	 **/
 	private function _exec_announcer( $class )
 	{
 		return ( method_exists( $class, 'announce') ) ? $class::announce() : NULL;
