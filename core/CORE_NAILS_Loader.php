@@ -15,14 +15,14 @@ require NAILS_PATH . 'MX/Loader.php';
 class CORE_NAILS_Loader extends MX_Loader {
 
 	/**
-	 *	Overloading this method so that if a view is supplied with the prefix of FCPATH then we
+	 *	Overloading this method so that if a view is supplied with the prefix of '/' then we
 	 *	load that view directly rather than try and do anythign clever with the path
 	 *
 	 **/
 	
 	public function view($view, $vars = array(), $return = FALSE) {
 	
-		if ( strpos( $view, FCPATH ) === 0 ) :
+		if ( strpos( $view, '/' ) === 0 ) :
 		
 			//	The supplied view is an absolute path, so use it.
 			

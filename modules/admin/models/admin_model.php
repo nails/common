@@ -25,7 +25,7 @@ class Admin_Model extends NAILS_Model
 	
 	public function __construct()
 	{
-		//$this->search_paths[] = FC_PATH . APPPATH . '/controllers/admin/';	//	Admin controllers specific for this app only.
+		$this->search_paths[] = FCPATH . APPPATH . 'modules/admin/controllers/';	//	Admin controllers specific for this app only.
 		$this->search_paths[] = NAILS_PATH . 'modules/admin/controllers/';
 	}
 	
@@ -47,6 +47,7 @@ class Admin_Model extends NAILS_Model
 				require_once $path . $module . '.php';
 				
 				$_details = $this->_exec_announcer( $module );
+				
 				if ( $_details ) :
 				
 					$_out = $_details;
@@ -59,7 +60,7 @@ class Admin_Model extends NAILS_Model
 		endforeach;
 		
 		// --------------------------------------------------------------------------
-		
+		//dump('-----------');
 		return $_out;
 	}
 	

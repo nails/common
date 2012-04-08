@@ -57,7 +57,7 @@ class Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check the user has permission to view this module (skip the dashboard
-		//	we need to show them _something_
+		//	we need to show them _something_)
 		
 		$_active_module = $this->uri->segment( 2 );
 		

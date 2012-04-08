@@ -11,7 +11,7 @@ class CORE_NAILS_Lang extends MX_Lang {
 	
 	public function load($langfile, $lang = '', $return = FALSE, $add_suffix = TRUE, $alt_path = '', $_module = '') {
 	
-		if ( strpos( $langfile, FCPATH ) === 0 ) :
+		if ( strpos( $langfile, '/' ) === 0 ) :
 		
 			//	The supplied langfile is an absolute path, so use it.
 			
