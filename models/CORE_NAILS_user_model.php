@@ -308,6 +308,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function is_admin()
 	{
+		if ( $this->is_superuser() )
+			return TRUE;
+		
 		return ( isset( $this->active_user->acl['admin'] ) ) ? TRUE : FALSE;
 	}
 	

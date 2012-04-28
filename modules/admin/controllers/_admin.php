@@ -39,7 +39,7 @@ class Admin_Controller extends NAILS_Controller
 		//	Admins only please
 		if ( ! $this->user->is_admin() )
 			unauthorised();
-			
+		
 		// --------------------------------------------------------------------------
 		
 		//	Load admin helper

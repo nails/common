@@ -45,7 +45,7 @@ class TinyMCE {
 		endforeach;
 		
 		//	Load assets
-		$this->ci->asset->load( 'system/_tiny_mce/jquery.tinymce.js', TRUE );
+		$this->ci->asset->load( NAILS_URL . 'libs/tiny_mce/jquery.tinymce.js' );
 	}
 	
 	

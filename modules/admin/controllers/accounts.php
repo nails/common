@@ -151,10 +151,12 @@ class NAILS_Accounts extends Admin_Controller {
 
 		$this->data['users'] = $this->user->get_users( FALSE, $_order, $_limit, $_where, $_search );
 		
+		// --------------------------------------------------------------------------
+		
 		//	Load views
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'accounts/overview',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/accounts/overview',	'modules/admin/views/accounts/overview',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',		$this->data );
 	}
 	
 	
@@ -761,10 +763,12 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		$this->data['notice']	= ( active_user( 'id' ) == $_user->id ) ? lang( 'account_edit_thisisyou' ) : FALSE;
 		
+		// --------------------------------------------------------------------------
+		
 		//	Load views
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'accounts/edit/index',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/accounts/edit/index',	'modules/admin/views/accounts/edit/index',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
 	}
 	
 	
@@ -1149,9 +1153,9 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'accounts/user_access',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/accounts/user_access',	'modules/admin/views/accounts/user_access',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
 	}
 	
 	
@@ -1227,9 +1231,9 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'accounts/edit_group',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/accounts/edit_group',	'modules/admin/views/accounts/edit_group',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
 	}
 }
 

@@ -1,30 +1,3 @@
-<?php
-
-	//	Define method so links are correct
-	$method = $this->uri->segment( 3, 'index' );
-
-	$asc_active		= APPPATH . 'modules/admin/views/_assets/img/sort/asc-active.png';
-	$asc_inactive	= APPPATH . 'modules/admin/views/_assets/img/sort/asc-inactive.png';
-	$desc_active	= APPPATH . 'modules/admin/views/_assets/img/sort/desc-active.png';
-	$desc_inactive	= APPPATH . 'modules/admin/views/_assets/img/sort/desc-inactive.png';
-	$search			= ( isset( $page->search ) && $page->search !== FALSE) ? '?search=' . urlencode( $page->search ) : NULL;
-	
-	if ( isset( $page->filter ) && $page->filter ) :
-		if ( $search ) :
-			$filter = '&';
-		else :
-			$filter = '?';
-		endif;
-		$filter .= "filter";
-		foreach ( $page->filter AS $table => $term ) :
-			$filter .= '[' . $table . ']=' . $term;
-		endforeach;
-	else:
-		$filter = NULL;
-	endif;
-				
-?>
-
 <!--	OVERRIDE STYLES	-->
 <style type="text/css">
 				
@@ -77,78 +50,11 @@
 			<tr>
 				
 				<!--	PROFILE IMG, CV, % COMPLETE	& SCORE	-->
-				<th>&nbsp;</th>
-				
-								
-				
-				<!--	FIRST_NAME	-->
-				<?php $col = "first_name"; ?>
-				<?php $sortmode = ( $order_col == $col && $order_dir == 'asc' ) ? 'desc' : 'asc' ?>
-				<th class="first">
-					<?php
-						
-						if ( $order_dir == 'asc' )
-							$img = ( $order_col == $col )	? img( $asc_active )	: img( $desc_inactive );
-						
-						if ( $order_dir == 'desc' )
-							$img = ( $order_col == $col )	? img( $desc_active )	: img( $desc_inactive );
-					
-					?>
-					<?=anchor( 'admin/accounts/' . $method . '/' . $col . '/' . $sortmode . $search . $filter, 'First Name' . $img )?>
-				</th>
-				
-				
-				<!--	LAST_NAME	-->
-				<?php $col = "last_name"; ?>
-				<?php $sortmode = ( $order_col == $col && $order_dir == 'asc' ) ? 'desc' : 'asc' ?>
-				<th class="last">
-					<?php
-						
-						if ( $order_dir == 'asc' )
-							$img = ( $order_col == $col )	? img( $asc_active )	: img( $desc_inactive );
-						
-						if ( $order_dir == 'desc' )
-							$img = ( $order_col == $col )	? img( $desc_active )	: img( $desc_inactive );
-					
-					?>
-					<?=anchor( 'admin/accounts/' . $method . '/' . $col . '/' . $sortmode . $search . $filter, 'Surname' . $img )?>
-				</th>
-				
-				
-				<!--	EMAIL	-->
-				<?php $col = "email"; ?>
-				<?php $sortmode = ( $order_col == $col && $order_dir == 'asc' ) ? 'desc' : 'asc' ?>
-				<th class="email">
-					<?php
-						
-						if ( $order_dir == 'asc' )
-							$img = ( $order_col == $col )	? img( $asc_active )	: img( $desc_inactive );
-						
-						if ( $order_dir == 'desc' )
-							$img = ( $order_col == $col )	? img( $desc_active )	: img( $desc_inactive );
-					
-					?>
-					<?=anchor( 'admin/accounts/' . $method . '/' . $col . '/' . $sortmode . $search . $filter, 'Email' . $img )?>
-				</th>
-				
-				
-				<!--	GROUP_NAME	-->
-				<?php $col = "group_name"; ?>
-				<?php $sortmode = ( $order_col == $col && $order_dir == 'asc' ) ? 'desc' : 'asc' ?>
-				<th class="group">
-					<?php
-						
-						if ( $order_dir == 'asc' )
-							$img = ( $order_col == $col )	? img( $asc_active )	: img( $desc_inactive );
-						
-						if ( $order_dir == 'desc' )
-							$img = ( $order_col == $col )	? img( $desc_active )	: img( $desc_inactive );
-					
-					?>
-					<?=anchor( 'admin/accounts/' . $method . '/' . $col . '/' . $sortmode . $search . $filter, 'Group' . $img )?>
-				</th>
-				
-				<!--	OPTIONS	-->
+				<th clas=s"img"></th>
+				<th class="first">First Name</th>
+				<th class="last">Surname</th>
+				<th class="email">Email</th>
+				<th class="group">Group</th>
 				<th class="options">Options</th>
 			
 			</tr>
@@ -164,7 +70,7 @@
 			<?php if ( count( $users ) == 0 ) : ?>
 			
 				<tr>
-					<td colspan="9" id="no_records">
+					<td colspan="6" id="no_records">
 					
 						<p>No records found</p>
 					

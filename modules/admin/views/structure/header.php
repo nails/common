@@ -14,8 +14,8 @@
 	</script>
 	
 	<!--	JS GLOBALS	-->
-	<script tyle="text/javascript">
-		var window.NAILS_URL = '<?=NAILS_URL?>';
+	<script type="text/javascript">
+		window.NAILS_URL = '<?=NAILS_URL?>';
 	</script>
 	
 	<!--	REQUIRED JS	-->

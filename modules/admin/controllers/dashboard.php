@@ -71,8 +71,10 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	public function index()
 	{
-		//	Load views
-		$this->load->view( 'structure/header',		$this->data );
+		//	Load header
+		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
+		
+		// --------------------------------------------------------------------------
 		
 		//	If no modules have been discovered it means that while this user is an admin
 		//	no modules have either a) been enabled for the site or b) for the user. Either
@@ -80,15 +82,18 @@ class NAILS_Dashboard extends Admin_Controller {
 		
 		if ( ! $this->_loaded_modules ) :
 		
-			$this->load->view( 'dashboard/no_modules',		$this->data );
+			$this->nails->load_view( 'admin/dashboard/no_modules',	'modules/admin/views/dashboard/no_modules',	$this->data );
 			
 		else :
 		
-			$this->load->view( 'dashboard/dashboard',		$this->data );
+			$this->nails->load_view( 'admin/dashboard/dashboard',	'modules/admin/views/dashboard/dashboard',	$this->data );
 		
 		endif;
 		
-		$this->load->view( 'structure/footer',		$this->data );
+		// --------------------------------------------------------------------------
+		
+		//	Footer
+		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
 	}
 	
 	

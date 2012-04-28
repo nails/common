@@ -43,8 +43,24 @@ class CORE_NAILS_Loader extends MX_Loader {
 		
 		else :
 		
-			//	Fall back to the old method
-			return parent::view( $view, $vars, $return );
+			//	Try looking in the application folder second - prevents Nails views being loaded
+			//	over an application view.
+			$_view = FCPATH . APPPATH . 'views/' . $view;
+			
+			if ( substr( $_view, -4 ) != '.php' )
+				$_view .= '.php';
+			
+			if ( file_exists( $_view ) ) :
+			
+				//	Try again with this view
+				return $this->view( $_view, $vars, $return );
+			
+			else :
+			
+				//	Fall back to the old method
+				return parent::view( $view, $vars, $return );
+				
+			endif;
 			
 		endif;
 	}
