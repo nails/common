@@ -575,9 +575,12 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function get_user( $user_id, $extended = FALSE )
 	{
+		if ( ! is_numeric( $user_id ) )
+			return FALSE;
+		
 		$this->db->where( 'u.id', $user_id );
 		$user = $this->get_users( $extended );
-		//dumpanddie($this->db->last_query());
+		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
 	
@@ -599,6 +602,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function get_user_by_email( $email, $extended = FALSE )
 	{
+		if ( ! is_string( $email ) )
+			return FALSE;
+		
 		$this->db->where( 'u.email', $email );
 		$user = $this->get_users( $extended );
 		
@@ -1063,7 +1069,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		return array( sha1( $password . $salt ), $salt );
+		return array( sha1( sha1( $password ) . $salt ), $salt );
 	}
 	
 	
@@ -1098,7 +1104,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 				
-		return sha1( $password . $_q->row()->salt );
+		return sha1( sha1( $password ) . $_q->row()->salt );
 	
 	}
 	
