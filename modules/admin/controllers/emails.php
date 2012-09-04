@@ -37,6 +37,10 @@ class NAILS_Emails extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		$d = new stdClass();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
 		$d->name				= 'Email Management';					//	Display name.
 		

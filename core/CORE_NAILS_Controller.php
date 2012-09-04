@@ -24,6 +24,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Define empty values
+		$this->data	= array();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Define the Nails version constant
 		define( 'NAILS_VERSION',	'2.4.1' );
 		define( 'NAILS_RELEASED',	'16th March 2012 @ 18:12' );
@@ -47,14 +52,17 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( defined( 'PROFILING' ) && PROFILING ) :
 			
 			/**
-			 * Enable profiler if not AJAX request and there's no user_token. user_token
+			 * Enable profiler if not AJAX or CI request and there's no user_token. user_token
 			 * is used by uploadify to validate the upload due to uploadify not passing
 			 * the session during upload.
 			 * 
 			 **/
 			
-			if ( ! $this->input->is_ajax_request() && ! $this->input->post( 'user_token' ) )
+			if ( ! $this->input->is_cli_request() && ! $this->input->is_ajax_request() && ! $this->input->post( 'user_token' ) ) :
+			
 				$this->output->enable_profiler( TRUE );
+				
+			endif;
 		
 		endif;
 		
@@ -126,6 +134,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->data['title']		= $this->config->item( 'title' );
 		$this->data['description']	= $this->config->item( 'description' );
 		$this->data['keywords']		= $this->config->item( 'keywords' );
+		
+		
+		// --------------------------------------------------------------------------
+		
+		//	Other defaults
+		$this->data['page']	= new stdClass();
 		
 		
 		// --------------------------------------------------------------------------

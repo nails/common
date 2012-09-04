@@ -39,6 +39,10 @@ class NAILS_Blog extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		$d = new stdClass();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
 		$d->name				= 'Blog';					//	Display name.
 		

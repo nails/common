@@ -37,6 +37,10 @@ class NAILS_Faq extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		$d = new stdClass();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
 		$d->name				= 'FAQ';					//	Display name.
 		

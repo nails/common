@@ -42,6 +42,10 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		$d = new stdClass();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
 		$d->name				= 'Members';					//	Display name.
 		

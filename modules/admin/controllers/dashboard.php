@@ -35,6 +35,10 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		$d = new stdClass();
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
 		$d->name				= 'Dashboard';					//	Display name.
 		
