@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 *	THE R404 PAGE
+	 *	THE 404 PAGE
 	 *	
 	 *	This view contains only the basic 404 status page. The controller
 	 *	will look for an app version of the file  first and load that up. It will fall back
