@@ -153,7 +153,7 @@ class NAILS_Logout extends NAILS_Controller {
  * 
  * Here's how it works:
  * 
- * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * CodeIgniter instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
  * 

@@ -20,7 +20,7 @@
  * 
  **/
  
-class NAISLS_Register extends NAILS_Controller {
+class NAILS_Register extends NAILS_Controller {
 	
 	
 	/**
