@@ -240,33 +240,6 @@ class Asset {
 	
 	
 	/**
-	 * Checks for an app version of a file (auto-load if desired)
-	 *
-	 * @access	public
-	 * @return	object
-	 * @author	Pablo
-	 **/
-	public function app_version( $asset, $auto_load = FALSE )
-	{
-		$type = $this->_determine_type( $asset );
-		$path = FCPATH . 'assets/app/' . $type . '/' . $asset;
-		
-		if ( @file_exists( $path ) ) :
-		
-			if ( $auto_load )
-				$this->load( $asset );
-			
-			return TRUE;
-		
-		else :
-		
-			return FALSE;
-		
-		endif;
-	}
-	
-	
-	/**
 	 * Output the assets for HTML
 	 *
 	 * @access	public
@@ -366,9 +339,10 @@ class Asset {
 	{
 		$out = '';
 		foreach ( $this->css AS $asset ) :
-			//$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/app/css/'.$asset) ;
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : 'assets/app/css/' . $asset ;
+		
+			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : 'assets/css/' . $asset ;
 			$out .= link_tag( $url )."\n";
+			
 		endforeach;
 		return $out;
 	}
@@ -425,8 +399,10 @@ class Asset {
 	{
 		$out = '';
 		foreach ( $this->js AS $asset ) :
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/app/js/'.$asset) ;
+		
+			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/js/'.$asset) ;
 			$out .= "<script type=\"text/javascript\" src=\"{$url}\"></script>\n";
+			
 		endforeach;
 		return $out;
 	}
