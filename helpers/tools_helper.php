@@ -96,7 +96,8 @@ if ( ! function_exists( 'format_bytes' ) )
  * @param	string
  * @return	float
  */
-function generate_reference( $length = 10 ) {
+function generate_reference( $length = 10 )
+{
 	$characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 	$string = '';    
 	for ( $p = 0; $p < $length; $p++ ) {
@@ -116,7 +117,8 @@ function generate_reference( $length = 10 ) {
  * @param	string
  * @return	float
  */
-function int_to_word( $number ) {
+function int_to_word( $number )
+{
 	
 	$words = array(
 	
@@ -125,6 +127,30 @@ function int_to_word( $number ) {
 	);
 	
 	return ( (int) $number >= count( $words ) ) ?  $number : $words[ $number ];
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Converts a string to a boolean
+ *
+ * @access	public
+ * @param	string
+ * @return	float
+ */
+function string_to_boolean( $string )
+{
+	if ( $string && strtoupper( $string ) !== "FALSE") :
+	
+		return true;
+	
+	else:
+	
+		return FALSE;
+	
+	endif;
 }
 
 

@@ -76,7 +76,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Check to see if the app is extending the user object; if it is load it up
 		//	and set up all our handy shortcut references.
 		
-		if ( file_exists( FCPATH.APPPATH.'models/user_model.php' ) ) :
+		if ( file_exists( FCPATH . APPPATH . 'models/user_model.php' ) ) :
 		
 			//	Extension detected, load 'er up!
 			$this->load->model( 'user_model' );
@@ -85,11 +85,25 @@ class CORE_NAILS_Controller extends MX_Controller {
 			$this->user			=& $this->user_model;
 			$this->data['user'] =& $this->user_model;
 			
+			// --------------------------------------------------------------------------
+			
+			//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
+			//	reference the user model
+			
+			define( 'NAILS_USR_OBJ', 'user_model' );
+			
 		else :
 		
 			//	Not being extended, reference as normal
 			$this->user			=& $this->CORE_NAILS_user_model;
 			$this->data['user'] =& $this->CORE_NAILS_user_model;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
+			//	reference the user model
+			
+			define( 'NAILS_USR_OBJ', 'CORE_NAILS_user_model' );
 		
 		endif;
 		
@@ -100,13 +114,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		$this->user->find_remembered_user();
 		$this->user->init();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
-		//	reference the user model
-		
-		define( 'NAILS_USR_OBJ', 'CORE_NAILS_user_model' );
 		
 		// --------------------------------------------------------------------------
 		

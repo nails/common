@@ -17,9 +17,9 @@ if ( ! function_exists( 'get_userobject' ) )
 			
 		$_ci =& get_instance();
 		
-		if ( !isset( $_ci->{NAILS_USR_OBJ} ) )
+		if ( ! isset( $_ci->{NAILS_USR_OBJ} ) )
 			return FALSE;
-			
+		
 		return $_ci->{NAILS_USR_OBJ};
 	}
 }

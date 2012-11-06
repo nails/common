@@ -1333,7 +1333,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->where( 'email', $email );
 		if (  $this->db->count_all_results( 'user' ) ) :
 		
-			$this->_set_error( lang( 'register_error_email_in_use' ) );
+			$this->_set_error( 'This email is already in use.' );
 			return FALSE;
 			
 		endif;

@@ -16,7 +16,7 @@
  * General
  * 
  **/
- 
+
 $lang['login_ok_welcome']					= '<strong>Welcome, %s!</strong>&nbsp; You last logged in %s.';
 $lang['no_access_already_logged_in']		= 'Sorry, you can\'t access that page while logged in (currently logged in as <strong>%s</strong>).';
 $lang['no_access_bad_data']					= 'Sorry, the link you clicked on seems to be invalid. Please contact technical support.';
