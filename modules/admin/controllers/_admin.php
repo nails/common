@@ -21,7 +21,6 @@ class Admin_Controller extends NAILS_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	
 	/**
 	* Common constructor for all admin pages
 	* 
@@ -103,6 +102,15 @@ class Admin_Controller extends NAILS_Controller
 		
 		//	Load admin helper
 		$this->load->helper( 'admin' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Look for an app Admin style
+		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :
+		
+			$this->asset->load( 'admin.css' );
+		
+		endif;
 	}
 	
 	

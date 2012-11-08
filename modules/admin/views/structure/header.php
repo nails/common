@@ -7,11 +7,7 @@
 	<meta name="description" content="" />
 	
 	<!--	ASSETS	-->
-	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-	<script type="text/javascript">
-		google.load("jquery", "1.6.2");
-		google.load("jqueryui", "1.8.2");
-	</script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 	
 	<!--	JS GLOBALS	-->
 	<script type="text/javascript">
