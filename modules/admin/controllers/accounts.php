@@ -118,6 +118,8 @@ class NAILS_Accounts extends Admin_Controller {
 		//	First lot of pagination data
 		//	Done like this due to the double call to get_users() - need to apply conditionals.
 		
+		$_page						= new stdClass();
+		$_page->order				= new stdClass();
 		$_page->order->column		= ( $this->uri->segment( 4 ) !== FALSE )		? $this->uri->segment( 4 ) : 'u.id';
 		$_page->order->direction	= ( $this->uri->segment( 5 ) !== FALSE )		? $this->uri->segment( 5 ) : 'desc';
 		$_page->per_page			= 25;

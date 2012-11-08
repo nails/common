@@ -45,8 +45,8 @@ class Admin_Model extends NAILS_Model
 	
 	/**
 	 * Look for modules which reside within the search paths; execute the announcer
-	 * if it's there and return it's details (no response means the suer doesn't have
-	 * permission to execute this module
+	 * if it's there and return it's details (no response means the user doesn't have
+	 * permission to execute this module).
 	 *
 	 * @access	public
 	 * @param	string	$module	The name of the module to search for
