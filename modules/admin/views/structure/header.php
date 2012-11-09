@@ -7,7 +7,6 @@
 	<meta name="description" content="" />
 	
 	<!--	ASSETS	-->
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 	
 	<!--	JS GLOBALS	-->
 	<script type="text/javascript">
@@ -15,6 +14,7 @@
 	</script>
 	
 	<!--	REQUIRED JS	-->
+	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.tipsy.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.fancybox.pack.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.mousewheel.pack.js'?>"></script>
@@ -93,7 +93,7 @@
 		
 			<div class="box" id="box_<?=url_title( $config->name )?>">
 			<h2 title=""><?=$config->name?> <a href="#" class="toggle">close</a></h2>
-			<ul class="container">
+			<ul class="box-container">
 			
 				<?php foreach( $config->funcs AS $method => $label ) : ?>
 				
@@ -149,25 +149,9 @@
 	
 		<div class="content_inner">
 		
-		
-			<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
-			<div class="notice">
-			
-				<p>testestest<?=$notice?></p>
-			
-			</div>
-			<?php endif; ?>
-			
-			<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
-			<div class="message">
-			
-				<p><?=$message?></p>
-			
-			</div>
-			<?php endif; ?>
 			
 			<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
-			<div class="error">
+			<div class="system-alert error">
 			
 				<p><?=$error?></p>
 			
@@ -175,9 +159,25 @@
 			<?php endif; ?>
 			
 			<?php if ( isset( $success ) && ! empty( $success ) ) : ?>
-			<div class="success">
+			<div class="system-alert success">
 			
 				<p><?=$success?></p>
+			
+			</div>
+			<?php endif; ?>
+			
+			<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
+			<div class="system-alert message">
+			
+				<p><?=$message?></p>
+			
+			</div>
+			<?php endif; ?>
+			
+			<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
+			<div class="system-alert notice">
+			
+				<p><?=$notice?></p>
 			
 			</div>
 			<?php endif; ?>

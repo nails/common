@@ -18,11 +18,11 @@ class Asset {
 	private $unload_assets;
 	
 	private $css			= array();
-	private $css_core		= array();
+	private $css_nails		= array();
 	private $css_inline		= array();
 	
 	private $js				= array();
-	private $js_core		= array();
+	private $js_nails		= array();
 	private $js_inline		= array();
 	
 	
@@ -50,14 +50,14 @@ class Asset {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function load( $assets, $core_assets = FALSE, $force_type = FALSE )
+	public function load( $assets, $nails_asset = FALSE, $force_type = FALSE )
 	{	
 		$assets = ( ! is_array($assets) && ! is_object($assets) ) ? array( $assets ) : $assets ;
 		
-		//	If it's core assets put them elewhere and finish execution
-		if ( $core_assets === TRUE ) :
+		//	If it's nails assets put them elewhere and finish execution
+		if ( $nails_asset === TRUE ) :
 		
-			$this->_load_core( $assets );
+			$this->_load_nails( $assets );
 			return;
 			
 		endif;
@@ -90,14 +90,14 @@ class Asset {
 	
 	
 	/**
-	 * Load a core asset
+	 * Load a nails asset
 	 *
 	 * @access	private
 	 * @param	none
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	private function _load_core( $assets )
+	private function _load_nails( $assets )
 	{
 		foreach ( $assets AS $asset ) :
 		
@@ -115,8 +115,8 @@ class Asset {
 				
 				switch ( $type ) :
 				
-					case 'css':	$this->css_core[$asset]	= $asset;	break;
-					case 'js':	$this->js_core[$asset]	= $asset;	break;
+					case 'css':	$this->css_nails[$asset]	= $asset;	break;
+					case 'js':	$this->js_nails[$asset]	= $asset;	break;
 					
 				endswitch;
 				
@@ -181,16 +181,16 @@ class Asset {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function clear(	$css = FALSE, $css_core = FALSE,
-							$css_inline = TRUE, $js = FALSE, $js_core = FALSE,
+	public function clear(	$css = FALSE, $css_nails = FALSE,
+							$css_inline = TRUE, $js = FALSE, $js_nails = FALSE,
 							$js_inline = TRUE )
 	{
 		//	CSS
 		if ( $css === TRUE )
 			$this->css = array();
 		
-		if ( $css_core === TRUE )
-			$this->css_core = array();
+		if ( $css_nails === TRUE )
+			$this->css_nails = array();
 		
 		if ( $css_inline === TRUE )
 			$this->css_inline = array();
@@ -199,8 +199,8 @@ class Asset {
 		if ( $js === TRUE )
 			$this->js = array();
 		
-		if ( $js_core === TRUE )
-			$this->js_core = array();
+		if ( $js_nails === TRUE )
+			$this->js_nails = array();
 		
 		if ( $js_inline === TRUE )
 			$this->js_inline = array();
@@ -257,11 +257,11 @@ class Asset {
 			
 				//	CSS
 				unset($this->css[$asset]);
-				unset($this->css_core[$asset]);
+				unset($this->css_nails[$asset]);
 				
 				//	JS
 				unset($this->js[$asset]);
-				unset($this->js_core[$asset]);
+				unset($this->js_nails[$asset]);
 			
 			endforeach;
 		
@@ -269,11 +269,11 @@ class Asset {
 		
 		//	Now output.
 		switch ( $type ) :
-			case 'css'			: $out  = $this->_print_css_core();
+			case 'css'			: $out  = $this->_print_css_nails();
 								  $out .= $this->_print_css();			break;
 			case 'css-inline'	: $out  = $this->_print_css_inline();	break;
 								  
-			case 'js'			: $out  = $this->_print_js_core();	
+			case 'js'			: $out  = $this->_print_js_nails();	
 								  $out .= $this->_print_js();			break;
 			case 'js-inline'	: $out  = $this->_print_js_inline();	break;
 		endswitch;
@@ -349,21 +349,24 @@ class Asset {
 	
 	
 	/**
-	 * Output the referenced Core CSS files
+	 * Output the referenced nails CSS files
 	 *
 	 * @access	private
 	 * @param	none
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	private function _print_css_core()
+	private function _print_css_nails()
 	{
 		$out = '';
-		foreach ( $this->css_core AS $asset ) :
-			//$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/core/css/'.$asset) ;
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : 'assets/core/css/' . $asset ;
+		
+		foreach ( $this->css_nails AS $asset ) :
+		
+			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'css/' . $asset ;
 			$out .= link_tag( $url )."\n";
+			
 		endforeach;
+		
 		return $out;
 	}
 	
@@ -398,30 +401,35 @@ class Asset {
 	private function _print_js()
 	{
 		$out = '';
+		
 		foreach ( $this->js AS $asset ) :
 		
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/js/'.$asset) ;
+			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url( 'assets/js/'.$asset ) ;
 			$out .= "<script type=\"text/javascript\" src=\"{$url}\"></script>\n";
 			
 		endforeach;
+		
 		return $out;
 	}
 	
 	
 	/**
-	 * Output the referenced Core JS files
+	 * Output the referenced nails JS files
 	 *
 	 * @access	private
 	 * @param	none
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	private function _print_js_core()
+	private function _print_js_nails()
 	{
 		$out = '';
-		foreach ( $this->js_core AS $asset ) :
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : site_url('assets/core/js/'.$asset) ;
+		
+		foreach ( $this->js_nails AS $asset ) :
+		
+			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'js/' . $asset ;
 			$out .= "<script type=\"text/javascript\" src=\"{$url}\"></script>\n";
+		
 		endforeach;
 		return $out;
 	}

@@ -113,24 +113,24 @@
 								echo login_as_button( $u->id, $u->password );
 							
 							//	Edit This User
-							echo anchor( 'admin/accounts/edit/' . $u->id . $return_string, 'Edit', 'class="a-button a-button-small"' );
+							echo anchor( 'admin/accounts/edit/' . $u->id . $return_string, 'Edit', 'class="awesome small"' );
 							
 							
 							//	Can't do any of these functions to yourself
 							if ( $u->id != active_user( 'id' ) ) :
 							
-								//echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="a-button a-button-small a-button-red"' );
+								//echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="awesome small red"' );
 							
 								if( ! $u->active )
-									echo anchor( 'admin/accounts/activate/' . $u->id . $return_string, 'Activate', 'class="a-button a-button-small a-button-green"' );
+									echo anchor( 'admin/accounts/activate/' . $u->id . $return_string, 'Activate', 'class="awesome small green"' );
 								
 								if( $u->active == 2 ) :
 								
-									echo anchor( 'admin/accounts/unban/' . $u->id . $return_string, 'Unban', 'class="a-button a-button-small"' );
+									echo anchor( 'admin/accounts/unban/' . $u->id . $return_string, 'Unban', 'class="awesome small"' );
 									
 								else :
 								
-									echo anchor( 'admin/accounts/ban/' . $u->id . $return_string, 'Ban', 'class="a-button a-button-small a-button-red"' );
+									echo anchor( 'admin/accounts/ban/' . $u->id . $return_string, 'Ban', 'class="awesome small red"' );
 									
 								endif;
 							
@@ -172,13 +172,13 @@
 			if ( $pagination->page != 0 ) :
 			
 				$prev = ( $pagination->page - 1 >= 0 ) ? $pagination->page-1 : 0;
-				echo '<li class="previous start">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/0' . $search . $filter, '&laquo;', 'class="a-button"' ) . '</li>';
-				echo '<li class="previous">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $prev . $search . $filter, '&lsaquo;', 'class="a-button"' ) . '</li>';
+				echo '<li class="previous start">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/0' . $search . $filter, '&laquo;', 'class="awesome"' ) . '</li>';
+				echo '<li class="previous">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $prev . $search . $filter, '&lsaquo;', 'class="awesome"' ) . '</li>';
 			
 			else :
 			
-				echo '<li class="previous start disabled"><a href="#" class="a-button" onclick="return false;">&laquo;</a></li>';
-				echo '<li class="previous disabled"><a href="#" class="a-button" onclick="return false;">&lsaquo;</a></li>';
+				echo '<li class="previous start disabled"><a href="#" class="awesome" onclick="return false;">&laquo;</a></li>';
+				echo '<li class="previous disabled"><a href="#" class="awesome" onclick="return false;">&lsaquo;</a></li>';
 				
 			endif;
 			
@@ -194,13 +194,13 @@
 				$next = ( $pagination->page < $pagination->num_pages ) ? $pagination->page : $pagination->num_pages - 1;
 				$pagination->num_pages--;
 				
-				echo '<li class="next">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $next . $search . $filter, '&rsaquo;', 'class="a-button"' ) . '</li>';
-				echo '<li class="next end">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $pagination->num_pages . $search . $filter, '&raquo;', 'class="a-button"' ) . '</li>';
+				echo '<li class="next">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $next . $search . $filter, '&rsaquo;', 'class="awesome"' ) . '</li>';
+				echo '<li class="next end">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $pagination->num_pages . $search . $filter, '&raquo;', 'class="awesome"' ) . '</li>';
 			
 			else :
 			
-				echo '<li class="next end disabled"><a href="#" class="a-button" onclick="return false;">&rsaquo;</a></li>';
-				echo '<li class="next disabled"><a href="#"  class="a-button" onclick="return false;">&raquo;</a></li>';
+				echo '<li class="next end disabled"><a href="#" class="awesome" onclick="return false;">&rsaquo;</a></li>';
+				echo '<li class="next disabled"><a href="#"  class="awesome" onclick="return false;">&raquo;</a></li>';
 	
 			endif;
 			
