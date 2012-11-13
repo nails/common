@@ -78,10 +78,9 @@ class NAILS_Forgotten_Password extends NAILS_Controller {
 			
 		endif;
 		
-		
 		//	If there's POST data attempt to validate the user
 		if ( $this->input->post() || $this->input->get( 'email' ) ) :
-			
+		
 			//	Define vars
 			$_email = $this->input->post( 'email' );
 			
@@ -110,25 +109,22 @@ class NAILS_Forgotten_Password extends NAILS_Controller {
 			
 			//	Run validation
 			if ( $this->form_validation->run() ) :
-				
+			
 				//	Attempt to reset password
 				if ( $this->user->set_password_token( $_email ) ) :
 				
-					//	Set messages
-					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
-					$this->data['success']		= lang( 'forgotten_password_success' );
-					
-					// --------------------------------------------------------------------------
-					
 					//	Send email to user; load library
 					$this->load->library( 'emailer' );
 					
 					// --------------------------------------------------------------------------
 					
 					//	Define basic email data
+					
+					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
+					
 					$_data = new stdClass();
-					$_data->to		= $this->data['reset_user']->email;
-					$_data->type_id	= 2; //	Forgotten password template
+					$_data->to_email	= $this->data['reset_user']->email;
+					$_data->type		= 'forgotten_password';
 					
 					// --------------------------------------------------------------------------
 					
@@ -141,7 +137,15 @@ class NAILS_Forgotten_Password extends NAILS_Controller {
 					// --------------------------------------------------------------------------
 					
 					//	Send user the password reset email
-					$this->emailer->send_now( $_data );
+					if ( $this->emailer->send( $_data ) ) :
+					
+						$this->data['success']		= lang( 'forgotten_password_success' );
+					
+					else :
+					
+						$this->data['error'] = lang( 'forgotten_password_email_fail' );
+					
+					endif;
 					
 				else :
 				

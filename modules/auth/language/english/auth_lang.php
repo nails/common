@@ -18,8 +18,8 @@
  **/
 
 $lang['login_ok_welcome']					= '<strong>Welcome, %s!</strong>&nbsp; You last logged in %s.';
-$lang['no_access_already_logged_in']		= 'Sorry, you can\'t access that page while logged in (currently logged in as <strong>%s</strong>).';
-$lang['no_access_bad_data']					= 'Sorry, the link you clicked on seems to be invalid. Please contact technical support.';
+$lang['no_access_already_logged_in']		= '<strong>Sorry,</strong> you can\'t access that page while logged in (currently logged in as <strong>%s</strong>).';
+$lang['no_access_bad_data']					= '<strong>Sorry,</strong> the link you clicked on seems to be invalid. Please contact technical support.';
 
 /**
  * Login
@@ -31,7 +31,7 @@ $lang['login_title']						= 'Please Log In';
 $lang['login_link_forgotten_password']		= 'Forgotten your Password?';
 $lang['login_link_register']				= 'Register';
 $lang['login_remember_me']					= 'Remember Me';
-$lang['login_error']						= 'There were errors. Please see below for details.';
+$lang['login_error']						= '<strong>Sorry,</strong> there were errors. Please see below for details.';
 
 
 /**
@@ -42,11 +42,12 @@ $lang['login_error']						= 'There were errors. Please see below for details.';
 //	Resetting
 $lang['forgotten_password_title']			= 'Reset your password';
 $lang['forgotten_password_blurb']			= 'Please enter your registered email address so we can send you a password reset token.';
-$lang['forgotten_password_wait']			= 'An email has been sent to <strong>%s</strong>%s with a password reset token. Please note that this link will only be valid for 24 hours.';
 $lang['forgotten_password_success']			= '<strong>Reset token sent!</strong> Please check your email remembering to look in junk and spam folders.';
-$lang['forgotten_password_code_not_set']	= 'We were unable to generate a token for the email address <strong>%s</strong>.';
+$lang['forgotten_password_email_fail']		= '<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
+$lang['forgotten_password_code_not_set']	= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
+
 //	Validating
-$lang['forgotten_password_expired_code']	= 'Sorry, the reset token you are using has expired. You will need to resubmit a password reset request.';
+$lang['forgotten_password_expired_code']	= '<strong>Sorry,</strong> the reset token you are using has expired. You will need to resubmit a password reset request.';
 $lang['forgotten_password_invalid_code']	= 'Invalid or expired password reset token.';
 $lang['forgotten_password_reset_blurb_1']	= 'Your password has been reset and is shown below.';
 $lang['forgotten_password_reset_blurb_2']	= 'Copy this password and use it to log in, it will <strong>not</strong> be shown again.';
