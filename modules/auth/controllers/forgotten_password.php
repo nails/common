@@ -126,6 +126,7 @@ class NAILS_Forgotten_Password extends NAILS_Controller {
 					// --------------------------------------------------------------------------
 					
 					//	Define basic email data
+					$_data = new stdClass();
 					$_data->to		= $this->data['reset_user']->email;
 					$_data->type_id	= 2; //	Forgotten password template
 					
