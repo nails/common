@@ -79,7 +79,7 @@ class NAILS_Reset_Password extends NAILS_Controller {
 		if ( $_user !== FALSE && isset( $_user->salt ) && $hash == md5( $_user->salt ) ) :
 		
 			//	Valid combination
-			if ( $this->input->post( 'resetme' ) ) :
+			if ( $this->input->post() ) :
 			
 				// Validate data
 				$this->load->library( 'form_validation' );
@@ -143,6 +143,7 @@ class NAILS_Reset_Password extends NAILS_Controller {
 			
 			// --------------------------------------------------------------------------
 			
+			$this->data['auth']			= new stdClass();
 			$this->data['auth']->id		= $id;
 			$this->data['auth']->hash	= $hash;
 			$this->data['return_to']	= ( $this->input->get( 'return_to' ) ) ? '?return_to=' . urlencode( $this->input->get( 'return_to' ) ) : NULL;

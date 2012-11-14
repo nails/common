@@ -146,6 +146,13 @@ class NAILS_Login extends NAILS_Controller
 						
 						$_redirect = ( $this->data['return_to'] ) ? $this->data['return_to'] : $_login['homepage'];
 						
+						// --------------------------------------------------------------------------
+						
+						//	Generate an event for this log in
+						create_event( 'did_log_in', $_login['user_id'] );
+						
+						// --------------------------------------------------------------------------
+						
 						redirect( $_redirect );
 						return;
 					

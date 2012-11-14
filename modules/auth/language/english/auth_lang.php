@@ -167,15 +167,15 @@ $lang['action_register']					= 'Sign Up Now';
  * 
  **/
  
-$lang['login_fail_general']						= 'Your log in has not been successful, please try again.';
-$lang['login_fail_inactive']					= 'Your log in failed, you must activate your account first.<br />If you did not receive a code, have lost your activation email or have deactivated your account then <a href="%s">click here to resend</a>.';
-$lang['login_fail_banned']						= 'This account has been banned; if you feel you have received this message in error then please contact us.';
-$lang['login_fail_blocked']						= 'This account has been temporarily blocked due to repeated failed logins. Please wait %s minutes before trying again (each failed login resets the block). ';
+$lang['login_fail_general']						= '<strong>Sorry,</strong> your log in has not been successful, please try again.';
+$lang['login_fail_inactive']					= '<strong>Sorry,</strong> your log in failed, you must activate your account first.<br />If you did not receive a code, have lost your activation email or have deactivated your account then <a href="%s">click here to resend</a>.';
+$lang['login_fail_banned']						= '<strong>This account has been banned;</strong> if you feel you have received this message in error then please contact us.';
+$lang['login_fail_blocked']						= '<strong>This account has been temporarily blocked due to repeated failed logins.<strong> Please wait %s minutes before trying again (each failed login resets the block). ';
 $lang['login_fail_social']						= 'This account was created using a social network; either login via the appropriate button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';
 $lang['login_fail_social_fb']					= 'This account was created using Facebook; either login via the Facebook button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';
 $lang['login_fail_social_in']					= 'This account was created using LinkedIn; either login via the LinkedIn button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';
 $lang['logout_successful']						= '<strong>Goodbye!</strong> You have been logged out successfully.';
-$lang['forgot_password_unsuccessful']			= 'That email address was not recognised, please try again.';
+$lang['forgot_password_unsuccessful']			= '<strong>Sorry,</strong> that email address was not recognised, please try again.';
 $lang['forgot_password_email_unsuccessful']		= 'Your email was recognised but there were problems issuing a reset token. You may be able to try again. If the problem continues please contact the site administrator.';
 $lang['password_change_successful']				= 'Your password was changed successfully.';
 $lang['password_change_unsuccessful']			= 'Your password was not changed.';

@@ -996,7 +996,7 @@ class Emailer {
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 		
-		if ( $_error->error_has_occurred() ) :
+		if ( ! $debug && ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && $_error->error_has_occurred() ) :
 		
 			//	The templates error'd, abort the send and let dev know
 			$_to		= 'hello@shedcollective.org';
@@ -1079,7 +1079,7 @@ class Emailer {
 		//	Debugging?
 		if ( $debug || ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) ) :
 		
-			$this->_debugger( $_send, $body, $plaintext );
+			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;
 		
 		endif;
@@ -1158,7 +1158,7 @@ class Emailer {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	private function _debugger( $input, $body, $plaintext )
+	private function _debugger( $input, $body, $plaintext, $recent_errors )
 	{
 		//	Debug mode, output data and don't actually send
 		
@@ -1188,6 +1188,22 @@ class Emailer {
 		echo '-----------------------------------------------------------------' . "\n";
 		echo 'Subject:	' . $input->subject . "\n";
 		echo 'template:	' . $input->template . "\n";
+		
+		if ( $recent_errors ) :
+		
+			echo "\n\n" . '<strong>Template Errors (' . count( $recent_errors ) . '):</strong>' . "\n";
+			echo '-----------------------------------------------------------------' . "\n";
+			
+			foreach ( $recent_errors AS $error ) :
+			
+				echo 'Severity: ' . $error->severity . "\n";
+				echo 'Mesage: ' . $error->message . "\n";
+				echo 'Filepath: ' . $error->filepath . "\n";
+				echo 'Line: ' . $error->line . "\n\n";
+			
+			endforeach;
+			
+		endif;
 		
 		echo "\n\n" . '<strong>HTML:</strong>' . "\n";
 		echo '-----------------------------------------------------------------' . "\n";

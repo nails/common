@@ -129,6 +129,7 @@ class Auth_model extends NAILS_Model
 				
 				// return some helpful data
 				$return = array(
+					'user_id'		=> $user->id,
 					'first_name'	=> $user->first_name,
 					'last_login'	=> (int) $user->last_login,
 					'homepage'		=> $user->group_homepage

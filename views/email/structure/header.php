@@ -10,27 +10,42 @@
 			{
 				margin:0;
 				padding:0;
-				font-size:12px;
-				font-family:helvetica,arial,sans-serif;
-				line-height:1.3em;
+				font-size:13px;
+				font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+				line-height:1.75em;
+				max-width:600px;
+				margin:auto;
+				color:#333;
 			}
 			
-			body .padder,
-			#BodyImposter .padder
+			.padder
 			{
 				padding: 20px;
 			}
 			
-			body p,
-			#BodyImposter p
+			h1
+			{
+				line-height:1.5em;
+				font-style:italic;
+				margin-bottom:1em;
+				padding-bottom:1em;
+				border-bottom:1px solid #ececec;
+			}
+			
+			p
 			{
 				margin-bottom:1em;
 			}
 			
-			body small,
-			#BodyImposter small
+			small
 			{
 				font-size:0.8em;
+			}
+			
+			.footer
+			{
+				border-top:1px solid #ececec;
+				margin-top:2em;
 			}
 		
 		</style>

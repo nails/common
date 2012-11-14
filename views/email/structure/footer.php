@@ -1,3 +1,4 @@
+	<div class="footer">
 	<?php
 
 		//	View Online link
@@ -22,6 +23,7 @@
 		endif;
 
 	?>
+	</div>
 	</div>
 	</div>
 	</body>

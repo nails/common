@@ -101,7 +101,7 @@ if ( ! function_exists( 'clean' ) )
 /**
  * is_clean
  *
- * Determiens wetehr a string is clean or not
+ * Determines wetehr a string is clean or not
  *
  * @access	public
  * @param	mixed

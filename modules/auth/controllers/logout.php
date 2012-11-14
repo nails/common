@@ -77,6 +77,11 @@ class NAILS_Logout extends NAILS_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Generate an event for this log in
+		create_event( 'did_log_out', active_user( 'id' ) );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Log user out
 		$this->auth_model->logout();
 		
