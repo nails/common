@@ -821,8 +821,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 				$_hash = $this->hash_password( $data['password'] );
 				
-				$data['password']	= $_hash[0];
-				$data['salt']		= $_hash[1];
+				$data['password']		= $_hash[0];
+				$data['password_md5']	= md5( $_hash[0] );
+				$data['salt']			= $_hash[1];
 			
 			endif;
 			
