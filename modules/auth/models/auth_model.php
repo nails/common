@@ -237,8 +237,9 @@ class Auth_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		//	Destroy PHP session
-		session_destroy();
+		//	Destroy PHP session if it exists
+		if ( session_id() )
+			session_destroy();
 		
 		// --------------------------------------------------------------------------
 		
