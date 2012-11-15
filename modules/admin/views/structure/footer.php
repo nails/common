@@ -6,6 +6,7 @@
 				</small>
 				
 			</div>
+			</div>
 		
 		</div>
 		

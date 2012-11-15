@@ -43,11 +43,6 @@
 <body>
 		
 	<div class="header">
-	
-		<?=img( array(
-			'src'	=> NAILS_URL . 'img/admin/logo.png',
-			'class'	=> 'left'
-		))?>
 		
 		<ul class="left" style="min-width:400px;">
 			
@@ -87,8 +82,8 @@
 	
 	
 	<div class="sidebar left">
-	
-	
+		<div class="padder">
+		
 		<?php if ( isset( $loaded_modules ) ) : foreach ( $loaded_modules AS $module => $config ) : ?>
 		
 			<div class="box" id="box_<?=url_title( $config->name )?>">
@@ -141,12 +136,13 @@
 		
 		<?php endif; ?>
 	
+		</div>
 	</div>
 	
 	
 	
 	<div class="content">
-	
+		<div class="padder">
 		<div class="content_inner">
 		
 			
