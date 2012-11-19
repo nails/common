@@ -185,9 +185,9 @@ class Cdn {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function replace( $file, $bucket, $replace_with, $options = array() )
+	public function replace( $file, $bucket, $replace_with, $options = array(), $is_raw = FALSE )
 	{
-		return $this->_cdn->replace( $file, $bucket, $replace_with, $options );
+		return $this->_cdn->replace( $file, $bucket, $replace_with, $options, $is_raw );
 	}
 	
 	
