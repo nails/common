@@ -105,12 +105,55 @@ class Admin_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Add the current module to the $page variable (for convenience)
+		$this->data['page'] = new stdClass();
+		
+		if ( isset( $this->_loaded_modules[ $this->uri->segment( 2 ) ] ) ) :
+		
+			$this->data['page']->module = $this->_loaded_modules[ $this->uri->segment( 2 ) ];
+		
+		else :
+		
+			$this->data['page']->moduled = FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Look for an app Admin style
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :
 		
 			$this->asset->load( 'admin.css' );
 		
 		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	static function _can_access( $module, $file )
+	{
+		$_acl = active_user( 'acl' );
+		
+		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( $file, '.php' ), $_acl['admin'] ) === FALSE ) ) :
+		
+			return NULL;
+		
+		else :
+		
+			return $module;
+		
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _get_current_module()
+	{
+		here();
 	}
 	
 	

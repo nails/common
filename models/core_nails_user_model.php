@@ -1441,6 +1441,28 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	
 	/**
+	 * Delete a user
+	 *
+	 * @access	public
+	 * @param	int		$id	The ID of the user to delete
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function destroy( $id )
+	{
+		$this->db->where( 'id', $id );
+		$this->db->delete( 'user' );
+		
+		// --------------------------------------------------------------------------
+		
+		return (bool) $this->db->affected_rows();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Generate a valid referral code
 	 *
 	 * @access	private
@@ -1711,28 +1733,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		return $_deactivated;
-	}	
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Delete a user
-	 *
-	 * @access	public
-	 * @param	int		$id	The ID of the user to delete
-	 * @return	boolean
-	 * @author	Pablo
-	 **/
-	public function delete_user( $id )
-	{
-		$this->db->where( 'id', $id );
-		$this->db->delete( 'user' );
-		
-		// --------------------------------------------------------------------------
-		
-		return (bool) $this->db->affected_rows();
 	}
 	
 	
@@ -1785,7 +1785,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @author	Pablo
 	 **/
 	public function upload_profile_image( $file, $user_id )
-	{
+	{dumpanddie( 'TODO; this method should use the upload/CDN library' );
  		//	Load helper
  		$this->load->helper( 'file' );
 		
@@ -1835,6 +1835,15 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			return array( 'id' => $filename.$ext );
 		
 		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function delete_profile_img()
+	{
+		//	TODO
 	}
 	
 	

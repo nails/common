@@ -57,14 +57,7 @@ class NAILS_Emails extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Only announce the controller if the user has permisison to know about it
-		$_acl = active_user( 'acl' );
-		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE ) )
-			return NULL;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Hey user! Pick me! Pick me!
-		return $d;
+		return self::->_can_access( $d, __FILE__ );
 	}
 	
 	
@@ -372,13 +365,13 @@ class NAILS_Emails extends Admin_Controller {
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
  * 
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
  * 
  **/
  
-if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_EMAILS' ) ) :
 
 	class Emails extends NAILS_Emails
 	{

@@ -1,16 +1,14 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Accounts
-*
-* Docs:			-
-*
-* Created:		14/10/2010
-* Modified:		24/03/2011
-*
-* Description:	-
-* 
-*/
+ * Name:			Accounts
+ *
+ * Created:		14/10/2010
+ * Modified:		24/03/2011
+ *
+ * Description:	-
+ * 
+ **/
 
 
 //	Include Admin_Controller; executes common admin functionality.
@@ -52,21 +50,15 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']			= 'All Members';			//	Sub-nav function.
+		$d->funcs['index']			= 'View All Members';			//	Sub-nav function.
+		$d->funcs['groups']			= 'Manage User Groups';		//	Sub-nav function.
 		$d->funcs['user_access']	= 'Manage User Access';		//	Sub-nav function.
 
 		
 		// --------------------------------------------------------------------------
 		
 		//	Only announce the controller if the user has permisison to know about it
-		$_acl = active_user( 'acl' );
-		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE ) )
-			return NULL;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Hey user! Pick me! Pick me!
-		return $d;
+		return self::_can_access( $d, __FILE__ );
 	}
 	
 	
@@ -107,7 +99,7 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->data['page']->admin_m	= 'index';
 		
 		//	Override the title (used when loading this method from one of the other methods)
-		$this->data['page']->title		= ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'Members';
+		$this->data['page']->title		= ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'View All Members';
 		
 		// --------------------------------------------------------------------------
 		
@@ -163,283 +155,6 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',		$this->data );
 		$this->nails->load_view( 'admin/accounts/overview',	'modules/admin/views/accounts/overview',	$this->data );
 		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',		$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Control which smart list function we're rendering
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function smart_lists()
-	{
-		$this->load->model( 'admin_smartlist_model' );
-		
-		switch( $this->uri->segment( 4 ) ) :
-			
-			case 'run':		$this->_smartlist_run();	break;
-			case 'export':	$this->_smartlist_export();	break;
-			case 'email':	$this->_smartlist_email();	break;
-			case 'edit':	$this->_smartlist_edit();	break;
-			case 'delete':	$this->_smartlist_delete();	break;
-			case 'create':	$this->_smartlist_create();	break;
-			
-			//	Default to showing a list of all smart lists
-			default:		$this->_smartlist_index();	break;
-			
-		endswitch;
-		
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: List all smart lists
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_index()
-	{
-		//	Load all required models
-		$this->load->model( 'sector_model' );
-		$this->load->model( 'location_model' );
-		$this->load->model( 'institution_model' );
-			
-		//	Get saved smart lists
-		$this->data['smartlists'] 		= $this->admin_smartlist_model->get_all();
-	
-		//	Load views
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'accounts/smartlists/index',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: Run search
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_run()
-	{
-		$this->data['smartlist']	= $this->admin_smartlist_model->get_smartlist( $this->uri->segment( 5 ) );
-		$this->data['users']		= $this->admin_smartlist_model->get_users_for_smartlist( $this->data['smartlist']->id );
-		
-		$this->data['page']->download	= ( $this->input->get( 'download' ) !== FALSE ) ? TRUE : FALSE;
-		
-		if ( $this->data['page']->download ) :
-		
-			$this->load->view( 'accounts/download',	$this->data );
-			
-		else:
-		
-			//	Load views
-			$this->load->view( 'structure/header',			$this->data );
-			$this->load->view( 'accounts/smartlists/run',	$this->data );
-			$this->load->view( 'structure/footer',			$this->data );
-		
-		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: Send email to smart list
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_email()
-	{
-		//	Get data
-		$this->data['smartlist']	= $this->admin_smartlist_model->get_smartlist( $this->uri->segment( 5 ) );
-		
-		//	Process email
-		if ( $this->input->post() ) :
-		
-			//	Validate
-			$this->load->library( 'form_validation' );
-			$this->form_validation->set_rules( 'subject',	'Subject',		'xss_clean|required' );
-			$this->form_validation->set_rules( 'body',		'Email Body',	'xss_clean|required' );
-			
-			if ( $this->form_validation->run() ) :
-				
-				//	Prep the data
-				$this->load->library( 'emailer' );
-				$subject	= strip_tags( $this->input->post( 'subject' ) );
-				
-				if ( $this->input->post( 'auto_html' ) ) :
-				
-					$this->load->library( 'typography' );
-					$body = auto_typography( strip_tags( $this->input->post( 'body' ), '<a><b><i><u><strike><h1></h1><img>' ) );
-					
-				else :
-				
-					$body = strip_tags( $this->input->post( 'body' ), '<a><b><i><u><strike><h1></h1><img>' );
-				
-				endif;
-				
-				//	Get the users and queue up the email.
-				$users = $this->admin_smartlist_model->get_users_for_smartlist( $this->data['smartlist']->id );
-				foreach ( $users AS $u ) :
-				
-					$email			= NULL;
-					$email->to		= $u->email;
-					$email->type	= 'adhoc';
-					$email->data	= array(
-					
-						//'login_url'				=> 'auth/login/with_hashes/' . md5( $u->user_id ) . '/' . md5( $u->password ),
-						//'unsubscribe_url'			=> urlencode( 'intern/cv/email_prefs' ),
-						'hide_signoff'				=> TRUE,
-						'user_id'					=> $u->user_id,
-						'user_password'				=> $u->password,
-						'user_email'				=> $u->email,
-						'user_first_name'			=> $u->first_name,
-						'user_last_name'			=> $u->last_name,
-						'email_body'				=> $body,
-						'email_subject'				=> $subject
-					);
-					
-					$this->emailer->queue( $email, 'instant' );
-				
-				endforeach;
-				
-				//	Redirect
-				$this->session->set_flashdata( 'success', 'Email successfully sent to '.count($users).' matched members from the "'.$this->data['smartlist']->title.' smart list!"' );
-				redirect( 'admin/accounts/smart_lists' );
-				return;
-				
-			endif;
-		
-		endif;
-		
-		//	Load views
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'accounts/smartlists/email',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: Export smart list
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_export()
-	{
-		//	Clearly TODO
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: Edit a smart list
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_edit()
-	{
-		//	Clearly TODO
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Smart List: Delete a smart list
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_delete()
-	{
-		if ( $this->admin_smartlist_model->delete( $this->uri->segment( 5 ) ) ) :
-		
-			$this->session->set_flashdata( 'success', 'Smart list deleted successfully.' );
-			redirect( 'admin/accounts/smart_lists' );
-		
-		else :
-		
-			$this->session->set_flashdata( 'error', 'Unable to delete smart list.' );
-			redirect( 'admin/accounts/smart_lists' );
-			
-		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	/**
-	 * Smart List: Create a new smart list
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _smartlist_create()
-	{
-		if ( $this->input->post() ) :
-		
-			if ( $this->admin_smartlist_model->create() ) :
-			
-				$this->session->set_flashdata( 'success', 'Smart List created successfully' );
-			
-			else :
-			
-				$this->session->set_flashdata( 'success', 'There was a problem creating the Smart List' );
-			
-			endif;
-			
-			redirect( 'admin/accounts/smart_lists' );
-			return;
-		
-		endif;
-		
-		//	Get data for view
-		$this->data['tables']		= $this->admin_smartlist_model->get_tables();
-		$this->data['cols']			= $this->admin_smartlist_model->get_columns( $this->data['tables'] );
-		$this->data['operators']	= $this->admin_smartlist_model->get_operators();
-		
-		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'accounts/smartlists/create',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
 	}
 	
 	
@@ -782,67 +497,6 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	
 	/**
-	 * Delete a user's profile image
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function delete_profile_img()
-	{
-		$_uid = $this->uri->segment( 4 );
-		
-		if ( $this->user->delete_profile_image( $_uid ) ) :
-		
-			$this->session->set_flashdata( 'success', 'Successfully Removed!' );
-			
-		else:
-		
-			$this->session->set_flashdata( 'error', 'Error!' );
-			
-		endif;
-		
-		redirect( 'admin/accounts/edit/' . $_uid );
-	
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Delete a user's CV
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function delete_user_cv()
-	{
-	
-		$_uid = $this->uri->segment( 4 );
-		
-		if ( $this->user->delete_cv( $_uid ) ) :
-		
-			$this->session->set_flashdata( 'success', 'Successfully Removed!' );
-			
-		else:
-		
-			$this->session->set_flashdata( 'error', 'Error!' );
-			
-		endif;
-		
-		redirect( 'admin/accounts/edit/' . $_uid );
-	
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
 	 * Delete a user account
 	 *
 	 * @access	public
@@ -1144,24 +798,17 @@ class NAILS_Accounts extends Admin_Controller {
 	// --------------------------------------------------------------------------
 	
 	
-	/**
-	 * Manage suer ACL's
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Gary
-	 **/
-	public function user_access()
+	public function groups()
 	{
-		$this->data['groups'] = $this->user->get_groups();
+		//	Set method info
+		$this->data['page']->admin_m	= 'groups';
+		$this->data['page']->title		= 'Manage User Groups';
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
-		$this->nails->load_view( 'admin/accounts/user_access',	'modules/admin/views/accounts/user_access',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
+		$this->load->view( 'admin/coming_soon',		$this->data );
+		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
 	}
 	
 	
@@ -1178,6 +825,12 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function edit_group()
 	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'edit_groups';
+		$this->data['page']->title		= 'Edit Group';
+		
+		// --------------------------------------------------------------------------
+		
 		$_gid = $this->uri->segment( 4, NULL );
 		
 		// --------------------------------------------------------------------------
@@ -1241,6 +894,36 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->nails->load_view( 'admin/accounts/edit_group',	'modules/admin/views/accounts/edit_group',	$this->data );
 		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Manage suer ACL's
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Gary
+	 **/
+	public function user_access()
+	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'user_access';
+		$this->data['page']->title		= 'Manage User Access';
+		
+		// --------------------------------------------------------------------------
+		
+		$this->data['groups'] = $this->user->get_groups();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/accounts/user_access',	'modules/admin/views/accounts/user_access',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+	}
 }
 
 
@@ -1265,13 +948,13 @@ class NAILS_Accounts extends Admin_Controller {
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
  * 
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
  * 
  **/
  
-if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_ACCOUNTS' ) ) :
 
 	class Accounts extends NAILS_Accounts
 	{

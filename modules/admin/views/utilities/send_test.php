@@ -56,7 +56,7 @@
 	
 <?php
 
-	echo form_submit( 'submit', 'Save Test Email', 'class="awesome"' );
+	echo form_submit( 'submit', 'Send Test Email' );
 	echo form_close();
 	
 ?>

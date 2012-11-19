@@ -6,7 +6,8 @@
 	th.email, td.email		{ width: auto }
 	th.group,td.group		{ width: 70px }
 	th.options, td.options	{ width: 100px; }
-	td.profile_img			{ width:40px; }
+	td.img					{ width:40px; }
+	td.img img				{ vertical-align: middle; }
 	td.cv					{ width:40px; text-align: center; color: #e7e7e7; }
 	td.percentage			{ width:20px; text-align: center; }
 	td.score				{ width:20px; text-align: center; }
@@ -14,7 +15,6 @@
 	td#no_records			{ height: 75px; text-align: center; color: #aaa; text-transform: uppercase; }
 			
 </style>
-
 
 <section class="filter-box">
 	<p>
@@ -88,7 +88,7 @@
 					
 						if ( ! empty( $u->profile_img ) ) :
 						
-							echo anchor( CDN_SERVER . 'profile_images/' . $u->profile_img, img( cdn_thumb( 'profile_images', $u->profile_img, 35, 35 ) ), 'class="fancybox"' );
+							echo anchor( cdn_serve( 'profile-images', $u->profile_img ), img( cdn_thumb( 'profile_images', $u->profile_img, 35, 35 ) ), 'class="fancybox"' );
 						
 						else :
 						
@@ -119,7 +119,7 @@
 							//	Can't do any of these functions to yourself
 							if ( $u->id != active_user( 'id' ) ) :
 							
-								//echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="awesome small red"' );
+								echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="awesome small red"' );
 							
 								if( ! $u->active )
 									echo anchor( 'admin/accounts/activate/' . $u->id . $return_string, 'Activate', 'class="awesome small green"' );
@@ -152,63 +152,5 @@
 	</table>
 	
 </section>
-	
-<aside>
 
-	<!--	PAGINATION	-->
-	<?php
-	
-	if ( isset( $pagination ) ) :
-	
-		//	Prep the vars
-		$order_col	= $pagination->order->column;
-		$order_dir	= $pagination->order->direction;
-	
-	?>
-	<ul class="pagination">
-	
-		<?php
-		
-			if ( $pagination->page != 0 ) :
-			
-				$prev = ( $pagination->page - 1 >= 0 ) ? $pagination->page-1 : 0;
-				echo '<li class="previous start">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/0' . $search . $filter, '&laquo;', 'class="awesome"' ) . '</li>';
-				echo '<li class="previous">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $prev . $search . $filter, '&lsaquo;', 'class="awesome"' ) . '</li>';
-			
-			else :
-			
-				echo '<li class="previous start disabled"><a href="#" class="awesome" onclick="return false;">&laquo;</a></li>';
-				echo '<li class="previous disabled"><a href="#" class="awesome" onclick="return false;">&lsaquo;</a></li>';
-				
-			endif;
-			
-		?>
-		
-		<li class="info">Page <strong><?php $pagination->page++; echo $pagination->page;?></strong> / <?=( $pagination->num_pages == 0 ) ? 1 : $pagination->num_pages?></li>
-		
-		
-		<?php
-		
-			if  ($pagination->page != $pagination->num_pages && $pagination->num_pages != 0 ) :
-				
-				$next = ( $pagination->page < $pagination->num_pages ) ? $pagination->page : $pagination->num_pages - 1;
-				$pagination->num_pages--;
-				
-				echo '<li class="next">'		. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $next . $search . $filter, '&rsaquo;', 'class="awesome"' ) . '</li>';
-				echo '<li class="next end">'	. anchor( 'admin/accounts/' . $method . '/' . $order_col . '/' . $order_dir . '/' . $pagination->num_pages . $search . $filter, '&raquo;', 'class="awesome"' ) . '</li>';
-			
-			else :
-			
-				echo '<li class="next end disabled"><a href="#" class="awesome" onclick="return false;">&rsaquo;</a></li>';
-				echo '<li class="next disabled"><a href="#"  class="awesome" onclick="return false;">&raquo;</a></li>';
-	
-			endif;
-			
-		?>
-	</ul>
-	<?php endif; ?>
-	
-</aside>
-
-<!--	CLEARFIX -->
-<div class="clear"></div>
+<!--	TODO: Pagination	-->

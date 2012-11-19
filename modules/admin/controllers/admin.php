@@ -60,13 +60,13 @@ class NAILS_Admin extends NAILS_Controller {
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
  * 
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
  * 
  **/
  
-if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_ADMIN' ) ) :
 
 	class Admin extends NAILS_Admin
 	{

@@ -2,7 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8" />
-	<title>Admin - <?=( isset( $page->title ) ) ? $page->title . ' - ' : NULL?><?=APP_NAME?></title>	
+	<title>
+	<?php
+		
+		echo 'Admin - ';
+		echo isset( $page->module->name ) ? $page->module->name . ' - ' : NULL;
+		echo isset( $page->title ) ? $page->title . ' - ' : NULL;
+		echo APP_NAME;
+				
+	?></title>	
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />
 	
@@ -48,6 +56,7 @@
 			
 			<li style="display:block;margin-bottom:4px;"><a href="<?=site_url( 'admin' )?>" style="font-size:18px;font-weight:bold;color:#fff;"><?=APP_NAME?> Administration</a></li>
 			<li><?=anchor( 'admin', 'Home' )?></li>
+			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name . '</li>' : NULL?></li>
 			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title . '</li>' : NULL?></li>
 		
 		</ul>
@@ -55,7 +64,7 @@
 		<ul class="right shaded">
 		
 			<li><?=anchor( '/', 'Switch to Front End')?></li>
-			<li style="color:#999;">Logged in as <a href="#"><?=active_user( 'first_name' )?></a></li>
+			<li style="color:#999;">Logged in as <?=anchor( 'admin/accounts/edit/' . active_user( 'id' ), active_user( 'first_name' ) )?></li>
 			<li class="logout"><?=anchor( 'auth/logout', 'Logout' )?><?=anchor( 'auth/logout', '' )?></li>
 		
 		</ul>

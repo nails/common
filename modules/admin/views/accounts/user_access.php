@@ -1,29 +1,4 @@
-<style type="text/css">
 
-	.permissions ul
-	{
-	
-	}
-	
-	.permissions li
-	{
-		font-size:12px;
-		margin:0;
-		padding:0;
-	}
-	
-	.permissions ul ul
-	{
-		margin:0;
-	}
-	.permissions li li
-	{
-		font-size:9px;
-		line-height:12px;
-		list-style-type:none;
-	}
-
-</style>
 
 <h1>Manage User Access</h1>
 <p>
@@ -102,8 +77,8 @@
 				</ul>
 			</td>
 			<td>
-				<?=anchor( 'admin/accounts/edit_group/' . $group->id, 'Edit', 'class="a-button a-button-small"' )?>
-				<?=anchor( 'admin/accounts/delete_group', 'Delete', 'class="a-button a-button-red a-button-small"' )?>
+				<?=anchor( 'admin/accounts/edit_group/' . $group->id, 'Edit', 'class="awesome small"' )?>
+				<?=anchor( 'admin/accounts/delete_group', 'Delete', 'class="awesome small red"' )?>
 			</td>
 		</tr>
 	

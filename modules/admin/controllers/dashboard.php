@@ -51,14 +51,7 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Only announce the controller if the user has permisison to know about it
-		$_acl = active_user( 'acl' );
-		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( __FILE__, '.php' ), $_acl['admin'] ) === FALSE ) )
-			return NULL;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Hey user! Pick me! Pick me!
-		return $d;
+		return self::_can_access( $d, __FILE__ );
 	}
 	
 	
@@ -114,6 +107,12 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	public function help()
 	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'help';
+		$this->data['page']->title		= 'Help';
+		
+		// --------------------------------------------------------------------------
+		
 		//	Load model
 		$this->load->model( 'admin_help_model' );
 		
@@ -125,9 +124,9 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'dashboard/help',		$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
+		$this->nails->load_view( 'admin/dashboard/help/overview',	'modules/admin/views/dashboard/help/overviewh',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
 	}
 
 }
@@ -154,13 +153,13 @@ class NAILS_Dashboard extends Admin_Controller {
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
  * 
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
  * 
  **/
  
-if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_DASHBOARD' ) ) :
 
 	class Dashboard extends NAILS_Dashboard
 	{
