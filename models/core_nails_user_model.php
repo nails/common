@@ -378,54 +378,68 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
 		
-		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Join Tables
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',			'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',	'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',			'left' );
 		
-		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Set Order
 		if ( is_array( $order ) )
 			$this->db->order_by( $order[0], $order[1] );
 		
-		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Set Limit
 		if ( is_array( $limit ) )
 			$this->db->limit( $limit[0], $limit[1] );
 		
-		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Set Where
 		if ( $where )
 			$this->db->where( $where );
 		
-		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Set Search
 		if ( $search ) :
 		
-			//	User table
-			$this->db->like( 'u.id', $search );
-			$this->db->or_like( 'u.email', $search );
-			$this->db->or_like( 'u.username', $search );
+			//	Build the query so that any existing wheres are considered AS WELL AS the search terms
 			
-			//	User Meta
-			$this->db->or_like( 'um.first_name', $search );
-			$this->db->or_like( 'um.last_name', $search );
+			if ( $where ) :
+			
+				//	Existing where, build it the hard way
+				$_where  = '(';
+				
+				//	User
+				$_where .= '`u`.`id` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`u`.`email` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`u`.`username` LIKE \'%' . $search . '%\' OR';
+				
+				//	User Meta
+				$_where .= '`um`.`first_name` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`um`.`last_name` LIKE \'%' . $search . '%\' OR';
+				
+				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+			
+			else :
+
+				//	No existing wheres, build it the easy way
+							
+				//	User table
+				$this->db->like( 'u.id', $search );
+				$this->db->or_like( 'u.email', $search );
+				$this->db->or_like( 'u.username', $search );
+				
+				//	User Meta
+				$this->db->or_like( 'um.first_name', $search );
+				$this->db->or_like( 'um.last_name', $search );
+			
+			endif;
 			
 		endif;
 		
@@ -757,10 +771,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	{
 		$data = (array) $data;
 		
-		//	Set some key information relevant to every update
-		$_last_update = time();
-		$this->db->set( 'u.last_update', $_last_update );
-		
 		//	Get the user ID to update
 		if ( ! is_null( $user_id ) && $user_id !== FALSE ) :
 		
@@ -782,14 +792,38 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		//	If there's some data we'll need to know the columns of `user`
 		//	We also want to unset any 'dangerous' items then set it for the query
+		
 		if ( $data ) :
 		
-			$_q = $this->db->query( 'DESCRIBE `user`' )->result();
-			foreach ( $_q AS $col ) :
-			
-				$_cols[] = $col->Field;
-			
-			endforeach;
+			//	Set the cols in user (rather than querying the DB)
+			$_cols		= array();
+			$_cols[]	= 'auth_method_id';
+			$_cols[]	= 'group_id';
+			$_cols[]	= 'fb_token';
+			$_cols[]	= 'fb_id';
+			$_cols[]	= 'linkedin_id';
+			$_cols[]	= 'linkedin_token';
+			$_cols[]	= 'linkedin_secret';
+			$_cols[]	= 'ip_address';
+			$_cols[]	= 'last_ip';
+			$_cols[]	= 'username';
+			$_cols[]	= 'password';
+			$_cols[]	= 'password_md5';
+			$_cols[]	= 'salt';
+			$_cols[]	= 'email';
+			$_cols[]	= 'activation_code';
+			$_cols[]	= 'forgotten_password_code';
+			$_cols[]	= 'remember_code';
+			$_cols[]	= 'created_on';
+			$_cols[]	= 'last_login';
+			$_cols[]	= 'last_seen';
+			$_cols[]	= 'active';
+			$_cols[]	= 'temp_pw';
+			$_cols[]	= 'failed_login_count';
+			$_cols[]	= 'failed_login_expires';
+			$_cols[]	= 'last_update';
+			$_cols[]	= 'user_acl';
+			$_cols[]	= 'login_count';
 			
 			//	Safety first, no updating of user's ID.
 			unset( $data->id );
@@ -801,10 +835,10 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			if (  array_key_exists( 'email', $data ) ) :
 			
 				//	Exclude the current user, we're only interested in other users
-				$this->db->where( 'u.id !=', $_uid );
-				$_u = $this->get_user_by_email( $data['email'] );
+				$this->db->where( 'u.id !=', (int) $_uid );
+				$this->db->where( 'u.email', $data['email'] );
 				
-				if ( $_u ) :
+				if ( $this->db->count_all_results( 'user u' ) ) :
 				
 					//	We found a user who isn't the current user who is already
 					//	using this email address.
@@ -814,7 +848,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 				endif;
 			
 			endif;
-			
 			
 			//	If we're updating the user's password we should generate a new hash			
 			if (  array_key_exists( 'password', $data ) ) :
@@ -827,58 +860,64 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			endif;
 			
+			//	Set the data
+			$_data_user	= array();
+			$_data_meta	= array();
 			
-			//	Join the user_meta table
-			//	'Hack' as described here: http://stackoverflow.com/a/4830568
-			$this->db->where( 'um.user_id = u.id' );
-			
-			//	Add the data
 			foreach ( $data AS $key => $val ) :
 			
 				//	user or user_meta?
 				if ( array_search( $key, $_cols ) !== FALSE ) :
 				
-					$this->db->set( 'u.' . $key, $val );
+					$_data_user[$key] = $val;
 				
 				else :
 				
-					$this->db->set( 'um.' . $key, $val );
+					$_data_meta[$key] = $val;
 				
 				endif;
 			
 			endforeach;
+			
+			//	Update the user table
+			$this->db->where( 'id', (int) $_uid );
+			$this->db->set( 'last_update', time() );
+			
+			if ( $_data_user ) :
+			
+				$this->db->set( $_data_user );
+				
+			endif;
+			
+			//	Update the meta table
+			$this->db->update( 'user' );
+			
+			if ( $_data_meta ) :
+			
+				$this->db->where( 'user_id', (int) $_uid );
+				$this->db->set( $_data_meta );
+				$this->db->update( 'user_meta' );
+			
+			endif;
+		
+		else :
+		
+			//	If there was no data then run an update anyway on just user table. We need to do this
+			//	As some methods will use $this->db->set() before calling update(); not sure if this is
+			//	a bad design or not... sorry.
+			
+			$this->db->set( 'last_update', time() );
+			$this->db->where( 'id', (int) $_uid );
+			$this->db->update( 'user' );
 		
 		endif;
-		
-		
-		// --------------------------------------------------------------------------
-		
-		
-		//	Set the user ID to update
-		
-		$this->db->where( 'u.id', $_uid );
-		
-		
-		// --------------------------------------------------------------------------
-		
-		
-		//	Set some key information relevant to every update
-		$this->db->set( 'u.last_update', time() );
-		
-		
-		// --------------------------------------------------------------------------
-		
-		
-		//	Perform the update
-		$this->db->update( 'user u, user_meta um' );
-		
 		
 		// --------------------------------------------------------------------------
 		
 		//	If we just updated the active user we should probably update their session info
 		if ( $_uid == active_user( 'id' ) ) :
 		
-			$this->active_user->last_update = $_last_update;
+			$this->active_user->last_update = time();
 			
 			if ( $data ) :
 			
@@ -890,8 +929,10 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			endif;
 			
-			//	If there's a remember me cookie then update that too
-			if ( $this->is_remembered() ) :
+			//	If there's a remember me cookie then update that too, but only if the password
+			//	or email address has changed
+			
+			if ( ( isset( $data['email'] ) || isset( $data['email'] ) ) && $this->is_remembered() ) :
 			
 				$this->set_remember_cookie();
 			
@@ -899,8 +940,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		endif;
 		
-		return TRUE;
+		// --------------------------------------------------------------------------
 		
+		return TRUE;
 	}
 	
 	
@@ -1877,6 +1919,40 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		return $_groups;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Returns an array of user groups
+	 *
+	 * @access	public
+	 * @param	string
+	 * @param	string
+	 * @param	array
+	 * @param	string
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	public function get_groups_flat()
+	{
+		$_groups	= $this->get_groups();
+		$_out		= array();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Loop through results and unserialise the acl
+		foreach( $_groups AS $group ) :
+		
+			$_out[$group->id] = $group->name;
+			
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
 	}
 	
 	

@@ -104,6 +104,7 @@ class NAILS_Override extends NAILS_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Prep recovery data
+		$_recovery_data						= new stdClass();
 		$_recovery_data->id					= md5( active_user( 'id' ) );
 		$_recovery_data->hash				= md5( active_user( 'password' ) );
 		$_recovery_data->email				= active_user( 'email' );

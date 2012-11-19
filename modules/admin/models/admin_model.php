@@ -71,6 +71,8 @@ class Admin_Model extends NAILS_Model
 				if ( $_details ) :
 				
 					$_out = $_details;
+					$_out->class_name = $module;
+					
 					break;
 					
 				endif;

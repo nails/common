@@ -1,3 +1,6 @@
+<?php
+	$method = $this->uri->segment( 3, 'index' );
+?>
 <!--	OVERRIDE STYLES	-->
 <style type="text/css">
 				
@@ -27,6 +30,36 @@
 </section>
 
 <hr>
+
+<aside style="padding:20px 0px;">
+	<?php
+		
+		$_url		 = $this->uri->segment( 4 );
+		$_url 		= $_url == 0 ? 'NEWEST' : '/' . ( $_url-1);
+		$_search	= $this->input->get( 'search' ) ? '?search=' . $this->input->get( 'search' ) : '';
+		
+		if ( $_url != 'NEWEST' ) :
+		
+			echo anchor( 'admin/accounts/' . $method . $_url . $_search, '&lsaquo; Newer', 'class="awesome small"' );
+			echo ' ';
+			echo anchor( 'admin/accounts/' . $method . $_search, '&laquo; Newest', 'class="awesome small"' );
+		
+		endif;
+		
+		
+		if ( $this->uri->segment( 4 ) + 1 <= $total_pages ) :
+		
+			$_url = '/' . ( $this->uri->segment( 4 ) + 1 );
+			echo anchor( 'admin/accounts/' . $method . $_url . $_search, 'Older &rsaquo;', 'class="right awesome small"' );
+			echo anchor( 'admin/accounts/' . $method . '/' . $total_pages . $_search, 'Oldest &raquo;', 'class="right awesome small"' );
+		
+		endif;
+		
+	?>
+	
+	<!--	CLEARFIX	-->
+	<div class="clear"></div>
+</aside>
 
 <!--	START RENDERING TABLE	-->
 <section>		
@@ -88,7 +121,7 @@
 					
 						if ( ! empty( $u->profile_img ) ) :
 						
-							echo anchor( cdn_serve( 'profile-images', $u->profile_img ), img( cdn_thumb( 'profile_images', $u->profile_img, 35, 35 ) ), 'class="fancybox"' );
+							echo anchor( cdn_serve( 'profile-images', $u->profile_img ), img( cdn_thumb( 'profile-images', $u->profile_img, 35, 35 ) ), 'class="fancybox"' );
 						
 						else :
 						
@@ -118,8 +151,6 @@
 							
 							//	Can't do any of these functions to yourself
 							if ( $u->id != active_user( 'id' ) ) :
-							
-								echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="awesome small red"' );
 							
 								if( ! $u->active )
 									echo anchor( 'admin/accounts/activate/' . $u->id . $return_string, 'Activate', 'class="awesome small green"' );
@@ -153,4 +184,33 @@
 	
 </section>
 
-<!--	TODO: Pagination	-->
+<aside style="padding:20px 0px;">
+	<?php
+		
+		$_url		= $this->uri->segment( 4 );
+		$_url		= $_url == 0 ? 'NEWEST' : '/' . ( $_url-1);
+		$_search	= $this->input->get( 'search' ) ? '?search=' . $this->input->get( 'search' ) : '';
+		
+		if ( $_url != 'NEWEST' ) :
+		
+			echo anchor( 'admin/accounts/' . $method . $_url . $_search, '&lsaquo; Newer', 'class="awesome small"' );
+			echo ' ';
+			echo anchor( 'admin/accounts/' . $method . $_search, '&laquo; Newest', 'class="awesome small"' );
+		
+		endif;
+		
+		
+		if ( $this->uri->segment( 4 ) + 1 <= $total_pages ) :
+		
+			$_url = '/' . ( $this->uri->segment( 4 ) + 1 );
+			echo anchor( 'admin/accounts/' . $method . $_url . $_search, 'Older &rsaquo;', 'class="right awesome small"' );
+			echo anchor( 'admin/accounts/' . $method . '/' . $total_pages . $_search, 'Oldest &raquo;', 'class="right awesome small"' );
+		
+		endif;
+		
+	?>
+	
+	<!--	CLEARFIX	-->
+	<div class="clear"></div>
+	
+</aside>

@@ -318,6 +318,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		return TRUE;
 	}
 	
+	// --------------------------------------------------------------------------
+	
 	
 	/**
 	 * Checks if a string is in valid UK postcode format
@@ -334,6 +336,31 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		
 		$pattern = '/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/';
 		return preg_match( $pattern, strtoupper( $str ) ) ? TRUE : FALSE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a string is in valid UK postcode format
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function valid_date( $day, $monthyear )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'valid_date', '%s is not a valid date.' );
+		
+		list( $month, $year ) = explode( '.', $monthyear );
+		
+		$month	= $CI->input->post( $month );
+		$year	= $CI->input->post( $year );
+		
+		return checkdate( $month, $day, $year );
 	}
 	
 }

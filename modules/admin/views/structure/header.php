@@ -96,37 +96,39 @@
 		<?php if ( isset( $loaded_modules ) ) : foreach ( $loaded_modules AS $module => $config ) : ?>
 		
 			<div class="box" id="box_<?=url_title( $config->name )?>">
-			<h2 title=""><?=$config->name?> <a href="#" class="toggle">close</a></h2>
-			<ul class="box-container">
-			
-				<?php foreach( $config->funcs AS $method => $label ) : ?>
-				
-					<?php if ($method == 'su' ) : ?>
+				<h2 title=""><?=$config->name?> <a href="#" class="toggle">close</a></h2>
+				<div class="box-container">
+					<ul>
 					
-						<?php if ( ! $user->is_superuser() ) continue ?>
-					
-						<?php foreach ( $label AS $su_method => $su_label ) : ?>
+						<?php foreach( $config->funcs AS $method => $label ) : ?>
 						
+							<?php if ($method == 'su' ) : ?>
+							
+								<?php if ( ! $user->is_superuser() ) continue ?>
+							
+								<?php foreach ( $label AS $su_method => $su_label ) : ?>
+								
+									<li>
+										&rsaquo;
+										<?=anchor( 'admin/' . $module . '/' . $su_method, $su_label )?>
+									</li>
+								
+								<?php endforeach; ?>
+								
+							<?php continue; ?>
+							
+							<?php endif; ?>
+							
+							
 							<li>
 								&rsaquo;
-								<?=anchor( 'admin/' . $module . '/' . $su_method, $su_label )?>
+								<?=anchor( 'admin/' . $module . '/' . $method, $label )?>
 							</li>
-						
+							
 						<?php endforeach; ?>
 						
-					<?php continue; ?>
-					
-					<?php endif; ?>
-					
-					
-					<li>
-						&rsaquo;
-						<?=anchor( 'admin/' . $module . '/' . $method, $label )?>
-					</li>
-					
-				<?php endforeach; ?>
-				
-			</ul>
+					</ul>
+				</div>
 			</div>
 		
 		

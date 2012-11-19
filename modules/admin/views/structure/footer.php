@@ -30,6 +30,11 @@
 			
 			// --------------------------------------------------------------------------
 			
+			//	Fancyboxes
+			$( '.fancybox' ).fancybox();
+			
+			// --------------------------------------------------------------------------
+			
 			//	Scroll to first field error
 			var _inline	= $( 'div.field.error:visible' );
 			var _scroll;

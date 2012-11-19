@@ -46,6 +46,7 @@ class NAILS_Utilities extends Admin_Controller {
 		
 		//	Navigation options
 		$d->funcs['test_email']		= 'Send Test Email';			//	Sub-nav function.
+		$d->funcs['user_access']	= 'Manage User Access';		//	Sub-nav function.
 
 		
 		// --------------------------------------------------------------------------
@@ -110,6 +111,120 @@ class NAILS_Utilities extends Admin_Controller {
 		//	Load views
 		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
 		$this->nails->load_view( 'admin/utilities/send_test',	'modules/admin/views/utilities/send_test',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Manage user groups ACL's
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Gary
+	 **/
+	public function user_access()
+	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'user_access';
+		$this->data['page']->title		= 'Manage User Access';
+		
+		// --------------------------------------------------------------------------
+		
+		$this->data['groups'] = $this->user->get_groups();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',			$this->data );
+		$this->nails->load_view( 'admin/utilities/user_access',	'modules/admin/views/utilities/user_access',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',			$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Edit a group
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function edit_group()
+	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'edit_groups';
+		$this->data['page']->title		= 'Edit Group';
+		
+		// --------------------------------------------------------------------------
+		
+		$_gid = $this->uri->segment( 4, NULL );
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->post() ) :
+		
+			$this->load->library( 'form_validation' );
+			
+			$this->form_validation->set_rules( 'display_name',			'Display Name',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'name',					'Slug',				'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',			'Description',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'default_homepage',		'Default Homepage', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'acl[]',					'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[superuser]',		'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin]',			'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[intern]',			'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[employer_manager]',	'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[employer_team]',	'Permissions', 		'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin][]',			'Permissions', 		'xss_clean' );
+			
+			if ( $this->form_validation->run() ) :
+			
+				$_data = array();
+				$_data['display_name']		= $this->input->post( 'display_name' );
+				$_data['name']				= $this->input->post( 'name' );
+				$_data['description']		= $this->input->post( 'description' );
+				$_data['default_homepage']	= $this->input->post( 'default_homepage' );
+				$_data['acl']				= serialize( $this->input->post( 'acl' ) );
+				
+				$this->user->update_group( $_gid, $_data );
+				
+				$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
+				redirect( 'admin/utilities/user_access' );
+				return;
+				
+			else :
+			
+				$this->data['error'] = validation_errors();
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->data['group'] = $this->user->get_group( $_gid );
+		
+		if ( ! $this->data['group'] ) :
+		
+			$this->session->set_flashdata( 'error', 'Group does not exist.' );
+			redirect( 'admin/utilities/user_access' );
+		
+		endif;
+		
+		$this->data['admin_modules'] = $this->_loaded_modules;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		$this->nails->load_view( 'admin/utilities/edit_group',	'modules/admin/views/utilities/edit_group',	$this->data );
 		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
 	}
 }

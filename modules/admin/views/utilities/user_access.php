@@ -1,5 +1,3 @@
-
-
 <h1>Manage User Access</h1>
 <p>
 	Manage how groups of user's can interface with the site, e.g: grant a specific group access to admin and specify which parts of admin they can view.
@@ -7,9 +5,7 @@
 
 <hr />
 
-
 <table>
-
 	<thead>
 		<tr>
 			<th>Name</th>
@@ -77,13 +73,12 @@
 				</ul>
 			</td>
 			<td>
-				<?=anchor( 'admin/accounts/edit_group/' . $group->id, 'Edit', 'class="awesome small"' )?>
-				<?=anchor( 'admin/accounts/delete_group', 'Delete', 'class="awesome small red"' )?>
+				<?=anchor( 'admin/utilities/edit_group/' . $group->id, 'Edit', 'class="awesome small"' )?>
+				<?=anchor( 'admin/utilities/delete_group', 'Delete', 'class="awesome small red"' )?>
 			</td>
 		</tr>
 	
 	<?php endforeach; ?>
 	
 	</tbody>
-
 </table>
