@@ -27,10 +27,10 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		
 		$_help			= array();
-		$_help['src']	= isset( $help['key'] ) ? $help['key'] : 'assets/img/form/help.png';
-		$_help['class']	= isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
 		$_error			= form_error( $_field['key'] ) ? 'error' : '';
@@ -123,10 +123,10 @@ if ( ! function_exists( 'form_field_date' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= isset( $help['key'] ) ? $help['key'] : 'assets/img/form/help.png';
-		$_help['class']	= isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
 		$_error = form_error( $_field['key'] . '_year' ) || form_error( $_field['key'] . '_month' ) || form_error( $_field['key'] . '_day' ) ? 'error' : '';
@@ -223,10 +223,10 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= isset( $help['key'] ) ? $help['key'] : 'assets/img/form/help.png';
-		$_help['class']	= isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
 		$_error = form_error( $_field['key'] ) ? 'error' : '';
@@ -305,10 +305,10 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= isset( $help['key'] ) ? $help['key'] : 'assets/img/form/help.png';
-		$_help['class']	= isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
 		$_error = form_error( $_field['key'] ) ? 'error' : '';
@@ -414,10 +414,10 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= isset( $help['key'] ) ? $help['key'] : 'assets/img/form/help.png';
-		$_help['class']	= isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
 		$_error = form_error( $_field['key'] ) ? 'error' : '';
