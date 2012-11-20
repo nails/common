@@ -352,66 +352,103 @@ class NAILS_Accounts extends Admin_Controller {
 			//	Data is valid and there'll be some form of admin after the update; ALL GOOD :]
 			if ( $this->form_validation->run( $this ) && $_admins ) :
 			
-				//	Set `user` data
+				//	Define the data var
 				$_data = array();
-				$_data['group_id']		= $_post['group_id'];
-				$_data['temp_pw']		= string_to_boolean( $_post['temp_pw'] );
-				$_data['first_name']	= $_post['first_name'];
-				$_data['last_name']		= $_post['last_name'];
-				$_data['email']			= $_post['email'];
-				$_data['username']		= $_post['username'];
-				
-				if ( $_post['password'] ) :
-				
-					$_data['password']	= $_post['password'];
-				
-				endif;
-				
-				//	Set `user_meta` data
-				foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
-				
-					switch ( $value['datatype'] ) :
-					
-						case 'date' :
-						
-							$_data[$col] = $_post[$col . '_year'] . '-' . $_post[$col . '_month'] . '-' . $_post[$col . '_day'];
-						
-						break;
-						
-						// --------------------------------------------------------------------------
-						
-						case 'bool' :
-						case 'boolean' :
-						
-							//	Convert all to boolean from string
-							$_data[$col] = string_to_boolean( $_post[$col] );
-						
-						break;
-						
-						// --------------------------------------------------------------------------
-						
-						default :
-						
-							$_data[$col] = $_post[$col];
-							
-						break;
-						
-					endswitch;
-					
-				endforeach;
 				
 				// --------------------------------------------------------------------------
 				
-				//	Update account
-				if ( $this->user->update( $_post['id'], $_data ) ) :
+				//	If we have a profile image, attempt to upload it
+				if ( isset( $_FILES['profile_img'] ) && $_FILES['profile_img']['error'] != 4 ) :
 					
-					$this->data['success'] = '<strong>Success!</strong> Updated user ' . title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) . ' (' . $_post['email'] . ')';	
-				
-				//	The account failed to update, feedback to user
-				else:
-				
-					$this->data['error'] = '<strong>Update error:</strong> There was a problem updating the user.';
+					$this->load->library( 'cdn' );
 					
+					$_options					= array();
+					$_options['allowed_types']	= 'jpg|png|gif';
+					$_options['max_size']		= 2097152;	//	2Mb
+					
+					$_filename = $this->cdn->replace( $_user->profile_img, 'profile-images', 'profile_img', $_options );
+					
+					if ( $_filename ) :
+					
+						$_data['profile_img'] = $_filename;
+					
+					else :
+					
+						$this->data['upload_error']	= $this->cdn->errors();
+						$this->data['error']		= '<strong>Update error:</strong> There was a problem uploading the Profile Image.';
+					
+					endif;
+						
+				endif;
+				
+				// --------------------------------------------------------------------------
+				
+				if ( ! isset( $this->data['upload_error'] ) ) :
+				
+					//	Set `user` data
+					$_data['group_id']		= $_post['group_id'];
+					$_data['temp_pw']		= string_to_boolean( $_post['temp_pw'] );
+					$_data['first_name']	= $_post['first_name'];
+					$_data['last_name']		= $_post['last_name'];
+					$_data['email']			= $_post['email'];
+					$_data['username']		= $_post['username'];
+					
+					if ( $_post['password'] ) :
+					
+						$_data['password']	= $_post['password'];
+					
+					endif;
+					
+					//	Set `user_meta` data
+					foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
+					
+						switch ( $value['datatype'] ) :
+						
+							case 'date' :
+							
+								$_data[$col] = $_post[$col . '_year'] . '-' . $_post[$col . '_month'] . '-' . $_post[$col . '_day'];
+							
+							break;
+							
+							// --------------------------------------------------------------------------
+							
+							case 'bool' :
+							case 'boolean' :
+							
+								//	Convert all to boolean from string
+								$_data[$col] = string_to_boolean( $_post[$col] );
+							
+							break;
+							
+							// --------------------------------------------------------------------------
+							
+							default :
+							
+								$_data[$col] = $_post[$col];
+								
+							break;
+							
+						endswitch;
+						
+					endforeach;
+					
+					// --------------------------------------------------------------------------
+					
+					//	Update account
+					if ( $this->user->update( $_post['id'], $_data ) ) :
+						
+						$this->data['success'] = '<strong>Success!</strong> Updated user ' . title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) . ' (' . $_post['email'] . ')';	
+						
+						//	refresh the user object
+						$_user = $this->user->get_user( $_post['id'] );
+					
+					//	The account failed to update, feedback to user
+					else:
+					
+						$this->data['error'] = '<strong>Update error:</strong> There was a problem updating the user.';
+						
+					endif;
+				
 				endif;
 				
 			
@@ -465,66 +502,6 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
 		$this->nails->load_view( 'admin/accounts/edit/index',	'modules/admin/views/accounts/edit/index',	$this->data );
 		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Forecully activate a user
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function activate()
-	{
-		//	Activate user
-		$activated = $this->user->activate( $this->uri->segment( 4 ) );
-		
-		//	Get the user's details
-		$u = $this->user->get_user( $this->uri->segment( 4 ) );
-		
-		//	Define messages
-		if ($activated === FALSE) :
-			$this->session->set_flashdata( 'error',		sprintf( lang( 'action_activate_fail' ),	title_case( $u->first_name . ' ' . $u->last_name ) ) );
-		else :
-			$this->session->set_flashdata( 'success',	sprintf( lang( 'action_activate_ok' ),		title_case( $u->first_name . ' ' . $u->last_name ) ) );
-		endif;
-		
-		redirect( $this->input->get( 'return_to' ) );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Forecully deactivate a user
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function deactivate()
-	{
-		//	Deactivate user
-		$deactivated = $this->auth->deactivate( $this->uri->segment( 4 ) );
-		
-		//	Get the user's details
-		$u = $this->auth->get_user($this->uri->segment(4));
-		
-		//	Define messages
-		if ($deactivated === FALSE) :
-			$this->session->set_flashdata( 'error',		sprintf( lang( 'action_deactivate_fail' ),	title_case( $u->first_name . ' ' . $u->last_name ) ) );
-		else :
-			$this->session->set_flashdata( 'success',	sprintf( lang( 'action_deactivate_ok' ),	title_case( $u->first_name . ' ' . $u->last_name ) ) );
-		endif;
-		
-		redirect( $this->input->get( 'return_to' ) );
 	}
 	
 	
@@ -605,6 +582,59 @@ class NAILS_Accounts extends Admin_Controller {
 		endif;
 		
 		redirect( $this->input->get( 'return_to' ) );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function delete_profile_img()
+	{
+		$_uid = $this->uri->segment( 4 );
+		$_user = $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		if ( ! $_user ) :
+		
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I was unable to find a user by that ID.' );
+			redirect( 'admin/accounts' );
+		
+		else :
+		
+			if ( $_user->profile_img ) :
+			
+				$this->load->library( 'cdn' );
+				
+				if ( $this->cdn->delete( $_user->profile_img, 'profile-images' ) ) :
+				
+					//	Update the user
+					$_data = array();
+					$_data['profile_img'] = NULL;
+					
+					$this->user->update( $_uid, $_data );
+					
+					// --------------------------------------------------------------------------
+					
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Profile image was deleted.' );
+				
+				else :
+				
+					$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I was unable delete this user\'s profile image. The CDN said: "' . implode( '", "', $this->cdn->errors() ) . '"' );
+				
+				endif;
+			
+			else :
+			
+				$this->session->set_flashdata( 'notice', '<strong>Hey!</strong> This user doesn\'t have a profile image to delete.' );
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			redirect( 'admin/accounts/edit/' . $_uid );
+		
+		endif;
 	}
 }
 

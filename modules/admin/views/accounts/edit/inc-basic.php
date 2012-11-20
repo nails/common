@@ -87,6 +87,19 @@
 		
 		// --------------------------------------------------------------------------
 		
+		//	Email verified
+		$_field					= array();
+		$_field['key']			= 'active';
+		$_field['label']		= 'Email verified';
+		$_field['default']		= $user_edit->active ? 'Yes' : 'No';
+		$_field['required']		= FALSE;
+		$_field['placeholder']	= 'The user\'s email address has been verified';
+		$_field['readonly']		= TRUE;
+		
+		echo form_field( $_field );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Username
 		$_field					= array();
 		$_field['key']			= 'username';
@@ -138,11 +151,37 @@
 		
 		// --------------------------------------------------------------------------
 		
+		//	Created On
+		$_field					= array();
+		$_field['key']			= 'last_update';
+		$_field['label']		= 'Modified';
+		$_field['default']		= date( 'jS M Y @ H:i', $user_edit->last_update );
+		$_field['required']		= FALSE;
+		$_field['placeholder']	= 'The time and date the user was last modified';
+		$_field['readonly']		= TRUE;
+		
+		echo form_field( $_field );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Log in count
+		$_field					= array();
+		$_field['key']			= 'login_count';
+		$_field['label']		= 'Log in counter';
+		$_field['default']		= $user_edit->login_count ? $user_edit->login_count : 'Never Logged In';
+		$_field['required']		= FALSE;
+		$_field['placeholder']	= 'The number of times a user has logged in';
+		$_field['readonly']		= TRUE;
+		
+		echo form_field( $_field );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Last Log in
 		$_field					= array();
 		$_field['key']			= 'last_login';
-		$_field['label']		= 'Last Log on';
-		$_field['default']		= date( 'jS M Y @ H:i', $user_edit->last_login );
+		$_field['label']		= 'Last Log in';
+		$_field['default']		= $user_edit->last_login ? date( 'jS M Y @ H:i', $user_edit->last_login ) : 'Never Logged In';
 		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'The time and date the user last logged in';
 		$_field['readonly']		= TRUE;

@@ -999,6 +999,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	public function update_last_login( $user_id )
 	{
 		$this->db->set( 'last_login', time() );
+		$this->db->set( 'login_count', 'login_count+1', FALSE );
 		$this->update( $user_id );
 	}
 	

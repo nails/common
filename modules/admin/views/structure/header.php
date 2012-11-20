@@ -24,15 +24,11 @@
 	<!--	REQUIRED JS	-->
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.tipsy.min.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.fancybox.pack.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.mousewheel.pack.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.easing.pack.js'?>"></script>
+	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.fancybox.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.admin.min.js'?>"></script>
 	
 	<!--	REQUIRED CSS	-->
 	<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/nails.admin.css'?>" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/jquery.tipsy.css'?>" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/jquery.fancybox.css'?>" />
 	
 	<!--	DYNAMIC	-->
 	<?php

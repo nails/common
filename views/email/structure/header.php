@@ -57,9 +57,9 @@
 	
 		echo '<h1>' . $email_subject . '</h1>';
 	
-		if ( isset( $first_name ) ) :
+		if ( isset( $sent_to->first ) && $sent_to->first ) :
 		
-			echo '<p>Hi ' . $first_name . ',</p>';
+			echo '<p>Hi ' . $sent_to->first . ',</p>';
 		
 		endif;
 	

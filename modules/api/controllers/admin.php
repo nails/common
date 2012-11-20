@@ -60,27 +60,6 @@ class Admin extends API_Controller
 		
 		endif;
 	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	public function delete_profile_img()
-	{
-		if ( ! $this->_authorised ) :
-		
-			$this->_out( array(
-				'status'	=> 400,
-				'error'		=> $this->_error
-			) );
-			return;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	TODO
-	}
 }
 
 /* End of file admin.php */

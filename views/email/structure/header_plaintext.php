@@ -4,9 +4,9 @@
 
 <?php
 
-	if ( isset( $first_name ) ) :
+	if ( isset( $sent_to->first ) && $sent_to->first ) :
 	
-		echo 'Hi ' . $first_name . ',' . "\n\n";
+		echo 'Hi ' . $sent_to->first . ',' . "\n\n";
 	
 	endif;
 

@@ -660,6 +660,17 @@ class Event {
 	 **/
 	public function mark_read( $user_id, $event_ids = NULL )
 	{
+		//	Admins logged in as people shouldn't be marking events as read, GHOST MODE, woooooooo
+		//	Ghost mode runs on production only, all other environments behave as normal (for testing)
+		
+		if ( ENVIRONMENT == 'production' && get_userobject()->was_admin() ) :
+		
+			return TRUE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		if ( $event_ids ) :
 		
 			if ( is_array( $event_ids ) ) :
@@ -703,6 +714,17 @@ class Event {
 	 **/
 	public function mark_type_read( $user_id, $types = NULL )
 	{
+		//	Admins logged in as people shouldn't be marking events as read, GHOST MODE, woooooooo
+		//	Ghost mode runs on production only, all other environments behave as normal (for testing)
+		
+		if ( ENVIRONMENT == 'production' && get_userobject()->was_admin() ) :
+		
+			return TRUE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		if ( $types ) :
 		
 			if ( is_array( $types ) ) :

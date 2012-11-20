@@ -124,7 +124,7 @@ class Auth_model extends NAILS_Model
 				if ( $remember )
 					$this->user->set_remember_cookie();
 					
-				//	Update their last login
+				//	Update their last login and increment their login count
 				$this->user->update_last_login( $user->id );
 				
 				// return some helpful data

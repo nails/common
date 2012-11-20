@@ -9,11 +9,10 @@
 	th.email, td.email		{ width: auto }
 	th.group,td.group		{ width: 70px }
 	th.options, td.options	{ width: 100px; }
-	td.img					{ width:40px; }
+	th.id,td.id				{ width:30px; text-align:center; }
+	td.img					{ text-align:center; width:40px; }
 	td.img img				{ vertical-align: middle; }
-	td.cv					{ width:40px; text-align: center; color: #e7e7e7; }
-	td.percentage			{ width:20px; text-align: center; }
-	td.score				{ width:20px; text-align: center; }
+	th.group,td.group		{ text-align:center; }
 	td 						{ text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 	td#no_records			{ height: 75px; text-align: center; color: #aaa; text-transform: uppercase; }
 			
@@ -66,34 +65,18 @@
 	<table id="account_list">
 	
 		<!--	TABLE HEAD	-->
-		<?php if ( ! isset( $order_col ) ) :?>
 		<thead>
 			<tr>
-				<th colspan="img"></td>
-				<th class="first">First Name</th>
-				<th class="last">Last Name</th>
-				<th class="email">Email</th>
-				<th class="group">Group</th>
-				<th class="options">Options</th>
-			</tr>
-		</thead>
-		<?php else : ?>
-		<thead>
-		
-			<tr>
-				
 				<!--	PROFILE IMG, CV, % COMPLETE	& SCORE	-->
-				<th clas=s"img"></th>
+				<th class="id">ID</th>
+				<th class="img">&nbsp;</th>
 				<th class="first">First Name</th>
 				<th class="last">Surname</th>
 				<th class="email">Email</th>
 				<th class="group">Group</th>
 				<th class="options">Options</th>
-			
 			</tr>
-		
 		</thead>
-		<?php endif; ?>
 		<!--	/TABLE HEAD-->
 		
 		
@@ -103,10 +86,8 @@
 			<?php if ( count( $users ) == 0 ) : ?>
 			
 				<tr>
-					<td colspan="6" id="no_records">
-					
+					<td colspan="7" id="no_records">
 						<p>No records found</p>
-					
 					</td>
 				</tr>
 			
@@ -115,7 +96,7 @@
 				<?php foreach ( $users AS $u ) : ?>
 			
 				<tr>
-				
+					<td class="id"><?=number_format( $u->id )?></td>
 					<td class="img">
 					<?php
 					
@@ -131,46 +112,39 @@
 					
 					?>
 					</td>
-					
 					<td class="first"><?=( empty( $u->first_name ) )		? '<span style="color:#ccc;"> &nbsp;&mdash;</span>' : title_case( $u->first_name )?></td>
 					<td class="last"><?=( empty( $u->last_name ) )			? '<span style="color:#ccc;"> &nbsp;&mdash;</span>' : title_case( $u->last_name )?></td>
 					<td class="email"><?=safe_mailto( $u->email )?></td>
 					<td class="group"><?=title_case( str_replace( '_', ' ', $u->group_name ) )?></td>
 					<td class="options">
+					<?php
+					
+						$return_string = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );
 						
-						<?php
+						if ( array_search( $u->group_id, array( 2, 3, 4, 5 ) ) !== FALSE )
+							echo login_as_button( $u->id, $u->password );
 						
-							$return_string = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );
+						//	Edit This User
+						echo anchor( 'admin/accounts/edit/' . $u->id . $return_string, 'Edit', 'class="awesome small"' );
+						
+						
+						//	Can't do any of these functions to yourself
+						if ( $u->id != active_user( 'id' ) ) :
 							
-							if ( array_search( $u->group_id, array( 2, 3, 4, 5 ) ) !== FALSE )
-								echo login_as_button( $u->id, $u->password );
+							if( $u->active == 2 ) :
 							
-							//	Edit This User
-							echo anchor( 'admin/accounts/edit/' . $u->id . $return_string, 'Edit', 'class="awesome small"' );
-							
-							
-							//	Can't do any of these functions to yourself
-							if ( $u->id != active_user( 'id' ) ) :
-							
-								if( ! $u->active )
-									echo anchor( 'admin/accounts/activate/' . $u->id . $return_string, 'Activate', 'class="awesome small green"' );
+								echo anchor( 'admin/accounts/unban/' . $u->id . $return_string, 'Unban', 'class="awesome small"' );
 								
-								if( $u->active == 2 ) :
-								
-									echo anchor( 'admin/accounts/unban/' . $u->id . $return_string, 'Unban', 'class="awesome small"' );
-									
-								else :
-								
-									echo anchor( 'admin/accounts/ban/' . $u->id . $return_string, 'Ban', 'class="awesome small red"' );
-									
-								endif;
+							else :
 							
+								echo anchor( 'admin/accounts/ban/' . $u->id . $return_string, 'Ban', 'class="awesome small red"' );
+								
 							endif;
-							
-						?>
 						
+						endif;
+						
+					?>
 					</td>
-				
 				</tr>
 				
 				<?php endforeach; ?>
