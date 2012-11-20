@@ -8,7 +8,7 @@
 		
 		if ( empty( $user_edit->profile_img ) ) :
 	
-			echo img( array( 'src' => cdn_placeholder( 100, 125, 1 ), 'id' => 'preview_image', 'class' => 'left', 'style' => 'margin-right:10px;' ) );
+			echo img( array( 'src' => cdn_blank_avatar( 100, 125 ), 'id' => 'preview_image', 'class' => 'left', 'style' => 'margin-right:10px;' ) );
 			echo form_upload( 'profile_img' );
 		
 		else :

@@ -603,6 +603,30 @@ class Local_CDN {
 		
 		return site_url( $_out );
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Generates the correct URL for using the placeholder utility
+	 *
+	 * @access	static
+	 * @param	int		$width	The width of the placeholder
+	 * @param	int		$height	The height of the placeholder
+	 * @param	int		border	The width of the border round the placeholder
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_blank_avatar_url( $width = 100, $height = 100, $sex = 'male' )
+	{
+		$_out  = 'cdn/blank_avatar/';
+		$_out .= $width . '/' . $height . '/' . $sex;
+		
+		// --------------------------------------------------------------------------
+		
+		return site_url( $_out );
+	}
 
 	
 	

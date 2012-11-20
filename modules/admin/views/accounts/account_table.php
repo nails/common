@@ -14,7 +14,6 @@
 	td.img img				{ vertical-align: middle; }
 	th.group,td.group		{ text-align:center; }
 	td 						{ text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
-	td#no_records			{ height: 75px; text-align: center; color: #aaa; text-transform: uppercase; }
 			
 </style>
 
@@ -106,7 +105,7 @@
 						
 						else :
 						
-							echo img( cdn_placeholder( 35, 35 ) );
+							echo img( cdn_blank_avatar( 35, 35 ) );
 						
 						endif;
 					

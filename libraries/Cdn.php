@@ -471,6 +471,27 @@ class Cdn {
 	
 	
 	/**
+	 * Calls the driver's static cdn_blank_avatar_url method
+	 *
+	 * @access	static
+	 * @param	int		$width	The width of the placeholder
+	 * @param	int		$height	The height of the placeholder
+	 * @param	mixed	$sex	What blank avatar to show
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_blank_avatar_url( $width = 100, $height = 100, $sex = 'male' )
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_blank_avatar_url( $width, $height, $sex );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Destructor
 	 *
 	 * @access	public

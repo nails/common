@@ -145,6 +145,30 @@ if ( ! function_exists( 'cdn_placeholder' ) )
 
 
 /**
+ * Returns the URL for a blank avatar graphic
+ *
+ * @param	string	$width	The width of the placeholder
+ * @param	string	$height	The height of the placeholder
+ * @param	string	$border	The width of the border, if any
+ * @return	string
+ */
+if ( ! function_exists( 'cdn_blank_avatar' ) )
+{
+	function cdn_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
+	{
+		_cdn_include_library();
+		
+		// --------------------------------------------------------------------------
+		
+		return CDN::cdn_blank_avatar_url( $width, $height, $sex );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * Get the extension of a file from it's mimetype
  *
  * @param	string	$mime_type	The mimetype to look up
