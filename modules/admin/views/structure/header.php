@@ -39,6 +39,9 @@
 	
 	?>
 	
+	<!--	PRINT	-->
+	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_URL . 'css/nails.admin.print.css'?>" />
+	
 	<script type="text/javascript" charset="utf-8">
 		<?=$this->asset->output( 'js-inline' )?>
 	</script>	
