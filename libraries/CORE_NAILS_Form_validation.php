@@ -360,6 +360,10 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$month	= $CI->input->post( $month );
 		$year	= $CI->input->post( $year );
 		
+		//	If all fields are blank then assume the field is not required
+		if ( $year . $month . $day == '00000000' )
+			return TRUE;
+		
 		return checkdate( $month, $day, $year );
 	}
 	

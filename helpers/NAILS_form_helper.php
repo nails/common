@@ -105,9 +105,16 @@ if ( ! function_exists( 'form_field' ) )
  */
 if ( ! function_exists( 'form_field_date' ) )
 {
-	function form_field_date( $field, $help = '' )
+	function form_field_date( $field, $help = '', $short = FALSE, $start_year = NULL, $end_year = NULL )
 	{
 		$_ci =& get_instance();
+		$_ci->load->helper( 'date' );
+		
+		// --------------------------------------------------------------------------
+		
+		$short		= $short ? $short : FALSE;
+		$start_year	= $start_year ? $start_year : date( 'Y' ) + 5;
+		$end_year	= $end_year ? $end_year : 1900;
 		
 		// --------------------------------------------------------------------------
 		
@@ -172,15 +179,15 @@ if ( ! function_exists( 'form_field_date' ) )
 		
 		//	Input
 		$_out .= dropdown_days( $_field['key'] . '_day', $_dob[2] );
-		$_out .= dropdown_months( $_field['key'] . '_month', FALSE, $_dob[1] );
-		$_out .= dropdown_years( $_field['key'] . '_year', date( 'Y' ), 1900, $_dob[0] );
+		$_out .= dropdown_months( $_field['key'] . '_month', $short, $_dob[1] );
+		$_out .= dropdown_years( $_field['key'] . '_year', $start_year, $end_year, $_dob[0] );
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
 		
 		//	Error
 		if ( $_error ) :
-			$_out .= '<span class="error">Please enter a valid date.</span>';
+			$_out .= '<span class="error">' . form_error( $_field['key'] . '_day' ) . '</span>';
 		endif;
 				
 		$_out .= '</label>';
@@ -269,6 +276,32 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		// --------------------------------------------------------------------------
 		
 		return $_out;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * form_field_dropdow
+ *
+ * Generates a form field (of type select)
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
+if ( ! function_exists( 'form_field_boolean' ) )
+{
+	function form_field_boolean( $field, $help = '' )
+	{
+		$_options		= array();
+		$_options[0]	= 'No';
+		$_options[1]	= 'Yes';
+		
+		return form_field_dropdown( $field, $_options, $help );
 	}
 }
 

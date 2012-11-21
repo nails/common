@@ -226,7 +226,7 @@ if ( ! function_exists( 'dropdown_years' ) )
 		/*** create the select ***/
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">';
 		
-		$select .= "<option value=\"\"";
+		$select .= "<option value=\"0000\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">-</option>\n";
 		
@@ -295,7 +295,7 @@ if ( ! function_exists( 'dropdown_months' ) )
 		
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 		
-		$select .= "<option value=\"\"";
+		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">-</option>\n";
 		
@@ -338,7 +338,7 @@ if ( ! function_exists( 'dropdown_days' ) )
 		
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 		
-		$select .= "<option value=\"\"";
+		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">-</option>\n";
 		
