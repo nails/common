@@ -343,7 +343,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	
 	
 	/**
-	 * Checks if a string is in valid UK postcode format
+	 * Checks if a series of date dropdowns is valid
 	 *
 	 * @param	string
 	 * @return	bool
@@ -365,6 +365,32 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 			return TRUE;
 		
 		return checkdate( $month, $day, $year );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a date has been set
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function date_required( $day, $monthyear )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'date_required', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'date_required', 'The %s field is required.' );
+		
+		list( $month, $year ) = explode( '.', $monthyear );
+		
+		$month	= $CI->input->post( $month );
+		$year	= $CI->input->post( $year );
+		
+		//	If all fields are blank then the rule fails
+		return $year . $month . $day == '00000000' ? FALSE : TRUE;
 	}
 	
 }
