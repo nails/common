@@ -4,8 +4,6 @@
 	echo form_hidden( 'id', $user_edit->id );
 	echo form_hidden( 'email_orig', $user_edit->email );
 	echo form_hidden( 'username_orig', $user_edit->username );
-	
-	echo '<h1>Manage Account &rsaquo; ' . $user_edit->first_name . ' ' . $user_edit->last_name .'</h1>';
 
 	$this->load->view( 'accounts/edit/inc-actions' );
 	$this->load->view( 'accounts/edit/inc-basic' );

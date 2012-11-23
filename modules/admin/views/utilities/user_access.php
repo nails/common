@@ -1,4 +1,3 @@
-<h1>Manage User Access</h1>
 <p>
 	Manage how groups of user's can interface with the site, e.g: grant a specific group access to admin and specify which parts of admin they can view.
 </p>

@@ -348,17 +348,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */	
-	public function valid_date( $day, $monthyear )
+	public function valid_date( $day, $field )
 	{
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'valid_date', '%s is not a valid date.' );
 		
-		list( $month, $year ) = explode( '.', $monthyear );
-		
-		$month	= $CI->input->post( $month );
-		$year	= $CI->input->post( $year );
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
 		
 		//	If all fields are blank then assume the field is not required
 		if ( $year . $month . $day == '00000000' )
@@ -377,20 +375,75 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */	
-	public function date_required( $day, $monthyear )
+	public function date_required( $day, $field )
 	{
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_required', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'date_required', 'The %s field is required.' );
 		
-		list( $month, $year ) = explode( '.', $monthyear );
-		
-		$month	= $CI->input->post( $month );
-		$year	= $CI->input->post( $year );
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
 		
 		//	If all fields are blank then the rule fails
 		return $year . $month . $day == '00000000' ? FALSE : TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a series of date dropdowns is valid
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function valid_datetime( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'valid_datetime', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'valid_datetime', '%s is not a valid datetime.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		$hour	= $CI->input->post( $field . '_hour' );
+		$minute	= $CI->input->post( $field . '_minute' );
+		
+		$_compiled = $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $minute . ':00';
+		
+		//	If all fields are blank then assume the field is not required
+		if ( $_compiled == '0000-00-00 00:00:00' )
+			return TRUE;
+		
+		return date( 'Y-m-d H:i:s', strtotime( $_compiled ) ) == $_compiled;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a datetime has been set
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function datetime_required( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		$hour	= $CI->input->post( $field . '_hour' );
+		$minute	= $CI->input->post( $field . '_minute' );
+		
+		//	If all fields are blank then the rule fails
+		return $year . $month . $day . $hour . $minute == '000000000000' ? FALSE : TRUE;
 	}
 	
 }

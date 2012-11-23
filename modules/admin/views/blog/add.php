@@ -179,11 +179,6 @@
 	
 </script>
 
-
-<h1>
-	Blog &rsaquo; Write New Post
-</h1>
-
 <p>
 	Compose your new blog post using this form.
 	<?=anchor( 'admin/blog', 'Back to Post Listing', 'class="a-button a-button-small right"' )?>

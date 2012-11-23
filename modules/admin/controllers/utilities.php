@@ -158,12 +158,6 @@ class NAILS_Utilities extends Admin_Controller {
 	 **/
 	public function edit_group()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'edit_groups';
-		$this->data['page']->title		= 'Edit Group';
-		
-		// --------------------------------------------------------------------------
-		
 		$_gid = $this->uri->segment( 4, NULL );
 		
 		// --------------------------------------------------------------------------
@@ -219,6 +213,12 @@ class NAILS_Utilities extends Admin_Controller {
 		endif;
 		
 		$this->data['admin_modules'] = $this->_loaded_modules;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set method info
+		$this->data['page']->admin_m	= 'edit_groups';
+		$this->data['page']->title		= 'Edit Group (' . $this->data['group']->display_name . ')';
 		
 		// --------------------------------------------------------------------------
 		

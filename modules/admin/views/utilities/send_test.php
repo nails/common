@@ -1,4 +1,3 @@
-<h1>Send Test Email</h1>	
 <p>
 	Use this form to send a test email, useful for testing that emails being sent are received by the end user.
 </p>

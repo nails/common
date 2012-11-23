@@ -295,11 +295,11 @@ class NAILS_Accounts extends Admin_Controller {
 						//	Dates must validate
 						if ( isset( $value['validation'] ) ) :
 						
-							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|' . $value['validation'] . '|valid_date[' . $col . '_month.' . $col . '_year]' );
+							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|' . $value['validation'] . '|valid_date[' . $col . ']' );
 							
 						else :
 						
-							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|valid_date[' . $col . '_month.' . $col . '_year]' );
+							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|valid_date[' . $col . ']' );
 						
 						endif;
 					
