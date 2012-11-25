@@ -309,6 +309,16 @@ class Local_CDN {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Check bucket is writeable
+		if ( ! is_writable( CDN_PATH . $_data['bucket'] ) ) :
+		
+			$this->_error( 'The target directory is not writable.' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	If a certain filename has been specified then send that to the CDN (this
 		//	will overwrite any existing file so use with caution)
 		
@@ -326,7 +336,7 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		//	Move the file
-		if ( @move_uploaded_file( $_data['file'], CDN_PATH . $_data['bucket'] . '/' . $_data['filename'] ) ) :
+		if ( move_uploaded_file( $_data['file'], CDN_PATH . $_data['bucket'] . '/' . $_data['filename'] ) ) :
 		
 			$_status = TRUE;
 			

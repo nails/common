@@ -1,5 +1,5 @@
-<div class="fieldset">
-	<div class="legend">Actions</div>
+<fieldset>
+	<legend>Actions</legend>
 	<p>
 	<?php
 	
@@ -42,4 +42,4 @@
 	<!--	CLEARFIX	-->
 	<div class="clear"></div>
 	
-</div>
+</fieldset>

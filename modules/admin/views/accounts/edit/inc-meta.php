@@ -1,5 +1,5 @@
-<div class="fieldset">
-	<div class="legend">Meta Information</div>
+<fieldset>
+	<legend>Meta Information</legend>
 	<?php
 		
 		if ( $user_meta ) :
@@ -111,4 +111,4 @@
 		endif;
 	
 	?>
-</div>
+</fieldset>

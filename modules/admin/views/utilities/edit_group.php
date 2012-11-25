@@ -15,9 +15,9 @@
 <?=form_open()?>
 
 	<!--	BASICS	-->
-	<div class="fieldset">
+	<fieldset>
 	
-		<div class="legend">Basics</div>
+		<legend>Basics</legend>
 		<?php
 		
 			//	Display Name
@@ -69,12 +69,12 @@
 		
 		?>
 		
-	</div>
+	</fieldset>
 	
 	<!--	PERMISSIONS	-->
-	<div class="fieldset" id="permissions">
+	<fieldset id="permissions">
 	
-		<div class="legend">Permissions</div>
+		<legend>Permissions</legend>
 		
 		<p>
 			Superusers have full, unrestricted access to admin.
@@ -127,7 +127,7 @@
 			
 		?>
 		
-	</div>
+	</fieldset>
 	
 	<p>
 		<?=form_submit( 'submit', 'Save Changes' )?>

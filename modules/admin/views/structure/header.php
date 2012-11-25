@@ -154,6 +154,24 @@
 	<div class="content">
 		<div class="padder">
 		<div class="content_inner">
+		
+			<?php
+			
+				if ( isset( $page->module->name ) && isset( $page->title ) ) :
+				
+					echo '<h1>';
+					echo $page->module->name . ' &rsaquo; ' . $page->title;
+					echo '</h1>';
+					
+				elseif ( ! isset( $page->module->name ) && isset( $page->title ) ) :
+				
+					echo '<h1>';
+					echo $page->title;
+					echo '</h1>';
+				
+				endif;
+				
+			?>
 			
 			<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
 			<div class="system-alert error">
@@ -193,24 +211,3 @@
 					<span class="js_error_text"></span>
 				</p>
 			</div>
-			
-			
-			<?php
-			
-				if ( isset( $page->module->name ) && isset( $page->title ) ) :
-				
-					echo '<h1>';
-					echo $page->module->name . ' &rsaquo; ' . $page->title;
-					echo '</h1>';
-					
-				elseif ( ! isset( $page->module->name ) && isset( $page->title ) ) :
-				
-					echo '<h1>';
-					echo $page->title;
-					echo '</h1>';
-				
-				endif;
-			
-			
-			
-			

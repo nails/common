@@ -1,6 +1,6 @@
-<div class="fieldset">
+<fieldset>
 
-	<div class="legend">Basic Information</div>
+	<legend>Basic Information</legend>
 	
 	<div class="box-container">
 	<?php
@@ -216,4 +216,4 @@
 	
 	?>
 	</div>
-</div>
+</fieldset>

@@ -6,9 +6,9 @@
 
 <?=form_open()?>
 
-	<div class="fieldset">
+	<fieldset>
 	
-		<div class="legend">Recipient</div>
+		<legend>Recipient</legend>
 		
 		<?php
 		
@@ -27,7 +27,7 @@
 		<!--	CLEARFIX	-->
 		<div class="clear"></div>
 		
-	</div>
+	</fieldset>
 	
 <?php
 

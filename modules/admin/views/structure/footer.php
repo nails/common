@@ -109,7 +109,7 @@
 				
 				this._add_stripes = function()
 				{
-					$( 'div.fieldset' ).each( function() {
+					$( 'fieldset' ).each( function() {
 						
 						$( 'div.field', this ).removeClass( 'odd even' );
 						$( 'div.field:visible:odd', this ).addClass( 'odd' );

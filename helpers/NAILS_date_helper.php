@@ -60,9 +60,9 @@ if ( ! function_exists( 'nice_time' ) )
 			
 		endif;
 		
-		//	If date is before time itself, output a mini easteregg
+		//	If date is effectively NULL
 		if ( $date == '0000-00-00 00:00:00' )
-			return 'by Christ himself';
+			return 'Unknown';
 		
 		//	Determine past or future date
 		if( $now >= $unix_date ) :

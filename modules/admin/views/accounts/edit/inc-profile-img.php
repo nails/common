@@ -1,5 +1,5 @@
-<div class="fieldset">
-	<div class="legend">Profile Image</div>
+<dfieldset>
+	<legend>Profile Image</legend>
 	<?php
 	
 		$_error = isset( $upload_error ) ? 'error' : NULL;
@@ -47,4 +47,4 @@
 	
 	<!--	CLEARFIX	-->
 	<div class="clear"></div>
-</div>
+</fieldset>
