@@ -66,6 +66,33 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	
 	/**
+	 * Returns an array of notifications for various methods
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	static function notifications()
+	{
+		$_ci =& get_instance();
+		$_notifications = array();
+		
+		// --------------------------------------------------------------------------
+		
+		$_notifications['index']			= array();
+		$_notifications['index']['value']	= $_ci->db->count_all( 'user' );
+		
+		// --------------------------------------------------------------------------
+		
+		return $_notifications;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Constructor
 	 *
 	 * @access	public

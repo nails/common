@@ -92,48 +92,66 @@
 	<div class="sidebar left">
 		<div class="padder">
 		
-		<?php if ( isset( $loaded_modules ) ) : foreach ( $loaded_modules AS $module => $config ) : ?>
+		<?php
 		
-			<div class="box" id="box_<?=url_title( $config->name )?>">
-				<h2 title=""><?=$config->name?> <a href="#" class="toggle">close</a></h2>
-				<div class="box-container">
-					<ul>
-					
-						<?php foreach( $config->funcs AS $method => $label ) : ?>
+		if ( isset( $loaded_modules ) ) :
+		
+			foreach ( $loaded_modules AS $module => $config ) :
+			
+				//	Get any notifications for this module if applicable
+				$_notifications = method_exists( $module, 'notifications') ? $module::notifications() : array();
+				
+				?>
+				<div class="box" id="box_<?=url_title( $config->name )?>">
+					<h2 title=""><?=$config->name?> <a href="#" class="toggle">close</a></h2>
+					<div class="box-container">
+						<ul>
+						<?php
 						
-							<?php if ($method == 'su' ) : ?>
-							
-								<?php if ( ! $user->is_superuser() ) continue ?>
-							
-								<?php foreach ( $label AS $su_method => $su_label ) : ?>
-								
-									<li>
-										&rsaquo;
-										<?=anchor( 'admin/' . $module . '/' . $su_method, $su_label )?>
-									</li>
-								
-								<?php endforeach; ?>
-								
-							<?php continue; ?>
-							
-							<?php endif; ?>
-							
-							
-							<li>
-								&rsaquo;
-								<?=anchor( 'admin/' . $module . '/' . $method, $label )?>
-							</li>
-							
-						<?php endforeach; ?>
+							//	Loop all the module methods
+							foreach( $config->funcs AS $method => $label ) :
 						
-					</ul>
+								//	Render super user methods, if any
+								if ( $method == 'su' && $user->is_superuser() ) :
+							
+									foreach ( $label AS $su_method => $su_label ) :
+									
+										echo '<li> &rsaquo; ' . anchor( 'admin/' . $module . '/' . $su_method, $su_label ) . '</li>';
+								
+									endforeach;
+									
+								else :
+								
+									
+									echo '<li> &rsaquo; ';
+									echo anchor( 'admin/' . $module . '/' . $method, $label );
+									
+									if ( isset( $_notifications[$method]['value'] ) && $_notifications[$method]['value'] ) :
+									
+										$_type	= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
+										$_title	= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
+										
+										echo '<span class="indicator ' . $_type . '" title="' . $_title . '" rel="tipsy-right">' . number_format( $_notifications[$method]['value'] ) . '</li>';
+									
+									endif;
+									
+									echo '</li>';
+									
+								endif;
+								
+							endforeach;
+							
+						?>
+						</ul>
+					</div>
 				</div>
-			</div>
+				<?php
+				
+			endforeach;
 		
+		else:
 		
-		<?php endforeach; else: ?>
-		
-		
+			?>
 			<div class="box">
 				<h2 title="">Oops!</h2>
 				<ul>
@@ -142,10 +160,11 @@
 					</li>
 				</ul>
 			</div>
+			<?php
 		
+		endif;
 		
-		<?php endif; ?>
-	
+		?>
 		</div>
 	</div>
 	
