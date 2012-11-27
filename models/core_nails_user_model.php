@@ -1415,7 +1415,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['last_ip']			= $_ip_address;
 		$_data['created_on']		= time();
 		$_data['last_update']		= time();
-		$_data['active']			= 0;
+		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )		? 1	: 0 ;;
 		$_data['salt']				= $_password[1];
 		$_data['activation_code']	= $_activation_code;
 		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )		? 1	: 0 ;
@@ -1433,6 +1433,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
+		unset( $data['active'] );
 		unset( $data['auth_method_id'] );
 		unset( $data['username'] );
 		unset( $data['fb_token'] );
@@ -1828,56 +1829,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @author	Pablo
 	 **/
 	public function upload_profile_image( $file, $user_id )
-	{dumpanddie( 'TODO; this method should use the upload/CDN library' );
- 		//	Load helper
- 		$this->load->helper( 'file' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Is the target folder writable
-		$_path = CDN_PATH . 'profile_images/';
-		if ( ! @is_writable( $_path ) )
-			return array( 'error' => $_path . ' is_not_writable' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Get extension
-		$ext = substr( $_FILES[$file]['name'], strrpos( $_FILES[$file]['name'], '.' ) );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Test extension		
-		$allowed = array ( '.jpg', '.jpeg', '.gif', '.png' );
-		
-		// --------------------------------------------------------------------------
-		
-		if ( ! in_array( strtolower( $ext ), $allowed ) )
-			return array( 'error' => 'invalid_file_type' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set filename
-		$filename = md5(time() . $user_id );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Try to move the file
-		if ( @move_uploaded_file( $_FILES[$file]['tmp_name'], $_path . $filename . $ext ) === FALSE ) :
-		
-			//	Problem uploading
-			return array( 'error' => 'could_not_move' );
-			
-		else :
-			
-			//	Update the meta tables
-			$_data['profile_img']		= $filename.$ext;
-			$this->update( $user_id, $_data );
-			
-			// --------------------------------------------------------------------------
-			
-			return array( 'id' => $filename.$ext );
-		
-		endif;
+	{
+		//	TODO: Should use the CDN library
 	}
 	
 	
@@ -1886,7 +1839,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	public function delete_profile_img()
 	{
-		//	TODO
+		//	TODO: Should use the CDN library
 	}
 	
 	
