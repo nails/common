@@ -16,7 +16,8 @@ class Admin_help_model extends NAILS_Model
 {
 	public function get_all()
 	{
-		return array();
+		$this->db->select( 'id, title, description, vimeo_id' );
+		return $this->db->get( 'admin_help_video' )->result();
 	}
 }
 

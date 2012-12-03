@@ -53,6 +53,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		//	Navigation options
 		$d->funcs['index']			= 'View All Members';			//	Sub-nav function.
+		$d->funcs['create']			= 'Create new User';			//	Sub-nav function.
 
 		
 		// --------------------------------------------------------------------------
@@ -193,7 +194,85 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	// --------------------------------------------------------------------------
 	
-
+	
+	public function create()
+	{
+		//	Set method info
+		$this->data['page']->admin_m	= 'create';
+		$this->data['page']->title		= 'Create new User';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Attempt to create the new user account
+		if ( $this->input->post() ) :
+		
+			$this->load->library( 'form_validation' );
+			
+			//	Set rules
+			$this->form_validation->set_rules( 'group_id',		'Group',			'xss_clean|required|is_natural_no_zero' );
+			$this->form_validation->set_rules( 'password',		'Password',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'temp_pw',		'Temp Password',	'xss_clean' );
+			$this->form_validation->set_rules( 'first_name',	'First Name',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',		'Last Name',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'email',			'Email',			'xss_clean|required|valid_email|is_unique[user.email]' );
+			
+			//	Set messages
+			$this->form_validation->set_message( 'required',			'This field is required.' );
+			$this->form_validation->set_message( 'is_natural_no_zero',	'This field is required.' );
+			$this->form_validation->set_message( 'valid_email',			'This field must be a valid email.' );
+			$this->form_validation->set_message( 'is_unique',			'This email is already in use.' );
+			
+			//	Execute
+			if ( $this->form_validation->run() ) :
+			
+				//	Success
+				$_group_id	= (int) $this->input->post( 'group_id' );
+				$_email		= $this->input->post( 'email' );
+				$_password	= $this->input->post( 'password' );
+				
+				$_meta					= array();
+				$_meta['first_name']	= $this->input->post( 'first_name' );
+				$_meta['last_name']		= $this->input->post( 'last_name' );
+				$_meta['temp_pw']		= (bool) $this->input->post( 'temp_pw' );
+				$_meta['active']		= TRUE;
+				
+				$_new_user = $this->user->create( $_email, $_password, $_group_id, $_meta );
+				if ( $_new_user ) :
+				
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> A user account was created for <strong>' . $_meta['first_name'] . '</strong>, update their details now.' );
+					redirect( 'admin/accounts/edit/' . $_new_user['id'] );
+				
+				else :
+				
+					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo;' . implode( '<br />&rsaquo; ', $this->user->get_error() );
+				
+				endif;
+			
+			else :
+			
+				$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account';
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Get the groups
+		$this->data['groups']		= $this->user->get_groups_flat();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',			$this->data );
+		$this->nails->load_view( 'admin/accounts/create/index',	'modules/admin/views/accounts/create/index',	$this->data );
+		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',			$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Edit an existing user account
 	 *

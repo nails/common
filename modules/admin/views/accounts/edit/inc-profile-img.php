@@ -1,4 +1,4 @@
-<dfieldset>
+<fieldset>
 	<legend>Profile Image</legend>
 	<?php
 	

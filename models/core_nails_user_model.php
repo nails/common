@@ -1409,7 +1409,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		// Users table
 		$_data['password']			= $_password[0];
 		$_data['password_md5']		= md5( $_password[0] );
-		$_data['email']				= $email;
+		$_data['email']				= trim( $email );
 		$_data['group_id']			= $group_id;
 		$_data['ip_address']		= $_ip_address;
 		$_data['last_ip']			= $_ip_address;
@@ -1900,7 +1900,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		//	Loop through results and unserialise the acl
 		foreach( $_groups AS $group ) :
 		
-			$_out[$group->id] = $group->name;
+			$_out[$group->id] = $group->display_name;
 			
 		endforeach;
 		

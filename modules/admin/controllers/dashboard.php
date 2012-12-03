@@ -68,6 +68,11 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	public function index()
 	{
+		$this->data['page']->admin_m	= 'index';
+		$this->data['page']->title		= 'Welcome';
+		
+		// --------------------------------------------------------------------------
+		
 		//	Load header
 		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
 		
@@ -119,13 +124,13 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Get data
-		$this->data['help'] = $this->admin_help_model->get_all();
+		$this->data['videos'] = $this->admin_help_model->get_all();
 		
 		// --------------------------------------------------------------------------
 		
 		//	Load views
 		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
-		$this->nails->load_view( 'admin/dashboard/help/overview',	'modules/admin/views/dashboard/help/overviewh',	$this->data );
+		$this->nails->load_view( 'admin/dashboard/help/overview',	'modules/admin/views/dashboard/help/overview',	$this->data );
 		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
 	}
 
