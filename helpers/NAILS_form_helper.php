@@ -622,7 +622,9 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		endif;
 		
-		$_out .= form_checkbox( $_field['key'], $options[0]['value'], $_selected ) . '<span class="text">' . $options[0]['label'] . '</span>';
+		$_key = isset( $options[0]['key'] ) ? $options[0]['key'] : $_field['key'];
+		
+		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected ) . '<span class="text">' . $options[0]['label'] . '</span>';
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -668,7 +670,10 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 				endif;
 			
 			endif;
-			$_out .= form_checkbox( $_field['key'], $options[$i]['value'], $_selected ) . '<span class="text">' . $options[$i]['label'] . '</span>';
+			
+			$_key = isset( $options[$i]['key'] ) ? $options[$i]['key'] : $_field['key'];
+			
+			$_out .= form_checkbox( $_key, $options[$i]['value'], $_selected ) . '<span class="text">' . $options[$i]['label'] . '</span>';
 			
 			$_out .= '</label>';
 		

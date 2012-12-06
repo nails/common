@@ -73,6 +73,57 @@ class Admin_Model extends NAILS_Model
 					$_out = $_details;
 					$_out->class_name = $module;
 					
+					//	List the public methods of this module (can't rely on the ['funcs'] array as it
+					//	might not list a method which the active user needs in their ACL)
+					
+					$_methods = get_class_methods( $module );
+					
+					//	Strip out anything which is not public or which starts with a _ (pseudo private)
+					$_remove_keys = array();
+					foreach ( $_methods AS $key => $method ) :
+					
+						if ( substr( $method, 0, 1 ) == '_' ) :
+						
+							$_remove_keys[] = $key;
+							continue;
+						
+						endif;
+						
+						// --------------------------------------------------------------------------
+						
+						$_method = new ReflectionMethod( $module, $method );
+						
+						if ( $_method->isStatic() ) :
+						
+							$_remove_keys[] = $key;
+							continue;
+						
+						endif;
+					
+					endforeach;
+					
+					foreach ( $_remove_keys AS $key ) :
+					
+						unset( $_methods[$key] );
+					
+					endforeach;
+					
+					//	Build the methods array so that the method names are the keys
+					$_details->methods = array();
+					foreach ( $_methods AS $method ) :
+					
+						if ( isset( $_details->funcs[$method] ) ) :
+						
+							$_details->methods[$method] =  $_details->funcs[$method];
+						
+						else :
+						
+							$_details->methods[$method] =  '<em style="font-style:italic">' . ucwords( str_replace( '_', ' ', $method ) ) . '</em> <span style="color:#999;">- Unlisted</span>';
+						
+						endif;
+					
+					endforeach;
+					
 					break;
 					
 				endif;

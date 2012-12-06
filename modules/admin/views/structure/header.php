@@ -96,6 +96,8 @@
 		
 		if ( isset( $loaded_modules ) ) :
 		
+			$_acl = active_user( 'acl' );
+			
 			foreach ( $loaded_modules AS $module => $config ) :
 			
 				//	Get any notifications for this module if applicable
@@ -110,19 +112,10 @@
 						
 							//	Loop all the module methods
 							foreach( $config->funcs AS $method => $label ) :
-						
-								//	Render super user methods, if any
-								if ( $method == 'su' && $user->is_superuser() ) :
 							
-									foreach ( $label AS $su_method => $su_label ) :
-									
-										echo '<li> &rsaquo; ' . anchor( 'admin/' . $module . '/' . $su_method, $su_label ) . '</li>';
-								
-									endforeach;
-									
-								else :
-								
-									
+								//	Is the method enabled?
+								if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method]) ) :
+
 									echo '<li> &rsaquo; ';
 									echo anchor( 'admin/' . $module . '/' . $method, $label );
 									
@@ -136,7 +129,7 @@
 									endif;
 									
 									echo '</li>';
-									
+								
 								endif;
 								
 							endforeach;

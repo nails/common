@@ -104,24 +104,75 @@
 			
 			// --------------------------------------------------------------------------
 		
-			foreach ( $admin_modules AS $module => $detail ) :
+			foreach ( $admin_modules AS $module => $detail ) : 
+			
+				$_module_hash = md5( serialize( $module ) );
+				
+				if ( $detail->name == 'Dashboard' ) :
+				
+					$_dashmd5 = $_module_hash;
+				
+				endif;
 			
 				$_field					= array();
-				$_field['key']			= 'acl[admin][]';
 				$_field['label']		= $detail->name;
 				$_field['default']		= FALSE;
 				
-				$_value = $module =='dashboard' ? '<small>If any admin module is selected this must also be selected.</small>' : '';
+				//	Build the field. Sadly, can't use the form helper due to the crazy multidimensional array
+				//	that we're building here.
 				
+				echo '<div class="field">';
 				
-				$_options = array();
-				$_options[] = array(
-					'value'		=> $detail->class_name,
-					'label'		=> $_value,
-					'selected'	=> isset( $group->acl['admin'] ) && array_search( $module , $group->acl['admin'] ) !== FALSE ? TRUE : FALSE
-				);
+				// Options
+				$_acl_post	= $this->input->post( 'acl' );
+				$_label		= '';
+				foreach ( $detail->methods AS $method => $label ) :
 				
-				echo form_field_checkbox( $_field, $_options );
+					echo '<label>';
+							
+					//	Label
+					if ( $_label == $_field['label'] ) :
+					
+						echo '<span class="label">&nbsp;</span>';
+					
+					else :
+					
+						$_label = $_field['label'];
+						
+						echo '<span class="label">';
+						echo $_field['label'];
+						echo '<small><a href="#" class="check-all" data-module="' . $_module_hash . '">Toggle all</a></small>';
+						echo '</span>';
+						
+					endif;
+					
+					$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>If any admin method is selected then this must also be selected.</small>' : '';
+					
+					$_options = array(
+						'key'		=> 'acl[admin][' . $module . '][' . $method . ']',
+						'value'		=> TRUE,
+						'label'		=> $label . $_sub_label,
+						'selected'	=> isset( $group->acl['admin'][$module][$method] ) ? TRUE : FALSE
+					);
+					
+					if ( $this->input->post() ) :
+					
+						$_selected = isset( $_acl_post['admin'][$module][$method] ) ? TRUE : FALSE;
+					
+					else :
+					
+						$_selected = isset( $group->acl['admin'][$module][$method] ) ? TRUE : FALSE;
+					
+					endif;
+					
+					echo form_checkbox( $_options['key'], TRUE, $_selected, 'class="admin_check method ' . $method . ' ' . $_module_hash  . '"' ) . '<span class="text">' . $_options['label'] . '</span>';
+					
+					echo '</label>';
+					echo '<div class="clear"></div>';
+				
+				endforeach;
+				
+				echo '</div>';
 		
 			endforeach;
 			
@@ -141,18 +192,25 @@
 
 	$(function(){
 	
-		$( '#permissions input[name*=acl]' ).click( function() {
+		$( '.admin_check' ).on( 'click', function() {
 		
-			$( '#permissions input[name*=acl]:checked' ).each( function() {
-				
-				if (this.name == 'acl[admin][]' )
-				{
-					//	At least one is checked, check the dashboard
-					$( '#permissions input[name*=acl][value=dashboard]' ).attr( 'checked', 'checked' );
-				}
-				
-			});
+			//	Check to see if ANY of the checkboxes are checked, if they
+			//	are dashboard MUST be checked.
+			
+			if ( $( '.admin_check:checked:not(.<?=$_dashmd5?>.index)' ).length )
+			{
+				$( '.admin_check.<?=$_dashmd5?>.method.index' ).attr( 'checked', 'checked' );
+			}
 		
+		});
+		
+		$( 'a.check-all' ).on( 'click', function() {
+			
+			var _hash = $(this).attr( 'data-module' );
+			$( 'input.' + _hash ).click();
+			
+			return false;
+			
 		});
 	
 	});

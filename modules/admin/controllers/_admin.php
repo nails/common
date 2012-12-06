@@ -64,9 +64,11 @@ class Admin_Controller extends NAILS_Controller
 		//	Check the user has permission to view this module (skip the dashboard
 		//	we need to show them _something_)
 		
-		$_active_module = $this->uri->segment( 2 );
+		$_active_module	= $this->uri->segment( 2 );
+		$_active_method	= $this->uri->segment( 3, 'index' );
+		$_acl			= active_user( 'acl' );
 		
-		if ( ! isset( $this->_loaded_modules[$_active_module] ) ) :
+		if ( ! $this->user->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
 		
 			//	If this is the dashboard, we should see if the user has permission to
 			//	access any other modules before we 404 their ass.
@@ -74,19 +76,17 @@ class Admin_Controller extends NAILS_Controller
 			if ( $_active_module == 'dashboard' ) :
 			
 				//	Look at the user's ACL
-				$_acl = active_user( 'acl' );
-				
 				if ( isset( $_acl['admin'] )  ) :
 				
 					//	If they have other modules defined, loop them until one is found
 					//	which appears in the loaded modules list. If this doesn't happen
 					//	then they'll fall back to the 'no loaded modules' page.
 					
-					foreach( $_acl['admin'] AS $option ) :
+					foreach( $_acl['admin'] AS $module => $methods ) :
 					
-						if ( isset( $this->_loaded_modules[$option] ) ) :
+						if ( isset( $this->_loaded_modules[$module] ) ) :
 						
-							redirect( 'admin/' . $option );
+							redirect( 'admin/' . $module );
 							break;
 						
 						endif;
@@ -101,7 +101,16 @@ class Admin_Controller extends NAILS_Controller
 				show_404();
 				
 			endif;
+		
+		elseif ( ! $this->user->is_superuser() ) :
+		
+			//	Module is OK, check to make sure they can access this method
+			if ( ! isset( $_acl['admin'][$_active_module][$_active_method] ) ) :
 			
+				unauthorised();
+			
+			endif;
+		
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -140,15 +149,28 @@ class Admin_Controller extends NAILS_Controller
 	
 	static function _can_access( $module, $file )
 	{
-		$_acl = active_user( 'acl' );
+		$_acl		= active_user( 'acl' );
+		$_module	= basename( $file, '.php' );
 		
-		if ( active_user( 'group_id' ) != 1 && ( ! isset( $_acl['admin'] ) || array_search( basename( $file, '.php' ), $_acl['admin'] ) === FALSE ) ) :
+		// --------------------------------------------------------------------------
 		
-			return NULL;
+		//	Super users can see what they like
+		if ( get_userobject()->is_superuser() ) :
+		
+			return $module;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Everyone else needs to have the correct ACL
+		if ( isset( $_acl['admin'][$_module] ) ) :
+		
+			return $module;
 		
 		else :
 		
-			return $module;
+			return NULL;
 		
 		endif;
 	}

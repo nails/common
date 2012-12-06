@@ -173,9 +173,6 @@ class NAILS_Utilities extends Admin_Controller {
 			$this->form_validation->set_rules( 'acl[]',					'Permissions', 		'xss_clean' );
 			$this->form_validation->set_rules( 'acl[superuser]',		'Permissions', 		'xss_clean' );
 			$this->form_validation->set_rules( 'acl[admin]',			'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[intern]',			'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[employer_manager]',	'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[employer_team]',	'Permissions', 		'xss_clean' );
 			$this->form_validation->set_rules( 'acl[admin][]',			'Permissions', 		'xss_clean' );
 			
 			if ( $this->form_validation->run() ) :
@@ -185,7 +182,18 @@ class NAILS_Utilities extends Admin_Controller {
 				$_data['name']				= $this->input->post( 'name' );
 				$_data['description']		= $this->input->post( 'description' );
 				$_data['default_homepage']	= $this->input->post( 'default_homepage' );
-				$_data['acl']				= serialize( $this->input->post( 'acl' ) );
+				
+				//	Parse ACL's
+				$_acl = $this->input->post( 'acl' );
+				
+				if ( isset( $_acl['admin'] ) ) :
+				
+					//	Remove ACLs which have no enabled methods - pointless	
+					$_acl['admin'] = array_filter( $_acl['admin'] );
+				
+				endif;
+				
+				$_data['acl']				= serialize( $_acl );
 				
 				$this->user->update_group( $_gid, $_data );
 				
