@@ -667,9 +667,9 @@ class Emailer {
 			
 			endfor;
 			
-			//$this->ci->db->set( 'eq.queue_id', $_queue_id );
-			//$this->ci->db->where_in( 'eq.id', $_queue_ids );
-			//$this->ci->db->update( 'email_queue eq' );
+			$this->ci->db->set( 'eq.queue_id', $_queue_id );
+			$this->ci->db->where_in( 'eq.id', $_queue_ids );
+			$this->ci->db->update( 'email_queue eq' );
 			
 			// --------------------------------------------------------------------------
 			
@@ -977,7 +977,7 @@ class Emailer {
 		// --------------------------------------------------------------------------
 		
 		//	Start prepping the email
-		$this->ci->email->from( $this->from->email, $this->from->name );
+		$this->ci->email->from( $this->from->email, $_send->from->name );
 		$this->ci->email->reply_to( $_send->from->email, $_send->from->name );
 		$this->ci->email->to( $_send_to );
 		$this->ci->email->subject( $_send->subject );
