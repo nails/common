@@ -119,12 +119,41 @@
 									echo '<li> &rsaquo; ';
 									echo anchor( 'admin/' . $module . '/' . $method, $label );
 									
-									if ( isset( $_notifications[$method]['value'] ) && $_notifications[$method]['value'] ) :
+									if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
 									
 										$_type	= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
 										$_title	= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
 										
-										echo '<span class="indicator ' . $_type . '" title="' . $_title . '" rel="tipsy-right">' . number_format( $_notifications[$method]['value'] ) . '</li>';
+										switch ( $_type ) :
+										
+											case 'split' :
+											
+												foreach ( $_notifications[$method]['options'] AS $notification ) :
+												
+													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'info';
+													$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
+													
+													if ( $notification['value'] ) :
+													
+														echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
+														
+													endif;
+													
+												endforeach;
+											
+											break;
+											
+											default :
+											
+												if ( $_notifications[$method]['value'] ) :
+												
+													echo '<span class="indicator ' . $_type . '" title="' . $_title . '" rel="tipsy-right">' . number_format( $_notifications[$method]['value'] ) . '</span>';
+													
+												endif;
+												
+											break;
+										
+										endswitch;
 									
 									endif;
 									
