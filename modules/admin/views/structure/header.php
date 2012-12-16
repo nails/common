@@ -51,9 +51,14 @@
 		
 	<div class="header">
 		
-		<ul class="left" style="min-width:400px;">
+		<ul class="left">
 			
-			<li style="display:block;margin-bottom:4px;"><a href="<?=site_url( 'admin' )?>" style="font-size:18px;font-weight:bold;color:#fff;"><?=APP_NAME?> Administration</a></li>
+			<li style="display:block;margin-bottom:4px;">
+				<a href="<?=site_url( 'admin' )?>" style="font-size:18px;font-weight:bold;color:#fff;">
+					<span class="app-name"><?=APP_NAME?></span>
+					Administration
+				</a>
+			</li>
 			<li><?=anchor( 'admin', 'Home' )?></li>
 			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name . '</li>' : NULL?></li>
 			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title . '</li>' : NULL?></li>
@@ -157,7 +162,7 @@
 									
 									endif;
 									
-									echo '</li>';
+									echo '<div class="clear"></div></li>';
 								
 								endif;
 								

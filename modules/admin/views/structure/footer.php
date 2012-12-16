@@ -1,4 +1,4 @@
-				<hr class="clear_right" />
+				<hr />
 				
 				<small class="footer" rel="tooltip-r" title="that's hella fast!">Rendered in {elapsed_time} seconds</small>
 				<small class="footer right">
