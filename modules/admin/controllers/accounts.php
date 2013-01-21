@@ -24,7 +24,6 @@ require_once '_admin.php';
 
 class NAILS_Accounts extends Admin_Controller {
 
-	private $group;
 	protected $accounts_group;
 	protected $accounts_where;
 	
@@ -134,6 +133,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Define vars
 		$_search = $this->input->get( 'search' );
 		
 		// --------------------------------------------------------------------------
@@ -152,31 +152,18 @@ class NAILS_Accounts extends Admin_Controller {
 					);
 		
 		// --------------------------------------------------------------------------
-			
+		
 		//	Is a group set?
 		if ( $this->accounts_group ) :
 		
-			$this->where['u.group_id'] = $this->group;
-			
-		else :
-		
-			$this->where = NULL;
+			$this->accounts_where['u.group_id'] = $this->accounts_group;
 		
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Work out the total number of pages
-		if ( $this->accounts_where ) :
-		
-			$this->db->where( $this->accounts_where );
-			
-			//	Join the user meta table in case we're searching in here
-			$this->db->join( 'user_meta um', 'um.user_id = u.id' );
-		
-		endif;
-		
-		$this->data['total_pages'] = ceil( $this->db->count_all_results( 'user u' ) / $_per_page );
+		$this->data['total_pages'] = floor( $this->user->count_users( $this->accounts_where, $_search ) / $_per_page );
 		
 		// --------------------------------------------------------------------------
 		

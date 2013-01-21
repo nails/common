@@ -1205,6 +1205,32 @@ class Emailer {
 			
 		endif;
 		
+		echo "\n\n" . '<strong>Rendered HTML:</strong>' . "\n";
+		echo '-----------------------------------------------------------------' . "\n";
+		
+		$_rendered_body = str_replace( '"', '\\"', $body );
+		$_rendered_body = str_replace( array("\r\n", "\r"), "\n", $_rendered_body );
+		$_lines = explode("\n", $_rendered_body);
+		$_new_lines = array();
+		
+		foreach ( $_lines AS $line ) :
+		
+		    if ( ! empty( $line ) ) :
+		    
+		        $_new_lines[] = trim( $line );
+		        
+		       endif;
+		       
+		endforeach;
+		
+		$_rendered_body = implode( $_new_lines );
+		
+		echo '<iframe width="100%" height="900" src="" id="renderframe"></iframe>' ."\n";
+		echo '<script type="text/javascript">' . "\n";
+		echo 'var _body = "' . $_rendered_body. '";' . "\n";
+		echo 'document.getElementById(\'renderframe\').src = "data:text/html;charset=utf-8," + escape(_body);' . "\n";
+		echo '</script>' . "\n";
+		
 		echo "\n\n" . '<strong>HTML:</strong>' . "\n";
 		echo '-----------------------------------------------------------------' . "\n";
 		echo htmlentities( $body ) ."\n";

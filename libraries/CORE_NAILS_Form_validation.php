@@ -394,6 +394,53 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	
 	
 	/**
+	 * Checks if a date is in the future
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function date_future( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'date_future', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'date_future', 'The %s field must be in the future.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		
+		return strtotime( $year . '-' . $month . '-' . $day ) < strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a date is in the future
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function date_past( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'date_past', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'date_past', 'The %s field must be in the past.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		
+		//	If all fields are blank then the rule fails
+		return strtotime( $year . '-' . $month . '-' . $day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Checks if a series of date dropdowns is valid
 	 *
 	 * @param	string
@@ -444,6 +491,56 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		
 		//	If all fields are blank then the rule fails
 		return $year . $month . $day . $hour . $minute == '000000000000' ? FALSE : TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a datetime is in the future
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function datetime_future( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		$hour	= $CI->input->post( $field . '_hour' );
+		$minute	= $CI->input->post( $field . '_minute' );
+		
+		return strtotime( $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $min ) < strtotime( date( 'Y-m-d H:m' ) ) ? FALSE : TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a datetime is in the future
+	 *
+	 * @param	string
+	 * @return	bool
+	 */	
+	public function datetime_past( $day, $field )
+	{
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+		
+		$month	= $CI->input->post( $field . '_month' );
+		$year	= $CI->input->post( $field . '_year' );
+		$hour	= $CI->input->post( $field . '_hour' );
+		$minute	= $CI->input->post( $field . '_minute' );
+		
+		return strtotime( $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $min ) > strtotime( date( 'Y-m-d H:m' ) ) ? FALSE : TRUE;
 	}
 	
 }

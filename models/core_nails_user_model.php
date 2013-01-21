@@ -369,7 +369,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function get_users( $extended = NULL, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
-	
 		//	Write selects
 		$this->db->select( 'u.*' );
 		$this->db->select( 'um.*' );
@@ -377,13 +376,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'ug.name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Join Tables
-		$this->db->join( 'user_meta um',			'u.id = um.user_id',			'left' );
-		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',	'left' );
-		$this->db->join( 'user_group ug',			'u.group_id = ug.id',			'left' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -399,60 +391,16 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		//	Set Where
-		if ( $where )
-			$this->db->where( $where );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set Search
-		if ( $search ) :
-		
-			//	Build the query so that any existing wheres are considered AS WELL AS the search terms
-			
-			if ( $where ) :
-			
-				//	Existing where, build it the hard way
-				$_where  = '(';
-				
-				//	User
-				$_where .= '`u`.`id` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`u`.`email` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`u`.`username` LIKE \'%' . $search . '%\' OR';
-				
-				//	User Meta
-				$_where .= '`um`.`first_name` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`um`.`last_name` LIKE \'%' . $search . '%\' OR';
-				
-				$this->db->where( substr( $_where, 0, -3 ) . ')' );
-			
-			else :
-
-				//	No existing wheres, build it the easy way
-							
-				//	User table
-				$this->db->like( 'u.id', $search );
-				$this->db->or_like( 'u.email', $search );
-				$this->db->or_like( 'u.username', $search );
-				
-				//	User Meta
-				$this->db->or_like( 'um.first_name', $search );
-				$this->db->or_like( 'um.last_name', $search );
-			
-			endif;
-			
-		endif;
-		
+		//	Build conditionals
+		$this->_getcount_users_common( $where, $search );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Execute Query
-		$q = $this->db->get( 'user u' );
-		
-		$_user = $q->result();
+		$q		= $this->db->get( 'user u' );
+		$_user	= $q->result();
 		
 		// --------------------------------------------------------------------------
-		
 		
 		//	Include any extra tables?
 		if ( $extended ) :
@@ -494,27 +442,28 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 				//	Loop for each returned user
 				foreach ( $_user AS $_u ) :
-				foreach ( $_tables AS $table ) :
-					
-					//	Define order by for certain tables
-					switch ( $table ) :
-					
-						case 'user_meta_school':	$this->db->order_by( 'year', 'desc' );	break;
-					
-					endswitch;
-					
-					// --------------------------------------------------------------------------
-					
-					$this->db->where( 'user_id', $_u->id );
-					$_u->{trim( $table )} = $this->db->get( trim( $table ) )->result();
-					
-				endforeach;
+				
+					foreach ( $_tables AS $table ) :
+						
+						//	Define order by for certain tables
+						switch ( $table ) :
+						
+							case 'user_meta_school':	$this->db->order_by( 'year', 'desc' );	break;
+						
+						endswitch;
+						
+						// --------------------------------------------------------------------------
+						
+						$this->db->where( 'user_id', $_u->id );
+						$_u->{trim( $table )} = $this->db->get( trim( $table ) )->result();
+						
+					endforeach;
+				
 				endforeach;
 				
 			endif;
 		
 		endif;
-		
 		
 		// --------------------------------------------------------------------------
 		
@@ -571,6 +520,91 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		//	Return the data
 		return $_user;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Counts the total amount of users for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_users() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_users( $where = NULL, $search = NULL )
+	{
+		$this->_getcount_users_common( $where, $search );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		return $this->db->count_all_results( 'user u' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _getcount_users_common( $where = NULL, $search = NULL )
+	{
+		$this->db->join( 'user_meta um',			'u.id = um.user_id',			'left' );
+		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',	'left' );
+		$this->db->join( 'user_group ug',			'u.group_id = ug.id',			'left' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Where
+		if ( $where ) :
+		
+			$this->db->where( $where );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Search
+		if ( $search ) :
+		
+			//	Build the query so that any existing wheres are considered AS WELL AS the search terms
+			
+			if ( $where ) :
+			
+				//	Existing where, build it the hard way
+				$_where  = '(';
+				
+				//	User
+				$_where .= '`u`.`id` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`u`.`email` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`u`.`username` LIKE \'%' . $search . '%\' OR';
+				
+				//	User Meta
+				$_where .= '`um`.`first_name` LIKE \'%' . $search . '%\' OR';
+				$_where .= '`um`.`last_name` LIKE \'%' . $search . '%\' OR';
+				
+				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+			
+			else :
+
+				//	No existing wheres, build it the easy way
+							
+				//	User table
+				$this->db->like( 'u.id', $search );
+				$this->db->or_like( 'u.email', $search );
+				$this->db->or_like( 'u.username', $search );
+				
+				//	User Meta
+				$this->db->or_like( 'um.first_name', $search );
+				$this->db->or_like( 'um.last_name', $search );
+			
+			endif;
+			
+		endif;
 	}
 	
 	
