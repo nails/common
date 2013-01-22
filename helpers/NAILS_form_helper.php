@@ -25,6 +25,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
@@ -33,7 +34,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
-		$_error			= form_error( $_field['key'] ) ? 'error' : '';
+		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
 		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
 		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
 		
@@ -64,6 +65,12 @@ if ( ! function_exists( 'form_field' ) )
 				
 			break;
 			
+			case 'upload' :
+			
+				$_out .= form_upload( $_field['key'] );
+				
+			break;
+			
 			case 'text' :
 			default :
 			
@@ -77,7 +84,15 @@ if ( ! function_exists( 'form_field' ) )
 		$_out .= $_help['title'] ? img( $_help ) : '';
 		
 		//	Error
-		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		if ( $_field['error'] ) :
+		
+			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			
+		else :
+		
+			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		
+		endif;
 				
 		$_out .= '</label>';
 		$_out .= '<div class="clear"></div>';

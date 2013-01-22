@@ -1217,7 +1217,7 @@ class Emailer {
 		
 		    if ( ! empty( $line ) ) :
 		    
-		        $_new_lines[] = trim( $line );
+		        $_new_lines[] = $line;
 		        
 		       endif;
 		       
