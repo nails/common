@@ -15,16 +15,16 @@
 		</script>
 		
 		<!--	STYLES	-->
-		<link href="<?=NAILS_URL?>css/twitter-bootstrap/bootstrap.min.css" rel="stylesheet">
-		<link href="<?=NAILS_URL?>css/twitter-bootstrap/bootstrap-responsive.min.css" rel="stylesheet">
 		<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
 		
 		<!--	JAVASCRIPT	-->
-		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-		<script type="text/javascript">
-			google.load( "jquery" );
-			google.load( "jqueryui" );
-		</script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+		<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>jquery.min.js"><\/script>')</script>
+		
+		<script src="<?=NAILS_URL?>js/nails.default.min.js"></script>
+		<script src="<?=NAILS_URL?>js/jquery.tipsy.min.js"></script>
+
 		
 		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
 		<!--[if lt IE 9]>
@@ -35,22 +35,58 @@
 	<body>
 	
 	<!--	NAILS MASTHEAD	-->
-	<div class="navbar navbar-fixed-top" id="masthead">
-		<div class="navbar-inner">
-			<div class="container">
-				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
-			</div>
+	<div class="container">
+		<div class="row sixteen columns first last">
+			<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
+			<hr />
 		</div>
-	</div>
 	
 	
-	<!--	PAGE CONTENT	-->
-	<div class="container" id="page-content">
+		<!--	PAGE CONTENT	-->
+		<div class="row sixteen columns first last">
 		
-		<h2><?=isset( $page->title ) ? $page->title: NULL?></h2>
-		<hr />
-		
-		<?=( $message )	? '<div class="alert">' . $message . '</div>'				: NULL ?>
-		<?=( $notice )	? '<div class="alert alert-info">' . $notice . '</div>'		: NULL ?>
-		<?=( $error )	? '<div class="alert alert-error">' . $error . '</div>'		: NULL ?>
-		<?=( $success )	? '<div class="alert alert-success">' . $success . '</div>'	: NULL ?>
+			<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+			
+			<!--	SYSTEM ALERTS	-->
+			
+			<?php if ( isset( $error ) && $error ) : ?>
+				<div class="system-alert error">
+					<div class="padder">
+						<p>
+							<?=$error?>
+						</p>
+					</div>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( isset( $success ) && $success ) : ?>
+				<div class="system-alert success">
+					<div class="padder">
+						<p>
+							<?=$success?>
+						</p>
+					</div>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( isset( $message ) && $message ) : ?>
+				<div class="system-alert message">
+					<div class="padder">
+						<p>
+							<?=$message?>
+						</p>
+					</div>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( isset( $notice ) && $notice ) : ?>
+				<div class="system-alert notice">
+					<div class="padder">
+						<p>
+							<?=$notice?>
+						</p>
+					</div>
+				</div>
+			<?php endif; ?>
+			
+		</div>

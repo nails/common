@@ -23,10 +23,14 @@
 	</script>
 	
 	<!--	REQUIRED JS	-->
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.min.js'?>"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+	<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>jquery.min.js"><\/script>')</script>
+	
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.tipsy.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.chosen.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.fancybox.min.js'?>"></script>
+	<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.default.min.js'?>"></script>
 	<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.admin.min.js'?>"></script>
 	
 	<!--	REQUIRED CSS	-->
@@ -266,33 +270,33 @@
 			
 			<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
 			<div class="system-alert error">
-			
-				<p><?=$error?></p>
-			
+				<div class="padder">
+					<p><?=$error?></p>
+				</div>
 			</div>
 			<?php endif; ?>
 			
 			<?php if ( isset( $success ) && ! empty( $success ) ) : ?>
 			<div class="system-alert success">
-			
-				<p><?=$success?></p>
-			
+				<div class="padder">
+					<p><?=$success?></p>
+				</div>
 			</div>
 			<?php endif; ?>
 			
 			<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
 			<div class="system-alert message">
-			
-				<p><?=$message?></p>
-			
+				<div class="padder">
+					<p><?=$message?></p>
+				</div>
 			</div>
 			<?php endif; ?>
 			
 			<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
 			<div class="system-alert notice">
-			
-				<p><?=$notice?></p>
-			
+				<div class="padder">
+					<p><?=$notice?></p>
+				</div>
 			</div>
 			<?php endif; ?>
 			

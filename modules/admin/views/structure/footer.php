@@ -17,17 +17,16 @@
 		<script tyle="text/javascript">
 		<!--//
 		
-			//	Tipsys
+			var _nails;
+			
 			$(function(){
 			
-				$( '*[rel=tipsy]' ).tipsy();
-				$( '*[rel=tipsy-right]' ).tipsy( { gravity: 'w' } );
-				$( '*[rel=tipsy-left]' ).tipsy( { gravity: 'e' } );
-				$( '*[rel=tipsy-top]' ).tipsy( { gravity: 's' } );
-				$( '*[rel=tipsy-bottom]' ).tipsy( { gravity: 'n' } );
+				//	Initialise Nails_JS
+				_nails = new Nails_JS();
+				_nails.init();
 			
 			});
-			
+						
 			// --------------------------------------------------------------------------
 			
 			//	Fancyboxes
