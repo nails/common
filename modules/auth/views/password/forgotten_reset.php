@@ -27,7 +27,7 @@
 		</p>
 		<hr />
 		<p>
-			<?=anchor( 'auth/login', lang( 'action_proceed_login' ), 'class="btn btn-primary"' )?>
+			<?=anchor( 'auth/login', lang( 'action_proceed_login' ), 'class="awesome"' )?>
 		</p>
 	</div>
 	

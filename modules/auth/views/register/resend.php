@@ -22,7 +22,7 @@
 	
 	<p class="alert alert-success">
 		An email with a link to verify your email has been re-sent to:
-		<strong>pablo@hellopablo.co.uk<?=$email?></strong>
+		<strong><?=$email?></strong>
 	</p>
 	
 	<h3>What to do next</h3>

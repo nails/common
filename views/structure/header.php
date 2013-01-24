@@ -24,7 +24,6 @@
 		
 		<script src="<?=NAILS_URL?>js/nails.default.min.js"></script>
 		<script src="<?=NAILS_URL?>js/jquery.tipsy.min.js"></script>
-
 		
 		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
 		<!--[if lt IE 9]>
@@ -34,59 +33,59 @@
 	</head>
 	<body>
 	
-	<!--	NAILS MASTHEAD	-->
 	<div class="container">
-		<div class="row sixteen columns first last">
-			<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
-			<hr />
+	
+		<!--	HEADER	-->
+		<div class="row" id="nails-default-header">
+			<div class="sixteen columns">
+				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
+			</div>
 		</div>
 	
 	
-		<!--	PAGE CONTENT	-->
-		<div class="row sixteen columns first last">
-		
-			<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+		<!--	CONTENT	-->
+		<div class="row" id="nails-default-content">
+			<div class="sixteen columns">
 			
-			<!--	SYSTEM ALERTS	-->
-			
-			<?php if ( isset( $error ) && $error ) : ?>
-				<div class="system-alert error">
-					<div class="padder">
-						<p>
-							<?=$error?>
-						</p>
+				<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+				
+				<!--	SYSTEM ALERTS	-->
+				<?php if ( isset( $error ) && $error ) : ?>
+					<div class="system-alert error">
+						<div class="padder">
+							<p>
+								<?=$error?>
+							</p>
+						</div>
 					</div>
-				</div>
-			<?php endif; ?>
-			
-			<?php if ( isset( $success ) && $success ) : ?>
-				<div class="system-alert success">
-					<div class="padder">
-						<p>
-							<?=$success?>
-						</p>
+				<?php endif; ?>
+				
+				<?php if ( isset( $success ) && $success ) : ?>
+					<div class="system-alert success">
+						<div class="padder">
+							<p>
+								<?=$success?>
+							</p>
+						</div>
 					</div>
-				</div>
-			<?php endif; ?>
-			
-			<?php if ( isset( $message ) && $message ) : ?>
-				<div class="system-alert message">
-					<div class="padder">
-						<p>
-							<?=$message?>
-						</p>
+				<?php endif; ?>
+				
+				<?php if ( isset( $message ) && $message ) : ?>
+					<div class="system-alert message">
+						<div class="padder">
+							<p>
+								<?=$message?>
+							</p>
+						</div>
 					</div>
-				</div>
-			<?php endif; ?>
-			
-			<?php if ( isset( $notice ) && $notice ) : ?>
-				<div class="system-alert notice">
-					<div class="padder">
-						<p>
-							<?=$notice?>
-						</p>
+				<?php endif; ?>
+				
+				<?php if ( isset( $notice ) && $notice ) : ?>
+					<div class="system-alert notice">
+						<div class="padder">
+							<p>
+								<?=$notice?>
+							</p>
+						</div>
 					</div>
-				</div>
-			<?php endif; ?>
-			
-		</div>
+				<?php endif; ?>

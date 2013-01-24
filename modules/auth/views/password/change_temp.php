@@ -29,7 +29,7 @@
 	$attr = array(
 	
 		'id'	=> 'reset-temp-password-form',
-		'class'	=> 'well'
+		'class'	=> 'nails-default-form'
 		
 	);
 	
@@ -54,11 +54,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -69,20 +69,18 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
-	<hr />
-	
-	<div class="control-group">
-		<label class="control-label">&nbsp;</label>
-		<div class="controls">
-			<?=form_submit( 'submit', lang( 'action_reset_continue' ), 'class="btn btn-primary"' )?>
+	<div class="row button-row">
+		<label class="two columns first">&nbsp;</label>
+		<div class="four columns last">
+			<?=form_submit( 'submit', lang( 'action_reset_continue' ), 'class="awesome"' )?>
 		</div>
 	</div>
 	

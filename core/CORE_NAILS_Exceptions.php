@@ -7,6 +7,96 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 	
 	// --------------------------------------------------------------------------
 	
+	
+	/**
+	 * 404 Page Not Found Handler
+	 * 
+	 * Modded to use the template 404 page rather than the default one. Bit Messy, but works.
+	 *
+	 * @access	private
+	 * @param	string	a message to pass to the view, if any
+	 * @param	boolean	whether to log the error or not
+	 * @return	void
+	 */
+	public function show_404( $use_page = '', $log_error = TRUE )
+	{
+		$_ci =& get_instance();
+		
+		// --------------------------------------------------------------------------
+		
+		// By default we log this, but allow a dev to skip it
+		if ( $log_error && ! $_ci->input->is_cli_request() )
+			log_message( 'error', '404 Page Not Found --> ' . $use_page . ' --> ' . $_SERVER['REQUEST_URI'] );
+		
+		// --------------------------------------------------------------------------
+		
+		//	If running on the command line just return a string
+		if ( $_ci->input->is_cli_request() ) :
+		
+			$_ci->output->set_output( "\n404 Page Not Found\n\n" );
+			echo $_ci->output->get_output();
+			exit( 0 );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set the correct header
+		$_ci->output->set_header( 'HTTP/1.1 404 Not Found' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Pull in some data which is required in the headers
+		$this->data['title']		=  $_ci->config->item( 'title' );
+		$this->data['description']	=  $_ci->config->item( 'description' );
+		$this->data['keywords']		=  $_ci->config->item( 'keywords' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Useful to have a reference to the user object too
+		$this->data['user']			=& get_userobject();
+		
+		// --------------------------------------------------------------------------
+		
+		//	If $_data['user'] === FALSE then include the user_model library and instanciate
+		//	it as it clearly hasn't already been done
+		
+		if ( $this->data['user'] === FALSE ) :
+		
+			//	Load up the user model and set the constant which IA_Controller would set
+			$_ci->load->model( 'user_model' );
+			$this->data['user']	=& $_ci->user_model;
+			define( 'IA_USR_OBJ', 'user_model' );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Assets
+			require_once( FCPATH . APPPATH . 'core/IA_Controller_Assets.php' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Finally, a little heads up to the views that this is a 404
+		$this->data['is_404'] = TRUE;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load views
+		$_ci->load->view( 'structure/header',	$this->data );
+		$_ci->load->view( 'system/404',			$this->data );
+		$_ci->load->view( 'structure/footer',	$this->data );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Send the output to the browser
+		echo $_ci->output->get_output();
+		exit( 0 );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
 	/**
 	 * PHP error handler
 	 * 

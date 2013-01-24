@@ -29,7 +29,7 @@
 	$attr = array(
 	
 		'id'	=> 'login-form',
-		'class'	=>	'well form-horizontal'
+		'class'	=> 'nails-default-form'
 		
 	);
 	
@@ -51,11 +51,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns">
 			<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -66,11 +66,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns">
 			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -82,9 +82,9 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group">
-		<label class="control-label">&nbsp;</label>
-		<div class="controls">
+	<div class="row">
+		<label class="two columns first">&nbsp;</label>
+		<div class="four columns last">
 			<label class="checkbox">
 				<?=form_checkbox( $_field, TRUE, TRUE )?>
 				<?=$_name?>
@@ -92,12 +92,11 @@
 		</div>
 	</div>
 	
-	<hr />
 	
-	<div class="control-group">
-		<label class="control-label">&nbsp;</label>
-		<div class="controls">
-			<?=form_submit( 'submit', 'Log In', 'class="btn btn-primary"' )?>
+	<div class="row button-row">
+		<label class="two columns first">&nbsp;</label>
+		<div class="four columns last">
+			<?=form_submit( 'submit', 'Log In', 'class="awesome"' )?>
 			<small style="margin-left:15px;">
 				<?=anchor( 'auth/forgotten_password', 'Forgotten your Password?' )?>
 			</small>

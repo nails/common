@@ -29,7 +29,7 @@
 	$attr = array(
 	
 		'id'	=> 'register-form',
-		'class'	=>	'well form-horizontal'
+		'class'	=>	'nails-default-form'
 		
 	);
 	
@@ -53,11 +53,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -68,11 +68,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -83,11 +83,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -98,11 +98,11 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'control-label' ) ); ?>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<div class="four columns last">
 			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
@@ -114,24 +114,22 @@
 		$_error = form_error( $_field ) ? 'error' : NULL
 	
 	?>
-	<div class="control-group <?=$_error?>">
-		<label class="control-label">&nbsp;</label>
-		<div class="controls">
+	<div class="row <?=$_error?>">
+		<label class="two columns first">&nbsp;</label>
+		<div class="four columns last">
 			<label class="checkbox">
 				<?=form_checkbox( $_field, TRUE, FALSE )?>
 				<?=$_name?>
-				<?=form_error( $_field, '<span class="help-inline">', '</span>' )?>
+				<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 			</label>
 		</div>
 	</div>
 	
 	<!--	SUBMIT BUTTON	-->
-	<hr />
-	
-	<div class="control-group">
-		<label class="control-label">&nbsp;</label>
-		<div class="controls">
-			<?=form_submit( 'submit', 'Register', 'class="btn btn-primary"' )?>
+	<div class="row button-row">
+		<label class="two columns first">&nbsp;</label>
+		<div class="four columns last">
+			<?=form_submit( 'submit', 'Register', 'class="awesome"' )?>
 		</div>
 	</div>
 	

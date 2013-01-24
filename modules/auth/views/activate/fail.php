@@ -21,7 +21,7 @@
 ?>
 	
 	
-	<p class="alert alert-error">
+	<p class="system-alert error">
 		<strong>Oh snap!</strong> We couldn't activate your account.
 	</p>
 	<p>
