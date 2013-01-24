@@ -42,6 +42,17 @@
 				font-size:0.8em;
 			}
 			
+			blockquote
+			{
+				border-left: 4px solid #EFEFEF;
+				padding-left: 10px;
+				margin-left: 0px;
+				font-style: italic;
+				font-size: 1.3em;
+				font-weight: lighter;
+				color: #777;
+			}
+			
 			.footer
 			{
 				border-top:1px solid #ececec;

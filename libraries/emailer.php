@@ -425,7 +425,7 @@ class Emailer {
 				//	Check the template
 				if ( ! $email->subject ) :
 				
-					$email->subject = 'An E-mail from Intern Avenue';
+					$email->subject = 'An E-mail from ' . APP_NAME;
 				
 				endif;
 			
