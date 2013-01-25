@@ -10,6 +10,30 @@
  * @param	mixed
  * @return	string
  */
+if ( ! function_exists( 'form_email' ) )
+{
+	function form_email($data = '', $value = '', $extra = '')
+	{
+		$defaults = array('type' => 'email', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
+
+		return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+	}	
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * form_field
+ *
+ * Generates a form field (of type text, password or textarea)
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
 if ( ! function_exists( 'form_field' ) )
 {
 	function form_field( $field, $help = '' )
