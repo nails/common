@@ -74,8 +74,12 @@ class Auth_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		if ( empty( $email ) || empty( $password ) )
+		if ( empty( $email ) || empty( $password ) ) :
+		
+			$this->_set_error( 'login_fail_missing_field' );
 			return FALSE;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

@@ -29,11 +29,7 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		$_app_modules			= explode( ',', 'auth,admin,dashboard' . APP_NAILS_MODULES );
 		$this->nails_modules	= array_unique( $_app_modules );
-		
-		//	Quick trick to remove empty values from the array:
-		//	http://briancray.com/2009/04/25/remove-null-values-php-arrays/
-		
-		$this->nails_modules	= array_filter( $this->nails_modules, 'strlen' );
+		$this->nails_modules	= array_filter( $this->nails_modules );
 		
 		// --------------------------------------------------------------------------
 		
@@ -72,6 +68,22 @@ class CORE_NAILS_Model extends CI_Model {
 	public function get_error()
 	{
 		return $this->_error;
+	}
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Determines whether a module is defined in APP_NAILS_MODULE
+	 *
+	 * @access	protected
+	 * @param	string	$module	The module to look for
+	 * @return	bool
+	 * @author	Pablo
+	 **/
+	protected function _module_is_enabled( $module )
+	{
+		return array_search( strtolower( $module ), $this->nails_modules ) !== FALSE;
 	}
 }
 

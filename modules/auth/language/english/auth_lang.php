@@ -167,6 +167,7 @@ $lang['action_register']					= 'Sign Up Now';
  * 
  **/
  
+$lang['login_fail_missing_field']				= '<strong>Sorry,</strong> a required field was missing.';
 $lang['login_fail_general']						= '<strong>Sorry,</strong> your log in has not been successful, please try again.';
 $lang['login_fail_inactive']					= '<strong>Sorry,</strong> your log in failed, you must activate your account first.<br />If you did not receive a code, have lost your activation email or have deactivated your account then <a href="%s">click here to resend</a>.';
 $lang['login_fail_banned']						= '<strong>This account has been banned;</strong> if you feel you have received this message in error then please contact us.';

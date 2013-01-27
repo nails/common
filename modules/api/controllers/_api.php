@@ -13,6 +13,24 @@
 
 class API_Controller extends NAILS_Controller
 {
+	public function __construct()
+	{
+		parent::__construct();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Check this module is enabled in settings
+		if ( ! $this->_module_is_enabled( 'api' ) ) :
+		
+			//	Cancel execution, module isn't enabled
+			show_404();
+		
+		endif;
+	}
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	*	Take the input and spit it out as JSON
 	*	
