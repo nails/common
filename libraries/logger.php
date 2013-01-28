@@ -3,9 +3,6 @@
 /**
 * Name:			Logger
 *
-*
-* Docs:			-
-*
 * Created:		26/05/2011
 * Modified:		26/05/2011
 *
@@ -38,6 +35,7 @@ class Logger {
 		
 		$this->log->dir		= $log_dir;
 		$this->log->file	= ( $log_file ) ? $log_file : date( 'Y-m-d' ) . '.php';
+		$this->log->exists	= FALSE;
 	}
 	
 	
@@ -52,19 +50,65 @@ class Logger {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function line( $line )
+	public function line( $line = '' )
 	{
-		if ( ! file_exists( $this->log->dir . $this->log->file ) )
-			write_file( $this->log->dir . $this->log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n");
+		//	If the log file doesn't exist (or we haven't checked already), attempt to create it
+		if ( ! $this->log->exists ) :
+		
+			if ( ! file_exists( $this->log->dir . $this->log->file ) ) :
 			
-		if ( empty( $line ) ) :
+				if ( write_file( $this->log->dir . $this->log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n") ) :
+				
+					$this->log->exists = TRUE;
+					
+				else :
+				
+					$this->log->exists = FALSE;
+				
+				endif;
+				
+			else :
 			
-			write_file( $this->log->dir . $this->log->file, "\n", 'a' );
+				$this->log->exists = TRUE;
 			
-		else :
-			
-			write_file( $this->log->dir . $this->log->file, date('Y-m-d H:i:s').' -- ' . $line . "\n", 'a' );
-			
+			endif;
+				
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->log->exists ) :
+		
+			if ( empty( $line ) ) :
+				
+				write_file( $this->log->dir . $this->log->file, "\n", 'a' );
+				
+			else :
+				
+				write_file( $this->log->dir . $this->log->file, date('Y-m-d H:i:s').' -- ' . trim( $line ) . "\n", 'a' );
+				
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If we're working on the command line then pump it out there too
+		
+		if ( $this->ci->input->is_cli_request() ) :
+		
+			fwrite( STDOUT, $line . "\n" );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If we're not on production and the request is not CLI then echo to the browser
+		if ( ENVIRONMENT != 'production' && ! $this->ci->input->is_cli_request() ) :
+		
+			echo $line . "\n";
+			ob_flush();
+		
 		endif;
 	}
 	
@@ -82,6 +126,11 @@ class Logger {
 	 **/
 	public function log_file( $log_file = NULL )
 	{
+		//	Reset the log exists var so that line() checks again
+		$this->log->exists = FALSE;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->log->file = ( $log_file ) ? $log_file : date( 'Y-m-d' ) . '.php';
 	}
 	
@@ -99,6 +148,11 @@ class Logger {
 	 **/
 	public function log_dir( $log_dir = NULL )
 	{
+		//	Reset the log exists var so that line() checks again
+		$this->log->exists = FALSE;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->log->dir = ( $log_dir ) ? $log_dir : './application/logs/';
 	}
 }
