@@ -1,91 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
+<?php
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * HEADER CONTROLLER
+	 * --------------------------------------------------------------------------
+	 * 
+	 * This view controls which header should be rendered. It will use the URI to
+	 * determine the appropriate header file (against the header config file).
+	 * 
+	 * Override this automatic behaviour by specifying the header_override
+	 * variable in the data supplied to the view.
+	 * 
+	 **/
+	 
+	 
+	// --------------------------------------------------------------------------
 	
-		<!--	META	-->
-		<meta charset="utf-8">
-		<title><?=isset( $page->title ) ? $page->title . ' - ' : NULL?><?=APP_NAME?></title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="description" content="">
-		<meta name="author" content="">
 		
-		<!--	JS GLOBALS	-->
-		<script tyle="text/javascript">
-			window.NAILS_URL = '<?=NAILS_URL?>';
-		</script>
-		
-		<!--	STYLES	-->
-		<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
-		
-		<!--	JAVASCRIPT	-->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-		<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>jquery.min.js"><\/script>')</script>
-		
-		<script src="<?=NAILS_URL?>js/nails.default.min.js"></script>
-		<script src="<?=NAILS_URL?>js/jquery.tipsy.min.js"></script>
-		
-		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		
-	</head>
-	<body>
+	if ( isset( $header_override ) ) :
 	
-	<div class="container">
+		//	Manual override
+		$this->load->view( $header_override );
 	
-		<!--	HEADER	-->
-		<div class="row" id="nails-default-header">
-			<div class="sixteen columns">
-				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
-			</div>
-		</div>
-	
-	
-		<!--	CONTENT	-->
-		<div class="row" id="nails-default-content">
-			<div class="sixteen columns">
+	else :
+
+		//	Auto-detect header if there is a config file
+		if ( file_exists( FCPATH . APPPATH . 'config/header_views.php' ) ) :
+		
+			$this->config->load( 'header_views' );
+			$_match = FALSE;
+			$_uri_string = $this->uri->uri_string();
 			
-				<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+			if ( ! $_uri_string ) :
+			
+				//	We're at the homepage, get the name of the default controller
+				$_uri_string = $this->router->routes['default_controller'];
+			
+			endif;
+			
+			if ( $this->config->item( 'alt_header' ) ) :
+			
+				foreach ( $this->config->item( 'alt_header' ) AS $pattern => $template ) :
 				
-				<!--	SYSTEM ALERTS	-->
-				<?php if ( isset( $error ) && $error ) : ?>
-					<div class="system-alert error">
-						<div class="padder">
-							<p>
-								<?=$error?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+					//	Prep the regex
+					$_key = str_replace( ':any', '.*', str_replace( ':num', '[0-9]*', $pattern ) );
+					
+					//	Match found?
+					if ( preg_match( '#^' . $_key . '$#', $_uri_string ) ) :
+					
+						$_match = $template;
+						break;
+					
+					endif;
+					
+				endforeach;
 				
-				<?php if ( isset( $success ) && $success ) : ?>
-					<div class="system-alert success">
-						<div class="padder">
-							<p>
-								<?=$success?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-				
-				<?php if ( isset( $message ) && $message ) : ?>
-					<div class="system-alert message">
-						<div class="padder">
-							<p>
-								<?=$message?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-				
-				<?php if ( isset( $notice ) && $notice ) : ?>
-					<div class="system-alert notice">
-						<div class="padder">
-							<p>
-								<?=$notice?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+			endif;
+			
+			//	Load the appropriate header view
+			if ( $_match ) :
+			
+				$this->load->view( $_match );
+			
+			else :
+	
+				$this->load->view( $this->config->item( 'default_header' ) );
+			
+			endif;
+			
+		else :
+		
+			//	No config file, fall back to the default Nails. header
+			$this->load->view( 'structure/header/nailsdefault' );
+		
+		endif;
+			
+	endif;

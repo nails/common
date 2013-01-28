@@ -33,7 +33,7 @@ class CORE_NAILS_Nails_Model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		if ( file_exists( $_desired_view ) ) :
+		if ( $desired && file_exists( $_desired_view ) ) :
 		
 			//	Desired view exists, load that
 			$this->load->view( $_desired_view, $data, $return );
