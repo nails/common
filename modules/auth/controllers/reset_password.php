@@ -20,9 +20,10 @@
  * 
  **/
 
-class NAILS_Reset_Password extends NAILS_Controller {
-	
-	
+require_once '_auth.php';
+
+class NAILS_Reset_Password extends NAILS_Controller
+{
 	/**
 	 * Constructor
 	 *

@@ -12,9 +12,8 @@
 * 
 */
 
-class System extends NAILS_Controller {
-	
-
+class System extends NAILS_Controller
+{
 	/**
 	 * Handle 404 errors
 	 *

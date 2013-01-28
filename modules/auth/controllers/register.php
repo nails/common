@@ -19,10 +19,11 @@
  * Read full explanation at the bottom of this file.
  * 
  **/
- 
-class NAILS_Register extends NAILS_Controller {
-	
-	
+
+require_once '_auth.php';
+
+class NAILS_Register extends NAILS_Auth_Controller
+{
 	/**
 	 * Constructor
 	 *

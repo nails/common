@@ -38,7 +38,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Determine which modules are to be loaded; include default modules
 		//	Duplicate in CORE_NAILS_Model.php
 		
-		$_app_modules			= explode( ',', 'auth,admin,dashboard,' . APP_NAILS_MODULES );
+		$_app_modules			= explode( ',', APP_NAILS_MODULES );
 		$this->nails_modules	= array_unique( $_app_modules );
 		$this->nails_modules	= array_filter( $this->nails_modules );
 		

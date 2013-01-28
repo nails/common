@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		API_Controller
+ * Name:		NALS_API_Controller
  *
  * Created:		18/11/2012
  * Modified:	18/11/2012
@@ -11,7 +11,7 @@
  **/
 
 
-class API_Controller extends NAILS_Controller
+class NAILS_API_Controller extends NAILS_Controller
 {
 	public function __construct()
 	{

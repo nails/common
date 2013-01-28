@@ -12,7 +12,7 @@
 
 require_once '_api.php';
 
-class Api extends API_Controller
+class Api extends NAILS_API_Controller
 {
 	private $_authorised;
 	private $_error;
