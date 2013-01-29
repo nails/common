@@ -294,24 +294,23 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string - column.value
 	 * @return	bool
 	 */	
-	public function unique_if_diff($new, $params)
+	public function unique_if_diff( $new, $params )
 	{
+		$CI =& get_instance();
 		
 		list($table, $column, $old) = explode(".", $params, 3);
 		
-		if ($new == $old)
+		if ($new == $CI->input->post( $old ))
 			return TRUE;
-			
-		$CI =& get_instance();
-		$CI->load->database();
 		
 		if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'unique_if_diff', '%s is not unique.' );
 				
-		$CI->db->where($column.' != \''.$old.'\'');
-		$CI->db->where($column, $new);
-		$CI->db->limit(1);
-		$q = $CI->db->get($table);
+		$CI->db->where( $column . ' !=', $CI->input->post( $old ) );
+		$CI->db->where( $column, $new );
+		$CI->db->limit( 1 );
+		$q = $CI->db->get( $table );
+		
 		if ($q->row())
 			return FALSE;
 		

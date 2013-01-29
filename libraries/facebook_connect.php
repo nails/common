@@ -44,7 +44,7 @@ class Facebook_Connect {
 		// --------------------------------------------------------------------------
 		
 		//	Fire up and initialize the SDK
-		require FCPATH . APPPATH . 'libraries/_resources/facebook-php-sdk/src/facebook.php';
+		require NAILS_PATH . 'libraries/_resources/facebook-php-sdk/src/facebook.php';
 		$this->facebook = new Facebook( $this->settings );
 		
 	}
