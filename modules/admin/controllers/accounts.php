@@ -365,6 +365,8 @@ class NAILS_Accounts extends Admin_Controller {
 			//	Load validation library
 			$this->load->library( 'form_validation' );
 			
+			// --------------------------------------------------------------------------
+			
 			//	Define user table rules 
 			$this->form_validation->set_rules( 'group_id',		'Account Type',	'xss_clean|required|is_natural_no_zero' );			
 			$this->form_validation->set_rules( 'email',			'Email',		'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
@@ -374,7 +376,11 @@ class NAILS_Accounts extends Admin_Controller {
 			$this->form_validation->set_rules( 'password',		'Password',		'xss_clean' );
 			$this->form_validation->set_rules( 'temp_pw',		'Temp PW',		'xss_clean' );
 			
+			// --------------------------------------------------------------------------
+			
 			//	Define user_meta table rules
+			$_uploads = array();
+			
 			foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
 			
 				$_datatype	= isset( $value['datatype'] )	? $value['datatype'] :  'string';
@@ -397,6 +403,17 @@ class NAILS_Accounts extends Admin_Controller {
 						endif;
 					
 					break;
+					
+					// --------------------------------------------------------------------------
+					
+					case 'file' :
+					case 'upload' :
+					
+						$_uploads[] = $value + array( 'col' => $col );
+					
+					break;
+					
+					// --------------------------------------------------------------------------
 					
 					case 'string' :
 					default :
@@ -425,6 +442,72 @@ class NAILS_Accounts extends Admin_Controller {
 			
 			// --------------------------------------------------------------------------
 			
+			//	Perform any user_meta file uploads
+			if ( $_uploads ) :
+			
+				$this->load->library( 'cdn' );
+				
+				// --------------------------------------------------------------------------
+				
+				$_successes	= array();
+				$_failed	= array();
+				
+				// --------------------------------------------------------------------------
+				
+				foreach ( $_uploads AS $upload ) :
+				
+					$_options		= array();
+					$_validation	= explode( '|', $upload['validation'] );
+					
+					// --------------------------------------------------------------------------
+					
+					if ( array_search( 'is_img', $_validation ) !== FALSE )
+						$_options['allowed_types']	= 'jpg|png|gif';
+					
+					// --------------------------------------------------------------------------
+					
+					foreach ( $_validation AS $rule ) :
+					
+						if ( preg_match( '/^max_size\[(\d+)\]/', $rule, $m ) ) :
+						
+							$_options['max_size']	= $m[1];
+						
+						endif;
+					
+					endforeach;
+					
+					// --------------------------------------------------------------------------
+					
+					//	Attempt upload
+					$_filename = $this->cdn->upload( $upload['col'], $upload['bucket'], $_options );
+					
+					// --------------------------------------------------------------------------
+					
+					if ( $_filename ) :
+					
+						//	File uploaded without a problem.
+						$_successes[$upload['col']]				= array();
+						$_successes[$upload['col']]['new']		= $_filename;
+						$_successes[$upload['col']]['old']		= $_user->{$upload['col']} ;
+						$_successes[$upload['col']]['bucket']	= $upload['bucket'];
+						
+					else :
+					
+						//	File failed to upload
+						$_failed['key']		= $upload['col'];
+						$_failed['label']	= $upload['label'];
+						$_failed['error']	= $this->cdn->errors();
+						
+						break;
+					
+					endif;
+				
+				endforeach;
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
 			//	Will there be any admins left after this update?
 			//	If current update is either super users or admin then no DB check is nessecary
 			
@@ -443,7 +526,7 @@ class NAILS_Accounts extends Admin_Controller {
 			// --------------------------------------------------------------------------
 			
 			//	Data is valid and there'll be some form of admin after the update; ALL GOOD :]
-			if ( $this->form_validation->run( $this ) && $_admins ) :
+			if ( $this->form_validation->run( $this ) && $_admins && ! $_failed ) :
 			
 				//	Define the data var
 				$_data = array();
@@ -515,6 +598,19 @@ class NAILS_Accounts extends Admin_Controller {
 							
 							// --------------------------------------------------------------------------
 							
+							case 'file' :
+							case 'upload' :
+							
+								if ( isset( $_successes[$col]['new'] ) ) :
+								
+									$_data[$col] = $_successes[$col]['new'];
+								
+								endif;
+							
+							break;
+							
+							// --------------------------------------------------------------------------
+							
 							default :
 							
 								$_data[$col] = $_post[$col];
@@ -532,8 +628,27 @@ class NAILS_Accounts extends Admin_Controller {
 						
 						$this->data['success'] = '<strong>Success!</strong> Updated user ' . title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) . ' (' . $_post['email'] . ')';	
 						
+						// --------------------------------------------------------------------------
+						
 						//	refresh the user object
 						$_user = $this->user->get_user( $_post['id'] );
+						
+						// --------------------------------------------------------------------------
+						
+						//	Delete any old files now orphaned as a result of the update.
+						if ( $_successes ) :
+						
+							foreach ( $_successes AS $file ) :
+							
+								if ( $file['old'] ) :
+								
+									$this->cdn->delete( $file['old'], $file['bucket'] );
+								
+								endif;
+							
+							endforeach;
+						
+						endif;
 					
 					//	The account failed to update, feedback to user
 					else:
@@ -549,7 +664,20 @@ class NAILS_Accounts extends Admin_Controller {
 			elseif ( $_admins === FALSE ) :
 			
 				$this->data['error'] = '<strong>Update Failed:</strong> The update would leave the system without any amdinistrators.';
+			
+			//	Update failed due to a failed meta upload	
+			elseif ( $_failed ) :
+			
+				//	Delete all new uploads
+				foreach ( $_successes AS $file ) :
 				
+					$this->cdn->delete( $file['new'], $file['bucket'] );
+				
+				endforeach;
+				
+				$this->data['error']							= '<strong>Update failed:</strong> The ' . $_failed['label'] . ' failed to upload.';
+				$this->data['upload_error_' . $_failed['key']]	= $_failed['error'];
+			
 			//	Update failed for another reason
 			else:
 			

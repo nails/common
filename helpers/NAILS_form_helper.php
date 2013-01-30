@@ -90,6 +90,7 @@ if ( ! function_exists( 'form_field' ) )
 			break;
 			
 			case 'upload' :
+			case 'file' :
 			
 				$_out .= form_upload( $_field['key'] );
 				
@@ -103,6 +104,15 @@ if ( ! function_exists( 'form_field' ) )
 			break;
 			
 		endswitch;
+		
+		//	Download original file, if type is file and original is available
+		if ( ( $_field['type'] == 'file' || $_field['type'] == 'upload' ) && $_field['default'] ) :
+		
+			$_out .= '<span class="file-download">';
+			$_out .= 'Download: ' . anchor( cdn_serve( 'test', $_field['default'] ), $_field['default'] );
+			$_out .= '</span>';
+		
+		endif;
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';

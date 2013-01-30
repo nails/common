@@ -14,12 +14,12 @@
 					
 				$_datatype = isset( $user_meta_cols[$field]['datatype'] ) ? $user_meta_cols[$field]['datatype'] : 'string';
 				
-				$_field					= array();
-				$_field['key']			= $field;
-				$_field['type']			= isset( $user_meta_cols[$field]['type'] ) ? $user_meta_cols[$field]['type'] : 'text';
-				$_field['label']		= isset( $user_meta_cols[$field]['label'] ) ? $user_meta_cols[$field]['label'] : ucwords( str_replace( '_', ' ', $field ) );
-				$_field['required']		= isset( $user_meta_cols[$field]['required'] ) ? $user_meta_cols[$field]['required'] : FALSE;
-				$_field['default']		= $value;
+				$_field						= array();
+				$_field['key']				= $field;
+				$_field['type']				= isset( $user_meta_cols[$field]['type'] ) ? $user_meta_cols[$field]['type'] : 'text';
+				$_field['label']			= isset( $user_meta_cols[$field]['label'] ) ? $user_meta_cols[$field]['label'] : ucwords( str_replace( '_', ' ', $field ) );
+				$_field['required']			= isset( $user_meta_cols[$field]['required'] ) ? $user_meta_cols[$field]['required'] : FALSE;
+				$_field['default']			= $value;
 				
 				switch ( $_datatype ) :
 				
@@ -88,6 +88,21 @@
 							echo form_field( $_field );
 							
 						endif;
+					
+					break;
+					
+					// --------------------------------------------------------------------------
+					
+					case 'file' :
+					case 'upload' :
+					
+						if ( isset( ${'upload_error_' . $_field['key']} )) :
+						
+							$_field['error'] = implode( ' ', ${'upload_error_' . $_field['key']} );
+						
+						endif;
+						
+						echo form_field( $_field );
 					
 					break;
 					
