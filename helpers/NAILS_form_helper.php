@@ -50,6 +50,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
+		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
@@ -109,7 +110,7 @@ if ( ! function_exists( 'form_field' ) )
 		if ( ( $_field['type'] == 'file' || $_field['type'] == 'upload' ) && $_field['default'] ) :
 		
 			$_out .= '<span class="file-download">';
-			$_out .= 'Download: ' . anchor( cdn_serve( 'test', $_field['default'] ), $_field['default'] );
+			$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), $_field['default'], 'target="_blank"' );
 			$_out .= '</span>';
 		
 		endif;

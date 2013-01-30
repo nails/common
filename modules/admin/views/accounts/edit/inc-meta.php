@@ -96,6 +96,7 @@
 					case 'file' :
 					case 'upload' :
 					
+						$_field['bucket'] = isset( $user_meta_cols[$field]['bucket'] ) ? $user_meta_cols[$field]['bucket'] : FALSE;
 						if ( isset( ${'upload_error_' . $_field['key']} )) :
 						
 							$_field['error'] = implode( ' ', ${'upload_error_' . $_field['key']} );
