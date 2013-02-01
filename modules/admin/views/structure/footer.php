@@ -22,7 +22,7 @@
 			$(function(){
 			
 				//	Initialise Nails_JS
-				_nails = new Nails_JS();
+				_nails = new NAILS_JS();
 				_nails.init();
 			
 			});
