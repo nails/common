@@ -479,26 +479,47 @@ class NAILS_Accounts extends Admin_Controller {
 					// --------------------------------------------------------------------------
 					
 					//	Attempt upload
-					$_filename = $this->cdn->upload( $upload['col'], $upload['bucket'], $_options );
 					
-					// --------------------------------------------------------------------------
-					
-					if ( $_filename ) :
-					
-						//	File uploaded without a problem.
-						$_successes[$upload['col']]				= array();
-						$_successes[$upload['col']]['new']		= $_filename;
-						$_successes[$upload['col']]['old']		= $_user->{$upload['col']} ;
-						$_successes[$upload['col']]['bucket']	= $upload['bucket'];
-						
-					else :
+					//	File is required and has not been supplied or file size is 0
+					if ( array_search( 'required', $_validation ) !== FALSE && ( ! isset( $_FILES[$upload['col']] ) || ! $_FILES[$upload['col']]['size'] ) ) :
 					
 						//	File failed to upload
 						$_failed['key']		= $upload['col'];
 						$_failed['label']	= $upload['label'];
-						$_failed['error']	= $this->cdn->errors();
+						$_failed['error']	= array( 'This field is required.' );
 						
 						break;
+					
+					//	File has not been supplied, but isn't required, so continue
+					elseif( array_search( 'required', $_validation ) === FALSE && ( ! isset( $_FILES[$upload['col']] ) || ! $_FILES[$upload['col']]['size'] ) ) :
+					
+						continue;
+					
+					//	File has been supplied, process and return any errors.
+					else :
+					
+						$_filename = $this->cdn->upload( $upload['col'], $upload['bucket'], $_options );
+					
+						// --------------------------------------------------------------------------
+						
+						if ( ! $_filename ) :
+						
+							//	File failed to upload
+							$_failed['key']		= $upload['col'];
+							$_failed['label']	= $upload['label'];
+							$_failed['error']	= $this->cdn->errors();
+							
+							break;
+							
+						else :
+						
+							//	File uploaded without a problem.
+							$_successes[$upload['col']]				= array();
+							$_successes[$upload['col']]['new']		= $_filename;
+							$_successes[$upload['col']]['old']		= $_user->{$upload['col']} ;
+							$_successes[$upload['col']]['bucket']	= $upload['bucket'];
+						
+						endif;
 					
 					endif;
 				
