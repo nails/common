@@ -50,8 +50,8 @@ class Whois {
 	public function lookup( $domain )
 	{
 		$domain = prep_url( $domain );
-		$domain = str_replace( 'http://www.', '', $domain );
-		$domain = str_replace( 'http://', '', $domain );
+		$domain = parse_url($domain);
+		$domain = preg_replace( '/^www\./', '', $domain['host'] );
 		
 		// --------------------------------------------------------------------------
 		
