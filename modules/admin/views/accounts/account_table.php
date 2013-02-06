@@ -139,6 +139,8 @@
 								echo anchor( 'admin/accounts/ban/' . $u->id . $return_string, 'Ban', 'class="awesome small red"' );
 								
 							endif;
+							
+							echo anchor( 'admin/accounts/delete/' . $u->id . $return_string, 'Delete', 'class="awesome small red confirm" data-confirm="CONFIRM DELETE\n\nThis action is not undoable, are you sure?"' );
 						
 						endif;
 						

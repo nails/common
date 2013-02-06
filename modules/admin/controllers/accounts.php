@@ -801,7 +801,7 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function unban()
 	{
-		//	Unan user
+		//	Unban user
 		$_uid = $this->uri->segment( 4 );
 		$this->user->unban( $_uid );
 		
@@ -822,6 +822,42 @@ class NAILS_Accounts extends Admin_Controller {
 			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was unbanned successfully.' );
 			
 		endif;
+		
+		redirect( $this->input->get( 'return_to' ) );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Deletes a user
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function delete()
+	{
+		//	Unan user
+		$_uid = $this->uri->segment( 4 );
+		$_user = $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define messages
+		if ( $this->user->destroy( $_uid ) ) :
+		
+			$this->session->set_flashdata( 'success',	'<strong>See ya!</strong> user ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was deleted successfully.' );
+			
+		else :
+		
+			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem deleting ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
 		
 		redirect( $this->input->get( 'return_to' ) );
 	}

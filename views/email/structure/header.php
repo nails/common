@@ -58,6 +58,25 @@
 				border-top:1px solid #ececec;
 				margin-top:2em;
 			}
+			
+			table.default-style
+			{
+				border:1px solid #ccc;
+				width:100%;
+			}
+			
+			table.default-style td
+			{
+				padding:10px;
+			}
+			
+			table.default-style td.left-header-cell
+			{
+				width:125px;
+				font-weight:bold;
+				background:#ececec;
+				border-right:1px solid #ccc;
+			}
 		
 		</style>
 	</head>
