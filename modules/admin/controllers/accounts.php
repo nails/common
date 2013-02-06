@@ -252,7 +252,7 @@ class NAILS_Accounts extends Admin_Controller {
 							//	Failed to send using the group email, try using the generic email
 							$_email->type = 'verify_email';
 							
-							if ( ! $this->emailer->send( $_email, FALSE ) ) :
+							if ( ! $this->emailer->send( $_email, TRUE ) ) :
 							
 								$_message = '<strong>Just a heads-up</strong>, while the account was created the welcome email failed to send.';
 								
