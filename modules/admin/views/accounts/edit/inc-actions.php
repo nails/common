@@ -20,6 +20,8 @@
 		//	Can't do any of these functions to yourself
 		if ( $user_edit->id != active_user( 'id' ) ) :
 			
+			echo anchor( 'admin/accounts/delete/' . $user_edit->id . '?return_to=' . urlencode( 'admin/accounts' ), 'Delete', 'class="awesome red small right confirm" data-confirm="CONFIRM DELETE\n\nThis action is not undoable, are you sure?"' );
+			
 			if ( $user_edit->active == 2 ) :
 			
 				echo anchor( 'admin/accounts/unban/' . $user_edit->id . $return_string, 'Unban', 'class="awesome small right"' );
@@ -29,7 +31,7 @@
 				echo anchor( 'admin/accounts/ban/' . $user_edit->id . $return_string, 'Ban', 'class="awesome red small right"' );
 				
 			endif;
-		
+					
 		elseif ( isset( $_no_login ) ) :
 		
 			echo '<p style="text-align:center;color:#aaa;">Sorry, there are no actions you can currently perform upon this user.</p>';

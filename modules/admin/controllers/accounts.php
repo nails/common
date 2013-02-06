@@ -196,12 +196,13 @@ class NAILS_Accounts extends Admin_Controller {
 			$this->load->library( 'form_validation' );
 			
 			//	Set rules
-			$this->form_validation->set_rules( 'group_id',		'Group',			'xss_clean|required|is_natural_no_zero' );
-			$this->form_validation->set_rules( 'password',		'Password',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'temp_pw',		'Temp Password',	'xss_clean' );
-			$this->form_validation->set_rules( 'first_name',	'First Name',		'xss_clean|required' );
-			$this->form_validation->set_rules( 'last_name',		'Last Name',		'xss_clean|required' );
-			$this->form_validation->set_rules( 'email',			'Email',			'xss_clean|required|valid_email|is_unique[user.email]' );
+			$this->form_validation->set_rules( 'group_id',			'Group',				'xss_clean|required|is_natural_no_zero' );
+			$this->form_validation->set_rules( 'password',			'Password',				'xss_clean' );
+			$this->form_validation->set_rules( 'send_activation',	'Send Welcome Email',	'xss_clean' );
+			$this->form_validation->set_rules( 'temp_pw',			'Temp Password',		'xss_clean' );
+			$this->form_validation->set_rules( 'first_name',		'First Name',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',			'Last Name',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'email',				'Email',				'xss_clean|required|valid_email|is_unique[user.email]' );
 			
 			//	Set messages
 			$this->form_validation->set_message( 'required',			'This field is required.' );
@@ -215,17 +216,62 @@ class NAILS_Accounts extends Admin_Controller {
 				//	Success
 				$_group_id	= (int) $this->input->post( 'group_id' );
 				$_email		= $this->input->post( 'email' );
-				$_password	= $this->input->post( 'password' );
+				$_password	= trim( $this->input->post( 'password' ) );
+				
+				if ( ! $_password ) :
+				
+					//	Password isn't set, generate one
+					$_password = strtoupper( random_string( 'alpha' ) );
+				
+				endif;
 				
 				$_meta					= array();
 				$_meta['first_name']	= $this->input->post( 'first_name' );
 				$_meta['last_name']		= $this->input->post( 'last_name' );
 				$_meta['temp_pw']		= (bool) $this->input->post( 'temp_pw' );
-				$_meta['active']		= TRUE;
 				
 				$_new_user = $this->user->create( $_email, $_password, $_group_id, $_meta );
+				
 				if ( $_new_user ) :
 				
+					//	If appropriate, send the activation email
+					if ( string_to_boolean( $this->input->post( 'send_activation' ) ) ) :
+						
+						$_email							= new stdClass();
+						$_email->type					= 'verify_email_' . $_group_id;
+						$_email->to_id					= $_new_user['id'];
+						$_email->data					= array();
+						$_email->data['admin']			= active_user( 'first_name,last_name' );
+						$_email->data['new_user']		= $_new_user;
+						$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
+						
+						$this->load->library( 'emailer' );
+						
+						if ( ! $this->emailer->send( $_email, TRUE ) ) :
+						
+							//	Failed to send using the group email, try using the generic email
+							$_email->type = 'verify_email';
+							
+							if ( ! $this->emailer->send( $_email, FALSE ) ) :
+							
+								$_message = '<strong>Just a heads-up</strong>, while the account was created the welcome email failed to send.';
+								
+								if ( ! trim( $this->input->post( 'password' ) ) ) :
+								
+									$_message .= ' You\'ll need to inform the user manually of their password, which is: <strong>' . $_password . '</strong>';
+								
+								endif;
+								
+								$this->session->set_flashdata( 'message', $_message );
+							
+							endif;
+						
+						endif;
+					
+					endif;
+					
+					// --------------------------------------------------------------------------
+					
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> A user account was created for <strong>' . $_meta['first_name'] . '</strong>, update their details now.' );
 					redirect( 'admin/accounts/edit/' . $_new_user['id'] );
 				
@@ -849,7 +895,7 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $this->user->destroy( $_uid ) ) :
 		
-			$this->session->set_flashdata( 'success',	'<strong>See ya!</strong> user ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was deleted successfully.' );
+			$this->session->set_flashdata( 'success',	'<strong>See ya!</strong> User ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was deleted successfully.' );
 			
 		else :
 		

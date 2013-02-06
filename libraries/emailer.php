@@ -61,11 +61,12 @@ class Emailer {
 	 * to send the mail immediately or to queue it up for the cron jobs
 	 *
 	 * @access	public
-	 * @param	object	$input	The input object
+	 * @param	object	$input		The input object
+	 * @param	bool	$graceful	Whether to gracefully fail or not
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function send( $input, $debug = FALSE )
+	public function send( $input, $graceful = FALSE )
 	{
 		//	We got something to work with?
 		if ( empty( $input ) )
@@ -122,15 +123,24 @@ class Emailer {
 		// --------------------------------------------------------------------------
 		
 		//	Lookup the email type (caching it as we go)
-		if ( ! isset( $this->email_type[ $input->type ]) ) :
+		if ( ! isset( $this->email_type[ $input->type ] ) ) :
 		
 			$this->ci->db->select( 'eqt.id, eqt.cron_run, eqt.type' );
 			$this->ci->db->where( 'eqt.id_string', $input->type );
 			
 			$this->email_type[ $input->type ] = $this->ci->db->get( 'email_queue_type eqt' )->row();
 			
-			if ( ! $this->email_type[ $input->type ] )
-				return show_error( 'Invalid Email Type' );
+			if ( ! $this->email_type[ $input->type ] ) :
+			
+				if ( ! $graceful ) :
+				
+					show_error( 'EMAILER: Invalid Email Type "' . $input->type . '"' );
+					
+				endif;
+				
+				return FALSE;
+			
+			endif;
 		
 		endif;
 		
@@ -170,7 +180,8 @@ class Emailer {
 				//	to_id is a single integer, check for this one user
 				if ( ! $this->_is_subscribed( $input->to_id, $this->email_type[ $input->type ]->type ) ) :
 				
-					//	Failover gracefully, the calling method doest need to know the email wans't actually sent
+					//	Failover gracefully, the calling method doest need to know
+					//	the email wasn't actually sent
 					
 					return TRUE;
 				
@@ -201,7 +212,7 @@ class Emailer {
 		//	If the cron run is instant then send now, otherwise queue it up
 		if ( $this->email_type[ $input->type ]->cron_run == 'instant' ) :
 		
-			return $this->_send_now( $input, $debug );
+			return $this->_send_now( $input, $graceful );
 		
 		else :
 		
@@ -333,7 +344,7 @@ class Emailer {
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	private function _send_now( $input, $debug = FALSE )
+	private function _send_now( $input, $graceful = FALSE )
 	{
 		//	Generate the correct input object and archive the email
 		$_input = $this->_queue( $input, FALSE );
@@ -347,13 +358,13 @@ class Emailer {
 				
 				foreach ( $input->id AS $id ) :
 				
-					$this->_send( $id, $debug );
+					$this->_send( $id, $graceful );
 				
 				endforeach;
 			
 			else :
 			
-				if ( $this->_send( $_input->id, $debug ) ) :
+				if ( $this->_send( $_input->id, $graceful ) ) :
 				
 					return $_input->ref;
 				
@@ -367,7 +378,7 @@ class Emailer {
 		
 		else :
 		
-			return ( $debug ) ? show_error( 'Insert Failed.' ) : FALSE;
+			return ( ! $graceful ) ? show_error( 'EMAILER: Insert Failed.' ) : FALSE;
 		
 		endif;
 	}
@@ -393,7 +404,7 @@ class Emailer {
 	{ 
 		$this->ci->db->select( 'eqa.id, eqa.ref, eqa.time_queued, eqa.email_vars, eqa.user_email' );
 		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img' );
-		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file,eqt.template_file_plaintext, eqt.subject' );
+		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
 		$this->ci->db->join( 'user u', 'u.id = eqa.user_id', 'LEFT' );
 		$this->ci->db->join( 'user_meta um', 'um.user_id = eqa.user_id', 'LEFT' );
@@ -453,7 +464,7 @@ class Emailer {
 	{
 		$this->ci->db->select( 'eq.id, eq.ref, eq.time_queued, eq.email_vars, eq.user_email' );
 		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img' );
-		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file,eqt.template_file_plaintext, eqt.subject' );
+		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
 		$this->ci->db->join( 'user u', 'u.id = eq.user_id', 'LEFT' );
 		$this->ci->db->join( 'user_meta um', 'um.user_id = eq.user_id', 'LEFT' );
@@ -887,12 +898,12 @@ class Emailer {
 	 *
 	 * @access	private
 	 * @param	object	$input			The input object
-	 * @param	boolean	$debug			Turn debugging on or off
+	 * @param	boolean	$graceful		Whether to fail gracefully or not
 	 * @param	boolean	$use_archive	Whetehr to use the archive or the live queue for the email look up
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	private function _send( $email_id = FALSE, $debug = FALSE, $use_archive = TRUE )
+	private function _send( $email_id = FALSE, $graceful = FALSE, $use_archive = TRUE )
 	{
 		//	Get the email if $email_id is not an object
 		if ( ! is_object( $email_id ) ) :
@@ -930,7 +941,7 @@ class Emailer {
 		$_send->to->login_url		= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
 		$_send->subject				= $_email->subject;
 		$_send->template			= $_email->template_file;
-		$_send->template_pt			= $_email->template_file_plaintext;
+		$_send->template_pt			= $_email->template_file . '_plaintext';
 		$_send->data				= $_email->email_vars;
 		
 		// --------------------------------------------------------------------------
@@ -996,7 +1007,7 @@ class Emailer {
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 		
-		if ( ! $debug && ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && $_error->error_has_occurred() ) :
+		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && $_error->error_has_occurred() ) :
 		
 			//	The templates error'd, abort the send and let dev know
 			$_to		= 'hello@shedcollective.org';
@@ -1068,7 +1079,7 @@ class Emailer {
 			foreach ( $input->attachment AS $file ) :
 			
 				if ( ! $this->_add_attachment( $file ) )
-					return ( $debug ) ? show_error( 'Failed to add attachment: '.$file ) : FALSE;
+					return ( ! $graceful ) ? show_error( 'EMAILER: Failed to add attachment: '.$file ) : FALSE;
 				
 			endforeach;
 			
@@ -1077,7 +1088,7 @@ class Emailer {
 		// --------------------------------------------------------------------------
 		
 		//	Debugging?
-		if ( $debug || ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) ) :
+		if ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) :
 		
 			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;

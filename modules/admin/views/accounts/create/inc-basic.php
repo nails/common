@@ -19,10 +19,32 @@
 		$_field					= array();
 		$_field['key']			= 'password';
 		$_field['label']		= 'Password';
-		$_field['required']		= TRUE;
-		$_field['placeholder']	= 'The user\'s password';
+		$_field['placeholder']	= 'The user\'s password, leave blank to auto-generate';
 		
-		echo form_field( $_field, 'The user will not be automatically informed what their password is.' );
+		echo form_field( $_field, 'Leave the password field blank to have the system auto-generate a 6 character password.' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Send welcome/activation email
+		$_field					= array();
+		$_field['key']			= 'send_activation';
+		$_field['label']		= 'Send Welcome Email';
+		$_field['default']		= FALSE;
+		$_field['required']		= FALSE;
+		
+		$_options = array();
+		$_options[] = array(
+			'value'		=> 'TRUE',
+			'label'		=> '<strong>Yes</strong>, send user welcome email containing their password.',
+			'selected'	=> TRUE
+		);
+		$_options[] = array(
+			'value'		=> 'FALSE',
+			'label'		=> '<strong>No</strong>, do not send welcome email.',
+			'selected'	=>	FALSE
+		);
+		
+		echo form_field_radio( $_field, $_options );
 		
 		// --------------------------------------------------------------------------
 		
