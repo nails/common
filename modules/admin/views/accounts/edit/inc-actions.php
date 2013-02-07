@@ -24,11 +24,11 @@
 			
 			if ( $user_edit->active == 2 ) :
 			
-				echo anchor( 'admin/accounts/unban/' . $user_edit->id . $return_string, 'Unban', 'class="awesome small right"' );
+				echo anchor( 'admin/accounts/unsuspend/' . $user_edit->id . $return_string, 'Unsuspend', 'class="awesome small right"' );
 				
 			else :
 			
-				echo anchor( 'admin/accounts/ban/' . $user_edit->id . $return_string, 'Ban', 'class="awesome red small right"' );
+				echo anchor( 'admin/accounts/suspend/' . $user_edit->id . $return_string, 'Suspend', 'class="awesome red small right"' );
 				
 			endif;
 					

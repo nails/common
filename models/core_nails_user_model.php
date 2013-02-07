@@ -306,12 +306,12 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function is_admin()
+	public function is_admin( $user = NULL )
 	{
-		if ( $this->is_superuser() )
+		if ( $this->is_superuser( $user = NULL ) )
 			return TRUE;
 		
-		return ( isset( $this->active_user->acl['admin'] ) ) ? TRUE : FALSE;
+		return $this->has_permission( 'admin', $user );
 	}
 	
 	
@@ -327,9 +327,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function is_superuser()
+	public function is_superuser( $user = NULL )
 	{
-		return ( isset( $this->active_user->acl['superuser'] ) && $this->active_user->acl['superuser'] ) ? TRUE : FALSE;
+		return $this->has_permission( 'superuser', $user );
 	}
 	
 	
@@ -356,6 +356,66 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	
 	/**
+	 * Determines whether the aspecified user has a certain acl permission
+	 *
+	 * @access	public
+	 * @param	string	$permission	The permission to check for, in the format admin.account.view
+	 * @param	mixed	$user		The user to check for; if null uses active user, if numeric, fetches suer, if object uses that object
+	 * @return	boolean
+	 * @author	Pablo
+	 * 
+	 **/
+	public function has_permission( $permission = NULL, $user = NULL )
+	{
+		//	Fetch the correct ACL
+		if ( is_numeric( $user ) ) :
+		
+			$_user = $this->get_user( $user );
+			
+			if ( isset( $_user->acl ) ) :
+			
+				$_acl = $_user->acl;
+				unset( $_user );
+			
+			else :
+			
+				return FALSE;
+			
+			endif;
+		
+		elseif ( isset( $user->acl ) ) :
+		
+			$_acl = $user->acl;
+		
+		else :
+		
+			$_acl = active_user( 'acl' );
+		
+		endif;
+		
+		if ( ! $_acl )
+			return FALSE;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Super users can do anything they damn well please
+		if ( isset( $_acl['superuser'] ) && $_acl['superuser'] )
+			return TRUE;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Test ACL, making sure to clean any dangerous data first
+		$_permission = preg_replace( '/[^a-zA-Z\_\.]/', '', $permission );
+		$_permission = explode( '.', $_permission );
+		eval( '$has_permission = isset( $_acl[\'' . implode( '\'][\'', $_permission ) .'\'] );' );
+		return $has_permission;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Get an array of users from the database, by default only user, group and
 	 * meta information is returned, request specific extra meta by specifying
 	 * which tables to include as the first parameter; seperate multiple tables
@@ -373,7 +433,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'u.*' );
 		$this->db->select( 'um.*' );
 		$this->db->select( 'uam.type AS `auth_type`' );
-		$this->db->select( 'ug.name AS `group_name`' );
+		$this->db->select( 'ug.display_name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
 		
@@ -1819,14 +1879,14 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	
 	/**
-	 * Ban a user
+	 * Suspend a user
 	 *
 	 * @access	public
-	 * @param	int		$id	The ID of the user to ban
+	 * @param	int		$id	The ID of the user to suspend
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	 public function ban( $id )
+	 public function suspend( $id )
 	 {
 	 	return $this->update( $id, array( 'active' => 2 ) );
 	 }
@@ -1836,14 +1896,14 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 
 	 
 	/**
-	 * Unban a user
+	 * Unsuspend a user
 	 *
 	 * @access	public
-	 * @param	int		$id	The ID of the user to unban
+	 * @param	int		$id	The ID of the user to unsuspend
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	 public function unban( $id )
+	 public function unsuspend( $id )
 	 {
 	 	return $this->update( $id, array( 'active' => 1 ) );
 	 }

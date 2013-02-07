@@ -4,8 +4,13 @@
 	echo form_hidden( 'id', $user_edit->id );
 	echo form_hidden( 'email_orig', $user_edit->email );
 	echo form_hidden( 'username_orig', $user_edit->username );
-
-	$this->load->view( 'accounts/edit/inc-actions' );
+	
+	if ( ! $this->input->get( 'inline' ) ) :
+	
+		$this->load->view( 'accounts/edit/inc-actions' );
+	
+	endif;
+	
 	$this->load->view( 'accounts/edit/inc-basic' );
 	$this->load->view( 'accounts/edit/inc-meta' );
 	$this->load->view( 'accounts/edit/inc-profile-img' );

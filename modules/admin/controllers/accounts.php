@@ -26,6 +26,9 @@ class NAILS_Accounts extends Admin_Controller {
 
 	protected $accounts_group;
 	protected $accounts_where;
+	protected $accounts_columns;
+	protected $accounts_actions;
+	protected $accounts_searchfields;
 	
 	
 	// --------------------------------------------------------------------------
@@ -107,8 +110,11 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Defaults defaults
-		$this->accounts_group = FALSE;
-		$this->accounts_where = array();
+		$this->accounts_group			= FALSE;
+		$this->accounts_where			= array();
+		$this->accounts_columns			= array();
+		$this->accounts_actions			= array();
+		$this->accounts_searchfields	= array();
 	}
 	
 	
@@ -125,31 +131,42 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function index()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'index';
+		//	Searching, sorting, ordering and paginating.
+		$_hash = 'search_' . md5( uri_string() ) . '_';
 		
-		//	Override the title (used when loading this method from one of the other methods)
-		$this->data['page']->title		= ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'View All Members';
+		if ( $this->input->get( 'reset' ) ) :
 		
-		// --------------------------------------------------------------------------
+			$this->session->unset_userdata( $_hash . 'per_page' );
+			$this->session->unset_userdata( $_hash . 'sort' );
+			$this->session->unset_userdata( $_hash . 'order' );
+		
+		endif;
+		
+		$_default_per_page	= $this->session->userdata( $_hash . 'per_page' ) ? $this->session->userdata( $_hash . 'per_page' ) : 50;
+		$_default_sort		= $this->session->userdata( $_hash . 'sort' ) ? 	$this->session->userdata( $_hash . 'sort' ) : 'u.id';
+		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'ASC';
 		
 		//	Define vars
-		$_search = $this->input->get( 'search' );
-		
-		// --------------------------------------------------------------------------
-			
-		//	Work out the limits
-		$_per_page	= 25;
-		$_page		= $this->uri->segment( 4, 0 );
-		$_offset	= $_page * $_per_page;
+		$_search	= $this->input->get( 'search' );
 		$_limit		= array(
-						$_per_page,
-						$_offset
+						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
+						$this->input->get( 'offset' ) ? $this->input->get( 'offset' ) : 0
 					);
 		$_order		= array(
-						'u.id',
-						'DESC'
+						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
+						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
+					
+		//	Set sorting and ordering info in session data so it's remembered for when user returns
+		$this->session->set_userdata( $_hash . 'per_page', $_limit[0] );
+		$this->session->set_userdata( $_hash . 'sort', $_order[0] );
+		$this->session->set_userdata( $_hash . 'order', $_order[1] );
+		
+		//	Set values for the page
+		$this->data['search']			= new stdClass();
+		$this->data['search']->per_page	= $_limit[0];
+		$this->data['search']->sort		= $_order[0];
+		$this->data['search']->order	= $_order[1];
 		
 		// --------------------------------------------------------------------------
 		
@@ -162,13 +179,38 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Work out the total number of pages
-		$this->data['total_pages'] = floor( $this->user->count_users( $this->accounts_where, $_search ) / $_per_page );
+		//	Get the accounts
+		$this->data['users']		= new stdClass();
+		$this->data['users']->data	= $this->user->get_users( FALSE, $_order, $_limit, $this->accounts_where, $_search );
+		
+		//	Work out pagination
+		$this->data['users']->pagination				= new stdClass();
+		$this->data['users']->pagination->total_results	= $this->user->count_users( $this->accounts_where, $_search );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Get the accounts
-		$this->data['users'] = $this->user->get_users( FALSE, $_order, $_limit, $this->accounts_where, $_search );
+		//	Set method info
+		$this->data['page']->admin_m	= 'index';
+		
+		//	Override the title (used when loading this method from one of the other methods)
+		$this->data['page']->title	 = ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'View All Members';
+		
+		if ( $_search ) :
+		
+			$this->data['page']->title	.= ' (search for "' . $_search . '" returned ' . number_format( $this->data['users']->pagination->total_results ) . ' results)';
+			
+		else :
+		
+			$this->data['page']->title	.= ' (' . number_format( $this->data['users']->pagination->total_results ) . ')';
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Pass any columns and actions to the view
+		$this->data['columns']		= $this->accounts_columns;
+		$this->data['actions']		= $this->accounts_actions;
+		$this->data['searchfields']	= $this->accounts_searchfields;
 		
 		// --------------------------------------------------------------------------
 		
@@ -489,15 +531,13 @@ class NAILS_Accounts extends Admin_Controller {
 			// --------------------------------------------------------------------------
 			
 			//	Perform any user_meta file uploads
+			$_successes	= array();
+			$_failed	= array();
+			
 			if ( $_uploads ) :
 			
 				$this->load->library( 'cdn' );
-				
-				// --------------------------------------------------------------------------
-				
-				$_successes	= array();
-				$_failed	= array();
-				
+								
 				// --------------------------------------------------------------------------
 				
 				foreach ( $_uploads AS $upload ) :
@@ -782,14 +822,39 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		$this->data['return_string']	= '?return_to=' . urlencode( $this->input->get( 'return_to' ) );
+		
+		if ( $this->input->get( 'inline' ) ) :
+		
+			$this->data['return_string'] .= '&inline=true';
+		
+		endif;
+		
 		$this->data['notice']			= active_user( 'id' ) == $_user->id ? '<strong>Hello there!</strong> You are currently editing your own account.' : FALSE;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
+		if ( $this->input->get( 'inline' ) ) :
+		
+			$this->nails->load_view( 'admin/structure/header_blank', 'modules/admin/views/structure/header_blank', $this->data );
+		
+		else :
+		
+			$this->nails->load_view( 'admin/structure/header', 'modules/admin/views/structure/header', $this->data );
+		
+		endif;
+		
 		$this->nails->load_view( 'admin/accounts/edit/index',	'modules/admin/views/accounts/edit/index',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+		
+		if ( $this->input->get( 'inline' ) ) :
+		
+			$this->nails->load_view( 'admin/structure/footer_blank', 'modules/admin/views/structure/footer_blank', $this->data );
+		
+		else :
+		
+			$this->nails->load_view( 'admin/structure/footer_blank', 'modules/admin/views/structure/footer_blank', $this->data );
+		
+		endif;
 	}
 	
 	
@@ -797,18 +862,18 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	
 	/**
-	 * Ban a user
+	 * Suspend a user
 	 *
 	 * @access	public
 	 * @param	none
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function ban()
+	public function suspend()
 	{
 		//	Ban user
 		$_uid = $this->uri->segment( 4 );
-		$this->user->ban( $_uid );
+		$this->user->suspend( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -820,11 +885,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $_user->active != 2 ) :
 		
-			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem banning ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem suspending ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was banned successfully.' );
+			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was suspended successfully.' );
 			
 		endif;
 		
@@ -845,11 +910,11 @@ class NAILS_Accounts extends Admin_Controller {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function unban()
+	public function unsuspend()
 	{
 		//	Unban user
 		$_uid = $this->uri->segment( 4 );
-		$this->user->unban( $_uid );
+		$this->user->unsuspend( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -861,11 +926,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $_user->active != 1 ) :
 		
-			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem unbanning ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem unsuspend ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was unbanned successfully.' );
+			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was unsuspend successfully.' );
 			
 		endif;
 		
@@ -914,8 +979,9 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	public function delete_profile_img()
 	{
-		$_uid = $this->uri->segment( 4 );
-		$_user = $this->user->get_user( $_uid );
+		$_uid		= $this->uri->segment( 4 );
+		$_user		= $this->user->get_user( $_uid );
+		$_return_to	= $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/accounts/edit/' . $_uid;
 		
 		// --------------------------------------------------------------------------
 		
@@ -956,7 +1022,7 @@ class NAILS_Accounts extends Admin_Controller {
 			
 			// --------------------------------------------------------------------------
 			
-			redirect( 'admin/accounts/edit/' . $_uid );
+			redirect( $_return_to );
 		
 		endif;
 	}

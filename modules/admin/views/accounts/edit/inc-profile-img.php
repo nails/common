@@ -22,7 +22,8 @@
 			echo anchor( cdn_serve( 'profile-images', $user_edit->profile_img ), img( $_img ), 'class="fancybox left"' );
 			echo '<p>';
 			echo form_upload( 'profile_img', NULL, 'style="float:none;"' ) . '<br />';
-			echo anchor( 'admin/accounts/delete_profile_img/' . $user_edit->id, 'Remove Image', 'class="awesome small red" style="margin-top:10px;"' );
+			$_return = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );
+			echo anchor( 'admin/accounts/delete_profile_img/' . $user_edit->id . $_return, 'Remove Image', 'class="awesome small red" style="margin-top:10px;"' );
 			echo '</p>';
 	
 		endif;
