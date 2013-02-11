@@ -35,7 +35,6 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		
 			$_ci->output->set_output( "\n404 Page Not Found\n\n" );
 			echo $_ci->output->get_output();
-			exit( 0 );
 		
 		endif;
 		
@@ -63,7 +62,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		
 		if ( $this->data['user'] === FALSE ) :
 		
-			//	Load up the user model and set the constant which IA_Controller would set
+			//	Load up the user model and set the constant which NAIL_Controller would set
 			$_ci->load->model( 'user_model' );
 			$this->data['user']	=& $_ci->user_model;
 			define( 'IA_USR_OBJ', 'user_model' );
@@ -91,7 +90,6 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		
 		//	Send the output to the browser
 		echo $_ci->output->get_output();
-		exit( 0 );
 	}
 	
 	

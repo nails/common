@@ -27,9 +27,26 @@
 			{
 				line-height:1.5em;
 				font-style:italic;
+				font-weight:bold;
 				margin-bottom:1em;
 				padding-bottom:1em;
 				border-bottom:1px solid #ececec;
+			}
+			
+			h2
+			{
+				font-size:1.2em;
+				font-weight:bold;
+				margin-top:3em;
+				border-bottom:1px solid #ececec;
+				padding-bottom:0.5em;
+			}
+			
+			h3,h4,h5,h6
+			{
+				font-size:1em;
+				font-weight:bold;
+				margin-bototm:1em;
 			}
 			
 			p

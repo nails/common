@@ -284,7 +284,8 @@ class NAILS_Accounts extends Admin_Controller {
 						$_email->to_id					= $_new_user['id'];
 						$_email->data					= array();
 						$_email->data['admin']			= active_user( 'first_name,last_name' );
-						$_email->data['new_user']		= $_new_user;
+						$_email->data['user']			= $this->user->get_user( $_new_user['id'] );
+						$_email->data['password']		= $_password;
 						$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
 						
 						$this->load->library( 'emailer' );

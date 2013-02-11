@@ -109,7 +109,7 @@ class NAILS_Reset_Password extends NAILS_Controller
 					$_data['password']					= $this->input->post( 'new_password' );
 					
 					//	Reset the password
-					$this->user->password_reset_from_temp( $id, $_data );
+					$this->user->update( $id, $_data );
 					
 					//	Log the user in
 					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), TRUE );

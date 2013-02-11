@@ -924,7 +924,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			//	If we're updatig the email of a user check to see if
 			//	the new email already exists; can't be having two identical
-			//	emails in the user.
+			//	emails in the user table.
 			
 			if (  array_key_exists( 'email', $data ) ) :
 			
@@ -1727,54 +1727,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			return $_password;
 		
 		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Resets a user's password from their temporary password
-	 *
-	 * @access	public
-	 * @param	int		$id		The ID of the user to reset
-	 * @param	array	$data	An array of data to apply to the user
-	 * @return	boolean
-	 * @author	Pablo
-	 **/
-	public function password_reset_from_temp( $id, $data )
-	{
-		if ( ! $id )
-			return FALSE;
-		
-		// --------------------------------------------------------------------------
-		
-		$_u	= $this->get_user( $id );
-		
-		if ( ! $_u )
-			return FALSE;
-		
-		// --------------------------------------------------------------------------
-		
-		$_data = (array) $data;
-		
-		// --------------------------------------------------------------------------
-		
-		$_pw = $this->hash_password( $_data['password'] );
-		
-		// --------------------------------------------------------------------------
-		
-		$_data['password']					= $_pw[0];
-		$_data['salt']						= $_pw[1];
-		
-		// --------------------------------------------------------------------------
-		
-		$this->db->where( 'id', $id );
-		$this->db->update( 'user', $_data );
-		
-		// --------------------------------------------------------------------------
-		
-		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
 	
 	
