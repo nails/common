@@ -629,41 +629,112 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set Search
-		if ( $search ) :
+		if ( $search && is_string( $search ) ) :
 		
-			//	Build the query so that any existing wheres are considered AS WELL AS the search terms
+			//	Search is a simple string, no columns are being specified to search across
+			//	so define a default set to search across
 			
-			if ( $where ) :
+			$search							= array( 'keywords' => $search, 'columns' => array() );
+			$search['columns']['id']		= 'u.id';
+			$search['columns']['email']		= 'u.email';
+			$search['columns']['username']	= 'u.username';
+			$search['columns']['name']		= array( ' ', 'um.first_name', 'um.last_name' );
 			
-				//	Existing where, build it the hard way
-				$_where  = '(';
-				
-				//	User
-				$_where .= '`u`.`id` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`u`.`email` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`u`.`username` LIKE \'%' . $search . '%\' OR';
-				
-				//	User Meta
-				$_where .= '`um`.`first_name` LIKE \'%' . $search . '%\' OR';
-				$_where .= '`um`.`last_name` LIKE \'%' . $search . '%\' OR';
-				
-				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+		endif;
+		
+		//	If there is a search term to use then build the search query
+		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
+		
+			//	Parse the keywords, look for specific column searches
+			preg_match_all('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', $search['keywords'], $_matches );
 			
+			if ( $_matches[1] && $_matches[2] ) :
+			
+				$_specifics = array_combine( $_matches[1], $_matches[2] );
+				
 			else :
-
-				//	No existing wheres, build it the easy way
-							
-				//	User table
-				$this->db->like( 'u.id', $search );
-				$this->db->or_like( 'u.email', $search );
-				$this->db->or_like( 'u.username', $search );
-				
-				//	User Meta
-				$this->db->or_like( 'um.first_name', $search );
-				$this->db->or_like( 'um.last_name', $search );
+			
+				$_specifics = array();
 			
 			endif;
 			
+			//	Match the specific labels to a column
+			if ( $_specifics ) :
+			
+				$_temp = array();
+				foreach ( $_specifics AS $col => $value ) :
+				
+					if ( isset( $search['columns'][ strtolower( $col )] ) ) :
+						
+						$_temp[] = array(
+							'cols'	=> $search['columns'][ strtolower( $col )],
+							'value'	=> $value
+						);
+						
+					endif;
+				
+				endforeach;
+				$_specifics = $_temp;
+				unset( $_temp );
+				
+				// --------------------------------------------------------------------------
+				
+				//	Remove controls from search string
+				$search['keywords'] = preg_replace('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
+			
+			endif;
+			
+			if ( $_specifics ) :
+			
+				//	We have some specifics
+				foreach( $_specifics AS $specific ) :
+				
+					if ( is_array( $specific['cols'] ) ) :
+					
+						$_separator = array_shift( $specific['cols'] );
+						$this->db->like( 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $specific['cols'] ) . ' )', $specific['value'] );
+					
+					else :
+					
+						$this->db->like( $specific['cols'], $specific['value'] );
+					
+					endif;
+				
+				endforeach;
+			
+			endif;
+			
+			
+			// --------------------------------------------------------------------------
+			
+			if ( $search['keywords'] ) : 
+			
+				$_where  = '(';
+				
+				if ( isset( $search[ 'columns' ] ) && $search[ 'columns' ] ) :
+				
+					//	We have some specifics
+					foreach( $search[ 'columns' ] AS $col ) :
+					
+						if ( is_array( $col ) ) :
+						
+							$_separator = array_shift( $col );
+							$_where .= 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $col ) . ' ) LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						else :
+						
+							$_where .= $col . ' LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						endif;
+					
+					endforeach;
+				
+				endif;
+				
+				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+				
+			endif;
+		
 		endif;
 	}
 	

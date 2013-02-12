@@ -13,15 +13,8 @@
 		
 		// --------------------------------------------------------------------------
 		
-		$_sort = array(
-			'u.id' 			=> 'User ID',
-			'um.first_name'	=> 'First Name, Last Name',
-			'um.last_name'	=> 'Last Name, First Name',
-			'u.email'		=> 'Email'
-		);
-		
-		//	Add any custom search fields
-		foreach ( $searchfields AS $field ) :
+		$_sort = array();
+		foreach ( $sortfields AS $field ) :
 		
 			$_sort[$field['col']] = $field['label'];
 		

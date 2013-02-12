@@ -28,7 +28,7 @@ class NAILS_Accounts extends Admin_Controller {
 	protected $accounts_where;
 	protected $accounts_columns;
 	protected $accounts_actions;
-	protected $accounts_searchfields;
+	protected $accounts_sortfields;
 	
 	
 	// --------------------------------------------------------------------------
@@ -110,11 +110,18 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Defaults defaults
-		$this->accounts_group			= FALSE;
-		$this->accounts_where			= array();
-		$this->accounts_columns			= array();
-		$this->accounts_actions			= array();
-		$this->accounts_searchfields	= array();
+		$this->accounts_group		= FALSE;
+		$this->accounts_where		= array();
+		$this->accounts_columns		= array();
+		$this->accounts_actions		= array();
+		$this->accounts_sortfields	= array();
+		
+		// --------------------------------------------------------------------------
+		
+		$this->accounts_sortfields[] = array( 'label' => 'User ID',					'col' => 'u.id' );
+		$this->accounts_sortfields[] = array( 'label' => 'First Name, Last Name',	'col' => 'um.first_name' );
+		$this->accounts_sortfields[] = array( 'label' => 'Last Name, First Name',	'col' => 'um.last_name' );
+		$this->accounts_sortfields[] = array( 'label' => 'Email',					'col' => 'u.email' );
 	}
 	
 	
@@ -147,7 +154,18 @@ class NAILS_Accounts extends Admin_Controller {
 		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'ASC';
 		
 		//	Define vars
-		$_search	= $this->input->get( 'search' );
+		$_search						= array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
+		
+		foreach ( $this->accounts_sortfields AS $field ) :
+		
+			$_search['columns'][strtolower( $field['label'] )] = $field['col'];
+		
+		endforeach;
+		
+		//	Add any other permenantly searchable fields here
+		$_search['columns']['name']		= array( ' ', 'um.first_name', 'um.last_name' );
+		$_search['columns']['gender']	= 'um.gender';
+		
 		$_limit		= array(
 						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
 						$this->input->get( 'offset' ) ? $this->input->get( 'offset' ) : 0
@@ -195,9 +213,9 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Override the title (used when loading this method from one of the other methods)
 		$this->data['page']->title	 = ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'View All Members';
 		
-		if ( $_search ) :
+		if ( $_search['keywords'] ) :
 		
-			$this->data['page']->title	.= ' (search for "' . $_search . '" returned ' . number_format( $this->data['users']->pagination->total_results ) . ' results)';
+			$this->data['page']->title	.= ' (search for "' . $_search['keywords'] . '" returned ' . number_format( $this->data['users']->pagination->total_results ) . ' results)';
 			
 		else :
 		
@@ -210,7 +228,7 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Pass any columns and actions to the view
 		$this->data['columns']		= $this->accounts_columns;
 		$this->data['actions']		= $this->accounts_actions;
-		$this->data['searchfields']	= $this->accounts_searchfields;
+		$this->data['sortfields']	= $this->accounts_sortfields;
 		
 		// --------------------------------------------------------------------------
 		
@@ -472,7 +490,7 @@ class NAILS_Accounts extends Admin_Controller {
 			
 			foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
 			
-				$_datatype	= isset( $value['datatype'] )	? $value['datatype'] :  'string';
+				$_datatype	= isset( $value['datatype'] )	? $value['datatype'] : 'string';
 				$_label		= isset( $value['label'] )		? $value['label'] : ucwords( str_replace( '_', ' ', $col ) );
 				
 				//	Some data types require different handling
