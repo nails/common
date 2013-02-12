@@ -47,7 +47,7 @@
 				else :
 					?>
 					<tr>
-						<td colspan="4" class="no-data">
+						<td colspan="<?=(4+count($columns))?>" class="no-data">
 							<p>No Users found</p>
 						</td>
 					</tr>
