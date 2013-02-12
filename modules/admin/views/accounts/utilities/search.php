@@ -1,5 +1,5 @@
 <div class="search">
-	<div class="mask"><?=img( NAILS_URL . '/img/loader/30px-000000-TRANS.gif' )?></div>
+	<div class="mask"><?=img( NAILS_URL . 'img/loader/30px-000000-TRANS.gif' )?></div>
 	<?php
 	
 		$_form = array(
@@ -49,7 +49,9 @@
 		echo form_dropdown( 'per_page', $_perpage, $search->per_page );
 		echo 'per page.';
 		
-		echo anchor( uri_string() . '?reset=true', 'reset', 'class="awesome small right"' );
+		echo anchor( uri_string() . '?reset=true', 'Reset', 'class="awesome small right"' );
+		echo form_submit( 'submit', 'Search', 'class="awesome small right"' );
+
 		
 		// --------------------------------------------------------------------------
 		
