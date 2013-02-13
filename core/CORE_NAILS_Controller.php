@@ -38,8 +38,17 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'2.4.1' );
-		define( 'NAILS_RELEASED',	'16th March 2012 @ 18:12' );
+		define( 'NAILS_VERSION',	'0.0.0' );
+		define( 'NAILS_RELEASED',	'Never Released' );
+		
+		//	Include the environment Nails config
+		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
+		
+			die( 'Nails environment not correctly configured.' );
+		
+		endif;
+		
+		require_once( NAILS_PATH . '/config/_nails.php' );
 		
 		// --------------------------------------------------------------------------
 		
