@@ -320,7 +320,8 @@ class CI_DB_driver {
 				$this->trans_complete();
 
 				// Log and display errors
-				log_message('error', 'Query error: '.$error_msg);
+				//	SH'EDIT: Added Query to log line
+				log_message('error', 'Query error: '.$error_msg.'; Query: '.$sql);
 				return $this->display_error(
 										array(
 												'Error Number: '.$error_no,
@@ -1155,6 +1156,16 @@ class CI_DB_driver {
 	 */
 	function display_error($error = '', $swap = '', $native = FALSE)
 	{
+		//	SH'EDIT: If in a production environment, don't show the error
+		//	as it's been logged
+		if ( ENVIRONMENT == 'production' ) :
+		
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$LANG =& load_class('Lang', 'core');
 		$LANG->load('db');
 
