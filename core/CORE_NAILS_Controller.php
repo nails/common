@@ -4,7 +4,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected $data;
 	protected $user;
-	protected $nails;
 	protected $nails_modules;
 	
 	// --------------------------------------------------------------------------
@@ -119,16 +118,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		$this->user->find_remembered_user();
 		$this->user->init();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load the Nails Helper Model
-		$this->load->model( 'CORE_NAILS_nails_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Reference to the nails model (mainly for simplicity)
-		$this->nails =& $this->CORE_NAILS_nails_model;
 		
 		// --------------------------------------------------------------------------
 		

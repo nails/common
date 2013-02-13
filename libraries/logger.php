@@ -1,14 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Logger
-*
-* Created:		26/05/2011
-* Modified:		26/05/2011
-*
-* Description:	A Library for logging data to the server
-* 
-*/
+ * Name:		Logger
+ *
+ * Description:	A Library for logging data to the server
+ * 
+ */
 
 class Logger {
 	

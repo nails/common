@@ -3,11 +3,6 @@
 /**
 * Name:			Asset
 *
-* Docs:			-
-*
-* Created:		15/02/2011
-* Modified:		13/04/2011
-*
 * Description:	A Library to make the loading (and unloading) of CSS and JS assets a breeze
 * 
 */

@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth [activate]
-*
-* Docs:			http://nails.shedcollective.org/docs/auth/
-*
-* Created:		13/11/2010
-* Modified:		03/02/2012
-*
-* Description:	This controller handles activating users
-* 
-*/
+ * Name:		Auth [activate]
+ *
+ * Description:	This controller handles activating users
+ * 
+ **/
 
 /**
  * OVERLOADING NAILS'S AUTH MODULE
@@ -24,33 +19,6 @@ require_once '_auth.php';
 
 class NAILS_Activate extends NAILS_Auth_Controller
 {
-	/**
-	 * Constructor
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function __construct()
-	{
-		parent::__construct();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
 	/**
 	 * Attempt to validate the user's activation code
 	 *
@@ -116,9 +84,9 @@ class NAILS_Activate extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',	'views/structure/header',			$this->data );
-		$this->nails->load_view( 'auth/activate/fail',	'modules/auth/views/activate/fail',	$this->data );
-		$this->nails->load_view( 'structure/footer',	'views/structure/footer',			$this->data );
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'auth/activate/fail',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 	
 	

@@ -1,14 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Cron Controller
-*
-* Created:		10/07/2012
-* Modified:		10/07/2012
-*
-* Description:	Executes common cron functionality
-* 
-*/
+ * Name:		Cron Controller
+ * 
+ * Description:	Executes common cron functionality
+ * 
+ **/
 
 class NAILS_Cron_Controller extends NAILS_Controller
 {

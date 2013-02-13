@@ -1,10 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			Admin API
- *
- * Created:		18/11/2012
- * Modified:		18/11/2012
+ * Name:		Admin API
  *
  * Description:	This controller handles API emthods relating to admin
  * 

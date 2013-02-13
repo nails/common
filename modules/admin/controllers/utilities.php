@@ -1,14 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin - Utilities
-*
-* Created:		15/11/2012
-* Modified:		15/11/2012
-*
-* Description:	-
-* 
-*/
+ * Name:		Admin - Utilities
+ *
+ * Description:	-
+ * 
+ **/
 
 
 //	Include Admin_Controller; executes common admin functionality.
@@ -109,9 +106,9 @@ class NAILS_Utilities extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
-		$this->nails->load_view( 'admin/utilities/send_test',	'modules/admin/views/utilities/send_test',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/utilities/send_test',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	
@@ -139,9 +136,9 @@ class NAILS_Utilities extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',			$this->data );
-		$this->nails->load_view( 'admin/utilities/user_access',	'modules/admin/views/utilities/user_access',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',			$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/utilities/user_access',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 	
 	
@@ -231,9 +228,9 @@ class NAILS_Utilities extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',		$this->data );
-		$this->nails->load_view( 'admin/utilities/edit_group',	'modules/admin/views/utilities/edit_group',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',		$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/utilities/edit_group',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
 	}
 }
 

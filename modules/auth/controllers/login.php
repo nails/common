@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth [login]
-*
-* Docs:			http://nails.shedcollective.org/docs/auth/
-*
-* Created:		14/10/2010
-* Modified:		04/04/2012
-*
-* Description:	This module handles the login process for all users.
-* 
-*/
+ * Name:		Auth [login]
+ *
+ * Description:	This module handles the login process for all users.
+ * 
+ **/
 
 /**
  * OVERLOADING NAILS'S AUTH MODULE
@@ -43,16 +38,6 @@ class NAILS_Login extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
-		
-		// --------------------------------------------------------------------------
-		
 		//	Where are we returning user to?
 		$this->data['return_to'] = $this->input->get( 'return_to' );
 		
@@ -79,7 +64,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		//	If you're logged in you shouldn't be accessing this method
 		if ( $this->user->is_logged_in() ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', $this->user->active_user( 'email' ) ) );
+			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
 			
 		endif;
@@ -180,9 +165,9 @@ class NAILS_Login extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',	'views/structure/header',			$this->data );
-		$this->nails->load_view( 'auth/login/form',		'modules/auth/views/login/form',	$this->data );
-		$this->nails->load_view( 'structure/footer',	'views/structure/footer',			$this->data );
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'auth/login/form',	$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
 	}
 	
 	
@@ -229,7 +214,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 				else :
 				
 					//	Nowhere to go? Send them to their default homepage
-					redirect( $this->user->active_user( 'group_homepage' ) );
+					redirect( active_user( 'group_homepage' ) );
 				
 				endif;
 			

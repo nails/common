@@ -3,14 +3,7 @@
 /**
 * Name:			FreeAgent
 *
-* Created:		10/02/2012
-* Modified:		10/02/2012
-*
 * Description:	Gateway to the FreeAgent API wrapper provided by HostLikeToast
-*
-* Requirements:	-
-*
-* Change log:	-
 * 
 */
 

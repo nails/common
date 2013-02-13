@@ -16,14 +16,14 @@
 	 
 	// --------------------------------------------------------------------------
 	
-		
+	
 	if ( isset( $footer_override ) ) :
 	
 		//	Manual override
 		$this->load->view( $footer_override );
 	
 	else :
-
+	
 		//	Auto-detect footer if there is a config file
 		if ( file_exists( FCPATH . APPPATH . 'config/footer_views.php' ) ) :
 		
@@ -62,16 +62,43 @@
 			
 				$this->load->view( $_match );
 			
+			elseif ( $this->uri->segment( 1 ) == 'admin' ) :
+			
+				//	No match, but in admin, load the appropriate admin view
+				if ( isset( $is_404 ) && $is_404 ) :
+				
+					//	404 with no route, show the default footer
+					$this->load->view( $this->config->item( 'default_footer' ) );
+				
+				else :
+				
+					//	Admin has no route and it's not a 404, load up the Nails admin footer
+					$this->load->view( 'structure/footer/nails-admin' );
+				
+				endif;
+			
 			else :
 	
 				$this->load->view( $this->config->item( 'default_footer' ) );
 			
 			endif;
+		
+		elseif ( $this->uri->segment( 1 ) == 'admin' && ( !isset( $is_404 ) || ! $is_404 ) ) :
+		
+			//	Loading admin footer and no config file. This isn't a 404 so
+			//	go ahead and load the normal Nails admin footer
+			
+			$this->load->view( 'structure/footer/nails-admin' );
+		
+		elseif ( file_exists( FCPATH . APPPATH . 'views/structure/footer/default.php' ) ) :
+		
+			//	No config file, but the app has a default footer
+			$this->load->view( 'structure/footer/default' );
 			
 		else :
 		
-			//	No config file, fall back to the default Nails. footer
-			$this->load->view( 'structure/footer/nailsdefault' );
+			//	No config file or app default, fall back to the default Nails. footer
+			$this->load->view( 'structure/footer/nails-default' );
 		
 		endif;
 			

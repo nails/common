@@ -3,11 +3,6 @@
 /**
 * Name:			NAILS_Calendar
 *
-* Docs:			-
-*
-* Created:		19/01/2012
-* Modified:		19/01/2012
-*
 * Description:	This extension overrides the generate function allowing more data to be made available to the cells
 				i.e month and year information. Also added new pseudo variable {day_padded}
 * 

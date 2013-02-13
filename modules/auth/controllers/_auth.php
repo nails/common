@@ -3,9 +3,6 @@
 /**
  * Name:		NAILS_Auth_Controller
  *
- * Created:		18/11/2012
- * Modified:	18/11/2012
- *
  * Description:	This controller executes various bits of common admin Auth functionality
  * 
  **/
@@ -26,6 +23,16 @@ class NAILS_Auth_Controller extends NAILS_Controller
 			show_404();
 		
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load model
+		$this->load->model( 'auth_model' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load language file
+		$this->lang->load( 'auth', 'english' );
 	}
 }
 

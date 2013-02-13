@@ -3,14 +3,7 @@
 /**
 * Name:			Profanity
 *
-* Created:		01/02/2012
-* Modified:		01/02/2012
-*
 * Description:	Quickly clean profanities from content
-*
-* Requirements:	-
-*
-* Change log:	-
 * 
 */
 

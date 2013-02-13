@@ -2,15 +2,8 @@
 
 /**
 * Name:			LinkedIn
-*
-* Created:		26/03/2012
-* Modified:		26/03/2012
-*
+* 
 * Description:	Gateway to the LinkedIn API
-*
-* Requirements:	-
-*
-* Change log:	-
 * 
 */
 

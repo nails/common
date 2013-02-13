@@ -1,17 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			TinyMCE
-**
-*
-* Docs:			-
-*
-* Created:		17/02/2011
-* Modified:		10/01/2012
-*
-* Description:	A Library to take the pain out of using TinyMCE in your apps.
-* 
-*/
+ * Name:		TinyMCE
+ *
+ * Description:	A Library to take the pain out of using TinyMCE in your apps.
+ * 
+ **/
 
 class TinyMCE {
 	

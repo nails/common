@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
 	<meta charset="UTF-8" />
 	<title>
@@ -16,28 +19,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	
 	<!--	ASSETS	-->
-	
-	<!--	JS GLOBALS	-->
 	<script type="text/javascript">
 		window.NAILS_URL = '<?=NAILS_URL?>';
 		window.SITE_URL = '<?=site_url()?>';
 	</script>
-	
-	<!--	REQUIRED JS	-->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 	<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>js/jquery.min.js"><\/script>')</script>
-	
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.tipsy.min.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.chosen.min.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/jquery.fancybox.min.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.default.min.js'?>"></script>
-	<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.admin.min.js'?>"></script>
-	
-	<!--	REQUIRED CSS	-->
-	<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/nails.admin.css'?>" />
-	
-	<!--	DYNAMIC	-->
 	<?php
 	
 		echo $this->asset->output( 'css' );
@@ -45,10 +33,7 @@
 		echo $this->asset->output( 'css-inline' );
 	
 	?>
-	
-	<!--	PRINT	-->
 	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_URL . 'css/nails.admin.print.css'?>" />
-	
 	<script type="text/javascript" charset="utf-8">
 		<?=$this->asset->output( 'js-inline' )?>
 	</script>	

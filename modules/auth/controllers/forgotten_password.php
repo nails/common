@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth [forgotten password]
-*
-* Docs:			http://nails.shedcollective.org/docs/auth/
-*
-* Created:		14/10/2010
-* Modified:		04/04/2012
-*
-* Description:	This controller handles the resetting of a user's password
-* 
-*/
+ * Name:		Auth [forgotten password]
+ *
+ * Description:	This controller handles the resetting of a user's password
+ * 
+ **/
 
 /**
  * OVERLOADING NAILS'S AUTH MODULE
@@ -40,16 +35,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		
 		//	Load libraries
 		$this->load->library( 'form_validation' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
 		
 		// --------------------------------------------------------------------------
 		
@@ -167,9 +152,9 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',			'views/structure/header',					$this->data );
-		$this->nails->load_view( 'auth/password/forgotten',		'modules/auth/views/password/forgotten',	$this->data );
-		$this->nails->load_view( 'structure/footer',			'views/structure/footer',					$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'auth/password/forgotten',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	
@@ -217,9 +202,9 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			//	Load the views; using the auth_model view loader as we need to check if
 			//	an overload file exists which should be used instead
 			
-			$this->nails->load_view( 'structure/header',				'views/structure/header',						$this->data );
-			$this->nails->load_view( 'auth/password/forgotten_reset',	'modules/auth/views/password/forgotten_reset',	$this->data );
-			$this->nails->load_view( 'structure/footer',				'views/structure/footer',						$this->data );
+			$this->load->view( 'structure/header',				$this->data );
+			$this->load->view( 'auth/password/forgotten_reset',	$this->data );
+			$this->load->view( 'structure/footer',				$this->data );
 			return;
 			
 		endif;
@@ -229,9 +214,9 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',		'views/structure/header',					$this->data );
-		$this->nails->load_view( 'auth/password/forgotten',	'modules/auth/views/password/forgotten',	$this->data );
-		$this->nails->load_view( 'structure/footer',		'views/structure/footer',					$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'auth/password/forgotten',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	

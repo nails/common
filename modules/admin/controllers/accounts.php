@@ -1,12 +1,8 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			Accounts
- *
- * Created:		14/10/2010
- * Modified:		24/03/2011
- *
- * Description:	-
+ * Name:		Accounts
+ * Description:	Browse and edit user accounts
  * 
  **/
 
@@ -233,9 +229,9 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',		$this->data );
-		$this->nails->load_view( 'admin/accounts/overview',	'modules/admin/views/accounts/overview',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',		$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/accounts/overview',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	
@@ -358,9 +354,9 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',		'modules/admin/views/structure/header',			$this->data );
-		$this->nails->load_view( 'admin/accounts/create/index',	'modules/admin/views/accounts/create/index',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',		'modules/admin/views/structure/footer',			$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/accounts/create/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 	
 	
@@ -855,25 +851,14 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Load views
 		if ( $this->input->get( 'inline' ) ) :
 		
-			$this->nails->load_view( 'admin/structure/header_blank', 'modules/admin/views/structure/header_blank', $this->data );
-		
-		else :
-		
-			$this->nails->load_view( 'admin/structure/header', 'modules/admin/views/structure/header', $this->data );
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
 		
 		endif;
 		
-		$this->nails->load_view( 'admin/accounts/edit/index',	'modules/admin/views/accounts/edit/index',	$this->data );
-		
-		if ( $this->input->get( 'inline' ) ) :
-		
-			$this->nails->load_view( 'admin/structure/footer_blank', 'modules/admin/views/structure/footer_blank', $this->data );
-		
-		else :
-		
-			$this->nails->load_view( 'admin/structure/footer_blank', 'modules/admin/views/structure/footer_blank', $this->data );
-		
-		endif;
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/accounts/edit/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	

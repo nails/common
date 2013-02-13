@@ -1,10 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			Auth API
- *
- * Created:			18/11/2012
- * Modified:		18/11/2012
+ * Name:		Auth API
  *
  * Description:	This controller handles auth API methods
  * 
@@ -32,16 +29,6 @@ class Auth extends NAILS_API_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth/auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load Languages
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
 		
 		// --------------------------------------------------------------------------
 		

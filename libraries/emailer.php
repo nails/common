@@ -3,9 +3,6 @@
 /**
 * Name:			Emailer
 *
-* Created:		13/11/2011
-* Modified:		13/11/2012
-*
 * Description:	Easily manage the email queue
 * 
 */
@@ -512,7 +509,7 @@ class Emailer {
 				//	Check the template
 				if ( ! $email->subject ) :
 				
-					$email->subject = 'An email from Intern Avenue.';
+					$email->subject = 'An email from ' . APP_NAME;
 				
 				endif;
 			

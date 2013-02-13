@@ -1,14 +1,11 @@
 <?php
 
 /**
-* Name:			Serve
-*
-* Created:		12/11/2012
-* Modified:		12/11/2012
-*
-* Description:	Serves a raw object from the upload directory
-* 
-*/
+ * Name:		Serve
+ *
+ * Description:	Serves a raw object from the upload directory
+ * 
+ **/
 
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';

@@ -3,9 +3,6 @@
 /**
 * Name:			Event
 *
-* Created:		15/05/2011
-* Modified:		19/05/2012
-*
 * Description:	A library for creating and reading event objects.
 * 
 */

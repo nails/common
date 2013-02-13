@@ -3,11 +3,6 @@
 /**
 * Name:			NAILS_Profiler
 *
-* Docs:			http://nails.shedcollective.org/docs/profiler
-*
-* Created:		27/02/2012
-* Modified:		27/02/2012
-*
 * Description:	Override the _compile_config() method so that it can handle objects in the config.
 * 
 */

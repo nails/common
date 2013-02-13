@@ -3,14 +3,7 @@
 /**
 * Name:			Facebook
 *
-* Created:		10/02/2012
-* Modified:		10/02/2012
-*
 * Description:	Gateway to the FB PHP SDK
-*
-* Requirements:	-
-*
-* Change log:	-
 * 
 */
 

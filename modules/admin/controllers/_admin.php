@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin_Controller
-*
-* Docs:			http://nails.shedcollective.org/docs/admin/
-*
-* Created:		09/01/2012
-* Modified:		09/01/2012
-*
-* Description:	This controller executes various bits of common admin functionality
-* 
-*/
+ * Name:			Admin_Controller
+ *
+ * Description:	This controller executes various bits of common admin functionality
+ * 
+ **/
 
 
 class Admin_Controller extends NAILS_Controller
@@ -36,18 +31,21 @@ class Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check this module is enabled in settings
-		if ( ! $this->_module_is_enabled( 'admin' ) ) :
+		if ( ! $this->_module_is_enabled( 'auth' ) ) :
 		
 			//	Cancel execution, module isn't enabled
 			show_404();
-		
+			
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Admins only please
-		if ( ! $this->user->is_admin() )
+		if ( ! $this->user->is_admin() ) :
+		
 			unauthorised();
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -145,7 +143,18 @@ class Admin_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Look for an app Admin style
+		//	Unload any previously loaded assets, admin handles it's own assets
+		$this->asset->clear_all();
+		
+		//	Load admin styles and JS
+		$this->asset->load( 'nails.admin.css', TRUE );
+		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
+		$this->asset->load( 'jquery.chosen.min.js', TRUE );
+		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
+		$this->asset->load( 'nails.default.min.js', TRUE );
+		$this->asset->load( 'nails.admin.min.js', TRUE );
+		
+		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :
 		
 			$this->asset->load( 'admin.css' );

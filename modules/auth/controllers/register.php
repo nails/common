@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth [Register]
-*
-* Docs:			-
-*
-* Created:		12/11/2010
-* Modified:		04/04/2012
-*
-* Description:	-
-* 
-*/
+ * Name:		Auth [Register]
+ *
+ * Description:	Handles user registration
+ * 
+ **/
 
 /**
  * OVERLOADING NAILS'S AUTH MODULE
@@ -40,16 +35,6 @@ class NAILS_Register extends NAILS_Auth_Controller
 		
 		//	Load libraries
 		$this->load->library( 'form_validation' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
 		
 		// --------------------------------------------------------------------------
 		
@@ -187,9 +172,9 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',	'views/structure/header',			$this->data );
-		$this->nails->load_view( 'auth/register/form',	'modules/auth/views/register/form',	$this->data );
-		$this->nails->load_view( 'structure/footer',	'views/structure/footer',			$this->data );
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'auth/register/form',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 	
 	
@@ -291,9 +276,9 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	Load the views; using the auth_model view loader as we need to check if
 		//	an overload file exists which should be used instead
 		
-		$this->nails->load_view( 'structure/header',		'views/structure/header',				$this->data );
-		$this->nails->load_view( 'auth/register/resend',	'modules/auth/views/register/resend',	$this->data );
-		$this->nails->load_view( 'structure/footer',		'views/structure/footer',				$this->data );
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'auth/register/resend',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 
 	}
 }

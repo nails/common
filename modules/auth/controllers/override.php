@@ -3,12 +3,7 @@
 /**
 * Name:			Override
 *
-* Docs:			http://nails.shedcollective.org/docs/auth/
-*
-* Created:		30/06/2011
-* Modified:		04/04/2012
-*
-* Description:	-
+* Description:	Allows admins to log in as another user
 * 
 */
 
@@ -35,16 +30,6 @@ class NAILS_Override extends NAILS_Auth_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
 		
 		// --------------------------------------------------------------------------
 		

@@ -1,14 +1,11 @@
 <?php
 
 /**
-* Name:			Thumb
-*
-* Created:		12/11/2012
-* Modified:		12/11/2012
-*
-* Description:	Generates a thumbnail of an image
-* 
-*/
+ * Name:		Thumb
+ *
+ * Description:	Generates a thumbnail of an image
+ * 
+ **/
 
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';

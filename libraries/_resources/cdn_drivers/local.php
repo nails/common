@@ -3,9 +3,6 @@
 /**
 * Name:			CDN
 *
-* Created:		12/11/2012
-* Modified:		12/11/2012
-*
 * Description:	A Library for dealing with content in the Local CDN
 * 
 */

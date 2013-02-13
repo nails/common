@@ -70,7 +70,7 @@
 			
 			//	These buttons are always available
 			echo anchor( login_as_url( $member->id, $member->password ), 'Login As', 'class="awesome small grey"' );
-			echo anchor( 'admin/accounts/edit/' . $member->id . $_return, 'Edit', 'data-fancybox-type="iframe" data-fancybox-group="interns" class="edit fancybox-max awesome small grey"' );
+			echo anchor( 'admin/accounts/edit/' . $member->id . $_return, 'Edit', 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
 			
 			// --------------------------------------------------------------------------
 			

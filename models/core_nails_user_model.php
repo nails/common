@@ -1,18 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			User_Model
-*
-* Docs:			http://nails.shedcollective.org/docs/users/
-*
-* Created:		12/12/2011
-* Modified:		16/12/2011
-*
-* Description:	The user model contains all methods for interacting and
-*				querying the active user. It also contains functionality for
-*				interfacing with the database with regards user accounts.
-* 
-*/
+ * Name:		User_Model
+ *
+ * Description:	The user model contains all methods for interacting and
+ *				querying the active user. It also contains functionality for
+ *				interfacing with the database with regards user accounts.
+ * 
+ **/
 
 class CORE_NAILS_User_Model extends NAILS_Model
 {

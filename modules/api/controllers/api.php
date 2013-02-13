@@ -1,10 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			API
- *
- * Created:			18/11/2012
- * Modified:		18/11/2012
+ * Name:		API
  *
  * Description:	This controller handles generic API methods
  * 

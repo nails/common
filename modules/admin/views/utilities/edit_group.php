@@ -1,10 +1,11 @@
 <div class="system-alert message">
 	<div class="padder">
 		<p>
-			While we'll do our best to validate the content you set sometimes a valid combination can render an
-			entire group useless. Please be extra careful and only change things when you know what you're doing.
-			Remember that you won't see the effect of changing the permissions of a
-			group other than your own, check that your changes have worked before considering the job done!
+			<strong>Please note:</strong> while the system will do its best to validate the content you set
+			sometimes a valid combination can render an entire group useless (including your own). Please be
+			extra careful and only change things when you know what you're doing. Remember that you won't see
+			the effect of changing the permissions of a group other than your own, check that your changes
+			have worked before considering the job done!
 		</p>
 	</div>
 </div>

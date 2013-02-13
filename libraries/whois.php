@@ -1,18 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			whois
-*
-* Created:		10/02/2012
-* Modified:		10/02/2012
-*
-* Description:	Gateway to the Whois Class
-*
-* Requirements:	-
-*
-* Change log:	-
-* 
-*/
+ * Name:		whois
+ *
+ * Description:	Gateway to the Whois Class
+ * 
+ **/
 
 class Whois {
 	

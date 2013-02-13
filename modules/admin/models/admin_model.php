@@ -3,11 +3,6 @@
 /**
  * Name:		Admin Model
  *
- * Docs:		http://nails.shedcollective.org/docs/users/
- *
- * Created:		28/03/2012
- * Modified:	08/04/2012
- *
  * Description:	This model contains some basic common admin functionality.
  * 
  */

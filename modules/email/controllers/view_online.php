@@ -3,9 +3,6 @@
 /**
 * Name:			View Online
 *
-* Created:		26/01/2012
-* Modified:		26/01/2012
-*
 * Description:	Allows users to view an email sent to them in their browser
 * 
 */

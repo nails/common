@@ -1,14 +1,10 @@
 <?php
 
 /**
-* Name:			Blank Avatar
-*
-* Created:		20/11/2012
-* Modified:		20/11/2012
-*
-* Description:	Generates a blank avatar
-* 
-*/
+ * Name:			Blank Avatar
+ * Description:	Generates a blank avatar
+ * 
+ **/
 
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';

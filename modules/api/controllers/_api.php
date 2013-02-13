@@ -3,9 +3,6 @@
 /**
  * Name:		NALS_API_Controller
  *
- * Created:		18/11/2012
- * Modified:	18/11/2012
- *
  * Description:	This controller executes various bits of common admin API functionality
  * 
  **/

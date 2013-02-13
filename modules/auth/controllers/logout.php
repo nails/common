@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth [logout]
-*
-* Docs:			-
-*
-* Created:		14/10/2010
-* Modified:		04/04/2012
-*
-* Description:	-
-* 
-*/
+ * Name:		Auth [logout]
+ *
+ * Description:	Logs a user out
+ * 
+ **/
 
 /**
  * OVERLOADING NAILS'S AUTH MODULE
@@ -24,33 +19,6 @@ require_once '_auth.php';
 
 class NAILS_Logout extends NAILS_Auth_Controller
 {
-	/**
-	 * Constructor
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function __construct()
-	{
-		parent::__construct();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'auth_model' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load language files
-		$this->nails->load_lang( 'english/auth',	'modules/auth/language/english/auth');
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-
 	/**
 	 * Log user out and forward to homepage (or via helper method if needed).
 	 *

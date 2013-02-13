@@ -1,14 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Track email opens
-*
-* Created:		26/01/2012
-* Modified:		26/01/2012
-*
-* Description:	Allows users to view an email sent to them in their browser
-* 
-*/
+ * Name:		Track email opens
+ *
+ * Description:	Allows users to view an email sent to them in their browser
+ * 
+ **/
 
 class Tracker extends IA_Controller
 {
@@ -33,8 +30,11 @@ class Tracker extends IA_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check the reference is present
-		if ( ! $_ref )
+		if ( ! $_ref ) :
+		
 			show_error( 'MISSING ARGUMENT: EMAIL_REF' );
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -45,8 +45,16 @@ class Tracker extends IA_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Render out a tiny, tiny image, thanks http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever
-		header('Content-Type: image/gif');
+		//	Render out a tiny, tiny image
+		//	Thanks http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever
+		
+		header( 'Content-Type: image/gif' );
+		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', FALSE );
+		header( 'Pragma: no-cache' );
+		
 		echo base64_decode('R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
 	}
 	

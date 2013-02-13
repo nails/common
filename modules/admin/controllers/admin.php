@@ -1,12 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			Admin
- *
- * Docs:			http://nails.shedcollective.org/docs/admin/
- *
- * Created:			09/01/2012
- * Modified:		09/01/2012
+ * Name:		Admin
  *
  * Description:	Exists purely to redirect users to the dashboard
  * 
@@ -23,7 +18,7 @@ require_once '_admin.php';
  * 
  **/
  
-class NAILS_Admin extends NAILS_Controller {
+class NAILS_Admin extends Admin_Controller {
 
 	public function index()
 	{

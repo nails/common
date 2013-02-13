@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin
-*
-* Docs:			-
-*
-* Created:		14/10/2010
-* Modified:		20/06/2011
-*
-* Description:	-
-* 
-*/
+ * Name:		Admin
+ *
+ * Description:	Admin dashboard
+ * 
+ **/
 
 //	Include Admin_Controller; executes common admin functionality.
 require_once '_admin.php';
@@ -74,7 +69,7 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load header
-		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
+		$this->load->view( 'structure/header',	$this->data );
 		
 		// --------------------------------------------------------------------------
 		
@@ -84,18 +79,18 @@ class NAILS_Dashboard extends Admin_Controller {
 		
 		if ( ! $this->_loaded_modules ) :
 		
-			$this->nails->load_view( 'admin/dashboard/no_modules',	'modules/admin/views/dashboard/no_modules',	$this->data );
+			$this->load->view( 'admin/dashboard/no_modules', $this->data );
 			
 		else :
 		
-			$this->nails->load_view( 'admin/dashboard/dashboard',	'modules/admin/views/dashboard/dashboard',	$this->data );
+			$this->load->view( 'admin/dashboard/dashboard', $this->data );
 		
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Footer
-		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
+		$this->load->view( 'structure/footer', $this->data );
 	}
 	
 	
@@ -129,9 +124,9 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Load views
-		$this->nails->load_view( 'admin/structure/header',	'modules/admin/views/structure/header',	$this->data );
-		$this->nails->load_view( 'admin/dashboard/help/overview',	'modules/admin/views/dashboard/help/overview',	$this->data );
-		$this->nails->load_view( 'admin/structure/footer',	'modules/admin/views/structure/footer',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/dashboard/help/overview',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 }

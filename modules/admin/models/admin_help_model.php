@@ -3,11 +3,6 @@
 /**
  * Name:		Admin Help Model
  *
- * Docs:		http://nails.shedcollective.org/docs/users/
- *
- * Created:		18/11/2012
- * Modified:	18/11/2012
- *
  * Description:	This model contains logic for the amdin help pages.
  * 
  */

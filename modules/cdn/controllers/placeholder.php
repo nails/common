@@ -1,14 +1,11 @@
 <?php
 
 /**
-* Name:			Placeholder
-*
-* Created:		12/11/2012
-* Modified:		12/11/2012
-*
-* Description:	Generates a placeholder image
-* 
-*/
+ * Name:			Placeholder
+ *
+ * Description:	Generates a placeholder image
+ * 
+ **/
 
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';

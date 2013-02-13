@@ -1,16 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Auth_model
-*
-* Docs:			-
-*
-* Created:		21/12/2011
-* Modified:		25/01/2012
-*
-* Description:	This model handles all things auth.
-* 
-*/
+ * Name:		Auth_model
+ *
+ * Description:	This model handles all things auth.
+ * 
+ **/
 
 class Auth_model extends NAILS_Model
 {
@@ -225,7 +220,7 @@ class Auth_model extends NAILS_Model
 		
 		//	NULL the remember_code so that auto-logins stop
 		$this->db->set( 'remember_code', NULL );
-		$this->db->where( 'id', $this->user->active_user( 'id' ) );
+		$this->db->where( 'id', active_user( 'id' ) );
 		$this->db->update( 'user' );
 		
 		// --------------------------------------------------------------------------
