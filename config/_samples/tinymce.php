@@ -16,7 +16,7 @@
 */
 
 
-	$config['setting']['script_url']						= NAILS_URL . 'libs/tiny_mce/tiny_mce.js';
+	$config['setting']['script_url']						= site_url('assets/core/js/system/_tiny_mce/tiny_mce.js');
 	$config['setting']['theme']								= 'advanced';
 	$config['setting']['plugins']							= 'fullscreen,paste';
 	$config['setting']['document_base_url']					= site_url();
@@ -81,6 +81,25 @@
 	
 	//	File Uploader
 	$config['setting']['relative_urls']						= FALSE;
+	$config['setting']['file_browser_callback']				= '
+
+function(field_name, url, type, win) {
+	  tinyMCE.activeEditor.windowManager.open({
+	      file : "madfilebrowser/mfm.php?field=" + field_name + "&url=" + url + "",
+	      title : \'File Manager\',
+	      width : 640,
+	      height : 450,
+	      resizable : "no",
+	      inline : "yes",
+	      close_previous : "no"
+	  }, {
+	      window : win,
+	      input : field_name
+	  });
+	  return false;
+	}
+	
+	';
 
 /* End of file tinymce.php */
 /* Location: ./application/config/tinymce.php */

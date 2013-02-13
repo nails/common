@@ -35,7 +35,7 @@
  **/
 class MX_Config extends CI_Config 
 {	
-	protected $ssl_routes;
+	protected $routes_ssl;
 	
 	
 	// --------------------------------------------------------------------------
@@ -48,61 +48,69 @@ class MX_Config extends CI_Config
 		
 		// --------------------------------------------------------------------------
 		
-		//	Only swap onto 'real' SSL on the live box.
-		if ( ENVIRONMENT == 'production' ) :
+		//	If SSL routing is enabled then parse the URL
+		if ( SSL_ROUTING ) :
 		
-			$_prefix = 'https://';
-		
-		else :
-		
-			$_prefix = 'http://';
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Fetch SSL routes
-		if ( ! $this->ssl_routes )
-			$this->ssl_routes = $this->item( 'ssl_routes' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Analyse target URL, if it matches a route then change it to be an https URL
-		$i = 0;
-		foreach ( $this->ssl_routes AS $route ) :
-		
-			//	Swap out the pseudo regex's
-			$route = str_replace( ':any', '.*', $route );
-			$route = str_replace( ':num', '[0-9]*', $route );
+			//	Only swap onto 'real' SSL on the live box.
+			if ( ENVIRONMENT == 'production' ) :
 			
-			//	See if any of the routes match, if they do halt the loop.
-			if ( preg_match( '#' . $route . '#', $_uri ) ) :
+				$_prefix = 'https://';
+				$this->config->load( 'routes_ssl' );
 			
-				$i++;
-				break;
+			else :
+			
+				$_prefix = 'http://';
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Fetch SSL routes
+			if ( ! $this->routes_ssl ) :
+			
+				$this->routes_ssl = $this->item( 'routes_ssl' );
 				
 			endif;
-		
-		endforeach;
-		
-		
-		// --------------------------------------------------------------------------
-		
-		//	If there was a match replace http:// with https://; also replace any
-		//	calls for anything to the assets folder or the favicon (so secure content
-		//	is shown).
-		
-		if (
-			   ( $i )
-			|| ( $i && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
-			|| ( $i && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
-		) :
-		
-			//	SSL is off and there was a match, turn SSL on
-			$_uri = preg_replace( '/^http:\/\//', $_prefix, $_uri );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Analyse target URL, if it matches a route then change it to be an https URL
+			$i = 0;
+			foreach ( $this->routes_ssl AS $route ) :
+			
+				//	Swap out the pseudo regex's
+				$route = str_replace( ':any', '.*', $route );
+				$route = str_replace( ':num', '[0-9]*', $route );
+				
+				//	See if any of the routes match, if they do halt the loop.
+				if ( preg_match( '#' . $route . '#', $_uri ) ) :
+				
+					$i++;
+					break;
+					
+				endif;
+			
+			endforeach;
+			
+			
+			// --------------------------------------------------------------------------
+			
+			//	If there was a match replace http:// with https://; also replace any
+			//	calls for anything to the assets folder or the favicon (so secure content
+			//	is shown).
+			
+			if (
+				   ( $i )
+				|| ( $i && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
+				|| ( $i && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
+			) :
+			
+				//	SSL is off and there was a match, turn SSL on
+				$_uri = preg_replace( '/^http:\/\//', $_prefix, $_uri );
+			
+			endif;
 		
 		endif;
-		
 		
 		// --------------------------------------------------------------------------
 		
