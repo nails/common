@@ -6,7 +6,15 @@ class CORE_NAILS_Log extends CI_Log
 	{
 		if ( ENVIRONMENT == 'production' ) :
 		
-			//	Test Log folder
+			//	Test Log folder, but only if the error level is to be captured
+			$level = strtoupper($level);
+	
+			if ( ! isset($this->_levels[$level]) OR ($this->_levels[$level] > $this->_threshold)) :
+			
+				return FALSE;
+				
+			endif;
+			
 			if ( ! is_writeable( $this->_log_path ) ) :
 			
 				//	Kick up a fuss and tell Shed

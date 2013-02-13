@@ -431,6 +431,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'ug.display_name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
+		$this->db->select( 'utz.gmt_offset timezone_gmt_offset, utz.label timezone_label' );
+		$this->db->select( 'ul.name language_name' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -611,6 +613,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',			'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',	'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',			'left' );
+		$this->db->join( 'timezone utz',			'um.timezone_id = utz.id',		'left' );
+		$this->db->join( 'language ul',				'um.language_id = ul.id',		'left' );
 		
 		// --------------------------------------------------------------------------
 		
