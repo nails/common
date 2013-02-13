@@ -1039,8 +1039,8 @@ class Emailer {
 			$_message	.= '' . "\n";
 			$_message	.= print_r( $_send, TRUE ) . "\n";
 			
-			$_headers = 'From: ' . APP_EMAIL_FROM_NAME . ' <' . APP_EMAIL_FROM_EMAIL . '>' . "\r\n" .
-						'Reply-To: hello@shedcollective.org' . "\r\n" .
+			$_headers = 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
+						'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
 						'X-Mailer: PHP/' . phpversion()  . "\r\n" .
 						'X-Priority: 1 (Highest)' . "\r\n" .
 						'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
