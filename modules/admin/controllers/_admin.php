@@ -31,7 +31,7 @@ class Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check this module is enabled in settings
-		if ( ! $this->_module_is_enabled( 'auth' ) ) :
+		if ( ! $this->_module_is_enabled( 'admin' ) ) :
 		
 			//	Cancel execution, module isn't enabled
 			show_404();
@@ -81,7 +81,7 @@ class Admin_Controller extends NAILS_Controller
 			//	If this is the dashboard, we should see if the user has permission to
 			//	access any other modules before we 404 their ass.
 			
-			if ( $_active_module == 'dashboard' ) :
+			if ( $_active_module == 'dashboard' || $_active_module == '' ) :
 			
 				//	Look at the user's ACL
 				if ( isset( $_acl['admin'] )  ) :

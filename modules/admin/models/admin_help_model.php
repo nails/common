@@ -3,7 +3,7 @@
 /**
  * Name:		Admin Help Model
  *
- * Description:	This model contains logic for the amdin help pages.
+ * Description:	This model contains logic for the admin help pages.
  * 
  */
 

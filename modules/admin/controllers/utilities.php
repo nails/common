@@ -230,7 +230,7 @@ class NAILS_Utilities extends Admin_Controller {
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'admin/utilities/edit_group',	$this->data );
-		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 }
 
