@@ -103,7 +103,7 @@ class Auth_model extends NAILS_Model
 				if ( $user->failed_login_count >= $this->brute_force_protection['limit'] ) :
 				
 					//	Check if the block has expired
-					if ( time() < $user->failed_login_expires ) :
+					if ( time() < strtotime( $user->failed_login_expires ) ) :
 					
 						$block_time= ceil( $this->brute_force_protection['expire']/60 );
 						$this->_set_error( 'login_fail_blocked', $block_time );
@@ -130,7 +130,7 @@ class Auth_model extends NAILS_Model
 				$return = array(
 					'user_id'		=> $user->id,
 					'first_name'	=> $user->first_name,
-					'last_login'	=> (int) $user->last_login,
+					'last_login'	=> $user->last_login,
 					'homepage'		=> $user->group_homepage
 				);
 				
@@ -177,7 +177,7 @@ class Auth_model extends NAILS_Model
 				if ( $user->failed_login_count >= $this->brute_force_protection['limit'] ) :
 				
 					//	Check if the block has expired
-					if ( time() < $user->failed_login_expires ) :
+					if ( time() < strtotime( $user->failed_login_expires ) ) :
 					
 						$block_time= ceil( $this->brute_force_protection['expire']/60 );
 						$this->_set_error( 'login_fail_blocked', $block_time );

@@ -86,7 +86,7 @@ class Auth extends NAILS_API_Controller
 				
 				if ( $_login['last_login'] ) :
 				
-					$_last_login	=  nice_time( (int) $_login['last_login'] );
+					$_last_login	=  nice_time( strtotime( $_login['last_login'] ) );
 					$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $_first_name, $_last_login ) ) );
 					
 				else :

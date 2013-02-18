@@ -1045,7 +1045,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			//	Update the user table
 			$this->db->where( 'id', (int) $_uid );
-			$this->db->set( 'last_update', time() );
+			$this->db->set( 'last_update', 'NOW()', FALSE );
 			
 			if ( $_data_user ) :
 			
@@ -1070,7 +1070,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			//	As some methods will use $this->db->set() before calling update(); not sure if this is
 			//	a bad design or not... sorry.
 			
-			$this->db->set( 'last_update', time() );
+			$this->db->set( 'last_update', 'NOW()', FALSE );
 			$this->db->where( 'id', (int) $_uid );
 			$this->db->update( 'user' );
 		
@@ -1081,7 +1081,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		//	If we just updated the active user we should probably update their session info
 		if ( $_uid == active_user( 'id' ) ) :
 		
-			$this->active_user->last_update = time();
+			$this->active_user->last_update = date( 'Y-m-d H:i:s' );
 			
 			if ( $data ) :
 			
@@ -1125,7 +1125,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	public function increment_failed_login( $user_id, $expires = 300 )
 	{
 		$this->db->set( 'failed_login_count', '`failed_login_count`+1', FALSE );
-		$this->db->set( 'failed_login_expires', time() + $expires );
+		$this->db->set( 'failed_login_expires', date( 'Y-m-d H:i:s', time() + $expires ) );
 		$this->update( $user_id );
 	}
 	
@@ -1144,7 +1144,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	public function reset_failed_login( $user_id )
 	{
 		$this->db->set( 'failed_login_count', 0 );
-		$this->db->set( 'failed_login_expires', 'NULL', FALSE  );
+		$this->db->set( 'failed_login_expires', 'NULL', FALSE );
 		$this->update( $user_id );
 	}
 	
@@ -1162,7 +1162,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function update_last_login( $user_id )
 	{
-		$this->db->set( 'last_login', time() );
+		$this->db->set( 'last_login', 'NOW()', FALSE );
 		$this->db->set( 'login_count', 'login_count+1', FALSE );
 		$this->update( $user_id );
 	}
@@ -1347,7 +1347,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Update user's 'last_seen' flag
-		$_data['last_seen'] = time();
+		$_data['last_seen'] = date( 'Y-m-d H:i:s' );
 		$this->db->where( 'id', $_me );
 		$this->db->update( 'user', $_data );
 	}
@@ -1577,8 +1577,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['group_id']			= $group_id;
 		$_data['ip_address']		= $_ip_address;
 		$_data['last_ip']			= $_ip_address;
-		$_data['created_on']		= time();
-		$_data['last_update']		= time();
+		$_data['created_on']		= date( 'Y-m-d H:i:s' );
+		$_data['last_update']		= date( 'Y-m-d H:i:s' );
 		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )		? 1	: 0 ;;
 		$_data['salt']				= $_password[1];
 		$_data['activation_code']	= $_activation_code;
@@ -1833,7 +1833,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			//	Update the user
 			$this->db->set( 'activation_code', NULL);
 			$this->db->set( 'active', 1 );
-			$this->db->set( 'last_login', time() );
+			$this->db->set( 'last_login', 'NOW()', FALSE );
 			$this->db->where( 'id', $id );
 			$this->db->update( 'user' );
 		
@@ -1843,7 +1843,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 			$this->db->set( 'activation_code', NULL );
 			$this->db->set( 'active', 1 );
-			$this->db->set( 'last_login', time() );
+			$this->db->set( 'last_login', 'NOW()', FALSE );
 			$this->db->where( 'id', $id );
 			$this->db->update( 'user' );
 			
@@ -1872,7 +1872,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	{		
 		$this->db->set( 'activation_code', $this->salt() );
 		$this->db->set( 'active', 0 );
-		$this->db->set( 'last_login', time() );
+		$this->db->set( 'last_login', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
 		$this->db->update( 'user' );
 		

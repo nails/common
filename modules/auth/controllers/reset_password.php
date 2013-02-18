@@ -99,7 +99,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					//	Log the user in
 					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), TRUE );
 					
-					$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( $_login['last_login'] ) ) ) );
+					$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
 					
 					//	Log user in and forward to wherever they need to go
 					if ( $this->input->get( 'return_to' ) ):

@@ -80,7 +80,7 @@ $lang['action_proceed_login']				= 'Proceed to Log In';
 $lang['login_fail_missing_field']				= '<strong>Sorry,</strong> a required field was missing.';
 $lang['login_fail_general']						= '<strong>Sorry,</strong> your log in has not been successful, please try again.';
 $lang['login_fail_banned']						= '<strong>This account has been banned;</strong> if you feel you have received this message in error then please contact us.';
-$lang['login_fail_blocked']						= '<strong>This account has been temporarily blocked due to repeated failed logins.<strong> Please wait %s minutes before trying again (each failed login resets the block). ';
+$lang['login_fail_blocked']						= '<strong>This account has been temporarily blocked due to repeated failed logins.</strong><br />Please wait %s minutes before trying again (each failed login resets the block). ';
 $lang['login_fail_social']						= 'This account was created using a social network; either login via the appropriate button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';
 $lang['login_fail_social_fb']					= 'This account was created using Facebook; either login via the Facebook button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';
 $lang['login_fail_social_in']					= 'This account was created using LinkedIn; either login via the LinkedIn button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';

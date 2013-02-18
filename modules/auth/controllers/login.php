@@ -122,7 +122,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 						
 						if ( $_login['last_login'] ) :
 						
-							$_last_login	=  nice_time( (int) $_login['last_login'] );
+							$_last_login	=  nice_time( strtotime( $_login['last_login'] ) );
 							$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $_first_name, $_last_login ) ) );
 							
 						else :
@@ -251,7 +251,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Say hello
-			$_welcome = lang( 'login_ok_welcome', array( $_user->first_name, nice_time( (int) $_user->last_login ) ) );
+			$_welcome = lang( 'login_ok_welcome', array( $_user->first_name, nice_time( strtotime( $_user->last_login ) ) ) );
 			$this->session->set_flashdata( 'message', $_welcome );
 			
 			// --------------------------------------------------------------------------

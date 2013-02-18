@@ -37,7 +37,7 @@
 			
 			if ( $member->last_login ) :
 			
-				echo '<small>Last login: <span class="nice-time">' . date( 'Y-m-d H:i:s', $member->last_login ) . '</span> (' . $member->login_count . ' logins)</small>';
+				echo '<small>Last login: <span class="nice-time">' . $member->last_login . '</span> (' . $member->login_count . ' logins)</small>';
 			
 			else :
 			

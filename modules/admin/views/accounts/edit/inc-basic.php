@@ -142,7 +142,7 @@
 		$_field					= array();
 		$_field['key']			= 'created_on';
 		$_field['label']		= 'Created';
-		$_field['default']		= date( 'jS M Y @ H:i', $user_edit->created_on );
+		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->created_on ) );
 		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'The time and date the user created the account';
 		$_field['readonly']		= TRUE;
@@ -155,7 +155,7 @@
 		$_field					= array();
 		$_field['key']			= 'last_update';
 		$_field['label']		= 'Modified';
-		$_field['default']		= date( 'jS M Y @ H:i', $user_edit->last_update );
+		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->last_update ) );
 		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'The time and date the user was last modified';
 		$_field['readonly']		= TRUE;
@@ -181,7 +181,7 @@
 		$_field					= array();
 		$_field['key']			= 'last_login';
 		$_field['label']		= 'Last Log in';
-		$_field['default']		= $user_edit->last_login ? date( 'jS M Y @ H:i', $user_edit->last_login ) : 'Never Logged In';
+		$_field['default']		= $user_edit->last_login ? date( 'jS M Y @ H:i', strtotime( $user_edit->last_login ) ) : 'Never Logged In';
 		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'The time and date the user last logged in';
 		$_field['readonly']		= TRUE;
