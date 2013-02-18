@@ -978,7 +978,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$_cols[]	= 'activation_code';
 			$_cols[]	= 'forgotten_password_code';
 			$_cols[]	= 'remember_code';
-			$_cols[]	= 'created_on';
+			$_cols[]	= 'created';
 			$_cols[]	= 'last_login';
 			$_cols[]	= 'last_seen';
 			$_cols[]	= 'active';
@@ -1577,7 +1577,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['group_id']			= $group_id;
 		$_data['ip_address']		= $_ip_address;
 		$_data['last_ip']			= $_ip_address;
-		$_data['created_on']		= date( 'Y-m-d H:i:s' );
+		$_data['created']		= date( 'Y-m-d H:i:s' );
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
 		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )		? 1	: 0 ;;
 		$_data['salt']				= $_password[1];

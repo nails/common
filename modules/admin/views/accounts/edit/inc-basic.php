@@ -140,9 +140,9 @@
 		
 		//	Created On
 		$_field					= array();
-		$_field['key']			= 'created_on';
+		$_field['key']			= 'created';
 		$_field['label']		= 'Created';
-		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->created_on ) );
+		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->created ) );
 		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'The time and date the user created the account';
 		$_field['readonly']		= TRUE;
