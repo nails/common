@@ -1004,16 +1004,16 @@ class Emailer {
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 		
-		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && $_error->error_has_occurred() ) :
+		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_EMAIL_DEVELOPER' ) && APP_EMAIL_DEVELOPER ) && $_error->error_has_occurred() ) :
 		
 			//	The templates error'd, abort the send and let dev know
-			$_to		= 'hello@shedcollective.org';
+			$_to		= APP_EMAIL_DEVELOPER;
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';
 			$_message	= 'Hi,' . "\n";
 			$_message	.= '' . "\n";
 			$_message	.= 'Email #' . $_email->id . ' was aborted due to errors occurring while building the template' . "\n";
 			$_message	.= '' . "\n";
-			$_message	.= 'Please take a look as a matter or urgency; the errors are noted below:' . "\n";
+			$_message	.= 'Please take a look as a matter of urgency; the errors are noted below:' . "\n";
 			$_message	.= '' . "\n";
 			$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
 			$_message	.= '' . "\n";
