@@ -107,8 +107,8 @@ class MX_Config extends CI_Config
 			
 			if (
 				   ( $i )
-				|| ( $i && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
-				|| ( $i && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
+				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
+				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
 			) :
 			
 				//	SSL is off and there was a match, turn SSL on
