@@ -432,6 +432,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
 		$this->db->select( 'utz.gmt_offset timezone_gmt_offset, utz.label timezone_label' );
+		$this->db->select( 'dfd.label date_format_date_label, dfd.format date_format_date_format' );
+		$this->db->select( 'dft.label date_format_time_label, dft.format date_format_time_format' );
 		$this->db->select( 'ul.name language_name' );
 		
 		// --------------------------------------------------------------------------
@@ -571,6 +573,30 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			endif;
 			
+			// --------------------------------------------------------------------------
+			
+			//	Tidy up date/time/timezone field
+			$user->date_setting					= new stdClass();
+			$user->date_setting->timezone		= new stdClass();
+			$user->date_setting->format			= new stdClass();
+			$user->date_setting->format->date	= new stdClass();
+			$user->date_setting->format->time	= new stdClass();
+			
+			$user->date_setting->timezone->label	= $user->timezone_label;
+			$user->date_setting->timezone->offset	= $user->timezone_gmt_offset;
+			
+			$user->date_setting->format->date->label	= $user->date_format_date_label;
+			$user->date_setting->format->date->format	= $user->date_format_date_format;
+			$user->date_setting->format->time->label	= $user->date_format_time_label;
+			$user->date_setting->format->time->format	= $user->date_format_time_format;
+			
+			unset($user->timezone_label);
+			unset($user->timezone_gmt_offset);
+			unset($user->date_format_date_label);
+			unset($user->date_format_date_format);
+			unset($user->date_format_time_label);
+			unset($user->date_format_time_format);
+			
 		endforeach;
 		
 		// --------------------------------------------------------------------------
@@ -610,11 +636,13 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	private function _getcount_users_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user_meta um',			'u.id = um.user_id',			'left' );
-		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',	'left' );
-		$this->db->join( 'user_group ug',			'u.group_id = ug.id',			'left' );
-		$this->db->join( 'timezone utz',			'um.timezone_id = utz.id',		'left' );
-		$this->db->join( 'language ul',				'um.language_id = ul.id',		'left' );
+		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
+		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
+		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );
+		$this->db->join( 'timezone utz',			'um.timezone_id = utz.id',			'left' );
+		$this->db->join( 'date_format_date dfd',	'um.date_format_date_id = dfd.id',	'left' );
+		$this->db->join( 'date_format_time dft',	'um.date_format_time_id = dft.id',	'left' );
+		$this->db->join( 'language ul',				'um.language_id = ul.id',			'left' );
 		
 		// --------------------------------------------------------------------------
 		

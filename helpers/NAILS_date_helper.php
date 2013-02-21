@@ -201,6 +201,40 @@ if ( ! function_exists( 'calculate_age' ) )
 
 
 /**
+ * user_timezone()
+ *
+ * Converts a date to the user's timezone
+ *
+ * @access	public
+ * @param	string	$date	A string containing the date to convert
+ * @return	string	The converted date in YYY-MM-DD H:i:s format
+ */
+if ( ! function_exists( 'user_timezone' ) )
+{
+	function user_timezone( $date )
+	{
+		$_setting	= active_user( 'date_setting' );
+		$_offset	= isset( $_setting->timezone->offset ) ? $_setting->timezone->offset : 0;
+		
+		if ( is_numeric( $date ) ) :
+		
+			$_out = date( 'Y-m-d H:i:s', time() + ( $_offset * 3600 ) );
+		
+		else :
+		
+			$_out = date( 'Y-m-d H:i:s', strtotime( $date . ' ' . $_offset . ' HOURS' ) );
+		
+		endif;
+		
+		return $_out;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * Dropdown - Years
  *
  * Generates a dropdown containing the values between $start_year and $end_year
