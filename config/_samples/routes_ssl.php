@@ -11,7 +11,7 @@
 $config['routes_ssl'] = array(
 
 	//	All of admin secure please
-	'admin:any)',
+	'admin:any',
 	'admin/:any',
 	
 	//	All of auth secure

@@ -55,7 +55,7 @@ class MX_Config extends CI_Config
 			if ( ENVIRONMENT == 'production' ) :
 			
 				$_prefix = 'https://';
-				$this->config->load( 'routes_ssl' );
+				$this->load( 'routes_ssl' );
 			
 			else :
 			
@@ -69,6 +69,12 @@ class MX_Config extends CI_Config
 			if ( ! $this->routes_ssl ) :
 			
 				$this->routes_ssl = $this->item( 'routes_ssl' );
+				
+				if ( ! $this->routes_ssl ) :
+				
+					$this->routes_ssl = array();
+					
+				endif;
 				
 			endif;
 			
