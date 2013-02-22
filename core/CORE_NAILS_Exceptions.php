@@ -65,12 +65,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 			//	Load up the user model and set the constant which NAIL_Controller would set
 			$_ci->load->model( 'user_model' );
 			$this->data['user']	=& $_ci->user_model;
-			define( 'IA_USR_OBJ', 'user_model' );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Assets
-			require_once( FCPATH . APPPATH . 'core/IA_Controller_Assets.php' );
+			define( 'NAILS_USR_OBJ', 'user_model' );
 		
 		endif;
 		

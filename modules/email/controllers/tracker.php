@@ -7,7 +7,7 @@
  * 
  **/
 
-class Tracker extends IA_Controller
+class Tracker extends NAILS_Controller
 {
 	
 	/**
