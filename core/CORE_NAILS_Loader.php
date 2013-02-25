@@ -244,7 +244,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 		{
 			$subclass	= APPPATH.'libraries/'.$subdir.config_item('subclass_prefix').$class.'.php';
 			$nailsclass = NAILS_PATH.'libraries/'.$subdir.'CORE_'.config_item('subclass_prefix').$class.'.php';
-			
+
 			// Is this a class extension request?
 			if (file_exists($subclass))
 			{

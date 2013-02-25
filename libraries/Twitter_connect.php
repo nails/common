@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Facebook
+* Name:			Twitter
 *
-* Description:	Gateway to the FB PHP SDK
+* Description:	Gateway to the Twitter API
 * 
 */
 
@@ -11,7 +11,7 @@ class Facebook_Connect {
 	
 	private $ci;
 	private $settings;
-	private $facebook;
+	private $twitter;
 	
 	
 	// --------------------------------------------------------------------------
@@ -31,14 +31,13 @@ class Facebook_Connect {
 		// --------------------------------------------------------------------------
 		
 		//	Fetch our config variables
-		$this->ci->config->load( 'facebook' );
-		$this->settings = $this->ci->config->item( 'facebook' );
+		$this->ci->config->load( 'twitter' );
+		$this->settings = $this->ci->config->item( 'twitter' );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Fire up and initialize the SDK
-		require NAILS_PATH . 'libraries/_resources/facebook-php-sdk/src/facebook.php';
-		$this->facebook = new Facebook( $this->settings );
+		//	TODO
 		
 	}
 	
@@ -47,7 +46,7 @@ class Facebook_Connect {
 	
 	
 	/**
-	 * Determines whether the active user has already linked their Facebook profile
+	 * Determines whether the active user has already linked their Twitter profile
 	 *
 	 * @access	public
 	 * @return	void
@@ -55,7 +54,7 @@ class Facebook_Connect {
 	 **/
 	public function user_is_linked()
 	{
-		return (bool) active_user( 'fb_id' );
+		return (bool) active_user( 'tw_id' );
 	}
 	
 	
@@ -63,7 +62,7 @@ class Facebook_Connect {
 	
 	
 	/**
-	 * Unlinks a local account from Facebook
+	 * Unlinks a local account from Twitter
 	 *
 	 * @access	public
 	 * @return	void
@@ -71,20 +70,6 @@ class Facebook_Connect {
 	 **/
 	public function unlink_user( $user_id )
 	{
-		//	Attempt to revoke permissions on Facebook
-		$this->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
-		
-		// --------------------------------------------------------------------------
-		
-		$this->destroySession();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Update our user
-		$_data['fb_id']		= NULL;
-		$_data['fb_token']	= NULl;
-		
-		return get_userobject()->update( $user_id, $_data );
 	}
 	
 	
@@ -92,7 +77,7 @@ class Facebook_Connect {
 	
 	
 	/**
-	 * Map method calls to the FB library
+	 * Map method calls to the Twitter library
 	 *
 	 * @access	public
 	 * @return	mixed
@@ -100,17 +85,17 @@ class Facebook_Connect {
 	 **/
 	public function __call( $method, $arguments )
 	{
-		if ( method_exists( $this->facebook, $method ) ) :
+		if ( method_exists( $this->twitter, $method ) ) :
 		
-			return call_user_func_array( array( $this->facebook, $method ), $arguments );
+			return call_user_func_array( array( $this->twitter, $method ), $arguments );
 		
 		else:
 		
-			show_error( 'Method does not exist Facebook::' . $method );
+			show_error( 'Method does not exist Twitter::' . $method );
 		
 		endif;
 	}
 }
 
-/* End of file facebook.php */
-/* Location: ./application/libraries/facebook.php */
+/* End of file Twitter_connect.php */
+/* Location: ./application/libraries/Twitter_connect.php */

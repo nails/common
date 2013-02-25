@@ -52,12 +52,30 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Determine which modules are to be loaded; include default modules
+		//	Determine which modules are to be loaded
 		//	Duplicate in CORE_NAILS_Model.php
 		
-		$_app_modules			= explode( ',', APP_NAILS_MODULES );
-		$this->nails_modules	= array_unique( $_app_modules );
-		$this->nails_modules	= array_filter( $this->nails_modules );
+		$_app_modules	= explode( ',', APP_NAILS_MODULES );
+		$_app_modules	= array_unique( $_app_modules );
+		$_app_modules	= array_filter( $_app_modules );
+		$_app_modules	= array_combine( $_app_modules, $_app_modules );
+		
+		$this->nails_modules = array();
+		foreach ( $_app_modules AS $module ) :
+		
+			preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
+			
+			if ( isset( $_matches[1] ) && isset( $_matches[3] ) ) :
+			
+				$this->nails_modules[$_matches[1]] = explode( '|', $_matches[3] );
+			
+			elseif ( isset( $_matches[1] ) ) :
+			
+				$this->nails_modules[$_matches[1]] = array();
+			
+			endif;
+		
+		endforeach;
 		
 		// --------------------------------------------------------------------------
 		
@@ -199,7 +217,29 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 **/
 	protected function _module_is_enabled( $module )
 	{
-		return array_search( strtolower( $module ), $this->nails_modules ) !== FALSE;
+		preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
+		
+		$_module	= isset( $_matches[1] ) ? $_matches[1] : '';
+		$_submodule	= isset( $_matches[3] ) ? $_matches[3] : '';
+		
+		if ( isset( $this->nails_modules[$_module] ) ) :
+		
+			//	Are we testing for a submodule in particular?
+			if ( $_submodule ) :
+			
+				return array_search( $_submodule, $this->nails_modules[$_module] ) !== FALSE;
+			
+			else :
+			
+				return TRUE;
+			
+			endif;
+		
+		else :
+		
+			return FALSE;
+		
+		endif;
 	}
 }
 

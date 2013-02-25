@@ -198,15 +198,6 @@ class Admin_Controller extends NAILS_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _get_current_module()
-	{
-		here();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
 	/**
 	* Loop through the enabled modules and see if a controller exists for it; if
 	* it does load it up and execute the annouce static method to see if we can
@@ -219,11 +210,15 @@ class Admin_Controller extends NAILS_Controller
 	**/
 	private function _load_active_modules()
 	{
-		foreach( $this->nails_modules AS $module ) :
+		foreach( $this->nails_modules AS $module => $sub_modules ) :
 		
 			$_module = $this->admin_model->find_module( $module );
-			if ( $_module )
+			
+			if ( $_module ) :
+			
 				$this->_loaded_modules[$module] = $_module;
+				
+			endif;
 		
 		endforeach;
 	}

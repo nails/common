@@ -254,5 +254,5 @@ class Linkedin_connect {
 	}
 }
 
-/* End of file linkedin.php */
-/* Location: ./application/libraries/linkedin.php */
+/* End of file Linkedin_connect.php */
+/* Location: ./application/libraries/Linkedin_connect.php */
