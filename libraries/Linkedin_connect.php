@@ -53,7 +53,7 @@ class Linkedin_connect {
 	 **/
 	public function user_is_linked()
 	{
-		return (bool) active_user( 'linkedin_id' );
+		return (bool) active_user( 'li_id' );
 	}
 	
 	
@@ -246,9 +246,9 @@ class Linkedin_connect {
 	public function unlink_user( $user_id )
 	{
 		//	Update our user
-		$_data['linkedin_id']		= NULL;
-		$_data['linkedin_token']	= NULl;
-		$_data['linkedin_secret']	= NULl;
+		$_data['li_id']		= NULL;
+		$_data['li_token']	= NULl;
+		$_data['li_secret']	= NULl;
 		
 		return get_userobject()->update( $user_id, $_data );
 	}

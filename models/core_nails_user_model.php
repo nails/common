@@ -855,7 +855,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	public function get_user_by_linkedinid( $linkedinid, $extended = FALSE )
 	{
-		$this->db->where( 'u.linkedin_id', $linkedinid );
+		$this->db->where( 'u.li_id', $linkedinid );
 		$user = $this->get_users( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
@@ -993,9 +993,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$_cols[]	= 'group_id';
 			$_cols[]	= 'fb_token';
 			$_cols[]	= 'fb_id';
-			$_cols[]	= 'linkedin_id';
-			$_cols[]	= 'linkedin_token';
-			$_cols[]	= 'linkedin_secret';
+			$_cols[]	= 'li_id';
+			$_cols[]	= 'li_token';
+			$_cols[]	= 'li_secret';
 			$_cols[]	= 'ip_address';
 			$_cols[]	= 'last_ip';
 			$_cols[]	= 'username';
@@ -1612,31 +1612,59 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['activation_code']	= $_activation_code;
 		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )		? 1	: 0 ;
 		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )					? $data['auth_method_id']	: 1 ;
-		$_data['username']			= ( isset( $data['username'] ) )						? $data['username']			: NULL ;
 		
 		//	Facebook oauth details
 		$_data['fb_token']			= ( isset( $data['fb_token'] ) )						? $data['fb_token']			: NULL ;
 		$_data['fb_id']				= ( isset( $data['fb_id'] ) )							? $data['fb_id']			: NULL ;
 		
 		//	Linkedin oauth details
-		$_data['linkedin_id']		= ( isset( $data['linkedin_id'] ) )						? $data['linkedin_id']		: NULL ;
-		$_data['linkedin_token']	= ( isset( $data['linkedin_token'] ) )					? $data['linkedin_token']	: NULL ;
-		$_data['linkedin_secret']	= ( isset( $data['linkedin_secret'] ) )					? $data['linkedin_secret']	: NULL ;
+		$_data['li_id']		= ( isset( $data['li_id'] ) )						? $data['li_id']		: NULL ;
+		$_data['li_token']	= ( isset( $data['li_token'] ) )					? $data['li_token']	: NULL ;
+		$_data['li_secret']	= ( isset( $data['li_secret'] ) )					? $data['li_secret']	: NULL ;
 		
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
 		unset( $data['active'] );
 		unset( $data['auth_method_id'] );
-		unset( $data['username'] );
 		unset( $data['fb_token'] );
 		unset( $data['fb_id'] );
-		unset( $data['linkedin_id'] );
-		unset( $data['linkedin_token'] );
-		unset( $data['linkedin_secret'] );
+		unset( $data['li_id'] );
+		unset( $data['li_token'] );
+		unset( $data['li_secret'] );
 		
 		$this->db->insert( 'user', $_data );
 		
 		$_id = $this->db->insert_id();
+		
+		// --------------------------------------------------------------------------
+		
+		//	If a username has been supplied check it's unique, if it's not then use the
+		//	User's ID (will be called in the MD5 query immediately following)
+		
+		if ( isset( $data['username'] ) && $data['username'] ) :
+		
+			$this->db->where( 'username' , trim( $data['username'] ) );
+			
+			if ( $this->db->count_all_results( 'user' ) ) :
+			
+				//	Not unique, use user ID
+				$this->db->set( 'username', $_id );
+			
+			else :
+			
+				//	Unique, go ahead and use it
+				$this->db->set( 'username', trim( $data['username'] ) );
+			
+			endif;
+			
+			unset( $data['username'] );
+			
+		else :
+		
+			//	Not supplied, use user ID
+			$this->db->set( 'username', $_id );
+		
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -1658,8 +1686,11 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->set( 'user_id', $_id );
 		$this->db->set( 'referral', $_referral );
 		
-		if ( $data )
+		if ( $data ) :
+		
 			$this->db->set( $data );
+			
+		endif;
 		
 		$this->db->insert( 'user_meta' );
 		

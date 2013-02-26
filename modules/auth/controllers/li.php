@@ -34,27 +34,162 @@ class NAILS_Li extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the Facebook Library
+		//	Load the LinkedIn Library
 		$this->load->library( 'Linkedin_connect', NULL, 'li' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set a return_to if available
+		$this->_return_to = $this->input->get( 'return_to' );
+		
+		//	If nothing, check the 'nailsFBConnectReturnTo' GET var which may be passed back
+		if ( ! $this->_return_to ) :
+		
+			$this->_return_to = $this->input->get( 'nailsLIConnectReturnTo' );
+			
+			//	Still empty? Group homepage
+			if ( ! $this->_return_to ) :
+			
+				$this->_return_to = active_user( 'group_homepage' );
+			
+			endif;
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set a return_to_fail if available
+		$this->_return_to_fail = $this->input->get( 'return_to_fail' );
+		
+		//	If nothing, check the GET var which may be passed back
+		if ( ! $this->_return_to_fail ) :
+		
+			$this->_return_to_fail = $this->input->get( 'nailsLIConnectReturnToFail' );
+			
+			if ( ! $this->_return_to_fail ) :
+			
+				//	Fallback to the value of $this->return_to
+				$this->_return_to_fail = $this->_return_to;
+				
+			endif;
+			
+		endif;
 	}
 	
+	
+	// --------------------------------------------------------------------------
+	
+	/* ! CONNECTING TO LINKEDIN */
 	
 	// --------------------------------------------------------------------------
 	
 	
 	public function connect()
 	{
+		switch ( $this->uri->segment( 4 ) ) :
 		
+			case 'verify' :		$this->_connect_verify();	break;
+			case 'connect' :
+			default:			$this->_connect_connect();	break;
+		
+		endswitch;
 	}
 	
 	
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Initiate a connection request
+	 *
+	 * @access	protected
+	 * @param	none
+	 * @return	void
+	 **/
+	protected function _connect_connect()
+	{
+		//	If the LinkedIn is already linked then we need to acknowledge it
+		if ( ! $this->input->get( 'force' ) && $this->li->user_is_linked() ) :
+		
+			$this->session->set_flashdata( 'message', '<strong>Woah there!</strong> You have already linked your LinkedIn account.' );
+			$this->_connect_fail();
+			return;
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		dumpanddie( 'TODO Handle Connection' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Verify the connection request
+	 *
+	 * @access	private
+	 * @param	none
+	 * @return	void
+	 **/
+	private function _connect_verify()
+	{
+		dumpanddie( 'TODO Handle verifying connection' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Handles a successfull connection request, This method can be overridden if more
+	 * than the basic data (i.e email, name, gender) is needed for account creation.
+	 * By this point the FB library is set up with the user's access token.
+	 *
+	 * @access	protected
+	 * @return	void
+	 **/
+	protected function _connect_success()
+	{
+		dumpanddie( 'TODO Handle successful connection' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Handles a failed connection request
+	 *
+	 * @access	protected
+	 * @param	none
+	 * @return	void
+	 **/
+	protected function _connect_fail()
+	{
+		$this->_redirect( $this->return_to_fail );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	/* ! DISCONNECTING FROM LINKEDIN */
+	
+	// --------------------------------------------------------------------------
+	
+	
 	public function disconnect()
 	{
-		
+		dumpanddie( 'TODO Handle disconnection' );
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	/* ! HELPER METHODS */
+	
+	// --------------------------------------------------------------------------
 }
 
 

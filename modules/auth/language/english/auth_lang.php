@@ -12,7 +12,8 @@
  * 
  **/
 
-$lang['login_ok_welcome']					= '<strong>Welcome, %s!</strong>&nbsp; You last logged in %s.';
+$lang['login_ok_welcome']					= '<strong>Welcome, %s!</strong> You last logged in %s.';
+$lang['login_ok_welcome_notime']			= '<strong>Welcome, %s!</strong> Nice to see you again.';
 $lang['no_access_already_logged_in']		= '<strong>Sorry,</strong> you can\'t access that page while logged in (currently logged in as <strong>%s</strong>).';
 $lang['no_access_bad_data']					= '<strong>Sorry,</strong> the link you clicked on seems to be invalid. Please contact technical support.';
 

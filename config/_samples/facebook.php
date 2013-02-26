@@ -7,5 +7,7 @@
 |
 */
 
-	$config['facebook']['appId']	= '';
-	$config['facebook']['secret']	= '';
+	$config['facebook']['appId']	= '';			//	The Facebook App ID
+	$config['facebook']['secret']	= '';			//	The Facebook Secret
+	$config['facebook']['scope']	= array();		//	The scopes which should be requested
+	$config['facebook']['settings_url']	= '';		//	The URL of the page where a logged in user can connect/disconnect their FB account

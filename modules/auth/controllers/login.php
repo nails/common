@@ -127,7 +127,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 							
 						else :
 						
-							$this->session->set_flashdata( 'message', '<strong>Hey ' . $_first_name . '!</strong> Nice to see you again.' );
+							$this->session->set_flashdata( 'message', lang( 'login_ok_welcome_notime', array( $_first_name ) ) );
 						
 						endif;
 						

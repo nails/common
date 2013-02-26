@@ -151,6 +151,11 @@ class NAILS_Register extends NAILS_Auth_Controller
 					
 					// --------------------------------------------------------------------------
 					
+					//	Create an event for this event
+					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'native' ) );
+					
+					// --------------------------------------------------------------------------
+					
 					//	Redirect to the group homepage
 					$_user = $this->user->get_user( $_uid['id'] );
 					$this->session->set_flashdata( 'success', '<strong>Welcome, ' . $_user->first_name . '!</strong>' );

@@ -22,7 +22,6 @@ class Facebook_Connect {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -33,6 +32,7 @@ class Facebook_Connect {
 		//	Fetch our config variables
 		$this->ci->config->load( 'facebook' );
 		$this->settings = $this->ci->config->item( 'facebook' );
+		array_unshift( $this->settings['scope'], 'email' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -51,7 +51,6 @@ class Facebook_Connect {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function user_is_linked()
 	{
@@ -63,14 +62,110 @@ class Facebook_Connect {
 	
 	
 	/**
-	 * Unlinks a local account from Facebook
+	 * Fetches the login URL
+	 *
+	 * @access	public
+	 * @param	string $success Where to redirect the user to on successful login
+	 * @param	string $fail Where to redirect the user to on failed login
+	 * @return	void
+	 **/
+	public function get_login_url( $success, $fail )
+	{	
+		//	Prep params
+		//$_params['scope']			= 'email,user_location,user_photos,user_birthday,user_work_history,friends_education_history,friends_work_history';
+		$_params['scope']			= implode( ',', $this->settings['scope'] );
+		$_params['redirect_uri']	= $this->_get_redirect_url( $success, $fail );
+		$_params['display']			= 'page';
+		
+		return $this->getLoginUrl( $_params );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Gets the URL where the user will be redirected to after connecting/logging in
+	 *
+	 * @access	public
+	 * @param	string $success Where to redirect the user to on successful login
+	 * @param	string $fail Where to redirect the user to on failed login
+	 * @return	void
+	 **/
+	private function _get_redirect_url( $success, $fail )
+	{
+		//	Set a little userdata for when we come back
+		$_data									= array();
+		$_data['nailsFBConnectReturnTo']		= $success ? $success : active_user( 'group_homepage' );
+		$_data['nailsFBConnectReturnToFail']	= $fail ? $fail : $success;
+		
+		//	Filter out empty items
+		$_data = array_filter( $_data );
+		$_query_string = $_data ? '?' . http_build_query( $_data ) : NULL;
+		
+		return site_url( 'auth/fb/connect/verify' . $_query_string  );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Fetches a user's access token
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
+	 **/
+	public function get_access_token( $code, $success, $fail )
+	{
+		$_url	= 'https://graph.facebook.com/oauth/access_token?client_id=' .
+				  $this->settings['appId'] . '&redirect_uri=' . urlencode( $this->_get_redirect_url( $success, $fail ) ) .
+				  '&client_secret=' . $this->settings['secret'] . '&code=' . $code;
+		
+		$_data	= @file_get_contents( $_url );
+		
+		if ( $_data ) :
+		
+			parse_str( $_data, $_access_token );
+			return $_access_token;
+		
+		else :
+		
+			return FALSE;
+		
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Sets a user's access token
+	 *
+	 * @access	public
+	 * @param	string $access_token The Access token to use
+	 * @return	void
+	 **/
+	public function set_access_token( $access_token )
+	{
+		$this->fb->setAccessToken( $_access_token );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Unlinks a local account from Facebook
+	 *
+	 * @access	public
+	 * @param	int	$user_id The ID of the user to unlink
+	 * @return	void
 	 **/
 	public function unlink_user( $user_id )
 	{
+		//	TODO Use the supplied user_id rather than the active_user
 		//	Attempt to revoke permissions on Facebook
 		$this->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
 		
@@ -96,7 +191,6 @@ class Facebook_Connect {
 	 *
 	 * @access	public
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function __call( $method, $arguments )
 	{

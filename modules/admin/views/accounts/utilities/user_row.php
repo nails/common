@@ -32,7 +32,7 @@
 			echo $member->email;
 			echo $member->active ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Verified Email Address' ) ) : '';
 			echo $member->fb_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Connected to Facebook' ) ) : '';
-			echo $member->linkedin_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Connected to LinkedIn' ) ) : '';
+			echo $member->li_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Connected to LinkedIn' ) ) : '';
 			echo '</small>';
 			
 			if ( $member->last_login ) :
