@@ -26,7 +26,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Ensure the sub-module is enabled
-		if ( ! $this->_module_is_enabled( 'auth[linkedin]' ) ) :
+		if ( ! module_is_enabled( 'auth[linkedin]' ) ) :
 		
 			show_404();
 		

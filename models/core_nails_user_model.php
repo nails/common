@@ -844,6 +844,28 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	
 	
 	/**
+	 * Get a specific user by their Twitter ID
+	 *
+	 * @access	public
+	 * @param	int		$twid		The user's Twitter ID
+	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
+	 * @return	object
+	 * @author	Pablo
+	 * 
+	 **/
+	public function get_user_by_twid( $twid, $extended = FALSE )
+	{
+		$this->db->where( 'u.tw_id', $twid );
+		$user = $this->get_users( $extended );
+		
+		return ( empty( $user ) ) ? FALSE : $user[0];
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Get a specific user by their LinkedIn ID
 	 *
 	 * @access	public
@@ -991,8 +1013,11 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$_cols		= array();
 			$_cols[]	= 'auth_method_id';
 			$_cols[]	= 'group_id';
-			$_cols[]	= 'fb_token';
 			$_cols[]	= 'fb_id';
+			$_cols[]	= 'fb_token';
+			$_cols[]	= 'tw_id';
+			$_cols[]	= 'tw_token';
+			$_cols[]	= 'tw_secret';
 			$_cols[]	= 'li_id';
 			$_cols[]	= 'li_token';
 			$_cols[]	= 'li_secret';
@@ -1605,22 +1630,27 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['group_id']			= $group_id;
 		$_data['ip_address']		= $_ip_address;
 		$_data['last_ip']			= $_ip_address;
-		$_data['created']		= date( 'Y-m-d H:i:s' );
+		$_data['created']			= date( 'Y-m-d H:i:s' );
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
-		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )		? 1	: 0 ;;
+		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )	? 1	: 0 ;
 		$_data['salt']				= $_password[1];
 		$_data['activation_code']	= $_activation_code;
-		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )		? 1	: 0 ;
-		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )					? $data['auth_method_id']	: 1 ;
+		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )	? 1	: 0 ;
+		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )				? $data['auth_method_id']	: 1 ;
 		
 		//	Facebook oauth details
-		$_data['fb_token']			= ( isset( $data['fb_token'] ) )						? $data['fb_token']			: NULL ;
-		$_data['fb_id']				= ( isset( $data['fb_id'] ) )							? $data['fb_id']			: NULL ;
+		$_data['fb_token']			= ( isset( $data['fb_token'] ) )					? $data['fb_token']			: NULL ;
+		$_data['fb_id']				= ( isset( $data['fb_id'] ) )						? $data['fb_id']			: NULL ;
+		
+		//	Twitter oauth details
+		$_data['tw_id']				= ( isset( $data['tw_id'] ) )						? $data['tw_id']			: NULL ;
+		$_data['tw_token']			= ( isset( $data['tw_token'] ) )					? $data['tw_token']			: NULL ;
+		$_data['tw_secret']			= ( isset( $data['tw_secret'] ) )					? $data['tw_secret']		: NULL ;
 		
 		//	Linkedin oauth details
-		$_data['li_id']		= ( isset( $data['li_id'] ) )						? $data['li_id']		: NULL ;
-		$_data['li_token']	= ( isset( $data['li_token'] ) )					? $data['li_token']	: NULL ;
-		$_data['li_secret']	= ( isset( $data['li_secret'] ) )					? $data['li_secret']	: NULL ;
+		$_data['li_id']				= ( isset( $data['li_id'] ) )						? $data['li_id']			: NULL ;
+		$_data['li_token']			= ( isset( $data['li_token'] ) )					? $data['li_token']			: NULL ;
+		$_data['li_secret']			= ( isset( $data['li_secret'] ) )					? $data['li_secret']		: NULL ;
 		
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
@@ -1628,6 +1658,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		unset( $data['auth_method_id'] );
 		unset( $data['fb_token'] );
 		unset( $data['fb_id'] );
+		unset( $data['tw_id'] );
+		unset( $data['tw_token'] );
+		unset( $data['tw_secret'] );
 		unset( $data['li_id'] );
 		unset( $data['li_token'] );
 		unset( $data['li_secret'] );

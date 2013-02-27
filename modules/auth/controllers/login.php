@@ -136,7 +136,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 						// --------------------------------------------------------------------------
 						
 						//	Generate an event for this log in
-						create_event( 'did_log_in', $_login['user_id'] );
+						create_event( 'did_log_in', $_login['user_id'], 0, NULL, array( 'method' => 'native' ) );
 						
 						// --------------------------------------------------------------------------
 						

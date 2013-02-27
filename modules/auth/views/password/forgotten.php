@@ -23,21 +23,12 @@
 	 *	should be handled by the containing header files.
 	 *	
 	 **/
-	 
-?>
-
-	<p>
-		Please enter your registered email address so we can send you an email with a link which
-		you can use to reset your password.
-	</p>
-
-<?php
 	
 	//	Form attributes
 	$attr = array(
 	
 		'id'	=> 'forgotten-password-form',
-		'class'	=> 'nails-default-form'
+		'class'	=> 'container nails-default-form'
 		
 	);
 	
@@ -47,6 +38,11 @@
 	
 	//	Write the HTML for the forgotten password form
 ?>
+
+	<p>
+		Please enter your registered email address so we can send you an email with a link which
+		you can use to reset your password.
+	</p>
 	
 	
 	<!--	INPUT FIELDS	-->

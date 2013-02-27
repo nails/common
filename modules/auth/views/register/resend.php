@@ -20,15 +20,17 @@
 	//	Write the HTML for the page
 ?>
 	
-	<p class="alert alert-success">
-		An email with a link to verify your email has been re-sent to:
-		<strong><?=$email?></strong>
-	</p>
-	
-	<h3>What to do next</h3>
-	<p>
-		Check your email (including spam folders) and click on the link to verify your email address.
-		It can sometimes take a while to receive your verification email.
-	</p>
+	<div class="container">
+		<p class="alert alert-success">
+			An email with a link to verify your email has been re-sent to:
+			<strong><?=$email?></strong>
+		</p>
+		
+		<h3>What to do next</h3>
+		<p>
+			Check your email (including spam folders) and click on the link to verify your email address.
+			It can sometimes take a while to receive your verification email.
+		</p>
+	</div>
 	
 <?php

@@ -17,7 +17,7 @@ class NAILS_API_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check this module is enabled in settings
-		if ( ! $this->_module_is_enabled( 'api' ) ) :
+		if ( ! module_is_enabled( 'api' ) ) :
 		
 			//	Cancel execution, module isn't enabled
 			show_404();

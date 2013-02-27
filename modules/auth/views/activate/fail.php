@@ -20,20 +20,20 @@
 	//	Write the HTML for the activation failed page
 ?>
 	
-	
-	<p class="system-alert error">
-		<strong>Oh snap!</strong> We couldn't activate your account.
-	</p>
-	<p>
-		There was a problem activating this account. This can happen for various reasons:
-	</p>
-	<ul>
-		<li>Account already active.</li>
-		<li>Invalid or expired activation code</li>
-		<?php if ( ! $user->is_logged_in() ) : ?>
-		<li>In many cases your account has already been activated, <?=anchor( 'auth/login', 'please try logging in' )?>.</li>
-		<?php endif; ?>
-	</ul>
-	
+	<div class="container">
+		<p class="system-alert error no-close">
+			<strong>Oh snap!</strong> We couldn't activate your account.
+		</p>
+		<p>
+			There was a problem activating this account. This can happen for various reasons:
+		</p>
+		<ul>
+			<li>Account already active.</li>
+			<li>Invalid or expired activation code</li>
+			<?php if ( ! $user->is_logged_in() ) : ?>
+			<li>In many cases your account has already been activated, <?=anchor( 'auth/login', 'please try logging in' )?>.</li>
+			<?php endif; ?>
+		</ul>
+	</div>
 	
 <?php

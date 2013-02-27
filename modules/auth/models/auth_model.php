@@ -154,6 +154,9 @@ class Auth_model extends NAILS_Model
 					//	Facebook Connect
 					case '2':		$this->_set_error( 'login_fail_social_fb', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
 					
+					//	Twitter
+					case '3':		$this->_set_error( 'login_fail_social_tw', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					
 					//	LinkedIn
 					case '5':		$this->_set_error( 'login_fail_social_in', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
 					

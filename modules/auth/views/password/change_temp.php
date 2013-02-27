@@ -29,7 +29,7 @@
 	$attr = array(
 	
 		'id'	=> 'reset-temp-password-form',
-		'class'	=> 'nails-default-form'
+		'class'	=> 'container nails-default-form'
 		
 	);
 	

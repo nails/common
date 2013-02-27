@@ -40,7 +40,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Ensure the sub-module is enabled
-		if ( ! $this->_module_is_enabled( 'auth[facebook]' ) ) :
+		if ( ! module_is_enabled( 'auth[facebook]' ) ) :
 		
 			show_404();
 		
@@ -210,7 +210,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 
 		if ( $this->user->is_logged_in() && $_user ) :
 		
-			//	This FB ID is already in use, tell the user so and prevent anything else from happening.
+			//	This Twitter ID is already in use, tell the user so and prevent anything else from happening.
 			$this->session->set_flashdata( 'error', '<strong>Sorry</strong>, the Facebook account you\'re currently logged into is already linked with another ' . APP_NAME . ' account.' );
 			$this->_connect_fail();
 			return;
@@ -224,7 +224,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 		if ( $this->user->is_logged_in() ) :
 		
-			$this->_link_user( $_me, $access_token );
+			$this->_link_user( $_me );
 		
 		endif;
 		
@@ -331,7 +331,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		create_event( 'did_link_facebook', active_user( 'id' ) );
+		create_event( 'did_link_fb', active_user( 'id' ) );
 		
 		// --------------------------------------------------------------------------
 		
@@ -380,11 +380,11 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		$this->user->set_login_data( $user->id, $user->email, $user->group_id, $user->lang );
 		
 		// --------------------------------------------------------------------------
-
+		
 		//	Set welcome message
 		if ( $user->last_login ) :
 		
-			$_last_login =  nice_time( (int) $user->last_login );
+			$_last_login =  nice_time( $user->last_login );
 			$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $user->first_name, $_last_login ) ) );
 		
 		else :
@@ -401,7 +401,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Create an event for this event
-		create_event( 'did_log_in', $user->id );
+		create_event( 'did_log_in', $user->id, 0, NULL, array( 'method' => 'facebook' ) );
 		
 		// --------------------------------------------------------------------------
 		
@@ -429,13 +429,14 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		$remember	= TRUE;
 		
 		//	Meta data
-		$data['first_name']		= $me['first_name'];
-		$data['last_name']		= $me['last_name'];
-		$data['username']		= $me['username'];
-		$data['fb_token']		= $this->fb->getAccessToken();
-		$data['fb_id']			= $me['id'];
-		$data['active']			= 1;	//	Trust the email from Facebook
-		$data['auth_method_id']	= 2;	//	Facebook, obviously.
+		$_data						= array();
+		$_data['first_name']		= $me['first_name'];
+		$_data['last_name']			= $me['last_name'];
+		$_data['username']			= $me['username'];
+		$_data['fb_id']				= $me['id'];
+		$_data['fb_token']			= $this->fb->getAccessToken();
+		$_data['active']			= 1;	//	Trust the email from Facebook
+		$_data['auth_method_id']	= 2;	//	Facebook, obviously.
 		
 		// --------------------------------------------------------------------------
 		
@@ -444,11 +445,11 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 			if ( $me['gender'] == 'male' ) :
 			
-				$data['gender'] = 'male';
+				$_data['gender'] = 'male';
 			
 			elseif ( $me['gender'] == 'female' ) :
 			
-				$data['gender'] = 'female';
+				$_data['gender'] = 'female';
 			
 			endif;
 		
@@ -459,14 +460,14 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		//	Handle referrals
 		if ( $this->session->userdata( 'referred_by' ) ) :
 		
-			$data['referred_by'] = $this->session->userdata( 'referred_by' );
+			$_data['referred_by'] = $this->session->userdata( 'referred_by' );
 		
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Create new user, group 2, standard member
-		$_uid = $this->user->create( $email, $password, 2, $data );
+		$_uid = $this->user->create( $email, $password, 2, $_data );
 		
 		if ( $_uid ) :
 		
@@ -483,7 +484,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			$_email							= new stdClass();
 			$_email->to_id					= $_uid['id'];
 			$_email->type					= 'register_fb';
-			$_email->data['first_name']		= $data['first_name'];
+			$_email->data['first_name']		= $_data['first_name'];
 			$_email->data['user_id']		= $_uid['id'];
 			
 			//	Send the email
@@ -502,7 +503,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Redirect to the wizard
-			$this->session->set_flashdata( 'success', '<strong>Hi, ' . $data['first_name'] . '!</strong> Your account has been set up and is ready to be used.' );
+			$this->session->set_flashdata( 'success', '<strong>Hi, ' . $_data['first_name'] . '!</strong> Your account has been set up and is ready to be used.' );
 			$this->session->set_flashdata( 'from_facebook', TRUE );
 			$this->_redirect( $this->_return_to );
 			return;
@@ -515,7 +516,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 	
 	
 	/**
-	 * Perform a rediret
+	 * Perform a redirect
 	 *
 	 * @access	public
 	 * @param	string $goto The URL to redirect to

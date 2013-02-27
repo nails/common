@@ -114,6 +114,9 @@ class Facebook_Connect {
 	 * Fetches a user's access token
 	 *
 	 * @access	public
+	 * @param	string $code The verification code
+	 * @param	string $success Where to redirect the user to on successful login
+	 * @param	string $fail Where to redirect the user to on failed login
 	 * @return	void
 	 **/
 	public function get_access_token( $code, $success, $fail )
@@ -149,7 +152,7 @@ class Facebook_Connect {
 	 **/
 	public function set_access_token( $access_token )
 	{
-		$this->fb->setAccessToken( $_access_token );
+		$this->setAccessToken( $access_token );
 	}
 	
 	

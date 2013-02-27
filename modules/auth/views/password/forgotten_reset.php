@@ -21,7 +21,7 @@
 ?>
 	
 	
-	<div id="password-rest-successfully">
+	<div id="password-reset-successfully" class="container">
 		<p>
 			Please log in using this temporary password: <strong><?=$new_password?></strong>
 		</p>

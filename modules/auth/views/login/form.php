@@ -29,7 +29,7 @@
 	$attr = array(
 	
 		'id'	=> 'login-form',
-		'class'	=> 'nails-default-form'
+		'class'	=> 'container nails-default-form'
 		
 	);
 	
@@ -43,64 +43,113 @@
 	//	Write the HTML for the login form
 ?>
 	
-	<!--	LOGIN FIELDS	-->
-	<?php
-		
-		$_field	= 'email';
-		$_name	= 'Email';
-		$_error = form_error( $_field ) ? 'error' : NULL
-	
-	?>
-	<div class="row <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
-		<div class="four columns">
-			<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-		</div>
-	</div>
-	
-	<?php
-		
-		$_field	= 'password';
-		$_name	= 'Password';
-		$_error = form_error( $_field ) ? 'error' : NULL
-	
-	?>
-	<div class="row <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
-		<div class="four columns">
-			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
-			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-		</div>
-	</div>
-	
-	<!--	REMEMBER ME CHECKBOX	-->
-	<?php
-		
-		$_field	= 'remember';
-		$_name	= 'Remember Me';
-		$_error = form_error( $_field ) ? 'error' : NULL
-	
-	?>
 	<div class="row">
-		<label class="two columns first">&nbsp;</label>
-		<div class="four columns last">
-			<label class="checkbox">
-				<?=form_checkbox( $_field, TRUE, TRUE )?>
-				<?=$_name?>
-			</label>
-		</div>
-	</div>
 	
-	
-	<div class="row button-row">
-		<label class="two columns first">&nbsp;</label>
-		<div class="four columns last">
-			<?=form_submit( 'submit', 'Log In', 'class="awesome"' )?>
-			<small style="margin-left:15px;">
-				<?=anchor( 'auth/forgotten_password', 'Forgotten your Password?' )?>
-			</small>
+		<!--	LOGIN FIELDS	-->
+		<div class="first seven columns">
+		
+			<p>
+				Sign in to your <?=APP_NAME?> account using your email address and password.
+				Not got an account? <?=anchor( 'auth/register', 'Click here to register' )?>.
+			</p>
+		
+			<?php
+				
+				$_field	= 'email';
+				$_name	= 'Email';
+				$_error = form_error( $_field ) ? 'error' : NULL
+			
+			?>
+			<div class="row <?=$_error?>">
+				<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+				<div class="four columns">
+					<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
+					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+				</div>
+			</div>
+			
+			<?php
+				
+				$_field	= 'password';
+				$_name	= 'Password';
+				$_error = form_error( $_field ) ? 'error' : NULL
+			
+			?>
+			<div class="row <?=$_error?>">
+				<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+				<div class="four columns">
+					<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
+					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+				</div>
+			</div>
+			
+			<!--	REMEMBER ME CHECKBOX	-->
+			<?php
+				
+				$_field	= 'remember';
+				$_name	= 'Remember Me';
+				$_error = form_error( $_field ) ? 'error' : NULL
+			
+			?>
+			<div class="row">
+				<label class="two columns first">&nbsp;</label>
+				<div class="four columns last">
+					<label class="checkbox">
+						<?=form_checkbox( $_field, TRUE, TRUE )?>
+						<?=$_name?>
+					</label>
+				</div>
+			</div>
+			
+			
+			<div class="row button-row">
+				<label class="two columns first">&nbsp;</label>
+				<div class="four columns last">
+					<?=form_submit( 'submit', 'Log In', 'class="awesome"' )?>
+					<small style="margin-left:15px;">
+						<?=anchor( 'auth/forgotten_password', 'Forgotten your Password?' )?>
+					</small>
+				</div>
+			</div>
+		
 		</div>
+		
+		<!--	SOCIAL NETWORK BUTTONS	-->
+		<?php
+		
+			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
+			
+				echo '<div class="eight columns last offset-by-one">';
+				echo '<p style="text-align:center;">Or, sign in using your preferred social network.</p>';
+				
+				// --------------------------------------------------------------------------
+				
+				//	FACEBOOK
+				if ( module_is_enabled( 'auth[facebook]' ) ) :
+				
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', 'Sign in with Facebook', 'class="social-signin fb"' ) . '</p>';
+				
+				endif;
+				
+				//	TWITTER
+				if ( module_is_enabled( 'auth[twitter]' ) ) :
+				
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', 'Sign in with Twitter', 'class="social-signin tw"' ) . '</p>';
+				
+				endif;
+				
+				//	LINKEDIN
+				if ( module_is_enabled( 'auth[linkedin]' ) ) :
+				
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', 'Sign in with LinkedIn', 'class="social-signin li"' ) . '</p>';
+				
+				endif;
+			
+			endif;
+			
+			echo '</div>';
+			
+		?>
 	</div>
 	
 <?php
