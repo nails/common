@@ -114,7 +114,8 @@ class NAILS_Register extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Create new user, group 2 (member)
-				$_uid = $this->user->create( $email, $password, 2, $data );
+				$_group_id = 2;
+				$_uid = $this->user->create( $email, $password, $_group_id, $data );
 				
 				if ( $_uid ) :
 				
@@ -128,26 +129,30 @@ class NAILS_Register extends NAILS_Auth_Controller
 					//	Registration was successfull, send the activation email...
 					$this->load->library( 'emailer' );
 					
-					//	Initialise vars
-					$_data = new StdClass();
-					$_data->data = array();
+					$_email							= new stdClass();
+					$_email->type					= 'verify_email_' . $_group_id;
+					$_email->to_id					= $_uid['id'];
+					$_email->data					= array();
+					$_email->data['user']			= $this->user->get_user( $_uid['id'] );
+					$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
 					
-					//	Fill 'em up!
-					$_data->to						= $this->data['email'];
-					$_data->type					= 'register_activate';
-					$_data->data['first_name']		= $data['first_name'];
-					$_data->data['user_id']			= $_uid['id'];
-					$_data->data['activation_code']	= $_uid['activation'];
+					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 					
-					// --------------------------------------------------------------------------
+						//	Failed to send using the group email, try using the generic email
+						$_email->type = 'verify_email';
+						
+						if ( ! $this->emailer->send( $_email, TRUE ) ) :
+						
+							//	Email failed to send, for now, do nothing.
+						
+						endif;
 					
-					//	Send the email
-					$this->emailer->send_now( $_data );
+					endif;
 					
 					// --------------------------------------------------------------------------
 					
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'], $email, 2 );
+					$this->user->set_login_data( $_uid['id'], $email, $_group_id );
 					
 					// --------------------------------------------------------------------------
 					

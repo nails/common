@@ -467,7 +467,8 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Create new user, group 2, standard member
-		$_uid = $this->user->create( $email, $password, 2, $_data );
+		$_group_id = 2;
+		$_uid = $this->user->create( $email, $password, $_group_id, $_data );
 		
 		if ( $_uid ) :
 		
@@ -482,18 +483,29 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			$this->load->library( 'emailer' );
 			
 			$_email							= new stdClass();
+			$_email->type					= 'verify_email_' . $_group_id;
 			$_email->to_id					= $_uid['id'];
-			$_email->type					= 'register_fb';
-			$_email->data['first_name']		= $_data['first_name'];
-			$_email->data['user_id']		= $_uid['id'];
+			$_email->data					= array();
+			$_email->data['user']			= $this->user->get_user( $_uid['id'] );
+			$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
 			
-			//	Send the email
-			$this->emailer->send( $_email );
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+			
+				//	Failed to send using the group email, try using the generic email
+				$_email->type = 'register_fb';
+				
+				if ( ! $this->emailer->send( $_email, TRUE ) ) :
+				
+					//	Email failed to send, for now, do nothing.
+				
+				endif;
+			
+			endif;
 			
 			// --------------------------------------------------------------------------
 			
 			//	Log the user in
-			$this->user->set_login_data( $_uid['id'], $email, 2 );
+			$this->user->set_login_data( $_uid['id'], $email, $_group_id );
 
 			// --------------------------------------------------------------------------
 			
