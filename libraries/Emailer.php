@@ -7,12 +7,13 @@
 * 
 */
 
-class Emailer {
+class Emailer
+{
 	
 	public $from;
-	
 	private $ci;
-	private $email_type = array();
+	private $email_type;
+	private $track_link_cache;
 	
 	
 	// --------------------------------------------------------------------------
@@ -47,6 +48,12 @@ class Emailer {
 		$this->ci->load->helper( 'email' );
 		$this->ci->load->helper( 'typography' );
 		$this->ci->load->helper( 'string' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set defaults
+		$this->email_type		= array();
+		$this->track_link_cache	= array();
 	}
 	
 	
@@ -627,6 +634,14 @@ class Emailer {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Processes a particular queue
+	 *
+	 * @access	public
+	 * @param	string $cron_run The queue to process
+	 * @return	array
+	 * @author	Pablo
+	 **/
 	public function process_queue( $cron_run )
 	{
 		$_stats = array();
@@ -976,7 +991,6 @@ class Emailer {
 		
 		// --------------------------------------------------------------------------
 		
-			
 		//	If we're not on a production server, never queue or send out to any
 		//	live addresses please
 		
@@ -1056,13 +1070,39 @@ class Emailer {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Parse the body for <a> links and replace with a tracking URL
+		//	First clear out any previous link caches
+		
+		$this->track_link_cache = array();
+		
+		if ( ENVIRONMENT == 'production' ) :
+		
+			$body = $this->_parse_links( $body, $_email->id, $_email->ref, TRUE );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Set the email body
 		$this->ci->email->message( $body );
+		
+		// --------------------------------------------------------------------------
 		
 		//	Set the plain text version
 		$plaintext  = $this->ci->load->view( 'email/structure/header_plaintext',	$_send->data, TRUE );
 		$plaintext .= $this->ci->load->view( 'email/' . $_send->template_pt,		$_send->data, TRUE );
 		$plaintext .= $this->ci->load->view( 'email/structure/footer_plaintext',	$_send->data, TRUE );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Parse the body for URLs and replace with a tracking URL (production only)
+		if ( ENVIRONMENT == 'production' ) :
+		
+			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
 		
 		$this->ci->email->set_alt_message( $plaintext );
 		
@@ -1127,6 +1167,14 @@ class Emailer {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Generates a unique reference for an email, optionally exclude strings
+	 *
+	 * @access	public
+	 * @param	array $exclude An array of strings to exclude
+	 * @return	array
+	 * @author	Pablo
+	 **/
 	private function _generate_reference( $exclude = array() )
 	{
 		do
@@ -1260,7 +1308,7 @@ class Emailer {
 	 * @access	private
 	 * @param	string
 	 * @param	string
-	 * @return	void
+	 * @return	array
 	 * @author	Pablo
 	 **/
 	private function _crunch_data( $emails )
@@ -1307,6 +1355,15 @@ class Emailer {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Determines whether a user is subscribed to a particular email group
+	 *
+	 * @access	public
+	 * @param	int $user_id The ID of the user to test
+	 * @param	string $email_type The type of email to test
+	 * @return	bool
+	 * @author	Pablo
+	 **/
 	private function _is_subscribed( $user_id, $email_type )
 	{
 		$this->ci->db->where( 'u.id', $user_id );
@@ -1327,6 +1384,17 @@ class Emailer {
 	
 	// --------------------------------------------------------------------------
 	
+	
+	/**
+	 * Increments an email's open count and adds a tracking note
+	 *
+	 * @access	public
+	 * @param	string $ref The email's reference
+	 * @param	string $guid the unique counter used to generate the hash
+	 * @param	string $hash The secutiry hash to check (i.e verify the ref and guid).
+	 * @return	bool
+	 * @author	Pablo
+	 **/
 	public function track_open( $ref, $guid, $hash )
 	{
 		$_email = $this->get_by_ref( $ref, $guid, $hash );
@@ -1340,6 +1408,13 @@ class Emailer {
 			
 			$this->ci->db->set( 'created', 'NOW()', FALSE );
 			$this->ci->db->set( 'email_id', $_email->id );
+			
+			if ( active_user( 'id' ) ) :
+			
+				$this->ci->db->set( 'user_id', active_user( 'id' ) );
+			
+			endif;
+			
 			$this->ci->db->insert( 'email_queue_track_open' );
 			
 			return TRUE;
@@ -1347,6 +1422,196 @@ class Emailer {
 		endif;
 		
 		return FALSE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Increments a link's open count and adds a tracking note
+	 *
+	 * @access	public
+	 * @param	string $ref The email's reference
+	 * @param	string $guid the unique counter used to generate the hash
+	 * @param	string $hash The secutiry hash to check (i.e verify the ref and guid).
+	 * @param	string $url 
+	 * @param	string $type 
+	 * @return	bool
+	 * @author	Pablo
+	 **/
+	public function track_link( $ref, $guid, $hash, $link_id )
+	{
+		$_email = $this->get_by_ref( $ref, $guid, $hash );
+		
+		if ( $_email && $_email != 'BAD_HASH' ) :
+		
+			//	Get the link which was clicked
+			$this->ci->db->select( 'url' );
+			$this->ci->db->where( 'email_id', $_email->id );
+			$this->ci->db->where( 'id', $link_id );
+			$_link = $this->ci->db->get( 'email_queue_link' )->row();
+			
+			if ( $_link ) :
+			
+				//	Update the read count and a add a track data point
+				$this->ci->db->set( 'link_click_count', 'link_click_count+1', FALSE );
+				$this->ci->db->where( 'id', $_email->id );
+				$this->ci->db->update( 'email_queue_archive' );
+				
+				//	Add a link trackback
+				$this->ci->db->set( 'created', 'NOW()', FALSE );
+				$this->ci->db->set( 'email_id', $_email->id );
+				$this->ci->db->set( 'link_id', $link_id );
+				
+				if ( active_user( 'id' ) ) :
+				
+					$this->ci->db->set( 'user_id', active_user( 'id' ) );
+				
+				endif;
+				
+				$this->ci->db->insert( 'email_queue_track_link' );
+				
+				//	Return the URL to go to
+				return $_link->url;
+			
+			else :
+			
+				return 'BAD_LINK';
+			
+			endif;
+		
+		endif;
+		
+		return 'BAD_HASH';	
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Parses a string for <a> links and replaces them with a trackable URL
+	 *
+	 * @access	public
+	 * @param	string $body The string to parse
+	 * @param	int $email_id The ID of the email being processed
+	 * @param	bool $is_html Whether body is HTML (i.e look for <a> tags) or plaintext (i.e look for plain URL)
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE )
+	{
+		//	Set the class variables for the ID and ref (need those in the callbacks)
+		$this->_generate_tracking_email_id	= $email_id;
+		$this->_generate_tracking_email_ref	= $email_ref;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $is_html ) :
+		
+			$body = preg_replace_callback( '/<a .*?(href="(.*?)").*?>(.*)<\/a>/', array( $this, '__process_link_html' ), $body );
+			
+		else :
+		
+			$body = preg_replace_callback( '/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/  ', array( $this, '__process_link_url' ), $body );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	And null these again, so nothing gets confused
+		$this->_generate_tracking_email_id	= NULL;
+		$this->_generate_tracking_email_ref	= NULL;
+		
+		// --------------------------------------------------------------------------
+		
+		return $body;
+	}
+	
+	private function __process_link_html( $link )
+	{
+		$_html	= isset( $link[0] ) && $link[0] ? $link[0] : '';
+		$_href	= isset( $link[1] ) && $link[1] ? $link[1] : '';
+		$_url	= isset( $link[2] ) && $link[2] ? $link[2] : '';
+		$_title	= isset( $link[3] ) && strip_tags( $link[3] ) ? strip_tags( $link[3] ) : $_url;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Only process if theres at least the HTML tag and a detected URL
+		//	otherwise it's not worth it/possible to accurately replace the tag
+		
+		if ( $_html && $_url ) :
+		
+			$_html = $this->__process_link_generate( $_html, $_url, $_title, TRUE );
+		
+		endif;
+		
+		return $_html;
+	}
+	
+	private function __process_link_url( $url )
+	{
+		$_html	= isset( $url[0] ) && $url[0] ? $url[0] : '';
+		$_url	= $_html;
+		$_title	= $_html;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Only process if theres a URL to process
+		if ( $_html && $_url ) :
+		
+			$_html = $this->__process_link_generate( $_html, $_url, $_title, FALSE );
+		
+		endif;
+		
+		return $_html;
+	}
+	
+	private function __process_link_generate( $html, $url, $title, $is_html )
+	{
+		//	Generate a tracking URL for this link
+		//	Firstly, check this URL hasn't been processed already (for this email)
+		
+		if ( isset( $this->track_link_cache[md5( $url )] ) ) :
+		
+			$_tracking_url = $this->track_link_cache[md5( $url )];
+			
+			//	Replace the URL	and return the new tag
+			$html = str_replace( $url, $_tracking_url, $html );
+		
+		else :
+		
+			//	New URL, needs processed. We take the URL and the Title, store it in the
+			//	database and generate the new tracking link (inc. hashes etc). We'll cache
+			//	this link so we don't have to process it again.
+			
+			$this->ci->db->set( 'email_id', $this->_generate_tracking_email_id );
+			$this->ci->db->set( 'url', $url );
+			$this->ci->db->set( 'title', $title );
+			$this->ci->db->set( 'created', 'NOW()', FALSE );
+			$this->ci->db->set( 'is_html', $is_html );
+			$this->ci->db->insert( 'email_queue_link' );
+			
+			$_id = $this->ci->db->insert_id();
+
+			if ( $_id ) :
+			
+				$_time			= time();
+				$_tracking_url	= site_url( 'email/tracker/link/' . $this->_generate_tracking_email_ref . '/' . $_time . '/' . md5( $_time . APP_PRIVATE_KEY . $this->_generate_tracking_email_ref ). '/' . $_id );
+				
+				$this->track_link_cache[md5( $url )] = $_tracking_url;
+				
+				// --------------------------------------------------------------------------
+
+				//	Replace the URL	and return the new tag
+				$html = str_replace( $url, $_tracking_url, $html );
+			
+			endif;
+		
+		endif;
+		
+		return $html;
 	}
 }
 
