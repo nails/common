@@ -1135,7 +1135,60 @@ class Emailer
 		// --------------------------------------------------------------------------
 		
 		//	Send!
-		return $this->ci->email->send() ? TRUE : FALSE;
+		if ( $this->ci->email->send() ) :
+		
+			return TRUE;
+		
+		else :
+		
+			//	Failed to send, notify developers
+			$_to		= APP_EMAIL_DEVELOPER;
+			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
+			$_message	= 'Hi,' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= 'Email #' . $_email->id . ' failed to send at SMTP time' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= 'Please take a look as a matter of urgency; debugging data is below:' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
+			$_message	.= '' . "\n";
+			
+			$_message	.= $this->ci->email->print_debugger();
+			
+			$_message	.= '' . "\n";
+			$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= 'Additional debugging information:' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= print_r( $_send, TRUE ) . "\n";
+			
+			$_headers = 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
+						'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
+						'X-Mailer: PHP/' . phpversion()  . "\r\n" .
+						'X-Priority: 1 (Highest)' . "\r\n" .
+						'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
+						'Importance: High';
+			
+			if ( ENVIRONMENT == 'production' ) :
+			
+				@mail( $_to, $_subject , $_message, $_headers );
+				
+			else :
+			
+				//	On non-production environments halt execution, this is an error with the configs
+				//	and should probably be addressed
+				
+				show_error( 'Email failed to send at SMTP time. Potential configuration error. Investigate, debugging data below: <div style="padding:20px;background:#EEE">' . $this->ci->email->print_debugger() . '</div>' );
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			return FALSE;
+			
+		endif;
 	}
 	
 	
