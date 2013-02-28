@@ -4,7 +4,9 @@
 | -------------------------------------------------------------------
 | SSL routes
 | -------------------------------------------------------------------
-| This file contains LinkedIn app configurations
+| 
+| This file contains SSL routes configurations. SSL routing must be enabled
+| for this to take hold.
 |
 */
 
