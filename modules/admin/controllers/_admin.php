@@ -210,7 +210,11 @@ class Admin_Controller extends NAILS_Controller
 	**/
 	private function _load_active_modules()
 	{
-		foreach( $this->nails_modules AS $module => $sub_modules ) :
+		$_modules = get_loaded_modules();
+		
+		// --------------------------------------------------------------------------
+		
+		foreach( $_modules AS $module => $sub_modules ) :
 		
 			$_module = $this->admin_model->find_module( $module );
 			
