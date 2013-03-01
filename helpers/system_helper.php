@@ -167,5 +167,36 @@ if ( ! function_exists( 'module_is_enabled' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+/**
+ * send_developer_mail()
+ *
+ * Quickly send a high priority email via mail() to the APP_DEVELOPER
+ * 
+ *
+ * @access	public
+ * @param	string $subject The subject of the email
+ * @param	string $message The message of the email
+ * @return	object
+ */
+if ( ! function_exists( 'send_developer_mail' ) )
+{
+	function send_developer_mail( $subject, $message )
+	{
+		$_to		= APP_EMAIL_DEVELOPER;
+		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
+					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
+					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
+					  'X-Priority: 1 (Highest)' . "\r\n" .
+					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
+					  'Importance: High';
+					  
+		@mail( $_to, $subject , $message, $_headers );
+	}
+}
+
+
 /* End of file system_helper.php */
 /* Location: ./application/helpers/system_helper.php */

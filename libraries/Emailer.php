@@ -1021,7 +1021,6 @@ class Emailer
 		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_EMAIL_DEVELOPER' ) && APP_EMAIL_DEVELOPER ) && $_error->error_has_occurred() ) :
 		
 			//	The templates error'd, abort the send and let dev know
-			$_to		= APP_EMAIL_DEVELOPER;
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';
 			$_message	= 'Hi,' . "\n";
 			$_message	.= '' . "\n";
@@ -1053,14 +1052,7 @@ class Emailer
 			$_message	.= '' . "\n";
 			$_message	.= print_r( $_send, TRUE ) . "\n";
 			
-			$_headers = 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
-						'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
-						'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-						'X-Priority: 1 (Highest)' . "\r\n" .
-						'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-						'Importance: High';
-			
-			@mail( $_to, $_subject , $_message, $_headers );
+			send_developer_mail( $_subject, $_message );
 			
 			// --------------------------------------------------------------------------
 			
@@ -1142,8 +1134,7 @@ class Emailer
 		else :
 		
 			//	Failed to send, notify developers
-			$_to		= APP_EMAIL_DEVELOPER;
-			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
+			$_subject	= '!! Email #' . $_email->id . ' failed to send at SMTP time';
 			$_message	= 'Hi,' . "\n";
 			$_message	.= '' . "\n";
 			$_message	.= 'Email #' . $_email->id . ' failed to send at SMTP time' . "\n";
@@ -1164,16 +1155,9 @@ class Emailer
 			$_message	.= '' . "\n";
 			$_message	.= print_r( $_send, TRUE ) . "\n";
 			
-			$_headers = 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
-						'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
-						'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-						'X-Priority: 1 (Highest)' . "\r\n" .
-						'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-						'Importance: High';
-			
 			if ( ENVIRONMENT == 'production' ) :
 			
-				@mail( $_to, $_subject , $_message, $_headers );
+				send_developer_mail( $_subject, $_message );
 				
 			else :
 			
