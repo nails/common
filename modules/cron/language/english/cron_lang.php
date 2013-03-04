@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			CDN Langfile
+* Name:			CRON Langfile
 *
-* Description:  Language file for CDN module
+* Description:  Language file for CRON module
 * 
 */
 

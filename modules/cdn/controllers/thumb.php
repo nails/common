@@ -10,7 +10,7 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Thumb extends CDN_Controller
+class Thumb extends NAILS_CDN_Controller
 {
 	protected $_fail;
 	protected $_bucket;

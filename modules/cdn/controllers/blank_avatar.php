@@ -9,7 +9,7 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Blank_avatar extends CDN_Controller
+class Blank_avatar extends NAILS_CDN_Controller
 {
 	protected $_fail;
 	protected $_man;

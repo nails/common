@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class CDN_Controller extends NAILS_Controller
+class NAILS_CDN_Controller extends NAILS_Controller
 {
 	protected $_cdn_root;
 	

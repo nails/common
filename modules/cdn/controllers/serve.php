@@ -10,7 +10,7 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Serve extends CDN_Controller
+class Serve extends NAILS_CDN_Controller
 {
 	private $_bucket;
 	private $_object;

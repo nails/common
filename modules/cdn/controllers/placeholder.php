@@ -10,7 +10,7 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Placeholder extends CDN_Controller
+class Placeholder extends NAILS_CDN_Controller
 {
 	private $_tile;
 	private $_width;
