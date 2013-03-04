@@ -32,6 +32,7 @@ class NAILS_Auth_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
+		//	TODO: Load lang using RENDER_LANG constant
 		$this->lang->load( 'auth', 'english' );
 	}
 }

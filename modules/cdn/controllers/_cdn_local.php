@@ -16,6 +16,8 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load language file
+		//	TODO: Load lang using RENDER_LANG constant
 		$this->lang->load( 'cdn', 'english' );
 	}
 	

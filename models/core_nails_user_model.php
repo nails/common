@@ -434,7 +434,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->select( 'utz.gmt_offset timezone_gmt_offset, utz.label timezone_label' );
 		$this->db->select( 'dfd.label date_format_date_label, dfd.format date_format_date_format' );
 		$this->db->select( 'dft.label date_format_time_label, dft.format date_format_time_format' );
-		$this->db->select( 'ul.name language_name' );
+		$this->db->select( 'ul.name language_name, ul.safe_name language_safe_name' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -590,12 +590,25 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$user->date_setting->format->time->label	= $user->date_format_time_label;
 			$user->date_setting->format->time->format	= $user->date_format_time_format;
 			
-			unset($user->timezone_label);
-			unset($user->timezone_gmt_offset);
-			unset($user->date_format_date_label);
-			unset($user->date_format_date_format);
-			unset($user->date_format_time_label);
-			unset($user->date_format_time_format);
+			unset( $user->timezone_label );
+			unset( $user->timezone_gmt_offset );
+			unset( $user->date_format_date_label );
+			unset( $user->date_format_date_format );
+			unset( $user->date_format_time_label );
+			unset( $user->date_format_time_format );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Tidy up langauge field
+			$user->language_setting				= new stdClass();
+			$user->language_setting->id			=	$user->language_id;
+			$user->language_setting->name		=	$user->language_name;
+			$user->language_setting->safe_name	=	$user->language_safe_name;
+			
+			unset( $user->language_id );
+			unset( $user->language_name );
+			unset( $user->language_safe_name );
+			
 			
 		endforeach;
 		

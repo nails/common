@@ -87,7 +87,6 @@ p {
 			<?php echo $heading; ?>
 		</h1>
 		<?php echo $message; ?>
-		<small><?=lang( 'error_footer', 'hello@shedcollective.org' )?></small>
 	</div>
 </body>
 </html>

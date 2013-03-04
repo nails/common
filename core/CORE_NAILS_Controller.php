@@ -120,6 +120,25 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Set any global preferences for this user, e.g languages, fall back to
+		//	the app's default language (defined in config.php).
+		
+		$_user_pref = active_user( 'language_setting' );
+		
+		if ( isset( $_user_pref->safe_name ) && $_user_pref->safe_name ) :
+		
+			define( 'RENDER_LANG', $_user_pref->safe_name );
+			define( 'RENDER_LANG_ID', $_user_pref->id );
+		
+		else :
+		
+			define( 'RENDER_LANG', $this->config->item( 'language' ) );
+			define( 'RENDER_LANG_ID', NULL );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Set alerts
 		
 		//	These are hooks for code to add feedback messages to the user.
