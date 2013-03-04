@@ -39,7 +39,7 @@
 	</script>	
 	
 </head>
-<body>
+<body class="<?=!$loaded_modules ? 'no-modules' : ''?>">
 		
 	<div class="header">
 		
@@ -89,143 +89,126 @@
 	<div class="sidebar left">
 		<div class="padder">
 		<?php
-		
-			if ( isset( $loaded_modules ) ) :
 			
-				$_acl			= active_user( 'acl' );
-				$_mobile_menu	= array();
-				
-				foreach ( $loaded_modules AS $module => $config ) :
-				
-					//	Add this to the mobile version of the menu
-					$_mobile_menu[$module]			= new stdClass();
-					$_mobile_menu[$module]->module	= $config->name;
-					$_mobile_menu[$module]->url		= NULL;
-					$_mobile_menu[$module]->subs	= array();
-					
-					// --------------------------------------------------------------------------
-					
-					//	Get any notifications for this module if applicable
-					$_notifications = method_exists( $module, 'notifications') ? $module::notifications() : array();
-					
-					?>
-					<div class="box" id="box_<?=url_title( $config->name )?>">
-						<h2>
-							<?=$config->name?>
-							<a href="#" class="toggle">close</a>
-						</h2>
-						<div class="box-container">
-							<ul>
-							<?php
-							
-								//	Loop all the module methods
-								foreach( $config->funcs AS $method => $label ) :
-								
-									//	Is the method enabled?
-									if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method]) ) :
-	
-										echo '<li> &rsaquo; ';
-										echo anchor( 'admin/' . $module . '/' . $method, $label );
-										
-										if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
-										
-											$_type	= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
-											$_title	= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
-											
-											switch ( $_type ) :
-											
-												case 'split' :
-												
-													foreach ( $_notifications[$method]['options'] AS $notification ) :
-													
-														$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'info';
-														$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
-														
-														if ( $notification['value'] ) :
-														
-															echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
-															
-														endif;
-														
-													endforeach;
-												
-												break;
-												
-												default :
-												
-													if ( $_notifications[$method]['value'] ) :
-													
-														echo '<span class="indicator ' . $_type . '" title="' . $_title . '" rel="tipsy-right">' . number_format( $_notifications[$method]['value'] ) . '</span>';
-														
-													endif;
-													
-												break;
-											
-											endswitch;
-										
-										endif;
-										
-										// --------------------------------------------------------------------------
-										
-										//	Add to the mobile menu
-										$_mobile_menu[$module]->subs[$method]			= new stdClass();
-										$_mobile_menu[$module]->subs[$method]->label	= $label;
-										$_mobile_menu[$module]->subs[$method]->url		= 'admin/' . $module . '/' . $method;
-										
-										echo '<div class="clear"></div></li>';
-									
-									endif;
-									
-								endforeach;
-								
-							?>
-							</ul>
-						</div>
-					</div>
-					<?php
-					
-				endforeach;
+			$_acl			= active_user( 'acl' );
+			$_mobile_menu	= array();
+			
+			foreach ( $loaded_modules AS $module => $config ) :
+			
+				//	Add this to the mobile version of the menu
+				$_mobile_menu[$module]			= new stdClass();
+				$_mobile_menu[$module]->module	= $config->name;
+				$_mobile_menu[$module]->url		= NULL;
+				$_mobile_menu[$module]->subs	= array();
 				
 				// --------------------------------------------------------------------------
 				
-				//	Build the Dropdown menu
-				echo '<div id="mobile-menu-main">';
-				echo '<select>';
-				echo '<option data-url="">Menu</option>';
+				//	Get any notifications for this module if applicable
+				$_notifications = method_exists( $module, 'notifications') ? $module::notifications() : array();
 				
-				$_module	= $this->uri->rsegment( 1 );
-				$_method	= $this->uri->rsegment( 2 );
-				
-				foreach ( $_mobile_menu AS $module => $item ) :
-					
-					echo '<optgroup label="' . str_replace( '"', '\"', $item->module ) . '">';
-					foreach ( $item->subs AS $method => $sub ) :
-					
-						$_selected = $_module == $module && $_method == $method ? 'selected="selected"' : '';
-						echo '<option data-url="' . $sub->url . '" ' . $_selected . '>' . $sub->label . '</option>';
-					
-					endforeach;
-					echo '</optgroup>';
-				
-				endforeach;
-				echo '</select>';
-				echo '</div>';
-			
-			else:
-			
 				?>
-				<div class="box">
-					<h2 title="">Oops!</h2>
-					<ul>
-						<li>
-							No modules enabled for this site.
-						</li>
-					</ul>
+				<div class="box" id="box_<?=url_title( $config->name )?>">
+					<h2>
+						<?=$config->name?>
+						<a href="#" class="toggle">close</a>
+					</h2>
+					<div class="box-container">
+						<ul>
+						<?php
+						
+							//	Loop all the module methods
+							foreach( $config->funcs AS $method => $label ) :
+							
+								//	Is the method enabled?
+								if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method]) ) :
+								
+									echo '<li> &rsaquo; ';
+									echo anchor( 'admin/' . $module . '/' . $method, $label );
+									
+									if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
+									
+										$_type	= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
+										$_title	= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
+										
+										switch ( $_type ) :
+										
+											case 'split' :
+											
+												foreach ( $_notifications[$method]['options'] AS $notification ) :
+												
+													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'info';
+													$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
+													
+													if ( $notification['value'] ) :
+													
+														echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
+														
+													endif;
+													
+												endforeach;
+											
+											break;
+											
+											default :
+											
+												if ( $_notifications[$method]['value'] ) :
+												
+													echo '<span class="indicator ' . $_type . '" title="' . $_title . '" rel="tipsy-right">' . number_format( $_notifications[$method]['value'] ) . '</span>';
+													
+												endif;
+												
+											break;
+										
+										endswitch;
+									
+									endif;
+									
+									// --------------------------------------------------------------------------
+									
+									//	Add to the mobile menu
+									$_mobile_menu[$module]->subs[$method]			= new stdClass();
+									$_mobile_menu[$module]->subs[$method]->label	= $label;
+									$_mobile_menu[$module]->subs[$method]->url		= 'admin/' . $module . '/' . $method;
+									
+									echo '<div class="clear"></div></li>';
+								
+								endif;
+								
+							endforeach;
+							
+						?>
+						</ul>
+					</div>
 				</div>
 				<?php
+				
+			endforeach;
 			
-			endif;
-		
+			// --------------------------------------------------------------------------
+			
+			//	Build the Dropdown menu
+			echo '<div id="mobile-menu-main">';
+			echo '<select>';
+			echo '<option data-url="">Menu</option>';
+			
+			$_module	= $this->uri->rsegment( 1 );
+			$_method	= $this->uri->rsegment( 2 );
+			
+			foreach ( $_mobile_menu AS $module => $item ) :
+				
+				echo '<optgroup label="' . str_replace( '"', '\"', $item->module ) . '">';
+				foreach ( $item->subs AS $method => $sub ) :
+				
+					$_selected = $_module == $module && $_method == $method ? 'selected="selected"' : '';
+					echo '<option data-url="' . $sub->url . '" ' . $_selected . '>' . $sub->label . '</option>';
+				
+				endforeach;
+				echo '</optgroup>';
+			
+			endforeach;
+			echo '</select>';
+			echo '</div>';
+				
 		?>
 		</div>
 	</div>

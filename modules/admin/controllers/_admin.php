@@ -214,7 +214,12 @@ class Admin_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		foreach( $_modules AS $module => $sub_modules ) :
+		//	Dashboard, always present, and always first
+		$this->_loaded_modules['dashboard'] = $this->admin_model->find_module( 'dashboard' );
+		
+		// --------------------------------------------------------------------------
+		
+		foreach( $_modules['admin'] AS $module ) :
 		
 			$_module = $this->admin_model->find_module( $module );
 			

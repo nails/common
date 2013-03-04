@@ -74,7 +74,7 @@ if ( ! function_exists( 'get_loaded_modules' ) )
 {
 	function get_loaded_modules()
 	{
-		//	If we already know which modules are laoded then return that, save 
+		//	If we already know which modules are loaded then return that, save 
 		//	the [small] overhead of working out the modules again and again.
 		
 		if ( isset( $GLOBALS['NAILS_LOADED_MODULES'] ) ) :
