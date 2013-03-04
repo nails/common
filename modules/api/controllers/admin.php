@@ -43,7 +43,7 @@ class Admin extends NAILS_API_Controller
 		if ( ! $this->user->is_logged_in() ) :
 		
 			$this->_authorised	= FALSE;
-			$this->_error		= 'You must be logged in';
+			$this->_error		= lang( 'auth_require_session' );
 		
 		endif;
 		
@@ -53,7 +53,7 @@ class Admin extends NAILS_API_Controller
 		if ( ! $this->user->is_admin() ) :
 		
 			$this->_authorised	= FALSE;
-			$this->_error		= 'You must be an administrator';
+			$this->_error		= lang( 'auth_require_administrator' );
 		
 		endif;
 	}

@@ -23,6 +23,11 @@ class NAILS_API_Controller extends NAILS_Controller
 			show_404();
 		
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the API langfile
+		$this->lang->load( 'api', 'english' );
 	}
 	
 	// --------------------------------------------------------------------------
@@ -87,7 +92,7 @@ class NAILS_API_Controller extends NAILS_Controller
 		
 			$this->_out( array(
 				'status'	=> 400,
-				'error'		=> '"' . $method . '" is not a valid method name'
+				'error'		=> lang( 'not_valid_method', $method )
 			) );
 		
 		endif;
