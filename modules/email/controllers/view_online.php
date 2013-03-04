@@ -7,7 +7,10 @@
 * 
 */
 
-class View_Online extends NAILS_Controller
+//	Include _email.php; executes common functionality
+require_once '_email.php';
+
+class View_Online extends NAILS_Email_Controller
 {
 	
 	/**
@@ -29,19 +32,13 @@ class View_Online extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Check the reference is present
-		if ( ! $_ref )
-			show_error( 'MISSING ARGUMENT: EMAIL_REF' );
-		
-		// --------------------------------------------------------------------------
-		
 		//	Fetch the email
 		$this->load->library( 'emailer' );
 		
 		$_email = $this->emailer->get_by_ref( $_ref, $_guid, $_hash );
 		
 		if ( ! $_email || $_email == 'BAD_HASH' )
-			show_error( 'Invalid email reference' );
+			show_error( lang( 'invalid_email' ) );
 		
 		// --------------------------------------------------------------------------
 		

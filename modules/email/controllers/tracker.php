@@ -7,9 +7,12 @@
  * 
  **/
 
-class Tracker extends NAILS_Controller
+//	Include _email.php; executes common functionality
+require_once '_email.php';
+
+class Tracker extends NAILS_Email_Controller
 {
-	
+
 	/**
 	 * Track an email open.
 	 *
@@ -26,15 +29,6 @@ class Tracker extends NAILS_Controller
 		$_ref	= $this->uri->segment( 3, 'NULL' );
 		$_guid	= $this->uri->segment( 4, 'NULL' );
 		$_hash	= $this->uri->segment( 5, 'NULL' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Check the reference is present
-		if ( ! $_ref ) :
-		
-			show_error( 'MISSING ARGUMENT: EMAIL_REF' );
-			
-		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -85,7 +79,7 @@ class Tracker extends NAILS_Controller
 		//	Check the reference is present
 		if ( ! $_ref ) :
 		
-			show_error( 'MISSING ARGUMENT: EMAIL_REF' );
+			show_error( lang( 'argument_missing', 'EMAIL_REF' ) );
 			
 		endif;
 		
@@ -105,7 +99,7 @@ class Tracker extends NAILS_Controller
 				$this->output->set_header( 'Content-type: application/json' ); 
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
-				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => 'Could not validate email' ) ) );
+				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_email' ) ) ) );
 			
 			break;
 			
@@ -116,7 +110,7 @@ class Tracker extends NAILS_Controller
 				$this->output->set_header( 'Content-type: application/json' ); 
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
-				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => 'Could not validate link' ) ) );
+				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_link' ) ) ) );
 			
 			break;
 			
