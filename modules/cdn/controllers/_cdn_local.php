@@ -13,6 +13,10 @@ class CDN_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		$this->_cdn_root = NAILS_PATH . 'modules/cdn/';
+		
+		// --------------------------------------------------------------------------
+		
+		$this->lang->load( 'cdn', 'english' );
 	}
 	
 	

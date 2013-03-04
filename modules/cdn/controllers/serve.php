@@ -92,7 +92,7 @@ class Serve extends CDN_Controller
 		$_out = array(
 		
 			'status'	=> 400,
-			'message'	=> 'Invalid request'
+			'message'	=> lang( 'invalid_request' )
 		
 		);
 		
