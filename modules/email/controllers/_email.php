@@ -24,8 +24,7 @@ class NAILS_Email_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		//	TODO: Load lang using RENDER_LANG constant
-		$this->lang->load( 'email', 'english' );
+		$this->lang->load( 'email', RENDER_LANG );
 	}
 }
 
