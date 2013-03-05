@@ -18,7 +18,7 @@
 		</div>
 		
 	</div><!--	/.container	-->
-	<script tyle="text/javascript">
+	<script type="text/javascript">
 	<!--//
 	
 		var _nails;

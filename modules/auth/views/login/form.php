@@ -61,9 +61,9 @@
 			
 			?>
 			<div class="row <?=$_error?>">
-				<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_input( $_field, set_value( $_field ), 'placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -76,9 +76,9 @@
 			
 			?>
 			<div class="row <?=$_error?>">
-				<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
+					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -144,10 +144,10 @@
 					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', 'Sign in with LinkedIn', 'class="social-signin li"' ) . '</p>';
 				
 				endif;
+				
+				echo '</div>';
 			
 			endif;
-			
-			echo '</div>';
 			
 		?>
 	</div>

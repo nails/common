@@ -72,7 +72,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 			//	Validate input
 			$this->form_validation->set_rules( 'first_name',	'First Name',			'required|xss_clean' );
 			$this->form_validation->set_rules( 'last_name',		'Surname',				'required|xss_clean' );
-			$this->form_validation->set_rules( 'email',			'Email',				'required|xss_clean|valid_email|is_unique[user.email]|is_unique[user.email_secondary]' );
+			$this->form_validation->set_rules( 'email',			'Email',				'required|xss_clean|valid_email|is_unique[user.email]' );
 			$this->form_validation->set_rules( 'password',		'Password',				'required|xss_clean' );
 			$this->form_validation->set_rules( 'terms',			'Terms & Conditions',	'required|xss_clean' );
 			

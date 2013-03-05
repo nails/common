@@ -13,7 +13,7 @@
 		<meta name="author" content="">
 		
 		<!--	JS GLOBALS	-->
-		<script tyle="text/javascript">
+		<script type="text/javascript">
 			window.NAILS_URL = '<?=NAILS_URL?>';
 		</script>
 		

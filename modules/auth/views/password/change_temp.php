@@ -55,9 +55,9 @@
 	
 	?>
 	<div class="row <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns last">
-			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
+			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
@@ -70,9 +70,9 @@
 	
 	?>
 	<div class="row <?=$_error?>">
-		<?=form_label( $_name, $_field, array( 'class' => 'two columns first' ) ); ?>
+		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns last">
-			<?=form_password( $_field, NULL, 'placeholder="' . $_name . '"' )?>
+			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
