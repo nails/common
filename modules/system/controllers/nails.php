@@ -7,7 +7,10 @@
  * 
  **/
 
-class Nails extends NAILS_Controller
+//	Include _system.php; executes common functionality
+require_once '_system.php';
+
+class Nails extends NAILS_System_Controller
 {
 	/**
 	 * Return info about the Nails installation

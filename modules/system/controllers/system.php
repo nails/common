@@ -6,8 +6,11 @@
  * Description:	Used for various misc. functionality
  * 
  **/
+ 
+//	Include _system.php; executes common functionality
+require_once '_system.php';
 
-class System extends NAILS_Controller
+class System extends NAILS_System_Controller
 {
 	/**
 	 * Handle 404 errors

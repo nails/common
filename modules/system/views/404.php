@@ -16,5 +16,5 @@
 ?>
 
 	<p>
-		Sorry, the page you are looking for was not found.
+		<?=lang( '404_text' )?>
 	</p>
