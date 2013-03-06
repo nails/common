@@ -21,19 +21,18 @@
 ?>
 	
 	<div class="container">
-		<p class="system-alert error no-close">
-			<strong>Oh snap!</strong> We couldn't activate your account.
-		</p>
 		<p>
-			There was a problem activating this account. This can happen for various reasons:
+			<?=lang( 'auth_verify_fail_message' )?>
 		</p>
 		<ul>
-			<li>Account already active.</li>
-			<li>Invalid or expired activation code</li>
-			<?php if ( ! $user->is_logged_in() ) : ?>
-			<li>In many cases your account has already been activated, <?=anchor( 'auth/login', 'please try logging in' )?>.</li>
-			<?php endif; ?>
+			<li><?=lang( 'auth_verify_fail_reason_active' )?></li>
+			<li><?=lang( 'auth_verify_fail_reason_invalid' )?></li>
 		</ul>
+		<?php if ( ! $user->is_logged_in() ) : ?>
+		<p>
+			<?=lang( 'auth_verify_fail_try_login', site_url( 'auth/login' ) )?>
+		</p>
+		<?php endif; ?>
 	</div>
 	
 <?php

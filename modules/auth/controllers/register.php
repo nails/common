@@ -39,7 +39,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Specify a default title for this page
-		$this->data['page']->title = 'Register';
+		$this->data['page']->title = lang( 'auth_title_register' );
 	}
 	
 	
@@ -59,7 +59,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	If you're logged in you shouldn't be accessing this method
 		if ( $this->user->is_logged_in() ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
 			
 		endif;
@@ -79,11 +79,9 @@ class NAILS_Register extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Change default messages
-			$this->form_validation->set_message( 'required',				lang( 'required_field' ) );
-			$this->form_validation->set_message( 'valid_email',				lang( 'valid_email' ) );
-			$this->form_validation->set_message( 'alpha_dash_space_accent',	lang( 'alpha_dash_space_accent' ) );
-			$this->form_validation->set_message( 'matches',					lang( 'matches' ) );
-			$this->form_validation->set_message( 'is_unique',				lang( 'is_unique', site_url( 'auth/forgotten_password' ) ) );
+			$this->form_validation->set_message( 'required',				lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_email',				lang( 'fv_valid_email' ) );
+			$this->form_validation->set_message( 'is_unique',				lang( 'auth_register_email_is_unique', site_url( 'auth/forgotten_password' ) ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -162,8 +160,10 @@ class NAILS_Register extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Redirect to the group homepage
+					//	TODO There should be the option to enable/disable forced activation
+					
 					$_user = $this->user->get_user( $_uid['id'] );
-					$this->session->set_flashdata( 'success', '<strong>Welcome, ' . $_user->first_name . '!</strong>' );
+					$this->session->set_flashdata( 'success', lang( 'auth_register_flashdata_welcome', $_user->first_name ) );
 					redirect( $_user->group_homepage );
 					return;
 				
@@ -171,7 +171,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 			
 			else:
 			
-				$this->data['error'] = lang( 'register_error' );
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 			
 			endif;
 		
@@ -179,9 +179,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
-		
+		//	Load the views
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'auth/register/form',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
@@ -209,7 +207,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	We got details?
 		if ( $_id === FALSE || $_hash === FALSE ):
 		
-			$this->session->set_flashdata( 'error', 'Invalid credentials supplied. Unable to resend activation email. <small class="right">Error #1</small>' );
+			$this->session->set_flashdata( 'error', lang( 'auth_register_resend_invalid' ) );
 			redirect( '/' );
 			return;
 		
@@ -222,7 +220,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		
 		if ( $_u === FALSE ) :
 		
-			$this->session->set_flashdata( 'error', 'Invalid credentials supplied. Unable to resend activation email.  <small class="right">Error #2</small>' );
+			$this->session->set_flashdata( 'error', lang( 'auth_register_resend_invalid' ) );
 			redirect( '/' );
 			return;
 		
@@ -233,7 +231,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	Account active?
 		if ( $_u->active ) :
 		
-			$this->session->set_flashdata( 'error', 'Account already active, please try logging in. <small class="right">Error #3</small>' );
+			$this->session->set_flashdata( 'message', lang( 'auth_register_resend_already_active', site_url( 'auth/login' ) ) );
 			redirect( 'auth/login' );
 			return;
 		
@@ -244,7 +242,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		//	Hash match?
 		if ( md5( $_u->activation_code ) != $_hash ) :
 		
-			$this->session->set_flashdata( 'error', 'Invalid credentials supplied. Unable to resend activation email. <small class="right">Error #4</small>' );
+			$this->session->set_flashdata( 'error', lang( 'auth_register_resend_invalid' ) );
 			redirect( '/' );
 			return;
 		
@@ -283,9 +281,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
-		
+		//	Load the views
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'auth/register/resend',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );

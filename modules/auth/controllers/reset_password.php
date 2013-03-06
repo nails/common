@@ -36,7 +36,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 		//	If user is logged in they shouldn't be accessing this method
 		if ( $this->user->is_logged_in() ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
 			
 		endif;
@@ -79,9 +79,8 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Set custom messages
-				$this->form_validation->set_message( 'required',	lang( 'required_reset' ) );
-				$this->form_validation->set_message( 'matches',		lang( 'matches' ) );
-				$this->form_validation->set_message( 'min_length',	lang( 'min_length_change_temp' ) );
+				$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+				$this->form_validation->set_message( 'matches',		lang( 'fv_matches' ) );
 				
 				// --------------------------------------------------------------------------
 				
@@ -99,7 +98,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					//	Log the user in
 					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), TRUE );
 					
-					$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
 					
 					//	Log user in and forward to wherever they need to go
 					if ( $this->input->get( 'return_to' ) ):
@@ -121,7 +120,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					
 				else:
 				
-					$this->data['error'] = lang( 'register_error' );
+					$this->data['error'] = lang( 'fv_there_were_errors' );
 					
 				endif;
 				
@@ -136,9 +135,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			//	Load the views; using the auth_model view loader as we need to check if
-			//	an overload file exists which should be used instead
-			
+			//	Load the views
 			$this->load->view( 'structure/header',			$this->data );
 			$this->load->view( 'auth/password/change_temp',	$this->data );
 			$this->load->view( 'structure/footer',			$this->data );

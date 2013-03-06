@@ -23,11 +23,11 @@
 	
 	<div id="password-reset-successfully" class="container">
 		<p>
-			Please log in using this temporary password: <strong><?=$new_password?></strong>
+			<?=lang( 'auth_forgot_reset_ok', $new_password )?>
 		</p>
 		<hr />
 		<p>
-			<?=anchor( 'auth/login', lang( 'action_proceed_login' ), 'class="awesome"' )?>
+			<?=anchor( 'auth/login', lang( 'auth_forgot_action_proceed_login' ), 'class="awesome"' )?>
 		</p>
 	</div>
 	

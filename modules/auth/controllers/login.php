@@ -44,7 +44,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Specify a default title for this page
-		$this->data['page']->title = 'Please Log In';
+		$this->data['page']->title = lang( 'auth_title_login' );
 	}
 	
 	
@@ -78,7 +78,10 @@ class NAILS_Login extends NAILS_Auth_Controller
 			$this->form_validation->set_rules( 'email',		'Email',	'required|xss_clean|valid_email' );
 			$this->form_validation->set_rules( 'password',	'Password',	'required|xss_clean' );
 			
-			if ( $this->form_validation->run() == TRUE ) :
+			$this->form_validation->set_message( 'required',		lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
+			
+			if ( $this->form_validation->run() ) :
 			
 				//	Attempt the log in
 				$_email		= $this->input->post( 'email' );
@@ -123,11 +126,11 @@ class NAILS_Login extends NAILS_Auth_Controller
 						if ( $_login['last_login'] ) :
 						
 							$_last_login	=  nice_time( strtotime( $_login['last_login'] ) );
-							$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $_first_name, $_last_login ) ) );
+							$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
 							
 						else :
 						
-							$this->session->set_flashdata( 'message', lang( 'login_ok_welcome_notime', array( $_first_name ) ) );
+							$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_first_name ) ) );
 						
 						endif;
 						
@@ -154,7 +157,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 			
 			else :
 			
-				$this->data['error'] = lang( 'register_error' );
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 				
 			endif;
 		
@@ -162,9 +165,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
-		
+		//	Load the views
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'auth/login/form',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
@@ -190,7 +191,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		
 		if ( empty( $_hash['id'] ) || empty( $_hash['pw'] ) ) :
 			
-			show_error( 'Incomplete login credentials.' );
+			show_error( $lang['auth_with_hashes_incomplete_creds'] );
 			
 		endif;
 		
@@ -251,7 +252,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Say hello
-			$_welcome = lang( 'login_ok_welcome', array( $_user->first_name, nice_time( strtotime( $_user->last_login ) ) ) );
+			$_welcome = lang( 'auth_login_ok_welcome', array( $_user->first_name, nice_time( strtotime( $_user->last_login ) ) ) );
 			$this->session->set_flashdata( 'message', $_welcome );
 			
 			// --------------------------------------------------------------------------
@@ -277,7 +278,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		else :
 		
 			//	Bad lookup, invalid hash.
-			$this->session->set_flashdata( 'error', 'Auto-login failed.' );
+			$this->session->set_flashdata( 'error', lang( 'auth_with_hashes_autologin_fail' ) );
 			redirect( '/' );
 		
 		endif;

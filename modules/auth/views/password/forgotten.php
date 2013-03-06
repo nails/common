@@ -40,23 +40,23 @@
 ?>
 
 	<p>
-		Please enter your registered email address so we can send you an email with a link which
-		you can use to reset your password.
+		<?=lang( 'auth_forgot_message' )?>
 	</p>
 	
 	
 	<!--	INPUT FIELDS	-->
 	<?php
 		
-		$_field	= 'email';
-		$_name	= 'Email';
-		$_error = form_error( $_field ) ? 'error' : NULL
+		$_field			= 'email';
+		$_name			= lang( 'form_label_email' );
+		$_placeholder	= lang( 'auth_forgot_email_placeholder' );
+		$_error			= form_error( $_field ) ? 'error' : NULL
 	
 	?>
 	<div class="row <?=$_error?>">
 		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns last">
-			<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+			<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
@@ -64,7 +64,7 @@
 	<div class="row button-row">
 		<label class="two columns first">&nbsp;</label>
 		<div class="four columns last">
-			<?=form_submit( 'submit', 'Reset Password', 'class="awesome"' )?>
+			<?=form_submit( 'submit', lang( 'auth_forgot_action_reset' ), 'class="awesome"' )?>
 		</div>
 	</div>
 	

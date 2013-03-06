@@ -132,7 +132,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		//	If the Facebook is already linked then we need to acknowledge it
 		if ( ! $this->input->get( 'force' ) && $this->fb->user_is_linked() ) :
 		
-			$this->session->set_flashdata( 'message', '<strong>Woah there!</strong> You have already linked your Facebook account.' );
+			$this->session->set_flashdata( 'message', lang( 'auth_social_already_linked', 'Facebook' ) );
 			$this->_connect_fail();
 			return;
 			
@@ -169,7 +169,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			
 			if ( ! $_access_token ) :
 			
-				$this->session->set_flashdata( 'error', '<strong>There was a problem.</strong> We could not validate your account with Facebook, you may be able to try again.' );
+				$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'Facebook' ) );
 				$this->_connect_fail();
 				return;
 			
@@ -210,8 +210,8 @@ class NAILS_Fb extends NAILS_Auth_Controller
 
 		if ( $this->user->is_logged_in() && $_user ) :
 		
-			//	This Twitter ID is already in use, tell the user so and prevent anything else from happening.
-			$this->session->set_flashdata( 'error', '<strong>Sorry</strong>, the Facebook account you\'re currently logged into is already linked with another ' . APP_NAME . ' account.' );
+			//	This Facebook ID is already in use, tell the user so and prevent anything else from happening.
+			$this->session->set_flashdata( 'error', lang( 'auth_social_account_in_use', array( 'Facebook', APP_NAME ) ) );
 			$this->_connect_fail();
 			return;
 		
@@ -250,7 +250,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 				//	is already regsitered to an account and that they need to log in and link the
 				//	account from their settings page.
 				
-				$this->session->set_flashdata( 'message', '<strong>You\'ve been here before?</strong> We noticed that the email associated with your Facebook account is already registered with ' . APP_NAME . '. In order to use Facebook to sign in you\'ll need to link your accounts via your Settings page. Log in below using your email address and we\'ll get you started.' );
+				$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use', array( 'Facebook', APP_NAME ) ) );
 				$this->_redirect( 'auth/login?return_to=' . urlencode( $this->settings['settings_url'] ) );
 				return;
 			
@@ -336,7 +336,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Redirect
-		$this->session->set_flashdata( 'success', '<strong>Success</strong>, your Facebook account is now linked.' );
+		$this->session->set_flashdata( 'success', lang( 'auth_social_linked_ok', 'Facebook' ) );
 		$this->_redirect( $this->_return_to );
 		return;
 	}
@@ -362,7 +362,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		//	Check if the user is banned.
 		if ( $user->active == 2 ) :
 			
-			$this->session->set_flashdata( 'error', lang( 'login_fail_banned' ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_banned' ) );
 			$this->_redirect( $this->return_to_fail );
 			return;
 			
@@ -385,11 +385,11 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		if ( $user->last_login ) :
 		
 			$_last_login =  nice_time( $user->last_login );
-			$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $user->first_name, $_last_login ) ) );
+			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
 		
 		else :
 		
-			$this->session->set_flashdata( 'message', lang( 'login_ok_welcome_notime', array( $user->first_name ) ) );
+			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $user->first_name ) ) );
 		
 		endif;
 		
@@ -514,8 +514,8 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			//	Redirect to the wizard
-			$this->session->set_flashdata( 'success', '<strong>Hi, ' . $_data['first_name'] . '!</strong> Your account has been set up and is ready to be used.' );
+			//	Redirect
+			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_data['first_name'] ) );
 			$this->session->set_flashdata( 'from_facebook', TRUE );
 			$this->_redirect( $this->_return_to );
 			return;

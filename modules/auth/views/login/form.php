@@ -49,36 +49,37 @@
 		<div class="first seven columns">
 		
 			<p>
-				Sign in to your <?=APP_NAME?> account using your email address and password.
-				Not got an account? <?=anchor( 'auth/register', 'Click here to register' )?>.
+				<?=lang( 'auth_login_message', array( APP_NAME, site_url( 'auth/register' ) ) )?>
 			</p>
 		
 			<?php
 				
-				$_field	= 'email';
-				$_name	= 'Email';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'email';
+				$_name			= lang( 'form_label_email' );
+				$_placeholder	= lang( 'auth_login_email_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
 			
 			<?php
 				
-				$_field	= 'password';
-				$_name	= 'Password';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'password';
+				$_name			= lang( 'form_label_password' );
+				$_placeholder	= lang( 'auth_login_pass_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -87,7 +88,7 @@
 			<?php
 				
 				$_field	= 'remember';
-				$_name	= 'Remember Me';
+				$_name	= lang( 'auth_login_label_remember_me' );
 				$_error = form_error( $_field ) ? 'error' : NULL
 			
 			?>
@@ -107,7 +108,7 @@
 				<div class="four columns last">
 					<?=form_submit( 'submit', 'Log In', 'class="awesome"' )?>
 					<small style="margin-left:15px;">
-						<?=anchor( 'auth/forgotten_password', 'Forgotten your Password?' )?>
+						<?=anchor( 'auth/forgotten_password', lang ('auth_login_forgot' ) )?>
 					</small>
 				</div>
 			</div>
@@ -120,28 +121,28 @@
 			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
 			
 				echo '<div class="eight columns last offset-by-one">';
-				echo '<p style="text-align:center;">Or, sign in using your preferred social network.</p>';
+				echo '<p style="text-align:center;">' . lang( 'auth_login_social_message' ) . '</p>';
 				
 				// --------------------------------------------------------------------------
 				
 				//	FACEBOOK
 				if ( module_is_enabled( 'auth[facebook]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', 'Sign in with Facebook', 'class="social-signin fb"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
 				
 				endif;
 				
 				//	TWITTER
 				if ( module_is_enabled( 'auth[twitter]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', 'Sign in with Twitter', 'class="social-signin tw"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
 				
 				endif;
 				
 				//	LINKEDIN
 				if ( module_is_enabled( 'auth[linkedin]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', 'Sign in with LinkedIn', 'class="social-signin li"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
 				
 				endif;
 				

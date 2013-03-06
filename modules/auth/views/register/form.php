@@ -50,65 +50,69 @@
 		<div class="first seven columns">
 		
 			<p>
-				To register with <?=APP_NAME?> simply complete the following form.
+				<?=lang( 'auth_register_message', APP_NAME )?>
 			</p>
 		
 			<?php
 				
-				$_field	= 'first_name';
-				$_name	= 'First Name';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'first_name';
+				$_name			= lang( 'form_label_first_name' );
+				$_placeholder	= lang( 'auth_register_first_name_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
 			
 			<?php
 				
-				$_field	= 'last_name';
-				$_name	= 'Last Name';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'last_name';
+				$_name			= lang( 'form_label_last_name' );
+				$_placeholder	= lang( 'auth_register_last_name_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
 			
 			<?php
 				
-				$_field	= 'email';
-				$_name	= 'Email';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'email';
+				$_name			= lang( 'form_label_email' );
+				$_placeholder	= lang( 'auth_register_email_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
 			
 			<?php
 				
-				$_field	= 'password';
-				$_name	= 'Password';
-				$_error = form_error( $_field ) ? 'error' : NULL
+				$_field			= 'password';
+				$_name			= lang( 'form_label_password' );
+				$_placeholder	= lang( 'auth_register_password_placeholder' );
+				$_error			= form_error( $_field ) ? 'error' : NULL
 			
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns last">
-					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -117,7 +121,7 @@
 			<?php
 				
 				$_field	= 'terms';
-				$_name	= 'I accept the T&C\'s';
+				$_name	= lang ( 'auth_register_label_accept_tc', site_url( 'legal/terms' ) );
 				$_error = form_error( $_field ) ? 'error' : NULL
 			
 			?>
@@ -136,7 +140,7 @@
 			<div class="row button-row">
 				<label class="two columns first">&nbsp;</label>
 				<div class="four columns last">
-					<?=form_submit( 'submit', 'Register', 'class="awesome"' )?>
+					<?=form_submit( 'submit', lang( 'action_register' ), 'class="awesome"' )?>
 				</div>
 			</div>
 		
@@ -148,28 +152,28 @@
 			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
 			
 				echo '<div class="eight columns last offset-by-one">';
-				echo '<p style="text-align:center;">Or, to save time, register using your preferred social network.</p>';
+				echo '<p style="text-align:center;">' . lang( 'auth_register_social_message' ) . '</p>';
 				
 				// --------------------------------------------------------------------------
 				
 				//	FACEBOOK
 				if ( module_is_enabled( 'auth[facebook]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', 'Sign in with Facebook', 'class="social-signin fb"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
 				
 				endif;
 				
 				//	TWITTER
 				if ( module_is_enabled( 'auth[twitter]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', 'Sign in with Twitter', 'class="social-signin tw"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
 				
 				endif;
 				
 				//	LINKEDIN
 				if ( module_is_enabled( 'auth[linkedin]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', 'Sign in with LinkedIn', 'class="social-signin li"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
 				
 				endif;
 				

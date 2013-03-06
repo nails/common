@@ -71,7 +71,7 @@ class Auth_model extends NAILS_Model
 		
 		if ( empty( $email ) || empty( $password ) ) :
 		
-			$this->_set_error( 'login_fail_missing_field' );
+			$this->_set_error( 'auth_login_fail_missing_field' );
 			return FALSE;
 			
 		endif;
@@ -94,7 +94,7 @@ class Auth_model extends NAILS_Model
 				//	Banned user
 				if ( (int) $user->active === 2 ) :
 				
-					$this->_set_error( 'login_fail_banned' );
+					$this->_set_error( 'auth_login_fail_banned' );
 					return FALSE;
 					
 				endif;
@@ -106,7 +106,7 @@ class Auth_model extends NAILS_Model
 					if ( time() < strtotime( $user->failed_login_expires ) ) :
 					
 						$block_time= ceil( $this->brute_force_protection['expire']/60 );
-						$this->_set_error( 'login_fail_blocked', $block_time );
+						$this->_set_error( 'auth_login_fail_blocked', $block_time );
 						return FALSE;
 						
 					endif;
@@ -152,16 +152,16 @@ class Auth_model extends NAILS_Model
 				switch( $user->auth_method_id ) :
 				
 					//	Facebook Connect
-					case '2':		$this->_set_error( 'login_fail_social_fb', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '2':		$this->_set_error( 'auth_login_fail_social_fb', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
 					
 					//	Twitter
-					case '3':		$this->_set_error( 'login_fail_social_tw', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '3':		$this->_set_error( 'auth_login_fail_social_tw', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
 					
 					//	LinkedIn
-					case '5':		$this->_set_error( 'login_fail_social_in', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '5':		$this->_set_error( 'auth_login_fail_social_li', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
 					
 					//	Other
-					default:	$this->_set_error( 'login_fail_social', site_url( 'auth/forgotten_password?email=' . $user->email ) );		break;
+					default:	$this->_set_error( 'auth_login_fail_social', site_url( 'auth/forgotten_password?email=' . $user->email ) );		break;
 					
 				endswitch;
 				return FALSE;
@@ -183,7 +183,7 @@ class Auth_model extends NAILS_Model
 					if ( time() < strtotime( $user->failed_login_expires ) ) :
 					
 						$block_time= ceil( $this->brute_force_protection['expire']/60 );
-						$this->_set_error( 'login_fail_blocked', $block_time );
+						$this->_set_error( 'auth_login_fail_blocked', $block_time );
 						return FALSE;
 						
 					endif;
@@ -198,7 +198,7 @@ class Auth_model extends NAILS_Model
 		endif;
 		
 		//	Login failed
-		$this->_set_error( 'login_fail_general' );
+		$this->_set_error( 'auth_login_fail_general' );
 		return FALSE;
 	}
 	
@@ -240,12 +240,14 @@ class Auth_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Destroy PHP session if it exists
-		if ( session_id() )
+		if ( session_id() ) :
+		
 			session_destroy();
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
-		$this->_set_message( 'logout_successful' );
 		return TRUE;
 	}
 	
@@ -303,68 +305,6 @@ class Auth_model extends NAILS_Model
 				
 			else :
 				$_output .= $this->_error_delimiter[0] . lang( $error['key'], $error['vars'] ) . $this->_error_delimiter[1];
-			
-			endif;
-			
-		endforeach;
-		
-		return $_output;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Sets a new message
-	 *
-	 * @access	public
-	 * @param	string	$key Language key of the message to set
-	 * @param	array	$vars	Variables to parse into the error string
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _set_message( $key, $vars = NULL )
-	{
-		if ( ! $vars ) :
-		
-			$this->_messages[] = $key;
-			
-		else :
-		
-			//	This var has variables in it
-			$this->_messages[]	= array( 'key' => $key, 'vars' => (array) $vars );
-		
-		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Gets and formats messages
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	string
-	 * @author	Pablo
-	 **/
-	public function get_messages()
-	{
-		$_output = '';
-		
-		if ( ! is_array( $this->_messages ) )
-			return FALSE;
-			
-		foreach ( $this->_messages as $message ) :
-		
-			if ( ! is_array( $message ) ) :
-			
-				$_output .= $this->_message_delimiter[0] . lang( $message ) . $this->_message_delimiter[1];
-				
-			else :
-				$_output .= $this->_message_delimiter[0] . lang( $message['key'], $message['vars'] ) . $this->_message_delimiter[1];
 			
 			endif;
 			

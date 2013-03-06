@@ -22,6 +22,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load the Nails. generic lang file
+		$this->lang->load( 'nails' );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Do we need to instanciate the database?
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 		
@@ -43,7 +48,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
 		
-			die( 'Nails environment not correctly configured.' );
+			die( lang( 'nails_not_configured' ) );
 		
 		endif;
 		
@@ -160,21 +165,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Other defaults
 		$this->data['page']	= new stdClass();
 		
-		
 		// --------------------------------------------------------------------------
-		
-		/**
-		 * Load any models which may require the use of $this->user here; using
-		 * autoload will mean they are loaded before the user_model and may cause
-		 * object referencing heartache.
-		 *
-		 **/
-		
-		// $this->load->model( 'some_model' );
-		
-		
-		// --------------------------------------------------------------------------
-		
 		
 		/**
 		 * SANDBOX

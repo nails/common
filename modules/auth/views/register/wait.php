@@ -22,7 +22,7 @@
 	
 	<div class="container">
 		<p>
-			An activation email with a link to activate your account has been sent to:
+			<?=lang( 'auth_register_wait_message' )?>
 		</p>
 		<p class="alert alert-info">
 			<strong><?=$email?></strong>
@@ -30,19 +30,16 @@
 		
 		<hr />
 		
-		<h3>What to do next</h2>
+		<h3><?=lang( 'auth_register_wait_next_title' )?></h2>
 		<p>
-			Check your e-mail (including spam folders) and click on the link to activate your account!
-			It can take up to 60 seconds to receive your activation e-mail. If you have not received
-			it, use the link below.
+			<?=lang( 'auth_register_wait_next_message' )?>
 		</p>
 		
 		<hr />
 		
-		<h3>Help! I Didn't Receive an E-mail</h3>
+		<h3><?=lang( 'auth_register_wait_help_title' )?></h3>
 		<p>
-			If you haven't received your activation e-mail after a few moments, you can
-			<?=anchor( 'auth/register/resend/' . $user_id . '/' . md5( $hash ), 'send it again' )?>.
+			<?=lang( 'auth_register_wait_help_message', site_url( 'auth/register/resend/' . $user_id . '/' . md5( $hash ) ) )?>.
 		</p>
 	</div>
 	

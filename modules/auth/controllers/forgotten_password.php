@@ -39,7 +39,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Specify a default title for this page
-		$this->data['page']->title = 'Reset your Password';
+		$this->data['page']->title = lang( 'auth_title_forgotten_password' );
 	}
 	
 	
@@ -59,7 +59,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		//	If user is logged in they shouldn't be accessing this method
 		if ( $this->user->is_logged_in() ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
 			
 		endif;
@@ -88,8 +88,8 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Override default messages
-			$this->form_validation->set_message( 'required',	lang( 'required' ) );
-			$this->form_validation->set_message( 'valid_email',	lang( 'valid_email' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -108,7 +108,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					
 					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
 					
-					$_data = new stdClass();
+					$_data				= new stdClass();
 					$_data->to_email	= $this->data['reset_user']->email;
 					$_data->type		= 'forgotten_password';
 					
@@ -125,23 +125,23 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					//	Send user the password reset email
 					if ( $this->emailer->send( $_data ) ) :
 					
-						$this->data['success']		= lang( 'forgotten_password_success' );
+						$this->data['success']		= lang( 'auth_forgot_success' );
 					
 					else :
 					
-						$this->data['error'] = lang( 'forgotten_password_email_fail' );
+						$this->data['error'] = lang( 'auth_forgot_email_fail' );
 					
 					endif;
 					
 				else :
 				
-					$this->data['error'] = lang( 'forgotten_password_code_not_set', $_email );
+					$this->data['error'] = lang( 'auth_forgot_code_not_set', $_email );
 					
 				endif;
 				
 			else :
 			
-				$this->data['error'] = lang( 'register_error' );
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 				
 			endif;
 			
@@ -149,9 +149,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
-		
+		//	Load the views
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'auth/password/forgotten',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
@@ -180,12 +178,12 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		if ( $_new_pw === 'EXPIRED' ) :
 		
 			//	Code has expired
-			$this->data['error'] = lang( 'forgotten_password_expired_code' );
+			$this->data['error'] = lang( 'auth_forgot_expired_code' );
 		
 		elseif ( $_new_pw === FALSE ) :
 		
 			//	Code was invalid
-			$this->data['error'] = lang( 'forgotten_password_invalid_code' );
+			$this->data['error'] = lang( 'auth_forgot_invalid_code' );
 		
 		else :
 		
@@ -195,7 +193,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Set some flashdata for the login page when they go to it; just a little reminder
-			$this->session->set_flashdata( 'notice', '<strong>In case you forgot,</strong> your temporary password is <strong>' . $_new_pw . '</strong>. You won\'t be shown this message again.' );
+			$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -211,9 +209,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
-		
+		//	Load the views
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'auth/password/forgotten',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );

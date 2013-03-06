@@ -45,6 +45,8 @@
 	
 	endif;
 	
+	dumpanddie( 'TODO: This page needs to be made more generic (i.e post to a dynamic url). It also needs to be possible to collect fields dynamically via a config.' );
+	
 	echo form_open( 'auth/tw/connect/verify' . $_returns, $attr );
 	
 	// --------------------------------------------------------------------------
@@ -52,20 +54,21 @@
 	//	Write the HTML for the register form
 ?>
 	<p>
-		In order to complete setting up your account we need a little more information from you.
+		<?=lang( 'auth_register_extra_message' )?>
 	</p>
 	
 	<?php
 		
-		$_field	= 'email';
-		$_name	= 'Email';
-		$_error = form_error( $_field ) ? 'error' : NULL
+		$_field			= 'email';
+		$_name			= lang( 'form_label_email' );
+		$_placeholder	= lang( 'auth_register_email_placeholder' );
+		$_error			= form_error( $_field ) ? 'error' : NULL
 	
 	?>
 	<div class="row <?=$_error?>">
 		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns">
-			<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+			<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
@@ -74,15 +77,16 @@
 	
 		if ( ! $first_name || ! $last_name ) :
 		
-			$_field	= 'first_name';
-			$_name	= 'First Name';
-			$_error = form_error( $_field ) ? 'error' : NULL
+			$_field			= 'first_name';
+			$_name			= lang( 'form_label_first_name' );
+			$_placeholder	= lang( 'auth_register_first_name_placeholder' );
+			$_error			= form_error( $_field ) ? 'error' : NULL
 		
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_input( $_field, set_value( $_field, $first_name ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field, $first_name ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -90,15 +94,16 @@
 			
 			// --------------------------------------------------------------------------
 			
-			$_field	= 'last_name';
-			$_name	= 'Surname';
-			$_error = form_error( $_field ) ? 'error' : NULL
+			$_field			= 'last_name';
+			$_name			= lang( 'form_label_last_name' );
+			$_placeholder	= lang( 'auth_register_last_name_placeholder' );
+			$_error			= form_error( $_field ) ? 'error' : NULL
 		
 			?>
 			<div class="row <?=$_error?>">
 				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 				<div class="four columns">
-					<?=form_input( $_field, set_value( $_field, $last_name ), 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+					<?=form_input( $_field, set_value( $_field, $last_name ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 				</div>
 			</div>
@@ -111,7 +116,7 @@
 	<div class="row button-row">
 		<label class="two columns first">&nbsp;</label>
 		<div class="four columns last">
-			<?=form_submit( 'submit', 'Continue', 'class="awesome"' )?>
+			<?=form_submit( 'submit', lang( 'action_continue' ), 'class="awesome"' )?>
 		</div>
 	</div>
 

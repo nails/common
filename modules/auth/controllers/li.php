@@ -111,7 +111,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		//	If the LinkedIn is already linked then we need to acknowledge it
 		if ( ! $this->input->get( 'force' ) && $this->li->user_is_linked() ) :
 		
-			$this->session->set_flashdata( 'message', '<strong>Woah there!</strong> You have already linked your LinkedIn account.' );
+			$this->session->set_flashdata( 'message', lang( 'auth_social_already_linked', 'LinkedIn' ) );
 			$this->_connect_fail();
 			return;
 			

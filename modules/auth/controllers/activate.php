@@ -35,20 +35,10 @@ class NAILS_Activate extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Incorrect data - fail
-		if ( $_id === NULL || $_code === NULL ) :
-		
-			$this->session->set_flashdata( 'error', lang( 'no_access_bad_data' ) );
-			redirect( '/' );
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
 		// Validate activation code
-		if ( $this->user->activate( $_id, $_code ) ) :
+		if ( $_id !== NULL && $_code !== NULL && $this->user->activate( $_id, $_code ) ) :
 			
-			//	Fetch the suer
+			//	Fetch the user
 			$_u = $this->user->get_user( $_id );
 			
 			// --------------------------------------------------------------------------
@@ -56,20 +46,22 @@ class NAILS_Activate extends NAILS_Auth_Controller
 			//	Reward referrer (if any)
 			if ( ! empty( $_u->referred_by ) ) :
 			
-				$this->load->model( 'referral_model' );
-				$this->referral_model->reward_referral( $_id, $_u->referred_by );
+				$this->user->reward_referral( $_id, $_u->referred_by );
 				
 			endif;
 			
 			// --------------------------------------------------------------------------
 			
 			//	Send user on their way
-			if ( ! $this->user->is_logged_in() )
+			if ( ! $this->user->is_logged_in() ) :
+			
 				$this->user->set_login_data( $_u->id, $_u->email, $_u->group_id );
+				
+			endif;
 			
 			// --------------------------------------------------------------------------
 			
-			$this->session->set_flashdata( 'success', '<strong>Email verified successfully, thanks!</strong>' );
+			$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -81,9 +73,9 @@ class NAILS_Activate extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the views; using the auth_model view loader as we need to check if
-		//	an overload file exists which should be used instead
+		$this->data['error'] = lang( 'auth_verify_fail_error' );
 		
+		//	Load the views
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'auth/activate/fail',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );

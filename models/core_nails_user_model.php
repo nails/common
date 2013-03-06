@@ -1964,6 +1964,15 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	public function reward_referral( $user_id, $referrer_id )
+	{
+		//	TODO
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Deactivate a user
 	 *

@@ -111,7 +111,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		//	If the Twitter is already linked then we need to acknowledge it
 		if ( ! $this->input->get( 'force' ) && $this->tw->user_is_linked() ) :
 		
-			$this->session->set_flashdata( 'message', '<strong>Woah there!</strong> You have already linked your Twitter account.' );
+			$this->session->set_flashdata( 'message', lang( 'auth_social_already_linked', 'Twitter' ) );
 			$this->_connect_fail();
 			return;
 			
@@ -152,7 +152,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 				
 				if ( ! isset( $_access_token->oauth_token ) || ! isset( $_access_token->oauth_token_secret )  ) :
 				
-					$this->session->set_flashdata( 'error', '<strong>There was a problem.</strong> We could not validate your account with Twitter, you may be able to try again.' );
+					$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'Twitter' ) );
 					$this->_connect_fail();
 					return;
 				
@@ -166,7 +166,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			
 			else :
 			
-				$this->session->set_flashdata( 'error', '<strong>There was a problem.</strong> We could not validate your account with Twitter, you may be able to try again.' );
+				$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'Twitter' ) );
 				$this->_connect_fail();
 				return;
 			
@@ -178,7 +178,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			
 			if ( ! isset( $_access_token->oauth_token ) || ! isset( $_access_token->oauth_token_secret )  ) :
 			
-				$this->session->set_flashdata( 'error', '<strong>There was a problem.</strong> We could not validate your account with Twitter, you may be able to try again.' );
+				$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'Twitter' ) );
 				$this->_connect_fail();
 				return;
 			
@@ -216,7 +216,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( $this->user->is_logged_in() && $_user ) :
 		
 			//	This Twitter ID is already in use, tell the user so and prevent anything else from happening.
-			$this->session->set_flashdata( 'error', '<strong>Sorry</strong>, the Twitter account you\'re currently logged into is already linked with another ' . APP_NAME . ' account.' );
+			$this->session->set_flashdata( 'error', lang( 'auth_social_account_in_use', array( 'Twitter', APP_NAME ) ) );
 			$this->_connect_fail();
 			return;
 		
@@ -317,7 +317,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Redirect
-		$this->session->set_flashdata( 'success', '<strong>Success</strong>, your Twitter account is now linked.' );
+		$this->session->set_flashdata( 'success', lang( 'auth_social_linked_ok', 'Twitter' ) );
 		$this->_redirect( $this->_return_to );
 		return;
 	}
@@ -343,7 +343,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		//	Check if the user is banned.
 		if ( $user->active == 2 ) :
 			
-			$this->session->set_flashdata( 'error', lang( 'login_fail_banned' ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_banned' ) );
 			$this->_redirect( $this->return_to_fail );
 			return;
 			
@@ -367,11 +367,11 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( $user->last_login ) :
 		
 			$_last_login =  nice_time( $user->last_login );
-			$this->session->set_flashdata( 'message', lang( 'login_ok_welcome', array( $user->first_name, $_last_login ) ) );
+			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
 		
 		else :
 		
-			$this->session->set_flashdata( 'message', lang( 'login_ok_welcome_notime', array( $user->first_name ) ) );
+			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $user->first_name ) ) );
 		
 		endif;
 		
@@ -439,8 +439,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			endif;
 			
 			//	Set messages
-			$this->form_validation->set_message( 'required', 'This field is required.' );
-			$this->form_validation->set_message( 'is_unique', 'This email is already registered.' );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'is_unique',	lang( 'fv_email_already_registered' ) );
 			
 			//	Execute
 			if ( $this->form_validation->run() ) :
@@ -529,8 +529,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					
 					// --------------------------------------------------------------------------
 					
-					//	Redirect to the wizard
-					$this->session->set_flashdata( 'success', '<strong>Hi, ' . $_data['first_name'] . '!</strong> Your account has been set up and is ready to be used.' );
+					//	Redirect
+					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_data['first_name'] ) );
 					$this->session->set_flashdata( 'from_twitter', TRUE );
 					$this->_redirect( $this->_return_to );
 					return;
@@ -539,7 +539,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			
 			else :
 			
-				$this->data['error'] = '<strong>There was a problem.</strong> Please check highlighted fields for errors.';
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 			
 			endif;
 		
@@ -554,14 +554,14 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		
 		//	Set some view data
 		$this->data['page']				= new stdClass();
-		$this->data['page']->title		= 'Almost there!';
+		$this->data['page']->title		= lang( 'auth_register_extra_title' );
 		
 		$this->data['return_to']		= $this->_return_to;
 		$this->data['return_to_fail']	= $this->_return_to_fail;
 		
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'auth/register/twitter',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'auth/register/extra-info',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 	
 	

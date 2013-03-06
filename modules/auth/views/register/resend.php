@@ -22,14 +22,12 @@
 	
 	<div class="container">
 		<p class="alert alert-success">
-			An email with a link to verify your email has been re-sent to:
-			<strong><?=$email?></strong>
+			<?=lang( 'auth_register_resend_message', $email )?>
 		</p>
 		
-		<h3>What to do next</h3>
+		<h3><?=lang( 'auth_register_resend_next_title' )?></h3>
 		<p>
-			Check your email (including spam folders) and click on the link to verify your email address.
-			It can sometimes take a while to receive your verification email.
+			<?=lang( 'auth_register_resend_next_message' )?>
 		</p>
 	</div>
 	

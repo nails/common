@@ -36,43 +36,50 @@
 	//	If there's a 'return_to' variable set it as a GET variable in case there;'s a form
 	//	validation error. Otherwise don't show it - cleaner.
 	
-	echo ( $return_to ) ? form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash . '?return_to=' . $return_to, $attr ) : form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash, $attr );
+	if ( $return_to ) :
+	
+		echo form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash . '?return_to=' . $return_to, $attr );
+		
+	else :
+	
+		echo form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash, $attr );
+		
+	endif;
 	
 	// --------------------------------------------------------------------------
 	
 	//	Write the HTML for the reset password form
 ?>
 	
-	
-	<?=form_hidden( 'resetme', TRUE )?>
-	
 	<!--	INPUT FIELDS	-->
 	<?php
 		
-		$_field	= 'new_password';
-		$_name	= 'New Password';
-		$_error = form_error( $_field ) ? 'error' : NULL
+		$_field			= 'new_password';
+		$_name			= lang( 'form_label_password' );
+		$_placeholder	= lang( 'auth_forgot_new_pass_placeholder' );
+		$_error			= form_error( $_field ) ? 'error' : NULL
 	
 	?>
 	<div class="row <?=$_error?>">
 		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns last">
-			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
 	
 	<?php
 		
-		$_field	= 'confirm_pass';
-		$_name	= 'Confirm';
-		$_error = form_error( $_field ) ? 'error' : NULL
+		$_field			= 'confirm_pass';
+		$_name			= lang( 'form_label_password_confirm' );
+		$_placeholder	= lang( 'auth_forgot_new_pass_confirm_placeholder' );
+		$_error			= form_error( $_field ) ? 'error' : NULL
 	
 	?>
 	<div class="row <?=$_error?>">
 		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
 		<div class="four columns last">
-			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_name . '"' )?>
+			<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
 			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
 		</div>
 	</div>
@@ -80,7 +87,7 @@
 	<div class="row button-row">
 		<label class="two columns first">&nbsp;</label>
 		<div class="four columns last">
-			<?=form_submit( 'submit', lang( 'action_reset_continue' ), 'class="awesome"' )?>
+			<?=form_submit( 'submit', lang( 'auth_forgot_action_reset_continue' ), 'class="awesome"' )?>
 		</div>
 	</div>
 	

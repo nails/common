@@ -36,7 +36,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		//	If you're not a admin then you shouldn't be accessing this class
 		if ( ! $this->user->was_admin() && ! $this->user->is_admin() ) :
 		
-			$this->session->set_flashdata( 'error', 'You do not have permission to access that content.' );
+			$this->session->set_flashdata( 'error', lang( 'auth_no_access' ) );
 			redirect( '/' );
 			
 		endif;
@@ -56,20 +56,17 @@ class NAILS_Override extends NAILS_Auth_Controller
 	 **/
 	public function login_as( )
 	{
-		//	Check we got something to work with
-		if ( ! $this->uri->segment( 4 ) || ! $this->uri->segment( 5 ) )
-			show_error( 'No security token!' );
-		
-		// --------------------------------------------------------------------------
-		
 		//	Perform lookup of user
 		$_hashid = $this->uri->segment( 4 );
 		$_hashpw = $this->uri->segment( 5 );
 		
 		$_u = $this->user->get_user_by_hashes( $_hashid, $_hashpw, TRUE );
 		
-		if ( ! $_u )
-			show_error( 'Sorry, the supplied credentials failed validation.' );
+		if ( ! $_u ) :
+		
+			show_error( lang( 'auth_override_invalid' ) );
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -78,12 +75,30 @@ class NAILS_Override extends NAILS_Auth_Controller
 		//	- Sign in as themselves
 		//	- Sign in as superusers or admins (groups 0 and 1)
 		//	- Sign in as someone of the same group
+		
 		if ( ! $this->session->userdata( 'admin_recovery' ) ) :
 		
-			if ( active_user( 'id' ) == $_u->id || active_user( 'group_id' ) == $_u->group_id || array_search( $_u->group_id, array( 0, 1 ) ) !== FALSE )
-				show_error( 'You cannot sign in as this person. For security we do not allow users to sign in as another administrator or another user of
-				the same group; it is also not possible to sign in as yourself for a second time; doing so will cause a break in the space-time continuum.
-				I don\'t believe you want to be responsible for that now, do you?' );
+			$_cloning	= ( active_user( 'id' ) == $_u->id );
+			$_superuser	= ( isset( $_u->acl['superuser'] ) && $_u->acl['superuser'] );
+			$_group		= ( active_user( 'group_id' ) == $_u->group_id );
+			
+			if ( $_cloning || $_superuser || $_group ) :
+			
+				if ( $_cloning ) :
+				
+					show_error( 'auth_override_fail_cloning' );
+					
+				elseif ( $_superuser ) :
+				
+					show_error( 'auth_override_fail_superuser' );
+				
+				elseif ( $_group ) :
+				
+					show_error( 'auth_override_fail_group' );
+				
+				endif;
+				
+			endif;
 			
 		endif;
 		
@@ -101,7 +116,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		//	Replace current user's session data
 		$this->user->set_login_data( $_u->id, $_u->email, $_u->group_id );
 		
-		$this->session->set_flashdata( 'success', 'You were successfully logged in as <strong>' . title_case( $_u->first_name . ' ' . $_u->last_name ) . '</strong>' );
+		$this->session->set_flashdata( 'success', lang( 'auth_override_ok', title_case( $_u->first_name . ' ' . $_u->last_name ) ) );
 		
 		// --------------------------------------------------------------------------
 		
@@ -113,6 +128,9 @@ class NAILS_Override extends NAILS_Auth_Controller
 			$_redirect = ( $_redirect ) ? $_redirect : $_u->group_homepage;
 			
 			$this->session->unset_userdata( 'admin_recovery' );
+			
+			//	Change the success message to reflect the user coming back
+			$this->session->set_flashdata( 'success', lang( 'auth_override_return', $_u->first_name ) );
 		
 		//	Otherwise set this variable so we CAN come back.
 		else :
