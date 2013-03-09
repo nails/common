@@ -8,7 +8,7 @@
 		echo form_open( NULL, $_form );
 		
 		echo '<div class="search-text">';
-		echo form_input( 'search', $this->input->get( 'search' ), 'placeholder="Type your search term and hit enter"' );
+		echo form_input( 'search', $this->input->get( 'search' ), 'placeholder="' . lang( 'admin_search_placeholder' ) . '"' );
 		echo '</div>';
 		
 		// --------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 		
 		endforeach;
 		
-		echo 'Sort results by ' . form_dropdown( 'sort', $_sort, $search->sort );
+		echo lang( 'admin_search_sort' ) . form_dropdown( 'sort', $_sort, $search->sort );
 		
 		// --------------------------------------------------------------------------
 		
@@ -28,7 +28,7 @@
 			'asc'	=> 'Ascending',
 			'desc'	=> 'Descending'
 		);
-		echo 'and order results in ' . form_dropdown( 'order', $_order, $search->order ) . 'order, show';
+		echo lang( 'admin_search_order_1' ) . form_dropdown( 'order', $_order, $search->order ) . lang( 'admin_search_order_2' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -40,10 +40,10 @@
 			100 => 100
 		);
 		echo form_dropdown( 'per_page', $_perpage, $search->per_page );
-		echo 'per page.';
+		echo lang( 'admin_search_per_page' );
 		
-		echo anchor( uri_string() . '?reset=true', 'Reset', 'class="awesome small right"' );
-		echo form_submit( 'submit', 'Search', 'class="awesome small right"' );
+		echo anchor( uri_string() . '?reset=true', lang( 'action_reset' ), 'class="awesome small right"' );
+		echo form_submit( 'submit', lang( 'action_search' ), 'class="awesome small right"' );
 
 		
 		// --------------------------------------------------------------------------

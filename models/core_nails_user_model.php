@@ -1697,7 +1697,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			if ( $this->db->count_all_results( 'user' ) ) :
 			
 				//	Not unique, use user ID
-				$this->db->set( 'username', $_id );
+				$this->db->set( 'username', 'user' . $_id );
 			
 			else :
 			
@@ -1711,7 +1711,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		else :
 		
 			//	Not supplied, use user ID
-			$this->db->set( 'username', $_id );
+			$this->db->set( 'username', 'user' . $_id );
 		
 		endif;
 		

@@ -1,5 +1,5 @@
 <fieldset>
-	<legend>Meta Information</legend>
+	<legend><?=lang( 'accounts_edit_meta_legend' )?></legend>
 	<?php
 		
 		if ( $user_meta ) :
@@ -27,8 +27,8 @@
 					case 'boolean' :
 					
 						$_options = array(
-							'No',
-							'Yes'
+							lang( 'no' ),
+							lang( 'Yes' )
 						);
 						echo form_field_dropdown( $_field, $_options );
 					
@@ -122,7 +122,7 @@
 		
 		else :
 		
-			echo '<p>There is no editable meta information for this user.</p>';
+			echo '<p>' . lang( 'accounts_edit_meta_noeditable' ) . '</p>';
 		
 		endif;
 	

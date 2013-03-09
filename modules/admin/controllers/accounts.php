@@ -44,14 +44,19 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load the laguage file
+		get_instance()->lang->load( 'admin_accounts', RENDER_LANG );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
-		$d->name				= 'Members';					//	Display name.
+		$d->name = lang( 'accounts_module_name' );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']			= 'View All Members';			//	Sub-nav function.
-		$d->funcs['create']			= 'Create new User';			//	Sub-nav function.
+		$d->funcs['index']		= lang( 'accounts_nav_index' );
+		$d->funcs['create']		= lang( 'accounts_nav_create' );
 
 		
 		// --------------------------------------------------------------------------
@@ -114,10 +119,10 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->accounts_sortfields[] = array( 'label' => 'User ID',					'col' => 'u.id' );
-		$this->accounts_sortfields[] = array( 'label' => 'First Name, Last Name',	'col' => 'um.first_name' );
-		$this->accounts_sortfields[] = array( 'label' => 'Last Name, First Name',	'col' => 'um.last_name' );
-		$this->accounts_sortfields[] = array( 'label' => 'Email',					'col' => 'u.email' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_id' ),	'col' => 'u.id' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_first' ),	'col' => 'um.first_name' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_last' ),	'col' => 'um.last_name' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_email' ),	'col' => 'u.email' );
 	}
 	
 	
@@ -203,15 +208,12 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Set method info
-		$this->data['page']->admin_m	= 'index';
-		
 		//	Override the title (used when loading this method from one of the other methods)
-		$this->data['page']->title	 = ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : 'View All Members';
+		$this->data['page']->title	 = ( ! empty( $this->data['page']->title ) ) ? $this->data['page']->title : lang( 'accounts_index_title' );
 		
 		if ( $_search['keywords'] ) :
 		
-			$this->data['page']->title	.= ' (search for "' . $_search['keywords'] . '" returned ' . number_format( $this->data['users']->pagination->total_results ) . ' results)';
+			$this->data['page']->title	.= ' (' . lang( 'accounts_index_search_results', array( $_search['keywords'], number_format( $this->data['users']->pagination->total_results ) ) ) . ')';
 			
 		else :
 		
@@ -240,9 +242,8 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	public function create()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'create';
-		$this->data['page']->title		= 'Create new User';
+		//	Page Title
+		$this->data['page']->title = lang( 'accounts_create_title' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -261,10 +262,10 @@ class NAILS_Accounts extends Admin_Controller {
 			$this->form_validation->set_rules( 'email',				'Email',				'xss_clean|required|valid_email|is_unique[user.email]' );
 			
 			//	Set messages
-			$this->form_validation->set_message( 'required',			'This field is required.' );
-			$this->form_validation->set_message( 'is_natural_no_zero',	'This field is required.' );
-			$this->form_validation->set_message( 'valid_email',			'This field must be a valid email.' );
-			$this->form_validation->set_message( 'is_unique',			'This email is already in use.' );
+			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_email',			lang( 'fv_valid_email' ) );
+			$this->form_validation->set_message( 'is_unique',			lang( 'fv_email_already_registered' ) );
 			
 			//	Execute
 			if ( $this->form_validation->run() ) :
@@ -380,7 +381,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		if ( ! $_user ) :
 		
-			$this->session->set_flashdata( 'error', 'Unknown user' );
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_unknown_id' ) );
 			redirect( $return_to );
 			return;
 		
@@ -540,8 +541,8 @@ class NAILS_Accounts extends Admin_Controller {
 			// --------------------------------------------------------------------------
 			
 			//	Set messages
-			$this->form_validation->set_message( 'required',			'This field is required.' );
-			$this->form_validation->set_message( 'is_natural_no_zero',	'This field is required.' );
+			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_required' ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -587,7 +588,7 @@ class NAILS_Accounts extends Admin_Controller {
 						//	File failed to upload
 						$_failed['key']		= $upload['col'];
 						$_failed['label']	= $upload['label'];
-						$_failed['error']	= array( 'This field is required.' );
+						$_failed['error']	= array( lang( 'fv_required' ) );
 						
 						break;
 					
@@ -775,7 +776,7 @@ class NAILS_Accounts extends Admin_Controller {
 					//	The account failed to update, feedback to user
 					else:
 					
-						$this->data['error'] = '<strong>Update error:</strong> There was a problem updating the user.';
+						$this->data['error'] = lang( 'fv_there_were_errors' );
 						
 					endif;
 				
@@ -785,7 +786,7 @@ class NAILS_Accounts extends Admin_Controller {
 			//	Update has failed, update will render the system admin-less
 			elseif ( $_admins === FALSE ) :
 			
-				$this->data['error'] = '<strong>Update Failed:</strong> The update would leave the system without any amdinistrators.';
+				$this->data['error'] = '<strong>Update Failed:</strong> The update would leave the system without any administrators.';
 			
 			//	Update failed due to a failed meta upload	
 			elseif ( $_failed ) :
@@ -803,7 +804,7 @@ class NAILS_Accounts extends Admin_Controller {
 			//	Update failed for another reason
 			else:
 			
-				$this->data['error'] = '<strong>Update error:</strong> There was a problem updating the user.';
+				$this->data['error'] = lang( 'fv_there_Were_errors' );
 				
 			endif;
 			
@@ -829,7 +830,9 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		$this->data['user_edit']	= $_user;
 		$this->data['user_meta']	= $_user_meta;
-		$this->data['page']->title	= 'Edit User ('.title_case( $_user->first_name . ' ' . $_user->last_name ) . ')';
+		
+		//	Page Title
+		$this->data['page']->title = lang( 'accounts_edit_title', title_case( $_user->first_name . ' ' . $_user->last_name ) );
 		
 		//	Get the groups
 		$this->data['groups']		= $this->user->get_groups_flat();
@@ -844,7 +847,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		endif;
 		
-		$this->data['notice']			= active_user( 'id' ) == $_user->id ? '<strong>Hello there!</strong> You are currently editing your own account.' : FALSE;
+		$this->data['notice']			= active_user( 'id' ) == $_user->id ? lang( 'accounts_edit_editing_self' ) : FALSE;
 		
 		// --------------------------------------------------------------------------
 		
@@ -875,7 +878,7 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function suspend()
 	{
-		//	Ban user
+		//	Suspend user
 		$_uid = $this->uri->segment( 4 );
 		$this->user->suspend( $_uid );
 		
@@ -887,13 +890,13 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Define messages
-		if ( $_user->active != 2 ) :
+		if ( ! $_user->is_suspended ) :
 		
-			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem suspending ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_suspend_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was suspended successfully.' );
+			$this->session->set_flashdata( 'success', lang( 'accounts_suspend_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
@@ -907,7 +910,7 @@ class NAILS_Accounts extends Admin_Controller {
 	
 	
 	/**
-	 * Unbans a user
+	 * Unsuspends a user
 	 *
 	 * @access	public
 	 * @param	none
@@ -916,7 +919,7 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function unsuspend()
 	{
-		//	Unban user
+		//	Unsuspend user
 		$_uid = $this->uri->segment( 4 );
 		$this->user->unsuspend( $_uid );
 		
@@ -928,19 +931,100 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Define messages
-		if ( $_user->active != 1 ) :
+		if ( $_user->is_suspended ) :
 		
-			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem unsuspend ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_unsuspend_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success',	'<strong>Success!</strong> ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was unsuspend successfully.' );
+			$this->session->set_flashdata( 'success', lang( 'accounts_unsuspend_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
 		redirect( $this->input->get( 'return_to' ) );
 	}
 	
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Set a user's email address as verified
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function verify()
+	{
+		//	Activate user
+		$_uid = $this->uri->segment( 4 );
+		$this->user->verify( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Get the user's details
+		$_user = $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define messages
+		if ( ! $_user->is_verified ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_activate_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			
+		else :
+		
+			$this->session->set_flashdata( 'success', lang( 'accounts_activate_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $this->input->get( 'return_to' ) );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Marks a user's email address as unverified
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function unverify()
+	{
+		//	Deactivate user
+		$_uid = $this->uri->segment( 4 );
+		$this->user->unverify( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Get the user's details
+		$_user = $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define messages
+		if ( $_user->is_verified ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_deactivate_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			
+		else :
+		
+			$this->session->set_flashdata( 'success', lang( 'accounts_deactivate_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			
+		endif;
+		
+		redirect( $this->input->get( 'return_to' ) );
+	}
+
 	
 	// --------------------------------------------------------------------------
 	
@@ -964,11 +1048,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $this->user->destroy( $_uid ) ) :
 		
-			$this->session->set_flashdata( 'success',	'<strong>See ya!</strong> User ' . title_case( $_user->first_name . ' ' . $_user->last_name ) . ' was deleted successfully.' );
+			$this->session->set_flashdata( 'error', lang( 'accounts_delete_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'error',		'<strong>Sorry,</strong> there was a problem deleting ' . title_case( $_user->first_name . ' ' . $_user->last_name ) );
+			$this->session->set_flashdata( 'success', lang( 'accounts_delete_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
@@ -991,7 +1075,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		if ( ! $_user ) :
 		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I was unable to find a user by that ID.' );
+			$this->session->set_flashdata( 'error', lang( 'accounts_delete_img_error_noid' ) );
 			redirect( 'admin/accounts' );
 		
 		else :
@@ -1010,17 +1094,17 @@ class NAILS_Accounts extends Admin_Controller {
 					
 					// --------------------------------------------------------------------------
 					
-					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Profile image was deleted.' );
+					$this->session->set_flashdata( 'success', lang( 'accounts_delete_img_success' ) );
 				
 				else :
 				
-					$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I was unable delete this user\'s profile image. The CDN said: "' . implode( '", "', $this->cdn->errors() ) . '"' );
+					$this->session->set_flashdata( 'error', lang( '', implode( '", "', $this->cdn->errors() ) ) );
 				
 				endif;
 			
 			else :
 			
-				$this->session->set_flashdata( 'notice', '<strong>Hey!</strong> This user doesn\'t have a profile image to delete.' );
+				$this->session->set_flashdata( 'notice', lang( 'accounts_delete_img_error_noimg' ) );
 			
 			endif;
 			

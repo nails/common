@@ -30,18 +30,19 @@
 			echo '<small>';
 			echo isset( $member->telephone ) && $member->telephone ? $member->telephone . ' | ' : '';
 			echo $member->email;
-			echo $member->active ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Verified Email Address' ) ) : '';
-			echo $member->fb_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Connected to Facebook' ) ) : '';
-			echo $member->li_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => 'Connected to LinkedIn' ) ) : '';
+			echo $member->is_verified ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_verified' ) ) ) : '';
+			echo $member->fb_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Facebook' ) ) ) : '';
+			echo $member->tw_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-twitter.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Twitter' ) ) ) : '';
+			echo $member->li_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'LinkedIn' ) ) ) : '';
 			echo '</small>';
 			
 			if ( $member->last_login ) :
 			
-				echo '<small>Last login: <span class="nice-time">' . $member->last_login . '</span> (' . $member->login_count . ' logins)</small>';
+				echo '<small>' . lang( 'accounts_index_last_login', array( $member->last_login, $member->login_count ) ) . '</small>';
 			
 			else :
 			
-				echo '<small>Last login: Never Logged In</small>';
+				echo '<small>' . lang( 'accounts_index_last_nologins' ) . '</small>';
 			
 			endif;
 			echo '</div>';
@@ -69,35 +70,40 @@
 			$_return = '?return_to=' . urlencode( $_return );
 			
 			//	These buttons are always available
-			echo anchor( login_as_url( $member->id, $member->password ), 'Login As', 'class="awesome small grey"' );
-			echo anchor( 'admin/accounts/edit/' . $member->id . $_return, 'Edit', 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
+			if ( $member->id != active_user( 'id' ) && $member->group_id != 1 && $member->group_id != active_user( 'group_id' ) ) :
+			
+				echo anchor( login_as_url( $member->id, $member->password ), lang( 'admin_login_as' ), 'class="awesome small grey"' );
+				
+			endif;
+			
+			echo anchor( 'admin/accounts/edit/' . $member->id . $_return, lang( 'action_edit' ), 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
 			
 			// --------------------------------------------------------------------------
 			
 			//	These buttons are dynamic (based on user's state and admin's permissions)
-			if ( $member->active == 2 ) :
+			if ( $member->is_suspended ) :
 			
-				echo anchor( 'admin/accounts/unsuspend/' . $member->id . $_return, 'Unsuspend', 'class="awesome small green"' );
+				echo anchor( 'admin/accounts/unsuspend/' . $member->id . $_return, lang( 'action_unsuspend' ), 'class="awesome small green"' );
 			
 			else :
 			
-				echo anchor( 'admin/accounts/suspend/' . $member->id . $_return, 'Suspend', 'class="awesome small red"' );
+				echo anchor( 'admin/accounts/suspend/' . $member->id . $_return, lang( 'action_suspend' ), 'class="awesome small red"' );
 			
 			endif;
 			
-			if ( $member->active == 3 ) :
+			if ( $member->is_verified ) :
 			
-				echo anchor( 'admin/accounts/activate/' . $member->id . $_return, 'Activate', 'class="awesome small green"' );
+				echo anchor( 'admin/accounts/unverify/' . $member->id . $_return, lang( 'action_unverify' ), 'class="awesome small red"' );
 			
 			else :
 			
-				echo anchor( 'admin/accounts/deactivate/' . $member->id . $_return, 'Deactivate', 'class="awesome small red"' );
+				echo anchor( 'admin/accounts/verify/' . $member->id . $_return, lang( 'action_verify' ), 'class="awesome small green"' );
 			
 			endif;
 			
 			if ( $user->has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) ) :
 			
-				echo anchor( 'admin/accounts/delete/' . $member->id . $_return, 'Delete', 'class="awesome small red"' );
+				echo anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
 			
 			endif;
 			

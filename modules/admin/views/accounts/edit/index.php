@@ -17,6 +17,6 @@
 	$this->load->view( 'accounts/edit/inc-social-media' );
 	
 	
-	echo '<p>' . form_submit( 'submit', 'Save Changes' ) . '</p>';
+	echo '<p>' . form_submit( 'submit', lang( 'action_save_changes' ) ) . '</p>';
 	
 	echo form_close();

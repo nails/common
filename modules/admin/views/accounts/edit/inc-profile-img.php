@@ -1,5 +1,5 @@
 <fieldset>
-	<legend>Profile Image</legend>
+	<legend><?=lang( 'accounts_edit_img_legend' )?></legend>
 	<?php
 	
 		$_error = isset( $upload_error ) ? 'error' : NULL;
@@ -23,7 +23,7 @@
 			echo '<p>';
 			echo form_upload( 'profile_img', NULL, 'style="float:none;"' ) . '<br />';
 			$_return = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );
-			echo anchor( 'admin/accounts/delete_profile_img/' . $user_edit->id . $_return, 'Remove Image', 'class="awesome small red" style="margin-top:10px;"' );
+			echo anchor( 'admin/accounts/delete_profile_img/' . $user_edit->id . $_return, lang( 'action_delete' ), 'class="awesome small red" style="margin-top:10px;"' );
 			echo '</p>';
 	
 		endif;

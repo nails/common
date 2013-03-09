@@ -1,6 +1,6 @@
 <div class="group-members all">
 	<p>
-		<?=isset( $page->description ) ? $page->description : 'This section lists all users registered on site. You can browse or search this list using the search facility below.' ?>
+		<?=isset( $page->description ) ? $page->description : lang( 'accounts_index_intro' ) ?>
 	</p>
 	
 	<?php
@@ -13,9 +13,9 @@
 	<table>
 		<thead>
 			<tr>
-				<th class="id">User ID</th>
-				<th class="details">User</th>
-				<th class="group">Group</th>
+				<th class="id"><?=lang( 'accounts_index_th_id' )?></th>
+				<th class="details"><?=lang( 'accounts_index_th_user' )?></th>
+				<th class="group"><?=lang( 'accounts_index_th_group' )?></th>
 				<?php
 				
 					foreach ( $columns AS $col ) :
@@ -27,7 +27,7 @@
 					endforeach;
 				
 				?>
-				<th class="actions">Actions</th>
+				<th class="actions"><?=lang( 'accounts_index_th_actions' )?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -48,7 +48,7 @@
 					?>
 					<tr>
 						<td colspan="<?=(4+count($columns))?>" class="no-data">
-							<p>No Users found</p>
+							<p><?=lang( 'accounts_index_no_users' )?></p>
 						</td>
 					</tr>
 					<?php

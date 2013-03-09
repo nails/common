@@ -54,7 +54,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
@@ -185,7 +185,7 @@ if ( ! function_exists( 'form_field_date' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
@@ -301,7 +301,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
@@ -420,7 +420,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
@@ -491,8 +491,8 @@ if ( ! function_exists( 'form_field_boolean' ) )
 	function form_field_boolean( $field, $help = '' )
 	{
 		$_options		= array();
-		$_options[0]	= 'No';
-		$_options[1]	= 'Yes';
+		$_options[0]	= lang( 'no' );
+		$_options[1]	= lang( 'yes' );
 		
 		return form_field_dropdown( $field, $_options, $help );
 	}
@@ -531,7 +531,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
@@ -648,7 +648,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		
 		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : 'assets/img/form/help.png';
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;

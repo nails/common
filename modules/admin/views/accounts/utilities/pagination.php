@@ -29,7 +29,7 @@
 	$_config['full_tag_open']			= '<ul>';
 	$_config['full_tag_close']			= '</ul>';
 	
-	$_config['first_link']				= 'First';
+	$_config['first_link']				= lang( 'action_first' );
 	$_config['first_tag_open']			= '<li class="page first">';
 	$_config['first_tag_close']			= '</li>';
 	
@@ -47,7 +47,7 @@
 	$_config['next_tag_open']			= '<li class="page next">';
 	$_config['next_tag_close']			= '</li>';
 	
-	$_config['last_link']				= 'Last';
+	$_config['last_link']				= lang( 'action_last' );
 	$_config['last_tag_open']			= '<li class="page last">';
 	$_config['last_tag_close']			= '</li>';
 	

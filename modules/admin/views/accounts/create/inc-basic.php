@@ -1,6 +1,6 @@
 <fieldset>
 
-	<legend>Basic Information</legend>
+	<legend><?=lang( 'accounts_create_basic_legend' )?></legend>
 	
 	<div class="box-container">
 	<?php
@@ -8,39 +8,39 @@
 		//	Group ID
 		$_field					= array();
 		$_field['key']			= 'group_id';
-		$_field['label']		= 'User Group';
+		$_field['label']		= lang( 'accounts_create_field_group_label' );
 		$_field['required']		= TRUE;
 		
-		echo form_field_dropdown( $_field, $groups, 'Specify to which group this user belongs.' );
+		echo form_field_dropdown( $_field, $groups, lang( 'accounts_create_field_group_tip' ) );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Password
 		$_field					= array();
 		$_field['key']			= 'password';
-		$_field['label']		= 'Password';
-		$_field['placeholder']	= 'The user\'s password, leave blank to auto-generate';
+		$_field['label']		= lang( 'form_label_password' );
+		$_field['placeholder']	= lang( 'accounts_create_field_password_placeholder' );
 		
-		echo form_field( $_field, 'Leave the password field blank to have the system auto-generate a 6 character password.' );
+		echo form_field( $_field, lang( 'accounts_create_field_password_tip' ) );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Send welcome/activation email
 		$_field					= array();
 		$_field['key']			= 'send_activation';
-		$_field['label']		= 'Send Welcome Email';
+		$_field['label']		= lang( 'accounts_create_field_send_welcome_label' );
 		$_field['default']		= FALSE;
 		$_field['required']		= FALSE;
 		
 		$_options = array();
 		$_options[] = array(
 			'value'		=> 'TRUE',
-			'label'		=> '<strong>Yes</strong>, send user welcome email containing their password.',
+			'label'		=> lang( 'accounts_create_field_send_welcome_yes' ),
 			'selected'	=> TRUE
 		);
 		$_options[] = array(
 			'value'		=> 'FALSE',
-			'label'		=> '<strong>No</strong>, do not send welcome email.',
+			'label'		=> lang( 'accounts_create_field_send_welcome_no' ),
 			'selected'	=>	FALSE
 		);
 		
@@ -51,19 +51,19 @@
 		//	Require password update on log in
 		$_field					= array();
 		$_field['key']			= 'temp_pw';
-		$_field['label']		= 'Update on log in';
+		$_field['label']		= lang( 'accounts_create_field_temp_pw_label' );
 		$_field['default']		= FALSE;
 		$_field['required']		= FALSE;
 		
 		$_options = array();
 		$_options[] = array(
 			'value'		=> 'TRUE',
-			'label'		=> '<strong>Yes</strong>, require user to update password on first log in.',
+			'label'		=> lang( 'accounts_create_field_temp_pw_yes' ),
 			'selected'	=> TRUE
 		);
 		$_options[] = array(
 			'value'		=> 'FALSE',
-			'label'		=> '<strong>No</strong>, do not require user to update password on first log in.',
+			'label'		=> lang( 'accounts_create_field_temp_pw_no' ),
 			'selected'	=>	FALSE
 		);
 		
@@ -74,9 +74,9 @@
 		//	First Name
 		$_field					= array();
 		$_field['key']			= 'first_name';
-		$_field['label']		= 'First Name';
+		$_field['label']		= lang( 'form_label_first_name' );
 		$_field['required']		= TRUE;
-		$_field['placeholder']	= 'The user\'s first name';
+		$_field['placeholder']	= lang( 'accounts_create_field_first_placeholder' );
 		
 		echo form_field( $_field );
 		
@@ -85,9 +85,9 @@
 		//	Last name
 		$_field					= array();
 		$_field['key']			= 'last_name';
-		$_field['label']		= 'Last Name';
+		$_field['label']		= lang( 'form_label_last_name' );
 		$_field['required']		= TRUE;
-		$_field['placeholder']	= 'The user\'s last name';
+		$_field['placeholder']	= lang( 'accounts_create_field_last_placeholder' );
 		
 		echo form_field( $_field );
 		
@@ -98,7 +98,7 @@
 		$_field['key']			= 'email';
 		$_field['label']		= 'Email';
 		$_field['required']		= TRUE;
-		$_field['placeholder']	= 'The user\'s email address';
+		$_field['placeholder']	= lang( 'accounts_create_field_email_placeholder' );;
 		
 		echo form_field( $_field );
 	

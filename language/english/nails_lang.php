@@ -28,6 +28,7 @@
 	$lang['action_save_changes']	= 'Save Changes';
 	$lang['action_update']			= 'Update';
 	$lang['action_upgrade']			= 'Upgrade';
+	$lang['action_search']			= 'Search';
 	$lang['action_cancel']			= 'Cancel';
 	$lang['action_reset']			= 'Reset';
 	$lang['action_continue']		= 'Continue';
@@ -48,6 +49,10 @@
 	$lang['action_register']		= 'Register';
 	$lang['action_login']			= 'Log In';
 	$lang['action_logout']			= 'Log Out';
+	$lang['action_suspend']			= 'Suspend';
+	$lang['action_unsuspend']		= 'Unsuspend';
+	$lang['action_verify']			= 'Verify';
+	$lang['action_unverify']		= 'Unverify';
 	
 	
 	// --------------------------------------------------------------------------
@@ -81,4 +86,6 @@
 	// --------------------------------------------------------------------------
 	
 	//	Common strings
+	$lang['yes']								= 'Yes';
+	$lang['no']								= 'No';
 	$lang['no_records_found']				= 'No Records found';

@@ -35,8 +35,9 @@ if ( ! function_exists( 'login_as_url' ) )
  */
 if ( ! function_exists( 'login_as_button' ) )
 {
-	function login_as_button( $uid, $upassword, $text = 'Login As', $attr = 'class="awesome small"' )
+	function login_as_button( $uid, $upassword, $text = '', $attr = 'class="awesome small"' )
 	{
+		$text =  ! $text ? lang( 'admin_login_as' ) : $text;
 		return anchor( login_as_url( $uid, $upassword ), $text, $attr );
 	}
 }
