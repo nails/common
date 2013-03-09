@@ -171,22 +171,27 @@ class NAILS_Utilities extends Admin_Controller {
 		
 		if ( $this->input->post() ) :
 		
+			//	Load library
 			$this->load->library( 'form_validation' );
 			
-			$this->form_validation->set_rules( 'display_name',			'Display Name',		'xss_clean|required' );
-			$this->form_validation->set_rules( 'name',					'Slug',				'xss_clean|required' );
-			$this->form_validation->set_rules( 'description',			'Description',		'xss_clean|required' );
-			$this->form_validation->set_rules( 'default_homepage',		'Default Homepage', 'xss_clean|required' );
-			$this->form_validation->set_rules( 'acl[]',					'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[superuser]',		'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin]',			'Permissions', 		'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin][]',			'Permissions', 		'xss_clean' );
+			//	Define rules
+			$this->form_validation->set_rules( 'display_name',		lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'name',				lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',		lang( 'utilities_edit_group_basic_field_label_description' ),	'xss_clean|required' );
+			$this->form_validation->set_rules( 'default_homepage',	lang( 'utilities_edit_group_basic_field_label_homepage' ), 		'xss_clean|required' );
+			$this->form_validation->set_rules( 'acl[]',				lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[superuser]',	lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin][]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			
+			//	Set messages
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 			
 			if ( $this->form_validation->run() ) :
 			
 				$_data = array();
 				$_data['display_name']		= $this->input->post( 'display_name' );
-				$_data['name']				= $this->input->post( 'name' );
+				$_data['name']				= url_title( $this->input->post( 'name' ), 'dash', TRUE );
 				$_data['description']		= $this->input->post( 'description' );
 				$_data['default_homepage']	= $this->input->post( 'default_homepage' );
 				

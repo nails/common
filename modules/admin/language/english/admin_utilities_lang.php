@@ -48,8 +48,8 @@
 	$lang['utilities_edit_group_basic_legend']							= 'Basics';
 	$lang['utilities_edit_group_basic_field_label_display']				= 'Display Name';
 	$lang['utilities_edit_group_basic_field_placeholder_display']		= 'Type the group\'s display name here.';
-	$lang['utilities_edit_group_basic_field_label_name']				= 'Name';
-	$lang['utilities_edit_group_basic_field_placeholder_name']			= 'Type the group\'s name here.';
+	$lang['utilities_edit_group_basic_field_label_name']				= 'Slug';
+	$lang['utilities_edit_group_basic_field_placeholder_name']			= 'Type the group\'s slug here.';
 	$lang['utilities_edit_group_basic_field_label_description']			= 'Description';
 	$lang['utilities_edit_group_basic_field_placeholder_description']	= 'Type the group\'s description here.';
 	$lang['utilities_edit_group_basic_field_label_homepage']			= 'Default Homepage';
