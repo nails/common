@@ -1404,7 +1404,7 @@ class Emailer
 	private function _is_subscribed( $user_id, $email_type )
 	{
 		$this->ci->db->where( 'u.id', $user_id );
-		$this->ci->db->where( 'u.active', TRUE );
+		$this->ci->db->where( 'u.is_verified', TRUE );
 		$this->ci->db->where( 'um.email_' . $email_type, TRUE );
 		
 		$this->ci->db->join( 'user u', 'u.id = um.user_id' );
