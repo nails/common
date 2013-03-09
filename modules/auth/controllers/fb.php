@@ -359,8 +359,8 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Check if the user is banned.
-		if ( $user->active == 2 ) :
+		//	Check if the user is suspended.
+		if ( $user->is_suspended) :
 			
 			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_banned' ) );
 			$this->_redirect( $this->return_to_fail );
@@ -435,7 +435,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		$_data['username']			= $me['username'];
 		$_data['fb_id']				= $me['id'];
 		$_data['fb_token']			= $this->fb->getAccessToken();
-		$_data['active']			= 1;	//	Trust the email from Facebook
+		$_data['is_verified']		= TRUE;	//	Trust the email from Facebook
 		$_data['auth_method_id']	= 2;	//	Facebook, obviously.
 		
 		// --------------------------------------------------------------------------

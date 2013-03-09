@@ -340,8 +340,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Check if the user is banned.
-		if ( $user->active == 2 ) :
+		//	Check if the user is suspended.
+		if ( $user->is_suspended ) :
 			
 			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_banned' ) );
 			$this->_redirect( $this->return_to_fail );

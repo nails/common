@@ -36,7 +36,7 @@ class NAILS_Activate extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		// Validate activation code
-		if ( $_id !== NULL && $_code !== NULL && $this->user->activate( $_id, $_code ) ) :
+		if ( $_id !== NULL && $_code !== NULL && $this->user->verify( $_id, $_code ) ) :
 			
 			//	Fetch the user
 			$_u = $this->user->get_user( $_id );

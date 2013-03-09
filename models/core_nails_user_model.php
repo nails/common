@@ -1047,7 +1047,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$_cols[]	= 'created';
 			$_cols[]	= 'last_login';
 			$_cols[]	= 'last_seen';
-			$_cols[]	= 'active';
+			$_cols[]	= 'is_verified';
+			$_cols[]	= 'is_suspended';
 			$_cols[]	= 'temp_pw';
 			$_cols[]	= 'failed_login_count';
 			$_cols[]	= 'failed_login_expires';
@@ -1645,7 +1646,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$_data['last_ip']			= $_ip_address;
 		$_data['created']			= date( 'Y-m-d H:i:s' );
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
-		$_data['active']			= ( isset( $data['active'] ) && $data['active'] )	? 1	: 0 ;
+		$_data['is_verified']		= ( isset( $data['is_verified'] ) && $data['is_verified'] )	? 1	: 0 ;
+		$_data['is_suspended']		= ( isset( $data['is_suspended'] ) && $data['is_suspended'] )	? 1	: 0 ;
 		$_data['salt']				= $_password[1];
 		$_data['activation_code']	= $_activation_code;
 		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )	? 1	: 0 ;
@@ -1667,7 +1669,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
-		unset( $data['active'] );
+		unset( $data['is_verified'] );
+		unset( $data['is_suspended'] );
 		unset( $data['auth_method_id'] );
 		unset( $data['fb_token'] );
 		unset( $data['fb_id'] );
@@ -1842,6 +1845,15 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	public function reward_referral( $user_id, $referrer_id )
+	{
+		//	TODO
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Validate a forgotten password code. If valid generate a new password and update user table
 	 *
@@ -1889,8 +1901,8 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			$_data['password']					= $_hash[0];
 			$_data['password_md5']				= md5( $_hash[0] );
 			$_data['salt']						= $_hash[1];
-			$_data['active']					= 1;
-			$_data['temp_pw']					= 1;
+			$_data['is_verified']				= TRUE;
+			$_data['temp_pw']					= TRUE;
 			$_data['forgotten_password_code']	= NULL;
 			
 			// --------------------------------------------------------------------------
@@ -1917,56 +1929,31 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function activate( $id, $code = FALSE )
+	public function verify( $id, $code = FALSE )
 	{
 		//	Code is present, use it in the check
-		if ( $code != FALSE ) :
+		if ( $code !== FALSE ) :
 		
 			//	Get the user
-			$this->db->select( 'email' );
+			$this->db->select( 'id' );
 			$this->db->where( 'activation_code', $code );
 			$this->db->limit( 1 );
 			$_user = $this->db->get( 'user' )->row();
 			
 			// --------------------------------------------------------------------------
 			
-			if ( empty( $_user ) )
+			if ( empty( $_user ) ) :
+			
+				//	Failed to verify code.
 				return FALSE;
-			
-			// --------------------------------------------------------------------------
-			
-			//	Update the user
-			$this->db->set( 'activation_code', NULL);
-			$this->db->set( 'active', 1 );
-			$this->db->set( 'last_login', 'NOW()', FALSE );
-			$this->db->where( 'id', $id );
-			$this->db->update( 'user' );
-		
-		
-		//	Just bloody well activate the user.
-		else :
-		
-			$this->db->set( 'activation_code', NULL );
-			$this->db->set( 'active', 1 );
-			$this->db->set( 'last_login', 'NOW()', FALSE );
-			$this->db->where( 'id', $id );
-			$this->db->update( 'user' );
+				
+			endif;
 			
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
-		//	How did we do?
-		return (bool) $this->db->affected_rows();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	public function reward_referral( $user_id, $referrer_id )
-	{
-		//	TODO
+		return $this->update( $id, array( 'is_verified' => TRUE, 'activation_code' => NULL ) );
 	}
 	
 	
@@ -1978,36 +1965,12 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @param	int		$id		The user to deactivate
-	 * @param	array	$data	If present deactivation feedback
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function deactivate( $id, $data )
-	{		
-		$this->db->set( 'activation_code', $this->salt() );
-		$this->db->set( 'active', 0 );
-		$this->db->set( 'last_login', 'NOW()', FALSE );
-		$this->db->where( 'id', $id );
-		$this->db->update( 'user' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	How did we do?
-		$_deactivated = (bool) $this->db->affected_rows();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Save some feedback if nessecary
-		if ( $_deactivated && $data ) :
-		
-			$this->db->set( 'deactivated_on', 'NOW()', FALSE );
-			$this->extra_table_insert( 'user_meta_deactivate_feedback', $data );
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		return $_deactivated;
+	public function unverify( $id )
+	{
+		return $this->update( $id, array( 'is_verified' => FALSE, 'activation_code' => $this->salt() ) );	
 	}
 	
 	
@@ -2024,7 +1987,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	 public function suspend( $id )
 	 {
-	 	return $this->update( $id, array( 'active' => 2 ) );
+	 	return $this->update( $id, array( 'is_suspended' => TRUE ) );
 	 }
 	 
 	 
@@ -2041,7 +2004,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 **/
 	 public function unsuspend( $id )
 	 {
-	 	return $this->update( $id, array( 'active' => 1 ) );
+	 	return $this->update( $id, array( 'is_suspended' => FALSE ) );
 	 }
 	 
 	 

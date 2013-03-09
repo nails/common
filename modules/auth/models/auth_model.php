@@ -92,7 +92,7 @@ class Auth_model extends NAILS_Model
 				//	Password accepted! Final checks...
 				
 				//	Banned user
-				if ( (int) $user->active === 2 ) :
+				if ( $user->is_suspended ) :
 				
 					$this->_set_error( 'auth_login_fail_banned' );
 					return FALSE;

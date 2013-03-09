@@ -86,15 +86,15 @@ class NAILS_Override extends NAILS_Auth_Controller
 			
 				if ( $_cloning ) :
 				
-					show_error( 'auth_override_fail_cloning' );
+					show_error( lang( 'auth_override_fail_cloning' ) );
 					
 				elseif ( $_superuser ) :
 				
-					show_error( 'auth_override_fail_superuser' );
+					show_error( lang( 'auth_override_fail_superuser' ) );
 				
 				elseif ( $_group ) :
 				
-					show_error( 'auth_override_fail_group' );
+					show_error( lang( 'auth_override_fail_group' ) );
 				
 				endif;
 				

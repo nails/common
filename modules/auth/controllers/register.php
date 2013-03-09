@@ -229,7 +229,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Account active?
-		if ( $_u->active ) :
+		if ( $_u->is_verified ) :
 		
 			$this->session->set_flashdata( 'message', lang( 'auth_register_resend_already_active', site_url( 'auth/login' ) ) );
 			redirect( 'auth/login' );
