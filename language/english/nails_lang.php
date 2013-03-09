@@ -32,6 +32,9 @@
 	$lang['action_continue']		= 'Continue';
 	$lang['action_delete']			= 'Delete';
 	$lang['action_remove']			= 'Remove';
+	$lang['action_close']			= 'Close';
+	$lang['action_open']			= 'Open';
+	$lang['action_view']			= 'View';
 	$lang['action_clear']			= 'Clear';
 	$lang['action_next']			= 'Next';
 	$lang['action_previous']		= 'Previous';
@@ -42,6 +45,8 @@
 	$lang['action_first']			= 'First';
 	$lang['action_last']			= 'Last';
 	$lang['action_register']		= 'Register';
+	$lang['action_login']			= 'Log In';
+	$lang['action_logout']			= 'Log Out';
 	
 	
 	// --------------------------------------------------------------------------
@@ -74,3 +79,5 @@
 	
 	// --------------------------------------------------------------------------
 	
+	//	Common strings
+	$lang['no_records_found']				= 'No Records found';

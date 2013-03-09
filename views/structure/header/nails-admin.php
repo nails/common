@@ -8,7 +8,7 @@
 	<title>
 	<?php
 		
-		echo 'Admin - ';
+		echo lang( 'admin_word_short' ) . ' - ';
 		echo isset( $page->module->name ) ? $page->module->name . ' - ' : NULL;
 		echo isset( $page->title ) ? $page->title . ' - ' : NULL;
 		echo APP_NAME;
@@ -18,10 +18,17 @@
 	<meta name="description" content="" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	
+	<!--	JS LOCALISATION	-->
+	<script tyle="text/javascript">
+		window.NAILS_LANG			= {};
+		window.NAILS_LANG.non_html5	= '<?=str_replace( "'", "\'", lang( 'js_error_non_html5' ) )?>';
+		window.NAILS_LANG.no_save	= '<?=str_replace( "'", "\'", lang( 'js_error_saving' ) )?>';
+	</script>
+	
 	<!--	ASSETS	-->
 	<script type="text/javascript">
-		window.NAILS_URL = '<?=NAILS_URL?>';
-		window.SITE_URL = '<?=site_url()?>';
+		window.NAILS_URL	= '<?=NAILS_URL?>';
+		window.SITE_URL		= '<?=site_url()?>';
 	</script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
@@ -48,21 +55,24 @@
 			<li style="display:block;margin-bottom:4px;">
 				<a href="<?=site_url( 'admin' )?>" style="font-size:18px;font-weight:bold;color:#fff;">
 					<span class="app-name"><?=APP_NAME?></span>
-					Administration
+					<?=lang( 'admin_word_long' )?>
 				</a>
 			</li>
-			<li><?=anchor( 'admin', 'Home' )?></li>
+			<li><?=anchor( 'admin', lang( 'admin_home' ) )?></li>
 			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name . '</li>' : NULL?></li>
 			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title . '</li>' : NULL?></li>
-		
 		</ul>
 		
 		<ul class="right shaded">
-		
-			<li><?=anchor( '/', 'Switch to Front End')?></li>
-			<li style="color:#999;">Logged in as <?=anchor( 'admin/accounts/edit/' . active_user( 'id' ), active_user( 'first_name' ) )?></li>
-			<li class="logout"><?=anchor( 'auth/logout', 'Logout' )?><?=anchor( 'auth/logout', '' )?></li>
-		
+			<li>
+				<?=anchor( '/', lang( 'admin_switch_frontend' ) )?>
+			</li>
+			<li style="color:#999;">
+				<?=lang( 'admin_loggedin_as', array( site_url( 'admin/accounts/edit/' . active_user( 'id' ) ), active_user( 'first_name' ) ) )?>
+			</li>
+			<li class="logout">
+				<?=anchor( 'auth/logout', lang( 'action_logout' ) )?>
+			</li>
 		</ul>
 		
 		<!--	CLEARFIX	-->
@@ -110,7 +120,10 @@
 				<div class="box" id="box_<?=url_title( $config->name )?>">
 					<h2>
 						<?=$config->name?>
-						<a href="#" class="toggle">close</a>
+						<a href="#" class="toggle">
+							<span class="close"><?=lang( 'action_close' )?></span>
+							<span class="open"><?=lang( 'action_open' )?></span>
+						</a>
 					</h2>
 					<div class="box-container">
 						<ul>
@@ -189,7 +202,7 @@
 			//	Build the Dropdown menu
 			echo '<div id="mobile-menu-main">';
 			echo '<select>';
-			echo '<option data-url="">Menu</option>';
+			echo '<option data-url="" disabled>' . lang( 'admin_nav_menu' ) . '</option>';
 			
 			$_module	= $this->uri->rsegment( 1 );
 			$_method	= $this->uri->rsegment( 2 );
@@ -232,6 +245,12 @@
 					echo '<h1>';
 					echo $page->title;
 					echo '</h1>';
+					
+				else :
+				
+					echo '<h1>';
+					echo $page->module->name;
+					echo '</h1>';
 				
 				endif;
 				
@@ -271,7 +290,7 @@
 			
 			<div class="js_error" style="display:none;">
 				<p>
-					<span class="js_error_head">Hey!</span>
+					<span class="js_error_head"><?=lang( 'js_error_header' )?></span>
 					<span class="js_error_text"></span>
 				</p>
 			</div>

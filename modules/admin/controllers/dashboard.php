@@ -34,14 +34,19 @@ class NAILS_Dashboard extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load the laguage file
+		get_instance()->lang->load( 'admin_dashboard', RENDER_LANG );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
-		$d->name				= 'Dashboard';					//	Display name.
+		$d->name				= lang( 'dashboard_module_name' );	//	Display name.
 		
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']		= 'Dashboard';					//	Sub-nav function.
-		$d->funcs['help']		= 'Help';						//	Sub-nav function.
+		$d->funcs['index']		= lang( 'dashboard_nav_index' );	//	Sub-nav function.
+		$d->funcs['help']		= lang( 'dashboard_nav_help' );		//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -63,8 +68,8 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	public function index()
 	{
-		$this->data['page']->admin_m	= 'index';
-		$this->data['page']->title		= 'Welcome';
+		//	Page Title
+		$this->data['page']->title = lang( 'dashboard_welcome_title' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -107,9 +112,8 @@ class NAILS_Dashboard extends Admin_Controller {
 	 **/
 	public function help()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'help';
-		$this->data['page']->title		= 'Help';
+		//	Page Title
+		$this->data['page']->title = lang( 'dashboard_help_title' );
 		
 		// --------------------------------------------------------------------------
 		

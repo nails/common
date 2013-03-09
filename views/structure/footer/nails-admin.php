@@ -1,12 +1,14 @@
 				<hr />
 				
-				<small class="footer" rel="tooltip-r" title="that's hella fast!">Rendered in {elapsed_time} seconds</small>
-				<small class="footer right">
-					Powered by <a href="http://nailsapp.co.uk" target="_blank" rel="tooltip-l" title="a framework from Shed Collective">Nails v<?=NAILS_VERSION?></a>
+				<small class="footer" rel="tooltip-r" title="<?=lang( 'admin_rendered_in_tip' )?>">
+					<?=lang( 'admin_rendered_in', '{elapsed_time}' )?>
+				</small>
+				<small class="footer right" rel="tooltip-l" title="<?=lang( 'admin_powered_by_tip' )?>">
+					<?=lang( 'admin_powered_by', array( 'http://nailsapp.co.uk', NAILS_VERSION ) )?>
 				</small>
 				
-			</div>
-			</div>
+			</div><!--	/.content_inner	-->
+			</div><!--	/.padder	-->
 		
 		</div>
 		

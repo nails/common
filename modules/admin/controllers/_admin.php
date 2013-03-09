@@ -49,6 +49,11 @@ class Admin_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load up the generic admin langfile
+		$this->lang->load( 'admin_generic', RENDER_LANG );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Load admin helper and config
 		$this->load->model( 'admin_model' );
 		
