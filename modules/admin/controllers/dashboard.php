@@ -40,13 +40,13 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Configurations
-		$d->name				= lang( 'dashboard_module_name' );	//	Display name.
+		$d->name = lang( 'dashboard_module_name' );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']		= lang( 'dashboard_nav_index' );	//	Sub-nav function.
-		$d->funcs['help']		= lang( 'dashboard_nav_help' );		//	Sub-nav function.
+		$d->funcs['index']		= lang( 'dashboard_nav_index' );
+		$d->funcs['help']		= lang( 'dashboard_nav_help' );
 		
 		// --------------------------------------------------------------------------
 		

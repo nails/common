@@ -113,7 +113,7 @@ class Admin_Model extends NAILS_Model
 						
 						else :
 						
-							$_details->methods[$method] =  '<em style="font-style:italic">' . ucwords( str_replace( '_', ' ', $method ) ) . '</em> <span style="color:#999;">- Unlisted</span>';
+							$_details->methods[$method] =  '<em style="font-style:italic">' . ucwords( str_replace( '_', ' ', $method ) ) . '</em> <span style="color:#999;">- ' . lang( 'admin_nav_unlisted' ) . '</span>';
 						
 						endif;
 					

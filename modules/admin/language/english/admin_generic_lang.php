@@ -16,6 +16,7 @@
 	
 	//	Navigation
 	$lang['admin_nav_menu']			= 'Menu';
+	$lang['admin_nav_unlisted']		= 'Unlisted';
 	
 	//	Footer
 	$lang['admin_rendered_in']		= 'Rendered in %s seconds';

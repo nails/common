@@ -36,14 +36,19 @@ class NAILS_Utilities extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load the laguage file
+		get_instance()->lang->load( 'admin_utilities', RENDER_LANG );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Configurations
-		$d->name				= 'Utilities';					//	Display name.
+		$d->name = lang( 'utilities_module_name' );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['test_email']		= 'Send Test Email';			//	Sub-nav function.
-		$d->funcs['user_access']	= 'Manage User Access';		//	Sub-nav function.
+		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
+		$d->funcs['user_access']	= lang( 'utilities_nav_user_access' );
 
 		
 		// --------------------------------------------------------------------------
@@ -65,9 +70,8 @@ class NAILS_Utilities extends Admin_Controller {
 	 **/
 	public function test_email()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'test_email';
-		$this->data['page']->title		= 'Send Test Email';
+		//	Page Title
+		$this->data['page']->title = lang ( 'utilities_test_email_title' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -75,8 +79,15 @@ class NAILS_Utilities extends Admin_Controller {
 		
 			//	Form validation and update
 			$this->load->library( 'form_validation' );
-			$this->form_validation->set_rules( 'recipient',	'Recipient',		'xss_clean|required|valid_email' );
 			
+			//	Define rules
+			$this->form_validation->set_rules( 'recipient',	lang( 'utilities_test_email_field_name' ), 'xss_clean|required|valid_email' );
+			
+			//	Set Messages
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
+			
+			//	Execute
 			if ( $this->form_validation->run() ) :
 			
 				//	Prepare date
@@ -89,13 +100,13 @@ class NAILS_Utilities extends Admin_Controller {
 				
 				if ( $this->emailer->send( $_email ) ) :
 				
-					$this->data['success'] = '<strong>Done!</strong> Test email sent!';
+					$this->data['success'] = lang( 'utilities_test_email_success', array( $_email->to_email, date( 'Y-m-d H:i:s' ) ) );
 					
 				else:
 				
-					echo '<h1>Sending Failed, debugging data below:</h1>';
+					echo '<h1>' . lang( 'utilities_test_email_error' ) . '</h1>';
 					echo $this->email->print_debugger();
-					die();
+					return;
 				
 				endif;
 				
@@ -125,9 +136,8 @@ class NAILS_Utilities extends Admin_Controller {
 	 **/
 	public function user_access()
 	{
-		//	Set method info
-		$this->data['page']->admin_m	= 'user_access';
-		$this->data['page']->title		= 'Manage User Access';
+		//	Page Title
+		$this->data['page']->title = lang ( 'utilities_user_access_title' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -221,9 +231,8 @@ class NAILS_Utilities extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Set method info
-		$this->data['page']->admin_m	= 'edit_groups';
-		$this->data['page']->title		= 'Edit Group (' . $this->data['group']->display_name . ')';
+		//	Page title
+		$this->data['page']->title = lang( 'utilities_edit_group_title', $this->data['group']->display_name );
 		
 		// --------------------------------------------------------------------------
 		

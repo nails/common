@@ -1,37 +1,38 @@
-<p>
-	Use this form to send a test email, useful for testing that emails being sent are received by the end user.
-</p>
+<div class="group-utilities send-test">
 
-<hr />
-
-<?=form_open()?>
-
-	<fieldset>
+	<p><?=lang( 'utilities_test_email_intro' )?></p>
 	
-		<legend>Recipient</legend>
-		
-		<?php
-		
-			//	Recipient
-			$_field					= array();
-			$_field['key']			= 'recipient';
-			$_field['label']		= 'Recipient';
-			$_field['default']		= set_value( $_field['key'] );
-			$_field['required']		= TRUE;
-			$_field['placeholder']	= 'Type recipient\'s email address';
+	<hr />
+	
+	<?=form_open()?>
+	
+		<fieldset>
+
+			<legend><?=lang( 'utilities_test_email_field_legend' )?></legend>
 			
-			echo form_field( $_field );
+			<?php
+			
+				//	Recipient
+				$_field					= array();
+				$_field['key']			= 'recipient';
+				$_field['label']		= lang( 'utilities_test_email_field_name' );
+				$_field['default']		= set_value( $_field['key'] );
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= lang( 'utilities_test_email_field_placeholder' );
+				
+				echo form_field( $_field );
+			
+			?>
+			
+			<!--	CLEARFIX	-->
+			<div class="clear"></div>
+			
+		</fieldset>
 		
-		?>
-		
-		<!--	CLEARFIX	-->
-		<div class="clear"></div>
-		
-	</fieldset>
+	<?php
 	
-<?php
-
-	echo '<p>' . form_submit( 'submit', 'Send Test Email' ) . '</p>';
-	echo form_close();
-	
-?>
+		echo '<p>' . form_submit( 'submit', lang( 'utilities_test_email_submit' ) ) . '</p>';
+		echo form_close();
+		
+	?>
+</div>

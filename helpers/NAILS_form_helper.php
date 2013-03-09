@@ -40,6 +40,7 @@ if ( ! function_exists( 'form_field' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
+		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -75,18 +76,21 @@ if ( ! function_exists( 'form_field' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 		
-		//	field
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
+		//	Field
 		switch ( $_field['type'] ) :
 		
 			case 'password' :
 			
-				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
 			case 'textarea' :
 			
-				$_out .= form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
@@ -100,7 +104,7 @@ if ( ! function_exists( 'form_field' ) )
 			case 'text' :
 			default :
 			
-				$_out .= form_input( $_field['key'], set_value( $_field['key'], $_field['default'] ), 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_input( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
@@ -170,6 +174,7 @@ if ( ! function_exists( 'form_field_date' ) )
 		
 		//	Set var defaults
 		$_field					= array();
+		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -227,6 +232,10 @@ if ( ! function_exists( 'form_field_date' ) )
 		if ( ! isset( $_date[2] ) )
 			$_date[2] = FALSE;
 		
+		//	TODO: Set ID for these fields
+		//	Does the field have an id?
+		//$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
 		//	Input
 		$_out .= dropdown_days( $_field['key'] . '_day', $_date[2] );
 		$_out .= dropdown_months( $_field['key'] . '_month', $short, $_date[1] );
@@ -281,6 +290,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
 		
 		//	Set var defaults
 		$_field					= array();
+		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -350,6 +360,10 @@ if ( ! function_exists( 'form_field_datetime' ) )
 		if ( ! isset( $_datetime[4] ) )
 			$_datetime[4] = FALSE;
 		
+		//	TODO: Set ID for these fields
+		//	Does the field have an id?
+		//$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
 		//	Input
 		$_out .= dropdown_days( $_field['key'] . '_day', $_datetime[2] );
 		$_out .= dropdown_months( $_field['key'] . '_month', $short, $_datetime[1] );
@@ -395,6 +409,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
+		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -436,7 +451,10 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		
 		endif;
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ) );
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
+		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), $_field['id'] );
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -535,7 +553,10 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 		
-		//	field
+		//	Does the field have an id?
+		$_id = isset( $options[0]['id'] ) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
+		
+		//	Field
 		if ( $_ci->input->post( $_field['key'] ) ) :
 		
 			$_selected = $_ci->input->post( $_field['key'] ) == $options[0]['value'] ? TRUE : FALSE;
@@ -545,7 +566,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 			$_selected = $options[0]['selected'];
 		
 		endif;
-		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected ) . '<span class="text">' . $options[0]['label'] . '</span>';
+		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -574,6 +595,10 @@ if ( ! function_exists( 'form_field_radio' ) )
 				$_selected = $options[$i]['selected'];
 			
 			endif;
+			
+			//	Does the field have an ID?
+			$_id = isset( $options[$i]['id'] ) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
+			
 			$_out .= form_radio( $_field['key'], $options[$i]['value'], $_selected ) . '<span class="text">' . $options[$i]['label'] . '</span>';
 			
 			$_out .= '</label>';
@@ -613,6 +638,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		//	Set var defaults
 		$_field					= array();
+		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
 		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
@@ -644,7 +670,10 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 		
-		//	field
+		//	Does the field have an id?
+		$_id = $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
+		
+		//	Field
 		if ( substr( $_field['key'], -2 ) == '[]' ) :
 		
 			//	Field is an array, need to look for the value
@@ -674,7 +703,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		$_key = isset( $options[0]['key'] ) ? $options[0]['key'] : $_field['key'];
 		
-		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected ) . '<span class="text">' . $options[0]['label'] . '</span>';
+		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -692,6 +721,9 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			
 			//	Label
 			$_out .= '<span class="label">&nbsp;</span>';
+			
+			//	Does the field have an id?
+			$_id = $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
 			
 			//	Input
 			if ( substr( $_field['key'], -2 ) == '[]' ) :
@@ -723,7 +755,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			
 			$_key = isset( $options[$i]['key'] ) ? $options[$i]['key'] : $_field['key'];
 			
-			$_out .= form_checkbox( $_key, $options[$i]['value'], $_selected ) . '<span class="text">' . $options[$i]['label'] . '</span>';
+			$_out .= form_checkbox( $_key, $options[$i]['value'], $_selected, $_id ) . '<span class="text">' . $options[$i]['label'] . '</span>';
 			
 			$_out .= '</label>';
 		

@@ -1,11 +1,7 @@
 <div class="system-alert message">
 	<div class="padder">
 		<p>
-			<strong>Please note:</strong> while the system will do its best to validate the content you set
-			sometimes a valid combination can render an entire group useless (including your own). Please be
-			extra careful and only change things when you know what you're doing. Remember that you won't see
-			the effect of changing the permissions of a group other than your own, check that your changes
-			have worked before considering the job done!
+			<?=lang( 'utilities_edit_group_warning' )?>
 		</p>
 	</div>
 </div>
@@ -17,16 +13,16 @@
 	<!--	BASICS	-->
 	<fieldset>
 	
-		<legend>Basics</legend>
+		<legend><?=lang( 'utilities_edit_group_basic_legend' )?></legend>
 		<?php
 		
 			//	Display Name
 			$_field					= array();
 			$_field['key']			= 'display_name';
-			$_field['label']		= 'Display Name';
+			$_field['label']		= lang( 'utilities_edit_group_basic_field_label_display' );
 			$_field['default']		= $group->display_name;
 			$_field['required']		= TRUE;
-			$_field['placeholder']	= 'Type the group\'s display name here.';
+			$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_display' );
 			
 			echo form_field( $_field );
 			
@@ -35,10 +31,10 @@
 			//	Name
 			$_field					= array();
 			$_field['key']			= 'name';
-			$_field['label']		= 'Name';
+			$_field['label']		= lang( 'utilities_edit_group_basic_field_label_name' );
 			$_field['default']		= $group->name;
 			$_field['required']		= TRUE;
-			$_field['placeholder']	= 'Type the group\'s name here.';
+			$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_name' );
 			
 			echo form_field( $_field );
 			
@@ -48,10 +44,10 @@
 			$_field					= array();
 			$_field['key']			= 'description';
 			$_field['type']			= 'textarea';
-			$_field['label']		= 'Description';
+			$_field['label']		= lang( 'utilities_edit_group_basic_field_label_description' );
 			$_field['default']		= $group->description;
 			$_field['required']		= TRUE;
-			$_field['placeholder']	= 'Type the group\'s description here.';
+			$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_description' );
 			
 			echo form_field( $_field );
 			
@@ -60,10 +56,10 @@
 			//	Name
 			$_field					= array();
 			$_field['key']			= 'default_homepage';
-			$_field['label']		= 'Homepage';
+			$_field['label']		= lang( 'utilities_edit_group_basic_field_label_homepage' );
 			$_field['default']		= $group->default_homepage;
 			$_field['required']		= TRUE;
-			$_field['placeholder']	= 'Type the group\'s homepage here.';
+			$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_homepage' );
 			
 			echo form_field( $_field );
 		
@@ -74,27 +70,29 @@
 	<!--	PERMISSIONS	-->
 	<fieldset id="permissions">
 	
-		<legend>Permissions</legend>
+		<legend><?=lang( 'utilities_edit_group_permission_legend' )?></legend>
 		
-		<p>
-			Superusers have full, unrestricted access to admin.
+		<p class="system-alert message no-close">
+			<?=lang( 'utilities_edit_group_permission_warn' )?>
 		</p>
 		<p>
-			For non-superuser groups you may also grant a access to the administration area by selecting which admin modules they have
-			permission to access. <strong>It goes without saying that you should be careful with these options.</strong>
+			<?=lang( 'utilities_edit_group_permission_intro' )?>
 		</p>
+		
+		<hr />
 		
 		<?php
 		
 			//	Require password update on log in
 			$_field					= array();
 			$_field['key']			= 'acl[superuser]';
-			$_field['label']		= 'Is Superuser';
+			$_field['label']		= lang( 'utilities_edit_group_permissions_field_label_superuser' );
 			$_field['default']		= FALSE;
 			$_field['required']		= FALSE;
 			
 			$_options = array();
 			$_options[] = array(
+				'id'		=> 'super-check',
 				'value'		=> 'TRUE',
 				'label'		=> '',
 				'selected'	=>	isset( $group->acl['superuser'] ) && $group->acl['superuser'] ? TRUE : FALSE
@@ -103,7 +101,10 @@
 			echo form_field_checkbox( $_field, $_options );
 			
 			// --------------------------------------------------------------------------
-		
+			
+			$_visible = $_options[0]['selected'] ? 'none' : 'block';
+			echo '<div id="toggle-superuser" style="display:' . $_visible . ';">';
+			
 			foreach ( $admin_modules AS $module => $detail ) : 
 			
 				$_module_hash = md5( serialize( $module ) );
@@ -119,7 +120,7 @@
 				$_field['default']		= FALSE;
 				
 				//	Build the field. Sadly, can't use the form helper due to the crazy multidimensional array
-				//	that we're building here.
+				//	that we're building here. Saddest of the sad pandas.
 				
 				echo '<div class="field">';
 				
@@ -141,12 +142,12 @@
 						
 						echo '<span class="label">';
 						echo $_field['label'];
-						echo '<small><a href="#" class="check-all" data-module="' . $_module_hash . '">Toggle all</a></small>';
+						echo '<small><a href="#" class="check-all" data-module="' . $_module_hash . '">' . lang( 'utilities_edit_group_permissions_toggle_all' ) . '</a></small>';
 						echo '</span>';
 						
 					endif;
 					
-					$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>If any admin method is selected then this must also be selected.</small>' : '';
+					$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>' . lang( 'utilities_edit_group_permissions_dashboard_warn' ) . '</small>' : '';
 					
 					$_options = array(
 						'key'		=> 'acl[admin][' . $module . '][' . $method . ']',
@@ -176,12 +177,14 @@
 		
 			endforeach;
 			
+			echo '</div>';
+			
 		?>
 		
 	</fieldset>
 	
 	<p>
-		<?=form_submit( 'submit', 'Save Changes' )?>
+		<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 	</p>
 	
 <?=form_close()?>
@@ -192,6 +195,22 @@
 
 	$(function(){
 	
+		$( '#super-check-0' ).on( 'click', function() {
+			
+			console.log($( '#super-check-0:checked' ).length);
+			if ( $( '#super-check-0:checked' ).length )
+			{
+				$( '#toggle-superuser' ).hide();
+			}
+			else
+			{
+				$( '#toggle-superuser' ).show();
+			}
+			
+		});
+		
+		// --------------------------------------------------------------------------
+		
 		$( '.admin_check' ).on( 'click', function() {
 		
 			//	Check to see if ANY of the checkboxes are checked, if they
