@@ -671,7 +671,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= '</span>';
 		
 		//	Does the field have an id?
-		$_id = $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
+		$_id = isset( $options[0]['id'] ) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
 		
 		//	Field
 		if ( substr( $_field['key'], -2 ) == '[]' ) :
@@ -701,7 +701,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		endif;
 		
-		$_key = isset( $options[0]['key'] ) ? $options[0]['key'] : $_field['key'];
+		$_key	= isset( $options[0]['key'] ) ? $options[0]['key'] : $_field['key'];
 		
 		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 		
@@ -723,7 +723,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			$_out .= '<span class="label">&nbsp;</span>';
 			
 			//	Does the field have an id?
-			$_id = $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
+			$_id = isset( $options[$i]['id'] ) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
 			
 			//	Input
 			if ( substr( $_field['key'], -2 ) == '[]' ) :

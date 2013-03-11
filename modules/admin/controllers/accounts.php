@@ -381,7 +381,7 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		if ( ! $_user ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'accounts_edit_unknown_id' ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_unknown_id' ) );
 			redirect( $return_to );
 			return;
 		
@@ -674,7 +674,7 @@ class NAILS_Accounts extends Admin_Controller {
 					else :
 					
 						$this->data['upload_error']	= $this->cdn->errors();
-						$this->data['error']		= '<strong>Update error:</strong> There was a problem uploading the Profile Image.';
+						$this->data['error']		= lang( 'accounts_edit_error_profile_img' );
 					
 					endif;
 						
@@ -749,7 +749,7 @@ class NAILS_Accounts extends Admin_Controller {
 					//	Update account
 					if ( $this->user->update( $_post['id'], $_data ) ) :
 						
-						$this->data['success'] = '<strong>Success!</strong> Updated user ' . title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) . ' (' . $_post['email'] . ')';	
+						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ), $_post['email'] ) );	
 						
 						// --------------------------------------------------------------------------
 						
@@ -786,7 +786,7 @@ class NAILS_Accounts extends Admin_Controller {
 			//	Update has failed, update will render the system admin-less
 			elseif ( $_admins === FALSE ) :
 			
-				$this->data['error'] = '<strong>Update Failed:</strong> The update would leave the system without any administrators.';
+				$this->data['error'] = lang( 'accounts_edit_error_no_admins' );
 			
 			//	Update failed due to a failed meta upload	
 			elseif ( $_failed ) :
@@ -798,13 +798,13 @@ class NAILS_Accounts extends Admin_Controller {
 				
 				endforeach;
 				
-				$this->data['error']							= '<strong>Update failed:</strong> The ' . $_failed['label'] . ' failed to upload.';
+				$this->data['error']							= lang( 'accounts_edit_error_upload', $_failed['label'] );
 				$this->data['upload_error_' . $_failed['key']]	= $_failed['error'];
 			
 			//	Update failed for another reason
 			else:
 			
-				$this->data['error'] = lang( 'fv_there_Were_errors' );
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 				
 			endif;
 			

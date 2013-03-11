@@ -28,6 +28,11 @@ class Local_CDN {
 	{
 		$this->_ci		=& get_instance();
 		$this->errors	= array();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load langfile
+		$this->_ci->lang->load( 'cdn_local', RENDER_LANG );
 	}
 	
 	
@@ -69,7 +74,7 @@ class Local_CDN {
 				//	If it's not in $_FILES does that file exist on the file system?
 				if ( ! file_exists( $file ) ) :
 				
-					$this->_error( 'You did not select a file to upload.' );
+					$this->_error( lang( 'cdn_local_no_file' ) );
 					return FALSE;
 				
 				else :
@@ -104,7 +109,7 @@ class Local_CDN {
 			
 			if ( ! isset( $options['content-type'] ) ) :
 			
-				$this->_error( 'A Content-Type must be defined for data stream uploads.' );
+				$this->_error( lang( 'cdn_local_stream_content_type' ) );
 				return FALSE;
 			
 			else :
@@ -126,7 +131,7 @@ class Local_CDN {
 				
 				else :
 				
-					$this->_error( 'Cache directory is not writeable.' );
+					$this->_error( lang( 'cdn_local_error_cache_write_fail' ) );
 					return FALSE;
 				
 				endif;
@@ -201,12 +206,12 @@ class Local_CDN {
 					array_splice( $_types, count( $_types ) - 1, 0, array( ' and ' ) );
 					$_accepted = implode( ', .', $_types );
 					$_accepted = str_replace( ', . and , ', ' and ', $_accepted );
-					$this->_error( 'The file type is not allowed, accepted file types are: .' . $_accepted . '.' );
+					$this->_error(  lang( 'cdn_local_error_bad_mime_plural', $_accepted ) );
 				
 				else :
 				
 					$_accepted = implode( '', $_types );
-					$this->_error( 'The file type is not allowed, accepted file type is .' . $_accepted . '.' );
+					$this->_error(  lang( 'cdn_local_error_bad_mime', $_accepted ) );
 				
 				endif;
 				
@@ -223,7 +228,8 @@ class Local_CDN {
 		
 			if ( filesize( $_file ) > $options['max_size'] ) :
 			
-				$this->_error( 'The file is too large.' );
+				$_fs_in_kb = format_bytes( $options['max_size'] );
+				$this->_error( lang( 'cdn_local_error_filesize', $_fs_in_kb ) );
 				return FALSE;
 			
 			endif;
@@ -245,7 +251,7 @@ class Local_CDN {
 			
 				if ( $w > $options['dimensions']['max_width'] ) :
 				
-					$this->_error( 'Image is too wide (max ' . $options['dimensions']['max_width'] . 'px)' );
+					$this->_error( lang( 'cdn_local_error_maxwidth', $options['dimensions']['max_width'] ) );
 					$error = TRUE;
 					
 				endif;
@@ -258,7 +264,7 @@ class Local_CDN {
 			
 				if ( $h > $options['dimensions']['max_height'] ) :
 				
-					$this->_error( 'Image is too tall (max ' . $options['dimensions']['max_height'] . 'px)' );
+					$this->_error( lang( 'cdn_local_error_maxheight', $options['dimensions']['max_height'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -271,7 +277,7 @@ class Local_CDN {
 			
 				if ( $w < $options['dimensions']['min_width'] ) :
 				
-					$this->_error( 'Image is too narrow (min ' . $options['dimensions']['min_width'] . 'px)' );
+					$this->_error( lang( 'cdn_local_error_minwidth', $options['dimensions']['min_width'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -284,7 +290,7 @@ class Local_CDN {
 			
 				if ( $h < $options['dimensions']['min_height'] ) :
 				
-					$this->_error( 'Image is too short (min ' . $options['dimensions']['min_height'] . 'px)' );
+					$this->_error( lang( 'cdn_local_error_minheight', $options['dimensions']['min_height'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -309,7 +315,7 @@ class Local_CDN {
 		//	Check bucket is writeable
 		if ( ! is_writable( CDN_PATH . $_data['bucket'] ) ) :
 		
-			$this->_error( 'The target directory is not writable.' );
+			$this->_error( lang( 'cdn_local_error_target_write_fail' ) );
 			return FALSE;
 		
 		endif;
@@ -380,14 +386,14 @@ class Local_CDN {
 			
 			else :
 			
-				$this->_error( 'File failed to delete' );
+				$this->_error( lang( 'cdn_local_error_delete' ) );
 				return FALSE;
 			
 			endif;
 		
 		else :
 		
-			$this->_error( 'No file to delete' );
+			$this->_error( lang( 'cdn_local_error_delete_nofile' ) );
 			return FALSE;
 		
 		endif;
@@ -407,6 +413,7 @@ class Local_CDN {
 	 **/
 	public function copy( $source, $file, $bucket, $options = array() )
 	{
+		//	TODO: Copy object between buckets
 	}
 	
 	
@@ -423,6 +430,7 @@ class Local_CDN {
 	 **/
 	public function move( $source, $file, $bucket, $options = array() )
 	{
+		//	TODO: Move object between buckets
 	}
 	
 	
@@ -654,5 +662,5 @@ class Local_CDN {
 	}
 }
 
-/* End of file logger.php */
-/* Location: ./application/libraries/logger.php */
+/* End of file local.php */
+/* Location: ./application/libraries/_resources/cdn_drivers/local.php */

@@ -28,7 +28,7 @@
 					
 						$_options = array(
 							lang( 'no' ),
-							lang( 'Yes' )
+							lang( 'yes' )
 						);
 						echo form_field_dropdown( $_field, $_options );
 					

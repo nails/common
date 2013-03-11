@@ -91,7 +91,7 @@
 		$_field					= array();
 		$_field['key']			= 'is_verified';
 		$_field['label']		= lang( 'accounts_edit_basic_field_verified_label' );
-		$_field['default']		= $user_edit->is_verified ? lang( 'Yes' ) : lang( 'no' );
+		$_field['default']		= $user_edit->is_verified ? lang( 'yes' ) : lang( 'no' );
 		$_field['required']		= FALSE;
 		$_field['readonly']		= TRUE;
 		
