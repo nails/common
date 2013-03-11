@@ -135,6 +135,7 @@
 	
 	//	Forgotten Password
 	$lang['auth_forgot_message']						= 'Please enter your registered email address so we can send you an email with a link which you can use to reset your password.';
+	$lang['auth_forgot_temp_message']					= '<strong>A password reset has been requested for this account</strong><br />Please choose a new password and click "Update Password &amp; Log In"';
 	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
 	$lang['auth_forgot_new_pass_placeholder']			= 'Type a new password';
 	$lang['auth_forgot_new_pass_confirm_placeholder']	= 'Confirm your new password';

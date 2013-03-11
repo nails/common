@@ -135,6 +135,10 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 			
 			// --------------------------------------------------------------------------
 			
+			$this->data['message']		= lang( 'auth_forgot_temp_message' );
+			
+			// --------------------------------------------------------------------------
+			
 			//	Load the views
 			$this->load->view( 'structure/header',			$this->data );
 			$this->load->view( 'auth/password/change_temp',	$this->data );
