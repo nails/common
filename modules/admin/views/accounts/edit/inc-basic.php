@@ -111,6 +111,46 @@
 		
 		// --------------------------------------------------------------------------
 		
+		//	Gender
+		$_field					= array();
+		$_field['key']			= 'gender';
+		$_field['label']		= lang( 'accounts_edit_basic_field_gender_label' );
+		$_field['default']		= $user_edit->gender;
+		$_field['required']		= FALSE;
+		
+		$_options = array();
+		$_options['undisclosed']	= 'Undisclosed';
+		$_options['male']			= 'Male';
+		$_options['female']			= 'Female';
+		$_options['transgender']	= 'Transgender';
+		$_options['other']			= 'Other';
+		
+		echo form_field_dropdown( $_field, $_options );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Timezone
+		$_field					= array();
+		$_field['key']			= 'timezone_id';
+		$_field['label']		= lang( 'accounts_edit_basic_field_timezone_label' );
+		$_field['default']		= $user_edit->timezone_id;
+		$_field['required']		= FALSE;
+		
+		echo form_field_dropdown( $_field, $timezones, lang( 'accounts_edit_basic_field_group_tip' ) );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Preferred Language
+		$_field					= array();
+		$_field['key']			= 'language_id';
+		$_field['label']		= lang( 'accounts_edit_basic_field_language_label' );
+		$_field['default']		= $user_edit->language_setting->id;
+		$_field['required']		= FALSE;
+		
+		echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_group_tip' ) );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Registered IP
 		$_field					= array();
 		$_field['key']			= 'ip_address';

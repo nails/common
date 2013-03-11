@@ -2146,5 +2146,5 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	}
 }
 
-/* End of file user_model.php */
-/* Location: ./system/application/models/user_model.php */
+/* End of file core_nails_user_model.php */
+/* Location: ./system/application/models/core_nails_user_model.php */

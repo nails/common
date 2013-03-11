@@ -1,5 +1,6 @@
 <?php
 
+	echo '<div class="group-members edit">';
 	echo form_open_multipart( 'admin/accounts/edit/' . $user_edit->id . $return_string );
 	echo form_hidden( 'id', $user_edit->id );
 	echo form_hidden( 'email_orig', $user_edit->email );
@@ -20,3 +21,4 @@
 	echo '<p>' . form_submit( 'submit', lang( 'action_save_changes' ) ) . '</p>';
 	
 	echo form_close();
+	echo '</div>';

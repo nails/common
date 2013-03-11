@@ -417,7 +417,10 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->data['ignored_fields'][] = 'referred_by';
 		$this->data['ignored_fields'][] = 'first_name';
 		$this->data['ignored_fields'][] = 'last_name';
+		$this->data['ignored_fields'][] = 'gender';
 		$this->data['ignored_fields'][] = 'profile_img';
+		$this->data['ignored_fields'][] = 'timezone_id';
+		$this->data['ignored_fields'][] = 'language_id';
 		
 		//	If no cols were found, DESCRIBE the user_meta table - where possible
 		//	you should manually set columns, including datatypes
@@ -472,13 +475,16 @@ class NAILS_Accounts extends Admin_Controller {
 			// --------------------------------------------------------------------------
 			
 			//	Define user table rules 
-			$this->form_validation->set_rules( 'group_id',		'Account Type',	'xss_clean|required|is_natural_no_zero' );			
-			$this->form_validation->set_rules( 'email',			'Email',		'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
-			$this->form_validation->set_rules( 'username',		'Username',		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
-			$this->form_validation->set_rules( 'first_name',	'First Name',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'last_name',		'Last Name',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'password',		'Password',		'xss_clean' );
-			$this->form_validation->set_rules( 'temp_pw',		'Temp PW',		'xss_clean' );
+			$this->form_validation->set_rules( 'group_id',		lang( 'accounts_edit_basic_field_group_label' ),		'xss_clean|required|is_natural_no_zero' );			
+			$this->form_validation->set_rules( 'email',			lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
+			$this->form_validation->set_rules( 'username',		lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
+			$this->form_validation->set_rules( 'first_name',	lang( 'form_label_first_name' ),						'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',		lang( 'form_label_last_name' ),							'xss_clean|required' );
+			$this->form_validation->set_rules( 'gender',		lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'timezone_id',	lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'language_id',	lang( 'accounts_edit_basic_field_language_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'password',		lang( 'accounts_edit_basic_field_password_label' ),		'xss_clean' );
+			$this->form_validation->set_rules( 'temp_pw',		lang( 'accounts_edit_basic_field_temp+pw_label' ),		'xss_clean' );
 			
 			// --------------------------------------------------------------------------
 			
@@ -684,13 +690,16 @@ class NAILS_Accounts extends Admin_Controller {
 				
 				if ( ! isset( $this->data['upload_error'] ) ) :
 				
-					//	Set `user` data
+					//	Set basic data
 					$_data['group_id']		= $_post['group_id'];
 					$_data['temp_pw']		= string_to_boolean( $_post['temp_pw'] );
 					$_data['first_name']	= $_post['first_name'];
 					$_data['last_name']		= $_post['last_name'];
 					$_data['email']			= $_post['email'];
 					$_data['username']		= $_post['username'];
+					$_data['gender']		= $_post['gender'];
+					$_data['timezone_id']	= $_post['timezone_id'];
+					$_data['language_id']	= $_post['language_id'];
 					
 					if ( $_post['password'] ) :
 					
@@ -698,7 +707,7 @@ class NAILS_Accounts extends Admin_Controller {
 					
 					endif;
 					
-					//	Set `user_meta` data
+					//	Set meta data
 					foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
 					
 						switch ( $value['datatype'] ) :
@@ -747,6 +756,7 @@ class NAILS_Accounts extends Admin_Controller {
 					// --------------------------------------------------------------------------
 					
 					//	Update account
+					
 					if ( $this->user->update( $_post['id'], $_data ) ) :
 						
 						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ), $_post['email'] ) );	
@@ -834,8 +844,14 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Page Title
 		$this->data['page']->title = lang( 'accounts_edit_title', title_case( $_user->first_name . ' ' . $_user->last_name ) );
 		
-		//	Get the groups
+		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user->get_groups_flat();
+		
+		$this->load->model( 'core_nails_timezone_model' );
+		$this->data['timezones']	= $this->core_nails_timezone_model->get_all_flat();
+		
+		$this->load->model( 'core_nails_language_model' );
+		$this->data['languages']	= $this->core_nails_language_model->get_all_flat();
 		
 		// --------------------------------------------------------------------------
 		
@@ -847,7 +863,31 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		endif;
 		
-		$this->data['notice']			= active_user( 'id' ) == $_user->id ? lang( 'accounts_edit_editing_self' ) : FALSE;
+		if ( active_user( 'id' ) == $_user->id ) :
+		
+			switch ( active_user( 'gender' ) ) :
+			
+				case 'male' :
+				
+					$this->data['notice'] = lang( 'accounts_edit_editing_self_m' );
+					
+				break;
+				
+				case 'female' :
+				
+					$this->data['notice'] = lang( 'accounts_edit_editing_self_f' );
+				
+				break;
+				
+				default :
+				
+					$this->data['notice'] = lang( 'accounts_edit_editing_self_u' );
+				
+				break;
+			
+			endswitch;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

@@ -34,7 +34,6 @@
 	$lang['accounts_index_th_actions']			= 'Actions';
 	$lang['accounts_index_no_users']			= 'No users found';
 	$lang['accounts_index_verified']			= 'Verified email address';
-	$lang['accounts_index_social_connected']	= 'Connected to %s';
 	$lang['accounts_index_last_login']			= 'Last login: <span class="nice-time">%s</span> (%s logins)';
 	$lang['accounts_index_last_nologins']		= 'Last login: Never Logged In';
 	
@@ -70,8 +69,10 @@
 	$lang['accounts_edit_error_profile_img']	= '<strong>Update Failed:</strong> There was a problem uploading the Profile Image.';
 	$lang['accounts_edit_error_upload']			= '<strong>Update failed:</strong> The file "%s" failed to upload.';
 	
-	$lang['accounts_edit_ok']				= '<strong>Success!</strong> Updated user %s (%s)';
-	$lang['accounts_edit_editing_self']		= '<strong>Hello there!</strong> You are currently editing your own account.';
+	$lang['accounts_edit_ok']					= '<strong>Success!</strong> Updated user %s (%s)';
+	$lang['accounts_edit_editing_self_m']		= '<strong>Hey there handsome!</strong> You are currently editing your own account.';
+	$lang['accounts_edit_editing_self_f']		= '<strong>Hey there beautiful!</strong> You are currently editing your own account.';
+	$lang['accounts_edit_editing_self_u']		= '<strong>Hello there!</strong> You are currently editing your own account.';
 	
 	$lang['accounts_edit_actions_legend']	= 'Actions';
 	
@@ -90,6 +91,11 @@
 	$lang['accounts_edit_basic_field_verified_label']			= 'Email verified';
 	$lang['accounts_edit_basic_field_username_label']			= 'Username';
 	$lang['accounts_edit_basic_field_username_placeholder']		= 'The user\'s username';
+	$lang['accounts_edit_basic_field_gender_label']				= 'Gender';
+	$lang['accounts_edit_basic_field_timezone_label']			= 'Timezone';
+	$lang['accounts_edit_basic_field_timezone_placeholder']		= 'The user\'s timezone, coming soon!';
+	$lang['accounts_edit_basic_field_language_label']			= 'Language';
+	$lang['accounts_edit_basic_field_language_placeholder']		= 'The user\'s preferred language, coming soon!';
 	$lang['accounts_edit_basic_field_register_ip_label']		= 'Registration IP';
 	$lang['accounts_edit_basic_field_last_ip_label']			= 'Last IP';
 	$lang['accounts_edit_basic_field_created_label']			= 'Created';
