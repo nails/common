@@ -36,8 +36,11 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		if ($new == $CI->input->post( $old ))
 			return TRUE;
 		
-		if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'unique_if_diff', '%s is not unique.' );
+		if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) ) :
+		
+			$CI->form_validation->set_message( 'unique_if_diff', lang( 'fv_unique_if_diff_field' ) );
+			
+		endif;
 				
 		$CI->db->where( $column . ' !=', $CI->input->post( $old ) );
 		$CI->db->where( $column, $new );
@@ -63,8 +66,11 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	{
 		$CI =& get_instance();
 		
-		if ( ! array_key_exists( 'valid_postcode', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'valid_postcode', '%s is not a valid UK postcode.' );
+		if ( ! array_key_exists( 'valid_postcode', $CI->form_validation->_error_messages ) ) :
+		
+			$CI->form_validation->set_message( 'valid_postcode', lang( 'fv_valid_postcode' ) );
+			
+		endif;
 		
 		$pattern = '/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/';
 		return preg_match( $pattern, strtoupper( $str ) ) ? TRUE : FALSE;
@@ -85,7 +91,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'valid_date', '%s is not a valid date.' );
+			$CI->form_validation->set_message( 'valid_date', lang( 'fv_valid_date_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -112,7 +118,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'date_required', 'The %s field is required.' );
+			$CI->form_validation->set_message( 'date_required', lang( 'fv_required_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -136,7 +142,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_future', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'date_future', 'The %s field must be in the future.' );
+			$CI->form_validation->set_message( 'date_future', lang( 'fv_valid_date_future_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -159,7 +165,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_past', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'date_past', 'The %s field must be in the past.' );
+			$CI->form_validation->set_message( 'date_past', lang( 'fv_valid_date_past_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -183,7 +189,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'valid_datetime', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'valid_datetime', '%s is not a valid datetime.' );
+			$CI->form_validation->set_message( 'valid_datetime', lang( 'fv_valid_datetime_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -214,7 +220,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_required_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -240,7 +246,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_valid_date_future_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );
@@ -265,7 +271,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', 'The %s field is required.' );
+			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_valid_date_past_field' ) );
 		
 		$month	= $CI->input->post( $field . '_month' );
 		$year	= $CI->input->post( $field . '_year' );

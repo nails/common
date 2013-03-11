@@ -63,6 +63,7 @@ class Asset {
 			//	This functionality implemented to allow the developer to define an always loaded item
 			//	but then unload it within a certain module if needed - usually only useful if system
 			//	modules have conflicts with app assets.
+			
 			if ( preg_match( '/unload:(.+)/', $asset, $match ) ) :
 			
 				$this->unload( $match[1] );
@@ -100,6 +101,7 @@ class Asset {
 			//	This functionality implemented to allow the developer to define an always loaded item
 			//	but then unload it within a certain module if needed - usually only useful if system
 			//	modules have conflicts with app assets.
+			
 			if ( preg_match( '/unload:(.+)/', $asset, $match ) ) :
 			
 				$this->unload( $match[1] );

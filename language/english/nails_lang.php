@@ -69,6 +69,18 @@
 	$lang['fv_matches_field']				= 'The %s field does not match the %s field.';
 	$lang['fv_is_unique']					= 'This field must be unique.';
 	$lang['fv_is_unique_field']				= 'The %s field is not unique.';
+	$lang['fv_unique_if_diff']				= 'This field must be unique.';
+	$lang['fv_unique_if_diff_field']		= 'The %s field is not unique.';
+	$lang['fv_valid_postcode']				= 'This field must be a valid UK postcode.';
+	$lang['fv_valid_postcode_field']		= 'The %s field is not a valid UK postcode.';
+	$lang['fv_valid_date']					= 'This field must be a valid date.';
+	$lang['fv_valid_date_field']			= 'The %s field is not a valid date.';
+	$lang['fv_valid_date_future']			= 'This field must be in the future.';
+	$lang['fv_valid_date_future_field']		= 'The %s field must be in the future.';
+	$lang['fv_valid_date_past']				= 'This field must be in the past.';
+	$lang['fv_valid_date_past_field']		= 'The %s field must be in the past.';
+	$lang['fv_valid_datetime']				= 'This field must be a valid datetime.';
+	$lang['fv_valid_datetime_field']		= 'The %s field is not a valid datetime.';
 	
 	
 	// --------------------------------------------------------------------------
