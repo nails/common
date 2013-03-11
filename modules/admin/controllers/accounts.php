@@ -1088,11 +1088,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $this->user->destroy( $_uid ) ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'accounts_delete_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'success', lang( 'accounts_delete_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success', lang( 'accounts_delete_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_delete_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
