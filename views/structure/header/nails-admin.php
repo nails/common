@@ -80,22 +80,6 @@
 	
 	</div>
 	
-	<div class="header_min">
-	
-		<a href="#" class="toggle-header">
-		
-			<?=img( array(
-				'src'	=> NAILS_URL . 'img/admin/head_slide_up.png',
-				'class'	=> 'up'
-			))?>
-	
-		</a>
-	
-	</div>
-	
-	
-	
-	
 	<div class="sidebar left">
 		<div class="padder">
 		<?php
@@ -290,7 +274,7 @@
 			
 			<div class="js_error" style="display:none;">
 				<p>
-					<span class="js_error_head"><?=lang( 'js_error_header' )?></span>
-					<span class="js_error_text"></span>
+					<span class="title"><?=lang( 'js_error_header' )?></span>
+					<span class="message"></span>
 				</p>
 			</div>

@@ -23,9 +23,13 @@
 			
 			$(function(){
 			
-				//	Initialise Nails_JS
+				//	Initialise NAILS_JS
 				_nails = new NAILS_JS();
 				_nails.init();
+				
+				//	Initialise NAILS_Admin
+				_nails_admin = new NAILS_Admin();
+				_nails_admin.init();
 			
 			});
 						
