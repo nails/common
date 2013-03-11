@@ -851,7 +851,7 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->data['timezones']	= $this->core_nails_timezone_model->get_all_flat();
 		
 		$this->load->model( 'core_nails_language_model' );
-		$this->data['languages']	= $this->core_nails_language_model->get_all_flat();
+		$this->data['languages']	= $this->core_nails_language_model->get_all_supported_flat();
 		
 		// --------------------------------------------------------------------------
 		

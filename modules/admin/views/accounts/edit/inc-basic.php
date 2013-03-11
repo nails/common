@@ -136,7 +136,7 @@
 		$_field['default']		= $user_edit->timezone_id;
 		$_field['required']		= FALSE;
 		
-		echo form_field_dropdown( $_field, $timezones, lang( 'accounts_edit_basic_field_group_tip' ) );
+		echo form_field_dropdown( $_field, $timezones, lang( 'accounts_edit_basic_field_timezone_tip' ) );
 		
 		// --------------------------------------------------------------------------
 		
@@ -147,7 +147,7 @@
 		$_field['default']		= $user_edit->language_setting->id;
 		$_field['required']		= FALSE;
 		
-		echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_group_tip' ) );
+		echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_language_tip' ) );
 		
 		// --------------------------------------------------------------------------
 		

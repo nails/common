@@ -11,10 +11,10 @@ class CORE_NAILS_Timezone_Model extends NAILS_Model
 {
 	public function get_all()
 	{
-		$this->db->select( 'id,gmt_offset,label' );
-		$this->db->order_by( 'gmt_offset', 'DESC' );
-		$this->db->order_by( 'label' );
-		return $this->db->get( 'timezone' )->result();
+		$this->db->select( 'tz.id,tz.gmt_offset,tz.label' );
+		$this->db->order_by( 'tz.gmt_offset', 'DESC' );
+		$this->db->order_by( 'tz.label' );
+		return $this->db->get( 'timezone tz' )->result();
 	}
 	
 	
@@ -39,5 +39,5 @@ class CORE_NAILS_Timezone_Model extends NAILS_Model
 	}
 }
 
-/* End of file core_nails_language_model.php */
-/* Location: ./system/application/models/core_nails_language_model.php */
+/* End of file core_nails_timezone_model.php */
+/* Location: ./system/application/models/core_nails_timezone_model.php */
