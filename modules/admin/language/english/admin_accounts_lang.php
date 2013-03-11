@@ -117,10 +117,10 @@
 	// --------------------------------------------------------------------------
 	
 	//	Activating/Deactivating
-	$lang['accounts_activate_success']		= '<strong>Success!</strong> %s was activated.';
-	$lang['accounts_activate_error']		= '<strong>Sorry,</strong> there was a problem activating %s.';
-	$lang['accounts_deactivate_success']	= '<strong>Success!</strong> %s was deactivated.';
-	$lang['accounts_deactivate_error']		= '<strong>Sorry,</strong> there was a problem deactivating %s.';
+	$lang['accounts_verified_success']		= '<strong>Success!</strong> %s was marked as verified.';
+	$lang['accounts_verified_error']		= '<strong>Sorry,</strong> there was a problem verifying %s.';
+	$lang['accounts_unverified_success']	= '<strong>Success!</strong> %s was marked as unverified.';
+	$lang['accounts_unverified_error']		= '<strong>Sorry,</strong> there was a problem unverifying %s.';
 	
 	// --------------------------------------------------------------------------
 	

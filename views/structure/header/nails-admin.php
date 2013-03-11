@@ -82,10 +82,16 @@
 	
 	<div class="sidebar left">
 		<div class="padder">
+		
+		<div class="nav-search">
+		<input type="search" placeholder="Type to search menu" />
+		</div>
+		
 		<?php
 			
 			$_acl			= active_user( 'acl' );
 			$_mobile_menu	= array();
+			$_counter		= 0;
 			
 			foreach ( $loaded_modules AS $module => $config ) :
 			
@@ -100,9 +106,25 @@
 				//	Get any notifications for this module if applicable
 				$_notifications = method_exists( $module, 'notifications') ? $module::notifications() : array();
 				
+				$_class = '';
+				
+				if ( $_counter == 0 ) :
+				
+					$_class = 'first';
+				
+				endif;
+				
+				if ( $_counter == ( count( $loaded_modules ) - 1 ) ) :
+				
+					$_class = 'last';
+				
+				endif;
+				
+				$_counter++;
+				
 				?>
-				<div class="box" id="box_<?=url_title( $config->name )?>">
-					<h2>
+				<div class="box <?=$_class?>" id="box_<?=url_title( $config->name )?>">
+					<h2 class="<?=$module?>">
 						<?=$config->name?>
 						<a href="#" class="toggle">
 							<span class="close"><?=lang( 'action_close' )?></span>
@@ -119,7 +141,10 @@
 								//	Is the method enabled?
 								if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method]) ) :
 								
-									echo '<li> &rsaquo; ';
+									//	Method enabled?
+									$_current = ( $this->uri->rsegment( 1 ) == $module && $this->uri->rsegment( 2 ) == $method )  ? 'current' : '';
+									
+									echo '<li class="' . $_current . '">&rsaquo; ';
 									echo anchor( 'admin/' . $module . '/' . $method, $label );
 									
 									if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :

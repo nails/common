@@ -973,11 +973,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( ! $_user->is_verified ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'accounts_activate_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_verified_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success', lang( 'accounts_activate_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'success', lang( 'accounts_verified_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
@@ -1014,11 +1014,11 @@ class NAILS_Accounts extends Admin_Controller {
 		//	Define messages
 		if ( $_user->is_verified ) :
 		
-			$this->session->set_flashdata( 'error', lang( 'accounts_deactivate_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'error', lang( 'accounts_unverified_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		else :
 		
-			$this->session->set_flashdata( 'success', lang( 'accounts_deactivate_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+			$this->session->set_flashdata( 'success', lang( 'accounts_unverified_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 			
 		endif;
 		
