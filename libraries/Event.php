@@ -165,7 +165,7 @@ class Event {
 			$_data[] = array(
 				'event_id'	=> $_event_id,	
 				'user_id'	=> $created_by,
-				'read'		=> TRUE
+				'is_read'	=> TRUE
 			);
 		
 		endif;
@@ -192,7 +192,7 @@ class Event {
 				$_data[] = array(
 					'event_id'	=> $_event_id,	
 					'user_id'	=> $ip,
-					'read'		=> FALSE
+					'is_read'	=> FALSE
 				);
 			
 			endforeach;
@@ -295,7 +295,7 @@ class Event {
 	{
 		//	Fetch all objects from the table
 		$this->_ci->db->select( 'e.id, e.type_id, et.type_id_string, et.type_name, et.type_description, e.created_by, um.first_name, um.last_name, um.profile_img, e.vars, e.created' );
-		$this->_ci->db->select( 'UNIX_TIMESTAMP( e.created ) created_time, eip.user_id interested_party, eip.read, e.level' );
+		$this->_ci->db->select( 'UNIX_TIMESTAMP( e.created ) created_time, eip.user_id interested_party, eip.is_read, e.level' );
 		
 		$this->_ci->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
 		$this->_ci->db->join( 'event_interested_party eip', 'e.id = eip.event_id', 'LEFT' );
@@ -329,7 +329,7 @@ class Event {
 				
 				$_out[ $event->id ]['interested_parties'][$event->interested_party] = array(
 					'user_id' => $event->interested_party,
-					'read' => (bool) $event->read
+					'is_read' => (bool) $event->is_read
 				);
 			
 			else :
@@ -352,7 +352,7 @@ class Event {
 					'interested_parties'	=>	array(
 						$event->interested_party => array(
 							'user_id' => $event->interested_party,
-							'read' => (bool) $event->read
+							'is_read' => (bool) $event->is_read
 						)
 					),
 				
@@ -503,7 +503,7 @@ class Event {
 		//	Include unread?
 		if ( ! $show_unread ) :
 		
-			$this->_ci->db->where( 'eip.read', FALSE );
+			$this->_ci->db->where( 'eip.is_read', FALSE );
 		
 		endif;
 		
@@ -688,7 +688,7 @@ class Event {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->_ci->db->set( 'read', TRUE );
+		$this->_ci->db->set( 'is_read', TRUE );
 		$this->_ci->db->update( 'event_interested_party' );
 		
 		// --------------------------------------------------------------------------
@@ -754,7 +754,7 @@ class Event {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->_ci->db->set( 'eip.read', TRUE );
+		$this->_ci->db->set( 'eip.is_read', TRUE );
 		$this->_ci->db->update( 'event_interested_party eip, event e' );
 		
 		// --------------------------------------------------------------------------
