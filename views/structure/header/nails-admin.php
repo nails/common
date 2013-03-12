@@ -69,6 +69,17 @@
 			</li>
 			<li style="color:#999;">
 				<?=lang( 'admin_loggedin_as', array( site_url( 'admin/accounts/edit/' . active_user( 'id' ) ), active_user( 'first_name' ) ) )?>
+				<?php
+				
+				$_admin_recovery = $this->session->userdata( 'admin_recovery' );
+				
+				if ( $this->session->userdata( 'admin_recovery' ) ) :
+				
+					echo lang( 'admin_admin_recover', array( site_url( 'auth/override/login_as/' . $_admin_recovery->id . '/' . $_admin_recovery->hash ), $_admin_recovery->name ) );
+				
+				endif;
+				
+				?>
 			</li>
 			<li class="logout">
 				<?=anchor( 'auth/logout', lang( 'action_logout' ) )?>

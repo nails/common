@@ -66,7 +66,7 @@ if ( ! function_exists( 'form_field' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '">';
+		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '">';
 		$_out .= '<label>';
 				
 		//	Label
@@ -430,7 +430,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_field['oddeven'] . '">';
 		$_out .= '<label>';
 				
 		//	Label
@@ -541,7 +541,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out  = '<div class="field radio ' . $_error . ' ' . $_field['oddeven'] . '">';
 		
 		//	First option
 		$_out .= '<label>';
@@ -570,9 +570,6 @@ if ( ! function_exists( 'form_field_radio' ) )
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
-		
-		//	Error
-		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 				
 		$_out .= '</label>';
 		
@@ -605,6 +602,9 @@ if ( ! function_exists( 'form_field_radio' ) )
 		
 		endfor;
 		
+		//	Error
+		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		
 		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 		
@@ -621,7 +621,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 /**
  * form_field
  *
- * Generates a form field containing radio buttons
+ * Generates a form field containing checboxes
  *
  * @access	public
  * @param	array
@@ -658,7 +658,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out  = '<div class="field checkbox ' . $_error . ' ' . $_field['oddeven'] . '">';
 		
 		//	First option
 		$_out .= '<label>';
@@ -707,9 +707,6 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
-		
-		//	Error
-		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 				
 		$_out .= '</label>';
 		
@@ -760,6 +757,9 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			$_out .= '</label>';
 		
 		endfor;
+		
+		//	Error
+		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 		
 		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';

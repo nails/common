@@ -37,6 +37,8 @@
 	$lang['accounts_index_last_login']			= 'Last login: <span class="nice-time">%s</span> (%s logins)';
 	$lang['accounts_index_last_nologins']		= 'Last login: Never Logged In';
 	
+	$lang['accounts_index_noteditable']			= 'You do not have permission to perform manipulations on this user.';
+	
 	// --------------------------------------------------------------------------
 	
 	//	Create new user
@@ -68,6 +70,8 @@
 	$lang['accounts_edit_error_no_admins']		= '<strong>Update Failed:</strong> The update would leave the system without any administrators.';
 	$lang['accounts_edit_error_profile_img']	= '<strong>Update Failed:</strong> There was a problem uploading the Profile Image.';
 	$lang['accounts_edit_error_upload']			= '<strong>Update failed:</strong> The file "%s" failed to upload.';
+	$lang['accounts_edit_error_noteditable']	= '<strong>Sorry,</strong> you do not have permission to perform manipulations on that user.';
+
 	
 	$lang['accounts_edit_ok']					= '<strong>Success!</strong> Updated user %s (%s)';
 	$lang['accounts_edit_editing_self_m']		= '<strong>Hey there handsome!</strong> You are currently editing your own account.';

@@ -382,7 +382,16 @@ class NAILS_Accounts extends Admin_Controller {
 		if ( ! $_user ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_unknown_id' ) );
-			redirect( $return_to );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
 			return;
 		
 		endif;
@@ -918,13 +927,29 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function suspend()
 	{
+		//	Get the user's details
+		$_uid	= $this->uri->segment( 4 );
+		$_user	= $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Suspend user
-		$_uid = $this->uri->segment( 4 );
 		$this->user->suspend( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Get the user's details
+		//	Get the user's details, again
 		$_user = $this->user->get_user( $_uid );
 		
 		// --------------------------------------------------------------------------
@@ -959,13 +984,29 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function unsuspend()
 	{
+		//	Get the user's details
+		$_uid	= $this->uri->segment( 4 );
+		$_user	= $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Unsuspend user
-		$_uid = $this->uri->segment( 4 );
 		$this->user->unsuspend( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Get the user's details
+		//	Get the user's details, again
 		$_user = $this->user->get_user( $_uid );
 		
 		// --------------------------------------------------------------------------
@@ -999,13 +1040,29 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function verify()
 	{
-		//	Activate user
-		$_uid = $this->uri->segment( 4 );
+		//	Get the user's details
+		$_uid	= $this->uri->segment( 4 );
+		$_user	= $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Verify user
 		$this->user->verify( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Get the user's details
+		//	Get the user's details, again
 		$_user = $this->user->get_user( $_uid );
 		
 		// --------------------------------------------------------------------------
@@ -1040,13 +1097,29 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function unverify()
 	{
-		//	Deactivate user
-		$_uid = $this->uri->segment( 4 );
+		//	Get the user's details
+		$_uid	= $this->uri->segment( 4 );
+		$_user	= $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Unverify user
 		$this->user->unverify( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Get the user's details
+		//	Get the user's details, again
 		$_user = $this->user->get_user( $_uid );
 		
 		// --------------------------------------------------------------------------
@@ -1079,8 +1152,24 @@ class NAILS_Accounts extends Admin_Controller {
 	 **/
 	public function delete()
 	{
-		//	Unan user
-		$_uid = $this->uri->segment( 4 );
+		//	Get the user's details
+		$_uid	= $this->uri->segment( 4 );
+		$_user	= $this->user->get_user( $_uid );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Non-superusers editing superusers is not cool
+		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Delete user
 		$_user = $this->user->get_user( $_uid );
 		
 		// --------------------------------------------------------------------------
@@ -1120,6 +1209,17 @@ class NAILS_Accounts extends Admin_Controller {
 		
 		else :
 		
+			//	Non-superusers editing superusers is not cool
+			if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+			
+				$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+				redirect( $_return_to );
+				return;
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
 			if ( $_user->profile_img ) :
 			
 				$this->load->library( 'cdn' );

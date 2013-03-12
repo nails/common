@@ -109,6 +109,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		$_recovery_data->id					= md5( active_user( 'id' ) );
 		$_recovery_data->hash				= md5( active_user( 'password' ) );
 		$_recovery_data->email				= active_user( 'email' );
+		$_recovery_data->name				= active_user( 'first_name' );
 		$_recovery_data->now_where_was_i	= $this->input->get( 'return_to' );
 		
 		// --------------------------------------------------------------------------
