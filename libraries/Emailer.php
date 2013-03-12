@@ -266,11 +266,11 @@ class Emailer
 				//	Append to queries
 				if ( $_queue ) :
 				
-					$_sql['queue']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', ' . time() . ', ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';
+					$_sql['queue']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';
 				
 				endif;
 				
-				$_sql['archive']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', ' . time() . ', ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';				
+				$_sql['archive']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';				
 			
 			endforeach;
 			
@@ -299,13 +299,13 @@ class Emailer
 			
 				$_sql[]	= '	INSERT INTO email_queue
 							(ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES
-							( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', ' . time() . ', ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
+							( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
 							
 			endif;
 						
 			$_sql[]	= '	INSERT INTO email_queue_archive
 						(ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES
-						( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', ' . time() . ', ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
+						( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
 		
 		endif;
 		
@@ -981,7 +981,6 @@ class Emailer
 		// --------------------------------------------------------------------------
 		
 		//	Add some extra, common variables for the template
-		
 		$_send->data['email_ref']		= $_email->ref;
 		$_send->data['sent_from']		= $_send->from;
 		$_send->data['sent_to']			= $_send->to;
@@ -1129,6 +1128,11 @@ class Emailer
 		//	Send!
 		if ( $this->ci->email->send() ) :
 		
+			//	Mail sent, mark the time
+			$this->ci->db->set( 'time_sent', 'NOW()', FALSE );
+			$this->ci->db->where( 'id', $_email->id );
+			$this->ci->db->update( 'email_queue_archive' );
+			
 			return TRUE;
 		
 		else :
