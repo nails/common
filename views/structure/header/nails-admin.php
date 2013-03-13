@@ -18,18 +18,21 @@
 	<meta name="description" content="" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	
+	<!--	JS GLOBALS	-->
+	<script tyle="text/javascript">
+		var ENVIRONMENT		= '<?=ENVIRONMENT?>';
+		window.SITE_URL		= '<?=site_url()?>';
+		window.NAILS_URL	= '<?=NAILS_URL?>';
+		window.NAILS_LANG	= {};
+	</script>
+	
 	<!--	JS LOCALISATION	-->
 	<script tyle="text/javascript">
-		window.NAILS_LANG			= {};
 		window.NAILS_LANG.non_html5	= '<?=str_replace( "'", "\'", lang( 'js_error_non_html5' ) )?>';
 		window.NAILS_LANG.no_save	= '<?=str_replace( "'", "\'", lang( 'js_error_saving' ) )?>';
 	</script>
 	
 	<!--	ASSETS	-->
-	<script type="text/javascript">
-		window.NAILS_URL	= '<?=NAILS_URL?>';
-		window.SITE_URL		= '<?=site_url()?>';
-	</script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 	<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>js/jquery.min.js"><\/script>')</script>

@@ -21,6 +21,9 @@ class Asset {
 	private $js_inline		= array();
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Constructor
 	 *
@@ -33,6 +36,9 @@ class Asset {
 	{
 		$this->CI =& get_instance();
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -85,6 +91,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Load a nails asset
 	 *
@@ -123,6 +132,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Mark an asset for unloading
 	 *
@@ -143,6 +155,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Load an inline asset
 	 *
@@ -161,6 +176,9 @@ class Asset {
 			case 'js_inline':	$this->js_inline[]	= $script;	break;
 		endswitch;
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -204,6 +222,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Clears all loaded assets
 	 *
@@ -216,6 +237,9 @@ class Asset {
 	{
 		$this->clear( TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE );
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -236,6 +260,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Output the assets for HTML
 	 *
@@ -245,7 +272,7 @@ class Asset {
 	 * @return	object
 	 * @author	Pablo
 	 **/
-	public function output( $type, $return = FALSE )
+	public function output( $type = 'all', $return = FALSE )
 	{
 		//	Unload anything first
 		if ( count ( $this->unload_assets ) ) :
@@ -264,8 +291,11 @@ class Asset {
 		
 		endif;
 		
+		// --------------------------------------------------------------------------
+		
 		//	Now output.
 		switch ( $type ) :
+		
 			case 'css'			: $out  = $this->_print_css_nails();
 								  $out .= $this->_print_css();			break;
 			case 'css-inline'	: $out  = $this->_print_css_inline();	break;
@@ -273,22 +303,38 @@ class Asset {
 			case 'js'			: $out  = $this->_print_js_nails();	
 								  $out .= $this->_print_js();			break;
 			case 'js-inline'	: $out  = $this->_print_js_inline();	break;
+			
+			case 'all'			: $out  = $this->_print_css_nails();
+								  $out .= $this->_print_css();
+								  $out .= $this->_print_js_nails();	
+								  $out .= $this->_print_js();			break;
 		endswitch;
 		
+		// --------------------------------------------------------------------------
+		
 		//	Force SSL for assets if running on non-standard port
-		if ( $_SERVER['SERVER_PORT'] != 80 ) :
+		if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off' ) :
 		
 			$site_url_ssl = str_replace( 'http://', 'https://', site_url() );
 			$out = str_replace( site_url(), $site_url_ssl, $out );
 			
 		endif;
 		
+		// --------------------------------------------------------------------------
+		
 		if ( $return ) :
+		
 			return $out;
+			
 		else :
+		
 			echo $out;
+			
 		endif;
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -324,6 +370,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Output the referenced CSS files
 	 *
@@ -343,6 +392,9 @@ class Asset {
 		endforeach;
 		return $out;
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -368,6 +420,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Output the inline CSS
 	 *
@@ -385,6 +440,9 @@ class Asset {
 		$out = preg_replace( '/<\/?style.*?>/si', '', $out );
 		return '<style type="text/css">'.$out.'</style>';
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**
@@ -410,6 +468,9 @@ class Asset {
 	}
 	
 	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Output the referenced nails JS files
 	 *
@@ -430,6 +491,9 @@ class Asset {
 		endforeach;
 		return $out;
 	}
+	
+	
+	// --------------------------------------------------------------------------
 	
 	
 	/**

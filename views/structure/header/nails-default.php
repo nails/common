@@ -14,7 +14,10 @@
 		
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
-			window.NAILS_URL = '<?=NAILS_URL?>';
+			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
+			window.SITE_URL		= '<?=site_url()?>';
+			window.NAILS_URL	= '<?=NAILS_URL?>';
+			window.NAILS_LANG	= {};
 		</script>
 		
 		<!--	STYLES	-->
