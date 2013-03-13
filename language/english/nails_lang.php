@@ -37,6 +37,7 @@
 	$lang['action_close']			= 'Close';
 	$lang['action_open']			= 'Open';
 	$lang['action_view']			= 'View';
+	$lang['action_preview']			= 'Preview';
 	$lang['action_clear']			= 'Clear';
 	$lang['action_next']			= 'Next';
 	$lang['action_previous']		= 'Previous';

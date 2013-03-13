@@ -404,17 +404,18 @@ class Emailer
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	public function get_all()
+	public function get_all( $order = 'eqa.time_queued', $sort = 'ASC', $offset = 0, $per_page = 25 )
 	{ 
-		$this->ci->db->select( 'eqa.id, eqa.ref, eqa.time_queued, eqa.email_vars, eqa.user_email' );
-		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img' );
+		$this->ci->db->select( 'eqa.id, eqa.ref, eqa.time_queued, eqa.email_vars, eqa.user_email, eqa.time_queued, eqa.time_sent, eqa.read_count, eqa.link_click_count' );
+		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img, um.gender' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
 		$this->ci->db->join( 'user u', 'u.id = eqa.user_id', 'LEFT' );
 		$this->ci->db->join( 'user_meta um', 'um.user_id = eqa.user_id', 'LEFT' );
 		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
 		
-		$this->ci->db->order_by( 'eqa.time_queued', 'ASC' );
+		$this->ci->db->order_by( $order, $sort );
+		$this->ci->db->limit( $per_page, $offset );
 		
 		$_emails = $this->ci->db->get( 'email_queue_archive eqa' )->result();
 		
@@ -451,6 +452,22 @@ class Emailer
 		// --------------------------------------------------------------------------
 		
 		return $_emails;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Returns the number of items in the arcive
+	 *
+	 * @access	public
+	 * @return	int
+	 * @author	Pablo
+	 **/
+	public function count_all()
+	{
+		return $this->ci->db->count_all_results( 'email_queue_archive' );
 	}
 	
 	

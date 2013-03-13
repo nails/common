@@ -27,8 +27,18 @@ class View_Online extends NAILS_Email_Controller
 		//	hash check in get_by_ref();
 		
 		$_ref	= $this->uri->segment( 3, 'NULL' );
-		$_guid	= $this->uri->segment( 4, 'NULL' );
-		$_hash	= $this->uri->segment( 5, 'NULL' );
+		
+		if ( $this->user->is_superuser() ) :
+		
+			$_guid	= FALSE;
+			$_hash	= FALSE;
+			
+		else:
+		
+			$_guid	= $this->uri->segment( 4, 'NULL' );
+			$_hash	= $this->uri->segment( 5, 'NULL' );
+		
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
