@@ -66,7 +66,7 @@ class NAILS_Cron_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Set logger details
-		$this->logger->log_dir( APPPATH . 'logs/cron/' . $log_dir . '/' );
+		$this->logger->log_dir( FCPATH . APPPATH . 'logs/cron/' . $log_dir . '/' );
 		$this->logger->log_file( $log_file . '-' . date( 'Y-m-d' ) . '.php' );
 		$this->logger->line( 'Starting job [' . $this->task . ']...' );
 		$this->logger->line();
