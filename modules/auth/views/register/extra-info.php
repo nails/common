@@ -45,7 +45,7 @@
 	
 	endif;
 	
-	dumpanddie( 'TODO: This page needs to be made more generic (i.e post to a dynamic url). It also needs to be possible to collect fields dynamically via a config.' );
+	//dumpanddie( 'TODO: This page needs to be made more generic (i.e post to a dynamic url). It also needs to be possible to collect fields dynamically via a config.' );
 	
 	echo form_open( 'auth/tw/connect/verify' . $_returns, $attr );
 	

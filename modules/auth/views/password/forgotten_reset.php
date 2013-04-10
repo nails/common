@@ -27,7 +27,7 @@
 		</p>
 		<hr />
 		<p>
-			<?=anchor( 'auth/login', lang( 'auth_forgot_action_proceed_login' ), 'class="awesome"' )?>
+			<?=anchor( 'auth/login', lang( 'auth_forgot_action_proceed' ), 'class="awesome"' )?>
 		</p>
 	</div>
 	

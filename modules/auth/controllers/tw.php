@@ -19,6 +19,12 @@ require_once '_auth.php';
 
 class NAILS_Tw extends NAILS_Auth_Controller
 {
+	protected $_register_token;
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -74,6 +80,11 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			endif;
 			
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Default register token is empty
+		$this->_register_token = array();
 	}
 	
 	
@@ -119,6 +130,15 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		if ( $this->input->get( 'token' ) ) :
+		
+			//	Drop a cookie
+			$this->input->set_cookie( 'twRegisterToken', $this->input->get( 'token' ), 900 );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->_redirect( $this->tw->get_login_url( $this->_return_to, $this->_return_to_fail ) );
 	}
 	
@@ -141,14 +161,14 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( ! $this->session->userdata( 'tw_access_token' ) ) :
 		
 			$_request_token = $this->session->userdata( 'tw_request_token' );
-			$this->session->unset_userdata( 'tw_request_token' );
+			//$this->session->unset_userdata( 'tw_request_token' );
 			
 			if ( $_request_token ) :
 			
 				//	Set the token to use
 				$this->tw->set_access_token( $_request_token->oauth_token, $_request_token->oauth_token_secret );
 				
-				$_access_token = $this->tw->get_access_token( $this->input->get( 'oauth_verifier' ), $this->_return_to, $this->_return_to_fail );
+				$_access_token = $this->tw->get_access_token( $this->input->get( 'oauth_verifier' ) );
 				
 				if ( ! isset( $_access_token->oauth_token ) || ! isset( $_access_token->oauth_token_secret )  ) :
 				
@@ -220,6 +240,47 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			$this->_connect_fail();
 			return;
 		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Test for a register token, if there verify and store it in memory
+		//	We'll delete the cookie once a user has successfully registered.
+		
+		$this->_register_token = get_cookie( 'twRegisterToken' );
+		
+		if ( $this->_register_token ) :
+		
+			$this->_register_token = $this->encrypt->decode( $this->_register_token, APP_PRIVATE_KEY );
+			
+			if ( $this->_register_token ) :
+			
+				$this->_register_token = unserialize( $this->_register_token );
+				
+				if ( $this->_register_token ) :
+				
+					if ( ! isset( $this->_register_token['ip'] ) || $this->_register_token['ip'] != $this->input->ip_address() ) :
+					
+						$this->_register_token = array();
+					
+					endif;
+					
+				else :
+				
+					$this->_register_token = array();
+				
+				endif;
+			
+			else :
+			
+				$this->_register_token = array();
+			
+			endif;
+		
+		else :
+		
+			$this->_register_token = array();
+			
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -316,6 +377,11 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Delete register token
+		delete_cookie( 'twRegisterToken' );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Redirect
 		$this->session->set_flashdata( 'success', lang( 'auth_social_linked_ok', 'Twitter' ) );
 		$this->_redirect( $this->_return_to );
@@ -384,6 +450,11 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		
 		//	Create an event for this event
 		create_event( 'did_log_in', $user->id, 0, NULL, array( 'method' => 'twitter' ) );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Delete register token
+		delete_cookie( 'twRegisterToken' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -481,8 +552,20 @@ class NAILS_Tw extends NAILS_Auth_Controller
 				
 				// --------------------------------------------------------------------------
 				
-				//	Create new user, group 2, standard member
-				$_group_id = 2;
+				//	Which group?
+				//	If there's a register_token set, use that if not fall back to the default
+				
+				if ( isset( $this->_register_token['group'] ) && $this->_register_token['group'] ) :
+				
+					$_group_id = $this->_register_token['group'];
+				
+				else :
+				
+					$_group_id = APP_DEFAULT_GROUP;
+				
+				endif;
+				
+				//	Create new user
 				$_uid = $this->user->create( $email, $password, $_group_id, $_data );
 				
 				if ( $_uid ) :
@@ -526,6 +609,11 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					
 					//	Create an event for this event
 					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'facebook' ) );
+					
+					// --------------------------------------------------------------------------
+					
+					//	Delete register token
+					delete_cookie( 'twRegisterToken' );
 					
 					// --------------------------------------------------------------------------
 					

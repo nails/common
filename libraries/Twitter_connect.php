@@ -161,7 +161,7 @@ class Twitter_Connect {
 	 **/
 	public function get_access_token( $code )
 	{
-		return $this->oauth_accessToken( $code );
+		return $this->oauth_accessToken( array( 'oauth_verifier' => $code ) );
 	}
 	
 	

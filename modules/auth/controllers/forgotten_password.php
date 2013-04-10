@@ -77,6 +77,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			if ( ! $_email && $this->input->get( 'email' ) ) :
 			
 				$_POST['email']	= $this->input->get( 'email' );
+				$_email			= $this->input->get( 'email' );
 				
 			endif;
 			
@@ -105,7 +106,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Define basic email data
-					
 					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
 					
 					$_data				= new stdClass();
@@ -125,7 +125,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					//	Send user the password reset email
 					if ( $this->emailer->send( $_data ) ) :
 					
-						$this->data['success']		= lang( 'auth_forgot_success' );
+						$this->data['success'] = lang( 'auth_forgot_success' );
 					
 					else :
 					

@@ -86,7 +86,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Run validation
-			if ( $this->form_validation->run() == TRUE ) :
+			if ( $this->form_validation->run() ) :
 			
 				//	Attempt the registration
 				$email		= $this->input->post( 'email' );
@@ -98,7 +98,6 @@ class NAILS_Register extends NAILS_Auth_Controller
 				//	Meta data
 				$data['first_name']	= $this->input->post( 'first_name' );
 				$data['last_name']	= $this->input->post( 'last_name' );
-				$data['marketing']	= $this->input->post( 'marketing' );
 				
 				// --------------------------------------------------------------------------
 				
@@ -111,9 +110,8 @@ class NAILS_Register extends NAILS_Auth_Controller
 				
 				// --------------------------------------------------------------------------
 				
-				//	Create new user, group 2 (member)
-				$_group_id = 2;
-				$_uid = $this->user->create( $email, $password, $_group_id, $data );
+				//	Create new user
+				$_uid = $this->user->create( $email, $password, APP_DEFAULT_GROUP, $data );
 				
 				if ( $_uid ) :
 				
@@ -128,11 +126,11 @@ class NAILS_Register extends NAILS_Auth_Controller
 					$this->load->library( 'emailer' );
 					
 					$_email							= new stdClass();
-					$_email->type					= 'verify_email_' . $_group_id;
+					$_email->type					= 'verify_email_' . APP_DEFAULT_GROUP;
 					$_email->to_id					= $_uid['id'];
 					$_email->data					= array();
 					$_email->data['user']			= $this->user->get_user( $_uid['id'] );
-					$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
+					$_email->data['group']			= $this->user->get_group( APP_DEFAULT_GROUP )->display_name;
 					
 					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 					
@@ -150,7 +148,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'], $email, $_group_id );
+					$this->user->set_login_data( $_uid['id'], $email, APP_DEFAULT_GROUP );
 					
 					// --------------------------------------------------------------------------
 					

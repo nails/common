@@ -156,24 +156,34 @@
 				
 				// --------------------------------------------------------------------------
 				
+				//	This is technically not needed for the default group, but left here by
+				//	way of an example
+				
+				$_token				= array();
+				$_token['nonce']	= time();
+				$_token['ip']		= $this->input->ip_address();
+				$_token['group']	= APP_DEFAULT_GROUP;
+				
+				$_token = urlencode( $this->encrypt->encode( serialize($_token) . '|' . $_token['ip'] . '|' . $_token['nonce'], APP_PRIVATE_KEY ) );
+				
 				//	FACEBOOK
 				if ( module_is_enabled( 'auth[facebook]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
 				
 				endif;
 				
 				//	TWITTER
 				if ( module_is_enabled( 'auth[twitter]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
 				
 				endif;
 				
 				//	LINKEDIN
 				if ( module_is_enabled( 'auth[linkedin]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
 				
 				endif;
 				

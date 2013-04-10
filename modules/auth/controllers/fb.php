@@ -21,6 +21,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 {
 	protected $_return_to;
 	protected $_return_to_fail;
+	protected $_register_token;
 	
 	
 	// --------------------------------------------------------------------------
@@ -88,6 +89,11 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			endif;
 			
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Default register token is empty
+		$this->_register_token = array();
 	}
 	
 	
@@ -136,6 +142,15 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			$this->_connect_fail();
 			return;
 			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->get( 'token' ) ) :
+		
+			//	Drop a cookie
+			$this->input->set_cookie( 'fbRegisterToken', $this->input->get( 'token' ), 900 );
+		
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -216,6 +231,48 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			return;
 		
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Test for a register token, if there verify and store it in memory then delete
+		
+		$this->_register_token = get_cookie( 'fbRegisterToken' );
+		
+		if ( $this->_register_token ) :
+		
+			$this->_register_token = $this->encrypt->decode( $this->_register_token, APP_PRIVATE_KEY );
+			
+			if ( $this->_register_token ) :
+			
+				$this->_register_token = unserialize( $this->_register_token );
+				
+				if ( $this->_register_token ) :
+				
+					if ( ! isset( $this->_register_token['ip'] ) || $this->_register_token['ip'] != $this->input->ip_address() ) :
+					
+						$this->_register_token = array();
+					
+					endif;
+					
+				else :
+				
+					$this->_register_token = array();
+				
+				endif;
+			
+			else :
+			
+				$this->_register_token = array();
+			
+			endif;
+		
+		else :
+		
+			$this->_register_token = array();
+			
+		endif;
+		
+		delete_cookie( 'fbRegisterToken' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -466,8 +523,20 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Create new user, group 2, standard member
-		$_group_id = 2;
+		//	Which group?
+		//	If there's a register_token set, use that if not fall back to the default
+		
+		if ( isset( $this->_register_token['group'] ) && $this->_register_token['group'] ) :
+		
+			$_group_id = $this->_register_token['group'];
+		
+		else :
+		
+			$_group_id = APP_DEFAULT_GROUP;
+		
+		endif;
+		
+		//	Create new user
 		$_uid = $this->user->create( $email, $password, $_group_id, $_data );
 		
 		if ( $_uid ) :

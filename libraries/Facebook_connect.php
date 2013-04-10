@@ -170,6 +170,7 @@ class Facebook_Connect {
 	{
 		//	TODO Use the supplied user_id rather than the active_user
 		//	Attempt to revoke permissions on Facebook
+		
 		$this->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
 		
 		// --------------------------------------------------------------------------

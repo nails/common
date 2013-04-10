@@ -146,7 +146,7 @@
 	$lang['auth_forgot_email_fail']						= '<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
 	$lang['auth_forgot_code_not_set']					= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
 	$lang['auth_forgot_expired_code']					= '<strong>Sorry,</strong> the reset token you are using has expired. You will need to resubmit a password reset request.';
-	$lang['auth_forgot_invalid_code']					= 'Invalid or expired password reset token.';
+	$lang['auth_forgot_invalid_code']					= '<strong>Sorry,</strong> Invalid or expired password reset token.';
 	$lang['auth_forgot_reminder']						= '<strong>In case you forgot,</strong> your temporary password is <strong>%s</strong>. You won\'t be shown this message again.';
 	$lang['auth_forgot_reset_ok']						= 'Please log in using this temporary password: <strong>%s</strong>';
 	$lang['auth_forgot_action_proceed']					= 'Proceed to Log In';
