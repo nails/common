@@ -87,7 +87,7 @@ class Linkedin_connect {
 		// --------------------------------------------------------------------------
 		
 		//	Save the response into the session for picking up later (i.e when we get our access token)
-		$this->ci->session->set_userdata( 'linkedin-oauth', $_response );
+		$this->ci->session->set_userdata( 'li_request_token', $_response );
 		
 		// --------------------------------------------------------------------------
 		
@@ -107,21 +107,21 @@ class Linkedin_connect {
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	public function get_access_token()
+	public function get_access_token( $verifier )
 	{
 		$_request_url	= $this->settings['api_endpoint'] . 'uas/oauth/accessToken';
 		
 		// --------------------------------------------------------------------------
 		
 		//	Fetch our previously saved request tokens and set as the oAuth token to use
-		$_token			= $this->ci->session->userdata( 'linkedin-oauth' );
+		$_token			= $this->ci->session->userdata( 'li_request_token' );
 		
 		$this->oauth->setToken( $_token['oauth_token'], $_token['oauth_token_secret'] );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Fetch the access token
-		$_response		= $this->oauth->getAccessToken( $_request_url, NULL, $this->ci->input->get( 'oauth_verifier' ) );
+		$_response		= $this->oauth->getAccessToken( $_request_url, NULL, $verifier );
 		
 		// --------------------------------------------------------------------------
 		
@@ -147,7 +147,7 @@ class Linkedin_connect {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function set_token( $token, $token_secret )
+	public function set_access_token( $token, $token_secret )
 	{
 		$this->access->token	= $token;
 		$this->access->secret	= $token_secret;

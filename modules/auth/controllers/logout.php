@@ -42,6 +42,8 @@ class NAILS_Logout extends NAILS_Auth_Controller
 		//	We're about to destroy the session so they'll go bye-bye unless we do
 		//	something with 'em.
 		
+		$_flash				= array();
+		$_flash['name']		= active_user( 'first_name' );
 		$_flash['success']	= $this->session->flashdata( 'success' );
 		$_flash['error']	= $this->session->flashdata( 'error' );
 		$_flash['notice']	= $this->session->flashdata( 'notice' );
@@ -91,7 +93,7 @@ class NAILS_Logout extends NAILS_Auth_Controller
 		
 		else :
 		
-			$this->session->set_flashdata( 'success', lang( 'auth_logout_successful' ) );
+			$this->session->set_flashdata( 'success', lang( 'auth_logout_successful', $_get['name'] ) );
 		
 		endif;
 		

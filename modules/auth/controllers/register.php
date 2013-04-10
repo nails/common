@@ -115,6 +115,12 @@ class NAILS_Register extends NAILS_Auth_Controller
 				
 				if ( $_uid ) :
 				
+					//	Fetch user and group data
+					$_user	= $this->user->get_user( $_uid['id'] );
+					$_group	= $this->user->get_group( APP_DEFAULT_GROUP );
+					
+					// --------------------------------------------------------------------------
+					
 					//	Some nice data...
 					$this->data['email']	= $email;
 					$this->data['user_id']	= $_uid['id'];
@@ -129,8 +135,8 @@ class NAILS_Register extends NAILS_Auth_Controller
 					$_email->type					= 'verify_email_' . APP_DEFAULT_GROUP;
 					$_email->to_id					= $_uid['id'];
 					$_email->data					= array();
-					$_email->data['user']			= $this->user->get_user( $_uid['id'] );
-					$_email->data['group']			= $this->user->get_group( APP_DEFAULT_GROUP )->display_name;
+					$_email->data['user']			= $_user;
+					$_email->data['group']			= $_group->display_name;
 					
 					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 					
@@ -160,9 +166,11 @@ class NAILS_Register extends NAILS_Auth_Controller
 					//	Redirect to the group homepage
 					//	TODO There should be the option to enable/disable forced activation
 					
-					$_user = $this->user->get_user( $_uid['id'] );
 					$this->session->set_flashdata( 'success', lang( 'auth_register_flashdata_welcome', $_user->first_name ) );
-					redirect( $_user->group_homepage );
+					
+					$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
+					
+					redirect( $_redirect );
 					return;
 				
 				endif;

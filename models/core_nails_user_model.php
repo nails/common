@@ -888,7 +888,7 @@ class CORE_NAILS_User_Model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_linkedinid( $linkedinid, $extended = FALSE )
+	public function get_user_by_liid( $linkedinid, $extended = FALSE )
 	{
 		$this->db->where( 'u.li_id', $linkedinid );
 		$user = $this->get_users( $extended );

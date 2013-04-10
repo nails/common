@@ -76,7 +76,7 @@
 	
 	
 	//	Logout lang strings
-	$lang['auth_logout_successful']						= '<strong>Goodbye!</strong> You have been logged out successfully.';
+	$lang['auth_logout_successful']						= '<strong>Goodbye, %s!</strong> You have been logged out successfully.';
 	
 	
 	// --------------------------------------------------------------------------

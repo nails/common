@@ -54,6 +54,9 @@
 	$lang['utilities_edit_group_basic_field_placeholder_description']	= 'Type the group\'s description here.';
 	$lang['utilities_edit_group_basic_field_label_homepage']			= 'Default Homepage';
 	$lang['utilities_edit_group_basic_field_placeholder_homepage']		= 'Type the group\'s homepage here.';
+	$lang['utilities_edit_group_basic_field_label_registration']		= 'Registration Redirect';
+	$lang['utilities_edit_group_basic_field_placeholder_registration']	= 'Redirect new registrants of this group here.';
+	$lang['utilities_edit_group_basic_field_tip_registration']			= 'If not defined new registrants will be redirected to the group\'s homepage.';
 
 	$lang['utilities_edit_group_permission_legend']						= 'Permissions';
 	$lang['utilities_edit_group_permission_warn']						= '<strong>Please note:</strong> Superusers have full, unrestricted access to admin, regardless of what extra permissions are set.';
