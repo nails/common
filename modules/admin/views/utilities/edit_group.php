@@ -41,7 +41,7 @@
 				
 				// --------------------------------------------------------------------------
 				
-				//	Name
+				//	Description
 				$_field					= array();
 				$_field['key']			= 'description';
 				$_field['type']			= 'textarea';
@@ -54,7 +54,7 @@
 				
 				// --------------------------------------------------------------------------
 				
-				//	Name
+				//	Default Homepage
 				$_field					= array();
 				$_field['key']			= 'default_homepage';
 				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_homepage' );
@@ -63,6 +63,18 @@
 				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_homepage' );
 				
 				echo form_field( $_field );
+				
+				// --------------------------------------------------------------------------
+				
+				//	Registration Redirect
+				$_field					= array();
+				$_field['key']			= 'registration_redirect';
+				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_registration' );
+				$_field['default']		= $group->registration_redirect;
+				$_field['required']		= FALSE;
+				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_registration' );
+				
+				echo form_field( $_field, lang( 'utilities_edit_group_basic_field_tip_registration' ) );
 			
 			?>
 			

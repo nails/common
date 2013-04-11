@@ -541,6 +541,12 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		
 		if ( $_uid ) :
 		
+			//	Fetch user and group data
+			$_user	= $this->user->get_user( $_uid['id'] );
+			$_group	= $this->user->get_group( $_group_id );
+			
+			// --------------------------------------------------------------------------
+			
 			//	Some nice data...
 			$this->data['email']	= $email;
 			$this->data['user_id']	= $_uid['id'];
@@ -555,8 +561,8 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			$_email->type					= 'verify_email_' . $_group_id;
 			$_email->to_id					= $_uid['id'];
 			$_email->data					= array();
-			$_email->data['user']			= $this->user->get_user( $_uid['id'] );
-			$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
+			$_email->data['user']			= $_user;
+			$_email->data['group']			= $_group->display_name;
 			
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 			
@@ -584,9 +590,13 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Redirect
-			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_data['first_name'] ) );
+			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
 			$this->session->set_flashdata( 'from_facebook', TRUE );
-			$this->_redirect( $this->_return_to );
+			
+			//	Registrations will be forced to the registration redirect, regardless of what else has been set
+			$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
+			
+			$this->_redirect( $_redirect );
 			return;
 		
 		endif;

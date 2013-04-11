@@ -161,7 +161,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( ! $this->session->userdata( 'tw_access_token' ) ) :
 		
 			$_request_token = $this->session->userdata( 'tw_request_token' );
-			//$this->session->unset_userdata( 'tw_request_token' );
+			$this->session->unset_userdata( 'tw_request_token' );
 			
 			if ( $_request_token ) :
 			
@@ -360,7 +360,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 	 **/
 	protected function _link_user( $access_token )
 	{
-		//	Set Facebook details
+		//	Set Twitter details
 		$_data				= array();
 		$_data['tw_id']		= $access_token->user_id;
 		$_data['tw_token']	= $access_token->oauth_token;
@@ -570,6 +570,12 @@ class NAILS_Tw extends NAILS_Auth_Controller
 				
 				if ( $_uid ) :
 				
+					//	Fetch user and group data
+					$_user	= $this->user->get_user( $_uid['id'] );
+					$_group	= $this->user->get_group( $_group_id );
+					
+					// --------------------------------------------------------------------------
+					
 					//	Some nice data...
 					$this->data['email']	= $email;
 					$this->data['user_id']	= $_uid['id'];
@@ -584,8 +590,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					$_email->type					= 'verify_email_' . $_group_id;
 					$_email->to_id					= $_uid['id'];
 					$_email->data					= array();
-					$_email->data['user']			= $this->user->get_user( $_uid['id'] );
-					$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
+					$_email->data['user']			= $_user;
+					$_email->data['group']			= $_group->display_name;
 					
 					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 					
@@ -608,7 +614,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Create an event for this event
-					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'facebook' ) );
+					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'twitter' ) );
 					
 					// --------------------------------------------------------------------------
 					
@@ -618,9 +624,13 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Redirect
-					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_data['first_name'] ) );
+					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
 					$this->session->set_flashdata( 'from_twitter', TRUE );
-					$this->_redirect( $this->_return_to );
+					
+					//	Registrations will be forced to the registration redirect, regardless of what else has been set
+					$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
+					
+					$this->_redirect( $_redirect );
 					return;
 				
 				endif;

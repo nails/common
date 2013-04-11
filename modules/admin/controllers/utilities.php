@@ -175,14 +175,15 @@ class NAILS_Utilities extends Admin_Controller {
 			$this->load->library( 'form_validation' );
 			
 			//	Define rules
-			$this->form_validation->set_rules( 'display_name',		lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'name',				lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
-			$this->form_validation->set_rules( 'description',		lang( 'utilities_edit_group_basic_field_label_description' ),	'xss_clean|required' );
-			$this->form_validation->set_rules( 'default_homepage',	lang( 'utilities_edit_group_basic_field_label_homepage' ), 		'xss_clean|required' );
-			$this->form_validation->set_rules( 'acl[]',				lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[superuser]',	lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin][]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'display_name',			lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'name',					lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',			lang( 'utilities_edit_group_basic_field_label_description' ),	'xss_clean|required' );
+			$this->form_validation->set_rules( 'default_homepage',		lang( 'utilities_edit_group_basic_field_label_homepage' ), 		'xss_clean|required' );
+			$this->form_validation->set_rules( 'registration_redirect',	lang( 'utilities_edit_group_basic_field_label_registration' ), 	'xss_clean' );
+			$this->form_validation->set_rules( 'acl[]',					lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[superuser]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin][]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
 			
 			//	Set messages
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
@@ -190,10 +191,11 @@ class NAILS_Utilities extends Admin_Controller {
 			if ( $this->form_validation->run() ) :
 			
 				$_data = array();
-				$_data['display_name']		= $this->input->post( 'display_name' );
-				$_data['name']				= url_title( $this->input->post( 'name' ), 'dash', TRUE );
-				$_data['description']		= $this->input->post( 'description' );
-				$_data['default_homepage']	= $this->input->post( 'default_homepage' );
+				$_data['display_name']			= $this->input->post( 'display_name' );
+				$_data['name']					= url_title( $this->input->post( 'name' ), 'dash', TRUE );
+				$_data['description']			= $this->input->post( 'description' );
+				$_data['default_homepage']		= $this->input->post( 'default_homepage' );
+				$_data['registration_redirect']	= $this->input->post( 'registration_redirect' );
 				
 				//	Parse ACL's
 				$_acl = $this->input->post( 'acl' );
