@@ -245,7 +245,7 @@ if ( ! function_exists( 'user_timezone' ) )
  */
 if ( ! function_exists( 'dropdown_years' ) )
 {
-	function dropdown_years( $field_name, $start_year = NULL, $end_year = NULL, $selected = NULL )
+	function dropdown_years( $field_name, $start_year = NULL, $end_year = NULL, $selected = NULL, $placeholder = NULL )
 	{
 		/*** defaults ***/
 		$start_year = ( is_null( $start_year ) )	? date( 'Y' )		: $start_year;
@@ -262,7 +262,7 @@ if ( ! function_exists( 'dropdown_years' ) )
 		
 		$select .= "<option value=\"0000\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
-		$select .= ">-</option>\n";
+		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
 		
 		foreach( $r as $year ) :
 		
@@ -293,7 +293,7 @@ if ( ! function_exists( 'dropdown_years' ) )
  */
 if ( ! function_exists( 'dropdown_months' ) )
 {
-	function dropdown_months( $field_name, $short = FALSE, $selected = NULL )
+	function dropdown_months( $field_name, $short = FALSE, $selected = NULL, $placeholder = NULL )
 	{
 		/*** array of months ***/
 		$months_short = array(	1	=>	'Jan',
@@ -331,7 +331,7 @@ if ( ! function_exists( 'dropdown_months' ) )
 		
 		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
-		$select .= ">-</option>\n";
+		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
 		
 		foreach( $months as $key => $mon ) :
 		
@@ -362,7 +362,7 @@ if ( ! function_exists( 'dropdown_months' ) )
  */
 if ( ! function_exists( 'dropdown_days' ) )
 {
-	function dropdown_days( $field_name, $selected = NULL )
+	function dropdown_days( $field_name, $selected = NULL, $placeholder = NULL )
 	{
 		/*** range of days ***/
 		$r = range( 1, 31 );
@@ -374,7 +374,7 @@ if ( ! function_exists( 'dropdown_days' ) )
 		
 		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
-		$select .= ">-</option>\n";
+		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
 		
 		foreach ( $r as $day ) :
 		
