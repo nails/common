@@ -10,6 +10,15 @@
 
 class NAILS_API_Controller extends NAILS_Controller
 {
+	/**
+	 *	Execute common functionality
+	 *	
+	 *	@access	public
+	 *	@param	none
+	 *	@return void
+	 *	@author Pablo
+	 *	
+	 **/
 	public function __construct()
 	{
 		parent::__construct();
@@ -34,15 +43,15 @@ class NAILS_API_Controller extends NAILS_Controller
 	
 	
 	/**
-	*	Take the input and spit it out as JSON
-	*	
-	*	@access	public
-	*	@param	none
-	*	@return void
-	*	@author Pablo
-	*	
-	**/
-	protected function _out( $out = array() )
+	 *	Take the input and spit it out as JSON
+	 *	
+	 *	@access	public
+	 *	@param	none
+	 *	@return void
+	 *	@author Pablo
+	 *	
+	 **/
+	protected function _out( $out = array(), $format = 'JSON' )
 	{
 		//	Set JSON headers
 		$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -82,7 +91,16 @@ class NAILS_API_Controller extends NAILS_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	function _remap( $method )
+	/**
+	 *	Take the input and spit it out as JSON
+	 *	
+	 *	@access	public
+	 *	@param	none
+	 *	@return void
+	 *	@author Pablo
+	 *	
+	 **/
+	public function _remap( $method )
 	{
 		if ( method_exists( $this, $method ) ) :
 		
@@ -90,12 +108,31 @@ class NAILS_API_Controller extends NAILS_Controller
 		
 		else :
 		
-			$this->_out( array(
-				'status'	=> 400,
-				'error'		=> lang( 'not_valid_method', $method )
-			) );
+			$this->_method_not_found( $method );
 		
 		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 *	Output JSON for when a method is not found (or enabled)
+	 *	
+	 *	@access	public
+	 *	@param	none
+	 *	@return void
+	 *	@author Pablo
+	 *	
+	 **/
+	protected function _method_not_found( $method )
+	{
+		 $this->_out( array( 'status' => 400, 'error' => lang( 'not_valid_method', $method ) ) );
+		 
+		 //	Careful now, this might break in future updates of CI
+		 echo $this->output->_display();
+		 exit(0);
 	}
 }
 

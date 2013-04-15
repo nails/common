@@ -14,6 +14,16 @@ class Admin_installer
 		//	Nothing to install
 		return TRUE;
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function dependencies( $modules )
+	{
+		//	No dependencies
+		return TRUE;
+	}
 }
 
 /* End of file _installer.php */

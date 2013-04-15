@@ -14,6 +14,15 @@ require NAILS_PATH . 'MX/Loader.php';
 
 class CORE_NAILS_Loader extends MX_Loader {
 
+	
+	public function model_is_loaded($model)
+	{
+		return array_search( $model, $this->_ci_models ) !== FALSE;
+	}
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 *	Overloading this method so that if a view is supplied with the prefix of '/' then we
 	 *	load that view directly rather than try and do anythign clever with the path

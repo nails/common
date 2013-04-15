@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Name:		CRON Installer
+ * Name:		Shop Installer
  *
- * Description:	This file contains the installer for the Nails CRON module
+ * Description:	This file contains the installer for the Nails Shop module
  * 
  */
 
-class Cron_installer
+class Shop_installer
 {
 	public function run( $config )
 	{
@@ -27,4 +27,4 @@ class Cron_installer
 }
 
 /* End of file _installer.php */
-/* Location: ./modules/cron/_installer.php */
+/* Location: ./modules/shop/_installer.php */

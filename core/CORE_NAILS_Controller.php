@@ -22,17 +22,38 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load the Nails. generic lang file
-		$this->lang->load( 'nails' );
-		
-		// --------------------------------------------------------------------------
-		
 		//	Do we need to instanciate the database?
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 		
 			$this->load->database();
 		
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Check App's default language is supported
+		
+		//	Load the language model and set the defaults
+		$this->load->model( 'core_nails_language_model', 'language_model' );
+		
+		//	Check default lang is supported by nails
+		$_supported		= array();
+		$_supported[]	= 'english';
+		
+		if ( array_search( APP_DEFAULT_LANG_SAFE, $_supported ) === FALSE ) :
+		
+	 		header( 'HTTP/1.1 500 Bad Request' );
+			die( 'ERROR: Default language ' . APP_DEFAULT_LANG_SAFE . ' is not a supported langauge.' );
+		
+		endif;
+		
+		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
+		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the Nails. generic lang file
+		$this->lang->load( 'nails' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -132,13 +153,13 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		if ( isset( $_user_pref->safe_name ) && $_user_pref->safe_name ) :
 		
-			define( 'RENDER_LANG', $_user_pref->safe_name );
-			define( 'RENDER_LANG_ID', $_user_pref->id );
+			define( 'RENDER_LANG',		$_user_pref->safe_name );
+			define( 'RENDER_LANG_ID',	$_user_pref->id );
 		
 		else :
 		
-			define( 'RENDER_LANG', $this->config->item( 'language' ) );
-			define( 'RENDER_LANG_ID', NULL );
+			define( 'RENDER_LANG',		APP_DEFAULT_LANG_SAFE );
+			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
 		
 		endif;
 		
@@ -158,7 +179,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->data['title']		= $this->config->item( 'title' );
 		$this->data['description']	= $this->config->item( 'description' );
 		$this->data['keywords']		= $this->config->item( 'keywords' );
-		
 		
 		// --------------------------------------------------------------------------
 		

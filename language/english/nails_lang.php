@@ -24,6 +24,7 @@
 
 	//	Verbs / common actions
 	$lang['action_save']			= 'Save';
+	$lang['action_create']			= 'Create';
 	$lang['action_edit']			= 'Edit';
 	$lang['action_save_changes']	= 'Save Changes';
 	$lang['action_update']			= 'Update';

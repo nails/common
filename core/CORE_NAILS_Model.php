@@ -62,5 +62,5 @@ class CORE_NAILS_Model extends CI_Model {
 	}
 }
 
-/* End of file NAILS_Model.php */
-/* Location: ./system/application/core/NAILS_Model.php */
+/* End of file CORE_NAILS_Model.php */
+/* Location: ./core/CORE_NAILS_Model.php */
