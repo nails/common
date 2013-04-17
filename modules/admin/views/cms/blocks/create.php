@@ -73,6 +73,7 @@
 		//	Title
 		$_field					= array();
 		$_field['key']			= 'value';
+		$_field['type']			= 'textarea';
 		$_field['label']		= 'Value';
 		$_field['default']		= '';
 		$_field['required']		= TRUE;

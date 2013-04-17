@@ -33,9 +33,9 @@ class Cms_block_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		$this->db->set( 'slug', $slug );
-		$this->db->set( 'title', $slug );
-		$this->db->set( 'description', $slug );
-		$this->db->set( 'located', $slug );
+		$this->db->set( 'title', $title );
+		$this->db->set( 'description', $description );
+		$this->db->set( 'located', $located );
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		
@@ -53,8 +53,8 @@ class Cms_block_model extends NAILS_Model
 			$_id = $this->db->insert_id();
 			
 			$this->db->set( 'block_id', $_id );
-			$this->db->set( 'lang_id', $this->language->get_default_id() );
-			$this->db->set( 'value', $value );
+			$this->db->set( 'lang_id', $this->language_model->get_default_id() );
+			$this->db->set( 'value', $default_value );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
 			
@@ -65,11 +65,13 @@ class Cms_block_model extends NAILS_Model
 				
 			endif;
 			
+			$this->db->insert( 'cms_block_translation' );
+			
 			if ( $this->db->affected_rows() ) :
 			
 				if ( $return_object ) :
 				
-					$this->get_by_id( $_id );
+					return $this->get_by_id( $_id );
 				
 				else :
 				
