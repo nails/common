@@ -89,7 +89,13 @@ if ( ! function_exists( 'get_loaded_modules' ) )
 		$_app_modules	= explode( ',', APP_NAILS_MODULES );
 		$_app_modules	= array_unique( $_app_modules );
 		$_app_modules	= array_filter( $_app_modules );
-		$_app_modules	= array_combine( $_app_modules, $_app_modules );
+		
+		//	Prevent errors from being thrown if there are no elements
+		if ( $_app_modules ) :
+		
+			$_app_modules	= array_combine( $_app_modules, $_app_modules );
+			
+		endif;
 		
 		$_nails_modules = array();
 		foreach ( $_app_modules AS $module ) :

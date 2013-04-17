@@ -25,7 +25,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Do we need to instanciate the database?
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 		
+			define( 'NAILS_DB_ENABLED', TRUE );
 			$this->load->database();
+		
+		else :
+		
+			define( 'NAILS_DB_ENABLED', FALSE );
 		
 		endif;
 		

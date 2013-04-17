@@ -16,6 +16,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_all()
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return array();
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->db->select( 'l.id,l.name,l.safe_name,l.priority,l.supported' );
 		$this->db->order_by( 'l.supported', 'DESC' );
 		$this->db->order_by( 'l.name' );
@@ -28,6 +36,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_all_supported()
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return array();
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->db->where( 'l.supported', TRUE );
 		return $this->get_all();
 	}
@@ -78,6 +94,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_by_id( $id )
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->db->where( 'l.id', $id );
 		$_result = $this->get_all();
 		
@@ -97,6 +121,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_by_safename( $safename )
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->db->where( 'l.safe_name', $safename );
 		$_result = $this->get_all();
 		
@@ -116,6 +148,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_default_id()
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return NULL;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		if ( $this->_default_lang )
 			return $this->_default_lang->id;
 		
@@ -131,7 +171,7 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 			
 		else :
 		
-			NULL;
+			return NULL;
 			
 		endif;
 	}
@@ -142,6 +182,14 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 	
 	public function get_default_name()
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return NULL;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		if ( $this->_default_lang )
 			return $this->_default_lang->name;
 		
@@ -157,7 +205,7 @@ class CORE_NAILS_Language_Model extends NAILS_Model
 			
 		else :
 		
-			NULL;
+			return NULL;
 			
 		endif;
 	}
