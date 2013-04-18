@@ -7,7 +7,9 @@
  * 
  */
 
-class Email_installer
+require_once( dirname(__FILE__) . '/../_installer.php' );
+
+class Email_installer extends Module_installer
 {
 	public function run( $config )
 	{
@@ -19,10 +21,19 @@ class Email_installer
 	// --------------------------------------------------------------------------
 	
 	
-	public function dependencies( $modules )
+	public function dependencies( &$modules )
 	{
 		//	No dependencies
-		return TRUE;
+		return 'OK';
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function fail_reason()
+	{
+		return FALSE;
 	}
 }
 

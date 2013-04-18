@@ -7,7 +7,9 @@
  * 
  */
 
-class Admin_installer
+require_once( dirname(__FILE__) . '/../_installer.php' );
+
+class Admin_installer extends Module_installer
 {
 	public function run( $config )
 	{
@@ -19,10 +21,28 @@ class Admin_installer
 	// --------------------------------------------------------------------------
 	
 	
-	public function dependencies( $modules )
+	public function dependencies( &$modules )
 	{
-		//	No dependencies
-		return TRUE;
+		//	Admin is dependent on auth being available.
+		if ( $this->has_module( 'auth', $modules ) ) :
+		
+			return 'OK';
+		
+		else :
+		
+			$modules[] = 'auth';
+			return array( 'auth' );
+			
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function fail_reason()
+	{
+		return FALSE;
 	}
 }
 
