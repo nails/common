@@ -144,7 +144,7 @@ function string_to_boolean( $string )
 {
 	if ( $string && strtoupper( $string ) !== "FALSE") :
 	
-		return true;
+		return TRUE;
 	
 	else:
 	

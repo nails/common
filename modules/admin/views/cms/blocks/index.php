@@ -35,14 +35,17 @@
 					
 					echo '<td class="title">';
 					echo $block->title;
-					echo '<small>Description: ' . $block->description . '<br />';
-					echo 'Located: ' . $block->located . '</small>';
+					echo '<small>';
+					echo 'Description: ' . $block->description . '<br />';
+					echo 'Located: ' . $block->located . '<br />';
+					echo 'Type: ' . $block_types[$block->type] . '<br />';
+					echo '</small>';
 					echo '</td>';
 					
 					// --------------------------------------------------------------------------
 					
 					echo '<td class="default">';
-					echo character_limiter( $block->default_value, 100 );
+					echo character_limiter( strip_tags( $block->default_value ), 100 );
 					echo '</td>';
 					
 					// --------------------------------------------------------------------------

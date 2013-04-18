@@ -10,6 +10,9 @@
 		<p>
 			<strong>Located:</strong> <?=$block->located?>
 		</p>
+		<p>
+			<strong>Located:</strong> <?=$block_types[$block->type]?>
+		</p>
 	</div>
 	
 	<?=form_open()?>
@@ -28,24 +31,56 @@
 			<div class="system-alert error no-close">
 				<strong>Oops!</strong> Please ensure a value is set.
 			</div>
-			<div class="textarea">
-				<textarea name="translation[0][value]"><?=$block->default_value?></textarea>
-			</div>
-			<?php if ( $block->default_value_revisions ) : ?>
-			<ul class="revisions">
-				<li class="summary">
-					<?=count( $block->default_value_revisions )?> Revisions
-					<a href="#" class="toggle-revisions right">Show/Hide</a>
-				</li>
-				<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
-					<li class="revision">
-						<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
-							<?=$revision->value?>
-						</span>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-			<?php endif; ?>
+			<?php
+			
+				//	Render the correct display
+				switch ( $block->type ) :
+				
+					case 'plaintext' :
+					
+						echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
+					
+					break;
+					
+					// --------------------------------------------------------------------------
+					
+					case 'richtext' :
+					
+						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="ckeditor"' );
+						
+						echo '<p class="system-alert notice no-close">';
+						echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
+						echo 'due to application stylesheets on the front end which are not loaded here.';
+						echo '</p>';
+					
+					break;
+				
+				endswitch;
+				
+				// --------------------------------------------------------------------------
+				
+				//	Revisions
+				if ( $block->default_value_revisions ) :
+				
+					?>
+					<ul class="revisions">
+						<li class="summary">
+							<?=count( $block->default_value_revisions )?> Revisions
+							<a href="#" class="toggle-revisions right">Show/Hide</a>
+						</li>
+						<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
+							<li class="revision">
+								<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
+									<?=$revision->value?>
+								</span>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+					<?php
+				
+				endif;
+			
+			?>
 		</fieldset>
 		
 		<!--	OTHER LANGUAGES	-->
@@ -116,9 +151,11 @@
 	<div class="system-alert error no-close">
 		<strong>Oops!</strong> Please ensure a language and value is set.
 	</div>
-	<div class="textarea">
-		<textarea name="new_translation[{{new_count}}][value]"></textarea>
-	</div>
+	<textarea name="new_translation[{{new_count}}][value]" id="translation_{{new_count}}"></textarea>
+	<p class="system-alert notice no-close">
+		<strong>Note:</strong> The editor's display might not be a true representation of the final layout
+		due to application stylesheets on the front end which are not loaded here.
+	</p>
 </script>
 
 <script style="text/javascript">
@@ -127,8 +164,7 @@
 	$(function(){
 	
 		var CMS_Blocks = new NAILS_Admin_CMS_Blocks;
-		CMS_Blocks.init_edit();
-		
+		CMS_Blocks.init_edit( '<?=$block->type?>' );
 	
 	});
 

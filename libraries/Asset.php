@@ -95,6 +95,32 @@ class Asset {
 	
 	
 	/**
+	 * Load a library (collection of assets)
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function library( $library )
+	{
+		switch( $library ) :
+		
+			case 'ckeditor' :
+			
+				//	Load assets for CKEditor
+				$this->load( 'libraries/ckeditor/ckeditor.js', TRUE );
+			
+			break;
+		
+		endswitch;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Load a nails asset
 	 *
 	 * @access	private

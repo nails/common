@@ -49,7 +49,13 @@ class Cms extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load helpers
 		$this->load->helper( 'cms' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the CKEditor librar
+		$this->asset->library( 'ckeditor' );
 	}
 	
 	
@@ -153,6 +159,17 @@ class Cms extends Admin_Controller {
 		$this->load->model( 'cms_block_model', 'cms_block' );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.blocks.min.js', TRUE );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define block types; block types allow for proper validation
+		$this->data['block_types']				= array();
+		$this->data['block_types']['plaintext']	= 'Plain Text';
+		$this->data['block_types']['richtext']	= 'Rich Text';
+		//$this->data['block_types']['image']		= 'Image (*.jpg, *.png, *.gif)';
+		//$this->data['block_types']['file']		= 'File (*.*)';
+		//$this->data['block_types']['number']	= 'Number';
+		//$this->data['block_types']['url']		= 'URL';
 		
 		// --------------------------------------------------------------------------
 		
@@ -278,23 +295,26 @@ class Cms extends Admin_Controller {
 			//	Form Validation
 			$this->load->library( 'form_validation' );
 			
-			$this->form_validation->set_rules( 'slug',			'Slug',			'xss_clean|required|callback__fvcallback_slug' );
+			$this->form_validation->set_rules( 'slug',			'Slug',			'xss_clean|required|callback__fvcallback_block_slug' );
 			$this->form_validation->set_rules( 'title',			'Title',		'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',	'Description',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'located',		'Located',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'type',			'Block Type',	'xss_clean|required|callback__fvcallback_block_type' );
 			$this->form_validation->set_rules( 'value',			'Value',		'xss_clean|required' );
 			
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'string_to_boolean',	lang( 'fv_required' ) );
 			
 			if ( $this->form_validation->run( $this ) ) :
 			
+				$_type	= $this->input->post( 'type' );
 				$_slug	= $this->input->post( 'slug' );
 				$_title	= $this->input->post( 'title' );
 				$_desc	= $this->input->post( 'description' );
 				$_loc	= $this->input->post( 'located' );
 				$_val	= $this->input->post( 'value' );
 				
-				if ( $this->cms_block->create_block( $_slug, $_title, $_desc, $_loc, $_val ) ) :
+				if ( $this->cms_block->create_block( $_type, $_slug, $_title, $_desc, $_loc, $_val ) ) :
 				
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Block created successfully.' );
 					redirect( 'admin/cms/blocks' );
@@ -325,7 +345,7 @@ class Cms extends Admin_Controller {
 	// --------------------------------------------------------------------------
 	
 	
-	public function _fvcallback_slug( $slug )
+	public function _fvcallback_block_slug( $slug )
 	{
 		$slug = trim( $slug );
 		
@@ -341,14 +361,43 @@ class Cms extends Admin_Controller {
 			
 			else :
 			
-				$this->form_validation->set_message( '_fvcallback_slug', 'Must be unique' );
+				$this->form_validation->set_message( '_fvcallback_block_slug', 'Must be unique' );
 				return FALSE;
 			
 			endif;
 		
 		else :
 		
-			$this->form_validation->set_message( '_fvcallback_slug', 'Invalid characters' );
+			$this->form_validation->set_message( '_fvcallback_block_slug', 'Invalid characters' );
+			return FALSE;
+		
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function _fvcallback_block_type( $type )
+	{
+		$type = trim( $type );
+		
+		if ( $type ) :
+		
+			if ( isset( $this->data['block_types'][$type] ) ) :
+			
+				return TRUE;
+			
+			else :
+			
+				$this->form_validation->set_message( '_fvcallback_block_type', 'Block type not supported.' );
+				return FALSE;
+			
+			endif;
+		
+		else :
+		
+			$this->form_validation->set_message( '_fvcallback_block_type', lang( 'fv_required' ) );
 			return FALSE;
 		
 		endif;

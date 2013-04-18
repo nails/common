@@ -11,7 +11,7 @@
 		<legend>Block details</legend>
 		<?php
 		
-		//	Title
+		//	Slug
 		$_field					= array();
 		$_field['key']			= 'slug';
 		$_field['label']		= 'Slug';
@@ -35,7 +35,7 @@
 		
 		// --------------------------------------------------------------------------
 		
-		//	Title
+		//	Description
 		$_field					= array();
 		$_field['key']			= 'description';
 		$_field['label']		= 'Description';
@@ -47,7 +47,7 @@
 		
 		// --------------------------------------------------------------------------
 		
-		//	Title
+		//	Located
 		$_field					= array();
 		$_field['key']			= 'located';
 		$_field['label']		= 'Located';
@@ -59,29 +59,33 @@
 		
 		// --------------------------------------------------------------------------
 		
+		//	Block Type
+		$_field					= array();
+		$_field['key']			= 'type';
+		$_field['label']		= 'Block Type';
+		$_field['required']		= TRUE;
+		
+		echo form_field_dropdown( $_field, $block_types );
+		
 		?>
 	</fieldset>
 	
-	<p>
-		All blocks must have an <?=APP_DEFAULT_LANG_NAME?> value, define the initial <?=APP_DEFAULT_LANG_NAME?> value now.
-	</p>
-	
-	<fieldset>
+	<fieldset id="default-value">
 		<legend><?=APP_DEFAULT_LANG_NAME?> Value</legend>
+		<p class="system-alert message no-close">
+			<strong>Note:</strong> All blocks must have an <?=APP_DEFAULT_LANG_NAME?> value, define the
+			initial <?=APP_DEFAULT_LANG_NAME?> value now.
+		</p>
 		<?php
 		
-		//	Title
-		$_field					= array();
-		$_field['key']			= 'value';
-		$_field['type']			= 'textarea';
-		$_field['label']		= 'Value';
-		$_field['default']		= '';
-		$_field['required']		= TRUE;
-		$_field['placeholder']	= 'The initial ' . APP_DEFAULT_LANG_NAME . ' value';
-		
-		echo form_field( $_field );
+			//	Value
+			echo form_textarea( 'value', set_value( 'value' ), 'id="default_value"' );
 		
 		?>
+		<p id="ckeditor-warn" class="system-alert notice no-close" style="margin-top:10px;">
+			<strong>Note:</strong> The editor's display might not be a true representation of the final layout
+			due to application stylesheets on the front end which are not loaded here.
+		</p>
 	</fieldset>
 	
 	<p>
@@ -90,3 +94,16 @@
 	
 	<?=form_close()?>
 </div>
+
+<script style="text/javascript">
+<!--//
+
+	$(function(){
+	
+		var CMS_Blocks = new NAILS_Admin_CMS_Blocks;
+		CMS_Blocks.init_create();
+	
+	});
+
+//-->
+</script>

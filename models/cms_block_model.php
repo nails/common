@@ -13,6 +13,7 @@ class Cms_block_model extends NAILS_Model
 	 * Creates a new block object
 	 * 
 	 * @access public
+	 * @param string $type The type of content the bock is
 	 * @param string $slug The slug to use for the block
 	 * @param string $title The title of the block
 	 * @param string $description The description of the block (i.e what it should represent)
@@ -21,7 +22,7 @@ class Cms_block_model extends NAILS_Model
 	 * @param bool $return_object Whether or not to return just the ID of the newly created object (FALSE) or the entire object (TRUE)
 	 * @return mixed
 	 **/
-	public function create_block( $slug, $title, $description, $located, $default_value, $return_object = FALSE )
+	public function create_block( $type, $slug, $title, $description, $located, $default_value, $return_object = FALSE )
 	{
 		//	Test the slug
 		if ( $this->get_by_slug( $slug ) ) :
@@ -32,6 +33,7 @@ class Cms_block_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		$this->db->set( 'type', $type );
 		$this->db->set( 'slug', $slug );
 		$this->db->set( 'title', $title );
 		$this->db->set( 'description', $description );
@@ -332,7 +334,7 @@ class Cms_block_model extends NAILS_Model
 	 **/
 	public function get_all( $include_revisions = FALSE )
 	{
-		$this->db->select( 'cb.slug, cb.title, cb.description, cb.located, cbv.*, um.first_name, u.email, um.last_name, l.name lang_name, l.safe_name, um.gender, um.profile_img' );
+		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, um.first_name, u.email, um.last_name, l.name lang_name, l.safe_name, um.gender, um.profile_img' );
 		
 		$this->db->join( 'cms_block cb', 'cb.id = cbv.block_id' );
 		$this->db->join( 'user u', 'u.id = cbv.created_by', 'LEFT' );
@@ -351,6 +353,7 @@ class Cms_block_model extends NAILS_Model
 			
 				 $_out[$_blocks[$i]->block_id]				= new stdClass();
 				 $_out[$_blocks[$i]->block_id]->id			= $_blocks[$i]->block_id;
+				 $_out[$_blocks[$i]->block_id]->type		= $_blocks[$i]->type;
  				 $_out[$_blocks[$i]->block_id]->slug		= $_blocks[$i]->slug;
  				 $_out[$_blocks[$i]->block_id]->title		= $_blocks[$i]->title;
  				 $_out[$_blocks[$i]->block_id]->description	= $_blocks[$i]->description;
