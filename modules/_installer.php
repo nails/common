@@ -11,6 +11,7 @@ class Module_installer
 {
 	protected function has_module( $needle, $haystack )
 	{
+		//	TODO - Allow this to use CSV for the needle
 		foreach ( $haystack AS $module ) :
 		
 			if ( preg_match( '/^' . $needle . '(\[.*\])?$/', $module ) ) :

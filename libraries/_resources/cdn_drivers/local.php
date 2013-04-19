@@ -325,7 +325,11 @@ class Local_CDN {
 		//	If a certain filename has been specified then send that to the CDN (this
 		//	will overwrite any existing file so use with caution)
 		
-		if ( isset( $options['filename'] ) && $options['filename'] ) :
+		if ( isset( $options['filename'] ) && $options['filename'] == 'USE_ORIGINAL' ) :
+		
+			$_data['filename'] =  $_FILES[$file]['name'];
+			
+		elseif ( isset( $options['filename'] ) && $options['filename'] ) :
 		
 			$_data['filename'] = $options['filename'];
 			
@@ -606,6 +610,23 @@ class Local_CDN {
 	
 	
 	/**
+	 * Returns the scheme of 'serve' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_serve_url_scheme()
+	{
+		return site_url( 'cdn/serve/{{bucket}}/{{file}}' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Generates the correct URL for using the thumb utility
 	 *
 	 * @access	static
@@ -626,6 +647,23 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		return site_url( $_out );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Returns the scheme of 'thumb' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_thumb_url_scheme()
+	{
+		return site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}' );
 	}
 	
 	
@@ -660,6 +698,23 @@ class Local_CDN {
 	
 	
 	/**
+	 * Returns the scheme of 'scale' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_scale_url_scheme()
+	{
+		return site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Generates the correct URL for using the placeholder utility
 	 *
 	 * @access	static
@@ -684,6 +739,23 @@ class Local_CDN {
 	
 	
 	/**
+	 * Returns the scheme of 'placeholder' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_placeholder_url_scheme()
+	{
+		return site_url( 'cdn/placeholder/{{width}}/{{height}}/{{border}}' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Generates the correct URL for using the placeholder utility
 	 *
 	 * @access	static
@@ -701,6 +773,23 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		return site_url( $_out );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Returns the scheme of 'blank_avatar' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_blank_avatar_url_scheme()
+	{
+		return site_url( 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}' );
 	}
 
 	

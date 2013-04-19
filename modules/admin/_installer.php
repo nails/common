@@ -23,15 +23,18 @@ class Admin_installer extends Module_installer
 	
 	public function dependencies( &$modules )
 	{
-		//	Admin is dependent on auth being available.
-		if ( $this->has_module( 'auth', $modules ) ) :
+		//	Admin is dependent on auth and CDN being available.
+		if ( $this->has_module( 'auth', $modules ) && $this->has_module( 'cdn', $modules ) ) :
 		
 			return 'OK';
 		
 		else :
 		
-			$modules[] = 'auth';
-			return array( 'auth' );
+			$modules	= array();
+			$modules[]	= 'auth';
+			$modules[]	= 'cdn';
+			
+			return $modules;
 			
 		endif;
 	}

@@ -48,7 +48,7 @@
 									<?php
 									
 										echo form_open_multipart( 'cdn/manager/upload/' . $type );
-										echo form_hidden( 'upload', TRUE );
+										echo form_hidden( 'return', $_SERVER['REQUEST_URI'] );
 										echo form_submit( 'submit', 'Upload ' . $type_single, 'class="awesome green"' );
 										echo form_upload( 'userfile' );
 										echo form_close();
@@ -103,22 +103,81 @@
 										
 											foreach ( $files AS $file ) :
 											
+												$_bucket = active_user( 'id' ) . '-' . $type;
+												
+												// --------------------------------------------------------------------------
+												
 												echo '<li class="thumb">';
 												
+												echo '<div class="image">';
 												switch ( $type ) :
 												
 													case 'image' :
-													
-														echo img( cdn_scale( active_user( 'id' ) . '-' . $type, $file, 150, 175 ) );
-														echo '<div class="actions">';
-														echo '<a href="#" class="awesome green small insert">Insert</a>';
-														echo anchor( 'cdn/manager/delete/image/' . $file, 'Delete', 'class="awesome red small delete"' );
-														echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '" target="_blank" class="awesome small">View</a>';
-														echo '</div>';
 														
+														//	Thumbnail
+														echo img( cdn_scale( $_bucket, $file, 150, 175 ) );
+														
+														//	Actions
+														echo '<div class="actions">';
+														
+														echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+														echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
+														echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '" class="fancybox awesome small">View</a>';
+														
+														echo '</div>';
+																												
+													break;
+													
+													// --------------------------------------------------------------------------
+													
+													case 'file' :
+													
+														switch ( substr( $file, strrpos( $file, '.' ) ) ) :
+														
+															case '.jpg' :
+															case '.png' :
+															case '.gif' :
+															
+																//	It's an image, so thumbnail it
+																echo img( cdn_scale( $_bucket, $file, 150, 175 ) );
+																
+																//	Actions
+																echo '<div class="actions">';
+																
+																echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+																echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
+																echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '"class="fancybox awesome small">View</a>';
+																
+																echo '</div>';
+															
+															break;
+															
+															default :
+															
+																//	Generic file
+																echo img( array( 'src' => NAILS_URL . 'img/icons/document-icon-128px.png', 'style' => 'border:none;margin-top:20px;' ) );
+																
+																//	Actions
+																echo '<div class="actions">';
+																
+																echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+																echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
+																echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '" target="_blank" class="awesome small">Download</a>';
+																
+																echo '</div>';
+																
+															break;
+														
+														endswitch;
+													
 													break;
 												
 												endswitch;
+												echo '</div>';
+																								
+												//	Filename
+												echo '<p class="filename">' . $file . '</p>';
+												
 												echo '</li>';
 											
 											endforeach;
@@ -144,7 +203,16 @@
 						?>
 						<div class="disabled">
 							<h1>Sorry, the media manager is not available.</h1>
-							<p>Your account doesn't have permission to view the media manager at the moment.</p>
+							<p>You don't have permission to view the media manager at the moment.</p>
+							<?php
+							
+								if ( ! $user->is_logged_in() ) :
+								
+									echo '<p>' . anchor( 'auth/login?return_to=' . urlencode( 'cdn/manager/browse/' . $type ), lang( 'action_login' ), 'class="awesome"' ) . '</p>';
+								
+								endif;
+							
+							?>
 						</div>
 						<?php
 						
@@ -177,11 +245,50 @@
 				
 				$( 'a.insert' ).on( 'click', function() {
 					
-					alert( 'TODO: Insert JS' );
+					var _bucket	= $(this).attr( 'data-bucket' );
+					var _file	= $(this).attr( 'data-file' );
+					
+					// --------------------------------------------------------------------------
+					
+					//	TODO Render a modal asking for customisations to the URL
+					
+					var _urlscheme			= {};
+					
+					_urlscheme.serve		= '<?=CDN::cdn_serve_url_scheme()?>';
+					_urlscheme.thumb		= '<?=CDN::cdn_thumb_url_scheme()?>';
+					_urlscheme.scale		= '<?=CDN::cdn_scale_url_scheme()?>';
+					_urlscheme.placeholder	= '<?=CDN::cdn_placeholder_url_scheme()?>';
+					_urlscheme.blank_avatar	= '<?=CDN::cdn_blank_avatar_url_scheme()?>';
+					
+					//	Choose the scheme to use (TODO, amke this dynamic)
+					var _scheme = _urlscheme['serve'];
+					
+					//	Define the data object
+					var _data = {
+						bucket	: _bucket,
+						file	: _file,
+						width	: 0,		//	TODO
+						height	: 0,		//	TODO
+						sex		: '',		//	TODO
+						border	: 0			//	TODO
+					};
+					
+					//	Apply the scheme
+					var _url = Mustache.render( _scheme, _data );
+					
+					submit_and_close( _url );
+					
+					// --------------------------------------------------------------------------
+					
 					return false;
 					
 				});
 				
+				function submit_and_close( url )
+				{
+					window.opener.CKEDITOR.tools.callFunction(<?=$ckeditor_func_num?>, url);
+					window.close();
+				}
 				
 				// --------------------------------------------------------------------------
 				

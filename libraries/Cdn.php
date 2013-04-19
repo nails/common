@@ -443,6 +443,25 @@ class Cdn {
 	
 	
 	/**
+	 * Calls the driver's static cdn_serve_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_serve_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_serve_url_scheme();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Calls the driver's static cdn_thumb_url method
 	 *
 	 * @access	static
@@ -458,6 +477,25 @@ class Cdn {
 		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
 		
 		return $_class::cdn_thumb_url( $bucket, $file, $width, $height );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Calls the driver's static cdn_thumb_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_thumb_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_thumb_url_scheme();
 	}
 	
 	
@@ -487,6 +525,25 @@ class Cdn {
 	
 	
 	/**
+	 * Calls the driver's static cdn_serve_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_scale_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_scale_url_scheme();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Calls the driver's static cdn_placeholder_url method
 	 *
 	 * @access	static
@@ -508,6 +565,25 @@ class Cdn {
 	
 	
 	/**
+	 * Calls the driver's static cdn_serve_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_placeholder_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_placeholder_url_scheme();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Calls the driver's static cdn_blank_avatar_url method
 	 *
 	 * @access	static
@@ -522,6 +598,25 @@ class Cdn {
 		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
 		
 		return $_class::cdn_blank_avatar_url( $width, $height, $sex );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Calls the driver's static cdn_serve_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_blank_avatar_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_blank_avatar_url_scheme();
 	}
 	
 	

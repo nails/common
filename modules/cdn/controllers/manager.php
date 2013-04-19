@@ -15,7 +15,10 @@
  * 
  **/
 
-class NAILS_Manager extends NAILS_Controller
+//	Include _cdn_local.php; executes common functionality
+require_once '_cdn_local.php';
+
+class NAILS_Manager extends NAILS_CDN_Controller
 {
 	/**
 	 * Construct the class; set defaults
@@ -31,14 +34,27 @@ class NAILS_Manager extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Determine if browsing/uploading is permitted
-		//	TODO Work out a way to do this nicely, maybe o a per group basis?
+		//	Module enabled?
+		if ( ! module_is_enabled( 'cdn' ) ) :
 		
-		$this->data['enabled'] = $this->user->is_superuser() ? TRUE : FALSE;
+			show_404();
+		
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
+		//	Determine if browsing/uploading is permitted
+		if ( $this->user->is_logged_in() ) :
+		
+			$this->data['enabled'] = $this->user->is_superuser() ? TRUE : FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load helpers and libraries
 		$this->load->helper( 'directory' );
+		$this->load->library( 'cdn' );
 	}
 	
 	
@@ -67,6 +83,16 @@ class NAILS_Manager extends NAILS_Controller
 			
 			// --------------------------------------------------------------------------
 			
+			case 'file' :
+			
+				$this->data['type']			= 'file';
+				$this->data['type_single']	= 'file';
+				$this->data['type_plural']	= 'files';
+			
+			break;
+			
+			// --------------------------------------------------------------------------
+			
 			default :
 			
 				$this->data['enabled'] = FALSE;
@@ -86,6 +112,16 @@ class NAILS_Manager extends NAILS_Controller
 				$this->data['files'] = array();
 			
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define vars from CKEditor
+		$this->data['ckeditor_func_num'] = $this->input->get( 'CKEditorFuncNum' );
+		
+		// --------------------------------------------------------------------------
+		
+		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
 		
 		// --------------------------------------------------------------------------
 		
@@ -112,6 +148,23 @@ class NAILS_Manager extends NAILS_Controller
 			
 				$this->data['type']			= 'image';
 				$this->data['type_single']	= 'Image';
+				
+				$_options					= array();
+				$_options['filename']		= 'USE_ORIGINAL';
+				$_options['allowed_types']	= 'jpg|gif|png';
+			
+			break;
+			
+			// --------------------------------------------------------------------------
+			
+			case 'file' :
+			
+				$this->data['type']			= 'file';
+				$this->data['type_single']	= 'file';
+				$this->data['type_plural']	= 'files';
+				
+				$_options					= array();
+				$_options['filename']		= 'USE_ORIGINAL';
 			
 			break;
 			
@@ -127,11 +180,16 @@ class NAILS_Manager extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Returning to...?
+		$_return = $this->input->post( 'return' ) ? $this->input->post( 'return' ) : 'cdn/manager/browse/' . $this->data['type'];
+		
+		// --------------------------------------------------------------------------
+		
 		//	User is authorised to upload?
 		if ( ! $this->data['enabled'] ) :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . $this->data['type_single'] . ' uploads are not available right now.' );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 			return;
 		
 		endif;
@@ -144,7 +202,7 @@ class NAILS_Manager extends NAILS_Controller
 		if ( ! $this->cdn->create_bucket( active_user( 'id' ) . '-' . $this->data['type'] ) ) :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I couldn\'t to create your personal upload folder.' );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 			return;
 		
 		endif;
@@ -155,17 +213,17 @@ class NAILS_Manager extends NAILS_Controller
 		//	TODO define the appropriate configs: certain file types and no randomly
 		//	generate names - let the user's choose their own name
 		
-		$_upload = $this->cdn->upload( 'userfile', active_user( 'id' ) . '-' . $this->data['type'] );
+		$_upload = $this->cdn->upload( 'userfile', active_user( 'id' ) . '-' . $this->data['type'], $_options );
 		
 		if ( $_upload ) :
 		
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> ' . $this->data['type_single'] . ' uploaded successfully!' );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 		
 		else :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . implode( $this->cdn->errors() ) );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 		
 		endif;
 	}
@@ -184,6 +242,15 @@ class NAILS_Manager extends NAILS_Controller
 			
 				$this->data['type']			= 'image';
 				$this->data['type_single']	= 'Image';
+			
+			break;
+			
+			// --------------------------------------------------------------------------
+			
+			case 'file' :
+			
+				$this->data['type']			= 'file';
+				$this->data['type_single']	= 'file';
 			
 			break;
 			
