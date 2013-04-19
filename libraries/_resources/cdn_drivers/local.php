@@ -484,6 +484,66 @@ class Local_CDN {
 	
 	
 	/**
+	 * Creates a new bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function create_bucket( $bucket )
+	{
+		//	Test if bucket exists, if it does stop, job done.
+		if ( is_dir( CDN_PATH . $bucket ) ) :
+		
+			return TRUE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Does't exist, attempt to create
+		if ( mkdir( CDN_PATH . $bucket ) ) :
+		
+			return TRUE;
+		
+		else :
+		
+			$this->_error( lang( 'cdn_local_mkdir_fail' ) );
+			return FALSE;
+		
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Deletes a bucket, only if empty
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function delete_bucket( $bucket )
+	{
+		//	TODO
+		return FALSE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/*	! HELPER METHODS */
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Returns the error array
 	 *
 	 * @access	public

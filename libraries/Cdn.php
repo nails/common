@@ -191,6 +191,46 @@ class Cdn {
 	// --------------------------------------------------------------------------
 	
 	
+	/*	! BUCKET METHODS */
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Creates a new bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function create_bucket( $bucket )
+	{
+		return $this->_cdn->create_bucket( $bucket );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Deletes a bucket, only if empty
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function delete_bucket( $bucket )
+	{
+		return $this->_cdn->delete_bucket( $bucket );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/*	! HELPER METHODS */
 	
 	
