@@ -19,7 +19,7 @@
 		<script tyle="text/javascript">
 		<!--//
 		
-			var _nails;
+			var _nails,_nails_admin;
 			
 			$(function(){
 			
