@@ -27,7 +27,7 @@
 		?>
 	</head>
 	<body>
-		<div class="group-cdn manager">
+		<div class="group-cdn manager <?=$this->input->get( 'is_fancybox' ) ? 'is-fancybox' : ''?>">
 			<div id="mask"></div>
 			<div class="browser-outer">
 				<div class="browser-inner">
@@ -103,10 +103,6 @@
 										
 											foreach ( $files AS $file ) :
 											
-												$_bucket = active_user( 'id' ) . '-' . $type;
-												
-												// --------------------------------------------------------------------------
-												
 												echo '<li class="thumb">';
 												
 												echo '<div class="image">';
@@ -115,14 +111,14 @@
 													case 'image' :
 														
 														//	Thumbnail
-														echo img( cdn_scale( $_bucket, $file, 150, 175 ) );
+														echo img( cdn_scale( $bucket, $file, 150, 175 ) );
 														
 														//	Actions
 														echo '<div class="actions">';
 														
-														echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
-														echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
-														echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '" class="fancybox awesome small">View</a>';
+														echo '<a href="#" data-bucket="' . $bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+														echo anchor( 'cdn/manager/delete/' . $type . '/' . $file . '?' . $_SERVER['QUERY_STRING'] . '&return=' . urlencode( $_SERVER['REQUEST_URI'] ), 'Delete', 'class="awesome red small delete"' );
+														echo '<a href="' . cdn_serve( $bucket, $file ) . '" class="fancybox awesome small">View</a>';
 														
 														echo '</div>';
 																												
@@ -139,12 +135,12 @@
 															case '.gif' :
 															
 																//	It's an image, so thumbnail it
-																echo img( cdn_scale( $_bucket, $file, 150, 175 ) );
+																echo img( cdn_scale( $bucket, $file, 150, 175 ) );
 																
 																//	Actions
 																echo '<div class="actions">';
 																
-																echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+																echo '<a href="#" data-bucket="' . $bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
 																echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
 																echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '"class="fancybox awesome small">View</a>';
 																
@@ -160,7 +156,7 @@
 																//	Actions
 																echo '<div class="actions">';
 																
-																echo '<a href="#" data-bucket="' . $_bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
+																echo '<a href="#" data-bucket="' . $bucket .'" data-file="' . $file .'" class="awesome green small insert">Insert</a>';
 																echo anchor( 'cdn/manager/delete/' . $type . '/' . $file, 'Delete', 'class="awesome red small delete"' );
 																echo '<a href="' . cdn_serve( active_user( 'id' ) . '-' . $type, $file ) . '" target="_blank" class="awesome small">Download</a>';
 																
@@ -206,6 +202,14 @@
 							<p>You don't have permission to view the media manager at the moment.</p>
 							<?php
 							
+								if ( isset( $bad_bucket ) ) :
+								
+									echo '<p class="system-alert error no-close">';
+									echo $bad_bucket;
+									echo '</p>';
+								
+								endif;
+							
 								if ( ! $user->is_logged_in() ) :
 								
 									echo '<p>' . anchor( 'auth/login?return_to=' . urlencode( 'cdn/manager/browse/' . $type ), lang( 'action_login' ), 'class="awesome"' ) . '</p>';
@@ -248,35 +252,22 @@
 					var _bucket	= $(this).attr( 'data-bucket' );
 					var _file	= $(this).attr( 'data-file' );
 					
-					// --------------------------------------------------------------------------
+					execute_callback( _bucket, _file );
 					
-					//	TODO Render a modal asking for customisations to the URL
+					//	Close window
+					<?php
+						
+						if ( $this->input->get( 'is_fancybox' ) ) :
+						
+							echo 'parent.$.fancybox.close();';
+						
+						else :
+						
+							echo 'window.close();';
+						
+						endif;
 					
-					var _urlscheme			= {};
-					
-					_urlscheme.serve		= '<?=CDN::cdn_serve_url_scheme()?>';
-					_urlscheme.thumb		= '<?=CDN::cdn_thumb_url_scheme()?>';
-					_urlscheme.scale		= '<?=CDN::cdn_scale_url_scheme()?>';
-					_urlscheme.placeholder	= '<?=CDN::cdn_placeholder_url_scheme()?>';
-					_urlscheme.blank_avatar	= '<?=CDN::cdn_blank_avatar_url_scheme()?>';
-					
-					//	Choose the scheme to use (TODO, amke this dynamic)
-					var _scheme = _urlscheme['serve'];
-					
-					//	Define the data object
-					var _data = {
-						bucket	: _bucket,
-						file	: _file,
-						width	: 0,		//	TODO
-						height	: 0,		//	TODO
-						sex		: '',		//	TODO
-						border	: 0			//	TODO
-					};
-					
-					//	Apply the scheme
-					var _url = Mustache.render( _scheme, _data );
-					
-					submit_and_close( _url );
+					?>
 					
 					// --------------------------------------------------------------------------
 					
@@ -284,10 +275,64 @@
 					
 				});
 				
-				function submit_and_close( url )
+				
+				function execute_callback( _bucket, _file )
 				{
-					window.opener.CKEDITOR.tools.callFunction(<?=$ckeditor_func_num?>, url);
-					window.close();
+				<?php
+				
+					if ( isset( $_GET['CKEditorFuncNum'] ) ) :
+					
+						//	Called from a CKEditor Instance
+						
+						?>
+							//	TODO Render a modal asking for customisations to the URL
+							
+							var _urlscheme			= {};
+							
+							_urlscheme.serve		= '<?=CDN::cdn_serve_url_scheme()?>';
+							_urlscheme.thumb		= '<?=CDN::cdn_thumb_url_scheme()?>';
+							_urlscheme.scale		= '<?=CDN::cdn_scale_url_scheme()?>';
+							_urlscheme.placeholder	= '<?=CDN::cdn_placeholder_url_scheme()?>';
+							_urlscheme.blank_avatar	= '<?=CDN::cdn_blank_avatar_url_scheme()?>';
+							
+							//	Choose the scheme to use (TODO, amke this dynamic)
+							var _scheme = _urlscheme['serve'];
+							
+							//	Define the data object
+							var _data = {
+								bucket	: _bucket,
+								file	: _file,
+								width	: 0,		//	TODO
+								height	: 0,		//	TODO
+								sex		: '',		//	TODO
+								border	: 0			//	TODO
+							};
+							
+							//	Apply the scheme
+							var _url = Mustache.render( _scheme, _data );
+							
+							//	Call back to the CKEditor instance
+							window.opener.CKEDITOR.tools.callFunction(<?=$ckeditor_func_num?>, _url );
+						
+						<?php
+					
+					else :
+					
+						//	Callback to a user defined function on the calling page.
+						
+						if ( $this->input->get( 'is_fancybox' ) ) :
+						
+							echo 'parent.' . $this->input->get( 'callback' ) . '( _file );';
+						
+						else :
+						
+							echo 'window.opener.' . $this->input->get( 'callback' ) . '( _file );';
+						
+						endif;
+					
+					endif;
+				
+				?>
 				}
 				
 				// --------------------------------------------------------------------------
@@ -297,6 +342,16 @@
 					return confirm( 'Are you sure?\n\nThis action is not undoable.' );
 					
 				});
+				
+				<?php
+				
+					if ( $this->input->get( 'deleted' ) ) :
+					
+						echo 'execute_callback( \'\', \'\' );';
+					
+					endif;
+				
+				?>
 			
 			});
 		

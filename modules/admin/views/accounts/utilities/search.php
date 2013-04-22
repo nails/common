@@ -8,7 +8,7 @@
 		echo form_open( NULL, $_form );
 		
 		echo '<div class="search-text">';
-		echo form_input( 'search', $this->input->get( 'search' ), 'placeholder="' . lang( 'admin_search_placeholder' ) . '"' );
+		echo form_input( 'search', $this->input->get( 'search' ), 'autocomplete="off" placeholder="' . lang( 'admin_search_placeholder' ) . '"' );
 		echo '</div>';
 		
 		// --------------------------------------------------------------------------

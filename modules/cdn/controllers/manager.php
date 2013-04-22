@@ -50,6 +50,116 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 		endif;
 		
+		if ( $this->data['enabled'] ) :
+		
+			//	Supported type?
+			switch( $this->uri->segment( 4 ) ) :
+			
+				case 'image' :
+				
+					$this->data['type']			= 'image';
+					$this->data['type_single']	= 'image';
+					$this->data['type_plural']	= 'images';
+				
+				break;
+				
+				// --------------------------------------------------------------------------
+				
+				case 'file' :
+				
+					$this->data['type']			= 'file';
+					$this->data['type_single']	= 'file';
+					$this->data['type_plural']	= 'files';
+				
+				break;
+				
+				// --------------------------------------------------------------------------
+				
+				default :
+				
+					$this->data['enabled'] = FALSE;
+				
+				break;
+			
+			endswitch;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Define the directory, if a bucket has been specified use that, if not
+			//	then use the user's uplaod directory
+			
+			if ( $this->input->get( 'bucket' ) && $this->input->get( 'hash' ) ) :
+			
+				//	Decrypt the bucket and cross reference with the hash. Doing this so
+				//	That users can't casually specify a bucket and upload willy nilly.
+				
+				$_bucket	= $this->input->get( 'bucket' );
+				$_hash		= $this->input->get( 'hash' );
+				
+				$_decrypted	= $this->encrypt->decode( $_bucket, APP_PRIVATE_KEY );
+				
+				if ( $_decrypted ) :
+				
+					$_bucket = explode( '|', $_decrypted );
+					
+					if ( $_bucket[0] && isset( $_bucket[1] ) ) :
+					
+						//	Bucket and nonce set, cross-check
+						if ( md5( $_bucket[0] . '|' . $_bucket[1] . '|' . APP_PRIVATE_KEY ) === $_hash ) :
+						
+							if ( is_dir( CDN_PATH . $_bucket[0] ) ) :
+							
+								$_test_ok = TRUE;
+								
+							else :
+							
+								$_test_ok	= FALSE;
+								$_error		= 'Bucket does not exist';
+							
+							endif;
+						
+						else :
+						
+							$_test_ok	= FALSE;
+							$_error		= 'Could not verify bucket hash';
+						
+						endif;
+					
+					else :
+					
+						$_test_ok	= FALSE;
+						$_error		= 'Incomplete bucket hash';
+					
+					endif;
+				
+				else :
+				
+					$_test_ok	= FALSE;
+					$_error		= 'Could not decrypt bucket hash';
+				
+				endif;
+				
+				if ( $_test_ok ) :
+				
+					$this->data['bucket']		= $_bucket[0];
+					$this->_directory	= CDN_PATH . $this->data['bucket'];
+				
+				else :
+				
+					$this->data['enabled']		= FALSE;
+					$this->data['bad_bucket']	= $_error;
+				
+				endif;
+			
+			else :
+			
+				$this->data['bucket']	= active_user( 'id' ) . '-' . $this->data['type'];
+				$this->_directory		= CDN_PATH . $this->data['bucket'];
+			
+			endif;
+		
+		endif;
+		
 		// --------------------------------------------------------------------------
 		
 		//	Load helpers and libraries
@@ -70,43 +180,16 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	 **/
 	public function browse()
 	{
-		//	Fetch all the files this user is allowed to see (i.e their own files)
-		switch( $this->uri->segment( 4 ) ) :
-		
-			case 'image' :
-			
-				$this->data['type']			= 'image';
-				$this->data['type_single']	= 'image';
-				$this->data['type_plural']	= 'images';
-			
-			break;
-			
-			// --------------------------------------------------------------------------
-			
-			case 'file' :
-			
-				$this->data['type']			= 'file';
-				$this->data['type_single']	= 'file';
-				$this->data['type_plural']	= 'files';
-			
-			break;
-			
-			// --------------------------------------------------------------------------
-			
-			default :
-			
-				$this->data['enabled'] = FALSE;
-			
-			break;
-		
-		endswitch;
-		
-		// --------------------------------------------------------------------------
-		
 		//	Fetch files
 		if ( $this->data['enabled'] ) :
 		
-			$this->data['files'] = directory_map( CDN_PATH . '/' . active_user( 'id' ) . '-' . $this->data['type'] );
+			//	Which directory? If a bucket hash has been specified then list that, if not
+			//	use the user's upload directory
+			
+			
+			// --------------------------------------------------------------------------
+			
+			$this->data['files'] = directory_map( $this->_directory );
 			
 			if ( $this->data['files'] === FALSE )
 				$this->data['files'] = array();
@@ -146,9 +229,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 			case 'image' :
 			
-				$this->data['type']			= 'image';
-				$this->data['type_single']	= 'Image';
-				
 				$_options					= array();
 				$_options['filename']		= 'USE_ORIGINAL';
 				$_options['allowed_types']	= 'jpg|gif|png';
@@ -159,10 +239,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			
 			case 'file' :
 			
-				$this->data['type']			= 'file';
-				$this->data['type_single']	= 'file';
-				$this->data['type_plural']	= 'files';
-				
 				$_options					= array();
 				$_options['filename']		= 'USE_ORIGINAL';
 			
@@ -196,12 +272,12 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->load->library( 'CDN' );
+		$this->load->library( 'cdn' );
 		
-		//	Create user's upload dir, if it's there already this will gracefully fail
-		if ( ! $this->cdn->create_bucket( active_user( 'id' ) . '-' . $this->data['type'] ) ) :
+		//	Create bucket, if it's there already this will gracefully fail
+		if ( ! $this->cdn->create_bucket( $this->data['bucket'] ) ) :
 		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I couldn\'t to create your personal upload folder.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I couldn\'t to create the upload folder.' );
 			redirect( $_return );
 			return;
 		
@@ -213,19 +289,19 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		//	TODO define the appropriate configs: certain file types and no randomly
 		//	generate names - let the user's choose their own name
 		
-		$_upload = $this->cdn->upload( 'userfile', active_user( 'id' ) . '-' . $this->data['type'], $_options );
+		$_upload = $this->cdn->upload( 'userfile', $this->data['bucket'], $_options );
 		
 		if ( $_upload ) :
 		
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> ' . $this->data['type_single'] . ' uploaded successfully!' );
-			redirect( $_return );
 		
 		else :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . implode( $this->cdn->errors() ) );
-			redirect( $_return );
 		
 		endif;
+		
+		redirect( $_return );
 	}
 	
 	
@@ -266,11 +342,16 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Returning to...?
+		$_return = $this->input->get( 'return' ) ? $this->input->get( 'return' ) : 'cdn/manager/browse/' . $this->data['type'];
+		
+		// --------------------------------------------------------------------------
+		
 		//	User is authorised to delete?
 		if ( ! $this->data['enabled'] ) :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . $this->data['type_single'] . ' deletions are not available right now.' );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 			return;
 		
 		endif;
@@ -283,17 +364,30 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		//	TODO define the appropriate configs: certain file types and no randomly
 		//	generate names - let the user's choose their own name
 		
-		$_delete = $this->cdn->delete( $this->uri->segment( 5 ), active_user( 'id' ) . '-' . $this->data['type'] );
+		$_delete = $this->cdn->delete( $this->uri->segment( 5 ), $this->data['bucket'] );
 		
 		if ( $_delete ) :
 		
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> ' . $this->data['type_single'] . ' deleted successfully!' );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			
+			if ( strpos( $_return, '?' ) ) :
+			
+				$_return .= '&';
+			
+			else :
+			
+				$_return .= '?';
+			
+			endif;
+			
+			$_return .= 'deleted=true';
+			
+			redirect( $_return );
 		
 		else :
 		
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . implode( $this->cdn->errors() ) );
-			redirect( 'cdn/manager/browse/' . $this->data['type'] );
+			redirect( $_return );
 		
 		endif;
 	}

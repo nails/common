@@ -40,7 +40,7 @@ if ( ! function_exists( 'form_field' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -52,6 +52,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
 		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -84,13 +85,13 @@ if ( ! function_exists( 'form_field' ) )
 		
 			case 'password' :
 			
-				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
 			case 'textarea' :
 			
-				$_out .= form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
@@ -104,7 +105,7 @@ if ( ! function_exists( 'form_field' ) )
 			case 'text' :
 			default :
 			
-				$_out .= form_input( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_input( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
 				
 			break;
 			
@@ -148,6 +149,182 @@ if ( ! function_exists( 'form_field' ) )
 
 
 /**
+ * form_field_image
+ *
+ * Generates a form field which uses the media manager to select an image
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
+if ( ! function_exists( 'form_field_mm_image' ) )
+{
+	function form_field_mm_image( $field, $help = '' )
+	{
+		//	Set var defaults
+		$_field					= array();
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
+		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		
+		$_help			= array();
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		
+		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Generate a unique ID for this field
+		$_id = 'field_mm_image_' . md5( microtime() );
+		
+		// --------------------------------------------------------------------------
+		
+		$_out  = '<div class="field mm-image ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
+		$_out .= '<label>';
+				
+		//	Label
+		$_out .= '<span class="label">';
+		$_out .= $_field['label'];
+		$_out .= $_field['required'] ? '*' : '';
+		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+		$_out .= '</span>';
+		
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
+		//	Field
+		
+		//	If there's post data, sue that value instead
+		if ( get_instance()->input->post() ) :
+		
+			$_field['default'] = get_instance()->input->post( $_field['key'] );
+		
+		endif;
+		
+		//	If a default has been specified then show a preview
+		$_out .= '<span id="' . $_id . '-preview" class="mm-image-preview">';
+		if ( $_field['default'] ) :
+		
+			$_out .= img( cdn_scale( $_field['bucket'], $_field['default'], 100, 100 ) );
+		
+		endif;
+		$_out .= '</span>';
+		
+		//	Choose image button
+		if ( $_field['bucket'] ) :
+		
+			$_nonce		= time();
+			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
+			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
+			
+			$_url		= site_url( 'cdn/manager/browse/image' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+		
+		else :
+		
+			$_url		= site_url( 'cdn/manager/browse/image' );
+		
+		endif;
+		
+		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="fancybox awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
+		
+		//	Remove button
+		$_display = $_field['default'] ? 'inline-block' : 'none';
+		
+		$_out .= '<br /><a href="#" class="awesome small red mm-image-remove" id="' . $_id . '-remove" style="display:' . $_display . '" onclick="return remove_' . $_id . '();">' . lang( 'action_remove' ) . '</a>';
+		
+		//	The actual field which is submitted
+		$_out .= '<input type="hidden" name="' . $_field['key'] . '" id="' . $_id . '-field" value="' . $_field['default'] . '" />';
+		
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+		
+		//	Error
+		if ( $_field['error'] ) :
+		
+			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			
+		else :
+		
+			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		
+		endif;
+				
+		$_out .= '</label>';
+		$_out .= '<div class="clear"></div>';
+		$_out .= '</div>';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		get_instance()->load->library( 'cdn' );
+		$_scheme = CDN::cdn_scale_url_scheme();
+		
+		$_scheme = str_replace( '{{width}}', 100, $_scheme );
+		$_scheme = str_replace( '{{height}}', 100, $_scheme );
+		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
+		
+$_out .= <<<EOT
+
+	<script style="text/javascript">
+	
+		function callback_$_id( file )
+		{
+			if ( file.length == 0 )
+			{
+				remove_$_id();
+				return;
+			}
+			
+			// --------------------------------------------------------------------------
+			
+			var _scheme = '$_scheme';
+			_scheme = _scheme.replace( '{{file}}', file );
+			$( '#$_id-preview' ).html( '<img src="' + _scheme + '" / >' );
+			$( '#$_id-field' ).val( file );
+			$( '#$_id-remove' ).css( 'display', 'inline-block' );
+		}
+		
+		function remove_$_id()
+		{
+			$( '#$_id-preview' ).html( '' );
+			$( '#$_id-field' ).val( '' );
+			$( '#$_id-remove' ).css( 'display', 'none' );
+			
+			return false;
+		}
+		
+	</script>
+
+EOT;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * form_field_date
  *
  * Generates a form field (of type select) for dates
@@ -174,7 +351,7 @@ if ( ! function_exists( 'form_field_date' ) )
 		
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
+		$_field['id']			= isset( $field['id'] ) ? $_field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -183,6 +360,7 @@ if ( ! function_exists( 'form_field_date' ) )
 		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -290,7 +468,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
 		
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -299,6 +477,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
 		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -409,7 +588,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
 		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
@@ -418,6 +597,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -441,9 +621,9 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_out .= '</span>';
 		
 		//	field
-		if ( ! isset( $options[0] ) ) :
+		if ( ! isset( $options[0] ) && ! is_null( $_field['placeholder'] ) ) :
 		
-			$_options = array( 'Please Choose...' ) + $options;
+			$_options = array( $_field['placeholder'] ) + $options;
 		
 		else :
 		
@@ -454,7 +634,94 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), $_field['id'] );
+		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'class="' . $_field['class'] . '" ' . $_field['id'] );
+		
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+		
+		//	Error
+		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+				
+		$_out .= '</label>';
+		$_out .= '<div class="clear"></div>';
+		$_out .= '</div>';
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * form_field_dropdown
+ *
+ * Generates a form field (of type select)
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
+if ( ! function_exists( 'form_field_dropdown_multiple' ) )
+{
+	function form_field_dropdown_multiple( $field, $options, $help = '' )
+	{
+		//	Set var defaults
+		$_field					= array();
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		
+		$_help			= array();
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		
+		$_error = form_error( $_field['key'] ) ? 'error' : '';
+		
+		// --------------------------------------------------------------------------
+		
+		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out .= '<label>';
+				
+		//	Label
+		$_out .= '<span class="label">';
+		$_out .= $_field['label'];
+		$_out .= $_field['required'] ? '*' : '';
+		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+		$_out .= '</span>';
+		
+		//	field
+		if ( ! isset( $options[0] ) && ! is_null( $_field['placeholder'] ) ) :
+		
+			$_options = array( $_field['placeholder'] ) + $options;
+		
+		else :
+		
+			$_options = $options;
+		
+		endif;
+		
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
+		//	Any defaults?
+		$_field['default'] = (array) $_field['default'];
+		
+		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] );
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -529,6 +796,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -638,7 +906,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $_field['id'] ) ? $_field['id'] : NULL;
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
 		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
 		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
 		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
@@ -646,6 +914,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';

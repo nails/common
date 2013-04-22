@@ -55,6 +55,7 @@
 	$lang['action_unsuspend']		= 'Unsuspend';
 	$lang['action_verify']			= 'Verify';
 	$lang['action_unverify']		= 'Unverify';
+	$lang['action_choose']			= 'Choose';
 	
 	
 	// --------------------------------------------------------------------------

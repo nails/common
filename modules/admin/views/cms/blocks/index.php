@@ -9,7 +9,7 @@
 	
 	<div class="search">
 		<div class="search-text">
-			<input type="text" name="search" value="" placeholder="Search block titles by typing in here...">
+			<input type="text" name="search" value="" autocomplete="off" placeholder="Search block titles by typing in here...">
 		</div>
 	</div>
 	

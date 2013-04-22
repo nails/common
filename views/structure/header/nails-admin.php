@@ -33,9 +33,6 @@
 	</script>
 	
 	<!--	ASSETS	-->
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-	<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>js/jquery.min.js"><\/script>')</script>
 	<?php
 	
 		echo $this->asset->output( 'css' );
