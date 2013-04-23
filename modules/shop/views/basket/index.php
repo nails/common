@@ -149,7 +149,7 @@
 			<div class="basket-empty">
 				<p>Your basket is currently empty</p>
 			</div>
-			<?
+			<?php
 		
 		endif;
 	
