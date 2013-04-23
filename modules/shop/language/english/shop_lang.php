@@ -7,4 +7,5 @@
 * 
 */
 
-	$lang['placeholder']	= 'Placeholder item';
+	$lang['button_add_to_basket']		= 'Add to Basket';
+	$lang['button_remove_from_basket']	= 'Remove from Basket';

@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id="edit-user-basic">
 
 	<legend><?=lang( 'accounts_edit_basic_legend' )?></legend>
 	

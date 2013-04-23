@@ -142,7 +142,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 				if ( $_test_ok ) :
 				
 					$this->data['bucket']		= $_bucket[0];
-					$this->_directory	= CDN_PATH . $this->data['bucket'];
+					$this->data['bucket_label']	= ucwords( $_bucket[0] );
+					$this->_directory			= CDN_PATH . $this->data['bucket'];
 				
 				else :
 				
@@ -153,8 +154,9 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			
 			else :
 			
-				$this->data['bucket']	= active_user( 'id' ) . '-' . $this->data['type'];
-				$this->_directory		= CDN_PATH . $this->data['bucket'];
+				$this->data['bucket']		= active_user( 'id' ) . '-' . $this->data['type'];
+				$this->data['bucket_label']	= 'Your User Upload Directory for ' . ucwords( $this->data['type_plural'] );
+				$this->_directory			= CDN_PATH . $this->data['bucket'];
 			
 			endif;
 		

@@ -862,6 +862,12 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->load->model( 'core_nails_language_model' );
 		$this->data['languages']	= $this->core_nails_language_model->get_all_supported_flat();
 		
+		//	Fetch any user uploads
+		$this->load->helper( 'directory' );
+		$this->data['user_uploads'] = array();
+		$this->data['user_uploads']['accounts_edit_upload_type_image']	= directory_map( CDN_PATH . $_user->id . '-image' );
+		$this->data['user_uploads']['accounts_edit_upload_type_file']	= directory_map( CDN_PATH . $_user->id . '-file' );
+		
 		// --------------------------------------------------------------------------
 		
 		$this->data['return_string']	= '?return_to=' . urlencode( $this->input->get( 'return_to' ) );

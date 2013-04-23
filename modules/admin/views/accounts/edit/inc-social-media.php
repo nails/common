@@ -1,4 +1,4 @@
-<fieldset class="social">
+<fieldset  id="edit-user-social" class="social">
 	<legend><?=lang( 'accounts_edit_social_legend' )?></legend>
 	<p>
 	<?php

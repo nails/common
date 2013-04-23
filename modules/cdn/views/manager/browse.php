@@ -47,7 +47,7 @@
 								<li class="toolbar">
 									<?php
 									
-										echo form_open_multipart( 'cdn/manager/upload/' . $type );
+										echo form_open_multipart( 'cdn/manager/upload/' . $type . '?' . $_SERVER['QUERY_STRING'] );
 										echo form_hidden( 'return', $_SERVER['REQUEST_URI'] );
 										echo form_submit( 'submit', 'Upload ' . $type_single, 'class="awesome green"' );
 										echo form_upload( 'userfile' );
@@ -88,6 +88,9 @@
 											
 										endif;
 									?>
+								</li>
+								<li class="bucket-info">
+									Browsing bucket: <strong><?=$bucket_label?></strong>
 								</li>
 								<li class="progress">
 									uploading &rsaquo;

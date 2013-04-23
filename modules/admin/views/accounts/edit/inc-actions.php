@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id="edit-user-actions">
 	<legend><?=lang( 'accounts_edit_actions_legend' )?></legend>
 	<p>
 	<?php

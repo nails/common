@@ -32,6 +32,7 @@ class Shop_product_model extends NAILS_Model
 		$this->_table_gallery	= 'shop_product_gallery';
 		$this->_table_meta		= 'shop_product_meta';
 		$this->_table_type		= 'shop_product_type';
+		$this->_table_tax		= 'shop_product_tax_rate';
 	}
 	
 	
@@ -43,13 +44,49 @@ class Shop_product_model extends NAILS_Model
 	 * 
 	 * @access public
 	 * @param array $data The data to create the object with
+	 * @param array $meta The meta data for the object
 	 * @param bool $return_obj Whether to return just the new ID or the full object
 	 * @return mixed
 	 **/
-	public function create( $data = array(), $return_obj = FALSE )
+	public function create( $data = array(), $meta = array(), $return_obj = FALSE )
 	{
-		if ( $data )
+		//	Minimum requirements are title and type
+		if ( !isset( $data['type'] ) || ! isset( $data['title'] ) ) :
+		
+			$this->_set_error( 'Missing Product Type or Title.' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Check type is valid
+		$this->db->where( 'slug', $data['type'] );
+		$_type = $this->db->get( $this->_table_type )->row();
+		
+		if ( ! $_type ) :
+		
+			$this->_set_error( 'Invalid product type' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define minimum
+		$this->db->set( 'type_id', $_type->id );
+		$this->db->set( 'title', $data['title'] );
+		
+		unset( $data['type'] );
+		unset( $data['title'] );
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $data ) :
+		
 			$this->db->set( $data );
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -59,23 +96,32 @@ class Shop_product_model extends NAILS_Model
 		
 		$this->db->insert( $this->_table );
 		
-		if ( $return_obj ) :
+		$_id = $this->db->insert_id();
 		
-			if ( $this->db->affected_rows() ) :
+		if ( $_id ) :
+		
+			//	Prefix all meta fields with the type slug
+			$_meta = array();
+			foreach ( $meta AS $key => $value ) :
 			
-				$_id = $this->db->insert_id();
-				
-				return $this->get_by_id( $_id );
+				$_meta[$_type->slug . '_' . $key ] = $value;
 			
-			else :
+			endforeach;
 			
-				return FALSE;
+			if ( $_meta ) :
+			
+				$this->db->set( $_meta );
 			
 			endif;
+			
+			$this->db->set( 'product_id', $_id );
+			$this->db->insert( $this->_table_meta );
+			
+			return $_id;
 		
 		else :
 		
-			return $this->db->affected_rows() ? $this->db->insert_id() : FALSE;
+			return FALSE;
 		
 		endif;
 	}
@@ -139,7 +185,28 @@ class Shop_product_model extends NAILS_Model
 	 **/
 	public function get_all()
 	{
-		return $this->db->get( $this->_table )->result();
+		$this->db->select( 'p.*' );
+		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
+		$this->db->select( 'pm.download_bucket,pm.download_filename' );
+		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.max_per_order type_max_per_order' );
+		
+		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
+		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
+		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
+		
+		$_products = $this->db->get( $this->_table . ' p' )->result();
+	
+		// --------------------------------------------------------------------------
+		
+		foreach ( $_products AS $product ) :
+		
+			$this->_format_product_object( $product );
+		
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_products;
 	}
 	
 	
@@ -155,7 +222,7 @@ class Shop_product_model extends NAILS_Model
 	 **/
 	public function get_by_id( $id )
 	{
-		$this->db->where( 'id', $id );
+		$this->db->where( 'p.id', $id );
 		$_result = $this->get_all();
 		
 		// --------------------------------------------------------------------------
@@ -166,6 +233,71 @@ class Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		return $_result[0];
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _format_product_object( &$product )
+	{
+		//	Type casting
+		$product->id			= (int) $product->id;
+		$product->price			= (float) $product->price;
+		$product->sale_price	= (float) $product->sale_price;
+		$product->tax_rate		= (float) $product->tax_rate;
+		$product->is_active		= (bool) $product->is_active;
+		$product->quantity_sold	= (int) $product->quantity_sold;
+		
+		if ( ! is_null( $product->quantity_available ) ) :
+		
+			$product->quantity_available = (int) $product->quantity_available;
+		
+		endif;
+		
+		if ( $product->is_on_sale && time() > strtotime( $product->sale_start ) && time() < strtotime( $product->sale_end ) ) :
+		
+			$product->is_on_sale	= TRUE;
+		
+		else :
+		
+			$product->is_on_sale	= FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Tax Rate
+		$product->tax			= new stdClass();
+		$product->tax->id		= (int) $product->tax_id;
+		$product->tax->label	= $product->tax_label;
+		$product->tax->rate		= (float) $product->tax_rate;
+		
+		unset( $product->tax_id );
+		unset( $product->tax_label );
+		unset( $product->tax_rate );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Type
+		$product->type					= new stdClass();
+		$product->type->id				= (int) $product->type_id;
+		$product->type->slug			= $product->type_slug;
+		$product->type->label			= $product->type_label;
+		
+		if ( ! is_null( $product->type_max_per_order ) ) :
+		
+			$product->type->max_per_order	= (int) $product->type_max_per_order;
+		
+		endif;
+		
+		unset( $product->type_id );
+		unset( $product->type_slug );
+		unset( $product->type_label );
+		unset( $product->type_max_per_order );
+		
+		// --------------------------------------------------------------------------
+		
 	}
 }
 

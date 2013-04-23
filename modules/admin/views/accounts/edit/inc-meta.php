@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id="edit-user-meta">
 	<legend><?=lang( 'accounts_edit_meta_legend' )?></legend>
 	<?php
 		

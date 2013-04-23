@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id="edit-user-profile-img">
 	<legend><?=lang( 'accounts_edit_img_legend' )?></legend>
 	<?php
 	

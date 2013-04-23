@@ -111,17 +111,39 @@ if ( ! function_exists( 'form_field' ) )
 			
 		endswitch;
 		
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+		
 		//	Download original file, if type is file and original is available
 		if ( ( $_field['type'] == 'file' || $_field['type'] == 'upload' ) && $_field['default'] ) :
 		
 			$_out .= '<span class="file-download">';
-			$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), $_field['default'], 'target="_blank"' );
+			
+			$_ext = end( explode( '.', $_field['default'] ) );
+			
+			switch ( $_ext ) :
+			
+				case 'jpg' :
+				case 'png' :
+				case 'gif' :
+				
+					$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), img( cdn_thumb( $_field['bucket'], $_field['default'], 35, 35 ) ), 'class="fancybox"' );
+				
+				break;
+				
+				// --------------------------------------------------------------------------
+				
+				default :
+				
+					$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), $_field['default'], 'target="_blank"' );
+				
+				break;
+			
+			endswitch;
+			
 			$_out .= '</span>';
 		
 		endif;
-		
-		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
 		
 		//	Error
 		if ( $_field['error'] ) :

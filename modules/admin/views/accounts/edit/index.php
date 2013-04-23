@@ -16,6 +16,7 @@
 	$this->load->view( 'accounts/edit/inc-meta' );
 	$this->load->view( 'accounts/edit/inc-profile-img' );
 	$this->load->view( 'accounts/edit/inc-social-media' );
+	$this->load->view( 'accounts/edit/inc-uploads' );
 	
 	
 	echo '<p>' . form_submit( 'submit', lang( 'action_save_changes' ) ) . '</p>';
