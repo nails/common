@@ -30,6 +30,13 @@ class Linkedin_connect {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Default vars
+		$this->access			= new stdClass();
+		$this->access->token	= NULL;
+		$this->access->secret	= NULL;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Fetch our config variables
 		$this->ci->config->load( 'linkedin' );
 		$this->settings = $this->ci->config->item( 'linkedin' );

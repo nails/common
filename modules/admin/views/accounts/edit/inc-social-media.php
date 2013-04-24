@@ -9,7 +9,7 @@
 			
 				echo '<div class="icon" style="background-image: url(' . NAILS_URL . 'img/admin/accounts/icons/facebook-icon.png)">';
 				echo 'ID: ' . $user_edit->fb_id;
-				echo '<br />Token: ' . $user_edit->fb_token;
+				echo '<br />Token: ' . $user_edit->fb_token;	
 				echo '</div>';
 			
 			endif;
@@ -20,7 +20,7 @@
 			
 				echo '<div class="icon" style="background-image: url(' . NAILS_URL . 'img/admin/accounts/icons/twitter-icon.png)">';
 				echo 'ID: ' . $user_edit->tw_id;
-				echo '<br />Token: ' . $user_edit->tw_token;
+				echo '<br />Token: ' . wordwrap( $user_edit->tw_token, 100, '<br />', TRUE );
 				echo '</div>';
 			
 			endif;
@@ -31,7 +31,7 @@
 			
 				echo '<div class="icon" style="background-image: url(' . NAILS_URL . 'img/admin/accounts/icons/linkedin-icon.png)">';
 				echo 'ID: ' . $user_edit->li_id;
-				echo '<br />Token: ' . $user_edit->li_token;
+				echo '<br />Token: ' . wordwrap( $user_edit->li_token, 100, '<br />', TRUE );
 				echo '</div>';
 			
 			endif;

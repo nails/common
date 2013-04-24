@@ -138,7 +138,7 @@
 			</table>
 			
 			<p class="checkout">
-				<?=anchor( 'shop/checkout', 'Checkout', 'class="awesome"' )?>
+				<?=anchor( 'shop/basket/checkout', 'Checkout', 'class="awesome"' )?>
 				<div class="clear"></div>
 			</p>
 			<?php
