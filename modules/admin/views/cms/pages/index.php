@@ -36,6 +36,14 @@
 	
 	<hr />
 	
+	<div class="search">
+		<div class="search-text">
+			<input type="text" name="search" value="" autocomplete="off" placeholder="Search page titles by typing in here...">
+		</div>
+	</div>
+	
+	<hr />
+	
 	<table>
 		<thead>
 			<tr>
@@ -51,38 +59,19 @@
 			
 				foreach ( $pages AS $page ) :
 				
-					echo '<tr>';
+					echo '<tr class="page" data-title="' . $page->title . '">';
 					echo '<td class="title">';
-					echo '<span class="title">';
-					if ( $page->title || $page->second_column_title ) :
-					
-						if ( $page->title ) :
-						
-							echo $page->title;
-						
-						else :
-						
-							echo $page->second_column_title;
-						
-						endif;
-					
-					else :
-					
-						echo '<span class="no-data">&mdash;</span>';
-					
-					endif;
-					echo '</span>';
-					echo '<span class="url">' . site_url( $page->url ) . '</span>';
+					echo '<span class="title">' . $page->title . '</span>';
+					echo '<span class="url">' . site_url( $page->slug ) . '</span>';
 					echo '</td>';
 					echo '<td class="modified">';
-					echo nice_time( $page->modified );
-					echo $page->user_id ? '<small>by ' . anchor( 'admin/accounts/edit/' . $page->user_id, $page->first_name . ' ' . $page->last_name ) . '</small>' : '';
+					echo '<span class="nice-time">' . $page->modified . '</span>';
+					echo $page->user->id ? '<small>by ' . anchor( 'admin/accounts/edit/' . $page->user->id, $page->user->first_name . ' ' . $page->user->last_name ) . '</small>' : '';
 					echo '</td>';
 					echo '<td class="actions">';
 					
-					echo anchor( 'admin/cms/edit/' . $page->id, 'Edit', 'class="awesome small"' );
-					echo anchor( $page->url, 'View', 'class="awesome small"' );
-					echo $page->revision_count ? anchor( 'admin/cms/revisions/' . $page->id, 'Revisions', 'class="awesome small"' ) : '';
+					echo anchor( 'admin/cms/pages/edit/' . $page->id, 'Edit', 'class="awesome small"' );
+					echo anchor( $page->slug, 'View', 'class="awesome small"' );
 					
 					echo '</td>';
 					echo '</tr>';
@@ -104,3 +93,17 @@
 	</table>
 	
 </div>
+
+<script style="text/javascript">
+<!--//
+
+	$(function(){
+	
+		var CMS_Pages = new NAILS_Admin_CMS_Pages;
+		CMS_Pages.init_search();
+		
+	
+	});
+
+//-->
+</script>

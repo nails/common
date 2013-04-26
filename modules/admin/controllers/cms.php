@@ -77,6 +77,7 @@ class Cms extends Admin_Controller {
 	{
 		//	Load common blocks items
 		$this->load->model( 'cms_page_model', 'cms_page' );
+		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
 		
@@ -136,6 +137,35 @@ class Cms extends Admin_Controller {
 	 **/
 	private function _pages_edit()
 	{
+		$this->data['cmspage'] = $this->cms_page->get_by_id( $this->uri->segment( 5 ), TRUE );
+		
+		if ( ! $this->data['cmspage'] ) :
+		
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> no page found by that ID' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->post() ) :
+		
+			dumpanddie($this->input->post());
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set method info
+		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->title . '"';
+		
+		//	Get available widgets
+		$this->data['widgets']	= $this->cms_page->get_available_widgets();
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/cms/pages/edit',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 	
 	
