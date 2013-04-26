@@ -47,7 +47,7 @@ class Thumb extends NAILS_CDN_Controller
 		$this->_width		= $this->uri->segment( 3, 100 );
 		$this->_height		= $this->uri->segment( 4, 100 );
 		$this->_bucket		= $this->uri->segment( 5 );
-		$this->_object		= $this->uri->segment( 6 );
+		$this->_object		= urldecode( $this->uri->segment( 6 ) );
 		$this->_extension	= ( ! empty( $this->_object ) ) ? strtolower( substr( $this->_object, strrpos( $this->_object, '.' ) ) ) : FALSE;
 		
 		//	Set a unique filename (but one which is constant if requested twice, i.e

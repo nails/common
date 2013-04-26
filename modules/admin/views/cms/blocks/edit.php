@@ -102,9 +102,33 @@
 					<div class="system-alert error no-close">
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>
-					<div class="textarea">
-						<textarea name="translation[<?=$_counter?>][value]"><?=$translation->value?></textarea>
-					</div>
+					<?php
+					
+						//	Render the correct display
+						switch ( $block->type ) :
+						
+							case 'plaintext' :
+							
+								echo '<textarea name="translation[' . $_counter . '][value]">' . $translation->value . '</textarea>';
+							
+							break;
+							
+							// --------------------------------------------------------------------------
+							
+							case 'richtext' :
+							
+								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="ckeditor"' );
+								
+								echo '<p class="system-alert notice no-close">';
+								echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
+								echo 'due to application stylesheets on the front end which are not loaded here.';
+								echo '</p>';
+							
+							break;
+						
+						endswitch;
+					
+					?>
 					<?php if ( $translation->revisions ) : ?>
 					<ul class="revisions">
 						<li class="summary">

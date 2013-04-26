@@ -61,7 +61,7 @@
 						
 						echo '<li>';
 						echo '<span class="lang" title="' . $variation->lang->name . '">' . $variation->lang->name . '</span>';
-						echo '<span class="value">' . $variation->value . '</span>';
+						echo '<span class="value">' . character_limiter( strip_tags( $variation->value, 100 ) ) . '</span>';
 						echo '</li>';
 					
 					endforeach;

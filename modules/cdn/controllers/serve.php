@@ -35,7 +35,7 @@ class Serve extends NAILS_CDN_Controller
 		
 		//	Work out some variables
 		$this->_bucket	= $this->uri->segment( 3 );
-		$this->_object	= $this->uri->segment( 4 );
+		$this->_object	= urldecode( $this->uri->segment( 4 ) );
 	}
 	
 	

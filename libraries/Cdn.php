@@ -100,7 +100,7 @@ class Cdn {
 	// --------------------------------------------------------------------------
 	
 	
-	/*	! UTILITY METHODS */
+	/*	! OBJECT METHODS */
 	
 	
 	// --------------------------------------------------------------------------
@@ -131,9 +131,26 @@ class Cdn {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function delete( $file, $bucket )
+	public function delete( $object, $bucket )
 	{
-		return $this->_cdn->delete( $file, $bucket );
+		return $this->_cdn->delete( $object, $bucket );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Calls the destroy method of the driver
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function destroy( $file, $bucket )
+	{
+		return $this->_cdn->destroy( $file, $bucket );
 	}
 	
 	
@@ -191,6 +208,57 @@ class Cdn {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Adds a tag to an object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function add_object_tag( $object_id, $tag_id )
+	{
+		return $this->_cdn->add_object_tag( $object_id, $tag_id );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Deletes a tag from an object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function delete_object_tag( $object_id, $tag_id )
+	{
+		return $this->_cdn->delete_object_tag( $object_id, $tag_id );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * counts the number of objects a tag contains
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function count_tag_objects( $tag_id )
+	{
+		return $this->_cdn->count_tag_objects( $tag_id );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/*	! BUCKET METHODS */
 	
 	
@@ -215,6 +283,40 @@ class Cdn {
 	
 	
 	/**
+	 * Returns a single bucket object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
+	{
+		return $this->_cdn->get_bucket( $bucket, $list_bucket, $filter_tag, $include_deleted );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Lists the contents of a bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function list_bucket( $bucket, $filter_tag = FALSE, $include_deleted = FALSE )
+	{
+		return $this->_cdn->list_bucket( $bucket, $filter_tag, $include_deleted );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
 	 * Deletes a bucket, only if empty
 	 *
 	 * @access	public
@@ -225,6 +327,57 @@ class Cdn {
 	public function delete_bucket( $bucket )
 	{
 		return $this->_cdn->delete_bucket( $bucket );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Adds a tag to a bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function add_bucket_tag( $bucket, $label )
+	{
+		return $this->_cdn->add_bucket_tag( $bucket, $label );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Deletes a tag from a bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function delete_bucket_tag( $bucket, $label )
+	{
+		return $this->_cdn->delete_bucket_tag( $bucket, $label );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Renames a bucket tag
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function rename_bucket_tag( $bucket, $label, $new_name )
+	{
+		return $this->_cdn->rename_bucket_tag( $bucket, $label, $new_name );
 	}
 	
 	
