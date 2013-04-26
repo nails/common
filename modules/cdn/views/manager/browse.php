@@ -77,11 +77,11 @@
 						<ul class="layout">
 							<li class="tags">
 							
-								<?php if ( $this->input->get( 'filter-tag' ) ) : ?>
+								<?php if ( $this->input->get( 'filter-tag' ) && $bucket->objects ) : ?>
 								<div class="info remove-object-tag" data-id="<?=$this->input->get( 'filter-tag' )?>">
 									<p>Drag files here to remove from tag</p>
 								</div>
-								<?php elseif( $bucket->tags ): ?>
+								<?php elseif( $bucket->tags && $bucket->objects ): ?>
 								<div class="info">
 									<p>Drag files onto tags to organise</p>
 								</div>
@@ -94,12 +94,12 @@
 								<ul>
 									<?php
 									
-										$_selected	 = ! $this->input->get( 'filter-tag' ) ? 'selected' : '';
-										$_uri		 = $_SERVER['REQUEST_URI'];
-										$_uri		.= strpos( $_SERVER['REQUEST_URI'], '?' ) !== FALSE ? '&' : '?';
+										$_selected		 = ! $this->input->get( 'filter-tag' ) ? 'selected' : '';
+										$_uri_raw		 = $_SERVER['REQUEST_URI'];
+										$_uri_raw		.= strpos( $_SERVER['REQUEST_URI'], '?' ) !== FALSE ? '&' : '?';
 										
 										//	Filter out any existing filter-tag=
-										$_uri		 = preg_replace( '/&{1,}filter\-tag=([0-9]*)/', '', $_uri );
+										$_uri		 = preg_replace( '/&{1,}filter\-tag=([0-9]*)/', '', $_uri_raw );
 										
 										echo '<li class="tag ' . $_selected . '">';
 										echo '<a href="' . preg_replace( '/&{1,}$/', '', $_uri ) . '" class="tag">';
@@ -144,6 +144,12 @@
 									echo form_submit( 'submit', 'Upload', 'class="awesome green"' );
 									echo form_upload( 'userfile' );
 									echo form_close();
+									
+									if ( $bucket->objects ) :
+									
+										echo '<input type="text" class="search" id="search-text" placeholder="Search files">';
+										
+									endif;
 								?>
 							</li>
 							<li class="bucket-info">
@@ -170,6 +176,22 @@
 									endif;
 								
 								?>
+								<span class="view-swap">
+									<?php
+										
+										//	Filter out any existing filter-view=
+										$_uri		 = preg_replace( '/&{1,}filter\-view=([a-z]*)/', '', $_uri_raw );
+										
+										$_selected = ! $this->input->get( 'filter-view' ) ? 'selected ' . $_selected . '' : '';
+										echo anchor( preg_replace( '/&{1,}$/', '', $_uri ), 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
+										
+										$_selected = $this->input->get( 'filter-view' ) == 'list' ? 'selected' : '';
+										echo anchor( $_uri . 'filter-view=list', 'List', 'class="list ' . $_selected . '"' );
+										
+										$_selected = $this->input->get( 'filter-view' ) == 'detail' ? 'selected' : '';
+										echo anchor( $_uri . 'filter-view=detail', 'Details', 'class="detail ' . $_selected . '"' );
+									?>
+								</span>
 							</li>
 							<li class="progress">
 								uploading &rsaquo;
@@ -177,59 +199,40 @@
 									<span class="bar" style="width:75%;"></span>
 								</span>
 							</li>
-							<li class="thumbs">
+							<li class="files">
 								<ul>
 								<?php
 								
 									if ( $bucket->objects ) :
 									
 										foreach ( $bucket->objects AS $object ) :
-										
-											echo '<li class="thumb" data-id="' . $object->id . '">';
 											
-											echo '<div class="image">';
-											switch ( $object->mime ) :
+											switch ( $this->input->get( 'filter-view' ) ) :
 											
-												case 'image/jpg' :
-												case 'image/jpeg' :
-												case 'image/png' :
-												case 'image/gif' :
-													
-													//	Thumbnail
-													echo img( cdn_scale( $bucket->slug, $object->filename, 150, 175 ) );
-													
-													$_action_download = 'View';
-																											
+												case 'detail' :
+												
+													$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object ) );
+												
 												break;
 												
 												// --------------------------------------------------------------------------
 												
+												case 'list' :
+												
+													$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object ) );
+												
+												break;
+												
+												// --------------------------------------------------------------------------
+												
+												case 'thumb' :
 												default :
 												
-													//	Generic file
-													echo img( array( 'src' => NAILS_URL . 'img/icons/document-icon-128px.png', 'style' => 'border:none;margin-top:20px;' ) );
-													
-													$_action_download = 'Download';
+													$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object ) );
 												
 												break;
 											
 											endswitch;
-											
-												//	Actions
-												echo '<div class="actions">';
-												
-												echo '<a href="#" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-												echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete"' );
-												echo '<a href="' . cdn_serve( $bucket->slug, $object->filename ) . '" class="fancybox awesome small">' . $_action_download . '</a>';
-												
-												echo '</div>';
-											
-											echo '</div>';
-																							
-											//	Filename
-											echo '<p class="filename">' . $object->filename_display . '</p>';
-											
-											echo '</li>';
 										
 										endforeach;
 										
