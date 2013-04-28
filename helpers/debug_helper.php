@@ -63,9 +63,9 @@ if ( ! function_exists( 'dump' ) )
 			
 				//	Continue execution unless instructed otherwise
 				if ( $die !== FALSE )
-					die( $output );
+					die( "\n\n" . $output . "\n\n" );
 					
-				echo $output;
+				echo "\n\n" . $output . "\n\n";
 			
 			break;
 		

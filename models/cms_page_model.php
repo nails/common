@@ -2,6 +2,7 @@
 
 class Cms_page_model extends NAILS_Model
 {
+	private $_routes_dir;
 	private $_available_widgets;
 	private $_nails_widgets_dir;
 	private $_app_widgets_dir;
@@ -18,11 +19,17 @@ class Cms_page_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		$this->_routes_dir			= FCPATH . APPPATH . 'config/';
 		$this->_nails_widgets_dir	= NAILS_PATH . 'modules/cms/widgets/';
 		$this->_app_widgets_dir		= FCPATH . APPPATH . 'modules/cms/widgets/';
 		
-		$this->_nails_prefix	= 'NAILS_CMS_';
-		$this->_app_prefix		= 'CMS_';
+		$this->_nails_prefix		= 'NAILS_CMS_';
+		$this->_app_prefix			= 'CMS_';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the generic widget
+		include_once $this->_nails_widgets_dir . '_widget.php';
 	}
 	
 	
@@ -38,9 +45,141 @@ class Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function update()
+	public function update( $page_id, $data )
 	{
-		//	TODO Update a page
+		//	Firstly, remove and remember the widgets, if any.
+		if ( isset( $data->widgets ) ) :
+		
+			$_widgets = $data->widgets;
+			unset( $data->widgets );
+		
+		endif;
+		
+		//	Next, check the slug is unique, encode it to be safe
+		if ( isset( $data->slug ) ) :
+		
+			$data->slug = trim( url_title( $data->slug ) );
+			$this->db->where( 'id !=', $page_id );
+			$this->db->where( 'slug', $data->slug );
+			
+			if ( $this->db->count_all_results( 'cms_page' ) ) :
+			
+				$this->_set_error( 'Slug must be unique.' );
+				return FALSE;
+			
+			endif;
+		
+		endif;
+		
+		//	Then update the page's meta data if needed
+		$this->db->set( $data );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		
+		if ( active_user( 'id' ) ) :
+		
+			$this->db->set( 'modified_by', active_user( 'id' ) );
+		
+		endif;
+		
+		$this->db->where( 'id', $page_id );
+		
+		if ( $this->db->update( 'cms_page' ) ) :
+		
+			//	Are there any widgets which need updating? If not then we're done
+			if ( isset( $_widgets ) && is_array( $_widgets ) ) :
+			
+				//	Loop through the $_widgets array, update any `old-` widgets, add `new-` widgets,
+				//	remove widgets which aren't provided and then save the order.
+				
+				$_order				= 0;
+				$_processed_widgets	= array();
+				
+				foreach ( $_widgets AS $key => $widget ) :
+				
+					//	Prepare and set data
+					$_type = $widget['slug'];
+					unset($widget['slug']);
+					
+					$this->db->set( 'order', $_order );
+					$this->db->set( 'widget_data', serialize( $widget ) );
+					$this->db->set( 'modified', 'NOW()', FALSE );
+					
+					if ( active_user( 'id' ) ) :
+					
+						$this->db->set( 'modified_by', active_user( 'id' ) );
+					
+					endif;
+					
+					// --------------------------------------------------------------------------
+					
+					//	Old or new?
+					$key = explode( '-', $key );
+					
+					if ( $key[0] == 'old' ) :
+					
+						//	Old widget, update
+						$this->db->where( 'id', $key[1] );
+						
+						$this->db->update( 'cms_page_widget' );
+						
+						$_processed_widgets[] = $key[1];
+					
+					elseif ( $key[0] == 'new' ) :
+					
+						//	New widget, insert
+						$this->db->set( 'page_id', $page_id );
+						$this->db->set( 'widget_class', $_type );
+						$this->db->set( 'created', 'NOW()', FALSE );
+						
+						if ( active_user( 'id' ) ) :
+						
+							$this->db->set( 'created_by', active_user( 'id' ) );
+						
+						endif;
+						
+						$this->db->insert( 'cms_page_widget' );
+						
+						$_processed_widgets[] = $this->db->insert_id();
+					
+					else :
+					
+						//	Que?
+					
+					endif;
+				
+					$_order++;
+					
+				endforeach;
+				
+				// --------------------------------------------------------------------------
+				
+				//	Remove old widgets (i.e widgets which were not processed)
+				$this->db->where( 'page_id', $page_id );
+				$this->db->where_not_in( 'id', $_processed_widgets );
+				$this->db->delete( 'cms_page_widget' );
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Update the routes file
+			if ( $this->_write_routes() ) :
+			
+				return TRUE;
+			
+			else :
+			
+				return FALSE;
+			
+			endif;
+		
+		else :
+		
+			$this->_set_error( 'Could not update page.' );
+			return FALSE;
+		
+		endif;
+		
 	}
 	
 	
@@ -208,6 +347,21 @@ class Cms_page_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		//	Sanitise
+		if ( $_nails_widgets === FALSE ) :
+		
+			$_nails_widgets = array();
+		
+		endif;
+		
+		if ( $_app_widgets === FALSE ) :
+		
+			$_app_widgets = array();
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Test and merge widgets
 		$_widgets = array();
 		foreach( $_nails_widgets AS $widget ) :
@@ -301,11 +455,15 @@ class Cms_page_model extends NAILS_Model
 			
 			if ( ! $data ) :
 			
-				$data = new stdClass();
+				$data = array();
+			
+			else :
+			
+				$_data = (array) $data;
 			
 			endif;
 			
-			$data->key = $key;
+			$data['key'] = $key;
 			$data = serialize( $data );
 		
 		endif;
@@ -319,16 +477,46 @@ class Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function get_widget_editor_draggable( $widget, $data = NULL )
+	public function get_widget_editor_functions( $widget, $data = NULL, $key = NULL )
 	{
-		return $this->_call_widget_method( $widget, $data, 'get_editor_draggable_html' );
+		if ( ! is_null( $key ) ) :
+		
+			$data = unserialize( $data );
+			
+			if ( ! $data ) :
+			
+				$data = array();
+			
+			else :
+			
+				$_data = (array) $data;
+			
+			endif;
+			
+			$data['key'] = $key;
+			$data = serialize( $data );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return $this->_call_widget_method( $widget, $data, 'get_editor_functions' );
 	}
 	
 	
 	// --------------------------------------------------------------------------
 	
 	
-	private function _call_widget_method( $widget, $data, $method )
+	public function get_widget_validation_rules( $widget, $field )
+	{
+		return $this->_call_widget_method( $widget, NULL, 'get_validation_rules', array( 'field' => $field ) );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _call_widget_method( $widget, $data, $method, $params = array() )
 	{
 		//	Load up widget classes
 		$_class		= strtolower( $widget );
@@ -368,15 +556,46 @@ class Cms_page_model extends NAILS_Model
 		
 		endif;
 		
-		if ( $_class ) :
+		if ( $_class && method_exists( $_class, $method ) ) :
 		
 			$_temp = new $_class();
 			$_temp->setup( unserialize( $data ) );
-			$_result = $_temp->$method();
+			$_result = call_user_func_array( array( $_temp, $method ), $params ); 
 			unset( $_temp );
 			
 			return $_result;
+		
+		endif;
+	}
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function can_write_routes()
+	{
+		//	First, test if file exists, if it does is it writable?
+		if ( file_exists( $this->_routes_dir . 'routes_cms_page.php' ) ) :
+		
+			if ( is_writable( $this->_routes_dir . 'routes_cms_page.php' ) ) :
 			
+				return TRUE;
+			
+			else :
+			
+				$this->_set_error( 'The route config exists, but is not writeable.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
+				return FALSE;
+			
+			endif;
+			
+		elseif ( is_writable( $this->_routes_dir ) ) :
+		
+			return TRUE;
+		
+		else :
+		
+			$this->_set_error( 'The route directory is not writeable.<small>' . $this->_routes_dir . '</small>' );
+			return FALSE;
+		
 		endif;
 	}
 	
@@ -385,7 +604,45 @@ class Cms_page_model extends NAILS_Model
 	
 	private function _write_routes()
 	{
-		//	TODO Rewrite the routes include file
+		if ( ! $this->can_write_routes() ) :
+		
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Routes are writeable, apparently, give it a bash
+		$_data = '<?php  if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\');' . "\n\n";
+		
+		$_pages = $this->get_all();
+		
+		foreach ( $_pages AS $page ) :
+		
+			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page\';';
+		
+		endforeach;
+		
+		$_fh = @fopen( $this->_routes_dir . 'routes_cms_page.php', 'w' );
+		
+		if ( ! $_fh ) :
+		
+			$this->_set_error( 'Unable to open routes file for writing.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
+			return FALSE;
+		
+		endif;
+		
+		if ( ! fwrite( $_fh, $_data ) ) :
+		
+			fclose( $_fh );
+			$this->_set_error( 'Unable to write data to routes file.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
+			return FALSE;
+		
+		endif;
+		
+		fclose( $_fh );
+		
+		return TRUE;
 	}
 }
 

@@ -4,7 +4,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	protected $data;
 	protected $user;
-	protected $_error;
+	protected $_error = array();
 	
 	
 	// --------------------------------------------------------------------------
