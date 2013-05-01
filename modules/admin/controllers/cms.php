@@ -87,6 +87,15 @@ class Cms extends Admin_Controller {
 		
 		if ( method_exists( $this, '_pages_' . $_method ) ) :
 		
+		
+			if ( ! $this->cms_page->can_write_routes() ) :
+			
+				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system: ' . implode( '', $this->cms_page->get_error() );
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
 			$this->{'_pages_' . $_method}();
 		
 		else :
@@ -147,9 +156,78 @@ class Cms extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		if ( $this->input->post() ) :
+		//	Load form validation (for error checking in the view, always needs t be available)
+		$this->load->library( 'form_validation' );
 		
-			dumpanddie($this->input->post());
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->post() ) :
+			
+			//	Set Rules
+			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|required|callback__callback_slug' );
+			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+			
+			//	Set messages
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			
+			//	Loop the widgets and get any widget specific validation rules
+			if ( is_array( $this->input->post( 'widgets' ) ) ) :
+			
+				foreach( $this->input->post( 'widgets' ) AS $postkey => $widget ) :
+				
+					foreach( $widget AS $field => $value ) :
+					
+						//	Skip the slug
+						if ( $field == 'slug' ) :
+						
+							continue;
+						
+						endif;
+					
+						$_rules = $this->cms_page->get_widget_validation_rules( $widget['slug'], $field );
+						
+						if ( $_rules ) :
+						
+							$this->form_validation->set_rules( 'widgets[' . $postkey . '][' . $field . ']', $field,	$_rules );
+						
+						endif;
+					
+					endforeach;
+				
+				endforeach;
+			
+			endif;
+			
+			//	Execute
+			if ( $this->form_validation->run( $this ) ) :
+			
+				//	Update the page
+				$_data					= new stdClass();
+				$_data->title			= $this->input->post( 'title' );
+				$_data->slug			= $this->input->post( 'slug' );
+				$_data->widgets			= $this->input->post( 'widgets' );
+				$_data->seo_description	= $this->input->post( 'seo_description' );
+				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+				
+				if ( $this->cms_page->update( $this->uri->segment( 5 ), $_data ) ) :
+				
+					//	Saved!
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page updated.' );
+					redirect( 'admin/cms/pages' );
+				
+				else :
+				
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( $this->cms_page->get_error() );
+				
+				endif;
+			
+			else :
+			
+				$this->data['error'] = lang( 'fv_there_were_errors' );
+			
+			endif;
 		
 		endif;
 		
@@ -166,6 +244,40 @@ class Cms extends Admin_Controller {
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/cms/pages/edit',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function _callback_slug( $str )
+	{
+		$str = trim( $str );
+		
+		//	Check is valid
+		if ( preg_match( '/[^a-zA-Z0-9\-_\/\.]+/', $str ) ) :
+		
+			$this->form_validation->set_message( '_callback_slug', 'Contains invalid characters (A-Z, 0-9, -, _ and / only).' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$str = url_title( $str );
+		$this->db->where( 'id !=', $this->uri->segment( 5 ) );
+		$this->db->where( 'slug', $str );
+		
+		if ( $this->db->count_all_results( 'cms_page' ) ) :
+		
+			$this->form_validation->set_message( '_callback_slug', 'Slug must be unique.' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return TRUE;
 	}
 	
 	

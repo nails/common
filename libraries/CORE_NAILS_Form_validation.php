@@ -19,6 +19,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 	
 	
+	public function get_error_array()
+	{
+		return $this->_error_array;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/**
 	 * Checks if a certain value is unique in a specified table
 	 * if different from current value.

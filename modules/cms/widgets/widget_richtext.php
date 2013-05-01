@@ -1,13 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget_richtext
+class Nails_CMS_Widget_richtext extends Nails_CMS_Widget
 {
 	static function details()
 	{
 		$_d	= new stdClass();
 		
 		$_d->name	= 'Rich Text';
+		$_d->iam	= 'Nails_CMS_Widget_richtext';
 		$_d->slug	= 'Widget_richtext';
+		$_d->info	= 'Build beautiful pages using the rich text editor; embed images, links and more.';
 		
 		return $_d;
 	}
@@ -32,17 +34,17 @@ class Nails_CMS_Widget_richtext
 	
 	public function setup( $data )
 	{
-		if ( isset( $data->body ) ) :
+		if ( isset( $data['body'] ) ) :
 		
-			$this->_body = $data->body;
+			$this->_body = $data['body'];
 		
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
-		if ( isset( $data->key ) && ! is_null( $data->key ) ) :
+		if ( isset( $data['key'] ) && ! is_null( $data['key'] ) ) :
 		
-			$this->_key = $data->key;
+			$this->_key = $data['key'];
 		
 		endif;
 	}
@@ -56,57 +58,75 @@ class Nails_CMS_Widget_richtext
 	
 	// --------------------------------------------------------------------------
 	
-	public function get_editor_draggable_html()
+	public function get_editor_html()
 	{
-		$_details = self::details();
+		$_details	= self::details();
+		
+		//	Include the slug as a hidden field, required for form rebuilding
+		$_out = form_hidden( $this->_key . '[slug]', $_details->slug );
+		
+		// --------------------------------------------------------------------------
 		
 		//	Return editor HTML
-		$_out  = '<li class="widget ' . $_details->slug . '" data-template="' . $_details->slug . '">';
-		$_out .= $_details->name;
-		$_out .= '</li>';
+		$_out .= form_textarea( $this->_key . '[body]', set_value( $this->_key . '[body]', $this->_body ), 'class="ckeditor"' );
 		
 		// --------------------------------------------------------------------------
 		
 		return $_out;
 	}
 	
+	
 	// --------------------------------------------------------------------------
 	
-	public function get_editor_html()
+	
+	protected function _editor_function_start()
 	{
-		$_details = self::details();
-		
-		//	Return editor HTML
-		$_out  = '<li class="holder">';
-		
-		$_out .= '<h2 class="handle">';
-		$_out .= $_details->name;
-		$_out .= '<a href="#" class="close">Close</a>';
-		$_out .= '</h2>';
-		$_out .= '<div class="editor-content">';
-		$_out .= '<p>';
-		$_out .= form_textarea( $this->_key . 'body', set_value( $this->_key . '[body]', $this->_body ), 'class="ckeditor"' );
-		$_out .= '</p>';
-		$_out .= '</div>';
+	
+$_out  = <<<EOT
+console.log('start');
+for ( var name in CKEDITOR.instances )
+{
+	var _data = CKEDITOR.instances[name].getData();
+	CKEDITOR.instances[name].destroy(true);
+	$( '.ckeditor[name="'+name+'"]' ).html(_data);
+}
 
-		$_out .= '</li>';
-		
-		// --------------------------------------------------------------------------
-		
-		//	JS
-		$_out .=  '<script type="text/javascript">';
-		$_out .= 'CKEDITOR.replaceAll( function( textarea, config ) {';
-		$_out .= 'if ( typeof(CKEDITOR.instances[textarea.name]) == \'undefined\' && $(textarea).hasClass( \'ckeditor\' ) )';
-		$_out .= '{';
-		$_out .= '	return true;';
-		$_out .= '} else {';
-		$_out .= '	return false;';
-		$_out .= '}';
-		$_out .= '})';
-		$_out .= '</script>';
-		
-		// --------------------------------------------------------------------------
+EOT;
 		
 		return $_out;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	protected function _editor_function_stop()
+	{
+	
+$_out  = <<<EOT
+console.log('stop');
+CKEDITOR.replaceAll( 'ckeditor' );
+
+EOT;
+		
+		return $_out;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function get_validation_rules( $field )
+	{
+		$_rules = '';
+		
+		switch( $field ) :
+		
+			case 'body' :	$_rules = 'required';	break;
+		
+		endswitch;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_rules;
 	}
 }

@@ -1,5 +1,5 @@
 <div class="group-cms pages edit">
-
+	<?=form_open()?>
 	<fieldset id="cms-page-edit-meta">
 		<legend>Meta Data</legend>
 			<?php
@@ -40,7 +40,11 @@
 			//	Get the widget draggables
 			foreach( $widgets AS $widget ) :
 			
-				echo $this->cms_page->get_widget_editor_draggable( $widget->slug );
+				$_class = $widgets[$widget->slug]->iam;
+				
+				echo '<li class="widget ' . $widget->slug . '" data-template="' . $widget->slug . '">';
+				echo $_class::details()->name;
+				echo '</li>';
 			
 			endforeach;	
 		?>
@@ -51,11 +55,105 @@
 		</li>
 		<?php
 		
-			//	Get the widget editors
-			$_counter = 0;
-			foreach( $cmspage->widgets AS $widget ) :
+			//	Get the widget editors, depending on the source, we need
+			//	to loop and preparethe data.
 			
-				echo $this->cms_page->get_widget_editor( $widget->widget_class, $widget->widget_data, 'old_widget[' . $widget->id . ']' );
+			//	If post data has been defined, use that
+			if ( is_array( $this->input->post( 'widgets' )  ) ) :
+			
+				$_widgets = array();
+				
+				//	Define the slug, key and data
+				foreach( $this->input->post( 'widgets' ) AS $key => $data ) :
+				
+					$_temp = new stdClass();
+					
+					//	Slug
+					$_temp->slug	= $data['slug'];
+					unset( $data['slug'] );
+					
+					//	Key
+					$_temp->key		= $key;
+					
+					//	Data
+					$_temp->data	= serialize( $data );
+					
+					// --------------------------------------------------------------------------
+					
+					$_widgets[]		= $_temp;
+				
+				endforeach;
+			
+			else :
+			
+				$_widgets = array();
+								
+				//	Define the slug, key and data
+				foreach( $cmspage->widgets AS $widget ) :
+				
+					$_temp = new stdClass();
+					
+					//	Slug
+					$_temp->slug	= $widget->widget_class;
+					
+					//	Key
+					$_temp->key		= 'old-' . $widget->id;
+					
+					//	Data
+					$_temp->data	= $widget->widget_data;
+					
+					// --------------------------------------------------------------------------
+					
+					$_widgets[]		= $_temp;
+				
+				endforeach;
+			
+			endif;
+			
+			$_counter = 0;
+			foreach( $_widgets AS $widget ) :
+			
+				$_class = $widgets[$widget->slug]->iam;
+				
+				//	Handle
+				echo '<li class="holder ' . $widget->slug . '" data-template="' . $widget->slug . '">';
+				echo '<h2 class="handle">';
+				echo $_class::details()->name;
+				echo '<small>' . $_class::details()->info . '</small>';
+				echo '<a href="#" class="close">Close</a>';
+				echo '</h2>';
+				
+				//	Editor
+				echo '<div class="editor-content">';
+				
+					//	Any errors?
+					$_errors = '';
+					foreach ( $this->form_validation->get_error_array() AS $field => $message ) :
+					
+						if ( preg_match( '/widgets\[' . $widget->key . '\]\[(.*)\]/', $field, $_matches ) ) :
+						
+							
+							$_errors .= '<br />&rsaquo; ' . ucwords( str_replace( '_', ' ', $_matches[1] ) ) .' - ' . $message;
+						
+						endif;
+					
+					endforeach;
+					
+					if ( $_errors ) :
+					
+						echo '<p class="system-alert error no-close">';
+						echo '<strong>There are errors in this widget:</strong>';
+						echo $_errors;
+						echo '</p>';
+					
+					endif;
+					
+					// --------------------------------------------------------------------------
+					
+					echo $this->cms_page->get_widget_editor( $widget->slug, $widget->data, 'widgets[' . $widget->key . ']' );
+					
+				echo '</div>';
+				echo '<li>';
 				
 				$_counter++;
 			
@@ -96,6 +194,15 @@
 			
 			?>
 	</fieldset>
+	
+	<p>
+		<?php
+		
+			echo form_submit( 'submit', lang( 'action_save_changes' ) );
+			echo form_close();
+			
+		?>
+	</p>
 
 </div>
 
@@ -114,11 +221,24 @@
 
 <?php
 
-	//	Get the widget templates
+	//	Get the widget templates and functions
 	foreach( $widgets AS $widget ) :
 	
+		$_class = $widgets[$widget->slug]->iam;
+		
 		echo '<script type="text/template" id="' . $widget->slug . '">';
-		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'new_widget[{{counter}}]' );
+		echo '<h2 class="handle">';
+		echo $_class::details()->name;
+		echo '<small>' . $_class::details()->info . '</small>';
+		echo '<a href="#" class="close">Close</a>';
+		echo '</h2>';
+		echo '<div class="editor-content">';
+		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'widgets[new-{{counter}}]' );
+		echo '</div>';
+		echo '</script>';
+		
+		echo '<script type="text/javascript">';
+		echo $this->cms_page->get_widget_editor_functions( $widget->slug, NULL, 'widgets[new-{{counter}}]' );
 		echo '</script>';
 	
 	endforeach;	

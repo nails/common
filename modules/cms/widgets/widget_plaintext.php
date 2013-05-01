@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget_plaintext
+class Nails_CMS_Widget_plaintext extends Nails_CMS_Widget
 {
 	static function details()
 	{
@@ -8,20 +8,23 @@ class Nails_CMS_Widget_plaintext
 		
 		$_d->name	= 'Plain Text';
 		$_d->slug	= 'Widget_plaintext';
+		$_d->iam	= 'Nails_CMS_Widget_plaintext';
+		$_d->info	= 'Plain, completely unformatted text.';
 		
 		return $_d;
 	}
 	
 	// --------------------------------------------------------------------------
 	
-	
+	private $_key;
 	private $_body;
 	
 	// --------------------------------------------------------------------------
 	
 	public function __construct()
 	{
-		$this->_body = '';
+		$this->_key		= 'plaintext';
+		$this->_body	= '';
 	}
 	
 	
@@ -30,9 +33,17 @@ class Nails_CMS_Widget_plaintext
 	
 	public function setup( $data )
 	{
-		if ( isset( $data->body ) ) :
+		if ( isset( $data['body'] ) ) :
 		
-			$this->_body = $data->body;
+			$this->_body = $data['body'];
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( isset( $data['key'] ) && ! is_null( $data['key'] ) ) :
+		
+			$this->_key = $data['key'];
 		
 		endif;
 	}
@@ -41,23 +52,7 @@ class Nails_CMS_Widget_plaintext
 	
 	public function render()
 	{
-		return $this->_body;
-	}
-	
-	// --------------------------------------------------------------------------
-	
-	public function get_editor_draggable_html()
-	{
-		$_details = self::details();
-		
-		//	Return editor HTML
-		$_out  = '<li class="widget ' . $_details->slug . '" data-template="' . $_details->slug . '">';
-		$_out .= $_details->name;
-		$_out .= '</li>';
-		
-		// --------------------------------------------------------------------------
-		
-		return $_out;
+		return nl2br( $this->_body );
 	}
 	
 	// --------------------------------------------------------------------------
@@ -66,21 +61,13 @@ class Nails_CMS_Widget_plaintext
 	{
 		$_details = self::details();
 		
-		//	Return editor HTML
-		$_out  = '<li class="holder">';
+		//	Include the slug as a hidden field, required for form rebuilding
+		$_out = form_hidden( $this->_key . '[slug]', $_details->slug );
 		
-		$_out .= '<h2 class="handle">';
-		$_out .= $_details->name;
-		$_out .= '<a href="#" class="close">Close</a>';
-		$_out .= '</h2>';
-		$_out .= '<div class="editor-content">';
-		$_out .= '<p class="coming-soon">';
-		$_out .= '<strong>Plain Text CMS Widget coming soon!</strong>';
-		$_out .= 'Soon you\'ll be able to place blocks of plain text into your pages.';
-		$_out .= '</p>';
-		$_out .= '</div>';
-
-		$_out .= '</li>';
+		// --------------------------------------------------------------------------
+		
+		//	Return editor HTML
+		$_out .= form_textarea( $this->_key . '[body]', set_value( $this->_key . '[body]', $this->_body ) );
 		
 		// --------------------------------------------------------------------------
 		
