@@ -169,21 +169,21 @@
 				//	FACEBOOK
 				if ( module_is_enabled( 'auth[facebook]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_register_social_register', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
 				
 				endif;
 				
 				//	TWITTER
 				if ( module_is_enabled( 'auth[twitter]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_register_social_register', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
 				
 				endif;
 				
 				//	LINKEDIN
 				if ( module_is_enabled( 'auth[linkedin]' ) ) :
 				
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_register_social_register', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
 				
 				endif;
 				

@@ -45,6 +45,13 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Determine render currency
+		//	TODO
+		define( 'SHOP_CURRENCY_SYMBOL', '&pound;' );
+		define( 'SHOP_CURRENCY_CODE', 'GBP' );
+		
+		// --------------------------------------------------------------------------
+		
 		//	Load the styles
 		$this->asset->load( 'nails.shop.css', TRUE );
 	}

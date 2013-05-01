@@ -93,7 +93,7 @@
 	$lang['auth_register_label_accept_tc']				= 'I accept the <a href="%s">T&amp;C\'s</a>';
 	
 	$lang['auth_register_social_message']				= 'Or, to save time, register using your preferred social network.';
-	$lang['auth_register_social_signin']				= 'Sign in with %s';
+	$lang['auth_register_social_signin']				= 'Register with %s';
 	
 	//	Extra info
 	$lang['auth_register_extra_message']				= 'In order to complete setting up your account we need a little more information from you.';

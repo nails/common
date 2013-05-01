@@ -48,7 +48,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( array_search( APP_DEFAULT_LANG_SAFE, $_supported ) === FALSE ) :
 		
 	 		header( 'HTTP/1.1 500 Bad Request' );
-			die( 'ERROR: Default language ' . APP_DEFAULT_LANG_SAFE . ' is not a supported langauge.' );
+			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SAFE . '" is not a supported language.' );
 		
 		endif;
 		
