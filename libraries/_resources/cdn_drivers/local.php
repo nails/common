@@ -352,7 +352,8 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		//	Does the user have permission to write to the bucket?
-		if ( ! get_userobject()->is_admin() && $_bucket->user->id && $_bucket->user->id != active_user( 'id' ) ) :
+
+		if ( ! get_userobject()->is_admin() && $_bucket->user_id && $_bucket->user_id != active_user( 'id' ) ) :
 		
 			$this->_error( 'You do not have permission to modify that bucket.' );
 			return FALSE;
