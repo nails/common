@@ -10,8 +10,10 @@
 class Shop_basket_model extends NAILS_Model
 {
 	private $_items;
+	private $_personal_details;
 	private $_payment_gateway;
 	private $_shipping_details;
+	private $_order_id;
 	private $_sess_var;
 	
 	
@@ -49,7 +51,19 @@ class Shop_basket_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		$this->_personal_details	= $this->session->userdata( $this->sess_var . '_pd' );
+		
+		if ( ! $this->_personal_details ) :
+		
+			$this->_personal_details				= new stdClass();
+			$this->_personal_details->first_name	= '';
+			$this->_personal_details->last_name		= '';
+			$this->_personal_details->email			= '';
+		
+		endif;
+		
 		$this->_payment_gateway		= (int) $this->session->userdata( $this->sess_var . '_pg' );
+		$this->_order_id			= (int) $this->session->userdata( $this->sess_var . '_oi' );
 		$this->_shipping_details	= $this->session->userdata( $this->sess_var . '_sd' );
 		
 		if ( ! $this->_shipping_details ) :
@@ -89,8 +103,10 @@ class Shop_basket_model extends NAILS_Model
 		$_basket->not_available		= array();
 		$_basket->quantity_adjusted	= array();
 		$_basket->requires_shipping	= FALSE;
+		$_basket->personal_details	= $this->_personal_details;
 		$_basket->shipping_details	= $this->_shipping_details;
 		$_basket->payment_gateway	= $this->_payment_gateway;
+		$_basket->order_id			= $this->_order_id;
 		
 		$_not_available				= array();
 		
@@ -220,10 +236,6 @@ class Shop_basket_model extends NAILS_Model
 		$_basket->totals->tax		= number_format( $_basket->totals->tax, 2);
 		$_basket->totals->sub		= number_format( $_basket->totals->sub, 2);
 		$_basket->totals->grand		= number_format( $_basket->totals->grand, 2);
-		
-		// --------------------------------------------------------------------------
-		
-		//	Update the session
 		
 		// --------------------------------------------------------------------------
 		
@@ -487,6 +499,15 @@ class Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	public function add_personal_details( $details )
+	{
+		$this->session->set_userdata( $this->sess_var . '_pd', $details );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	public function add_shipping_details( $details )
 	{
 		$this->session->set_userdata( $this->sess_var . '_sd', $details );
@@ -499,6 +520,15 @@ class Shop_basket_model extends NAILS_Model
 	public function add_payment_gateway( $payment_gateway )
 	{
 		$this->session->set_userdata( $this->sess_var . '_pg', $payment_gateway );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function add_order_id( $order_id )
+	{
+		$this->session->set_userdata( $this->sess_var . '_oi', $order_id );
 	}
 	
 	

@@ -8,11 +8,54 @@
 		
 		// --------------------------------------------------------------------------
 		
+		//	Personal Details
+		if ( $guest ) :
+		
+			//	Title
+			if ( $requires_shipping || count( $payment_gateways ) > 1 ) :
+			
+				echo '<h2>Personal Details</h2>';
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			$_field					= array();
+			$_field['key']			= 'first_name';
+			$_field['label']		= 'First Name';
+			$_field['placeholder']	= 'e.g John';
+			
+			echo form_field( $_field );
+			
+			// --------------------------------------------------------------------------
+			
+			$_field					= array();
+			$_field['key']			= 'last_name';
+			$_field['label']		= 'Surname';
+			$_field['placeholder']	= 'e.g Smith';
+			
+			echo form_field( $_field );
+			
+			// --------------------------------------------------------------------------
+			
+			$_field					= array();
+			$_field['key']			= 'email';
+			$_field['label']		= 'Email';
+			$_field['placeholder']	= 'e.g john@smith.com';
+			
+			echo form_field( $_field );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Shipping Options
 		if ( $requires_shipping ) :
 		
-			if ( count( $payment_gateways ) > 1 ) :
+			//	Title
+			if ( $guest || count( $payment_gateways ) > 1 ) :
 			
-				echo '<h2>Shipping Options</h2>';
+				echo '<h2>Shipping Details</h2>';
 			
 			endif;
 			
@@ -109,14 +152,6 @@
 				echo form_field_dropdown( $_field, array( 'AUS Example State','AUS Example State','AUS Example State' ) );
 			
 			echo '</div>';
-			
-			// --------------------------------------------------------------------------
-			
-			if ( count( $payment_gateways ) > 1 ) :
-			
-				echo '<h2>Payment Options</h2>';
-			
-			endif;
 		
 		endif;
 		
@@ -124,6 +159,13 @@
 		
 		//	Payment Options
 		if ( count( $payment_gateways ) > 1 ) :
+		
+			//	Title
+			if ( $guest || $requires_shipping ) :
+			
+				echo '<h2>Payment Options</h2>';
+			
+			endif;
 		
 			echo '<p>Please choose your preferred payment method.</p>';
 			

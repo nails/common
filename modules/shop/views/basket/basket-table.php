@@ -64,15 +64,15 @@
 						if ( $item->is_on_sale ) :
 						
 							echo '<td class="price on-sale">';
-							echo '<span>' . SHOP_CURRENCY_SYMBOL . $item->sale_price . '</span>';
+							echo '<span>' . SHOP_USER_CURRENCY_SYMBOL . $item->sale_price . '</span>';
 							echo '<span class="ribbon"></span>';
-							echo '<del>was ' . SHOP_CURRENCY_SYMBOL . $item->price . '</del>';
+							echo '<del>was ' . SHOP_USER_CURRENCY_SYMBOL . $item->price . '</del>';
 							echo '</td>';
 						
 						else :
 						
 							echo '<td class="price">';
-							echo SHOP_CURRENCY_SYMBOL . $item->price;
+							echo SHOP_USER_CURRENCY_SYMBOL . $item->price;
 							echo '</td>';
 						
 						endif;
@@ -84,7 +84,7 @@
 						if ( $item->shipping ) :
 						
 							echo '<td class="shipping">';
-							echo SHOP_CURRENCY_SYMBOL . $item->shipping;
+							echo SHOP_USER_CURRENCY_SYMBOL . $item->shipping;
 							echo '</td>';
 						
 						else :
@@ -96,7 +96,7 @@
 						endif;
 						
 					?>
-					<td class="total"><?=SHOP_CURRENCY_SYMBOL . $item->total?></td>
+					<td class="total"><?=SHOP_USER_CURRENCY_SYMBOL . $item->total?></td>
 				</tr>
 				<?php
 		
@@ -112,7 +112,7 @@
 				
 				if ( $basket->totals->shipping ) :
 				
-					echo SHOP_CURRENCY_SYMBOL . $basket->totals->shipping;
+					echo SHOP_USER_CURRENCY_SYMBOL . $basket->totals->shipping;
 				
 				else :
 				
@@ -127,12 +127,12 @@
 		<tr class="total grand">
 			<td class="label" colspan="4">TAX</td>
 			<td class="value">&nbsp;</td>
-			<td class="value"><?=SHOP_CURRENCY_SYMBOL . $basket->totals->tax?></td>
+			<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . $basket->totals->tax?></td>
 		</tr>
 		<tr class="total grand">
 			<td class="label" colspan="4">Grand Total</td>
 			<td class="value">&nbsp;</td>
-			<td class="value"><?=SHOP_CURRENCY_SYMBOL . $basket->totals->grand?></td>
+			<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . $basket->totals->grand?></td>
 		</tr>
 		
 	</tbody>

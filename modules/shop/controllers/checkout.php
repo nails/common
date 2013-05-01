@@ -81,9 +81,10 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 			
 			//	If there's no shipping and only one payment gateway then skip this page
-			//	entirely - simples!
+			//	entirely - simples! Unless they are a guest, in which case we need to take
+			//	some personal details
 			
-			if ( ! $this->data['requires_shipping'] && count( $this->data['payment_gateways'] ) == 1 ) :
+			if ( ! $this->data['guest'] && ! $this->data['requires_shipping'] && count( $this->data['payment_gateways'] ) == 1 ) :
 			
 				//	Save payment gateway info to the session
 				$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
@@ -106,6 +107,16 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 				//	Validate
 				$this->load->library( 'form_validation' );
+				
+				if ( $this->data['guest'] ) :
+				
+					$this->form_validation->set_rules( 'first_name',	'First Name',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'last_name',		'Surname',		'xss_clean|required' );
+					$this->form_validation->set_rules( 'email',			'Email',		'xss_clean|required|valid_email' );
+				
+				endif;
+				
+				// --------------------------------------------------------------------------
 				
 				if ( $this->data['requires_shipping'] ) :
 				
@@ -141,19 +152,38 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				
 				endif;
 				
+				// --------------------------------------------------------------------------
+				
 				//	Payment gateway
 				$this->form_validation->set_rules( 'payment_gateway', 'Payment Gateway', 'xss_clean|required|is_natural' );
+				
+				// --------------------------------------------------------------------------
 				
 				//	Set messages
 				$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
 				$this->form_validation->set_message( 'is_natural',	lang( 'fv_required' ) );
+				$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
 				
 				if ( $this->form_validation->run() ) :
-
+				
+					//	Save personal info to session
+					if ( $this->data['guest'] ) :
+					
+						$_details				= new stdClass();
+						$_details->first_name	= $this->input->post( 'first_name' );
+						$_details->last_name	= $this->input->post( 'last_name' );
+						$_details->email		= $this->input->post( 'email' );
+						
+						$this->basket->add_personal_details( $_details );
+					
+					endif;
+					
+					// --------------------------------------------------------------------------
+					
 					//	Save shipping info to the session
 					if ( $this->data['requires_shipping'] ) :
 					
-						$_details = new stdClass();
+						$_details				= new stdClass();
 						$_details->addressee	= $this->input->post( 'addressee' );
 						$_details->line_1		= $this->input->post( 'line_1' );
 						$_details->line_2		= $this->input->post( 'line_2' );
@@ -175,30 +205,47 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						
 						endif;
 						
-						$this->basket->add_shipping_info( $_details );
+						$this->basket->add_shipping_details( $_details );
 					
 					endif;
 					
 					// --------------------------------------------------------------------------
 					
-					//	Redirect to the appropriate payment gateway
-					foreach ( $this->data['payment_gateways'] AS $pg ) :
+					//	Redirect to the appropriate payment gateway. If there's only one, then
+					//	bump straight along to that one
 					
-						if ( $pg == $this->input->post( 'payment_gateway' ) ) :
-						
-							//	Save payment gateway info to the session
-							$this->basket_model->add_payment_gateway( $pg->id );
-							
-							//	... and confirm
-							$_uri  = 'shop/checkout/confirm';
-							$_uri .= $this->data['guest'] ? '?guest=true' : '';
-							
-							redirect( $_uri );
-							break;
-						
-						endif;
+					if ( count( $this->data['payment_gateways'] ) == 1 ) :
 					
-					endforeach;
+						//	Save payment gateway info to the session
+						$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+						
+						//	... and confirm
+						$_uri  = 'shop/checkout/confirm';
+						$_uri .= $this->data['guest'] ? '?guest=true' : '';
+						
+						redirect( $_uri );
+					
+					else :
+					
+						foreach ( $this->data['payment_gateways'] AS $pg ) :
+						
+							if ( $pg == $this->input->post( 'payment_gateway' ) ) :
+							
+								//	Save payment gateway info to the session
+								$this->basket->add_payment_gateway( $pg->id );
+								
+								//	... and confirm
+								$_uri  = 'shop/checkout/confirm';
+								$_uri .= $this->data['guest'] ? '?guest=true' : '';
+								
+								redirect( $_uri );
+								break;
+							
+							endif;
+						
+						endforeach;
+						
+					endif;
 					
 					// --------------------------------------------------------------------------
 					
@@ -216,19 +263,27 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Set appropriate title
-			if ( $this->data['requires_shipping'] && count( $this->data['payment_gateways'] ) > 1 ) :
+			$_titles = array();
 			
-				$this->data['page']->title = 'Checkout &rsaquo; Shipping and Payment Options';
+			if ( $this->data['guest'] ) :
 			
-			elseif ( $this->data['requires_shipping'] ) :
-			
-				$this->data['page']->title = 'Checkout &rsaquo; Shipping Options';
-				
-			else :
-			
-				$this->data['page']->title = 'Checkout &rsaquo; Payment Options';
+				$_titles[] = 'Personal Details';
 			
 			endif;
+			
+			if ( $this->data['requires_shipping'] ) :
+			
+				$_titles[] = 'Shipping Details';
+			
+			endif;
+			
+			if ( count( $this->data['payment_gateways'] ) > 1 ) :
+			
+				$_titles[] = 'Payment Options';
+			
+			endif;
+			
+			$this->data['page']->title = 'Checkout &rsaquo; ' . str_lreplace( ', ', ' &amp; ', implode( ', ', $_titles ) );
 			
 			// --------------------------------------------------------------------------
 			
@@ -393,10 +448,15 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _payment_paypal()
 	{
 		//	Create the order
-		$this->data['order'] = new stdClass();
-		$this->data['order']->id	= 123;
-		$this->data['order']->ref	= 'ABCREF';
-		$this->data['order']->code	= '123ABCCODE';
+		$this->data['order'] = $this->order->create( $this->data['basket'], TRUE );
+		
+		if ( ! $this->data['order'] ) :
+		
+			$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . implode( '', $this->order->get_errors() ) );
+			redirect( 'shop/basket' );
+			return;
+		
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -441,7 +501,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load the views
-		$this->load->view( 'shop/payment/paypal/index',	$this->data );
+		$this->load->view( 'shop/checkout/payment/paypal/index',	$this->data );
 	}
 	
 	
@@ -532,7 +592,70 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	public function processing()
 	{
-		here( 'TODO: Wait for the order status to be updated.' );
+		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		
+		switch( $this->data['order']->status ) :
+		
+			case 'PENDING' :	$this->_processing_pending();		break;
+			case 'VERIFIED' :	$this->_processing_verified();		break;
+			case 'ABANDONED' :	$this->_processing_abandond();		break;
+			case 'CANCELLED' :	$this->_processing_cancelled();		break;
+			default :			$this->_processing_error();			break;
+		
+		endswitch;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _processing_pending()
+	{
+		$this->load->view( 'shop/checkout/payment/processing/pending', $this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _processing_verified()
+	{
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'shop/checkout/payment/processing/verified', $this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _processing_abandoned()
+	{
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'shop/checkout/payment/processing/abandoned', $this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _processing_cancelled()
+	{
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'shop/checkout/payment/processing/cancelled', $this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _processing_error()
+	{
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'shop/checkout/payment/processing/error', $this->data );
+		$this->load->view( 'structure/footer',	$this->data );
 	}
 	
 	
@@ -550,7 +673,46 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	public function notify()
 	{
-		here( 'TODO: Handle payment gateways notifying' );
+		switch( $this->uri->segment( 4 ) ) :
+		
+			case 'paypal';	$this->_notify_paypal();	break;
+			
+			// --------------------------------------------------------------------------
+			
+			default : show_404();	break;
+		
+		endswitch;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _notify_paypal()
+	{
+		here();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _notify_is_testing()
+	{
+		if ( ENVIRONMENT == 'production' )
+			return FALSE;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->get( 'testing' ) && $this->input->get( 'ref' ) ) :
+		
+			return TRUE;
+		
+		else :
+		
+			return FALSE;
+		
+		endif;
 	}
 }
 

@@ -45,10 +45,23 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Determine render currency
-		//	TODO
-		define( 'SHOP_CURRENCY_SYMBOL', '&pound;' );
-		define( 'SHOP_CURRENCY_CODE', 'GBP' );
+		//	Set the currency constants
+		
+		//	TODO; hard coded GBP the noo
+		
+		//	Shop's base currency (i.e what the products are listed in etc)
+		define( 'SHOP_BASE_CURRENCY_SYMBOL',	'&pound;' );
+		define( 'SHOP_BASE_CURRENCY_CODE',		'GBP' );
+		define( 'SHOP_BASE_CURRENCY_ID',		52 );
+		
+		//	User's preferred currency
+		define( 'SHOP_USER_CURRENCY_SYMBOL',	'&pound;' );
+		define( 'SHOP_USER_CURRENCY_CODE',		'GBP' );
+		define( 'SHOP_USER_CURRENCY_ID',		52 );
+		
+		//	Exchange rate betweent the two currencies
+		define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
+		
 		
 		// --------------------------------------------------------------------------
 		

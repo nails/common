@@ -57,7 +57,7 @@ if ( ! function_exists( 'get_basket_count' ) )
 
 
 /**
- * Gets the number of items of the absket
+ * Gets the number of items of the basket
  *
  * @access	public
  * @param	none
