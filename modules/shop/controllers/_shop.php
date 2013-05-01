@@ -32,6 +32,7 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load the models
+		$this->load->model( 'shop_model',			'shop' );
 		$this->load->model( 'shop_basket_model',	'basket' );
 		$this->load->model( 'shop_currency_model',	'currency' );
 		$this->load->model( 'shop_order_model',		'order' );
@@ -46,20 +47,21 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Set the currency constants
-		
-		//	TODO; hard coded GBP the noo
+		$_base = $this->shop->get_base_currency();
 		
 		//	Shop's base currency (i.e what the products are listed in etc)
-		define( 'SHOP_BASE_CURRENCY_SYMBOL',	'&pound;' );
-		define( 'SHOP_BASE_CURRENCY_CODE',		'GBP' );
-		define( 'SHOP_BASE_CURRENCY_ID',		52 );
+		define( 'SHOP_BASE_CURRENCY_SYMBOL',	$_base->symbol );
+		define( 'SHOP_BASE_CURRENCY_CODE',		$_base->code );
+		define( 'SHOP_BASE_CURRENCY_ID',		$_base->id );
 		
 		//	User's preferred currency
+		//	TODO: Hardcoded GBP just now
 		define( 'SHOP_USER_CURRENCY_SYMBOL',	'&pound;' );
 		define( 'SHOP_USER_CURRENCY_CODE',		'GBP' );
 		define( 'SHOP_USER_CURRENCY_ID',		52 );
 		
 		//	Exchange rate betweent the two currencies
+		//	TODO: Hardcoded GBP just now
 		define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
 		
 		

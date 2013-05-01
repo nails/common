@@ -121,22 +121,25 @@
 		
 			case 'paypal' :
 			
-				echo '<p>' . anchor( 'shop/checkout/notify/' . $order->payment_gateway->slug . '?testing=true&ref='. $order->ref, 'Testing: Simulate Successful Payment', 'class="awesome small"' ) . '</p>';
+				echo '<p>';
+				echo anchor( 'shop/checkout/notify/' . $order->payment_gateway->slug . '?testing=true&ref='. $order->ref, 'Testing: Simulate Successful Payment', 'class="awesome small"' );
+				echo '<br /><small>Auto advance disabled on non-production servers</small>';
+				echo '</p>';
 			
 			break;
 		
 		endswitch;
+		
+	else :
+	
+		//	On production so auto advance
+		echo '<script type="text/javascript">';
+		echo 'var t = setTimeout( "document.forms[0].submit();",2000 );';
+		echo '</script>';
 	
 	endif;
 
 
 ?>
-
-<script type="text/javascript">
-
-	//var t = setTimeout( "document.forms[0].submit();",2000 );
-
-</script>
-
 </body>
 </html>

@@ -28,7 +28,7 @@ class Shop_currency_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		$this->_table = 'table_name';
+		$this->_table = 'shop_currency';
 	}
 	
 	

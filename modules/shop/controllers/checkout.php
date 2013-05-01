@@ -594,11 +594,25 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
 		
+		if ( ! $this->data['order'] ) :
+		
+			show_404();
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Empty the basket
+		$this->basket->destroy();
+		
+		// --------------------------------------------------------------------------
+		
 		switch( $this->data['order']->status ) :
 		
 			case 'PENDING' :	$this->_processing_pending();		break;
 			case 'VERIFIED' :	$this->_processing_verified();		break;
-			case 'ABANDONED' :	$this->_processing_abandond();		break;
+			case 'FAILED' :		$this->_processing_failed();		break;
+			case 'ABANDONED' :	$this->_processing_abandoned();		break;
 			case 'CANCELLED' :	$this->_processing_cancelled();		break;
 			default :			$this->_processing_error();			break;
 		
@@ -620,6 +634,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	private function _processing_verified()
 	{
+		$this->data['page']->title	= 'Thanks for your order!';
+		$this->data['success']		= '<strong>Success!</strong> Your order has been processed.';
+		
+		// --------------------------------------------------------------------------
+		
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'shop/checkout/payment/processing/verified', $this->data );
 		$this->load->view( 'structure/footer',	$this->data );
@@ -629,11 +648,18 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
+	private function _processing_failed()
+	{
+		$this->_processing_error();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	private function _processing_abandoned()
 	{
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/abandoned', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->_processing_error();
 	}
 	
 	
@@ -642,9 +668,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	private function _processing_cancelled()
 	{
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/cancelled', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->_processing_error();
 	}
 	
 	
@@ -653,6 +677,20 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	private function _processing_error()
 	{
+		if ( ! $this->data['error'] ) :
+		
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem processing your order';
+			
+		endif;
+		
+		if ( ! isset( $this->data['page']->title ) || ! $this->data['page']->title ) :
+		
+			$this->data['page']->title = 'An error occurred';
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'shop/checkout/payment/processing/error', $this->data );
 		$this->load->view( 'structure/footer',	$this->data );
@@ -673,6 +711,13 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	public function notify()
 	{
+		//	Testing, testing, 1, 2, 3?
+		$this->data['testing'] = $this->_notify_is_testing();
+		
+		//	Load the logger
+		$this->load->library( 'logger' );
+		
+		//	Handle the notification in a way appropriate to the payment gateway
 		switch( $this->uri->segment( 4 ) ) :
 		
 			case 'paypal';	$this->_notify_paypal();	break;
@@ -690,7 +735,234 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	private function _notify_paypal()
 	{
-		here();
+		//	Configure logger
+		$this->logger->log_dir( 'shop/notify/paypal' );
+		$this->logger->log_file( 'ipn' );
+		
+		$this->logger->line();
+		$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+		$this->logger->line( 'Waking up IPN responder' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	POST data?
+		if ( ! $this->data['testing'] && ! $this->input->post() ) :
+		
+			$this->logger->line( 'No POST data, going back to sleep...' );
+			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+			$this->logger->line();
+			
+			show_404();
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Are we testing?
+		if ( $this->data['testing'] ) :
+		
+			$_ipn = TRUE;
+			$this->logger->line();
+			$this->logger->line( '**TESTING**' );
+			$this->logger->line( '**Simulating data sent from PayPal**' );
+			$this->logger->line();
+			
+			//	Check order exists
+			$_order = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+			
+			if ( ! $_order ) :
+			
+				$this->logger->line( 'Invalid order reference, aborting.' );
+				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+				$this->logger->line();
+				
+				show_404();
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			$_paypal					= array();
+			$_paypal['payment_type']	= 'instant';
+			$_paypal['invoice']			= $_order->id;
+			$_paypal['custom']			=  $this->encrypt->encode( md5( $_order->ref . ':' . $_order->code ), APP_PRIVATE_KEY );
+			$_paypal['txn_id']			= 'TEST:' . random_string( 'alpha', 6 );
+			$_paypal['txn_type']		= 'subscr_payment';
+			$_paypal['payment_status']	= 'Completed';
+			$_paypal['mc_fee']			= 0.00;
+		
+		else :
+		
+			$this->logger->line( 'Validating the IPN call' );
+			$this->load->library( 'paypal' );
+			
+			$_ipn		= $this->paypal->validate_ipn();
+			$_paypal	= $this->input->post();
+			
+			$_order = $this->order->get_by_id( $this->input->post( 'invoice' ) );
+			
+			if ( ! $_order ) :
+			
+				$this->logger->line( 'Invalid order ID, aborting.' );
+				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+				$this->logger->line();
+				
+				show_404();
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Did the IPN validate?
+		if ( $_ipn ) :
+		
+			$this->logger->line( 'IPN Verified with PayPal' );
+			$this->logger->line();
+			
+			// --------------------------------------------------------------------------
+			
+			//	Extra verification step, check the 'custom' variable decodes appropriately
+			$this->logger->line( 'Verifying data' );
+			$this->logger->line();
+			
+			$_verification = $this->encrypt->decode( $_paypal['custom'], APP_PRIVATE_KEY );
+			
+			if ( $_verification != md5( $_order->ref . ':' . $_order->code ) ) :
+			
+				$_data = array(
+					'pp_txn_id'	=> $_paypal['txn_id']
+				);
+				$this->order->fail( $_order->id, $_data );
+				
+				$this->logger->line( 'Order failed secondary verification, aborting.' );
+				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+				$this->logger->line();
+				
+				// --------------------------------------------------------------------------
+				
+				//	Inform developers
+				send_developer_mail( '!! An IPN request failed', 'An IPN request was made which failed secondary verification, Order ID #' . $_paypal['invoice'] );
+				
+				show_404();
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Only bother to handle certain types
+			//	TODO: handle refunds
+			$this->logger->line( 'Checking txn_type is supported' );
+			$this->logger->line();
+			
+			if ( $_paypal['txn_type'] != 'subscr_payment' ) :
+			
+				$this->logger->line( 'Not a valid PayPal txn_type, gracefully aborting.' );
+				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+				$this->logger->line();
+				
+				show_404();
+				
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Check if order has already been processed
+			$this->logger->line( 'Checking if order has already been processed' );
+			$this->logger->line();
+			
+			if ( $_order->status != 'PENDING' ) :
+			
+				$this->logger->line( 'Order has already been processed, aborting.' );
+				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+				$this->logger->line();
+				
+				show_404();
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	Check the status of the payment
+			$this->logger->line( 'Checking the status of the payment is "Completed"' );
+			$this->logger->line();
+			
+			if ( $_paypal['payment_status'] != 'Completed' ) :
+			
+				$this->logger->line( 'Invalid payment status' );
+				
+				$_data = array(
+					'pp_txn_id'	=> $_paypal['txn_id']
+				);
+				$this->order->fail( $_order->id, $_data );
+				
+				// --------------------------------------------------------------------------
+				
+				//	Inform developers
+				send_developer_mail( '!! A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with reason "' . $_paypal['pending_reason'] . '".' );
+				return;
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
+			
+			//	All seems good, continue with order processing
+			$this->logger->line( 'All seems well, continuing...' );
+			$this->logger->line();
+			
+			$this->logger->line( 'Setting txn_id (' . $_paypal['txn_id'] . ') and fees_deducted (' . $_paypal['mc_fee'] . ').' );
+			$this->logger->line();
+			
+			$_data = array(
+				'pp_txn_id'		=> $_paypal['txn_id'],
+				'fees_deducted'	=> $_paypal['mc_fee']
+			);
+			$this->order->verify( $_order->id, $_data );
+			
+			// --------------------------------------------------------------------------
+			
+			//	PROCESSSSSS...
+			$this->order->process( $_order, $this->logger );
+			$this->logger->line();
+			
+			// --------------------------------------------------------------------------
+			
+			//	Send a receipt to the customer
+			$this->logger->line( 'Sending receipt to customer: ' . $_order->user->email );
+			$this->order->send_receipt( $_order, $this->logger );
+			$this->logger->line();
+			
+			// --------------------------------------------------------------------------
+			
+			//	Send a notification to the store owner(s)
+			$this->logger->line( 'Sending notification to store owner: ' . shop_setting( 'notify_order' ) );
+			
+			//	TODO, send store owner email
+			
+			$this->logger->line();
+			
+			// --------------------------------------------------------------------------
+			
+			$this->logger->line( 'All done here, going back to sleep...' );
+			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+			$this->logger->line();
+			
+			if ( $this->data['testing'] ) :
+			
+				echo anchor( 'shop/checkout/processing?ref=' . $_order->ref, 'Continue to Processing Page' );
+			
+			endif;
+		
+		else :
+		
+			$this->logger->line( 'PayPal did not verify this IPN call, aborting.' );
+			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
+			$this->logger->line();
+			
+			show_404();
+		
+		endif;
 	}
 	
 	

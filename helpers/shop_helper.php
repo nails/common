@@ -159,5 +159,33 @@ if ( ! function_exists( 'round_to_precision' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+/**
+ * Get's the URL for adding to the basket
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'shop_setting' ) )
+{
+	function shop_setting( $key = NULL )
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->shop->settings( $key );
+	}
+}
+
+
 /* End of file shop_helper.php */
 /* Location: ./modules/shop/helpers/shop_helper.php */

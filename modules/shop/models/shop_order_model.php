@@ -67,7 +67,7 @@ class Shop_order_model extends NAILS_Model
 		do
 		{
 			//	Generate the string
-			$_order->ref = strtoupper( random_string( 'alnum', 8 ) );
+			$_order->ref = date( 'Y' ) . '-' . strtoupper( random_string( 'alnum', 8 ) );
 			
 			//	Test it
 			$this->db->where( 'ref', $_order->ref );
@@ -381,8 +381,15 @@ class Shop_order_model extends NAILS_Model
 	
 	public function get_items_for_order( $order_id )
 	{
-		$this->db->where( 'order_id', $order_id );	
-		$_items = $this->db->get( 'shop_order_product' )->result();
+		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax' );
+		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
+		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
+		
+		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
+		
+		$this->db->where( 'op.order_id', $order_id );	
+		$_items = $this->db->get( 'shop_order_product op' )->result();
 		
 		foreach ( $_items AS $item ) :
 		
@@ -397,10 +404,181 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function abandon( $order_id )
+	public function abandon( $order_id, $data = array() )
 	{
-		$_data = array( 'status' => 'ABANDONED' );
-		return $this->update( $order_id, $_data );	
+		$data['status'] = 'ABANDONED';
+		return $this->update( $order_id, $data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function fail( $order_id, $data = array() )
+	{
+		$data['status'] = 'FAILED';
+		return $this->update( $order_id, $data );
+	}
+	
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function verify( $order_id, $data = array() )
+	{
+		$data['status'] = 'VERIFIED';
+		return $this->update( $order_id, $data );	
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function cancel( $order_id, $data = array() )
+	{
+		$data['status'] = 'CANCELLED';
+		return $this->update( $order_id, $data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function process( $order, &$logger = NULL )
+	{
+		//	Check to see if a logger object has been passed, if not create
+		//	a dummy method so we don't get errors
+		
+		if ( ! method_exists( $logger, 'line' ) ) :
+		
+			//	It hasn't, define a dummy
+			$_logger = function( $line ) {};
+			
+		else :
+		
+			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If an ID has been passed, look it up
+		if ( is_numeric( $order ) ) :
+		
+			$_logger( 'Looking up order #' . $order );
+			$order = $this->get_by_id( $order );
+			
+			if ( ! $order ) :
+			
+				$_logger( 'Invalid order ID' );
+				$this->_set_error( 'Invalid order ID' );
+				return FALSE;
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$_logger( 'Processing order #' . $order->id );
+		
+		//	Loop through all the items in the order. If there's a proccessor method
+		//	for the object type then begin grouping the products so we can execute
+		//	the processor in a oner with all the associated products
+		
+		$_processors = array();
+		
+		foreach ( $order->items AS $item ) :
+		
+			$_logger( 'Processing item #' . $item->id . ': ' . $item->title . ' (' . $item->type->label . ')' );
+		
+			if ( $item->type->ipn_method && method_exists( $this, '_process_' . $item->type->ipn_method ) ) :
+			
+				if ( ! isset( $_processors['_process_' . $item->type->ipn_method] ) ) :
+				
+					$_processors['_process_' . $item->type->ipn_method] = array();
+				
+				endif;
+				
+				$_processors['_process_' . $item->type->ipn_method][] =& $item;
+			
+			endif;
+		
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute the processors
+		if ( $_processors ) :
+		
+			$_logger( 'Executing processors...' );
+			
+			foreach ( $_processors AS $method => $products ) :
+			
+				$_logger( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
+				call_user_func( array( $this, $method), $_logger, $products );
+			
+			endforeach;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return TRUE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _process_download( $_logger, $items )
+	{
+		//	Compose an email
+		$_logger( 'TODO: compose email with links to all the downloads' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function send_receipt( $order, $logger = NULL )
+	{
+		//	Check to see if a logger object has been passed, if not create
+		//	a dummy method so we don't get errors
+		
+		if ( ! method_exists( $logger, 'line' ) ) :
+		
+			//	It hasn't, define a dummy
+			$_logger = function( $line ) {};
+			
+		else :
+		
+			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If an ID has been passed, look it up
+		if ( is_numeric( $order ) ) :
+		
+			$_logger( 'Looking up order #' . $order );
+			$order = $this->get_by_id( $order );
+			
+			if ( ! $order ) :
+			
+				$_logger( 'Invalid order ID' );
+				$this->_set_error( 'Invalid order ID' );
+				return FALSE;
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Todo
 	}
 	
 	
@@ -556,9 +734,30 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_item( &$order )
+	private function _format_item( &$item )
 	{
+		$item->id				= (int) $item->id;
+		$item->quantity			= (int) $item->quantity;
+		$item->price			= (float) $item->price;
+		$item->sale_price		= (float) $item->sale_price;
+		$item->sale_price		= (float) $item->sale_price;
+		$item->was_on_sale		= (bool) $item->tax;
+		$item->processed		= (bool) $item->processed;
+		$item->refunded			= (bool) $item->refunded;
 		
+		// --------------------------------------------------------------------------
+		
+		//	Product type
+		$item->type				= new stdClass();
+		$item->type->id			= (int) $item->pt_id;
+		$item->type->slug		= $item->pt_slug;
+		$item->type->label		= $item->pt_label;
+		$item->type->ipn_method	= $item->pt_ipn_method;
+		
+		unset( $item->pt_id );
+		unset( $item->pt_slug );
+		unset( $item->pt_label );
+		unset( $item->pt_ipn_method );
 	}
 }
 

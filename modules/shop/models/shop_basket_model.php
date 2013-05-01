@@ -392,6 +392,10 @@ class Shop_basket_model extends NAILS_Model
 		
 		//	Update the session
 		$this->_update_session();
+		$this->session->unset_userdata( $this->sess_var . '_pd' );
+		$this->session->unset_userdata( $this->sess_var . '_sd' );
+		$this->session->unset_userdata( $this->sess_var . '_pg' );
+		$this->session->unset_userdata( $this->sess_var . '_oi' );
 	}
 	
 	
@@ -555,6 +559,13 @@ class Shop_basket_model extends NAILS_Model
 	private function _update_session()
 	{
 		$this->session->set_userdata( $this->sess_var, $this->_items );
+		
+		if ( $this->user->is_logged_in() ) :
+		
+			$_data = array( 'shop_basket' => serialize( $this->_items ) );
+			$this->user->update( active_user( 'id' ), $_data );
+		
+		endif;
 	}
 	
 	// --------------------------------------------------------------------------
