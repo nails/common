@@ -32,6 +32,10 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	
 	// --------------------------------------------------------------------------
 	
+	/* ! BAKSET */
+	
+	// --------------------------------------------------------------------------
+	
 	
 	/**
 	 * Render the user's basket
@@ -51,6 +55,20 @@ class NAILS_Basket extends NAILS_Shop_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load the payment gateway model
+		$this->load->model( 'shop_payment_gateway_model', 'payment_gateway' );
+		
+		//	Fetch the supported payment gateways
+		$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
+		
+		if ( ! $this->data['payment_gateways'] ) :
+		
+			$this->data['message'] = '<strong>Sorry,</strong> there\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment, you won\'t be able to checkout.';
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'shop/basket/index',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
@@ -60,24 +78,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	/**
-	 * Handle the checkout process
-	 * 
-	 * @access	public
-	 * @return	void
-	 * @author	Pablo
-	 * 
-	 **/
-	public function checkout()
-	{
-		$this->data['page']->title = 'Checkout';
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/basket/checkout',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
-	}
+
 	
 	
 	// --------------------------------------------------------------------------

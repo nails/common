@@ -188,7 +188,7 @@ class Shop_product_model extends NAILS_Model
 		$this->db->select( 'p.*' );
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
 		$this->db->select( 'pm.download_bucket,pm.download_filename' );
-		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.max_per_order type_max_per_order' );
+		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.requires_shipping type_requires_shipping,pt.max_per_order type_max_per_order' );
 		
 		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
 		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
@@ -280,10 +280,11 @@ class Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Type
-		$product->type					= new stdClass();
-		$product->type->id				= (int) $product->type_id;
-		$product->type->slug			= $product->type_slug;
-		$product->type->label			= $product->type_label;
+		$product->type						= new stdClass();
+		$product->type->id					= (int) $product->type_id;
+		$product->type->slug				= $product->type_slug;
+		$product->type->label				= $product->type_label;
+		$product->type->requires_shipping	= (bool) $product->type_requires_shipping;
 		
 		if ( ! is_null( $product->type_max_per_order ) ) :
 		
@@ -294,6 +295,7 @@ class Shop_product_model extends NAILS_Model
 		unset( $product->type_id );
 		unset( $product->type_slug );
 		unset( $product->type_label );
+		unset( $product->type_requires_shipping );
 		unset( $product->type_max_per_order );
 		
 		// --------------------------------------------------------------------------

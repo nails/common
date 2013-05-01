@@ -4,144 +4,66 @@
 	
 		if ( $basket->items ) :
 		
-			?>
-			<table>
-				<thead>
-					<tr>
-						<th class="item">Item</th>
-						<th class="quantity">Quantity</th>
-						<th class="price">Unit Price</th>
-						<th class="tax">Tax</th>
-						<th class="shipping">Shipping</th>
-						<th class="total">Total</th>
-					</tr>
-				</thead>
-				<tbody>
+			$this->load->view( 'shop/basket/basket-table' );
+			
+			if ( $payment_gateways ) :
+			
+				echo '<p class="checkout">';
+				echo anchor( 'shop/checkout', 'Checkout', 'class="awesome"' );
 				
-					<!--	ITEMS	-->
-					<?php
+				echo '<small>';
+				
+					echo 'We accept ';
 					
-						$_i = 0;
-						
-						foreach ( $basket->items AS $key => $item ) :
-						
-							$_stripe = $_i % 2 ? 'odd' : 'even';
-							$_i++;
-							
-							?>
-							<tr data-product_id="<?=$item->id?>" data-key="<?=$key?>" class="<?=$_stripe?>">
-								<td class="item">
-									<div class="img <?=$item->type->slug?>">
-										<!--	PRODUCT'S PRIMARY IMAGE	-->
-									</div>
-									<?=$item->title?>
-									<small>
-										<?=$item->type->label?>,
-										Product ID: <?=$item->id?>
-									</small>
-								</td>
-								<td class="quantity">
-								<?php
-								
-									//	Decrement
-									echo anchor( 'shop/basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
-									
-									//	Quantity
-									echo '<span class="value">' . $item->quantity . '</span>';
-									
-									//	Increment
-									if ( is_null( $item->type->max_per_order ) || $item->quantity < $item->type->max_per_order ) :
-									
-										echo anchor( 'shop/basket/increment/' . $item->id, 'Increment', 'class="increment"' );
-										
-									endif;
-									
-								?>
-								</td>
-								<?php
-								
-									if ( $item->is_on_sale ) :
-									
-										echo '<td class="price on-sale">';
-										echo '<span>' . $item->sale_price . '</span>';
-										echo '<span class="ribbon"></span>';
-										echo '<del>was ' . $item->price . '</del>';
-										echo '</td>';
-									
-									else :
-									
-										echo '<td class="price">';
-										echo $item->price;
-										echo '</td>';
-									
-									endif;
-									
-								?>
-								<td class="tax"><?=$item->tax_rate?></td>
-								<?php
-								
-									if ( $item->shipping ) :
-									
-										echo '<td class="shipping">';
-										echo $item->shipping;
-										echo '</td>';
-									
-									else :
-									
-										echo '<td class="shipping free">';
-										echo 'FREE';
-										echo '</td>';
-									
-									endif;
-									
-								?>
-								<td class="total"><?=$item->total?></td>
-							</tr>
-							<?php
+					$_num = count( $payment_gateways );
 					
-						endforeach;
-						
-					?>
+					if ( $_num > 1 ) :
 					
-					<!--	TOTALS	-->
-					<tr class="total sub">
-						<td class="label" colspan="4">Sub Total</td>
-						<td class="value">
-						<?php
+						for ( $i=0; $i < $_num; $i++ ) :
+						
+							if ( $i == $_num-1 ) :
 							
-							if ( $basket->totals->shipping ) :
+								echo ' and ';
 							
-								echo $basket->totals->shipping;
+							elseif( $i != 0 ) :
+							
+								echo ', ';
+							
+							endif;
+							
+							// --------------------------------------------------------------------------
+							
+							if ( $payment_gateways[$i]->website ) :
+							
+								echo anchor( $payment_gateways[$i]->website, $payment_gateways[$i]->label );
 							
 							else :
 							
-								echo 'FREE';
+								echo $payment_gateways[$i]->label;
 								
 							endif;
-							
-						?>
-						</td>
-						<td class="value"><?=$basket->totals->sub?></td>
-					</tr>
-					<tr class="total grand">
-						<td class="label" colspan="4">TAX</td>
-						<td class="value">&nbsp;</td>
-						<td class="value"><?=$basket->totals->tax?></td>
-					</tr>
-					<tr class="total grand">
-						<td class="label" colspan="4">Grand Total</td>
-						<td class="value">&nbsp;</td>
-						<td class="value"><?=$basket->totals->grand?></td>
-					</tr>
+						
+						endfor;
 					
-				</tbody>
-			</table>
+					else :
+					
+						if ( $payment_gateways[0]->website ) :
+						
+							echo anchor( $payment_gateways[0]->website, $payment_gateways[0]->label );
+						
+						else :
+						
+							echo $payment_gateways[0]->label;
+							
+						endif;
+					
+					endif;
+				
+				echo '</small>';
+				
+				echo '</p>';
 			
-			<p class="checkout">
-				<?=anchor( 'shop/basket/checkout', 'Checkout', 'class="awesome"' )?>
-				<div class="clear"></div>
-			</p>
-			<?php
+			endif;
 		
 		else :
 		

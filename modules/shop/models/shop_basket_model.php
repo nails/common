@@ -10,6 +10,8 @@
 class Shop_basket_model extends NAILS_Model
 {
 	private $_items;
+	private $_payment_gateway;
+	private $_shipping_details;
 	private $_sess_var;
 	
 	
@@ -44,6 +46,27 @@ class Shop_basket_model extends NAILS_Model
 			endif;
 		
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->_payment_gateway		= (int) $this->session->userdata( $this->sess_var . '_pg' );
+		$this->_shipping_details	= $this->session->userdata( $this->sess_var . '_sd' );
+		
+		if ( ! $this->_shipping_details ) :
+		
+			//	Clear addressing as per: http://www.royalmail.com/personal/help-and-support/How-do-I-address-my-mail-correctly
+			
+			$this->_shipping_details			= new stdClass();
+			$this->_shipping_details->addressee	= '';	//	Named addresse
+			$this->_shipping_details->line_1	= '';	//	Building number and street name
+			$this->_shipping_details->line_2	= '';	//	Locality name, if required
+			$this->_shipping_details->town		= '';	//	Town
+			$this->_shipping_details->postcode	= '';	//	Postcode
+			$this->_shipping_details->state		= '';	//	State
+			$this->_shipping_details->country	= '';	//	Country
+		
+		endif;
+
 	}
 	
 	
@@ -58,13 +81,16 @@ class Shop_basket_model extends NAILS_Model
 		
 		$_basket					= new stdClass();
 		$_basket->items				= array();
-		$_basket->totals			= new stdClass;
+		$_basket->totals			= new stdClass();
 		$_basket->totals->tax		= 0.00;
 		$_basket->totals->shipping	= 0.00;
 		$_basket->totals->sub		= 0.00;
 		$_basket->totals->grand		= 0.00;
 		$_basket->not_available		= array();
 		$_basket->quantity_adjusted	= array();
+		$_basket->requires_shipping	= FALSE;
+		$_basket->shipping_details	= $this->_shipping_details;
+		$_basket->payment_gateway	= $this->_payment_gateway;
 		
 		$_not_available				= array();
 		
@@ -101,24 +127,42 @@ class Shop_basket_model extends NAILS_Model
 				
 				// --------------------------------------------------------------------------
 				
-				//	Calculate shipping costs
-				
+				//	Work out currency conversion rate from the default currency to the user's
+				//	preferred currency.
 				//	TODO
-				$_shipping = 2.5;
+				$_conversion_rate = 1;
+				
+				// --------------------------------------------------------------------------
+				
+				//	Calculate shipping costs
+				if ( $_item->type->requires_shipping ) :
+				
+					//	TODO - calculate the shipping cost
+					$_shipping = $_conversion_rate * 2.5;
+					
+					// --------------------------------------------------------------------------
+					
+					//	At least one item in this basket requires shipping, change the flag
+					$_basket->requires_shipping = TRUE;
+					
+				else :
+				
+					$_shipping = 0;
+				
+				endif;
 				
 				$_item->shipping = number_format( $_shipping, 2 );
-				$_basket->totals->shipping += $_shipping;
 				
 				// --------------------------------------------------------------------------
 				
 				//	Calculate Total
 				if ( $_item->is_on_sale ):
 				
-					$_item->total = $_item->sale_price * $_item->quantity;
+					$_item->total = ( $_conversion_rate * $_item->sale_price ) * $_item->quantity;
 					
 				else :
 				
-					$_item->total = $_item->price * $_item->quantity;
+					$_item->total = ( $_conversion_rate * $_item->price ) * $_item->quantity;
 				
 				endif;
 				
@@ -128,7 +172,7 @@ class Shop_basket_model extends NAILS_Model
 				
 				//	Calculate TAX
 				$_item->tax_rate	= round_to_precision( 100 * $_product->tax->rate, 2 ) . '%';
-				$_item->tax			= number_format( round_to_precision( $_item->total * $_product->tax->rate, 2 ), 2 );
+				$_item->tax			= number_format( round_to_precision( ( $_conversion_rate * $_item->total ) * $_product->tax->rate, 2 ), 2 );
 				
 				// --------------------------------------------------------------------------
 				
@@ -136,7 +180,7 @@ class Shop_basket_model extends NAILS_Model
 				$_basket->totals->tax		+= $_item->tax;
 				$_basket->totals->shipping	+= $_item->shipping;
 				$_basket->totals->sub		+= $_item->total;
-				$_basket->totals->grand		+= $_item->tax + $_item->total;
+				$_basket->totals->grand		+= $_item->tax + $_item->total + $_item->shipping;
 				
 				// --------------------------------------------------------------------------
 				
@@ -172,17 +216,17 @@ class Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Tidy up totals
-		$_basket->totals->shipping	= number_format( $_basket->totals->tax, 2);
-		$_basket->totals->tax	= number_format( $_basket->totals->tax, 2);
-		$_basket->totals->sub	= number_format( $_basket->totals->sub, 2);
-		$_basket->totals->grand	= number_format( $_basket->totals->grand, 2);
+		$_basket->totals->shipping	= number_format( $_basket->totals->shipping, 2);
+		$_basket->totals->tax		= number_format( $_basket->totals->tax, 2);
+		$_basket->totals->sub		= number_format( $_basket->totals->sub, 2);
+		$_basket->totals->grand		= number_format( $_basket->totals->grand, 2);
 		
 		// --------------------------------------------------------------------------
 		
 		//	Update the session
 		
 		// --------------------------------------------------------------------------
-		//dumpanddie( $_basket);
+		
 		return $_basket;
 	}
 	
@@ -437,6 +481,24 @@ class Shop_basket_model extends NAILS_Model
 			return FALSE;
 		
 		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function add_shipping_details( $details )
+	{
+		$this->session->set_userdata( $this->sess_var . '_sd', $details );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function add_payment_gateway( $payment_gateway )
+	{
+		$this->session->set_userdata( $this->sess_var . '_pg', $payment_gateway );
 	}
 	
 	
