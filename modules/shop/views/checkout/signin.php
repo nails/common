@@ -7,9 +7,6 @@
 				If you are already registered with <?=APP_NAME?> then log in; you'll be able to see your previous orders
 				and track the progress of this order.
 			</p>
-			<p class="system-alert message no-close">
-				<strong>TODO:</strong> Make sure Social Sign In redirects properly
-			</p>
 			<?php
 			
 				if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
@@ -29,21 +26,21 @@
 					//	FACEBOOK
 					if ( module_is_enabled( 'auth[facebook]' ) ) :
 					
-						echo anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' );
+						echo anchor( 'auth/fb/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' );
 					
 					endif;
 					
 					//	TWITTER
 					if ( module_is_enabled( 'auth[twitter]' ) ) :
 					
-						echo anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' );
+						echo anchor( 'auth/tw/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' );
 					
 					endif;
 					
 					//	LINKEDIN
 					if ( module_is_enabled( 'auth[linkedin]' ) ) :
 					
-						echo anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
+						echo anchor( 'auth/li/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
 					
 					endif;
 					
@@ -100,9 +97,6 @@
 				If you don't already have an account you can register one now. We'll add this order to your account so you can
 				track it's progress.
 			</p>
-			<p class="system-alert message no-close">
-				<strong>TODO:</strong> Drop down of account type (AskIvy only), and check social sign in redirects upon registration
-			</p>
 			<?php
 			
 				if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
@@ -122,21 +116,21 @@
 					//	FACEBOOK
 					if ( module_is_enabled( 'auth[facebook]' ) ) :
 					
-						echo anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' );
+						echo anchor( 'auth/fb/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' );
 					
 					endif;
 					
 					//	TWITTER
 					if ( module_is_enabled( 'auth[twitter]' ) ) :
 					
-						echo anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' );
+						echo anchor( 'auth/tw/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' );
 					
 					endif;
 					
 					//	LINKEDIN
 					if ( module_is_enabled( 'auth[linkedin]' ) ) :
 					
-						echo anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
+						echo anchor( 'auth/li/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
 					
 					endif;
 					

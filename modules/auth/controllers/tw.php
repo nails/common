@@ -46,7 +46,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Set a return_to if available
-		$this->_return_to = $this->input->get( 'return_to' );
+		$this->_register_use_return	= TRUE;
+		$this->_return_to			= $this->input->get( 'return_to' );
 		
 		//	If nothing, check the 'nailsTWConnectReturnTo' GET var which may be passed back
 		if ( ! $this->_return_to ) :
@@ -56,7 +57,8 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			//	Still empty? Group homepage
 			if ( ! $this->_return_to ) :
 			
-				$this->_return_to = active_user( 'group_homepage' );
+				$this->_return_to			= active_user( 'group_homepage' );
+				$this->_register_use_return	= FALSE;
 			
 			endif;
 			
@@ -74,7 +76,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 			
 			if ( ! $this->_return_to_fail ) :
 			
-				//	Fallback to the value of $this->return_to
+				//	Fallback to the value of $this->_return_to
 				$this->_return_to_fail = $this->_return_to;
 				
 			endif;
@@ -327,7 +329,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 	 **/
 	protected function _connect_fail()
 	{
-		$this->_redirect( $this->return_to_fail );
+		$this->_redirect( $this->_return_to_fail );
 	}
 	
 	
@@ -410,7 +412,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( $user->is_suspended ) :
 			
 			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_banned' ) );
-			$this->_redirect( $this->return_to_fail );
+			$this->_redirect( $this->_return_to_fail );
 			return;
 			
 		endif;
@@ -459,7 +461,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Redirect
-		$this->_redirect( $this->return_to );
+		$this->_redirect( $this->_return_to );
 		return;
 	}
 	
@@ -628,7 +630,15 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					$this->session->set_flashdata( 'from_twitter', TRUE );
 					
 					//	Registrations will be forced to the registration redirect, regardless of what else has been set
-					$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
+					if ( $this->_register_use_return ) :
+					
+						$_redirect = $this->_return_to;
+					
+					else :
+					
+						$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
+						
+					endif;
 					
 					$this->_redirect( $_redirect );
 					return;

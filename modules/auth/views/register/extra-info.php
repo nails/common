@@ -36,8 +36,8 @@
 	if ( $return_to || $return_to_fail ) :
 	
 		$_returns = '?';
-		$_returns .= $return_to ? 'return_to=' . url_encode( $return_to ) : '';
-		$_returns .= $return_to_fail ? 'return_to_fail=' . url_encode( $return_to_fail ) : '';
+		$_returns .= $return_to ? 'return_to=' . urlencode( $return_to ) : '';
+		$_returns .= $return_to_fail ? '&return_to_fail=' . urlencode( $return_to_fail ) : '';
 	
 	else :
 	
