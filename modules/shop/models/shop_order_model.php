@@ -504,7 +504,7 @@ class Shop_order_model extends NAILS_Model
 				
 				endif;
 				
-				$_processors['_process_' . $item->type->ipn_method][] =& $item;
+				$_processors['_process_' . $item->type->ipn_method][] = $item;
 			
 			endif;
 		
