@@ -207,9 +207,9 @@ class NAILS_Basket extends NAILS_Shop_Controller
 
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS'S SHOP MODULE
  * 
- * The following block of code makes it simple to extend one of the core auth
+ * The following block of code makes it simple to extend one of the core shop
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole

@@ -137,7 +137,7 @@
 					<td>
 						<strong><?=shop_setting( 'invoice_company' )?></strong>
 						<br /><?=nl2br( shop_setting( 'invoice_address' ) )?>
-						<br /><?=nl2br( shop_setting( 'invoice_vat' ) )?>
+						<br /><?=nl2br( shop_setting( 'invoice_vat_no' ) )?>
 					</td>
 				</tr>
 			</tbody>
