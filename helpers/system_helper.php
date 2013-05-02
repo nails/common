@@ -199,7 +199,7 @@ if ( ! function_exists( 'send_developer_mail' ) )
 					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
 					  'Importance: High';
 					  
-		@mail( $_to, $subject , $message, $_headers );
+		@mail( $_to, $subject . ' - ' . APP_NAME , $message, $_headers );
 	}
 }
 

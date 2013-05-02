@@ -938,7 +938,27 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			//	Send a notification to the store owner(s)
 			$this->logger->line( 'Sending notification to store owner: ' . shop_setting( 'notify_order' ) );
 			
-			//	TODO, send store owner email
+			$this->load->library( 'emailer' );
+			
+			$_email							= new stdClass();
+			$_email->type					= 'shop_notify';
+			$_email->to_email				= shop_setting( 'notify_order' );
+			$_email->data					= array();
+			$_email->data['order']			= $_order;
+			
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+			
+				//	Email failed to send, alert developers
+				$_logger( '!! Failed to send order notification, alerting developers' );
+				$_logger( implode( "\n", $this->emailer->get_errors() ) );
+				
+				send_developer_mail( '!! Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+				
+				return FALSE;
+			
+			endif;
+			
+			// --------------------------------------------------------------------------
 			
 			$this->logger->line();
 			

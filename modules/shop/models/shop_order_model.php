@@ -188,6 +188,7 @@ class Shop_order_model extends NAILS_Model
 				$_temp['price']			= $item->price;
 				$_temp['sale_price']	= $item->sale_price;
 				$_temp['tax']			= $item->tax;
+				$_temp['shipping']		= $item->shipping;
 				$_temp['was_on_sale']	= $item->is_on_sale;
 				
 				$_items[] = $_temp;
@@ -298,7 +299,7 @@ class Shop_order_model extends NAILS_Model
 		$this->db->select( 'o.*' );
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.gender, um.profile_img' );
 		$this->db->select( 'pg.slug pg_slug, pg.label pg_label, pg.logo pg_logo' );
-		$this->db->select( 'oc.code oc_code,oc.symbol oc_symbol,bc.code bc_code,bc.symbol bc_symbol' );
+		$this->db->select( 'oc.code oc_code,oc.symbol oc_symbol, oc.decimal_precision oc_precision,bc.code bc_code,bc.symbol bc_symbol,bc.decimal_precision bc_precision' );
 		
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
 		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
@@ -381,7 +382,7 @@ class Shop_order_model extends NAILS_Model
 	
 	public function get_items_for_order( $order_id )
 	{
-		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax' );
+		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping' );
 		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		
@@ -393,6 +394,8 @@ class Shop_order_model extends NAILS_Model
 		
 		foreach ( $_items AS $item ) :
 		
+			$this->db->where( 'product_id', $item->product_id );
+			$item->meta = $this->db->get( 'shop_product_meta' )->row();
 			$this->_format_item( $item );
 		
 		endforeach;
@@ -517,7 +520,7 @@ class Shop_order_model extends NAILS_Model
 			foreach ( $_processors AS $method => $products ) :
 			
 				$_logger( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
-				call_user_func( array( $this, $method), $_logger, $products );
+				call_user_func_array( array( $this, $method), array( &$_logger, &$products, &$order ) );
 			
 			endforeach;
 		
@@ -532,10 +535,49 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _process_download( $_logger, $items )
+	protected function _process_download( &$_logger, &$items, &$order )
 	{
-		//	Compose an email
-		$_logger( 'TODO: compose email with links to all the downloads' );
+		//	Generate links for all the items
+		$_urls		= array();
+		$_expires	= 172800; //	48 hours
+		foreach( $items AS $item ) :
+		
+			$_temp = new stdClass();
+			$_temp->title	= $item->title;
+			$_temp->url		= cdn_expiring_url( $item->meta->download_bucket, $item->meta->download_filename, $_expires ) . '&dl=1';
+			$_urls[] = $_temp;
+			
+			unset( $_temp );
+		
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Send the user an email with the links
+		$_logger( 'Sending download email to ' . $order->user->email  . '; email contains ' . count( $_urls ) . ' expiring URLs' );
+		
+		$this->load->library( 'emailer' );
+		
+		$_email							= new stdClass();
+		$_email->type					= 'shop_product_type_download';
+		$_email->to_email				= $order->user->email;
+		$_email->data					= array();
+		$_email->data['order']			= new stdClass();
+		$_email->data['order']->id		= $order->id;
+		$_email->data['order']->ref		= $order->ref;
+		$_email->data['order']->created	= $order->created;
+		$_email->data['expires']		= $_expires;
+		$_email->data['urls']			= $_urls;
+		
+		if ( ! $this->emailer->send( $_email, TRUE ) ) :
+		
+			//	Email failed to send, alert developers
+			$_logger( '!! Failed to send download links, alerting developers' );
+			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			
+			send_developer_mail( '!! Unable to send download email', 'Unable to send the email with download links to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+		
+		endif;
 	}
 	
 	
@@ -578,7 +620,29 @@ class Shop_order_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		//	Todo
+		$this->load->library( 'emailer' );
+		
+		$_email							= new stdClass();
+		$_email->type					= 'shop_receipt';
+		$_email->to_email				= $order->user->email;
+		$_email->data					= array();
+		$_email->data['order']			= $order;
+		
+		if ( ! $this->emailer->send( $_email, TRUE ) ) :
+		
+			//	Email failed to send, alert developers
+			$_logger( '!! Failed to send receipt, alerting developers' );
+			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			
+			send_developer_mail( '!! Unable to send receipt email', 'Unable to send the email receipt to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+			
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return TRUE;
 	}
 	
 	
@@ -697,17 +761,20 @@ class Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Currencies
-		$order->currency				= new stdClass();
+		$order->currency					= new stdClass();
 		
-		$order->currency->order			= new stdClass();
-		$order->currency->order->id		= (int) $order->currency_id;
-		$order->currency->order->code	= $order->oc_code;
-		$order->currency->order->symbol	= $order->oc_symbol;
+		$order->currency->order				= new stdClass();
+		$order->currency->order->id			= (int) $order->currency_id;
+		$order->currency->order->code		= $order->oc_code;
+		$order->currency->order->symbol		= $order->oc_symbol;
+		$order->currency->order->precision	= $order->oc_precision;
 		
-		$order->currency->base			= new stdClass();
-		$order->currency->base->id		= (int) $order->base_currency_id;
-		$order->currency->base->code	= $order->bc_code;
-		$order->currency->base->symbol	= $order->bc_symbol;
+		$order->currency->base				= new stdClass();
+		$order->currency->base->id			= (int) $order->base_currency_id;
+		$order->currency->base->code		= $order->bc_code;
+		$order->currency->base->symbol		= $order->bc_symbol;
+		$order->currency->base->precision	= $order->bc_precision;
+
 		
 		$order->currency->exchange_rate	= (float) $order->exchange_rate;
 		
@@ -740,8 +807,9 @@ class Shop_order_model extends NAILS_Model
 		$item->quantity			= (int) $item->quantity;
 		$item->price			= (float) $item->price;
 		$item->sale_price		= (float) $item->sale_price;
-		$item->sale_price		= (float) $item->sale_price;
-		$item->was_on_sale		= (bool) $item->tax;
+		$item->tax				= (float) $item->tax;
+		$item->shipping			= (float) $item->shipping;
+		$item->was_on_sale		= (bool) $item->was_on_sale;
 		$item->processed		= (bool) $item->processed;
 		$item->refunded			= (bool) $item->refunded;
 		
@@ -758,6 +826,12 @@ class Shop_order_model extends NAILS_Model
 		unset( $item->pt_slug );
 		unset( $item->pt_label );
 		unset( $item->pt_ipn_method );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Meta
+		unset( $item->meta->id );
+		unset( $item->meta->product_id );
 	}
 }
 

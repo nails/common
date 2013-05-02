@@ -14,6 +14,7 @@ class Emailer
 	private $ci;
 	private $email_type;
 	private $track_link_cache;
+	private $_errors;
 	
 	
 	// --------------------------------------------------------------------------
@@ -54,6 +55,7 @@ class Emailer
 		//	Set defaults
 		$this->email_type		= array();
 		$this->track_link_cache	= array();
+		$this->_errors			= array();
 	}
 	
 	
@@ -73,20 +75,31 @@ class Emailer
 	public function send( $input, $graceful = FALSE )
 	{
 		//	We got something to work with?
-		if ( empty( $input ) )
+		if ( empty( $input ) ) :
+		
+			$this->_set_error( 'EMAILER: No input' );
 			return FALSE;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Ensure $input is an object
-		if ( ! is_object( $input ) )
+		if ( ! is_object( $input ) ) :
+		
 			$input = (object) $input;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Check we have at least a user_id/email and an email type
-		if ( ( empty( $input->to_id ) && empty( $input->to_email ) ) || empty( $input->type ) )
+		if ( ( empty( $input->to_id ) && empty( $input->to_email ) ) || empty( $input->type ) ) :
+		
+			$this->_set_error( 'EMAILER: Missing user ID, user email or email type' );
 			return FALSE;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -139,7 +152,11 @@ class Emailer
 				if ( ! $graceful ) :
 				
 					show_error( 'EMAILER: Invalid Email Type "' . $input->type . '"' );
-					
+				
+				else :
+				
+					$this->_set_error( 'EMAILER: Invalid Email Type "' . $input->type . '"' );
+				
 				endif;
 				
 				return FALSE;
@@ -382,7 +399,16 @@ class Emailer
 		
 		else :
 		
-			return ( ! $graceful ) ? show_error( 'EMAILER: Insert Failed.' ) : FALSE;
+			if ( ! $graceful ) :
+			
+				show_error( 'EMAILER: Insert Failed.' );
+				
+			else :
+			
+				$this->_set_error( 'EMAILER: Insert Failed.' );
+				FALSE;
+				
+			endif;
 		
 		endif;
 	}
@@ -955,8 +981,12 @@ class Emailer
 		
 		// --------------------------------------------------------------------------
 		
-		if ( ! $_email )
+		if ( ! $_email ) :
+		
+			$this->_set_error( 'EMAILER: Unable to fetch email object' );
 			return FALSE;
+			
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -1072,6 +1102,10 @@ class Emailer
 			
 			// --------------------------------------------------------------------------
 			
+			$this->_set_error( 'EMAILER: Errors in email template, developers informed' );
+			
+			// --------------------------------------------------------------------------]
+			
 			return FALSE;
 		
 		endif;
@@ -1123,8 +1157,20 @@ class Emailer
 			
 			foreach ( $input->attachment AS $file ) :
 			
-				if ( ! $this->_add_attachment( $file ) )
-					return ( ! $graceful ) ? show_error( 'EMAILER: Failed to add attachment: '.$file ) : FALSE;
+				if ( ! $this->_add_attachment( $file ) ) :
+				
+					if ( ! $graceful ) :
+					
+						show_error( 'EMAILER: Failed to add attachment: ' . $file );
+						
+					else :
+					
+						$this->_set_error( 'EMAILER: Insert Failed.' );
+						return FALSE;
+						
+					endif;
+					
+				endif;
 				
 			endforeach;
 			
@@ -1178,6 +1224,7 @@ class Emailer
 			
 			if ( ENVIRONMENT == 'production' ) :
 			
+				$this->_set_error( 'Email failed to send at SMTP time, developers informed' );
 				send_developer_mail( $_subject, $_message );
 				
 			else :
@@ -1670,6 +1717,30 @@ class Emailer
 		endif;
 		
 		return $html;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/* !ERRORS */
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function get_errors()
+	{
+		return $this->_errors;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _set_error( $message )
+	{
+		$this->_errors[] = $message;
 	}
 }
 

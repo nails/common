@@ -683,7 +683,7 @@ class Local_CDN {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function get_object( $object )
+	public function get_object( $object, $bucket = NULL )
 	{
 		$this->db->select( 'o.id, o.user_id, o.filename, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales, o.is_deleted' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
@@ -696,6 +696,22 @@ class Local_CDN {
 		else :
 		
 			$this->db->where( 'o.filename', $object );
+			
+			if ( $bucket ) :
+			
+				if ( is_numeric( $bucket ) ) :
+				
+					$this->db->where( 'b.id', $bucket );
+				
+				else :
+				
+					$this->db->where( 'b.slug', $bucket );
+				
+				endif;
+				
+				$this->db->join( 'cdn_local_bucket b', ' b.id = o.bucket_id' );
+			
+			endif;
 		
 		endif;
 		
@@ -1548,6 +1564,50 @@ class Local_CDN {
 	static function cdn_blank_avatar_url_scheme()
 	{
 		return site_url( 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Generates a properly hashed expiring url
+	 *
+	 * @access	static
+	 * @param	string	$bucket		The bucket which the image resides in
+	 * @param	string	$object		The object to be served
+	 * @param	string	$expires	The length of time the URL should be valid for, in seconds
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_expiring_url( $bucket, $object, $expires )
+	{
+		//	Hash the expirey time
+		$_hash = get_instance()->encrypt->encode( $bucket . '|' . $object . '|' . $expires . '|' . time() . '|' . md5( time() . $bucket . $object . $expires . APP_PRIVATE_KEY ), APP_PRIVATE_KEY );
+		$_hash = urlencode( $_hash );
+		
+		$_out  = 'cdn/serve?token=' . $_hash;
+		
+		// --------------------------------------------------------------------------
+		
+		return site_url( $_out );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Returns the scheme of 'expiring' urls
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_expiring_url_scheme()
+	{
+		return site_url( 'cdn/serve?token={{token}}' );
 	}
 
 	

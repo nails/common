@@ -169,6 +169,30 @@ if ( ! function_exists( 'cdn_blank_avatar' ) )
 
 
 /**
+ * Returns an expiring url
+ *
+ * @param	string	$bucket		The bucket which the image resides in
+ * @param	string	$object		The object to be served
+ * @param	string	$expires	The length of time the URL should be valid for, in seconds
+ * @return	string
+ */
+if ( ! function_exists( 'cdn_expiring_url' ) )
+{
+	function cdn_expiring_url( $bucket, $object, $expires )
+	{
+		_cdn_include_library();
+		
+		// --------------------------------------------------------------------------
+		
+		return CDN::cdn_expiring_url( $bucket, $object, $expires );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * Get the extension of a file from it's mimetype
  *
  * @param	string	$mime_type	The mimetype to look up

@@ -259,6 +259,23 @@ class Cdn {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Returns a single object object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function get_object( $object, $bucket = NULL )
+	{
+		return $this->_cdn->get_object( $object, $bucket );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/*	! BUCKET METHODS */
 	
 	
@@ -770,6 +787,46 @@ class Cdn {
 		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
 		
 		return $_class::cdn_blank_avatar_url_scheme();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Calls the driver's static cdn_expiring_url method
+	 *
+	 * @access	static
+	 * @param	string	$bucket		The bucket which the image resides in
+	 * @param	string	$file		The filename of the image we're 'scaling'
+	 * @param	string	$expires	The length of time the URL should be valid for, in seconds
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_expiring_url( $bucket, $file, $expires )
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_expiring_url( $bucket, $file, $expires );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Calls the driver's static cdn_expiring_url_scheme method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	static function cdn_expiring_url_scheme()
+	{
+		$_class = self::_include_driver( strtolower( CDN_DRIVER ) );
+		
+		return $_class::cdn_expiring_url_scheme();
 	}
 	
 	
