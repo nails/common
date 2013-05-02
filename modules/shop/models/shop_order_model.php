@@ -407,6 +407,66 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	public function get_for_user( $user_id, $email )
+	{
+		$this->db->where_in( 'o.status', array( 'VERIFIED', 'PENDING' ) );
+		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
+		return $this->get_all();
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function get_items_for_user( $user_id, $email, $type = NULL )
+	{
+		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping' );
+		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
+		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
+		
+		$this->db->join( 'shop_order o', 'o.id = op.order_id' );
+		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
+		
+		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
+		$this->db->where( 'o.status', 'VERIFIED' );	
+		
+		if ( $type ) :
+		
+			if ( is_numeric( $type ) ) :
+			
+				$this->db->where( 'pt.id', $type );
+				
+			else :
+			
+				$this->db->where( 'pt.slug', $type );
+			
+			endif;
+		
+		endif;
+		
+		$_items = $this->db->get( 'shop_order_product op' )->result();
+		
+		foreach ( $_items AS $item ) :
+		
+			$this->db->where( 'product_id', $item->product_id );
+			$item->meta = $this->db->get( 'shop_product_meta' )->row();
+			$this->_format_item( $item );
+		
+		endforeach;
+		
+		return $_items;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	public function abandon( $order_id, $data = array() )
 	{
 		$data['status'] = 'ABANDONED';
