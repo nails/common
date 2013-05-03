@@ -104,7 +104,7 @@ class Logger {
 		if ( ENVIRONMENT != 'production' && ! $this->ci->input->is_cli_request() ) :
 		
 			echo $line . "<br />\n";
-			ob_flush();
+			@ob_flush();
 		
 		endif;
 	}
