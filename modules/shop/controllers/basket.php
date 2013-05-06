@@ -96,7 +96,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	{
 		if ( $this->basket->add( $this->uri->rsegment( 3 ), $this->uri->rsegment( 4 ) ) ) :
 		
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Item was added to your basket.' );
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Item was added to your basket. <a href="javascript: history.go(-1)">Continue Shopping</a>' );
 		
 		else :
 		
