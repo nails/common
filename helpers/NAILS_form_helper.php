@@ -171,6 +171,184 @@ if ( ! function_exists( 'form_field' ) )
 
 
 /**
+ * form_field_mm
+ *
+ * Generates a form field which uses the media manager to select a file
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
+if ( ! function_exists( 'form_field_mm' ) )
+{
+	function form_field_mm( $field, $help = '' )
+	{
+		//	Set var defaults
+		$_field					= array();
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
+		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		
+		$_help			= array();
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		
+		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Generate a unique ID for this field
+		$_id = 'field_mm_' . md5( microtime() );
+		
+		// --------------------------------------------------------------------------
+		
+		$_out  = '<div class="field mm-file ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
+		$_out .= '<label>';
+				
+		//	Label
+		$_out .= '<span class="label">';
+		$_out .= $_field['label'];
+		$_out .= $_field['required'] ? '*' : '';
+		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+		$_out .= '</span>';
+		
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		
+		//	Field
+		
+		//	Choose image button
+		if ( $_field['bucket'] ) :
+		
+			$_nonce		= time();
+			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
+			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
+			
+			$_url		= site_url( 'cdn/manager/browse/image' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+		
+		else :
+		
+			$_url		= site_url( 'cdn/manager/browse/image' );
+		
+		endif;
+		
+		$_out .= '<div class="mm-file-container">';
+		
+		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="fancybox awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
+		
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+		
+		//	Remove button
+		$_display = $_field['default'] ? 'inline-block' : 'none';
+		
+		$_out .= '<br /><a href="#" class="awesome small red mm-file-remove" id="' . $_id . '-remove" style="display:' . $_display . '" onclick="return remove_' . $_id . '();">' . lang( 'action_remove' ) . '</a>';
+		
+		//	If there's post data, use that value instead
+		if ( get_instance()->input->post() ) :
+		
+			$_field['default'] = get_instance()->input->post( $_field['key'] );
+		
+		endif;
+		
+		//	If a default has been specified then show a download link
+		$_out .= '<span id="' . $_id . '-preview" class="mm-file-download">';
+		if ( $_field['default'] ) :
+		
+			$_out .= anchor( cdn_serve( $_field['bucket'], $_field['default'] ) . '?dl=true', 'Download File' );
+		
+		endif;
+		$_out .= '</span>';
+		
+		//	The actual field which is submitted
+		$_out .= '<input type="hidden" name="' . $_field['key'] . '" id="' . $_id . '-field" value="' . $_field['default'] . '" />';
+		
+		$_out .= '</div>';
+		
+		//	Error
+		if ( $_field['error'] ) :
+		
+			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			
+		else :
+		
+			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		
+		endif;
+				
+		$_out .= '</label>';
+		$_out .= '<div class="clear"></div>';
+		$_out .= '</div>';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		get_instance()->load->library( 'cdn' );
+		$_scheme = CDN::cdn_serve_url_scheme();
+		
+		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
+		
+$_out .= <<<EOT
+
+	<script style="text/javascript">
+	
+		function callback_$_id( file )
+		{
+			if ( file.length == 0 )
+			{
+				remove_$_id();
+				return;
+			}
+			
+			// --------------------------------------------------------------------------
+			
+			var _scheme = '$_scheme';
+			_scheme = _scheme.replace( '{{file}}', file );
+			$( '#$_id-preview' ).html( '<a href="' + _scheme + '?dl=1">Download</a>' );
+			$( '#$_id-field' ).val( file );
+			$( '#$_id-remove' ).css( 'display', 'inline-block' );
+		}
+		
+		function remove_$_id()
+		{
+			$( '#$_id-preview' ).html( '' );
+			$( '#$_id-field' ).val( '' );
+			$( '#$_id-remove' ).css( 'display', 'none' );
+			
+			return false;
+		}
+		
+	</script>
+
+EOT;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * form_field_image
  *
  * Generates a form field which uses the media manager to select an image

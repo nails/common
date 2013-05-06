@@ -138,19 +138,75 @@ class Shop_product_model extends NAILS_Model
 	 * @param array $data The data to update the object with
 	 * @return bool
 	 **/
-	public function update( $id, $data = array() )
+	public function update( $id, $data = array(), $meta = array() )
 	{
-		if ( ! $data )
+		$_current = $this->get_by_id( $id );
+		
+		if ( ! $_current ) :
+		
+			$this->_set_error( 'Invalid product ID' );
 			return FALSE;
+		
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
-		$this->db->set( $data );
-		$this->db->set( 'modified', 'NOW()', FALSE );
-		$this->db->where( 'id', $id );
-		$this->db->update( $this->_table );
+		//	Minimum requirements are title and type
+		if ( isset( $data['title'] ) && ! $data['title'] ) :
 		
-		return $this->db->affected_rows() ? TRUE : FALSE;
+			$this->_set_error( 'Missing Product Title.' );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Can't change product type, or ID
+		unset( $data['type_id'] );
+		unset( $data['id'] );
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $data ) :
+		
+			$this->db->set( $data );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		$this->db->set( 'modified_by', active_user( 'id' ) );
+		$this->db->where( 'id', $id );
+		
+		if ($this->db->update( $this->_table ) ) :
+		
+			
+			//	Prefix all meta fields with the type slug
+			$_meta = array();
+			foreach ( $meta AS $key => $value ) :
+			
+				$_meta[$_current->type->slug . '_' . $key ] = $value;
+			
+			endforeach;
+			
+			if ( $_meta ) :
+			
+				$this->db->set( $_meta );
+			
+			endif;
+			
+			$this->db->where( 'product_id', $id );
+			$this->db->update( $this->_table_meta );
+			
+			return TRUE;
+		
+		else :
+		
+			$this->_set_error( 'Unable to save product.' );
+			return FALSE;
+		
+		endif;
 	}
 	
 	
