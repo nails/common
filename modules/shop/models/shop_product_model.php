@@ -193,11 +193,10 @@ class Shop_product_model extends NAILS_Model
 			if ( $_meta ) :
 			
 				$this->db->set( $_meta );
+				$this->db->where( 'product_id', $id );
+				$this->db->update( $this->_table_meta );
 			
 			endif;
-			
-			$this->db->where( 'product_id', $id );
-			$this->db->update( $this->_table_meta );
 			
 			return TRUE;
 		
@@ -239,7 +238,7 @@ class Shop_product_model extends NAILS_Model
 	 * @param none
 	 * @return array
 	 **/
-	public function get_all()
+	public function get_all( $only_active = TRUE )
 	{
 		$this->db->select( 'p.*' );
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
@@ -249,6 +248,14 @@ class Shop_product_model extends NAILS_Model
 		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
 		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
 		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
+
+		$this->db->where( 'p.is_deleted', FALSE );
+
+		if ( $only_active ) :
+		
+			$this->db->where( 'p.is_active', TRUE );
+
+		endif;
 		
 		$_products = $this->db->get( $this->_table . ' p' )->result();
 	
@@ -279,7 +286,7 @@ class Shop_product_model extends NAILS_Model
 	public function get_by_id( $id )
 	{
 		$this->db->where( 'p.id', $id );
-		$_result = $this->get_all();
+		$_result = $this->get_all( FALSE );
 		
 		// --------------------------------------------------------------------------
 		
