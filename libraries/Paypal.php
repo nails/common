@@ -22,13 +22,15 @@ class Paypal
 			$this->curl->create( 'https://www.sandbox.paypal.com/cgi-bin/webscr' );
 		
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Prepare POST variables
 		$_post			= $_POST;
 		$_post['cmd']	= '_notify-validate';
 		
+		array_walk( $_post, function( &$item, $key ) { $item = utf8_encode( $item ); } );
+
 		$this->curl->post( $_post );
 		
 		// --------------------------------------------------------------------------

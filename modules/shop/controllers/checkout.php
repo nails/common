@@ -746,6 +746,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 		
 		//	POST data?
+
+		//	Want to test a previous IPN message?
+		//	Paste the IPN message into the following and uncomment
+		//	parse_str( '', $_POST );
+		
 		if ( ! $this->data['testing'] && ! $this->input->post() ) :
 		
 			$this->logger->line( 'No POST data, going back to sleep...' );
