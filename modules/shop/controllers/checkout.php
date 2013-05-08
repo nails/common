@@ -737,7 +737,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		//	Configure logger
 		$this->logger->log_dir( 'shop/notify/paypal' );
-		$this->logger->log_file( 'ipn' );
+		$this->logger->log_file( 'ipn-' . date( 'Y-m-d' ) . '.php' );
 		
 		$this->logger->line();
 		$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );

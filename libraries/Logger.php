@@ -54,7 +54,7 @@ class Logger {
 		
 			if ( ! file_exists( $this->log->dir . $this->log->file ) ) :
 			
-				if ( write_file( $this->log->dir . $this->log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n") ) :
+				if ( write_file( $this->log->dir . $this->log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n" ) ) :
 				
 					$this->log->exists = TRUE;
 					
@@ -152,12 +152,12 @@ class Logger {
 		
 		if ( $log_dir ) :
 
-			$this->log->dir = $log_dir;
+			$this->log->dir = FCPATH . APPPATH . 'logs/' . $log_dir;
 			$this->log->dir .= substr( $this->log->dir, -1 ) != '/' ? '/' : '';
 
 		else :
 
-			$this->log->dir = './application/logs/';
+			$this->log->dir = FCPATH . APPPATH . 'logs/';
 
 		endif;
 	}
