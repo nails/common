@@ -117,7 +117,7 @@
 				</div>
 			</div>
 			
-			<!--	REMEMBER ME CHECKBOX	-->
+			<!--	ACCEPT T&C's	-->
 			<?php
 				
 				$_field	= 'terms';

@@ -146,7 +146,7 @@
 				// --------------------------------------------------------------------------
 				
 			
-				echo form_open();
+				echo form_open( 'auth/register?return_to=' . urlencode( 'shop/checkout' ) );
 				echo form_hidden( 'new_user', TRUE );
 				
 				// --------------------------------------------------------------------------
@@ -188,9 +188,11 @@
 				
 				// --------------------------------------------------------------------------
 				
-				echo form_field_submit( lang( 'action_login' ) );
-				
-				echo '<p class="forgot">' . anchor( 'auth/forgotten_password', 'Forgotten your password?' ) . '</p>';
+				echo form_hidden( 'terms', TRUE );
+
+				// --------------------------------------------------------------------------
+
+				echo form_field_submit( lang( 'action_register' ) );
 				
 				// --------------------------------------------------------------------------
 				
