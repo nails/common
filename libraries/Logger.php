@@ -150,7 +150,16 @@ class Logger {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->log->dir = ( $log_dir ) ? $log_dir : './application/logs/';
+		if ( $log_dir ) :
+
+			$this->log->dir = $log_dir;
+			$this->log->dir .= substr( $this->log->dir, -1 ) != '/' ? '/' : '';
+
+		else :
+
+			$this->log->dir = './application/logs/';
+
+		endif;
 	}
 }
 
