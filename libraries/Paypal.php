@@ -28,15 +28,13 @@ class Paypal
 		//	Prepare POST variables
 		$_post			= $_POST;
 		$_post['cmd']	= '_notify-validate';
-		
-		array_walk( $_post, function( &$item, $key ) { $item = utf8_encode( $item ); } );
 
 		$this->curl->post( $_post );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Execute
-		return $this->curl->execute() == 'VALID' ? TRUE : FALSE;
+		return $this->curl->execute() == 'VERIFIED' ? TRUE : FALSE;
 	}
 }
 

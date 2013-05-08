@@ -602,10 +602,10 @@ class Shop_order_model extends NAILS_Model
 		$_expires	= 172800; //	48 hours
 		foreach( $items AS $item ) :
 		
-			$_temp = new stdClass();
+			$_temp			= new stdClass();
 			$_temp->title	= $item->title;
 			$_temp->url		= cdn_expiring_url( $item->meta->download_bucket, $item->meta->download_filename, $_expires ) . '&dl=1';
-			$_urls[] = $_temp;
+			$_urls[]		= $_temp;
 			
 			unset( $_temp );
 		

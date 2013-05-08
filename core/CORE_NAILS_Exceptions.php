@@ -30,6 +30,11 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Set the correct header
+		header( 'HTTP/1.1 404 Not Found' );
+
+		// --------------------------------------------------------------------------
+
 		//	If running on the command line just return a string
 		if ( $_ci->input->is_cli_request() ) :
 		
@@ -37,11 +42,6 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 			echo $_ci->output->get_output();
 		
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set the correct header
-		$_ci->output->set_header( 'HTTP/1.1 404 Not Found' );
 		
 		// --------------------------------------------------------------------------
 		

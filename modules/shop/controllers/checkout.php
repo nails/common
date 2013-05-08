@@ -748,8 +748,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		//	POST data?
 
 		//	Want to test a previous IPN message?
-		//	Paste the IPN message into the following and uncomment
-		//	parse_str( '', $_POST );
+		//	Paste the IPN message into the following and uncomment the following lines
+
+		//	$_message = '';
+		//	$_message = str_replace( '+', '%2B', $_message );
+		//	parse_str( $_message, $_POST );
 		
 		if ( ! $this->data['testing'] && ! $this->input->post() ) :
 		
@@ -792,7 +795,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$_paypal['invoice']			= $_order->id;
 			$_paypal['custom']			=  $this->encrypt->encode( md5( $_order->ref . ':' . $_order->code ), APP_PRIVATE_KEY );
 			$_paypal['txn_id']			= 'TEST:' . random_string( 'alpha', 6 );
-			$_paypal['txn_type']		= 'subscr_payment';
+			$_paypal['txn_type']		= 'cart';
 			$_paypal['payment_status']	= 'Completed';
 			$_paypal['mc_fee']			= 0.00;
 		
@@ -861,9 +864,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$this->logger->line( 'Checking txn_type is supported' );
 			$this->logger->line();
 			
-			if ( $_paypal['txn_type'] != 'subscr_payment' ) :
+			if ( $_paypal['txn_type'] != 'cart' ) :
 			
-				$this->logger->line( 'Not a valid PayPal txn_type, gracefully aborting.' );
+				$this->logger->line( '"' . $_paypal['txn_type'] . '" is not a supported PayPal txn_type, gracefully aborting.' );
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 				$this->logger->line();
 				
@@ -1018,9 +1021,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS'S SHOP MODULE
  * 
- * The following block of code makes it simple to extend one of the core auth
+ * The following block of code makes it simple to extend one of the core shop
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
