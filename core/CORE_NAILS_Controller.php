@@ -19,6 +19,62 @@ class CORE_NAILS_Controller extends MX_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		//	Define the Nails version constant
+		define( 'NAILS_VERSION',	'0.0.0' );
+		define( 'NAILS_RELEASED',	'Never Released' );
+		
+		//	Include the environment Nails config
+		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
+		
+			die( lang( 'nails_not_configured' ) );
+		
+		endif;
+		
+		require_once( NAILS_PATH . '/config/_nails.php' );
+
+		// --------------------------------------------------------------------------
+		
+		//	Is Nails in maintenance mode?
+		if ( NAILS_MAINTENANCE ) :
+
+			$whitelist_ip = explode(',', NAILS_MAINTENANCE_WHITELIST );
+			
+			if ( array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
+			
+				header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
+				header( 'Status: 503 Service Temporarily Unavailable' );
+				header( 'Retry-After: 7200' );
+				
+				// --------------------------------------------------------------------------
+				
+		 		//	Look for an app override
+		 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
+		 		
+		 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+		 		
+		 		//	Fall back to the Nails maintenance page
+		 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+		 		
+		 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+		 		
+		 		//	Fall back, back to plain text
+		 		else :
+		 		
+		 			echo '<h1>Down for maintenance</h1>';
+		 		
+		 		endif;
+		 		
+		 		// --------------------------------------------------------------------------
+		 		
+		 		//	Halt script execution
+	 			exit(0);
+		 		
+		 	endif;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -64,21 +120,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		//	Define empty values
 		$this->data	= array();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.0.0' );
-		define( 'NAILS_RELEASED',	'Never Released' );
-		
-		//	Include the environment Nails config
-		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
-		
-			die( lang( 'nails_not_configured' ) );
-		
-		endif;
-		
-		require_once( NAILS_PATH . '/config/_nails.php' );
 		
 		// --------------------------------------------------------------------------
 		
