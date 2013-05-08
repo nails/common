@@ -276,6 +276,23 @@ class Cdn {
 	// --------------------------------------------------------------------------
 	
 	
+	/**
+	 * Returns objects uploaded by the user
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function list_objects_for_user( $user_id, $include_deleted = FALSE )
+	{
+		return $this->_cdn->list_objects_for_user( $user_id, $include_deleted );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	/*	! BUCKET METHODS */
 	
 	

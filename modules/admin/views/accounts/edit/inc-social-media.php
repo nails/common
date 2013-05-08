@@ -1,3 +1,4 @@
+<?php if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[twitter]' ) || module_is_enabled( 'auth[linkedin]' ) ) : ?>
 <fieldset  id="edit-user-social" class="social">
 	<legend><?=lang( 'accounts_edit_social_legend' )?></legend>
 	<p>
@@ -47,3 +48,4 @@
 	?>
 	</p>
 </fieldset>
+<?php endif; 

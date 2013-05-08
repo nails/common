@@ -863,10 +863,12 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->data['languages']	= $this->core_nails_language_model->get_all_supported_flat();
 		
 		//	Fetch any user uploads
-		$this->load->helper( 'directory' );
-		$this->data['user_uploads'] = array();
-		$this->data['user_uploads']['accounts_edit_upload_type_image']	= directory_map( CDN_PATH . $_user->id . '-image' );
-		$this->data['user_uploads']['accounts_edit_upload_type_file']	= directory_map( CDN_PATH . $_user->id . '-file' );
+		if ( module_is_enabled( 'cdn' ) ) :
+
+			$this->load->library( 'cdn' );
+			$this->data['user_uploads'] = $this->cdn->list_objects_for_user( $_user->id );
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

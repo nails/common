@@ -123,8 +123,7 @@
 	$lang['accounts_edit_social_none']		= 'This user is not currently connected to any social media network';
 	
 	$lang['accounts_edit_upload_legend']		= 'User Uploads';
-	$lang['accounts_edit_upload_message']		= '<strong>Note:</strong> This section only lists files found in the user\'s private upload bucket.';
-	$lang['accounts_edit_upload_nofile']		= 'No %s found';
+	$lang['accounts_edit_upload_nofile']		= 'No files found';
 	$lang['accounts_edit_upload_type_image']	= 'Images';
 	$lang['accounts_edit_upload_type_file']		= 'Files';
 		

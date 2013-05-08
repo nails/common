@@ -436,7 +436,7 @@ class Local_CDN {
 	
 	
 	/**
-	 * Destroys (permenantly deletes) an object
+	 * Marks an object as deleted
 	 *
 	 * @access	public
 	 * @param	none
@@ -500,11 +500,23 @@ class Local_CDN {
 	 **/
 	public function destroy( $file, $bucket )
 	{
+		$_file		= urldecode( $file );
+		$_bucket	= urldecode( $bucket );
+
+		if ( file_exists( CDN_PATH . $bucket . '/' . $_file ) ) :
 		
-		if ( file_exists( CDN_PATH . $bucket . '/' . urldecode( $file ) ) ) :
-		
-			if ( @unlink( CDN_PATH . $bucket . '/' . urldecode( $file ) ) ) :
+			if ( @unlink( CDN_PATH . $bucket . '/' . $_file ) ) :
 			
+				//	Remove the database entry
+				$_object = $this->get_object( $_file, $_bucket );
+
+				if ( $_object ) :
+
+					$this->where( 'id', $_object->id );
+					$this->db->delete( 'cdn_local_object' );
+
+				endif;
+
 				return TRUE;
 			
 			else :
@@ -570,7 +582,6 @@ class Local_CDN {
 	 **/
 	public function replace( $file, $bucket, $replace_with, $options = array(), $is_raw = FALSE )
 	{
-		dumpanddie( 'TODO: replace file - needs to update the DB etc' );
 		//	Firstly, attempt the upload
 		$_filename = $this->upload( $replace_with, $bucket, $options, $is_raw );
 		
@@ -731,6 +742,53 @@ class Local_CDN {
 			return FALSE;
 		
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns objects uploaded by the user
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function list_objects_for_user( $user_id, $include_deleted = FALSE )
+	{
+		$this->db->select( 'o.id, o.user_id, o.filename, b.id bucket_id, b.slug bucket_slug, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales, o.is_deleted' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
+		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->where( 'o.user_id', $user_id );
+		
+		if ( ! $include_deleted ) :
+		
+			$this->db->where( 'o.is_deleted', FALSE );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
+		$this->db->join( 'cdn_local_bucket b', 'o.bucket_id = b.id', 'LEFT' );
+		
+		$this->db->order_by( 'o.filename_display' );
+		
+		$_objects = $this->db->get( 'cdn_local_object o' )->result();
+		
+		foreach( $_objects AS $object ) :
+		
+			//	Format object object
+			$this->_format_object( $object );
+		
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_objects;
 	}
 	
 	
@@ -924,7 +982,7 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		//	Does't exist, attempt to create
-		if ( mkdir( CDN_PATH . $bucket ) ) :
+		if ( @ mkdir( CDN_PATH . $bucket ) ) :
 		
 			$this->db->set( 'slug', $bucket );
 			$this->db->set( 'created', 'NOW()', FALSE );
@@ -1347,6 +1405,19 @@ class Local_CDN {
 		unset( $object->email );
 		unset( $object->profile_img );
 		unset( $object->gender );
+
+		// --------------------------------------------------------------------------
+
+		if ( isset( $object->bucket_id ) ) :
+
+			$object->bucket			= new stdClass();
+			$object->bucket->id		= $object->bucket_id;
+			$object->bucket->slug	= $object->bucket_slug;
+
+			unset( $object->bucket_id );
+			unset( $object->bucket_slug );
+
+		endif;
 	}
 	
 	

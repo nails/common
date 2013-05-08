@@ -73,9 +73,9 @@ class Scale extends Thumb
 				// --------------------------------------------------------------------------
 				
 				//	Set the appropriate cache headers
-				header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
-				header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
-				header( 'X-CDN-CACHE: MISS' );
+				//header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
+				//header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
+				//header( 'X-CDN-CACHE: MISS' );
 				
 				// --------------------------------------------------------------------------
 				
