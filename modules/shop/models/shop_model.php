@@ -48,7 +48,15 @@ class Shop_model extends NAILS_Model
 	
 	public function set_settings( $key_values )
 	{
-		dump( 'TODO' );
+		foreach ( $key_values AS $key => $value ) :
+
+			$this->db->where( 'key', $key );
+			$this->db->set( 'value', serialize( $value ) );
+			$this->db->update( 'shop_settings' );
+
+		endforeach;
+
+		return TRUE;
 	}
 	
 	

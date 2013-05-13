@@ -388,14 +388,20 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		
 		endif;
 		
-		if ( ! $_acl )
+		if ( ! $_acl ) :
+
 			return FALSE;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Super users can do anything they damn well please
-		if ( isset( $_acl['superuser'] ) && $_acl['superuser'] )
+		if ( isset( $_acl['superuser'] ) && $_acl['superuser'] ) :
+
 			return TRUE;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

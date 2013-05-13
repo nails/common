@@ -102,7 +102,6 @@ class Shop_payment_gateway_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		$this->db->set( $data );
-		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
 		$this->db->update( $this->_table );
 		

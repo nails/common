@@ -60,14 +60,14 @@ class Shop extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		$_notifications['index']			= array();
-		$_notifications['index']['title']	= 'Active Products';
-		$_notifications['index']['value']	= 13;
+		// $_notifications['index']			= array();
+		// $_notifications['index']['title']	= 'Active Products';
+		// $_notifications['index']['value']	= 13;
 		
-		$_notifications['orders']			= array();
-		$_notifications['orders']['type']	= 'alert';
-		$_notifications['orders']['title']	= 'Unfulfilled orders';
-		$_notifications['orders']['value']	= 13;
+		// $_notifications['orders']			= array();
+		// $_notifications['orders']['type']	= 'alert';
+		// $_notifications['orders']['title']	= 'Unfulfilled orders';
+		// $_notifications['orders']['value']	= 13;
 		
 		// --------------------------------------------------------------------------
 		
@@ -234,14 +234,63 @@ class Shop extends Admin_Controller {
 	{
 		//	Set method info
 		$this->data['page']->title = 'Shop Settings';
+
+		// --------------------------------------------------------------------------
+
+		//	Load models
+		$this->load->model( 'shop/shop_model', 'shop' );
+		$this->load->model( 'shop/shop_payment_gateway_model', 'payment_gateway' );
 		
 		// --------------------------------------------------------------------------
-		
+
 		//	Process POST
 		if ( $this->input->post() ) :
 		
-			//	TODO
+			switch ( $this->input->post( 'update' ) ) :
+
+				case 'settings' :
+
+					$this->_settings_update_settings();
+
+				break;
+
+				case 'paymentgateways' :
+
+					$this->_settings_update_paymentgateways();
+
+				break;
+
+				case 'currencies' :
+
+					$this->_settings_update_currencies();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				default :
+
+					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
+
+				break;
+
+			endswitch;
 		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get data
+		$this->data['settings'] = $this->shop->settings();
+
+		if ( $this->user->is_superuser() ) :
+
+			$this->data['payment_gateways'] = $this->payment_gateway->get_all();
+
+		else :
+
+			$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
+
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -249,6 +298,66 @@ class Shop extends Admin_Controller {
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/shop/settings',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _settings_update_settings()
+	{
+		//	Prepare update
+		$_settings					= array();
+		$_settings['notify_order']	= $this->input->post( 'notify_order' );
+		$_settings['new_item']		= 'wahoo';
+
+		if ( $this->shop->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+	// --------------------------------------------------------------------------
+
+
+	private function _settings_update_paymentgateways()
+	{
+		//	Prepare update
+		foreach( $this->input->post( 'paymentgateway' ) AS $id => $values ) :
+
+			$_data						= new stdClass();
+
+			if ( $this->user->is_superuser() ) :
+
+				$_data->enabled				= (bool) $values['enabled'];
+				$_data->sandbox_account_id	= $values['sandbox_account_id'];
+				$_data->sandbox_api_key		= $values['sandbox_api_key'];
+				$_data->sandbox_api_secret	= $values['sandbox_api_secret'];
+
+			endif;
+			$_data->account_id			= $values['account_id'];
+			$_data->api_key				= $values['api_key'];
+			$_data->api_secret			= $values['api_secret'];
+
+			$this->payment_gateway->update( $id, $_data );
+
+		endforeach;
+
+		$this->data['success'] = '<strong>Success!</strong> Payment Gateway settings have been saved.';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _settings_update_currencies()
+	{
+		//	TODO
 	}
 }
 
