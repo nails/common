@@ -1,34 +1,37 @@
 <ul class="sidebar four columns last">
-	<li class="widget latest-posts">
-		<h5>Latest Posts</h5>
-		<ul>
-			<li>
-				<a href="#">This is the title of a post</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-			<li>
-				<a href="#">How to be the best banker, like, ever.</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-			<li>
-				<a href="#">Love Coffee? Love Venture Capital more!</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-			<li>
-				<a href="#">This is the title of a post</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-			<li>
-				<a href="#">How to be the best banker, like, ever.</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-			<li>
-				<a href="#">Love Coffee? Love Venture Capital more!</a>
-				<small>Published 3rd May 2013, 12:13</small>
-			</li>
-		</ul>
-	</li>
-	<li class="widget categories">
+<?php
+
+	if ( $widget->latest_posts ) :
+
+		echo '<li class="widget latest-posts">';
+		echo $widget->latest_posts;
+		echo '</li>';
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	if ( $widget->categories ) :
+
+		echo '<li class="widget latest-posts">';
+		echo $widget->latest_posts;
+		echo '</li>';
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	if ( $widget->tags ) :
+
+		echo '<li class="widget latest-posts">';
+		echo $widget->latest_posts;
+		echo '</li>';
+
+	endif;
+
+
+	?>
+	<!-- <li class="widget categories">
 		<h5>Categories</h5>
 		<ul>
 			<li>&rsaquo; <a href="#">Investment Banking</a></li>
@@ -43,5 +46,5 @@
 			<li><a href="#">Preparation</a></li>
 			<li><a href="#">Current Affairs</a></li>
 		</ul>
-	</li>
+	</li> -->
 </ul>

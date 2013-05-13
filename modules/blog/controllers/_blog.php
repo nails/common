@@ -33,6 +33,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		
 		//	Load the models
 		$this->load->model( 'blog_post_model',		'post' );
+		$this->load->model( 'blog_widget_model',	'widget' );
 		
 		// --------------------------------------------------------------------------
 		

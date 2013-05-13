@@ -584,8 +584,13 @@ class Cdn {
 		
 		if ( $_result == 'application/zip' ) :
 		
-			$_fi = finfo_open( FILEINFO_MIME_TYPE, '/etc/magic' );
-			$_result = finfo_file( $_fi, $file );
+			$_fi = @finfo_open( FILEINFO_MIME_TYPE, CDN_MAGIC );
+
+			if ( $_fi ) :
+
+				$_result	= finfo_file( $_fi, $file );
+
+			endif;
 			
 			//	If this comes back as an octet stream then fallback to application/zip
 			if ( $_result == 'application/octet-stream' ) :

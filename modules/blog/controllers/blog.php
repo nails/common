@@ -38,6 +38,14 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		
 		//	Load posts		
 		$this->data['posts'] = $this->post->get_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Widgets
+		$this->data['widget'] = new stdClass();
+		$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+		$this->data['widget']->categories	= $this->widget->categories();
+		$this->data['widget']->tags			= $this->widget->tags();
 		
 		// --------------------------------------------------------------------------
 		
@@ -70,7 +78,15 @@ class NAILS_Blog extends NAILS_Blog_Controller
 			show_404();
 			
 		// --------------------------------------------------------------------------
-				
+		
+		//	Widgets
+		$this->data['widget'] = new stdClass();
+		$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+		$this->data['widget']->categories	= $this->widget->categories();
+		$this->data['widget']->tags			= $this->widget->tags();
+
+		// --------------------------------------------------------------------------
+		
 		//	Meta & Breadcrumbs
 		$this->data['page']->title 				= $this->data['post']->title;
 		$this->data['page']->description 		= $this->data['post']->seo_description;
