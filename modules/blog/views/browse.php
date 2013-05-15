@@ -41,4 +41,7 @@
 	$this->load->view( 'blog/sidebar' );
 
 ?>
+
+	<div class="clearfix"></div>
+	
 </div>
