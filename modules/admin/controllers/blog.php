@@ -39,8 +39,24 @@ class NAILS_Blog extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']		= 'Manage Posts';					//	Sub-nav function.
-		$d->funcs['create']		= 'Create New Post';					//	Sub-nav function.
+		$d->funcs['index']				= 'Manage Posts';		//	Sub-nav function.
+		$d->funcs['create']				= 'Create New Post';	//	Sub-nav function.
+		
+		get_instance()->load->helper( 'blog_helper' );
+
+		if ( blog_setting( 'categories_enabled' ) ) :
+
+			$d->funcs['manager_category']	= 'Manage Categories';	//	Sub-nav function.
+
+		endif;
+
+		if ( blog_setting( 'tags_enabled' ) ) :
+
+			$d->funcs['manager_tag']		= 'Manage Tags';		//	Sub-nav function.
+
+		endif;
+
+		$d->funcs['settings']			= 'Blog Settings';		//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -65,7 +81,10 @@ class NAILS_Blog extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->load->model( 'blog/blog_post_model', 'post' );
+		$this->load->model( 'blog/blog_model',			'blog' );
+		$this->load->model( 'blog/blog_post_model',		'post' );
+		$this->load->model( 'blog/blog_category_model',	'category' );
+		$this->load->model( 'blog/blog_tag_model',		'tag' );
 	}
 	
 	
@@ -145,6 +164,18 @@ class NAILS_Blog extends Admin_Controller {
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= $this->input->post( 'is_published' );
+
+				if ( blog_setting( 'categories_enabled' ) ) :
+
+					$_data['categories']	= $this->input->post( 'categories' );
+
+				endif;
+
+				if ( blog_setting( 'tags_enabled' ) ) :
+
+					$_data['tags']			= $this->input->post( 'tags' );
+
+				endif;
 				
 				if ( $this->post->create( $_data ) ) :
 				
@@ -168,6 +199,21 @@ class NAILS_Blog extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load Categories and Tags
+		if ( blog_setting( 'categories_enabled' ) ) :
+
+			$this->data['categories']	= $this->category->get_all();
+
+		endif;
+
+		if ( blog_setting( 'tags_enabled' ) ) :
+
+			$this->data['tags']			= $this->tag->get_all();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
 		
@@ -229,7 +275,7 @@ class NAILS_Blog extends Admin_Controller {
 			if ( $this->form_validation->run() ) :
 			
 				//	Prepare data
-				$_data = array();
+				$_data						= array();
 				$_data['title']				= $this->input->post( 'title' );
 				$_data['excerpt']			= $this->input->post( 'excerpt' );
 				$_data['image']				= $this->input->post( 'image' );
@@ -237,6 +283,19 @@ class NAILS_Blog extends Admin_Controller {
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= $this->input->post( 'is_published' );
+
+				if ( blog_setting( 'categories_enabled' ) ) :
+
+					$_data['categories']	= $this->input->post( 'categories' );
+
+
+				endif;
+
+				if ( blog_setting( 'tags_enabled' ) ) :
+
+					$_data['tags']			= $this->input->post( 'tags' );
+
+				endif;
 				
 				if ( $this->post->update( $_post_id, $_data ) ) :
 				
@@ -260,14 +319,29 @@ class NAILS_Blog extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Load Categories and Tags
+		if ( blog_setting( 'categories_enabled' ) ) :
+
+			$this->data['categories']	= $this->category->get_all();
+
+		endif;
+
+		if ( blog_setting( 'tags_enabled' ) ) :
+
+			$this->data['tags']			= $this->tag->get_all();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
 		
 		// --------------------------------------------------------------------------
 		
-		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'admin/blog/edit',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
 	}
 	
 	
@@ -340,6 +414,289 @@ class NAILS_Blog extends Admin_Controller {
 		redirect( 'admin/blog' );
 		return;
 
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function manager_category()
+	{
+		$this->data['page']->title = 'Category Manager';
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		if ( $this->input->get( 'rebuild' ) ) :
+
+			$this->data['rebuild'] = TRUE;
+
+		else :
+
+			$this->data['rebuild'] = FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle POST
+		if ( $this->input->post() ) :
+
+			if ( $this->category->create( $this->input->post( 'category' ) ) ) :
+
+				$this->data['success'] = '<strong>Success!</strong> Category created.';
+				$this->data['rebuild'] = TRUE;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> could not create category.';
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['categories']	= $this->category->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/blog/manager/category',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete_category()
+	{
+		if ( $this->category->delete( $this->uri->segment( 4 ) ) ) :
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category Deleted.' );
+			$_rebuild = 1;
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem deleting that category.' );
+			$_rebuild = 0;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_fancybox = $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true&rebuild=' . $_rebuild : '';
+
+		redirect( 'admin/blog/manager_category' . $_fancybox );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function manager_tag()
+	{
+		$this->data['page']->title = 'Tag Manager';
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		if ( $this->input->get( 'rebuild' ) ) :
+
+			$this->data['rebuild'] = TRUE;
+
+		else :
+
+			$this->data['rebuild'] = FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle POST
+		if ( $this->input->post() ) :
+
+			if ( $this->tag->create( $this->input->post( 'tag' ) ) ) :
+
+				$this->data['success'] = '<strong>Success!</strong> Tag created.';
+				$this->data['rebuild'] = TRUE;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> could not create tag.';
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Load Tags
+		$this->data['tags']	= $this->tag->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/blog/manager/tag',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete_tag()
+	{
+		if ( $this->tag->delete( $this->uri->segment( 4 ) ) ) :
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag Deleted.' );
+			$_rebuild = 1;
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem deleting that tag.' );
+			$_rebuild = 0;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_fancybox = $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true&rebuild=' . $_rebuild : '';
+
+		redirect( 'admin/blog/manager_tag' . $_fancybox );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Configure the blog
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function settings()
+	{
+		//	Set method info
+		$this->data['page']->title = 'Blog Settings';
+
+		// --------------------------------------------------------------------------
+
+		//	Load models
+		$this->load->model( 'blog/blog_model', 'blog' );
+		
+		// --------------------------------------------------------------------------
+
+		//	Process POST
+		if ( $this->input->post() ) :
+		
+			switch ( $this->input->post( 'update' ) ) :
+
+				case 'settings' :
+
+					$this->_settings_update_settings();
+
+				break;
+
+				case 'sidebar' :
+
+					$this->_settings_update_sidebar();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				default :
+
+					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
+
+				break;
+
+			endswitch;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get data
+		$this->data['settings'] = $this->blog->settings();
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/blog/settings',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _settings_update_settings()
+	{
+		//	Prepare update
+		$_settings							= array();
+		$_settings['blog_url']				= $this->input->post( 'blog_url' );
+		$_settings['categories_enabled']	= (bool) $this->input->post( 'categories_enabled' );
+		$_settings['tags_enabled']			= (bool) $this->input->post( 'tags_enabled' );
+
+		// --------------------------------------------------------------------------
+
+		//	Sanitize blog url
+		$_settings['blog_url'] .= substr( $_settings['blog_url'], -1 ) != '/' ? '/' : '';
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->blog->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _settings_update_sidebar()
+	{
+		//	Prepare update
+		$_settings						= array();
+		$_settings['sidebar_enabled']	= (bool) $this->input->post( 'sidebar_enabled' );
+		$_settings['sidebar_position']	= $this->input->post( 'sidebar_position' );
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->blog->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Sidebar settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
 	}
 }
 

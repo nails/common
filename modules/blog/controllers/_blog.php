@@ -32,6 +32,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load the models
+		$this->load->model( 'blog_model',			'blog' );
 		$this->load->model( 'blog_post_model',		'post' );
 		$this->load->model( 'blog_widget_model',	'widget' );
 		
@@ -39,6 +40,26 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		
 		//	Load the helper
 		$this->load->helper( 'blog' );
+
+		// --------------------------------------------------------------------------
+
+		if ( blog_setting( 'categories_enabled' ) ) :
+
+			$this->load->model( 'blog_category_model',	'category' );
+
+		endif;
+
+
+		if ( blog_setting( 'tags_enabled' ) ) :
+
+			$this->load->model( 'blog_tag_model',	'tag' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch the Blog URL
+		$this->data['blog_url'] = blog_setting( 'blog_url' );
 		
 		// --------------------------------------------------------------------------
 		

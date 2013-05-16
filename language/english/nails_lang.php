@@ -101,6 +101,35 @@
 	// --------------------------------------------------------------------------
 	
 	//	Common strings
-	$lang['yes']								= 'Yes';
+	$lang['yes']							= 'Yes';
 	$lang['no']								= 'No';
 	$lang['no_records_found']				= 'No Records found';
+
+
+	// --------------------------------------------------------------------------
+
+	//	Days and Months
+	$lang['day_mon']	= 'Monday';
+	$lang['day_tue']	= 'Tuesday';
+	$lang['day_wed']	= 'Wednesday';
+	$lang['day_thur']	= 'Thursday';
+	$lang['day_fri']	= 'Friday';
+	$lang['day_sat']	= 'Saturday';
+	$lang['day_dun']	= 'Sunday';
+
+	$lang['month_jan']	= 'January';
+	$lang['month_feb']	= 'February';
+	$lang['month_mar']	= 'March';
+	$lang['month_apr']	= 'April';
+	$lang['month_may']	= 'May';
+	$lang['month_jun']	= 'June';
+	$lang['month_jul']	= 'July';
+	$lang['month_aug']	= 'August';
+	$lang['month_sep']	= 'September';
+	$lang['month_oct']	= 'October';
+	$lang['month_nov']	= 'November';
+	$lang['month_dec']	= 'December';
+
+
+
+

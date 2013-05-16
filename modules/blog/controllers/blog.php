@@ -42,10 +42,14 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Widgets
-		$this->data['widget'] = new stdClass();
-		$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-		$this->data['widget']->categories	= $this->widget->categories();
-		$this->data['widget']->tags			= $this->widget->tags();
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+			$this->data['widget']->categories	= $this->widget->categories();
+			$this->data['widget']->tags			= $this->widget->tags();
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -54,7 +58,6 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		$this->load->view( 'blog/browse',		$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
-
 	
 	
 	// --------------------------------------------------------------------------
@@ -69,7 +72,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	public function single()
 	{
 		//	Get the single post by its slug
-		$this->data['post'] = $this->post->get_by_slug( $this->uri->segment( 2 ), TRUE );
+		$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ), TRUE );
 		
 		// --------------------------------------------------------------------------
 		
@@ -80,14 +83,18 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Widgets
-		$this->data['widget'] = new stdClass();
-		$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-		$this->data['widget']->categories	= $this->widget->categories();
-		$this->data['widget']->tags			= $this->widget->tags();
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+			$this->data['widget']->categories	= $this->widget->categories();
+			$this->data['widget']->tags			= $this->widget->tags();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 		
-		//	Meta & Breadcrumbs
+		//	Meta
 		$this->data['page']->title 				= $this->data['post']->title;
 		$this->data['page']->description 		= $this->data['post']->seo_description;
 		$this->data['page']->keywords 			= $this->data['post']->seo_keywords;
@@ -97,6 +104,247 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		//	Load views
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'blog/single',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function archive()
+	{
+		//	Widgets
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+			$this->data['widget']->categories	= $this->widget->categories();
+			$this->data['widget']->tags			= $this->widget->tags();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_year	= $this->uri->rsegment( 3 );
+		$_month	= $this->uri->rsegment( 4 );
+
+		if ( $_year && $_month ) :
+
+			$this->_archive_month( $_year, $_month );
+
+		elseif ( $_year ) :
+
+			$this->_archive_year( $_year );
+
+		else :
+
+			$this->_archive();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _archive()
+	{
+		//	Meta
+		$this->data['page']->title 				= 'Archive';
+		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME;
+		$this->data['page']->keywords 			= '';
+		
+		// --------------------------------------------------------------------------
+
+		$this->data['posts'] = $this->post->get_archive();
+
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _archive_year( $year )
+	{
+		//	Meta
+		$this->data['page']->title 				= 'Archive (' . $year . ')';
+		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted during ' . $year;
+		$this->data['page']->keywords 			= '';
+		
+		// --------------------------------------------------------------------------
+
+		$this->data['posts'] = $this->post->get_archive( $year );
+
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _archive_month( $year, $month )
+	{
+		switch ( (int) $month ) :
+
+			case 1 :	$_month = lang( 'month_jan' ); break;
+			case 2 :	$_month = lang( 'month_feb' ); break;
+			case 3 :	$_month = lang( 'month_mar' ); break;
+			case 4 :	$_month = lang( 'month_apr' ); break;
+			case 5 :	$_month = lang( 'month_may' ); break;
+			case 6 :	$_month = lang( 'month_jun' ); break;
+			case 7 :	$_month = lang( 'month_jul' ); break;
+			case 8 :	$_month = lang( 'month_aug' ); break;
+			case 8 :	$_month = lang( 'month_sep' ); break;
+			case 10 :	$_month = lang( 'month_oct' ); break;
+			case 11 :	$_month = lang( 'month_nov' ); break;
+			case 12 :	$_month = lang( 'month_dec' ); break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		//	Meta
+		$this->data['page']->title 				= 'Archive (' . $_month . ', ' . $year . ')';
+		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted during ' . $_month . ', ' . $year;
+		$this->data['page']->keywords 			= '';
+		
+		// --------------------------------------------------------------------------
+
+		$this->data['posts'] = $this->post->get_archive( $year, $month );
+
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function category()
+	{
+		if ( ! blog_setting( 'categories_enabled' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! $this->uri->rsegment( 3 ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get category
+		$this->data['category'] = $this->category->get_by_slug( $this->uri->rsegment( 3 ) );
+		
+		if ( ! $this->data['category'] ) :
+
+			show_404();
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+			$this->data['widget']->categories	= $this->widget->categories();
+			$this->data['widget']->tags			= $this->widget->tags();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Meta
+		$this->data['page']->title 				= 'Posts in category "' . $this->data['category']->label . '"';
+		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted in the  ' . $this->data['category']->label . ' category ';
+		$this->data['page']->keywords 			= '';
+		
+		// --------------------------------------------------------------------------
+
+		$this->data['posts'] = $this->post->get_with_category( $this->data['category']->id );
+
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function tag()
+	{
+		if ( ! blog_setting( 'tags_enabled' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! $this->uri->rsegment( 3 ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get category
+		$this->data['tag'] = $this->tag->get_by_slug( $this->uri->rsegment( 3 ) );
+		
+		if ( ! $this->data['tag'] ) :
+
+			show_404();
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
+			$this->data['widget']->categories	= $this->widget->categories();
+			$this->data['widget']->tags			= $this->widget->tags();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Meta
+		$this->data['page']->title 				= 'Posts tagged with "' . $this->data['tag']->label . '"';
+		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' tagged with  ' . $this->data['tag']->label . ' ';
+		$this->data['page']->keywords 			= '';
+		
+		// --------------------------------------------------------------------------
+
+		$this->data['posts'] = $this->post->get_with_tag( $this->data['tag']->id );
+
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'blog/archive',		$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 	

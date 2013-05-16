@@ -1,5 +1,15 @@
-<ul class="sidebar four columns last">
 <?php
+
+	//	Left hand sidebar?
+	if ( blog_setting( 'sidebar_position' ) == 'left' ) :
+
+		echo '<ul class="sidebar four columns first">';
+
+	else :
+
+		echo '<ul class="sidebar four columns offset-by-one last">';
+
+	endif;
 
 	if ( $widget->latest_posts ) :
 
@@ -11,40 +21,23 @@
 
 	// --------------------------------------------------------------------------
 
-	if ( $widget->categories ) :
+	if (blog_setting( 'categories_enabled' ) &&  $widget->categories ) :
 
 		echo '<li class="widget latest-posts">';
-		echo $widget->latest_posts;
+		echo $widget->categories;
 		echo '</li>';
 
 	endif;
 
 	// --------------------------------------------------------------------------
 
-	if ( $widget->tags ) :
+	if ( blog_setting( 'tags_enabled' ) && $widget->tags ) :
 
 		echo '<li class="widget latest-posts">';
-		echo $widget->latest_posts;
+		echo $widget->tags;
 		echo '</li>';
 
 	endif;
 
-
-	?>
-	<!-- <li class="widget categories">
-		<h5>Categories</h5>
-		<ul>
-			<li>&rsaquo; <a href="#">Investment Banking</a></li>
-			<li>&rsaquo; <a href="#">Private Equity</a></li>
-			<li>&rsaquo; <a href="#">Venture Capital</a></li>
-		</ul>
-	</li>
-	<li class="widget tags">
-		<h5>Tags</h5>
-		<ul class="clearfix">
-			<li><a href="#">Interviews</a></li>
-			<li><a href="#">Preparation</a></li>
-			<li><a href="#">Current Affairs</a></li>
-		</ul>
-	</li> -->
+?>
 </ul>

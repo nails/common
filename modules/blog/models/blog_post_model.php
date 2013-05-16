@@ -9,6 +9,24 @@
 
 class Blog_post_model extends NAILS_Model
 {
+
+	private $_reserved;
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		//	Define reserved words (for slugs, basically just controller methods)
+		$this->_reserved = array( 'index', 'single', 'category','tag', 'archive' );
+	}
+
+
 	/**
 	 * Creates a new object
 	 * 
@@ -20,9 +38,19 @@ class Blog_post_model extends NAILS_Model
 	{
 		//	Prepare slug
 		$_counter = 0;
+
+		if ( ! isset( $data['title'] ) || ! $data['title'] ) :
+
+			$this->_set_error( 'Title missing' );
+			return FALSE;
+
+		endif;
+
+		$_slug_prefix = array_search( $data['title'], $this->_reserved ) !== FALSE ? 'post-' : '';
+
 		do
 		{
-			$_slug  = url_title( $data['title'], 'dash', TRUE );
+			$_slug  = $_slug_prefix . url_title( $data['title'], 'dash', TRUE );
 			$_slug .= $_counter > 0 ? '-' . $_counter : '';
 			
 			$_counter++;
@@ -57,8 +85,41 @@ class Blog_post_model extends NAILS_Model
 		$this->db->insert( 'blog_post' );
 		
 		if ( $this->db->affected_rows() ) :
+
+			$_id = $this->db->insert_id();
+
+			//	Add Categories and tags, if any
+			if ( isset( $data['categories'] ) && $data['categories'] ) :
+
+				$_data = array();
+
+				foreach ( $data['categories'] AS $cat_id ) :
+
+					$_data[] = array( 'post_id' => $_id, 'category_id' => $cat_id );
+
+				endforeach;
+
+				$this->db->insert_batch( 'blog_post_category', $_data );
+
+			endif;
+
+			if ( isset( $data['tags'] ) ) :
+
+				$_data = array();
+
+				foreach ( $data['tags'] AS $tag_id ) :
+
+					$_data[] = array( 'post_id' => $_id, 'tag_id' => $tag_id );
+
+				endforeach;
+
+				$this->db->insert_batch( 'blog_post_tag', $_data );
+
+			endif;
+
+			// --------------------------------------------------------------------------
 		
-			return $this->db->insert_id();
+			return $_id;
 		
 		else :
 		
@@ -93,9 +154,19 @@ class Blog_post_model extends NAILS_Model
 		if ( ! $_current->is_published && $data['is_published'] ) :
 		
 			$_counter = 0;
+
+			if ( ! isset( $data['title'] ) || ! $data['title'] ) :
+
+				$this->_set_error( 'Title missing' );
+				return FALSE;
+
+			endif;
+
+			$_slug_prefix = array_search( $data['title'], $this->_reserved ) !== FALSE ? 'post-' : '';
+			
 			do
 			{
-				$_slug  = url_title( $data['title'], 'dash', TRUE );
+				$_slug  = $_slug_prefix . url_title( $data['title'], 'dash', TRUE );
 				$_slug .= $_counter > 0 ? '-' . $_counter : '';
 				
 				$_counter++;
@@ -151,6 +222,55 @@ class Blog_post_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		//	Update/reset any categories/tags if any have been defined
+		if ( isset( $data['categories'] ) ) :
+
+			//	Delete all categories
+			$this->db->where( 'post_id', $id );
+			$this->db->delete( 'blog_post_category' );
+
+			//	Recreate new ones
+			if ( $data['categories'] ) :
+
+				$_data = array();
+
+				foreach ( $data['categories'] AS $cat_id ) :
+
+					$_data[] = array( 'post_id' => $id, 'category_id' => $cat_id );
+
+				endforeach;
+
+				$this->db->insert_batch( 'blog_post_category', $_data );
+
+			endif;
+
+		endif;
+
+		if ( isset( $data['tags'] ) ) :
+
+			//	Delete all tags
+			$this->db->where( 'post_id', $id );
+			$this->db->delete( 'blog_post_tag' );
+
+			//	Recreate new ones
+			if ( $data['tags'] ) :
+
+				$_data = array();
+
+				foreach ( $data['tags'] AS $tag_id ) :
+
+					$_data[] = array( 'post_id' => $id, 'tag_id' => $tag_id );
+
+				endforeach;
+
+				$this->db->insert_batch( 'blog_post_tag', $_data );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		return TRUE;
 	}
 	
@@ -236,13 +356,31 @@ class Blog_post_model extends NAILS_Model
 			
 		endif;
 		
-		$this->db->order_by( 'modified', 'DESC' );
+		$this->db->order_by( 'published', 'DESC' );
 		
 		$_posts = $this->db->get( 'blog_post bp' )->result();
 		
 		foreach ( $_posts AS $post ) :
 		
 			$this->_format_post_object( $post );
+
+			// --------------------------------------------------------------------------
+
+			//	Fetch associated categories
+			$this->db->select( 'c.id,c.slug,c.label' );
+			$this->db->join( 'blog_category c', 'c.id = pc.category_id' );
+			$this->db->where( 'pc.post_id', $post->id );
+			$this->db->group_by( 'c.id' );
+			$this->db->order_by( 'c.label' );
+			$post->categories = $this->db->get( 'blog_post_category pc' )->result();
+
+			//	Fetch associated tags
+			$this->db->select( 't.id,t.slug,t.label' );
+			$this->db->join( 'blog_tag t', 't.id = pt.tag_id' );
+			$this->db->where( 'pt.post_id', $post->id );
+			$this->db->group_by( 't.id' );
+			$this->db->order_by( 't.label' );
+			$post->tags = $this->db->get( 'blog_post_tag pt' )->result();
 		
 		endforeach;
 		
@@ -350,6 +488,145 @@ class Blog_post_model extends NAILS_Model
 		$this->db->order_by( 'bp.created', 'DESC' );		
 		return $this->get_all();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_archive( $year = NULL, $month = NULL )
+	{
+		if ( $year ) :
+
+			$this->db->where( 'YEAR( bp.published ) = ', (int) $year );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $month ) :
+
+			$this->db->where( 'MONTH( bp.published ) = ', (int) $month );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $this->get_all();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	{
+		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		
+		if ( $include_body ) :
+		
+			$this->db->select( 'bp.body' );
+		
+		endif;
+		
+		$this->db->select( 'um.first_name, um.last_name, u.email, um.profile_img, um.gender' );
+
+		$this->db->join( 'blog_post bp', 'bp.id = bc.post_id' );
+		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user_meta um', 'bp.user_id = um.user_id', 'LEFT' );
+		
+		if ( $only_published ) :
+		
+			$this->db->where( 'bp.is_published', TRUE );
+		
+		endif;
+		
+		if ( $exclude_deleted ) :
+		
+			$this->db->where( 'bp.is_deleted', FALSE );
+			
+		endif;
+		
+		$this->db->order_by( 'published', 'DESC' );
+
+		if ( is_numeric( $id_slug ) ) :
+
+			$this->db->where( 'bc.category_id = ', $id_slug );
+
+		else :
+
+			$this->db->where( 'c.slug = ', $id_slug );
+			$this->db->join( 'blog_category c', 'c.id = bc.category_id' );
+
+		endif;
+
+		$_posts = $this->db->get( 'blog_post_category bc' )->result();
+
+		foreach ( $_posts AS $post ) :
+		
+			$this->_format_post_object( $post );
+		
+		endforeach;
+		
+		return $_posts;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	{
+		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		
+		if ( $include_body ) :
+		
+			$this->db->select( 'bp.body' );
+		
+		endif;
+		
+		$this->db->select( 'um.first_name, um.last_name, u.email, um.profile_img, um.gender' );
+
+		$this->db->join( 'blog_post bp', 'bp.id = bt.post_id' );
+		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user_meta um', 'bp.user_id = um.user_id', 'LEFT' );
+		
+		if ( $only_published ) :
+		
+			$this->db->where( 'bp.is_published', TRUE );
+		
+		endif;
+		
+		if ( $exclude_deleted ) :
+		
+			$this->db->where( 'bp.is_deleted', FALSE );
+			
+		endif;
+		
+		$this->db->order_by( 'published', 'DESC' );
+
+		if ( is_numeric( $id_slug ) ) :
+
+			$this->db->where( 'bt.tag_id = ', $id_slug );
+
+		else :
+
+			$this->db->where( 't.slug = ', $id_slug );
+			$this->db->join( 'blog_tag t', 't.id = bt.tag_id' );
+
+		endif;
+
+		$_posts = $this->db->get( 'blog_post_tag bt' )->result();
+
+		foreach ( $_posts AS $post ) :
+		
+			$this->_format_post_object( $post );
+		
+		endforeach;
+		
+		return $_posts;
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -363,7 +640,7 @@ class Blog_post_model extends NAILS_Model
 		$post->is_deleted			= (bool) $post->is_deleted;
 		
 		//	Generate URL
-		$post->url					= site_url( 'blog/' . $post->slug );
+		$post->url					= site_url( blog_setting( 'blog_url' ) . $post->slug );
 		
 		//	Author
 		$post->author				= new stdClass();

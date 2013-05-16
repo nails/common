@@ -309,11 +309,10 @@ class Shop extends Admin_Controller {
 		//	Prepare update
 		$_settings					= array();
 		$_settings['notify_order']	= $this->input->post( 'notify_order' );
-		$_settings['new_item']		= 'wahoo';
 
 		if ( $this->shop->set_settings( $_settings ) ) :
 
-			$this->data['success'] = '<strong>Success!</strong> settings have been saved.';
+			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
 
 		else :
 

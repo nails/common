@@ -17,8 +17,9 @@
 		<thead>
 			<tr>
 				<th class="image">Image</th>
-				<th class="title">Title and Excerpt</th>
+				<th class="title">Details</th>
 				<th class="status">Published</th>
+				<th class="author">Author</th>
 				<th class="modified">Modified</th>
 				<th class="actions">Actions</th>
 			</tr>
@@ -47,9 +48,16 @@
 					echo '</td>';
 					
 					echo '<td class="title">';
-					echo $post->title;
-					echo '<small>' . anchor( $post->url, $post->url, 'target="_blank"' ) . '</small>';
-					echo '<small>' . $post->excerpt . '</small>';
+
+						//	Title
+						echo $post->title;
+
+						//	URL
+						echo '<small>' . anchor( $post->url, $post->url, 'target="_blank"' ) . '</small>';
+
+						//	Exceprt
+						echo '<small>' . $post->excerpt . '</small>';
+
 					echo '</td>';
 					
 					echo '<td class="status">';
@@ -66,6 +74,7 @@
 					
 					echo '</td>';
 					
+					echo '<td class="author">' . $post->author->first_name . ' ' . $post->author->last_name . '</td>';
 					echo '<td class="modified"><span class="nice-time">' . $post->modified . '</span></td>';
 					
 					echo '<td class="actions">';
@@ -80,7 +89,7 @@
 			else :
 			
 				echo '<tr>';
-				echo '<td colspan="5" class="no-data">';
+				echo '<td colspan="6" class="no-data">';
 				echo 'No Posts found';
 				echo '</td>';
 				echo '</tr>';

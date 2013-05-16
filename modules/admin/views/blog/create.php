@@ -60,12 +60,132 @@
 		
 		<fieldset id="create-post-body">
 			<legend>Post Body</legend>
+			<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
 			<textarea class="ckeditor" name="body"><?=set_value( 'body' )?></textarea>
 			<p class="system-alert notice no-close" style="margin-top:10px;">
 				<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 				due to application stylesheets on the front end which are not loaded here.
 			</p>
 		</fieldset>
+		<?php 
+
+		if ( blog_setting( 'categories_enabled' ) || blog_setting( 'tags_enabled' ) ) :
+
+			echo '<fieldset id="create-post-cats-tags" class="categories-tags">';
+
+			if ( blog_setting( 'categories_enabled' ) && blog_setting( 'tags_enabled' ) ) :
+
+				echo '<legend>Categories &amp; Tags</legend>';
+
+			elseif ( blog_setting( 'categories_enabled' ) ) :
+
+				echo '<legend>Categories</legend>';
+
+			elseif ( blog_setting( 'tagss_enabled' ) ) :
+
+				echo '<legend>Tags</legend>';
+
+			endif;
+
+
+			// --------------------------------------------------------------------------
+
+			echo '<p>';
+
+			echo 'Organise your posts and help user\'s find them by assigning ';
+
+			if ( blog_setting( 'categories_enabled' ) ) :
+
+				echo '<u rel="tipsy" title="Categories allow for a broad grouping of post topics and should be considered top-level \'containers\' for posts of similar content.">categories</u> ';
+
+				if ( blog_setting( 'tags_enabled' ) ) :
+
+					echo 'and ';
+
+				else :
+
+					echo '.';
+
+				endif;
+
+			endif;
+
+
+			if ( blog_setting( 'tags_enabled' ) ) :
+
+				echo '<u rel="tipsy" title="Tags are similar to categories, but they are generally used to describe your post in more detail.">tags</u>.';
+
+			endif;
+
+			echo '</p>';
+
+			// --------------------------------------------------------------------------
+
+			if ( blog_setting( 'categories_enabled' ) ) :
+
+			?>
+			<fieldset class="categories">
+				<legend>Categories</legend>
+				<select name="categories[]" multiple="multiple" class="chosen">
+				<?php
+
+					$_post_raw	= $this->input->post( 'categories' ) ? $this->input->post( 'categories' ) : array();
+					$_post		= array();
+
+					foreach ( $_post_raw AS $key => $value ) :
+
+						$_post[$value] = TRUE;
+
+					endforeach;
+
+					foreach ( $categories AS $category ) :
+
+						$_selected = isset( $_post[$category->id] ) ? 'selected="selected"' : '';
+						echo '<option value="' . $category->id . '" ' . $_selected . '>' . $category->label . '</option>';
+
+					endforeach;
+
+				?>
+				</select>
+				<p>
+					<small><?=anchor( 'admin/blog/manager_category', 'Manage Categories', 'data-fancybox-type="iframe" class="fancybox"')?></small>
+				</p>
+			</fieldset>
+			<?php endif; ?>
+
+			<?php if ( blog_setting( 'tags_enabled' ) ) : ?>
+			<fieldset class="tags">
+				<legend>Tags</legend>
+				<select name="tags[]" multiple="multiple" class="chosen">
+				<?php
+
+					$_post_raw	= $this->input->post( 'tags' ) ? $this->input->post( 'tags' ) : array();
+					$_post		= array();
+
+					foreach ( $_post_raw AS $key => $value ) :
+
+						$_post[$value] = TRUE;
+
+					endforeach;
+
+					foreach ( $tags AS $tag ) :
+
+						$_selected = isset( $_post[$tag->id] ) ? 'selected="selected"' : '';
+						echo '<option value="' . $tag->id . '" ' . $_selected . '>' . $tag->label . '</option>';
+
+					endforeach;
+
+				?>
+				</select>
+				<p>
+					<small><?=anchor( 'admin/blog/manager_tag', 'Manage Tags', 'data-fancybox-type="iframe" class="fancybox"')?></small>
+				</p>
+			</fieldset>
+			<?php endif; ?>
+
+			<div class="clearfix"></div>
+		</fieldset>
+		<?php endif; ?>
 		
 		<fieldset id="create-post-seo">
 			<legend>Search Engine Optimisation</legend>
@@ -109,9 +229,42 @@
 
 	$(function(){
 	
-		$( 'select.chosen' ).chosen();
+		$( 'select.chosen' ).chosen({
+			'no_results_text' : 'Add items using the manager. No results for'
+		});
 	
 	});
+
+	function rebuild_select( id, options)
+	{
+		//	Take a note of the currently selected items
+		var _selected = $( 'select[name="' + id + '[]"] option:selected' );
+
+		//	Empty the list
+		$( 'select[name="' + id + '[]"] option' ).remove();
+
+		//	Repopulate the list, marking as selected if needed
+		var _opt;
+
+		for ( i=0;i<options.length;i++)
+		{
+			_opt = $( '<option>' ).val( options[i].id ).html( options[i].label );
+
+			//	Test to see if this tag should be selected or not
+			for (x=0;x<_selected.length;x++)
+			{
+				if ( options[i].id == $(_selected[x]).val() )
+				{
+					_opt.attr( 'selected', 'selcted' );
+					break;
+				}
+			}
+
+			$( 'select[name="' + id + '[]"]' ).append( _opt );
+		}
+
+		$( 'select.chosen' ).trigger( 'liszt:updated' );
+	}
 
 //-->
 </script>

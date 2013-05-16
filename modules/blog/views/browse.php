@@ -1,8 +1,31 @@
-<div class="blog browse">
+<div class="blog browse container">
 <?php
+	
+	//	Sidebar enabled? If it's not we'll adjust columns accordingly
+	if ( blog_setting( 'sidebar_enabled' ) ) :
 
-	echo '<ul class="posts twelve columns first">';
+		//	Left hand sidebar?
+		if ( blog_setting( 'sidebar_position' ) == 'left' ) :
 
+			$this->load->view( 'blog/sidebar' );
+
+			echo '<ul class="posts eleven columns offset-by-one last">';
+
+		else :
+
+			echo '<ul class="posts eleven columns first">';
+
+		endif;
+
+	else :
+
+		echo '<ul class="posts sixteen columns first last">';
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Render Posts
 	foreach ( $posts AS $post ) :
 	
 		echo '<li class="post clearfix">';
@@ -14,14 +37,14 @@
 			echo '<div class="eight columns last">';
 		
 		endif;
-		echo '<h2 class="title">' . anchor( 'blog/' . $post->slug, $post->title ) . '</h2>';
+		echo '<h2 class="title">' . anchor( $blog_url . $post->slug, $post->title ) . '</h2>';
 		echo '<p class="date-author">';
 		echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
 		echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
 		echo '</p>';
 		echo '<p class="excerpt">' . $post->excerpt . '</p>';
 		echo '<p class="meta">';
-		echo anchor( 'blog/' . $post->slug, 'Read More', 'class="read-more"' );
+		echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
 		echo '</p>';
 		
 		if ( $post->image ) :
@@ -38,7 +61,11 @@
 	
 	// --------------------------------------------------------------------------
 	
-	$this->load->view( 'blog/sidebar' );
+	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
+
+		$this->load->view( 'blog/sidebar' );
+
+	endif;
 
 ?>
 

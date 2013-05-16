@@ -163,7 +163,7 @@ if ( ! function_exists( 'round_to_precision' ) )
 
 
 /**
- * Get's the URL for adding to the basket
+ * Helper for quickly accessing shop settings
  *
  * @access	public
  * @param	none

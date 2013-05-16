@@ -158,13 +158,18 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	 **/
 	public function browse()
 	{
+		//	Unload all styles and load just the nails styles
+		$this->asset->clear_all();
+		$this->asset->load( 'nails.default.css', TRUE );
+
 		//	Fetch files
 		if ( $this->data['enabled'] ) :
 		
 			$this->data['bucket'] = $this->cdn->get_bucket( $this->data['bucket'], TRUE, $this->input->get( 'filter-tag' ) );
-			
+
 			// --------------------------------------------------------------------------
-			
+
+			//	Load assets
 			$this->asset->load( 'jquery.min.js', TRUE );
 			$this->asset->load( 'jquery.ui.min.js', TRUE );
 			$this->asset->load( 'nails.default.min.js', TRUE );
