@@ -47,6 +47,44 @@
 
 					?>
 				</fieldset>
+
+				<fieldset id="shop-settings-url">
+					<legend>URL</legend>
+					<p>
+						Customise the shop's URL by specifying it here.
+					</p>
+					<?php
+
+						if ( $settings['shop_url'] != 'shop/' ) :
+
+							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
+							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', $settings['shop_url'] ) . '\(\:any\)\/\?\'\]\s*?=\s*?\'shop\/\$1\'\;#';
+
+							if ( ! preg_match( $_pattern, $_routes_file) ) :
+
+								echo '<p class="system-alert message no-close">';
+								echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> file or the shop will not work.';
+								echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . $settings['shop_url'] . '(:any)/?\'] = \'shop/$1\';</code>';
+								echo '</p>';
+
+							endif;
+
+						endif;
+
+						// --------------------------------------------------------------------------
+
+						//	Blog URL
+						$_field					= array();
+						$_field['key']			= 'shop_url';
+						$_field['label']		= 'Shop URL';
+						$_field['default']		= $settings['shop_url'];
+						$_field['placeholder']	= 'Customise the Shop\'s URL (include trialing slash)';
+						
+						echo form_field( $_field );
+
+					?>
+				</fieldset>
+
 				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 				<?=form_close()?>
 			</div>

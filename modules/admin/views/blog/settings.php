@@ -32,10 +32,25 @@
 					<p>
 						Customise the blog's URL by specifying it here.
 					</p>
-					<p class="system-alert message no-close">
-						<strong>Please Note:</strong> Any deviations from <code>blog/</code> will require that the appropriate route be set in the app's <code>routes.php</code> file.
-					</p>
 					<?php
+
+						if ( $settings['blog_url'] != 'blog/' ) :
+
+							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
+							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', $settings['blog_url'] ) . '\(\:any\)\/\?\'\]\s*?=\s*?\'blog\/\$1\'\;#';
+
+							if ( ! preg_match( $_pattern, $_routes_file) ) :
+
+								echo '<p class="system-alert message no-close">';
+								echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> file or the blog will not work.';
+								echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . $settings['blog_url'] . '(:any)/?\'] = \'blog/$1\';</code>';
+								echo '</p>';
+
+							endif;
+
+						endif;
+
+						// --------------------------------------------------------------------------
 
 						//	Blog URL
 						$_field					= array();

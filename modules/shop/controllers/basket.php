@@ -26,7 +26,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->data['return'] = $this->input->get( 'return' ) ? $this->input->get( 'return' ) : 'shop/basket';
+		$this->data['return'] = $this->input->get( 'return' ) ? $this->input->get( 'return' ) : shop_setting( 'shop_url' ) . 'basket';
 	}
 	
 	

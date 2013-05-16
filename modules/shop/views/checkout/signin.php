@@ -204,7 +204,7 @@
 	
 	<div class="sixteen columns first last guest-checkout">
 		<p>
-			Prefer not to register? <?=anchor( 'shop/checkout?guest=true', 'Checkout as a guest' )?>.
+			Prefer not to register? <?=anchor( shop_setting( 'shop_url' ) . 'checkout?guest=true', 'Checkout as a guest' )?>.
 		</p>
 	</div>
 

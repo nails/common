@@ -40,7 +40,7 @@
 							//	Decrement
 							if ( ! isset( $no_changes ) || ! $no_changes ) :
 							
-								echo anchor( 'shop/basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
+								echo anchor( shop_setting( 'shop_url' ) . 'basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
 								
 							endif;
 							
@@ -52,7 +52,7 @@
 							
 								if ( is_null( $item->type->max_per_order ) || $item->quantity < $item->type->max_per_order ) :
 								
-									echo anchor( 'shop/basket/increment/' . $item->id, 'Increment', 'class="increment"' );
+									echo anchor( shop_setting( 'shop_url' ) . 'basket/increment/' . $item->id, 'Increment', 'class="increment"' );
 									
 								endif;
 							

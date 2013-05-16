@@ -9,7 +9,7 @@
 			if ( $payment_gateways ) :
 			
 				echo '<p class="checkout">';
-				echo anchor( 'shop/checkout', 'Checkout', 'class="awesome"' );
+				echo anchor( shop_setting( 'shop_url' ) . 'checkout', 'Checkout', 'class="awesome"' );
 				
 				echo '<small>';
 				

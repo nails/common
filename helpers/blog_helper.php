@@ -9,7 +9,7 @@
  */
 if ( ! function_exists( 'blog_setting' ) )
 {
-	function blog_setting( $key = NULL )
+	function blog_setting( $key = NULL, $force_refresh = FALSE )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'blog' ) ) :
@@ -20,7 +20,7 @@ if ( ! function_exists( 'blog_setting' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		return get_instance()->blog->settings( $key );
+		return get_instance()->blog->settings( $key, $force_refresh );
 	}
 }
 

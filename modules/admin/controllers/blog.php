@@ -634,7 +634,7 @@ class NAILS_Blog extends Admin_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->blog->settings();
+		$this->data['settings'] = $this->blog->settings( NULL, TRUE );
 		
 		// --------------------------------------------------------------------------
 		

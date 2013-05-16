@@ -281,7 +281,7 @@ class Shop extends Admin_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->shop->settings();
+		$this->data['settings'] = $this->shop->settings( NULL, TRUE );
 
 		if ( $this->user->is_superuser() ) :
 
@@ -309,6 +309,14 @@ class Shop extends Admin_Controller {
 		//	Prepare update
 		$_settings					= array();
 		$_settings['notify_order']	= $this->input->post( 'notify_order' );
+		$_settings['shop_url']		= $this->input->post( 'shop_url' );
+
+		// --------------------------------------------------------------------------
+
+		//	Sanitize shop url
+		$_settings['shop_url'] .= substr( $_settings['shop_url'], -1 ) != '/' ? '/' : '';
+
+		// --------------------------------------------------------------------------
 
 		if ( $this->shop->set_settings( $_settings ) ) :
 

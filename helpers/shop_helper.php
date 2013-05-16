@@ -114,7 +114,7 @@ if ( ! function_exists( 'add_to_basket_url' ) )
 	function add_to_basket_url( $product_id, $return_to = NULL )
 	{
 		$_return = $return_to ? '?return=' . urlencode( $return_to ) : ''; 
-		return site_url( 'shop/basket/add/' . $product_id . $_return );
+		return site_url( shop_setting( 'shop_url' ) . 'basket/add/' . $product_id . $_return );
 	}
 }
 
@@ -134,7 +134,7 @@ if ( ! function_exists( 'remove_from_basket_url' ) )
 	function remove_from_basket_url( $product_id, $return_to = NULL )
 	{
 		$_return = $return_to ? '?return=' . urlencode( $return_to ) : ''; 
-		return site_url( 'shop/basket/remove/' . $product_id . $_return );
+		return site_url( shop_setting( 'shop_url' ) . 'basket/remove/' . $product_id . $_return );
 	}
 }
 
@@ -171,7 +171,7 @@ if ( ! function_exists( 'round_to_precision' ) )
  */
 if ( ! function_exists( 'shop_setting' ) )
 {
-	function shop_setting( $key = NULL )
+	function shop_setting( $key = NULL, $force_refresh = FALSE )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
@@ -182,7 +182,7 @@ if ( ! function_exists( 'shop_setting' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		return get_instance()->shop->settings( $key );
+		return get_instance()->shop->settings( $key, $force_refresh );
 	}
 }
 

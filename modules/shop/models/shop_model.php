@@ -15,9 +15,9 @@ class Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function settings( $key = NULL )
+	public function settings( $key = NULL, $force_refresh = FALSE )
 	{
-		if ( ! $this->_settings ) :
+		if ( ! $this->_settings || $force_refresh ) :
 		
 			$_settings = $this->db->get( 'shop_settings' )->result();
 			
