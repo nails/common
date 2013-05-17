@@ -460,7 +460,7 @@ class Blog_post_model extends NAILS_Model
 	public function get_by_slug( $slug )
 	{
 		$this->db->where( 'bp.slug', $slug );
-		$_result = $this->get_all( FALSE, TRUE, FALSE );
+		$_result = $this->get_all( FALSE, TRUE, TRUE );
 		
 		// --------------------------------------------------------------------------
 		

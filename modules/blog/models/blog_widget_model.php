@@ -48,6 +48,7 @@ class Blog_widget_model extends NAILS_Model
 
 		$this->db->select( 'id,slug,title,published' );
 		$this->db->where( 'is_published', TRUE );
+		$this->db->where( 'is_deleted', FALSE );
 		$this->db->limit( $_config->limit );
 		$this->db->order_by( 'published', 'DESC' );
 		$_posts = $this->db->get( 'blog_post' )->result();
