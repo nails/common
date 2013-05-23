@@ -43,7 +43,7 @@
 	<?=img( NAILS_URL . '/img/modules/shop/payment-gateway/lock-locked-icon.png' )?> All transactions are secure.
 </h2>
 <?php
-
+	
 	echo img( NAILS_URL . '/img/loader/20px-000000-TRANS.gif' );
 	
 	echo form_open( $paypal->url );
@@ -58,7 +58,7 @@
 	
 	// --------------------------------------------------------------------------
 	
-	//	Shipping
+	//	Tell PayPal not to prompt for shipping details
 	echo form_hidden( 'no_shipping',	TRUE );
 	
 	// --------------------------------------------------------------------------
@@ -73,24 +73,40 @@
 		if ( $item->is_on_sale ) :
 		
 			echo form_hidden( 'amount_' . $_counter,	$item->sale_price );
+			//echo form_hidden( 'tax_' . $_counter,		$item->sale_price * $item->tax_rate->rate );
 			
 		else :
 		
 			echo form_hidden( 'amount_' . $_counter,	$item->price );
+			//echo form_hidden( 'tax_' . $_counter,		$item->price * $item->tax_rate->rate );
 		
 		endif;
 		
-		echo form_hidden( 'tax_' . $_counter,			$item->tax );
 		echo form_hidden( 'quantity_' . $_counter,		$item->quantity );
+		echo form_hidden( 'shipping_' . $_counter,		( $item->shipping + $item->shipping_tax ) );
 		
 		
 	$_counter++;
 	endforeach;
+
+	// --------------------------------------------------------------------------
+
+	//	Shipping, Taxes 
+	echo form_hidden( 'tax_cart',		$basket->totals->tax_items );
+
+	// --------------------------------------------------------------------------
+
+	//	Voucher
+	if ( $basket->discount->shipping || $basket->discount->items ) :
+
+		echo form_hidden( 'discount_amount_cart',	$basket->discount->items + $basket->discount->shipping );
+
+	endif;
 	
 	// --------------------------------------------------------------------------
 	
 	//	Verifiers
-	echo form_hidden( 'invoice',		$order->id );
+	echo form_hidden( 'invoice',		$order->ref );
 	echo form_hidden( 'custom',			$this->encrypt->encode( md5( $order->ref . ':' . $order->code ), APP_PRIVATE_KEY ) );
 	
 	// --------------------------------------------------------------------------

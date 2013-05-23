@@ -40,10 +40,32 @@
 						$_field					= array();
 						$_field['key']			= 'notify_order';
 						$_field['label']		= 'Order Notifications';
-						$_field['default']		= $settings['notify_order'];
+						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Who should be notified of new orders';
 						
 						echo form_field( $_field, 'Specify multiple addresses with a comma.' );
+
+					?>
+				</fieldset>
+
+				<fieldset id="shop-settings-free-shipping">
+					<legend>Free Shipping</legend>
+					<p>
+						If you wish to offer your customers an incentive to spend more you can offer free shipping when they spend a certain amount. Define what that figure should be here.
+						If you don't want to offer this service set the threshold to 0.
+					</p>
+					<p class="system-alert message no-close">
+						<strong>Please note:</strong> This is calculated on the cost of items <em>before</em> any tax is applied.
+					</p>
+					<?php
+
+						//	Order Notifications
+						$_field					= array();
+						$_field['key']			= 'free_shipping_threshold';
+						$_field['label']		= 'Threshold';
+						$_field['default']		= $settings[$_field['key']];
+						
+						echo form_field( $_field );
 
 					?>
 				</fieldset>
@@ -77,8 +99,61 @@
 						$_field					= array();
 						$_field['key']			= 'shop_url';
 						$_field['label']		= 'Shop URL';
-						$_field['default']		= $settings['shop_url'];
+						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Customise the Shop\'s URL (include trialing slash)';
+						
+						echo form_field( $_field );
+
+					?>
+				</fieldset>
+
+				<fieldset id="shop-settings-invoice">
+					<legend>Invoice details</legend>
+					<p>
+						These details will be visible on invoices and email receipts.
+					</p>
+					<?php
+
+						//	Company Name
+						$_field					= array();
+						$_field['key']			= 'invoice_company';
+						$_field['label']		= 'Company Name';
+						$_field['default']		= $settings[$_field['key']];
+						$_field['placeholder']	= 'The registered company name.';
+						
+						echo form_field( $_field );
+
+						// --------------------------------------------------------------------------
+
+						//	Address
+						$_field					= array();
+						$_field['key']			= 'invoice_address';
+						$_field['label']		= 'Company Address';
+						$_field['type']			= 'textarea';
+						$_field['default']		= $settings[$_field['key']];
+						$_field['placeholder']	= 'The address to show on the invoice.';
+						
+						echo form_field( $_field );
+
+						// --------------------------------------------------------------------------
+
+						//	VAT Number
+						$_field					= array();
+						$_field['key']			= 'invoice_vat_no';
+						$_field['label']		= 'VAT Number';
+						$_field['default']		= $settings[$_field['key']];
+						$_field['placeholder']	= 'Your VAT number, if any.';
+						
+						echo form_field( $_field );
+
+						// --------------------------------------------------------------------------
+
+						//	Company Number
+						$_field					= array();
+						$_field['key']			= 'invoice_company_no';
+						$_field['label']		= 'Company Number';
+						$_field['default']		= $settings[$_field['key']];
+						$_field['placeholder']	= 'Your company number.';
 						
 						echo form_field( $_field );
 
@@ -202,7 +277,7 @@
 
 					echo '<p class="system-alert message no-close">';
 					echo '<strong>No Payment gateways have been enabled.</strong>';
-					echo '<br />No payment gateways ahve been enabled for this site. Please contact the developers on ' . mailto( APP_EMAIL_DEVELOPER ) . ' for assistance.';
+					echo '<br />No payment gateways have been enabled for this site. Please contact the developers on ' . mailto( APP_EMAIL_DEVELOPER ) . ' for assistance.';
 					echo '</p>';
 
 				endif;
@@ -212,17 +287,63 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'currencies' ? 'block' : 'none'?>
 			<div id="tab-currencies" class="tab page currencies" style="display:<?=$_display?>;">
-				<!-- <?=form_open()?> -->
-				<!-- <?=form_hidden( 'update', 'currencies' )?> -->
+				<?=form_open()?>
+				<?=form_hidden( 'update', 'currencies' )?>
 				<p>
 					Configure supported currencies.
 				</p>
-				<hr />
 				<p class="system-alert message no-close">
-					<strong>Coming soon!</strong>
-					<br />Choose which currencies you wish to support in your online shop.
+					<strong>Please note:</strong> At present multiple currencies are not fully supported in the front end and changing these values may produce unexpected results.
 				</p>
-				<!-- <?=form_close()?> -->
+				<hr />
+				<fieldset id="shop-currencies-base">
+					<legend>Base Currency</legend>
+					<p>
+						The base currency is the default currency of the shop. When you create a new product and define it's
+						price, you are doing so in the base currency. You are free to change this but it will be reflected
+						across the entire store, <em>change with caution</em>.
+					</p>
+					<?php
+
+						//	Base Currency
+						$_field					= array();
+						$_field['key']			= 'base_currency';
+						$_field['label']		= 'Base Currency';
+						$_field['default']		= $settings[$_field['key']];
+
+						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="chosen-base"' );
+
+					?>
+				</fieldset>
+				<fieldset id="shop-currencies-base">
+					<legend>Supported Currencies</legend>
+					<p>
+						Define which currencies you wish to support in your store, the base currency must always be supported.
+					</p>
+					<?php
+
+						echo '<select name="active_currencies[]" multiple="multiple" class="chosen-active">';
+						foreach ( $currencies_all_flat AS $currency ) :
+
+							$_selected = $currency->is_active ? 'selected="selected"' : '';
+							echo '<option value="'. $currency->id . '" ' . $_selected . '>' . $currency->code . ' - ' . $currency->label . '</option>';
+
+						endforeach;
+						echo '</select>';
+
+					?>
+				</fieldset>
+				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<?=form_close()?>
 			</div>
 		</section>
 </div>
+
+<script type="text/javascript">
+	$( function(){
+
+		$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
+		$( 'select.chosen-active' ).chosen( { width : '100%' });
+
+	});
+</script>

@@ -41,7 +41,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		if ( ! $this->_can_checkout() ) :
 		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . implode( '', $this->get_errors() ) );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
 			redirect( shop_setting( 'shop_url' ) . 'basket' );
 			return;
 		
@@ -83,11 +83,19 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			//	If there's no shipping and only one payment gateway then skip this page
 			//	entirely - simples! Unless they are a guest, in which case we need to take
 			//	some personal details
-			
-			if ( ! $this->data['guest'] && ! $this->data['requires_shipping'] && count( $this->data['payment_gateways'] ) == 1 ) :
+
+			if ( ! $this->data['guest'] && ! $this->data['requires_shipping'] && ( count( $this->data['payment_gateways'] ) == 1 || $this->data['basket']->totals->grand == 0 ) ) :
 			
 				//	Save payment gateway info to the session
-				$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+				if ( $this->data['basket']->totals->grand != 0 ) :
+
+					$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+
+				else :
+
+					$this->basket->remove_payment_gateway();
+
+				endif;
 				
 				//	... and redirect to confirm
 				$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
@@ -127,7 +135,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					$this->form_validation->set_rules( 'postcode',	'Postcode',		'xss_clean|required' );
 					$this->form_validation->set_rules( 'country',	'Country',		'xss_clean|required' );
 					
-					dump( 'TODO: state form validation rules' );
 					//	If country is USA then us_state is required
 					if ( $this->input->post( 'country' ) == 'ID OF USA' ) :
 					
@@ -139,7 +146,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					
 					endif;
 					
-					//	If country is AUSTRALIE then aus_state is required
+					//	If country is AUSTRALIA then aus_state is required
 					if ( $this->input->post( 'country' ) == 'ID OF AUSTRALIA' ) :
 					
 						$this->form_validation->set_rules( 'aus_state',		'State',		'xss_clean|required' );
@@ -155,7 +162,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Payment gateway
-				$this->form_validation->set_rules( 'payment_gateway', 'Payment Gateway', 'xss_clean|required|is_natural' );
+				if ( $this->data['basket']->totals->grand > 0 ) :
+
+					$this->form_validation->set_rules( 'payment_gateway', 'Payment Gateway', 'xss_clean|required|is_natural' );
+
+				endif;
 				
 				// --------------------------------------------------------------------------
 				
@@ -176,6 +187,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						
 						$this->basket->add_personal_details( $_details );
 					
+					else :
+
+						//	In case it's already there for some reason
+						$this->basket->remove_personal_details();
+
 					endif;
 					
 					// --------------------------------------------------------------------------
@@ -206,6 +222,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						endif;
 						
 						$this->basket->add_shipping_details( $_details );
+
+					else :
+
+						//	In case it's already there for some reason
+						$this->basket->remove_shipping_details();
 					
 					endif;
 					
@@ -214,7 +235,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					//	Redirect to the appropriate payment gateway. If there's only one, then
 					//	bump straight along to that one
 					
-					if ( count( $this->data['payment_gateways'] ) == 1 ) :
+					if ( $this->data['basket']->totals->grand > 0 && count( $this->data['payment_gateways'] ) == 1 ) :
 					
 						//	Save payment gateway info to the session
 						$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
@@ -225,11 +246,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						
 						redirect( $_uri );
 					
-					else :
+					elseif ( $this->data['basket']->totals->grand > 0 && count( $this->data['payment_gateways'] ) >= 1 ) :
 					
 						foreach ( $this->data['payment_gateways'] AS $pg ) :
 						
-							if ( $pg == $this->input->post( 'payment_gateway' ) ) :
+							if ( $pg->id == $this->input->post( 'payment_gateway' ) ) :
 							
 								//	Save payment gateway info to the session
 								$this->basket->add_payment_gateway( $pg->id );
@@ -244,11 +265,23 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 							endif;
 						
 						endforeach;
+
+					elseif ( $this->data['basket']->totals->grand == 0 ) :
+
+						//	Incase it's already there for some reason
+						$this->basket->remove_payment_gateway();
+
+						// --------------------------------------------------------------------------
+
+						$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
+						$_uri .= $this->data['guest'] ? '?guest=true' : '';
+						
+						redirect( $_uri );
 						
 					endif;
 					
 					// --------------------------------------------------------------------------
-					
+					here();
 					//	Something went wrong.
 					$this->data['error'] = '<strong>Sorry,</strong> we couldn\'t verify your payment option. Please try again.';
 				
@@ -325,7 +358,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		if ( ! $this->_can_checkout() ) :
 		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . implode( '', $this->get_errors() ) );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
 			redirect( shop_setting( 'shop_url' ) . 'basket' );
 			return;
 		
@@ -389,7 +422,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		if ( ! $this->_can_checkout() ) :
 		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . implode( '', $this->get_errors() ) );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
 			redirect( shop_setting( 'shop_url' ) . 'basket' );
 			return;
 		
@@ -408,6 +441,43 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 				$this->data['guest'] = FALSE;
 			
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Is the order a zero-value order? If so, just mark it as verified and send
+			//	to processing immediately
+			
+			if ( $this->data['basket']->totals->grand == 0 ) :
+
+				//	Create order, then set as verified and redirect to processing page
+				$_order = $this->order->create( $this->data['basket'], TRUE );
+				
+				if ( ! $_order ) :
+				
+					$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . $this->data['error'] );
+					redirect( shop_setting( 'shop_url' ) . 'basket' );
+					return;
+				
+				endif;
+				
+				//	Set as verified
+				$this->order->verify( $_order->id );
+
+				//	Process the order, send receipt and send order notification
+				$this->order->process( $_order );
+				$this->order->send_receipt( $_order );
+				$this->order->send_order_notification( $_order );
+
+				if ( $_order->voucher ) :
+
+					$this->voucher->redeem( $_order->voucher->id, $_order );
+
+				endif;
+				
+				//	Redirect to processing page
+				redirect( shop_setting( 'shop_url' ) . 'checkout/processing?ref=' . $_order->ref );
+
 			endif;
 			
 			// --------------------------------------------------------------------------
@@ -452,7 +522,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 		if ( ! $this->data['order'] ) :
 		
-			$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . implode( '', $this->order->get_errors() ) );
+			$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . $this->data['error'] );
 			redirect( shop_setting( 'shop_url' ) . 'basket' );
 			return;
 		
@@ -481,19 +551,20 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 			case 'production' :
 			
-				$this->data['paypal']->url	= 'https://www.paypal.com/cgi-bin/webscr';
+				$this->data['paypal']->url			= 'https://www.paypal.com/cgi-bin/webscr';
+				$this->data['paypal']->business		= $_payment_gateway->account_id;
 			
 			break;
 			
 			default :
 			
-				$this->data['paypal']->url	= 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+				$this->data['paypal']->url			= 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+				$this->data['paypal']->business		= $_payment_gateway->sandbox_account_id;
 			
 			break;
 		
 		endswitch;
 		
-		$this->data['paypal']->business		= $_payment_gateway->account_id;
 		$this->data['paypal']->notify		= site_url( shop_setting( 'shop_url' ) . 'checkout/notify/paypal' );
 		$this->data['paypal']->cancel		= site_url( shop_setting( 'shop_url' ) . 'checkout/cancel' );
 		$this->data['paypal']->processing	= site_url( shop_setting( 'shop_url' ) . 'checkout/processing' );
@@ -560,7 +631,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 		if ( ! $this->data['basket']->items ) :
 		
-			$this->_set_error( 'Your basket is empty.' );
+			$this->data['error'] = 'Your basket is empty.';
 			return FALSE;
 		
 		endif;
@@ -576,7 +647,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( ! $this->data['payment_gateways'] ) :
 		
 			//	Uh-oh, no supported payment gateways. Bad times but feedback to the user.			
-			$this->_set_error( 'There\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment. Please try again later.' );
+			$this->data['error'] = 'There\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment. Please try again later.';
 			return FALSE;
 		
 		endif;
@@ -702,7 +773,21 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	public function cancel()
 	{
-		here( 'TODO: Abandon the order and go back to the basket.' );
+		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		
+		if ( ! $this->data['order'] ) :
+		
+			show_404();
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->order->cancel( $this->data['order']->id );
+
+		$this->session->set_flashdata( 'message', '<strong>Checkout was cancelled.</strong><br />At your request, we cancelled checkout - you have not been charged.' );
+
+		redirect( shop_setting( 'shop_url' ) . 'basket' );
 	}
 	
 	
@@ -944,26 +1029,17 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Send a notification to the store owner(s)
-			$this->logger->line( 'Sending notification to store owner: ' . shop_setting( 'notify_order' ) );
-			
-			$this->load->library( 'emailer' );
-			
-			$_email							= new stdClass();
-			$_email->type					= 'shop_notify';
-			$_email->to_email				= shop_setting( 'notify_order' );
-			$_email->data					= array();
-			$_email->data['order']			= $_order;
-			
-			if ( ! $this->emailer->send( $_email, TRUE ) ) :
-			
-				//	Email failed to send, alert developers
-				$_logger( '!! Failed to send order notification, alerting developers' );
-				$_logger( implode( "\n", $this->emailer->get_errors() ) );
-				
-				send_developer_mail( '!! Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
-				
-				return FALSE;
-			
+			$this->logger->line( 'Sending notification to store owner(s): ' . shop_setting( 'notify_order' ) );
+			$this->order->send_order_notification( $_order, $this->logger );
+
+			// --------------------------------------------------------------------------
+
+			if ( $_order->voucher ) :
+
+				//	Redeem the voucher, if it's there
+				$this->logger->line( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
+				$this->voucher->redeem( $_order->voucher->id, $_order );
+
 			endif;
 			
 			// --------------------------------------------------------------------------

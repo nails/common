@@ -3,13 +3,122 @@
 	<?php
 	
 		if ( $basket->items ) :
+
+			//	Voucher removed?
+			if ( isset( $basket->voucher_removed ) && $basket->voucher_removed ) :
+
+				echo '<div class="system-alert message sixteen columns first last row">';
+				echo '<div class="padder">';
+				echo '<p><strong>We removed your voucher:</strong> ' . $basket->voucher_removed . '</p>';
+				echo '</div>';
+				echo '</div>';
+
+			endif;
 		
-			$this->load->view( 'shop/basket/basket-table' );
+			$this->load->view( 'shop/basket/basket-table', array( 'show_shipping_chooser' => TRUE ) );
+
+			// --------------------------------------------------------------------------
+
+			//	Vouchers
+			echo '<div class="vouchers sixteen columns first last row">';
+
+				if ( $basket->voucher ) :
+
+					echo '<div class="voucher row ' . strtolower( $basket->voucher->type ) . '">';
+
+					echo '<div class="four columns first">';
+					echo '<span class="code">';
+
+					switch( $basket->voucher->type ) :
+
+						case 'GIFT_CARD' :	echo img( NAILS_URL . 'img/modules/shop/basket/ribbon-gift-card.png' );	break;
+						default:			echo img( NAILS_URL . 'img/modules/shop/basket/ribbon-voucher.png' );	break;
+
+					endswitch;
+
+					echo $basket->voucher->code;
+					echo '</span>';
+					echo '</div>';
+
+					echo '<div class="twelve columns last">';
+					echo '<span class="label">';
+
+					switch( $basket->voucher->type ) :
+
+						case 'GIFT_CARD' :
+
+							echo '<strong>' . APP_NAME . ' Gift Card - ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->discount_value, SHOP_USER_CURRENCY_PRECISION ) . '</strong>';
+							echo '<small>Remaining balance: ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->gift_card_balance, SHOP_USER_CURRENCY_PRECISION ) . '</small>';
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						default:
+
+							echo $basket->voucher->label;;
+
+						break;
+
+					endswitch;
+
+					echo anchor( shop_setting( 'shop_url' ) . 'basket/remove_voucher', 'Remove' );
+					echo '</span>';
+					echo '</div>';
+
+					echo '</div>';
+
+				else :
+
+					//	Add voucher
+					echo '<div class="voucher-add row">';
+
+					echo form_open( shop_setting( 'shop_url' ) . 'basket/add_voucher' );
+					echo form_input( 'voucher', NULL, 'class="working" placeholder="Got a discount voucher or giftcard code? Enter it here..."' );
+					echo form_submit( 'submit', 'Validate', 'class="awesome"' );
+					echo form_close();
+					echo '<script type="text/javascript">';
+					echo '$( \'.voucher-add form\').on( \'submit\', function () { $(this).addClass( \'working\' ); } )';
+					echo '</script>';
+					echo '</div>';
+
+				endif;
+
+			echo '</div>';
+
+			// --------------------------------------------------------------------------
+
+			//	Free shipping?
+			if ( shop_setting( 'free_shipping_threshold' ) && $basket->requires_shipping ) :
+
+				if ( $basket->totals->sub  < shop_setting( 'free_shipping_threshold' ) ) :
+
+					$_amount_left = shop_setting( 'free_shipping_threshold' ) - $basket->totals->sub;
+					$_amount_left = SHOP_USER_CURRENCY_SYMBOL . number_format( $_amount_left, SHOP_USER_CURRENCY_PRECISION );
+
+					echo '<div class="free-shipping-threshold row">';
+					echo '<p>Spend another <span class="amount-left">' . $_amount_left . '</span> to receive free shipping!</p>';
+					echo '</div>';
+
+				else :
+
+					echo '<div class="free-shipping-threshold row">';
+					echo '<p>';
+					echo 'Your order qualifies for free shipping!';
+					echo '<small>Your order qualifies because you\'ve spent more than ' . SHOP_USER_CURRENCY_SYMBOL . number_format( shop_setting( 'free_shipping_threshold' ), SHOP_USER_CURRENCY_PRECISION ) . '</small>';
+					echo '</p>';
+					echo '</div>';
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
 			
 			if ( $payment_gateways ) :
 			
 				echo '<p class="checkout">';
-				echo anchor( shop_setting( 'shop_url' ) . 'checkout', 'Checkout', 'class="awesome"' );
+				echo anchor( shop_setting( 'shop_url' ) . 'checkout', 'Checkout', 'class="awesome huge"' );
 				
 				echo '<small>';
 				

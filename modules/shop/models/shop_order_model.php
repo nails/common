@@ -121,7 +121,20 @@ class Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Payment gateway
-		$_order->payment_gateway_id = $basket->payment_gateway;
+		if ( $basket->payment_gateway ) :
+
+			$_order->payment_gateway_id = $basket->payment_gateway;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set voucher ID
+		if ( $basket->voucher ) :
+
+			$_order->voucher_id = $basket->voucher->id;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -136,6 +149,7 @@ class Shop_order_model extends NAILS_Model
 		if ( $basket->requires_shipping ) :
 		
 			$_order->requires_shipping	= TRUE;
+			$_order->shipping_method_id	= $basket->shipping_method;
 			$_order->shipping_addressee	= $basket->shipping_details->addressee;
 			$_order->shipping_line_1	= $basket->shipping_details->line_1;
 			$_order->shipping_line_2	= $basket->shipping_details->line_2;
@@ -149,13 +163,13 @@ class Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set totals
-		$_order->sub_total		= $basket->totals->sub;
-		$_order->grand_total	= $basket->totals->grand;
-		$_order->taxes			= $basket->totals->tax;
-		$_order->shipping		= $basket->totals->shipping;
-		
-		//	TODO when vouchers are implemented
-		//$_order->deductions	= $basket->totals->deductions;
+		$_order->shipping_total		= $basket->totals->shipping;
+		$_order->sub_total			= $basket->totals->sub;
+		$_order->tax_shipping		= $basket->totals->tax_shipping;
+		$_order->tax_items			= $basket->totals->tax_items;
+		$_order->discount_shipping	= $basket->discount->shipping;
+		$_order->discount_items		= $basket->discount->items;
+		$_order->grand_total		= $basket->totals->grand;
 		
 		// --------------------------------------------------------------------------
 		
@@ -189,6 +203,9 @@ class Shop_order_model extends NAILS_Model
 				$_temp['sale_price']	= $item->sale_price;
 				$_temp['tax']			= $item->tax;
 				$_temp['shipping']		= $item->shipping;
+				$_temp['shipping_tax']	= $item->shipping_tax;
+				$_temp['total']			= $item->total;
+				$_temp['tax_rate_id']	= $item->tax_rate->id;
 				$_temp['was_on_sale']	= $item->is_on_sale;
 				
 				$_items[] = $_temp;
@@ -211,7 +228,7 @@ class Shop_order_model extends NAILS_Model
 				
 				else :
 				
-					return $this->db->insert_id();
+					return $_order->id;
 				
 				endif;
 			
@@ -223,7 +240,6 @@ class Shop_order_model extends NAILS_Model
 				
 				//	Set error message
 				$this->_set_error( 'Unable to add products to order, aborting.' );
-				
 				return FALSE;
 			
 			endif;
@@ -300,12 +316,17 @@ class Shop_order_model extends NAILS_Model
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.gender, um.profile_img' );
 		$this->db->select( 'pg.slug pg_slug, pg.label pg_label, pg.logo pg_logo' );
 		$this->db->select( 'oc.code oc_code,oc.symbol oc_symbol, oc.decimal_precision oc_precision,bc.code bc_code,bc.symbol bc_symbol,bc.decimal_precision bc_precision' );
+		$this->db->select( 'v.code v_code,v.label v_label, v.type v_type, v.discount_type v_discount_type, v.discount_value v_discount_value, v.discount_application v_discount_application' );
+		$this->db->select( 'v.product_type_id v_product_type_id, v.is_active v_is_active, v.is_deleted v_is_deleted, v.valid_from v_valid_from, v.valid_to v_valid_to' );
+		$this->db->select( 'sm.courier sm_courier, sm.method sm_method' );
 		
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
 		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
 		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
 		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
 		$this->db->join( 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
+		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
 		
 		$_orders = $this->db->get( 'shop_order o' )->result();
 		
@@ -382,12 +403,14 @@ class Shop_order_model extends NAILS_Model
 	
 	public function get_items_for_order( $order_id )
 	{
-		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping' );
+		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping,op.shipping_tax,op.total' );
 		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
+		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 		
 		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
 		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id' );
 		
 		$this->db->where( 'op.order_id', $order_id );	
 		$_items = $this->db->get( 'shop_order_product op' )->result();
@@ -425,13 +448,15 @@ class Shop_order_model extends NAILS_Model
 	
 	public function get_items_for_user( $user_id, $email, $type = NULL )
 	{
-		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping' );
+		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping,op.shipping_tax,op.total' );
 		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
+		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 		
 		$this->db->join( 'shop_order o', 'o.id = op.order_id' );
 		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
 		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id' );
 		
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
 		$this->db->where( 'o.status', 'VERIFIED' );	
@@ -704,6 +729,85 @@ class Shop_order_model extends NAILS_Model
 		
 		return TRUE;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function send_order_notification( $order, $logger = NULL )
+	{
+		//	Check to see if a logger object has been passed, if not create
+		//	a dummy method so we don't get errors
+		
+		if ( ! method_exists( $logger, 'line' ) ) :
+		
+			//	It hasn't, define a dummy
+			$_logger = function( $line ) {};
+			
+		else :
+		
+			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->helper( 'email' );
+		if ( ! valid_email( shop_setting( 'notify_order' ) ) ) :
+
+			$_logger( 'Invalid notification email' );
+			$this->_set_error( 'Invalid notification email.' );
+			return FALSE;
+
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	If an ID has been passed, look it up
+		if ( is_numeric( $order ) ) :
+		
+			$_logger( 'Looking up order #' . $order );
+			$order = $this->get_by_id( $order );
+			
+			if ( ! $order ) :
+			
+				$_logger( 'Invalid order ID' );
+				$this->_set_error( 'Invalid order ID.' );
+				return FALSE;
+			
+			endif;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->library( 'emailer' );
+		
+		$_email							= new stdClass();
+		$_email->type					= 'shop_notify';
+		$_email->data					= array();
+		$_email->data['order']			= $order;
+		
+		$_recipients = explode( ',', shop_setting( 'notify_order' ) );
+
+		foreach ( $_recipients AS $recipient ) :
+
+			$_email->to_email = $recipient;
+
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+			
+				//	Email failed to send, alert developers
+				$_logger( '!! Failed to send order notification, alerting developers.' );
+				$_logger( implode( "\n", $this->emailer->get_errors() ) );
+				
+				send_developer_mail( '!! Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+				
+				return FALSE;
+			
+			endif;
+
+		endforeach;
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -712,9 +816,9 @@ class Shop_order_model extends NAILS_Model
 	private function _format_order( &$order )
 	{
 		//	Generic
-		$order->id	= (int) $order->id;
+		$order->id					= (int) $order->id;
 		$order->requires_shipping	= (bool) $order->requires_shipping;
-		$order->fulfilled	= (bool) $order->fulfilled;
+		$order->fulfilled			= (bool) $order->fulfilled;
 		
 		// --------------------------------------------------------------------------
 		
@@ -768,19 +872,26 @@ class Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Totals
-		$order->totals 				= new stdClass();
-		$order->totals->sub			= $order->sub_total;
-		$order->totals->grand		= $order->grand_total;
-		$order->totals->tax			= $order->taxes;
-		$order->totals->shipping	= $order->shipping;
-		$order->totals->deductions	= $order->deductions;
-		$order->totals->fees		= $order->fees_deducted;
+		$order->totals 					= new stdClass();
+		$order->totals->shipping		= (float) $order->shipping_total;
+		$order->totals->sub				= (float) $order->sub_total;
+		$order->totals->tax_shipping	= (float) $order->tax_shipping;
+		$order->totals->tax_items		= (float) $order->tax_items;
+		$order->totals->grand			= (float) $order->grand_total;
+
+		$order->discount 				= new stdClass();
+		$order->discount->shipping		= (float) $order->discount_shipping;
+		$order->discount->items			= (float) $order->discount_items;
+
+		$order->totals->fees			= (float) $order->fees_deducted;
 		
+		unset( $order->shipping_total );
 		unset( $order->sub_total );
+		unset( $order->tax_shipping );
+		unset( $order->tax_items );
 		unset( $order->grand_total );
-		unset( $order->taxes );
-		unset( $order->shipping );
-		unset( $order->deductions );
+		unset( $order->dicount_shipping );
+		unset( $order->dicount_items );
 		unset( $order->fees_deducted );
 		
 		// --------------------------------------------------------------------------
@@ -799,7 +910,7 @@ class Shop_order_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		//	Shipping
+		//	Shipping details
 		$order->shipping_details 			= new stdClass();
 		$order->shipping_details->addressee	= $order->shipping_addressee;
 		$order->shipping_details->line_1	= $order->shipping_line_1;
@@ -816,6 +927,17 @@ class Shop_order_model extends NAILS_Model
 		unset( $order->shipping_postcode );
 		unset( $order->shipping_state );
 		unset( $order->shipping_country );
+
+
+		//	Shipping method
+		$order->shipping_method 			= new stdClass();
+		$order->shipping_method->id 		= $order->shipping_method_id;
+		$order->shipping_method->courier 	= $order->sm_courier;
+		$order->shipping_method->method 	= $order->sm_method;
+
+		unset( $order->shipping_method_id );
+		unset( $order->sm_courier );
+		unset( $order->sm_method );
 
 		
 		// --------------------------------------------------------------------------
@@ -836,7 +958,7 @@ class Shop_order_model extends NAILS_Model
 		$order->currency->base->precision	= $order->bc_precision;
 
 		
-		$order->currency->exchange_rate	= (float) $order->exchange_rate;
+		$order->currency->exchange_rate		= (float) $order->exchange_rate;
 		
 		unset( $order->exchange_rate );
 		unset( $order->currency_id );
@@ -849,12 +971,40 @@ class Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Vouchers
-		$order->voucher		= new stdClass();
-		$order->voucher->id	= (int) $order->voucher_id;
-		
-		//	TODO
-		
+		if ( $order->voucher_id ) :
+
+			$order->voucher							= new stdClass();
+			$order->voucher->id						= (int) $order->voucher_id;
+			$order->voucher->code					= $order->v_code;
+			$order->voucher->label					= $order->v_label;
+			$order->voucher->type					= $order->v_type;
+			$order->voucher->discount_type			= $order->v_discount_type;
+			$order->voucher->discount_value			= (float) $order->v_discount_value;
+			$order->voucher->discount_application	= $order->v_discount_application;
+			$order->voucher->product_type_id		= (int) $order->v_product_type_id;
+			$order->voucher->valid_from				= $order->v_valid_from;
+			$order->voucher->valid_to				= $order->v_valid_to;
+			$order->voucher->is_active				= (bool) $order->v_is_active;
+			$order->voucher->is_deleted				= (bool) $order->v_is_deleted;
+
+		else :
+
+			$order->voucher							= FALSE;
+
+		endif;
+
 		unset( $order->voucher_id );
+		unset( $order->v_code );
+		unset( $order->v_label );
+		unset( $order->v_type );
+		unset( $order->v_discount_type );
+		unset( $order->v_discount_value );
+		unset( $order->v_discount_application );
+		unset( $order->v_product_type_id );
+		unset( $order->v_valid_from );
+		unset( $order->v_valid_to );
+		unset( $order->v_is_active );
+		unset( $order->v_is_deleted );
 	}
 	
 	
@@ -869,6 +1019,7 @@ class Shop_order_model extends NAILS_Model
 		$item->sale_price		= (float) $item->sale_price;
 		$item->tax				= (float) $item->tax;
 		$item->shipping			= (float) $item->shipping;
+		$item->total			= (float) $item->total;
 		$item->was_on_sale		= (bool) $item->was_on_sale;
 		$item->processed		= (bool) $item->processed;
 		$item->refunded			= (bool) $item->refunded;
@@ -886,6 +1037,18 @@ class Shop_order_model extends NAILS_Model
 		unset( $item->pt_slug );
 		unset( $item->pt_label );
 		unset( $item->pt_ipn_method );
+
+		// --------------------------------------------------------------------------
+
+		//	Tax rate
+		$item->tax_rate				= new stdClass();
+		$item->tax_rate->id			= (int) $item->tax_rate_id;
+		$item->tax_rate->label		= $item->tax_rate_label;
+		$item->tax_rate->rate		= (float) $item->tax_rate_rate;
+
+		unset( $item->tax_rate_id );
+		unset( $item->tax_rate_label );
+		unset( $item->tax_rate_rate );
 		
 		// --------------------------------------------------------------------------
 		

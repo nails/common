@@ -240,6 +240,7 @@ class Shop extends Admin_Controller {
 		//	Load models
 		$this->load->model( 'shop/shop_model', 'shop' );
 		$this->load->model( 'shop/shop_payment_gateway_model', 'payment_gateway' );
+		$this->load->model( 'shop/shop_currency_model',	'currency' );
 		
 		// --------------------------------------------------------------------------
 
@@ -292,6 +293,9 @@ class Shop extends Admin_Controller {
 			$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
 
 		endif;
+
+		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
+		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
 		
 		// --------------------------------------------------------------------------
 		
@@ -307,9 +311,14 @@ class Shop extends Admin_Controller {
 	private function _settings_update_settings()
 	{
 		//	Prepare update
-		$_settings					= array();
-		$_settings['notify_order']	= $this->input->post( 'notify_order' );
-		$_settings['shop_url']		= $this->input->post( 'shop_url' );
+		$_settings								= array();
+		$_settings['notify_order']				= $this->input->post( 'notify_order' );
+		$_settings['shop_url']					= $this->input->post( 'shop_url' );
+		$_settings['free_shipping_threshold']	= (float) $this->input->post( 'free_shipping_threshold' );
+		$_settings['invoice_company']			= $this->input->post( 'invoice_company' );
+		$_settings['invoice_address']			= $this->input->post( 'invoice_address' );
+		$_settings['invoice_vat_no']			= $this->input->post( 'invoice_vat_no' );
+		$_settings['invoice_company_no']		= $this->input->post( 'invoice_company_no' );
 
 		// --------------------------------------------------------------------------
 
@@ -364,7 +373,40 @@ class Shop extends Admin_Controller {
 
 	private function _settings_update_currencies()
 	{
-		//	TODO
+		//	Prepare update
+		$_settings								= array();
+		$_settings['base_currency']				= (int) $this->input->post( 'base_currency' );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->shop->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
+
+			//	Save the active currencies
+			$_where_in = array( $_settings['base_currency'] );
+
+			foreach ( $this->input->post( 'active_currencies' ) AS $id ) :
+
+				$_where_in[] = $id;
+
+			endforeach;
+			
+			if ( $this->currency->set_active_currencies( $_where_in ) ) :
+
+				$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> an error occurred while setting supported currencies.';
+
+			endif;
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the base currency.';
+
+		endif;
 	}
 }
 

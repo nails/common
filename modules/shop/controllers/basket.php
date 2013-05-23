@@ -51,7 +51,8 @@ class NAILS_Basket extends NAILS_Shop_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->data['basket'] = $this->basket->get_basket();
+		$this->data['basket']			= $this->basket->get_basket();
+		$this->data['shipping_methods'] = $this->shipping->get_all();
 		
 		// --------------------------------------------------------------------------
 		
@@ -195,6 +196,96 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	public function decrement()
 	{
 		$this->basket->decrement( $this->uri->rsegment( 3 ) );
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $this->data['return'] );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Validate and add a voucher to a basket
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
+	public function add_voucher()
+	{
+		$_voucher = $this->voucher->validate( $this->input->post( 'voucher' ), get_basket() );
+		
+		if ( $_voucher ) :
+
+			//	Validated, add to basket
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Voucher has been applied to your basket.' );
+			$this->basket->add_voucher( $_voucher->code );
+
+		else :
+
+			//	Failed to validate, feedback
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that voucher is not valid:<br />&rsaquo; ' . implode( '<br />&rsaquo;', $this->voucher->get_error() ) );
+
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $this->data['return'] );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Remove any associated voucher from the user's basket
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
+	public function remove_voucher()
+	{
+		$this->basket->remove_voucher();
+		$this->session->set_flashdata( 'success', '<strong>Success!</strong> Your voucher was removed.' );
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $this->data['return'] );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Set the preferred shipping method
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
+	public function set_shipping_method()
+	{
+		$_method = $this->shipping->validate( $this->input->post( 'shipping_method' ) );
+		
+		if ( $_method ) :
+
+			//	Validated, add to basket
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Your shipping method has been updated.' );
+			$this->basket->add_shipping_method( $_method->id );
+
+		else :
+
+			//	Failed to validate, feedback
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that shipping is not valid:<br />&rsaquo; ' . implode( '<br />&rsaquo;', $this->shipping->get_error() ) );
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

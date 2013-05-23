@@ -944,9 +944,9 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 
 
 /**
- * form_field_dropdow
+ * form_field_boolean
  *
- * Generates a form field (of type select)
+ * Generates a form field (of type select, with two options: yes and no)
  *
  * @access	public
  * @param	array

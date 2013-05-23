@@ -44,7 +44,7 @@
 				text-align: left;
 				border-right:1px dotted #CCC;
 				border-bottom:1px dotted #CCC;
-				vertical-align:top;
+				vertical-align:middle;
 			}
 			
 			td
@@ -74,21 +74,47 @@
 			{
 				color:green;
 			}
-			
-			td.total,
-			td.tax
+
+			th.quantity,
+			th.unit,
+			th.vat,
+			th.shipping,
+			th.total,
+			td.quantity,
+			td.unit,
+			td.vat,
+			td.shipping,
+			td.total
+			{
+				text-align:center;
+			}
+
+			td.sub
+			{
+				border-top:1px solid #CCC;
+			}
+
+			td.sub,
+			td.tax,
+			td.discount,
+			td.grand
 			{
 				font-weight:bold;
+				text-align:center;
 			}
 			
+			td.sub.label,
 			td.tax.label,
-			td.total.label
+			td.discount.label,
+			td.grand.label
 			{
 				text-align:right;
 			}
 			
+			td.sub.spacer,
 			td.tax.spacer,
-			td.total.spacer
+			td.discount.spacer,
+			td.grand.spacer
 			{
 				border-right:0px;
 			}
@@ -136,8 +162,10 @@
 					<td class="th">Sender</td>
 					<td>
 						<strong><?=shop_setting( 'invoice_company' )?></strong>
-						<br /><?=nl2br( shop_setting( 'invoice_address' ) )?>
-						<br /><?=nl2br( shop_setting( 'invoice_vat_no' ) )?>
+						<?=shop_setting( 'invoice_address' ) ? '<br />' . nl2br( shop_setting( 'invoice_address' ) ) : ''?>
+						<?=shop_setting( 'invoice_vat_no' ) ? '<small>VAT No.: ' . nl2br( shop_setting( 'invoice_vat_no' ) ) . '</small>' : ''?>
+						<?=shop_setting( 'invoice_company_no' ) ? '<small>Company No.: ' . nl2br( shop_setting( 'invoice_company_no' ) ) . '</small>' : ''?>
+
 					</td>
 				</tr>
 			</tbody>
@@ -185,8 +213,11 @@
 					<th class="quantity">Quantity</th>
 					<th class="item">Details</th>
 					<th class="unit">Unit Cost</th>
-					<th class="vat">Tax</th>
+					<th class="vat">Tax Rate</th>
+					<?php if ( $order->requires_shipping ) : ?>
 					<th class="shipping">Shipping</th>
+					<?php endif; ?>
+					<th class="total">Total</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -198,31 +229,72 @@
 						<small><?=$item->type->label?>; Product ID: <?=$item->product_id?></small>
 					</td>
 					<td class="unit"><?=$order->currency->order->symbol . number_format( $item->price, $order->currency->order->precision )?></td>
-					<td class="vat"><?=$order->currency->order->symbol . number_format( $item->tax, $order->currency->order->precision )?></td>
+					<td class="vat"><?=$item->tax_rate->rate*100?>%</td>
+
+					<?php if ( $order->requires_shipping ) : ?>
 					<td class="shipping"><?=$order->currency->order->symbol . number_format( $item->shipping, $order->currency->order->precision )?></td>
+					<?php endif; ?>
+
+					<td class="total"><?=$order->currency->order->symbol . number_format( $item->total, $order->currency->order->precision )?></td>
 				</tr>
 				<?php endforeach; ?>
 				
 				<tr>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label">Sub Total</td>
-					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision )?></td>
+					<td class="sub label" colspan="4">Sub Total</td>
+					<?php if ( $order->requires_shipping ) : ?>
+					<td class="sub value"><?=$order->currency->order->symbol . number_format( $order->totals->shipping, $order->currency->order->precision )?></td>
+					<?php endif;?>
+					<td class="sub value"><?=$order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision )?></td>
 				</tr>
 				<tr>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label">Tax</td>
-					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->tax, $order->currency->order->precision )?></td>
+					<td class="tax label" colspan="4">Tax</td>
+					<?php if ( $order->requires_shipping ) : ?>
+					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->tax_shipping, $order->currency->order->precision )?></td>
+					<?php endif;?>
+					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->tax_items, $order->currency->order->precision )?></td>
 				</tr>
+				<?php if ( $order->discount->shipping || $order->discount->items ) : ?>
 				<tr>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="tax label spacer">&nbsp;</td>
-					<td class="total label">Grand Total</td>
-					<td class="total value"><?=$order->currency->order->symbol . number_format( $order->totals->grand, $order->currency->order->precision )?></td>
+					<td class="tax label" colspan="4">Discount</td>
+					<?php
+
+						if ( $order->requires_shipping && $order->discount->shipping  ) :
+
+							echo '<td class="discount value">';
+							echo $order->currency->order->symbol . number_format( $order->discount->shipping, $order->currency->order->precision );
+							echo '</td>';
+
+						elseif ( $order->requires_shipping ) :
+
+							echo '<td class="discount value">';
+							echo '&mdash;';
+							echo '</td>';
+
+						endif;
+
+
+						if ( $order->discount->items  ) :
+
+							echo '<td class="discount value">';
+							echo $order->currency->order->symbol . number_format( $order->discount->items, $order->currency->order->precision );
+							echo '</td>';
+
+						else :
+
+							echo '<td class="discount value">';
+							echo '&mdash;';
+							echo '</td>';
+
+						endif;
+					?>
+				</tr>
+			<?php endif; ?>
+				<tr>
+					<td class="grand label" colspan="4">Grand Total</td>
+					<?php if ( $order->requires_shipping ) : ?>
+					<td class="grand label spacer">&nbsp;</td>
+					<?php endif;?>
+					<td class="grand value"><?=$order->currency->order->symbol . number_format( $order->totals->grand, $order->currency->order->precision )?></td>
 				</tr>
 			</tbody>
 		</table>

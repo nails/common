@@ -3,8 +3,19 @@
 </p>
 <?php
 
+	$_plural = count( $urls ) > 1 ? TRUE : FALSE;
+
 	echo '<p class="heads-up">';
-	echo '<strong>Please note: </strong> these links are only valid for ' . ( $expires/60/60 ) . ' hours after which the link will stop working';
+
+	if ( $_plural ) :
+
+		echo '<strong>Please note: </strong> these links are only valid for ' . ( $expires/60/60 ) . ' hours after which the links will stop working';
+
+	else :
+
+		echo '<strong>Please note: </strong> this link is only valid for ' . ( $expires/60/60 ) . ' hours after which it will stop working';
+
+	endif;
 	
 	if ( $sent_to->id ) :
 	

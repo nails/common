@@ -32,7 +32,7 @@ class Shop_product_model extends NAILS_Model
 		$this->_table_gallery	= 'shop_product_gallery';
 		$this->_table_meta		= 'shop_product_meta';
 		$this->_table_type		= 'shop_product_type';
-		$this->_table_tax		= 'shop_product_tax_rate';
+		$this->_table_tax		= 'shop_tax_rate';
 	}
 	
 	

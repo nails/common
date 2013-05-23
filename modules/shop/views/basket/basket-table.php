@@ -1,12 +1,14 @@
-<div class="sixteen columns first last">
+<div class="sixteen columns first last row">
 	<table>
 		<thead>
 			<tr>
 				<th class="item">Item</th>
 				<th class="quantity">Quantity</th>
 				<th class="price">Unit Price</th>
-				<th class="tax">Tax</th>
+				<th class="tax">Tax Rate</th>
+				<?php if ( $basket->requires_shipping ) : ?>
 				<th class="shipping">Shipping</th>
+				<?php endif; ?>
 				<th class="total">Total</th>
 			</tr>
 		</thead>
@@ -65,55 +67,146 @@
 							if ( $item->is_on_sale ) :
 							
 								echo '<td class="price on-sale">';
-								echo '<span>' . SHOP_USER_CURRENCY_SYMBOL . $item->sale_price . '</span>';
+								echo '<span>' . SHOP_USER_CURRENCY_SYMBOL . number_format( $item->sale_price, SHOP_USER_CURRENCY_PRECISION ) . '</span>';
 								echo '<span class="ribbon"></span>';
-								echo '<del>was ' . SHOP_USER_CURRENCY_SYMBOL . $item->price . '</del>';
+								echo '<del>was ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $item->price, SHOP_USER_CURRENCY_PRECISION ) . '</del>';
 								echo '</td>';
 							
 							else :
 							
 								echo '<td class="price">';
-								echo SHOP_USER_CURRENCY_SYMBOL . $item->price;
+								echo SHOP_USER_CURRENCY_SYMBOL . number_format( $item->price, SHOP_USER_CURRENCY_PRECISION );
 								echo '</td>';
 							
 							endif;
 							
 						?>
-						<td class="tax"><?=$item->tax_rate?></td>
+						<td class="tax"><?=$item->tax_rate->label?></td>
 						<?php
 						
-							if ( $item->shipping ) :
-							
-								echo '<td class="shipping">';
-								echo SHOP_USER_CURRENCY_SYMBOL . $item->shipping;
-								echo '</td>';
-							
-							else :
-							
-								echo '<td class="shipping free">';
-								echo 'FREE';
-								echo '</td>';
-							
+							if ( $basket->requires_shipping ) :
+
+								if ( $item->type->requires_shipping && $item->shipping ) :
+								
+									echo '<td class="shipping">';
+									echo SHOP_USER_CURRENCY_SYMBOL . number_format( $item->shipping, SHOP_USER_CURRENCY_PRECISION );
+									echo '</td>';
+								
+								elseif ( $item->type->requires_shipping && ! $item->shipping ) :
+								
+									echo '<td class="shipping free">';
+									echo 'FREE';
+									echo '</td>';
+								
+								else :
+
+									echo '<td class="shipping free">';
+									echo '&mdash;';
+									echo '</td>';
+
+								endif;
+
 							endif;
 							
 						?>
-						<td class="total"><?=SHOP_USER_CURRENCY_SYMBOL . $item->total?></td>
+						<td class="total"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $item->total, SHOP_USER_CURRENCY_PRECISION )?></td>
 					</tr>
 					<?php
 			
 				endforeach;
 				
 			?>
+
+			<!--	SHIPPING CHOOSER	-->
+			<?php
+
+				if ( $basket->requires_shipping ) :
+
+					echo '<tr class="shipping-chooser">';
+					echo '<td colspan="6">';
+
+					if ( isset( $show_shipping_chooser ) && $show_shipping_chooser ) :
+
+
+						echo form_open( shop_setting( 'shop_url' ) . 'basket/set_shipping_method' );
+						echo 'Shipping method: ';
+						echo '<select name="shipping_method" id="shipping-chooser">';
+
+						$_notes = FALSE;
+
+						foreach ( $shipping_methods AS $method ) :
+
+							if ( $method->id == $basket->shipping_method ) :
+
+								$_selected	= 'selected="selected"';
+								$_notes		= $method->notes;
+
+							else :
+
+								$_selected = '';
+
+							endif;
+							echo '<option value="' . $method->id . '" ' . $_selected . '>' . $method->courier . ' - ' . $method->method . '</option>';
+
+						endforeach;
+
+						echo '</select>';
+
+						echo '<noscript>';
+						echo form_submit( 'submit', lang( 'action_update' ), 'class="awesome small"' );
+						echo '</noscript>';
+
+						if ( $_notes ) :
+
+							echo '<small><strong>Please note:</strong> ' . $_notes . '</small>';
+
+						endif;
+
+						echo form_close();
+
+					else :
+
+						echo 'Shipping method: TODO TODO';
+
+					endif;
+
+					echo '</td>';
+					echo '</tr>';
+
+				endif;
+
+			?>
 			
 			<!--	TOTALS	-->
 			<tr class="total sub">
 				<td class="label" colspan="4">Sub Total</td>
+				<?php
+
+					if ( $basket->requires_shipping ) :
+
+						echo '<td class="value">';
+						
+						if ( $basket->totals->shipping ) :
+						
+							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->shipping, SHOP_USER_CURRENCY_PRECISION );
+						
+						else :
+						
+							echo 'FREE';
+							
+						endif;
+
+						echo '</td>';
+
+					endif;
+					
+				?>
 				<td class="value">
 				<?php
 					
-					if ( $basket->totals->shipping ) :
+					if ( $basket->totals->sub ) :
 					
-						echo SHOP_USER_CURRENCY_SYMBOL . $basket->totals->shipping;
+						echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->sub, SHOP_USER_CURRENCY_PRECISION );
 					
 					else :
 					
@@ -123,19 +216,80 @@
 					
 				?>
 				</td>
-				<td class="value"><?=$basket->totals->sub?></td>
 			</tr>
-			<tr class="total grand">
+
+			<tr class="total tax">
 				<td class="label" colspan="4">TAX</td>
-				<td class="value">&nbsp;</td>
-				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . $basket->totals->tax?></td>
+				<?php if ( $basket->requires_shipping ) : ?>
+				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->tax_shipping, SHOP_USER_CURRENCY_PRECISION )?></td>
+			<?php endif; ?>
+				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->tax_items, SHOP_USER_CURRENCY_PRECISION )?></td>
 			</tr>
+
+			<?php if ( $basket->discount->shipping || $basket->discount->items ) : ?>
+			<tr class="total discount">
+				<td class="label" colspan="4">Discounts</td>
+				<?php if ( $basket->requires_shipping ) : ?>
+				<td class="value">
+					<?php
+
+						if ( $basket->discount->shipping ) :
+
+							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->discount->shipping, SHOP_USER_CURRENCY_PRECISION );
+
+						else :
+
+							echo '<span class="blank">&mdash;</span>';
+
+						endif;
+
+					?>
+				</td>
+				<?php endif; ?>
+				<td class="value">
+					<?php
+
+						if ( $basket->discount->items ) :
+
+							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->discount->items, SHOP_USER_CURRENCY_PRECISION );
+
+						else :
+
+							echo '<span class="blank">&mdash;</span>';
+
+						endif;
+
+					?>
+				</td>
+			</tr>
+			<?php endif; ?>
+
 			<tr class="total grand">
 				<td class="label" colspan="4">Grand Total</td>
+				<?php if ( $basket->requires_shipping ) : ?>
 				<td class="value">&nbsp;</td>
-				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . $basket->totals->grand?></td>
+				<?php endif; ?>
+				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->grand, SHOP_USER_CURRENCY_PRECISION )?></td>
 			</tr>
 			
 		</tbody>
 	</table>
 </div>
+<?php if ( isset( $show_shipping_chooser ) && $show_shipping_chooser ) : ?>
+
+	<script type="text/javascript">
+
+		$(function(){
+
+			$( '#shipping-chooser' ).on( 'change', function() {
+			
+				$(this).closest( '.shipping-chooser' ).addClass( 'working' );
+				$(this).closest( 'form' ).submit();
+
+			});
+
+		});
+
+	</script>
+
+<?php endif; ?>
