@@ -28,7 +28,6 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	 **/
 	public function index()
 	{
-			
 		//	Meta & Breadcrumbs
 		$this->data['page']->title 				= APP_NAME . ' Blog';
 		$this->data['page']->description 		= '';
@@ -360,6 +359,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	 **/
 	public function _remap( $method )
 	{
+		$method = $method ? $method : 'index';
+
 		if ( method_exists( $this, $method ) ) :
 		
 			//	Method exists, execute it
@@ -367,7 +368,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		
 		else :
 		
-			//	Doesn't exist, consider segment( 2 ) a slug
+			//	Doesn't exist, consider rsegment( 2 ) a slug
 			$this->single();
 		
 		endif;
