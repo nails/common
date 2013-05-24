@@ -24,13 +24,13 @@ class Logger {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function __construct( $log_file = NULL, $log_dir = './application/logs/' )
+	public function __construct( $log_file = NULL, $log_dir = NULL )
 	{
 		$this->ci =& get_instance();
 		
 		$this->ci->load->helper( 'file' );
 		
-		$this->log->dir		= $log_dir;
+		$this->log->dir	= $this->log_dir( $log_dir );
 		$this->log->file	= ( $log_file ) ? $log_file : date( 'Y-m-d' ) . '.php';
 		$this->log->exists	= FALSE;
 	}

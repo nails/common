@@ -60,7 +60,7 @@ if ( ! function_exists( 'img' ) )
 		$img .= '/>';
 
 		//	Force SSL for local images if running on non-standard port
-		if ( $_SERVER['SERVER_PORT'] != 80 ) :
+		if ( isset( $_SERVER['HTTPS'] ) && strtolower( $_SERVER['HTTPS'] ) == 'on' ) :
 		
 			$site_url_ssl = str_replace( 'http://', 'https://', site_url() );
 			$img = str_replace( site_url(), $site_url_ssl, $img );
