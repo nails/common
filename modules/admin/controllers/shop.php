@@ -20,6 +20,14 @@ class Shop extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		if ( ! module_is_enabled( 'shop' ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$d = new stdClass();
 		
 		// --------------------------------------------------------------------------
@@ -30,10 +38,10 @@ class Shop extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['index']		= 'Manage Inventory';				//	Sub-nav function.
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
-		$d->funcs['settings']	= 'Shop Settings';					//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -217,196 +225,6 @@ class Shop extends Admin_Controller {
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Configure the shop
-	 *
-	 * @access public
-	 * @param none
-	 * @return void
-	 **/
-	public function settings()
-	{
-		//	Set method info
-		$this->data['page']->title = 'Shop Settings';
-
-		// --------------------------------------------------------------------------
-
-		//	Load models
-		$this->load->model( 'shop/shop_model', 'shop' );
-		$this->load->model( 'shop/shop_payment_gateway_model', 'payment_gateway' );
-		$this->load->model( 'shop/shop_currency_model',	'currency' );
-		
-		// --------------------------------------------------------------------------
-
-		//	Process POST
-		if ( $this->input->post() ) :
-		
-			switch ( $this->input->post( 'update' ) ) :
-
-				case 'settings' :
-
-					$this->_settings_update_settings();
-
-				break;
-
-				case 'paymentgateways' :
-
-					$this->_settings_update_paymentgateways();
-
-				break;
-
-				case 'currencies' :
-
-					$this->_settings_update_currencies();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				default :
-
-					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
-
-				break;
-
-			endswitch;
-		
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Get data
-		$this->data['settings'] = $this->shop->settings( NULL, TRUE );
-
-		if ( $this->user->is_superuser() ) :
-
-			$this->data['payment_gateways'] = $this->payment_gateway->get_all();
-
-		else :
-
-			$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
-
-		endif;
-
-		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
-		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'admin/shop/settings',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _settings_update_settings()
-	{
-		//	Prepare update
-		$_settings								= array();
-		$_settings['notify_order']				= $this->input->post( 'notify_order' );
-		$_settings['shop_url']					= $this->input->post( 'shop_url' );
-		$_settings['free_shipping_threshold']	= (float) $this->input->post( 'free_shipping_threshold' );
-		$_settings['invoice_company']			= $this->input->post( 'invoice_company' );
-		$_settings['invoice_address']			= $this->input->post( 'invoice_address' );
-		$_settings['invoice_vat_no']			= $this->input->post( 'invoice_vat_no' );
-		$_settings['invoice_company_no']		= $this->input->post( 'invoice_company_no' );
-
-		// --------------------------------------------------------------------------
-
-		//	Sanitize shop url
-		$_settings['shop_url'] .= substr( $_settings['shop_url'], -1 ) != '/' ? '/' : '';
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->shop->set_settings( $_settings ) ) :
-
-			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
-
-		else :
-
-			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
-
-		endif;
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	private function _settings_update_paymentgateways()
-	{
-		//	Prepare update
-		foreach( $this->input->post( 'paymentgateway' ) AS $id => $values ) :
-
-			$_data						= new stdClass();
-
-			if ( $this->user->is_superuser() ) :
-
-				$_data->enabled				= (bool) $values['enabled'];
-				$_data->sandbox_account_id	= $values['sandbox_account_id'];
-				$_data->sandbox_api_key		= $values['sandbox_api_key'];
-				$_data->sandbox_api_secret	= $values['sandbox_api_secret'];
-
-			endif;
-			$_data->account_id			= $values['account_id'];
-			$_data->api_key				= $values['api_key'];
-			$_data->api_secret			= $values['api_secret'];
-
-			$this->payment_gateway->update( $id, $_data );
-
-		endforeach;
-
-		$this->data['success'] = '<strong>Success!</strong> Payment Gateway settings have been saved.';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _settings_update_currencies()
-	{
-		//	Prepare update
-		$_settings								= array();
-		$_settings['base_currency']				= (int) $this->input->post( 'base_currency' );
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->shop->set_settings( $_settings ) ) :
-
-			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
-
-			//	Save the active currencies
-			$_where_in = array( $_settings['base_currency'] );
-
-			foreach ( $this->input->post( 'active_currencies' ) AS $id ) :
-
-				$_where_in[] = $id;
-
-			endforeach;
-			
-			if ( $this->currency->set_active_currencies( $_where_in ) ) :
-
-				$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
-
-			else :
-
-				$this->data['error'] = '<strong>Sorry,</strong> an error occurred while setting supported currencies.';
-
-			endif;
-
-		else :
-
-			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the base currency.';
-
-		endif;
 	}
 }
 

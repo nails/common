@@ -45,6 +45,7 @@ class NAILS_Events extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'events_nav_index' );
 		
 		// --------------------------------------------------------------------------

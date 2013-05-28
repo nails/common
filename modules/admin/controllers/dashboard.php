@@ -45,6 +45,7 @@ class NAILS_Dashboard extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'dashboard_nav_index' );
 		$d->funcs['help']		= lang( 'dashboard_nav_help' );
 		

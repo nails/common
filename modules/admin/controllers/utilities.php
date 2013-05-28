@@ -47,6 +47,7 @@ class NAILS_Utilities extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs					= array();
 		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
 		$d->funcs['user_access']	= lang( 'utilities_nav_user_access' );
 

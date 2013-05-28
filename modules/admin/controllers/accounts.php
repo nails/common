@@ -55,6 +55,7 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'accounts_nav_index' );
 		$d->funcs['create']		= lang( 'accounts_nav_create' );
 

@@ -55,6 +55,15 @@ class Blog_widget_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Any data?
+		if ( ! $_posts ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Render HTML?
 		if ( $return_html ) :
 
@@ -132,6 +141,15 @@ class Blog_widget_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Any data?
+		if ( ! $_cats ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Render HTML?
 		if ( $return_html ) :
 
@@ -200,6 +218,15 @@ class Blog_widget_model extends NAILS_Model
 
 		$this->db->order_by( 't.label' );
 		$_tags = $this->db->get( 'blog_tag t' )->result();
+
+		// --------------------------------------------------------------------------
+
+		//	Any data?
+		if ( ! $_tags ) :
+
+			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

@@ -29,6 +29,14 @@ class NAILS_Blog extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		if ( ! module_is_enabled( 'blog' ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$d = new stdClass();
 		
 		// --------------------------------------------------------------------------
@@ -39,8 +47,9 @@ class NAILS_Blog extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
-		$d->funcs['index']				= 'Manage Posts';		//	Sub-nav function.
-		$d->funcs['create']				= 'Create New Post';	//	Sub-nav function.
+		$d->funcs				= array();
+		$d->funcs['index']		= 'Manage Posts';		//	Sub-nav function.
+		$d->funcs['create']		= 'Create New Post';	//	Sub-nav function.
 		
 		get_instance()->load->helper( 'blog_helper' );
 
@@ -55,8 +64,6 @@ class NAILS_Blog extends Admin_Controller {
 			$d->funcs['manager_tag']		= 'Manage Tags';		//	Sub-nav function.
 
 		endif;
-
-		$d->funcs['settings']			= 'Blog Settings';		//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -577,126 +584,6 @@ class NAILS_Blog extends Admin_Controller {
 		$_fancybox = $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true&rebuild=' . $_rebuild : '';
 
 		redirect( 'admin/blog/manager_tag' . $_fancybox );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Configure the blog
-	 *
-	 * @access public
-	 * @param none
-	 * @return void
-	 **/
-	public function settings()
-	{
-		//	Set method info
-		$this->data['page']->title = 'Blog Settings';
-
-		// --------------------------------------------------------------------------
-
-		//	Load models
-		$this->load->model( 'blog/blog_model', 'blog' );
-		
-		// --------------------------------------------------------------------------
-
-		//	Process POST
-		if ( $this->input->post() ) :
-		
-			switch ( $this->input->post( 'update' ) ) :
-
-				case 'settings' :
-
-					$this->_settings_update_settings();
-
-				break;
-
-				case 'sidebar' :
-
-					$this->_settings_update_sidebar();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				default :
-
-					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
-
-				break;
-
-			endswitch;
-		
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Get data
-		$this->data['settings'] = $this->blog->settings( NULL, TRUE );
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'admin/blog/settings',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _settings_update_settings()
-	{
-		//	Prepare update
-		$_settings							= array();
-		$_settings['blog_url']				= $this->input->post( 'blog_url' );
-		$_settings['categories_enabled']	= (bool) $this->input->post( 'categories_enabled' );
-		$_settings['tags_enabled']			= (bool) $this->input->post( 'tags_enabled' );
-
-		// --------------------------------------------------------------------------
-
-		//	Sanitize blog url
-		$_settings['blog_url'] .= substr( $_settings['blog_url'], -1 ) != '/' ? '/' : '';
-
-		// --------------------------------------------------------------------------
-
-		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
-
-			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
-
-		else :
-
-			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _settings_update_sidebar()
-	{
-		//	Prepare update
-		$_settings						= array();
-		$_settings['sidebar_enabled']	= (bool) $this->input->post( 'sidebar_enabled' );
-		$_settings['sidebar_position']	= $this->input->post( 'sidebar_position' );
-
-		// --------------------------------------------------------------------------
-
-		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
-
-			$this->data['success'] = '<strong>Success!</strong> Sidebar settings have been saved.';
-
-		else :
-
-			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
-
-		endif;
 	}
 }
 

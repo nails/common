@@ -20,10 +20,10 @@
 	endif;
 
 	// --------------------------------------------------------------------------
-
+	
 	if (blog_setting( 'categories_enabled' ) &&  $widget->categories ) :
 
-		echo '<li class="widget latest-posts">';
+		echo '<li class="widget categories">';
 		echo $widget->categories;
 		echo '</li>';
 
@@ -33,7 +33,7 @@
 
 	if ( blog_setting( 'tags_enabled' ) && $widget->tags ) :
 
-		echo '<li class="widget latest-posts">';
+		echo '<li class="widget tags">';
 		echo $widget->tags;
 		echo '</li>';
 

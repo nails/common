@@ -20,6 +20,14 @@ class Cms extends Admin_Controller {
 	 **/
 	static function announce()
 	{
+		if ( ! module_is_enabled( 'cms' ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$d = new stdClass();
 		
 		// --------------------------------------------------------------------------
@@ -30,6 +38,7 @@ class Cms extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['pages']		= 'Manage Pages';					//	Sub-nav function.
 		$d->funcs['blocks']		= 'Manage Blocks';					//	Sub-nav function.
 		

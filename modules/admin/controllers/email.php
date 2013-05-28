@@ -45,6 +45,7 @@ class NAILS_Email extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Navigation options
+		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'email_nav_index' );
 		$d->funcs['compose']	= lang( 'email_nav_compose' );
 		$d->funcs['campaign']	= lang( 'email_nav_campaign' );
