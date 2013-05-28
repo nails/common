@@ -547,7 +547,8 @@ class Emailer
 			// --------------------------------------------------------------------------
 			
 			//	If no subject is defined in the variables, if not check to see if one was
-			//	defined in the emplate; if not, fall back to a default subject
+			//	defined in the template; if not, fall back to a default subject
+		
 			$_subject = isset( $email->email_vars['email_subject'] );
 			
 			if ( $_subject ) :
