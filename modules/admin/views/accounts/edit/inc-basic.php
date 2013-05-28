@@ -12,7 +12,27 @@
 		$_field['default']		= $user_edit->group_id;
 		$_field['required']		= TRUE;
 		
-		echo form_field_dropdown( $_field, $groups, lang( 'accounts_edit_basic_field_group_tip' ) );
+		//	Prepare ID's
+		$_groups_by_id = array();
+		foreach( $groups AS $group ) :
+
+			$_groups_by_id[$group->id] = $group->display_name;
+
+		endforeach;
+
+		echo form_field_dropdown( $_field, $_groups_by_id, lang( 'accounts_edit_basic_field_group_tip' ) );
+
+		//	Render the group descriptions
+		echo '<ul id="user-group-descriptions">';
+		for( $i=0; $i<count( $groups ); $i++ ) :
+
+			$_display = $groups[$i]->id == set_value( $_field['key'], $_field['default'] ) ? 'block' : 'none';
+			echo '<li class="system-alert notice no-close" id="user-group-' . $groups[$i]->id . '" style="display:' . $_display . ';">';
+			echo  '<strong>' . $groups[$i]->display_name . ':</strong> ' . $groups[$i]->description;
+			echo '</li>';
+
+		endfor;
+		echo '</ul>';
 		
 		// --------------------------------------------------------------------------
 		

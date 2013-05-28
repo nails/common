@@ -29,7 +29,7 @@
 					
 					default :
 					
-						echo anchor( cdn_serve( $file->bucket->slug . '?dl=1', $file->filename ), $file->filename );
+						echo anchor( cdn_serve( $file->bucket->slug, $file->filename ) . '?dl=1', $file->filename_display );
 					
 					break;
 				

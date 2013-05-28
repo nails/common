@@ -351,7 +351,7 @@ class NAILS_Accounts extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		//	Get the groups
-		$this->data['groups']		= $this->user->get_groups_flat();
+		$this->data['groups']		= $this->user->get_groups();
 		
 		// --------------------------------------------------------------------------
 		
@@ -855,7 +855,7 @@ class NAILS_Accounts extends Admin_Controller {
 		$this->data['page']->title = lang( 'accounts_edit_title', title_case( $_user->first_name . ' ' . $_user->last_name ) );
 		
 		//	Get the groups, timezones and languages
-		$this->data['groups']		= $this->user->get_groups_flat();
+		$this->data['groups']		= $this->user->get_groups();
 		
 		$this->load->model( 'core_nails_timezone_model' );
 		$this->data['timezones']	= $this->core_nails_timezone_model->get_all_flat();
