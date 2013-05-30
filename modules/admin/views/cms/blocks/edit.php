@@ -17,6 +17,7 @@
 	
 	<?=form_open()?>
 	<fieldset>
+	<?php if ( APP_MULTI_LANG ) : ?>
 		<legend>Translations</legend>
 		<p class="system-alert message no-close">
 			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_NAME?> version, however more translations can be
@@ -24,9 +25,17 @@
 			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_NAME?>.
 		</p>
 		
+		
 		<!--	DEFAULT LANG	-->
 		<fieldset class="translation" data-lang_id="<?=$default_id?>">
 			<legend><?=APP_DEFAULT_LANG_NAME?></legend>
+
+	<?php else : ?>
+		<legend>Value</legend>
+		<div class="translation" data-lang_id="<?=$default_id?>">
+
+	<?php endif; ?>
+
 			<?=form_hidden( 'translation[0][lang_id]', $default_id )?>
 			<div class="system-alert error no-close">
 				<strong>Oops!</strong> Please ensure a value is set.
@@ -81,7 +90,11 @@
 				endif;
 			
 			?>
+		<?php if ( APP_MULTI_LANG ) : ?>
 		</fieldset>
+		<?php else : ?>
+		</div>
+		<?php endif; ?>
 		
 		<!--	OTHER LANGUAGES	-->
 		<?php
@@ -119,10 +132,14 @@
 							
 								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="ckeditor"' );
 								
-								echo '<p class="system-alert notice no-close">';
-								echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
-								echo 'due to application stylesheets on the front end which are not loaded here.';
-								echo '</p>';
+								if ( $block->type == 'richtext' ) :
+
+									echo '<p class="system-alert notice no-close">';
+									echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
+									echo 'due to application stylesheets on the front end which are not loaded here.';
+									echo '</p>';
+
+								endif;
 							
 							break;
 						
@@ -152,10 +169,13 @@
 		
 		?>
 		
+
+		<?php if ( APP_MULTI_LANG ) : ?>
 		<!--	ACTIONS	-->
 		<p class="add-translation">
 			<a href="#" class="awesome small right" id="new-translation">Add Translation</a>
 		</p>
+		<?php endif; ?>
 		
 	</fieldset>
 	
@@ -176,10 +196,12 @@
 		<strong>Oops!</strong> Please ensure a language and value is set.
 	</div>
 	<textarea name="new_translation[{{new_count}}][value]" id="translation_{{new_count}}"></textarea>
+	<?php if ( $block->type == 'richtext' ) : ?>
 	<p class="system-alert notice no-close">
 		<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 		due to application stylesheets on the front end which are not loaded here.
 	</p>
+	<?php endif; ?>
 </script>
 
 <script style="text/javascript">
