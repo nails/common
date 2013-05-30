@@ -170,7 +170,7 @@ class Cms_page_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 			
 			//	Update the routes file
-			if ( $this->_write_routes() ) :
+			if ( $this->write_routes() ) :
 			
 				return TRUE;
 			
@@ -589,19 +589,37 @@ class Cms_page_model extends NAILS_Model
 			
 			else :
 			
-				$this->_set_error( 'The route config exists, but is not writeable.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
-				return FALSE;
+				//	Attempt to chmod the file
+				if ( @chmod( $this->_routes_dir . 'routes_cms_page.php', FILE_WRITE_MODE ) ) :
+
+					return TRUE;
+
+				else :
+
+					$this->_set_error( 'The route config exists, but is not writeable.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
+					return FALSE;
+
+				endif;
 			
 			endif;
-			
+		
 		elseif ( is_writable( $this->_routes_dir ) ) :
 		
 			return TRUE;
 		
 		else :
 		
-			$this->_set_error( 'The route directory is not writeable.<small>' . $this->_routes_dir . '</small>' );
-			return FALSE;
+			//	Attempt to chmod the directory
+			if ( @chmod( $this->_routes_dir, DIR_WRITE_MODE ) ) :
+
+				return TRUE;
+
+			else :
+
+				$this->_set_error( 'The route directory is not writeable.<small>' . $this->_routes_dir . '</small>' );
+				return FALSE;
+
+			endif;
 		
 		endif;
 	}
@@ -609,7 +627,7 @@ class Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _write_routes()
+	public function write_routes()
 	{
 		if ( ! $this->can_write_routes() ) :
 		

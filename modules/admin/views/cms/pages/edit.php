@@ -28,9 +28,13 @@
 			
 			?>
 	</fieldset>
+
+	<fieldset id="cms-page-edit-layout" class="editor">
+		<legend>Page Layout</legend>
+	</fieldset>
 	
-	<fieldset id="cms-page-edit-seo" class="editor">
-		<legend>Editor</legend>
+	<fieldset id="cms-page-edit-body" class="editor">
+		<legend>Page Body</legend>
 		<p>
 			Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.
 		</p>

@@ -61,6 +61,12 @@
 		?>
 		</tbody>
 	</table>
+
+	<hr />
+	
+	<p>
+		Sometimes the site's routing system can get confused. If pages aren't appearing as they should try <?=anchor( 'admin/cms/pages/rewrite_routes', 'rewriting the routes file' )?>.
+	</p>
 	
 </div>
 

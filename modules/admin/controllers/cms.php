@@ -147,7 +147,7 @@ class Cms extends Admin_Controller {
 	
 	
 	/**
-	 * Administration homepage / dashboard
+	 * Edit a page
 	 *
 	 * @access public
 	 * @param none
@@ -253,6 +253,27 @@ class Cms extends Admin_Controller {
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/cms/pages/edit',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _pages_rewrite_routes()
+	{
+		if ( $this->cms_page->write_routes() ) :
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Routes rewritten successfully.' );
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem writing the routes:<br />' . array_pop( $this->cms_page->get_error() ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		redirect( 'admin/cms/pages' );
 	}
 	
 	
