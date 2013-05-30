@@ -47,7 +47,15 @@ class NAILS_Dashboard extends Admin_Controller {
 		//	Navigation options
 		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'dashboard_nav_index' );
-		$d->funcs['help']		= lang( 'dashboard_nav_help' );
+
+		//	Only show the help option if there are videos available
+		get_instance()->load->model( 'admin_help_model' );
+
+		if ( get_instance()->admin_help_model->count() ) :
+
+			$d->funcs['help']		= lang( 'dashboard_nav_help' );
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -115,11 +123,6 @@ class NAILS_Dashboard extends Admin_Controller {
 	{
 		//	Page Title
 		$this->data['page']->title = lang( 'dashboard_help_title' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load model
-		$this->load->model( 'admin_help_model' );
 		
 		// --------------------------------------------------------------------------
 		

@@ -58,7 +58,14 @@ class Cms_page_model extends NAILS_Model
 		//	Next, check the slug is unique, encode it to be safe
 		if ( isset( $data->slug ) ) :
 		
-			$data->slug = trim( url_title( $data->slug ) );
+			$data->slug = explode( '/', trim( $data->slug ) );
+			foreach ( $data->slug AS &$value ) :
+
+				$value = url_title( $value, 'dash', TRUE );
+
+			endforeach;
+			$data->slug = implode( '/', $data->slug );
+
 			$this->db->where( 'id !=', $page_id );
 			$this->db->where( 'slug', $data->slug );
 			
@@ -201,8 +208,8 @@ class Cms_page_model extends NAILS_Model
 		$this->db->select( 'p.id,p.slug,p.title,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
 		
-		$this->db->join( 'user u', 'u.id = p.modified_by' );
-		$this->db->join( 'user_meta um', 'um.user_id = p.modified_by' );
+		$this->db->join( 'user u', 'u.id = p.modified_by', 'LEFT' );
+		$this->db->join( 'user_meta um', 'um.user_id = p.modified_by', 'LEFT' );
 		
 		if ( ! $include_deleted ) :
 		
@@ -614,12 +621,13 @@ class Cms_page_model extends NAILS_Model
 		
 		//	Routes are writeable, apparently, give it a bash
 		$_data = '<?php  if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\');' . "\n\n";
+		$_data .= '//	THIS FILE IS CREATED/MODIFIED AUTOMATICALLY, ANY MANUAL EDITS WILL BE OVERWRITTEN'."\n\n";
 		
 		$_pages = $this->get_all();
 		
 		foreach ( $_pages AS $page ) :
 		
-			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page\';';
+			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page\';' . "\n";
 		
 		endforeach;
 		

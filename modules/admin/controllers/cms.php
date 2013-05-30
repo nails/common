@@ -273,7 +273,17 @@ class Cms extends Admin_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		$str = url_title( $str );
+		//	Prepare the slug
+		$str = explode( '/', trim( $str ) );
+		foreach ( $str AS &$value ) :
+
+			$value = url_title( $value, 'dash', TRUE );
+
+		endforeach;
+		$str = implode( '/', $str );
+		
+		// --------------------------------------------------------------------------
+
 		$this->db->where( 'id !=', $this->uri->segment( 5 ) );
 		$this->db->where( 'slug', $str );
 		

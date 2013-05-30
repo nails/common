@@ -13,8 +13,8 @@
 	// --------------------------------------------------------------------------
 	
 	//	Nav
-	$lang['dashboard_nav_index']		= 'Dashboard';
-	$lang['dashboard_nav_help']			= 'Help';
+	$lang['dashboard_nav_index']		= 'Site Overview';
+	$lang['dashboard_nav_help']			= 'Help Videos';
 	
 	// --------------------------------------------------------------------------
 	
