@@ -67,11 +67,16 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		//	TODO: Hardcoded GBP just now
 		define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
 		
-		
 		// --------------------------------------------------------------------------
 		
 		//	Load the styles
 		$this->asset->load( 'nails.shop.css', TRUE );
+
+		if ( file_exists( FCPATH . 'assets/css/shop.css' ) ) :
+		
+			$this->asset->load( 'shop.css' );
+		
+		endif;
 	}
 }
 

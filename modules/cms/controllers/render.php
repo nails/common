@@ -57,8 +57,12 @@ class NAILS_Render extends NAILS_CMS_Controller
 		
 		//	Get the page HTML
 		$this->data['page']->title		= $_page->title;
+		$this->data['page']->slug		= $_page->slug;
+		$this->data['page']->layout		= $_page->layout;
 		$this->data['rendered_page']	= $this->cms_page->render( $_page );
-		
+
+		// --------------------------------------------------------------------------
+
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'cms/page/render',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );

@@ -86,9 +86,6 @@ class Cms extends Admin_Controller {
 	{
 		//	Load common blocks items
 		$this->load->model( 'cms_page_model', 'cms_page' );
-		$this->asset->load( 'jquery.ui.min.js', TRUE );
-		$this->asset->load( 'mustache.min.js', TRUE );
-		$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
 		
 		// --------------------------------------------------------------------------
 		
@@ -134,6 +131,13 @@ class Cms extends Admin_Controller {
 		
 		//	Fetch all the pages in the DB
 		$this->data['pages'] = $this->cms_page->get_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
 		
 		// --------------------------------------------------------------------------
 		
@@ -171,7 +175,7 @@ class Cms extends Admin_Controller {
 		// --------------------------------------------------------------------------
 		
 		if ( $this->input->post() ) :
-			
+		
 			//	Set Rules
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|required|callback__callback_slug' );
@@ -182,32 +186,38 @@ class Cms extends Admin_Controller {
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 			
 			//	Loop the widgets and get any widget specific validation rules
-			if ( is_array( $this->input->post( 'widgets' ) ) ) :
-			
-				foreach( $this->input->post( 'widgets' ) AS $postkey => $widget ) :
+			$_areas = array( 'hero', 'body', 'sidebar' );
+
+			foreach ( $_areas AS $area ) :
+
+				if ( is_array( $this->input->post( 'widgets_' . $area ) ) ) :
 				
-					foreach( $widget AS $field => $value ) :
+					foreach( $this->input->post( 'widgets_' . $area ) AS $postkey => $widget ) :
 					
-						//	Skip the slug
-						if ( $field == 'slug' ) :
+						foreach( $widget AS $field => $value ) :
 						
-							continue;
+							//	Skip the slug
+							if ( $field == 'slug' ) :
+							
+								continue;
+							
+							endif;
 						
-						endif;
-					
-						$_rules = $this->cms_page->get_widget_validation_rules( $widget['slug'], $field );
+							$_rules = $this->cms_page->get_widget_validation_rules( $widget['slug'], $field );
+							
+							if ( $_rules ) :
+							
+								$this->form_validation->set_rules( 'widgets_' . $area . '[' . $postkey . '][' . $field . ']', $field,	$_rules );
+							
+							endif;
 						
-						if ( $_rules ) :
-						
-							$this->form_validation->set_rules( 'widgets[' . $postkey . '][' . $field . ']', $field,	$_rules );
-						
-						endif;
+						endforeach;
 					
 					endforeach;
 				
-				endforeach;
-			
-			endif;
+				endif;
+
+			endforeach;
 			
 			//	Execute
 			if ( $this->form_validation->run( $this ) ) :
@@ -216,9 +226,15 @@ class Cms extends Admin_Controller {
 				$_data					= new stdClass();
 				$_data->title			= $this->input->post( 'title' );
 				$_data->slug			= $this->input->post( 'slug' );
-				$_data->widgets			= $this->input->post( 'widgets' );
+				$_data->layout			= $this->input->post( 'layout' );
 				$_data->seo_description	= $this->input->post( 'seo_description' );
 				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+				foreach ( $_areas AS $area ) :
+
+					$_data->{'widgets_' . $area }	= $this->input->post( 'widgets_' . $area );
+
+				endforeach;
 				
 				if ( $this->cms_page->update( $this->uri->segment( 5 ), $_data ) ) :
 				
@@ -247,6 +263,13 @@ class Cms extends Admin_Controller {
 		
 		//	Get available widgets
 		$this->data['widgets']	= $this->cms_page->get_available_widgets();
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.pages.editor.min.js', TRUE );
 		
 		// --------------------------------------------------------------------------
 		

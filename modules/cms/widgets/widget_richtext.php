@@ -83,14 +83,12 @@ class Nails_CMS_Widget_richtext extends Nails_CMS_Widget
 	{
 	
 $_out  = <<<EOT
-console.log('start');
 for ( var name in CKEDITOR.instances )
 {
 	var _data = CKEDITOR.instances[name].getData();
 	CKEDITOR.instances[name].destroy(true);
 	$( '.ckeditor[name="'+name+'"]' ).html(_data);
 }
-
 EOT;
 		
 		return $_out;
@@ -103,9 +101,7 @@ EOT;
 	{
 	
 $_out  = <<<EOT
-console.log('stop');
 CKEDITOR.replaceAll( 'ckeditor' );
-
 EOT;
 		
 		return $_out;

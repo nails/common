@@ -48,12 +48,19 @@ class Cms_page_model extends NAILS_Model
 	public function update( $page_id, $data )
 	{
 		//	Firstly, remove and remember the widgets, if any.
-		if ( isset( $data->widgets ) ) :
-		
-			$_widgets = $data->widgets;
-			unset( $data->widgets );
-		
-		endif;
+		$_areas = array( 'hero', 'body', 'sidebar' );
+
+		foreach ( $_areas AS $area ) :
+
+			if ( isset( $data->{'widgets_' . $area} ) ) :
+			
+				${'_widgets_' . $area} = $data->{'widgets_' . $area};
+				unset( $data->{'widgets_' . $area} );
+			
+			endif;
+
+		endforeach;
+
 		
 		//	Next, check the slug is unique, encode it to be safe
 		if ( isset( $data->slug ) ) :
@@ -93,79 +100,85 @@ class Cms_page_model extends NAILS_Model
 		if ( $this->db->update( 'cms_page' ) ) :
 		
 			//	Are there any widgets which need updating? If not then we're done
-			if ( isset( $_widgets ) && is_array( $_widgets ) ) :
-			
-				//	Loop through the $_widgets array, update any `old-` widgets, add `new-` widgets,
-				//	remove widgets which aren't provided and then save the order.
+			foreach ( $_areas AS $area ) :
+
+				if ( isset( ${'_widgets_' . $area} ) && is_array( ${'_widgets_' . $area} ) ) :
 				
-				$_order				= 0;
-				$_processed_widgets	= array();
-				
-				foreach ( $_widgets AS $key => $widget ) :
-				
-					//	Prepare and set data
-					$_type = $widget['slug'];
-					unset($widget['slug']);
+					//	Loop through the $_widgets array, update any `old-` widgets, add `new-` widgets,
+					//	remove widgets which aren't provided and then save the order.
 					
-					$this->db->set( 'order', $_order );
-					$this->db->set( 'widget_data', serialize( $widget ) );
-					$this->db->set( 'modified', 'NOW()', FALSE );
+					$_order				= 0;
+					$_processed_widgets	= array();
 					
-					if ( active_user( 'id' ) ) :
+					foreach ( ${'_widgets_' . $area} AS $key => $widget ) :
 					
-						$this->db->set( 'modified_by', active_user( 'id' ) );
-					
-					endif;
-					
-					// --------------------------------------------------------------------------
-					
-					//	Old or new?
-					$key = explode( '-', $key );
-					
-					if ( $key[0] == 'old' ) :
-					
-						//	Old widget, update
-						$this->db->where( 'id', $key[1] );
+						//	Prepare and set data
+						$_type = $widget['slug'];
+						unset($widget['slug']);
 						
-						$this->db->update( 'cms_page_widget' );
-						
-						$_processed_widgets[] = $key[1];
-					
-					elseif ( $key[0] == 'new' ) :
-					
-						//	New widget, insert
-						$this->db->set( 'page_id', $page_id );
-						$this->db->set( 'widget_class', $_type );
-						$this->db->set( 'created', 'NOW()', FALSE );
+						$this->db->set( 'order', $_order );
+						$this->db->set( 'widget_data', serialize( $widget ) );
+						$this->db->set( 'modified', 'NOW()', FALSE );
 						
 						if ( active_user( 'id' ) ) :
 						
-							$this->db->set( 'created_by', active_user( 'id' ) );
+							$this->db->set( 'modified_by', active_user( 'id' ) );
 						
 						endif;
 						
-						$this->db->insert( 'cms_page_widget' );
+						// --------------------------------------------------------------------------
 						
-						$_processed_widgets[] = $this->db->insert_id();
+						//	Old or new?
+						$key = explode( '-', $key );
+						
+						if ( $key[0] == 'old' ) :
+						
+							//	Old widget, update
+							$this->db->where( 'id', $key[1] );
+							
+							$this->db->update( 'cms_page_widget' );
+							
+							$_processed_widgets[] = $key[1];
+						
+						elseif ( $key[0] == 'new' ) :
+						
+							//	New widget, insert
+							$this->db->set( 'page_id', $page_id );
+							$this->db->set( 'widget_class', $_type );
+							$this->db->set( 'widget_area', $area );
+							$this->db->set( 'created', 'NOW()', FALSE );
+							
+							if ( active_user( 'id' ) ) :
+							
+								$this->db->set( 'created_by', active_user( 'id' ) );
+							
+							endif;
+							
+							$this->db->insert( 'cms_page_widget' );
+							
+							$_processed_widgets[] = $this->db->insert_id();
+						
+						else :
+						
+							//	Que?
+						
+						endif;
 					
-					else :
+						$_order++;
+						
+					endforeach;
 					
-						//	Que?
+					// --------------------------------------------------------------------------
 					
-					endif;
+					//	Remove old widgets (i.e widgets which were not processed)
+					$this->db->where( 'page_id', $page_id );
+					$this->db->where( 'widget_area', $area );
+					$this->db->where_not_in( 'id', $_processed_widgets );
+					$this->db->delete( 'cms_page_widget' );
 				
-					$_order++;
-					
-				endforeach;
-				
-				// --------------------------------------------------------------------------
-				
-				//	Remove old widgets (i.e widgets which were not processed)
-				$this->db->where( 'page_id', $page_id );
-				$this->db->where_not_in( 'id', $_processed_widgets );
-				$this->db->delete( 'cms_page_widget' );
-			
-			endif;
+				endif;
+
+			endforeach;
 			
 			// --------------------------------------------------------------------------
 			
@@ -205,7 +218,7 @@ class Cms_page_model extends NAILS_Model
 	
 	public function get_all( $include_widgets = FALSE, $include_deleted = FALSE )
 	{
-		$this->db->select( 'p.id,p.slug,p.title,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
+		$this->db->select( 'p.id,p.slug,p.title,p.layout,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
 		
 		$this->db->join( 'user u', 'u.id = p.modified_by', 'LEFT' );
@@ -230,10 +243,20 @@ class Cms_page_model extends NAILS_Model
 			//	Fetch widgets
 			if ( $include_widgets ) :
 				
-				$this->db->select();
 				$this->db->where( 'page_id', $page->id );
+				$this->db->where( 'widget_area', 'hero' );
 				$this->db->order_by( 'order' );
-				$page->widgets = $this->db->get( 'cms_page_widget' )->result();
+				$page->widgets_hero = $this->db->get( 'cms_page_widget' )->result();
+
+				$this->db->where( 'page_id', $page->id );
+				$this->db->where( 'widget_area', 'body' );
+				$this->db->order_by( 'order' );
+				$page->widgets_body = $this->db->get( 'cms_page_widget' )->result();
+
+				$this->db->where( 'page_id', $page->id );
+				$this->db->where( 'widget_area', 'sidebar' );
+				$this->db->order_by( 'order' );
+				$page->widgets_sidebar = $this->db->get( 'cms_page_widget' )->result();
 				
 			endif;
 			
@@ -426,23 +449,20 @@ class Cms_page_model extends NAILS_Model
 	
 	public function render( $page )
 	{
-		if ( ! isset( $page->widgets ) || ! $page->widgets ) :
-		
-			return '';
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
 		//	Loop through all the widgets, instanciate the appropriate widget and execute
 		//	it's render function, append the result to the $_out variable and spit that back
 		
-		$_out		= '';
+		$_out	= array( 'hero' => '', 'body' => '', 'sidebar' => '' );
+		$_area	= array( 'hero', 'body', 'sidebar' );
 		
-		foreach ( $page->widgets AS $key => $widget ) :
-		
-			$_out .= $this->_call_widget_method( $widget->widget_class, $widget->widget_data, 'render' );
-		
+		foreach ($_area AS $area ) :
+
+			foreach ( $page->{'widgets_' . $area} AS $key => $widget ) :
+			
+				$_out[$area] .= $this->_call_widget_method( $widget->widget_class, $widget->widget_data, 'render' );
+			
+			endforeach;
+
 		endforeach;
 		
 		// --------------------------------------------------------------------------

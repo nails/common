@@ -24,5 +24,16 @@ class NAILS_CMS_Controller extends NAILS_Controller
 		
 		//	Load language file
 		$this->lang->load( 'cms', RENDER_LANG );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Load the styles
+		$this->asset->load( 'nails.cms.css', TRUE );
+
+		if ( file_exists( FCPATH . 'assets/css/cms.css' ) ) :
+		
+			$this->asset->load( 'cms.css' );
+		
+		endif;
 	}
 }

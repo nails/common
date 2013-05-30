@@ -25,146 +25,82 @@
 			$_field['placeholder']	= 'The Page\'s slug.';
 			
 			echo form_field( $_field );
-			
+
 			?>
 	</fieldset>
 
-	<fieldset id="cms-page-edit-layout" class="editor">
+	<fieldset id="cms-page-edit-layout" class="layout">
 		<legend>Page Layout</legend>
-	</fieldset>
-	
-	<fieldset id="cms-page-edit-body" class="editor">
-		<legend>Page Body</legend>
-		<p>
-			Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.
-		</p>
-		<div class="widgets">
-		<?php
-		
-			//	Get the widget draggables
-			foreach( $widgets AS $widget ) :
-			
-				$_class = $widgets[$widget->slug]->iam;
+		<ul>
+			<?php
+
+				$_layout = $this->input->post( 'layout' ) ? $this->input->post( 'layout' ) : $cmspage->layout;
 				
-				echo '<li class="widget ' . $widget->slug . '" data-template="' . $widget->slug . '">';
-				echo $_class::details()->name;
-				echo '</li>';
-			
-			endforeach;	
-		?>
-		</div>
-		<ul class="holders <?=$cmspage->widgets ? '' : 'empty'?>">
-		<li class="empty">
-			<p>Drag an item here from the sidebar to begin editing!</p>
-		</li>
-		<?php
-		
-			//	Get the widget editors, depending on the source, we need
-			//	to loop and preparethe data.
-			
-			//	If post data has been defined, use that
-			if ( is_array( $this->input->post( 'widgets' )  ) ) :
-			
-				$_widgets = array();
-				
-				//	Define the slug, key and data
-				foreach( $this->input->post( 'widgets' ) AS $key => $data ) :
-				
-					$_temp = new stdClass();
-					
-					//	Slug
-					$_temp->slug	= $data['slug'];
-					unset( $data['slug'] );
-					
-					//	Key
-					$_temp->key		= $key;
-					
-					//	Data
-					$_temp->data	= serialize( $data );
-					
-					// --------------------------------------------------------------------------
-					
-					$_widgets[]		= $_temp;
-				
-				endforeach;
-			
-			else :
-			
-				$_widgets = array();
-								
-				//	Define the slug, key and data
-				foreach( $cmspage->widgets AS $widget ) :
-				
-					$_temp = new stdClass();
-					
-					//	Slug
-					$_temp->slug	= $widget->widget_class;
-					
-					//	Key
-					$_temp->key		= 'old-' . $widget->id;
-					
-					//	Data
-					$_temp->data	= $widget->widget_data;
-					
-					// --------------------------------------------------------------------------
-					
-					$_widgets[]		= $_temp;
-				
-				endforeach;
-			
-			endif;
-			
-			$_counter = 0;
-			foreach( $_widgets AS $widget ) :
-			
-				$_class = $widgets[$widget->slug]->iam;
-				
-				//	Handle
-				echo '<li class="holder ' . $widget->slug . '" data-template="' . $widget->slug . '">';
-				echo '<h2 class="handle">';
-				echo $_class::details()->name;
-				echo '<small>' . $_class::details()->info . '</small>';
-				echo '<a href="#" class="close">Close</a>';
-				echo '</h2>';
-				
-				//	Editor
-				echo '<div class="editor-content">';
-				
-					//	Any errors?
-					$_errors = '';
-					foreach ( $this->form_validation->get_error_array() AS $field => $message ) :
-					
-						if ( preg_match( '/widgets\[' . $widget->key . '\]\[(.*)\]/', $field, $_matches ) ) :
-						
-							
-							$_errors .= '<br />&rsaquo; ' . ucwords( str_replace( '_', ' ', $_matches[1] ) ) .' - ' . $message;
-						
-						endif;
-					
-					endforeach;
-					
-					if ( $_errors ) :
-					
-						echo '<p class="system-alert error no-close">';
-						echo '<strong>There are errors in this widget:</strong>';
-						echo $_errors;
-						echo '</p>';
-					
-					endif;
-					
-					// --------------------------------------------------------------------------
-					
-					echo $this->cms_page->get_widget_editor( $widget->slug, $widget->data, 'widgets[' . $widget->key . ']' );
-					
-				echo '</div>';
-				echo '<li>';
-				
-				$_counter++;
-			
-			endforeach;	
-		?>
+			?>
+			<li class="hero-sidebar-left">
+				<label>
+					<?=form_radio( 'layout', 'hero-sidebar-left', ( $_layout == 'hero-sidebar-left' ) )?>
+				</label>
+			</li>
+			<li class="hero-sidebar-right">
+				<label>
+					<?=form_radio( 'layout', 'hero-sidebar-right', ( $_layout == 'hero-sidebar-right' ) )?>
+				</label>
+			</li>
+			<li class="hero-full-width">
+				<label>
+					<?=form_radio( 'layout', 'hero-full-width', ( $_layout == 'hero-full-width' ) )?>
+				</label>
+			</li>
+			<li class="no-hero-sidebar-left">
+				<label>
+					<?=form_radio( 'layout', 'no-hero-sidebar-left', ( $_layout == 'no-hero-sidebar-left' ) )?>
+				</label>
+			</li>
+			<li class="no-hero-sidebar-right">
+				<label>
+					<?=form_radio( 'layout', 'no-hero-sidebar-right', ( $_layout == 'no-hero-sidebar-right' ) )?>
+				</label>
+			</li>
+			<li class="no-hero-full-width">
+				<label>
+					<?=form_radio( 'layout', 'no-hero-full-width', ( $_layout == 'no-hero-full-width' ) )?>
+				</label>
+			</li>
 		</ul>
 	</fieldset>
+	
+	<?php
+
+		//	Hero editor
+		$_config = array( 'config' => array() );
+		$_config['config']['area']			= 'hero';
+		$_config['config']['title']			= 'Page Hero';
+		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+
+		$this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+		// --------------------------------------------------------------------------
+
+		//	Body editor
+		$_config = array( 'config' => array() );
+		$_config['config']['area']			= 'body';
+		$_config['config']['title']			= 'Page Body';
+		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+
+		$this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+		// --------------------------------------------------------------------------
+
+		//	Sidebar editor
+		$_config = array( 'config' => array() );
+		$_config['config']['area']			= 'sidebar';
+		$_config['config']['title']			= 'Page Sidebar';
+		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+
+		$this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+	?>
 	
 	<fieldset id="cms-page-edit-seo">
 		<legend>Search Engine Optimisation</legend>
@@ -215,8 +151,77 @@
 
 	$(function(){
 	
-		var CMS_Pages = new NAILS_Admin_CMS_Pages;
-		CMS_Pages.init_edit();
+		//	Hero
+		var CMS_Pages_hero = new NAILS_Admin_CMS_Pages_Editor;
+		CMS_Pages_hero.init( 'hero' );
+
+		//	Body
+		var CMS_Pages_body = new NAILS_Admin_CMS_Pages_Editor;
+		CMS_Pages_body.init( 'body' );
+
+		//	Sidebar
+		var CMS_Pages_sidebar = new NAILS_Admin_CMS_Pages_Editor;
+		CMS_Pages_sidebar.init( 'sidebar' );
+
+		// --------------------------------------------------------------------------
+
+		//	Handle the layout selector
+		function sort_layout( type )
+		{
+			switch ( type )
+			{
+				case 'hero-sidebar-left' :
+				case 'hero-sidebar-right' :
+
+					$( '#cms-page-edit-hero' ).show();
+					$( '#cms-page-edit-body' ).show();
+					$( '#cms-page-edit-sidebar' ).show();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'hero-full-width' :
+
+					$( '#cms-page-edit-hero' ).show();
+					$( '#cms-page-edit-body' ).show();
+					$( '#cms-page-edit-sidebar' ).hide();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'no-hero-sidebar-left' :
+				case 'no-hero-sidebar-right' :
+
+					$( '#cms-page-edit-hero' ).hide();
+					$( '#cms-page-edit-body' ).show();
+					$( '#cms-page-edit-sidebar' ).show();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'no-hero-full-width' :
+
+					$( '#cms-page-edit-hero' ).hide();
+					$( '#cms-page-edit-body' ).show();
+					$( '#cms-page-edit-sidebar' ).hide();
+
+				break;
+
+			}
+		}
+
+		//	Catch selections
+		$( 'input[name=layout]' ).on( 'click', function()
+		{
+			sort_layout( $(this).val());
+		});
+
+		//	Process the current layout
+		sort_layout( '<?=$_layout?>' );
+
 	
 	});
 
@@ -237,12 +242,12 @@
 		echo '<a href="#" class="close">Close</a>';
 		echo '</h2>';
 		echo '<div class="editor-content">';
-		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'widgets[new-{{counter}}]' );
+		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'widgets_{{key}}[new-{{counter}}]' );
 		echo '</div>';
 		echo '</script>';
 		
 		echo '<script type="text/javascript">';
-		echo $this->cms_page->get_widget_editor_functions( $widget->slug, NULL, 'widgets[new-{{counter}}]' );
+		echo $this->cms_page->get_widget_editor_functions( $widget->slug, NULL, 'widgets__{{key}}[new-{{counter}}]' );
 		echo '</script>';
 	
 	endforeach;	
