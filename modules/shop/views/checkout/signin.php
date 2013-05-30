@@ -17,7 +17,7 @@
 					$_token				= array();
 					$_token['nonce']	= time();
 					$_token['ip']		= $this->input->ip_address();
-					$_token['group']	= APP_DEFAULT_GROUP;
+					$_token['group']	= APP_USER_DEFAULT_GROUP;
 					
 					$_token = urlencode( $this->encrypt->encode( serialize($_token) . '|' . $_token['ip'] . '|' . $_token['nonce'], APP_PRIVATE_KEY ) );
 					
@@ -107,7 +107,7 @@
 					$_token				= array();
 					$_token['nonce']	= time();
 					$_token['ip']		= $this->input->ip_address();
-					$_token['group']	= APP_DEFAULT_GROUP;
+					$_token['group']	= APP_USER_DEFAULT_GROUP;
 					
 					$_token = urlencode( $this->encrypt->encode( serialize($_token) . '|' . $_token['ip'] . '|' . $_token['nonce'], APP_PRIVATE_KEY ) );
 					

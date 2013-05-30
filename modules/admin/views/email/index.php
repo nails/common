@@ -70,12 +70,16 @@
 										
 										echo $email->first_name . ' ' . $email->last_name;
 										echo '<small>' . mailto( $email->send_to ) . '</small>';
+
+										$_email = $email->send_to;
 										
 									else :
 									
 										echo img( cdn_blank_avatar( 45, 45, 'male' ) );
 										echo '&mdash;';
 										echo '<small>' . mailto( $email->user_email ) . '</small>';
+
+										$_email = $email->user_email;
 									
 									endif;
 								

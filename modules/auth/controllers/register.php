@@ -33,6 +33,15 @@ class NAILS_Register extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Is registration enabled
+		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) || ! APP_USER_ALLOW_REGISTRATION ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load libraries
 		$this->load->library( 'form_validation' );
 		
@@ -111,13 +120,13 @@ class NAILS_Register extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Create new user
-				$_uid = $this->user->create( $email, $password, APP_DEFAULT_GROUP, $data );
+				$_uid = $this->user->create( $email, $password, APP_USER_DEFAULT_GROUP, $data );
 				
 				if ( $_uid ) :
 				
 					//	Fetch user and group data
 					$_user	= $this->user->get_user( $_uid['id'] );
-					$_group	= $this->user->get_group( APP_DEFAULT_GROUP );
+					$_group	= $this->user->get_group( APP_USER_DEFAULT_GROUP );
 					
 					// --------------------------------------------------------------------------
 					
@@ -132,7 +141,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 					$this->load->library( 'emailer' );
 					
 					$_email							= new stdClass();
-					$_email->type					= 'verify_email_' . APP_DEFAULT_GROUP;
+					$_email->type					= 'verify_email_' . APP_USER_DEFAULT_GROUP;
 					$_email->to_id					= $_uid['id'];
 					$_email->data					= array();
 					$_email->data['user']			= $_user;
@@ -154,7 +163,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'], $email, APP_DEFAULT_GROUP );
+					$this->user->set_login_data( $_uid['id'], $email, APP_USER_DEFAULT_GROUP );
 					
 					// --------------------------------------------------------------------------
 					

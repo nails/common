@@ -1031,7 +1031,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		
 		else :
 		
-			$_selected = $options[0]['selected'];
+			$_selected = isset( $options[0]['selected'] ) ? $options[0]['selected'] : FALSE;
 		
 		endif;
 		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
@@ -1057,7 +1057,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 			
 			else :
 			
-				$_selected = $options[$i]['selected'];
+				$_selected = isset( $options[$i]['selected'] ) ? $options[$i]['selected'] : FALSE;
 			
 			endif;
 			
@@ -1146,8 +1146,9 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		if ( substr( $_field['key'], -2 ) == '[]' ) :
 		
 			//	Field is an array, need to look for the value
-			$_values	= $_ci->input->post( substr( $_field['key'], 0, -2 ) );
-			$_selected	= $_ci->input->post() ? FALSE : $options[0]['selected'];
+			$_values		= $_ci->input->post( substr( $_field['key'], 0, -2 ) );
+			$_data_selected	= isset( $options[0]['selected'] ) ? $options[0]['selected'] : FALSE;
+			$_selected		= $_ci->input->post() ? FALSE : $_data_selected;
 			
 			if ( is_array( $_values ) && array_search( $options[0]['value'], $_values ) !== FALSE ) :
 			
@@ -1164,7 +1165,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			
 			else :
 			
-				$_selected = $options[0]['selected'];
+				$_selected = isset( $options[0]['selected'] ) ? $options[0]['selected'] : FALSE;
 			
 			endif;
 		
@@ -1196,7 +1197,8 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 			
 				//	Field is an array, need to look for the value
 				$_values	= $_ci->input->post( substr( $_field['key'], 0, -2 ) );
-				$_selected	= $_ci->input->post() ? FALSE : $options[$i]['selected'];
+				$_data_selected	= isset( $options[$i]['selected'] ) ? $options[$i]['selected'] : FALSE;
+				$_selected		= $_ci->input->post() ? FALSE : $_data_selected;
 				
 				if ( is_array( $_values ) && array_search( $options[$i]['value'], $_values ) !== FALSE ) :
 				
@@ -1213,7 +1215,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 				
 				else :
 				
-					$_selected = $options[$i]['selected'];
+					$_selected = isset( $options[$i]['selected'] ) ? $options[$i]['selected'] : FALSE;
 				
 				endif;
 			

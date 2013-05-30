@@ -49,7 +49,19 @@
 		<div class="first seven columns">
 		
 			<p>
-				<?=lang( 'auth_login_message', array( APP_NAME, site_url( 'auth/register' ) ) )?>
+				<?php
+
+					if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+
+						echo lang( 'auth_login_message', array( APP_NAME, site_url( 'auth/register' ) ) );
+
+					else :
+
+						echo lang( 'auth_login_message_no_register', array( APP_NAME ) );
+
+					endif;
+
+				?>
 			</p>
 		
 			<?php

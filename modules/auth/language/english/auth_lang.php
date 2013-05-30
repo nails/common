@@ -27,6 +27,7 @@
 	
 	//	Login lang strings
 	$lang['auth_login_message']							= 'Sign in to your %s account using your email address and password. Not got an account? <a href="%s">Click here to register</a>.';
+	$lang['auth_login_message_no_register']				= 'Sign in to your %s account using your email address and password.';
 	$lang['auth_login_email_placeholder']				= 'Your registered email address';
 	$lang['auth_login_pass_placeholder']				= 'Your password';
 	$lang['auth_login_label_remember_me']				= 'Remember Me';
@@ -71,6 +72,7 @@
 	$lang['auth_social_email_in_use']					= '<strong>You\'ve been here before?</strong> We noticed that the email associated with your %1$s account is already registered with %2$s. In order to use %1$s to sign in you\'ll need to link your accounts via your Settings page. Log in below using your email address and we\'ll get you started.';
 	$lang['auth_social_linked_ok']						= '<strong>Success</strong>, your %s account is now linked.';
 	$lang['auth_social_register_ok']					= '<strong>Hi, %s!</strong> Your account has been set up and is ready to be used.';
+	$lang['auth_social_register_disabled']				= '<strong>Sorry,</strong> new registrations are not permitted.';
 	
 	// --------------------------------------------------------------------------
 	

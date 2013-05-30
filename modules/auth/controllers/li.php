@@ -301,8 +301,18 @@ class NAILS_Li extends NAILS_Auth_Controller
 		
 		if ( ! $_user ) :
 		
-			//	OK, fine, this is a new user!
-			$this->_create_user( $access_token );
+			//	OK, fine, this is a new user! Registerm buyt only if registration is allowed
+			if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+
+				$this->_create_user( $access_token );
+
+			else :
+
+				//	Registration is not enabled, fail with error
+				$this->session->set_flashdata( 'error', lang( 'auth_social_register_disabled' ) );
+				$this->_redirect( $this->_return_to_fail );
+
+			endif;
 		
 		else :
 		
@@ -572,7 +582,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 				
 				else :
 				
-					$_group_id = APP_DEFAULT_GROUP;
+					$_group_id = APP_USER_DEFAULT_GROUP;
 				
 				endif;
 				

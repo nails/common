@@ -33,7 +33,7 @@
 	$lang['email_index_thead_clicks']	= 'Clicks';
 	$lang['email_index_thead_actions']	= 'Actions';
 	$lang['email_index_subject']		= 'Subject: %s';
-	$lang['email_index_queued']			= 'Queued for sending';
+	$lang['email_index_queued']			= 'Queued';
 	$lang['email_index_noemail']		= 'No Emails Found';
 	
 	// --------------------------------------------------------------------------
