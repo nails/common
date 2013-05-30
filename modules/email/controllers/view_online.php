@@ -28,7 +28,7 @@ class View_Online extends NAILS_Email_Controller
 		
 		$_ref	= $this->uri->segment( 3, 'NULL' );
 		
-		if ( $this->user->is_superuser() ) :
+		if ( $this->user->is_admin() ) :
 		
 			$_guid	= FALSE;
 			$_hash	= FALSE;
