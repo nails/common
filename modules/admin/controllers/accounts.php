@@ -485,7 +485,6 @@ class NAILS_Accounts extends Admin_Controller {
 			// --------------------------------------------------------------------------
 			
 			//	Define user table rules 
-			$this->form_validation->set_rules( 'group_id',		lang( 'accounts_edit_basic_field_group_label' ),		'xss_clean|required|is_natural_no_zero' );			
 			$this->form_validation->set_rules( 'email',			lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
 			$this->form_validation->set_rules( 'username',		lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
 			$this->form_validation->set_rules( 'first_name',	lang( 'form_label_first_name' ),						'xss_clean|required' );
@@ -647,25 +646,8 @@ class NAILS_Accounts extends Admin_Controller {
 			
 			// --------------------------------------------------------------------------
 			
-			//	Will there be any admins left after this update?
-			//	If current update is either super users or admin then no DB check is nessecary
-			
-			if ( $_post['group_id'] != 1 && $_post['group_id'] != 2 ) :
-			
-				$this->db->where( 'group_id', 1 );
-				$this->db->or_where( 'group_id', 2 );
-				$_admins = ( $this->db->count_all_results( 'user' ) ) ? TRUE : FALSE;
-				
-			else :
-			
-				$_admins = TRUE;
-				
-			endif;
-			
-			// --------------------------------------------------------------------------
-			
 			//	Data is valid and there'll be some form of admin after the update; ALL GOOD :]
-			if ( $this->form_validation->run( $this ) && $_admins && ! $_failed ) :
+			if ( $this->form_validation->run( $this ) && ! $_failed ) :
 			
 				//	Define the data var
 				$_data = array();
@@ -701,7 +683,6 @@ class NAILS_Accounts extends Admin_Controller {
 				if ( ! isset( $this->data['upload_error'] ) ) :
 				
 					//	Set basic data
-					$_data['group_id']		= $_post['group_id'];
 					$_data['temp_pw']		= string_to_boolean( $_post['temp_pw'] );
 					$_data['first_name']	= $_post['first_name'];
 					$_data['last_name']		= $_post['last_name'];

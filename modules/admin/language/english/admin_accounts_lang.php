@@ -80,15 +80,15 @@
 	
 	$lang['accounts_edit_actions_legend']	= 'Actions';
 	
+	$lang['accounts_edit_password_legend']							= 'Password';
+	$lang['accounts_edit_password_field_password_label']			= 'Reset Password';
+	$lang['accounts_edit_password_field_password_placeholder']		= 'Reset the user\'s password by specifying a new one here';
+	$lang['accounts_edit_password_field_password_tip']				= 'The user will NOT be informed of any password changes';
+	$lang['accounts_edit_password_field_temp_pw_label']				= 'Update on next log in';
+	$lang['accounts_edit_password_field_temp_pw_yes']				= '<strong>Yes</strong>, require user to update password on next log in.';
+	$lang['accounts_edit_password_field_temp_pw_no']				= '<strong>No</strong>, do not require user to update password on next log in.';
+
 	$lang['accounts_edit_basic_legend']							= 'Basic Information';
-	$lang['accounts_edit_basic_field_group_label']				= 'User Group';
-	$lang['accounts_edit_basic_field_group_tip']				= 'Specify to which group this user belongs';
-	$lang['accounts_edit_basic_field_password_label']			= 'Reset Password';
-	$lang['accounts_edit_basic_field_password_placeholder']		= 'Reset the user\'s password by specifying a new one here';
-	$lang['accounts_edit_basic_field_password_tip']				= 'The user will NOT be informed of any password changes';
-	$lang['accounts_edit_basic_field_temp_pw_label']			= 'Update on next log in';
-	$lang['accounts_edit_basic_field_temp_pw_yes']				= '<strong>Yes</strong>, require user to update password on next log in.';
-	$lang['accounts_edit_basic_field_temp_pw_no']				= '<strong>No</strong>, do not require user to update password on next log in.';
 	$lang['accounts_edit_basic_field_first_placeholder']		= 'The user\'s first name';
 	$lang['accounts_edit_basic_field_last_placeholder']			= 'The user\'s surname';
 	$lang['accounts_edit_basic_field_email_placeholder']		= 'The user\'s email address';
