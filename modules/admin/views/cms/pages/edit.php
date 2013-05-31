@@ -68,6 +68,22 @@
 				</label>
 			</li>
 		</ul>
+		<p id="cms-page-edit-sidebar-width">
+			<label>
+				Sidebar Width:
+				<?php
+
+					$_columns = array();
+					for( $i=1; $i<=8; $i++ ) :
+
+						$_columns[$i] = $i . ' columns';
+
+					endfor;
+					echo form_dropdown( 'sidebar_width', $_columns, set_value( 'sidebar_width', $cmspage->sidebar_width ) );
+
+				?>
+			</label>
+		</p>
 	</fieldset>
 	
 	<?php
@@ -176,6 +192,7 @@
 					$( '#cms-page-edit-hero' ).show();
 					$( '#cms-page-edit-body' ).show();
 					$( '#cms-page-edit-sidebar' ).show();
+					$( '#cms-page-edit-sidebar-width' ).show();
 
 				break;
 
@@ -186,6 +203,7 @@
 					$( '#cms-page-edit-hero' ).show();
 					$( '#cms-page-edit-body' ).show();
 					$( '#cms-page-edit-sidebar' ).hide();
+					$( '#cms-page-edit-sidebar-width' ).hide();
 
 				break;
 
@@ -197,6 +215,7 @@
 					$( '#cms-page-edit-hero' ).hide();
 					$( '#cms-page-edit-body' ).show();
 					$( '#cms-page-edit-sidebar' ).show();
+					$( '#cms-page-edit-sidebar-width' ).show();
 
 				break;
 
@@ -207,6 +226,7 @@
 					$( '#cms-page-edit-hero' ).hide();
 					$( '#cms-page-edit-body' ).show();
 					$( '#cms-page-edit-sidebar' ).hide();
+					$( '#cms-page-edit-sidebar-width' ).hide();
 
 				break;
 

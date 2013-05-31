@@ -7,10 +7,10 @@
 	
 		<!--	META	-->
 		<meta charset="utf-8">
-		<title><?=isset( $page->title ) ? $page->title . ' - ' : NULL?><?=APP_NAME?></title>
+		<title><?=isset( $page->title ) && $page->title ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="description" content="">
-		<meta name="author" content="">
+		<meta name="description" content="<?=isset( $page->description ) && $page->description ? $page->description : ''?>">
+		<meta name="description" content="<?=isset( $page->keywords ) && $page->keywords ? $page->keywords : ''?>">
 		
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
@@ -21,15 +21,11 @@
 		</script>
 		
 		<!--	STYLES	-->
-		<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
-		
-		<!--	JAVASCRIPT	-->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-		<script>!window.jQuery && document.write('<script src="<?=NAILS_URL?>jquery.min.js"><\/script>')</script>
-		
-		<script src="<?=NAILS_URL?>js/nails.default.min.js"></script>
-		<script src="<?=NAILS_URL?>js/jquery.tipsy.min.js"></script>
+		<?php
+
+			$this->asset->output();
+
+		?>
 		
 		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
 		<!--[if lt IE 9]>

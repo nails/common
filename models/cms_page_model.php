@@ -218,7 +218,7 @@ class Cms_page_model extends NAILS_Model
 	
 	public function get_all( $include_widgets = FALSE, $include_deleted = FALSE )
 	{
-		$this->db->select( 'p.id,p.slug,p.title,p.layout,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
+		$this->db->select( 'p.id,p.slug,p.title,p.layout,p.sidebar_width,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
 		
 		$this->db->join( 'user u', 'u.id = p.modified_by', 'LEFT' );
@@ -273,8 +273,9 @@ class Cms_page_model extends NAILS_Model
 	
 	private function _format_page_object( &$page )
 	{
-		$page->id			= (int) $page->id;
-		$page->is_deleted	= (bool) $page->is_deleted;
+		$page->id				= (int) $page->id;
+		$page->sidebar_width	= (int) $page->sidebar_width;
+		$page->is_deleted		= (bool) $page->is_deleted;
 		
 		// --------------------------------------------------------------------------
 		

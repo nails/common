@@ -221,15 +221,27 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Meta Defaults - these appear in the header files
-		$this->data['title']		= $this->config->item( 'title' );
-		$this->data['description']	= $this->config->item( 'description' );
-		$this->data['keywords']		= $this->config->item( 'keywords' );
+		//	Other defaults
+		$this->data['page']					= new stdClass();
+		$this->data['page']->title			= $this->config->item( 'title' );
+		$this->data['page']->description	= $this->config->item( 'description' );
+		$this->data['page']->keywords		= $this->config->item( 'keywords' );
 		
 		// --------------------------------------------------------------------------
-		
-		//	Other defaults
-		$this->data['page']	= new stdClass();
+
+		//	Default assets
+		$this->asset->load( 'nails.default.css', TRUE );
+		$this->asset->load( 'jquery.min.js', TRUE );
+		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
+		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
+		$this->asset->load( 'nails.default.min.js', TRUE );
+
+		//	App assets
+		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
+
+			$this->asset->load( 'styles.css' );
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

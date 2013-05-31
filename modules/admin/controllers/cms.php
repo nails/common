@@ -227,6 +227,7 @@ class Cms extends Admin_Controller {
 				$_data->title			= $this->input->post( 'title' );
 				$_data->slug			= $this->input->post( 'slug' );
 				$_data->layout			= $this->input->post( 'layout' );
+				$_data->sidebar_width	= $this->input->post( 'sidebar_width' );
 				$_data->seo_description	= $this->input->post( 'seo_description' );
 				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 

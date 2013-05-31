@@ -277,7 +277,7 @@ class Asset {
 	 **/
 	public function get_loaded()
 	{
-		$loaded = NULL;
+		$loaded				= new stdClass();
 		$loaded->css		= $this->css;
 		$loaded->js			= $this->js;
 		$loaded->css_inline	= $this->css_inline;
