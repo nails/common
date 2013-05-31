@@ -46,31 +46,43 @@
 
 		echo '<hr />';
 
-		echo 'Show:';
+		echo 'Status:';
 		echo '<label>';
 		echo form_checkbox( 'show[verified]', TRUE, ( isset( $search->show['verified'] ) && $search->show['verified'] ) );
-		echo 'Verified Orders';
+		echo 'Verified';
 		echo '</label>';
 
 		echo '<label>';
 		echo form_checkbox( 'show[pending]', TRUE, ( isset( $search->show['pending'] ) && $search->show['pending'] ) );
-		echo 'Pending Orders';
+		echo 'Pending';
 		echo '</label>';
 
 		echo '<label>';
 		echo form_checkbox( 'show[abandoned]', TRUE, ( isset( $search->show['abandoned'] ) && $search->show['abandoned'] ) );
-		echo 'Abandoned Orders';
+		echo 'Abandoned';
 		echo '</label>';
 
 		echo '<label>';
 		echo form_checkbox( 'show[cancelled]', TRUE, ( isset( $search->show['cancelled'] ) && $search->show['cancelled'] ) );
-		echo 'Cancelled Orders';
+		echo 'Cancelled';
 		echo '</label>';
 
 		echo '<label>';
 		echo form_checkbox( 'show[failed]', TRUE, ( isset( $search->show['failed'] ) && $search->show['failed'] ) );
-		echo 'Failed Orders';
+		echo 'Failed';
 		echo '</label>';
+
+		echo '<span style="margin-left:10px;">Fulfilled:</span>';
+		echo '<label>';
+		echo form_checkbox( 'fulfilled[fulfilled]', TRUE, ( isset( $search->fulfilled['fulfilled'] ) && $search->fulfilled['fulfilled'] ) );
+		echo 'Yes';
+		echo '</label>';
+
+		echo '<label>';
+		echo form_checkbox( 'fulfilled[unfulfilled]', TRUE, ( isset( $search->fulfilled['unfulfilled'] ) && $search->fulfilled['unfulfilled'] ) );
+		echo 'No';
+		echo '</label>';
+
 
 		echo anchor( uri_string() . '?reset=true', lang( 'action_reset' ), 'class="awesome small right"' );
 		echo form_submit( 'submit', lang( 'action_search' ), 'class="awesome small right"' );

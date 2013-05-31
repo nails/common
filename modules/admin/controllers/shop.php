@@ -227,28 +227,63 @@ class Shop extends Admin_Controller {
 		$this->session->set_userdata( $_hash . 'order', $_order[1] );
 		
 		//	Set values for the page
-		$this->data['search']			= new stdClass();
-		$this->data['search']->per_page	= $_limit[0];
-		$this->data['search']->sort		= $_order[0];
-		$this->data['search']->order	= $_order[1];
-		$this->data['search']->show		= $this->input->get( 'show' );
-
+		$this->data['search']				= new stdClass();
+		$this->data['search']->per_page		= $_limit[0];
+		$this->data['search']->sort			= $_order[0];
+		$this->data['search']->order		= $_order[1];
+		$this->data['search']->show			= $this->input->get( 'show' );
+		$this->data['search']->fulfilled	= $this->input->get( 'fulfilled' );
+		
 		// --------------------------------------------------------------------------
 
 		//	Prepare the where
-		if ( $this->data['search']->show ) :
+		if ( $this->data['search']->show || $this->data['search']->fulfilled ) :
 
-			$_where = '( `o`.`status` IN (';
+			$_where = '( ';
 
-				$_statuses = array_keys( $this->data['search']->show );
-				foreach ( $_statuses AS &$stat ) :
+			if ( $this->data['search']->show ) :
 
-					$stat = strtoupper( $stat );
+				$_where .= '`o`.`status` IN (';
 
-				endforeach;
-				$_where .= "'" . implode( "','", $_statuses ) . "'";
+					$_statuses = array_keys( $this->data['search']->show );
+					foreach ( $_statuses AS &$stat ) :
 
-			$_where .= '))';
+						$stat = strtoupper( $stat );
+
+					endforeach;
+					$_where .= "'" . implode( "','", $_statuses ) . "'";
+
+				$_where .= ')';
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			if ( $this->data['search']->show && $this->data['search']->fulfilled ) :
+
+				$_where .= ' AND ';
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			if ( $this->data['search']->fulfilled ) :
+
+				$_where .= '`o`.`fulfilment_status` IN (';
+
+					$_statuses = array_keys( $this->data['search']->fulfilled );
+					foreach ( $_statuses AS &$stat ) :
+
+						$stat = strtoupper( $stat );
+
+					endforeach;
+					$_where .= "'" . implode( "','", $_statuses ) . "'";
+
+				$_where .= ')';
+
+			endif;
+
+			$_where .= ')';
 
 		else :
 

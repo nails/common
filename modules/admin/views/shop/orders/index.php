@@ -2,8 +2,6 @@
 	<p>
 		Browse all orders which have been processed by the site from this page.
 	</p>
-	
-	<hr />
 
 	<?php
 	
