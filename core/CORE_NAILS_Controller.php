@@ -41,12 +41,19 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Define constants (set defaults if not already set)
-		$this->_default_constants();
+		$this->_define_constants();
 
 		// --------------------------------------------------------------------------
 		
 		//	Is Nails in maintenance mode?
 		$this->_maintenance_mode();
+
+		// --------------------------------------------------------------------------
+
+		//	If we're on a staging environment then prompt for a password;
+		//	but only if a password has been defined in app.php
+
+		$this->_staging();
 		
 		// --------------------------------------------------------------------------
 		
@@ -107,7 +114,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _default_constants()
+	protected function _define_constants()
 	{
 		//	Define the Nails version constant
 		define( 'NAILS_VERSION',	'0.0.0' );
@@ -127,6 +134,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_DEFAULT_LANG_SAFE' ) )			define( 'APP_DEFAULT_LANG_SAFE',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
+		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
+		if ( ! defined( 'APP_STAGING_PASSWORD' ) )			define( 'APP_STAGING_PASS',				'' );
 
 	}
 
@@ -173,6 +182,80 @@ class CORE_NAILS_Controller extends MX_Controller {
 		 	endif;
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _staging()
+	{
+		if ( ENVIRONMENT == 'development' && APP_STAGING_PASS ) :
+
+			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
+
+				$this->_staging_request_credentials();
+
+			endif;
+
+			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
+
+				if ( APP_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || APP_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) :
+
+					$this->_staging_request_credentials();
+
+				endif;
+
+			else :
+
+				$this->_staging_request_credentials();
+
+			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _staging_request_credentials()
+	{
+		header( 'WWW-Authenticate: Basic realm="' . APP_NAME . ' Staging Area"' );
+		header( 'HTTP/1.0 401 Unauthorized' );
+		?>
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<title><?=APP_NAME?> - Unauthorised</title>
+				<meta charset="utf-8">
+				
+				<!--	STYLES	-->
+				<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
+				
+				<style type="text/css">
+				
+					#main-col
+					{
+						text-align:center;
+						margin-top:100px;
+					}
+				
+				</style>
+				
+			</head>
+			<body>
+				<div class="container row">
+					<div class="six columns first last offset-by-five" id="main-col">
+						<h1>unauthorised</h1>
+						<hr />
+						<p>This staging environment restrticted to authorised users only.</p>
+					</div>
+				</div>	
+			</body>
+		</html>
+		<?php
+		exit( 0 );
 	}
 
 
