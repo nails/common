@@ -59,6 +59,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		//	Do we need to instanciate the database?
 		$this->_instanciate_db();
+
+		// --------------------------------------------------------------------------
+
+		//	Instanciate the user model
+		$this->_instanciate_user();
 		
 		// --------------------------------------------------------------------------
 		
@@ -69,11 +74,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		//	Profiling
 		$this->_instanciate_profiler();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Instanciate the user model
-		$this->_instanciate_user();
 
 		// --------------------------------------------------------------------------
 		
@@ -127,6 +127,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
 		if ( ! defined( 'APP_EMAL_FROM_NAME' ) )			define( 'APP_EMAL_FROM_NAME',			APP_NAME );
 		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
+
 		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
 		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
@@ -135,7 +136,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
-		if ( ! defined( 'APP_STAGING_PASSWORD' ) )			define( 'APP_STAGING_PASS',				'' );
+		if ( ! defined( 'APP_STAGING_PASSWORD' ) )			define( 'APP_STAGING_PASSWORD',				'' );
 
 	}
 
