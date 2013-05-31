@@ -7,7 +7,7 @@
 		
 		if ( array_search( $user_edit->group_id, array( 0, 1 ) ) === FALSE && $user_edit->group_id != active_user( 'group_id' ) ) :
 		
-			echo login_as_button( $user_edit->id, $user_edit->password, lang( 'admin_login_as' ) . ' ' . $user_edit->first_name, 'class="awesome"' );
+			echo login_as_button( $user_edit->id, $user_edit->password, lang( 'admin_login_as' ) . ' ' . $user_edit->first_name, 'class="awesome" target="_parent"' );
 		
 		endif;
 		

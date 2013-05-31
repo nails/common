@@ -310,7 +310,7 @@ class Shop_order_model extends NAILS_Model
 	 * @param none
 	 * @return array
 	 **/
-	public function get_all()
+	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		$this->db->select( 'o.*' );
 		$this->db->select( 'u.email, um.first_name, um.last_name, um.gender, um.profile_img' );
@@ -319,14 +319,31 @@ class Shop_order_model extends NAILS_Model
 		$this->db->select( 'v.code v_code,v.label v_label, v.type v_type, v.discount_type v_discount_type, v.discount_value v_discount_value, v.discount_application v_discount_application' );
 		$this->db->select( 'v.product_type_id v_product_type_id, v.is_active v_is_active, v.is_deleted v_is_deleted, v.valid_from v_valid_from, v.valid_to v_valid_to' );
 		$this->db->select( 'sm.courier sm_courier, sm.method sm_method' );
+
+		// --------------------------------------------------------------------------
 		
-		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
-		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
-		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
-		$this->db->join( 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
-		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
-		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		//	Set Order
+		if ( is_array( $order ) ) :
+
+			$this->db->order_by( $order[0], $order[1] );
+
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Limit
+		if ( is_array( $limit ) ) :
+
+			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		//	Build conditionals
+		$this->_getcount_orders_common( $where, $search );
+
+		// --------------------------------------------------------------------------
 		
 		$_orders = $this->db->get( 'shop_order o' )->result();
 		
@@ -343,6 +360,167 @@ class Shop_order_model extends NAILS_Model
 		endforeach;
 		
 		return $_orders;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Counts the total amount of orders for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_all() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_orders( $where = NULL, $search = NULL )
+	{
+		$this->_getcount_orders_common( $where, $search );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		return $this->db->count_all_results( 'shop_order o' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _getcount_orders_common( $where = NULL, $search = NULL )
+	{
+		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
+		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
+		$this->db->join( 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
+		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Where
+		if ( $where ) :
+		
+			$this->db->where( $where );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Search
+		if ( $search && is_string( $search ) ) :
+		
+			//	Search is a simple string, no columns are being specified to search across
+			//	so define a default set to search across
+			
+			$search								= array( 'keywords' => $search, 'columns' => array() );
+			$search['columns']['id']			= 'o.id';
+			$search['columns']['ref']			= 'o.ref';
+			$search['columns']['user_id']		= 'o.user_id';
+			$search['columns']['user_email']	= 'o.user_email';
+			$search['columns']['pp_txn_id']		= 'o.pp_txn_id';
+			
+		endif;
+		
+		//	If there is a search term to use then build the search query
+		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
+		
+			//	Parse the keywords, look for specific column searches
+			preg_match_all('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', $search['keywords'], $_matches );
+			
+			if ( $_matches[1] && $_matches[2] ) :
+			
+				$_specifics = array_combine( $_matches[1], $_matches[2] );
+				
+			else :
+			
+				$_specifics = array();
+			
+			endif;
+			
+			//	Match the specific labels to a column
+			if ( $_specifics ) :
+			
+				$_temp = array();
+				foreach ( $_specifics AS $col => $value ) :
+				
+					if ( isset( $search['columns'][ strtolower( $col )] ) ) :
+						
+						$_temp[] = array(
+							'cols'	=> $search['columns'][ strtolower( $col )],
+							'value'	=> $value
+						);
+						
+					endif;
+				
+				endforeach;
+				$_specifics = $_temp;
+				unset( $_temp );
+				
+				// --------------------------------------------------------------------------
+				
+				//	Remove controls from search string
+				$search['keywords'] = preg_replace('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
+			
+			endif;
+			
+			if ( $_specifics ) :
+			
+				//	We have some specifics
+				foreach( $_specifics AS $specific ) :
+				
+					if ( is_array( $specific['cols'] ) ) :
+					
+						$_separator = array_shift( $specific['cols'] );
+						$this->db->like( 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $specific['cols'] ) . ' )', $specific['value'] );
+					
+					else :
+					
+						$this->db->like( $specific['cols'], $specific['value'] );
+					
+					endif;
+				
+				endforeach;
+			
+			endif;
+			
+			
+			// --------------------------------------------------------------------------
+			
+			if ( $search['keywords'] ) : 
+			
+				$_where  = '(';
+				
+				if ( isset( $search[ 'columns' ] ) && $search[ 'columns' ] ) :
+				
+					//	We have some specifics
+					foreach( $search[ 'columns' ] AS $col ) :
+					
+						if ( is_array( $col ) ) :
+						
+							$_separator = array_shift( $col );
+							$_where .= 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $col ) . ' ) LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						else :
+						
+							$_where .= $col . ' LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						endif;
+					
+					endforeach;
+				
+				endif;
+				
+				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+				
+			endif;
+		
+		endif;
 	}
 	
 	

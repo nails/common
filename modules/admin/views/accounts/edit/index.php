@@ -6,7 +6,7 @@
 	echo form_hidden( 'email_orig', $user_edit->email );
 	echo form_hidden( 'username_orig', $user_edit->username );
 	
-	if ( ! $this->input->get( 'inline' ) ) :
+	if ( ! $this->input->get( 'inline' ) || $this->input->get( 'is_fancybox' ) ) :
 	
 		$this->load->view( 'accounts/edit/inc-actions' );
 	
