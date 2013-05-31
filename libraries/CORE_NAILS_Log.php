@@ -40,7 +40,7 @@ class CORE_NAILS_Log extends CI_Log
 				
 				$message	= strtoupper($level).' '.((strtoupper($level) == 'INFO') ? ' -' : '-').' '.date($this->_date_fmt). ' --> '.$msg."\n";
 				
-				$_subject	= '!! Log folders are not writeable on ' . APP_NAME;
+				$_subject	= 'Log folders are not writeable on ' . APP_NAME;
 				$_message	= 'I just tried to write to the log folder for ' . APP_NAME . ' and found them not to be writeable.' . "\n";
 				$_message	.= '' . "\n";
 				$_message	.= 'Get this fixed ASAP - I\'ll bug you every time this happens.' . "\n";

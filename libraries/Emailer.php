@@ -1202,7 +1202,7 @@ class Emailer
 		else :
 		
 			//	Failed to send, notify developers
-			$_subject	= '!! Email #' . $_email->id . ' failed to send at SMTP time';
+			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
 			$_message	= 'Hi,' . "\n";
 			$_message	.= '' . "\n";
 			$_message	.= 'Email #' . $_email->id . ' failed to send at SMTP time' . "\n";

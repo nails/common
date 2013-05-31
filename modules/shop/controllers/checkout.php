@@ -936,7 +936,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Inform developers
-				send_developer_mail( '!! An IPN request failed', 'An IPN request was made which failed secondary verification, Order ID #' . $_paypal['invoice'] );
+				send_developer_mail( 'An IPN request failed', 'An IPN request was made which failed secondary verification, Order ID #' . $_paypal['invoice'] );
 				
 				show_404();
 			
@@ -993,7 +993,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Inform developers
-				send_developer_mail( '!! A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with reason "' . $_paypal['pending_reason'] . '".' );
+				send_developer_mail( 'A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with reason "' . $_paypal['pending_reason'] . '".' );
 				return;
 			
 			endif;

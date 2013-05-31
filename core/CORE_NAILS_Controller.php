@@ -4,6 +4,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected $data;
 	protected $user;
+
+	private $_supported_lang;
 	
 	// --------------------------------------------------------------------------
 	
@@ -21,10 +23,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		parent::__construct();
 
 		// --------------------------------------------------------------------------
-
-		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.0.0' );
-		define( 'NAILS_RELEASED',	'Never Released' );
 		
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
@@ -37,7 +35,107 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 		
+		//	Define data array (used extensively in views)
+		$this->data	= array();
+
+		// --------------------------------------------------------------------------
+
+		//	Define constants (set defaults if not already set)
+		$this->_default_constants();
+
+		// --------------------------------------------------------------------------
+		
 		//	Is Nails in maintenance mode?
+		$this->_maintenance_mode();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Do we need to instanciate the database?
+		$this->_instanciate_db();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Instanciate languages
+		$this->_instanciate_languages();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Profiling
+		$this->_instanciate_profiler();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Instanciate the user model
+		$this->_instanciate_user();
+
+		// --------------------------------------------------------------------------
+		
+		//	Set alerts
+		
+		//	These are hooks for code to add feedback messages to the user.
+		$this->data['notice']	= $this->session->flashdata( 'notice' );
+		$this->data['message']	= $this->session->flashdata( 'message' );
+		$this->data['error']	= $this->session->flashdata( 'error' );
+		$this->data['success']	= $this->session->flashdata( 'success' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Other defaults
+		$this->data['page']					= new stdClass();
+		$this->data['page']->title			= '';
+		$this->data['page']->description	= '';
+		$this->data['page']->keywords		= '';
+		
+		// --------------------------------------------------------------------------
+
+		//	Default assets
+		$this->asset->load( 'nails.default.css', TRUE );
+		$this->asset->load( 'jquery.min.js', TRUE );
+		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
+		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
+		$this->asset->load( 'nails.default.min.js', TRUE );
+
+		//	App assets
+		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
+
+			$this->asset->load( 'styles.css' );
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _default_constants()
+	{
+		//	Define the Nails version constant
+		define( 'NAILS_VERSION',	'0.0.0' );
+		define( 'NAILS_RELEASED',	'Never Released' );
+
+		// --------------------------------------------------------------------------
+
+		//	Default app constants (if not already defined)
+		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
+		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
+		if ( ! defined( 'APP_EMAL_FROM_NAME' ) )			define( 'APP_EMAL_FROM_NAME',			APP_NAME );
+		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
+		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
+		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
+		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
+		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
+		if ( ! defined( 'APP_DEFAULT_LANG_SAFE' ) )			define( 'APP_DEFAULT_LANG_SAFE',		'english' );
+		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
+		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
+
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _maintenance_mode()
+	{
 		if ( NAILS_MAINTENANCE ) :
 
 			$whitelist_ip = explode(',', NAILS_MAINTENANCE_WHITELIST );
@@ -75,10 +173,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		 	endif;
 
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Do we need to instanciate the database?
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _instanciate_db()
+	{
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 		
 			define( 'NAILS_DB_ENABLED', TRUE );
@@ -89,41 +191,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 			define( 'NAILS_DB_ENABLED', FALSE );
 		
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Check App's default language is supported
-		
-		//	Load the language model and set the defaults
-		$this->load->model( 'core_nails_language_model', 'language_model' );
-		
-		//	Check default lang is supported by nails
-		$_supported		= array();
-		$_supported[]	= 'english';
-		
-		if ( array_search( APP_DEFAULT_LANG_SAFE, $_supported ) === FALSE ) :
-		
-	 		header( 'HTTP/1.1 500 Bad Request' );
-			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SAFE . '" is not a supported language.' );
-		
-		endif;
-		
-		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
-		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load the Nails. generic lang file
-		$this->lang->load( 'nails' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Define empty values
-		$this->data	= array();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Profiling
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _instanciate_profiler()
+	{
 		if ( defined( 'PROFILING' ) && PROFILING ) :
 			
 			/**
@@ -140,9 +215,62 @@ class CORE_NAILS_Controller extends MX_Controller {
 			endif;
 		
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _instanciate_languages()
+	{
+		//	Load the language model and set the defaults
+		$this->load->model( 'core_nails_language_model', 'language_model' );
 		
+		//	Check default lang is supported by nails
+		$this->_supported		= array();
+		$this->_supported[]	= 'english';
+		
+		if ( array_search( APP_DEFAULT_LANG_SAFE, $this->_supported ) === FALSE ) :
+		
+	 		header( 'HTTP/1.1 500 Bad Request' );
+			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SAFE . '" is not a supported language.' );
+		
+		endif;
+		
+		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
+		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
+
+		// --------------------------------------------------------------------------
+
+		//	Load the Nails. generic lang file
+		$this->lang->load( 'nails' );
+
 		// --------------------------------------------------------------------------
 		
+		//	Set any global preferences for this user, e.g languages, fall back to
+		//	the app's default language (defined in config.php).
+		
+		$_user_pref = active_user( 'language_setting' );
+		
+		if ( isset( $_user_pref->safe_name ) && $_user_pref->safe_name ) :
+		
+			define( 'RENDER_LANG',		$_user_pref->safe_name );
+			define( 'RENDER_LANG_ID',	$_user_pref->id );
+		
+		else :
+		
+			define( 'RENDER_LANG',		APP_DEFAULT_LANG_SAFE );
+			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
+		
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _instanciate_user()
+	{
 		//	Load the generic user model
 		$this->load->model( 'CORE_NAILS_user_model' );
 		
@@ -189,79 +317,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		$this->user->find_remembered_user();
 		$this->user->init();
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set any global preferences for this user, e.g languages, fall back to
-		//	the app's default language (defined in config.php).
-		
-		$_user_pref = active_user( 'language_setting' );
-		
-		if ( isset( $_user_pref->safe_name ) && $_user_pref->safe_name ) :
-		
-			define( 'RENDER_LANG',		$_user_pref->safe_name );
-			define( 'RENDER_LANG_ID',	$_user_pref->id );
-		
-		else :
-		
-			define( 'RENDER_LANG',		APP_DEFAULT_LANG_SAFE );
-			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set alerts
-		
-		//	These are hooks for code to add feedback messages to the user.
-		$this->data['notice']	= $this->session->flashdata( 'notice' );
-		$this->data['message']	= $this->session->flashdata( 'message' );
-		$this->data['error']	= $this->session->flashdata( 'error' );
-		$this->data['success']	= $this->session->flashdata( 'success' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Other defaults
-		$this->data['page']					= new stdClass();
-		$this->data['page']->title			= $this->config->item( 'title' );
-		$this->data['page']->description	= $this->config->item( 'description' );
-		$this->data['page']->keywords		= $this->config->item( 'keywords' );
-		
-		// --------------------------------------------------------------------------
-
-		//	Default assets
-		$this->asset->load( 'nails.default.css', TRUE );
-		$this->asset->load( 'jquery.min.js', TRUE );
-		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
-		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
-		$this->asset->load( 'nails.default.min.js', TRUE );
-
-		//	App assets
-		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
-
-			$this->asset->load( 'styles.css' );
-
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		/**
-		 * SANDBOX
-		 * 
-		 * This is where you should test your code; all user data has been loaded
-		 * and the module constructor is about to be called.
-		 * 
-		 * DO NOT COMMIT CODE HERE TO THE REPO ONLY USE THIS LOCALLY!
-		 * 
-		 * - Pablo
-		 * 
-		 **/
-		
-		
-		
-		
-		
-		// END SANDBOX
 	}
 }
 

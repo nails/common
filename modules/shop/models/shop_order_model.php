@@ -838,7 +838,7 @@ class Shop_order_model extends NAILS_Model
 			$_logger( '!! Failed to send download links, alerting developers' );
 			$_logger( implode( "\n", $this->emailer->get_errors() ) );
 			
-			send_developer_mail( '!! Unable to send download email', 'Unable to send the email with download links to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+			send_developer_mail( 'Unable to send download email', 'Unable to send the email with download links to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 		
 		endif;
 	}
@@ -897,7 +897,7 @@ class Shop_order_model extends NAILS_Model
 			$_logger( '!! Failed to send receipt, alerting developers' );
 			$_logger( implode( "\n", $this->emailer->get_errors() ) );
 			
-			send_developer_mail( '!! Unable to send receipt email', 'Unable to send the email receipt to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+			send_developer_mail( 'Unable to send receipt email', 'Unable to send the email receipt to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 			
 			return FALSE;
 		
@@ -978,7 +978,7 @@ class Shop_order_model extends NAILS_Model
 				$_logger( '!! Failed to send order notification, alerting developers.' );
 				$_logger( implode( "\n", $this->emailer->get_errors() ) );
 				
-				send_developer_mail( '!! Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
+				send_developer_mail( 'Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 				
 				return FALSE;
 			
