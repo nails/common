@@ -711,6 +711,26 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
+	public function fulfil( $order_id, $data = array() )
+	{
+		$data['fulfilment_status'] = 'FULFILLED';
+		return $this->update( $order_id, $data );
+	}
+
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function unfulfil( $order_id, $data = array() )
+	{
+		$data['fulfilment_status'] = 'UNFULFILLED';
+		return $this->update( $order_id, $data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
 	public function process( $order, &$logger = NULL )
 	{
 		//	Check to see if a logger object has been passed, if not create
@@ -787,6 +807,21 @@ class Shop_order_model extends NAILS_Model
 			
 			endforeach;
 		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Has the order been fulfilled? If all products in the order are processed
+		//	then consider this order fulfilled.
+
+		$this->db->where( 'order_id', $order->id );
+		$this->db->where( 'processed', FALSE );
+
+		if ( ! $this->db->count_all_results( 'shop_order_product' ) ) :
+
+			//	No unprocessed items, consider order FULFILLED
+			$this->fulfil( $order->id );
+
 		endif;
 		
 		// --------------------------------------------------------------------------
