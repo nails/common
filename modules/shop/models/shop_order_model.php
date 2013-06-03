@@ -802,13 +802,17 @@ class Shop_order_model extends NAILS_Model
 	{
 		//	Generate links for all the items
 		$_urls		= array();
+		$_ids		= array();
 		$_expires	= 172800; //	48 hours
+
 		foreach( $items AS $item ) :
 		
 			$_temp			= new stdClass();
 			$_temp->title	= $item->title;
 			$_temp->url		= cdn_expiring_url( $item->meta->download_bucket, $item->meta->download_filename, $_expires ) . '&dl=1';
 			$_urls[]		= $_temp;
+
+			$_ids[]			= $item->id;
 			
 			unset( $_temp );
 		
@@ -832,7 +836,14 @@ class Shop_order_model extends NAILS_Model
 		$_email->data['expires']		= $_expires;
 		$_email->data['urls']			= $_urls;
 		
-		if ( ! $this->emailer->send( $_email, TRUE ) ) :
+		if ( $this->emailer->send( $_email, TRUE ) ) :
+
+			//	MArk items as processed
+			$this->db->set( 'processed', TRUE );
+			$this->db->where_in( 'id', $_ids );
+			$this->db->update( 'shop_order_product' );
+
+		else :
 		
 			//	Email failed to send, alert developers
 			$_logger( '!! Failed to send download links, alerting developers' );
