@@ -328,9 +328,9 @@ class Blog_post_model extends NAILS_Model
 	 * @param bool $only_published Whether to include drafts in the results or not
 	 * @return array
 	 **/
-	public function get_all( $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	public function get_all( $only_published = TRUE, $include_body = FALSE, $include_gallery = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
 		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
 		
 		if ( $include_body ) :
@@ -381,6 +381,21 @@ class Blog_post_model extends NAILS_Model
 			$this->db->group_by( 't.id' );
 			$this->db->order_by( 't.label' );
 			$post->tags = $this->db->get( 'blog_post_tag pt' )->result();
+
+			// --------------------------------------------------------------------------
+
+			//	Fetch associated Images
+			if ( $include_gallery ) :
+
+				$this->db->where( 'post_id', $post->id );
+				$this->db->order_by( 'order' );
+				$post->gallery = $this->db->get( 'blog_post_image' )->result();
+
+			else :
+
+				$post->gallery = array();
+
+			endif;
 		
 		endforeach;
 		
@@ -434,7 +449,7 @@ class Blog_post_model extends NAILS_Model
 	public function get_by_id( $id )
 	{
 		$this->db->where( 'bp.id', $id );
-		$_result = $this->get_all( FALSE, TRUE, FALSE );
+		$_result = $this->get_all( FALSE, TRUE, TRUE, FALSE );
 		
 		// --------------------------------------------------------------------------
 		
@@ -460,7 +475,7 @@ class Blog_post_model extends NAILS_Model
 	public function get_by_slug( $slug )
 	{
 		$this->db->where( 'bp.slug', $slug );
-		$_result = $this->get_all( FALSE, TRUE, TRUE );
+		$_result = $this->get_all( FALSE, TRUE, TRUE, FALSE );
 		
 		// --------------------------------------------------------------------------
 		
