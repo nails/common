@@ -136,7 +136,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
-		if ( ! defined( 'APP_STAGING_PASSWORD' ) )			define( 'APP_STAGING_PASSWORD',				'' );
+		if ( ! defined( 'APP_STAGING_PASS' ) )				define( 'APP_STAGING_PASS',				'' );
 
 	}
 
