@@ -4,7 +4,7 @@
 	if ( $post->gallery_type == 'fancy' ) :
 
 		//	This is a simple list of thumbnails with a fancybox gallery
-		echo '<ul class="gallery fancy">';
+		echo '<ul class="gallery fancy clearfix">';
 		foreach ( $post->gallery AS $slide ) :
 
 			echo '<li class="slide">';
