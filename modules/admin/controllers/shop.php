@@ -173,15 +173,31 @@ class Shop extends Admin_Controller {
 	
 	// --------------------------------------------------------------------------
 	
+
+	public function orders()
+	{
+		switch( $this->uri->segment( '4' ) ) :
+
+			case 'view' :		$this->_orders_view();		break;
+			case 'process' :	$this->_orders_process();	break;
+			case 'index' :
+			default :			$this->_orders_index();		break;
+
+		endswitch;
+	}
+
 	
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Manage orders
 	 *
-	 * @access public
+	 * @access protected
 	 * @param none
 	 * @return void
 	 **/
-	public function orders()
+	protected function _orders_index()
 	{
 		//	Set method info
 		$this->data['page']->title = 'Manage Orders';
@@ -314,6 +330,128 @@ class Shop extends Admin_Controller {
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/orders/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * View order
+	 *
+	 * @access protected
+	 * @param none
+	 * @return void
+	 **/
+	protected function _orders_view()
+	{
+		//	Fetch and check order
+		$this->load->model( 'shop/shop_order_model', 'order' );
+
+		$this->data['order'] = $this->order->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $this->data['order'] ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> no order exists by that ID.' );
+			redirect( 'admin/shop/orders' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fulfilled?
+		$this->load->helper( 'date' );
+		if ( $this->data['order']->fulfilment_status == 'UNFULFILLED' ) :
+
+			$this->data['message'] = '<strong>This order has not been fulfilled; order was placed ' . nice_time( strtotime( $this->data['order']->created ) ) . '</strong><br />Once all purchased items are marked as processed the order will be automatically marked as fulfilled.';
+
+		elseif ( ! $this->data['success'] ):
+
+			$this->data['success'] = '<strong>This order was fulfilled ' . nice_time( strtotime( $this->data['order']->fulfilled ) ) . '</strong>';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set method info
+		$this->data['page']->title = 'View Order &rsaquo; ' . $this->data['order']->ref;
+		
+		// --------------------------------------------------------------------------
+		
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/orders/view',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _orders_process()
+	{
+		$_order_id		= $this->uri->segment( 5 );
+		$_product_id	= $this->uri->segment( 6 );
+		$_is_fancybox	= $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true' : '';
+
+		// --------------------------------------------------------------------------
+
+		//	Update item
+		if ( $this->uri->segment( 7 ) == 'processed' ) :
+
+			$this->db->set( 'processed', TRUE );
+
+		else :
+
+			$this->db->set( 'processed', FALSE );
+
+		endif;
+
+		$this->db->where( 'order_id',	$_order_id );
+		$this->db->where( 'id',			$_product_id );
+
+		$this->db->update( 'shop_order_product' );
+
+		if ( $this->db->affected_rows() ) :
+
+			//	Product updated, check if order has been fulfilled
+			$this->db->where( 'order_id', $_order_id );
+			$this->db->where( 'processed', FALSE );
+
+			if ( ! $this->db->count_all_results( 'shop_order_product' ) ) :
+
+				//	No unprocessed items, consider order FULFILLED
+				$this->load->model( 'shop/shop_order_model', 'order' );
+				$this->order->fulfil( $_order_id );
+
+			else :
+
+				//	Still some unprocessed items, amrk as unfulfilled (in case it was already fulfilled)
+				$this->load->model( 'shop/shop_order_model', 'order' );
+				$this->order->unfulfil( $_order_id );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product\'s status was updated successfully.' );
+			redirect( 'admin/shop/orders/view/' . $_order_id . $_is_fancybox );
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I was not able to update the status of that product.' );
+			redirect( 'admin/shop/orders/view/' . $_order_id . $_is_fancybox );
+
+		endif;
 	}
 	
 	

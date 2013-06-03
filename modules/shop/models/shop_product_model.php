@@ -258,7 +258,7 @@ class Shop_product_model extends NAILS_Model
 		endif;
 		
 		$_products = $this->db->get( $this->_table . ' p' )->result();
-	
+		
 		// --------------------------------------------------------------------------
 		
 		foreach ( $_products AS $product ) :

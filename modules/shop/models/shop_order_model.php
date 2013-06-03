@@ -713,7 +713,9 @@ class Shop_order_model extends NAILS_Model
 	
 	public function fulfil( $order_id, $data = array() )
 	{
-		$data['fulfilment_status'] = 'FULFILLED';
+		$data['fulfilment_status']	= 'FULFILLED';
+		$data['fulfilled']			= date( 'Y-m-d H:i:s' );
+		
 		return $this->update( $order_id, $data );
 	}
 
@@ -723,7 +725,9 @@ class Shop_order_model extends NAILS_Model
 	
 	public function unfulfil( $order_id, $data = array() )
 	{
-		$data['fulfilment_status'] = 'UNFULFILLED';
+		$data['fulfilment_status']	= 'UNFULFILLED';
+		$data['fulfilled']			= NULL;
+		
 		return $this->update( $order_id, $data );
 	}
 	
@@ -1042,7 +1046,6 @@ class Shop_order_model extends NAILS_Model
 		//	Generic
 		$order->id					= (int) $order->id;
 		$order->requires_shipping	= (bool) $order->requires_shipping;
-		$order->fulfilled			= (bool) $order->fulfilled;
 		
 		// --------------------------------------------------------------------------
 		
@@ -1091,7 +1094,7 @@ class Shop_order_model extends NAILS_Model
 		unset( $order->first_name );
 		unset( $order->last_name );
 		unset( $order->gender );
-		unset( $order->profle_img );
+		unset( $order->profile_img );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1114,8 +1117,8 @@ class Shop_order_model extends NAILS_Model
 		unset( $order->tax_shipping );
 		unset( $order->tax_items );
 		unset( $order->grand_total );
-		unset( $order->dicount_shipping );
-		unset( $order->dicount_items );
+		unset( $order->discount_shipping );
+		unset( $order->discount_items );
 		unset( $order->fees_deducted );
 		
 		// --------------------------------------------------------------------------
@@ -1188,9 +1191,11 @@ class Shop_order_model extends NAILS_Model
 		unset( $order->currency_id );
 		unset( $order->oc_code );
 		unset( $order->oc_symbol );
+		unset( $order->oc_precision );
 		unset( $order->base_currency_id );
 		unset( $order->bc_code );
 		unset( $order->bc_symbol );
+		unset( $order->bc_precision );
 		
 		// --------------------------------------------------------------------------
 		

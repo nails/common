@@ -30,7 +30,7 @@
 					foreach ( $orders->data AS $order ) :
 					
 						?>
-						<tr>
+						<tr id="order-<?=$order->id?>">
 							<td class="id"><?=$order->id?></td>
 							<td class="ref"><?=$order->ref?></td>
 							<td class="customer">
@@ -67,10 +67,29 @@
 							</td>
 							<td class="value"><?=SHOP_BASE_CURRENCY_SYMBOL . number_format( $order->totals->grand, SHOP_BASE_CURRENCY_PRECISION )?></td>
 							<td class="status"><?=$order->status?></td>
-							<td class="fulfilment"><?=$order->fulfilment_status?></td>
+							<?php
+
+								if ( $order->status == 'VERIFIED' ) :
+
+									if ( $order->fulfilment_status == 'FULFILLED' ) :
+
+										echo '<td class="fulfilment yes">' . lang( 'yes' ) . '</td>';
+
+									else :
+
+										echo '<td class="fulfilment no">' . lang( 'no' ) . '</td>';
+
+									endif;
+
+								else :
+
+									echo '<td class="fulfilment">&mdash;</td>';
+
+								endif;
+
+							?>
 							<td class="actions">
-								<?=anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small"' )?>
-								<?=anchor( 'admin/shop/orders/edit/' . $order->id, lang( 'action_edit' ), 'class="awesome small"' )?>
+								<?=anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' )?>
 							</td>
 						</tr>
 						<?php
@@ -96,3 +115,18 @@
 	
 	?>
 </div>
+
+<script	type="text/javascript">
+
+	function mark_fulfilled( order_id )
+	{
+		console.log( 'fulfilling ' + order_id );
+		$( '#order-' + order_id ).find( 'td.fulfilment' ).removeClass( 'no' ).addClass( 'yes' ).text( '<?=lang( 'yes' )?>' );
+	}
+
+	function mark_unfulfilled( order_id )
+	{
+		console.log( 'unfulfilling ' + order_id );
+		$( '#order-' + order_id ).find( 'td.fulfilment' ).removeClass( 'yes' ).addClass( 'no' ).text( '<?=lang( 'no' )?>' );
+	}
+</script>

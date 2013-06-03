@@ -172,6 +172,9 @@ class Shop_voucher_model extends NAILS_Model
 				$this->db->set( 'modified', 'NOW()', FALSE );
 				$this->db->set( 'use_count', 'use_count+1', FALSE );
 
+				$this->db->where( 'id', $voucher->id );
+				$this->db->update( 'shop_voucher' );
+
 			break;
 
 		endswitch;
