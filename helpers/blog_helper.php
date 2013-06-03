@@ -24,5 +24,33 @@ if ( ! function_exists( 'blog_setting' ) )
 	}
 }
 
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Get latest blog posts
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'blog_latest_posts' ) )
+{
+	function blog_latest_posts( $limit = 9 )
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
+		
+			get_instance()->load->model( 'blog/blog_post_model', 'post' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->post->get_latest( $limit );
+	}
+}
+
 /* End of file blog_helper.php */
 /* Location: ./modules/blog/helpers/blog_helper.php */
