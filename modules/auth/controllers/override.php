@@ -111,6 +111,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		$_recovery_data->email				= active_user( 'email' );
 		$_recovery_data->name				= active_user( 'first_name' );
 		$_recovery_data->now_where_was_i	= $this->input->get( 'return_to' );
+		$_recovery_data->back_to_admin_url	= site_url( 'auth/override/login_as/' . $_recovery_data->id . '/' . $_recovery_data->hash );
 		
 		// --------------------------------------------------------------------------
 		
