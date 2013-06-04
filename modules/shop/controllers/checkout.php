@@ -474,6 +474,13 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					$this->voucher->redeem( $_order->voucher->id, $_order );
 
 				endif;
+
+				// --------------------------------------------------------------------------
+
+				//	Destory the basket
+				$this->basket->destroy();
+
+				// --------------------------------------------------------------------------
 				
 				//	Redirect to processing page
 				redirect( shop_setting( 'shop_url' ) . 'checkout/processing?ref=' . $_order->ref );
@@ -694,7 +701,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_unpaid()
+	protected function _processing_unpaid()
 	{
 		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
 	}
@@ -703,7 +710,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_paid()
+	protected function _processing_paid()
 	{
 		$this->data['page']->title	= 'Thanks for your order!';
 		$this->data['success']		= '<strong>Success!</strong> Your order has been processed.';
@@ -719,7 +726,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_failed()
+	protected function _processing_failed()
 	{
 		$this->_processing_error();
 	}
@@ -728,7 +735,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_abandoned()
+	protected function _processing_abandoned()
 	{
 		$this->_processing_error();
 	}
@@ -737,7 +744,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_cancelled()
+	protected function _processing_cancelled()
 	{
 		$this->_processing_error();
 	}
@@ -746,7 +753,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_error()
+	protected function _processing_error()
 	{
 		if ( ! $this->data['error'] ) :
 		
@@ -818,7 +825,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _notify_paypal()
+	protected function _notify_paypal()
 	{
 		//	Configure logger
 		$this->logger->log_dir( shop_setting( 'shop_url' ) . 'notify/paypal' );
@@ -965,7 +972,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$this->logger->line( 'Checking if order has already been processed' );
 			$this->logger->line();
 			
-			if ( $_order->status != 'UNPAID' ) :
+			if ( ENVIRONMENT == 'production' && $_order->status != 'UNPAID' ) :
 			
 				$this->logger->line( 'Order has already been processed, aborting.' );
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
@@ -973,6 +980,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				
 				return;
 			
+			elseif ( ENVIRONMENT != 'production' && $_order->status != 'UNPAID' ) :
+
+				$this->logger->line( 'Order has already been processed, but not on production so continuing anyway.' );
+				$this->logger->line();
+
 			endif;
 			
 			// --------------------------------------------------------------------------
@@ -1011,7 +1023,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				'pp_txn_id'		=> $_paypal['txn_id'],
 				'fees_deducted'	=> $_paypal['mc_fee']
 			);
-			$this->order->verify( $_order->id, $_data );
+			$this->order->paid( $_order->id, $_data );
 			
 			// --------------------------------------------------------------------------
 			
@@ -1071,7 +1083,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _notify_is_testing()
+	protected function _notify_is_testing()
 	{
 		if ( ENVIRONMENT == 'production' )
 			return FALSE;

@@ -7,7 +7,15 @@
  * 
  **/
 
-class Shop_order_model extends NAILS_Model
+/**
+ * OVERLOADING NAILS'S MODELS
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+
+class NAILS_Shop_order_model extends NAILS_Model
 {
 	private $_table;
 	private $_table_product;
@@ -207,6 +215,12 @@ class Shop_order_model extends NAILS_Model
 				$_temp['total']			= $item->total;
 				$_temp['tax_rate_id']	= $item->tax_rate->id;
 				$_temp['was_on_sale']	= $item->is_on_sale;
+
+				if ( isset( $item->extra_data ) && $item->extra_data ) :
+
+					$_temp['extra_data'] = serialize( $item->extra_data );
+
+				endif;
 				
 				$_items[] = $_temp;
 				unset( $_temp );
@@ -582,13 +596,13 @@ class Shop_order_model extends NAILS_Model
 	public function get_items_for_order( $order_id )
 	{
 		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping,op.shipping_tax,op.total' );
-		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
+		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date,op.extra_data' );
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 		
 		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
 		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id' );
+		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 		
 		$this->db->where( 'op.order_id', $order_id );	
 		$_items = $this->db->get( 'shop_order_product op' )->result();
@@ -887,7 +901,7 @@ class Shop_order_model extends NAILS_Model
 		
 		if ( $this->emailer->send( $_email, TRUE ) ) :
 
-			//	MArk items as processed
+			//	Mark items as processed
 			$this->db->set( 'processed', TRUE );
 			$this->db->where_in( 'id', $_ids );
 			$this->db->update( 'shop_order_product' );
@@ -1294,8 +1308,49 @@ class Shop_order_model extends NAILS_Model
 		//	Meta
 		unset( $item->meta->id );
 		unset( $item->meta->product_id );
+
+		// --------------------------------------------------------------------------
+
+		//	Extra data
+		$item->extra_data = $item->extra_data ? unserialize( $item->extra_data ) : NULL;
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS'S MODELS
+ * 
+ * The following block of code makes it simple to extend one of the core shop
+ * models. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_ORDER_MODEL' ) ) :
+
+	class Shop_order_model extends NAILS_Shop_order_model
+	{
+	}
+
+endif;
 
 /* End of file shop_order_model.php */
 /* Location: ./application/models/shop_order_model.php */
