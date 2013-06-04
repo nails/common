@@ -1,4 +1,4 @@
-<div class="container shop processing paid">
+<div class="container shop processing verified">
 	<p>
 		Many thanks for your order, it has been assigned reference <strong><?=$order->ref?></strong>,
 		please quote this reference in any correspondence regarding this order.

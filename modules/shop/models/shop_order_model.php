@@ -610,7 +610,7 @@ class Shop_order_model extends NAILS_Model
 	
 	public function get_for_user( $user_id, $email )
 	{
-		$this->db->where_in( 'o.status', array( 'VERIFIED', 'PENDING' ) );
+		$this->db->where_in( 'o.status', array( 'PAID', 'UNPAID' ) );
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
 		return $this->get_all();
 	}
@@ -637,7 +637,7 @@ class Shop_order_model extends NAILS_Model
 		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id' );
 		
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
-		$this->db->where( 'o.status', 'VERIFIED' );	
+		$this->db->where( 'o.status', 'PAID' );	
 		
 		if ( $type ) :
 		
@@ -691,9 +691,19 @@ class Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function verify( $order_id, $data = array() )
+	public function paid( $order_id, $data = array() )
 	{
-		$data['status'] = 'VERIFIED';
+		$data['status'] = 'PAID';
+		return $this->update( $order_id, $data );	
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function unpaid( $order_id, $data = array() )
+	{
+		$data['status'] = 'UNPAID';
 		return $this->update( $order_id, $data );	
 	}
 	

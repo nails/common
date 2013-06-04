@@ -186,23 +186,7 @@
 				</tr>
 				<tr>
 					<td class="th">Status</td>
-					<?php
-					
-						if ( $order->status == 'VERIFIED' ) :
-						
-							echo '<td class="status paid">PAID</td>';
-						
-						elseif ( $order->status == 'CANCELLED' ) :
-						
-							echo '<td class="status">CANCELLED</td>';
-							
-						else :
-						
-							echo '<td class="status">UNPAID</td>';
-						
-						endif;
-					
-					?>
+					<?='<td class="status ' . strtolower(  $order->status ) . '">' .  $order->status . '</td>'?>
 				</tr>
 			</tbody>
 		</table>

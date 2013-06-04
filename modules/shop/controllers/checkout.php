@@ -445,12 +445,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
-			//	Is the order a zero-value order? If so, just mark it as verified and send
+			//	Is the order a zero-value order? If so, just mark it as paid and send
 			//	to processing immediately
 			
 			if ( $this->data['basket']->totals->grand == 0 ) :
 
-				//	Create order, then set as verified and redirect to processing page
+				//	Create order, then set as paid and redirect to processing page
 				$_order = $this->order->create( $this->data['basket'], TRUE );
 				
 				if ( ! $_order ) :
@@ -461,8 +461,8 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				
 				endif;
 				
-				//	Set as verified
-				$this->order->verify( $_order->id );
+				//	Set as paid
+				$this->order->paid( $_order->id );
 
 				//	Process the order, send receipt and send order notification
 				$this->order->process( $_order );
@@ -680,8 +680,8 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 		switch( $this->data['order']->status ) :
 		
-			case 'PENDING' :	$this->_processing_pending();		break;
-			case 'VERIFIED' :	$this->_processing_verified();		break;
+			case 'UNPAID' :		$this->_processing_unpaid();		break;
+			case 'PAID' :		$this->_processing_paid();			break;
 			case 'FAILED' :		$this->_processing_failed();		break;
 			case 'ABANDONED' :	$this->_processing_abandoned();		break;
 			case 'CANCELLED' :	$this->_processing_cancelled();		break;
@@ -694,16 +694,16 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_pending()
+	private function _processing_unpaid()
 	{
-		$this->load->view( 'shop/checkout/payment/processing/pending', $this->data );
+		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
 	}
 	
 	
 	// --------------------------------------------------------------------------
 	
 	
-	private function _processing_verified()
+	private function _processing_paid()
 	{
 		$this->data['page']->title	= 'Thanks for your order!';
 		$this->data['success']		= '<strong>Success!</strong> Your order has been processed.';
@@ -711,7 +711,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 		
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/verified', $this->data );
+		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 	
@@ -965,7 +965,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$this->logger->line( 'Checking if order has already been processed' );
 			$this->logger->line();
 			
-			if ( $_order->status != 'PENDING' ) :
+			if ( $_order->status != 'UNPAID' ) :
 			
 				$this->logger->line( 'Order has already been processed, aborting.' );
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );

@@ -360,7 +360,7 @@
 				<tr>
 					<th class="details">Details</th>
 					<th class="quantity">Quantity</th>
-					<?php if ( $order->status == 'VERIFIED' ) : ?>
+					<?php if ( $order->status == 'PAID' ) : ?>
 					<th class="processed">Processed</th>
 					<th class="actions">Actions</th>
 					<?php endif; ?>
@@ -378,7 +378,7 @@
 					echo '</th>';
 					echo '<td class="quantity">' . $item->quantity . '</th>';
 
-					if ( $order->status == 'VERIFIED' ) :
+					if ( $order->status == 'PAID' ) :
 
 						$_is_fancybox = $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true' : '';
 
@@ -411,7 +411,7 @@
 
 <?php
 
-	if ( $this->input->get( 'is_fancybox' ) && $order->status == 'VERIFIED' ) :
+	if ( $this->input->get( 'is_fancybox' ) && $order->status == 'PAID' ) :
 
 		echo '<script type="text/javascript">';
 		if ( $order->fulfilment_status == 'FULFILLED' ) :

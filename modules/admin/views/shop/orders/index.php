@@ -69,7 +69,7 @@
 							<td class="status"><?=$order->status?></td>
 							<?php
 
-								if ( $order->status == 'VERIFIED' ) :
+								if ( $order->status == 'PAID' ) :
 
 									if ( $order->fulfilment_status == 'FULFILLED' ) :
 
