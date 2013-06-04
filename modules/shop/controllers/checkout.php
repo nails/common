@@ -809,7 +809,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			default : show_404();	break;
+			default : /*	Silence is golden	*/	break;
 		
 		endswitch;
 	}
@@ -845,7 +845,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 			$this->logger->line();
 			
-			show_404();
+			return;
 		
 		endif;
 		
@@ -869,7 +869,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 				$this->logger->line();
 				
-				show_404();
+				return;
 			
 			endif;
 			
@@ -896,11 +896,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 			if ( ! $_order ) :
 			
-				$this->logger->line( 'Invalid order ID, aborting.' );
+				$this->logger->line( 'Invalid order ID, aborting. Likely a transaction not initiated by the site.' );
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 				$this->logger->line();
 				
-				show_404();
+				return;
 			
 			endif;
 		
@@ -938,7 +938,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				//	Inform developers
 				send_developer_mail( 'An IPN request failed', 'An IPN request was made which failed secondary verification, Order ID #' . $_paypal['invoice'] );
 				
-				show_404();
+				return;
 			
 			endif;
 			
@@ -955,7 +955,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 				$this->logger->line();
 				
-				show_404();
+				return;
 				
 			endif;
 			
@@ -971,7 +971,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 				$this->logger->line();
 				
-				show_404();
+				return;
 			
 			endif;
 			
@@ -1063,8 +1063,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$this->logger->line( 'PayPal did not verify this IPN call, aborting.' );
 			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
 			$this->logger->line();
-			
-			show_404();
 		
 		endif;
 	}
