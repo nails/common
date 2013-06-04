@@ -19,8 +19,12 @@
 		<thead>
 			<tr>
 				<th class="title">Block Title &amp; Description</th>
+				<?php if ( APP_MULTI_LANG ) : ?>
 				<th class="default"><?=APP_DEFAULT_LANG_NAME?> Value</th>
 				<th class="translations">Translations</th>
+				<?php else : ?>
+				<th class="default">Value</th>
+				<?php endif; ?>
 				<th class="actions">Actions</th>
 			</tr>
 		</thead>
@@ -50,24 +54,28 @@
 					
 					// --------------------------------------------------------------------------
 					
-					echo '<td class="translations">';
-					echo '<ul>';
-					foreach ( $block->translations AS $variation ) :
-					
-						if ( $variation->lang->safename == APP_DEFAULT_LANG_SAFE )
-							continue;
+					if ( APP_MULTI_LANG ) :
+
+						echo '<td class="translations">';
+						echo '<ul>';
+						foreach ( $block->translations AS $variation ) :
 						
-						// --------------------------------------------------------------------------
+							if ( $variation->lang->safename == APP_DEFAULT_LANG_SAFE )
+								continue;
+							
+							// --------------------------------------------------------------------------
+							
+							echo '<li>';
+							echo '<span class="lang" title="' . $variation->lang->name . '">' . $variation->lang->name . '</span>';
+							echo '<span class="value">' . character_limiter( strip_tags( $variation->value, 100 ) ) . '</span>';
+							echo '</li>';
 						
-						echo '<li>';
-						echo '<span class="lang" title="' . $variation->lang->name . '">' . $variation->lang->name . '</span>';
-						echo '<span class="value">' . character_limiter( strip_tags( $variation->value, 100 ) ) . '</span>';
-						echo '</li>';
+						endforeach;
+						echo '</ul>';
+						echo'</td>';
 					
-					endforeach;
-					echo '</ul>';
-					echo'</td>';
-					
+					endif;
+
 					// --------------------------------------------------------------------------
 					
 					echo '<td class="actions">';
