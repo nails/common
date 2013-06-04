@@ -13,7 +13,23 @@ if ( ! function_exists( 'login_as_url' ) )
 	function login_as_url( $uid, $upassword )
 	{
 		//	Generate the return string
-		$_return_string = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );
+		$_url = uri_string();
+		if ( $_GET ) :
+
+			//	Remove common problematic GET vars (for instance, we don't want is_fancybox when we return)
+			$_get = $_GET;
+			unset( $_get['is_fancybox'] );
+			unset( $_get['inline'] );
+
+			if ( $_get ) :
+
+				$_url .= '?' . http_build_query( $_get );
+
+			endif;
+
+		endif;
+		
+		$_return_string = '?return_to=' . urlencode( $_url );
 		
 		// --------------------------------------------------------------------------
 		
