@@ -209,8 +209,14 @@
 				<tr>
 					<td class="quantity"><?=$item->quantity?></td>
 					<td class="item">
-						<?=$item->title?>
-						<small><?=$item->type->label?>; Product ID: <?=$item->product_id?></small>
+					<?php
+
+						//	Load the 'details' view; in a separate view so apps can easily customise the layout/content
+						//	of this part of the view without having to duplicate the entire invoice view.
+
+						$this->load->view( 'shop/orders/invoice-item-cell', array( 'item' => &$item ) );
+
+					?>
 					</td>
 					<td class="unit"><?=$order->currency->order->symbol . number_format( $item->price, $order->currency->order->precision )?></td>
 					<td class="vat"><?=$item->tax_rate->rate*100?>%</td>

@@ -1,9 +1,12 @@
 <?php
 
 	foreach ( $order->items AS $item ) :
-	
-		echo $item->title . "\n";
-		echo ' - ' . $item->type->label . '; Product ID: ' . $item->product_id . "\n";
+
+		//	Load the 'details' view; in a separate view so apps can easily customise the layout/content
+		//	of this part of the view without having to duplicate the entire basket view.
+
+		$this->load->view( 'email/shop/utilities/order_table_item_cell_plaintext', array( 'item' => &$item ) );
+
 		echo 'Quantity: ' . $item->quantity . "\n";
 		
 		if ( $item->was_on_sale ) :

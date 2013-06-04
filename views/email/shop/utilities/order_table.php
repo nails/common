@@ -18,8 +18,12 @@
 		
 			echo '<tr class="line-bottom">';
 			echo '<td>';
-			echo $item->title;
-			echo '<small>' . $item->type->label . '; Product ID: ' . $item->product_id . '</small>';
+			
+			//	Load the 'details' view; in a separate view so apps can easily customise the layout/content
+			//	of this part of the view without having to duplicate the entire basket view.
+
+			$this->load->view( 'email/shop/utilities/order_table_item_cell', array( 'item' => &$item ) );
+
 			echo '</td>';
 			echo '<td class="center">' . $item->quantity . '</td>';
 			
