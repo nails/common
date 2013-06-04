@@ -52,5 +52,61 @@ if ( ! function_exists( 'blog_latest_posts' ) )
 	}
 }
 
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Get all posts for a certain tag
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'blog_posts_with_tag' ) )
+{
+	function blog_posts_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
+		
+			get_instance()->load->model( 'blog/blog_post_model', 'post' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->post->get_with_tag( $id_slug, $only_published, $include_body, $exclude_deleted );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Get all posts for a certain category
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'blog_posts_with_category' ) )
+{
+	function blog_posts_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
+		
+			get_instance()->load->model( 'blog/blog_post_model', 'post' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->post->get_with_category( $id_slug, $only_published, $include_body, $exclude_deleted );
+	}
+}
+
 /* End of file blog_helper.php */
 /* Location: ./modules/blog/helpers/blog_helper.php */
