@@ -34,6 +34,18 @@
 			
 			echo form_field( $_field );
 
+
+			// --------------------------------------------------------------------------
+
+			//	Group
+			$_field					= array();
+			$_field['key']			= 'customer_group';
+			$_field['label']		= 'Customer Group';
+			$_field['default']		= $order->user->group->id ? $order->user->group->label : 'Unregistered User';
+			$_field['readonly']		= TRUE;
+			
+			echo form_field( $_field );
+
 			// --------------------------------------------------------------------------
 
 			//	Email

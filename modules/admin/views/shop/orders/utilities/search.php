@@ -48,13 +48,13 @@
 
 		echo 'Status:';
 		echo '<label>';
-		echo form_checkbox( 'show[verified]', TRUE, ( isset( $search->show['verified'] ) && $search->show['verified'] ) );
-		echo 'Verified';
+		echo form_checkbox( 'show[paid]', TRUE, ( isset( $search->show['paid'] ) && $search->show['paid'] ) );
+		echo 'Paid';
 		echo '</label>';
 
 		echo '<label>';
-		echo form_checkbox( 'show[pending]', TRUE, ( isset( $search->show['pending'] ) && $search->show['pending'] ) );
-		echo 'Pending';
+		echo form_checkbox( 'show[unpaid]', TRUE, ( isset( $search->show['unpaid'] ) && $search->show['unpaid'] ) );
+		echo 'Unpaid';
 		echo '</label>';
 
 		echo '<label>';

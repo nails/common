@@ -327,7 +327,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		$this->db->select( 'o.*' );
-		$this->db->select( 'u.email, um.first_name, um.last_name, um.gender, um.profile_img' );
+		$this->db->select( 'u.email, um.first_name, um.last_name, um.gender, um.profile_img,ug.id user_group_id,ug.display_name user_group_label' );
 		$this->db->select( 'pg.slug pg_slug, pg.label pg_label, pg.logo pg_logo' );
 		$this->db->select( 'oc.code oc_code,oc.symbol oc_symbol, oc.decimal_precision oc_precision,bc.code bc_code,bc.symbol bc_symbol,bc.decimal_precision bc_precision' );
 		$this->db->select( 'v.code v_code,v.label v_label, v.type v_type, v.discount_type v_discount_type, v.discount_value v_discount_value, v.discount_application v_discount_application' );
@@ -408,6 +408,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	private function _getcount_orders_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
 		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
 		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
 		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
@@ -1109,6 +1110,10 @@ class NAILS_Shop_order_model extends NAILS_Model
 		
 		$order->user->gender		= $order->gender;
 		$order->user->profile_img	= $order->profile_img;
+
+		$order->user->group			= new stdClass();
+		$order->user->group->id		= $order->user_group_id;
+		$order->user->group->label	= $order->user_group_label;
 		
 		unset( $order->user_id );
 		unset( $order->user_email );
@@ -1119,6 +1124,8 @@ class NAILS_Shop_order_model extends NAILS_Model
 		unset( $order->last_name );
 		unset( $order->gender );
 		unset( $order->profile_img );
+		unset( $order->user_group_id );
+		unset( $order->user_group_label );
 		
 		// --------------------------------------------------------------------------
 		

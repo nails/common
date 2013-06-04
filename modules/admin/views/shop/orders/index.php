@@ -58,6 +58,7 @@
 									echo '<strong>' . anchor( 'admin/accounts/edit/' . $order->user->id, $order->user->first_name . ' ' . $order->user->last_name, 'class="fancybox" data-fancybox-type="iframe"' ) . '</strong>';
 									
 									echo '<small>';
+									echo $order->user->group->id ? $order->user->group->label . ' &rsaquo; ' : '';
 									echo $order->user->email;
 									echo '</small>';
 

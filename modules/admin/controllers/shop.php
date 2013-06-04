@@ -42,6 +42,7 @@ class Shop extends Admin_Controller {
 		$d->funcs['index']		= 'Manage Inventory';				//	Sub-nav function.
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
+		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -217,7 +218,7 @@ class Shop extends Admin_Controller {
 		
 		$_default_per_page	= $this->session->userdata( $_hash . 'per_page' ) ? $this->session->userdata( $_hash . 'per_page' ) : 50;
 		$_default_sort		= $this->session->userdata( $_hash . 'sort' ) ? 	$this->session->userdata( $_hash . 'sort' ) : 'o.id';
-		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'ASC';
+		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'desc';
 		
 		//	Define vars
 		$_search			= array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
@@ -542,6 +543,31 @@ class Shop extends Admin_Controller {
 		
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function reports()
+	{
+		//	Set method info
+		$this->data['page']->title = 'Generate Reports';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Process POST
+		if ( $this->input->post() ) :
+		
+			//	TODO
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/reports/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
 	}
 }
