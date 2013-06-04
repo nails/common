@@ -27,14 +27,14 @@
 					?>
 					<tr data-product_id="<?=$item->id?>" data-key="<?=$key?>" class="<?=$_stripe?>">
 						<td class="item">
-							<div class="img <?=$item->type->slug?>">
-								<!--	PRODUCT'S PRIMARY IMAGE	-->
-							</div>
-							<?=$item->title?>
-							<small>
-								<?=$item->type->label?>,
-								Product ID: <?=$item->id?>
-							</small>
+						<?php
+
+							//	Load the 'details' view; in a sepearet view so apps can easily customise the layout/content
+							//	of this part of the view without having to duplicate the entire basket view.
+
+							$this->load->view( 'shop/basket/basket-item-cell', array( 'item' => &$item ) );
+
+						?>
 						</td>
 						<td class="quantity">
 						<?php
