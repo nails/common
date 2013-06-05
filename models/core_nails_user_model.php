@@ -510,15 +510,6 @@ class CORE_NAILS_User_Model extends NAILS_Model
 				
 					foreach ( $_tables AS $table ) :
 						
-						//	Define order by for certain tables
-						switch ( $table ) :
-						
-							case 'user_meta_school':	$this->db->order_by( 'year', 'desc' );	break;
-						
-						endswitch;
-						
-						// --------------------------------------------------------------------------
-						
 						$this->db->where( 'user_id', $_u->id );
 						$_u->{trim( $table )} = $this->db->get( trim( $table ) )->result();
 						
@@ -581,40 +572,9 @@ class CORE_NAILS_User_Model extends NAILS_Model
 			
 			// --------------------------------------------------------------------------
 			
-			//	Tidy up date/time/timezone field
-			$user->date_setting					= new stdClass();
-			$user->date_setting->timezone		= new stdClass();
-			$user->date_setting->format			= new stdClass();
-			$user->date_setting->format->date	= new stdClass();
-			$user->date_setting->format->time	= new stdClass();
-			
-			$user->date_setting->timezone->label	= $user->timezone_label;
-			$user->date_setting->timezone->offset	= $user->timezone_gmt_offset;
-			
-			$user->date_setting->format->date->label	= $user->date_format_date_label;
-			$user->date_setting->format->date->format	= $user->date_format_date_format;
-			$user->date_setting->format->time->label	= $user->date_format_time_label;
-			$user->date_setting->format->time->format	= $user->date_format_time_format;
-			
-			unset( $user->timezone_label );
-			unset( $user->timezone_gmt_offset );
-			unset( $user->date_format_date_label );
-			unset( $user->date_format_date_format );
-			unset( $user->date_format_time_label );
-			unset( $user->date_format_time_format );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Tidy up langauge field
-			$user->language_setting				= new stdClass();
-			$user->language_setting->id			=	$user->language_id;
-			$user->language_setting->name		=	$user->language_name;
-			$user->language_setting->safe_name	=	$user->language_safe_name;
-			
-			unset( $user->language_id );
-			unset( $user->language_name );
-			unset( $user->language_safe_name );
-			
+
+			//	Format the user object
+			$this->_format_user_object( $user );
 			
 		endforeach;
 		
@@ -2149,6 +2109,91 @@ class CORE_NAILS_User_Model extends NAILS_Model
 		$this->db->set( $data );
 		$this->db->where( 'id', $id );
 		$this->db->update( 'user_group' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Format a user object
+	 *
+	 * @access	protected
+	 * @param	object	$user	The user object to format
+	 * @param	array	$data	The data to use in the update
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	protected function _format_user_object( &$user )
+	{
+		//	Ints
+		$user->id					= (int) $user->id;
+		$user->auth_method_id		= (int) $user->auth_method_id;
+		$user->group_id				= (int) $user->group_id;
+		$user->login_count			= (int) $user->login_count;
+		$user->referred_by			= (int) $user->referred_by;
+		$user->failed_login_count	= (int) $user->failed_login_count;
+
+		//	Bools
+		$user->temp_pw			= (bool) $user->temp_pw;
+		$user->is_verified		= (bool) $user->is_verified;
+		$user->is_suspended		= (bool) $user->is_suspended;
+
+		//	Dates (TODO)
+
+		// --------------------------------------------------------------------------
+
+		//	Social Networks (TODO)
+
+		// --------------------------------------------------------------------------
+
+		//	Tidy up date/time/timezone field
+		$user->date_setting					= new stdClass();
+		$user->date_setting->timezone		= new stdClass();
+		$user->date_setting->format			= new stdClass();
+		$user->date_setting->format->date	= new stdClass();
+		$user->date_setting->format->time	= new stdClass();
+		
+		$user->date_setting->timezone->id			= (int) $user->timezone_id;
+		$user->date_setting->timezone->label		= $user->timezone_label;
+		$user->date_setting->timezone->offset		= $user->timezone_gmt_offset;
+		
+		$user->date_setting->format->date->id		= (int) $user->date_format_date_id;
+		$user->date_setting->format->date->label	= $user->date_format_date_label;
+		$user->date_setting->format->date->format	= $user->date_format_date_format;
+
+		$user->date_setting->format->time->id		= (int) $user->date_format_time_id;
+		$user->date_setting->format->time->label	= $user->date_format_time_label;
+		$user->date_setting->format->time->format	= $user->date_format_time_format;
+		
+		unset( $user->timezone_id );
+		unset( $user->timezone_label );
+		unset( $user->timezone_gmt_offset );
+
+		unset( $user->date_format_date_id );
+		unset( $user->date_format_date_label );
+		unset( $user->date_format_date_format );
+
+		unset( $user->date_format_time_id );
+		unset( $user->date_format_time_label );
+		unset( $user->date_format_time_format );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Tidy up langauge field
+		$user->language_setting				= new stdClass();
+		$user->language_setting->id			= (int) $user->language_id;
+		$user->language_setting->name		= $user->language_name;
+		$user->language_setting->safe_name	= $user->language_safe_name;
+		
+		unset( $user->language_id );
+		unset( $user->language_name );
+		unset( $user->language_safe_name );
+
+		// --------------------------------------------------------------------------
+
+		//	Tidy User meta
+		unset( $user->user_id );
 	}
 }
 
