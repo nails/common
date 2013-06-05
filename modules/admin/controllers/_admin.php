@@ -8,7 +8,7 @@
  **/
 
 
-class Admin_Controller extends NAILS_Controller
+class NAILS_Admin_Controller extends NAILS_Controller
 {
 	protected $_loaded_modules;
 	

@@ -18,7 +18,8 @@ require_once '_admin.php';
  * 
  **/
 
-class NAILS_Accounts extends Admin_Controller {
+class NAILS_Accounts extends NAILS_Admin_Controller
+{
 
 	protected $accounts_group;
 	protected $accounts_where;

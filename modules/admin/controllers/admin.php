@@ -18,7 +18,8 @@ require_once '_admin.php';
  * 
  **/
  
-class NAILS_Admin extends Admin_Controller {
+class NAILS_Admin extends NAILS_Admin_Controller
+{
 
 	public function index()
 	{

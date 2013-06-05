@@ -18,7 +18,8 @@ require_once '_admin.php';
  * 
  **/
  
-class NAILS_Blog extends Admin_Controller {
+class NAILS_Blog extends NAILS_Admin_Controller
+{
 
 	/**
 	 * Announces this module's details to those in the know.
