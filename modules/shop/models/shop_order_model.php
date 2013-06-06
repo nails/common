@@ -642,7 +642,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	public function get_items_for_user( $user_id, $email, $type = NULL )
 	{
 		$this->db->select( 'op.id,op.product_id,op.quantity,op.title,op.price,op.sale_price,op.tax,op.shipping,op.shipping_tax,op.total' );
-		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date' );
+		$this->db->select( 'op.was_on_sale,op.processed,op.refunded,op.refunded_date,op.extra_data' );
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 		
