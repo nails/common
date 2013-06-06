@@ -86,7 +86,7 @@ if ( ! function_exists( 'cms_render_block' ) )
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'cms_block' ) ) :
 		
-			get_instance()->load->model( 'cms_block_model', 'cms_block' );
+			get_instance()->load->model( 'cms/cms_block_model', 'cms_block' );
 		
 		endif;
 		

@@ -839,11 +839,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user->get_groups();
 		
-		$this->load->model( 'core_nails_timezone_model' );
-		$this->data['timezones']	= $this->core_nails_timezone_model->get_all_flat();
+		$this->load->model( 'timezone_model' );
+		$this->data['timezones']	= $this->timezone_model->get_all_flat();
 		
-		$this->load->model( 'core_nails_language_model' );
-		$this->data['languages']	= $this->core_nails_language_model->get_all_supported_flat();
+		$this->load->model( 'language_model' );
+		$this->data['languages']	= $this->language_model->get_all_supported_flat();
 		
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :

@@ -32,7 +32,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->load->model( 'cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model', 'cms_page' );
 		
 		// --------------------------------------------------------------------------
 		

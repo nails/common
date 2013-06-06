@@ -94,7 +94,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function pages()
 	{
 		//	Load common blocks items
-		$this->load->model( 'cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model', 'cms_page' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -371,7 +371,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function blocks()
 	{
 		//	Load common blocks items
-		$this->load->model( 'cms_block_model', 'cms_block' );
+		$this->load->model( 'cms/cms_block_model', 'cms_block' );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.blocks.min.js', TRUE );
 		

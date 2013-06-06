@@ -3,8 +3,6 @@
 class CORE_NAILS_Controller extends MX_Controller {
 
 	protected $data;
-	protected $user;
-
 	private $_supported_lang;
 	
 	// --------------------------------------------------------------------------
@@ -308,7 +306,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instanciate_languages()
 	{
 		//	Load the language model and set the defaults
-		$this->load->model( 'core_nails_language_model', 'language_model' );
+		$this->load->model( 'system/language_model' );
 		
 		//	Check default lang is supported by nails
 		$this->_supported		= array();
@@ -355,44 +353,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instanciate_user()
 	{
-		//	Load the generic user model
-		$this->load->model( 'CORE_NAILS_user_model' );
+		//	Load the user model and set a $user variable (for the views)
+		$this->load->model( 'system/user_model', 'user' );
+		$this->data['user'] =& $this->user;
 		
-		// --------------------------------------------------------------------------
-		
-		//	Check to see if the app is extending the user object; if it is load it up
-		//	and set up all our handy shortcut references.
-		
-		if ( file_exists( FCPATH . APPPATH . 'models/user_model.php' ) ) :
-		
-			//	Extension detected, load 'er up!
-			$this->load->model( 'user_model' );
-			
-			//	Set references
-			$this->user			=& $this->user_model;
-			$this->data['user'] =& $this->user_model;
-			
-			// --------------------------------------------------------------------------
-			
-			//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
-			//	reference the user model
-			
-			define( 'NAILS_USR_OBJ', 'user_model' );
-			
-		else :
-		
-			//	Not being extended, reference as normal
-			$this->user			=& $this->CORE_NAILS_user_model;
-			$this->data['user'] =& $this->CORE_NAILS_user_model;
-			
-			// --------------------------------------------------------------------------
-			
-			//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
-			//	reference the user model
-			
-			define( 'NAILS_USR_OBJ', 'CORE_NAILS_user_model' );
-		
-		endif;
+		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
+		//	reference the user model
+
+		define( 'NAILS_USR_OBJ', 'user' );
 		
 		// --------------------------------------------------------------------------
 		
