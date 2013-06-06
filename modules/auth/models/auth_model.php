@@ -78,7 +78,7 @@ class Auth_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		$user = $this->user->get_user_by_email( $email );
+		$user = $this->user->get_by_email( $email );
 		
 		if ( $user ) :
 		

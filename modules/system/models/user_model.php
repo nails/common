@@ -119,7 +119,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Look up the user so we can cross-check the codes
-		$_u = $this->get_user_by_email( $_email, TRUE );
+		$_u = $this->get_by_email( $_email, TRUE );
 		
 		if ( $_u && $_code === $_u->remember_code ) :
 		
@@ -373,7 +373,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Fetch the correct ACL
 		if ( is_numeric( $user ) ) :
 		
-			$_user = $this->get_user( $user );
+			$_user = $this->get_by_id( $user );
 			
 			if ( isset( $_user->acl ) ) :
 			
@@ -436,7 +436,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_users( $extended = NULL, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
+	public function get_all( $extended = NULL, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
@@ -598,7 +598,7 @@ class NAILS_User_model extends NAILS_Model
 	
 	/**
 	 * Counts the total amount of users for a partricular query/search key. Essentially performs
-	 * the same query as $this->get_users() but without limiting.
+	 * the same query as $this->get_all() but without limiting.
 	 *
 	 * @access	public
 	 * @param	string	$where	An array of where conditions
@@ -607,7 +607,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function count_users( $where = NULL, $search = NULL )
+	public function count_all( $where = NULL, $search = NULL )
 	{
 		$this->_getcount_users_common( $where, $search );
 		
@@ -766,13 +766,13 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user( $user_id, $extended = FALSE )
+	public function get_by_id( $user_id, $extended = FALSE )
 	{
 		if ( ! is_numeric( $user_id ) )
 			return FALSE;
 		
 		$this->db->where( 'u.id', $user_id );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
@@ -793,13 +793,13 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_email( $email, $extended = FALSE )
+	public function get_by_email( $email, $extended = FALSE )
 	{
 		if ( ! is_string( $email ) )
 			return FALSE;
 		
 		$this->db->where( 'u.email', $email );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
@@ -818,10 +818,10 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_fbid( $fbid, $extended = FALSE )
+	public function get_by_fbid( $fbid, $extended = FALSE )
 	{
 		$this->db->where( 'u.fb_id', $fbid );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
@@ -840,10 +840,10 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_twid( $twid, $extended = FALSE )
+	public function get_by_twid( $twid, $extended = FALSE )
 	{
 		$this->db->where( 'u.tw_id', $twid );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
@@ -862,10 +862,10 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_liid( $linkedinid, $extended = FALSE )
+	public function get_by_liid( $linkedinid, $extended = FALSE )
 	{
 		$this->db->where( 'u.li_id', $linkedinid );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
@@ -886,7 +886,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_hashes( $_hash_id, $_hash_pw, $extended = FALSE )
+	public function get_by_hashes( $_hash_id, $_hash_pw, $extended = FALSE )
 	{
 		if ( empty( $_hash_id ) || empty( $_hash_pw ) )
 			return FALSE;
@@ -901,7 +901,7 @@ class NAILS_User_model extends NAILS_Model
 		
 		//	Do it
 		$this->db->limit( 1 );
-		$q = $this->get_users( $extended );
+		$q = $this->get_all( $extended );
 		
 		// --------------------------------------------------------------------------
 		
@@ -922,18 +922,16 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function get_user_by_referral( $referral_code, $extended = FALSE  )
+	public function get_by_referral( $referral_code, $extended = FALSE  )
 	{
 		$this->db->where( 'um.referral', $referral_code );
-		$user = $this->get_users( $extended );
+		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
 	}
 	
 	
 	// --------------------------------------------------------------------------
-	
-	
 	
 	
 	/**
@@ -950,7 +948,7 @@ class NAILS_User_model extends NAILS_Model
 	{
 		$this->db->limit( $limit );
 		$this->db->order_by( 'u.id', 'desc' );
-		return $this->get_users( $extended );
+		return $this->get_all( $extended );
 	}
 	
 	
@@ -1383,7 +1381,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Store this entire user in memory
-		$this->active_user = $this->get_user( $_me );
+		$this->active_user = $this->get_by_id( $_me );
 		
 		// --------------------------------------------------------------------------
 		

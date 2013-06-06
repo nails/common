@@ -125,7 +125,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 				if ( $_uid ) :
 				
 					//	Fetch user and group data
-					$_user	= $this->user->get_user( $_uid['id'] );
+					$_user	= $this->user->get_by_id( $_uid['id'] );
 					$_group	= $this->user->get_group( APP_USER_DEFAULT_GROUP );
 					
 					// --------------------------------------------------------------------------
@@ -231,7 +231,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Valid user?
-		$_u = $this->user->get_user( $_id );
+		$_u = $this->user->get_by_id( $_id );
 		
 		if ( $_u === FALSE ) :
 		

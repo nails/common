@@ -60,7 +60,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		$_hashid = $this->uri->segment( 4 );
 		$_hashpw = $this->uri->segment( 5 );
 		
-		$_u = $this->user->get_user_by_hashes( $_hashid, $_hashpw, TRUE );
+		$_u = $this->user->get_by_hashes( $_hashid, $_hashpw, TRUE );
 		
 		if ( ! $_u ) :
 		

@@ -233,7 +233,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		//	First up, check if the user has previously connected this Twitter account
 		//	to another registered account
 		
-		$_user = $this->user->get_user_by_twid( $access_token->user_id );
+		$_user = $this->user->get_by_twid( $access_token->user_id );
 
 		if ( $this->user->is_logged_in() && $_user ) :
 		
@@ -299,7 +299,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 		
 		//	If we recognise the user, update their access token, if not create a new account
-		$_user = $this->user->get_user_by_twid( $access_token->user_id );
+		$_user = $this->user->get_by_twid( $access_token->user_id );
 		
 		if ( ! $_user ) :
 		
@@ -583,7 +583,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 				if ( $_uid ) :
 				
 					//	Fetch user and group data
-					$_user	= $this->user->get_user( $_uid['id'] );
+					$_user	= $this->user->get_by_id( $_uid['id'] );
 					$_group	= $this->user->get_group( $_group_id );
 					
 					// --------------------------------------------------------------------------

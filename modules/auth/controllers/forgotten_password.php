@@ -106,7 +106,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Define basic email data
-					$this->data['reset_user']	= $this->user->get_user_by_email( $_email );
+					$this->data['reset_user']	= $this->user->get_by_email( $_email );
 					
 					$_data				= new stdClass();
 					$_data->to_email	= $this->data['reset_user']->email;

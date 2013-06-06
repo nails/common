@@ -217,7 +217,7 @@ class Emailer
 		//	If we're sending to an email address, try and associate it to a registered user
 		if ( $input->to_email ) :
 		
-			$_user = get_userobject()->get_user_by_email( $input->to_email );
+			$_user = get_userobject()->get_by_email( $input->to_email );
 			
 			if ( $_user ) :
 			

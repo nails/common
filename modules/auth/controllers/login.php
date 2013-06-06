@@ -240,7 +240,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		 * 
 		 **/
 		
-		$_user = $this->user->get_user_by_hashes( $_hash['id'], $_hash['pw'] );
+		$_user = $this->user->get_by_hashes( $_hash['id'], $_hash['pw'] );
 		
 		// --------------------------------------------------------------------------
 		

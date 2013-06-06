@@ -39,7 +39,7 @@ class NAILS_Activate extends NAILS_Auth_Controller
 		if ( $_id !== NULL && $_code !== NULL && $this->user->verify( $_id, $_code ) ) :
 			
 			//	Fetch the user
-			$_u = $this->user->get_user( $_id );
+			$_u = $this->user->get_by_id( $_id );
 			
 			// --------------------------------------------------------------------------
 			

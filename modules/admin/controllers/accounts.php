@@ -202,11 +202,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		
 		//	Get the accounts
 		$this->data['users']		= new stdClass();
-		$this->data['users']->data	= $this->user->get_users( FALSE, $_order, $_limit, $this->accounts_where, $_search );
+		$this->data['users']->data	= $this->user->get_all( FALSE, $_order, $_limit, $this->accounts_where, $_search );
 		
 		//	Work out pagination
 		$this->data['users']->pagination				= new stdClass();
-		$this->data['users']->pagination->total_results	= $this->user->count_users( $this->accounts_where, $_search );
+		$this->data['users']->pagination->total_results	= $this->user->count_all( $this->accounts_where, $_search );
 		
 		// --------------------------------------------------------------------------
 		
@@ -301,7 +301,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						$_email->to_id					= $_new_user['id'];
 						$_email->data					= array();
 						$_email->data['admin']			= active_user( 'first_name,last_name' );
-						$_email->data['user']			= $this->user->get_user( $_new_user['id'] );
+						$_email->data['user']			= $this->user->get_by_id( $_new_user['id'] );
 						$_email->data['password']		= $_password;
 						$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
 						
@@ -379,7 +379,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the user's data; loaded early because it's required for the user_meta_cols
 		//	(we need to know the group of the user so we can pull up the correct cols/rules)
 		
-		$_user = $this->user->get_user( $this->uri->segment( 4 ) );
+		$_user = $this->user->get_by_id( $this->uri->segment( 4 ) );
 		
 		if ( ! $_user ) :
 		
@@ -756,7 +756,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						// --------------------------------------------------------------------------
 						
 						//	refresh the user object
-						$_user = $this->user->get_user( $_post['id'] );
+						$_user = $this->user->get_by_id( $_post['id'] );
 						
 						// --------------------------------------------------------------------------
 						
@@ -920,7 +920,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_user( $_uid );
+		$_user	= $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -941,7 +941,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Get the user's details, again
-		$_user = $this->user->get_user( $_uid );
+		$_user = $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -977,7 +977,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_user( $_uid );
+		$_user	= $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -998,7 +998,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Get the user's details, again
-		$_user = $this->user->get_user( $_uid );
+		$_user = $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1033,7 +1033,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_user( $_uid );
+		$_user	= $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1054,7 +1054,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Get the user's details, again
-		$_user = $this->user->get_user( $_uid );
+		$_user = $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1090,7 +1090,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_user( $_uid );
+		$_user	= $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1111,7 +1111,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Get the user's details, again
-		$_user = $this->user->get_user( $_uid );
+		$_user = $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1145,7 +1145,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_user( $_uid );
+		$_user	= $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1161,7 +1161,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Delete user
-		$_user = $this->user->get_user( $_uid );
+		$_user = $this->user->get_by_id( $_uid );
 		
 		// --------------------------------------------------------------------------
 		
@@ -1188,7 +1188,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	public function delete_profile_img()
 	{
 		$_uid		= $this->uri->segment( 4 );
-		$_user		= $this->user->get_user( $_uid );
+		$_user		= $this->user->get_by_id( $_uid );
 		$_return_to	= $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/accounts/edit/' . $_uid;
 		
 		// --------------------------------------------------------------------------

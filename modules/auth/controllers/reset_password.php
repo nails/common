@@ -58,7 +58,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 	private function _validate( $id, $hash )
 	{
 		//	Check auth credentials
-		$_user = $this->user->get_user( $id );
+		$_user = $this->user->get_by_id( $id );
 		
 		// --------------------------------------------------------------------------
 		
