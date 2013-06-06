@@ -839,7 +839,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user->get_groups();
 		
-		$this->load->model( 'timezone_model' );
+		$this->load->model( 'system/timezone_model' );
 		$this->data['timezones']	= $this->timezone_model->get_all_flat();
 		
 		$this->load->model( 'language_model' );
