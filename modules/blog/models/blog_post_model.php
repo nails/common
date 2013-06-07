@@ -103,7 +103,7 @@ class Blog_post_model extends NAILS_Model
 
 			endif;
 
-			if ( isset( $data['tags'] ) ) :
+			if ( isset( $data['tags'] ) && $data['tags'] != FALSE ) :
 
 				$_data = array();
 
