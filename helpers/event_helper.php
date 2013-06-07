@@ -2,7 +2,7 @@
 
 if ( ! function_exists( 'create_event' ) )
 {
-	function create_event( $type, $created_by, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $_recorded = NULL )
+	function create_event( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $_recorded = NULL )
 	{
 		$_ci =& get_instance();
 		$_ci->load->library( 'event' );

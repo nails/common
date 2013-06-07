@@ -60,7 +60,7 @@ class Event {
 	 * @return	int or boolean
 	 * @author	Pablo
 	 **/
-	public function create( $type, $created_by, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $recorded = NULL )
+	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $recorded = NULL )
 	{
 		//	Admins logged in as people shouldn't be creating events, GHOST MODE, woooooooo
 		//	Ghost mode runs on production only, all other environments generate events (for testing)
@@ -106,10 +106,14 @@ class Event {
 		
 		// --------------------------------------------------------------------------
 		
+		//	Prep created by
+		if ( ! $created_by )
+			$created_by = ( active_user( 'id' ) ? active_user( 'id' ) : NULL );
+		
 		//	Prep data
 		$_data					= array();
 		$_data['type_id']		= $this->_event_type[$type]->id;
-		$_data['created_by']	= ( ! $created_by ) ? NULL : $created_by;
+		$_data['created_by']	= $created_by;
 		$_data['vars']			= ( $vars ) ? serialize( $vars ) : NULL;
 		$_data['ref']			= (int) $ref;
 		$_data['ref']			= $_data['ref'] ? $_data['ref'] : NULL;
