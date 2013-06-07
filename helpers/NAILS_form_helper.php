@@ -798,6 +798,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -806,11 +807,13 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
-		$_error = form_error( $_field['key'] ) ? 'error' : '';
+		$_error			= form_error( $_field['key'] ) ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '">';
 		$_out .= '<label>';
 				
 		//	Label
@@ -834,7 +837,13 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'class="' . $_field['class'] . '" ' . $_field['id'] );
+		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly );
+
+		if ( $_readonly ) :
+
+			$_out .= form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
@@ -882,6 +891,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -890,11 +900,13 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 		
-		$_error = form_error( $_field['key'] ) ? 'error' : '';
+		$_error			= form_error( $_field['key'] ) ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
 		
 		// --------------------------------------------------------------------------
 		
-		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_field['oddeven'] . '">';
+		$_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '">';
 		$_out .= '<label>';
 				
 		//	Label
@@ -921,7 +933,13 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		//	Any defaults?
 		$_field['default'] = (array) $_field['default'];
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] );
+		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly );
+
+		if ( $_readonly ) :
+
+			$_out .= form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
