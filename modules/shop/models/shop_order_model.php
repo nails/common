@@ -400,6 +400,32 @@ class NAILS_Shop_order_model extends NAILS_Model
 		//	Execute Query
 		return $this->db->count_all_results( 'shop_order o' );
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Counts the total amount of orders for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_all() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_unfulfilled_orders( $where = NULL, $search = NULL )
+	{
+		$this->db->where( 'fulfilment_status', 'UNFULFILLED' );
+		$this->db->where( 'status', 'PAID' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		return $this->db->count_all_results( 'shop_order o' );
+	}
 
 
 	// --------------------------------------------------------------------------

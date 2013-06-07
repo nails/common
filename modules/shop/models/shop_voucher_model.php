@@ -244,17 +244,46 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	 * @param none
 	 * @return array
 	 **/
-	public function get_all( $only_active = TRUE )
+	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
+		//	Only active vouchers?
 		if ( $only_active ) :
 
 			$this->db->where( 'v.is_active', TRUE );
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
+		//	Set Order
+		if ( is_array( $order ) ) :
+
+			$this->db->order_by( $order[0], $order[1] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set Limit
+		if ( is_array( $limit ) ) :
+
+			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Build conditionals
+		$this->_getcount_vouchers_common( $where, $search );
+
+		// --------------------------------------------------------------------------
+
+		//	Ignore deleted vouchers
 		$this->db->where( 'v.is_deleted', FALSE );
 
 		$_vouchers = $this->db->get( 'shop_voucher v' )->result();
+
+		// --------------------------------------------------------------------------
 
 		foreach ( $_vouchers AS $voucher ) :
 
@@ -265,6 +294,171 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		return $_vouchers;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Counts the total amount of vouchers for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_all() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_vouchers( $only_active = TRUE, $where = NULL, $search = NULL )
+	{
+		//	Only active vouchers?
+		if ( $only_active ) :
+
+			$this->db->where( 'v.is_active', TRUE );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		$this->_getcount_vouchers_common( $where, $search );
+
+		// --------------------------------------------------------------------------
+
+		//	Ignore deleted vouchers
+		$this->db->where( 'v.is_deleted', FALSE );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		return $this->db->count_all_results( 'shop_voucher v' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _getcount_vouchers_common( $where = NULL, $search = NULL )
+	{
+		//	Set Where
+		if ( $where ) :
+		
+			$this->db->where( $where );
+			
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Search
+		if ( $search && is_string( $search ) ) :
+		
+			//	Search is a simple string, no columns are being specified to search across
+			//	so define a default set to search across
+			
+			$search								= array( 'keywords' => $search, 'columns' => array() );
+			$search['columns']['id']			= 'o.id';
+			$search['columns']['ref']			= 'o.ref';
+			$search['columns']['user_id']		= 'o.user_id';
+			$search['columns']['user_email']	= 'o.user_email';
+			$search['columns']['pp_txn_id']		= 'o.pp_txn_id';
+			
+		endif;
+		
+		//	If there is a search term to use then build the search query
+		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
+		
+			//	Parse the keywords, look for specific column searches
+			preg_match_all('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', $search['keywords'], $_matches );
+			
+			if ( $_matches[1] && $_matches[2] ) :
+			
+				$_specifics = array_combine( $_matches[1], $_matches[2] );
+				
+			else :
+			
+				$_specifics = array();
+			
+			endif;
+			
+			//	Match the specific labels to a column
+			if ( $_specifics ) :
+			
+				$_temp = array();
+				foreach ( $_specifics AS $col => $value ) :
+				
+					if ( isset( $search['columns'][ strtolower( $col )] ) ) :
+						
+						$_temp[] = array(
+							'cols'	=> $search['columns'][ strtolower( $col )],
+							'value'	=> $value
+						);
+						
+					endif;
+				
+				endforeach;
+				$_specifics = $_temp;
+				unset( $_temp );
+				
+				// --------------------------------------------------------------------------
+				
+				//	Remove controls from search string
+				$search['keywords'] = preg_replace('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
+			
+			endif;
+			
+			if ( $_specifics ) :
+			
+				//	We have some specifics
+				foreach( $_specifics AS $specific ) :
+				
+					if ( is_array( $specific['cols'] ) ) :
+					
+						$_separator = array_shift( $specific['cols'] );
+						$this->db->like( 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $specific['cols'] ) . ' )', $specific['value'] );
+					
+					else :
+					
+						$this->db->like( $specific['cols'], $specific['value'] );
+					
+					endif;
+				
+				endforeach;
+			
+			endif;
+			
+			
+			// --------------------------------------------------------------------------
+			
+			if ( $search['keywords'] ) : 
+			
+				$_where  = '(';
+				
+				if ( isset( $search[ 'columns' ] ) && $search[ 'columns' ] ) :
+				
+					//	We have some specifics
+					foreach( $search[ 'columns' ] AS $col ) :
+					
+						if ( is_array( $col ) ) :
+						
+							$_separator = array_shift( $col );
+							$_where .= 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $col ) . ' ) LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						else :
+						
+							$_where .= $col . ' LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
+						
+						endif;
+					
+					endforeach;
+				
+				endif;
+				
+				$this->db->where( substr( $_where, 0, -3 ) . ')' );
+				
+			endif;
+		
+		endif;
 	}
 	
 	

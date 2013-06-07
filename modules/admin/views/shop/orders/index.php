@@ -55,7 +55,15 @@
 
 									echo '<div>';
 									
-									echo '<strong>' . anchor( 'admin/accounts/edit/' . $order->user->id, $order->user->first_name . ' ' . $order->user->last_name, 'class="fancybox" data-fancybox-type="iframe"' ) . '</strong>';
+									if ( $order->user->id ) :
+
+										echo '<strong>' . anchor( 'admin/accounts/edit/' . $order->user->id, $order->user->first_name . ' ' . $order->user->last_name, 'class="fancybox" data-fancybox-type="iframe"' ) . '</strong>';
+
+									else :
+
+										echo '<strong>' . $order->user->first_name . ' ' . $order->user->last_name . '</strong>';
+
+									endif;
 									
 									echo '<small>';
 									echo $order->user->group->id ? $order->user->group->label . ' &rsaquo; ' : '';

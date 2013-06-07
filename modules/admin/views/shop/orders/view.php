@@ -385,9 +385,10 @@
 
 					echo '<tr>';
 					echo '<td class="details">';
-					echo $item->title;
-					echo '<small>Type: ' . $item->type->label . '; Product ID: ' . $item->product_id . '</small>';
-					echo '</th>';
+
+					$this->load->view( 'admin/shop/orders/view-item-cell', array( 'item' => &$item ) );
+
+					echo '</td>';
 					echo '<td class="quantity">' . $item->quantity . '</th>';
 
 					if ( $order->status == 'PAID' ) :
