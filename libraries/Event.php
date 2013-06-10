@@ -298,7 +298,7 @@ class Event {
 	public function get_all( $limit = NULL )
 	{
 		//	Fetch all objects from the table
-		$this->_ci->db->select( 'e.id, e.type_id, et.type_id_string, et.type_name, et.type_description, e.created_by, um.first_name, um.last_name, um.profile_img, e.vars, e.created' );
+		$this->_ci->db->select( 'e.id, e.type_id, et.id_string, et.name, et.description, e.created_by, um.first_name, um.last_name, um.profile_img, e.vars, e.created' );
 		$this->_ci->db->select( 'UNIX_TIMESTAMP( e.created ) created_time, eip.user_id interested_party, eip.is_read, e.level' );
 		
 		$this->_ci->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
@@ -368,9 +368,9 @@ class Event {
 				$_out[ $event->id ]['creator']->profile_img	= $event->profile_img;
 				
 				$_out[ $event->id ]['type']->id				= $event->type_id;
-				$_out[ $event->id ]['type']->id_string		= $event->type_id_string;
-				$_out[ $event->id ]['type']->name			= $event->type_name;
-				$_out[ $event->id ]['type']->description	= $event->type_description;
+				$_out[ $event->id ]['type']->id_string		= $event->id_string;
+				$_out[ $event->id ]['type']->name			= $event->name;
+				$_out[ $event->id ]['type']->description	= $event->description;
 			
 			endif;
 		

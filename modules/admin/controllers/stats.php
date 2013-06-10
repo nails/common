@@ -32,6 +32,7 @@ class Stats extends NAILS_Admin_Controller
 		
 		//	Navigation options
 		$d->funcs['index']		= 'Statistics Overveiw';					//	Sub-nav function.
+		$d->funcs['events']		= 'Browse Events';							//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -44,7 +45,7 @@ class Stats extends NAILS_Admin_Controller
 	
 	
 	/**
-	 * Job overview
+	 * Stats overview
 	 *
 	 * @access public
 	 * @param none
@@ -57,13 +58,42 @@ class Stats extends NAILS_Admin_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Fetch jobs
+		//	Fetch stats
 		
 		// --------------------------------------------------------------------------
 		
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'admin/stats/index',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Events browser
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function events()
+	{
+		//	Set method info
+		$this->data['page']->title = 'Browse Events';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Fetch events
+		$this->load->library( 'event' );
+		$this->data['events'] = $this->event->get_all( 1000 );
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/stats/events',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 }
 
