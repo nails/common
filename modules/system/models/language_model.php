@@ -33,7 +33,6 @@ class NAILS_Language_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		$this->db->select( 'l.id,l.name,l.safe_name,l.priority,l.supported' );
-		$this->db->order_by( 'l.supported', 'DESC' );
 		$this->db->order_by( 'l.name' );
 		return $this->db->get( 'language l' )->result();
 	}
@@ -216,6 +215,39 @@ class NAILS_Language_model extends NAILS_Model
 			return NULL;
 			
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function mark_supported( $id )
+	{
+		$_data				= array();
+		$_data['supported']	= TRUE;
+		return $this->update( $id, $_data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function mark_unsupported( $id )
+	{
+		$_data				= array();
+		$_data['supported']	= FALSE;
+		return $this->update( $id, $_data );	
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function update( $id, $data )
+	{
+		$this->db->set( $data );
+		$this->db->where( 'id', $id );
+		return $this->db->update( 'language' );
 	}
 }
 
