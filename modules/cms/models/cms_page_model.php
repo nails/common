@@ -440,6 +440,11 @@ class Cms_page_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
+		//	Sort into some alphabetical order
+		ksort( $_widgets );
+
+		// --------------------------------------------------------------------------
+
 		return $_widgets;
 		
 	}
@@ -460,7 +465,9 @@ class Cms_page_model extends NAILS_Model
 
 			foreach ( $page->{'widgets_' . $area} AS $key => $widget ) :
 			
+				$_out[$area] .= '<div class="widget ' . $widget->widget_class . '">';
 				$_out[$area] .= $this->_call_widget_method( $widget->widget_class, $widget->widget_data, 'render' );
+				$_out[$area] .= '</div>';
 			
 			endforeach;
 

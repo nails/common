@@ -1,14 +1,14 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget_plaintext extends Nails_CMS_Widget
+class Nails_CMS_Widget_html extends Nails_CMS_Widget
 {
 	static function details()
 	{
 		$_d	= new stdClass();
 		
-		$_d->name	= 'Plain Text';
-		$_d->slug	= 'Widget_plaintext';
-		$_d->iam	= 'Nails_CMS_Widget_plaintext';
+		$_d->name	= 'HTML';
+		$_d->slug	= 'Widget_html';
+		$_d->iam	= 'Nails_CMS_Widget_html';
 		$_d->info	= 'Plain, completely unformatted text.';
 		
 		return $_d;
@@ -23,7 +23,7 @@ class Nails_CMS_Widget_plaintext extends Nails_CMS_Widget
 	
 	public function __construct()
 	{
-		$this->_key		= 'plaintext';
+		$this->_key		= 'html';
 		$this->_body	= '';
 	}
 	
@@ -52,7 +52,7 @@ class Nails_CMS_Widget_plaintext extends Nails_CMS_Widget
 	
 	public function render()
 	{
-		return nl2br( $this->_body );
+		return $this->_body;
 	}
 	
 	// --------------------------------------------------------------------------
