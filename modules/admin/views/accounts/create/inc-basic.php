@@ -15,6 +15,14 @@
 		$_groups_by_id = array();
 		foreach( $groups AS $group ) :
 
+			//	If the group is a superuser group and the active user is not a superuser
+			//	then remove it
+			if ( isset( $group->acl['superuser'] ) && $group->acl['superuser'] && ! $user->is_superuser() ) :
+
+				continue;
+
+			endif;
+
 			$_groups_by_id[$group->id] = $group->display_name;
 
 		endforeach;
@@ -23,12 +31,23 @@
 
 		//	Render the group descriptions
 		echo '<ul id="user-group-descriptions">';
+		$_counter = 0;
 		for( $i=0; $i<count( $groups ); $i++ ) :
 
-			$_display = !$i ? 'block' : 'none';
+			if ( isset( $groups[$i]->acl['superuser'] ) && $groups[$i]->acl['superuser'] && ! $user->is_superuser() ) :
+
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$_display = !$_counter ? 'block' : 'none';
 			echo '<li class="system-alert notice no-close" id="user-group-' . $groups[$i]->id . '" style="display:' . $_display . ';">';
 			echo  '<strong>' . $groups[$i]->display_name . ':</strong> ' . $groups[$i]->description;
 			echo '</li>';
+
+			$_counter++;
 
 		endfor;
 		echo '</ul>';
