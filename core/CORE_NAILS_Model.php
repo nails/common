@@ -80,11 +80,6 @@ class CORE_NAILS_Model extends CI_Model {
 
 			show_error( 'Table variable not set' );
 
-		else :
-
-			$_prefix	= $this->_table_prefix ? $this->_table_prefix . '.' : '';
-			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
-
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -94,17 +89,17 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->db->set( $_prefix . 'created', 'NOW()', FALSE );
-		$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
+		$this->db->set( 'created', 'NOW()', FALSE );
+		$this->db->set( 'modified', 'NOW()', FALSE );
 
 		if ( $this->user->is_logged_in() ) :
 
-			$this->db->set( $_prefix . 'created_by', active_user( 'id' ) );
-			$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
+			$this->db->set( 'created_by', active_user( 'id' ) );
+			$this->db->set( 'modified_by', active_user( 'id' ) );
 
 		endif;
 		
-		$this->db->insert( $_table );
+		$this->db->insert( $this->_table );
 		
 		if ( $this->db->affected_rows() ) :
 
@@ -191,17 +186,12 @@ class CORE_NAILS_Model extends CI_Model {
 
 			show_error( 'Table variable not set' );
 
-		else :
-
-			$_prefix	= $this->_table_prefix ? $this->_table_prefix . '.' : '';
-			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
-
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . 'id', $id );
-		$this->db->delete( $_table );
+		$this->db->where( 'id', $id );
+		$this->db->delete( $this->_table );
 		
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
