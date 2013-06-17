@@ -112,6 +112,15 @@ class Asset {
 				$this->load( 'libraries/ckeditor/ckeditor.js', TRUE );
 			
 			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'jqueryui' :
+
+				$this->load( 'jquery.ui.min.js', TRUE );
+				$this->load( 'jquery.ui.datetimepicker.min.js', TRUE );
+
+			break;
 		
 		endswitch;
 	}

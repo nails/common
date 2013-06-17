@@ -591,6 +591,66 @@ class NAILS_User_model extends NAILS_Model
 		//	Return the data
 		return $_user;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Get an array of users from the database, by default only user, group and
+	 * meta information is returned, request specific extra meta by specifying
+	 * which tables to include as the first parameter; seperate multiple tables
+	 * using a comma.
+	 *
+	 * @access	public
+	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
+	 * @return	string
+	 * @author	Pablo
+	 * 
+	 **/
+	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
+	{
+		//	Write selects
+		$this->db->select( 'u.id, u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Order
+		if ( is_array( $order ) )
+			$this->db->order_by( $order[0], $order[1] );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Limit
+		if ( is_array( $limit ) )
+			$this->db->limit( $limit[0], $limit[1] );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Build conditionals
+		$this->_getcount_users_common( $where, $search );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		$q		= $this->db->get( 'user u' );
+		$_user	= $q->result();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Determine the user's ACL
+		foreach ( $_user AS $user ) :
+
+			//	Format the user object
+			$this->_format_user_object( $user, TRUE );
+			
+		endforeach;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Return the data
+		return $_user;
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -2130,76 +2190,84 @@ class NAILS_User_model extends NAILS_Model
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	protected function _format_user_object( &$user )
+	protected function _format_user_object( &$user, $minimal = FALSE )
 	{
-		//	Ints
-		$user->id					= (int) $user->id;
-		$user->auth_method_id		= (int) $user->auth_method_id;
-		$user->group_id				= (int) $user->group_id;
-		$user->login_count			= (int) $user->login_count;
-		$user->referred_by			= (int) $user->referred_by;
-		$user->failed_login_count	= (int) $user->failed_login_count;
+		if ( $minimal ) :
 
-		//	Bools
-		$user->temp_pw			= (bool) $user->temp_pw;
-		$user->is_verified		= (bool) $user->is_verified;
-		$user->is_suspended		= (bool) $user->is_suspended;
+			$user->id = (int) $user->id;
 
-		//	Dates (TODO)
+		else :
 
-		// --------------------------------------------------------------------------
+			//	Ints
+			$user->id					= (int) $user->id;
+			$user->auth_method_id		= (int) $user->auth_method_id;
+			$user->group_id				= (int) $user->group_id;
+			$user->login_count			= (int) $user->login_count;
+			$user->referred_by			= (int) $user->referred_by;
+			$user->failed_login_count	= (int) $user->failed_login_count;
 
-		//	Social Networks (TODO)
+			//	Bools
+			$user->temp_pw			= (bool) $user->temp_pw;
+			$user->is_verified		= (bool) $user->is_verified;
+			$user->is_suspended		= (bool) $user->is_suspended;
 
-		// --------------------------------------------------------------------------
+			//	Dates (TODO)
 
-		//	Tidy up date/time/timezone field
-		$user->date_setting					= new stdClass();
-		$user->date_setting->timezone		= new stdClass();
-		$user->date_setting->format			= new stdClass();
-		$user->date_setting->format->date	= new stdClass();
-		$user->date_setting->format->time	= new stdClass();
-		
-		$user->date_setting->timezone->id			= (int) $user->timezone_id;
-		$user->date_setting->timezone->label		= $user->timezone_label;
-		$user->date_setting->timezone->offset		= $user->timezone_gmt_offset;
-		
-		$user->date_setting->format->date->id		= (int) $user->date_format_date_id;
-		$user->date_setting->format->date->label	= $user->date_format_date_label;
-		$user->date_setting->format->date->format	= $user->date_format_date_format;
+			// --------------------------------------------------------------------------
 
-		$user->date_setting->format->time->id		= (int) $user->date_format_time_id;
-		$user->date_setting->format->time->label	= $user->date_format_time_label;
-		$user->date_setting->format->time->format	= $user->date_format_time_format;
-		
-		unset( $user->timezone_id );
-		unset( $user->timezone_label );
-		unset( $user->timezone_gmt_offset );
+			//	Social Networks (TODO)
 
-		unset( $user->date_format_date_id );
-		unset( $user->date_format_date_label );
-		unset( $user->date_format_date_format );
+			// --------------------------------------------------------------------------
 
-		unset( $user->date_format_time_id );
-		unset( $user->date_format_time_label );
-		unset( $user->date_format_time_format );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Tidy up langauge field
-		$user->language_setting				= new stdClass();
-		$user->language_setting->id			= (int) $user->language_id;
-		$user->language_setting->name		= $user->language_name;
-		$user->language_setting->safe_name	= $user->language_safe_name;
-		
-		unset( $user->language_id );
-		unset( $user->language_name );
-		unset( $user->language_safe_name );
+			//	Tidy up date/time/timezone field
+			$user->date_setting					= new stdClass();
+			$user->date_setting->timezone		= new stdClass();
+			$user->date_setting->format			= new stdClass();
+			$user->date_setting->format->date	= new stdClass();
+			$user->date_setting->format->time	= new stdClass();
+			
+			$user->date_setting->timezone->id			= (int) $user->timezone_id;
+			$user->date_setting->timezone->label		= $user->timezone_label;
+			$user->date_setting->timezone->offset		= $user->timezone_gmt_offset;
+			
+			$user->date_setting->format->date->id		= (int) $user->date_format_date_id;
+			$user->date_setting->format->date->label	= $user->date_format_date_label;
+			$user->date_setting->format->date->format	= $user->date_format_date_format;
 
-		// --------------------------------------------------------------------------
+			$user->date_setting->format->time->id		= (int) $user->date_format_time_id;
+			$user->date_setting->format->time->label	= $user->date_format_time_label;
+			$user->date_setting->format->time->format	= $user->date_format_time_format;
+			
+			unset( $user->timezone_id );
+			unset( $user->timezone_label );
+			unset( $user->timezone_gmt_offset );
 
-		//	Tidy User meta
-		unset( $user->user_id );
+			unset( $user->date_format_date_id );
+			unset( $user->date_format_date_label );
+			unset( $user->date_format_date_format );
+
+			unset( $user->date_format_time_id );
+			unset( $user->date_format_time_label );
+			unset( $user->date_format_time_format );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Tidy up langauge field
+			$user->language_setting				= new stdClass();
+			$user->language_setting->id			= (int) $user->language_id;
+			$user->language_setting->name		= $user->language_name;
+			$user->language_setting->safe_name	= $user->language_safe_name;
+			
+			unset( $user->language_id );
+			unset( $user->language_name );
+			unset( $user->language_safe_name );
+
+			// --------------------------------------------------------------------------
+
+			//	Tidy User meta
+			unset( $user->user_id );
+
+		endif;
 	}
 }
 

@@ -4,7 +4,7 @@
 					<?=lang( 'admin_rendered_in', '{elapsed_time}' )?>
 				</small>
 				<small class="footer right" rel="tooltip-l" title="<?=lang( 'admin_powered_by_tip' )?>">
-					<?=lang( 'admin_powered_by', array( 'http://nailsapp.co.uk', NAILS_VERSION ) )?>
+					<?=lang( 'admin_powered_by', array( 'http://nailsapp.co.uk', NAILS_VERSION . ' (revision '. NAILS_REVISION . ')' ) )?>
 				</small>
 				
 			</div><!--	/.content_inner	-->

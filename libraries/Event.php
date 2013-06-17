@@ -10,6 +10,7 @@
 class Event {
 	
 	private $_ci;
+	private $db;
 	private $_event_table;
 	private	$_error;
 	private $_event_type;
@@ -27,7 +28,8 @@ class Event {
 	 **/
 	public function __construct()
 	{
-		$this->_ci =& get_instance();
+		$this->_ci	=& get_instance();
+		$this->db	=& $this->_ci->db;
 		
 		// --------------------------------------------------------------------------
 		
@@ -94,9 +96,9 @@ class Event {
 		//	Get the event type
 		if ( ! isset( $this->_event_type[$type] ) ) :
 		
-			$this->_ci->db->select( 'id' );
-			$this->_ci->db->where( 'id_string', $type );
-			$this->_event_type[$type] = $this->_ci->db->get( 'event_type' )->row();
+			$this->db->select( 'id' );
+			$this->db->where( 'id_string', $type );
+			$this->_event_type[$type] = $this->db->get( 'event_type' )->row();
 			
 			if ( ! $this->_event_type[$type] )
 				show_error( 'Unrecognised event type.' );
@@ -114,6 +116,7 @@ class Event {
 		$_data					= array();
 		$_data['type_id']		= $this->_event_type[$type]->id;
 		$_data['created_by']	= $created_by;
+		$_data['url']			= uri_string();
 		$_data['vars']			= ( $vars ) ? serialize( $vars ) : NULL;
 		$_data['ref']			= (int) $ref;
 		$_data['ref']			= $_data['ref'] ? $_data['ref'] : NULL;
@@ -121,7 +124,7 @@ class Event {
 		
 		// --------------------------------------------------------------------------
 		
-		$this->_ci->db->set( $_data );
+		$this->db->set( $_data );
 		
 		if ( $recorded ) :
 		
@@ -129,25 +132,25 @@ class Event {
 		
 		else :
 		
-			$this->_ci->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'created', 'NOW()', FALSE );
 		
 		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Create the event
-		$this->_ci->db->insert( $this->_event_table );
+		$this->db->insert( $this->_event_table );
 		
 		// --------------------------------------------------------------------------
 		
-		if ( ! $this->_ci->db->affected_rows() ) :
+		if ( ! $this->db->affected_rows() ) :
 		
 			$this->_add_error( 'Event could not be created' );
 			return FALSE;
 		
 		else :
 		
-			$_event_id = $this->_ci->db->insert_id();
+			$_event_id = $this->db->insert_id();
 		
 		endif;
 		
@@ -208,9 +211,9 @@ class Event {
 		if ( $_data ) :
 		
 			//	Attempt to add interested parties
-			$this->_ci->db->insert_batch( $this->_event_table_ip, $_data );
+			$this->db->insert_batch( $this->_event_table_ip, $_data );
 			
-			if ( $this->_ci->db->affected_rows() ) :
+			if ( $this->db->affected_rows() ) :
 			
 				//	All good! Return the new event ID
 				return $_event_id;
@@ -220,8 +223,8 @@ class Event {
 				$this->_add_error( 'Interested parties failed to add, event not created' );
 				
 				//	Roll back the event
-				$this->_ci->db->where( 'id', $_event_id );
-				$this->_ci->db->delete( $this->_event_table );
+				$this->db->where( 'id', $_event_id );
+				$this->db->delete( $this->_event_table );
 				
 				return FALSE;
 			
@@ -265,13 +268,13 @@ class Event {
 		// --------------------------------------------------------------------------
 		
 		//	Perform delete
-		$this->_ci->db->where( 'id', $id );	
-		$this->_ci->db->delete( $this->_event_table );
+		$this->db->where( 'id', $id );	
+		$this->db->delete( $this->_event_table );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Spit back result
-		if  ( $this->_ci->db->affected_rows() ) :
+		if  ( $this->db->affected_rows() ) :
 		
 			return TRUE;
 		
@@ -295,24 +298,40 @@ class Event {
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	public function get_all( $limit = NULL )
+	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $include_interested_parties = FALSE )
 	{
 		//	Fetch all objects from the table
-		$this->_ci->db->select( 'e.id, e.type_id, et.id_string, et.name, et.description, e.created_by, um.first_name, um.last_name, um.profile_img, e.vars, e.created' );
-		$this->_ci->db->select( 'UNIX_TIMESTAMP( e.created ) created_time, eip.user_id interested_party, eip.is_read, e.level' );
+		$this->db->select( 'e.*, et.slug type_slug, et.label type_label, et.description type_description, et.ref_join_table, et.ref_join_column' );
+		$this->db->select( 'u.email,um.first_name,um.last_name,um.profile_img,um.gender' );
+
+		//	Set Order
+		if ( is_array( $order ) ) :
+
+			$this->db->order_by( $order[0], $order[1] );
+
+		else :
+
+			$this->db->order_by( 'e.created', 'DESC' );
+
+		endif;
 		
-		$this->_ci->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
-		$this->_ci->db->join( 'event_interested_party eip', 'e.id = eip.event_id', 'LEFT' );
-		$this->_ci->db->join( 'user_meta um', 'um.user_id = e.created_by', 'LEFT' );
-		$this->_ci->db->join( 'user u', 'u.id = um.user_id', 'LEFT' );
+		// --------------------------------------------------------------------------
 		
-		if ( is_array( $limit ) )
-			$this->_ci->db->order_by( $limit[0], $limit[1] );
+		//	Set Limit
+		if ( is_array( $limit ) ) :
+
+			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
 		
-		$this->_ci->db->order_by( 'e.created', 'DESC' );
-		$this->_ci->db->order_by( 'e.level', 'DESC' );
+		// --------------------------------------------------------------------------
 		
-		$_events = $this->_ci->db->get( $this->_event_table . ' e' )->result();
+		//	Build conditionals
+		$this->_getcount_common( $where );
+
+		// --------------------------------------------------------------------------
+		
+		$_events = $this->db->get( $this->_event_table . ' e' )->result();
 		
 		// --------------------------------------------------------------------------
 		
@@ -320,70 +339,70 @@ class Event {
 		//	interested parties as a sub-array. This method only requires a single
 		//	query to the DB rather than one for each returned event.
 		
-		$_out					= array();
 		$_created_parts_keys	= array( 'year', 'month', 'day' );
 		
 		foreach( $_events AS $event ) :
 		
-			if ( isset( $_out[ $event->id ] ) ) :
-			
-				//	Object has already been created, add this interested party
-				//	Store interested parties using their user_id as the key so
-				//	it can be easily referenced.
-				
-				$_out[ $event->id ]['interested_parties'][$event->interested_party] = array(
-					'user_id' => $event->interested_party,
-					'is_read' => (bool) $event->is_read
-				);
-			
-			else :
-			
-				//	Not yet set, define the base array
-				
-				$_out[ $event->id ] = array(
-					'id'					=> $event->id,
-					'type'					=> new stdClass(),
-					'creator'				=> new stdClass(),
-					'vars'					=> unserialize( $event->vars ),
-					'created'				=> $event->created,
-					'created_time'			=> $event->created_time,
-					'created_parts'			=> array_combine( $_created_parts_keys, explode( '|', date( 'Y|F|d', strtotime( $event->created ) ) ) ),
-					'level'					=> $event->level,
-					
-					//	Store interested parties using their user_id as the key so
-					//	it can be easily referenced.
-					
-					'interested_parties'	=>	array(
-						$event->interested_party => array(
-							'user_id' => $event->interested_party,
-							'is_read' => (bool) $event->is_read
-						)
-					),
-				
-				);
-				
-				$_out[ $event->id ]['creator']->id			= $event->type_id;
-				$_out[ $event->id ]['creator']->first_name	= $event->first_name;
-				$_out[ $event->id ]['creator']->last_name	= $event->last_name;
-				$_out[ $event->id ]['creator']->profile_img	= $event->profile_img;
-				
-				$_out[ $event->id ]['type']->id				= $event->type_id;
-				$_out[ $event->id ]['type']->id_string		= $event->id_string;
-				$_out[ $event->id ]['type']->name			= $event->name;
-				$_out[ $event->id ]['type']->description	= $event->description;
-			
+			$this->_format_event_object( $event) ;
+
+			// --------------------------------------------------------------------------
+
+			if ( $include_interested_parties ) :
+
+				$event->interested_parties = $this->_get_interested_parties_for_event( $event->id );
+
 			endif;
 		
 		endforeach;
 		
 		// --------------------------------------------------------------------------
 		
-		//	Reset the array indexes
-		$_out = array_values( $_out );
+		return $_events;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	
+	/**
+	 * Counts the total amount of events for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_all() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_all( $where = NULL )
+	{
+		$this->_getcount_common( $where );
 		
 		// --------------------------------------------------------------------------
 		
-		return $_out;
+		//	Execute Query
+		return $this->db->count_all_results( $this->_event_table . ' e' );
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	private function _getcount_common( $where = NULL, $search = NULL )
+	{
+		$this->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
+		$this->db->join( 'user_meta um', 'um.user_id = e.created_by', 'LEFT' );
+		$this->db->join( 'user u', 'u.id = um.user_id', 'LEFT' );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Where
+		if ( $where ) :
+		
+			$this->db->where( $where );
+			
+		endif;
 	}
 	
 	
@@ -400,7 +419,7 @@ class Event {
 	 **/
 	public function get_by_id( $id )
 	{
-		$this->_ci->db->where( 'e.id', $id );
+		$this->db->where( 'e.id', $id );
 		$_event = $this->get_all();
 		
 		// --------------------------------------------------------------------------
@@ -433,130 +452,15 @@ class Event {
 	{
 		if ( is_numeric( $type ) ) :
 		
-			$this->_ci->db->where( 'et.id', $type );
+			$this->db->where( 'et.id', $type );
 		
 		else :
 		
-			$this->_ci->db->where( 'et.id_string', $type );
+			$this->db->where( 'et.slug', $type );
 		
 		endif;
 		
 		return $this->get_all();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Fetch event objects of [or not of] a particular type
-	 *
-	 * @access	public
-	 * @param	array	$filter		The types of event to include/exclude
-	 * @param	string	$method		The method of search, either include or exclude
-	 * @param	array	$limit		An optional limit to pass to get_all()
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_by_types( $filter = NULL, $method = 'include', $limit = NULL )
-	{
-		if ( $filter && $method == 'include' ) :
-		
-			$this->_ci->db->where_in( 'et.id_string', $filter );
-		
-		elseif ( $filter && $method == 'exclude' ) :
-		
-			$this->_ci->db->where_not_in( 'et.id_string', $filter );
-		
-		elseif ( $filter ):
-		
-			$this->_add_error( 'Invalid method' );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		return $this->get_all( $limit );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Fetch event objects which pertain to an interested party
-	 *
-	 * @access	public
-	 * @param	int		$id			The ID of the interested party
-	 * @param	array	$filter		The types of event to include
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_for_interested_party( $id, $level = 0, $limit = 150, $show_unread = TRUE )
-	{
-		$this->_ci->db->where( 'eip.user_id', $id );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Define the level threshold
-		$this->_ci->db->where( 'e.level >=', $level );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Include unread?
-		if ( ! $show_unread ) :
-		
-			$this->_ci->db->where( 'eip.is_read', FALSE );
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		return $this->get_all( $limit );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Get count of events
-	 *
-	 * @access	public
-	 * @param	int		$id			The ID of the interested party
-	 * @param	array	$filter		The types of event to include
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_count_for_interested_party( $type = 'notifications', $id, $level = 1, $limit = 150, $show_unread = TRUE )
-	{
-	
-		if ( $type == 'notifications' ) :
-			
-			$result = $this->get_for_interested_party( $id, $level = 1, $limit = 150, $show_unread = FALSE ); 
-
-			return count( $result );
-		
-		elseif ( $type == 'messages' ) :
-		
-			$_count = 0;
-			
-			// --------------------------------------------------------------------------
-			
-			//	Fetch 'did_post_message' events which are of interest to this user which have not been read
-			$_event_types = array(
-				'did_post_message', 'did_post_interview', 'did_request_connection', 'did_authorise_connection'
-			);
-			$this->_ci->db->where_in( 'e.type', $_event_types );
-			$result = $this->get_for_interested_party( $id, 0, 150, FALSE );
-
-			// --------------------------------------------------------------------------
-				
-			return count( $result );
-		
-		endif;
-
 	}
 	
 	
@@ -573,197 +477,37 @@ class Event {
 	 **/
 	public function get_by_user( $user_id )
 	{
-		$this->_ci->db->where( 'e.created_by', $user_id );
+		$this->db->where( 'e.created_by', $user_id );
 		return $this->get_all();
 	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Fetch event objects created on or between a particular date(s)
-	 *
-	 * @access	public
-	 * @param	string	$start	The start date
-	 * @param	string	$end	The end date
-	 * @param	array	$opts	An array defining a user_id and/or type to restrict the lookup by (i.e all events created between X and Y by user X of type 'test')
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_by_date( $start, $end = NULL, $opts = NULL )
-	{	
-		//	Set range
-		if ( $end ) :
-			
-			$start	= strtotime( $start );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Alter 'special' cases a little
-			if ( strtolower( $end ) == 'today' || strtolower( $end ) == 'yesterday' ) :
-			
-				$end	= mktime( 23, 59, 59,	date( 'm', strtotime( $end ) ), date( 'd', strtotime( $end ) ), date( 'Y', strtotime( $end ) ) );
-			
-			else:
-			
-				$end	= strtotime( $end );
-			
-			endif;
-			
-			// --------------------------------------------------------------------------
-				
-			$this->_ci->db->where( 'e.created >= ',	$start,	FALSE );
-			$this->_ci->db->where( 'e.created <= ',	$end,	FALSE );
-			
-		else :
-		
-			$start	= strtotime( $start );
-			$start	= mktime(0,	 0,	 0,		date( 'm', $start ), date( 'd', $start ), date( 'Y', $start ) );
-			$end	= mktime(23, 59, 59,	date( 'm', $start ), date( 'd', $start ), date( 'Y', $start ) );
-			
-			// --------------------------------------------------------------------------
-			
-			$this->_ci->db->where( 'e.created >= ',	$start,	FALSE );
-			$this->_ci->db->where( 'e.created <= ',	$end,	FALSE );
-			
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set options (allows the developer to specify events created by a certain
-		//	user of a certain type within a specific date range
-		
-		if ( isset( $opts['user_id'] ) )
-			$this->_ci->db->where( 'user_id', $opts['user_id'] );
-			
-		if ( isset( $opts['type'] ) )
-			$this->_ci->db->where( 'type', $opts['type'] );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Execute query
-		return $this->get_all();
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
 
-	/**
-	 * Mark events for a particular user as read
-	 *
-	 * @access	public
-	 * @param	int		$user_id	The user ID to update
-	 * @param	array	$event_ids	An array of event IDs to specifically mark as read, defaults to *
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function mark_read( $user_id, $event_ids = NULL )
-	{
-		//	Admins logged in as people shouldn't be marking events as read, GHOST MODE, woooooooo
-		//	Ghost mode runs on production only, all other environments behave as normal (for testing)
-		
-		if ( ENVIRONMENT == 'production' && get_userobject()->was_admin() ) :
-		
-			return TRUE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		if ( $event_ids ) :
-		
-			if ( is_array( $event_ids ) ) :
-			
-				$this->_ci->db->where_in( 'event_id', $event_ids );
-			
-			else :
-			
-				$this->_ci->db->where( 'event_id', $event_ids );
-			
-			endif;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->_ci->db->where( 'user_id', $user_id );
-		
-		// --------------------------------------------------------------------------
-		
-		$this->_ci->db->set( 'is_read', TRUE );
-		$this->_ci->db->update( 'event_interested_party' );
-		
-		// --------------------------------------------------------------------------
-		
-		return TRUE;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
 
-	/**
-	 * Mark events of a particular type for a particular user as read
-	 *
-	 * @access	public
-	 * @param	int		$user_id	The user ID to update
-	 * @param	array	$types		An array of event IDs to specifically mark as read, defaults to *
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function mark_type_read( $user_id, $types = NULL )
+	// --------------------------------------------------------------------------
+
+
+	public function get_types()
 	{
-		//	Admins logged in as people shouldn't be marking events as read, GHOST MODE, woooooooo
-		//	Ghost mode runs on production only, all other environments behave as normal (for testing)
-		
-		if ( ENVIRONMENT == 'production' && get_userobject()->was_admin() ) :
-		
-			return TRUE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		if ( $types ) :
-		
-			if ( is_array( $types ) ) :
-			
-				$this->_ci->db->where_in( 'e.id_string', $types );
-			
-			else :
-			
-				if ( is_numeric( $types ) ) :
-				
-					$this->_ci->db->where( 'et.id', $types );
-					
-				else :
-				
-					$this->_ci->db->where( 'et.id_string', $types );
-				
-				endif;
-			
-			endif;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->_ci->db->where( 'e.id = eip.event_id' );
-		
-		// --------------------------------------------------------------------------
-		
-		$this->_ci->db->where( 'eip.user_id', $user_id );
-		
-		// --------------------------------------------------------------------------
-		
-		$this->_ci->db->set( 'eip.is_read', TRUE );
-		$this->_ci->db->update( 'event_interested_party eip, event e' );
-		
-		// --------------------------------------------------------------------------
-		
-		return TRUE;
+		$this->db->order_by( 'label,slug' );
+		return $this->db->get( 'event_type' )->result();;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_types_flat()
+	{
+		$_types = $this->get_types();
+
+		$_out = array();
+
+		foreach ( $_types AS $type ) :
+
+			$_out[$type->id] = $type->label ? $type->label : title_case( str_replace( '_', ' ', $type->slug ) );
+
+		endforeach;
+
+		return $_out;
 	}
 	
 	
@@ -798,6 +542,54 @@ class Event {
 	private function _add_error( $error )
 	{
 		$this->_error[] = $error;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_event_object( &$obj )
+	{
+		//	Ints
+		$obj->id	= (int) $obj->id;
+		$obj->level	= (int) $obj->level;
+		$obj->ref	= is_null( $obj->ref ) ? NULL : (int) $obj->ref;
+
+		//	Type
+		$obj->type					= new stdClass();
+		$obj->type->id				= $obj->type_id;
+		$obj->type->slug			= $obj->type_slug;
+		$obj->type->label			= $obj->type_label;
+		$obj->type->description		= $obj->type_description;
+		$obj->type->ref_join_table	= $obj->ref_join_table;
+		$obj->type->ref_join_column	= $obj->ref_join_column;
+
+
+		unset( $obj->type_id );
+		unset( $obj->type_slug );
+		unset( $obj->type_label );
+		unset( $obj->type_description );
+		unset( $obj->ref_join_table );
+		unset( $obj->ref_join_column );
+
+		//	Vars
+		$obj->data	= unserialize( $obj->data );
+
+		//	User
+		$obj->user				= new stdClass();
+		$obj->user->id			= $obj->created_by;
+		$obj->user->email		= $obj->email;
+		$obj->user->first_name	= $obj->first_name;
+		$obj->user->last_name	= $obj->last_name;
+		$obj->user->profile_img	= $obj->profile_img;
+		$obj->user->gender		= $obj->gender;
+
+		unset( $obj->created_by );
+		unset( $obj->email );
+		unset( $obj->first_name );
+		unset( $obj->last_name );
+		unset( $obj->profile_img );
+		unset( $obj->gender );
 	}
 
 }
