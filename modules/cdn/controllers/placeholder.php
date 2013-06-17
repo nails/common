@@ -116,7 +116,7 @@ class Placeholder extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Output to browser
-			//header( 'Content-Type: image/png' );
+			header( 'Content-Type: image/png' );
 			imagepng( $_img );
 			
 			// --------------------------------------------------------------------------
