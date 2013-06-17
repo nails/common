@@ -17,7 +17,7 @@
 
 class NAILS_Shop_payment_gateway_model extends NAILS_Model
 {
-	private $_table;
+	protected $_table;
 	
 	
 	// --------------------------------------------------------------------------
