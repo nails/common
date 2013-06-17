@@ -305,6 +305,33 @@ class NAILS_Shop_product_model extends NAILS_Model
 		
 		return $_result[0];
 	}
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_product_types()
+	{
+		$this->db->order_by( 'label' );
+		return $this->db->get( $this->_table_type )->result();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_product_types_flat()
+	{
+		$_types	= $this->get_product_types();
+		$_out	= array();
+
+		foreach ( $_types AS $type ) :
+
+			$_out[$type->id] = $type->label;
+
+		endforeach;
+
+		return $_out;
+	}
 	
 	
 	// --------------------------------------------------------------------------

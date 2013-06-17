@@ -134,7 +134,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->load->helper( 'shop' );
 		$this->load->model( 'shop/shop_model', 'shop' );
 		$this->load->model( 'shop/shop_currency_model', 'currency' );
-
+		$this->load->model( 'shop/shop_product_model', 'product' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -611,6 +611,47 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_create()
 	{
+		if ( $this->input->post() ) :
+
+			$this->load->library( 'form_validation' );
+
+			$this->form_validation->set_rules( 'type', '', 'required|is_natural' );
+
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+			if ( $this->form_validation->run() ) :
+
+				dumpanddie( 'valid' );
+
+			else :
+
+				$this->data['error'] = lang( 'fv_there_was_an_error' );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['page']->title = 'Create Voucher';
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		$this->data['product_types'] = $this->product->get_product_types_flat();
+
+		// --------------------------------------------------------------------------
+
+		//	Load assets
+		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'nails.admin.shop.vouchers.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/vouchers/create',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 

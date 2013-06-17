@@ -1,6 +1,7 @@
 <div class="group-shop vouchers browse">
 	<p>
 		Browse all vouchers (including gift cards) which are associated with the shop.
+		<?=anchor( 'admin/shop/vouchers/create', 'Create Voucher', 'class="awesome small green right"' )?>
 	</p>
 
 	<?php
