@@ -97,7 +97,7 @@ class Event {
 		if ( ! isset( $this->_event_type[$type] ) ) :
 		
 			$this->db->select( 'id' );
-			$this->db->where( 'id_string', $type );
+			$this->db->where( 'slug', $type );
 			$this->_event_type[$type] = $this->db->get( 'event_type' )->row();
 			
 			if ( ! $this->_event_type[$type] )
