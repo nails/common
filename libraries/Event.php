@@ -56,13 +56,13 @@ class Event {
 	 * @param	string		$type				The type of event to create
 	 * @param	int			$created_by			The event creator (NULL == system)
 	 * @param	int/array	$interested_party	The ID of an interested aprty (array for multiple interested parties)
-	 * @param	mixed		$vars				Any data to store alongside the event object
+	 * @param	mixed		$data				Any data to store alongside the event object
 	 * @param	int			$ref				A numeric reference to store alongside the event (e.g the id of the object the event relates to)
 	 * @param	string		$recorded			A strtotime() friendly string of the date to use instead of NOW() for the created date
 	 * @return	int or boolean
 	 * @author	Pablo
 	 **/
-	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $recorded = NULL )
+	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $data = NULL, $ref = NULL, $recorded = NULL )
 	{
 		//	Admins logged in as people shouldn't be creating events, GHOST MODE, woooooooo
 		//	Ghost mode runs on production only, all other environments generate events (for testing)
@@ -117,7 +117,7 @@ class Event {
 		$_data['type_id']		= $this->_event_type[$type]->id;
 		$_data['created_by']	= $created_by;
 		$_data['url']			= uri_string();
-		$_data['vars']			= ( $vars ) ? serialize( $vars ) : NULL;
+		$_data['data']			= ( $data ) ? serialize( $data ) : NULL;
 		$_data['ref']			= (int) $ref;
 		$_data['ref']			= $_data['ref'] ? $_data['ref'] : NULL;
 		$_data['level']			= $level;
@@ -572,7 +572,7 @@ class Event {
 		unset( $obj->ref_join_table );
 		unset( $obj->ref_join_column );
 
-		//	Vars
+		//	Data
 		$obj->data	= unserialize( $obj->data );
 
 		//	User
