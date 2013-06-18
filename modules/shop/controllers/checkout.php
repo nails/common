@@ -884,7 +884,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 			$_paypal					= array();
 			$_paypal['payment_type']	= 'instant';
-			$_paypal['invoice']			= $_order->id;
+			$_paypal['invoice']			= $_order->ref;
 			$_paypal['custom']			=  $this->encrypt->encode( md5( $_order->ref . ':' . $_order->code ), APP_PRIVATE_KEY );
 			$_paypal['txn_id']			= 'TEST:' . random_string( 'alpha', 6 );
 			$_paypal['txn_type']		= 'cart';
@@ -899,7 +899,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$_ipn		= $this->paypal->validate_ipn();
 			$_paypal	= $this->input->post();
 			
-			$_order = $this->order->get_by_id( $this->input->post( 'invoice' ) );
+			$_order = $this->order->get_by_ref( $this->input->post( 'invoice' ) );
 			
 			if ( ! $_order ) :
 			
@@ -943,7 +943,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Inform developers
-				send_developer_mail( 'An IPN request failed', 'An IPN request was made which failed secondary verification, Order ID #' . $_paypal['invoice'] );
+				send_developer_mail( 'An IPN request failed', 'An IPN request was made which failed secondary verification, Order: ' . $_paypal['invoice'] );
 				
 				return;
 			
