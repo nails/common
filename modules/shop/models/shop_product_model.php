@@ -332,6 +332,21 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		return $_out;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_product_type_by_id( $id )
+	{
+		$this->db->where( 'id', $id );
+		$_types = $this->get_product_types();
+
+		if ( ! $_types )
+			return FALSE;
+
+		return $_types[0];
+	}
 	
 	
 	// --------------------------------------------------------------------------

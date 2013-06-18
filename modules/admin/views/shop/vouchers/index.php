@@ -151,8 +151,19 @@
 								?>
 							</td>
 							<td class="actions">
-								<?=anchor( 'admin/shop/vouchers/view/' . $voucher->id, lang( 'action_edit' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' )?>
-								<?=anchor( 'admin/shop/vouchers/delete/' . $voucher->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-confirm="Are you sure?"' )?>
+								<?php
+								
+									if ( $voucher->is_active ) :
+
+										echo anchor( 'admin/shop/vouchers/deactivate/' . $voucher->id, 'Suspend', 'class="awesome small red confirm"' );
+
+									else :
+
+										echo anchor( 'admin/shop/vouchers/activate/' . $voucher->id, 'Activate', 'class="awesome small green"' );
+
+									endif;
+
+								?>
 							</td>
 						</tr>
 						<?php

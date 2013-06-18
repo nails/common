@@ -36,6 +36,17 @@
 
 			// --------------------------------------------------------------------------
 
+			//	Label
+			$_field					= array();
+			$_field['key']			= 'label';
+			$_field['label']		= 'Label/Description';
+			$_field['placeholder']	= 'The label is shown to the user when the voucher is applied.';
+			$_field['required']		= TRUE;
+			
+			echo form_field( $_field );
+
+			// --------------------------------------------------------------------------
+
 			//	Discount type
 			$_field				= array();
 			$_field['key']		= 'discount_type';
@@ -98,6 +109,7 @@
 			$_field					= array();
 			$_field['key']			= 'valid_to';
 			$_field['label']		= 'Valid To';
+			$_field['sub_label']	= 'Leave blank for no expiry date';
 			$_field['placeholder']	= 'YYYY-MM-DD HH:MM:SS';
 			$_field['class']		= 'datetime2';
 			
@@ -151,35 +163,8 @@
 <script type="text/javascript">
 	$( function(){
 
-		$( 'select.chosen' ).chosen();
-
-		// --------------------------------------------------------------------------
-
 		var _shop_voucher = new NAILS_Admin_Shop_Vouchers;
 		_shop_voucher.init_create();
-
-		// --------------------------------------------------------------------------
-
-		$( '.datetime1' ).datetimepicker(
-		{
-			dateFormat	: 'yy-mm-dd',
-			timeFormat	: 'HH:mm:ss',
-			onSelect	: function( dateValue, inst )
-			{
-				$( '.datetime2' ).datetimepicker( 'option', "minDate", dateValue );
-			}
-		});
-
-		$( '.datetime2' ).datetimepicker(
-		{
-			dateFormat	: 'yy-mm-dd',
-			timeFormat	: 'HH:mm:ss',
-			minDate		: '<?=date( 'Y-m-d H:i:s', strtotime( 'TODAY' ) )?>',
-			onSelect	: function( dateValue, inst )
-			{
-				$( '.datetime1' ).datetimepicker( 'option', "maxDate", dateValue );
-			}
-		});
 		
 	})
 </script>
