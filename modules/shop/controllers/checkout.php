@@ -703,7 +703,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	
 	protected function _processing_unpaid()
 	{
-		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
+		$this->load->view( 'shop/checkout/payment/processing/unpaid', $this->data );
 	}
 	
 	
