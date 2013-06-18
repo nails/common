@@ -837,21 +837,51 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 		
-		//	field
-		if ( ! isset( $options[0] ) && ! is_null( $_field['placeholder'] ) ) :
-		
-			$_options = array( $_field['placeholder'] ) + $options;
-		
-		else :
-		
-			$_options = $options;
-		
-		endif;
+		// --------------------------------------------------------------------------
+
+		//	Field
 		
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+		//	Get the selected options
+		if ( $_POST ) :
+
+			$_key = str_replace( '[]', '', $_field['key'] );
+			$_selected = isset( $_POST[$_key] ) ? $_POST[$_key] : '';
+
+		else :
+
+			//	Use the 'default' variabel
+			$_selected = $_field['default'];
+
+		endif;
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly );
+		//	Build the select
+		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . '>';
+
+		if ( ! is_null( $_field['placeholder'] ) ) :
+
+			$_out .= '<option disabled>' . $_field['placeholder'] . '</option>';
+
+		endif;
+
+		foreach ( $options AS $value => $label ) :
+
+			//	Selected?
+			$_checked = $value == $_selected ? 'selected="selected"' : '';
+			$_out .= '<option value="' . $value . '" ' . $_checked . '>' . $label . '</option>';
+
+		endforeach;
+		$_out .= '</select>';
+
+		if ( $_readonly ) :
+
+			$_out .= form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
 
 		if ( $_readonly ) :
 
@@ -929,31 +959,55 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_out .= $_field['required'] ? '*' : '';
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
-		
-		//	field
-		if ( ! isset( $options[0] ) && ! is_null( $_field['placeholder'] ) ) :
-		
-			$_options = array( $_field['placeholder'] ) + $options;
-		
-		else :
-		
-			$_options = $options;
-		
-		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Field
 		
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 		
 		//	Any defaults?
 		$_field['default'] = (array) $_field['default'];
+
+		//	Get the selected options
+		if ( $_POST ) :
+
+			$_key = str_replace( '[]', '', $_field['key'] );
+			$_selected = isset( $_POST[$_key] ) ? $_POST[$_key] : array();
+
+		else :
+
+			//	Use the 'default' variabel
+			$_selected = $_field['default'];
+
+		endif;
 		
-		$_out .= form_dropdown( $_field['key'], $_options, set_value( $_field['key'], $_field['default'] ), 'multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly );
+		//	Build the select
+		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . '>';
+
+		if ( ! is_null( $_field['placeholder'] ) ) :
+
+			$_out .= '<option disabled>' . $_field['placeholder'] . '</option>';
+
+		endif;
+
+		foreach ( $options AS $value => $label ) :
+
+			//	Selected?
+			$_checked = array_search( $value, $_selected ) !== FALSE ? 'selected="selected"' : '';
+			$_out .= '<option value="' . $value . '" ' . $_checked . '>' . $label . '</option>';
+
+		endforeach;
+		$_out .= '</select>';
 
 		if ( $_readonly ) :
 
 			$_out .= form_hidden( $_field['key'], $_field['default'] );
 
 		endif;
+
+		// --------------------------------------------------------------------------
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
