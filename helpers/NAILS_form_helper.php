@@ -240,12 +240,19 @@ if ( ! function_exists( 'form_field_mm' ) )
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 			
-			$_url		= site_url( 'cdn/manager/browse/image' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
 		
 		else :
 		
-			$_url		= site_url( 'cdn/manager/browse/image' );
+			$_url		= site_url( 'cdn/manager/browse' );
 		
+		endif;
+
+		//	Is the site running on SSL? If so then change the protocol so as to avoice 'protocols don't match' errors
+		if ( isset( $_SERVER['HTTPS'] ) && strtoupper( $_SERVER['HTTPS'] ) == 'ON' ) :
+
+			$_url = str_replace( 'http://', 'https://', $_url );
+
 		endif;
 		
 		$_out .= '<div class="mm-file-container">';
@@ -434,12 +441,19 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 			
-			$_url		= site_url( 'cdn/manager/browse/image' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
 		
 		else :
 		
-			$_url		= site_url( 'cdn/manager/browse/image' );
+			$_url		= site_url( 'cdn/manager/browse' );
 		
+		endif;
+
+		//	Is the site running on SSL? If so then change the protocol so as to avoice 'protocols don't match' errors
+		if ( isset( $_SERVER['HTTPS'] ) && strtoupper( $_SERVER['HTTPS'] ) == 'ON' ) :
+
+			$_url = str_replace( 'http://', 'https://', $_url );
+
 		endif;
 		
 		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="fancybox awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
