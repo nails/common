@@ -143,7 +143,7 @@ class Emailer
 		if ( ! isset( $this->email_type[ $input->type ] ) ) :
 		
 			$this->ci->db->select( 'eqt.id, eqt.cron_run, eqt.type' );
-			$this->ci->db->where( 'eqt.id_string', $input->type );
+			$this->ci->db->where( 'eqt.slug', $input->type );
 			
 			$this->email_type[ $input->type ] = $this->ci->db->get( 'email_queue_type eqt' )->row();
 			
