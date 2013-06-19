@@ -15,6 +15,7 @@
 			<tr>
 				<th class="id">ID</th>
 				<th class="ref">Ref</th>
+				<th class="placed">Placed</th>
 				<th class="customer">Customer</th>
 				<th class="value">Value</th>
 				<th class="status">Status</th>
@@ -26,6 +27,9 @@
 			<?php
 			
 				if ( $orders->data ) :
+
+					$_date_format = active_user( 'date_setting' )->format->date->format;
+					$_time_format = active_user( 'date_setting' )->format->time->format;
 				
 					foreach ( $orders->data AS $order ) :
 					
@@ -33,6 +37,7 @@
 						<tr id="order-<?=$order->id?>">
 							<td class="id"><?=$order->id?></td>
 							<td class="ref"><?=$order->ref?></td>
+							<td class="placed"><?=date( $_date_format . '\<\s\m\a\l\l\>' . $_time_format . '\<\/\s\m\a\l\l\>', strtotime( $order->created ) )?></td>
 							<td class="customer">
 								<?php
 
@@ -75,7 +80,7 @@
 								?>
 							</td>
 							<td class="value"><?=SHOP_BASE_CURRENCY_SYMBOL . number_format( $order->totals->grand, SHOP_BASE_CURRENCY_PRECISION )?></td>
-							<td class="status"><?=$order->status?></td>
+							<td class="status <?=$order->status?>"><?=$order->status?></td>
 							<?php
 
 								if ( $order->status == 'PAID' ) :

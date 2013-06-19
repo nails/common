@@ -432,6 +432,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$this->data['ignored_fields'][] = 'profile_img';
 		$this->data['ignored_fields'][] = 'timezone_id';
 		$this->data['ignored_fields'][] = 'language_id';
+		$this->data['ignored_fields'][] = 'date_format_date_id';
+		$this->data['ignored_fields'][] = 'date_format_time_id';
 		
 		//	If no cols were found, DESCRIBE the user_meta table - where possible
 		//	you should manually set columns, including datatypes
@@ -486,15 +488,17 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Define user table rules 
-			$this->form_validation->set_rules( 'email',			lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
-			$this->form_validation->set_rules( 'username',		lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
-			$this->form_validation->set_rules( 'first_name',	lang( 'form_label_first_name' ),						'xss_clean|required' );
-			$this->form_validation->set_rules( 'last_name',		lang( 'form_label_last_name' ),							'xss_clean|required' );
-			$this->form_validation->set_rules( 'gender',		lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'timezone_id',	lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'language_id',	lang( 'accounts_edit_basic_field_language_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'password',		lang( 'accounts_edit_basic_field_password_label' ),		'xss_clean' );
-			$this->form_validation->set_rules( 'temp_pw',		lang( 'accounts_edit_basic_field_temp+pw_label' ),		'xss_clean' );
+			$this->form_validation->set_rules( 'email',					lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
+			$this->form_validation->set_rules( 'username',				lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
+			$this->form_validation->set_rules( 'first_name',			lang( 'form_label_first_name' ),						'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',				lang( 'form_label_last_name' ),							'xss_clean|required' );
+			$this->form_validation->set_rules( 'gender',				lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'timezone_id',			lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'date_format_date_id',	lang( 'accounts_edit_basic_field_date_format_label' ),	'xss_clean|required' );
+			$this->form_validation->set_rules( 'date_format_time_id',	lang( 'accounts_edit_basic_field_time_format_label' ),	'xss_clean|required' );
+			$this->form_validation->set_rules( 'language_id',			lang( 'accounts_edit_basic_field_language_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'password',				lang( 'accounts_edit_basic_field_password_label' ),		'xss_clean' );
+			$this->form_validation->set_rules( 'temp_pw',				lang( 'accounts_edit_basic_field_temp+pw_label' ),		'xss_clean' );
 			
 			// --------------------------------------------------------------------------
 			
@@ -684,14 +688,16 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				if ( ! isset( $this->data['upload_error'] ) ) :
 				
 					//	Set basic data
-					$_data['temp_pw']		= string_to_boolean( $_post['temp_pw'] );
-					$_data['first_name']	= $_post['first_name'];
-					$_data['last_name']		= $_post['last_name'];
-					$_data['email']			= $_post['email'];
-					$_data['username']		= $_post['username'];
-					$_data['gender']		= $_post['gender'];
-					$_data['timezone_id']	= $_post['timezone_id'];
-					$_data['language_id']	= $_post['language_id'];
+					$_data['temp_pw']				= string_to_boolean( $_post['temp_pw'] );
+					$_data['first_name']			= $_post['first_name'];
+					$_data['last_name']				= $_post['last_name'];
+					$_data['email']					= $_post['email'];
+					$_data['username']				= $_post['username'];
+					$_data['gender']				= $_post['gender'];
+					$_data['timezone_id']			= $_post['timezone_id'];
+					$_data['date_format_date_id']	= $_post['date_format_date_id'];
+					$_data['date_format_time_id']	= $_post['date_format_time_id'];
+					$_data['language_id']			= $_post['language_id'];
 					
 					if ( $_post['password'] ) :
 					
@@ -748,7 +754,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					// --------------------------------------------------------------------------
 					
 					//	Update account
-					
 					if ( $this->user->update( $_post['id'], $_data ) ) :
 						
 						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ), $_post['email'] ) );	
@@ -839,11 +844,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user->get_groups();
 		
-		$this->load->model( 'system/timezone_model' );
-		$this->data['timezones']	= $this->timezone_model->get_all_flat();
+		$this->load->model( 'system/datetime_model' );
+		$this->data['timezones']	= $this->datetime_model->get_all_timezone_flat();
+		$this->data['date_formats']	= $this->datetime_model->get_all_date_format_flat();
+		$this->data['time_formats']	= $this->datetime_model->get_all_time_format_flat();
 		
 		$this->load->model( 'language_model' );
-		$this->data['languages']	= $this->language_model->get_all_supported_flat();
+		$this->data['languages']	= $this->language_model->get_all_flat();
 		
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :
@@ -898,6 +905,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->data['footer_override'] = 'structure/footer/blank';
 		
 		endif;
+
+		$this->asset->load( 'jquery.chosen.min.js', TRUE );
 		
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/accounts/edit/index',	$this->data );

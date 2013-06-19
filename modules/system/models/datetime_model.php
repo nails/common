@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		CORE_NAILS_Timezone_Model
+ * Name:		Datetime_model
  *
- * Description:	This model contains all methods for handling timezones
+ * Description:	This model contains all methods for handling dates, times and timezones
  * 
  **/
 
@@ -15,9 +15,76 @@
  * 
  **/
 
-class NAILS_Timezone_model extends NAILS_Model
+class NAILS_Datetime_model extends NAILS_Model
 {
-	public function get_all()
+	// --------------------------------------------------------------------------
+
+	//	DATE FORMAT METHODS
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_date_format()
+	{
+		return $this->db->get( 'date_format_date dfd' )->result();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_date_format_flat()
+	{
+		$_out		= array();
+		$_formats	= $this->get_all_date_format();
+		
+		for( $i=0; $i<count( $_formats ); $i++ ) :
+		
+			$_out[$_formats[$i]->id] = $_formats[$i]->label;
+		
+		endfor;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	//	TIME FORMAT METHODS
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_time_format()
+	{
+		return $this->db->get( 'date_format_time dft' )->result();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_time_format_flat()
+	{
+		$_out		= array();
+		$_formats	= $this->get_all_time_format();
+		
+		for( $i=0; $i<count( $_formats ); $i++ ) :
+		
+			$_out[$_formats[$i]->id] = $_formats[$i]->label;
+		
+		endfor;
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
+	}
+
+	// --------------------------------------------------------------------------
+
+	//	TIMEZONE METHODS
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_timezone()
 	{
 		$this->db->select( 'tz.id,tz.gmt_offset,tz.label' );
 		$this->db->order_by( 'tz.gmt_offset', 'DESC' );
@@ -29,10 +96,10 @@ class NAILS_Timezone_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function get_all_flat()
+	public function get_all_timezone_flat()
 	{
 		$_out		= array();
-		$_timezones	= $this->get_all();
+		$_timezones	= $this->get_all_timezone();
 		
 		for( $i=0; $i<count( $_timezones ); $i++ ) :
 		
@@ -75,14 +142,14 @@ class NAILS_Timezone_model extends NAILS_Model
  * 
  **/
  
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_TIMEZONE_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_DATETIME_MODEL' ) ) :
 
-	class Timezone_model extends NAILS_Timezone_model
+	class Datetime_model extends NAILS_Datetime_model
 	{
 	}
 
 endif;
 
 
-/* End of file timezone_model.php */
-/* Location: ./system/application/models/timezone_model.php */
+/* End of file datetime_model.php */
+/* Location: ./system/application/models/datetime_model.php */

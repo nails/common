@@ -15,10 +15,11 @@
 		<thead>
 			<tr>
 				<th class="code">Code</th>
-				<th class="type">Type</th>
+				<th class="type">Details</th>
 				<th class="value">Discount</th>
 				<th class="valid_from">Valid From</th>
 				<th class="expires">Expires</th>
+				<th class="uses">Uses</th>
 				<th class="actions">Actions</th>
 			</tr>
 		</thead>
@@ -35,11 +36,13 @@
 							<td class="type">
 							<?php
 
+								echo $voucher->label;
+
 								switch( $voucher->type ) :
 
 									case 'NORMAL' :
 
-										echo 'Normal';
+										echo '<small>Type: Normal</small>';
 
 									break;
 
@@ -47,7 +50,7 @@
 
 									case 'LIMITED_USE' :
 
-										echo 'Limited Use';
+										echo '<small>Type: Limited Use</small>';
 										echo '<small>Limited to ' . $voucher->limited_use_limit . ' uses; used ' . $voucher->use_count . ' times</small>';
 
 
@@ -57,7 +60,7 @@
 
 									case 'GIFT_CARD' :
 
-										echo 'Gift card';
+										echo '<small>Type: Gift card</small>';
 										echo '<small>Remaining Balance:' . SHOP_BASE_CURRENCY_SYMBOL . number_format( $voucher->gift_card_balance, SHOP_BASE_CURRENCY_PRECISION ). '</small>';
 
 									break;
@@ -85,7 +88,7 @@
 
 									case 'PRODUCT_TYPES' :
 
-										echo 'Certain product types only &ndash; PRODUCT TYPE';
+										echo 'Certain product types only &rsaquo; ' . $voucher->product->label;
 
 									break;
 
@@ -150,6 +153,7 @@
 
 								?>
 							</td>
+							<td class="uses"><?=number_format( $voucher->use_count )?></td>
 							<td class="actions">
 								<?php
 								

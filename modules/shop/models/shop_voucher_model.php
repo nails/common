@@ -285,7 +285,22 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		$this->load->model( 'shop/shop_product_model', 'product' );
+
 		foreach ( $_vouchers AS $voucher ) :
+
+			//	Fetch extra data 
+			switch ( $voucher->discount_application ) :
+
+				case 'PRODUCT_TYPES' :
+				
+					$voucher->product = $this->product->get_product_type_by_id( $voucher->product_type_id );
+
+				break;
+
+			endswitch;
+
+			// --------------------------------------------------------------------------
 
 			$this->_format_voucher( $voucher );
 

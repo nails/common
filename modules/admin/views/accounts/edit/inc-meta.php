@@ -16,7 +16,7 @@
 				
 				$_field						= array();
 				$_field['key']				= $field;
-				$_field['type']				= isset( $user_meta_cols[$field]['type'] ) ? $user_meta_cols[$field]['type'] : 'text';
+				$_field['type']				= isset( $user_meta_cols[$field]['datatype'] ) ? $user_meta_cols[$field]['datatype'] : 'text';
 				$_field['label']			= isset( $user_meta_cols[$field]['label'] ) ? $user_meta_cols[$field]['label'] : ucwords( str_replace( '_', ' ', $field ) );
 				$_field['required']			= isset( $user_meta_cols[$field]['required'] ) ? $user_meta_cols[$field]['required'] : FALSE;
 				$_field['default']			= $value;
@@ -26,6 +26,8 @@
 					case 'bool':
 					case 'boolean' :
 					
+						$_field['class']	= 'chosen';
+
 						$_options = array(
 							lang( 'no' ),
 							lang( 'yes' )
@@ -74,6 +76,8 @@
 									$_options[$row->{$_select_id}] = $row->{$_select_name};
 								
 								endforeach;
+
+								$_field['class']	= 'chosen';
 	
 								echo form_field_dropdown( $_field, $_options );
 							
