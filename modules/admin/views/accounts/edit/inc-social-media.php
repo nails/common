@@ -10,7 +10,7 @@
 			
 				echo '<div class="icon" style="background-image: url(' . NAILS_URL . 'img/admin/accounts/icons/facebook-icon.png)">';
 				echo 'ID: ' . $user_edit->fb_id;
-				echo '<br />Token: ' . $user_edit->fb_token;	
+				echo '<br />Token: ' . wordwrap( $user_edit->fb_token, 100, '<br />', TRUE );
 				echo '</div>';
 			
 			endif;
