@@ -137,13 +137,13 @@
 	
 	//	Forgotten Password
 	$lang['auth_forgot_message']						= 'Please enter your registered email address so we can send you an email with a link which you can use to reset your password.';
-	$lang['auth_forgot_temp_message']					= '<strong>A password reset has been requested for this account</strong><br />Please choose a new password and click "Update Password &amp; Log In"';
+	$lang['auth_forgot_temp_message']					= '<strong>A password reset has been requested for this account</strong><br />Please choose a new password and click "Change Password &amp; Log In"';
 	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
 	$lang['auth_forgot_new_pass_placeholder']			= 'Type a new password';
 	$lang['auth_forgot_new_pass_confirm_placeholder']	= 'Confirm your new password';
 	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
 	$lang['auth_forgot_action_reset']					= 'Reset Password';
-	$lang['auth_forgot_action_reset_continue']			= 'Change Password &amp; Log In';
+	$lang['auth_forgot_action_reset_continue']			= 'Change Password & Log In';
 	$lang['auth_forgot_success']						= '<strong>Reset token sent!</strong> Please check your email remembering to look in junk and spam folders.';
 	$lang['auth_forgot_email_fail']						= '<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
 	$lang['auth_forgot_code_not_set']					= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
