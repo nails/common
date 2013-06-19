@@ -7,6 +7,10 @@ class CORE_NAILS_Model extends CI_Model {
 	protected $_error = array();
 	protected $_table;
 	protected $_table_prefix;
+
+	private $_cache_values;
+	private $_cache_keys;
+	private $_cache_method;
 	
 	// --------------------------------------------------------------------------
 	
@@ -14,8 +18,7 @@ class CORE_NAILS_Model extends CI_Model {
 	/**
 	 * Construct the model
 	 *
-	 * @access	protected
-	 * @param	string	$error	The error message
+	 * @access	public
 	 * @return	void
 	 * @author	Pablo
 	 **/
@@ -27,8 +30,42 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
 		$this->user =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		//	Set the cache method
+		//	TODO: check for availability of thigns like memcached
+
+		$this->_cache_values	= array();
+		$this->_cache_keys		= array();
+		$this->_cache_method	= 'LOCAL';
 	}
 	
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Destruct the model
+	 *
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function __destruct()
+	{
+		//	Clear cache's
+		if ( isset( $this->_cache_keys ) && $this->_cache_keys ) :
+
+			foreach ( $this->_cache_keys AS $key ) :
+
+				
+				$this->_unset_cache( $key );
+
+			endforeach;
+
+		endif;
+	}
 	
 	// --------------------------------------------------------------------------
 	
@@ -60,6 +97,177 @@ class CORE_NAILS_Model extends CI_Model {
 	public function get_error()
 	{
 		return $this->_error;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Provides models with the an easy interface for saving data to a cache.
+	 *
+	 * @access	protected
+	 * @param string $key The key for the cached item
+	 * @param mixed $value The data to be cached
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	protected function _set_cache( $key, $value )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+		
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				$this->_cache_values[md5( $_prefix . $key )] = serialize( $value );
+				$this->_cache_keys[]	= $key;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Lookup a cache item
+	 *
+	 * @access	protected
+	 * @param	string	$key	The key to fetch
+	 * @return	mixed
+	 * @author	Pablo
+	 **/
+	protected function _get_cache( $key )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				if ( isset( $this->_cache_values[md5( $_prefix . $key )] ) ) :
+
+					return unserialize( $this->_cache_values[md5( $_prefix . $key )] );
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Unset a cache item
+	 *
+	 * @access	protected
+	 * @param	string	$key	The key to fetch
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	protected function _unset_cache( $key )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+		
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				unset( $this->_cache_values[md5( $_prefix . $key )] );
+
+				$_key = array_search( $key, $this->_cache_keys );
+
+				if ( $_key !== FALSE ) :
+
+					unset( $this->_cache_keys[$_key] );
+
+				endif;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Define the cache key prefix
+	 *
+	 * @access	private
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	private function _cache_prefix()
+	{
+		return get_called_class();
 	}
 
 

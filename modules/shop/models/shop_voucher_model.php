@@ -294,7 +294,20 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 				case 'PRODUCT_TYPES' :
 				
-					$voucher->product = $this->product->get_product_type_by_id( $voucher->product_type_id );
+					$_cache = $this->_get_cache(  'voucher-product-type-' . $voucher->product_type_id );
+					if ( $_cache ) :
+
+						//	Exists in cache
+						dump( 'hit!' );
+						$voucher->product = $_cache;
+
+					else :
+
+						//	Doesn't exist, fetch and save
+						$voucher->product = $this->product->get_product_type_by_id( $voucher->product_type_id );
+						$this->_set_cache( 'voucher-product-type-' . $voucher->product_type_id, $voucher->product );
+
+					endif;
 
 				break;
 

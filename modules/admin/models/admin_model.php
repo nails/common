@@ -25,6 +25,10 @@ class Admin_Model extends NAILS_Model
 	 **/
 	public function __construct()
 	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
 		/**
 		 * Set the search paths to look for modules within; paths listed first
 		 * take priority over those listed after it.
