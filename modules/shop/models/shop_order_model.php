@@ -671,10 +671,10 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 		
-		$this->db->join( 'shop_order o', 'o.id = op.order_id' );
-		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id' );
+		$this->db->join( 'shop_order o', 'o.id = op.order_id', 'LEFT' );
+		$this->db->join( 'shop_product p', 'p.id = op.product_id', 'LEFT' );
+		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id', 'LEFT' );
+		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 		
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
 		$this->db->where( 'o.status', 'PAID' );	
@@ -694,7 +694,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		endif;
 		
 		$_items = $this->db->get( 'shop_order_product op' )->result();
-		
+		dumpanddie($this->db->last_query());
 		foreach ( $_items AS $item ) :
 		
 			$this->db->where( 'product_id', $item->product_id );
