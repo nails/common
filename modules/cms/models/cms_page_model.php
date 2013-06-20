@@ -219,10 +219,9 @@ class Cms_page_model extends NAILS_Model
 	public function get_all( $include_widgets = FALSE, $include_deleted = FALSE )
 	{
 		$this->db->select( 'p.id,p.slug,p.title,p.layout,p.sidebar_width,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
-		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		
 		$this->db->join( 'user u', 'u.id = p.modified_by', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = p.modified_by', 'LEFT' );
 		
 		if ( ! $include_deleted ) :
 		

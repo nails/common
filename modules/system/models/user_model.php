@@ -611,7 +611,7 @@ class NAILS_User_model extends NAILS_Model
 	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		//	Write selects
-		$this->db->select( 'u.id, u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->select( 'u.id, u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -686,10 +686,10 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );
-		$this->db->join( 'timezone utz',			'um.timezone_id = utz.id',			'left' );
-		$this->db->join( 'date_format_date dfd',	'um.date_format_date_id = dfd.id',	'left' );
-		$this->db->join( 'date_format_time dft',	'um.date_format_time_id = dft.id',	'left' );
-		$this->db->join( 'language ul',				'um.language_id = ul.id',			'left' );
+		$this->db->join( 'timezone utz',			'u.timezone_id = utz.id',			'left' );
+		$this->db->join( 'date_format_date dfd',	'u.date_format_date_id = dfd.id',	'left' );
+		$this->db->join( 'date_format_time dft',	'u.date_format_time_id = dft.id',	'left' );
+		$this->db->join( 'language ul',				'u.language_id = ul.id',			'left' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -712,7 +712,7 @@ class NAILS_User_model extends NAILS_Model
 			$search['columns']['id']		= 'u.id';
 			$search['columns']['email']		= 'u.email';
 			$search['columns']['username']	= 'u.username';
-			$search['columns']['name']		= array( ' ', 'um.first_name', 'um.last_name' );
+			$search['columns']['name']		= array( ' ', 'u.first_name', 'u.last_name' );
 			
 		endif;
 		
@@ -984,7 +984,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_by_referral( $referral_code, $extended = FALSE  )
 	{
-		$this->db->where( 'um.referral', $referral_code );
+		$this->db->where( 'u.referral', $referral_code );
 		$user = $this->get_all( $extended );
 		
 		return ( empty( $user ) ) ? FALSE : $user[0];
@@ -1087,9 +1087,23 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'last_update';
 			$_cols[]	= 'user_acl';
 			$_cols[]	= 'login_count';
+			$_cols[]	= 'admin_nav';
+			$_cols[]	= 'admin_dashboard';
+			$_cols[]	= 'referral';
+			$_cols[]	= 'referred_by';
+			$_cols[]	= 'salutation';
+			$_cols[]	= 'first_name';
+			$_cols[]	= 'last_name';
+			$_cols[]	= 'gender';
+			$_cols[]	= 'profile_img';
+			$_cols[]	= 'timezone_id';
+			$_cols[]	= 'date_format_date_id';
+			$_cols[]	= 'date_format_time_id';
+			$_cols[]	= 'language_id';
 			
 			//	Safety first, no updating of user's ID.
 			unset( $data->id );
+			unset( $data->id_md5 );
 			
 			//	If we're updatig the email of a user check to see if
 			//	the new email already exists; can't be having two identical
@@ -1195,7 +1209,7 @@ class NAILS_User_model extends NAILS_Model
 			//	If there's a remember me cookie then update that too, but only if the password
 			//	or email address has changed
 			
-			if ( ( isset( $data['email'] ) || isset( $data['email'] ) ) && $this->is_remembered() ) :
+			if ( ( isset( $data['email'] ) || isset( $data['password'] ) ) && $this->is_remembered() ) :
 			
 				$this->set_remember_cookie();
 			
@@ -1686,18 +1700,41 @@ class NAILS_User_model extends NAILS_Model
 		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )				? $data['auth_method_id']	: 1 ;
 		
 		//	Facebook oauth details
-		$_data['fb_token']			= ( isset( $data['fb_token'] ) )					? $data['fb_token']			: NULL ;
-		$_data['fb_id']				= ( isset( $data['fb_id'] ) )						? $data['fb_id']			: NULL ;
+		$_data['fb_token']			= ( isset( $data['fb_token'] ) )	? $data['fb_token']		: NULL ;
+		$_data['fb_id']				= ( isset( $data['fb_id'] ) )		? $data['fb_id']		: NULL ;
 		
 		//	Twitter oauth details
-		$_data['tw_id']				= ( isset( $data['tw_id'] ) )						? $data['tw_id']			: NULL ;
-		$_data['tw_token']			= ( isset( $data['tw_token'] ) )					? $data['tw_token']			: NULL ;
-		$_data['tw_secret']			= ( isset( $data['tw_secret'] ) )					? $data['tw_secret']		: NULL ;
+		$_data['tw_id']				= ( isset( $data['tw_id'] ) )		? $data['tw_id']		: NULL ;
+		$_data['tw_token']			= ( isset( $data['tw_token'] ) )	? $data['tw_token']		: NULL ;
+		$_data['tw_secret']			= ( isset( $data['tw_secret'] ) )	? $data['tw_secret']	: NULL ;
 		
 		//	Linkedin oauth details
-		$_data['li_id']				= ( isset( $data['li_id'] ) )						? $data['li_id']			: NULL ;
-		$_data['li_token']			= ( isset( $data['li_token'] ) )					? $data['li_token']			: NULL ;
-		$_data['li_secret']			= ( isset( $data['li_secret'] ) )					? $data['li_secret']		: NULL ;
+		$_data['li_id']				= ( isset( $data['li_id'] ) )		? $data['li_id']		: NULL ;
+		$_data['li_token']			= ( isset( $data['li_token'] ) )	? $data['li_token']		: NULL ;
+		$_data['li_secret']			= ( isset( $data['li_secret'] ) )	? $data['li_secret']	: NULL ;
+
+		//	Referral code
+		$_data['referral']			= $this->_generate_referral();
+
+		//	Other data
+		$_data['salutation']		= ( isset( $data['salutation'] ) )	? $data['salutation']	: NULL ;
+		$_data['first_name']		= ( isset( $data['first_name'] ) )	? $data['first_name']	: NULL ;
+		$_data['last_name']			= ( isset( $data['last_name'] ) )	? $data['last_name']	: NULL ;
+
+		if ( isset( $data['gender'] ) ) 
+			$_data['gender'] = $data['gender'];
+
+		if ( isset( $data['timezone_id'] ) ) 
+			$_data['timezone_id'] = $data['timezone_id'];
+
+		if ( isset( $data['date_format_date_id'] ) ) 
+			$_data['date_format_date_id'] = $data['date_format_date_id'];
+
+		if ( isset( $data['date_format_time_id'] ) ) 
+			$_data['date_format_time_id'] = $data['date_format_time_id'];
+
+		if ( isset( $data['language_id'] ) ) 
+			$_data['language_id'] = $data['language_id'];
 		
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
@@ -1712,7 +1749,15 @@ class NAILS_User_model extends NAILS_Model
 		unset( $data['li_id'] );
 		unset( $data['li_token'] );
 		unset( $data['li_secret'] );
-		
+		unset( $data['salutation'] );
+		unset( $data['first_name'] );
+		unset( $data['last_name'] );
+		unset( $data['gender'] );
+		unset( $data['timezone_id'] );
+		unset( $data['date_format_date_id'] );
+		unset( $data['date_format_time_id'] );
+		unset( $data['language_id'] );
+
 		$this->db->insert( 'user', $_data );
 		
 		$_id = $this->db->insert_id();
@@ -1756,16 +1801,11 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'id', $_id );
 		$this->db->update( 'user' );
 		
-		// --------------------------------------------------------------------------
-		
-		//	Generate a referral code
-		$_referral = $this->_generate_referral();
 		
 		// --------------------------------------------------------------------------
 		
 		//	Create the user_meta record, add any extra data if needed
 		$this->db->set( 'user_id', $_id );
-		$this->db->set( 'referral', $_referral );
 		
 		if ( $data ) :
 		
@@ -1827,7 +1867,7 @@ class NAILS_User_model extends NAILS_Model
 		while ( 1 > 0 ) :
 		
 			$referral = random_string( 'alnum', 8 );
-			$q = $this->db->get_where( 'user_meta', array( 'referral' => $referral ) );
+			$q = $this->db->get_where( 'user', array( 'referral' => $referral ) );
 			if ( $q->num_rows() == 0 )
 				break;
 				

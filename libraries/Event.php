@@ -302,7 +302,7 @@ class Event {
 	{
 		//	Fetch all objects from the table
 		$this->db->select( 'e.*, et.slug type_slug, et.label type_label, et.description type_description, et.ref_join_table, et.ref_join_column' );
-		$this->db->select( 'u.email,um.first_name,um.last_name,um.profile_img,um.gender' );
+		$this->db->select( 'u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
 
 		//	Set Order
 		if ( is_array( $order ) ) :
@@ -392,8 +392,7 @@ class Event {
 	private function _getcount_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = e.created_by', 'LEFT' );
-		$this->db->join( 'user u', 'u.id = um.user_id', 'LEFT' );
+		$this->db->join( 'user u', 'u.id = e.created_by', 'LEFT' );
 		
 		// --------------------------------------------------------------------------
 		

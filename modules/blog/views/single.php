@@ -29,8 +29,18 @@
 
 		echo '<h1 class="title">' . $post->title . '</h1>';
 		echo '<p class="date-author">';
-		echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
-		echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
+
+		if ( $post->is_published ) :
+
+			echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
+			echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
+
+		else :
+
+			echo 'This post has not  yet been published.';
+
+		endif;
+
 		echo '</p>';
 		echo '<p class="excerpt">' . $post->excerpt . '</p>';
 		echo '<hr />';
@@ -46,7 +56,7 @@
 
 		// --------------------------------------------------------------------------
 
-		echo '<div class="body">';
+		echo '<div class="body clearfix">';
 		if ( $post->image ) :
 		
 			echo img( array( 'src' => cdn_scale( 'blog', $post->image, 200, 200 ), 'class' => 'featured-img' ) );

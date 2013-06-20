@@ -334,11 +334,10 @@ class Cms_block_model extends NAILS_Model
 	 **/
 	public function get_all( $include_revisions = FALSE )
 	{
-		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, um.first_name, u.email, um.last_name, l.name lang_name, l.slug lang_slug, um.gender, um.profile_img' );
+		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, u.email, u.last_name, l.name lang_name, l.slug lang_slug, u.gender, u.profile_img' );
 		
 		$this->db->join( 'cms_block cb', 'cb.id = cbv.block_id' );
 		$this->db->join( 'user u', 'u.id = cbv.created_by', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = cbv.created_by', 'LEFT' );
 		$this->db->join( 'language l', 'l.id = cbv.lang_id', 'LEFT' );
 		
 		$this->db->order_by( 'cb.title' );
@@ -382,7 +381,7 @@ class Cms_block_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 			
 			//	Save the default version
-			if ( $_blocks[$i]->slug == APP_DEFAULT_LANG_SLUG ) :
+			if ( $_blocks[$i]->lang_slug == APP_DEFAULT_LANG_SLUG ) :
 			
 				$_out[$_blocks[$i]->block_id]->default_value = $_blocks[$i]->value;
 			
@@ -393,10 +392,9 @@ class Cms_block_model extends NAILS_Model
 			//	Are we including revisions?
 			if ( $include_revisions ) :
 			
-				$this->db->select( 'cbtr.*, u.email, um.first_name, um.last_name, um.gender, um.profile_img' );
+				$this->db->select( 'cbtr.*, u.email, u.first_name, u.last_name, u.gender, u.profile_img' );
 				$this->db->where( 'cbtr.block_translation_id', $_blocks[$i]->id );
 				$this->db->join( 'user u', 'u.id = cbtr.created_by', 'LEFT' );
-				$this->db->join( 'user_meta um', 'um.user_id = cbtr.created_by', 'LEFT' );
 				$this->db->order_by( 'created', 'DESC' );
 				$_temp->revisions = $this->db->get( 'cms_block_translation_revision cbtr' )->result();
 				
@@ -419,7 +417,7 @@ class Cms_block_model extends NAILS_Model
 				
 				endforeach;
 				
-				if ( $_blocks[$i]->slug == APP_DEFAULT_LANG_SLUG ) :
+				if ( $_blocks[$i]->lang_slug == APP_DEFAULT_LANG_SLUG ) :
 				
 					$_out[$_blocks[$i]->block_id]->default_value_revisions = $_temp->revisions;
 				

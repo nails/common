@@ -122,8 +122,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_id' ),	'col' => 'u.id' );
-		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_first' ),	'col' => 'um.first_name' );
-		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_last' ),	'col' => 'um.last_name' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_first' ),	'col' => 'u.first_name' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_last' ),	'col' => 'u.last_name' );
 		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_email' ),	'col' => 'u.email' );
 	}
 	
@@ -166,8 +166,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		endforeach;
 		
 		//	Add any other permenantly searchable fields here
-		$_search['columns']['name']		= array( ' ', 'um.first_name', 'um.last_name' );
-		$_search['columns']['gender']	= 'um.gender';
+		$_search['columns']['name']		= array( ' ', 'u.first_name', 'u.last_name' );
+		$_search['columns']['gender']	= 'u.gender';
 		
 		$_limit		= array(
 						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
@@ -424,16 +424,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Set fields to ignore by default
 		$this->data['ignored_fields'] = array();
 		$this->data['ignored_fields'][] = 'user_id';
-		$this->data['ignored_fields'][] = 'referral';
-		$this->data['ignored_fields'][] = 'referred_by';
-		$this->data['ignored_fields'][] = 'first_name';
-		$this->data['ignored_fields'][] = 'last_name';
-		$this->data['ignored_fields'][] = 'gender';
-		$this->data['ignored_fields'][] = 'profile_img';
-		$this->data['ignored_fields'][] = 'timezone_id';
-		$this->data['ignored_fields'][] = 'language_id';
-		$this->data['ignored_fields'][] = 'date_format_date_id';
-		$this->data['ignored_fields'][] = 'date_format_time_id';
 		
 		//	If no cols were found, DESCRIBE the user_meta table - where possible
 		//	you should manually set columns, including datatypes

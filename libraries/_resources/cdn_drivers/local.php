@@ -698,7 +698,7 @@ class Local_CDN {
 	{
 		$this->db->select( 'o.id, o.user_id, o.filename, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales, o.is_deleted' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
-		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		
 		if ( is_numeric( $object ) ) :
 		
@@ -727,7 +727,6 @@ class Local_CDN {
 		endif;
 		
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
 		
 		$_object = $this->db->get( 'cdn_local_object o' )->row();
 		
@@ -760,7 +759,7 @@ class Local_CDN {
 	{
 		$this->db->select( 'o.id, o.user_id, o.filename, b.id bucket_id, b.slug bucket_slug, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales, o.is_deleted' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
-		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->where( 'o.user_id', $user_id );
 		
 		if ( ! $include_deleted ) :
@@ -772,7 +771,6 @@ class Local_CDN {
 		// --------------------------------------------------------------------------
 		
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
 		$this->db->join( 'cdn_local_bucket b', 'o.bucket_id = b.id', 'LEFT' );
 		
 		$this->db->order_by( 'o.filename_display' );
@@ -1095,7 +1093,7 @@ class Local_CDN {
 	{
 		$this->db->select( 'o.id, o.user_id, o.filename, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales, o.is_deleted' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
-		$this->db->select( 'u.email, um.first_name, um.last_name, um.profile_img, um.gender' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		
 		if ( is_numeric( $bucket ) ) :
 		
@@ -1127,7 +1125,6 @@ class Local_CDN {
 		
 		
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'um.user_id = o.user_id', 'LEFT' );
 		
 		$this->db->order_by( 'o.filename_display' );
 		

@@ -64,8 +64,8 @@
 			echo '<span class="text and">sort by </span>';
 			$_options					= array();
 			$_options['e.created']		= 'Date';
-			$_options['um.first_name']	= 'First Name';
-			$_options['um.last_name']	= 'Surname';
+			$_options['u.first_name']	= 'First Name';
+			$_options['u.last_name']	= 'Surname';
 			$_options['et.label']		= 'Event Type';
 
 			echo form_dropdown( 'sort', $_options, $this->input->get( 'sort' ), 'class="chosen"' );

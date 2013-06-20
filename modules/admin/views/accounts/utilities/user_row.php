@@ -22,7 +22,7 @@
 			
 			switch ( $this->input->get( 'sort' ) ) :
 			
-				case 'um.last_name' :	echo '<strong>' . $member->last_name . ', ' . $member->first_name . '</strong>';	break;
+				case 'u.last_name' :	echo '<strong>' . $member->last_name . ', ' . $member->first_name . '</strong>';	break;
 				default :				echo '<strong>' . $member->first_name . ' ' . $member->last_name . '</strong>';		break;
 			
 			endswitch;

@@ -298,7 +298,6 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 					if ( $_cache ) :
 
 						//	Exists in cache
-						dump( 'hit!' );
 						$voucher->product = $_cache;
 
 					else :

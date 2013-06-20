@@ -75,6 +75,7 @@ class Blog_post_model extends NAILS_Model
 		$this->db->set( 'created',			'NOW()', FALSE );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 		$this->db->set( 'created_by',		active_user( 'id' ) );
+		$this->db->set( 'modified_by',		active_user( 'id' ) );
 		
 		if ( $data['is_published'] ) :
 		
@@ -339,10 +340,9 @@ class Blog_post_model extends NAILS_Model
 		
 		endif;
 		
-		$this->db->select( 'um.first_name, um.last_name, u.email, um.profile_img, um.gender' );
-		
+		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
+	
 		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'bp.user_id = um.user_id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -544,11 +544,10 @@ class Blog_post_model extends NAILS_Model
 		
 		endif;
 		
-		$this->db->select( 'um.first_name, um.last_name, u.email, um.profile_img, um.gender' );
+		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bc.post_id' );
 		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'bp.user_id = um.user_id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -601,11 +600,10 @@ class Blog_post_model extends NAILS_Model
 		
 		endif;
 		
-		$this->db->select( 'um.first_name, um.last_name, u.email, um.profile_img, um.gender' );
+		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bt.post_id' );
 		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
-		$this->db->join( 'user_meta um', 'bp.user_id = um.user_id', 'LEFT' );
 		
 		if ( $only_published ) :
 		

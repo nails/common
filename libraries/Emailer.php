@@ -433,11 +433,10 @@ class Emailer
 	public function get_all( $order = 'eqa.time_queued', $sort = 'ASC', $offset = 0, $per_page = 25 )
 	{ 
 		$this->ci->db->select( 'eqa.id, eqa.ref, eqa.time_queued, eqa.email_vars, eqa.user_email, eqa.time_queued, eqa.time_sent, eqa.read_count, eqa.link_click_count' );
-		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img, um.gender' );
+		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
 		$this->ci->db->join( 'user u', 'u.id = eqa.user_id', 'LEFT' );
-		$this->ci->db->join( 'user_meta um', 'um.user_id = eqa.user_id', 'LEFT' );
 		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
 		
 		$this->ci->db->order_by( $order, $sort );
@@ -510,11 +509,10 @@ class Emailer
 	public function get_queue( $cron_run = NULL, $queue_id = NULL )
 	{
 		$this->ci->db->select( 'eq.id, eq.ref, eq.time_queued, eq.email_vars, eq.user_email' );
-		$this->ci->db->select( 'u.email send_to, um.first_name, um.last_name, u.id user_id, u.password user_password, u.group_id user_group, um.profile_img' );
+		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
 		$this->ci->db->join( 'user u', 'u.id = eq.user_id', 'LEFT' );
-		$this->ci->db->join( 'user_meta um', 'um.user_id = eq.user_id', 'LEFT' );
 		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eq.type_id' );
 		
 		if ( $cron_run ) :
