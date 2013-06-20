@@ -60,6 +60,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Load these items, everytime.
+		$this->_autoload_items();
+
+		// --------------------------------------------------------------------------
+
 		//	Instanciate the user model
 		$this->_instanciate_user();
 		
@@ -90,22 +95,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->data['page']->title			= '';
 		$this->data['page']->description	= '';
 		$this->data['page']->keywords		= '';
-		
-		// --------------------------------------------------------------------------
-
-		//	Default assets
-		$this->asset->load( 'nails.default.css', TRUE );
-		$this->asset->load( 'jquery.min.js', TRUE );
-		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
-		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
-		$this->asset->load( 'nails.default.min.js', TRUE );
-
-		//	App assets
-		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
-
-			$this->asset->load( 'styles.css' );
-
-		endif;
 	}
 
 
@@ -347,6 +336,79 @@ class CORE_NAILS_Controller extends MX_Controller {
 		endif;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _autoload_items()
+	{
+		$_packages		= array();
+		$_packages[]	= APPPATH . 'third_party';
+		$_packages[]	= NAILS_PATH;
+
+		foreach ( $_packages AS $package ) :
+
+			$this->load->add_package_path( $package );
+
+		endforeach; 
+
+		// --------------------------------------------------------------------------
+
+		$_libraries		= array();
+		$_libraries[]	= 'session';
+		$_libraries[]	= 'encrypt';
+		$_libraries[]	= 'asset';
+
+		foreach ( $_libraries AS $library ) :
+
+			$this->load->library( $library );
+
+		endforeach; 
+
+		// --------------------------------------------------------------------------
+
+		$_helpers		= array();
+		$_helpers[]		= 'system';	//	To maintain sanity, load this first.
+		$_helpers[]		= 'url';
+		$_helpers[]		= 'form';
+		$_helpers[]		= 'html';
+		$_helpers[]		= 'tools';
+		$_helpers[]		= 'debug';
+		$_helpers[]		= 'language';
+		$_helpers[]		= 'text';
+		$_helpers[]		= 'exception';
+		$_helpers[]		= 'typography';
+		$_helpers[]		= 'cdn';
+		$_helpers[]		= 'event';
+		
+		foreach ( $_helpers AS $helper ) :
+
+			$this->load->helper( $helper );
+
+		endforeach; 
+
+		// --------------------------------------------------------------------------
+
+		$_nails_assets		= array();
+		$_nails_assets[]	= 'nails.default.css';
+		$_nails_assets[]	= 'jquery.min.js';
+		$_nails_assets[]	= 'jquery.fancybox.min.js';
+		$_nails_assets[]	= 'jquery.tipsy.min.js';
+		$_nails_assets[]	= 'nails.default.min.js';
+
+		foreach ( $_nails_assets AS $asset ) :
+
+			$this->asset->load( $asset, TRUE );
+
+		endforeach; 
+
+		//	App assets
+		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
+
+			$this->asset->load( 'styles.css' );
+
+		endif;
+	}
 
 	// --------------------------------------------------------------------------
 
