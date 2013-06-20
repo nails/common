@@ -31,7 +31,7 @@ class NAILS_Cron_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		$this->lang->load( 'cron', RENDER_LANG );
+		$this->lang->load( 'cron', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

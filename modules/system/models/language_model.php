@@ -32,7 +32,7 @@ class NAILS_Language_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		$this->db->select( 'l.id,l.name,l.safe_name,l.priority,l.supported' );
+		$this->db->select( 'l.id,l.name,l.slug,l.priority,l.supported' );
 		$this->db->order_by( 'l.name' );
 		return $this->db->get( 'language l' )->result();
 	}
@@ -126,7 +126,7 @@ class NAILS_Language_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function get_by_safename( $safename )
+	public function get_by_slug( $slug )
 	{
 		if ( ! NAILS_DB_ENABLED ) :
 		
@@ -136,7 +136,7 @@ class NAILS_Language_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		$this->db->where( 'l.safe_name', $safename );
+		$this->db->where( 'l.slug', $slug );
 		$_result = $this->get_all();
 		
 		// --------------------------------------------------------------------------
@@ -169,7 +169,7 @@ class NAILS_Language_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Fetch and cache
-		$_default = $this->get_by_safename( APP_DEFAULT_LANG_SAFE );
+		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
 		
 		if ( isset( $_default->id ) ) :
 		
@@ -203,7 +203,7 @@ class NAILS_Language_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Fetch and cache
-		$_default = $this->get_by_safename( APP_DEFAULT_LANG_SAFE );
+		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
 		
 		if ( isset( $_default->id ) ) :
 		

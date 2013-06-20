@@ -102,7 +102,7 @@
 			$_counter = 1;
 			foreach ( $block->translations AS $translation ) :
 			
-				if ( $translation->lang->safename == APP_DEFAULT_LANG_SAFE )
+				if ( $translation->lang->slug == APP_DEFAULT_LANG_SLUG )
 					continue;
 			
 				?>

@@ -82,7 +82,7 @@ if ( ! function_exists( 'add_to_basket_button' ) )
 		
 		if ( ! $button_text ) :
 		
-			get_instance()->lang->load( 'shop/shop', RENDER_LANG );
+			get_instance()->lang->load( 'shop/shop', RENDER_LANG_SLUG );
 			
 			if ( $_in_basket ) :
 			

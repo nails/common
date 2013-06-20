@@ -468,6 +468,15 @@ class NAILS_Li extends NAILS_Auth_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	If no return to value is defined, default to the group homepage
+		if ( ! $this->_return_to ) :
+
+			$this->_return_to = $user->group_homepage;
+
+		endif;
+		
+		// --------------------------------------------------------------------------
+
 		//	Redirect
 		$this->_redirect( $this->_return_to );
 		return;

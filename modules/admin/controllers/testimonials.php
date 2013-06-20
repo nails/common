@@ -36,7 +36,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_testimonials', RENDER_LANG );
+		get_instance()->lang->load( 'admin_testimonials', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

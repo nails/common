@@ -130,7 +130,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
 		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
 		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
-		if ( ! defined( 'APP_DEFAULT_LANG_SAFE' ) )			define( 'APP_DEFAULT_LANG_SAFE',		'english' );
+		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
@@ -312,10 +312,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_supported		= array();
 		$this->_supported[]	= 'english';
 		
-		if ( array_search( APP_DEFAULT_LANG_SAFE, $this->_supported ) === FALSE ) :
+		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
 		
 	 		header( 'HTTP/1.1 500 Bad Request' );
-			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SAFE . '" is not a supported language.' );
+			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
 		
 		endif;
 		
@@ -334,14 +334,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		$_user_pref = active_user( 'language_setting' );
 		
-		if ( isset( $_user_pref->safe_name ) && $_user_pref->safe_name ) :
+		if ( isset( $_user_pref->slug ) && $_user_pref->slug ) :
 		
-			define( 'RENDER_LANG',		$_user_pref->safe_name );
+			define( 'RENDER_LANG_SLUG',	$_user_pref->slug );
 			define( 'RENDER_LANG_ID',	$_user_pref->id );
 		
 		else :
 		
-			define( 'RENDER_LANG',		APP_DEFAULT_LANG_SAFE );
+			define( 'RENDER_LANG_SLUG',	APP_DEFAULT_LANG_SLUG );
 			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
 		
 		endif;

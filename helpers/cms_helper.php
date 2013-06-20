@@ -99,14 +99,14 @@ if ( ! function_exists( 'cms_render_block' ) )
 			
 		// --------------------------------------------------------------------------
 		
-		if ( is_null( $lang ) || $lang == APP_DEFAULT_LANG_SAFE )
+		if ( is_null( $lang ) || $lang == APP_DEFAULT_LANG_SLUG )
 			return $_block->default_value;
 		
 		// --------------------------------------------------------------------------
 		
 		for ( $i=0; $i<count( $_block->translations ); $i++ ) :
 		
-			if ( $lang == $_block->translations[$i]->lang->safename ) :
+			if ( $lang == $_block->translations[$i]->lang->slug ) :
 			
 				return $_block->translations[$i]->value;
 			

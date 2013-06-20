@@ -32,7 +32,7 @@ class NAILS_Auth_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		$this->lang->load( 'auth', RENDER_LANG );
+		$this->lang->load( 'auth', RENDER_LANG_SLUG );
 	}
 }
 

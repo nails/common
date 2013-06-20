@@ -27,7 +27,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		$this->lang->load( 'blog', RENDER_LANG );
+		$this->lang->load( 'blog', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

@@ -334,7 +334,7 @@ class Cms_block_model extends NAILS_Model
 	 **/
 	public function get_all( $include_revisions = FALSE )
 	{
-		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, um.first_name, u.email, um.last_name, l.name lang_name, l.safe_name, um.gender, um.profile_img' );
+		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, um.first_name, u.email, um.last_name, l.name lang_name, l.slug lang_slug, um.gender, um.profile_img' );
 		
 		$this->db->join( 'cms_block cb', 'cb.id = cbv.block_id' );
 		$this->db->join( 'user u', 'u.id = cbv.created_by', 'LEFT' );
@@ -368,7 +368,7 @@ class Cms_block_model extends NAILS_Model
 			$_temp->lang				= new stdClass();
 			$_temp->lang->id			= (int) $_blocks[$i]->lang_id;
 			$_temp->lang->name			= $_blocks[$i]->lang_name;
-			$_temp->lang->safename		= $_blocks[$i]->safe_name;
+			$_temp->lang->slug			= $_blocks[$i]->lang_slug;
 			$_temp->created				= $_blocks[$i]->created;
 			$_temp->modified			= $_blocks[$i]->modified;
 			$_temp->user				= new stdClass();
@@ -382,7 +382,7 @@ class Cms_block_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 			
 			//	Save the default version
-			if ( $_blocks[$i]->safe_name == APP_DEFAULT_LANG_SAFE ) :
+			if ( $_blocks[$i]->slug == APP_DEFAULT_LANG_SLUG ) :
 			
 				$_out[$_blocks[$i]->block_id]->default_value = $_blocks[$i]->value;
 			
@@ -419,7 +419,7 @@ class Cms_block_model extends NAILS_Model
 				
 				endforeach;
 				
-				if ( $_blocks[$i]->safe_name == APP_DEFAULT_LANG_SAFE ) :
+				if ( $_blocks[$i]->slug == APP_DEFAULT_LANG_SLUG ) :
 				
 					$_out[$_blocks[$i]->block_id]->default_value_revisions = $_temp->revisions;
 				

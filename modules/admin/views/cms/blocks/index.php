@@ -60,7 +60,7 @@
 						echo '<ul>';
 						foreach ( $block->translations AS $variation ) :
 						
-							if ( $variation->lang->safename == APP_DEFAULT_LANG_SAFE )
+							if ( $variation->lang->slug == APP_DEFAULT_LANG_SLUG )
 								continue;
 							
 							// --------------------------------------------------------------------------

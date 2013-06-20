@@ -79,7 +79,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		//	Finally, laod the system lang file so something can be displayed (if using
 		//	the default 404)
 		
-		$_ci->lang->load( 'system/system', RENDER_LANG );
+		$_ci->lang->load( 'system/system', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

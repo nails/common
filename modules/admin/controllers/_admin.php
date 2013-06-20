@@ -50,7 +50,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load up the generic admin langfile
-		$this->lang->load( 'admin_generic', RENDER_LANG );
+		$this->lang->load( 'admin_generic', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

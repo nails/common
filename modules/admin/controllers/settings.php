@@ -38,7 +38,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_settings', RENDER_LANG );
+		get_instance()->lang->load( 'admin_settings', RENDER_LANG_SLUG );
 		
 		// --------------------------------------------------------------------------
 		

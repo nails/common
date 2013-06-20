@@ -331,7 +331,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			$this->lang->load( 'auth/auth', RENDER_LANG );
+			$this->lang->load( 'auth/auth', RENDER_LANG_SLUG );
 			
 			// --------------------------------------------------------------------------
 			

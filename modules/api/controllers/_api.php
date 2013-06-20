@@ -36,7 +36,7 @@ class NAILS_API_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		$this->lang->load( 'api', RENDER_LANG );
+		$this->lang->load( 'api', RENDER_LANG_SLUG );
 	}
 	
 	// --------------------------------------------------------------------------

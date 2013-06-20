@@ -27,7 +27,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load language file
-		$this->lang->load( 'cdn', RENDER_LANG );
+		$this->lang->load( 'cdn', RENDER_LANG_SLUG );
 	}
 	
 	
