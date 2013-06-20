@@ -694,7 +694,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		endif;
 		
 		$_items = $this->db->get( 'shop_order_product op' )->result();
-		dumpanddie($this->db->last_query());
+		
 		foreach ( $_items AS $item ) :
 		
 			$this->db->where( 'product_id', $item->product_id );
