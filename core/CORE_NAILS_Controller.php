@@ -55,13 +55,13 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		// --------------------------------------------------------------------------
 		
-		//	Do we need to instanciate the database?
-		$this->_instanciate_db();
-
-		// --------------------------------------------------------------------------
-
 		//	Load these items, everytime.
 		$this->_autoload_items();
+
+		// --------------------------------------------------------------------------
+		
+		//	Do we need to instanciate the database?
+		$this->_instanciate_db();
 
 		// --------------------------------------------------------------------------
 
