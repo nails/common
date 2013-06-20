@@ -109,8 +109,13 @@ class Event {
 		// --------------------------------------------------------------------------
 		
 		//	Prep created by
-		if ( ! $created_by )
-			$created_by = ( active_user( 'id' ) ? active_user( 'id' ) : NULL );
+		if ( ! $created_by ) :
+
+			$created_by = active_user( 'id' ) ? active_user( 'id' ) : NULL;
+
+		endif;
+
+		// --------------------------------------------------------------------------
 		
 		//	Prep data
 		$_data					= array();
