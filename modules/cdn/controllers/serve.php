@@ -101,17 +101,31 @@ class Serve extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Look up the object in the DB
+		$_object = $this->cdn->get_object( $this->_object, $this->_bucket );
+
+		// --------------------------------------------------------------------------
+
 		//	Check the request headers; avoid hitting the disk at all if possible. If the Etag
 		//	matches then send a Not-Modified header and terminate execution.
 		
-		if ( ! $this->input->get( 'dl' ) ) :
+		if ( $this->_serve_not_modified( $this->_bucket . $this->_object ) ) :
 		
-			if ( $this->_serve_not_modified( $this->_bucket . $this->_object ) ) :
-			
-				return;
-				
+			if ( $_object ) :
+
+				if ( $this->input->get( 'dl' ) ) :
+
+					$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+
+				else :
+
+					$this->cdn->increment_count( 'SERVE', $_object->id );
+
+				endif;
+
 			endif;
-		
+			return;
+			
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -122,12 +136,6 @@ class Serve extends NAILS_CDN_Controller
 			return $this->_bad_src();
 			
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Look up the object in the DB
-		$this->load->library( 'cdn' );
-		$_object = $this->cdn->get_object( $this->_object, $this->_bucket );
 		
 		// --------------------------------------------------------------------------
 		
@@ -179,6 +187,23 @@ class Serve extends NAILS_CDN_Controller
 		
 		//	Send the contents of the file to the browser
 		echo file_get_contents( CDN_PATH . $this->_bucket . '/' . $this->_object );
+
+		// --------------------------------------------------------------------------
+
+		//	Bump the counter
+		if ( $_object ) :
+
+			if ( $this->input->get( 'dl' ) ) :
+
+				$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+
+			else :
+
+				$this->cdn->increment_count( 'SERVE', $_object->id );
+
+			endif;
+
+		endif;
 	}
 	
 	

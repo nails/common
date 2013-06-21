@@ -797,6 +797,73 @@ class Local_CDN {
 		
 		return $_objects;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function increment_count( $action, $object, $bucket = NULL )
+	{
+		switch ( strtoupper( $action ) ) :
+		
+			case 'SERVE'	:
+
+				$this->db->set( 'o.serves', 'o.serves+1', FALSE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'DOWNLOAD'	:
+
+				$this->db->set( 'o.downloads', 'o.downloads+1', FALSE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'THUMB' :
+
+				$this->db->set( 'o.thumbs', 'o.thumbs+1', FALSE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'SCALE' :
+
+				$this->db->set( 'o.scales', 'o.scales+1', FALSE );
+
+			break;
+
+		endswitch;
+
+		if ( is_numeric( $object ) ) :
+
+			$this->db->where( 'o.id', $object );
+
+		else :
+
+			$this->db->where( 'o.filename', $object );
+
+		endif;
+
+		if ( $bucket && is_numeric( $bucket ) ) :
+
+			$this->db->where( 'o.bucket_id', $bucket );
+			$this->db->update( 'cdn_local_object o' );
+
+		elseif ( $bucket ) :
+
+			$this->db->where( 'b.slug', $bucket );
+			$this->db->update( 'cdn_local_object o JOIN cdn_local_bucket b ON b.id = o.bucket_id' );
+
+		else :
+
+			$this->db->update( 'cdn_local_object o' );
+
+		endif;
+	}
 	
 	
 	// --------------------------------------------------------------------------

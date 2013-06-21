@@ -36,8 +36,12 @@ class Scale extends Thumb
 		//	Check the request headers; avoid hitting the disk at all if possible. If the Etag
 		//	matches then send a Not-Modified header and terminate execution.
 		
-		if ( $this->_serve_not_modified( $this->_cache_file ) )
+		if ( $this->_serve_not_modified( $this->_cache_file ) ) :
+
+			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
 			return;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -47,6 +51,7 @@ class Scale extends Thumb
 		
 		if ( file_exists( CACHE_DIR . $this->_cache_file ) ) :
 		
+			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
 			$this->_serve_from_cache( $this->_cache_file );
 		
 		else :
@@ -73,9 +78,9 @@ class Scale extends Thumb
 				// --------------------------------------------------------------------------
 				
 				//	Set the appropriate cache headers
-				//header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
-				//header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
-				//header( 'X-CDN-CACHE: MISS' );
+				header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
+				header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
+				header( 'X-CDN-CACHE: MISS' );
 				
 				// --------------------------------------------------------------------------
 				
@@ -83,11 +88,23 @@ class Scale extends Thumb
 				$thumb->show();
 				
 				// --------------------------------------------------------------------------
+
+				//	Bump the counter
+				$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+
+				// --------------------------------------------------------------------------
 				
-				//	Save to the cache, this involves saving a local copy then punting that up to S3
-				
-				//	Save local version
-				$thumb->save( CACHE_DIR . $this->_cache_file, strtoupper( substr( $this->_extension, 1 ) ) );
+				//	Save local version, make sure cache is writable
+				if ( is_writable( CACHE_DIR . $this->_cache_file ) ) :
+
+					$thumb->save( CACHE_DIR . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+
+				else :
+
+					//	Inform developers
+					send_developer_mail( 'Cache dir not writeable', 'The CDN cannot write to the cache idrectory.' );
+
+				endif;
 			
 			else :
 			
