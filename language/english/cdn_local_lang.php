@@ -9,7 +9,8 @@
 
 	//	Errors
 	$lang['cdn_local_no_file']					= 'You did not select a file to upload.';
-	$lang['cdn_local_mkdir_fail']				= 'Failed to create bucket.';
+	$lang['cdn_local_mkdir_fail']				= 'Failed to create bucket directory.';
+	$lang['cdn_local_insert_fail']				= 'Failed to create bucket record.';
 	$lang['cdn_local_stream_content_type']		= 'A Content-Type must be defined for data stream uploads.';
 	$lang['cdn_local_error_cache_write_fail']	= 'Cache directory is not writeable.';
 	$lang['cdn_local_error_target_write_fail']	= 'The target directory is not writable.';

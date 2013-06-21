@@ -83,8 +83,18 @@ class NAILS_Manager extends NAILS_CDN_Controller
 								
 							else :
 							
-								$_test_ok	= FALSE;
-								$_error		= 'Bucket <strong>"' . $_bucket[0] . '"</strong> does not exist';
+								//	Bucket doesn't exist - attempt to create it
+								if ( $this->cdn->create_bucket( $_bucket[0] ) ) :
+
+									$_test_ok = TRUE;
+
+								else :
+
+									$_test_ok	= FALSE;
+									$_error		= 'Bucket <strong>"' . $_bucket[0] . '"</strong> does not exist';
+									$_error		.= '<small>Additionally, the following error occured while attempting to create the bucket:<br />' . implode( '', $this->cdn->errors() ) . '</small>';
+
+								endif;
 							
 							endif;
 						

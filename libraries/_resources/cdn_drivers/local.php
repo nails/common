@@ -1002,7 +1002,7 @@ class Local_CDN {
 			
 				@unlink( CDN_PATH . $bucket );
 				
-				$this->_error( lang( 'cdn_local_mkdir_fail' ) );
+				$this->_error( lang( 'cdn_local_insert_fail' ) );
 				return FALSE;
 			
 			endif;
