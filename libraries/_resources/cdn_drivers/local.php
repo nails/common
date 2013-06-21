@@ -391,9 +391,9 @@ class Local_CDN {
 		
 		//	And set the display name
 		$_data['name']	= $_name;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Move the file
 		if ( move_uploaded_file( $_data['file'], CDN_PATH . $bucket . '/' . $_data['filename'] ) ) :
 		
@@ -650,6 +650,15 @@ class Local_CDN {
 			break;
 		
 		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		//	Check whether file is animated gif
+		if ( $data['content-type'] == 'image/gif' ) :
+
+			$this->db->set( 'is_animated', $this->_detect_animated_gif( CDN_PATH . $data['bucket_slug'] . '/' . $data['filename'] ) );
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -1678,7 +1687,61 @@ class Local_CDN {
 		return site_url( 'cdn/serve?token={{token}}' );
 	}
 
-	
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Attempts to detect whether a gif is animated or not
+	 * Credit where credit's due: http://php.net/manual/en/function.imagecreatefromgif.php#59787
+	 *
+	 * @access	protected
+	 * @param	string $filename the path to the file to check
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	protected function _detect_animated_gif( $filename )
+	{
+		$filecontents=file_get_contents($filename);
+
+		$str_loc=0;
+		$count=0;
+		while ($count < 2) # There is no point in continuing after we find a 2nd frame
+		{
+
+			$where1=strpos($filecontents,"\x00\x21\xF9\x04",$str_loc);
+			if ($where1 === FALSE)
+			{
+				break;
+			}
+			else
+			{
+				$str_loc=$where1+1;
+				$where2=strpos($filecontents,"\x00\x2C",$str_loc);
+				if ($where2 === FALSE)
+				{
+					break;
+				}
+				else
+				{
+					if ($where1+8 == $where2)
+					{
+						$count++;
+					}
+					$str_loc=$where2+1;
+				}
+			}
+		}
+
+		if ($count > 1)
+		{
+			return(true);
+		}
+		else
+		{
+			return(false);
+		}
+	}
 	
 	// --------------------------------------------------------------------------
 	
