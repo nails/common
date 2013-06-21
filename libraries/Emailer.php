@@ -436,7 +436,7 @@ class Emailer
 		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 		
-		$this->ci->db->join( 'user u', 'u.id = eqa.user_id', 'LEFT' );
+		$this->ci->db->join( 'user u', 'u.id = eqa.user_id OR u.email = eqa.user_email', 'LEFT' );
 		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
 		
 		$this->ci->db->order_by( $order, $sort );
@@ -446,31 +446,10 @@ class Emailer
 		
 		// --------------------------------------------------------------------------
 		
-		//	Process emails
+		//	Format emails
 		foreach ( $_emails AS $email ) :
-		
-			$email->email_vars = unserialize( $email->email_vars );
-			
-			// --------------------------------------------------------------------------
-			
-			//	If no subject is defined in the variables, if not check to see if one was
-			//	defined in the emplate; if not, fall back to a default subject
-			$_subject = isset( $email->email_vars['email_subject'] );
-			
-			if ( $_subject ) :
-			
-				$email->subject = $email->email_vars['email_subject'];
-			
-			else :
-			
-				//	Check the template
-				if ( ! $email->subject ) :
-				
-					$email->subject = 'An E-mail from ' . APP_NAME;
-				
-				endif;
-			
-			endif;
+
+			$this->_format_email( $email );
 		
 		endforeach;
 		
@@ -1741,6 +1720,58 @@ class Emailer
 	{
 		$this->_errors[] = $message;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_email( &$email )
+	{
+		$email->email_vars = unserialize( $email->email_vars );
+		
+		// --------------------------------------------------------------------------
+		
+		//	If no subject is defined in the variables, if not check to see if one was
+		//	defined in the emplate; if not, fall back to a default subject
+		$_subject = isset( $email->email_vars['email_subject'] );
+		
+		if ( $_subject ) :
+		
+			$email->subject = $email->email_vars['email_subject'];
+		
+		else :
+		
+			//	Check the template
+			if ( ! $email->subject ) :
+			
+				$email->subject = 'An E-mail from ' . APP_NAME;
+			
+			endif;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Sent to
+		$email->user 				= new stdClass();
+		$email->user->id			= $email->user_id;
+		$email->user->email			= $email->send_to;
+		$email->user->first_name	= $email->first_name;
+		$email->user->last_name		= $email->last_name;
+		$email->user->profile_img	= $email->profile_img;
+		$email->user->gender		= $email->gender;
+
+		//	If the email is still empty, fallback to another
+		if ( ! $email->user->email ) :
+
+			$email->user->email = $email->user_email;
+
+		endif;
+
+		//	Not unsetting anything in case anything else is using it.
+		//	This is a TODO and should be fixed when the email module/library gets an overhaul.
+	}
+
 }
 
 /* End of file emailer.php */

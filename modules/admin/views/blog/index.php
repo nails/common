@@ -19,8 +19,8 @@
 				<th class="image">Image</th>
 				<th class="title">Details</th>
 				<th class="status">Published</th>
-				<th class="author">Author</th>
-				<th class="modified">Modified</th>
+				<th class="user">Author</th>
+				<th class="datetime">Modified</th>
 				<th class="actions">Actions</th>
 			</tr>
 		</thead>
@@ -28,6 +28,9 @@
 		<?php
 		
 			if ( $posts ) :
+
+				$_date_format = active_user( 'pref_date_format' );
+				$_time_format = active_user( 'pref_time_format' );
 			
 				foreach ( $posts AS $post ) :
 				
@@ -74,8 +77,9 @@
 					
 					echo '</td>';
 					
-					echo '<td class="author">' . $post->author->first_name . ' ' . $post->author->last_name . '</td>';
-					echo '<td class="modified"><span class="nice-time">' . $post->modified . '</span></td>';
+					//	User common cells
+					$this->load->view( 'admin/_utilities/table-cell-user',		$post->author );
+					$this->load->view( 'admin/_utilities/table-cell-datetime',	array( 'datetime' => $post->modified ) );
 					
 					echo '<td class="actions">';
 					echo anchor( 'admin/blog/edit/' . $post->id, lang( 'action_edit' ), 'class="awesome small"' );

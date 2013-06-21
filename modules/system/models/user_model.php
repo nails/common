@@ -2277,6 +2277,10 @@ class NAILS_User_model extends NAILS_Model
 			$user->date_setting->format->time->id		= (int) $user->date_format_time_id;
 			$user->date_setting->format->time->label	= $user->date_format_time_label;
 			$user->date_setting->format->time->format	= $user->date_format_time_format;
+
+			//	Set an easy access pref
+			$user->pref_date_format						= $user->date_format_date_format;
+			$user->pref_time_format						= $user->date_format_time_format;
 			
 			unset( $user->timezone_id );
 			unset( $user->timezone_label );

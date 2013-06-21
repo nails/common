@@ -18,7 +18,8 @@
 		<thead>
 			<tr>
 				<th class="title">Page</th>
-				<th class="modified">Modified</th>
+				<th class="user">Modified By</th>
+				<th class="datetime">Modified</th>
 				<th class="actions">Actions</th>
 			</tr>
 		</thead>
@@ -34,14 +35,14 @@
 					echo '<span class="title">' . $page->title . '</span>';
 					echo '<span class="url">' . site_url( $page->slug ) . '</span>';
 					echo '</td>';
-					echo '<td class="modified">';
-					echo '<span class="nice-time">' . $page->modified . '</span>';
-					echo $page->user->id ? '<small>by ' . anchor( 'admin/accounts/edit/' . $page->user->id, $page->user->first_name . ' ' . $page->user->last_name ) . '</small>' : '';
-					echo '</td>';
+
+					$this->load->view( 'admin/_utilities/table-cell-user',		$page->user );
+					$this->load->view( 'admin/_utilities/table-cell-datetime',	array( 'datetime' => $page->modified ) );
+
 					echo '<td class="actions">';
 					
-					echo anchor( 'admin/cms/pages/edit/' . $page->id, 'Edit', 'class="awesome small"' );
-					echo anchor( $page->slug, 'View', 'target="_blank" class="awesome small"' );
+						echo anchor( 'admin/cms/pages/edit/' . $page->id, 'Edit', 'class="awesome small"' );
+						echo anchor( $page->slug, 'View', 'target="_blank" class="awesome small"' );
 					
 					echo '</td>';
 					echo '</tr>';

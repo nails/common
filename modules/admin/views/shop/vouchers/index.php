@@ -16,6 +16,7 @@
 			<tr>
 				<th class="code">Code</th>
 				<th class="type">Details</th>
+				<th class="user">Created By</th>
 				<th class="value">Discount</th>
 				<th class="valid_from">Valid From</th>
 				<th class="expires">Expires</th>
@@ -102,6 +103,11 @@
 								echo '</small>';
 							?>
 							</td>
+							<?php
+
+								$this->load->view( 'admin/_utilities/table-cell-user',		$voucher->creator );
+
+							?>
 							<td class="value">
 								<?php
 
