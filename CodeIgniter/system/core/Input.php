@@ -348,7 +348,10 @@ class CI_Input {
 		}
 		else
 		{
-			$this->ip_address = $_SERVER['REMOTE_ADDR'];
+			//	Hack by Shed, don't assume this exists - fixed in the CI master branch so happy to implement this
+			//	change in the knowledge it'll be overwritten when CI is upgraded next.
+
+			$this->ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
 		}
 
 		if ( ! $this->valid_ip($this->ip_address))
