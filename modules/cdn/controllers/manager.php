@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS' CDN MODULE
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -411,7 +411,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS' CDN MODULE
  * 
  * The following block of code makes it simple to extend one of the core auth
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

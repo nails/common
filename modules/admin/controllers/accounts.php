@@ -11,7 +11,7 @@
 require_once '_admin.php';
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -1251,7 +1251,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
