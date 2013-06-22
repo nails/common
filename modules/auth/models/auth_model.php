@@ -17,11 +17,11 @@
 
 class NAILS_Auth_model extends NAILS_Model
 {
-	public  $activation_code;
-	private $_errors;
-	private $_error_delimiter;
-	private $_messages;
-	private $_message_delimiter;
+	public $activation_code;
+	protected $_errors;
+	protected $_error_delimiter;
+	protected $_messages;
+	protected $_message_delimiter;
 	
 	
 	// --------------------------------------------------------------------------

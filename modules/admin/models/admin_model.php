@@ -17,7 +17,7 @@
 
 class NAILS_Admin_Model extends NAILS_Model
 {
-	private $search_paths;
+	protected $search_paths;
 	
 	
 	// --------------------------------------------------------------------------
@@ -42,6 +42,7 @@ class NAILS_Admin_Model extends NAILS_Model
 		 * take priority over those listed after it.
 		 * 
 		 **/
+
 		$this->search_paths[] = FCPATH . APPPATH . 'modules/admin/controllers/';	//	Admin controllers specific for this app only.
 		$this->search_paths[] = NAILS_PATH . 'modules/admin/controllers/';
 	}
@@ -156,7 +157,7 @@ class NAILS_Admin_Model extends NAILS_Model
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	private function _exec_announcer( $class )
+	protected function _exec_announcer( $class )
 	{
 		return method_exists( $class, 'announce' ) ? $class::announce() : NULL;
 	}

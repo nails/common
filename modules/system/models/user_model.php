@@ -98,12 +98,12 @@ class NAILS_User_model extends NAILS_Model
 	/**
 	 * Log in a previously logged in user
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	void
 	 * @author	Pablo
 	 * 
 	 **/
-	private function _login_remembered_user()
+	protected function _login_remembered_user()
 	{
 		//	Only attempt to log in a user if they are remembered.
 		//	This constant is set in User_Model::find_remembered_user();
@@ -681,7 +681,17 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _getcount_users_common( $where = NULL, $search = NULL )
+	/**
+	 * Consolidates the extra calls which need to be made (to save having the same calls in get_all and count_all)
+	 *
+	 * @access	protected
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	protected function _getcount_users_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
@@ -1355,7 +1365,7 @@ class NAILS_User_model extends NAILS_Model
 	/**
 	 * Generate a unique salt
 	 *
-	 * @access	private
+	 * @access	public
 	 * @param	none
 	 * @return	string
 	 * @author	Pablo
@@ -1853,12 +1863,12 @@ class NAILS_User_model extends NAILS_Model
 	/**
 	 * Generate a valid referral code
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @param	none
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	private function _generate_referral()
+	protected function _generate_referral()
 	{
 		$this->load->helper( 'string' );
 		

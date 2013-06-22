@@ -17,7 +17,7 @@
 
 class NAILS_Shop_model extends NAILS_Model
 {
-	private $_settings;
+	protected $_settings;
 	
 	
 	// --------------------------------------------------------------------------

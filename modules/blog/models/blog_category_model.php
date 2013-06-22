@@ -75,7 +75,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function create( $label )
 	{
-		$_slug = $this->_generate_slug( $label );
+		$_slug = $this->_generate_slug( $label, 'blog_category' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $label );
 		$this->db->set( 'created', 'NOW()', FALSE );
@@ -98,7 +98,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function update( $id_slug, $label )
 	{
-		$_slug = $this->_generate_slug( $label );
+		$_slug = $this->_generate_slug( $label, 'blog_category' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );
@@ -166,7 +166,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	private function _format_category( &$category )
+	protected function _format_category( &$category )
 	{
 		$category->id	= (int) $category->id;
 
@@ -175,35 +175,6 @@ class NAILS_Blog_category_model extends NAILS_Model
 			$category->post_count	= (int) $category->post_count;
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	private function _generate_slug( $label )
-	{
-		$_counter = 0;
-		
-		do
-		{
-			$_slug = url_title( $label, 'dash', TRUE );
-
-			if ( $_counter ) :
-
-				$_slug_test = $_slug . '-' . $_counter;
-
-			else :
-
-				$_slug_test = $_slug;
-
-			endif;
-
-			$this->db->where( 'slug', $_slug_test );
-			$_counter++;
-
-		} while( $this->db->count_all_results( 'blog_category' ) );
-
-		return $_slug_test;
 	}
 }
 

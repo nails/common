@@ -17,7 +17,7 @@
 
 class NAILS_Language_model extends NAILS_Model
 {
-	private $_default_lang;
+	protected $_default_lang;
 	
 	// --------------------------------------------------------------------------
 	
@@ -245,6 +245,14 @@ class NAILS_Language_model extends NAILS_Model
 
 	public function update( $id, $data )
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return FALSE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$this->db->set( $data );
 		$this->db->where( 'id', $id );
 		return $this->db->update( 'language' );

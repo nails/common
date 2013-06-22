@@ -352,7 +352,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_product_object( &$product )
+	protected function _format_product_object( &$product )
 	{
 		//	Type casting
 		$product->id			= (int) $product->id;

@@ -17,14 +17,14 @@
 
 class NAILS_Shop_basket_model extends NAILS_Model
 {
-	private $_items;
-	private $_personal_details;
-	private $_payment_gateway;
-	private $_shipping_method;
-	private $_shipping_details;
-	private $_order_id;
-	private $_voucher_code;
-	private $_sess_var;
+	protected $_items;
+	protected $_personal_details;
+	protected $_payment_gateway;
+	protected $_shipping_method;
+	protected $_shipping_details;
+	protected $_order_id;
+	protected $_voucher_code;
+	protected $_sess_var;
 	
 	
 	// --------------------------------------------------------------------------
@@ -974,7 +974,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _update_session()
+	protected function _update_session()
 	{
 		$this->session->set_userdata( $this->sess_var, $this->_items );
 		
@@ -989,7 +989,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _get_basket_key_by_product_id( $product_id )
+	protected function _get_basket_key_by_product_id( $product_id )
 	{
 		foreach( $this->_items AS $key => $item ) :
 		

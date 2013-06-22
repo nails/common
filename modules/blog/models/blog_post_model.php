@@ -18,7 +18,7 @@
 class NAILS_Blog_post_model extends NAILS_Model
 {
 
-	private $_reserved;
+	protected $_reserved;
 
 
 	// --------------------------------------------------------------------------
@@ -653,7 +653,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_post_object( &$post )
+	protected function _format_post_object( &$post )
 	{
 		//	Type casting
 		$post->id					= (int) $post->id;

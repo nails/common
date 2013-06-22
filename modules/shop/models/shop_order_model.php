@@ -18,7 +18,7 @@
 class NAILS_Shop_order_model extends NAILS_Model
 {
 	protected $_table;
-	private $_table_product;
+	protected $_table_product;
 	
 	
 	// --------------------------------------------------------------------------
@@ -431,7 +431,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	private function _getcount_orders_common( $where = NULL, $search = NULL )
+	protected function _getcount_orders_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
 		$this->db->join( 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
@@ -1091,7 +1091,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_order( &$order )
+	protected function _format_order( &$order )
 	{
 		//	Generic
 		$order->id					= (int) $order->id;
@@ -1296,7 +1296,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_item( &$item )
+	protected function _format_item( &$item )
 	{
 		$item->id				= (int) $item->id;
 		$item->quantity			= (int) $item->quantity;

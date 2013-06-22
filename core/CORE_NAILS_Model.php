@@ -541,6 +541,57 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		return $_result[0];
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _generate_slug( $label, $table = NULL, $column = NULL )
+	{
+		//	Prep table and column
+		$_prefix	= ! $_table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
+		$_table		= ! $table ? $this->_table : $table;
+		$_column	= ! $column ? 'slug' : $column;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! $_table ) :
+
+			show_error( 'Table variable not set' );
+
+		endif;
+
+		if ( ! $_column ) :
+
+			show_error( 'Column variable not set' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_counter = 0;
+		
+		do
+		{
+			$_slug = url_title( $label, 'dash', TRUE );
+
+			if ( $_counter ) :
+
+				$_slug_test = $_slug . '-' . $_counter;
+
+			else :
+
+				$_slug_test = $_slug;
+
+			endif;
+
+			$this->db->where( $_prefix . $_column, $_slug_test );
+			$_counter++;
+
+		} while( $this->db->count_all_results( $_prefix . $_table ) );
+
+		return $_slug_test;
+	}
 }
 
 /* End of file CORE_NAILS_Model.php */

@@ -17,12 +17,12 @@
 
 class NAILS_Cms_page_model extends NAILS_Model
 {
-	private $_routes_dir;
-	private $_available_widgets;
-	private $_nails_widgets_dir;
-	private $_app_widgets_dir;
-	private $_nails_prefix;
-	private $_app_prefix;
+	protected $_routes_dir;
+	protected $_available_widgets;
+	protected $_nails_widgets_dir;
+	protected $_app_widgets_dir;
+	protected $_nails_prefix;
+	protected $_app_prefix;
 	
 	
 	// --------------------------------------------------------------------------
@@ -285,7 +285,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_page_object( &$page )
+	protected function _format_page_object( &$page )
 	{
 		$page->id				= (int) $page->id;
 		$page->sidebar_width	= (int) $page->sidebar_width;
@@ -565,7 +565,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _call_widget_method( $widget, $data, $method, $params = array() )
+	protected function _call_widget_method( $widget, $data, $method, $params = array() )
 	{
 		//	Load up widget classes
 		$_class		= strtolower( $widget );
