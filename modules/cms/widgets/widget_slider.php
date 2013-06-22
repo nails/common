@@ -4,8 +4,7 @@ class Nails_CMS_Widget_slider extends Nails_CMS_Widget
 {
 	static function details()
 	{
-		$_d	= new stdClass();
-		
+		$_d			= parent::details();
 		$_d->name	= 'Slider';
 		$_d->slug	= 'Widget_slider';
 		$_d->iam	= 'Nails_CMS_Widget_slider';

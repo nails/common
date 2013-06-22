@@ -90,9 +90,10 @@
 
 		//	Hero editor
 		$_config = array( 'config' => array() );
-		$_config['config']['area']			= 'hero';
-		$_config['config']['title']			= 'Page Hero';
-		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+		$_config['config']['area']					= 'hero';
+		$_config['config']['accept_widgets_for']	= array( 'ALL', 'HERO', 'HERO_BODY', 'HERO_SIDEBAR' );
+		$_config['config']['title']					= 'Page Hero';
+		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
 
 		$this->load->view( 'admin/cms/pages/_editor', $_config  );
 
@@ -100,9 +101,10 @@
 
 		//	Body editor
 		$_config = array( 'config' => array() );
-		$_config['config']['area']			= 'body';
-		$_config['config']['title']			= 'Page Body';
-		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+		$_config['config']['area']					= 'body';
+		$_config['config']['accept_widgets_for']	= array( 'ALL', 'BODY', 'HERO_BODY', 'BODY_SIDEBAR' );
+		$_config['config']['title']					= 'Page Body';
+		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
 
 		$this->load->view( 'admin/cms/pages/_editor', $_config  );
 
@@ -110,9 +112,10 @@
 
 		//	Sidebar editor
 		$_config = array( 'config' => array() );
-		$_config['config']['area']			= 'sidebar';
-		$_config['config']['title']			= 'Page Sidebar';
-		$_config['config']['description']	= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
+		$_config['config']['area']					= 'sidebar';
+		$_config['config']['accept_widgets_for']	= array( 'ALL', 'SIDEBAR', 'HERO_SIDEBAR', 'BODY_SIDEBAR' );
+		$_config['config']['title']					= 'Page Sidebar';
+		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
 
 		$this->load->view( 'admin/cms/pages/_editor', $_config  );
 

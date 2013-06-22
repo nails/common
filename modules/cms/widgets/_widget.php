@@ -6,11 +6,24 @@ class Nails_CMS_Widget
 	{
 		$_d	= new stdClass();
 		
-		$_d->name	= 'Widget';
-		$_d->slug	= 'Widget';
-		$_d->iam	= 'Nails_CMS_Widget';
-		$_d->info	= '';
-		
+		$_d->name			= 'Widget';
+		$_d->slug			= 'Widget';
+		$_d->iam			= 'Nails_CMS_Widget';
+		$_d->info			= '';
+
+		//	To restrict a widget to a certain area, specify one of the
+		//	following values:
+
+		//	ALL				Can be used in any widget area
+		//	HERO			Can only be used in the Hero area
+		//	BODY			Can only be used in the Body area
+		//	SIDEBAR			Can only be used in the Sidebar area
+		//	HERO_BODY		Can be used in both the Hero and Body areas
+		//	HERO_SIDEBAR	Can be used in both the Hero and Sidebar areas
+		//	BODY_SIDEBAR	Can be used in both the Body and Sidebar areas
+
+		$_d->restrict_area	= 'ALL';
+
 		return $_d;
 	}
 	

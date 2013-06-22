@@ -4,8 +4,7 @@ class Nails_CMS_Widget_richtext extends Nails_CMS_Widget
 {
 	static function details()
 	{
-		$_d	= new stdClass();
-		
+		$_d			= parent::details();
 		$_d->name	= 'Rich Text';
 		$_d->iam	= 'Nails_CMS_Widget_richtext';
 		$_d->slug	= 'Widget_richtext';
