@@ -431,6 +431,34 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		return $this->db->get( $_table )->result();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetches all objects
+	 * 
+	 * @access public
+	 * @param none
+	 * @return int
+	 **/
+	public function count()
+	{
+		if ( ! $this->_table ) :
+
+			show_error( 'Table variable not set' );
+
+		else :
+
+			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		return $this->db->count_all_results( $_table );
+	}
 	
 	
 	// --------------------------------------------------------------------------
