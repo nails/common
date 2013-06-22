@@ -17,7 +17,7 @@
 	
 	<?=form_open()?>
 	<fieldset>
-	<?php if ( APP_MULTI_LANG ) : ?>
+	<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		<legend>Translations</legend>
 		<p class="system-alert message no-close">
 			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_NAME?> version, however more translations can be
@@ -90,7 +90,7 @@
 				endif;
 			
 			?>
-		<?php if ( APP_MULTI_LANG ) : ?>
+		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		</fieldset>
 		<?php else : ?>
 		</div>
@@ -170,7 +170,7 @@
 		?>
 		
 
-		<?php if ( APP_MULTI_LANG ) : ?>
+		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		<!--	ACTIONS	-->
 		<p class="add-translation">
 			<a href="#" class="awesome small right" id="new-translation">Add Translation</a>

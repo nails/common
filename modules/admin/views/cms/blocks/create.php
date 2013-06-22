@@ -71,15 +71,20 @@
 	</fieldset>
 	
 	<fieldset id="default-value">
+
+		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		<legend><?=APP_DEFAULT_LANG_NAME?> Value</legend>
 		<p class="system-alert message no-close">
 			<strong>Note:</strong> All blocks must have an <?=APP_DEFAULT_LANG_NAME?> value, define the
 			initial <?=APP_DEFAULT_LANG_NAME?> value now.
 		</p>
+		<?php else : ?>
+		<legend>Value</legend>
+		<?php endif; ?>
 		<?php
 		
 			//	Value
-			echo form_textarea( 'value', set_value( 'value' ), 'id="default_value"' );
+			echo form_textarea( 'value', set_value( 'value' ), 'placeholder="Define the default value" id="default_value"' );
 		
 		?>
 		<p id="ckeditor-warn" class="system-alert notice no-close" style="margin-top:10px;">
