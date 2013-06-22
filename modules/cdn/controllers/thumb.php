@@ -165,7 +165,12 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 				else :
 
 					//	Inform developers
-					send_developer_mail( 'Cache dir not writeable', 'The CDN cannot write to the cache idrectory.' );
+					$_subject	= 'Cache (scale) dir not writeable';
+					$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
+					$_message	.= 'Dir: ' . CACHE_DIR . $this->_cache_file . "\n\n";
+					$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+					
+					send_developer_mail( $_subject, $_message );
 
 				endif;
 			

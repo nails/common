@@ -129,8 +129,22 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			//	Save to CACHE_DIR
-			imagepng( $_img, CACHE_DIR . $this->_cache_file );
+			//	Save local version, make sure cache is writable
+			if ( is_writable( CACHE_DIR . $this->_cache_file ) ) :
+
+				imagepng( $_img, CACHE_DIR . $this->_cache_file );
+
+			else :
+
+				//	Inform developers
+				$_subject	= 'Cache (scale) dir not writeable';
+				$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
+				$_message	.= 'Dir: ' . CACHE_DIR . $this->_cache_file . "\n\n";
+				$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+				
+				send_developer_mail( $_subject, $_message );
+
+			endif;
 			
 			// --------------------------------------------------------------------------
 			

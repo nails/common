@@ -159,10 +159,22 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				
 				// --------------------------------------------------------------------------
 				
-				//	Save to the cache, this involves saving a local copy then punting that up to S3
-				
 				//	Save local version
-				$thumb->save( CACHE_DIR . $this->_cache_file );
+				if ( is_writable( CACHE_DIR . $this->_cache_file ) ) :
+
+					$thumb->save( CACHE_DIR . $this->_cache_file );
+
+				else :
+
+					//	Inform developers
+					$_subject	= 'Cache (scale) dir not writeable';
+					$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
+					$_message	.= 'Dir: ' . CACHE_DIR . $this->_cache_file . "\n\n";
+					$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+					
+					send_developer_mail( $_subject, $_message );
+
+				endif;
 			
 			else :
 			
