@@ -160,7 +160,7 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				// --------------------------------------------------------------------------
 				
 				//	Save local version
-				if ( is_writable( CACHE_DIR . $this->_cache_file ) ) :
+				if ( is_writable( CACHE_DIR ) ) :
 
 					$thumb->save( CACHE_DIR . $this->_cache_file );
 

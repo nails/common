@@ -44,12 +44,12 @@ class NAILS_Scale extends Thumb
 		//	Check the request headers; avoid hitting the disk at all if possible. If the Etag
 		//	matches then send a Not-Modified header and terminate execution.
 		
-		if ( $this->_serve_not_modified( $this->_cache_file ) ) :
+		 if ( $this->_serve_not_modified( $this->_cache_file ) ) :
 
-			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
-			return;
+		 	$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+		 	return;
 
-		endif;
+		 endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -103,7 +103,7 @@ class NAILS_Scale extends Thumb
 				// --------------------------------------------------------------------------
 				
 				//	Save local version, make sure cache is writable
-				if ( is_writable( CACHE_DIR . $this->_cache_file ) ) :
+				if ( is_writable( CACHE_DIR ) ) :
 
 					$thumb->save( CACHE_DIR . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
 
