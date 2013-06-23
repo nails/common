@@ -23,8 +23,9 @@
 	echo '<span class="user-data">';
 
 		$_name  = '';
-		$_name .= isset( $first_name ) && $first_name ? $first_name . ' ' : 'Unknown';
-		$_name .= isset( $last_name ) && $last_name ? $last_name . ' ' : ' User';
+		$_name .= isset( $first_name ) && $first_name ? $first_name . ' ' : '';
+		$_name .= isset( $last_name ) && $last_name ? $last_name . ' ' : '';
+		$_name  = $_name ? $_name : 'Unknown User';
 
 		if ( isset( $id ) && $id ) :
 

@@ -413,7 +413,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		$this->data['blocks']		= $this->cms_block->get_all();
-		$this->data['languages']	= $this->language_model->get_all_supported_flat();
+		$this->data['languages']	= $this->language->get_all_supported_flat();
 		
 		// --------------------------------------------------------------------------
 		
@@ -482,8 +482,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Fetch data
-		$this->data['languages']	= $this->language_model->get_all_supported_flat();
-		$this->data['default_id']	= $this->language_model->get_default_id();
+		$this->data['languages']	= $this->language->get_all_supported_flat();
+		$this->data['default_id']	= $this->language->get_default_id();
 		
 		// --------------------------------------------------------------------------
 		
@@ -552,7 +552,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['languages'] = $this->language_model->get_all_supported_flat();
+		$this->data['languages'] = $this->language->get_all_supported_flat();
 		
 		// --------------------------------------------------------------------------
 		

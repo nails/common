@@ -483,7 +483,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'first_name',			lang( 'form_label_first_name' ),						'xss_clean|required' );
 			$this->form_validation->set_rules( 'last_name',				lang( 'form_label_last_name' ),							'xss_clean|required' );
 			$this->form_validation->set_rules( 'gender',				lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'timezone_id',			lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
+			$this->form_validation->set_rules( 'timezone',				lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
 			$this->form_validation->set_rules( 'date_format_date_id',	lang( 'accounts_edit_basic_field_date_format_label' ),	'xss_clean|required' );
 			$this->form_validation->set_rules( 'date_format_time_id',	lang( 'accounts_edit_basic_field_time_format_label' ),	'xss_clean|required' );
 			$this->form_validation->set_rules( 'language_id',			lang( 'accounts_edit_basic_field_language_label' ),		'xss_clean|required' );
@@ -684,7 +684,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					$_data['email']					= $_post['email'];
 					$_data['username']				= $_post['username'];
 					$_data['gender']				= $_post['gender'];
-					$_data['timezone_id']			= $_post['timezone_id'];
+					$_data['timezone']				= $_post['timezone'];
 					$_data['date_format_date_id']	= $_post['date_format_date_id'];
 					$_data['date_format_time_id']	= $_post['date_format_time_id'];
 					$_data['language_id']			= $_post['language_id'];
@@ -778,12 +778,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					endif;
 				
 				endif;
-				
-			
-			//	Update has failed, update will render the system admin-less
-			elseif ( $_admins === FALSE ) :
-			
-				$this->data['error'] = lang( 'accounts_edit_error_no_admins' );
 			
 			//	Update failed due to a failed meta upload	
 			elseif ( $_failed ) :
@@ -833,14 +827,10 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		
 		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user->get_groups();
-		
-		$this->load->model( 'system/datetime_model' );
-		$this->data['timezones']	= $this->datetime_model->get_all_timezone_flat();
-		$this->data['date_formats']	= $this->datetime_model->get_all_date_format_flat();
-		$this->data['time_formats']	= $this->datetime_model->get_all_time_format_flat();
-		
-		$this->load->model( 'language_model' );
-		$this->data['languages']	= $this->language_model->get_all_flat();
+		$this->data['timezones']	= $this->datetime->get_all_timezone_flat();
+		$this->data['date_formats']	= $this->datetime->get_all_date_format_flat();
+		$this->data['time_formats']	= $this->datetime->get_all_time_format_flat();
+		$this->data['languages']	= $this->language->get_all_flat();
 		
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :

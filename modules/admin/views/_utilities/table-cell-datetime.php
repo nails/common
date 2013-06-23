@@ -3,8 +3,8 @@
 	if ( $datetime && $datetime != '0000-00-00 00:00:00' ) :
 
 		echo '<td class="datetime">';
-		echo '<span class="nice-time">' . $datetime . '</span>';
-		echo '<small>' . date( active_user( 'pref_date_format' ) . ' ' . active_user( 'pref_time_format' ), strtotime( $datetime ) ) . '</small>';
+		echo '<span class="nice-time">' . user_date( $datetime, 'Y-m-d', 'H:i:s' ) . '</span>';
+		echo '<small>' . user_date( $datetime ) . '</small>';
 		echo '</td>';
 
 	else :

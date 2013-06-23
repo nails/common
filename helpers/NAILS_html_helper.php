@@ -247,4 +247,4 @@ if ( ! function_exists('list_first_last'))
 }
 
 /* End of file NAILS_html_helper.php */
-/* Location: ./application/helpers/NAILS_html_helper.php */
+/* Location: ./helpers/NAILS_html_helper.php */

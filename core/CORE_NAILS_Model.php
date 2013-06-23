@@ -29,12 +29,12 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 		
 		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
-		$this->user =& get_userobject();
+		$this->user = get_userobject();
 
 		// --------------------------------------------------------------------------
 
 		//	Set the cache method
-		//	TODO: check for availability of thigns like memcached
+		//	TODO: check for availability of things like memcached
 
 		$this->_cache_values	= array();
 		$this->_cache_keys		= array();
@@ -282,7 +282,7 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @param bool $return_obj Whether to return just the new ID or the full object
 	 * @return mixed
 	 **/
-	public function create( $data, $return_object = FALSE )
+	public function create( $data = array(), $return_object = FALSE )
 	{
 		if ( ! $this->_table ) :
 

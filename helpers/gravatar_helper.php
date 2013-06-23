@@ -91,4 +91,4 @@ if ( ! function_exists( 'gravatar' ))
 }
 
 /* End of file gravatar_helper.php */
-/* Location: ./application/helpers/gravatar_helper.php */
+/* Location: ./helpers/gravatar_helper.php */

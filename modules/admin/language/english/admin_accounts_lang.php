@@ -67,7 +67,6 @@
 	
 	//	Errors
 	$lang['accounts_edit_error_unknown_id']		= 'Unknown User ID';
-	$lang['accounts_edit_error_no_admins']		= '<strong>Update Failed:</strong> The update would leave the system without any administrators.';
 	$lang['accounts_edit_error_profile_img']	= '<strong>Update Failed:</strong> There was a problem uploading the Profile Image.';
 	$lang['accounts_edit_error_upload']			= '<strong>Update failed:</strong> The file "%s" failed to upload.';
 	$lang['accounts_edit_error_noteditable']	= '<strong>Sorry,</strong> you do not have permission to perform manipulations on that user.';

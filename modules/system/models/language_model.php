@@ -21,7 +21,15 @@ class NAILS_Language_model extends NAILS_Model
 	
 	// --------------------------------------------------------------------------
 	
-	
+	public function set_usr_obj( &$usr )
+	{
+		$this->user =& $usr;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_all()
 	{
 		if ( ! NAILS_DB_ENABLED ) :

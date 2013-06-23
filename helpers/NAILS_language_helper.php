@@ -31,4 +31,4 @@ if ( ! function_exists('lang'))
 
 
 /* End of file NAILS_language_helper.php */
-/* Location: ./application/helpers/NAILS_language_helper.php */
+/* Location: ./helpers/NAILS_language_helper.php */

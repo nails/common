@@ -17,11 +17,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 * 
 	 **/
 	public function __construct()
-	{
-		parent::__construct();
-
-		// --------------------------------------------------------------------------
-		
+	{	
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
 		
@@ -52,7 +48,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	but only if a password has been defined in app.php
 
 		$this->_staging();
-		
+
 		// --------------------------------------------------------------------------
 		
 		//	Load these items, everytime.
@@ -67,14 +63,19 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Instanciate the user model
 		$this->_instanciate_user();
-		
+
 		// --------------------------------------------------------------------------
 		
 		//	Instanciate languages
 		$this->_instanciate_languages();
-		
+
 		// --------------------------------------------------------------------------
 		
+		//	Instanciate DateTime
+		$this->_instanciate_datetime();
+
+		// --------------------------------------------------------------------------
+
 		//	Profiling
 		$this->_instanciate_profiler();
 
@@ -109,12 +110,21 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Default Nails. constants
+		//	These should be defined in config/_nails.php
+		if ( ! defined( 'NAILS_REVISION') )					define( 'NAILS_REVISION',				0 );
+		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
+		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
+		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
+		if ( ! defined( 'NAILS_TIMEZONE') )					define( 'NAILS_TIMEZONE',				'UTC' );
+
+		// --------------------------------------------------------------------------
+
 		//	Default app constants (if not already defined)
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
 		if ( ! defined( 'APP_EMAL_FROM_NAME' ) )			define( 'APP_EMAL_FROM_NAME',			APP_NAME );
 		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
-
 		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
 		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
@@ -268,6 +278,28 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
+	protected function _instanciate_datetime()
+	{
+		//	Pass the user object to the datetime model
+		$this->datetime->set_usr_obj( $this->user );
+
+		// --------------------------------------------------------------------------
+
+		//	Set the timezones
+		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : NAILS_TIMEZONE;
+		$this->datetime->set_timezones( NAILS_TIMEZONE, $_timezone_user );
+
+		// --------------------------------------------------------------------------
+
+		//	Set the default date/time formats
+		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
+		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
+		$this->datetime->set_formats( $_format_date, $_format_time );
+	}
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _instanciate_profiler()
 	{
 		if ( defined( 'PROFILING' ) && PROFILING ) :
@@ -294,9 +326,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instanciate_languages()
 	{
-		//	Load the language model and set the defaults
-		$this->load->model( 'system/language_model' );
-		
+		//	Pass the user object to the language model
+		$this->language->set_usr_obj( $this->user );
+
 		//	Check default lang is supported by nails
 		$this->_supported		= array();
 		$this->_supported[]	= 'english';
@@ -308,8 +340,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		endif;
 		
-		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
-		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
+		define( 'APP_DEFAULT_LANG_ID',		$this->language->get_default_id() );
+		define( 'APP_DEFAULT_LANG_NAME',	$this->language->get_default_name() );
 
 		// --------------------------------------------------------------------------
 
@@ -350,7 +382,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			$this->load->add_package_path( $package );
 
-		endforeach; 
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
@@ -361,14 +393,23 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		foreach ( $_libraries AS $library ) :
 
-			$this->load->library( $library );
+			if ( is_array( $library ) ) :
 
-		endforeach; 
+				$this->load->library( $library[0], $library[1] );
+
+			else :
+
+				$this->load->library( $library );
+
+			endif;
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
 		$_helpers		= array();
 		$_helpers[]		= 'system';	//	To maintain sanity, load this first.
+		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
 		$_helpers[]		= 'form';
 		$_helpers[]		= 'html';
@@ -380,12 +421,33 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'typography';
 		$_helpers[]		= 'cdn';
 		$_helpers[]		= 'event';
-		
+
 		foreach ( $_helpers AS $helper ) :
 
 			$this->load->helper( $helper );
 
-		endforeach; 
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		$_models	= array();
+		$_models[]	= array( 'system/user_model', 'user' );
+		$_models[]	= array( 'system/datetime_model', 'datetime' );
+		$_models[]	= array( 'system/language_model', 'language' );
+
+		foreach ( $_models AS $model ) :
+
+			if ( is_array( $model ) ) :
+
+				$this->load->model( $model[0], $model[1] );
+
+			else :
+
+				$this->load->model( $model );
+
+			endif;
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
@@ -400,7 +462,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			$this->asset->load( $asset, TRUE );
 
-		endforeach; 
+		endforeach;
 
 		//	App assets
 		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
@@ -415,13 +477,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instanciate_user()
 	{
-		//	Load the user model and set a $user variable (for the views)
-		$this->load->model( 'system/user_model', 'user' );
+		//	Set a $user variable (for the views)
 		$this->data['user'] =& $this->user;
 		
 		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
 		//	reference the user model
-
+		
 		define( 'NAILS_USR_OBJ', 'user' );
 		
 		// --------------------------------------------------------------------------

@@ -445,7 +445,6 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->select( 'ug.display_name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
-		$this->db->select( 'utz.gmt_offset timezone_gmt_offset, utz.label timezone_label' );
 		$this->db->select( 'dfd.label date_format_date_label, dfd.format date_format_date_format' );
 		$this->db->select( 'dft.label date_format_time_label, dft.format date_format_time_format' );
 		$this->db->select( 'ul.name language_name, ul.slug language_slug' );
@@ -696,7 +695,6 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );
-		$this->db->join( 'timezone utz',			'u.timezone_id = utz.id',			'left' );
 		$this->db->join( 'date_format_date dfd',	'u.date_format_date_id = dfd.id',	'left' );
 		$this->db->join( 'date_format_time dft',	'u.date_format_time_id = dft.id',	'left' );
 		$this->db->join( 'language ul',				'u.language_id = ul.id',			'left' );
@@ -1106,7 +1104,7 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'last_name';
 			$_cols[]	= 'gender';
 			$_cols[]	= 'profile_img';
-			$_cols[]	= 'timezone_id';
+			$_cols[]	= 'timezone';
 			$_cols[]	= 'date_format_date_id';
 			$_cols[]	= 'date_format_time_id';
 			$_cols[]	= 'language_id';
@@ -1734,8 +1732,8 @@ class NAILS_User_model extends NAILS_Model
 		if ( isset( $data['gender'] ) ) 
 			$_data['gender'] = $data['gender'];
 
-		if ( isset( $data['timezone_id'] ) ) 
-			$_data['timezone_id'] = $data['timezone_id'];
+		if ( isset( $data['timezone'] ) ) 
+			$_data['timezone'] = $data['timezone'];
 
 		if ( isset( $data['date_format_date_id'] ) ) 
 			$_data['date_format_date_id'] = $data['date_format_date_id'];
@@ -1763,7 +1761,7 @@ class NAILS_User_model extends NAILS_Model
 		unset( $data['first_name'] );
 		unset( $data['last_name'] );
 		unset( $data['gender'] );
-		unset( $data['timezone_id'] );
+		unset( $data['timezone'] );
 		unset( $data['date_format_date_id'] );
 		unset( $data['date_format_time_id'] );
 		unset( $data['language_id'] );
@@ -2271,14 +2269,9 @@ class NAILS_User_model extends NAILS_Model
 
 			//	Tidy up date/time/timezone field
 			$user->date_setting					= new stdClass();
-			$user->date_setting->timezone		= new stdClass();
 			$user->date_setting->format			= new stdClass();
 			$user->date_setting->format->date	= new stdClass();
 			$user->date_setting->format->time	= new stdClass();
-			
-			$user->date_setting->timezone->id			= (int) $user->timezone_id;
-			$user->date_setting->timezone->label		= $user->timezone_label;
-			$user->date_setting->timezone->offset		= $user->timezone_gmt_offset;
 			
 			$user->date_setting->format->date->id		= (int) $user->date_format_date_id;
 			$user->date_setting->format->date->label	= $user->date_format_date_label;
@@ -2291,10 +2284,6 @@ class NAILS_User_model extends NAILS_Model
 			//	Set an easy access pref
 			$user->pref_date_format						= $user->date_format_date_format;
 			$user->pref_time_format						= $user->date_format_time_format;
-			
-			unset( $user->timezone_id );
-			unset( $user->timezone_label );
-			unset( $user->timezone_gmt_offset );
 
 			unset( $user->date_format_date_id );
 			unset( $user->date_format_date_label );

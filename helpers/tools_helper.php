@@ -155,4 +155,4 @@ function string_to_boolean( $string )
 
 
 /* End of file tools_helper.php */
-/* Location: ./application/helpers/tools_helper.php */
+/* Location: ./helpers/tools_helper.php */

@@ -215,4 +215,4 @@ if ( ! function_exists( 'send_developer_mail' ) )
 
 
 /* End of file system_helper.php */
-/* Location: ./application/helpers/system_helper.php */
+/* Location: ./helpers/system_helper.php */

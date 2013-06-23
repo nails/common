@@ -263,7 +263,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->data['languages'] = $this->language_model->get_all();
+		$this->data['languages'] = $this->language->get_all();
 		
 		// --------------------------------------------------------------------------
 		
@@ -281,7 +281,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language_model->mark_supported( $_id ) ) :
+		if ( $this->language->mark_supported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_ok' ) );
 
@@ -302,7 +302,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language_model->mark_unsupported( $_id ) ) :
+		if ( $this->language->mark_unsupported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_ok' ) );
 
