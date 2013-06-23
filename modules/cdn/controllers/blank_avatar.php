@@ -135,7 +135,6 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				
 				//	Set some PHPThumbFactory options
 				$_options['resizeUp']		= TRUE;
-				$_options['jpegQuality']	= 80;
 				
 				// --------------------------------------------------------------------------
 				
