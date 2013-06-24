@@ -47,8 +47,8 @@
 
 						case 'GIFT_CARD' :
 
-							echo '<strong>' . APP_NAME . ' Gift Card - ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->discount_value, SHOP_USER_CURRENCY_PRECISION ) . '</strong>';
-							echo '<small>Remaining balance: ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->gift_card_balance, SHOP_USER_CURRENCY_PRECISION ) . '</small>';
+							echo '<strong>' . APP_NAME . ' Gift Card - ' . shop_format_price( $basket->voucher->discount_value, TRUE ) . '</strong>';
+							echo '<small>Remaining balance: ' . shop_format_price( $basket->voucher->gift_card_balance, TRUE ) . '</small>';
 
 						break;
 
@@ -94,7 +94,7 @@
 				if ( $basket->totals->sub  < shop_setting( 'free_shipping_threshold' ) ) :
 
 					$_amount_left = shop_setting( 'free_shipping_threshold' ) - $basket->totals->sub;
-					$_amount_left = SHOP_USER_CURRENCY_SYMBOL . number_format( $_amount_left, SHOP_USER_CURRENCY_PRECISION );
+					$_amount_left = shop_format_price( $_amount_left, TRUE );
 
 					echo '<div class="free-shipping-threshold row">';
 					echo '<p>Spend another <span class="amount-left">' . $_amount_left . '</span> to receive free shipping!</p>';
@@ -105,7 +105,7 @@
 					echo '<div class="free-shipping-threshold row">';
 					echo '<p>';
 					echo 'Your order qualifies for free shipping!';
-					echo '<small>Your order qualifies because you\'ve spent more than ' . SHOP_USER_CURRENCY_SYMBOL . number_format( shop_setting( 'free_shipping_threshold' ), SHOP_USER_CURRENCY_PRECISION ) . '</small>';
+					echo '<small>Your order qualifies because you\'ve spent more than ' . shop_format_price( shop_setting( 'free_shipping_threshold' ), TRUE ) . '</small>';
 					echo '</p>';
 					echo '</div>';
 

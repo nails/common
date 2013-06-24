@@ -40,6 +40,10 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',		$_base->decimal_precision );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',			$_base->code );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',			$_base->id );
+
+		//	Formatting constants
+		if ( ! defined( 'SHOP_BASE_CURRENCY_THOUSANDS' ) )	define( 'SHOP_BASE_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_DECIMALS' ) )	define( 'SHOP_BASE_CURRENCY_DECIMALS',		$_base->decimal_symbol );
 		
 		//	User's preferred currency
 		//	TODO: Same as default just now
@@ -48,6 +52,10 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )	define( 'SHOP_USER_CURRENCY_PRECISION',		$_base->decimal_precision );
 		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )		define( 'SHOP_USER_CURRENCY_CODE',			$_base->code );
 		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )			define( 'SHOP_USER_CURRENCY_ID',			$_base->id );
+
+		//	Formatting constants
+		if ( ! defined( 'SHOP_USER_CURRENCY_THOUSANDS' ) )	define( 'SHOP_USER_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
+		if ( ! defined( 'SHOP_USER_CURRENCY_DECIMALS' ) )	define( 'SHOP_USER_CURRENCY_DECIMALS',		$_base->decimal_symbol );
 
 		//	Exchange rate betweent the two currencies
 		//	TODO: Hardcoded GBP just now
@@ -151,21 +159,24 @@ class NAILS_Shop_model extends NAILS_Model
 
 	public function format_price( $price, $include_symbol = FALSE )
 	{
+		//	SHOP_USER_CURRENCY_THOUSANDS
+		$_value = number_format( $price, SHOP_USER_CURRENCY_PRECISION, SHOP_USER_CURRENCY_DECIMALS, SHOP_USER_CURRENCY_THOUSANDS );
+
 		if ( $include_symbol ) :
 
 			if ( SHOP_USER_CURRENCY_SYMBOL_POS == 'BEFORE' ) :
 
-				return SHOP_USER_CURRENCY_SYMBOL . number_format( $price, SHOP_USER_CURRENCY_PRECISION );
+				return SHOP_USER_CURRENCY_SYMBOL . $_value;
 
 			else :
 
-				return number_format( $price, SHOP_USER_CURRENCY_PRECISION ) . SHOP_USER_CURRENCY_SYMBOL;
+				return $_value . SHOP_USER_CURRENCY_SYMBOL;
 
 			endif;
 
 		else :
 
-			return number_format( $price, SHOP_USER_CURRENCY_PRECISION );
+			return $_value;
 
 		endif;
 	}

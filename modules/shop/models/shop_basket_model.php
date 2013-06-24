@@ -608,20 +608,8 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	
 	public function get_basket_total( $include_symbol = FALSE )
 	{
-		if ( isset( $this->basket->totals ) ) :
-		
-			$_value = $this->basket->totals->sub;
-		
-		else :
-		
-			$_value = (float) 0;
-		
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Format
-		return shop_format_price( $_value, $include_symbol );
+		//	Fetchh & Format
+		return shop_format_price( $this->get_basket()->totals->sub, $include_symbol );
 	}
 	
 	

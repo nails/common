@@ -67,15 +67,15 @@
 							if ( $item->is_on_sale ) :
 							
 								echo '<td class="price on-sale">';
-								echo '<span>' . SHOP_USER_CURRENCY_SYMBOL . number_format( $item->sale_price, SHOP_USER_CURRENCY_PRECISION ) . '</span>';
+								echo '<span>' . shop_format_price( $item->sale_price, TRUE ) . '</span>';
 								echo '<span class="ribbon"></span>';
-								echo '<del>was ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $item->price, SHOP_USER_CURRENCY_PRECISION ) . '</del>';
+								echo '<del>was ' . shop_format_price( $item->price, TRUE ) . '</del>';
 								echo '</td>';
 							
 							else :
 							
 								echo '<td class="price">';
-								echo SHOP_USER_CURRENCY_SYMBOL . number_format( $item->price, SHOP_USER_CURRENCY_PRECISION );
+								echo shop_format_price( $item->price, TRUE );
 								echo '</td>';
 							
 							endif;
@@ -89,7 +89,7 @@
 								if ( $item->type->requires_shipping && $item->shipping ) :
 								
 									echo '<td class="shipping">';
-									echo SHOP_USER_CURRENCY_SYMBOL . number_format( $item->shipping, SHOP_USER_CURRENCY_PRECISION );
+									echo shop_format_price( $item->shipping, TRUE );
 									echo '</td>';
 								
 								elseif ( $item->type->requires_shipping && ! $item->shipping ) :
@@ -109,7 +109,7 @@
 							endif;
 							
 						?>
-						<td class="total"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $item->total, SHOP_USER_CURRENCY_PRECISION )?></td>
+						<td class="total"><?=shop_format_price( $item->total, TRUE )?></td>
 					</tr>
 					<?php
 			
@@ -188,7 +188,7 @@
 						
 						if ( $basket->totals->shipping ) :
 						
-							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->shipping, SHOP_USER_CURRENCY_PRECISION );
+							echo shop_format_price( $basket->totals->shipping, TRUE );
 						
 						else :
 						
@@ -206,7 +206,7 @@
 					
 					if ( $basket->totals->sub ) :
 					
-						echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->sub, SHOP_USER_CURRENCY_PRECISION );
+						echo shop_format_price( $basket->totals->sub, TRUE );
 					
 					else :
 					
@@ -221,9 +221,9 @@
 			<tr class="total tax">
 				<td class="label" colspan="4">TAX</td>
 				<?php if ( $basket->requires_shipping ) : ?>
-				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->tax_shipping, SHOP_USER_CURRENCY_PRECISION )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->tax_shipping, TRUE )?></td>
 			<?php endif; ?>
-				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->tax_items, SHOP_USER_CURRENCY_PRECISION )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->tax_items, TRUE )?></td>
 			</tr>
 
 			<?php if ( $basket->discount->shipping || $basket->discount->items ) : ?>
@@ -235,7 +235,7 @@
 
 						if ( $basket->discount->shipping ) :
 
-							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->discount->shipping, SHOP_USER_CURRENCY_PRECISION );
+							echo shop_format_price( $basket->discount->shipping, TRUE );
 
 						else :
 
@@ -251,7 +251,7 @@
 
 						if ( $basket->discount->items ) :
 
-							echo SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->discount->items, SHOP_USER_CURRENCY_PRECISION );
+							echo shop_format_price( $basket->discount->items, TRUE );
 
 						else :
 
@@ -269,7 +269,7 @@
 				<?php if ( $basket->requires_shipping ) : ?>
 				<td class="value">&nbsp;</td>
 				<?php endif; ?>
-				<td class="value"><?=SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->totals->grand, SHOP_USER_CURRENCY_PRECISION )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->grand, TRUE )?></td>
 			</tr>
 			
 		</tbody>

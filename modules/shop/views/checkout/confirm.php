@@ -35,8 +35,8 @@
 
 					case 'GIFT_CARD' :
 
-						echo '<strong>' . APP_NAME . ' Gift Card - ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->discount_value, SHOP_USER_CURRENCY_PRECISION ) . '</strong>';
-						echo '<small>Remaining balance: ' . SHOP_USER_CURRENCY_SYMBOL . number_format( $basket->voucher->gift_card_balance, SHOP_USER_CURRENCY_PRECISION ) . '</small>';
+						echo '<strong>' . APP_NAME . ' Gift Card - ' . shop_format_price( $basket->voucher->discount_value, TRUE ) . '</strong>';
+						echo '<small>Remaining balance: ' . shop_format_price( $basket->voucher->gift_card_balance, TRUE ) . '</small>';
 
 					break;
 

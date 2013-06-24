@@ -128,7 +128,15 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		return $this->db->get( 'shop_currency c' )->result();
+		$_results = $this->db->get( 'shop_currency c' )->result();
+
+		foreach ( $_results aS $result ) :
+
+			$this->_format_currency_object( $result );
+
+		endforeach;
+
+		return $_results;
 	}
 	
 	
@@ -245,6 +253,29 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 			$this->_set_error( 'Unable to disabled all currencies' );
 			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_currency_object( &$currency )
+	{
+		$currency->id				= (int) $currency->id;
+		$currency->created_by		= is_null( $currency->created_by ) ? NULL : (int) $currency->created_by;
+		$currency->modified_by		= is_null( $currency->modified_by ) ? NULL : (int) $currency->modified_by;
+		$currency->is_active		= (bool) $currency->is_active;
+		$currency->base_exchange	= (float) $currency->base_exchange;
+
+		// --------------------------------------------------------------------------
+
+		//	If this currency lacks a symbol, use it's CODE as a symbol
+		if ( ! $currency->symbol ) :
+
+			$currency->symbol			= $currency->code . ' ';
+			$currency->symbol_position	= 'BEFORE';
 
 		endif;
 	}
