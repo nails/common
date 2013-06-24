@@ -35,17 +35,19 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Shop's base currency (i.e what the products are listed in etc)
-		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL' ) )		define( 'SHOP_BASE_CURRENCY_SYMBOL',	$_base->symbol );
-		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',	$_base->decimal_precision );
-		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',		$_base->code );
-		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',		$_base->id );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL' ) )		define( 'SHOP_BASE_CURRENCY_SYMBOL',		$_base->symbol );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_BASE_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',		$_base->decimal_precision );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',			$_base->code );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',			$_base->id );
 		
 		//	User's preferred currency
 		//	TODO: Same as default just now
-		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL',	$_base->symbol );
-		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )	define( 'SHOP_USER_CURRENCY_PRECISION',	$_base->decimal_precision );
-		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )		define( 'SHOP_USER_CURRENCY_CODE',		$_base->code );
-		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )			define( 'SHOP_USER_CURRENCY_ID',		$_base->id );
+		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL',		$_base->symbol );
+		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_USER_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
+		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )	define( 'SHOP_USER_CURRENCY_PRECISION',		$_base->decimal_precision );
+		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )		define( 'SHOP_USER_CURRENCY_CODE',			$_base->code );
+		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )			define( 'SHOP_USER_CURRENCY_ID',			$_base->id );
 
 		//	Exchange rate betweent the two currencies
 		//	TODO: Hardcoded GBP just now
@@ -141,6 +143,31 @@ class NAILS_Shop_model extends NAILS_Model
 		$this->_set_cache( 'base_currency', $_base );
 
 		return $_base;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function format_price( $price, $include_symbol = FALSE )
+	{
+		if ( $include_symbol ) :
+
+			if ( SHOP_USER_CURRENCY_SYMBOL_POS == 'BEFORE' ) :
+
+				return SHOP_USER_CURRENCY_SYMBOL . number_format( $price, SHOP_USER_CURRENCY_PRECISION );
+
+			else :
+
+				return number_format( $price, SHOP_USER_CURRENCY_PRECISION ) . SHOP_USER_CURRENCY_SYMBOL;
+
+			endif;
+
+		else :
+
+			return number_format( $price, SHOP_USER_CURRENCY_PRECISION );
+
+		endif;
 	}
 }
 

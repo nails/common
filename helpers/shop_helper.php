@@ -83,7 +83,7 @@ if ( ! function_exists( 'get_basket_count' ) )
  */
 if ( ! function_exists( 'get_basket_total' ) )
 {
-	function get_basket_total()
+	function get_basket_total( $include_symbol )
 	{
 		//	Load the shop model, if not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
@@ -103,7 +103,7 @@ if ( ! function_exists( 'get_basket_total' ) )
 		
 		// --------------------------------------------------------------------------
 
-		return number_format( get_instance()->basket->get_basket_total(), 2 );
+		return get_instance()->basket->get_basket_total( $include_symbol );
 	}
 }
 
@@ -247,6 +247,34 @@ if ( ! function_exists( 'shop_setting' ) )
 		// --------------------------------------------------------------------------
 		
 		return get_instance()->shop->settings( $key, $force_refresh );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Helper for quickly formatting shop prices
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'shop_format_price' ) )
+{
+	function shop_format_price( $price, $include_symbol = FALSE )
+	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->shop->format_price( $price, $include_symbol );
 	}
 }
 
