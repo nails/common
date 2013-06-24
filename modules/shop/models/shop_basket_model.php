@@ -606,7 +606,26 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function add( $product_id, $quantity = NULL, $extra_data = NULl )
+	public function get_basket_total()
+	{
+
+		if ( isset( $this->basket->totals ) ) :
+		
+			return $this->basket->totals->sub;
+		
+		else :
+		
+			return (float)0.00;
+		
+		endif;
+		
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	public function add( $product_id, $quantity = NULL, $extra_data = NULL )
 	{
 		if ( ! $quantity ) :
 		

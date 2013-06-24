@@ -29,7 +29,7 @@ if ( ! function_exists( 'get_basket' ) )
 
 
 /**
- * Gets the number of items of the absket
+ * Gets the number of items of the basket
  *
  * @access	public
  * @param	none
@@ -49,6 +49,34 @@ if ( ! function_exists( 'get_basket_count' ) )
 		// --------------------------------------------------------------------------
 		
 		return get_instance()->basket->get_basket_count( $respect_quantity );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Gets the current basket total
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'get_basket_total' ) )
+{
+	function get_basket_total()
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'basket' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_basket_model', 'basket' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+
+		return number_format( get_instance()->basket->get_basket_total(), 2 );
 	}
 }
 
