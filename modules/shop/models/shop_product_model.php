@@ -246,24 +246,37 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 * @param none
 	 * @return array
 	 **/
-	public function get_all( $only_active = TRUE )
+	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $where = NULL, $search = NULL  )
 	{
 		$this->db->select( 'p.*' );
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
 		$this->db->select( 'pm.download_bucket,pm.download_filename' );
 		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.requires_shipping type_requires_shipping,pt.max_per_order type_max_per_order' );
-		
-		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
-		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
-		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
 
-		$this->db->where( 'p.is_deleted', FALSE );
+		// --------------------------------------------------------------------------
 
-		if ( $only_active ) :
-		
-			$this->db->where( 'p.is_active', TRUE );
+		//	Set Order
+		if ( is_array( $order ) ) :
+
+			$this->db->order_by( $order[0], $order[1] );
 
 		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Set Limit
+		if ( is_array( $limit ) ) :
+
+			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		//	Build conditionals
+		$this->_getcount_common( $only_active, $where, $search );
+		
+		// --------------------------------------------------------------------------
 		
 		$_products = $this->db->get( $this->_table . ' p' )->result();
 		
@@ -278,6 +291,50 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		return $_products;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _getcount_common( $only_active = TRUE, $where = NULL, $search = NULL )
+	{
+		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
+		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
+		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
+
+		$this->db->where( 'p.is_deleted', FALSE );
+
+		if ( $only_active ) :
+		
+			$this->db->where( 'p.is_active', TRUE );
+
+		endif;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Counts the total amount of products for a partricular query/search key. Essentially performs
+	 * the same query as $this->get_all() but without limiting.
+	 *
+	 * @access	public
+	 * @param	string	$where	An array of where conditions
+	 * @param	mixed	$search	A string containing the search terms
+	 * @return	int
+	 * @author	Pablo
+	 * 
+	 **/
+	public function count_all( $only_active = FALSE, $where = NULL, $search = NULL )
+	{
+		$this->_getcount_common( $only_active, $where, $search );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Execute Query
+		return $this->db->count_all_results( 'shop_product p' );
 	}
 	
 	
