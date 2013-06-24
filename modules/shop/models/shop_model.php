@@ -18,11 +18,44 @@
 class NAILS_Shop_model extends NAILS_Model
 {
 	protected $_settings;
-	
-	
+	protected $_base_currency;
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$_base = $this->get_base_currency();
+
+		// --------------------------------------------------------------------------
+		
+		//	Shop's base currency (i.e what the products are listed in etc)
+		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL' ) )		define( 'SHOP_BASE_CURRENCY_SYMBOL',	$_base->symbol );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',	$_base->decimal_precision );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',		$_base->code );
+		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',		$_base->id );
+		
+		//	User's preferred currency
+		//	TODO: Same as default just now
+		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL',	$_base->symbol );
+		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )	define( 'SHOP_USER_CURRENCY_PRECISION',	$_base->decimal_precision );
+		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )		define( 'SHOP_USER_CURRENCY_CODE',		$_base->code );
+		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )			define( 'SHOP_USER_CURRENCY_ID',		$_base->id );
+
+		//	Exchange rate betweent the two currencies
+		//	TODO: Hardcoded GBP just now
+		if ( ! defined( 'SHOP_USER_CURRENCY_EXCHANGE' ) )	define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function settings( $key = NULL, $force_refresh = FALSE )
 	{
 		if ( ! $this->_settings || $force_refresh ) :
@@ -62,6 +95,15 @@ class NAILS_Shop_model extends NAILS_Model
 			$this->db->set( 'value', serialize( $value ) );
 			$this->db->update( 'shop_settings' );
 
+			// --------------------------------------------------------------------------
+
+			//	Unset the cache if the base_currency is being updated
+			if ( $key == 'base_currency' ) :
+
+				$this->_unet_cache( 'base_currency' );
+
+			endif;
+
 		endforeach;
 
 		return TRUE;
@@ -73,7 +115,32 @@ class NAILS_Shop_model extends NAILS_Model
 	
 	public function get_base_currency()
 	{
-		return $this->currency->get_by_id( shop_setting( 'base_currency' ) );
+		$_cache = $this->_get_cache( 'base_currency' );
+
+		if ( $_cache ) :
+
+			return $_cache;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Load the currency model, if not already loaded
+		if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+		
+			$this->load->model( 'shop/shop_currency_model', 'currency' );
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch base currency
+		$_base = $this->currency->get_by_id( $this->settings( 'base_currency' ) );
+
+		//	Cache
+		$this->_set_cache( 'base_currency', $_base );
+
+		return $_base;
 	}
 }
 

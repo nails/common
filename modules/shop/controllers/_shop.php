@@ -47,28 +47,6 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Set the currency constants
-		$_base = $this->shop->get_base_currency();
-		
-		//	Shop's base currency (i.e what the products are listed in etc)
-		define( 'SHOP_BASE_CURRENCY_SYMBOL',	$_base->symbol );
-		define( 'SHOP_BASE_CURRENCY_PRECISION',	$_base->decimal_precision );
-		define( 'SHOP_BASE_CURRENCY_CODE',		$_base->code );
-		define( 'SHOP_BASE_CURRENCY_ID',		$_base->id );
-		
-		//	User's preferred currency
-		//	TODO: Same as default just now
-		define( 'SHOP_USER_CURRENCY_SYMBOL',	$_base->symbol );
-		define( 'SHOP_USER_CURRENCY_PRECISION',	$_base->decimal_precision );
-		define( 'SHOP_USER_CURRENCY_CODE',		$_base->code );
-		define( 'SHOP_USER_CURRENCY_ID',		$_base->id );
-		
-		//	Exchange rate betweent the two currencies
-		//	TODO: Hardcoded GBP just now
-		define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
-		
-		// --------------------------------------------------------------------------
-		
 		//	Load the styles
 		$this->asset->load( 'nails.shop.css', TRUE );
 

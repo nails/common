@@ -11,6 +11,15 @@ if ( ! function_exists( 'get_basket' ) )
 {
 	function get_basket()
 	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'basket' ) ) :
 		
@@ -39,6 +48,15 @@ if ( ! function_exists( 'get_basket_count' ) )
 {
 	function get_basket_count( $respect_quantity = TRUE )
 	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'basket' ) ) :
 		
@@ -67,6 +85,15 @@ if ( ! function_exists( 'get_basket_total' ) )
 {
 	function get_basket_total()
 	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'basket' ) ) :
 		
@@ -95,6 +122,15 @@ if ( ! function_exists( 'add_to_basket_button' ) )
 {
 	function add_to_basket_button( $product_id, $button_text = NULL, $attr = 'class="add-to-basket awesome small"', $return_to = NULL )
 	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_model', 'shop' );
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'basket' ) ) :
 		
@@ -201,7 +237,7 @@ if ( ! function_exists( 'shop_setting' ) )
 {
 	function shop_setting( $key = NULL, $force_refresh = FALSE )
 	{
-		//	Load the model if it's not already loaded
+		//	Load the shop model, if not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
 		
 			get_instance()->load->model( 'shop/shop_model', 'shop' );
