@@ -70,7 +70,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set data
-		$this->db->set( 'user_id',			active_user( 'id' ) );
 		$this->db->set( 'slug',				$_slug );
 		$this->db->set( 'title',			$data['title'] );
 		$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );
@@ -199,8 +198,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set data
-		$this->db->set( 'user_id',			active_user( 'id' ) );
-		
 		if ( isset( $data['title'] ) ) :			$this->db->set( 'title',			$data['title'] );			endif;
 		if ( isset( $data['excerpt'] ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
 		if ( isset( $data['image'] ) ) :			$this->db->set( 'image',			$data['image'] );			endif;
@@ -339,8 +336,8 @@ class NAILS_Blog_post_model extends NAILS_Model
 	 **/
 	public function get_all( $only_published = TRUE, $include_body = FALSE, $include_gallery = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -350,7 +347,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 	
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -543,8 +540,8 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 	public function get_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -555,7 +552,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bc.post_id' );
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -599,8 +596,8 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 	public function get_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -611,7 +608,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bt.post_id' );
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -665,14 +662,14 @@ class NAILS_Blog_post_model extends NAILS_Model
 		
 		//	Author
 		$post->author				= new stdClass();
-		$post->author->id			= (int) $post->user_id;
+		$post->author->id			= (int) $post->modified_by;
 		$post->author->first_name	= $post->first_name;
 		$post->author->last_name	= $post->last_name;
 		$post->author->email		= $post->email;
 		$post->author->profile_img	= $post->profile_img;
 		$post->author->gender		= $post->gender;
 		
-		unset( $post->user_id );
+		unset( $post->modified_by );
 		unset( $post->first_name );
 		unset( $post->last_name );
 		unset( $post->email );

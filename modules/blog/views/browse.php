@@ -31,8 +31,8 @@
 		echo '<li class="post clearfix">';
 		if ( $post->image ) :
 		
-			echo '<div class="img four columns first">';
-			echo img( array( 'src' => cdn_scale( 'blog', $post->image, 200, 200 ), 'class' => 'scale-with-grid' ) );
+			echo '<div class="img three columns first featured-image">';
+			echo anchor( $blog_url . $post->slug, img( array( 'src' => cdn_scale( 'blog', $post->image, 200, 200 ), 'class' => 'scale-with-grid' ) ) );
 			echo '</div>';
 			echo '<div class="eight columns last">';
 		

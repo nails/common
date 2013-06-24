@@ -55,7 +55,8 @@
 
 			//	Post
 			echo '<li class="post">';
-			echo anchor( $post->url, $post->title );
+			$_img = $post->image ? img( cdn_thumb( 'blog', $post->image, 32, 32 ) ) : '';
+			echo anchor( $post->url, $_img . $post->title );
 			echo '</li>';
 
 		endforeach;
