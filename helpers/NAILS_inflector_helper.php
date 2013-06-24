@@ -136,4 +136,4 @@ if ( ! function_exists( 'genderise' ) )
 
 
 /* End of file NAILS_inflector_helper.php */
-/* Location: ./application/helpers/NAILS_inflector_helper.php */
+/* Location: ./helpers/NAILS_inflector_helper.php */

@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -17,14 +17,14 @@
 
 class NAILS_Shop_basket_model extends NAILS_Model
 {
-	private $_items;
-	private $_personal_details;
-	private $_payment_gateway;
-	private $_shipping_method;
-	private $_shipping_details;
-	private $_order_id;
-	private $_voucher_code;
-	private $_sess_var;
+	protected $_items;
+	protected $_personal_details;
+	protected $_payment_gateway;
+	protected $_shipping_method;
+	protected $_shipping_details;
+	protected $_order_id;
+	protected $_voucher_code;
+	protected $_sess_var;
 	
 	
 	// --------------------------------------------------------------------------
@@ -993,7 +993,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _update_session()
+	protected function _update_session()
 	{
 		$this->session->set_userdata( $this->sess_var, $this->_items );
 		
@@ -1008,7 +1008,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _get_basket_key_by_product_id( $product_id )
+	protected function _get_basket_key_by_product_id( $product_id )
 	{
 		foreach( $this->_items AS $key => $item ) :
 		
@@ -1047,7 +1047,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'

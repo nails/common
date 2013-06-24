@@ -850,6 +850,23 @@ class Cdn {
 		
 		return $_class::cdn_expiring_url_scheme();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Calls the driver's increment_count method
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	public function increment_count( $action, $object, $bucket = NULL )
+	{
+		return $this->_cdn->increment_count( $action, $object, $bucket );
+	}
 	
 	
 	// --------------------------------------------------------------------------

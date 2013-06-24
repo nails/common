@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S SHOP MODULE
+ * OVERLOADING NAILS' SHOP MODULE
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -45,7 +45,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 
 /**
- * OVERLOADING NAILS'S SHOP MODULE
+ * OVERLOADING NAILS' SHOP MODULE
  * 
  * The following block of code makes it simple to extend one of the core shop
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

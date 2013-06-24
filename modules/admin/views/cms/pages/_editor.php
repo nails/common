@@ -7,13 +7,18 @@
 	<?php
 	
 		//	Get the widget draggables
+
 		foreach( $widgets AS $widget ) :
-		
-			$_class = $widgets[$widget->slug]->iam;
+
+			if ( array_search( $widget->restrict_area, $config['accept_widgets_for'] ) !== FALSE ) :
 			
-			echo '<li class="widget ' . $widget->slug . '" data-template="' . $widget->slug . '">';
-			echo $_class::details()->name;
-			echo '</li>';
+				$_class = $widgets[$widget->slug]->iam;
+				
+				echo '<li class="widget ' . $widget->slug . '" data-template="' . $widget->slug . '">';
+				echo $_class::details()->name;
+				echo '</li>';
+
+			endif;
 		
 		endforeach;	
 	?>

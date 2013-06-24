@@ -11,7 +11,15 @@
 require_once '_cdn_local.php';
 require_once 'thumb.php';
 
-class Scale extends Thumb
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+
+class NAILS_Scale extends Thumb
 {
 	/**
 	 * Generate the thumbnail
@@ -36,8 +44,12 @@ class Scale extends Thumb
 		//	Check the request headers; avoid hitting the disk at all if possible. If the Etag
 		//	matches then send a Not-Modified header and terminate execution.
 		
-		if ( $this->_serve_not_modified( $this->_cache_file ) )
-			return;
+		 if ( $this->_serve_not_modified( $this->_cache_file ) ) :
+
+		 	$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+		 	return;
+
+		 endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -47,6 +59,7 @@ class Scale extends Thumb
 		
 		if ( file_exists( CACHE_DIR . $this->_cache_file ) ) :
 		
+			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
 			$this->_serve_from_cache( $this->_cache_file );
 		
 		else :
@@ -73,9 +86,9 @@ class Scale extends Thumb
 				// --------------------------------------------------------------------------
 				
 				//	Set the appropriate cache headers
-				//header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
-				//header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
-				//header( 'X-CDN-CACHE: MISS' );
+				header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
+				header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
+				header( 'X-CDN-CACHE: MISS' );
 				
 				// --------------------------------------------------------------------------
 				
@@ -83,11 +96,28 @@ class Scale extends Thumb
 				$thumb->show();
 				
 				// --------------------------------------------------------------------------
+
+				//	Bump the counter
+				$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+
+				// --------------------------------------------------------------------------
 				
-				//	Save to the cache, this involves saving a local copy then punting that up to S3
-				
-				//	Save local version
-				$thumb->save( CACHE_DIR . $this->_cache_file, strtoupper( substr( $this->_extension, 1 ) ) );
+				//	Save local version, make sure cache is writable
+				if ( is_writable( CACHE_DIR ) ) :
+
+					$thumb->save( CACHE_DIR . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+
+				else :
+
+					//	Inform developers
+					$_subject	= 'Cache (scale) dir not writeable';
+					$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
+					$_message	.= 'Dir: ' . CACHE_DIR . $this->_cache_file . "\n\n";
+					$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+					
+					send_developer_mail( $_subject, $_message );
+
+				endif;
 			
 			else :
 			
@@ -99,6 +129,42 @@ class Scale extends Thumb
 		endif;
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * The following block of code makes it simple to extend one of the core admin
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SCALE' ) ) :
+
+	class Scale extends NAILS_Scale
+	{
+	}
+
+endif;
 
 
 /* End of file thumb.php */

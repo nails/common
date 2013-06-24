@@ -7,10 +7,18 @@
  * 
  **/
 
-class Blog_post_model extends NAILS_Model
+/**
+ * OVERLOADING NAILS' MODELS
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+
+class NAILS_Blog_post_model extends NAILS_Model
 {
 
-	private $_reserved;
+	protected $_reserved;
 
 
 	// --------------------------------------------------------------------------
@@ -62,7 +70,6 @@ class Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set data
-		$this->db->set( 'user_id',			active_user( 'id' ) );
 		$this->db->set( 'slug',				$_slug );
 		$this->db->set( 'title',			$data['title'] );
 		$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );
@@ -191,8 +198,6 @@ class Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set data
-		$this->db->set( 'user_id',			active_user( 'id' ) );
-		
 		if ( isset( $data['title'] ) ) :			$this->db->set( 'title',			$data['title'] );			endif;
 		if ( isset( $data['excerpt'] ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
 		if ( isset( $data['image'] ) ) :			$this->db->set( 'image',			$data['image'] );			endif;
@@ -331,8 +336,8 @@ class Blog_post_model extends NAILS_Model
 	 **/
 	public function get_all( $only_published = TRUE, $include_body = FALSE, $include_gallery = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -342,7 +347,7 @@ class Blog_post_model extends NAILS_Model
 		
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 	
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -535,8 +540,8 @@ class Blog_post_model extends NAILS_Model
 
 	public function get_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -547,7 +552,7 @@ class Blog_post_model extends NAILS_Model
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bc.post_id' );
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -591,8 +596,8 @@ class Blog_post_model extends NAILS_Model
 
 	public function get_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.user_id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.published' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
 		
@@ -603,7 +608,7 @@ class Blog_post_model extends NAILS_Model
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
 		$this->db->join( 'blog_post bp', 'bp.id = bt.post_id' );
-		$this->db->join( 'user u', 'bp.user_id = u.id', 'LEFT' );
+		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
 		
 		if ( $only_published ) :
 		
@@ -645,7 +650,7 @@ class Blog_post_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_post_object( &$post )
+	protected function _format_post_object( &$post )
 	{
 		//	Type casting
 		$post->id					= (int) $post->id;
@@ -657,14 +662,14 @@ class Blog_post_model extends NAILS_Model
 		
 		//	Author
 		$post->author				= new stdClass();
-		$post->author->id			= (int) $post->user_id;
+		$post->author->id			= (int) $post->modified_by;
 		$post->author->first_name	= $post->first_name;
 		$post->author->last_name	= $post->last_name;
 		$post->author->email		= $post->email;
 		$post->author->profile_img	= $post->profile_img;
 		$post->author->gender		= $post->gender;
 		
-		unset( $post->user_id );
+		unset( $post->modified_by );
 		unset( $post->first_name );
 		unset( $post->last_name );
 		unset( $post->email );
@@ -672,6 +677,42 @@ class Blog_post_model extends NAILS_Model
 		unset( $post->gender );
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS' MODELS
+ * 
+ * The following block of code makes it simple to extend one of the core Nails
+ * models. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_BLOG_POST_MODEL' ) ) :
+
+	class Blog_post_model extends NAILS_Blog_post_model
+	{
+	}
+
+endif;
 
 /* End of file blog_post_model.php */
 /* Location: ./application/models/blog_post_model.php */

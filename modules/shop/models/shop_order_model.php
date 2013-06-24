@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -18,7 +18,7 @@
 class NAILS_Shop_order_model extends NAILS_Model
 {
 	protected $_table;
-	private $_table_product;
+	protected $_table_product;
 	
 	
 	// --------------------------------------------------------------------------
@@ -431,7 +431,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	private function _getcount_orders_common( $where = NULL, $search = NULL )
+	protected function _getcount_orders_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
 		$this->db->join( 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
@@ -1091,7 +1091,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_order( &$order )
+	protected function _format_order( &$order )
 	{
 		//	Generic
 		$order->id					= (int) $order->id;
@@ -1296,7 +1296,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	private function _format_item( &$item )
+	protected function _format_item( &$item )
 	{
 		$item->id				= (int) $item->id;
 		$item->quantity			= (int) $item->quantity;
@@ -1353,7 +1353,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'

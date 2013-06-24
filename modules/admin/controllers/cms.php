@@ -10,7 +10,7 @@
 require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -412,7 +412,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->data['blocks'] = $this->cms_block->get_all();
+		$this->data['blocks']		= $this->cms_block->get_all();
+		$this->data['languages']	= $this->language->get_all_supported_flat();
 		
 		// --------------------------------------------------------------------------
 		
@@ -481,8 +482,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Fetch data
-		$this->data['languages']	= $this->language_model->get_all_flat();
-		$this->data['default_id']	= $this->language_model->get_default_id();
+		$this->data['languages']	= $this->language->get_all_supported_flat();
+		$this->data['default_id']	= $this->language->get_default_id();
 		
 		// --------------------------------------------------------------------------
 		
@@ -548,6 +549,10 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			endif;
 		
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['languages'] = $this->language->get_all_supported_flat();
 		
 		// --------------------------------------------------------------------------
 		
@@ -624,7 +629,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

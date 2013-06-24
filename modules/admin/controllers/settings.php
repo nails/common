@@ -12,7 +12,7 @@
 require_once '_admin.php';
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -49,6 +49,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		
 		//	Navigation options
 		$d->funcs = array();
+		$d->funcs['site']	= lang( 'settings_nav_site' );
 		
 		if ( module_is_enabled( 'blog' ) ) :
 
@@ -77,6 +78,88 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		
 		//	Only announce the controller if the user has permisison to know about it
 		return self::_can_access( $d, __FILE__ );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Configure the blog
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function site()
+	{
+		//	Set method info
+		$this->data['page']->title = lang( 'settings_site_title' );
+
+		// --------------------------------------------------------------------------
+
+		//	Load models
+		$this->load->model( 'system/system_model', 'blog' );
+		
+		// --------------------------------------------------------------------------
+
+		//	Process POST
+		if ( $this->input->post() ) :
+		
+			switch ( $this->input->post( 'update' ) ) :
+
+				case 'analytics' :
+
+					$this->_site_update_analytics();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				default :
+
+					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
+
+				break;
+
+			endswitch;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get data
+		$this->data['settings'] = $this->site->settings( NULL, TRUE );
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/settings/site',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _site_update_analytics()
+	{
+		//	Prepare update
+		$_settings								= array();
+		$_settings['google_analytics_account']	= $this->input->post( 'google_analytics_account' );
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->site->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Site settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
 	}
 
 
@@ -411,7 +494,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

@@ -4,8 +4,7 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 {
 	static function details()
 	{
-		$_d	= new stdClass();
-		
+		$_d			= parent::details();
 		$_d->name	= 'Image';
 		$_d->slug	= 'Widget_image';
 		$_d->iam	= 'Nails_CMS_Widget_image';

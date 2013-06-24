@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS' CDN MODULE
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -83,8 +83,18 @@ class NAILS_Manager extends NAILS_CDN_Controller
 								
 							else :
 							
-								$_test_ok	= FALSE;
-								$_error		= 'Bucket <strong>"' . $_bucket[0] . '"</strong> does not exist';
+								//	Bucket doesn't exist - attempt to create it
+								if ( $this->cdn->create_bucket( $_bucket[0] ) ) :
+
+									$_test_ok = TRUE;
+
+								else :
+
+									$_test_ok	= FALSE;
+									$_error		= 'Bucket <strong>"' . $_bucket[0] . '"</strong> does not exist';
+									$_error		.= '<small>Additionally, the following error occured while attempting to create the bucket:<br />' . implode( '', $this->cdn->errors() ) . '</small>';
+
+								endif;
 							
 							endif;
 						
@@ -401,7 +411,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 
 /**
- * OVERLOADING NAILS'S AUTH MODULE
+ * OVERLOADING NAILS' CDN MODULE
  * 
  * The following block of code makes it simple to extend one of the core auth
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

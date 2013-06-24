@@ -29,12 +29,12 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 		
 		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
-		$this->user =& get_userobject();
+		$this->user = get_userobject();
 
 		// --------------------------------------------------------------------------
 
 		//	Set the cache method
-		//	TODO: check for availability of thigns like memcached
+		//	TODO: check for availability of things like memcached
 
 		$this->_cache_values	= array();
 		$this->_cache_keys		= array();
@@ -282,7 +282,7 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @param bool $return_obj Whether to return just the new ID or the full object
 	 * @return mixed
 	 **/
-	public function create( $data, $return_object = FALSE )
+	public function create( $data = array(), $return_object = FALSE )
 	{
 		if ( ! $this->_table ) :
 
@@ -431,6 +431,34 @@ class CORE_NAILS_Model extends CI_Model {
 		
 		return $this->db->get( $_table )->result();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetches all objects
+	 * 
+	 * @access public
+	 * @param none
+	 * @return int
+	 **/
+	public function count()
+	{
+		if ( ! $this->_table ) :
+
+			show_error( 'Table variable not set' );
+
+		else :
+
+			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		return $this->db->count_all_results( $_table );
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -512,6 +540,57 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 		
 		return $_result[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _generate_slug( $label, $table = NULL, $column = NULL )
+	{
+		//	Prep table and column
+		$_prefix	= ! $_table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
+		$_table		= ! $table ? $this->_table : $table;
+		$_column	= ! $column ? 'slug' : $column;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! $_table ) :
+
+			show_error( 'Table variable not set' );
+
+		endif;
+
+		if ( ! $_column ) :
+
+			show_error( 'Column variable not set' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_counter = 0;
+		
+		do
+		{
+			$_slug = url_title( $label, 'dash', TRUE );
+
+			if ( $_counter ) :
+
+				$_slug_test = $_slug . '-' . $_counter;
+
+			else :
+
+				$_slug_test = $_slug;
+
+			endif;
+
+			$this->db->where( $_prefix . $_column, $_slug_test );
+			$_counter++;
+
+		} while( $this->db->count_all_results( $_prefix . $_table ) );
+
+		return $_slug_test;
 	}
 }
 

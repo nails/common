@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -17,11 +17,19 @@
 
 class NAILS_Language_model extends NAILS_Model
 {
-	private $_default_lang;
+	protected $_default_lang;
 	
 	// --------------------------------------------------------------------------
 	
-	
+	public function set_usr_obj( &$usr )
+	{
+		$this->user =& $usr;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_all()
 	{
 		if ( ! NAILS_DB_ENABLED ) :
@@ -245,6 +253,14 @@ class NAILS_Language_model extends NAILS_Model
 
 	public function update( $id, $data )
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+		
+			return FALSE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$this->db->set( $data );
 		$this->db->where( 'id', $id );
 		return $this->db->update( 'language' );
@@ -256,7 +272,7 @@ class NAILS_Language_model extends NAILS_Model
 
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * The following block of code makes it simple to extend one of the core
  * models. Some might argue it's a little hacky but it's a simple 'fix'

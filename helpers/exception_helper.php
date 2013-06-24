@@ -51,4 +51,4 @@ if ( ! function_exists( 'unauthorised' ) )
 }
 
 /* End of file exception_helper.php */
-/* Location: ./application/helpers/exception_helper.php */
+/* Location: ./helpers/exception_helper.php */

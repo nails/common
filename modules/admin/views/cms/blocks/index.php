@@ -19,7 +19,7 @@
 		<thead>
 			<tr>
 				<th class="title">Block Title &amp; Description</th>
-				<?php if ( APP_MULTI_LANG ) : ?>
+				<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 				<th class="default"><?=APP_DEFAULT_LANG_NAME?> Value</th>
 				<th class="translations">Translations</th>
 				<?php else : ?>
@@ -54,7 +54,7 @@
 					
 					// --------------------------------------------------------------------------
 					
-					if ( APP_MULTI_LANG ) :
+					if ( APP_MULTI_LANG && count( $languages ) > 1 ) :
 
 						echo '<td class="translations">';
 						echo '<ul>';

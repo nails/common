@@ -4,8 +4,7 @@ class Nails_CMS_Widget_html extends Nails_CMS_Widget
 {
 	static function details()
 	{
-		$_d	= new stdClass();
-		
+		$_d			= parent::details();
 		$_d->name	= 'HTML';
 		$_d->slug	= 'Widget_html';
 		$_d->iam	= 'Nails_CMS_Widget_html';

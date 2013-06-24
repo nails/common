@@ -15,135 +15,7 @@ if ( ! function_exists( 'nice_time' ) )
 {
 	function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
-	
-		if( empty( $date ) || $date == '0000-00-00' ) :
-		
-			if ( $opt_bad_msg ) :
-			
-				return $opt_bad_msg;
-				
-			else :
-			
-				return 'No date supplied';
-				
-			endif;
-			
-		endif;
-		
-		$periods		= array( 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade' );
-		$lengths		= array( 60,60,24,7,'4.35', 12, 10 );
-		
-		$now			= time();
-		
-		if ( is_int( $date ) ) :
-		
-			$unix_date = $date;
-			
-		else :
-		
-			$unix_date = strtotime( $date );
-			
-		endif;
-		
-		//	Check date supplied is valid
-		if( empty( $unix_date ) ) :
-		
-			if ( $opt_bad_msg ) :
-			
-				return $opt_bad_msg;
-			
-			else :
-			
-				return 'Bad date supplied ('.$date.')';
-			
-			endif;
-			
-		endif;
-		
-		//	If date is effectively NULL
-		if ( $date == '0000-00-00 00:00:00' )
-			return 'Unknown';
-		
-		//	Determine past or future date
-		if( $now >= $unix_date ) :
-			$difference = $now - $unix_date;
-			
-			if( $tense === TRUE ) :
-				$tense = 'ago';
-			endif;
-		
-		else :
-			$difference = $unix_date - $now;
-			if( $tense === TRUE ) :
-				$tense = 'from now';
-			endif;
-		endif;
-		
-		for( $j = 0; $difference >= $lengths[$j] && $j < count( $lengths )-1; $j++ ) :
-			$difference /= $lengths[$j];
-		endfor;
-		
-		$difference = round( $difference );
-		
-		if( $difference != 1 ) :
-			$periods[$j] .= 's';
-		endif;
-		
-		// If it's greater than 1 week and $greater_1_week is defined, return that
-		if ( substr( $periods[$j], 0, 4 ) == 'week' && $greater_1_week !== NULL)
-			return $greater_1_week;
-			
-		// If it's less than 20 seconds, return 'Just now'
-		if ( is_null( $less_10_mins ) && substr( $periods[$j], 0, 6 ) == 'second' && $difference <=20 )
-			return 'a moment ago';
-			
-		//	If $less_10_mins is set then return that if less than 10 minutes
-		if (	! is_null( $less_10_mins )
-				&&
-				(
-					(substr( $periods[$j], 0, 6 ) == 'minute'	&& $difference <=10)||
-					(substr( $periods[$j], 0, 6 ) == 'second'	&& $difference <=60)
-				)
-			)
-			return $less_10_mins;
-		
-		if( "{$difference} {$periods[$j]} {$tense}" == '1 day ago') :
-		
-			return 'Yesterday';
-		
-		else :
-		
-			return "{$difference} {$periods[$j]} {$tense}";
-			
-		endif;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Reformats a date using PHP
- *
- * @access	public
- * @param	string
- * @param	string
- * @return	string
- */
-if ( ! function_exists( 'reformat_date' ) )
-{
-	function reformat_date( $date = FALSE, $pattern = 'jS F Y' )
-	{
-	
-		if( empty( $date ) ) :
-		
-			return 'No Date Available';
-			
-		endif;
-		
-		return date( $pattern, strtotime( $date ) ); 
-
+		return get_instance()->datetime->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
 	}
 }
 
@@ -193,40 +65,6 @@ if ( ! function_exists( 'calculate_age' ) )
 		// --------------------------------------------------------------------------
 		
 		return $_age_years;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * user_timezone()
- *
- * Converts a date to the user's timezone
- *
- * @access	public
- * @param	string	$date	A string containing the date to convert
- * @return	string	The converted date in YYY-MM-DD H:i:s format
- */
-if ( ! function_exists( 'user_timezone' ) )
-{
-	function user_timezone( $date )
-	{
-		$_setting	= active_user( 'date_setting' );
-		$_offset	= isset( $_setting->timezone->offset ) ? $_setting->timezone->offset : 0;
-		
-		if ( is_numeric( $date ) ) :
-		
-			$_out = date( 'Y-m-d H:i:s', time() + ( $_offset * 3600 ) );
-		
-		else :
-		
-			$_out = date( 'Y-m-d H:i:s', strtotime( $date . ' ' . $_offset . ' HOURS' ) );
-		
-		endif;
-		
-		return $_out;
 	}
 }
 
@@ -497,4 +335,4 @@ if ( ! function_exists( 'datepicker' ) )
 
 
 /* End of file NAILS_date_helper.php */
-/* Location: ./application/helpers/NAILS_date_helper.php */
+/* Location: ./helpers/NAILS_date_helper.php */

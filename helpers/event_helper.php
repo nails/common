@@ -11,4 +11,4 @@ if ( ! function_exists( 'create_event' ) )
 }
 
 /* End of file event_helper.php */
-/* Location: ./application/helpers/event_helper.php */
+/* Location: ./helpers/event_helper.php */

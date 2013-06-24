@@ -100,4 +100,4 @@ if ( ! function_exists( 'here' ) )
 
 
 /* End of file debug_helper.php */
-/* Location: ./application/helpers/debug_helper.php */
+/* Location: ./helpers/debug_helper.php */

@@ -10,7 +10,15 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Placeholder extends NAILS_CDN_Controller
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+
+class NAILS_Placeholder extends NAILS_CDN_Controller
 {
 	private $_tile;
 	private $_width;
@@ -121,8 +129,22 @@ class Placeholder extends NAILS_CDN_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			//	Save to CACHE_DIR
-			imagepng( $_img, CACHE_DIR . $this->_cache_file );
+			//	Save local version, make sure cache is writable
+			if ( is_writable( CACHE_DIR ) ) :
+
+				imagepng( $_img, CACHE_DIR . $this->_cache_file );
+
+			else :
+
+				//	Inform developers
+				$_subject	= 'Cache (scale) dir not writeable';
+				$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
+				$_message	.= 'Dir: ' . CACHE_DIR . $this->_cache_file . "\n\n";
+				$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+				
+				send_developer_mail( $_subject, $_message );
+
+			endif;
 			
 			// --------------------------------------------------------------------------
 			
@@ -142,6 +164,42 @@ class Placeholder extends NAILS_CDN_Controller
 		$this->index();
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * The following block of code makes it simple to extend one of the core admin
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_PLACEHOLDER' ) ) :
+
+	class Placeholder extends NAILS_Placeholder
+	{
+	}
+
+endif;
 
 
 /* End of file placeholder.php */

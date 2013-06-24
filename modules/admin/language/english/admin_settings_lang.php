@@ -8,13 +8,19 @@
 */
 
 	//	Generic for module
-	$lang['settings_module_name']		= 'Settings';
+	$lang['settings_module_name']	= 'Settings';
 	
 	// --------------------------------------------------------------------------
 	
 	//	Nav
+	$lang['settings_nav_site']		= 'Site';
 	$lang['settings_nav_blog']		= 'Blog';
 	$lang['settings_nav_shop']		= 'Shop';
+
+	// --------------------------------------------------------------------------
+
+	//	Site Settings
+	$lang['settings_site_title']	= 'Site';
 
 	// --------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -246,6 +246,10 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	 **/
 	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
+		$this->db->select( 'v.*, u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
+
+		// --------------------------------------------------------------------------
+
 		//	Only active vouchers?
 		if ( $only_active ) :
 
@@ -366,8 +370,10 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	private function _getcount_vouchers_common( $where = NULL, $search = NULL )
+	protected function _getcount_vouchers_common( $where = NULL, $search = NULL )
 	{
+		$this->db->join( 'user u', 'u.id = v.created_by' );
+
 		//	Set Where
 		if ( $where ) :
 		
@@ -384,11 +390,8 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 			//	so define a default set to search across
 			
 			$search								= array( 'keywords' => $search, 'columns' => array() );
-			$search['columns']['id']			= 'o.id';
-			$search['columns']['ref']			= 'o.ref';
-			$search['columns']['user_id']		= 'o.user_id';
-			$search['columns']['user_email']	= 'o.user_email';
-			$search['columns']['pp_txn_id']		= 'o.pp_txn_id';
+			$search['columns']['id']			= 'v.id';
+			$search['columns']['code']			= 'v.code';
 			
 		endif;
 		
@@ -751,6 +754,22 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		$voucher->is_active			= (bool) $voucher->is_active;
 		$voucher->is_deleted		= (bool) $voucher->is_deleted;
+
+		//	Creator
+		$voucher->creator				= new stdClass();
+		$voucher->creator->id			= (int) $voucher->created_by;
+		$voucher->creator->email		= $voucher->email;
+		$voucher->creator->first_name	= $voucher->first_name;
+		$voucher->creator->last_name	= $voucher->last_name;
+		$voucher->creator->profile_img	= $voucher->profile_img;
+		$voucher->creator->gender		= $voucher->gender;
+
+		unset( $voucher->created_by );
+		unset( $voucher->email );
+		unset( $voucher->first_name );
+		unset( $voucher->last_name );
+		unset( $voucher->profile_img );
+		unset( $voucher->gender );
 	}
 }
 
@@ -759,7 +778,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 
 /**
- * OVERLOADING NAILS'S MODELS
+ * OVERLOADING NAILS' MODELS
  * 
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'

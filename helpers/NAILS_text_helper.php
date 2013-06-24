@@ -120,4 +120,4 @@ if ( ! function_exists( 'is_clean' ) )
 }
 
 /* End of file NAILS_text_helper.php */
-/* Location: ./application/helpers/NAILS_text_helper.php */
+/* Location: ./helpers/NAILS_text_helper.php */

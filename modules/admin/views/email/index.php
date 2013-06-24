@@ -18,7 +18,7 @@
 			<tr>
 				<th class="id"><?=lang( 'email_index_thead_id' )?></th>
 				<th class="ref"><?=lang( 'email_index_thead_ref' )?></th>
-				<th class="to"><?=lang( 'email_index_thead_to' )?></th>
+				<th class="user"><?=lang( 'email_index_thead_to' )?></th>
 				<th class="queued"><?=lang( 'email_index_thead_queued' )?></th>
 				<th class="sent"><?=lang( 'email_index_thead_sent' )?></th>
 				<th class="type"><?=lang( 'email_index_thead_type' )?></th>
@@ -38,76 +38,13 @@
 						<tr>
 							<td class="id"><?=number_format( $email->id )?></td>
 							<td class="ref"><?=$email->ref?></td>
-							<td class="to">
-								<?php
-								
-									if ( $email->send_to ) :
-									
-										if ( $email->profile_img ) :
-										
-											echo img( cdn_thumb( 'profile-images', $email->profile_img, 45, 45 ) );
-										
-										else :
-										
-											switch ( $email->gender ) :
-											
-												case 'female' :
-												
-													echo img( cdn_blank_avatar( 45, 45, 'female' ) );
-												
-												break;
-												
-												case 'male' :
-												default : 
-												
-													echo img( cdn_blank_avatar( 45, 45, 'male' ) );
-												
-												break;
-											
-											endswitch;
-										
-										endif;
-										
-										echo $email->first_name . ' ' . $email->last_name;
-										echo '<small>' . mailto( $email->send_to ) . '</small>';
+							<?php
 
-										$_email = $email->send_to;
-										
-									else :
-									
-										echo img( cdn_blank_avatar( 45, 45, 'male' ) );
-										echo '&mdash;';
-										echo '<small>' . mailto( $email->user_email ) . '</small>';
+								$this->load->view( 'admin/_utilities/table-cell-user', $email->user );
+								$this->load->view( 'admin/_utilities/table-cell-datetime', array( 'datetime' => $email->time_queued ) );
+								$this->load->view( 'admin/_utilities/table-cell-datetime', array( 'datetime' => $email->time_sent, 'nodata' => '<span class="queued">' . lang( 'email_index_queued' ) . '</span>' ) );
 
-										$_email = $email->user_email;
-									
-									endif;
-								
-								?>
-							</td>
-							<td class="queued">
-								<?php
-								
-									echo '<span class="nice-time">' . $email->time_queued . '</span>';
-									echo '<small>' . $email->time_queued . '</small>';
-								
-								?>
-							</td>
-							<td class="sent">
-								<?php
-								
-									if ( ! (int) $email->time_sent ) :
-									
-										echo '<span class="queued">' . lang( 'email_index_queued' ) . '</span>';
-									
-									else :
-									
-										echo '<span class="nice-time">' . $email->time_sent . '</span>';
-										echo '<small>' . $email->time_sent . '</small>';
-										
-									endif;
-								?>
-							</td>
+							?>
 							<td class="type">
 								<?=$email->name?>
 								<small><?=lang( 'email_index_subject', $email->subject )?></small>

@@ -12,7 +12,7 @@
 require_once '_admin.php';
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -263,7 +263,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->data['languages'] = $this->language_model->get_all();
+		$this->data['languages'] = $this->language->get_all();
 		
 		// --------------------------------------------------------------------------
 		
@@ -281,7 +281,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language_model->mark_supported( $_id ) ) :
+		if ( $this->language->mark_supported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_ok' ) );
 
@@ -302,7 +302,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language_model->mark_unsupported( $_id ) ) :
+		if ( $this->language->mark_unsupported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_ok' ) );
 
@@ -321,7 +321,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 
 /**
- * OVERLOADING NAILS'S ADMIN MODULES
+ * OVERLOADING NAILS' ADMIN MODULES
  * 
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'

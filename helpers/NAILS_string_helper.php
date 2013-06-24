@@ -31,4 +31,4 @@ if ( ! function_exists('str_lreplace'))
 
 
 /* End of file NAILS_string_helper.php */
-/* Location: ./application/helpers/NAILS_string_helper.php */
+/* Location: ./helpers/NAILS_string_helper.php */

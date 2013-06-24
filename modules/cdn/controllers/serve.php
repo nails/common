@@ -10,7 +10,15 @@
 //	Include _cdn_local.php; executes common functionality
 require_once '_cdn_local.php';
 
-class Serve extends NAILS_CDN_Controller
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ * 
+ **/
+
+class NAILS_Serve extends NAILS_CDN_Controller
 {
 	private $_bucket;
 	private $_object;
@@ -101,17 +109,31 @@ class Serve extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
+		//	Look up the object in the DB
+		$_object = $this->cdn->get_object( $this->_object, $this->_bucket );
+
+		// --------------------------------------------------------------------------
+
 		//	Check the request headers; avoid hitting the disk at all if possible. If the Etag
 		//	matches then send a Not-Modified header and terminate execution.
 		
-		if ( ! $this->input->get( 'dl' ) ) :
+		if ( $this->_serve_not_modified( $this->_bucket . $this->_object ) ) :
 		
-			if ( $this->_serve_not_modified( $this->_bucket . $this->_object ) ) :
-			
-				return;
-				
+			if ( $_object ) :
+
+				if ( $this->input->get( 'dl' ) ) :
+
+					$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+
+				else :
+
+					$this->cdn->increment_count( 'SERVE', $_object->id );
+
+				endif;
+
 			endif;
-		
+			return;
+			
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -122,12 +144,6 @@ class Serve extends NAILS_CDN_Controller
 			return $this->_bad_src();
 			
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Look up the object in the DB
-		$this->load->library( 'cdn' );
-		$_object = $this->cdn->get_object( $this->_object, $this->_bucket );
 		
 		// --------------------------------------------------------------------------
 		
@@ -179,6 +195,23 @@ class Serve extends NAILS_CDN_Controller
 		
 		//	Send the contents of the file to the browser
 		echo file_get_contents( CDN_PATH . $this->_bucket . '/' . $this->_object );
+
+		// --------------------------------------------------------------------------
+
+		//	Bump the counter
+		if ( $_object ) :
+
+			if ( $this->input->get( 'dl' ) ) :
+
+				$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+
+			else :
+
+				$this->cdn->increment_count( 'SERVE', $_object->id );
+
+			endif;
+
+		endif;
 	}
 	
 	
@@ -213,6 +246,42 @@ class Serve extends NAILS_CDN_Controller
 		$this->index();
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * OVERLOADING NAILS' CDN MODULES
+ * 
+ * The following block of code makes it simple to extend one of the core admin
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ * 
+ * Here's how it works:
+ * 
+ * CodeIgniter  instanciate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclre class X' errors
+ * and if we call our overloading class something else it will never get instanciated.
+ * 
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instanciated et voila.
+ * 
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ * 
+ **/
+ 
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SERVE' ) ) :
+
+	class Serve extends NAILS_Serve
+	{
+	}
+
+endif;
 
 
 /* End of file serve.php */

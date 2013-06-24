@@ -86,9 +86,9 @@
 
 		//	Timezone
 		$_field					= array();
-		$_field['key']			= 'timezone_id';
+		$_field['key']			= 'timezone';
 		$_field['label']		= lang( 'accounts_edit_basic_field_timezone_label' );
-		$_field['default']		= $user_edit->date_setting->timezone->id;
+		$_field['default']		= $user_edit->timezone;
 		$_field['required']		= FALSE;
 		$_field['class']		= 'chosen';
 		

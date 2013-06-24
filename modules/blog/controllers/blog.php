@@ -8,7 +8,7 @@
  **/
 
 /**
- * OVERLOADING NAILS'S SHOP MODULE
+ * OVERLOADING NAILS' BLOG MODULE
  * 
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
@@ -386,7 +386,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 
 /**
- * OVERLOADING NAILS'S BLOG MODULE
+ * OVERLOADING NAILS' BLOG MODULE
  * 
  * The following block of code makes it simple to extend one of the core blog
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
