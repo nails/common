@@ -431,6 +431,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_models	= array();
+		$_models[]	= array( 'system/site_model', 'site' );
 		$_models[]	= array( 'system/user_model', 'user' );
 		$_models[]	= array( 'system/datetime_model', 'datetime' );
 		$_models[]	= array( 'system/language_model', 'language' );
