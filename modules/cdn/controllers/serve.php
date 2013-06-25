@@ -139,7 +139,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Check the object is set
-		if ( $this->_bad_token || ! $this->_object || ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		if ( ! defined( 'CDN_PATH' ) || $this->_bad_token || ! $this->_object || ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
 		
 			return $this->_bad_src();
 			
@@ -220,21 +220,43 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	
 	private function _bad_src()
 	{
-		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Content-type: application/json' );
-		header( 'HTTP/1.0 400 Bad Request' );
-		
-		// --------------------------------------------------------------------------
-		
-		$_out = array(
-		
-			'status'	=> 400,
-			'message'	=> lang( 'invalid_request' )
-		
-		);
-		
-		echo json_encode( $_out );
+		if ( ! defined( 'CDN_PATH' ) ) :
+
+			header( 'Cache-Control: no-cache, must-revalidate' );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Content-type: application/json' );
+			header( 'HTTP/1.0 400 Bad Request' );
+			
+			// --------------------------------------------------------------------------
+			
+			$_out = array(
+			
+				'status'	=> 400,
+				'message'	=> lang( 'cdn_not_configured' )
+			
+			);
+			
+			echo json_encode( $_out );
+
+		else :
+
+			header( 'Cache-Control: no-cache, must-revalidate' );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Content-type: application/json' );
+			header( 'HTTP/1.0 400 Bad Request' );
+			
+			// --------------------------------------------------------------------------
+			
+			$_out = array(
+			
+				'status'	=> 400,
+				'message'	=> lang( 'invalid_request' )
+			
+			);
+			
+			echo json_encode( $_out );
+
+		endif;
 	}
 	
 	

@@ -17,11 +17,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 * 
 	 **/
 	public function __construct()
-	{	
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
 		
-			die( lang( 'nails_not_configured' ) );
+			echo '<strong style="color:red;">ERROR:</strong> Nails. environment not correctly configured; config file not found.';
+			exit( 0 );
 		
 		endif;
 		
@@ -427,6 +432,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 			$this->load->helper( $helper );
 
 		endforeach;
+
 
 		// --------------------------------------------------------------------------
 

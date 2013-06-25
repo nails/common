@@ -47,7 +47,11 @@
 		<strong>Please Remember: </strong> Tests can sometimes take a while to execute. If you're finding page timeouts occur or out of memory limits please try running these tests from the command line.
 	</p>
 
-	<?=form_open( 'tests/run' )?>
+	<?php
+
+		$_query_string = isset( $_SERVER['QUERY_STRING'] ) && $_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '';
+		echo form_open( 'system/test/run' . $_query_string );
+	?>
 	<ol class="row" id="tests">
 		<?php
 

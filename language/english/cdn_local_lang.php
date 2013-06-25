@@ -8,6 +8,7 @@
 */
 
 	//	Errors
+	$lang['cdn_not_configured']					= 'CDN Not configured correctly';
 	$lang['cdn_local_no_file']					= 'You did not select a file to upload.';
 	$lang['cdn_local_mkdir_fail']				= 'Failed to create bucket directory.';
 	$lang['cdn_local_insert_fail']				= 'Failed to create bucket record.';

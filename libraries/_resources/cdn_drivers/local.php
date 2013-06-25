@@ -34,6 +34,14 @@ class Local_CDN {
 		
 		//	Load langfile
 		get_instance()->lang->load( 'cdn_local', RENDER_LANG_SLUG );
+
+		// --------------------------------------------------------------------------
+
+		if ( ! defined( 'CDN_PATH' ) ) :
+
+			show_error( 'CDN: CDN not properly configured.' );
+
+		endif;
 	}
 	
 	

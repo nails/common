@@ -47,19 +47,17 @@ if ( ! function_exists( 'dump' ) )
 		endif;
 		
 		//	Check the global ENVIRONMENT setting.
-		switch( ENVIRONMENT ) :
+		switch( strtoupper( ENVIRONMENT ) ) :
 		
-			case 'production':
-			case 'cli-live' :
+			case 'PRODUCTION':
 				
 				//	Mute output regardless of setting
 				return;
 			
 			break;
 			
-			case 'local':
-			case 'development':
-			case 'cli-local':
+			case 'STAGING':
+			case 'DEVELOPMENT':
 			
 				//	Continue execution unless instructed otherwise
 				if ( $die !== FALSE )

@@ -112,7 +112,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 		//	cache to see if this image has been processed already; serve it up if
 		//	it has.
 		
-		if ( file_exists( CACHE_DIR . $this->_cache_file ) ) :
+		if ( defined( 'CACHE_DIR' ) && file_exists( CACHE_DIR . $this->_cache_file ) ) :
 		
 			$this->cdn->increment_count( 'THUMB', $this->_object, $this->_bucket );
 			$this->_serve_from_cache( $this->_cache_file );
@@ -122,7 +122,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			//	Cache object does not exist, fetch the original, process it and save a
 			//	version in the cache bucket.
 			
-			if ( file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+			if ( defined( 'CDN_PATH' ) && file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
 			
 				//	Object exists, time for manipulation fun times :>
 				
@@ -158,11 +158,11 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 				// --------------------------------------------------------------------------
 
 				//	Save local version, make sure cache is writable
-				if ( is_writable( CACHE_DIR ) ) :
+				if ( defined( 'CACHE_DIR' ) && is_writable( CACHE_DIR ) ) :
 
 					$thumb->save( CACHE_DIR . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
 
-				else :
+				elseif( defined( 'CACHE_DIR' ) ) :
 
 					//	Inform developers
 					$_subject	= 'Cache (scale) dir not writeable';
@@ -197,39 +197,61 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 	 **/
 	protected function _bad_src()
 	{
-		//	Create the icon
-		$_icon = @imagecreatefrompng( $this->_fail );
-		$_icon_w = imagesx( $_icon );  
-		$_icon_h = imagesy( $_icon );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Create the background
-		$_bg	= imagecreatetruecolor( $this->_width, $this->_height );
-		$_white	= imagecolorallocate( $_bg, 255, 255, 255);
-		imagefill( $_bg, 0, 0, $_white );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Merge the two
-		$_center_x = ( $this->_width / 2 ) - ( $_icon_w / 2 );
-		$_center_y = ( $this->_height / 2 ) - ( $_icon_h / 2 );
-		imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Output to browser
-		header( 'Content-type: image/png' );
-		header( 'HTTP/1.1 404 Not Found' );
-		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		imagepng( $_bg );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Destroy the images
-		imagedestroy( $_icon );
-		imagedestroy( $_bg );
+		if ( ! defined( 'CDN_PATH' ) ) :
+
+			header( 'Cache-Control: no-cache, must-revalidate' );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Content-type: application/json' );
+			header( 'HTTP/1.0 400 Bad Request' );
+			
+			// --------------------------------------------------------------------------
+			
+			$_out = array(
+			
+				'status'	=> 400,
+				'message'	=> lang( 'cdn_not_configured' )
+			
+			);
+			
+			echo json_encode( $_out );
+
+		else :
+
+			//	Create the icon
+			$_icon = @imagecreatefrompng( $this->_fail );
+			$_icon_w = imagesx( $_icon );  
+			$_icon_h = imagesy( $_icon );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Create the background
+			$_bg	= imagecreatetruecolor( $this->_width, $this->_height );
+			$_white	= imagecolorallocate( $_bg, 255, 255, 255);
+			imagefill( $_bg, 0, 0, $_white );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Merge the two
+			$_center_x = ( $this->_width / 2 ) - ( $_icon_w / 2 );
+			$_center_y = ( $this->_height / 2 ) - ( $_icon_h / 2 );
+			imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Output to browser
+			header( 'Content-type: image/png' );
+			header( 'HTTP/1.1 404 Not Found' );
+			header( 'Cache-Control: no-cache, must-revalidate' );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			imagepng( $_bg );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Destroy the images
+			imagedestroy( $_icon );
+			imagedestroy( $_bg );
+
+		endif;
 	}
 	
 	

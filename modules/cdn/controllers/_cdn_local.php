@@ -43,7 +43,10 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	{
 		//	Cache object exists, set the appropriate headers and return the
 		//	contents of the file.
-		
+	
+		if ( ! defined( 'CACHE_DIR' ) )
+			return FALSE;
+
 		$_stats = stat( CACHE_DIR . $file );
 		
 		header( 'content-type: image/png' );

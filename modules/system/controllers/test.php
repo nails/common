@@ -7,8 +7,8 @@
  * 
  **/
 
-//	Include Tests_controller; executes common tests functionality.
-require_once '_tests.php';
+//	Include System_controller; executes common tests functionality.
+require_once '_system.php';
 
 /**
  * OVERLOADING NAILS' TEST MODULE
@@ -18,7 +18,7 @@ require_once '_tests.php';
  * 
  **/
 
-class NAILS_Tests extends NAILS_Tests_Controller
+class NAILS_Test extends NAILS_System_Controller
 {
 	protected $_tests;
 	private $_info;
@@ -40,12 +40,21 @@ class NAILS_Tests extends NAILS_Tests_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Only superusers or commad line
-		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() ) :
-		
-			show_404();
+		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+
+			if ( module_is_enabled( 'auth' ) ) :
+
+				unauthorised();
+
+			else :
+
+				show_404();
+
+			endif;
 
 		endif;
+
+		$this->_validate_token();
 
 		// --------------------------------------------------------------------------
 
@@ -115,7 +124,7 @@ class NAILS_Tests extends NAILS_Tests_Controller
 		// --------------------------------------------------------------------------
 
 		//	Determine what type of view to return
-		switch( $this->uri->segment( 3 ) ) :
+		switch( $this->uri->segment( 4 ) ) :
 
 			case 'json' :
 
@@ -250,7 +259,7 @@ class NAILS_Tests extends NAILS_Tests_Controller
 		// --------------------------------------------------------------------------
 
 		//	Determine what type of view to return
-		switch( $this->uri->segment( 3 ) ) :
+		switch( $this->uri->segment( 4 ) ) :
 
 			case 'json' :
 
@@ -321,16 +330,23 @@ class NAILS_Tests extends NAILS_Tests_Controller
 	{
 		//	Directories to test
 		$_dirs		= array();
-		$_dirs[]	= CACHE_DIR;
-		$_dirs[]	= CDN_PATH;
 
-		$this->load->helper( 'directory' );
+		if ( defined( 'CACHE_DIR' ) )
+			$_dirs[]	= CACHE_DIR;
 
-		foreach ( directory_map( CDN_PATH, 1 ) AS $sub_dir ) :
+		if ( defined( 'CDN_PATH' ) ) :
+			
+			$_dirs[]	= CDN_PATH;
 
-			$_dirs[] = CDN_PATH . $sub_dir;
+			$this->load->helper( 'directory' );
 
-		endforeach;
+			foreach ( directory_map( CDN_PATH, 1 ) AS $sub_dir ) :
+
+				$_dirs[] = CDN_PATH . $sub_dir;
+
+			endforeach;
+
+		endif;
 
 		foreach ( $_dirs AS $dir ) :
 
@@ -352,7 +368,7 @@ class NAILS_Tests extends NAILS_Tests_Controller
 	{
 		$this->_info->label			= 'Directories are writeable';
 		$this->_info->description	= 'This test will check that the application can write to all directories that it needs to.';
-		$this->_info->testing		= 'Tests that /assets/cache/, /assets/uploads/ and /asset/uploads/* are writeable by the app.';
+		$this->_info->testing		= 'Tests that required writeable directories are writeable by the app.';
 		$this->_info->expecting		= 'All folders to be writable.';
 
 		// --------------------------------------------------------------------------
@@ -391,7 +407,7 @@ class NAILS_Tests extends NAILS_Tests_Controller
  
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_TESTS' ) ) :
 
-	class Tests extends NAILS_Tests
+	class Test extends NAILS_Test
 	{
 	}
 

@@ -2,7 +2,7 @@
 <?=strtoupper( $page->title )?>
 
 
-The following tests are configured to run on this application. To execute these tests run `index.php tests run`.
+The following tests are configured to run on this application. To execute these tests run `index.php system tests run`.
 
 <?php
 

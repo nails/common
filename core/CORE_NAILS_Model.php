@@ -29,7 +29,11 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 		
 		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
-		$this->user = get_userobject();
+		if ( function_exists( 'get_userobject' ) ) :
+		
+			$this->user = get_userobject();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

@@ -6,14 +6,6 @@
 * Description:  Generic language file for Nails
 * 
 */
-
-	//	Startup
-	$lang['nails_not_configured']	= '<strong style="color:red;">ERROR:</strong> Nails. environment not correctly configured; config file not found.';
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
 	//	Default header/footer
 	$lang['nails_footer_powered_by']	= 'Powered by <a href="http://nailsapp.co.uk">Nails. v%s</a>';
 	$lang['nails_footer_developed_by']	= 'Developed by <a href="http://shedcollective.org">Shed Collective</a> &copy; 2012 - 2013';

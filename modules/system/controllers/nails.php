@@ -58,6 +58,44 @@ class NAILS_Nails extends NAILS_System_Controller
 				
 		$this->output->set_output( json_encode( $_out ) );
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function configure()
+	{
+		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+
+			if ( module_is_enabled( 'auth' ) ) :
+
+				unauthorised();
+
+			else :
+
+				show_404();
+
+			endif;
+
+		endif;
+
+		$this->_validate_token();
+
+		// --------------------------------------------------------------------------
+
+		$this->data['page']->title = 'Nails. Configuration Manager';
+
+		// --------------------------------------------------------------------------
+
+		$this->data['header_override'] = 'structure/header/blank';
+		$this->data['footer_override'] = 'structure/footer/blank';
+
+		$this->asset->load( 'nails.configure.css', TRUE );
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'system/nails/configure/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
 }
 
 

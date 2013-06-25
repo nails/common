@@ -57,7 +57,7 @@ class NAILS_Scale extends Thumb
 		//	cache to see if this image has been processed already; serve it up if
 		//	it has.
 		
-		if ( file_exists( CACHE_DIR . $this->_cache_file ) ) :
+		if ( defined( 'CACHE_DIR' ) && file_exists( CACHE_DIR . $this->_cache_file ) ) :
 		
 			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
 			$this->_serve_from_cache( $this->_cache_file );
@@ -67,7 +67,7 @@ class NAILS_Scale extends Thumb
 			//	Cache object does not exist, fetch the original, process it and save a
 			//	version in the cache bucket.
 			
-			if ( file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+			if ( defined( 'CDN_PATH' ) && file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
 			
 				//	Object exists, time for manipulation fun times :>
 				
@@ -103,11 +103,11 @@ class NAILS_Scale extends Thumb
 				// --------------------------------------------------------------------------
 				
 				//	Save local version, make sure cache is writable
-				if ( is_writable( CACHE_DIR ) ) :
+				if ( defined( 'CACHE_DIR' ) && is_writable( CACHE_DIR ) ) :
 
 					$thumb->save( CACHE_DIR . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
 
-				else :
+				elseif ( defined( 'CACHE_DIR' ) ) :
 
 					//	Inform developers
 					$_subject	= 'Cache (scale) dir not writeable';

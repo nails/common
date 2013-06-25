@@ -7,7 +7,14 @@
 	
 		<!--	META	-->
 		<meta charset="utf-8">
-		<title><?=isset( $page->title ) ? $page->title . ' - ' : NULL?><?=APP_NAME?></title>
+		<title><?php
+
+			echo isset( $page->title ) ? $page->title : '';
+			echo isset( $page->title ) && APP_NAME ? ' - ' : '';
+			echo APP_NAME;
+
+
+		?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 		<meta name="description" content="">
 		<meta name="author" content="">
@@ -15,6 +22,14 @@
 		<!--	STYLES	-->
 		<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/nails.admin.css'?>" />
 		<?=$this->asset->output( 'css' )?>
+		
+		<!--	JS GLOBALS	-->
+		<script type="text/javascript">
+			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
+			window.SITE_URL		= '<?=site_url()?>';
+			window.NAILS_URL	= '<?=NAILS_URL?>';
+			window.NAILS_LANG	= {};
+		</script>
 		
 		<!-- JAVASCRIPT[S] -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
