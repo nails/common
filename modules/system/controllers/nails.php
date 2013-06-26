@@ -83,15 +83,21 @@ class NAILS_Nails extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Define page data
 		$this->data['page']->title = 'Nails. Configuration Manager';
 
 		// --------------------------------------------------------------------------
 
+		//	Load assets
+		$this->asset->load( 'nails.configure.css', TRUE );
+		$this->asset->load( 'nails.configure.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
 		$this->data['header_override'] = 'structure/header/blank';
 		$this->data['footer_override'] = 'structure/footer/blank';
-
-		$this->asset->load( 'nails.configure.css', TRUE );
-
+		
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'system/nails/configure/index',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
