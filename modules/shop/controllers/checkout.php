@@ -900,7 +900,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$_paypal['custom']			=  $this->encrypt->encode( md5( $_order->ref . ':' . $_order->code ), APP_PRIVATE_KEY );
 			$_paypal['txn_id']			= 'TEST:' . random_string( 'alpha', 6 );
 			$_paypal['txn_type']		= 'cart';
-			$_paypal['payment_status']	= 'Pending';
+			$_paypal['payment_status']	= 'Completed';
 			$_paypal['pending_reason']	= 'PaymentReview';
 			$_paypal['mc_fee']			= 0.00;
 		
