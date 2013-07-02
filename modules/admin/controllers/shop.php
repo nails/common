@@ -284,6 +284,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		switch( $this->uri->segment( '4' ) ) :
 
 			case 'view' :		$this->_orders_view();		break;
+			case 'reprocess' :	$this->_orders_reprocess();	break;
 			case 'process' :	$this->_orders_process();	break;
 			case 'index' :
 			default :			$this->_orders_index();		break;
@@ -467,13 +468,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Fulfilled?
 		$this->load->helper( 'date' );
-		if ( $this->data['order']->fulfilment_status == 'UNFULFILLED' ) :
+		if ( $this->data['order']->status == 'PAID' ) :
 
-			$this->data['message'] = '<strong>This order has not been fulfilled; order was placed ' . nice_time( strtotime( $this->data['order']->created ) ) . '</strong><br />Once all purchased items are marked as processed the order will be automatically marked as fulfilled.';
+			if ( $this->data['order']->fulfilment_status == 'UNFULFILLED' ) :
 
-		elseif ( ! $this->data['success'] ):
+				$this->data['message'] = '<strong>This order has not been fulfilled; order was placed ' . nice_time( strtotime( $this->data['order']->created ) ) . '</strong><br />Once all purchased items are marked as processed the order will be automatically marked as fulfilled.';
 
-			$this->data['success'] = '<strong>This order was fulfilled ' . nice_time( strtotime( $this->data['order']->fulfilled ) ) . '</strong>';
+			elseif ( ! $this->data['success'] ):
+
+				$this->data['success'] = '<strong>This order was fulfilled ' . nice_time( strtotime( $this->data['order']->fulfilled ) ) . '</strong>';
+
+			endif;
 
 		endif;
 
@@ -496,6 +501,53 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/orders/view',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+	// --------------------------------------------------------------------------
+
+	protected function _orders_reprocess()
+	{
+		//	Check order exists
+		$this->load->model( 'shop/shop_order_model', 'order' );
+		$_order = $this->order->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $_order ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I couldn\'t find an order by that ID.' );
+			redirect( 'admin/shop/orders' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		//	PROCESSSSSS...
+		$this->order->process( $_order );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Send a receipt to the customer
+		$this->order->send_receipt( $_order );
+		
+		// --------------------------------------------------------------------------
+		
+		//	Send a notification to the store owner(s)
+		$this->order->send_order_notification( $_order );
+
+		// --------------------------------------------------------------------------
+
+		if ( $_order->voucher ) :
+
+			//	Redeem the voucher, if it's there
+			$this->load->model( 'shop/shop_voucher_model', 'voucher' );
+			$this->voucher->redeem( $_order->voucher->id, $_order );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->session->set_flashdata( 'success', '<strong>Success!</strong> Order was processed succesfully. The user has been sent a receipt.' );
+		redirect( 'admin/shop/orders' );
 	}
 
 
@@ -540,7 +592,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			else :
 
-				//	Still some unprocessed items, amrk as unfulfilled (in case it was already fulfilled)
+				//	Still some unprocessed items, mark as unfulfilled (in case it was already fulfilled)
 				$this->load->model( 'shop/shop_order_model', 'order' );
 				$this->order->unfulfil( $_order_id );
 

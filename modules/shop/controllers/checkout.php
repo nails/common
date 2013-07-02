@@ -833,7 +833,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 		$this->logger->line();
 		$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-		$this->logger->line( 'Waking up IPN responder' );
+		$this->logger->line( 'Waking up IPN responder; handling with PayPal' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -990,25 +990,92 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Check the status of the payment
-			$this->logger->line( 'Checking the status of the payment is "Completed"' );
+			$this->logger->line( 'Checking the status of the payment' );
 			$this->logger->line();
-			
-			if ( $_paypal['payment_status'] != 'Completed' ) :
-			
-				$this->logger->line( 'Invalid payment status' );
-				
-				$_data = array(
-					'pp_txn_id'	=> $_paypal['txn_id']
-				);
-				$this->order->fail( $_order->id, $_data );
-				
+
+
+			switch( strtolower( $_paypal['payment_status'] ) ) :
+
+
+				case 'completed' :
+
+					//	Do nothing, this transaction is OK
+					$this->logger->line( 'Payment status is "completed"; continuing...' );
+
+				break;
+
 				// --------------------------------------------------------------------------
+
+				case 'reversed' :
+
+					//	Transaction was cancelled, mark order as FAILED
+					$this->logger->line( 'Payment was reversed, marking as failed and aborting' );
 				
-				//	Inform developers
-				send_developer_mail( 'A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with reason "' . $_paypal['pending_reason'] . '".' );
-				return;
-			
-			endif;
+					$_data = array(
+						'pp_txn_id'	=> $_paypal['txn_id']
+					);
+					$this->order->fail( $_order->id, $_data );
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'pending' :
+
+					//	Check the pending_reason, if it's 'paymentreview' then gracefully stop
+					//	processing; PayPal will send a further IPN once the payment is complete
+
+					$this->logger->line( 'Payment status is "pending"; check the reason.' );
+
+					if ( strtolower( $_paypal['pending_reason'] ) == 'paymentreview' ) :
+
+						//	The transaction is pending review, gracefully stop proicessing, but don't cancel the order
+						$this->logger->line( 'Payment is pending review by PayPal, gracefully aborting just now.' );
+						return;
+
+					else :
+
+						$_data = array(
+							'pp_txn_id'	=> $_paypal['txn_id']
+						);
+						$this->order->fail( $_order->id, $_data );
+
+						// --------------------------------------------------------------------------
+
+						//	Inform developers
+						send_developer_mail( 'A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with status "' . $_paypal['payment_status'] . '" and reason "' . $_paypal['pending_reason'] . '".' );
+						return;
+
+
+					endif;
+
+					// --------------------------------------------------------------------------
+
+					return;
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				default :
+
+					//	Unknown/invalid payment status
+					$this->logger->line( 'Invalid payment status' );
+				
+					$_data = array(
+						'pp_txn_id'	=> $_paypal['txn_id']
+					);
+					$this->order->fail( $_order->id, $_data );
+					
+					// --------------------------------------------------------------------------
+					
+					//	Inform developers
+					send_developer_mail( 'A PayPal payment failed', '<strong>' . $_order->user->first_name . ' ' . $_order->user->last_name . ' (' . $_order->user->email . ')</strong> has just attempted to pay for order ' . $_order->ref . '. The payment failed with status "' . $_paypal['payment_status'] . '" and reason "' . $_paypal['pending_reason'] . '".' );
+					return;
+
+				break;
+
+			endswitch;
 			
 			// --------------------------------------------------------------------------
 			

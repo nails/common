@@ -44,27 +44,24 @@
 							<td class="status <?=$order->status?>"><?=$order->status?></td>
 							<?php
 
-								if ( $order->status == 'PAID' ) :
+								if ( $order->fulfilment_status == 'FULFILLED' ) :
 
-									if ( $order->fulfilment_status == 'FULFILLED' ) :
-
-										echo '<td class="fulfilment yes">' . lang( 'yes' ) . '</td>';
-
-									else :
-
-										echo '<td class="fulfilment no">' . lang( 'no' ) . '</td>';
-
-									endif;
+									echo '<td class="fulfilment yes">' . lang( 'yes' ) . '</td>';
 
 								else :
 
-									echo '<td class="fulfilment">&mdash;</td>';
+									echo '<td class="fulfilment no">' . lang( 'no' ) . '</td>';
 
 								endif;
 
 							?>
 							<td class="actions">
-								<?=anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' )?>
+								<?php
+
+									echo anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+									echo anchor( 'admin/shop/orders/reprocess/' . $order->id, 'Process', 'class="awesome small confirm" data-confirm="Are you sure?\n\nProcessing the order again may result in multiple dispatch of items."' );
+
+								?>
 							</td>
 						</tr>
 						<?php

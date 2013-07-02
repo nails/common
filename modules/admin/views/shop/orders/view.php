@@ -25,6 +25,17 @@
 
 			// --------------------------------------------------------------------------
 
+			//	Status
+			$_field					= array();
+			$_field['key']			= 'status';
+			$_field['label']		= 'Order Status';
+			$_field['default']		= $order->status;
+			$_field['readonly']		= TRUE;
+			
+			echo form_field( $_field );
+
+			// --------------------------------------------------------------------------
+
 			//	Name
 			$_field					= array();
 			$_field['key']			= 'customer_name';
