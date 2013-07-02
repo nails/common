@@ -414,6 +414,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$_helpers		= array();
 		$_helpers[]		= 'system';	//	To maintain sanity, load this first.
+		$_helpers[]		= 'site';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
 		$_helpers[]		= 'form';
