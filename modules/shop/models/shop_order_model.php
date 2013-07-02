@@ -780,6 +780,14 @@ class NAILS_Shop_order_model extends NAILS_Model
 		
 		return $this->update( $order_id, $data );
 	}
+
+	// --------------------------------------------------------------------------
+	
+	public function pending( $order_id, $data = array() )
+	{
+		$data['status'] = 'PENDING';
+		return $this->update( $order_id, $data );
+	}
 	
 	
 	// --------------------------------------------------------------------------

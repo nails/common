@@ -689,6 +689,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		
 			case 'UNPAID' :		$this->_processing_unpaid();		break;
 			case 'PAID' :		$this->_processing_paid();			break;
+			case 'PENDING' :	$this->_processing_pending();		break;
 			case 'FAILED' :		$this->_processing_failed();		break;
 			case 'ABANDONED' :	$this->_processing_abandoned();		break;
 			case 'CANCELLED' :	$this->_processing_cancelled();		break;
@@ -704,6 +705,17 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _processing_unpaid()
 	{
 		$this->load->view( 'shop/checkout/payment/processing/unpaid', $this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _processing_pending()
+	{
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'shop/checkout/payment/processing/pending', $this->data );
+		$this->load->view( 'structure/footer',	$this->data );
 	}
 	
 	
@@ -888,7 +900,8 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$_paypal['custom']			=  $this->encrypt->encode( md5( $_order->ref . ':' . $_order->code ), APP_PRIVATE_KEY );
 			$_paypal['txn_id']			= 'TEST:' . random_string( 'alpha', 6 );
 			$_paypal['txn_type']		= 'cart';
-			$_paypal['payment_status']	= 'Completed';
+			$_paypal['payment_status']	= 'Pending';
+			$_paypal['pending_reason']	= 'PaymentReview';
 			$_paypal['mc_fee']			= 0.00;
 		
 		else :
@@ -1031,9 +1044,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 						//	The transaction is pending review, gracefully stop proicessing, but don't cancel the order
 						$this->logger->line( 'Payment is pending review by PayPal, gracefully aborting just now.' );
+						$this->order->pending( $_order->id );
 						return;
 
 					else :
+
+						$this->logger->line( 'Unsupported payment reason "' . $_paypal['pending_reason'] . '", aborting.' );
+
+						// --------------------------------------------------------------------------
 
 						$_data = array(
 							'pp_txn_id'	=> $_paypal['txn_id']
