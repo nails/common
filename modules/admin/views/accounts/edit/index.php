@@ -33,9 +33,5 @@
 			$( '#user-group-descriptions li' ).hide();
 			$( '#user-group-' + $(this).val() ).show();
 		});
-
-		// --------------------------------------------------------------------------
-
-		$( 'select.chosen' ).chosen();
 	});
 </script>

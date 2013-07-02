@@ -16,6 +16,7 @@
 	$lang['utilities_nav_test_email']		= 'Send Test Email';
 	$lang['utilities_nav_user_access']		= 'Manage User Access';
 	$lang['utilities_nav_languages']		= 'Manage Languages';
+	$lang['utilities_nav_export']			= 'Export Data';
 	
 	// --------------------------------------------------------------------------
 	
@@ -86,3 +87,19 @@
 	$lang['utilities_languages_mark_unsupported_ok']	= '<strong>Success!</strong> Language marked as unsupported.';
 	$lang['utilities_languages_mark_unsupported_fail']	= '<strong>Sorry,</strong> there was a problem marking this language as unsupported.';
 
+
+	// --------------------------------------------------------------------------
+
+	//	Export data
+	$lang['utilities_export_title']				= 'Export Data';
+	$lang['utilities_export_intro']				= 'Export data stored in the site\'s database in a variety of formats.';
+	$lang['utilities_export_warn']				= '<strong>Please note:</strong> Exporting may take some time when executing on large databases. Please be patient.';
+	$lang['utilities_export_legend_source']		= 'Data Source';
+	$lang['utilities_export_field_source']		= 'Source';
+	$lang['utilities_export_legend_format']		= 'Export Format';
+	$lang['utilities_export_field_format']		= 'Format';
+
+	$lang['utilities_export_error_source']			= '<strong>Sorry,</strong> invalid data source.';
+	$lang['utilities_export_error_format']			= '<strong>Sorry,</strong> invalid format type.';
+	$lang['utilities_export_error_source_notexist']	= '<strong>Sorry,</strong> that data source is not available.';
+	$lang['utilities_export_error_format_notexist']	= '<strong>Sorry,</strong> that format type is not available.';

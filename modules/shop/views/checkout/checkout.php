@@ -232,11 +232,6 @@
 
 	$(function(){
 	
-		//	Chosen
-		//$( 'select.chosen' ).chosen();
-		
-		// --------------------------------------------------------------------------
-		
 		//	US state chooser
 		$( 'select[name=country]' ).on( 'change', function() {
 		

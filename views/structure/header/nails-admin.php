@@ -150,7 +150,7 @@
 							foreach( $config->funcs AS $method => $label ) :
 							
 								//	Is the method enabled?
-								if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method]) ) :
+								if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method] ) ) :
 								
 									//	Method enabled?
 									$_current = ( $this->uri->rsegment( 1 ) == $module && $this->uri->rsegment( 2 ) == $method )  ? 'current' : '';

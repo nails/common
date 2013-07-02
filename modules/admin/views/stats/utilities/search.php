@@ -114,10 +114,6 @@
 <script type="text/javascript">
 	$( function(){
 
-		$( 'select.chosen' ).chosen();
-
-		// --------------------------------------------------------------------------
-
 		$( '.datetime.from' ).datetimepicker(
 		{
 			dateFormat : 'yy-mm-dd',
