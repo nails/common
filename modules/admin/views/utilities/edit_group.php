@@ -100,22 +100,15 @@
 				$_field					= array();
 				$_field['key']			= 'acl[superuser]';
 				$_field['label']		= lang( 'utilities_edit_group_permissions_field_label_superuser' );
-				$_field['default']		= FALSE;
+				$_field['default']		= isset( $group->acl['superuser'] ) && $group->acl['superuser'] ? TRUE : FALSE;
 				$_field['required']		= FALSE;
+				$_field['id']			= 'super-user';
 				
-				$_options = array();
-				$_options[] = array(
-					'id'		=> 'super-check',
-					'value'		=> 'TRUE',
-					'label'		=> '',
-					'selected'	=>	isset( $group->acl['superuser'] ) && $group->acl['superuser'] ? TRUE : FALSE
-				);
-				
-				echo form_field_checkbox( $_field, $_options );
+				echo form_field_boolean( $_field );
 				
 				// --------------------------------------------------------------------------
 				
-				$_visible = $_options[0]['selected'] ? 'none' : 'block';
+				$_visible = $_field['default'] ? 'none' : 'block';
 				echo '<div id="toggle-superuser" style="display:' . $_visible . ';">';
 				
 				foreach ( $admin_modules AS $module => $detail ) : 
@@ -209,10 +202,10 @@
 
 	$(function(){
 	
-		$( '#super-check-0' ).on( 'click', function() {
-			
-			console.log($( '#super-check-0:checked' ).length);
-			if ( $( '#super-check-0:checked' ).length )
+		//$( '#super-user' ).on( 'change', function() {
+		$('.field.boolean .toggle').on('toggle', function (e, active) {
+		
+			if ( active )
 			{
 				$( '#toggle-superuser' ).hide();
 			}

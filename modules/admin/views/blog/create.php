@@ -16,11 +16,12 @@
 			$_field					= array();
 			$_field['key']			= 'is_published';
 			$_field['label']		= 'Published';
+			$_field['text_on']		= 'YES';
+			$_field['text_off']		= 'NO';
 			$_field['default']		= TRUE;
 			$_field['required']		= TRUE;
-			//$_field['class']		= 'chosen';
 			
-			echo form_field_dropdown( $_field, array( 'No', 'Yes' ) );
+			echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
 			
 			// --------------------------------------------------------------------------
 			

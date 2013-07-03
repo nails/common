@@ -64,6 +64,7 @@
 		$_field['key']			= 'type';
 		$_field['label']		= 'Block Type';
 		$_field['required']		= TRUE;
+		$_field['class']		= 'chosen';
 		
 		echo form_field_dropdown( $_field, $block_types );
 		

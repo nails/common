@@ -1043,11 +1043,74 @@ if ( ! function_exists( 'form_field_boolean' ) )
 {
 	function form_field_boolean( $field, $help = '' )
 	{
-		$_options		= array();
-		$_options[0]	= lang( 'no' );
-		$_options[1]	= lang( 'yes' );
+		$_ci =& get_instance();
 		
-		return form_field_dropdown( $field, $_options, $help );
+		// --------------------------------------------------------------------------
+		
+		//	Set var defaults
+		$_field					= array();
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['text_on']		= isset( $field['text_on'] ) ? $field['text_on'] : 'ON';
+		$_field['text_off']		= isset( $field['text_off'] ) ? $field['text_off'] : 'OFF';
+		
+		$_help			= array();
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		
+		$_error = form_error( $_field['key'] ) ? 'error' : '';
+		
+		// --------------------------------------------------------------------------
+		
+		$_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '">';
+		
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+				
+		//	Label
+		$_out .= '<span class="label">';
+		$_out .= $_field['label'];
+		$_out .= $_field['required'] ? '*' : '';
+		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+		$_out .= '</span>';
+		
+		//	Field
+		
+		if ( $_ci->input->post( $_field['key'] ) ) :
+		
+			$_selected = $_ci->input->post( $_field['key'] ) == $_field['default'] ? TRUE : FALSE;
+		
+		else :
+		
+			$_selected = (bool) $_field['default'];
+		
+		endif;
+		
+		$_out .= '<div class="toggle toggle-modern"></div>';
+		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] );
+		
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+		
+		//	Error
+		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+		
+		$_out .= '<div class="clear"></div>';
+		$_out .= '</div>';
+		
+		// --------------------------------------------------------------------------
+		
+		return $_out;
 	}
 }
 

@@ -74,7 +74,7 @@
 						$_field['label']		= 'Categories';
 						$_field['default']		= $settings['categories_enabled'];
 						
-						echo form_field_dropdown( $_field, array( 'Disabled', 'Enabled' ) );
+						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@
 						$_field['label']		= 'Tags';
 						$_field['default']		= $settings['tags_enabled'];
 						
-						echo form_field_dropdown( $_field, array( 'Disabled', 'Enabled' ) );
+						echo form_field_boolean( $_field );
 
 					?>
 				</fieldset>
@@ -106,7 +106,7 @@
 						$_field['label']		= 'Enabled';
 						$_field['default']		= $settings['sidebar_enabled'];
 						
-						echo form_field_dropdown( $_field, array( 'Disabled', 'Enabled' ) );
+						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
@@ -115,6 +115,7 @@
 						$_field['key']			= 'sidebar_position';
 						$_field['label']		= 'Position';
 						$_field['default']		= $settings['sidebar_position'];
+						$_field['class']		= 'chosen';
 						
 						echo form_field_dropdown( $_field, array( 'left' => 'Left', 'right' => 'Right' ) );
 

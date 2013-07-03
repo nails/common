@@ -190,7 +190,17 @@
 					foreach ( $payment_gateways AS $pg ) :
 
 						echo '<fieldset id="shop-settings-pg-' . $pg->slug . '">';
-						echo '<legend>' . $pg->label . '</legend>';
+						echo '<legend>';
+						if ( $pg->logo ) :
+
+							echo img( array( 'src' => NAILS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo, 'style' => 'margin-top:-10px;' ) );
+
+						else :
+
+							echo $pg->label;
+
+						endif;
+						echo '</legend>';
 
 						//	Only superusers can change the 'enabled' status of a payment gateway
 						if ( $user->is_superuser() ) :
@@ -200,9 +210,8 @@
 							$_field['key']			= 'paymentgateway[' . $pg->id . '][enabled]';
 							$_field['label']		= 'Supported';
 							$_field['default']		= $pg->enabled;
-							$_field['class']		= 'chosen';
 							
-							echo form_field_dropdown( $_field, array( 'No', 'Yes' ) );
+							echo form_field_boolean( $_field );
 
 						endif;
 

@@ -156,6 +156,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery.min.js', TRUE );
 		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
 		$this->asset->load( 'jquery.chosen.min.js', TRUE );
+		$this->asset->load( 'jquery.toggles.min.js', TRUE );
 		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
 		$this->asset->load( 'jquery.scrollto.min.js', TRUE );
 		$this->asset->load( 'nails.default.min.js', TRUE );

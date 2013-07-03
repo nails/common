@@ -121,6 +121,14 @@ class Asset {
 				$this->load( 'jquery.ui.datetimepicker.min.js', TRUE );
 
 			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'ibutton' :
+
+				$this->load( 'libraries/jquery.ibutton/lib/jquery.ibutton.min.js', TRUE );
+
+			break;
 		
 		endswitch;
 	}
