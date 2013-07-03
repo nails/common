@@ -17,6 +17,20 @@
 
 class NAILS_Shop_shipping_model extends NAILS_Model
 {
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+		
+		$this->_table			= 'shop_shipping_method';
+		$this->_table_prefix	= 'sm';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_all( $only_active = TRUE, $include_deleted = FALSE )
 	{
 		$this->db->select( 'sm.*, tr.id tr_id, tr.label tr_label, tr.rate tr_rate' );
@@ -35,7 +49,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 
 		endif;
 
-		$this->db->order_by( 'sm.courier, sm.order' );
+		$this->db->order_by( 'sm.order' );
 
 		$_methods = $this->db->get( 'shop_shipping_method sm' )->result();
 
@@ -155,7 +169,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 	protected function _format_method( &$object )
 	{
 		$object->id							= (int) $object->id;
-		$object->order						= (int) $object->id;
+		$object->order						= (int) $object->order;
 
 		$object->default_price				= (float) $object->default_price;
 		$object->default_price_additional	= (float) $object->default_price_additional;

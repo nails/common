@@ -20,6 +20,16 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-currencies">Currencies</a>
 			</li>
+
+			<?php $_active = $this->input->post( 'update' ) == 'shipping_methods' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-shipping-methods">Shipping Methods</a>
+			</li>
+
+			<?php $_active = $this->input->post( 'update' ) == 'tax_rates' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-tax-rates">Tax Rates</a>
+			</li>
 		</ul>
 		
 		<section class="tabs pages">
@@ -190,7 +200,7 @@
 							$_field['key']			= 'paymentgateway[' . $pg->id . '][enabled]';
 							$_field['label']		= 'Supported';
 							$_field['default']		= $pg->enabled;
-							//$_field['class']		= 'chosen';
+							$_field['class']		= 'chosen';
 							
 							echo form_field_dropdown( $_field, array( 'No', 'Yes' ) );
 
@@ -292,16 +302,13 @@
 				<p>
 					Configure supported currencies.
 				</p>
-				<p class="system-alert message no-close">
-					<strong>Please note:</strong> At present multiple currencies are not fully supported in the front end and changing these values may produce unexpected results.
-				</p>
 				<hr />
 				<fieldset id="shop-currencies-base">
 					<legend>Base Currency</legend>
 					<p>
 						The base currency is the default currency of the shop. When you create a new product and define it's
 						price, you are doing so in the base currency. You are free to change this but it will be reflected
-						across the entire store, <em>change with caution</em>.
+						across the entire store, <em>change with <strong>extreme</strong> caution</em>.
 					</p>
 					<?php
 
@@ -336,14 +343,260 @@
 				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 				<?=form_close()?>
 			</div>
+
+
+			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'block' : 'none'?>
+			<div id="tab-shipping-methods" class="tab page shipping-methods" style="display:<?=$_display?>;">
+				<?=form_open()?>
+				<?=form_hidden( 'update', 'shipping_methods' )?>
+				<p>
+					Configure supported shipping methods.
+				</p>
+				<hr />
+				<table id="existing-shipping-methods">
+					<thead>
+						<tr>
+							<th class="order-handle">&nbsp;</th>
+							<th class="courier">Courier</th>
+							<th class="method">Method</th>
+							<th class="default_price">Price</th>
+							<th class="default_price_additional">1+ Price</th>
+							<th class="tax_rate">Tax Rate</th>
+							<th class="notes">Notes</th>
+							<th class="active">Active</th>
+							<th class="default">Default</th>
+							<th class="delete">&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php
+
+						$_counter_ship = 0;
+						foreach ( $shipping_methods AS $method ) :
+
+							echo '<tr>';
+
+							echo '<td class="order-handle">';
+							echo '<input type="hidden" name="methods[' . $_counter_ship . '][id]" value="' . $method->id . '" />';
+							echo '<input type="hidden" name="methods[' . $_counter_ship . '][order]" value="' . $method->order . '" class="order" />';
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'courier';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'method';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'default_price';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'default_price_additional';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							echo '<td class="tax_rate">';
+							echo form_dropdown( 'methods[' . $_counter_ship . '][tax_rate_id]', $tax_rates_flat, set_value( 'methods[' . $_counter_ship . '][tax_rate_id]', $method->tax_rate->id ) );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'notes';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							echo '<td class="active">';
+							if ( $_POST ) :
+
+								$_checked = isset( $_POST['methods'][$_counter_ship]['is_active'] ) ? TRUE : FALSE;
+
+							else :
+
+								$_checked = $method->is_active;
+
+							endif;
+							echo form_checkbox( 'methods[' . $_counter_ship . '][is_active]', TRUE, $_checked );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							echo '<td class="default">';
+							echo form_radio( 'default', $_counter_ship, set_radio( 'default', $_counter_ship, $method->is_default ) );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							echo '<td class="delete">';
+							echo '<a href="#" class="delete awesome small red">Delete</a>';
+							echo '</td>';
+
+
+							echo '</tr>';
+
+
+						$_counter_ship++;
+						endforeach;
+
+					?>
+					</tbody>
+				</table>
+				<p>
+					<a href="#" id="add-new-shipping" style="float:right" class="awesome green small">Add Shipping Method</a>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				</p>
+				<?=form_close()?>
+			</div>
+
+
+			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'block' : 'none'?>
+			<div id="tab-tax-rates" class="tab page tax-rates" style="display:<?=$_display?>;">
+				<?=form_open()?>
+				<?=form_hidden( 'update', 'tax_rates' )?>
+				<p>
+					Configure supported Tax Rates
+				</p>
+				<p class="system-alert message no-close">
+					<strong>Please note:</strong> This functionality is still incomplete.
+				</p>
+				<hr />
+				<fieldset id="shop-add-tax-rate">
+					<legend>Add New Tax Rate</legend>
+					<?php
+
+
+					?>
+				</fieldset>
+				<ul id="existing-tax-rates">
+
+
+				</ul>
+				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<?=form_close()?>
+			</div>
 		</section>
 </div>
 
 <script type="text/javascript">
+
+	//	CURRENCIES
+
+	$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
+	$( 'select.chosen-active' ).chosen( { width : '100%' });
+
+	// --------------------------------------------------------------------------
+
+	//	SHIPPING
+
+	$( 'td.tax_rate select' ).chosen( { width : '100%' });
+
+	var _counter_ship = <?=$_counter_ship?>;
+	function set_order_ship()
+	{
+		var _order_counter = 0;
+
+	 	$( '#existing-shipping-methods .order-handle input.order' ).each(function()
+ 		{
+ 			$(this).val( _order_counter );
+ 			_order_counter++;
+ 		});
+	}
+
 	$( function(){
 
-		$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
-		$( 'select.chosen-active' ).chosen( { width : '100%' });
+		$( '#existing-shipping-methods tbody' ).sortable({
+			 handle: 'td:first',
+			 stop: function( event, ui )
+			 {
+			 	set_order_ship();
+			 }
+		});
+
+		// --------------------------------------------------------------------------
+
+		$( '#add-new-shipping' ).on( 'click', function()
+		{
+			_counter_ship++;
+			var _template = Mustache.render( $( '#template-new-shipping' ).html(), {counter:_counter_ship} );
+
+			$( '#existing-shipping-methods tbody' ).append( _template );
+			$( '#existing-shipping-methods tbody' ).sortable('refresh');
+			set_order_ship();
+			$( 'td.tax_rate select' ).chosen( { width : '100%' });
+
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		$(document).on( 'click', '#existing-shipping-methods tbody .delete', function()
+		{
+			if (confirm( 'Are you sure?' ))
+			{
+				$(this).closest( 'tr' ).remove();
+			}
+			return false;
+		});
 
 	});
+
+	// --------------------------------------------------------------------------
+
+	//	TAX RATES
+
+</script>
+
+<script type="text/template" id="template-new-shipping">
+<tr>
+	<td class="order-handle">
+		<input type="hidden" name="methods[{{counter}}][order]" value="" class="order" />
+	</td>
+	<td class="courier">
+		<?=form_input( 'methods[{{counter}}][courier]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="method">
+		<?=form_input( 'methods[{{counter}}][method]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="default_price">
+		<?=form_input( 'methods[{{counter}}][default_price]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="default_price_additional">
+		<?=form_input( 'methods[{{counter}}][default_price_additional]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="tax_rate">
+		<?=form_dropdown( 'methods[{{counter}}][tax_rate_id]', $tax_rates_flat, NULL )?>
+	</td>
+	<td class="notes">
+		<?=form_input( 'methods[{{counter}}][notes]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="active">
+		<?=form_checkbox( 'methods[{{counter}}][is_active]', TRUE )?>
+	</td>
+	<td class="default">
+		<?=form_radio( 'default', '{{counter}}' )?>
+	</td>
+</tr>
 </script>

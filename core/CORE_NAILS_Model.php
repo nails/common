@@ -427,7 +427,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		else :
 
-			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+			$_table = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
 
 		endif;
 
@@ -441,7 +441,33 @@ class CORE_NAILS_Model extends CI_Model {
 
 
 	/**
-	 * Fetches all objects
+	 * Fetches all objects as a flat array
+	 * 
+	 * @access public
+	 * @param string $label_col The name of the column to use as the label
+	 * @param string $id_col The name of the column to use as the ID
+	 * @return array
+	 **/
+	public function get_all_flat( $label_col = 'label', $id_col = 'id' )
+	{
+		$_items	= $this->get_all();
+		$_out	= array();
+
+		foreach( $_items AS $item ) :
+		
+			$_out[$item->{$id_col}] = $item->{$label_col};
+
+		endforeach;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Counts all objects
 	 * 
 	 * @access public
 	 * @param none

@@ -142,7 +142,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _site_update_analytics()
+	protected function _site_update_analytics()
 	{
 		//	Prepare update
 		$_settings								= array();
@@ -238,7 +238,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _blog_update_settings()
+	protected function _blog_update_settings()
 	{
 		//	Prepare update
 		$_settings							= array();
@@ -269,7 +269,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _blog_update_sidebar()
+	protected function _blog_update_sidebar()
 	{
 		//	Prepare update
 		$_settings						= array();
@@ -317,9 +317,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load models
-		$this->load->model( 'shop/shop_model', 'shop' );
-		$this->load->model( 'shop/shop_payment_gateway_model', 'payment_gateway' );
-		$this->load->model( 'shop/shop_currency_model',	'currency' );
+		$this->load->model( 'shop/shop_model',					'shop' );
+		$this->load->model( 'shop/shop_payment_gateway_model',	'payment_gateway' );
+		$this->load->model( 'shop/shop_currency_model',			'currency' );
+		$this->load->model( 'shop/shop_shipping_model',			'shipping' );
+		$this->load->model( 'shop/shop_tax_model',				'tax' );
 		
 		// --------------------------------------------------------------------------
 
@@ -343,6 +345,18 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				case 'currencies' :
 
 					$this->_shop_update_currencies();
+
+				break;
+
+				case 'shipping_methods' :
+
+					$this->_shop_shipping_methods();
+
+				break;
+
+				case 'tax_rates' :
+
+					$this->_shop_tax_rates();
 
 				break;
 
@@ -375,7 +389,16 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
 		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
-		
+		$this->data['shipping_methods']			= $this->shipping->get_all( FALSE );
+		$this->data['tax_rates']				= $this->tax->get_all();
+		$this->data['tax_rates_flat']			= $this->tax->get_all_flat();
+		array_unshift( $this->data['tax_rates_flat'], 'No Tax');
+
+		// --------------------------------------------------------------------------
+
+		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
+
 		// --------------------------------------------------------------------------
 		
 		$this->load->view( 'structure/header',		$this->data );
@@ -387,7 +410,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _shop_update_settings()
+	protected function _shop_update_settings()
 	{
 		//	Prepare update
 		$_settings								= array();
@@ -420,7 +443,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _shop_update_paymentgateways()
+	protected function _shop_update_paymentgateways()
 	{
 		//	Prepare update
 		foreach( $this->input->post( 'paymentgateway' ) AS $id => $values ) :
@@ -450,7 +473,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _shop_update_currencies()
+	protected function _shop_update_currencies()
 	{
 		//	Prepare update
 		$_settings								= array();
@@ -486,6 +509,70 @@ class NAILS_Settings extends NAILS_Admin_Controller
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the base currency.';
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _shop_shipping_methods()
+	{
+		$_methods	= $this->input->post( 'methods' );
+		$_ids		= array();
+
+		foreach( $_methods AS $counter => &$method ) :
+
+			//	If there's an ID we'll be updating (remove for safety)
+			$_id = isset( $method['id'] ) ? $method['id'] : NULL;
+			unset( $method['id'] );
+
+			//	Correctly define the Tax Rate ID
+			$method['tax_rate_id']	= $method['tax_rate_id'] ? $method['tax_rate_id'] : NULL;
+
+			//	And is this itemthe default?
+			$method['is_default']	= $counter == $this->input->post( 'default' ) ? TRUE : FALSE;
+
+			//	Active?
+			$method['is_active']	= isset( $method['is_active'] ) ? TRUE : FALSE;
+			
+			if ( $_id ) :
+
+				$this->shipping->update( $_id, $method );
+				$_ids[] = $_id;
+
+			else :
+
+				$_ids[] = $this->shipping->create( $method );
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Mark any items not in the $_ids array as is_deleted
+		$this->db->set( 'is_deleted', TRUE );
+
+		if ( $_ids ) :
+
+			$this->db->where_not_in( 'id', $_ids );
+
+		endif;
+
+		$this->db->update( 'shop_shipping_method' );
+
+		// --------------------------------------------------------------------------
+
+		$this->data['success'] = '<strong>Success!</strong> Shipping Methods have been updated.';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _shop_tax_rates()
+	{
+		dumpanddie($_POST);
 	}
 }
 
