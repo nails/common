@@ -25,6 +25,16 @@ class NAILS_Shop_tax_model extends NAILS_Model
 
 		$this->_table = 'shop_tax_rate';
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all()
+	{
+		$this->db->where( 'is_deleted', FALSE );
+		return parent::get_all();
+	}
 }
 
 

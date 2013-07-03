@@ -347,7 +347,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'block' : 'none'?>
 			<div id="tab-shipping-methods" class="tab page shipping-methods" style="display:<?=$_display?>;">
-				<?=form_open()?>
+				<?=form_open( NULL, 'id="form-shipping-methods"' )?>
 				<?=form_hidden( 'update', 'shipping_methods' )?>
 				<p>
 					Configure supported shipping methods.
@@ -474,27 +474,63 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'block' : 'none'?>
 			<div id="tab-tax-rates" class="tab page tax-rates" style="display:<?=$_display?>;">
-				<?=form_open()?>
+				<?=form_open( NULL, 'id="form-tax-rates"' )?>
 				<?=form_hidden( 'update', 'tax_rates' )?>
 				<p>
 					Configure supported Tax Rates
 				</p>
-				<p class="system-alert message no-close">
-					<strong>Please note:</strong> This functionality is still incomplete.
-				</p>
 				<hr />
-				<fieldset id="shop-add-tax-rate">
-					<legend>Add New Tax Rate</legend>
+				<table id="existing-tax-rates">
+					<thead>
+						<tr>
+							<th class="label">Label</th>
+							<th class="rate">Rate</th>
+							<th class="delete">&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody>
 					<?php
 
+						$_counter_tax = 0;
+						foreach ( $tax_rates AS $rate ) :
+
+							echo '<tr>';
+
+							$_field = 'label';
+
+							echo '<td class="' . $_field . '">';
+							echo '<input type="hidden" name="rates[' . $_counter_tax . '][id]" value="' . $rate->id . '" />';
+							echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							$_field = 'rate';
+
+							echo '<td class="' . $_field . '">';
+							echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'class="table-cell"' );
+							echo '</td>';
+
+							// --------------------------------------------------------------------------
+
+							echo '<td class="delete">';
+							echo '<a href="#" class="delete awesome small red">Delete</a>';
+							echo '</td>';
+
+
+							echo '</tr>';
+
+
+						$_counter_tax++;
+						endforeach;
 
 					?>
-				</fieldset>
-				<ul id="existing-tax-rates">
-
-
-				</ul>
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+					</tbody>
+				</table>
+				<p>
+					<a href="#" id="add-new-tax-rate" style="float:right" class="awesome green small">Add Tax Rate</a>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				</p>
 				<?=form_close()?>
 			</div>
 		</section>
@@ -561,11 +597,163 @@
 			return false;
 		});
 
+		// --------------------------------------------------------------------------
+
+		$( '#form-shipping-methods' ).on( 'submit', function()
+		{
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		$( '#form-shipping-methods' ).on( 'submit', function()
+		{
+			var _errors = 0;
+			var _value;
+
+			$(this).find( 'tbody tr' ).each(function()
+			{
+				//	Courier
+				_value = $(this).find( 'td.courier input' ).val();
+				if ( ! _value.length )
+				{
+					$(this).find( 'td.courier' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.courier' ).removeClass( 'error' );
+				}
+
+				// --------------------------------------------------------------------------
+
+				//	Method
+				_value = $(this).find( 'td.method input' ).val();
+				if ( ! _value.length )
+				{
+					$(this).find( 'td.method' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.method' ).removeClass( 'error' );
+				}
+
+				// --------------------------------------------------------------------------
+
+				//	Price
+				_value = parseInt( $(this).find( 'td.default_price input' ).val(), 10 );
+				if ( _value < 0 )
+				{
+					$(this).find( 'td.default_price' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.default_price' ).removeClass( 'error' );
+				}
+
+				// --------------------------------------------------------------------------
+
+				//	+1 Price
+				_value = parseInt( $(this).find( 'td.default_price_additional input' ).val(), 10 );
+				if ( _value < 0 )
+				{
+					$(this).find( 'td.default_price_additional' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.default_price_additional' ).removeClass( 'error' );
+				}
+			});
+
+			if ( _errors )
+			{
+				alert( 'Please check highlighted fields for errors:\n\n- A courier must be provided\n- A method must be provided\n- Price and 1+ Price must be positive' );
+				return false;
+			}
+
+			return true;
+		});
+
 	});
 
 	// --------------------------------------------------------------------------
 
 	//	TAX RATES
+
+	var _counter_tax = <?=$_counter_tax?>;
+
+	$( function(){
+
+		$( '#add-new-tax-rate' ).on( 'click', function()
+		{
+			_counter_tax++;
+			var _template = Mustache.render( $( '#template-new-tax-rate' ).html(), {counter:_counter_tax} );
+
+			$( '#existing-tax-rates tbody' ).append( _template );
+
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		$(document).on( 'click', '#existing-tax-rates tbody .delete', function()
+		{
+			if (confirm( 'Are you sure?' ))
+			{
+				$(this).closest( 'tr' ).remove();
+			}
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		$( '#form-tax-rates' ).on( 'submit', function()
+		{
+			var _errors = 0;
+			var _value;
+
+			$(this).find( 'tbody tr' ).each(function()
+			{
+				//	Label
+				_value = $(this).find( 'td.label input' ).val();
+				if ( ! _value.length )
+				{
+					$(this).find( 'td.label' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.label' ).removeClass( 'error' );
+				}
+
+				// --------------------------------------------------------------------------
+
+				//	Rate
+				_value = parseInt( $(this).find( 'td.rate input' ).val(), 10 );
+				if ( _value > 1 || _value < 0 )
+				{
+					$(this).find( 'td.rate' ).addClass( 'error' );
+					_errors++;
+				}
+				else
+				{
+					$(this).find( 'td.rate' ).removeClass( 'error' );
+				}
+			});
+
+			if ( _errors )
+			{
+				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n-Rate must be a numeric in the range 0-1' );
+				return false;
+			}
+
+			return true;
+		});
+
+	});
 
 </script>
 
@@ -597,6 +785,22 @@
 	</td>
 	<td class="default">
 		<?=form_radio( 'default', '{{counter}}' )?>
+	</td>
+	<td class="delete">
+		<a href="#" class="delete awesome small red">Delete</a>
+	</td>
+</tr>
+</script>
+<script type="text/template" id="template-new-tax-rate">
+<tr>
+	<td class="label">
+		<?=form_input( 'rates[{{counter}}][label]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="rate">
+		<?=form_input( 'rates[{{counter}}][rate]', NULL, 'class="table-cell"' )?>
+	</td>
+	<td class="delete">
+		<a href="#" class="delete awesome small red">Delete</a>
 	</td>
 </tr>
 </script>

@@ -572,7 +572,44 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 	protected function _shop_tax_rates()
 	{
-		dumpanddie($_POST);
+		$_rates	= $this->input->post( 'rates' );
+		$_ids	= array();
+
+		foreach( $_rates AS $counter => &$rate ) :
+
+			//	If there's an ID we'll be updating (remove for safety)
+			$_id = isset( $rate['id'] ) ? $rate['id'] : NULL;
+			unset( $rate['id'] );
+			
+			if ( $_id ) :
+
+				$this->tax->update( $_id, $rate );
+				$_ids[] = $_id;
+
+			else :
+
+				$_ids[] = $this->tax->create( $rate );
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Mark any items not in the $_ids array as is_deleted
+		$this->db->set( 'is_deleted', TRUE );
+
+		if ( $_ids ) :
+
+			$this->db->where_not_in( 'id', $_ids );
+
+		endif;
+
+		$this->db->update( 'shop_tax_rate' );
+
+		// --------------------------------------------------------------------------
+
+		$this->data['success'] = '<strong>Success!</strong> Tax Rates have been updated.';
 	}
 }
 
