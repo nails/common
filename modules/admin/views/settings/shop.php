@@ -451,7 +451,7 @@
 							// --------------------------------------------------------------------------
 
 							echo '<td class="delete">';
-							echo '<a href="#" class="delete awesome small red">Delete</a>';
+							echo '<a href="#" class="delete-row awesome small red">Delete</a>';
 							echo '</td>';
 
 
@@ -514,7 +514,7 @@
 							// --------------------------------------------------------------------------
 
 							echo '<td class="delete">';
-							echo '<a href="#" class="delete awesome small red">Delete</a>';
+							echo '<a href="#" class="delete-row awesome small red">Delete</a>';
 							echo '</td>';
 
 
@@ -538,223 +538,13 @@
 
 <script type="text/javascript">
 
-	//	CURRENCIES
+	var _settings;
 
-	$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
-	$( 'select.chosen-active' ).chosen( { width : '100%' });
-
-	// --------------------------------------------------------------------------
-
-	//	SHIPPING
-
-	$( 'td.tax_rate select' ).chosen( { width : '100%' });
-
-	var _counter_ship = <?=$_counter_ship?>;
-	function set_order_ship()
+	$(function()
 	{
-		var _order_counter = 0;
-
-	 	$( '#existing-shipping-methods .order-handle input.order' ).each(function()
- 		{
- 			$(this).val( _order_counter );
- 			_order_counter++;
- 		});
-	}
-
-	$( function(){
-
-		$( '#existing-shipping-methods tbody' ).sortable({
-			 handle: 'td:first',
-			 stop: function( event, ui )
-			 {
-			 	set_order_ship();
-			 }
-		});
-
-		// --------------------------------------------------------------------------
-
-		$( '#add-new-shipping' ).on( 'click', function()
-		{
-			_counter_ship++;
-			var _template = Mustache.render( $( '#template-new-shipping' ).html(), {counter:_counter_ship} );
-
-			$( '#existing-shipping-methods tbody' ).append( _template );
-			$( '#existing-shipping-methods tbody' ).sortable('refresh');
-			set_order_ship();
-			$( 'td.tax_rate select' ).chosen( { width : '100%' });
-
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$(document).on( 'click', '#existing-shipping-methods tbody .delete', function()
-		{
-			if (confirm( 'Are you sure?' ))
-			{
-				$(this).closest( 'tr' ).remove();
-			}
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$( '#form-shipping-methods' ).on( 'submit', function()
-		{
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$( '#form-shipping-methods' ).on( 'submit', function()
-		{
-			var _errors = 0;
-			var _value;
-
-			$(this).find( 'tbody tr' ).each(function()
-			{
-				//	Courier
-				_value = $(this).find( 'td.courier input' ).val();
-				if ( ! _value.length )
-				{
-					$(this).find( 'td.courier' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.courier' ).removeClass( 'error' );
-				}
-
-				// --------------------------------------------------------------------------
-
-				//	Method
-				_value = $(this).find( 'td.method input' ).val();
-				if ( ! _value.length )
-				{
-					$(this).find( 'td.method' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.method' ).removeClass( 'error' );
-				}
-
-				// --------------------------------------------------------------------------
-
-				//	Price
-				_value = parseInt( $(this).find( 'td.default_price input' ).val(), 10 );
-				if ( _value < 0 )
-				{
-					$(this).find( 'td.default_price' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.default_price' ).removeClass( 'error' );
-				}
-
-				// --------------------------------------------------------------------------
-
-				//	+1 Price
-				_value = parseInt( $(this).find( 'td.default_price_additional input' ).val(), 10 );
-				if ( _value < 0 )
-				{
-					$(this).find( 'td.default_price_additional' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.default_price_additional' ).removeClass( 'error' );
-				}
-			});
-
-			if ( _errors )
-			{
-				alert( 'Please check highlighted fields for errors:\n\n- A courier must be provided\n- A method must be provided\n- Price and 1+ Price must be positive' );
-				return false;
-			}
-
-			return true;
-		});
-
+		_settings = new NAILS_Admin_Shop_Settings();
+		_settings.init();
 	});
-
-	// --------------------------------------------------------------------------
-
-	//	TAX RATES
-
-	var _counter_tax = <?=$_counter_tax?>;
-
-	$( function(){
-
-		$( '#add-new-tax-rate' ).on( 'click', function()
-		{
-			_counter_tax++;
-			var _template = Mustache.render( $( '#template-new-tax-rate' ).html(), {counter:_counter_tax} );
-
-			$( '#existing-tax-rates tbody' ).append( _template );
-
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$(document).on( 'click', '#existing-tax-rates tbody .delete', function()
-		{
-			if (confirm( 'Are you sure?' ))
-			{
-				$(this).closest( 'tr' ).remove();
-			}
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$( '#form-tax-rates' ).on( 'submit', function()
-		{
-			var _errors = 0;
-			var _value;
-
-			$(this).find( 'tbody tr' ).each(function()
-			{
-				//	Label
-				_value = $(this).find( 'td.label input' ).val();
-				if ( ! _value.length )
-				{
-					$(this).find( 'td.label' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.label' ).removeClass( 'error' );
-				}
-
-				// --------------------------------------------------------------------------
-
-				//	Rate
-				_value = parseInt( $(this).find( 'td.rate input' ).val(), 10 );
-				if ( _value > 1 || _value < 0 )
-				{
-					$(this).find( 'td.rate' ).addClass( 'error' );
-					_errors++;
-				}
-				else
-				{
-					$(this).find( 'td.rate' ).removeClass( 'error' );
-				}
-			});
-
-			if ( _errors )
-			{
-				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n-Rate must be a numeric in the range 0-1' );
-				return false;
-			}
-
-			return true;
-		});
-
-	});
-
 </script>
 
 <script type="text/template" id="template-new-shipping">
@@ -787,7 +577,7 @@
 		<?=form_radio( 'default', '{{counter}}' )?>
 	</td>
 	<td class="delete">
-		<a href="#" class="delete awesome small red">Delete</a>
+		<a href="#" class="delete-row awesome small red">Delete</a>
 	</td>
 </tr>
 </script>
@@ -800,7 +590,7 @@
 		<?=form_input( 'rates[{{counter}}][rate]', NULL, 'class="table-cell"' )?>
 	</td>
 	<td class="delete">
-		<a href="#" class="delete awesome small red">Delete</a>
+		<a href="#" class="delete-row awesome small red">Delete</a>
 	</td>
 </tr>
 </script>

@@ -396,6 +396,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		$this->asset->load( 'nails.admin.shop.settings.min.js', TRUE );
 		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
 
