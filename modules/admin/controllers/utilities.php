@@ -79,7 +79,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->_export_sources		= array();
 
 		if ( $this->user->is_superuser() || isset( $_acl['admin']['accounts']['index'] ) )
-		$this->_export_sources[]	= array( 'Members: All', 'Export a list of all the site\'s registered users (basic info).', 'users_all' );
+		$this->_export_sources[]	= array( 'Members: All', 'Export a list of all the site\'s registered users and their meta data.', 'users_all' );
 
 		if ( module_is_enabled( 'shop' ) ) :
 
@@ -87,7 +87,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 			$this->_export_sources[]	= array( 'Shop: Inventory', 'Export a list of the shop\'s inventory.', 'shop_inventory' );
 
 			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['orders'] ) )
-			$this->_export_sources[]	= array( 'Shop: Orders', 'Export a list of all shop orders.', 'shop_orders' );
+			$this->_export_sources[]	= array( 'Shop: Orders', 'Export a list of all shop orders and their products.', 'shop_orders' );
 
 			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['vouchers'] ) )
 			$this->_export_sources[]	= array( 'Shop: Vouchers', 'Export a list of all shop vouchers.', 'shop_vouchers' );
@@ -395,7 +395,30 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 					//	All seems well, export data!
 					$_data = $this->{'_export_source_' . $_source[2]}();
-					$this->{'_export_format_' . $_format[2]}( $_data, $_source[2] );
+
+					//	if $_data is an array then we need to write multiple files to a zip
+					if ( is_array( $_data ) ) :
+
+						//	Load Zip class
+						$this->load->library( 'zip' );
+
+						//	Process each file
+						foreach( $_data AS $data ) :
+
+							$_file = $this->{'_export_format_' . $_format[2]}( $data, TRUE );
+
+							$this->zip->add_data( $_file[0], $_file[1] );
+
+						endforeach;
+
+						$this->zip->download( 'data-export-' . $_source[2] . '-' . date( 'Y-m-d_H-i-s' ) );
+
+					else :
+
+						$this->{'_export_format_' . $_format[2]}( $_data );
+
+					endif;
+
 					return;
 
 				endif;
@@ -449,23 +472,63 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$_out			= new stdClass();
-		$_out->fields	= array();
-		$_out->data		= array();
+		//	Prepare our out array
+
+		//	User
+		$_out				= array();
+		$_out[0]			= new stdClass();
+		$_out[0]->filename	= 'user';
+		$_out[0]->fields	= array();
+		$_out[0]->data		= array();
+
+		//	user_group
+		$_out[1]			= new stdClass();
+		$_out[1]->filename	= 'user_group';
+		$_out[1]->fields	= array();
+		$_out[1]->data		= array();
+
+		//	user_auth_method
+		$_out[2]			= new stdClass();
+		$_out[2]->filename	= 'user_auth_method';
+		$_out[2]->fields	= array();
+		$_out[2]->data		= array();
+
+		//	user_meta
+		$_out[3]			= new stdClass();
+		$_out[3]->filename	= 'user_meta';
+		$_out[3]->fields	= array();
+		$_out[3]->data		= array();
+
+		//	All other user_meta_* tables
+		$_tables = $this->db->query( 'SHOW TABLES LIKE \'user_meta_%\'' )->result();
+		$_counter = 4;
+		foreach( $_tables AS $table ) :
+
+			$_table = array_values((array)$table);
+
+			$_out[$_counter]			= new stdClass();
+			$_out[$_counter]->filename	= $_table[0];
+			$_out[$_counter]->fields	= array();
+			$_out[$_counter]->data		= array();
+
+			$_counter++;
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch all users
-		$this->db->select( 'u.id,u.group_id,ug.display_name group_name,u.username,u.email,u.created,u.last_login,u.last_seen,u.last_update,u.is_verified,u.is_suspended,u.login_count,u.salutation,u.first_name,u.last_name' );
-		$this->db->order_by( 'u.id' );
-		$this->db->join( 'user_group ug', 'ug.id = u.group_id' );
-		$_out->data = $this->db->get( 'user u' )->result_array();
+		//	Fetch data
+		foreach( $_out AS &$out ) :
 
-		if ( $_out->data ) :
+			$_fields = $this->db->query( 'DESCRIBE ' . $out->filename )->result();
+			foreach ( $_fields AS $field )
+				$out->fields[] = $field->Field;
 
-			$_out->fields = array_keys( $_out->data[0] );
+			$out->data		= $this->db->get( $out->filename )->result_array();
 
-		endif;
+		endforeach;
+
+		// --------------------------------------------------------------------------
 
 		return $_out;
 	}
@@ -488,6 +551,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_out			= new stdClass();
+		$_out->filename	= 'shop_inventory';
 		$_out->fields	= array( 'TODO' );
 		$_out->data		= array( array( 'TODO' ) );
 
@@ -513,9 +577,20 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$_out			= new stdClass();
-		$_out->fields	= array();
-		$_out->data		= array();
+		//	Prepare the $_out var; give each table its own index
+
+		//	Orders
+		$_out				= array();
+		$_out[0]			= new stdClass();
+		$_out[0]->filename	= 'shop_orders';
+		$_out[0]->fields	= array();
+		$_out[0]->data		= array();
+
+		//	Order_products
+		$_out[1]			= new stdClass();
+		$_out[1]->filename	= 'shop_order_products';
+		$_out[1]->fields	= array();
+		$_out[1]->data		= array();
 
 		// --------------------------------------------------------------------------
 
@@ -523,17 +598,46 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'o.id,o.ref,o.user_id,o.user_email,o.user_first_name,o.user_last_name,o.status' );
 		$this->db->select( 'o.requires_shipping,o.fulfilment_status,o.created,o.modified,o.fulfilled,o.exchange_rate' ) ;
 		$this->db->select( 'o.shipping_total,o.sub_total,o.tax_shipping,o.tax_items,o.discount_shipping,o.discount_items' );
-		$this->db->select( 'o.grand_total,o.fees_deducted' );
-		$_out->data = $this->db->get( 'shop_order o' )->result_array();
-		
-		if ( $_out->data ) :
+		$this->db->select( 'o.grand_total,o.fees_deducted,o.payment_gateway_id, pg.label payment_gateway_label' );
+		$this->db->select( 'o.shipping_method_id, sm.courier shipping_method_courier, sm.method shipping_method_method' );
+		$this->db->select( 'o.shipping_addressee,o.shipping_line_1,o.shipping_line_2,o.shipping_town,o.shipping_postcode,o.shipping_country,o.shipping_state' );
+		$this->db->select( 'o.voucher_id,v.code voucher_code,v.type voucher_type,v.discount_type voucher_discount_type' );
+		$this->db->select( 'v.discount_value voucher_discount_value,v.discount_application voucher_discount_application' );
+		$this->db->select( 'v.label voucher_label, v.valid_from voucher_valid_from,v.valid_to voucher_valid_to, v.use_count voucher_use_count' );
 
-			$_out->fields = array_keys( $_out->data[0] );
+		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+
+		$_out[0]->data = $this->db->get( 'shop_order o' )->result_array();
+		
+		if ( $_out[0]->data ) :
+
+			$_out[0]->fields = array_keys( $_out[0]->data[0] );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
+		//	Fetch all order_products
+		$this->db->select( 'op.id, op.order_id, op.product_id, op.title product_title, pt.label product_type, op.price,op.sale_price' );
+		$this->db->select( 'op.was_on_sale,op.shipping,op.tax,op.shipping_tax,op.total,tr.label tax_rate_label,tr.rate tax_rate,op.processed' );
+		$this->db->select( 'op.refunded,op.refunded_date,op.extra_data' );
+
+		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+
+		$_out[1]->data = $this->db->get( 'shop_order_product op' )->result_array();
+		
+		if ( $_out[1]->data ) :
+
+			$_out[1]->fields = array_keys( $_out[1]->data[0] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
 		return $_out;
 	}
 
@@ -555,6 +659,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_out			= new stdClass();
+		$_out->filename	= 'shop_vouchers';
 		$_out->fields	= array();
 		$_out->data		= array();
 
@@ -581,16 +686,63 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _export_format_csv( $data, $filename )
+	protected function _export_format_csv( $data, $return_data = FALSE )
 	{
 		//	Send header
-		$this->output->set_header( 'Pragma: public' );
-		$this->output->set_header( 'Expires: 0' );
-		$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-		$this->output->set_header( 'Cache-Control: private', FALSE );
-		$this->output->set_header( 'Content-Type: application/octet-stream' );
-		$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $filename . '-' . date( 'Y-m-d_h-i-s' ) . '.csv;' );
-		$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+		if ( ! $return_data ) :
+
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.csv;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set view data
+		$this->data['fields']	= $data->fields;
+		$this->data['data']		= $data->data;
+
+		// --------------------------------------------------------------------------
+
+			//	Load view
+		if ( ! $return_data ) :
+
+			$this->load->view( 'admin/utilities/export/csv', $this->data );
+
+		else :
+
+			$_out	= array();
+			$_out[]	= $data->filename . '.csv';
+			$_out[]	= $this->load->view( 'admin/utilities/export/csv', $this->data, TRUE );
+
+			return $_out;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _export_format_html( $data, $return_data = FALSE )
+	{
+		//	Send header
+		if ( ! $return_data ) :
+
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.html;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -601,50 +753,81 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load view
-		$this->load->view( 'admin/utilities/export/csv', $this->data );
+		if ( ! $return_data ) :
+
+			$this->load->view( 'admin/utilities/export/html', $this->data );
+
+		else :
+
+			$_out	= array();
+			$_out[]	= $data->filename . '.html';
+			$_out[]	= $this->load->view( 'admin/utilities/export/html', $this->data, TRUE );
+
+			return $_out;
+
+		endif;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _export_format_html( $data, $filename )
+	protected function _export_format_serialize( $data, $return_data = FALSE )
 	{
 		//	Send header
-		$this->output->set_header( 'Pragma: public' );
-		$this->output->set_header( 'Expires: 0' );
-		$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-		$this->output->set_header( 'Cache-Control: private', FALSE );
-		$this->output->set_header( 'Content-Type: application/octet-stream' );
-		$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $filename . '-' . date( 'Y-m-d_h-i-s' ) . '.html;' );
-		$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+		if ( ! $return_data ) :
+
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.txt;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Set view data
-		$this->data['fields']	= $data->fields;
-		$this->data['data']		= $data->data;
+		$this->data['data'] = $data;
 
 		// --------------------------------------------------------------------------
 
 		//	Load view
-		$this->load->view( 'admin/utilities/export/html', $this->data );
+		if ( ! $return_data ) :
+
+			$this->load->view( 'admin/utilities/export/serialize', $this->data );
+
+		else :
+
+			$_out	= array();
+			$_out[]	= $data->filename . '.txt';
+			$_out[]	= $this->load->view( 'admin/utilities/export/serialize', $this->data, TRUE );
+
+			return $_out;
+
+		endif;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _export_format_serialize( $data, $filename )
+	protected function _export_format_json( $data, $return_data = FALSE )
 	{
 		//	Send header
-		$this->output->set_header( 'Pragma: public' );
-		$this->output->set_header( 'Expires: 0' );
-		$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-		$this->output->set_header( 'Cache-Control: private', FALSE );
-		$this->output->set_header( 'Content-Type: application/octet-stream' );
-		$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $filename . '-' . date( 'Y-m-d_h-i-s' ) . '.txt;' );
-		$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+		if ( ! $return_data ) :
+
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.json;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -654,33 +837,19 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load view
-		$this->load->view( 'admin/utilities/export/serialize', $this->data );
-	}
+		if ( ! $return_data ) :
 
+			$this->load->view( 'admin/utilities/export/json', $this->data );
 
-	// --------------------------------------------------------------------------
+		else :
 
+			$_out	= array();
+			$_out[]	= $data->filename . '.json';
+			$_out[]	= $this->load->view( 'admin/utilities/export/json', $this->data, TRUE );
 
-	protected function _export_format_json( $data, $filename )
-	{
-		//	Send header
-		$this->output->set_header( 'Pragma: public' );
-		$this->output->set_header( 'Expires: 0' );
-		$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-		$this->output->set_header( 'Cache-Control: private', FALSE );
-		$this->output->set_header( 'Content-Type: application/octet-stream' );
-		$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $filename . '-' . date( 'Y-m-d_h-i-s' ) . '.json;' );
-		$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+			return $_out;
 
-		// --------------------------------------------------------------------------
-
-		//	Set view data
-		$this->data['data']		= $data;
-
-		// --------------------------------------------------------------------------
-
-		//	Load view
-		$this->load->view( 'admin/utilities/export/json', $this->data );
+		endif;
 	}
 }
 
