@@ -1176,7 +1176,7 @@ class Emailer
 			
 			return TRUE;
 		
-		else :
+		else:
 		
 			//	Failed to send, notify developers
 			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
@@ -1210,7 +1210,15 @@ class Emailer
 				//	On non-production environments halt execution, this is an error with the configs
 				//	and should probably be addressed
 				
-				show_error( 'Email failed to send at SMTP time. Potential configuration error. Investigate, debugging data below: <div style="padding:20px;background:#EEE">' . $this->ci->email->print_debugger() . '</div>' );
+				if ( ! graceful ) :
+
+					show_error( 'Email failed to send at SMTP time. Potential configuration error. Investigate, debugging data below: <div style="padding:20px;background:#EEE">' . $this->ci->email->print_debugger() . '</div>' );
+
+				else :
+
+					$this->_set_error( 'Email failed to send at SMTP time.' );
+
+				endif;
 			
 			endif;
 			
