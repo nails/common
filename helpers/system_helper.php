@@ -191,17 +191,17 @@ if ( ! function_exists( 'send_developer_mail' ) )
 {
 	function send_developer_mail( $subject, $message )
 	{
-		if ( ! APP_EMAIL_DEVELOPER ) :
+		if ( ! APP_EMAIL_DEVELOPER && ! NAILS_EMAIL_DEVELOPER ) :
 
 			//	Log the fact there's no email
-			log_message( 'error', 'Attempting to send developer email, but APP_EMAIL_DEVELOPER is not defined.' );
+			log_message( 'error', 'Attempting to send developer email, but APP_EMAIL_DEVELOPER and NAILS_EMAIL_DEVELOPER are not defined.' );
 			return FALSE;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$_to		= APP_EMAIL_DEVELOPER;
+		$_to		= APP_EMAIL_DEVELOPER ? APP_EMAIL_DEVELOPER : NAILS_EMAIL_DEVELOPER;
 		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
 					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
 					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .

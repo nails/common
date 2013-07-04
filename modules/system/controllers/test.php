@@ -78,6 +78,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 		$this->_tests = array();
 		$this->_tests[] = 'canwritedirs';
+		$this->_tests[] = 'cansendemail';
 
 		$this->data['tests'] =& $this->_tests;
 	}
@@ -101,9 +102,9 @@ class NAILS_Test extends NAILS_System_Controller
 			if ( method_exists( $this, '_info_' . $this->_tests[$i] ) ) :
 
 				$_test = $this->_tests[$i];
-				$this->_tests[$i] = $this->{'_info_' . $this->_tests[$i] }();
+				$this->_tests[$i] = clone( $this->{'_info_' . $this->_tests[$i] }() );
 				$this->_tests[$i]->test = $_test;
-
+			
 			else :
 
 				$this->_tests[$i] = FALSE;
@@ -218,8 +219,8 @@ class NAILS_Test extends NAILS_System_Controller
 
 				// --------------------------------------------------------------------------
 
-				$_result		= $this->{'_test_' . $_tests[$i] }();
-				$_result->info	= $this->{'_info_' . $_tests[$i] }();
+				$_result		= clone( $this->{'_test_' . $_tests[$i] }() );
+				$_result->info	= clone( $this->{'_info_' . $_tests[$i] }() );
 				$_results[]		= $_result;
 
 			endif;
@@ -328,27 +329,48 @@ class NAILS_Test extends NAILS_System_Controller
 
 	protected function _test_canwritedirs()
 	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+
+		// --------------------------------------------------------------------------
+
 		//	Directories to test
 		$_dirs		= array();
 
-		if ( defined( 'CACHE_DIR' ) )
+		//	Cache directory
+		if ( defined( 'CACHE_DIR' ) ) :
+
 			$_dirs[]	= CACHE_DIR;
 
-		if ( defined( 'CDN_PATH' ) ) :
+		endif;
+
+		//	Check CDN buckets/dirs
+		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
 			
 			$_dirs[]	= CDN_PATH;
 
-			$this->load->helper( 'directory' );
+			//	Get all the buckets and check that directories exist and are writable
+			$this->load->library( 'cdn' );
+			$_buckets = $this->cdn->get_buckets();
+			
+			foreach ( $_buckets AS $bucket ) :
 
-			foreach ( directory_map( CDN_PATH, 1 ) AS $sub_dir ) :
-
-				$_dirs[] = CDN_PATH . $sub_dir;
+				$_dirs[] = CDN_PATH . $bucket->slug . '/';
 
 			endforeach;
 
 		endif;
 
 		foreach ( $_dirs AS $dir ) :
+
+			if ( ! file_exists( $dir ) ) :
+
+				$this->_result->pass		= FALSE;
+				$this->_result->errors[]	= '"' . $dir . '" does not exist.';
+				continue;
+
+			endif;
 
 			if ( ! is_writable( $dir ) ) :
 
@@ -370,6 +392,58 @@ class NAILS_Test extends NAILS_System_Controller
 		$this->_info->description	= 'This test will check that the application can write to all directories that it needs to.';
 		$this->_info->testing		= 'Tests that required writeable directories are writeable by the app.';
 		$this->_info->expecting		= 'All folders to be writable.';
+
+		// --------------------------------------------------------------------------
+
+		return $this->_info;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _test_cansendemail()
+	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+		
+		// --------------------------------------------------------------------------
+
+		$_email				= new stdClass();
+		$_email->type		= 'test_email';
+		$_email->to_email	= APP_EMAIL_DEVELOPER ? APP_EMAIL_DEVELOPER : NAILS_EMAIL_DEVELOPER;
+
+		if ( ! $_email->to_email ) :
+
+			$this->_result->pass		= FALSE;
+			$this->_result->errors[]	= 'APP_EMAIL_DEVELOPER and NAILS_EMAIL_DEVELOPER are blank.';
+
+		else :
+
+			//	Send the email
+			$this->load->library( 'emailer' );
+			
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+			
+				$this->_result->pass		= FALSE;
+				$this->_result->errors[]	= 'Email failed to send; error: ' . implode( ', ', $this->emailer->get_errors() );
+			
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $this->_result;
+	}
+
+	protected function _info_cansendemail()
+	{
+		$this->_info->label			= 'Can send email';
+		$this->_info->description	= 'This test checks that the app can send email; provided email credentials are provided';
+		$this->_info->testing		= 'Tests that an email can be sent without error.';
+		$this->_info->expecting		= 'The email to send without error';
 
 		// --------------------------------------------------------------------------
 

@@ -1111,37 +1111,27 @@ class Local_CDN {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
+	public function get_buckets( $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
 	{
 		$this->db->select( 'id,slug,user_id,allowed_types,max_size,created,modified' );
 		$this->db->select( '(SELECT COUNT(*) FROM cdn_local_object WHERE bucket_id = b.id AND is_deleted = 0) object_count' );
 		
-		if ( is_numeric( $bucket ) ) :
-		
-			$this->db->where( 'b.id', $bucket );
-		
-		else :
-		
-			$this->db->where( 'b.slug', $bucket );
-		
-		endif;
-		
-		$_bucket = $this->db->get( 'cdn_local_bucket b' )->row();
+		$_buckets = $this->db->get( 'cdn_local_bucket b' )->result();
 		
 		// --------------------------------------------------------------------------
 		
-		if( $_bucket ) :
+		foreach ( $_buckets AS &$bucket ) :
 		
 			//	Format bucket object
-			$_bucket->id		= (int) $_bucket->id;
-			$_bucket->user_id	= (int) $_bucket->user_id;
+			$bucket->id			= (int) $bucket->id;
+			$bucket->user_id	= (int) $bucket->user_id;
 			
 			// --------------------------------------------------------------------------
 			
 			//	List contents
 			if ( $list_bucket ) :
 			
-				$_bucket->objects = $this->list_bucket( $_bucket->id, $filter_tag, $include_deleted );
+				$bucket->objects = $this->list_bucket( $bucket->id, $filter_tag, $include_deleted );
 			
 			endif;
 			
@@ -1151,14 +1141,46 @@ class Local_CDN {
 			$this->db->select( 'bt.id,bt.label,bt.created' );
 			$this->db->select( '(SELECT COUNT(*) FROM cdn_local_object_tag ot JOIN cdn_local_object o ON o.id = ot.object_id WHERE tag_id = bt.id AND o.is_deleted = 0 ) total' );
 			$this->db->order_by( 'bt.label' );
-			$this->db->where( 'bt.bucket_id', $_bucket->id );
-			$_bucket->tags = $this->db->get( 'cdn_local_bucket_tag bt' )->result();
+			$this->db->where( 'bt.bucket_id', $bucket->id );
+			$bucket->tags = $this->db->get( 'cdn_local_bucket_tag bt' )->result();
 		
-		endif;
+		endforeach;
 		
 		// --------------------------------------------------------------------------
 		
-		return $_bucket;
+		return $_buckets;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Gets a single bucket
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE )
+	{
+		if ( is_numeric( $bucket ) ) :
+		
+			$this->db->where( 'b.id', $bucket );
+		
+		else :
+		
+			$this->db->where( 'b.slug', $bucket );
+		
+		endif;
+
+		$_bucket = $this->get_buckets( $list_bucket, $filter_tag, TRUE );
+
+		if ( ! $_bucket )
+			return FALSE;
+
+		return $_bucket[0];
 	}
 	
 	

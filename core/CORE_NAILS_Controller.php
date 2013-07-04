@@ -125,6 +125,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
 		if ( ! defined( 'NAILS_STAGING_USER') )				define( 'NAILS_STAGING_USER',			'' );
 		if ( ! defined( 'NAILS_STAGING_PASS') )				define( 'NAILS_STAGING_PASS',			'' );
+		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
 
 		// --------------------------------------------------------------------------
 

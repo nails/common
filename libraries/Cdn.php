@@ -317,6 +317,23 @@ class Cdn {
 	
 	
 	/**
+	 * Returns an array of all bucket objects
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function get_buckets( $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
+	{
+		return $this->_cdn->get_buckets( $list_bucket, $filter_tag, $include_deleted );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Returns a single bucket object
 	 *
 	 * @access	public
@@ -324,9 +341,9 @@ class Cdn {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
+	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE )
 	{
-		return $this->_cdn->get_bucket( $bucket, $list_bucket, $filter_tag, $include_deleted );
+		return $this->_cdn->get_bucket( $bucket, $list_bucket, $filter_tag );
 	}
 	
 	
