@@ -134,7 +134,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		if ( $_config->show_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM blog_post_category WHERE category_id = c.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpc.post_id) FROM blog_post_category bpc JOIN blog_post bp ON bpc.post_id = bp.id WHERE bpc.category_id = c.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
 
 		endif;
 
@@ -214,7 +214,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		if ( $_config->show_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM blog_post_tag WHERE tag_id = t.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpt.post_id) FROM blog_post_tag bpt JOIN blog_post bp ON bpt.post_id = bp.id WHERE tag_id = t.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
 
 		endif;
 
