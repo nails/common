@@ -121,7 +121,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
 		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
-		if ( ! defined( 'NAILS_TIMEZONE') )					define( 'NAILS_TIMEZONE',				'UTC' );
+		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
 		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
 		if ( ! defined( 'NAILS_STAGING_USER') )				define( 'NAILS_STAGING_USER',			'' );
 		if ( ! defined( 'NAILS_STAGING_PASS') )				define( 'NAILS_STAGING_PASS',			'' );
@@ -300,8 +300,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Set the timezones
-		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : NAILS_TIMEZONE;
-		$this->datetime->set_timezones( NAILS_TIMEZONE, $_timezone_user );
+		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : NAILS_DEFAULT_TIMEZONE;
+		$this->datetime->set_timezones( 'UTC', $_timezone_user );
 
 		// --------------------------------------------------------------------------
 
@@ -309,6 +309,20 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
 		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
 		$this->datetime->set_formats( $_format_date, $_format_time );
+
+		// --------------------------------------------------------------------------
+
+		//	Make sure the system is running on UTC
+		date_default_timezone_set( 'UTC' );
+
+		// --------------------------------------------------------------------------
+
+		//	Make sure the DB is thinking along the same lines
+		if ( NAILS_DB_ENABLED ) :
+
+			$this->db->query( 'SET time_zone = \'+0:00\'' );
+
+		endif;
 	}
 
 	// --------------------------------------------------------------------------

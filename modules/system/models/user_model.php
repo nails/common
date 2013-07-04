@@ -1744,8 +1744,15 @@ class NAILS_User_model extends NAILS_Model
 		if ( isset( $data['gender'] ) ) 
 			$_data['gender'] = $data['gender'];
 
-		if ( isset( $data['timezone'] ) ) 
+		if ( isset( $data['timezone'] ) ) :
+
 			$_data['timezone'] = $data['timezone'];
+
+		elseif ( defined( 'NAILS_DEFAULT_TIMEZONE' ) && NAILS_DEFAULT_TIMEZONE ) :
+
+			$_data['timezone'] = NAILS_DEFAULT_TIMEZONE;
+
+		endif;
 
 		if ( isset( $data['date_format_date_id'] ) ) 
 			$_data['date_format_date_id'] = $data['date_format_date_id'];

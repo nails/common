@@ -63,9 +63,13 @@ class NAILS_Datetime_model extends NAILS_Model
 		else :
 
 			//	Are we dealing with a UNIX timestamp or a datetime?
-			if ( is_numeric( $timestamp ) ) :
+			if ( ! is_numeric( $timestamp ) ) :
 
 				$timestamp = date( 'Y-m-d H:i:s', strtotime( $timestamp ) );
+
+			else :
+
+				$timestamp = date( 'Y-m-d H:i:s', $timestamp );
 
 			endif;
 
@@ -78,7 +82,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		$_format_time	= is_null( $format_time ) ? $this->_format_time : $format_time; 
 
 		// --------------------------------------------------------------------------
-
+		
 		//	Create the new DateTime object
 		$_datetime = new DateTime( $timestamp, new DateTimeZone( $this->_timezone_nails ) );
 
