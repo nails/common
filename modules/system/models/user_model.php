@@ -72,19 +72,18 @@ class NAILS_User_model extends NAILS_Model
 			
 		//	Look for a cookie
 		$_ci->load->helper( 'cookie' );
-		$_email	= get_cookie( 'email' );
-		$_code	= get_cookie( 'remember_code' );
+		$_remember_me	= get_cookie( 'remember_me' );
 		
 		// --------------------------------------------------------------------------
 		
 		//	If we're missing anything then there's nothing to do
-		if ( ! $_email || ! $_code )
+		if ( ! $_remember_me )
 			return;
 		
 		// --------------------------------------------------------------------------
 			
 		//	User cookie's were found
-		define( 'LOGIN_REMEMBERED_USER', $_email . '|' . $_code );
+		define( 'LOGIN_REMEMBERED_USER', $_remember_me );
 		
 		// --------------------------------------------------------------------------
 		
@@ -293,8 +292,16 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function is_remembered()
 	{
+		//	Look for the remember me cookie and explode it, if we're landed with
+		//	a 2 part array then it's likely this is a valid cookie - however, this
+		//	test is, obviously, not gonna detect a spoof.
+
 		$this->load->helper( 'cookie' );
-		return ( get_cookie( 'email' ) && get_cookie( 'remember_code' ) ) ? TRUE : FALSE;
+
+		$_cookie = get_cookie( 'remember_me' );
+		$_cookie = explode( '|', $_cookie );
+
+		return count( $_cookie ) == 2 ? TRUE : FALSE;
 	}
 	
 	
@@ -1299,35 +1306,42 @@ class NAILS_User_model extends NAILS_Model
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function set_remember_cookie()
+	public function set_remember_cookie( $id = NULL, $password = NULL, $email = NULL )
 	{
-		if ( ! active_user( 'id' ) )
-			return FALSE;
+		if ( ! $id || ! $password || ! $email ) :
+
+			if ( ! active_user( 'id' ) ||  ! active_user( 'password' ) || ! active_user( 'email' ) ) :
+
+				return FALSE;
+			else :
+
+				$id			= active_user( 'id' );
+				$password	= active_user( 'password' );
+				$email		= active_user( 'email' );
+
+			endif;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
 		//	Generate a code to remember the user by and save it to the DB
-		$salt = sha1( active_user( 'password' ) );
-		$this->db->set( 'remember_code', $salt );
-		$this->db->where( 'id', active_user( 'id' ) );
+
+		$_salt = $this->encrypt->encode( sha1( $id . $password . $email . APP_PRIVATE_KEY. time() ), APP_PRIVATE_KEY );
+
+		$this->db->set( 'remember_code', $_salt );
+		$this->db->where( 'id', $id );
 		$this->db->update( 'user' );
 		
 		// --------------------------------------------------------------------------
 		
-		//	Set the cookies
-		$data = NULL;
-		$data['name']	= 'email';
-		$data['value']	= active_user( 'email' );
-		$data['expire']	= 1209600;
-		set_cookie( $data );
-		
-		// --------------------------------------------------------------------------
-		
-		$data = NULL;
-		$data['name']	= 'remember_code';
-		$data['value']	= $salt;
-		$data['expire']	= 1209600;
-		set_cookie( $data );
+		//	Set the cookie
+		$_data				= array();
+		$_data['name']		= 'remember_me';
+		$_data['value']		= $email . '|' . $_salt;
+		$_data['expire']	= 1209600; //	2 weeks
+
+		set_cookie( $_data );
 	}
 	
 	
@@ -1347,13 +1361,11 @@ class NAILS_User_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		if ( get_cookie( 'email' ) )
-			delete_cookie( 'email' );
-		
-		// --------------------------------------------------------------------------
-		
-		if ( get_cookie('remember_code' ) )
-			delete_cookie( 'remember_code' );
+		if ( get_cookie( 'remember_me' ) ) :
+
+			delete_cookie( 'remember_me' );
+
+		endif;
 	}
 	
 	

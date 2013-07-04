@@ -128,9 +128,12 @@ class NAILS_Auth_model extends NAILS_Model
 				$this->user->set_login_data( $user->id, $user->email, $user->group_id );
 				
 				//	If we're remembering this user set a cookie
-				if ( $remember )
-					$this->user->set_remember_cookie();
-					
+				if ( $remember ) :
+
+					$this->user->set_remember_cookie( $user->id, $user->password, $user->email );
+
+				endif;
+				
 				//	Update their last login and increment their login count
 				$this->user->update_last_login( $user->id );
 				
