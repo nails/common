@@ -1210,7 +1210,7 @@ class Emailer
 				//	On non-production environments halt execution, this is an error with the configs
 				//	and should probably be addressed
 				
-				if ( ! graceful ) :
+				if ( ! $graceful ) :
 
 					show_error( 'Email failed to send at SMTP time. Potential configuration error. Investigate, debugging data below: <div style="padding:20px;background:#EEE">' . $this->ci->email->print_debugger() . '</div>' );
 
