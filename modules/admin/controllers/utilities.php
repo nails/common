@@ -438,6 +438,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 	protected function _export_source_users_all()
 	{
+		$_acl = active_user( 'acl' );
 		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
@@ -475,6 +476,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 	protected function _export_source_shop_inventory()
 	{
+		$_acl = active_user( 'acl' );
 		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['inventory'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
@@ -500,6 +502,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 	protected function _export_source_shop_orders()
 	{
+		$_acl = active_user( 'acl' );
 		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['orders'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
@@ -540,6 +543,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 	protected function _export_source_shop_vouchers()
 	{
+		$_acl = active_user( 'acl' );
 		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['vouchers'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
