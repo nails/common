@@ -122,6 +122,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
 		if ( ! defined( 'NAILS_TIMEZONE') )					define( 'NAILS_TIMEZONE',				'UTC' );
+		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
+		if ( ! defined( 'NAILS_STAGING_USER') )				define( 'NAILS_STAGING_USER',			'' );
+		if ( ! defined( 'NAILS_STAGING_PASS') )				define( 'NAILS_STAGING_PASS',			'' );
 
 		// --------------------------------------------------------------------------
 
@@ -139,6 +142,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
 		if ( ! defined( 'APP_STAGING_PASS' ) )				define( 'APP_STAGING_PASS',				'' );
+
+		// --------------------------------------------------------------------------
+
+		//	Default common API credentials
+		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
 
 	}
 
@@ -193,7 +201,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _staging()
 	{
-		if ( ENVIRONMENT == 'staging' && APP_STAGING_PASS ) :
+		if ( ENVIRONMENT == 'staging' && ( ( APP_STAGING_USER && APP_STAGING_PASS ) || ( NAILS_STAGING_USER && NAILS_STAGING_PASS ) ) ) :
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
@@ -203,7 +211,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
 
-				if ( APP_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || APP_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) :
+				if ( ( APP_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || APP_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) && ( NAILS_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || NAILS_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) ) :
 
 					$this->_staging_request_credentials();
 
