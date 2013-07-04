@@ -193,7 +193,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _staging()
 	{
-		if ( ENVIRONMENT == 'development' && APP_STAGING_PASS ) :
+		if ( ENVIRONMENT == 'staging' && APP_STAGING_PASS ) :
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
