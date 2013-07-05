@@ -43,31 +43,43 @@ class NAILS_Activate extends NAILS_Auth_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			//	Reward referrer (if any)
+			//	Reward referrer (if any
 			if ( ! empty( $_u->referred_by ) ) :
 			
 				$this->user->reward_referral( $_id, $_u->referred_by );
 				
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
+			//	Set success message
+			$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
+
+			// --------------------------------------------------------------------------
+
 			//	Send user on their way
 			if ( ! $this->user->is_logged_in() ) :
 			
-				$this->user->set_login_data( $_u->id, $_u->email, $_u->group_id );
+				//	If a password change is requested, then redirect here
+				if ( $_u->temp_pw ) :
+
+					//	Send user on their merry way
+					redirect( 'auth/reset_password/' . $_u->id . '/' . md5( $_u->salt ) );
+
+				else :
+
+					//	Nope, log in as normal
+					$this->user->set_login_data( $_u->id, $_u->email, $_u->group_id );
+
+					// --------------------------------------------------------------------------
+
+					//	Where are we redirecting too?	
+					redirect( $_u->group_homepage );
+					return;
+
+				endif;
 				
 			endif;
-			
-			// --------------------------------------------------------------------------
-			
-			$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Where are we redirecting too?	
-			redirect( $_u->group_homepage );
-			return;
 			
 		endif;
 		

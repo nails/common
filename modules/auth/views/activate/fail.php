@@ -20,7 +20,7 @@
 	//	Write the HTML for the activation failed page
 ?>
 	
-	<div class="container">
+	<div id="nails-activation-failed" class="container">
 		<p>
 			<?=lang( 'auth_verify_fail_message' )?>
 		</p>

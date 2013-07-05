@@ -21,7 +21,7 @@
 ?>
 	
 	
-	<div id="password-reset-successfully" class="container">
+	<div id="nails-password-reset-successfully" class="container">
 		<p>
 			<?=lang( 'auth_forgot_reset_ok', $new_password )?>
 		</p>

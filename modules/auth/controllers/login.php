@@ -111,11 +111,28 @@ class NAILS_Login extends NAILS_Auth_Controller
 						 * 
 						 **/
 						
-						$_return_to	= ( $this->data['return_to'] ) ? '?return_to='.urlencode( $this->data['return_to'] ) : NULL;
+						$_query	= array();
+
+						if ( $this->data['return_to'] ) :
+
+							$_query['return_to'] = urlencode( $this->data['return_to'] );
+
+						endif;
+						
+						//	Log the user out and remove the 'remember me' cookie - if we don't do this then the password reset
+						//	page will see a logged in user and go nuts (i.e error).
+
+						if ( $this->user->is_remembered() ) :
+
+							$_query['remember'] = TRUE;
+
+						endif;
+
+						$_query = $_query ? '?' . http_build_query( $_query ) : '';
 						
 						$this->auth_model->logout();
 						
-						redirect( 'auth/reset_password/' . $_login['temp_pw']['id'] . '/' . $_login['temp_pw']['hash'] . $_return_to );
+						redirect( 'auth/reset_password/' . $_login['temp_pw']['id'] . '/' . $_login['temp_pw']['hash'] . $_query );
 						return;
 					
 					else :

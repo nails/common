@@ -12,6 +12,7 @@
 	$lang['auth_title_login']							= 'Please Log In';
 	$lang['auth_title_register']						= 'Register';
 	$lang['auth_title_forgotten_password']				= 'Forgotten your password?';
+	$lang['auth_title_reset']							= 'Reset your Password';
 	
 	
 	// --------------------------------------------------------------------------

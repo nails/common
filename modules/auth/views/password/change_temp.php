@@ -36,15 +36,23 @@
 	//	If there's a 'return_to' variable set it as a GET variable in case there;'s a form
 	//	validation error. Otherwise don't show it - cleaner.
 	
+	$_query = array();
+
 	if ( $return_to ) :
 	
-		echo form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash . '?return_to=' . $return_to, $attr );
-		
-	else :
-	
-		echo form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash, $attr );
+		$_query['return_to'] = $return_to;
 		
 	endif;
+
+	if ( $remember ) :
+	
+		$_query['remember'] = $remember;
+		
+	endif;
+
+	$_query = $_query ? '?' . http_build_query( $_query ) : '';
+
+	echo form_open( 'auth/reset_password/' . $auth->id . '/' . $auth->hash . $_query, $attr );
 	
 	// --------------------------------------------------------------------------
 	

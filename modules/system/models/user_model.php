@@ -20,7 +20,23 @@
 class NAILS_User_model extends NAILS_Model
 {
 
-	public $active_user;
+	protected $active_user;
+	protected $remember_cookie;
+	protected $is_remembered;
+
+	// --------------------------------------------------------------------------
+
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$this->active_user		= new stdClass();
+		$this->remember_cookie	= 'nailsrememberme';
+		$this->is_remembered	= NULL;
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -72,7 +88,7 @@ class NAILS_User_model extends NAILS_Model
 			
 		//	Look for a cookie
 		$_ci->load->helper( 'cookie' );
-		$_remember_me	= get_cookie( 'remember_me' );
+		$_remember_me = get_cookie( $this->remember_cookie );
 		
 		// --------------------------------------------------------------------------
 		
@@ -292,16 +308,27 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function is_remembered()
 	{
+		//	Deja vu?
+		if ( ! is_null( $this->is_remembered ) ) :
+
+			return $this->is_remembered;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Look for the remember me cookie and explode it, if we're landed with
 		//	a 2 part array then it's likely this is a valid cookie - however, this
 		//	test is, obviously, not gonna detect a spoof.
 
 		$this->load->helper( 'cookie' );
 
-		$_cookie = get_cookie( 'remember_me' );
+		$_cookie = get_cookie( $this->remember_cookie );
 		$_cookie = explode( '|', $_cookie );
 
-		return count( $_cookie ) == 2 ? TRUE : FALSE;
+		$this->is_remembered = count( $_cookie ) == 2 ? TRUE : FALSE;
+
+		return $this->is_remembered;
 	}
 	
 	
@@ -1337,11 +1364,16 @@ class NAILS_User_model extends NAILS_Model
 		
 		//	Set the cookie
 		$_data				= array();
-		$_data['name']		= 'remember_me';
+		$_data['name']		= $this->remember_cookie;
 		$_data['value']		= $email . '|' . $_salt;
 		$_data['expire']	= 1209600; //	2 weeks
 
 		set_cookie( $_data );
+
+		// --------------------------------------------------------------------------
+
+		//	Update the flag
+		$this->is_remembered = TRUE;
 	}
 	
 	
@@ -1361,11 +1393,12 @@ class NAILS_User_model extends NAILS_Model
 		
 		// --------------------------------------------------------------------------
 		
-		if ( get_cookie( 'remember_me' ) ) :
+		delete_cookie( $this->remember_cookie );
 
-			delete_cookie( 'remember_me' );
+		// --------------------------------------------------------------------------
 
-		endif;
+		//	Update the flag
+		$this->is_remembered = FALSE;
 	}
 	
 	

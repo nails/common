@@ -91,12 +91,14 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					$_data['forgotten_password_code']	= NULL;
 					$_data['temp_pw']					= NULL;
 					$_data['password']					= $this->input->post( 'new_password' );
+
+					$_remember							= (bool) $this->input->get( 'remember' );
 					
 					//	Reset the password
 					$this->user->update( $id, $_data );
 					
 					//	Log the user in
-					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), TRUE );
+					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
 					
 					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
 					
@@ -128,12 +130,15 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 			
 			// --------------------------------------------------------------------------
 			
+			//	Set data
+			$this->data['page']->title	= lang( 'auth_title_reset' );
+
 			$this->data['auth']			= new stdClass();
 			$this->data['auth']->id		= $id;
 			$this->data['auth']->hash	= $hash;
-			$this->data['return_to']	= ( $this->input->get( 'return_to' ) ) ? '?return_to=' . urlencode( $this->input->get( 'return_to' ) ) : NULL;
-			
-			// --------------------------------------------------------------------------
+
+			$this->data['return_to']	= $this->input->get( 'return_to' );
+			$this->data['remember']		= $this->input->get( 'remember' );
 			
 			$this->data['message']		= lang( 'auth_forgot_temp_message' );
 			

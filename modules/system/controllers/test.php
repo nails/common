@@ -345,6 +345,8 @@ class NAILS_Test extends NAILS_System_Controller
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
 		//	Check CDN buckets/dirs
 		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
 			
@@ -362,6 +364,18 @@ class NAILS_Test extends NAILS_System_Controller
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
+		//	Is the app routes file writeable? Various modules might require access to it
+		if ( module_is_enabled( 'cms' ) || module_is_enabled( 'blog' ) || module_is_enabled( 'shop' ) ) :
+
+			$_dirs[] = FCPATH . APPPATH . 'config/routes_cms_page.php';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute test
 		foreach ( $_dirs AS $dir ) :
 
 			if ( ! file_exists( $dir ) ) :
@@ -388,10 +402,10 @@ class NAILS_Test extends NAILS_System_Controller
 
 	protected function _info_canwritedirs()
 	{
-		$this->_info->label			= 'Directories are writeable';
-		$this->_info->description	= 'This test will check that the application can write to all directories that it needs to.';
-		$this->_info->testing		= 'Tests that required writeable directories are writeable by the app.';
-		$this->_info->expecting		= 'All folders to be writable.';
+		$this->_info->label			= 'Directories &amp; Files are writeable';
+		$this->_info->description	= 'This test will check that the application can write to all directories and files that it needs to.';
+		$this->_info->testing		= 'Tests that required writeable directories & files are writeable by the app.';
+		$this->_info->expecting		= 'All folders and files to be writable.';
 
 		// --------------------------------------------------------------------------
 
