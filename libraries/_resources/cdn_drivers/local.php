@@ -352,7 +352,7 @@ class Local_CDN {
 		//	Check bucket is writeable
 		if ( ! is_writable( CDN_PATH . $bucket ) ) :
 		
-			$this->_error( lang( 'cdn_local_error_target_write_fail' ) );
+			$this->_error( lang( 'cdn_local_error_target_write_fail', CDN_PATH . $bucket ) );
 			return FALSE;
 		
 		endif;

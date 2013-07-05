@@ -31,7 +31,7 @@
 		
 		echo '<div class="filesize">' . $object->filesize . '</div>';
 		
-		echo '<div class="modified">' . $object->modified . '</div>';
+		echo '<div class="modified">' . user_date( $object->modified ) . '</div>';
 		
 		echo '<div class="actions">';
 		

@@ -14,7 +14,7 @@
 	$lang['cdn_local_insert_fail']				= 'Failed to create bucket record.';
 	$lang['cdn_local_stream_content_type']		= 'A Content-Type must be defined for data stream uploads.';
 	$lang['cdn_local_error_cache_write_fail']	= 'Cache directory is not writeable.';
-	$lang['cdn_local_error_target_write_fail']	= 'The target directory is not writable.';
+	$lang['cdn_local_error_target_write_fail']	= 'The target directory is not writable. <small>(%s)</small>';
 	$lang['cdn_local_error_bad_mime']			= 'The file type is not allowed, accepted file type is %s.';
 	$lang['cdn_local_error_bad_mime_plural']	= 'The file type is not allowed, accepted file types are: %s.';
 	$lang['cdn_local_error_filesize']			= 'The file is too large, maximum file size is %s.';

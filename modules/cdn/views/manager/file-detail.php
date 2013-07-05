@@ -40,8 +40,8 @@
 		
 		echo '<div class="filesize"><strong>Filesize:</strong> ' . $object->filesize . '</div>';
 		
-		echo '<div class="created"><strong>Created:</strong> ' . $object->created . '</div>';
-		echo '<div class="modified"><strong>Modified:</strong> ' . $object->modified . '</div>';
+		echo '<div class="created"><strong>Created:</strong> ' . user_date( $object->created ) . '</div>';
+		echo '<div class="modified"><strong>Modified:</strong> ' . user_date( $object->modified ) . '</div>';
 		
 		echo '<div class="actions">';
 		
