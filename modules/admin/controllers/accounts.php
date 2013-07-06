@@ -393,7 +393,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
-			redirect( $this->input->get( 'return_to' ) );
+			$_return_to = $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/dashboard';
+			redirect( $_return_to );
 			return;
 		
 		endif;
