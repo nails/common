@@ -37,9 +37,9 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	 * 
 	 **/
 	public function __construct()
-	{	
+	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
 		
 		//	Work out some variables
@@ -103,6 +103,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		//	Check if there was a bad token
 		if ( $this->_bad_token ) :
 		
+			log_message( 'error', 'CDN: Serve: Bad Token' );
 			return $this->_bad_src();
 		
 		endif;
@@ -138,13 +139,32 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Check the object is set
-		if ( ! defined( 'CDN_PATH' ) || $this->_bad_token || ! $this->_object || ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		//	Check some specifics
+
+		//	CDN_PATH Defined
+		if ( ! defined( 'CDN_PATH' ) ) :
 		
+			log_message( 'error', 'CDN: Serve: CDN_PATH is not defined' );
 			return $this->_bad_src();
 			
 		endif;
 		
+		//	Object found?
+		if ( ! $this->_object ) :
+		
+			log_message( 'error', 'CDN: Serve: Object not found' );
+			return $this->_bad_src();
+			
+		endif;
+
+		//	File exists?
+		if ( ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		
+			log_message( 'error', 'CDN: Serve: File does not exist' );
+			return $this->_bad_src();
+			
+		endif;
+
 		// --------------------------------------------------------------------------
 		
 		//	Determine headers to send. Are we forcing the download?
@@ -218,7 +238,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _bad_src()
+	protected function _bad_src()
 	{
 		if ( ! defined( 'CDN_PATH' ) ) :
 

@@ -123,7 +123,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
 		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
 		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
-		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		'' );
+		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		serialize( array() ) );
 		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
 
 		// --------------------------------------------------------------------------
@@ -140,8 +140,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
-		if ( ! defined( 'APP_STAGING_USER' ) )				define( 'APP_STAGING_USER',				'' );
-		if ( ! defined( 'APP_STAGING_PASS' ) )				define( 'APP_STAGING_PASS',				'' );
+		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
 
 		// --------------------------------------------------------------------------
 

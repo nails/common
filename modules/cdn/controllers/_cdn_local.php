@@ -79,4 +79,71 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		
 		return FALSE;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Generate a fail image
+	 *
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	protected function _bad_src( $width = 100, $height = 100 )
+	{
+		if ( ! defined( 'CDN_PATH' ) ) :
+
+			header( 'Cache-Control: no-cache, must-revalidate' );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Content-type: application/json' );
+			header( 'HTTP/1.0 400 Bad Request' );
+			
+			// --------------------------------------------------------------------------
+			
+			$_out = array(
+			
+				'status'	=> 400,
+				'message'	=> lang( 'cdn_not_configured' )
+			
+			);
+			
+			echo json_encode( $_out );
+
+		else :
+
+			//	Create the icon
+			$_icon = @imagecreatefrompng( $this->_cdn_root . '_resources/img/fail.png' );
+			$_icon_w = imagesx( $_icon );  
+			$_icon_h = imagesy( $_icon );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Create the background
+			$_bg	= imagecreatetruecolor( $width, $height );
+			$_white	= imagecolorallocate( $_bg, 255, 255, 255);
+			imagefill( $_bg, 0, 0, $_white );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Merge the two
+			$_center_x = ( $width / 2 ) - ( $_icon_w / 2 );
+			$_center_y = ( $height / 2 ) - ( $_icon_h / 2 );
+			imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Output to browser
+			header( 'Content-type: image/png' );
+			imagepng( $_bg );
+			
+			// --------------------------------------------------------------------------
+			
+			//	Destroy the images
+			imagedestroy( $_icon );
+			imagedestroy( $_bg );
+
+		endif;
+	}
 }

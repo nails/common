@@ -31,8 +31,12 @@ class NAILS_Scale extends Thumb
 	public function index()
 	{
 		//	We must have a bucket, object and extension in order to work with this
-		if ( ! $this->_bucket || ! $this->_object || ! $this->_extension )
+		if ( ! $this->_bucket || ! $this->_object || ! $this->_extension ) :
+
+			log_message( 'error', 'CDN: Scale: Missing _buvket, _object or _extension' );
 			return $this->_bad_src();
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -118,11 +122,16 @@ class NAILS_Scale extends Thumb
 					send_developer_mail( $_subject, $_message );
 
 				endif;
+
+			elseif( ! defined( 'CDN_PATH' ) ) :
+
+				log_message( 'error', 'CDN: Scale: CDN_PATH not defined' );
 			
 			else :
 			
 				//	This object does not exist.
-				return $this->_bad_src();
+				log_message( 'error', 'CDN: Scale: File not found; ' . CDN_PATH . $this->_bucket . '/' . $this->_object );
+				return $this->_bad_src( $this->_width, $this->_height );
 			
 			endif;
 			

@@ -46,7 +46,6 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 		
 		//	'Constant' variables
-		$this->_fail		= $this->_cdn_root . '_resources/img/fail.png';
 		$this->_man			= $this->_cdn_root . '_resources/img/avatar_man.png';
 		$this->_woman		= $this->_cdn_root . '_resources/img/avatar_woman.png';
 				
@@ -121,6 +120,15 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				case 'man' :
 				case 'm' :
 				case '1' :
+
+					$_src = $this->_man;
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				//	Fallback to a default avatar
+				//	TODO: Make this avatar gender neutral
 				default :
 				
 					$_src = $this->_man;
@@ -178,56 +186,12 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 			else :
 			
 				//	This object does not exist.
-				return $this->_bad_src();
+				log_message( 'error', 'CDN: Blank Avatar: File not found; ' . $_src );
+				return $this->_bad_src( $this->_width, $this->_height );
 			
 			endif;
 			
 		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Generate a fail image
-	 *
-	 * @access	public
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	protected function _bad_src()
-	{
-		//	Create the icon
-		$_icon = @imagecreatefrompng( $this->_fail );
-		$_icon_w = imagesx( $_icon );  
-		$_icon_h = imagesy( $_icon );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Create the background
-		$_bg	= imagecreatetruecolor( $this->_width, $this->_height );
-		$_white	= imagecolorallocate( $_bg, 255, 255, 255);
-		imagefill( $_bg, 0, 0, $_white );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Merge the two
-		$_center_x = ( $this->_width / 2 ) - ( $_icon_w / 2 );
-		$_center_y = ( $this->_height / 2 ) - ( $_icon_h / 2 );
-		imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Output to browser
-		header( 'Content-type: image/png' );
-		imagepng( $_bg );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Destroy the images
-		imagedestroy( $_icon );
-		imagedestroy( $_bg );
 	}
 	
 	

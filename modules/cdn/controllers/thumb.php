@@ -46,11 +46,6 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Bad src variables
-		$this->_fail		= $this->_cdn_root . '_resources/img/fail.png';
-		
-		// --------------------------------------------------------------------------
-		
 		//	Determine dynamic values
 		$this->_width		= $this->uri->segment( 3, 100 );
 		$this->_height		= $this->uri->segment( 4, 100 );
@@ -86,8 +81,12 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 	public function index()
 	{
 		//	We must have a bucket, object and extension in order to work with this
-		if ( ! $this->_bucket || ! $this->_object || ! $this->_extension )
+		if ( ! $this->_bucket || ! $this->_object || ! $this->_extension ) :
+
+			log_message( 'error', 'CDN: Thumb: Missing _bucket, _object or _extension' );
 			return $this->_bad_src();
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		
@@ -173,84 +172,19 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 					send_developer_mail( $_subject, $_message );
 
 				endif;
+
+			elseif( ! defined( 'CDN_PATH' ) ) :
+
+				log_message( 'error', 'CDN: Thumb: CDN_PATH not defined' ); 
 			
 			else :
 			
 				//	This object does not exist.
-				return $this->_bad_src();
+				log_message( 'error', 'CDN: Thumb: File not found; ' . CDN_PATH . $this->_bucket . '/' . $this->_object );
+				return $this->_bad_src( $this->_width, $this->_height );
 			
 			endif;
 			
-		endif;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Generate a fail image
-	 *
-	 * @access	public
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	protected function _bad_src()
-	{
-		if ( ! defined( 'CDN_PATH' ) ) :
-
-			header( 'Cache-Control: no-cache, must-revalidate' );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			header( 'Content-type: application/json' );
-			header( 'HTTP/1.0 400 Bad Request' );
-			
-			// --------------------------------------------------------------------------
-			
-			$_out = array(
-			
-				'status'	=> 400,
-				'message'	=> lang( 'cdn_not_configured' )
-			
-			);
-			
-			echo json_encode( $_out );
-
-		else :
-
-			//	Create the icon
-			$_icon = @imagecreatefrompng( $this->_fail );
-			$_icon_w = imagesx( $_icon );  
-			$_icon_h = imagesy( $_icon );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Create the background
-			$_bg	= imagecreatetruecolor( $this->_width, $this->_height );
-			$_white	= imagecolorallocate( $_bg, 255, 255, 255);
-			imagefill( $_bg, 0, 0, $_white );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Merge the two
-			$_center_x = ( $this->_width / 2 ) - ( $_icon_w / 2 );
-			$_center_y = ( $this->_height / 2 ) - ( $_icon_h / 2 );
-			imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Output to browser
-			header( 'Content-type: image/png' );
-			header( 'HTTP/1.1 404 Not Found' );
-			header( 'Cache-Control: no-cache, must-revalidate' );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			imagepng( $_bg );
-			
-			// --------------------------------------------------------------------------
-			
-			//	Destroy the images
-			imagedestroy( $_icon );
-			imagedestroy( $_bg );
-
 		endif;
 	}
 	
