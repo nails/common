@@ -66,52 +66,81 @@
 	<td class="actions">
 		<?php
 		
-			//	Actions,  only super users can do anything to other superusers
-			if ( ! $user->is_superuser() && isset( $member->acl['superuser'] ) && $member->acl['superuser'] ) :
+			//	Actions, only super users can do anything to other superusers
+			if ( ! $user->is_superuser() && $user->has_permission( 'superuser', $member ) ) :
 			
 				//	Member is a superuser and the admin is not a super user, no editing facility
 				echo '<span class="not-editable">' . lang( 'accounts_index_noteditable' ) . '</span>';
 			
 			else :
 			
-				$_return = $_SERVER['QUERY_STRING'] ? uri_string() . '?' . $_SERVER['QUERY_STRING'] : uri_string();
-				$_return = '?return_to=' . urlencode( $_return );
+				$_return	= $_SERVER['QUERY_STRING'] ? uri_string() . '?' . $_SERVER['QUERY_STRING'] : uri_string();
+				$_return	= '?return_to=' . urlencode( $_return );
+				$_buttons	= array();
 				
-				//	These buttons are always available
-				if ( $member->id != active_user( 'id' ) && $member->group_id != 1 && $member->group_id != active_user( 'group_id' ) ) :
+				// --------------------------------------------------------------------------
+
+				//	Login as?
+				if ( $member->id != active_user( 'id' ) && $user->has_permission( 'admin.accounts.can_login_as' ) ) :
 				
-					echo anchor( login_as_url( $member->id, $member->password ), lang( 'admin_login_as' ), 'class="awesome small grey"' );
+					$_buttons[] = login_as_button( $member->id, $member->password );
 					
 				endif;
-				
-				echo anchor( 'admin/accounts/edit/' . $member->id . $_return, lang( 'action_edit' ), 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
+
+				// --------------------------------------------------------------------------
+
+				//	Edit
+				if ( $member->id == active_user( 'id' ) || $user->has_permission( 'admin.accounts.can_edit_others' ) ) :
+
+					$_buttons[] = anchor( 'admin/accounts/edit/' . $member->id . $_return, lang( 'action_edit' ), 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
+
+				endif;
 				
 				// --------------------------------------------------------------------------
 				
-				//	These buttons are dynamic (based on user's state and admin's permissions)
+				//	Suspend user
 				if ( $member->is_suspended ) :
 				
-					echo anchor( 'admin/accounts/unsuspend/' . $member->id . $_return, lang( 'action_unsuspend' ), 'class="awesome small green"' );
+					if ( $user->has_permission( 'admin.accounts.unsuspend' ) ) :
+
+						$_buttons[] = anchor( 'admin/accounts/unsuspend/' . $member->id . $_return, lang( 'action_unsuspend' ), 'class="awesome small green"' );
+
+					endif;
 				
 				else :
 				
-					echo anchor( 'admin/accounts/suspend/' . $member->id . $_return, lang( 'action_suspend' ), 'class="awesome small red"' );
+					if ( $user->has_permission( 'admin.accounts.suspend' ) ) :
+
+						$_buttons[] = anchor( 'admin/accounts/suspend/' . $member->id . $_return, lang( 'action_suspend' ), 'class="awesome small red"' );
+
+					endif;
 				
 				endif;
 				
+				// --------------------------------------------------------------------------
+
+				//	Verify user
 				if ( $member->is_verified ) :
 				
-					echo anchor( 'admin/accounts/unverify/' . $member->id . $_return, lang( 'action_unverify' ), 'class="awesome small red"' );
+					if ( $user->has_permission( 'admin.accounts.unverify' ) ) :
+
+						$_buttons[] = anchor( 'admin/accounts/unverify/' . $member->id . $_return, lang( 'action_unverify' ), 'class="awesome small red"' );
+
+					endif;
 				
 				else :
 				
-					echo anchor( 'admin/accounts/verify/' . $member->id . $_return, lang( 'action_verify' ), 'class="awesome small green"' );
+					if ( $user->has_permission( 'admin.accounts.verify' ) ) :
+
+						$_buttons[] = anchor( 'admin/accounts/verify/' . $member->id . $_return, lang( 'action_verify' ), 'class="awesome small green"' );
+
+					endif;
 				
 				endif;
 				
 				if ( $user->has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) && $member->group_id != 1 ) :
 				
-					echo anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
+					$_buttons[] = anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
 				
 				endif;
 				
@@ -120,9 +149,26 @@
 				//	These buttons are variable between views
 				foreach ( $actions AS $button ) :
 				
-					echo anchor( $button['url'] . $_return, $button['label'], 'class="awesome small ' . $button['class'] . '"' );
+					$_buttons[] = anchor( $button['url'] . $_return, $button['label'], 'class="awesome small ' . $button['class'] . '"' );
 					
 				endforeach;
+
+				// --------------------------------------------------------------------------
+
+				//	Render all the buttons, if any
+				if ( $_buttons ) :
+
+					foreach ( $_buttons AS $button ) :
+
+						echo $button;
+
+					endforeach;
+
+				else :
+
+					echo '<span class="not-editable">' . lang( 'accounts_index_noactions' ) . '</span>';
+
+				endif;
 				
 			endif;
 		

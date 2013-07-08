@@ -402,7 +402,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 * 
 	 **/
-	public function has_permission( $permission = NULL, $user = NULL )
+	public function has_permission( $permission = NULL, &$user = NULL )
 	{
 		//	Fetch the correct ACL
 		if ( is_numeric( $user ) ) :

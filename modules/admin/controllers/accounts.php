@@ -36,7 +36,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 *
 	 * @access	static
 	 * @param	none
-	 * @return	void
+	 * @return	mixed
 	 * @author	Pablo
 	 **/
 	static function announce()
@@ -76,7 +76,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 *
 	 * @access	static
 	 * @param	none
-	 * @return	void
+	 * @return	array
 	 * @author	Pablo
 	 **/
 	static function notifications()
@@ -92,6 +92,33 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		return $_notifications;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns an array of extra permissions which can be specified
+	 *
+	 * @access	static
+	 * @param	none
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	static function permissions()
+	{
+		$_permissions = array();
+		
+		// --------------------------------------------------------------------------
+		
+		//	Define some basic extra permissions
+		$_permissions['can_login_as']		= 'Can log in as another user';
+		$_permissions['can_edit_others']	= 'Can edit other users';
+		
+		// --------------------------------------------------------------------------
+		
+		return $_permissions;
 	}
 	
 	
@@ -390,13 +417,23 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		endif;
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			$_return_to = $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/dashboard';
 			redirect( $_return_to );
 			return;
 		
+		endif;
+
+		//	Is this user editing someone other than themselves? If so, do they have permission?
+		if ( active_user( 'id' ) != $_user->id && ! $this->user->has_permission( 'admin.accounts.can_edit_others' ) ) :
+
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
+			$_return_to = $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/dashboard';
+			redirect( $_return_to );
+			return;
+
 		endif;
 		
 		// --------------------------------------------------------------------------
@@ -915,7 +952,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -972,7 +1009,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -1028,7 +1065,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -1085,7 +1122,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -1140,7 +1177,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
+		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
 		
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -1191,8 +1228,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		else :
 		
 			//	Non-superusers editing superusers is not cool
-			if ( ! $this->user->is_superuser() && isset( $_user->acl['superuser'] ) && $_user->acl['superuser'] ) :
-			
+			if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
+
 				$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 				redirect( $_return_to );
 				return;

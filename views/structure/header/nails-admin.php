@@ -107,7 +107,7 @@
 			foreach ( $loaded_modules AS $module => $config ) :
 				
 				//	Get any notifications for this module if applicable
-				$_notifications = method_exists( $module, 'notifications') ? $module::notifications() : array();
+				$_notifications = $module::notifications();
 
 				$_class = '';
 				
@@ -134,7 +134,7 @@
 
 
 				$_options = array();
-
+				
 				foreach( $config->funcs AS $method => $label ) :
 
 					$_temp						= new stdClass();

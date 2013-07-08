@@ -58,12 +58,12 @@ class NAILS_Admin_Model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @param	string	$module	The name of the module to search for
-	 * @return	array
+	 * @return	stdClass
 	 * @author	Pablo
 	 **/
 	public function find_module( $module )
 	{
-		$_out = array();
+		$_out = new stdClass();
 		
 		// --------------------------------------------------------------------------
 		
@@ -74,12 +74,12 @@ class NAILS_Admin_Model extends NAILS_Model
 			
 				require_once $path . $module . '.php';
 				
-				$_details = $this->_exec_announcer( $module );
+				$_details = $module::announce();
 				
 				if ( $_details ) :
 				
-					$_out = $_details;
-					$_out->class_name = $module;
+					$_out				= $_details;
+					$_out->class_name	= $module;
 					
 					//	List the public methods of this module (can't rely on the ['funcs'] array as it
 					//	might not list a method which the active user needs in their ACL)
@@ -116,23 +116,28 @@ class NAILS_Admin_Model extends NAILS_Model
 					
 					endforeach;
 					
+					// --------------------------------------------------------------------------
+
 					//	Build the methods array so that the method names are the keys
-					$_details->methods = array();
+					$_out->methods = array();
 					foreach ( $_methods AS $method ) :
 					
-						if ( isset( $_details->funcs[$method] ) ) :
+						if ( isset( $_out->funcs[$method] ) ) :
 						
-							$_details->methods[$method] =  $_details->funcs[$method];
+							$_out->methods[$method] =  $_out->funcs[$method];
 						
 						else :
 						
-							$_details->methods[$method] =  '<em style="font-style:italic">' . ucwords( str_replace( '_', ' ', $method ) ) . '</em> <span style="color:#999;">- ' . lang( 'admin_nav_unlisted' ) . '</span>';
+							$_out->methods[$method] =  '<em style="font-style:italic">' . ucwords( str_replace( '_', ' ', $method ) ) . '</em> <span style="color:#999;">- ' . lang( 'admin_nav_unlisted' ) . '</span>';
 						
 						endif;
 					
 					endforeach;
 					
-					break;
+					// --------------------------------------------------------------------------
+
+					//	Any extra permissions?
+					$_out->extra_permissions = $module::permissions();
 					
 				endif;
 			
@@ -141,25 +146,8 @@ class NAILS_Admin_Model extends NAILS_Model
 		endforeach;
 		
 		// --------------------------------------------------------------------------
-		
+
 		return $_out;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Execute the module announcer if it exists
-	 *
-	 * @access	public
-	 * @param	string	$class	The name of the class we're announcing
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	protected function _exec_announcer( $class )
-	{
-		return method_exists( $class, 'announce' ) ? $class::announce() : NULL;
 	}
 }
 

@@ -17,13 +17,13 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	
 	
 	/**
-	* Common constructor for all admin pages
-	* 
-	* @access	public
-	* @return	void
-	* @author	Pablo
-	* 
-	**/
+	 * Common constructor for all admin pages
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
 	public function __construct()
 	{
 		parent::__construct();
@@ -174,7 +174,17 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	static function _can_access( $module, $file )
+	/**
+	 * Determines wether the active_user() can access the specified module
+	 * 
+	 * @access	static
+	 * @param	$module A reference to the module definition
+	 * @param	$file The file we're checking
+	 * @return	mixed
+	 * @author	Pablo
+	 * 
+	 **/
+	static function _can_access( &$module, $file )
 	{
 		$_acl		= active_user( 'acl' );
 		$_module	= basename( $file, '.php' );
@@ -207,15 +217,15 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	
 	
 	/**
-	* Loop through the enabled modules and see if a controller exists for it; if
-	* it does load it up and execute the annouce static method to see if we can
-	* display it to the active user.
-	* 
-	* @access	public
-	* @return	void
-	* @author	Pablo
-	* 
-	**/
+	 * Loop through the enabled modules and see if a controller exists for it; if
+	 * it does load it up and execute the annouce static method to see if we can
+	 * display it to the active user.
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
 	private function _load_active_modules()
 	{
 		$_modules = get_loaded_modules();
@@ -231,12 +241,63 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		
 			$_module = $this->admin_model->find_module( $module );
 			
-			if ( $_module ) :
+			if ( (array) $_module ) :
 			
 				$this->_loaded_modules[$module] = $_module;
 				
 			endif;
 		
 		endforeach;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Basic definition of the announce() static method
+	 * 
+	 * @access	public
+	 * @return	NULL
+	 * @author	Pablo
+	 * 
+	 **/
+	static function announce()
+	{
+		return NULL;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Basic definition of the notifications() static method
+	 * 
+	 * @access	public
+	 * @return	array
+	 * @author	Pablo
+	 * 
+	 **/
+	static function notifications()
+	{
+		return array();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Basic definition of the permissions() static method
+	 * 
+	 * @access	public
+	 * @return	array
+	 * @author	Pablo
+	 * 
+	 **/
+	static function permissions()
+	{
+		return array();
 	}
 }

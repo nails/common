@@ -73,28 +73,29 @@ class NAILS_Override extends NAILS_Auth_Controller
 		//	Check sign-in permissions; ignore if recovering.
 		//	Users cannot:
 		//	- Sign in as themselves
-		//	- Sign in as superusers or admins (groups 0 and 1)
-		//	- Sign in as someone of the same group
+		//	- Sign in as superusers (unless they are a superuser)
 		
 		if ( ! $this->session->userdata( 'admin_recovery' ) ) :
 		
-			$_cloning	= ( active_user( 'id' ) == $_u->id );
-			$_superuser	= ( isset( $_u->acl['superuser'] ) && $_u->acl['superuser'] );
-			$_group		= ( active_user( 'group_id' ) == $_u->group_id );
+			$_permission	= $this->user->has_permission( 'admin.accounts.can_login_as' );
+			$_cloning		= active_user( 'id' ) == $_u->id ? TRUE : FALSE;
+			$_superuser		= ! $this->user->has_permission( 'superuser' ) && $this->user->has_permission( 'superuser', $_u ) ? TRUE : FALSE;
+
+			if ( ! $_permission || $_cloning || $_superuser ) :
 			
-			if ( $_cloning || $_superuser || $_group ) :
-			
-				if ( $_cloning ) :
+				if ( ! $_permission ) :
+
+					$this->session->set_flashdata( 'error', lang( 'auth_override_fail_nopermission' ) );
+					redirect( 'admin/dashboard' );
+					return;
+
+				elseif ( $_cloning ) :
 				
 					show_error( lang( 'auth_override_fail_cloning' ) );
 					
 				elseif ( $_superuser ) :
 				
 					show_error( lang( 'auth_override_fail_superuser' ) );
-				
-				elseif ( $_group ) :
-				
-					show_error( lang( 'auth_override_fail_group' ) );
 				
 				endif;
 				

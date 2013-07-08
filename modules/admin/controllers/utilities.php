@@ -281,8 +281,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		
 		endif;
 		
-		$this->data['admin_modules'] = $this->_loaded_modules;
-		
 		// --------------------------------------------------------------------------
 		
 		//	Page title

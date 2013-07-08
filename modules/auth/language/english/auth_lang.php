@@ -49,9 +49,9 @@
 	$lang['auth_override_invalid']						= 'Sorry, the supplied credentials failed validation.';
 	$lang['auth_override_ok']							= 'You were successfully logged in as <strong>%s</strong>';
 	$lang['auth_override_return']						= '<strong>Welcome back!</strong> You successfully logged back in as <strong>%s</strong>';
+	$lang['auth_override_fail_nopermission']			= '<strong>Sorry,</strong> you do not have permission to sign in as other users.';
 	$lang['auth_override_fail_cloning']					= 'You cannot sign in as this person. For security we do not allow users to sign in as themselves for a second time; doing so will cause a break in the space-time continuum. I don\'t believe you want to be responsible for that now, do you?';
 	$lang['auth_override_fail_superuser']				= 'You cannot sign in as this person. For security we do not allow users to sign in as superusers; doing so will cause a break in the space-time continuum. I don\'t believe you want to be responsible for that now, do you?';
-	$lang['auth_override_fail_group']					= 'You cannot sign in as this person. For security we do not allow users to sign in as users who are of the same user type; doing so will cause a break in the space-time continuum. I don\'t believe you want to be responsible for that now, do you?';
 	
 	//	Auth_model lang strings
 	$lang['auth_login_fail_missing_field']				= '<strong>Sorry,</strong> a required field was missing.';

@@ -111,7 +111,7 @@
 				$_visible = $_field['default'] ? 'none' : 'block';
 				echo '<div id="toggle-superuser" style="display:' . $_visible . ';">';
 				
-				foreach ( $admin_modules AS $module => $detail ) : 
+				foreach ( $loaded_modules AS $module => $detail ) : 
 				
 					$_module_hash = md5( serialize( $module ) );
 					
@@ -175,10 +175,41 @@
 						echo form_checkbox( $_options['key'], TRUE, $_selected, 'class="admin_check method ' . $method . ' ' . $_module_hash  . '"' ) . '<span class="text">' . $_options['label'] . '</span>';
 						
 						echo '</label>';
-						echo '<div class="clear"></div>';
 					
 					endforeach;
+
+					// --------------------------------------------------------------------------
+
+					//	Any extra permissions to render?
+					foreach ( $detail->extra_permissions AS $permission => $label ) :
+
+						echo '<label>';
+						echo '<span class="label">&nbsp;</span>';
+
+						$_options = array(
+							'key'		=> 'acl[admin][' . $module . '][' . $permission . ']',
+							'value'		=> TRUE,
+							'label'		=> $label,
+							'selected'	=> isset( $group->acl['admin'][$module][$permission] ) ? TRUE : FALSE
+						);
+						
+						if ( $this->input->post() ) :
+						
+							$_selected = isset( $_acl_post['admin'][$module][$permission] ) ? TRUE : FALSE;
+						
+						else :
+						
+							$_selected = isset( $group->acl['admin'][$module][$permission] ) ? TRUE : FALSE;
+						
+						endif;
+						
+						echo form_checkbox( $_options['key'], TRUE, $_selected, 'class="admin_check method ' . $permission . ' ' . $_module_hash  . '"' ) . '<span class="text">' . $label . '</span>';
+
+						echo '</label>';
+
+					endforeach;
 					
+					echo '<div class="clear"></div>';
 					echo '</div>';
 			
 				endforeach;

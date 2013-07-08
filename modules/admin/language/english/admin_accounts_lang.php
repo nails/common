@@ -38,6 +38,7 @@
 	$lang['accounts_index_last_nologins']		= 'Last login: Never Logged In';
 	
 	$lang['accounts_index_noteditable']			= 'You do not have permission to perform manipulations on this user.';
+	$lang['accounts_index_noactions']			= 'There are no actions you can perform on this user.';
 	
 	// --------------------------------------------------------------------------
 	

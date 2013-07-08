@@ -12,28 +12,36 @@ if ( ! function_exists( 'login_as_url' ) )
 {
 	function login_as_url( $uid, $upassword )
 	{
-		//	Generate the return string
-		$_url = uri_string();
-		if ( $_GET ) :
+		if ( get_instance()->user->has_permission( 'admin.accounts.can_login_as' ) ) :
 
-			//	Remove common problematic GET vars (for instance, we don't want is_fancybox when we return)
-			$_get = $_GET;
-			unset( $_get['is_fancybox'] );
-			unset( $_get['inline'] );
+			//	Generate the return string
+			$_url = uri_string();
+			if ( $_GET ) :
 
-			if ( $_get ) :
+				//	Remove common problematic GET vars (for instance, we don't want is_fancybox when we return)
+				$_get = $_GET;
+				unset( $_get['is_fancybox'] );
+				unset( $_get['inline'] );
 
-				$_url .= '?' . http_build_query( $_get );
+				if ( $_get ) :
+
+					$_url .= '?' . http_build_query( $_get );
+
+				endif;
 
 			endif;
+			
+			$_return_string = '?return_to=' . urlencode( $_url );
+			
+			// --------------------------------------------------------------------------
+			
+			return site_url( 'auth/override/login_as/' . md5( $uid ) . '/' . md5( $upassword ) . $_return_string );
+
+		else :
+
+			return '';
 
 		endif;
-		
-		$_return_string = '?return_to=' . urlencode( $_url );
-		
-		// --------------------------------------------------------------------------
-		
-		return site_url( 'auth/override/login_as/' . md5( $uid ) . '/' . md5( $upassword ) . $_return_string );
 	}
 }
 
@@ -51,10 +59,18 @@ if ( ! function_exists( 'login_as_url' ) )
  */
 if ( ! function_exists( 'login_as_button' ) )
 {
-	function login_as_button( $uid, $upassword, $text = '', $attr = 'class="awesome small"' )
+	function login_as_button( $uid, $upassword, $text = '', $attr = 'class="awesome small grey"' )
 	{
-		$text =  ! $text ? lang( 'admin_login_as' ) : $text;
-		return anchor( login_as_url( $uid, $upassword ), $text, $attr );
+		if ( get_instance()->user->has_permission( 'admin.accounts.can_login_as' ) ) :
+
+			$text =  ! $text ? lang( 'admin_login_as' ) : $text;
+			return anchor( login_as_url( $uid, $upassword ), $text, $attr );
+
+		else :
+
+			return '';
+
+		endif;
 	}
 }
 
