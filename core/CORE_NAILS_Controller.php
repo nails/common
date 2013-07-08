@@ -123,8 +123,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
 		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
 		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
-		if ( ! defined( 'NAILS_STAGING_USER') )				define( 'NAILS_STAGING_USER',			'' );
-		if ( ! defined( 'NAILS_STAGING_PASS') )				define( 'NAILS_STAGING_PASS',			'' );
+		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		'' );
 		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
 
 		// --------------------------------------------------------------------------
@@ -202,7 +201,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _staging()
 	{
-		if ( ENVIRONMENT == 'staging' && ( ( APP_STAGING_USER && APP_STAGING_PASS ) || ( NAILS_STAGING_USER && NAILS_STAGING_PASS ) ) ) :
+		$_users_nails	= @unserialize( NAILS_STAGING_USERPASS );
+		$_users_app		= @unserialize( APP_STAGING_USERPASS );
+
+		if ( ENVIRONMENT == 'staging' && ( $_users_nails || $_users_app ) ) :
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
@@ -212,7 +214,17 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
 
-				if ( ( APP_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || APP_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) && ( NAILS_STAGING_USER != $_SERVER['PHP_AUTH_USER'] || NAILS_STAGING_PASS != $_SERVER['PHP_AUTH_PW'] ) ) :
+				//	Determine the users
+				$_users			= array_filter( array_merge( (array) $_users_nails, (array) $_users_app ) );
+				$_user_check	= array();
+
+				foreach ( $_users AS $user ) :
+
+					$_user_check[$user[0]] = $user[1];
+
+				endforeach;
+
+				if ( ! isset( $_user_check[$_SERVER['PHP_AUTH_USER']] ) || $_user_check[$_SERVER['PHP_AUTH_USER']] != $_SERVER['PHP_AUTH_PW'] ) :
 
 					$this->_staging_request_credentials();
 
