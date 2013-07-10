@@ -606,25 +606,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				
 				foreach ( $_uploads AS $upload ) :
 				
-					$_options		= array();
-					$_validation	= explode( '|', $upload['validation'] );
-					
-					// --------------------------------------------------------------------------
-					
-					if ( array_search( 'is_img', $_validation ) !== FALSE )
-						$_options['allowed_types']	= 'jpg|png|gif';
-					
-					// --------------------------------------------------------------------------
-					
-					foreach ( $_validation AS $rule ) :
-					
-						if ( preg_match( '/^max_size\[(\d+)\]/', $rule, $m ) ) :
-						
-							$_options['max_size']	= $m[1];
-						
-						endif;
-					
-					endforeach;
+					$_validation = explode( '|', $upload['validation'] );
 					
 					// --------------------------------------------------------------------------
 					
@@ -648,11 +630,18 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					//	File has been supplied, process and return any errors.
 					else :
 					
-						$_filename = $this->cdn->upload( $upload['col'], $upload['bucket'], $_options );
+						$_options						= array();
+						$_options['attachment']			= new stdClass();
+						$_options['attachment']->label	= $upload['label'];
+						$_options['attachment']->table	= 'user_meta';
+						$_options['attachment']->col	= $upload['col'];
+						$_options['attachment']->id		= $_post['id'];
+
+						$_object = $this->cdn->object_create( $upload['col'], $upload['bucket'], $_options );
 					
 						// --------------------------------------------------------------------------
 						
-						if ( ! $_filename ) :
+						if ( ! $_object ) :
 						
 							//	File failed to upload
 							$_failed['key']		= $upload['col'];
@@ -665,7 +654,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						
 							//	File uploaded without a problem.
 							$_successes[$upload['col']]				= array();
-							$_successes[$upload['col']]['new']		= $_filename;
+							$_successes[$upload['col']]['new']		= $_object->id;
 							$_successes[$upload['col']]['old']		= $_user->{$upload['col']} ;
 							$_successes[$upload['col']]['bucket']	= $upload['bucket'];
 						
@@ -691,16 +680,28 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				if ( isset( $_FILES['profile_img'] ) && $_FILES['profile_img']['error'] != 4 ) :
 					
 					$this->load->library( 'cdn' );
+
+					$_object = $this->cdn->object_replace( $_user->profile_img, 'profile-images', 'profile_img' );
 					
-					$_options					= array();
-					$_options['allowed_types']	= 'jpg|png|gif';
-					$_options['max_size']		= 2097152;	//	2Mb
+					if ( $_object ) :
 					
-					$_filename = $this->cdn->replace( $_user->profile_img, 'profile-images', 'profile_img', $_options );
-					
-					if ( $_filename ) :
-					
-						$_data['profile_img'] = $_filename;
+						$_data['profile_img'] = $_object->id;
+
+						// --------------------------------------------------------------------------
+
+						//	Make sure an attachment exists
+						$_attachment					= array();
+						$_attachment['label']			= 'Profile Image';
+						$_attachment['table']			= 'user';
+						$_attachment['col']				= 'profile_img';
+						$_attachment['attached_to_id']	= $_post['id'];
+						$_attachment['select_cols']		= 'first_name,last_name';
+
+						//	Remove any old attachments
+						$this->cdn->object_attachment_purge( $_attachment );
+
+						//	Add new attachment
+						$this->cdn->object_attachment_add( $_object->id, $_attachment );
 					
 					else :
 					
@@ -874,7 +875,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		if ( module_is_enabled( 'cdn' ) ) :
 
 			$this->load->library( 'cdn' );
-			$this->data['user_uploads'] = $this->cdn->list_objects_for_user( $_user->id );
+			$this->data['user_uploads'] = $this->cdn->get_objects_for_user( $_user->id );
 
 		endif;
 		

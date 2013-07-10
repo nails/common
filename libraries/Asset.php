@@ -551,10 +551,13 @@ class Asset {
 	{
 		$out = '';
 		foreach ( $this->js_inline AS $asset ) :
-			$out .= $asset."\n";
+
+			$out .= $asset . "\n";
+
 		endforeach;
+
 		$out = preg_replace( '/<\/?script.*?>/si', '', $out );
-		return $out;
+		
 		return '<script type="text/javascript">'.$out.'</script>';
 	}
 }

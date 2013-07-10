@@ -15,7 +15,7 @@
  * 
  **/
 
-//	Include _cdn_local.php; executes common functionality
+//	Include _cdn.php; executes common functionality
 require_once '_cms.php';
 
 class NAILS_Render extends NAILS_CMS_Controller

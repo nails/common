@@ -5,7 +5,7 @@
 		
 			if ( $member->profile_img ) :
 			
-				echo anchor( cdn_serve( 'profile-images', $member->profile_img ), img( array( 'src' => cdn_thumb( 'profile-images', $member->profile_img, 65, 65 ), 'class' => 'profile-img' ) ), 'class="fancybox"' );
+				echo anchor( cdn_serve( $member->profile_img ), img( array( 'src' => cdn_thumb( $member->profile_img, 65, 65 ), 'class' => 'profile-img' ) ), 'class="fancybox"' );
 			
 			else :
 			

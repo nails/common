@@ -12,7 +12,7 @@
 	$lang['admin_word_long']		= 'Administration';
 	$lang['admin_home']				= 'Home';
 	$lang['admin_switch_frontend']	= 'Switch to Front End';
-	$lang['admin_loggedin_as']		= 'Logged in as <a href="%s">%s</a>';
+	$lang['admin_loggedin_as']		= 'Logged in as <a href="%s" class="fancybox" data-fancybox-type="iframe">%s</a>';
 	$lang['admin_admin_recover']	= ', log back in as <a href="%s">%s</a>';
 	
 	// --------------------------------------------------------------------------

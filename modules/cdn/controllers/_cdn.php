@@ -95,10 +95,10 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	{
 		if ( ! defined( 'CDN_PATH' ) ) :
 
-			header( 'Cache-Control: no-cache, must-revalidate' );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			header( 'Content-type: application/json' );
-			header( 'HTTP/1.0 400 Bad Request' );
+			$this->output->set_header( 'Cache-Control: no-cache, must-revalidate' );
+			$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+			$this->output->set_header( 'Content-type: application/json' );
+			$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
 			
 			// --------------------------------------------------------------------------
 			
@@ -109,7 +109,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 			
 			);
 			
-			echo json_encode( $_out );
+			$this->output->set_output( json_encode( $_out ) );
 
 		else :
 
@@ -136,6 +136,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 			
 			//	Output to browser
 			header( 'Content-type: image/png' );
+			header( 'HTTP/1.0 400 Bad Request' );
 			imagepng( $_bg );
 			
 			// --------------------------------------------------------------------------

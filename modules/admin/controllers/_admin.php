@@ -168,6 +168,23 @@ class NAILS_Admin_Controller extends NAILS_Controller
 			$this->asset->load( 'admin.css' );
 		
 		endif;
+
+		//	Inline assets
+		$_js  = 'var _nails,_nails_admin;';
+		$_js .= '$(function(){';
+
+		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';
+		$_js .= '_nails = new NAILS_JS();';
+		$_js .= '_nails.init();}';
+
+
+		$_js .= 'if ( typeof( NAILS_Admin ) === \'function\' ){';
+		$_js .= '_nails_admin = new NAILS_Admin();';
+		$_js .= '_nails_admin.init();}';
+
+		$_js .= '});';
+
+		$this->asset->inline( '<script>' . $_js . '</script>' );
 	}
 	
 	

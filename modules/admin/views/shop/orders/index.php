@@ -58,8 +58,39 @@
 							<td class="actions">
 								<?php
 
-									echo anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
-									echo anchor( 'admin/shop/orders/reprocess/' . $order->id, 'Process', 'class="awesome small confirm" data-confirm="Are you sure?\n\nProcessing the order again may result in multiple dispatch of items."' );
+									//	Render buttons
+									$_buttons = array();
+
+									// --------------------------------------------------------------------------
+
+									if ( $user->has_permission( 'admin.shop.orders_view' ) ) :
+
+										$_buttons[] = anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									if ( $user->has_permission( 'admin.shop.orders_reprocess' ) ) :
+
+										$_buttons[] = anchor( 'admin/shop/orders/reprocess/' . $order->id, 'Process', 'class="awesome small confirm" data-confirm="Are you sure?\n\nProcessing the order again may result in multiple dispatch of items."' );
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									if ( $_buttons ) :
+
+										foreach ( $_buttons aS $button ) :
+
+											echo $button;
+
+										endforeach;
+									else :
+
+										echo '<span class="blank">There are no actions you can perform on this item.</span>';
+
+									endif;
 
 								?>
 							</td>

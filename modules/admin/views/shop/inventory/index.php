@@ -1,6 +1,15 @@
 <div class="group-shop inventory browse">
 	<p>
 		Browse the shop's inventory.
+		<?php
+
+			if ( $user->has_permission( 'admin.shop.inventory_create' ) ) :
+
+				echo anchor( 'admin/shop/inventory/create', 'Add New Item', 'class="awesome small green right"' );
+
+			endif;
+
+		?>
 	</p>
 
 	<?php
@@ -81,8 +90,38 @@
 							<td class="actions">
 								<?php
 
-									echo anchor( 'admin/shop/inventory/view/' . $item->id, lang( 'action_edit' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
-									echo anchor( 'admin/shop/inventory/delete/' . $item->id, lang( 'action_delete' ), 'class="awesome small red confirm" date-confirm="Are you sure?"' );
+									//	Render buttons
+									$_buttons = array();
+
+									if ( $user->has_permission( 'admin.shop.edit' ) ) : 
+
+										$_buttons[] = anchor( 'admin/shop/inventory/edit/' . $item->id, lang( 'action_edit' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									if ( $user->has_permission( 'admin.shop.delete' ) ) : 
+
+										$_buttons[] = anchor( 'admin/shop/inventory/delete/' . $item->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-confirm="Are you sure?"' );
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									if ( $_buttons ) :
+
+										foreach ( $_buttons aS $button ) :
+
+											echo $button;
+
+										endforeach;
+
+									else :
+
+										echo '<span class="blank">There are no actions you can perform on this item.</span>';
+
+									endif;
 
 								?>
 							</td>

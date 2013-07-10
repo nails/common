@@ -1,4 +1,20 @@
-<!DOCTYPE html>
+<?php
+
+	$_filter_view = $this->input->get( 'filter-view' );
+
+	if ( ! $_filter_view ) :
+
+		$_filter_view = $this->session->userdata( 'cdn-manager-view' );
+
+		if ( ! $_filter_view ) :
+
+			$_filter_view = 'thumb';
+
+		endif;
+
+	endif;
+
+?><!DOCTYPE html>
 <html>
 	<head>
 		<title>Media Manager</title>
@@ -182,13 +198,13 @@
 										//	Filter out any existing filter-view=
 										$_uri		 = preg_replace( '/&{1,}filter\-view=([a-z]*)/', '', $_uri_raw );
 										
-										$_selected = ! $this->input->get( 'filter-view' ) ? 'selected ' . $_selected . '' : '';
-										echo anchor( preg_replace( '/&{1,}$/', '', $_uri ), 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
+										$_selected = $_filter_view == 'thumb' ? 'selected ' . $_selected . '' : '';
+										echo anchor( $_uri . 'filter-view=thumb', 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
 										
-										$_selected = $this->input->get( 'filter-view' ) == 'list' ? 'selected' : '';
+										$_selected = $_filter_view == 'list' ? 'selected' : '';
 										echo anchor( $_uri . 'filter-view=list', 'List', 'class="list ' . $_selected . '"' );
 										
-										$_selected = $this->input->get( 'filter-view' ) == 'detail' ? 'selected' : '';
+										$_selected = $_filter_view == 'detail' ? 'selected' : '';
 										echo anchor( $_uri . 'filter-view=detail', 'Details', 'class="detail ' . $_selected . '"' );
 									?>
 								</span>
@@ -206,11 +222,12 @@
 									if ( $bucket->objects ) :
 									
 										foreach ( $bucket->objects AS $object ) :
-											
-											switch ( $this->input->get( 'filter-view' ) ) :
+
+											switch ( $_filter_view ) :
 											
 												case 'detail' :
 												
+													$this->session->set_userdata( 'cdn-manager-view', 'detail' );
 													$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object ) );
 												
 												break;
@@ -219,6 +236,7 @@
 												
 												case 'list' :
 												
+													$this->session->set_userdata( 'cdn-manager-view', 'list' );
 													$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object ) );
 												
 												break;
@@ -228,6 +246,7 @@
 												case 'thumb' :
 												default :
 												
+													$this->session->set_userdata( 'cdn-manager-view', 'thumb' );
 													$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object ) );
 												
 												break;
@@ -290,11 +309,11 @@
 				
 				var _urlscheme			= {};
 				
-				_urlscheme.serve		= '<?=CDN::cdn_serve_url_scheme()?>';
-				_urlscheme.thumb		= '<?=CDN::cdn_thumb_url_scheme()?>';
-				_urlscheme.scale		= '<?=CDN::cdn_scale_url_scheme()?>';
-				_urlscheme.placeholder	= '<?=CDN::cdn_placeholder_url_scheme()?>';
-				_urlscheme.blank_avatar	= '<?=CDN::cdn_blank_avatar_url_scheme()?>';
+				_urlscheme.serve		= '<?=$this->cdn->url_serve_scheme()?>';
+				_urlscheme.thumb		= '<?=$this->cdn->url_thumb_scheme()?>';
+				_urlscheme.scale		= '<?=$this->cdn->url_scale_scheme()?>';
+				_urlscheme.placeholder	= '<?=$this->cdn->url_placeholder_scheme()?>';
+				_urlscheme.blank_avatar	= '<?=$this->cdn->url_blank_avatar_scheme()?>';
 				
 				_manager = new NAILS_CDN_Manager();
 				<?php

@@ -3,27 +3,19 @@
 	echo '<li class="file list" data-title="' . $object->filename_display . '" data-id="' . $object->id . '">';
 	
 		echo '<div class="filename">';
-		switch ( $object->mime ) :
-		
-			case 'image/jpg' :
-			case 'image/jpeg' :
-			case 'image/png' :
-			case 'image/gif' :
-			
-				echo img( cdn_thumb( $bucket->slug, $object->filename, 30, 30 ) );
+
+			if ( $object->is_img ) :
+
+				echo img( cdn_thumb( $object->id, 30, 30 ) );
 				$_action_download = 'View';
-			
-			break;
-			
-			default :
-			
+
+			else :
+
 				$_action_download = 'Download';
-			
-			break;
+
+			endif;
 		
-		endswitch;
-		
-		echo $object->filename_display;
+			echo $object->filename_display;
 		
 		echo '</div>';
 		
@@ -35,9 +27,10 @@
 		
 		echo '<div class="actions">';
 		
-			echo '<a href="#" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete"' );
-			echo '<a href="' . cdn_serve( $bucket->slug, $object->filename ) . '" class="fancybox awesome small">' . $_action_download . '</a>';
+			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
+			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments="' . count( $object->attachments ) . '"' );
+			echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
+			echo anchor( 'cdn/manager/attachments/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Attachments (' . count( $object->attachments ) . ')', 'class="fancybox awesome small" data-fancybox-type="iframe"' );
 		
 		echo '</div>';
 		

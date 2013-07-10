@@ -58,19 +58,27 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 	// --------------------------------------------------------------------------
 	
 	
+	public function upload()
+	{
+		here( active_user() );
+	}
+
+	// --------------------------------------------------------------------------
+
+
 	public function add_object_tag()
 	{
 		$_object_id	= $this->input->get( 'object_id' );
 		$_tag_id	= $this->input->get( 'tag_id' );
 		$_out		= array();
 		
-		$_added = $this->cdn->add_object_tag( $_object_id, $_tag_id );
+		$_added = $this->cdn->object_tag_add( $_object_id, $_tag_id );
 		
 		if ( $_added ) :
 		
 			//	Get new count for this tag
 			$_out = array(
-				'new_total'	=> $this->cdn->count_tag_objects( $_tag_id )
+				'new_total'	=> $this->cdn->object_tag_count( $_tag_id )
 			);
 		
 		else :
@@ -97,13 +105,13 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		$_tag_id	= $this->input->get( 'tag_id' );
 		$_out		= array();
 		
-		$_deleted = $this->cdn->delete_object_tag( $_object_id, $_tag_id );
+		$_deleted = $this->cdn->object_tag_delete( $_object_id, $_tag_id );
 		
 		if ( $_deleted ) :
 		
 			//	Get new count for this tag
 			$_out = array(
-				'new_total'	=> $this->cdn->count_tag_objects( $_tag_id )
+				'new_total'	=> $this->cdn->object_tag_count( $_tag_id )
 			);
 		
 		else :

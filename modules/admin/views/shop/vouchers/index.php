@@ -1,7 +1,15 @@
 <div class="group-shop vouchers browse">
 	<p>
 		Browse all vouchers (including gift cards) which are associated with the shop.
-		<?=anchor( 'admin/shop/vouchers/create', 'Create Voucher', 'class="awesome small green right"' )?>
+		<?php
+
+			if ( $user->has_permission( 'admin.shop.vouchers_create' ) ) :
+
+				echo anchor( 'admin/shop/vouchers/create', 'Create Voucher', 'class="awesome small green right"' );
+
+			endif;
+
+		?>
 	</p>
 
 	<?php
@@ -163,13 +171,41 @@
 							<td class="actions">
 								<?php
 								
+									$_buttons = array();
+
+									// --------------------------------------------------------------------------
+
 									if ( $voucher->is_active ) :
 
-										echo anchor( 'admin/shop/vouchers/deactivate/' . $voucher->id, 'Suspend', 'class="awesome small red confirm"' );
+										if ( $user->has_permission( 'admin.shop.vouchers_deactivate' ) ) :
+
+											$_buttons[] = anchor( 'admin/shop/vouchers/deactivate/' . $voucher->id, 'Suspend', 'class="awesome small red confirm"' );
+
+										endif;
 
 									else :
 
-										echo anchor( 'admin/shop/vouchers/activate/' . $voucher->id, 'Activate', 'class="awesome small green"' );
+										if ( $user->has_permission( 'admin.shop.vouchers_activate' ) ) :
+
+											$_buttons[] = anchor( 'admin/shop/vouchers/activate/' . $voucher->id, 'Activate', 'class="awesome small green"' );
+
+										endif;
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									if ( $_buttons ) :
+
+										foreach ( $_buttons AS $button ) :
+
+											echo $button;
+
+										endforeach;
+
+									else :
+
+										echo '<span class="blank">There are no actions you can do on this item.</span>';
 
 									endif;
 

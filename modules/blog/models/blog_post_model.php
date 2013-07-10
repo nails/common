@@ -126,6 +126,30 @@ class NAILS_Blog_post_model extends NAILS_Model
 			endif;
 
 			// --------------------------------------------------------------------------
+
+			//	If there was an image attached to this post make sure there's an attachment
+			//	registered in the CDN
+
+			if ( $data['image'] ) :
+
+				$this->load->library( 'cdn' );
+
+				$_attachment					= array();
+				$_attachment['label']			= 'Blog Post Image';
+				$_attachment['table']			= 'blog_post';
+				$_attachment['col']				= 'image';
+				$_attachment['attached_to_id']	= $_id;
+				$_attachment['select_cols']		= 'title';
+
+				if ( ! $this->cdn->object_attachment_exists( $data['image'], $_attachment ) ) :
+
+					$this->cdn->object_attachment_add( $data['image'], $_attachment );
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
 		
 			return $_id;
 		
@@ -270,6 +294,43 @@ class NAILS_Blog_post_model extends NAILS_Model
 				endforeach;
 
 				$this->db->insert_batch( 'blog_post_tag', $_data );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Update any CDN attachments if nessecary
+
+		$this->load->library( 'cdn' );
+
+		$_attachment					= array();
+		$_attachment['label']			= 'Blog Post Image';
+		$_attachment['table']			= 'blog_post';
+		$_attachment['col']				= 'image';
+		$_attachment['attached_to_id']	= $id;
+		$_attachment['select_cols']		= 'title';
+
+		if ( isset( $data['image'] ) && $data['image'] ) :
+
+			if ( ! $this->cdn->object_attachment_repoint( $data['image'], $attachment ) ) :
+
+				//	No attachments were updated, add one if it doesn't exist
+				if ( ! $this->cdn->object_attachment_exists( $data['image'], $_attachment ) ) :
+
+					$this->cdn->object_attachment_add( $data['image'], $_attachment );
+
+				endif;
+
+			endif;
+
+		elseif ( isset( $data['image'] ) && ! $data['image'] && $data['image'] != $_current->image ) :
+
+			//	Data is set, but empty - delete any existing attachments
+			if ( $_current->image ) :
+
+				$this->cdn->object_attachment_delete( $_current->image, $_attachment );
 
 			endif;
 

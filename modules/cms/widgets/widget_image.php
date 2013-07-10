@@ -73,13 +73,14 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 	{
 		$_details = self::details();
 		
+		get_instance()->load->library( 'cdn' );
+
 		//	Include the slug as a hidden field, required for form rebuilding
 		$_out = form_hidden( $this->_key . '[slug]', $_details->slug );
 		
 		// --------------------------------------------------------------------------
 		
 		//	Return editor HTML
-
 		$_nonce		= uniqid();
 		$_bucket	= urlencode( get_instance()->encrypt->encode( 'cms|' . $_nonce , APP_PRIVATE_KEY ) );
 		$_hash		= md5( 'cms|' . $_nonce . '|' . APP_PRIVATE_KEY );
@@ -109,10 +110,15 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 		// --------------------------------------------------------------------------
 
 		//	Callback
+		$_url_scheme = get_instance()->cdn->url_serve_scheme();
+		$_url_scheme = str_replace( '{{bucket}}',	'cms',		$_url_scheme );
+		$_url_scheme = str_replace( '{{file}}',		'[[file]]',	$_url_scheme );
+
 		$_out .= '<script type="text/javascript">';
 		$_out .= '$(\'a.fancybox-' . $_nonce . '\').fancybox();';
-		$_out .= 'function callback_' . md5( $this->_key . $_nonce ) . '( file, bucket ) {';
-		$_out .= 'var _url = \'' . cdn_serve( 'cms', "' + file + '" ) . '\';';
+		$_out .= 'function callback_' . md5( $this->_key . $_nonce ) . '( file ) {';
+		$_out .= 'var _url = \'' . $_url_scheme . '\';';
+		$_out .= '_url = _url.replace( \'[[file]]\', file );';
 		$_out .= '$(\'#image-url-' . $_nonce . '\').val(_url);';
 		$_out .= '}';
 		$_out .= '</script>';

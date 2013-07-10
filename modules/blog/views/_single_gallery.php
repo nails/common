@@ -8,7 +8,7 @@
 		foreach ( $post->gallery AS $slide ) :
 
 			echo '<li class="slide">';
-			echo anchor( cdn_serve( 'blog', $slide->image_filename ), img( cdn_thumb( 'blog', $slide->image_filename, 100, 100 ) ), 'class="fancybox-gallery" data-fancybox-group="blog-post-gallery" title="' . $slide->image_caption . '"' );
+			echo anchor( cdn_serve( $slide->image_id ), img( cdn_thumb( $slide->image_id, 100, 100 ) ), 'class="fancybox-gallery" data-fancybox-group="blog-post-gallery" title="' . $slide->image_caption . '"' );
 			echo '</li>';
 
 		endforeach;

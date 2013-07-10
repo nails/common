@@ -94,6 +94,37 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
+	static function permissions()
+	{
+		$_permissions = array();
+
+		// --------------------------------------------------------------------------
+
+		//	Inventory
+		$_permissions['inventory_create']	= 'Inventory: Create';
+		$_permissions['inventory_edit']		= 'Inventory: Edit';
+		$_permissions['inventory_delete']	= 'Inventory: Delete';
+		$_permissions['inventory_restore']	= 'Inventory: Restore';
+
+		//	Orders
+		$_permissions['orders_view']		= 'Orders: View';
+		$_permissions['orders_reprocess']	= 'Orders: Reprocess';
+		$_permissions['orders_process']		= 'Orders: Process';
+
+		//	Vouchers
+		$_permissions['vouchers_create']		= 'Vouchers: Create';
+		$_permissions['vouchers_activate']		= 'Vouchers: Activate';
+		$_permissions['vouchers_deactivate']	= 'Vouchers: Deactivate';
+
+		// --------------------------------------------------------------------------
+
+		return $_permissions;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Constructor
 	 *
@@ -147,6 +178,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->load->model( 'shop/shop_model', 'shop' );
 		$this->load->model( 'shop/shop_currency_model', 'currency' );
 		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_tax_model', 'tax' );
 	}
 	
 	
@@ -166,6 +198,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			case 'create' :		$this->_inventory_create();		break;
 			case 'edit' :		$this->_inventory_edit();		break;
+			case 'delete' :		$this->_inventory_delete();		break;
+			case 'restore' :	$this->_inventory_restore();		break;
 			case 'index' :
 			default :			$this->_inventory_index();		break;
 
@@ -263,7 +297,39 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_create()
 	{
-		dump( 'create inventory' );
+		$this->data['page']->title = 'Add new Inventory Item';
+
+		// --------------------------------------------------------------------------
+
+		//	Process POST
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		$this->data['product_types']	= $this->product->get_product_types_flat();
+		$this->data['tax_rates']		= $this->tax->get_all_flat();
+		
+		array_unshift( $this->data['tax_rates'], 'No Tax');
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'nails.admin.shop.inventory.add.min.js', TRUE );
+		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/inventory/create',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
@@ -273,6 +339,24 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _inventory_edit()
 	{
 		dump( 'edit inventory' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _inventory_delete()
+	{
+		dump( 'delete inventory' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _inventory_restore()
+	{
+		dump( 'restore inventory' );
 	}
 	
 	
@@ -451,6 +535,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 **/
 	protected function _orders_view()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.orders_view' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to view order details.' );
+			redirect( 'admin/shop/orders' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Fetch and check order
 		$this->load->model( 'shop/shop_order_model', 'order' );
 
@@ -507,6 +601,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _orders_reprocess()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.orders_reprocess' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to reprocess orders.' );
+			redirect( 'admin/shop/orders' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Check order exists
 		$this->load->model( 'shop/shop_order_model', 'order' );
 		$_order = $this->order->get_by_id( $this->uri->segment( 5 ) );
@@ -556,6 +660,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _orders_process()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.orders_process' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to process order items.' );
+			redirect( 'admin/shop/orders' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_order_id		= $this->uri->segment( 5 );
 		$_product_id	= $this->uri->segment( 6 );
 		$_is_fancybox	= $this->input->get( 'is_fancybox' ) ? '?is_fancybox=true' : '';
@@ -756,6 +870,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_create()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.vouchers_create' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to create vouchers.' );
+			redirect( 'admin/shop/vouchers' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
 			$this->load->library( 'form_validation' );
@@ -1063,6 +1187,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_activate()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.vouchers_activate' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to activate vouchers.' );
+			redirect( 'admin/shop/vouchers' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_id = $this->uri->segment( 5 );
 
 		if ( $this->voucher->update( $_id, array( 'is_active' => TRUE ) ) ) :
@@ -1084,6 +1218,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_deactivate()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.vouchers_deactivate' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to suspend vouchers.' );
+			redirect( 'admin/shop/vouchers' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_id = $this->uri->segment( 5 );
 
 		if ( $this->voucher->update( $_id, array( 'is_active' => FALSE ) ) ) :
@@ -1098,70 +1242,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		redirect( 'admin/shop/vouchers' );
 	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Edit an existing product
-	 *
-	 * @access public
-	 * @param none
-	 * @return void
-	 **/
-	public function create()
-	{
-		//	Set method info
-		$this->data['page']->title = 'Add Product';
-		
-		// --------------------------------------------------------------------------
-		
-		//	Process POST
-		if ( $this->input->post() ) :
-		
-			//	TODO
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/inventory/create',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Edit an existing product
-	 *
-	 * @access public
-	 * @param none
-	 * @return void
-	 **/
-	public function edit()
-	{
-		//	Set method info
-		$this->data['page']->title = 'Edit Product ()';
-		
-		// --------------------------------------------------------------------------
-		
-		//	Process POST
-		if ( $this->input->post() ) :
-		
-			//	TODO
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
-	}
 
 
 	// --------------------------------------------------------------------------
@@ -1169,6 +1249,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	public function reports()
 	{
+		if ( ! $this->user->has_permission( 'admin.shop.reports' ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to generate reports.' );
+			redirect( 'admin/shop/vouchers' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Set method info
 		$this->data['page']->title = 'Generate Reports';
 		

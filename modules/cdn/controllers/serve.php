@@ -7,8 +7,8 @@
  * 
  **/
 
-//	Include _cdn_local.php; executes common functionality
-require_once '_cdn_local.php';
+//	Include _cdn.php; executes common functionality
+require_once '_cdn.php';
 
 /**
  * OVERLOADING NAILS' CDN MODULES
@@ -124,11 +124,11 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 				if ( $this->input->get( 'dl' ) ) :
 
-					$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+					$this->cdn->object_increment_count( 'DOWNLOAD', $_object->id );
 
 				else :
 
-					$this->cdn->increment_count( 'SERVE', $_object->id );
+					$this->cdn->object_increment_count( 'SERVE', $_object->id );
 
 				endif;
 
@@ -223,11 +223,11 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 			if ( $this->input->get( 'dl' ) ) :
 
-				$this->cdn->increment_count( 'DOWNLOAD', $_object->id );
+				$this->cdn->object_increment_count( 'DOWNLOAD', $_object->id );
 
 			else :
 
-				$this->cdn->increment_count( 'SERVE', $_object->id );
+				$this->cdn->object_increment_count( 'SERVE', $_object->id );
 
 			endif;
 
@@ -270,7 +270,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 			$_out = array(
 			
 				'status'	=> 400,
-				'message'	=> lang( 'invalid_request' )
+				'message'	=> lang( 'cdn_error_serve_invalid_request' )
 			
 			);
 			
@@ -327,4 +327,4 @@ endif;
 
 
 /* End of file serve.php */
-/* Location: ./application/modules/cdn_local/controllers/server.php */
+/* Location: ./application/modules/cdn/controllers/server.php */

@@ -35,6 +35,24 @@ class NAILS_Shop_tax_model extends NAILS_Model
 		$this->db->where( 'is_deleted', FALSE );
 		return parent::get_all();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_flat()
+	{
+		$_rates = $this->get_all();
+		$_out	= array();
+
+		foreach ( $_rates AS $rate ) :
+
+			$_out[$rate->id] = $rate->label . ' - ' . $rate->rate*100 . '%';
+
+		endforeach;
+
+		return $_out;
+	}
 }
 
 

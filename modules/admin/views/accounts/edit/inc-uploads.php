@@ -14,12 +14,13 @@
 				
 				switch( $file->mime ) :
 				
+					case 'image/jpg':
 					case 'image/jpeg':
-					case 'image/gifgif':
+					case 'image/gif':
 					case 'image/png':
 					
-						echo '<a href="' . cdn_serve( $file->bucket->slug, $file->filename ) . '" class="fancybox image">';
-						echo img( cdn_thumb( $file->bucket->slug, $file->filename, 35, 35 ) );
+						echo '<a href="' . cdn_serve( $file->id ) . '" class="fancybox image">';
+						echo img( cdn_thumb( $file->id, 35, 35 ) );
 						echo $file->filename_display;
 						echo '<small>Bucket: ' . $file->bucket->slug . '</small>';
 						echo '</a>';
@@ -30,7 +31,7 @@
 					
 					default :
 					
-						echo anchor( cdn_serve( $file->bucket->slug, $file->filename ) . '?dl=1', $file->filename_display . '<small>Bucket: ' . $file->bucket->slug . '</small>' );
+						echo anchor( cdn_serve( $file->id ) . '?dl=1', $file->filename_display . '<small>Bucket: ' . $file->bucket->slug . '</small>' );
 					
 					break;
 				

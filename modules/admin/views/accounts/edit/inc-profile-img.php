@@ -14,12 +14,12 @@
 		else :
 
 			$_img = array(
-				'src'	=> cdn_thumb( 'profile-images', $user_edit->profile_img, 100, 125 ),
+				'src'	=> cdn_thumb( $user_edit->profile_img, 100, 125 ),
 				'id'	=> 'preview_image',
 				'style'	=> 'border:1px solid #CCC;padding:0;margin-right:10px;'
 			);
 			
-			echo anchor( cdn_serve( 'profile-images', $user_edit->profile_img ), img( $_img ), 'class="fancybox left"' );
+			echo anchor( cdn_serve( $user_edit->profile_img ), img( $_img ), 'class="fancybox left"' );
 			echo '<p>';
 			echo form_upload( 'profile_img', NULL, 'style="float:none;"' ) . '<br />';
 			$_return = '?return_to=' . urlencode( uri_string() . '?' . $_SERVER['QUERY_STRING'] );

@@ -6,8 +6,8 @@
  * 
  **/
 
-//	Include _cdn_local.php; executes common functionality
-require_once '_cdn_local.php';
+//	Include _cdn.php; executes common functionality
+require_once '_cdn.php';
 
 /**
  * OVERLOADING NAILS' CDN MODULES
@@ -242,4 +242,4 @@ endif;
 
 
 /* End of file thumb.php */
-/* Location: ./application/modules/cdn_local/controllers/thumb.php */
+/* Location: ./application/modules/cdn/controllers/thumb.php */

@@ -16,24 +16,6 @@
 		<div class="clear"></div>
 		
 		<!--	GLOBAL JS	-->
-		<script tyle="text/javascript">
-		<!--//
-		
-			var _nails,_nails_admin;
-			
-			$(function(){
-			
-				//	Initialise NAILS_JS
-				_nails = new NAILS_JS();
-				_nails.init();
-				
-				//	Initialise NAILS_Admin
-				_nails_admin = new NAILS_Admin();
-				_nails_admin.init();
-			
-			});
-		
-		//-->
-		</script>
+		<?php $this->asset->output( 'js-inline' ); ?>
 	</body>
 </html>

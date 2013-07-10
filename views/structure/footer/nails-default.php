@@ -18,18 +18,12 @@
 		</div>
 		
 	</div><!--	/.container	-->
+
+	<!-- JS HOOK -->
+	<?php $this->asset->output( 'js-inline' ); ?>
+
 	<script type="text/javascript">
 	<!--//
-	
-		var _nails;
-		
-		$(function(){
-		
-			//	Initialise Nails_JS
-			_nails = new NAILS_JS();
-			_nails.init();
-		
-		});
 
 		<?php if ( ENVIRONMENT == 'production' && site_settings( 'google_analytics_account' ) ) : ?>
 

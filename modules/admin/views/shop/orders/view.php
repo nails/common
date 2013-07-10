@@ -410,14 +410,30 @@
 
 							echo '<td class="processed yes">' . lang( 'yes' ) . '</td>';
 							echo '<td class="actions">';
-							echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/unprocessed' . $_is_fancybox, 'Mark as Unprocessed', 'class="awesome small red"' );
+							if ( $user->has_permission( 'admin.shop.process' ) ) :
+
+								echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/unprocessed' . $_is_fancybox, 'Mark as Unprocessed', 'class="awesome small red"' );
+
+							else :
+
+								echo '<span class="blank">&mdash;</span>';
+
+							endif;
 							echo '</td>';
 
 						else :
 
 							echo '<td class="processed no">' . lang( 'no' ) . '</td>';
 							echo '<td class="actions">';
-							echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/processed' . $_is_fancybox, 'Mark as Processed', 'class="awesome small green"' );
+							if ( $user->has_permission( 'admin.shop.process' ) ) :
+
+								echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/processed' . $_is_fancybox, 'Mark as Processed', 'class="awesome small green"' );
+
+							else :
+								
+								echo '<span class="blank">&mdash;</span>';
+
+							endif;
 							echo '</td>';
 
 						endif;

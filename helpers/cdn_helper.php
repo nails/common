@@ -1,44 +1,19 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 
-if ( ! function_exists( '_cdn_include_library' ) )
-{
-	function _cdn_include_library()
-	{
-		//	Check to see if the library is being overloaded by the app
-		
-		if ( file_exists( FCPATH . APPPATH . 'libraries/Cdn.php' ) ) :
-		
-			include_once FCPATH . APPPATH . 'libraries/Cdn.php';
-		
-		else :
-		
-			include_once NAILS_PATH . 'libraries/Cdn.php';
-			
-		endif;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
 /**
  * Returns the URL for serving raw content from the CDN
  *
- * @param	string	$bucket	The bucket which the file resides in
- * @param	string	$file	The filename of the object
+ * @param	string	$object	The ID or filename of the object to serve
  * @return	string
  */
 if ( ! function_exists( 'cdn_serve' ) )
 {
-	function cdn_serve( $bucket, $file )
+	function cdn_serve( $object )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_serve_url( $bucket, $file );
+		return get_instance()->cdn->url_serve( $object );
 	}
 }
 
@@ -57,13 +32,11 @@ if ( ! function_exists( 'cdn_serve' ) )
  */
 if ( ! function_exists( 'cdn_thumb' ) )
 {
-	function cdn_thumb( $bucket, $file, $width, $height )
+	function cdn_thumb( $object, $width, $height )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_thumb_url( $bucket, $file, $width, $height );
+		return get_instance()->cdn->url_thumb( $object, $width, $height );
 	}
 }
 
@@ -82,13 +55,11 @@ if ( ! function_exists( 'cdn_thumb' ) )
  */
 if ( ! function_exists( 'cdn_scale' ) )
 {
-	function cdn_scale( $bucket, $file, $width, $height )
+	function cdn_scale( $object, $width, $height )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_scale_url( $bucket, $file, $width, $height );
+		return get_instance()->cdn->url_scale( $object, $width, $height );
 	}
 }
 
@@ -108,35 +79,9 @@ if ( ! function_exists( 'cdn_placeholder' ) )
 {
 	function cdn_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_placeholder_url( $width, $height, $border );
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Returns the URL for a placeholder graphic
- *
- * @param	string	$width	The width of the placeholder
- * @param	string	$height	The height of the placeholder
- * @param	string	$border	The width of the border, if any
- * @return	string
- */
-if ( ! function_exists( 'cdn_placeholder' ) )
-{
-	function cdn_placeholder( $width = 100, $height = 100, $border = 0 )
-	{
-		_cdn_include_library();
-		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_placeholder_url( $width, $height, $border );
+		return get_instance()->cdn->url_placeholder( $width, $height, $border );
 	}
 }
 
@@ -156,11 +101,9 @@ if ( ! function_exists( 'cdn_blank_avatar' ) )
 {
 	function cdn_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_blank_avatar_url( $width, $height, $sex );
+		return get_instance()->cdn->url_blank_avatar( $width, $height, $sex );
 	}
 }
 
@@ -178,13 +121,11 @@ if ( ! function_exists( 'cdn_blank_avatar' ) )
  */
 if ( ! function_exists( 'cdn_expiring_url' ) )
 {
-	function cdn_expiring_url( $bucket, $object, $expires )
+	function cdn_expiring_url( $object, $expires )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::cdn_expiring_url( $bucket, $object, $expires );
+		return get_instance()->cdn->url_expiring( $object, $expires );
 	}
 }
 
@@ -202,11 +143,9 @@ if ( ! function_exists( 'get_ext_from_mimetype' ) )
 {
 	function get_ext_from_mimetype( $mime_type )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::get_ext_from_mimetype( $mime_type );
+		return get_instance()->cdn->get_ext_from_mimetype( $mime_type );
 	}
 }
 
@@ -224,11 +163,9 @@ if ( ! function_exists( 'get_mimetype_from_ext' ) )
 {
 	function get_mimetype_from_ext( $ext )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::get_mimetype_from_ext( $ext );
+		return get_instance()->cdn->get_mimetype_from_ext( $ext );
 	}
 }
 
@@ -246,14 +183,12 @@ if ( ! function_exists( 'get_mime_type_from_file' ) )
 {
 	function get_mime_type_from_file( $file )
 	{
-		_cdn_include_library();
+		get_instance()->load->library( 'cdn' );
 		
-		// --------------------------------------------------------------------------
-		
-		return CDN::get_mime_type_from_file( $file );
+		return get_instance()->cdn->get_mime_type_from_file( $file );
 	}
 }
 
 
-/* End of file cdn.php */
-/* Location: ./application/libraries/cdn.php */
+/* End of file cdn_helper.php */
+/* Location: ./helpers/cdn.php */

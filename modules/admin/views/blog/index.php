@@ -40,7 +40,7 @@
 					
 					if ( $post->image ) :
 					
-						echo anchor( cdn_serve( 'blog', $post->image ), img( cdn_scale( 'blog', $post->image, 75, 75 ) ), 'class="fancybox"' );
+						echo anchor( cdn_serve( $post->image ), img( cdn_scale( $post->image, 75, 75 ) ), 'class="fancybox"' );
 					
 					else :
 					

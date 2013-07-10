@@ -127,7 +127,7 @@ if ( ! function_exists( 'form_field' ) )
 				case 'png' :
 				case 'gif' :
 				
-					$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), img( cdn_thumb( $_field['bucket'], $_field['default'], 35, 35 ) ), 'class="fancybox"' );
+					$_out .= 'Download: ' . anchor( cdn_serve( $_field['default'] ), img( cdn_thumb( $_field['default'], 35, 35 ) ), 'class="fancybox"' );
 				
 				break;
 				
@@ -135,7 +135,7 @@ if ( ! function_exists( 'form_field' ) )
 				
 				default :
 				
-					$_out .= 'Download: ' . anchor( cdn_serve( $_field['bucket'], $_field['default'] ), $_field['default'], 'target="_blank"' );
+					$_out .= 'Download: ' . anchor( cdn_serve( $_field['default'] ), $_field['default'], 'target="_blank"' );
 				
 				break;
 			
@@ -278,7 +278,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_out .= '<span id="' . $_id . '-preview" class="mm-file-download">';
 		if ( $_field['default'] ) :
 		
-			$_out .= anchor( cdn_serve( $_field['bucket'], $_field['default'] ) . '?dl=true', 'Download File' );
+			$_out .= anchor( cdn_serve( $_field['default'] ) . '?dl=true', 'Download File' );
 		
 		endif;
 		$_out .= '</span>';
@@ -307,7 +307,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		
 		//	Quick script to instanciate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
-		$_scheme = CDN::cdn_serve_url_scheme();
+		$_scheme = get_instance()->cdn->url_serve_scheme();
 		
 		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
 		
@@ -315,8 +315,8 @@ $_out .= <<<EOT
 
 	<script style="text/javascript">
 	
-		function callback_$_id( file )
-		{
+		function callback_$_id( file, id )
+		{console.log(id);
 			if ( file.length == 0 )
 			{
 				remove_$_id();
@@ -328,7 +328,7 @@ $_out .= <<<EOT
 			var _scheme = '$_scheme';
 			_scheme = _scheme.replace( '{{file}}', file );
 			$( '#$_id-preview' ).html( '<a href="' + _scheme + '?dl=1">Download</a>' );
-			$( '#$_id-field' ).val( file );
+			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );
 		}
 		
@@ -429,7 +429,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_out .= '<span id="' . $_id . '-preview" class="mm-image-preview">';
 		if ( $_field['default'] ) :
 		
-			$_out .= img( cdn_scale( $_field['bucket'], $_field['default'], 100, 100 ) );
+			$_out .= img( cdn_scale( $_field['default'], 100, 100 ) );
 		
 		endif;
 		$_out .= '</span>';
@@ -488,7 +488,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		
 		//	Quick script to instanciate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
-		$_scheme = CDN::cdn_scale_url_scheme();
+		$_scheme = get_instance()->cdn->url_scale_scheme();
 		
 		$_scheme = str_replace( '{{width}}', 100, $_scheme );
 		$_scheme = str_replace( '{{height}}', 100, $_scheme );
@@ -498,8 +498,8 @@ $_out .= <<<EOT
 
 	<script style="text/javascript">
 	
-		function callback_$_id( file )
-		{
+		function callback_$_id( file, id )
+		{console.log(id);
 			if ( file.length == 0 )
 			{
 				remove_$_id();
@@ -511,7 +511,7 @@ $_out .= <<<EOT
 			var _scheme = '$_scheme';
 			_scheme = _scheme.replace( '{{file}}', file );
 			$( '#$_id-preview' ).html( '<img src="' + _scheme + '" / >' );
-			$( '#$_id-field' ).val( file );
+			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );
 		}
 		
@@ -858,13 +858,9 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endif;
 		
 		//	Build the select
-		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . '>';
+		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . '>';
 
-		if ( ! is_null( $_field['placeholder'] ) ) :
-
-			$_out .= '<option disabled>' . $_field['placeholder'] . '</option>';
-
-		endif;
 
 		foreach ( $options AS $value => $label ) :
 
@@ -984,13 +980,8 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		endif;
 		
 		//	Build the select
-		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . '>';
-
-		if ( ! is_null( $_field['placeholder'] ) ) :
-
-			$_out .= '<option disabled>' . $_field['placeholder'] . '</option>';
-
-		endif;
+		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . '>';
 
 		foreach ( $options AS $value => $label ) :
 

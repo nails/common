@@ -474,6 +474,11 @@ class NAILS_User_model extends NAILS_Model
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
+		if ( module_is_enabled( 'cdn' ) ) :
+
+			$this->db->select( 'cdno.filename profile_img' );
+
+		endif;
 		$this->db->select( 'um.*' );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
@@ -726,6 +731,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _getcount_users_common( $where = NULL, $search = NULL )
 	{
+		$this->db->join( 'cdn_object cdno',			'cdno.id = u.profile_img',				'left' );
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );

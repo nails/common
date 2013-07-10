@@ -7,8 +7,8 @@
  * 
  **/
 
-//	Include _cdn_local.php; executes common functionality
-require_once '_cdn_local.php';
+//	Include _cdn.php; executes common functionality
+require_once '_cdn.php';
 require_once 'thumb.php';
 
 /**
@@ -50,7 +50,7 @@ class NAILS_Scale extends Thumb
 		
 		 if ( $this->_serve_not_modified( $this->_cache_file ) ) :
 
-		 	$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+		 	$this->cdn->object_increment_count( 'SCALE', $this->_object, $this->_bucket );
 		 	return;
 
 		 endif;
@@ -63,7 +63,7 @@ class NAILS_Scale extends Thumb
 		
 		if ( defined( 'CACHE_DIR' ) && file_exists( CACHE_DIR . $this->_cache_file ) ) :
 		
-			$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+			$this->cdn->object_increment_count( 'SCALE', $this->_object, $this->_bucket );
 			$this->_serve_from_cache( $this->_cache_file );
 		
 		else :
@@ -102,7 +102,7 @@ class NAILS_Scale extends Thumb
 				// --------------------------------------------------------------------------
 
 				//	Bump the counter
-				$this->cdn->increment_count( 'SCALE', $this->_object, $this->_bucket );
+				$this->cdn->object_increment_count( 'SCALE', $this->_object, $this->_bucket );
 
 				// --------------------------------------------------------------------------
 				
@@ -177,4 +177,4 @@ endif;
 
 
 /* End of file thumb.php */
-/* Location: ./application/modules/cdn_local/controllers/thumb.php */
+/* Location: ./application/modules/cdn/controllers/thumb.php */
