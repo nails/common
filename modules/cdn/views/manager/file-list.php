@@ -1,8 +1,8 @@
 <?php
 
-	echo '<li class="file list" data-title="' . $object->filename_display . '" data-id="' . $object->id . '">';
+	echo '<tr class="file list" data-title="' . $object->filename_display . '" data-id="' . $object->id . '">';
 	
-		echo '<div class="filename">';
+		echo '<td class="filename">';
 
 			if ( $object->is_img ) :
 
@@ -17,25 +17,44 @@
 		
 			echo $object->filename_display;
 		
-		echo '</div>';
+		echo '</td>';
 		
-		echo '<div class="type">' . $object->mime . '</div>';
+		echo '<td class="mime">' . $object->mime . '</td>';
 		
-		echo '<div class="filesize">' . $object->filesize . '</div>';
+		echo '<td class="filesize">' . format_bytes( $object->filesize ) . '</td>';
 		
-		echo '<div class="modified">' . user_date( $object->modified ) . '</div>';
+		echo '<td class="modified">' . user_datetime( $object->modified ) . '</td>';
 		
-		echo '<div class="actions">';
-		
+		echo '<td class="actions">';
+
+			//	Any restrictive attachments?
+			$_total			= 0;
+			$_normal		= 0;
+			$_restrictive	= 0;
+
+			foreach( $object->attachments AS $attachment ) :
+
+				$_total++;
+
+				if ( $attachment->is_restrictive ) :
+
+					$_restrictive++;
+
+				else :
+
+					$_normal++;
+
+				endif;
+
+			endforeach;
+
+			// --------------------------------------------------------------------------
+
 			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments="' . count( $object->attachments ) . '"' );
+			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments-total="' . $_total . '" data-attachments-restrictive="' . $_restrictive . '" data-attachments-normal="' . $_normal . '"' );
 			echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
 			echo anchor( 'cdn/manager/attachments/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Attachments (' . count( $object->attachments ) . ')', 'class="fancybox awesome small" data-fancybox-type="iframe"' );
 		
-		echo '</div>';
+		echo '</td>';
 		
-		// --------------------------------------------------------------------------
-		
-		echo '<div class="clear"></div>';
-		
-	echo '</li>';
+	echo '</tr>';

@@ -154,7 +154,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean|required' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'image',				'Featured Image',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
@@ -167,7 +167,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data = array();
 				$_data['title']				= $this->input->post( 'title' );
 				$_data['excerpt']			= $this->input->post( 'excerpt' );
-				$_data['image']				= $this->input->post( 'image' );
+				$_data['image_id']			= $this->input->post( 'image_id' );
 				$_data['body']				= $this->input->post( 'body' );
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
@@ -273,7 +273,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean|required' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'image',				'Featured Image',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
@@ -286,7 +286,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data						= array();
 				$_data['title']				= $this->input->post( 'title' );
 				$_data['excerpt']			= $this->input->post( 'excerpt' );
-				$_data['image']				= $this->input->post( 'image' );
+				$_data['image_id']			= $this->input->post( 'image_id' );
 				$_data['body']				= $this->input->post( 'body' );
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );

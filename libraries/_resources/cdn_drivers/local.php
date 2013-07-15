@@ -103,6 +103,8 @@ class Local_CDN {
 		
 			if ( @unlink( CDN_PATH . $bucket . '/' . $_file ) ) :
 
+				//	TODO: Delete Cache items
+
 				return TRUE;
 			
 			else :
@@ -138,7 +140,7 @@ class Local_CDN {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function create_bucket( $bucket )
+	public function bucket_create( $bucket )
 	{
 		if ( @mkdir( CDN_PATH . $bucket ) ) :
 		
@@ -156,7 +158,7 @@ class Local_CDN {
 	// --------------------------------------------------------------------------
 
 
-	public function destroy_bucket( $bucket )
+	public function bucket_delete( $bucket )
 	{
 		if ( @unlink( CDN_PATH . $bucket ) ) :
 		

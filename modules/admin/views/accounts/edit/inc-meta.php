@@ -106,8 +106,8 @@
 							$_field['error'] = implode( ' ', ${'upload_error_' . $_field['key']} );
 						
 						endif;
-						
-						echo form_field( $_field );
+
+						echo form_field_mm( $_field );
 					
 					break;
 					

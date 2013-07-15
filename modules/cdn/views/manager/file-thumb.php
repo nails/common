@@ -19,12 +19,35 @@
 	
 		//	Actions
 		echo '<div class="actions">';
-		
-		echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
 
-		echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments="' . count( $object->attachments ) . '"' );
-		echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
-		echo anchor( 'cdn/manager/attachments/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Attachments (' . count( $object->attachments ) . ')', 'class="fancybox awesome small" data-fancybox-type="iframe"' );
+			//	Any restrictive attachments?
+			$_total			= 0;
+			$_normal		= 0;
+			$_restrictive	= 0;
+
+			foreach( $object->attachments AS $attachment ) :
+
+				$_total++;
+
+				//	TODO: Create a config file for defining this stuff
+				if ( 1==0 && $attachment->is_restrictive ) :
+
+					$_restrictive++;
+
+				else :
+
+					$_normal++;
+
+				endif;
+
+			endforeach;
+
+			// --------------------------------------------------------------------------
+		
+			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
+			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments-total="' . $_total . '" data-attachments-restrictive="' . $_restrictive . '" data-attachments-normal="' . $_normal . '"' );
+			echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
+			echo anchor( 'cdn/manager/attachments/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Attachments (' . count( $object->attachments ) . ')', 'class="fancybox awesome small" data-fancybox-type="iframe"' );
 		
 		echo '</div>';
 	

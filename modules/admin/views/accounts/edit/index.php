@@ -1,7 +1,7 @@
 <?php
 
 	echo '<div class="group-members edit">';
-	echo form_open_multipart( 'admin/accounts/edit/' . $user_edit->id . $return_string );
+	echo form_open_multipart( 'admin/accounts/edit/' . $user_edit->id . '?' . $_SERVER['QUERY_STRING'] );
 	echo form_hidden( 'id', $user_edit->id );
 	echo form_hidden( 'email_orig', $user_edit->email );
 	echo form_hidden( 'username_orig', $user_edit->username );

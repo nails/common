@@ -1,28 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * form_field
- *
- * Generates a form field (of type text, password or textarea)
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
- */
-if ( ! function_exists( 'form_email' ) )
-{
-	function form_email($data = '', $value = '', $extra = '')
-	{
-		$defaults = array('type' => 'email', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
-
-		return "<input "._parse_form_attributes($data, $defaults).$extra." />";
-	}	
-}
-
-
-// --------------------------------------------------------------------------
-
 
 /**
  * form_field
@@ -53,6 +30,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
 		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -79,13 +57,21 @@ if ( ! function_exists( 'form_field' ) )
 		
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+		//	Any data attributes?
+		$_data = '';
+		foreach( $_field['data'] AS $attr => $value ) :
+
+			$_data .= ' data-' . $attr . '="' . $value . '"';
+
+		endforeach;
 		
 		//	Field
 		switch ( $_field['type'] ) :
 		
 			case 'password' :
 			
-				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly . $_data );
 				
 			break;
 			
@@ -134,8 +120,8 @@ if ( ! function_exists( 'form_field' ) )
 				// --------------------------------------------------------------------------
 				
 				default :
-				
-					$_out .= 'Download: ' . anchor( cdn_serve( $_field['default'] ), $_field['default'], 'target="_blank"' );
+
+					$_out .= anchor( cdn_serve( $_field['default'] ) . '?dl=1', 'Download', 'class="awesome small" target="_blank"' );
 				
 				break;
 			
@@ -550,104 +536,14 @@ EOT;
  */
 if ( ! function_exists( 'form_field_date' ) )
 {
-	function form_field_date( $field, $help = '', $short = FALSE, $start_year = NULL, $end_year = NULL )
+	function form_field_date( $field, $help = '' )
 	{
-		$_ci =& get_instance();
-		$_ci->load->helper( 'date' );
-		
-		// --------------------------------------------------------------------------
-		
-		$short		= $short ? $short : FALSE;
-		$start_year	= $start_year ? $start_year : date( 'Y' ) + 5;
-		$end_year	= $end_year ? $end_year : 1900;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $_field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
-		
-		$_error = form_error( $_field['key'] . '_year' ) || form_error( $_field['key'] . '_month' ) || form_error( $_field['key'] . '_day' ) ? 'error' : '';
-		
-		// --------------------------------------------------------------------------
-		
-		$_out  = '<div class="field date-picker ' . $_error . ' ' . $_field['oddeven'] . '">';
-		$_out .= '<label>';
-				
-		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
-		
-		if ( $_ci->input->post() ) :
-		
-			$_date		= array();
-			$_date[]	= $_ci->input->post( $_field['key'] .'_year' );
-			$_date[]	= $_ci->input->post( $_field['key'] .'_month' );
-			$_date[]	= $_ci->input->post( $_field['key'] .'_day' );
-		
-		else :
-		
-			if ( isset( $_field['default'] ) ) :
-			
-				$_date	= explode( '-', $_field['default'] );
-				
-			else :
-				
-				$_date	= array( '' );
-			
-			endif;
-			
-		endif;
-		
-		if ( ! isset( $_date[1] ) )
-			$_date[1] = FALSE;
-			
-		if ( ! isset( $_date[2] ) )
-			$_date[2] = FALSE;
-		
-		//	TODO: Set ID for these fields
-		//	Does the field have an id?
-		//$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
-		
-		//	Input
-		$_out .= dropdown_days( $_field['key'] . '_day', $_date[2] );
-		$_out .= dropdown_months( $_field['key'] . '_month', $short, $_date[1] );
-		$_out .= dropdown_years( $_field['key'] . '_year', $start_year, $end_year, $_date[0] );
-		
-		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
-		
-		//	Error
-		if ( $_error ) :
-			$_out .= '<span class="error">' . form_error( $_field['key'] . '_day' ) . '</span>';
-		endif;
-				
-		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
-		$_out .= '</div>';
-		
-		// --------------------------------------------------------------------------
-		
-		return $_out;
+		$_field					= $field;
+		$_field['type']			= 'date';
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] . ' date' : 'date';
+		$_field['placeholder']	= 'YYYY-MM-DD';
+
+		return form_field( $_field, $help );
 	}
 }
 
@@ -667,118 +563,14 @@ if ( ! function_exists( 'form_field_date' ) )
  */
 if ( ! function_exists( 'form_field_datetime' ) )
 {
-	function form_field_datetime( $field, $help = '', $short = TRUE, $start_year = NULL, $end_year = NULL )
+	function form_field_datetime( $field, $help = '' )
 	{
-		$_ci =& get_instance();
-		$_ci->load->helper( 'date' );
-		
-		// --------------------------------------------------------------------------
-		
-		$short		= $short ? $short : FALSE;
-		$start_year	= $start_year ? $start_year : date( 'Y' ) + 5;
-		$end_year	= $end_year ? $end_year : 1900;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-right';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
-		
-		$_error = form_error( $_field['key'] . '_year' ) || form_error( $_field['key'] . '_month' ) || form_error( $_field['key'] . '_day' ) ? 'error' : '';
-		
-		// --------------------------------------------------------------------------
-		
-		$_out  = '<div class="field date-picker datetime-picker ' . $_error . ' ' . $_field['oddeven'] . '">';
-		$_out .= '<label>';
-				
-		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
-		
-		if ( $_ci->input->post() ) :
-		
-			$_datetime		= array();
-			$_datetime[]	= $_ci->input->post( $_field['key'] .'_year' );
-			$_datetime[]	= $_ci->input->post( $_field['key'] .'_month' );
-			$_datetime[]	= $_ci->input->post( $_field['key'] .'_day' );
-			$_datetime[]	= $_ci->input->post( $_field['key'] .'_hour' );
-			$_datetime[]	= $_ci->input->post( $_field['key'] .'_minute' );
-		
-		else :
-		
-			if ( isset( $_field['default'] ) ) :
-			
-				//	Firstly, explode the space (expected string is in the format DDDD-DD-DD DD:DD:DD)
-				$_temp	= explode( ' ', $_field['default'] );
-				$_temp1	= isset( $_temp[0] ) ? explode( '-', $_temp[0] ) : array( '' );
-				$_temp2	= isset( $_temp[1] ) ? explode( ':', $_temp[1] ) : array( '' );
-				$_datetime = array_merge( $_temp1, $_temp2 );
-				
-			else :
-				
-				$_datetime	= array( '' );
-			
-			endif;
-			
-		endif;
-		
-		if ( ! isset( $_datetime[1] ) )
-			$_datetime[1] = FALSE;
-			
-		if ( ! isset( $_datetime[2] ) )
-			$_datetime[2] = FALSE;
-			
-		if ( ! isset( $_datetime[3] ) )
-			$_datetime[3] = FALSE;
-			
-		if ( ! isset( $_datetime[4] ) )
-			$_datetime[4] = FALSE;
-		
-		//	TODO: Set ID for these fields
-		//	Does the field have an id?
-		//$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
-		
-		//	Input
-		$_out .= dropdown_days( $_field['key'] . '_day', $_datetime[2] );
-		$_out .= dropdown_months( $_field['key'] . '_month', $short, $_datetime[1] );
-		$_out .= dropdown_years( $_field['key'] . '_year', $start_year, $end_year, $_datetime[0] );
-		$_out .= dropdown_hours( $_field['key'] . '_hour', $_datetime[3] );
-		$_out .= dropdown_minutes( $_field['key'] . '_minute', NULL, $_datetime[4] );
-		
-		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
-		
-		//	Error
-		if ( $_error ) :
-			$_out .= '<span class="error">' . form_error( $_field['key'] . '_day' ) . '</span>';
-		endif;
-				
-		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
-		$_out .= '</div>';
-		
-		// --------------------------------------------------------------------------
-		
-		return $_out;
+		$_field					= $field;
+		$_field['type']			= 'datetime';
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] . ' datetime' : 'datetime';
+		$_field['placeholder']	= 'YYYY-MM-DD HH:mm:ss';
+
+		return form_field( $_field, $help );
 	}
 }
 
@@ -813,6 +605,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -844,6 +637,14 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 
+		//	Any data attributes?
+		$_data = '';
+		foreach( $_field['data'] AS $attr => $value ) :
+
+			$_data .= ' data-' . $attr . '="' . $value . '"';
+
+		endforeach;
+
 		//	Get the selected options
 		if ( $_POST ) :
 
@@ -859,7 +660,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		
 		//	Build the select
 		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
-		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . '>';
+		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 
 		foreach ( $options AS $value => $label ) :
@@ -932,6 +733,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -962,6 +764,14 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+		//	Any data attributes?
+		$_data = '';
+		foreach( $_field['data'] AS $attr => $value ) :
+
+			$_data .= ' data-' . $attr . '="' . $value . '"';
+
+		endforeach;
 		
 		//	Any defaults?
 		$_field['default'] = (array) $_field['default'];
@@ -981,7 +791,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		
 		//	Build the select
 		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
-		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . '>';
+		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :
 
@@ -1051,6 +861,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		$_field['text_on']		= isset( $field['text_on'] ) ? $field['text_on'] : 'ON';
 		$_field['text_off']		= isset( $field['text_off'] ) ? $field['text_off'] : 'OFF';
+		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
 		
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -1067,6 +878,14 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+		//	Any data attributes?
+		$_data = '';
+		foreach( $_field['data'] AS $attr => $value ) :
+
+			$_data .= ' data-' . $attr . '="' . $value . '"';
+
+		endforeach;
 				
 		//	Label
 		$_out .= '<span class="label">';
@@ -1088,7 +907,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		endif;
 		
 		$_out .= '<div class="toggle toggle-modern"></div>';
-		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] );
+		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data );
 		
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';

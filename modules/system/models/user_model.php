@@ -479,7 +479,7 @@ class NAILS_User_model extends NAILS_Model
 			$this->db->select( 'cdno.filename profile_img' );
 
 		endif;
-		$this->db->select( 'um.*' );
+		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
@@ -859,6 +859,28 @@ class NAILS_User_model extends NAILS_Model
 		
 		endif;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _get_meta_columns()
+	{
+		$_cols = array();
+
+		// --------------------------------------------------------------------------
+
+		//	Module: shop
+		if ( module_is_enabled( 'shop' ) ) :
+
+			$_cols[] = 'um.shop_basket';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $_cols;
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -1089,7 +1111,8 @@ class NAILS_User_model extends NAILS_Model
 			
 		else :
 		
-			show_error( 'USER UPDATE ERROR: No user ID set' );
+			$this->_set_error( 'No user ID set' );
+			return FALSE;
 		
 		endif;
 		
@@ -1168,6 +1191,7 @@ class NAILS_User_model extends NAILS_Model
 					//	We found a user who isn't the current user who is already
 					//	using this email address.
 					
+					$this->_set_error( 'Email already in use.' );
 					return FALSE;
 				
 				endif;
@@ -1194,7 +1218,22 @@ class NAILS_User_model extends NAILS_Model
 				//	user or user_meta?
 				if ( array_search( $key, $_cols ) !== FALSE ) :
 				
-					$_data_user[$key] = $val;
+					//	Careful now, some items cannot be blank and must be NULL
+					switch( $key ) :
+
+						case 'profile_img' :
+
+							$_data_user[$key] = $val ? $val : NULL;
+
+						break;
+
+						default :
+
+							$_data_user[$key] = $val;
+
+						break;
+
+					endswitch;
 				
 				else :
 				
@@ -1203,6 +1242,8 @@ class NAILS_User_model extends NAILS_Model
 				endif;
 			
 			endforeach;
+
+			// --------------------------------------------------------------------------
 			
 			//	Update the user table
 			$this->db->where( 'id', (int) $_uid );
@@ -1213,6 +1254,8 @@ class NAILS_User_model extends NAILS_Model
 				$this->db->set( $_data_user );
 				
 			endif;
+
+			// --------------------------------------------------------------------------
 			
 			//	Update the meta table
 			$this->db->update( 'user' );
@@ -1224,6 +1267,7 @@ class NAILS_User_model extends NAILS_Model
 				$this->db->update( 'user_meta' );
 			
 			endif;
+			
 		
 		else :
 		
@@ -1253,6 +1297,8 @@ class NAILS_User_model extends NAILS_Model
 				endforeach;
 			
 			endif;
+
+			// --------------------------------------------------------------------------
 			
 			//	If there's a remember me cookie then update that too, but only if the password
 			//	or email address has changed

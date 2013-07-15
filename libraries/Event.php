@@ -63,7 +63,7 @@ class Event {
 	 * @author	Pablo
 	 **/
 	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $data = NULL, $ref = NULL, $recorded = NULL )
-	{
+	{dump($created_by);
 		//	Admins logged in as people shouldn't be creating events, GHOST MODE, woooooooo
 		//	Ghost mode runs on production only, all other environments generate events (for testing)
 		
@@ -109,9 +109,10 @@ class Event {
 		// --------------------------------------------------------------------------
 		
 		//	Prep created by
+		$created_by = (int) $created_by;
 		if ( ! $created_by ) :
 
-			$created_by = active_user( 'id' ) ? active_user( 'id' ) : NULL;
+			$created_by = active_user( 'id' ) ? (int) active_user( 'id' ) : NULL;
 
 		endif;
 
@@ -119,7 +120,7 @@ class Event {
 		
 		//	Prep data
 		$_data					= array();
-		$_data['type_id']		= $this->_event_type[$type]->id;
+		$_data['type_id']		= (int) $this->_event_type[$type]->id;
 		$_data['created_by']	= $created_by;
 		$_data['url']			= uri_string();
 		$_data['data']			= ( $data ) ? serialize( $data ) : NULL;

@@ -29,10 +29,10 @@
 	foreach ( $posts AS $post ) :
 	
 		echo '<li class="post clearfix">';
-		if ( $post->image ) :
+		if ( $post->image_id ) :
 		
 			echo '<div class="img three columns first featured-image">';
-			echo anchor( $blog_url . $post->slug, img( array( 'src' => cdn_scale( $post->image, 200, 200 ), 'class' => 'scale-with-grid' ) ) );
+			echo anchor( $blog_url . $post->slug, img( array( 'src' => cdn_scale( $post->image_id, 200, 200 ), 'class' => 'scale-with-grid' ) ) );
 			echo '</div>';
 			echo '<div class="eight columns last">';
 		
@@ -47,7 +47,7 @@
 		echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
 		echo '</p>';
 		
-		if ( $post->image ) :
+		if ( $post->image_id ) :
 		
 			echo '</div>';
 		

@@ -495,10 +495,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$_nails_assets		= array();
 		$_nails_assets[]	= 'nails.default.css';
-		$_nails_assets[]	= 'jquery.min.js';
-		$_nails_assets[]	= 'jquery.fancybox.min.js';
-		$_nails_assets[]	= 'jquery.scrollto.min.js';
-		$_nails_assets[]	= 'jquery.tipsy.min.js';
 		$_nails_assets[]	= 'nails.default.min.js';
 
 		foreach ( $_nails_assets AS $asset ) :

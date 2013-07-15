@@ -644,7 +644,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		
 		//	Check the product ID is valid
 		$_product = $this->product->get_by_id( $product_id );
-		
+
 		if ( ! $_product ) :
 		
 			$this->_set_error( 'Invalid Product ID.' );

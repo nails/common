@@ -53,7 +53,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function user_date( $timestamp = NULL, $format_date = NULL, $format_time = NULL )
+	public function user_date( $timestamp = NULL, $format_date = NULL )
 	{
 		//	Has a specific timestamp been given?
 		if ( is_null( $timestamp ) ) :
@@ -65,9 +65,81 @@ class NAILS_Datetime_model extends NAILS_Model
 			//	Are we dealing with a UNIX timestamp or a datetime?
 			if ( ! is_numeric( $timestamp ) ) :
 
+				if ( ! $timestamp || $timestamp == '0000-00-00' ) :
+
+					return '';
+
+				endif;
+
+				$timestamp = date( 'Y-m-d', strtotime( $timestamp ) );
+
+			else :
+
+				if ( ! $timestamp ) :
+
+					return '';
+
+				endif;
+
+				$timestamp = date( 'Y-m-d', $timestamp );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Has a date/time format been supplied? If so overwrite the defaults
+		$_format_date = is_null( $format_date ) ? $this->_format_date : $format_date; 
+
+		// --------------------------------------------------------------------------
+		
+		//	Create the new DateTime object
+		$_datetime = new DateTime( $timestamp, new DateTimeZone( $this->_timezone_nails ) );
+
+		// --------------------------------------------------------------------------
+
+		//	If the user's timezone is different from the Nails. timezone then set it so.
+		if ( $this->_timezone_nails != $this->_timezone_user )
+			$_datetime->setTimeZone( new DateTimeZone( $this->_timezone_user ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Return the formatted date
+		return $_datetime->format( $_format_date );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function user_datetime( $timestamp = NULL, $format_date = NULL, $format_time = NULL )
+	{
+		//	Has a specific timestamp been given?
+		if ( is_null( $timestamp ) ) :
+
+			$timestamp = date( 'Y-m-d H:i:s' );
+
+		else :
+
+			//	Are we dealing with a UNIX timestamp or a datetime?
+			if ( $timestamp && ! is_numeric( $timestamp ) ) :
+
+				if ( ! $timestamp || $timestamp == '0000-00-00 00:00:00' ) :
+
+					return '';
+
+				endif;
+
 				$timestamp = date( 'Y-m-d H:i:s', strtotime( $timestamp ) );
 
 			else :
+
+				if ( ! $timestamp ) :
+
+					return '';
+
+				endif;
 
 				$timestamp = date( 'Y-m-d H:i:s', $timestamp );
 
@@ -96,6 +168,51 @@ class NAILS_Datetime_model extends NAILS_Model
 
 		//	Return the formatted date
 		return $_datetime->format( $_format_date . ' ' . $_format_time );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function user_rdate( $timestamp = NULL, $format = 'date' )
+	{
+		//	Has a specific timestamp been given?
+		if ( is_null( $timestamp ) ) :
+
+			$timestamp = date( 'Y-m-d H:i:s' );
+
+		else :
+
+			$_format = $format == 'date' ? 'Y-m-d' : 'Y-m-d H:i:s';
+
+			//	Are we dealing with a UNIX timestamp or a datetime?
+			if ( ! is_numeric( $timestamp ) ) :
+
+				$timestamp = date( $_format, strtotime( $timestamp ) );
+
+			else :
+
+				$timestamp = date( $_format, $timestamp );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		//	Create the new DateTime object
+		$_datetime = new DateTime( $timestamp, new DateTimeZone( $this->_timezone_user ) );
+
+		// --------------------------------------------------------------------------
+
+		//	If the user's timezone is different from the Nails. timezone then set it so.
+		if ( $this->_timezone_nails != $this->_timezone_user )
+			$_datetime->setTimeZone( new DateTimeZone( $this->_timezone_nails ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Return the formatted date
+		return $format == 'date' ? $_datetime->format( 'Y-m-d' ) : $_datetime->format( 'Y-m-d H:i:s' );
 	}
 
 

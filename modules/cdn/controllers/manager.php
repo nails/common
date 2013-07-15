@@ -243,11 +243,17 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 		foreach( $this->data['object']->attachments AS $attachment ) :
 
+			$_temp					= new stdClass();
+			$_temp->is_restrictive	= $attachment->is_restrictive;
+			$_temp->where_id		= '';
+
 			if ( $attachment->select_cols && $attachment->attached_to_id ) :
 
 				$_select	= $attachment->select_cols;
 				$_table		= $attachment->select_table ? $attachment->select_table : $attachment->table;
 				$_where_id	= $attachment->select_id_col ? $attachment->select_id_col : 'id';
+
+				$_temp->where_id = $_where_id . ':' . $attachment->attached_to_id;
 
 				$this->db->select( $_select );
 				$this->db->where( $_where_id, $attachment->attached_to_id );
@@ -257,19 +263,21 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 				if ( $_result ) :
 
-					$this->data['attachments'][] = $attachment->label . ': ' . implode( ' ', $_result ) . ' (#' . $attachment->attached_to_id . ')';
+					$_temp->label = $attachment->label . ': "' . implode( ' ', $_result );
 
 				else :
 
-					$this->data['attachments'][] = $attachment->label;
+					$_temp->label = $attachment->label;
 
 				endif;
 
 			else :
 
-				$this->data['attachments'][] = $attachment->label;
+				$_temp->label			= $attachment->label;
 
 			endif;
+
+			$this->data['attachments'][] = $_temp;
 
 		endforeach;
 
@@ -387,18 +395,10 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 		endif;
 
-		if ( $_object->attachments ) :
-
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> this file has attachments and cannot be deleted.' );
-			redirect( $_return );
-			return;
-
-		endif;
-
 		// --------------------------------------------------------------------------
 		
 		//	Attempt Delete
-		$_delete = $this->cdn->object_delete( $this->uri->segment( 4 ), $this->data['bucket'] );
+		$_delete = $this->cdn->object_delete( $_object->id );
 		
 		if ( $_delete ) :
 		

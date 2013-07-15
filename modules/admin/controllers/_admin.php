@@ -128,7 +128,8 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		//	Load admin helper
+		//	Load libraries and helpers
+		$this->load->library( 'cdn' );
 		$this->load->helper( 'admin' );
 		
 		// --------------------------------------------------------------------------
@@ -153,14 +154,9 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		
 		//	Load admin styles and JS
 		$this->asset->load( 'nails.admin.css', TRUE );
-		$this->asset->load( 'jquery.min.js', TRUE );
-		$this->asset->load( 'jquery.tipsy.min.js', TRUE );
-		$this->asset->load( 'jquery.chosen.min.js', TRUE );
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
-		$this->asset->load( 'jquery.fancybox.min.js', TRUE );
-		$this->asset->load( 'jquery.scrollto.min.js', TRUE );
 		$this->asset->load( 'nails.default.min.js', TRUE );
 		$this->asset->load( 'nails.admin.min.js', TRUE );
+		$this->asset->load( 'jquery.toggles.min.js', TRUE );
 		
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :

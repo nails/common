@@ -161,7 +161,7 @@
 		$_field					= array();
 		$_field['key']			= 'created';
 		$_field['label']		= lang( 'accounts_edit_basic_field_created_label' );
-		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->created ) );
+		$_field['default']		= user_datetime( $user_edit->created );
 		$_field['required']		= FALSE;
 		$_field['readonly']		= TRUE;
 		
@@ -173,7 +173,7 @@
 		$_field					= array();
 		$_field['key']			= 'last_update';
 		$_field['label']		= lang( 'accounts_edit_basic_field_modified_label' );
-		$_field['default']		= date( 'jS M Y @ H:i', strtotime( $user_edit->last_update ) );
+		$_field['default']		= user_datetime( $user_edit->last_update );
 		$_field['required']		= FALSE;
 		$_field['readonly']		= TRUE;
 		
@@ -197,7 +197,7 @@
 		$_field					= array();
 		$_field['key']			= 'last_login';
 		$_field['label']		= lang( 'accounts_edit_basic_field_last_login_label' );
-		$_field['default']		= $user_edit->last_login ? date( 'jS M Y @ H:i', strtotime( $user_edit->last_login ) ) : lang( 'accounts_edit_basic_field_not_logged_in' );
+		$_field['default']		= $user_edit->last_login ? user_datetime( $user_edit->last_login ) : lang( 'accounts_edit_basic_field_not_logged_in' );
 		$_field['required']		= FALSE;
 		$_field['readonly']		= TRUE;
 		

@@ -57,9 +57,9 @@
 		// --------------------------------------------------------------------------
 
 		echo '<div class="body clearfix">';
-		if ( $post->image ) :
+		if ( $post->image_id ) :
 		
-			echo img( array( 'src' => cdn_scale( $post->image, 200, 200 ), 'class' => 'featured-img' ) );
+			echo img( array( 'src' => cdn_scale( $post->image_id, 200, 200 ), 'class' => 'featured-img' ) );
 		
 		endif;
 		echo $post->body;

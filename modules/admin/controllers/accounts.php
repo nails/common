@@ -531,8 +531,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 			
 			//	Define user_meta table rules
-			$_uploads = array();
-			
 			foreach ( $this->data['user_meta_cols'] AS $col => $value ) :
 			
 				$_datatype	= isset( $value['datatype'] )	? $value['datatype'] : 'string';
@@ -542,15 +540,15 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				switch ( $_datatype ) :
 				
 					case 'date' :
-					
+
 						//	Dates must validate
 						if ( isset( $value['validation'] ) ) :
 						
-							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|' . $value['validation'] . '|valid_date[' . $col . ']' );
+							$this->form_validation->set_rules( $col, $_label, 'xss_clean|' . $value['validation'] . '|valid_date[' . $col . ']' );
 							
 						else :
 						
-							$this->form_validation->set_rules( $col . '_day', $_label, 'xss_clean|valid_date[' . $col . ']' );
+							$this->form_validation->set_rules( $col, $_label, 'xss_clean|valid_date[' . $col . ']' );
 						
 						endif;
 					
@@ -560,13 +558,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					
 					case 'file' :
 					case 'upload' :
-					
-						$_uploads[] = $value + array( 'col' => $col );
-					
-					break;
-					
-					// --------------------------------------------------------------------------
-					
 					case 'string' :
 					default :
 					
@@ -591,85 +582,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			//	Set messages
 			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'valid_date',			lang( 'fv_valid_date' ) );
+			$this->form_validation->set_message( 'valid_datetime',		lang( 'fv_valid_datetime' ) );
 			
 			// --------------------------------------------------------------------------
 			
-			//	Perform any user_meta file uploads
-			$_successes	= array();
-			$_failed	= array();
-			
-			if ( $_uploads ) :
-			
-				$this->load->library( 'cdn' );
-								
-				// --------------------------------------------------------------------------
-				
-				foreach ( $_uploads AS $upload ) :
-				
-					$_validation = explode( '|', $upload['validation'] );
-					
-					// --------------------------------------------------------------------------
-					
-					//	Attempt upload
-					
-					//	File is required and has not been supplied or file size is 0
-					if ( array_search( 'required', $_validation ) !== FALSE && ( ! isset( $_FILES[$upload['col']] ) || ! $_FILES[$upload['col']]['size'] ) ) :
-					
-						//	File failed to upload
-						$_failed['key']		= $upload['col'];
-						$_failed['label']	= $upload['label'];
-						$_failed['error']	= array( lang( 'fv_required' ) );
-						
-						break;
-					
-					//	File has not been supplied, but isn't required, so continue
-					elseif( array_search( 'required', $_validation ) === FALSE && ( ! isset( $_FILES[$upload['col']] ) || ! $_FILES[$upload['col']]['size'] ) ) :
-					
-						continue;
-					
-					//	File has been supplied, process and return any errors.
-					else :
-					
-						$_options						= array();
-						$_options['attachment']			= new stdClass();
-						$_options['attachment']->label	= $upload['label'];
-						$_options['attachment']->table	= 'user_meta';
-						$_options['attachment']->col	= $upload['col'];
-						$_options['attachment']->id		= $_post['id'];
-
-						$_object = $this->cdn->object_create( $upload['col'], $upload['bucket'], $_options );
-					
-						// --------------------------------------------------------------------------
-						
-						if ( ! $_object ) :
-						
-							//	File failed to upload
-							$_failed['key']		= $upload['col'];
-							$_failed['label']	= $upload['label'];
-							$_failed['error']	= $this->cdn->errors();
-							
-							break;
-							
-						else :
-						
-							//	File uploaded without a problem.
-							$_successes[$upload['col']]				= array();
-							$_successes[$upload['col']]['new']		= $_object->id;
-							$_successes[$upload['col']]['old']		= $_user->{$upload['col']} ;
-							$_successes[$upload['col']]['bucket']	= $upload['bucket'];
-						
-						endif;
-					
-					endif;
-				
-				endforeach;
-			
-			endif;
-			
-			// --------------------------------------------------------------------------
-			
-			//	Data is valid and there'll be some form of admin after the update; ALL GOOD :]
-			if ( $this->form_validation->run( $this ) && ! $_failed ) :
+			//	Data is valid; ALL GOOD :]
+			if ( $this->form_validation->run( $this ) ) :
 			
 				//	Define the data var
 				$_data = array();
@@ -678,30 +597,12 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				
 				//	If we have a profile image, attempt to upload it
 				if ( isset( $_FILES['profile_img'] ) && $_FILES['profile_img']['error'] != 4 ) :
-					
-					$this->load->library( 'cdn' );
 
 					$_object = $this->cdn->object_replace( $_user->profile_img, 'profile-images', 'profile_img' );
 					
 					if ( $_object ) :
 					
 						$_data['profile_img'] = $_object->id;
-
-						// --------------------------------------------------------------------------
-
-						//	Make sure an attachment exists
-						$_attachment					= array();
-						$_attachment['label']			= 'Profile Image';
-						$_attachment['table']			= 'user';
-						$_attachment['col']				= 'profile_img';
-						$_attachment['attached_to_id']	= $_post['id'];
-						$_attachment['select_cols']		= 'first_name,last_name';
-
-						//	Remove any old attachments
-						$this->cdn->object_attachment_purge( $_attachment );
-
-						//	Add new attachment
-						$this->cdn->object_attachment_add( $_object->id, $_attachment );
 					
 					else :
 					
@@ -739,32 +640,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					
 						switch ( $value['datatype'] ) :
 						
-							case 'date' :
-							
-								$_data[$col] = $_post[$col . '_year'] . '-' . $_post[$col . '_month'] . '-' . $_post[$col . '_day'];
-							
-							break;
-							
-							// --------------------------------------------------------------------------
-							
 							case 'bool' :
 							case 'boolean' :
 							
 								//	Convert all to boolean from string
 								$_data[$col] = string_to_boolean( $_post[$col] );
-							
-							break;
-							
-							// --------------------------------------------------------------------------
-							
-							case 'file' :
-							case 'upload' :
-							
-								if ( isset( $_successes[$col]['new'] ) ) :
-								
-									$_data[$col] = $_successes[$col]['new'];
-								
-								endif;
 							
 							break;
 							
@@ -791,45 +671,15 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						
 						//	refresh the user object
 						$_user = $this->user->get_by_id( $_post['id'] );
-						
-						// --------------------------------------------------------------------------
-						
-						//	Delete any old files now orphaned as a result of the update.
-						if ( $_successes ) :
-						
-							foreach ( $_successes AS $file ) :
-							
-								if ( $file['old'] ) :
-								
-									$this->cdn->delete( $file['old'], $file['bucket'] );
-								
-								endif;
-							
-							endforeach;
-						
-						endif;
 					
 					//	The account failed to update, feedback to user
 					else:
 					
-						$this->data['error'] = lang( 'fv_there_were_errors' );
+						$this->data['error'] = lang( 'accounts_edit_fail', implode( ', ', $this->user->get_error() ) );
 						
 					endif;
 				
 				endif;
-			
-			//	Update failed due to a failed meta upload	
-			elseif ( $_failed ) :
-			
-				//	Delete all new uploads
-				foreach ( $_successes AS $file ) :
-				
-					$this->cdn->delete( $file['new'], $file['bucket'] );
-				
-				endforeach;
-				
-				$this->data['error']							= lang( 'accounts_edit_error_upload', $_failed['label'] );
-				$this->data['upload_error_' . $_failed['key']]	= $_failed['error'];
 			
 			//	Update failed for another reason
 			else:
@@ -874,20 +724,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :
 
-			$this->load->library( 'cdn' );
 			$this->data['user_uploads'] = $this->cdn->get_objects_for_user( $_user->id );
 
 		endif;
 		
 		// --------------------------------------------------------------------------
-		
-		$this->data['return_string']	= '?return_to=' . urlencode( $this->input->get( 'return_to' ) );
-		
-		if ( $this->input->get( 'inline' ) ) :
-		
-			$this->data['return_string'] .= '&inline=true';
-		
-		endif;
 		
 		if ( active_user( 'id' ) == $_user->id ) :
 		
@@ -1240,10 +1081,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 			
 			if ( $_user->profile_img ) :
-			
-				$this->load->library( 'cdn' );
 				
-				if ( $this->cdn->delete( $_user->profile_img, 'profile-images' ) ) :
+				if ( $this->cdn->object_delete( $_user->profile_img, 'profile-images' ) ) :
 				
 					//	Update the user
 					$_data = array();
@@ -1257,7 +1096,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				
 				else :
 				
-					$this->session->set_flashdata( 'error', lang( '', implode( '", "', $this->cdn->errors() ) ) );
+					$this->session->set_flashdata( 'error', lang( 'accounts_delete_img_error', implode( '", "', $this->cdn->errors() ) ) );
 				
 				endif;
 			

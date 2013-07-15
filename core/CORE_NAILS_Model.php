@@ -293,7 +293,7 @@ class CORE_NAILS_Model extends CI_Model {
 			show_error( 'Table variable not set' );
 
 		endif;
-
+		
 		// --------------------------------------------------------------------------
 
 		if ( $data )
@@ -316,7 +316,9 @@ class CORE_NAILS_Model extends CI_Model {
 		if ( $this->db->affected_rows() ) :
 
 			$_id =  $this->db->insert_id();
-		
+
+			// --------------------------------------------------------------------------
+
 			if ( $return_object ) :
 				
 				return $this->get_by_id( $_id );
@@ -378,7 +380,15 @@ class CORE_NAILS_Model extends CI_Model {
 		$this->db->where( $_prefix . 'id', $id );
 		$this->db->update( $_table );
 		
-		return $this->db->affected_rows() ? TRUE : FALSE;
+		if ( $this->db->affected_rows() ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 
@@ -405,7 +415,15 @@ class CORE_NAILS_Model extends CI_Model {
 		$this->db->where( 'id', $id );
 		$this->db->delete( $this->_table );
 		
-		return $this->db->affected_rows() ? TRUE : FALSE;
+		if ( $this->db->affected_rows() ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 	
 	
@@ -579,7 +597,7 @@ class CORE_NAILS_Model extends CI_Model {
 	protected function _generate_slug( $label, $table = NULL, $column = NULL )
 	{
 		//	Prep table and column
-		$_prefix	= ! $_table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
+		$_prefix	= ! $table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
 		$_table		= ! $table ? $this->_table : $table;
 		$_column	= ! $column ? 'slug' : $column;
 

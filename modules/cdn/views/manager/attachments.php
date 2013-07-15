@@ -63,8 +63,23 @@
 					echo '<ul>';
 					foreach ( $attachments AS $attachment ) :
 
-						echo '<li class="attachment">';
-						echo $attachment;
+						$_restrictive = $attachment->is_restrictive ? 'restrictive' : '';
+						echo '<li class="attachment ' . $_restrictive . '">';
+
+						if ( $attachment->where_id ) :
+
+							echo '<span class="where-id">' . $attachment->where_id . '</span>';
+
+						endif;
+
+						echo $attachment->label;
+
+						if ( $_restrictive ) :
+
+							echo '<small>To maintain database integrity, this attachment prevents deletion.</small>';
+
+						endif;
+
 						echo '</li>';
 
 					endforeach;
@@ -73,8 +88,8 @@
 
 				else :
 
-					echo '<p class="system-alert success no-close">';
-					echo '<strong>No Attachments!</strong> This item is not marked as being attached to any other piece of content.';
+					echo '<p class="system-alert message no-close">';
+					echo '<strong>No Attachments</strong><br />This item is not marked as being attached to any other piece of content.';
 					echo '</p>';
 
 				endif;

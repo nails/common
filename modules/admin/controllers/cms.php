@@ -50,6 +50,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$d->funcs				= array();
 		$d->funcs['pages']		= 'Manage Pages';					//	Sub-nav function.
 		$d->funcs['blocks']		= 'Manage Blocks';					//	Sub-nav function.
+		$d->funcs['sliders']	= 'Manage Sliders';					//	Sub-nav function.
 		
 		// --------------------------------------------------------------------------
 		
@@ -131,7 +132,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	 * @param none
 	 * @return	void
 	 **/
-	private function _pages_index()
+	protected function _pages_index()
 	{
 		//	Page Title
 		$this->data['page']->title = 'Manage Pages';
@@ -166,7 +167,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	 * @param none
 	 * @return	void
 	 **/
-	private function _pages_edit()
+	protected function _pages_edit()
 	{
 		$this->data['cmspage'] = $this->cms_page->get_by_id( $this->uri->segment( 5 ), TRUE );
 		
@@ -292,7 +293,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	private function _pages_rewrite_routes()
+	protected function _pages_rewrite_routes()
 	{
 		if ( $this->cms_page->write_routes() ) :
 
@@ -405,7 +406,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _blocks_index()
+	protected function _blocks_index()
 	{
 		//	Set method info
 		$this->data['page']->title		= 'Manage Blocks';
@@ -426,7 +427,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _blocks_edit()
+	protected function _blocks_edit()
 	{
 		$this->data['block'] = $this->cms_block->get_by_id( $this->uri->segment( 5 ), TRUE );
 		
@@ -496,7 +497,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	private function _blocks_create()
+	protected function _blocks_create()
 	{
 		if ( ! $this->user->is_superuser() ) :
 		
@@ -621,6 +622,59 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			return FALSE;
 		
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function sliders()
+	{
+		//	Load common slider items
+		//$this->load->model( 'cms/cms_block_model', 'cms_block' );
+		//$this->asset->load( 'mustache.min.js', TRUE );
+		//$this->asset->load( 'nails.admin.cms.blocks.min.js', TRUE );
+		
+		// --------------------------------------------------------------------------
+		
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
+		
+		if ( method_exists( $this, '_sliders_' . $_method ) ) :
+		
+			$this->{'_sliders_' . $_method}();
+		
+		else :
+		
+			show_404();
+		
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sliders_index()
+	{
+		$this->data['page']->title = 'Manage Sliders';
+		
+		// --------------------------------------------------------------------------
+		
+		//	Fetch all the sliders in the DB
+		//$this->data['sliders'] = $this->cms_page->get_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		//$this->asset->load( 'jquery.ui.min.js', TRUE );
+		//$this->asset->load( 'mustache.min.js', TRUE );
+		//$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/cms/sliders/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 }
 

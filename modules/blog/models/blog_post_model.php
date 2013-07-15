@@ -71,14 +71,25 @@ class NAILS_Blog_post_model extends NAILS_Model
 		
 		//	Set data
 		$this->db->set( 'slug',				$_slug );
-		$this->db->set( 'title',			$data['title'] );
-		$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );
-		$this->db->set( 'image',			$data['image'] );
-		$this->db->set( 'body',				$data['body'] );
-		$this->db->set( 'seo_title',		$data['title'] );
-		$this->db->set( 'seo_description',	$data['seo_description'] );
-		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );
-		$this->db->set( 'is_published',		$data['is_published'] );
+
+		if ( array_key_exists( 'title', $data ) ) :				$this->db->set( 'title',			$data['title'] );			endif;
+		if ( array_key_exists( 'excerpt', $data ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
+		if ( array_key_exists( 'body', $data ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
+		if ( array_key_exists( 'seo_title', $data ) ) :			$this->db->set( 'seo_title',		$data['title'] );			endif;
+		if ( array_key_exists( 'seo_description', $data ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
+		if ( array_key_exists( 'seo_keywords', $data ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
+		if ( array_key_exists( 'is_published', $data ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
+
+		//	Safety first!
+		if ( array_key_exists( 'image_id', $data ) ) :
+
+			$_image_id = (int) $data['image_id'];
+			$_image_id = ! $_image_id ? NULL : $_image_id;
+
+			$this->db->set( 'image_id', $_image_id );
+
+		endif;
+
 		$this->db->set( 'created',			'NOW()', FALSE );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 		$this->db->set( 'created_by',		active_user( 'id' ) );
@@ -122,30 +133,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 				endforeach;
 
 				$this->db->insert_batch( 'blog_post_tag', $_data );
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			//	If there was an image attached to this post make sure there's an attachment
-			//	registered in the CDN
-
-			if ( $data['image'] ) :
-
-				$this->load->library( 'cdn' );
-
-				$_attachment					= array();
-				$_attachment['label']			= 'Blog Post Image';
-				$_attachment['table']			= 'blog_post';
-				$_attachment['col']				= 'image';
-				$_attachment['attached_to_id']	= $_id;
-				$_attachment['select_cols']		= 'title';
-
-				if ( ! $this->cdn->object_attachment_exists( $data['image'], $_attachment ) ) :
-
-					$this->cdn->object_attachment_add( $data['image'], $_attachment );
-
-				endif;
 
 			endif;
 
@@ -222,15 +209,24 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Set data
-		if ( isset( $data['title'] ) ) :			$this->db->set( 'title',			$data['title'] );			endif;
-		if ( isset( $data['excerpt'] ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
-		if ( isset( $data['image'] ) ) :			$this->db->set( 'image',			$data['image'] );			endif;
-		if ( isset( $data['body'] ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
-		if ( isset( $data['seo_title'] ) ) :		$this->db->set( 'seo_title',		$data['title'] );			endif;
-		if ( isset( $data['seo_description'] ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
-		if ( isset( $data['seo_keywords'] ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
-		if ( isset( $data['is_published'] ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
-		if ( isset( $data['modified'] ) ) :			$this->db->set( 'modified',			'NOW()', FALSE );			endif;
+		if ( array_key_exists( 'title', $data ) ) :				$this->db->set( 'title',			$data['title'] );			endif;
+		if ( array_key_exists( 'excerpt', $data ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
+		if ( array_key_exists( 'body', $data ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
+		if ( array_key_exists( 'seo_title', $data ) ) :			$this->db->set( 'seo_title',		$data['title'] );			endif;
+		if ( array_key_exists( 'seo_description', $data ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
+		if ( array_key_exists( 'seo_keywords', $data ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
+		if ( array_key_exists( 'is_published', $data ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
+		if ( array_key_exists( 'modified', $data ) ) :			$this->db->set( 'modified',			'NOW()', FALSE );			endif;
+
+		//	Safety first!
+		if ( array_key_exists( 'image_id', $data ) ) :
+
+			$_image_id = (int) $data['image_id'];
+			$_image_id = ! $_image_id ? NULL : $_image_id;
+
+			$this->db->set( 'image_id', $_image_id );
+
+		endif;
 		
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		
@@ -242,7 +238,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		
 		if ( $_slug ) :
 		
-			$this->db->set( 'slug',			$_slug );
+			$this->db->set( 'slug', $_slug );
 		
 		endif;
 		
@@ -301,43 +297,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Update any CDN attachments if nessecary
-
-		$this->load->library( 'cdn' );
-
-		$_attachment					= array();
-		$_attachment['label']			= 'Blog Post Image';
-		$_attachment['table']			= 'blog_post';
-		$_attachment['col']				= 'image';
-		$_attachment['attached_to_id']	= $id;
-		$_attachment['select_cols']		= 'title';
-
-		if ( isset( $data['image'] ) && $data['image'] ) :
-
-			if ( ! $this->cdn->object_attachment_repoint( $data['image'], $attachment ) ) :
-
-				//	No attachments were updated, add one if it doesn't exist
-				if ( ! $this->cdn->object_attachment_exists( $data['image'], $_attachment ) ) :
-
-					$this->cdn->object_attachment_add( $data['image'], $_attachment );
-
-				endif;
-
-			endif;
-
-		elseif ( isset( $data['image'] ) && ! $data['image'] && $data['image'] != $_current->image ) :
-
-			//	Data is set, but empty - delete any existing attachments
-			if ( $_current->image ) :
-
-				$this->cdn->object_attachment_delete( $_current->image, $_attachment );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		return TRUE;
 	}
 	
@@ -359,7 +318,15 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->where( 'id', $id );
 		$this->db->update( 'blog_post' );
 		
-		return $this->db->affected_rows() ? TRUE : FALSE;
+		if ( $this->db->affected_rows() ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 	
 	
@@ -367,7 +334,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 	
 	
 	/**
-	 * Undeleted an existing object
+	 * Recover an existing object
 	 * 
 	 * @access public
 	 * @param int $id The ID of the object to recover
@@ -397,7 +364,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 	 **/
 	public function get_all( $only_published = TRUE, $include_body = FALSE, $include_gallery = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
 		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
@@ -450,7 +417,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			// --------------------------------------------------------------------------
 
-			//	Fetch associated Images
+			//	Fetch associated images
 			if ( $include_gallery ) :
 
 				$this->db->where( 'post_id', $post->id );
@@ -601,7 +568,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 	public function get_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.excerpt, bp.seo_title' );
 		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :
@@ -657,7 +624,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 	public function get_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
 	{
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.excerpt, bp.seo_title' );
 		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 		
 		if ( $include_body ) :

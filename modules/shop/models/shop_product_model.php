@@ -220,18 +220,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 			endif;
 
 			// --------------------------------------------------------------------------
-
-			//	Finally, run any post-update methods for this product type; these methods
-			//	are where things like CDN attachments or cache's are updated
-
-			if ( method_exists( $this, '_update_' . $_type->slug ) ) :
-
-				$this->{'_update_' . $_type->slug}( $id, $data, $_meta, $_current );
-
-			endif;
-
-
-			// --------------------------------------------------------------------------
 			
 			return TRUE;
 		
@@ -240,70 +228,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$this->_set_error( 'Unable to save product.' );
 			return FALSE;
 		
-		endif;
-	}
-	
-
-	// --------------------------------------------------------------------------
-
-
-	//	PRODUCT TYPE CREATE/EDIT METHODS
-
-	//	These methods are called after a product is created or updated and can be
-	//	used to do specific tasks (such as CDN attachments or cache control).
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _create_download( $id, $data, $meta )
-	{
-		$_attachment					= array();
-		$_attachment['label']			= 'Shop: Download';
-		$_attachment['table']			= 'shop_product_meta';
-		$_attachment['col']				= 'download_id';
-		$_attachment['attached_to_id']	= $id;
-		$_attachment['select_cols']		= 'title';
-		$_attachment['select_table']	= 'shop_product';
-
-		if ( isset( $meta['download_id'] ) && $meta['download_id'] ) :
-
-			$this->cdn->object_attachment_add( $meta['download_id'], $_attachment );
-
-		endif;
-	}
-
-	protected function _update_download( $id, $data, $meta, $_old )
-	{
-		$_attachment					= array();
-		$_attachment['label']			= 'Shop: Download';
-		$_attachment['table']			= 'shop_product_meta';
-		$_attachment['col']				= 'download_id';
-		$_attachment['attached_to_id']	= $id;
-		$_attachment['select_cols']		= 'title';
-		$_attachment['select_table']	= 'shop_product';
-
-		if ( isset( $meta['download_id'] ) && $meta['download_id'] ) :
-
-			//	Download ID is set, make sure any existing attachments are repointed
-			//	then double check the atatchment exists, if not - add it
-
-			$this->cdn->object_attachment_repoint( $meta['download_id'], $_attachment );
-
-			//	Check there is an attachment
-			if ( ! $this->cdn->object_attachment_exists( $meta['download_id'], $_attachment ) ) :
-
-				$this->cdn->object_attachment_add( $meta['download_id'], $_attachment );
-
-			endif;
-
-		elseif ( isset( $meta['download_id'] ) && ! $meta['download_id'] && $meta['download_id'] != $_old->download_id ):
-
-			//	Download ID is set, but it's blank and not the same value, remove any old
-			//	CDN attachments
-
-			$this->cdn->object_attachment_delete( $_old->download_id, $_attachment );
-
 		endif;
 	}
 
@@ -323,7 +247,15 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->where( 'id', $id );
 		$this->db->delete( $this->_table );
 		
-		return $this->db->affected_rows() ? TRUE : FALSE;
+		if ( $this->db->affected_rows() ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 	
 	
@@ -341,7 +273,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	{
 		$this->db->select( 'p.*' );
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
-		$this->db->select( 'pm.*' );
+		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.requires_shipping type_requires_shipping,pt.max_per_order type_max_per_order' );
 
 		// --------------------------------------------------------------------------
@@ -401,6 +333,24 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$this->db->where( 'p.is_active', TRUE );
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _get_meta_columns()
+	{
+		$_cols = array();
+
+		// --------------------------------------------------------------------------
+
+		//	Downloads
+		$_cols[] = 'pm.download_id';
+
+		// --------------------------------------------------------------------------
+
+		return $_cols;
 	}
 	
 	

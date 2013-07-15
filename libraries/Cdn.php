@@ -13,6 +13,7 @@ class Cdn {
 	private $_cdn;
 	private $db;
 	private $_errors;
+	private $_attachments;
 	
 	// --------------------------------------------------------------------------
 	
@@ -46,6 +47,60 @@ class Cdn {
 		//	Load the storage driver
 		$_class = $this->_include_driver( );
 		$this->_cdn = new $_class( $options );
+
+		// --------------------------------------------------------------------------
+
+		//	Load the config file
+		$this->_ci->config->load( 'cdn', TRUE, TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Merge the attachment config with the default one
+		$this->_attachments	= array();
+
+		//	Table: User
+		$this->_attachments['user']							= array();
+		$this->_attachments['user']['_attr']				= array();
+		$this->_attachments['user']['_attr']['id_column']	= 'id';
+
+		//	User.profile_img
+		$this->_attachments['user']['profile_img']					= array();
+		$this->_attachments['user']['profile_img']['label']			= 'Profile Image';
+		$this->_attachments['user']['profile_img']['select_cols']	= 'first_name,last_name';
+
+		if ( module_is_enabled( 'blog' ) ) :
+
+			//	Table: blog_post
+			$this->_attachments['blog_post']						= array();
+			$this->_attachments['blog_post']['_attr']				= array();
+			$this->_attachments['blog_post']['_attr']['id_column']	= 'id';
+
+			//	shop_product_meta.download_id
+			$this->_attachments['blog_post']['image']			= array();
+			$this->_attachments['blog_post']['image']['label']	= 'Blog: Post Image';
+
+		endif;
+
+
+		if ( module_is_enabled( 'shop' ) ) :
+
+			//	Table: shop_product_meta
+			$this->_attachments['shop_product_meta']						= array();
+			$this->_attachments['shop_product_meta']['_attr']				= array();
+			$this->_attachments['shop_product_meta']['_attr']['id_column']	= 'product_id';
+
+			//	shop_product_meta.download_id
+			$this->_attachments['shop_product_meta']['download_id']						= array();
+			$this->_attachments['shop_product_meta']['download_id']['label']			= 'Shop: Download';
+			$this->_attachments['shop_product_meta']['download_id']['select_cols']		= 'title';
+			$this->_attachments['shop_product_meta']['download_id']['select_table']		= 'shop_product';
+			$this->_attachments['shop_product_meta']['download_id']['is_restrictive']	= TRUE;
+
+		endif;
+
+		//	Merge the two arrays
+		$this->_attachments = array_replace_recursive( $this->_attachments, (array) $this->_ci->config->item( 'attachments', 'cdn' ) );
+		$this->_attachments = array_filter( $this->_attachments );
 	}
 	
 	
@@ -224,7 +279,7 @@ class Cdn {
 				//	If it's not in $_FILES does that file exist on the file system?
 				if ( ! file_exists( $object ) ) :
 				
-					$this->cdn->set_error( lang( 'cdn_error_no_file' ) );
+					$this->set_error( lang( 'cdn_error_no_file' ) );
 					return FALSE;
 				
 				else :
@@ -261,7 +316,7 @@ class Cdn {
 			
 			if ( ! isset( $options['content-type'] ) ) :
 			
-				$this->cdn->set_error( lang( 'cdn_stream_content_type' ) );
+				$this->set_error( lang( 'cdn_stream_content_type' ) );
 				return FALSE;
 			
 			else :
@@ -284,7 +339,7 @@ class Cdn {
 				
 				else :
 				
-					$this->cdn->set_error( lang( 'cdn_error_cache_write_fail' ) );
+					$this->set_error( lang( 'cdn_error_cache_write_fail' ) );
 					return FALSE;
 				
 				endif;
@@ -326,7 +381,7 @@ class Cdn {
 
 		if ( ! get_userobject()->is_admin() && $_bucket->user_id && $_bucket->user_id != active_user( 'id' ) ) :
 		
-			$this->cdn->set_error( lang( 'cdn_error_bucket_nopermission' ) );
+			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
 		
 		endif;
@@ -397,12 +452,12 @@ class Cdn {
 					array_splice( $_types, count( $_types ) - 1, 0, array( ' and ' ) );
 					$_accepted = implode( ', .', $_types );
 					$_accepted = str_replace( ', . and , ', ' and ', $_accepted );
-					$this->cdn->set_error(  lang( 'cdn_error_bad_mime_plural', $_accepted ) );
+					$this->set_error(  lang( 'cdn_error_bad_mime_plural', $_accepted ) );
 				
 				else :
 				
 					$_accepted = implode( '', $_types );
-					$this->cdn->set_error(  lang( 'cdn_error_bad_mime', $_accepted ) );
+					$this->set_error(  lang( 'cdn_error_bad_mime', $_accepted ) );
 				
 				endif;
 				
@@ -422,7 +477,7 @@ class Cdn {
 			if ( $_data->filesize > $_bucket->max_size ) :
 			
 				$_fs_in_kb = format_bytes( $_bucket->max_size );
-				$this->cdn->set_error( lang( 'cdn_error_filesize', $_fs_in_kb ) );
+				$this->set_error( lang( 'cdn_error_filesize', $_fs_in_kb ) );
 				return FALSE;
 			
 			endif;
@@ -472,7 +527,7 @@ class Cdn {
 			
 				if ( $_data->img->width > $options['dimensions']['max_width'] ) :
 				
-					$this->cdn->set_error( lang( 'cdn_error_maxwidth', $options['dimensions']['max_width'] ) );
+					$this->set_error( lang( 'cdn_error_maxwidth', $options['dimensions']['max_width'] ) );
 					$error = TRUE;
 					
 				endif;
@@ -485,7 +540,7 @@ class Cdn {
 			
 				if ( $_data->img->height > $options['dimensions']['max_height'] ) :
 				
-					$this->cdn->set_error( lang( 'cdn_error_maxheight', $options['dimensions']['max_height'] ) );
+					$this->set_error( lang( 'cdn_error_maxheight', $options['dimensions']['max_height'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -498,7 +553,7 @@ class Cdn {
 			
 				if ( $_data->img->width < $options['dimensions']['min_width'] ) :
 				
-					$this->cdn->set_error( lang( 'cdn_error_minwidth', $options['dimensions']['min_width'] ) );
+					$this->set_error( lang( 'cdn_error_minwidth', $options['dimensions']['min_width'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -511,7 +566,7 @@ class Cdn {
 			
 				if ( $_data->img->height < $options['dimensions']['min_height'] ) :
 				
-					$this->cdn->set_error( lang( 'cdn_error_minheight', $options['dimensions']['min_height'] ) );
+					$this->set_error( lang( 'cdn_error_minheight', $options['dimensions']['min_height'] ) );
 					$error = TRUE;
 				
 				endif;
@@ -574,20 +629,6 @@ class Cdn {
 
 				$_status = $_object;
 
-				// --------------------------------------------------------------------------
-
-				//	Any atatchments to add?
-				if ( isset( $options['attachment'] ) && $options['attachment'] ) :
-
-					$_label	= isset( $options['attachment']->label ) ? $options['attachment']->label : NULL;
-					$_table	= isset( $options['attachment']->table ) ? $options['attachment']->table : NULL;
-					$_col	= isset( $options['attachment']->col ) ? $options['attachment']->col : NULL;
-					$_id	= isset( $options['attachment']->id ) ? $options['attachment']->id : NULL;
-
-					$this->object_attachment_add( $_object->id, $_label, $_table, $_col, $_id );
-
-				endif;
-
 			else :
 
 				$this->_cdn->destroy( $_data->filename, $_data->bucket_slug );
@@ -615,146 +656,6 @@ class Cdn {
 
 		return $_status;
 	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function object_attachment_add( $object_id, $data )
-	{
-		if ( ! $object_id ) :
-		
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$_object = $this->get_object( $object_id );
-		
-		if ( ! $_object ) :
-		
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$_data						= array();
-		$_data['object_id']			= $_object->id;
-		$_data['label']				= isset( $data['label'] ) ? $data['label'] : NULL;
-		$_data['table']				= isset( $data['table'] ) ? $data['table'] : NULL;
-		$_data['column']			= isset( $data['column'] ) ? $data['column'] : NULL;
-		$_data['attached_to_id']	= isset( $data['attached_to_id'] ) ? $data['attached_to_id'] : NULL;
-		$_data['select_cols']		= isset( $data['select_cols'] ) ? $data['select_cols'] : NULL;
-		$_data['select_table']		= isset( $data['select_table'] ) ? $data['select_table'] : NULL;
-		$_data['select_id_col']		= isset( $data['select_id_col'] ) ? $data['select_id_col'] : NULL;
-
-		$this->db->set( $_data );
-		$this->db->set( 'created',			'NOW()', FALSE );
-
-		if ( active_user( 'id' ) ) :
-
-			$this->db->set( 'created_by',		active_user( 'id' ) );
-
-		endif;
-
-		$this->db->insert( 'cdn_object_attachment' );
-
-		return (bool) $this->db->affected_rows();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function object_attachment_delete( $object_id, $data )
-	{
-		$_data						= array();
-		$_data['object_id']			= $_object_id;
-		$_data['label']				= isset( $data['label'] ) ? $data['label'] : NULL;
-		$_data['table']				= isset( $data['table'] ) ? $data['table'] : NULL;
-		$_data['column']			= isset( $data['column'] ) ? $data['column'] : NULL;
-		$_data['attached_to_id']	= isset( $data['attached_to_id'] ) ? $data['attached_to_id'] : NULL;
-		$_data['select_cols']		= isset( $data['select_cols'] ) ? $data['select_cols'] : NULL;
-		$_data['select_table']		= isset( $data['select_table'] ) ? $data['select_table'] : NULL;
-		$_data['select_id_col']		= isset( $data['select_id_col'] ) ? $data['select_id_col'] : NULL;
-
-		$this->db->where( $_data );
-
-		$this->db->delete( 'cdn_object_attachment' );
-
-		return (bool) $this->db->affected_rows();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function object_attachment_purge($data )
-	{
-		$_data						= array();
-		$_data['label']				= isset( $data['label'] ) ? $data['label'] : NULL;
-		$_data['table']				= isset( $data['table'] ) ? $data['table'] : NULL;
-		$_data['column']			= isset( $data['column'] ) ? $data['column'] : NULL;
-		$_data['attached_to_id']	= isset( $data['attached_to_id'] ) ? $data['attached_to_id'] : NULL;
-		$_data['select_cols']		= isset( $data['select_cols'] ) ? $data['select_cols'] : NULL;
-		$_data['select_table']		= isset( $data['select_table'] ) ? $data['select_table'] : NULL;
-		$_data['select_id_col']		= isset( $data['select_id_col'] ) ? $data['select_id_col'] : NULL;
-
-		$this->db->where( $_data );
-
-		$this->db->delete( 'cdn_object_attachment' );
-
-		return (bool) $this->db->affected_rows();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function object_attachment_exists( $object_id, $data )
-	{
-		$_data						= array();
-		$_data['object_id']			= $_object_id;
-		$_data['label']				= isset( $data['label'] ) ? $data['label'] : NULL;
-		$_data['table']				= isset( $data['table'] ) ? $data['table'] : NULL;
-		$_data['column']			= isset( $data['column'] ) ? $data['column'] : NULL;
-		$_data['attached_to_id']	= isset( $data['attached_to_id'] ) ? $data['attached_to_id'] : NULL;
-		$_data['select_cols']		= isset( $data['select_cols'] ) ? $data['select_cols'] : NULL;
-		$_data['select_table']		= isset( $data['select_table'] ) ? $data['select_table'] : NULL;
-		$_data['select_id_col']		= isset( $data['select_id_col'] ) ? $data['select_id_col'] : NULL;
-
-		$this->db->where( $_data );
-
-		return (bool) $this->db->count_all_results( 'cdn_object_attachment' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function object_attachment_repoint( $new_object, $data)
-	{
-		$this->db->set( 'object_id', $new_object );
-
-		$_data						= array();
-		$_data['label']				= isset( $data['label'] ) ? $data['label'] : NULL;
-		$_data['table']				= isset( $data['table'] ) ? $data['table'] : NULL;
-		$_data['column']			= isset( $data['column'] ) ? $data['column'] : NULL;
-		$_data['attached_to_id']	= isset( $data['attached_to_id'] ) ? $data['attached_to_id'] : NULL;
-		$_data['select_cols']		= isset( $data['select_cols'] ) ? $data['select_cols'] : NULL;
-		$_data['select_table']		= isset( $data['select_table'] ) ? $data['select_table'] : NULL;
-		$_data['select_id_col']		= isset( $data['select_id_col'] ) ? $data['select_id_col'] : NULL;
-
-		$this->db->where( $_data );
-
-		$this->db->update( 'cdn_object_attachment' );
-
-		return (bool) $this->db->affected_rows();
-	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -768,7 +669,7 @@ class Cdn {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_delete( $object, $bucket )
+	public function object_delete( $object )
 	{
 		if ( ! $object ) :
 		
@@ -801,8 +702,8 @@ class Cdn {
 		endif;
 
 		// --------------------------------------------------------------------------
-
-		if ( $this->_cdn->delete( $_object->filename, $bucket ) ) :
+		
+		if ( $this->_cdn->delete( $_object->filename, $_object->bucket->slug ) ) :
 
 			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
@@ -1273,7 +1174,7 @@ class Cdn {
 			
 				$this->_cdn->destroy( $bucket );
 				
-				$this->cdn->set_error( lang( 'cdn_error_bucket_insert' ) );
+				$this->set_error( lang( 'cdn_error_bucket_insert' ) );
 				return FALSE;
 			
 			endif;
@@ -1686,12 +1587,15 @@ class Cdn {
 
 		foreach ( $object->attachments AS $attachment ) :
 
-			$attachment->id				= (int) $attachment->id;
-			$attachment->attached_to_id	= (int) $attachment->attached_to_id;
+			$attachment->id			= (int) $attachment->id;
+			$attachment->object_id	= (int) $attachment->object_id;
+			$attachment->ref_id		= (int) $attachment->ref_id;
+			$attachment->info_id	= (int) $attachment->info_id;
 
+			unset( $attachment->id );
 			unset( $attachment->object_id );
-			unset( $attachment->created );
-			unset( $attachment->created_by );
+			unset( $attachment->ref_id );
+			unset( $attachment->info_id );
 
 		endforeach;
 

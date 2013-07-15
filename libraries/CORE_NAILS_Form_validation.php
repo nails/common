@@ -90,50 +90,30 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	
 	
 	/**
-	 * Checks if a series of date dropdowns is valid
+	 * Checks if a date is valid
 	 *
 	 * @param	string
 	 * @return	bool
 	 */
-	public function valid_date( $day, $field )
+	public function valid_date( $date )
 	{
+		//	If blank, then assume the date is not required
+		if ( ! $date  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'valid_date', lang( 'fv_valid_date_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
+		$_date	= explode( '-', $date );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
 		
-		//	If all fields are blank then assume the field is not required
-		if ( $year . $month . $day == '00000000' )
-			return TRUE;
-		
-		return checkdate( $month, $day, $year );
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Checks if a date has been set
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	public function date_required( $day, $field )
-	{
-		$CI =& get_instance();
-		
-		if ( ! array_key_exists( 'date_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'date_required', lang( 'fv_required_field' ) );
-		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
-		
-		//	If all fields are blank then the rule fails
-		return $year . $month . $day == '00000000' ? FALSE : TRUE;
+		return checkdate( $_month, $_day, $_year );
 	}
 	
 	
@@ -146,17 +126,25 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */
-	public function date_future( $day, $field )
+	public function date_future( $date )
 	{
+		//	If blank, then assume the date is not required
+		if ( ! $date  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_future', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'date_future', lang( 'fv_valid_date_future_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
+		$_date	= explode( '-', $date );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
 		
-		return strtotime( $year . '-' . $month . '-' . $day ) < strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+		return strtotime( $_year . '-' . $_month . '-' . $_day ) < strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
 	}
 	
 	
@@ -169,18 +157,25 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */
-	public function date_past( $day, $field )
+	public function date_past( $date )
 	{
+		//	If blank, then assume the date is not required
+		if ( ! $date  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'date_past', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'date_past', lang( 'fv_valid_date_past_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
+		$_date	= explode( '-', $date );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
 		
-		//	If all fields are blank then the rule fails
-		return strtotime( $year . '-' . $month . '-' . $day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+		return strtotime( $_year . '-' . $_month . '-' . $_day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
 	}
 	
 	
@@ -193,76 +188,88 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */
-	public function valid_datetime( $day, $field )
+	public function valid_datetime( $datetime )
 	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $datetime  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
 		if ( ! array_key_exists( 'valid_datetime', $CI->form_validation->_error_messages ) )
 			$CI->form_validation->set_message( 'valid_datetime', lang( 'fv_valid_datetime_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
-		$hour	= $CI->input->post( $field . '_hour' );
-		$minute	= $CI->input->post( $field . '_minute' );
+		$_datetime	= explode( ' ', $datetime );
 		
-		$_compiled = $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $minute . ':00';
+		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) 
+			return FALSE;
+
+		$_date	= explode( '-', $_datetime[0] );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
+
+		$_valid_date = checkdate( $_month, $_day, $_year );
+		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
 		
-		//	If all fields are blank then assume the field is not required
-		if ( $_compiled == '0000-00-00 00:00:00' )
+		return $_valid_date && $_valid_time ? TRUE : FALSE;
+	}
+	
+	
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Checks if a datetime is in the future
+	 *
+	 * @param	string
+	 * @return	bool
+	 */
+	public function datetime_future( $datetime )
+	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $datetime  )
 			return TRUE;
-		
-		return date( 'Y-m-d H:i:s', strtotime( $_compiled ) ) == $_compiled;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Checks if a datetime has been set
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	public function datetime_required( $day, $field )
-	{
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
-		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_required_field' ) );
+		if ( ! array_key_exists( 'datetime_future', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_future', lang( 'fv_valid_datetime_future_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
-		$hour	= $CI->input->post( $field . '_hour' );
-		$minute	= $CI->input->post( $field . '_minute' );
+		$_datetime	= explode( ' ', $datetime );
 		
-		//	If all fields are blank then the rule fails
-		return $year . $month . $day . $hour . $minute == '000000000000' ? FALSE : TRUE;
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Checks if a datetime is in the future
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	public function datetime_future( $day, $field )
-	{
-		$CI =& get_instance();
+		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) 
+			return FALSE;
+
+		$_date	= explode( '-', $_datetime[0] );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
+
+		$_valid_date = checkdate( $_month, $_day, $_year );
+		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
 		
-		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_valid_date_future_field' ) );
-		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
-		$hour	= $CI->input->post( $field . '_hour' );
-		$minute	= $CI->input->post( $field . '_minute' );
-		
-		return strtotime( $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $min ) < strtotime( date( 'Y-m-d H:m' ) ) ? FALSE : TRUE;
+		if ( $_valid_date && $_valid_time ) :
+
+			if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) > time() ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 	
 	
@@ -275,23 +282,53 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */
-	public function datetime_past( $day, $field )
+	public function datetime_past( $datetime )
 	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $datetime  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
 		$CI =& get_instance();
 		
-		if ( ! array_key_exists( 'datetime_required', $CI->form_validation->_error_messages ) )
-			$CI->form_validation->set_message( 'datetime_required', lang( 'fv_valid_date_past_field' ) );
+		if ( ! array_key_exists( 'datetime_past', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_past', lang( 'fv_valid_datetime_past_field' ) );
 		
-		$month	= $CI->input->post( $field . '_month' );
-		$year	= $CI->input->post( $field . '_year' );
-		$hour	= $CI->input->post( $field . '_hour' );
-		$minute	= $CI->input->post( $field . '_minute' );
+		$_datetime	= explode( ' ', $datetime );
 		
-		return strtotime( $year . '-' . $month . '-' . $day . ' ' . $hour . ':' . $min ) > strtotime( date( 'Y-m-d H:m' ) ) ? FALSE : TRUE;
+		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) 
+			return FALSE;
+
+		$_date	= explode( '-', $_datetime[0] );
+		$_year	= isset( $_date[0] ) ? $_date[0] : NULL;
+		$_month	= isset( $_date[1] ) ? $_date[1] : NULL;
+		$_day	= isset( $_date[2] ) ? $_date[2] : NULL;
+
+		$_valid_date = checkdate( $_month, $_day, $_year );
+		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
+		
+		if ( $_valid_date && $_valid_time ) :
+
+			if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) < time() ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 	
 }
 
 
 /* End of file NAILS_Form_validation.php */
-/* Location: ./system/application/core/NAILS_Form_validation.php */
+/* Location: ./core/NAILS_Form_validation.php */

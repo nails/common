@@ -74,6 +74,7 @@
 
 	
 	$lang['accounts_edit_ok']					= '<strong>Success!</strong> Updated user %s (%s)';
+	$lang['accounts_edit_fail']					= '<strong>Sorry,</strong> failed to update user: %s';
 	$lang['accounts_edit_editing_self_m']		= '<strong>Hey there handsome!</strong> You are currently editing your own account.';
 	$lang['accounts_edit_editing_self_f']		= '<strong>Hey there beautiful!</strong> You are currently editing your own account.';
 	$lang['accounts_edit_editing_self_u']		= '<strong>Hello there!</strong> You are currently editing your own account.';
@@ -159,7 +160,7 @@
 	
 	//	Deleting profile image
 	$lang['accounts_delete_img_success']		= '<strong>Success!</strong> Profile image was deleted.';
-	$lang['accounts_delete_img_error']			= '<strong>Sorry,</strong> I was unable delete this user\'s profile image. The CDN said: "%s"';
+	$lang['accounts_delete_img_error']			= '<strong>Sorry,</strong> I was unable delete this user\'s profile image. The server said: "%s"';
 	$lang['accounts_delete_img_error_noid']		= '<strong>Sorry,</strong> I was unable to find a user by that ID.';
 	$lang['accounts_delete_img_error_noimg']	= '<strong>Hey!</strong> This user doesn\'t have a profile image to delete.';
 	

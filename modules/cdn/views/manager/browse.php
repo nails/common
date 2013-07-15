@@ -216,69 +216,100 @@
 								</span>
 							</li>
 							<li class="files">
-								<ul>
-								<?php
+							<?php
+							
+								if ( $bucket->objects ) :
 								
-									if ( $bucket->objects ) :
-									
-										foreach ( $bucket->objects AS $object ) :
+									if ( $_filter_view == 'list' ) :
 
-											switch ( $_filter_view ) :
-											
-												case 'detail' :
-												
-													$this->session->set_userdata( 'cdn-manager-view', 'detail' );
-													$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object ) );
-												
-												break;
-												
-												// --------------------------------------------------------------------------
-												
-												case 'list' :
-												
-													$this->session->set_userdata( 'cdn-manager-view', 'list' );
-													$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object ) );
-												
-												break;
-												
-												// --------------------------------------------------------------------------
-												
-												case 'thumb' :
-												default :
-												
-													$this->session->set_userdata( 'cdn-manager-view', 'thumb' );
-													$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object ) );
-												
-												break;
-											
-											endswitch;
+										echo '<table>';
+										echo '<thead>';
+										echo '<tr>';
+										echo '<th class="filename">File</th>';
+										echo '<th class="mime">Type</th>';
+										echo '<th class="filesize">Filesize</th>';
+										echo '<th class="modified">Modified</th>';
+										echo '<th class="actions">Actions</th>';
+										echo '</tr>';
+										echo '</thead>';
+										echo '<tbody>';
+
+									else :
+
+										echo '<ul>';
+
+									endif;
+
+									// --------------------------------------------------------------------------
+
+									foreach ( $bucket->objects AS $object ) :
+
+										switch ( $_filter_view ) :
 										
-										endforeach;
+											case 'detail' :
+											
+												$this->session->set_userdata( 'cdn-manager-view', 'detail' );
+												$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object ) );
+											
+											break;
+											
+											// --------------------------------------------------------------------------
+											
+											case 'list' :
+											
+												$this->session->set_userdata( 'cdn-manager-view', 'list' );
+												$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object ) );
+											
+											break;
+											
+											// --------------------------------------------------------------------------
+											
+											case 'thumb' :
+											default :
+											
+												$this->session->set_userdata( 'cdn-manager-view', 'thumb' );
+												$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object ) );
+											
+											break;
 										
+										endswitch;
+									
+									endforeach;
+
+									if ( $_filter_view == 'list' ) :
+
+										echo '</tbody>';
+										echo '</table>';
+
+									else :
+
+										echo '</ul>';
+
+									endif;
+									
+								else :
+								
+									echo '<div class="no-files">';
+									
+									if ( $this->input->get( 'filter-tag' ) ) :
+									
+										echo '<h1>No Files in this Tag</h1>';
+										echo '<p>Either drag a file in from the \'All My Files\' tag or upload a new file using the form above.</p>';
+									
 									else :
 									
-										echo '<div class="no-files">';
 										
-										if ( $this->input->get( 'filter-tag' ) ) :
+										echo '<h1>No Files</h1>';
+										echo '<p>Upload your first file using the form above.</p>';
 										
-											echo '<h1>No Files in this Tag</h1>';
-											echo '<p>Either drag a file in from the \'All My Files\' tag or upload a new file using the form above.</p>';
 										
-										else :
-										
-											
-											echo '<h1>No Files</h1>';
-											echo '<p>Upload your first file using the form above.</p>';
-											
-											
-										endif;
-										
-										echo '</div>';
-									
 									endif;
+									
+									echo '</div>';
 								
-								?>
-								</ul>
+								endif;
+							
+							?>
 							</li>
 						</ul>
 					</div>

@@ -38,9 +38,9 @@
 					
 					echo '<td class="image">';
 					
-					if ( $post->image ) :
+					if ( $post->image_id ) :
 					
-						echo anchor( cdn_serve( $post->image ), img( cdn_scale( $post->image, 75, 75 ) ), 'class="fancybox"' );
+						echo anchor( cdn_serve( $post->image_id ), img( cdn_scale( $post->image_id, 75, 75 ) ), 'class="fancybox"' );
 					
 					else :
 					
@@ -67,7 +67,7 @@
 					if ( $post->is_published ) :
 					
 						echo '<span class="yes">Yes</span>';
-						echo '<small class="nice-time">' . $post->published . '</small>';
+						echo '<small class="nice-time">' . user_datetime( $post->published, 'Y-m-d', 'H:i:s' ) . '</small>';
 						
 					else :
 					

@@ -65,8 +65,19 @@
 				<?=anchor( '/', lang( 'admin_switch_frontend' ) )?>
 			</li>
 			<li style="color:#999;">
-				<?=lang( 'admin_loggedin_as', array( site_url( 'admin/accounts/edit/' . active_user( 'id' ) ), active_user( 'first_name' ) ) )?>
 				<?php
+
+				//	Logged in as
+				$_link = anchor( 'admin/accounts/edit/' . active_user( 'id' ), active_user( 'first_name' ), 'class="fancybox" data-fancybox-type="iframe"' );
+				echo lang( 'admin_loggedin_as', $_link );
+
+				if ( active_user( 'profile_img' ) ) :
+
+					echo img( array( 'src' => cdn_thumb( active_user( 'profile_img' ), 16, 16 ), 'class' => 'avatar' ) );
+
+				endif;
+
+				// --------------------------------------------------------------------------
 				
 				$_admin_recovery = $this->session->userdata( 'admin_recovery' );
 				

@@ -77,6 +77,10 @@
 	$lang['fv_valid_date_past_field']		= 'The %s field must be in the past.';
 	$lang['fv_valid_datetime']				= 'This field must be a valid datetime.';
 	$lang['fv_valid_datetime_field']		= 'The %s field is not a valid datetime.';
+	$lang['fv_valid_datetime_future']		= 'This field must be in the future.';
+	$lang['fv_valid_datetime_future_field']	= 'The %s field must be in the future.';
+	$lang['fv_valid_datetime_past']			= 'This field must be in the past.';
+	$lang['fv_valid_datetime_past_field']	= 'The %s field must be in the past.';
 	
 	
 	// --------------------------------------------------------------------------

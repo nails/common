@@ -38,7 +38,7 @@
 			
 			if ( $member->last_login ) :
 			
-				echo '<small>' . lang( 'accounts_index_last_login', array( $member->last_login, $member->login_count ) ) . '</small>';
+				echo '<small>' . lang( 'accounts_index_last_login', array( user_datetime( $member->last_login, 'Y-m-d', 'H:i:s' ), $member->login_count ) ) . '</small>';
 			
 			else :
 			

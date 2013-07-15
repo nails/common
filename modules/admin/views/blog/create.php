@@ -50,7 +50,7 @@
 			
 			//	Featured Image
 			$_field					= array();
-			$_field['key']			= 'image';
+			$_field['key']			= 'image_id';
 			$_field['label']		= 'Featured Image';
 			$_field['bucket']		= 'blog';
 			

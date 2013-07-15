@@ -52,9 +52,9 @@
 			
 			//	Featured Image
 			$_field					= array();
-			$_field['key']			= 'image';
+			$_field['key']			= 'image_id';
 			$_field['label']		= 'Featured Image';
-			$_field['default']		= $post->image;
+			$_field['default']		= $post->image_id;
 			$_field['bucket']		= 'blog';
 			
 			echo form_field_mm_image( $_field );
