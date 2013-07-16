@@ -45,3 +45,10 @@
 
 	//	Serve errors
 	$lang['cdn_error_serve_invalid_request']	= 'Invalid Request';
+	$lang['cdn_error_serve_bad_token']			= 'Bad Token';
+	$lang['cdn_error_serve_object_not_defined']	= 'Object not defined';
+	$lang['cdn_error_serve_file_not_found']		= 'File not found';
+
+
+
+

@@ -104,7 +104,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		if ( $this->_bad_token ) :
 		
 			log_message( 'error', 'CDN: Serve: Bad Token' );
-			return $this->_bad_src();
+			return $this->_bad_src( lang( 'cdn_error_serve_bad_token' ) );
 		
 		endif;
 		
@@ -145,15 +145,15 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		if ( ! defined( 'CDN_PATH' ) ) :
 		
 			log_message( 'error', 'CDN: Serve: CDN_PATH is not defined' );
-			return $this->_bad_src();
+			return $this->_bad_src( lang( 'cdn_not_configured' ) );
 			
 		endif;
 		
 		//	Object found?
 		if ( ! $this->_object ) :
 		
-			log_message( 'error', 'CDN: Serve: Object not found' );
-			return $this->_bad_src();
+			log_message( 'error', 'CDN: Serve: Object not defined' );
+			return $this->_bad_src( lang( 'cdn_error_serve_object_not_defined' ) );
 			
 		endif;
 
@@ -161,7 +161,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		if ( ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
 		
 			log_message( 'error', 'CDN: Serve: File does not exist' );
-			return $this->_bad_src();
+			return $this->_bad_src( lang( 'cdn_error_serve_file_not_found' ) );
 			
 		endif;
 
@@ -238,45 +238,29 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	// --------------------------------------------------------------------------
 	
 	
-	protected function _bad_src()
+	protected function _bad_src( $error = NULL )
 	{
-		if ( ! defined( 'CDN_PATH' ) ) :
+		header( 'Cache-Control: no-cache, must-revalidate' );
+		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Content-type: application/json' );
+		header( 'HTTP/1.0 400 Bad Request' );
+		
+		// --------------------------------------------------------------------------
+		
+		$_out = array(
+		
+			'status'	=> 400,
+			'message'	=> lang( 'cdn_error_serve_invalid_request' )
+		
+		);
 
-			header( 'Cache-Control: no-cache, must-revalidate' );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			header( 'Content-type: application/json' );
-			header( 'HTTP/1.0 400 Bad Request' );
-			
-			// --------------------------------------------------------------------------
-			
-			$_out = array(
-			
-				'status'	=> 400,
-				'message'	=> lang( 'cdn_not_configured' )
-			
-			);
-			
-			echo json_encode( $_out );
+		if ( $error ) :
 
-		else :
-
-			header( 'Cache-Control: no-cache, must-revalidate' );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			header( 'Content-type: application/json' );
-			header( 'HTTP/1.0 400 Bad Request' );
-			
-			// --------------------------------------------------------------------------
-			
-			$_out = array(
-			
-				'status'	=> 400,
-				'message'	=> lang( 'cdn_error_serve_invalid_request' )
-			
-			);
-			
-			echo json_encode( $_out );
+			$_out['error'] = $error;
 
 		endif;
+		
+		echo json_encode( $_out );
 	}
 	
 	
