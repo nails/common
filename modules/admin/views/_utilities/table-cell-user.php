@@ -5,7 +5,7 @@
 
 	// --------------------------------------------------------------------------
 
-	//	Profile imag
+	//	Profile image
 	if ( isset( $profile_img ) && $profile_img ) :
 
 		echo anchor( cdn_serve( $profile_img ) ,img( cdn_thumb( $profile_img, 35, 35 ) ), 'class="fancybox"' );

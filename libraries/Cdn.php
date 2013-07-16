@@ -13,7 +13,6 @@ class Cdn {
 	private $_cdn;
 	private $db;
 	private $_errors;
-	private $_attachments;
 	
 	// --------------------------------------------------------------------------
 	
@@ -47,60 +46,6 @@ class Cdn {
 		//	Load the storage driver
 		$_class = $this->_include_driver( );
 		$this->_cdn = new $_class( $options );
-
-		// --------------------------------------------------------------------------
-
-		//	Load the config file
-		$this->_ci->config->load( 'cdn', TRUE, TRUE );
-
-		// --------------------------------------------------------------------------
-
-		//	Merge the attachment config with the default one
-		$this->_attachments	= array();
-
-		//	Table: User
-		$this->_attachments['user']							= array();
-		$this->_attachments['user']['_attr']				= array();
-		$this->_attachments['user']['_attr']['id_column']	= 'id';
-
-		//	User.profile_img
-		$this->_attachments['user']['profile_img']					= array();
-		$this->_attachments['user']['profile_img']['label']			= 'Profile Image';
-		$this->_attachments['user']['profile_img']['select_cols']	= 'first_name,last_name';
-
-		if ( module_is_enabled( 'blog' ) ) :
-
-			//	Table: blog_post
-			$this->_attachments['blog_post']						= array();
-			$this->_attachments['blog_post']['_attr']				= array();
-			$this->_attachments['blog_post']['_attr']['id_column']	= 'id';
-
-			//	shop_product_meta.download_id
-			$this->_attachments['blog_post']['image']			= array();
-			$this->_attachments['blog_post']['image']['label']	= 'Blog: Post Image';
-
-		endif;
-
-
-		if ( module_is_enabled( 'shop' ) ) :
-
-			//	Table: shop_product_meta
-			$this->_attachments['shop_product_meta']						= array();
-			$this->_attachments['shop_product_meta']['_attr']				= array();
-			$this->_attachments['shop_product_meta']['_attr']['id_column']	= 'product_id';
-
-			//	shop_product_meta.download_id
-			$this->_attachments['shop_product_meta']['download_id']						= array();
-			$this->_attachments['shop_product_meta']['download_id']['label']			= 'Shop: Download';
-			$this->_attachments['shop_product_meta']['download_id']['select_cols']		= 'title';
-			$this->_attachments['shop_product_meta']['download_id']['select_table']		= 'shop_product';
-			$this->_attachments['shop_product_meta']['download_id']['is_restrictive']	= TRUE;
-
-		endif;
-
-		//	Merge the two arrays
-		$this->_attachments = array_replace_recursive( $this->_attachments, (array) $this->_ci->config->item( 'attachments', 'cdn' ) );
-		$this->_attachments = array_filter( $this->_attachments );
 	}
 	
 	
@@ -154,12 +99,12 @@ class Cdn {
 
 	public function get_objects()
 	{
-		$this->db->select( 'o.id, o.user_id, o.filename, o.filename_display, o.created, o.modified, o.serves, o.thumbs, o.scales' );
-		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height' );
+		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 		
-		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
 		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
@@ -168,11 +113,33 @@ class Cdn {
 		
 		foreach ( $_objects AS $obj ) :
 
-			//	Fetch any attachments
-			$this->db->where( 'object_id', $obj->id );
-			$obj->attachments = $this->db->get( 'cdn_object_attachment' )->result();
+			//	Format the object, make it pretty
+			$this->_format_object( $obj );
 
-			// --------------------------------------------------------------------------
+		endforeach;
+
+		return $_objects;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_objects_from_trash()
+	{
+		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
+		
+		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
+
+		$this->db->order_by( 'o.filename_display' );
+		
+		$_objects = $this->db->get( 'cdn_object_trash o' )->result();
+		
+		foreach ( $_objects AS $obj ) :
 
 			//	Format the object, make it pretty
 			$this->_format_object( $obj );
@@ -233,6 +200,52 @@ class Cdn {
 
 
 	/**
+	 * Returns a single object object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	public function get_object_from_trash( $object, $bucket = NULL )
+	{
+		if ( is_numeric( $object ) ) :
+		
+			$this->db->where( 'o.id', $object );
+		
+		else :
+		
+			$this->db->where( 'o.filename', $object );
+			
+			if ( $bucket ) :
+			
+				if ( is_numeric( $bucket ) ) :
+				
+					$this->db->where( 'b.id', $bucket );
+				
+				else :
+				
+					$this->db->where( 'b.slug', $bucket );
+				
+				endif;
+			
+			endif;
+		
+		endif;
+
+		$_objects = $this->get_objects_from_trash();
+
+		if ( ! $_objects )
+			return FALSE;
+
+		return $_objects[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Returns objects uploaded by the user
 	 *
 	 * @access	public
@@ -242,7 +255,7 @@ class Cdn {
 	 **/
 	public function get_objects_for_user( $user_id )
 	{
-		$this->db->where( 'o.user_id', $user_id );
+		$this->db->where( 'o.created_by', $user_id );
 		return $this->get_objects();
 	}
 
@@ -351,7 +364,15 @@ class Cdn {
 		// --------------------------------------------------------------------------
 
 		//	Test and set the bucket, if it doesn't exist, create it
-		$_bucket = $this->get_bucket( $bucket );
+		if ( is_numeric( $bucket ) || is_string( $bucket ) ) :
+
+			$_bucket = $this->get_bucket( $bucket );
+
+		else :
+
+			$_bucket = $bucket;
+
+		endif;
 		
 		if ( ! $_bucket ) :
 		
@@ -360,7 +381,7 @@ class Cdn {
 				$_bucket = $this->get_bucket( $bucket );
 				
 				$_data->bucket_id	= $_bucket->id;
-				$_data->bucket_slug	= $bucket;
+				$_data->bucket_slug	= $_bucket->slug;
 			
 			else :
 			
@@ -371,15 +392,14 @@ class Cdn {
 		else :
 		
 			$_data->bucket_id	= $_bucket->id;
-			$_data->bucket_slug	= $bucket;
+			$_data->bucket_slug	= $_bucket->slug;
 		
 		endif;
 
 		// --------------------------------------------------------------------------
 		
 		//	Does the user have permission to write to the bucket?
-
-		if ( ! get_userobject()->is_admin() && $_bucket->user_id && $_bucket->user_id != active_user( 'id' ) ) :
+		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
 		
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
@@ -659,16 +679,8 @@ class Cdn {
 	
 	
 	// --------------------------------------------------------------------------
-	
-	
-	/**
-	 * Permenantly deletes an object
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
+
+
 	public function object_delete( $object )
 	{
 		if ( ! $object ) :
@@ -694,7 +706,186 @@ class Cdn {
 		//	Can the user modify the bucket/objects? Admins always can but if the bucket
 		//	has a user then the current user must be the owner
 		
-		if ( ! get_userobject()->is_admin() && $_object->user->id && $_object->user->id != active_user( 'id' ) ) :
+		if ( ! $this->_can_edit_object( $_object ) ) :
+		
+			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
+			return FALSE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		$_data						= array();
+		$_data['id']				= $_object->id;
+		$_data['bucket_id']			= $_object->bucket->id;
+		$_data['filename']			= $_object->filename;
+		$_data['filename_display']	= $_object->filename_display;
+		$_data['mime']				= $_object->mime;
+		$_data['filesize']			= $_object->filesize;
+		$_data['img_width']			= $_object->img_width;
+		$_data['img_height']		= $_object->img_height;
+		$_data['is_animated']		= $_object->is_animated;
+		$_data['created']			= $_object->created;
+		$_data['created_by']		= $_object->creator->id;
+		$_data['modified']			= $_object->modified;
+		$_data['modified_by']		= $_object->modified_by;
+		$_data['serves']			= $_object->serves;
+		$_data['downloads']			= $_object->downloads;
+		$_data['thumbs']			= $_object->thumbs;
+		$_data['scales']			= $_object->scales;
+
+		$this->db->set( $_data );
+		$this->db->set( 'trashed', 'NOW()', FALSE );
+		
+		//	Start transaction
+		$this->db->trans_start();
+
+			//	Create trash object
+			$this->db->insert( 'cdn_object_trash' );
+
+			//	Remove original object
+			$this->db->where( 'id', $_object->id );
+			$this->db->delete( 'cdn_object' );
+
+		$this->db->trans_complete();
+
+		if ( $this->db->trans_status() !== FALSE ) :
+
+			return TRUE;
+
+		else :
+
+			$this->set_error( lang( 'cdn_error_delete' ) );
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function object_restore( $object )
+	{
+		if ( ! $object ) :
+		
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$_object = $this->get_object_from_trash( $object );
+		
+		if ( ! $_object ) :
+		
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Can the user modify the bucket/objects? Admins always can but if the bucket
+		//	has a user then the current user must be the owner
+		
+		if ( ! $this->_can_edit_object( $_object ) ) :
+		
+			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
+			return FALSE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		$_data						= array();
+		$_data['id']				= $_object->id;
+		$_data['bucket_id']			= $_object->bucket->id;
+		$_data['filename']			= $_object->filename;
+		$_data['filename_display']	= $_object->filename_display;
+		$_data['mime']				= $_object->mime;
+		$_data['filesize']			= $_object->filesize;
+		$_data['img_width']			= $_object->img_width;
+		$_data['img_height']		= $_object->img_height;
+		$_data['is_animated']		= $_object->is_animated;
+		$_data['created']			= $_object->created;
+		$_data['created_by']		= $_object->creator->id;
+		$_data['serves']			= $_object->serves;
+		$_data['downloads']			= $_object->downloads;
+		$_data['thumbs']			= $_object->thumbs;
+		$_data['scales']			= $_object->scales;
+
+		if ( get_userobject()->is_logged_in() ) :
+
+			$_data['modified_by']	= active_user( 'id' );
+
+		endif;
+
+		$this->db->set( $_data );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		
+		//	Start transaction
+		$this->db->trans_start();
+
+			//	Restore object
+			$this->db->insert( 'cdn_object' );
+
+			//	Remove trash object
+			$this->db->where( 'id', $_object->id );
+			$this->db->delete( 'cdn_object_trash' );
+
+		$this->db->trans_complete();
+
+		if ( $this->db->trans_status() !== FALSE ) :
+
+			return TRUE;
+
+		else :
+
+			$this->set_error( lang( 'cdn_error_delete' ) );
+			return FALSE;
+
+		endif;
+	}
+
+	// --------------------------------------------------------------------------
+	
+	
+	/**
+	 * Permenantly deletes an object
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function object_destroy( $object )
+	{
+		if ( ! $object ) :
+		
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$_object = $this->get_object( $object );
+		
+		if ( ! $_object ) :
+		
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		//	Can the user modify the bucket/objects? Admins always can but if the bucket
+		//	has a user then the current user must be the owner
+		
+		if ( ! $this->_can_edit_object( $_object ) ) :
 		
 			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
 			return FALSE;
@@ -775,16 +966,7 @@ class Cdn {
 		
 		if ( $_upload ) :
 		
-			//	Update any existing attachments to point to this new object
-			$_object = $this->get_object( $object );
-
 			if ( $_object ) :
-
-				$this->db->set( 'object_id', $_upload->id );
-				$this->db->where( 'object_id', $_object->id );
-				$this->db->update( 'cdn_object_attachment' );
-
-				// --------------------------------------------------------------------------
 
 				//	Attempt the delete
 				$this->delete( $_object->id, $bucket );
@@ -830,11 +1012,7 @@ class Cdn {
 		// --------------------------------------------------------------------------
 		
 		//	Valid tag?
-		$this->db->select( 't.*, b.user_id' );
-		$this->db->join( 'cdn_bucket b', 'b.id = t.bucket_id', 'LEFT' );
-		
 		$this->db->where( 't.id', $tag_id );
-		
 		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
 		
 		if ( ! $_tag ) :
@@ -849,7 +1027,7 @@ class Cdn {
 		//	Can the user modify the bucket/objects? Admins always can but if the bucket
 		//	has a user then the current user must be the owner
 		
-		if ( ! get_userobject()->is_admin() && $_tag->user_id && $_tag->user_id != active_user( 'id' ) ) :
+		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
 		
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
@@ -905,11 +1083,7 @@ class Cdn {
 		// --------------------------------------------------------------------------
 		
 		//	Valid tag?
-		$this->db->select( 't.*, b.user_id' );
-		$this->db->join( 'cdn_bucket b', 'b.id = t.bucket_id', 'LEFT' );
-		
 		$this->db->where( 't.id', $tag_id );
-		
 		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
 		
 		if ( ! $_tag ) :
@@ -924,7 +1098,7 @@ class Cdn {
 		//	Can the user modify the bucket/objects? Admins always can but if the bucket
 		//	has a user then the current user must be the owner
 		
-		if ( ! get_userobject()->is_admin() && $_tag->user_id && $_tag->user_id != active_user( 'id' ) ) :
+		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
 		
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
@@ -1055,9 +1229,12 @@ class Cdn {
 	 **/
 	public function get_buckets( $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
 	{
-		$this->db->select( 'id,slug,user_id,allowed_types,max_size,created,modified' );
+		$this->db->select( 'b.id,b.slug,b.label,b.allowed_types,b.max_size,b.created,b.created_by,b.modified,b.modified_by' );
+		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( '(SELECT COUNT(*) FROM cdn_object WHERE bucket_id = b.id) object_count' );
 		
+		$this->db->join( 'user u', 'u.id = b.created_by', 'LEFT' );
+
 		$_buckets = $this->db->get( 'cdn_bucket b' )->result();
 		
 		// --------------------------------------------------------------------------
@@ -1065,8 +1242,7 @@ class Cdn {
 		foreach ( $_buckets AS &$bucket ) :
 		
 			//	Format bucket object
-			$bucket->id			= (int) $bucket->id;
-			$bucket->user_id	= (int) $bucket->user_id;
+			$this->_format_bucket( $bucket );
 			
 			// --------------------------------------------------------------------------
 			
@@ -1137,7 +1313,7 @@ class Cdn {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function bucket_create( $bucket )
+	public function bucket_create( $bucket, $label = NULL )
 	{
 		//	Test if bucket exists, if it does stop, job done.
 		$_bucket = $this->get_bucket( $bucket );
@@ -1155,12 +1331,22 @@ class Cdn {
 		if ( $_bucket ) :
 
 			$this->db->set( 'slug', $bucket );
+			if ( ! $label ) :
+
+				$this->db->set( 'label', ucwords( str_replace( '-', ' ', $bucket ) ) );
+
+			else :
+
+				$this->db->set( 'label', $label );
+
+			endif;
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
 			
-			if ( active_user( 'id' ) ) :
+			if ( get_userobject()->is_logged_in() ) :
 			
-				$this->db->set( 'user_id', active_user( 'id' ) );
+				$this->db->set( 'created_by',	active_user( 'id' ) );
+				$this->db->set( 'modified_by',	active_user( 'id' ) );
 			
 			endif;
 			
@@ -1267,9 +1453,17 @@ class Cdn {
 		endif;
 		
 		// --------------------------------------------------------------------------
-		
+
 		//	Test bucket
-		$_bucket = $this->get_bucket( $bucket );
+		if ( is_numeric( $bucket ) || is_string( $bucket ) ) :
+
+			$_bucket = $this->get_bucket( $bucket );
+
+		else :
+
+			$_bucket = $bucket;
+
+		endif;
 		
 		if ( ! $_bucket ) :
 		
@@ -1280,8 +1474,8 @@ class Cdn {
 		
 		//	If the bucket has an owner/user then only the owner user can add tags to the bucket
 		//	Administrators can add to any bucket
-		
-		if ( ! get_userobject()->is_admin() && $_bucket->user_id && $bucket->user_id != active_user( 'id' ) ) :
+
+		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
 		
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
@@ -1326,7 +1520,15 @@ class Cdn {
 	public function bucket_tag_delete( $bucket, $label )
 	{
 		//	Test bucket
-		$_bucket = $this->get_bucket( $bucket );
+		if ( is_numeric( $bucket ) || is_string( $bucket ) ) :
+
+			$_bucket = $this->get_bucket( $bucket );
+
+		else :
+
+			$_bucket = $bucket;
+
+		endif;
 		
 		if ( ! $_bucket ) :
 		
@@ -1338,7 +1540,7 @@ class Cdn {
 		//	If the bucket has an owner/user then only the owner user can delete tags from the bucket
 		//	Administrators can add to any bucket
 		
-		if ( ! get_userobject()->is_admin() && $_bucket->user_id && $bucket->user_id != active_user( 'id' ) ) :
+		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
 		
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
@@ -1459,9 +1661,10 @@ class Cdn {
 		$this->db->set( 'created',			'NOW()', FALSE );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 		
-		if ( active_user( 'id' ) ) :
+		if ( get_userobject()->is_logged_in() ) :
 		
-			$this->db->set( 'user_id',		active_user( 'id' ) );
+			$this->db->set( 'created_by',	active_user( 'id' ) );
+			$this->db->set( 'modified_by',	active_user( 'id' ) );
 		
 		endif;
 		
@@ -1540,34 +1743,37 @@ class Cdn {
 
 
 	/**
-	 * Formats an object
+	 * Formats an object object
 	 *
 	 * @access	private
-	 * @param	array	$message	The error message to add
+	 * @param	object	$object	The object to format
 	 * @return	void
 	 * @author	Pablo
 	 **/
 	private function _format_object( &$object )
 	{
-		$object->id			= (int) $object->id;
-		$object->filesize	= (int) $object->filesize;
-		$object->img_width	= (int) $object->img_width;
-		$object->img_height	= (int) $object->img_height;
-		$object->serves		= (int) $object->serves;
-		$object->thumbs		= (int) $object->thumbs;
-		$object->scales		= (int) $object->scales;
+		$object->id				= (int) $object->id;
+		$object->filesize		= (int) $object->filesize;
+		$object->img_width		= (int) $object->img_width;
+		$object->img_height		= (int) $object->img_height;
+		$object->is_animated	= (bool) $object->is_animated;
+		$object->serves			= (int) $object->serves;
+		$object->downloads		= (int) $object->downloads;
+		$object->thumbs			= (int) $object->thumbs;
+		$object->scales			= (int) $object->scales;
+		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
 		
 		// --------------------------------------------------------------------------
 		
-		$object->user				= new stdClass();
-		$object->user->id			= $object->user_id;
-		$object->user->first_name	= $object->first_name;
-		$object->user->last_name	= $object->last_name;
-		$object->user->email		= $object->email;
-		$object->user->profile_img	= $object->profile_img;
-		$object->user->gender		= $object->gender;
+		$object->creator				= new stdClass();
+		$object->creator->id			= $object->created_by ? (int) $object->created_by : NULL;
+		$object->creator->first_name	= $object->first_name;
+		$object->creator->last_name		= $object->last_name;
+		$object->creator->email			= $object->email;
+		$object->creator->profile_img	= $object->profile_img;
+		$object->creator->gender		= $object->gender;
 		
-		unset( $object->user_id );
+		unset( $object->created_by );
 		unset( $object->first_name );
 		unset( $object->last_name );
 		unset( $object->email );
@@ -1582,23 +1788,6 @@ class Cdn {
 
 		unset( $object->bucket_id );
 		unset( $object->bucket_slug );
-
-		// --------------------------------------------------------------------------
-
-		foreach ( $object->attachments AS $attachment ) :
-
-			$attachment->id			= (int) $attachment->id;
-			$attachment->object_id	= (int) $attachment->object_id;
-			$attachment->ref_id		= (int) $attachment->ref_id;
-			$attachment->info_id	= (int) $attachment->info_id;
-
-			unset( $attachment->id );
-			unset( $attachment->object_id );
-			unset( $attachment->ref_id );
-			unset( $attachment->info_id );
-
-		endforeach;
-
 
 		// --------------------------------------------------------------------------
 
@@ -1617,6 +1806,140 @@ class Cdn {
 			break;
 
 		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Formats a bucket object
+	 *
+	 * @access	private
+	 * @param	object	$bucket	The bucket to format
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	private function _format_bucket( &$bucket )
+	{
+		$bucket->id				= (int) $bucket->id;
+		$bucket->object_count	= (int) $bucket->object_count;
+		$bucket->max_size		= (int) $bucket->max_size;
+		$bucket->allowed_types	= explode( '|', $bucket->allowed_types );
+		$bucket->modified_by	= $bucket->modified_by ? (int) $bucket->modified_by : NULL;
+
+		// --------------------------------------------------------------------------
+
+		$bucket->creator				= new stdClass();
+		$bucket->creator->id			= $bucket->created_by ? (int) $bucket->created_by : NULL;
+		$bucket->creator->first_name	= $bucket->first_name;
+		$bucket->creator->last_name		= $bucket->last_name;
+		$bucket->creator->email			= $bucket->email;
+		$bucket->creator->profile_img	= $bucket->profile_img;
+		$bucket->creator->gender		= $bucket->gender;
+		
+		unset( $bucket->created_by );
+		unset( $bucket->first_name );
+		unset( $bucket->last_name );
+		unset( $bucket->email );
+		unset( $bucket->profile_img );
+		unset( $bucket->gender );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _can_edit_object( $object, $user_id = NULL )
+	{
+		if ( is_numeric( $object ) || is_string( $object ) ) :
+
+			$_object = $this->get_object( $object );
+
+		else :
+
+			$_object = $object;
+
+		endif;
+
+		if ( is_null( $user_id ) ) :
+
+			$_user = active_user();
+
+		else :
+
+			$_user = get_userobject()->get_by_id( $user_id );
+
+		endif;
+
+		$_usrobj =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		//	Admins can always read/write to objects
+		if ( $_usrobj->is_admin( $_user ) ) :
+		
+			return TRUE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $_object->creator->id && $_object->creator->id == $_user->id ) :
+
+			return TRUE;
+
+		endif;
+
+		return FALSE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _can_edit_bucket( $bucket, $user_id = NULL )
+	{
+		if ( is_numeric( $bucket ) || is_string( $bucket ) ) :
+
+			$_bucket = $this->get_bucket( $bucket );
+
+		else :
+
+			$_bucket = $bucket;
+
+		endif;
+
+		if ( is_null( $user_id ) ) :
+
+			$_user = active_user();
+
+		else :
+
+			$_user = get_userobject()->get_by_id( $user_id );
+
+		endif;
+
+		$_usrobj =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		//	Admins can always read/write to buckets
+		if ( $_usrobj->is_admin( $_user ) ) :
+		
+			return TRUE;
+		
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $_bucket->creator->id && $_bucket->creator->id == $_user->id ) :
+
+			return TRUE;
+
+		endif;
+
+		return FALSE;
 	}
 
 

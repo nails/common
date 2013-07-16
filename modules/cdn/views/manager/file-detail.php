@@ -33,37 +33,11 @@
 		
 		echo '<div class="created"><strong>Created:</strong> ' . user_datetime( $object->created ) . '</div>';
 		echo '<div class="modified"><strong>Modified:</strong> ' . user_datetime( $object->modified ) . '</div>';
-		echo '<div class="attachments"><strong>Attachments:</strong> ' . count( $object->attachments ) . ' ';
-		echo anchor( 'cdn/manager/attachments/' . $object->id . '?' . $_SERVER['QUERY_STRING'], '<small>[details]</small>', 'class="fancybox" data-fancybox-type="iframe"' );
-		echo '</div>';
 		
 		echo '<div class="actions">';
 
-			//	Any restrictive attachments?
-			$_total			= 0;
-			$_normal		= 0;
-			$_restrictive	= 0;
-
-			foreach( $object->attachments AS $attachment ) :
-
-				$_total++;
-
-				if ( $attachment->is_restrictive ) :
-
-					$_restrictive++;
-
-				else :
-
-					$_normal++;
-
-				endif;
-
-			endforeach;
-
-			// --------------------------------------------------------------------------
-		
 			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete" data-attachments-total="' . $_total . '" data-attachments-restrictive="' . $_restrictive . '" data-attachments-normal="' . $_normal . '"' );
+			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete"' );
 			echo '<a href="' . cdn_serve( $object->id ) . '" class="fancybox awesome small">' . $_action_download . '</a>';
 		
 		echo '</div>';

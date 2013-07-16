@@ -77,7 +77,9 @@ class NAILS_Manager extends NAILS_CDN_Controller
 						//	Bucket and nonce set, cross-check
 						if ( md5( $_bucket[0] . '|' . $_bucket[1] . '|' . APP_PRIVATE_KEY ) === $_hash ) :
 						
-							if ( $this->cdn->get_bucket( $_bucket[0] ) ) :
+							$this->data['bucket'] = $this->cdn->get_bucket( $_bucket[0], TRUE, $this->input->get( 'filter-tag' ) );
+
+							if ( $this->data['bucket'] ) :
 							
 								$_test_ok = TRUE;
 								
@@ -87,6 +89,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 								if ( $this->cdn->bucket_create( $_bucket[0] ) ) :
 
 									$_test_ok = TRUE;
+									$this->data['bucket'] = $this->cdn->get_bucket( $_bucket[0], TRUE, $this->input->get( 'filter-tag' ) );
 
 								else :
 
@@ -119,12 +122,10 @@ class NAILS_Manager extends NAILS_CDN_Controller
 				
 				endif;
 				
-				if ( $_test_ok ) :
-				
-					$this->data['bucket']		= $_bucket[0];
-					$this->data['bucket_label']	= ucwords( $_bucket[0] );
-				
-				else :
+
+				// --------------------------------------------------------------------------
+
+				if ( ! $_test_ok ) :
 				
 					$this->data['enabled']		= FALSE;
 					$this->data['bad_bucket']	= $_error;
@@ -133,19 +134,28 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			
 			else :
 			
-				$this->data['bucket']		= 'user-' . active_user( 'id' );
-				$this->data['bucket_label']	= 'Your User Upload Directory';
+				//	No bucket specified, use the user's upload bucket
+				$_slug	= 'user-' . active_user( 'id' );
+				$_label	= 'User Upload Directory';
 				
 				// --------------------------------------------------------------------------
 				
 				//	Test bucket, if it doesn't exist, create it
-				if ( ! $this->cdn->get_bucket( $this->data['bucket'] ) ) :
+				$this->data['bucket'] = $this->cdn->get_bucket( $_slug, TRUE, $this->input->get( 'filter-tag' ) );
 				
-					if ( ! $this->cdn->bucket_create( $this->data['bucket'] ) ) :
+				if ( ! $this->data['bucket'] ) :
+				
+					$_bucket_id = $this->cdn->bucket_create( $_slug, $_label );
+					
+					if ( ! $_bucket_id ) :
 					
 						 $this->data['enabled']		= FALSE;
-						 $this->data['bad_bucket']	= 'Unable to create upload bucket.';
+						 $this->data['bad_bucket']	= 'Unable to create upload bucket. ' . implode( '. ', $this->cdn->errors() );
 					
+					else :
+
+						$this->data['bucket'] = $this->cdn->get_bucket( $_bucket_id, TRUE, $this->input->get( 'filter-tag' ) );
+
 					endif;
 				
 				endif;
@@ -175,10 +185,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		//	Fetch files
 		if ( $this->data['enabled'] ) :
 		
-			$this->data['bucket'] = $this->cdn->get_bucket( $this->data['bucket'], TRUE, $this->input->get( 'filter-tag' ) );
-
-			// --------------------------------------------------------------------------
-
 			//	Load assets
 			$this->asset->load( 'jquery.min.js', TRUE );
 			$this->asset->load( 'jquery.ui.min.js', TRUE );
@@ -197,94 +203,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			$this->load->view( 'manager/disabled', $this->data );
 		
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function attachments()
-	{
-		//	User is authorised to upload?
-		if ( ! $this->data['enabled'] ) :
-		
-			$this->data['error'] = '<strong>Sorry,</strong> ' . $this->data['type_single'] . ' attachment browser is not available right now.';
-			$this->load->view( 'cdn/manager/attachments', $this->data );
-			return;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->library( 'cdn' );
-
-		if ( ! $this->uri->segment( 4 ) ) :
-
-			$this->data['error'] = '<strong>Sorry,</strong> invalid object.';
-			$this->load->view( 'cdn/manager/attachments', $this->data );
-			return;
-
-		endif;
-
-		$this->data['object'] = $this->cdn->get_object( $this->uri->segment( 4 ) );
-
-		if ( ! $this->data['object'] ) :
-
-			$this->data['error'] = '<strong>Sorry,</strong> invalid object.';
-			$this->load->view( 'cdn/manager/attachments', $this->data );
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Valid object, attachments?
-		$this->data['attachments'] = array();
-
-		foreach( $this->data['object']->attachments AS $attachment ) :
-
-			$_temp					= new stdClass();
-			$_temp->is_restrictive	= $attachment->is_restrictive;
-			$_temp->where_id		= '';
-
-			if ( $attachment->select_cols && $attachment->attached_to_id ) :
-
-				$_select	= $attachment->select_cols;
-				$_table		= $attachment->select_table ? $attachment->select_table : $attachment->table;
-				$_where_id	= $attachment->select_id_col ? $attachment->select_id_col : 'id';
-
-				$_temp->where_id = $_where_id . ':' . $attachment->attached_to_id;
-
-				$this->db->select( $_select );
-				$this->db->where( $_where_id, $attachment->attached_to_id );
-				$this->db->from( $_table );
-
-				$_result = $this->db->get()->row_array();
-
-				if ( $_result ) :
-
-					$_temp->label = $attachment->label . ': "' . implode( ' ', $_result );
-
-				else :
-
-					$_temp->label = $attachment->label;
-
-				endif;
-
-			else :
-
-				$_temp->label			= $attachment->label;
-
-			endif;
-
-			$this->data['attachments'][] = $_temp;
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		//	Load view
-		$this->load->view( 'cdn/manager/attachments', $this->data );
 	}
 	
 	
@@ -313,23 +231,11 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			return;
 		
 		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->load->library( 'cdn' );
-		
-		//	Create bucket, if it's there already this will gracefully fail
-		if ( ! $this->cdn->bucket_create( $this->data['bucket'] ) ) :
-		
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I couldn\'t create the upload folder.' );
-			redirect( $_return );
-			return;
-		
-		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Are we in a tag?
+		$_options = array();
 		if ( $this->input->get( 'filter-tag' ) ) :
 
 			$_options['tag'] = $this->input->get( 'filter-tag' );
@@ -338,7 +244,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Upload the file
-		if ( $this->cdn->object_create( 'userfile', $this->data['bucket'], $_options ) ) :
+		$this->load->library( 'cdn' );
+		if ( $this->cdn->object_create( 'userfile', $this->data['bucket']->id, $_options ) ) :
 		
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File uploaded successfully!' );
 		
@@ -374,9 +281,9 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 		// --------------------------------------------------------------------------
 		
-		$this->load->library( 'CDN' );
+		$this->load->library( 'cdn' );
 
-		//	Fetch the object and make sure it has no attachments
+		//	Fetch the object
 		if ( ! $this->uri->segment( 4 ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid object.' );
@@ -402,7 +309,83 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		
 		if ( $_delete ) :
 		
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File deleted successfully!' );
+			$_url = site_url( 'cdn/manager/restore/' . $this->uri->segment( 4 ) . '?' . $_SERVER['QUERY_STRING'] );
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File deleted successfully! <a href="' . $_url . '">Undo?</a>' );
+			
+			if ( strpos( $_return, '?' ) ) :
+			
+				$_return .= '&';
+			
+			else :
+			
+				$_return .= '?';
+			
+			endif;
+			
+			$_return .= 'deleted=true';
+		
+		else :
+		
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . implode( $this->cdn->errors() ) );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $_return );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function restore()
+	{
+		//	Returning to...?
+		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		
+		// --------------------------------------------------------------------------
+		
+		//	User is authorised to restore??
+		if ( ! $this->data['enabled'] ) :
+		
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> file restorations are not available right now.' );
+			redirect( $_return );
+			return;
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		$this->load->library( 'cdn' );
+
+		//	Fetch the object
+		if ( ! $this->uri->segment( 4 ) ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid object.' );
+			redirect( $_return );
+			return;
+
+		endif;
+
+		$_object = $this->cdn->get_object_from_trash( $this->uri->segment( 4 ) );
+
+		if ( ! $_object ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid object.' );
+			redirect( $_return );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+		
+		//	Attempt Restore
+		$_restore = $this->cdn->object_restore( $_object->id );
+		
+		if ( $_restore ) :
+		
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File restored successfully!' );
 			
 			if ( strpos( $_return, '?' ) ) :
 			

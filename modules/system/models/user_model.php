@@ -362,7 +362,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function is_admin( $user = NULL )
 	{
-		if ( $this->is_superuser( $user = NULL ) )
+		if ( $this->is_superuser( $user ) )
 			return TRUE;
 		
 		return $this->has_permission( 'admin', $user );
@@ -491,11 +491,6 @@ class NAILS_User_model extends NAILS_Model
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
-		if ( module_is_enabled( 'cdn' ) ) :
-
-			$this->db->select( 'cdno.filename profile_img' );
-
-		endif;
 		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
@@ -748,7 +743,6 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _getcount_users_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'cdn_object cdno',			'cdno.id = u.profile_img',				'left' );
 		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
 		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
 		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );
@@ -2207,35 +2201,6 @@ class NAILS_User_model extends NAILS_Model
 	 {
 	 	return $this->update( $id, array( 'is_suspended' => FALSE ) );
 	 }
-	 
-	 
-	 // --------------------------------------------------------------------------
-	 
-	 
-	/**
-	 * Upload a profile image and update the user's record
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	int
-	 * @param	string
-	 * @param	int
-	 * @return	bool
-	 * @author	Pablo
-	 **/
-	public function upload_profile_image( $file, $user_id )
-	{
-		//	TODO: Should use the CDN library
-	}
-	
-	
-	// --------------------------------------------------------------------------
-	
-	
-	public function delete_profile_img()
-	{
-		//	TODO: Should use the CDN library
-	}
 	
 	
 	// --------------------------------------------------------------------------

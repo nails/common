@@ -33,7 +33,7 @@
 	$lang['cdn_error_maxheight']			= 'Image is too tall (max %spx)';
 	$lang['cdn_error_minwidth']				= 'Image is too narrow (min %spx)';
 	$lang['cdn_error_minheight']			= 'Image is too short (min %spx)';
-	$lang['cdn_error_delete']				= 'File failed to delete';
+	$lang['cdn_error_delete']				= 'File failed to delete, it may be in use.';
 	$lang['cdn_error_delete_nofile']		= 'No file to delete.';
 	$lang['cdn_error_couldnotmove']			= 'Failed to move uploaded file into the bucket.';
 

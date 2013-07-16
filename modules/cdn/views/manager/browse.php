@@ -169,7 +169,7 @@
 								?>
 							</li>
 							<li class="bucket-info">
-								Browsing bucket: <strong><?=$bucket_label?></strong>
+								Browsing bucket: <strong><?=$bucket->label?></strong>
 								<?php
 								
 									if ( $this->input->get( 'filter-tag' ) ) :
