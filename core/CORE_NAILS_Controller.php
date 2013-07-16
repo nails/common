@@ -152,6 +152,23 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Database Debug
+		if ( ! defined( 'DB_DEBUG' ) ) :
+
+			if ( ENVIRONMENT == 'production' ) :
+
+				define( 'DB_DEBUG', FALSE );
+
+			else :
+
+				define( 'DB_DEBUG', TRUE );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Default common API credentials
 		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
 
