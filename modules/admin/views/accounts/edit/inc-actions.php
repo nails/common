@@ -47,7 +47,7 @@
 	//	Suspend
 	if ( $user_edit->is_suspended ) :
 	
-		if ( $this->user->has_permission( 'admin.accounts.unsuspend' ) ) :
+		if ( active_user( 'id') != $user_edit->id && $this->user->has_permission( 'admin.accounts.unsuspend' ) ) :
 
 			$_buttons[] = anchor( 'admin/accounts/unsuspend/' . $user_edit->id . $return_string, lang( 'action_unsuspend' ), 'class="awesome"' );
 
@@ -55,7 +55,7 @@
 		
 	else :
 	
-		if ( $this->user->has_permission( 'admin.accounts.suspend' ) ) :
+		if ( active_user( 'id') != $user_edit->id && $this->user->has_permission( 'admin.accounts.suspend' ) ) :
 
 			$_buttons[] = anchor( 'admin/accounts/suspend/' . $user_edit->id . $return_string, lang( 'action_suspend' ), 'class="awesome red"' );
 

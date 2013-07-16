@@ -273,8 +273,25 @@ class NAILS_User_model extends NAILS_Model
 		$this->session->set_userdata( 'id',			$id );
 		$this->session->set_userdata( 'email',		$email );
 		$this->session->set_userdata( 'group_id',	$group_id );
-		
-		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Clears the login data for a user
+	 *
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
+	public function clear_login_data()
+	{
+		$this->session->unset_userdata( 'id' );
+		$this->session->unset_userdata( 'email' );
+		$this->session->unset_userdata( 'group_id' );
 	}
 	
 	

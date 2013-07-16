@@ -177,6 +177,50 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		
 		return strtotime( $_year . '-' . $_month . '-' . $_day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function date_before( $date, $field )
+	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $date  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'date_before', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'date_before', lang( 'fv_valid_date_before_field' ) );
+
+		// --------------------------------------------------------------------------
+
+		return strtotime( $date ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
+	}
+
+	
+	// --------------------------------------------------------------------------
+
+
+	public function date_after( $date, $field )
+	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $date  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'date_after', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'date_after', lang( 'fv_valid_date_after_field' ) );
+
+		// --------------------------------------------------------------------------
+		
+		return strtotime( $date ) > strtotime( $CI->input->post( $field ) );
+	}
 	
 	
 	// --------------------------------------------------------------------------
@@ -325,6 +369,50 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 			return FALSE;
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function datetime_before( $datetime, $field )
+	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $datetime  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'datetime_before', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_before', lang( 'fv_valid_datetime_before_field' ) );
+
+		// --------------------------------------------------------------------------
+
+		return strtotime( $datetime ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
+	}
+
+	
+	// --------------------------------------------------------------------------
+
+
+	public function datetime_after( $datetime, $field )
+	{
+		//	If blank, then assume the datetime is not required
+		if ( ! $datetime  )
+			return TRUE;
+
+		// --------------------------------------------------------------------------
+
+		$CI =& get_instance();
+		
+		if ( ! array_key_exists( 'datetime_after', $CI->form_validation->_error_messages ) )
+			$CI->form_validation->set_message( 'datetime_after', lang( 'fv_valid_datetime_after_field' ) );
+
+		// --------------------------------------------------------------------------
+
+		return strtotime( $datetime ) > strtotime( $CI->input->post( $field ) );
 	}
 	
 }

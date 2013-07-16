@@ -63,7 +63,7 @@ class Event {
 	 * @author	Pablo
 	 **/
 	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $data = NULL, $ref = NULL, $recorded = NULL )
-	{dump($created_by);
+	{
 		//	Admins logged in as people shouldn't be creating events, GHOST MODE, woooooooo
 		//	Ghost mode runs on production only, all other environments generate events (for testing)
 		

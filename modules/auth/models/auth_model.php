@@ -99,10 +99,10 @@ class NAILS_Auth_model extends NAILS_Model
 			
 				//	Password accepted! Final checks...
 				
-				//	Banned user
+				//	Suspended user?
 				if ( $user->is_suspended ) :
 				
-					$this->_set_error( 'auth_login_fail_banned' );
+					$this->_set_error( 'auth_login_fail_suspended' );
 					return FALSE;
 					
 				endif;
@@ -240,8 +240,7 @@ class NAILS_Auth_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	Destroy key parts of the session (enough for user_model to report user as logged out)
-		$this->session->unset_userdata( 'email' );
-		$this->session->unset_userdata( 'group_id' );
+		$this->user->clear_login_data();
 		
 		// --------------------------------------------------------------------------
 		

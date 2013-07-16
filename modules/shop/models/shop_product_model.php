@@ -456,7 +456,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$product->id			= (int) $product->id;
 		$product->price			= (float) $product->price;
 		$product->sale_price	= (float) $product->sale_price;
-		$product->tax_rate		= (float) $product->tax_rate;
+		$product->tax_ra		= (float) $product->tax_rate;
 		$product->is_active		= (bool) $product->is_active;
 		$product->quantity_sold	= (int) $product->quantity_sold;
 		
@@ -465,7 +465,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$product->quantity_available = (int) $product->quantity_available;
 		
 		endif;
-		
+
 		if ( time() > strtotime( $product->sale_start ) && time() < strtotime( $product->sale_end ) ) :
 		
 			$product->is_on_sale	= TRUE;
@@ -508,9 +508,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 		unset( $product->type_label );
 		unset( $product->type_requires_shipping );
 		unset( $product->type_max_per_order );
-		
-		// --------------------------------------------------------------------------
-		
 	}
 }
 

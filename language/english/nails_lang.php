@@ -71,16 +71,24 @@
 	$lang['fv_valid_postcode_field']		= 'The %s field is not a valid UK postcode.';
 	$lang['fv_valid_date']					= 'This field must be a valid date.';
 	$lang['fv_valid_date_field']			= 'The %s field is not a valid date.';
-	$lang['fv_valid_date_future']			= 'This field must be in the future.';
-	$lang['fv_valid_date_future_field']		= 'The %s field must be in the future.';
-	$lang['fv_valid_date_past']				= 'This field must be in the past.';
-	$lang['fv_valid_date_past_field']		= 'The %s field must be in the past.';
+	$lang['fv_date_future']					= 'This field must be in the future.';
+	$lang['fv_date_future_field']			= 'The %s field must be in the future.';
+	$lang['fv_date_past']					= 'This field must be in the past.';
+	$lang['fv_date_past_field']				= 'The %s field must be in the past.';
+	$lang['fv_date_before']					= 'This must be before the %2$s field.';
+	$lang['fv_date_before_field']			= 'The %s field must be before the %s field.';
+	$lang['fv_date_after']					= 'This must be after the %2$s field.';
+	$lang['fv_date_after_field']			= 'The %s field must be before the %s field.';
 	$lang['fv_valid_datetime']				= 'This field must be a valid datetime.';
 	$lang['fv_valid_datetime_field']		= 'The %s field is not a valid datetime.';
-	$lang['fv_valid_datetime_future']		= 'This field must be in the future.';
-	$lang['fv_valid_datetime_future_field']	= 'The %s field must be in the future.';
-	$lang['fv_valid_datetime_past']			= 'This field must be in the past.';
-	$lang['fv_valid_datetime_past_field']	= 'The %s field must be in the past.';
+	$lang['fv_datetime_future']				= 'This field must be in the future.';
+	$lang['fv_datetime_future_field']		= 'The %s field must be in the future.';
+	$lang['fv_datetime_past']				= 'This field must be in the past.';
+	$lang['fv_datetime_past_field']			= 'The %s field must be in the past.';
+	$lang['fv_datetime_before']				= 'This must be before the %2$s field.';
+	$lang['fv_datetime_before_field']		= 'The %s field must be before the %s field.';
+	$lang['fv_datetime_after']				= 'This must be after the %2$s field.';
+	$lang['fv_datetime_after_field']		= 'The %s field must be before the %s field.';
 	
 	
 	// --------------------------------------------------------------------------

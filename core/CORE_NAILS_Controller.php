@@ -75,6 +75,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_instanciate_languages();
 
 		// --------------------------------------------------------------------------
+
+		//	Is the suer suspended?
+		//	Executed here so that both the user and language systems are initialised
+		//	(so that any errors can be shown in the correct language).
+
+		$this->_is_user_suspended();
+
+		// --------------------------------------------------------------------------
 		
 		//	Instanciate DateTime
 		$this->_instanciate_datetime();
@@ -369,7 +377,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->language->set_usr_obj( $this->user );
 
 		//	Check default lang is supported by nails
-		$this->_supported		= array();
+		$this->_supported	= array();
 		$this->_supported[]	= 'english';
 		
 		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
@@ -545,6 +553,32 @@ class CORE_NAILS_Controller extends MX_Controller {
 		
 		$this->user->find_remembered_user();
 		$this->user->init();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _is_user_suspended()
+	{
+		//	Check if this user is suspended
+		if ( $this->user->is_logged_in() && active_user( 'is_suspended' ) ) :
+
+			//	Load models and langs
+			$this->load->model( 'auth/auth_model' );
+			$this->lang->load( 'auth/auth', RENDER_LANG_SLUG );
+
+			//	Log the user out
+			$this->auth_model->logout();
+
+			//	Create a new session
+			$this->session->sess_create();
+
+			//	Give them feedback
+			$this->session->set_flashdata( 'error', lang( 'auth_login_fail_suspended' ) );
+			redirect( '/' );
+
+		endif;
 	}
 }
 
