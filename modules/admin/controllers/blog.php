@@ -151,7 +151,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		
 			$this->load->library( 'form_validation' );
 			
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
@@ -171,7 +171,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['body']				= $this->input->post( 'body' );
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
-				$_data['is_published']		= $this->input->post( 'is_published' );
+				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
 
 				if ( blog_setting( 'categories_enabled' ) ) :
 
@@ -270,7 +270,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		
 			$this->load->library( 'form_validation' );
 			
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
@@ -290,7 +290,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['body']				= $this->input->post( 'body' );
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
-				$_data['is_published']		= $this->input->post( 'is_published' );
+				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
 
 				if ( blog_setting( 'categories_enabled' ) ) :
 
