@@ -158,10 +158,21 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		endif;
 
 		//	File exists?
-		if ( ! file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		$_file = CDN_PATH . $this->_bucket . '/' . $this->_object;
+
+		if ( ! file_exists( $_file ) ) :
 		
 			log_message( 'error', 'CDN: Serve: File does not exist' );
-			return $this->_bad_src( lang( 'cdn_error_serve_file_not_found' ) );
+
+			if ( $this->user->is_superuser() ) :
+
+				return $this->_bad_src( lang( 'cdn_error_serve_file_not_found' ) . ': ' . $_file );
+
+			else :
+
+				return $this->_bad_src( lang( 'cdn_error_serve_file_not_found' ) );
+
+			endif;
 			
 		endif;
 
@@ -191,12 +202,12 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		
 		else :
 		
-			$_stats = stat( CDN_PATH . $this->_bucket . '/' . $this->_object );
+			$_stats = stat( $_file );
 			
 			//	Determine headers to send
 			$_finfo = new finfo( FILEINFO_MIME_TYPE ); // return mime type ala mimetype extension
 			
-			header( 'Content-type: ' . $_finfo->file( CDN_PATH . $this->_bucket . '/' . $this->_object ) );
+			header( 'Content-type: ' . $_finfo->file( $_file ) );
 			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $_stats[9] ) . 'GMT' );
 			header( 'ETag: "' . md5( $this->_bucket . $this->_object ) . '"' );
 			
@@ -214,7 +225,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Send the contents of the file to the browser
-		echo file_get_contents( CDN_PATH . $this->_bucket . '/' . $this->_object );
+		echo file_get_contents( $_file );
 
 		// --------------------------------------------------------------------------
 
