@@ -412,12 +412,8 @@ class Cdn {
 		
 		$_ext	= $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
 		
-		if ( $_bucket->allowed_types && $_bucket->allowed_types != '*' ) :
+		if ( $_bucket->allowed_types ) :
 		
-			$_types	= explode( '|', $_bucket->allowed_types );
-			
-			// --------------------------------------------------------------------------
-			
 			//	Handle stupid bloody MS Office 'x' documents
 			//	If the returned extension is doc, xls or ppt compare it to the uploaded
 			//	extension but append an x, if they match then force the x version.
@@ -465,18 +461,18 @@ class Cdn {
 			
 			// --------------------------------------------------------------------------
 			
-			if ( array_search( $_ext, $_types ) === FALSE ) :
+			if ( array_search( $_ext, $_bucket->allowed_types ) === FALSE ) :
 			
-				if ( count( $_types ) > 1 ) :
+				if ( count( $_bucket->allowed_types ) > 1 ) :
 				
-					array_splice( $_types, count( $_types ) - 1, 0, array( ' and ' ) );
-					$_accepted = implode( ', .', $_types );
+					array_splice( $_bucket->allowed_types, count( $_bucket->allowed_types ) - 1, 0, array( ' and ' ) );
+					$_accepted = implode( ', .', $_bucket->allowed_types );
 					$_accepted = str_replace( ', . and , ', ' and ', $_accepted );
 					$this->set_error(  lang( 'cdn_error_bad_mime_plural', $_accepted ) );
 				
 				else :
 				
-					$_accepted = implode( '', $_types );
+					$_accepted = implode( '', $_bucket->allowed_types );
 					$this->set_error(  lang( 'cdn_error_bad_mime', $_accepted ) );
 				
 				endif;
@@ -966,6 +962,8 @@ class Cdn {
 		
 		if ( $_upload ) :
 		
+			$_object = $this->get_object( $object );
+
 			if ( $_object ) :
 
 				//	Attempt the delete
@@ -1885,7 +1883,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		if ( $_object->creator->id && $_object->creator->id == $_user->id ) :
+		if ( ! $_object->creator->id || $_object->creator->id == $_user->id ) :
 
 			return TRUE;
 
@@ -1933,7 +1931,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		if ( $_bucket->creator->id && $_bucket->creator->id == $_user->id ) :
+		if ( ! $_bucket->creator->id || $_bucket->creator->id == $_user->id ) :
 
 			return TRUE;
 
