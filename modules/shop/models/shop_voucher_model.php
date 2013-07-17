@@ -372,7 +372,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	protected function _getcount_vouchers_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user u', 'u.id = v.created_by' );
+		$this->db->join( 'user u', 'u.id = v.created_by', 'LEFT' );
 
 		//	Set Where
 		if ( $where ) :
