@@ -83,7 +83,7 @@ if ( ! function_exists( 'get_basket_count' ) )
  */
 if ( ! function_exists( 'get_basket_total' ) )
 {
-	function get_basket_total( $include_symbol )
+	function get_basket_total( $include_symbol = FALSE, $include_thousands = FALSE )
 	{
 		//	Load the shop model, if not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
@@ -103,7 +103,7 @@ if ( ! function_exists( 'get_basket_total' ) )
 		
 		// --------------------------------------------------------------------------
 
-		return get_instance()->basket->get_basket_total( $include_symbol );
+		return get_instance()->basket->get_basket_total( $include_symbol, $include_thousands );
 	}
 }
 
@@ -263,7 +263,7 @@ if ( ! function_exists( 'shop_setting' ) )
  */
 if ( ! function_exists( 'shop_format_price' ) )
 {
-	function shop_format_price( $price, $include_symbol = FALSE )
+	function shop_format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE )
 	{
 		//	Load the shop model, if not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
@@ -274,7 +274,7 @@ if ( ! function_exists( 'shop_format_price' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		return get_instance()->shop->format_price( $price, $include_symbol );
+		return get_instance()->shop->format_price( $price, $include_symbol, $include_thousands );
 	}
 }
 

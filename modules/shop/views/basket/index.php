@@ -7,7 +7,7 @@
 			//	Voucher removed?
 			if ( isset( $basket->voucher_removed ) && $basket->voucher_removed ) :
 
-				echo '<div class="system-alert message sixteen columns first last row">';
+				echo '<div class="system-alert message sixteen columns row">';
 				echo '<div class="padder">';
 				echo '<p><strong>We removed your voucher:</strong> ' . $basket->voucher_removed . '</p>';
 				echo '</div>';
@@ -15,12 +15,15 @@
 
 			endif;
 		
-			$this->load->view( 'shop/basket/basket-table', array( 'show_shipping_chooser' => TRUE ) );
+			// --------------------------------------------------------------------------
+
+			//	Load table
+			$this->load->view( 'shop/basket/basket-table' );
 
 			// --------------------------------------------------------------------------
 
 			//	Vouchers
-			echo '<div class="vouchers sixteen columns first last row">';
+			echo '<div class="vouchers sixteen columns row">';
 
 				if ( $basket->voucher ) :
 

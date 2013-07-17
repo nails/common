@@ -1,4 +1,4 @@
-<div class="sixteen columns first last row">
+<div class="sixteen columns row">
 	<table>
 		<thead>
 			<tr>
@@ -67,15 +67,15 @@
 							if ( $item->is_on_sale ) :
 							
 								echo '<td class="price on-sale">';
-								echo '<span>' . shop_format_price( $item->sale_price, TRUE ) . '</span>';
+								echo '<span>' . shop_format_price( $item->sale_price_render, TRUE, TRUE ) . '</span>';
 								echo '<span class="ribbon"></span>';
-								echo '<del>was ' . shop_format_price( $item->price, TRUE ) . '</del>';
+								echo '<del>was ' . shop_format_price( $item->price_render, TRUE, TRUE ) . '</del>';
 								echo '</td>';
 							
 							else :
 							
 								echo '<td class="price">';
-								echo shop_format_price( $item->price, TRUE );
+								echo shop_format_price( $item->price_render, TRUE, TRUE );
 								echo '</td>';
 							
 							endif;
@@ -86,10 +86,10 @@
 						
 							if ( $basket->requires_shipping ) :
 
-								if ( $item->type->requires_shipping && $item->shipping ) :
+								if ( $item->type->requires_shipping && $item->shipping_render ) :
 								
 									echo '<td class="shipping">';
-									echo shop_format_price( $item->shipping, TRUE );
+									echo shop_format_price( $item->shipping_render, TRUE, TRUE );
 									echo '</td>';
 								
 								elseif ( $item->type->requires_shipping && ! $item->shipping ) :
@@ -109,7 +109,7 @@
 							endif;
 							
 						?>
-						<td class="total"><?=shop_format_price( $item->total, TRUE )?></td>
+						<td class="total"><?=shop_format_price( $item->total_render, TRUE, TRUE )?></td>
 					</tr>
 					<?php
 			
@@ -117,20 +117,72 @@
 				
 			?>
 
+			<!--	CURRENCY CHOOSER	-->
+			<?php
+
+				if ( ( ! isset( $no_changes ) || ! $no_changes ) && count( $currencies ) > 1 ) :
+
+					$_colspan = $basket->requires_shipping ? 6 : 5;
+					echo '<tr class="currency-chooser">';
+					echo '<td colspan="' . $_colspan . '">';
+
+
+						echo form_open( shop_setting( 'shop_url' ) . 'basket/set_currency' );
+
+						echo 'Currency:';
+
+						echo '<select name="currency" class="chosen" id="currency-chooser">';
+
+						foreach ( $currencies AS $currency ) :
+
+							if ( $currency->id == SHOP_USER_CURRENCY_ID ) :
+
+								$_selected	= 'selected="selected"';
+
+							else :
+
+								$_selected = '';
+
+							endif;
+
+							$_symbol = $currency->symbol ? ' - ' . $currency->symbol : '';
+							echo '<option value="' . $currency->id . '" ' . $_selected . '>' . $currency->code . $_symbol . '</option>';
+
+						endforeach;
+
+						echo '</select>';
+
+						if ( SHOP_BASE_CURRENCY_ID != SHOP_USER_CURRENCY_ID ) :
+
+							echo '<small><strong>Please note:</strong> Currency conversions are estimates only.</small>';
+
+						endif;
+
+						echo '<noscript>';
+						echo form_submit( 'submit', lang( 'action_update' ), 'class="awesome small"' );
+						echo '</noscript>';
+
+						echo form_close();
+
+					echo '</td>';
+					echo '</tr>';
+
+				endif;
+
+
+			?>
+
 			<!--	SHIPPING CHOOSER	-->
 			<?php
 
-				if ( $basket->requires_shipping ) :
+				if ( ( ! isset( $no_changes ) || ! $no_changes ) && $basket->requires_shipping ) :
 
 					echo '<tr class="shipping-chooser">';
 					echo '<td colspan="6">';
 
-					if ( isset( $show_shipping_chooser ) && $show_shipping_chooser ) :
-
-
 						echo form_open( shop_setting( 'shop_url' ) . 'basket/set_shipping_method' );
 						echo 'Shipping method: ';
-						echo '<select name="shipping_method" id="shipping-chooser">';
+						echo '<select name="shipping_method" class="chosen" id="shipping-chooser">';
 
 						$_notes = FALSE;
 
@@ -164,12 +216,6 @@
 
 						echo form_close();
 
-					else :
-
-						echo 'Shipping method: TODO TODO';
-
-					endif;
-
 					echo '</td>';
 					echo '</tr>';
 
@@ -186,9 +232,9 @@
 
 						echo '<td class="value">';
 						
-						if ( $basket->totals->shipping ) :
+						if ( $basket->totals->shipping_render ) :
 						
-							echo shop_format_price( $basket->totals->shipping, TRUE );
+							echo shop_format_price( $basket->totals->shipping_render, TRUE, TRUE );
 						
 						else :
 						
@@ -204,9 +250,9 @@
 				<td class="value">
 				<?php
 					
-					if ( $basket->totals->sub ) :
+					if ( $basket->totals->sub_render ) :
 					
-						echo shop_format_price( $basket->totals->sub, TRUE );
+						echo shop_format_price( $basket->totals->sub_render, TRUE, TRUE );
 					
 					else :
 					
@@ -221,9 +267,9 @@
 			<tr class="total tax">
 				<td class="label" colspan="4">TAX</td>
 				<?php if ( $basket->requires_shipping ) : ?>
-				<td class="value"><?=shop_format_price( $basket->totals->tax_shipping, TRUE )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->tax_shipping_render, TRUE, TRUE )?></td>
 			<?php endif; ?>
-				<td class="value"><?=shop_format_price( $basket->totals->tax_items, TRUE )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->tax_items_render, TRUE, TRUE )?></td>
 			</tr>
 
 			<?php if ( $basket->discount->shipping || $basket->discount->items ) : ?>
@@ -233,9 +279,9 @@
 				<td class="value">
 					<?php
 
-						if ( $basket->discount->shipping ) :
+						if ( $basket->discount->shipping_render ) :
 
-							echo shop_format_price( $basket->discount->shipping, TRUE );
+							echo shop_format_price( $basket->discount->shipping_render, TRUE, TRUE );
 
 						else :
 
@@ -249,9 +295,9 @@
 				<td class="value">
 					<?php
 
-						if ( $basket->discount->items ) :
+						if ( $basket->discount->items_render ) :
 
-							echo shop_format_price( $basket->discount->items, TRUE );
+							echo shop_format_price( $basket->discount->items_render, TRUE, TRUE );
 
 						else :
 
@@ -269,27 +315,9 @@
 				<?php if ( $basket->requires_shipping ) : ?>
 				<td class="value">&nbsp;</td>
 				<?php endif; ?>
-				<td class="value"><?=shop_format_price( $basket->totals->grand, TRUE )?></td>
+				<td class="value"><?=shop_format_price( $basket->totals->grand_render, TRUE, TRUE )?></td>
 			</tr>
 			
 		</tbody>
 	</table>
 </div>
-<?php if ( isset( $show_shipping_chooser ) && $show_shipping_chooser ) : ?>
-
-	<script type="text/javascript">
-
-		$(function(){
-
-			$( '#shipping-chooser' ).on( 'change', function() {
-			
-				$(this).closest( '.shipping-chooser' ).addClass( 'working' );
-				$(this).closest( 'form' ).submit();
-
-			});
-
-		});
-
-	</script>
-
-<?php endif; ?>

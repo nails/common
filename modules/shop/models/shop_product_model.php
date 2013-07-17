@@ -41,6 +41,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->_table_meta		= 'shop_product_meta';
 		$this->_table_type		= 'shop_product_type';
 		$this->_table_tax		= 'shop_tax_rate';
+
+		// --------------------------------------------------------------------------
+
+		//	Ensure currency model is loaded
+		$this->load->model( 'shop/shop_currency_model', 'currency' );
 	}
 	
 	
@@ -306,11 +311,26 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		foreach ( $_products AS $product ) :
-		
+
 			$this->_format_product_object( $product );
+
+			// --------------------------------------------------------------------------
+
+			//	Do prices need converted?
+			if ( SHOP_BASE_CURRENCY_ID != SHOP_USER_CURRENCY_ID ) :
+
+				$product->price_render 		= $this->currency->convert_to_user( $product->price );
+				$product->sale_price_render	= $this->currency->convert_to_user( $product->sale_price );
+
+			else :
+
+				$product->price_render		= $product->price;
+				$product->sale_price_render	= $product->price;
+
+			endif;
 		
 		endforeach;
-		
+
 		// --------------------------------------------------------------------------
 		
 		return $_products;

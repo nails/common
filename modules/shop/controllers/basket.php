@@ -64,6 +64,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 		
 		$this->data['basket']			= $this->basket->get_basket();
 		$this->data['shipping_methods'] = $this->shipping->get_all();
+		$this->data['currencies']		= $this->currency->get_all();
 		
 		// --------------------------------------------------------------------------
 		
@@ -78,6 +79,23 @@ class NAILS_Basket extends NAILS_Shop_Controller
 			$this->data['message'] = '<strong>Sorry,</strong> there\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment, you won\'t be able to checkout.';
 		
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Load assets
+		$this->asset->load( 'nails.shop.basket.min.js', TRUE );
+
+		//	Inline assets
+		$_js  = 'var _nails_shop_basket;';
+		$_js .= '$(function(){';
+
+		$_js .= 'if ( typeof( NAILS_Shop_Basket ) === \'function\' ){';
+		$_js .= '_nails_shop_basket = new NAILS_Shop_Basket();';
+		$_js .= '_nails_shop_basket.init();}';
+
+		$_js .= '});';
+
+		$this->asset->inline( '<script>' . $_js . '</script>' );
 		
 		// --------------------------------------------------------------------------
 		
@@ -295,6 +313,48 @@ class NAILS_Basket extends NAILS_Shop_Controller
 
 			//	Failed to validate, feedback
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that shipping is not valid:<br />&rsaquo; ' . implode( '<br />&rsaquo;', $this->shipping->get_error() ) );
+
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		redirect( $this->data['return'] );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Set the user's preferred currency
+	 * 
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 * 
+	 **/
+	public function set_currency()
+	{
+		$_currency = $this->currency->get_by_id( $this->input->post( 'currency' ) );
+		
+		if ( $_currency && $_currency->is_active ) :
+
+			//	Valid currency
+			$this->session->set_userdata( 'shop_currency', $_currency->id );
+
+			if ( $this->user->is_logged_in() ) :
+
+				//	Save to the user object
+				$this->user->update( active_user( 'id' ), array( 'shop_currency' => $_currency->id ) );
+
+			endif;
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Your currency has been updated.' );
+
+		else :
+
+			//	Failed to validate, feedback
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that currency is not valid.' );
 
 		endif;
 		

@@ -337,17 +337,18 @@ class Asset {
 		// --------------------------------------------------------------------------
 		
 		//	Now output.
+		$out = '';
 		switch ( $type ) :
 		
-			case 'css'			: $out  = $this->_print_css_nails();
+			case 'css'			: $out .= $this->_print_css_nails();
 								  $out .= $this->_print_css();			break;
 			case 'css-inline'	: $out  = $this->_print_css_inline();	break;
 								  
-			case 'js'			: $out  = $this->_print_js_nails();	
+			case 'js'			: $out .= $this->_print_js_nails();	
 								  $out .= $this->_print_js();			break;
-			case 'js-inline'	: $out  = $this->_print_js_inline();	break;
+			case 'js-inline'	: $out .= $this->_print_js_inline();	break;
 			
-			case 'all'			: $out  = $this->_print_css_nails();
+			case 'all'			: $out .= $this->_print_css_nails();
 								  $out .= $this->_print_css();
 								  $out .= $this->_print_js_nails();	
 								  $out .= $this->_print_js();			break;

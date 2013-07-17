@@ -464,15 +464,15 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 			if ( $this->user->is_superuser() ) :
 
-				$_data->enabled				= (bool) $values['enabled'];
-				$_data->sandbox_account_id	= $values['sandbox_account_id'];
-				$_data->sandbox_api_key		= $values['sandbox_api_key'];
-				$_data->sandbox_api_secret	= $values['sandbox_api_secret'];
+				$_data->enabled				= isset( $values['enabled'] ) ? (bool) $values['enabled'] : FALSE;
+				$_data->sandbox_account_id	= isset( $values['sandbox_account_id'] ) ? $values['sandbox_account_id'] : NULL;
+				$_data->sandbox_api_key		= isset( $values['sandbox_api_key'] ) ? $values['sandbox_api_key'] : NULL;
+				$_data->sandbox_api_secret	= isset( $values['sandbox_api_secret'] ) ? $values['sandbox_api_secret'] : NULL;
 
 			endif;
-			$_data->account_id			= $values['account_id'];
-			$_data->api_key				= $values['api_key'];
-			$_data->api_secret			= $values['api_secret'];
+			$_data->account_id			= isset( $values['account_id'] ) ? $values['account_id'] : NULL;
+			$_data->api_key				= isset( $values['api_key'] ) ? $values['api_key'] : NULL;
+			$_data->api_secret			= isset( $values['api_secret'] ) ? $values['api_secret'] : NULL;
 
 			$this->payment_gateway->update( $id, $_data );
 

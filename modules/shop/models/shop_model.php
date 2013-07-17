@@ -46,20 +46,55 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_BASE_CURRENCY_DECIMALS' ) )	define( 'SHOP_BASE_CURRENCY_DECIMALS',		$_base->decimal_symbol );
 		
 		//	User's preferred currency
-		//	TODO: Same as default just now
-		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL',		$_base->symbol );
-		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_USER_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
-		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )	define( 'SHOP_USER_CURRENCY_PRECISION',		$_base->decimal_precision );
-		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )		define( 'SHOP_USER_CURRENCY_CODE',			$_base->code );
-		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )			define( 'SHOP_USER_CURRENCY_ID',			$_base->id );
+		if ( $this->session->userdata( 'shop_currency' ) ) :
+
+			//	Use the currency defined in the session
+			$_currency_id = $this->session->userdata( 'shop_currency' );
+
+		elseif( active_user( 'shop_currency' ) ) :
+
+			//	Use the currency defined in the user object
+			$_currency_id = active_user( 'shop_currency' );
+			$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+		else :
+
+			//	Use the base currency
+			$_currency_id = $_base->id;
+			$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+		endif;
+
+		//	Fetch the user's render currency
+		$_user_currency = $this->currency->get_by_id( $_currency_id );
+
+		if ( ! $_user_currency || ! $_user_currency->is_active ) :
+
+			//	Bad currency ID or not active, use base
+			$_user_currency = $_base;
+			$this->session->unset_userdata( 'shop_currency', $_currency_id );
+
+			if ( $thus->user->is_logged_in() ) :
+
+				$this->user->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
+
+			endif;
+
+		endif;
+
+		//	Set the user constants
+		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL' ) )			define( 'SHOP_USER_CURRENCY_SYMBOL',		$_user_currency->symbol );
+		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL_POS' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL_POS',	$_user_currency->symbol_position );
+		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )		define( 'SHOP_USER_CURRENCY_PRECISION',		$_user_currency->decimal_precision );
+		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )			define( 'SHOP_USER_CURRENCY_CODE',			$_user_currency->code );
+		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )				define( 'SHOP_USER_CURRENCY_ID',			$_user_currency->id );
 
 		//	Formatting constants
-		if ( ! defined( 'SHOP_USER_CURRENCY_THOUSANDS' ) )	define( 'SHOP_USER_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
-		if ( ! defined( 'SHOP_USER_CURRENCY_DECIMALS' ) )	define( 'SHOP_USER_CURRENCY_DECIMALS',		$_base->decimal_symbol );
+		if ( ! defined( 'SHOP_USER_CURRENCY_THOUSANDS' ) )		define( 'SHOP_USER_CURRENCY_THOUSANDS',		$_user_currency->thousands_seperator );
+		if ( ! defined( 'SHOP_USER_CURRENCY_DECIMALS' ) )		define( 'SHOP_USER_CURRENCY_DECIMALS',		$_user_currency->decimal_symbol );
 
 		//	Exchange rate betweent the two currencies
-		//	TODO: Hardcoded GBP just now
-		if ( ! defined( 'SHOP_USER_CURRENCY_EXCHANGE' ) )	define( 'SHOP_USER_CURRENCY_EXCHANGE',	1 );
+		if ( ! defined( 'SHOP_USER_CURRENCY_BASE_EXCHANGE' ) )	define( 'SHOP_USER_CURRENCY_BASE_EXCHANGE',	$_user_currency->base_exchange );
 	}
 
 
@@ -110,7 +145,7 @@ class NAILS_Shop_model extends NAILS_Model
 			//	Unset the cache if the base_currency is being updated
 			if ( $key == 'base_currency' ) :
 
-				$this->_unet_cache( 'base_currency' );
+				$this->_unset_cache( 'base_currency' );
 
 			endif;
 
@@ -157,10 +192,11 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function format_price( $price, $include_symbol = FALSE )
+	public function format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE )
 	{
 		//	SHOP_USER_CURRENCY_THOUSANDS
-		$_value = number_format( $price, SHOP_USER_CURRENCY_PRECISION, SHOP_USER_CURRENCY_DECIMALS, SHOP_USER_CURRENCY_THOUSANDS );
+		$_thousands	= $include_thousands ? SHOP_USER_CURRENCY_THOUSANDS : '';
+		$_value		= number_format( $price, SHOP_USER_CURRENCY_PRECISION, SHOP_USER_CURRENCY_DECIMALS, $_thousands );
 
 		if ( $include_symbol ) :
 

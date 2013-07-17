@@ -149,7 +149,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		//	Set currency and exchange rates
 		$_order->currency_id		= SHOP_USER_CURRENCY_ID;
 		$_order->base_currency_id	= SHOP_BASE_CURRENCY_ID;
-		$_order->exchange_rate		= SHOP_USER_CURRENCY_EXCHANGE;
+		$_order->exchange_rate		= SHOP_USER_CURRENCY_BASE_EXCHANGE;
 		
 		// --------------------------------------------------------------------------
 		

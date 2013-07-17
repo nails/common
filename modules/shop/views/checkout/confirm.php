@@ -69,8 +69,25 @@
 
 			echo '<section class="row sixteen columns first last">';
 			echo '<h2>Shipping Details</h2>';
-			echo '<p>';
+			echo '<table class="shipping-details">';
 
+				$_method = $this->shipping->get_by_id( $basket->shipping_method );
+
+				echo '<tr>';
+				echo '<td class="label">Courier:</td>';
+				echo '<td class="value">' . $_method->courier . '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+				echo '<td class="label">Method:</td>';
+				echo '<td class="value">' . $_method->method . '</td>';
+				echo '</tr>';
+
+
+
+				echo '<tr>';
+				echo '<td class="label">Address:</td>';
+				echo '<td class="value">';
 				echo '<strong>' . $basket->shipping_details->addressee . '</strong>';
 				echo $basket->shipping_details->line_1 ? '<br />' . $basket->shipping_details->line_1 : '';
 				echo $basket->shipping_details->line_2 ? '<br />' . $basket->shipping_details->line_2 : '';
@@ -78,8 +95,10 @@
 				echo $basket->shipping_details->postcode ? '<br />' . $basket->shipping_details->postcode : '';
 				echo $basket->shipping_details->country ? '<br />' . $basket->shipping_details->country : '';
 				echo $basket->shipping_details->state ? '<br />' . $basket->shipping_details->state : '';
+				echo '</td>';
+				echo '</tr>';
 
-			echo '</p>';
+			echo '</table>';
 			echo '</section>';
 
 		endif;

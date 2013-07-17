@@ -72,18 +72,16 @@
 		
 		if ( $item->is_on_sale ) :
 		
-			echo form_hidden( 'amount_' . $_counter,	$item->sale_price );
-			//echo form_hidden( 'tax_' . $_counter,		$item->sale_price * $item->tax_rate->rate );
+			echo form_hidden( 'amount_' . $_counter,	shop_format_price( $item->sale_price_render, FALSE ) );
 			
 		else :
 		
-			echo form_hidden( 'amount_' . $_counter,	$item->price );
-			//echo form_hidden( 'tax_' . $_counter,		$item->price * $item->tax_rate->rate );
+			echo form_hidden( 'amount_' . $_counter,	shop_format_price( $item->price_render, FALSE ) );
 		
 		endif;
 		
 		echo form_hidden( 'quantity_' . $_counter,		$item->quantity );
-		echo form_hidden( 'shipping_' . $_counter,		( $item->shipping + $item->shipping_tax ) );
+		echo form_hidden( 'shipping_' . $_counter,		shop_format_price( ( $item->shipping_render + $item->shipping_tax ), FALSE ) );
 		
 		
 	$_counter++;
@@ -92,14 +90,14 @@
 	// --------------------------------------------------------------------------
 
 	//	Shipping, Taxes 
-	echo form_hidden( 'tax_cart',		$basket->totals->tax_items );
+	echo form_hidden( 'tax_cart',		shop_format_price( $basket->totals->tax_items_render, FALSE ) );
 
 	// --------------------------------------------------------------------------
 
 	//	Voucher
 	if ( $basket->discount->shipping || $basket->discount->items ) :
 
-		echo form_hidden( 'discount_amount_cart',	$basket->discount->items + $basket->discount->shipping );
+		echo form_hidden( 'discount_amount_cart',	shop_format_price( $basket->discount->items_render + $basket->discount->shipping_render, FALSE ) );
 
 	endif;
 	

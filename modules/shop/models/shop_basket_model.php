@@ -88,7 +88,6 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		endif;
 
-
 		$this->_shipping_details	= $this->session->userdata( $this->sess_var . '_sd' );
 		
 		if ( ! $this->_shipping_details ) :
@@ -146,31 +145,33 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_basket						= new stdClass();
-		$_basket->items					= array();
-		$_basket->totals				= new stdClass();
-		$_basket->totals->shipping		= 0.00;
-		$_basket->totals->sub			= 0.00;
-		$_basket->totals->tax_shipping	= 0.00;
-		$_basket->totals->tax_items		= 0.00;
-		$_basket->totals->grand			= 0.00;
-		$_basket->discount				= new stdClass;
-		$_basket->discount->shipping	= 0.00;
-		$_basket->discount->items		= 0.00;
-		$_basket->not_available			= array();
-		$_basket->quantity_adjusted		= array();
-		$_basket->requires_shipping		= FALSE;
-		$_basket->personal_details		= $this->_personal_details;
-		$_basket->shipping_method		= $this->_shipping_method;
-		$_basket->shipping_details		= $this->_shipping_details;
-		$_basket->payment_gateway		= $this->_payment_gateway;
-		$_basket->order_id				= $this->_order_id;
-		$_basket->voucher				= $this->_voucher_code;
+		$_basket							= new stdClass();
+		$_basket->items						= array();
+		$_basket->totals					= new stdClass();
+		$_basket->totals->shipping			= 0.00;
+		$_basket->totals->sub				= 0.00;
+		$_basket->totals->tax_shipping		= 0.00;
+		$_basket->totals->tax_items			= 0.00;
+		$_basket->totals->grand				= 0.00;
+		$_basket->discount					= new stdClass;
+		$_basket->discount->shipping		= 0.00;
+		$_basket->discount->shipping_render	= 0.00;
+		$_basket->discount->items			= 0.00;
+		$_basket->discount->items_render	= 0.00;
+		$_basket->not_available				= array();
+		$_basket->quantity_adjusted			= array();
+		$_basket->requires_shipping			= FALSE;
+		$_basket->personal_details			= $this->_personal_details;
+		$_basket->shipping_method			= $this->_shipping_method;
+		$_basket->shipping_details			= $this->_shipping_details;
+		$_basket->payment_gateway			= $this->_payment_gateway;
+		$_basket->order_id					= $this->_order_id;
+		$_basket->voucher					= $this->_voucher_code;
 		
-		$_not_available					= array();
+		$_not_available						= array();
 
 		//	Variable to track the amount of a discount which has been used
-		$_discount_total				= 0;
+		$_discount_total					= 0;
 		
 		// --------------------------------------------------------------------------
 		
@@ -193,6 +194,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 
 			endif;
+			
 
 			if ( $_product && $_product->is_active && ( is_null( $_product->quantity_available ) || $_product->quantity_available ) ) :
 			
@@ -208,26 +210,19 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				
 				// --------------------------------------------------------------------------
 				
-				$_item				= new stdClass();
-				$_item->id			= $_product->id;
-				$_item->title		= $_product->title;
-				$_item->type		= $_product->type;
-				$_item->tax			= $_product->tax;
-				$_item->quantity	= $item->quantity;
-				$_item->price		= $_product->price;
-				$_item->sale_price	= $_product->sale_price;
-				$_item->is_on_sale	= $_product->is_on_sale;
-				$_item->shipping	= $_product->shipping;
-				$_item->extra_data	= $item->extra_data;
-				
-				// --------------------------------------------------------------------------
-				
-				//	Work out currency conversion rate from the default currency to the user's
-				//	preferred currency.
-
-				//	TODO
-
-				$_conversion_rate = 1;
+				$_item						= new stdClass();
+				$_item->id					= $_product->id;
+				$_item->title				= $_product->title;
+				$_item->type				= $_product->type;
+				$_item->tax					= $_product->tax;
+				$_item->quantity			= $item->quantity;
+				$_item->price				= $_product->price;
+				$_item->price_render		= $_product->price_render;
+				$_item->sale_price			= $_product->sale_price;
+				$_item->sale_price_render	= $_product->sale_price_render;
+				$_item->is_on_sale			= $_product->is_on_sale;
+				$_item->shipping			= $_product->shipping;
+				$_item->extra_data			= $item->extra_data;
 				
 				// --------------------------------------------------------------------------
 				
@@ -244,7 +239,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 					else :
 
-						//	Multiple items, first item costs price, then the rest are charged at price_additional
+						//	Multiple items, first item costs `price`, then the rest are charged at `price_additional`
 						$_shipping = $_item->shipping->price + ($_item->shipping->price_additional * ( $_item->quantity-1 ) );
 
 					endif;
@@ -264,21 +259,25 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				
 				endif;
 				
-				$_item->shipping				= $_shipping;
-				$_item->shipping_tax			= $_shipping_tax;
+				$_item->shipping			= $_shipping;
+				$_item->shipping_render		= $this->currency->convert_to_user( $_shipping );
+				$_item->shipping_tax		= $_shipping_tax;
+				$_item->shipping_tax_render	= $this->currency->convert_to_user( $_shipping_tax );
 				
 				// --------------------------------------------------------------------------
 				
 				//	Calculate Total
 				if ( $_item->is_on_sale ):
 				
-					$_item->total = ( $_conversion_rate * $_item->sale_price ) * $_item->quantity;
+					$_item->total = $_item->sale_price  * $_item->quantity;
 					
 				else :
 				
-					$_item->total = ( $_conversion_rate * $_item->price ) * $_item->quantity;
+					$_item->total = $_item->price * $_item->quantity;
 				
 				endif;
+
+				$_item->total_render = $this->currency->convert_to_user( $_item->total );
 
 				// --------------------------------------------------------------------------
 
@@ -287,8 +286,9 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				$_item->tax_rate->id	= $_product->tax->id;
 				$_item->tax_rate->label	= round_to_precision( 100 * $_product->tax->rate, 2 ) . '%';
 				$_item->tax_rate->rate	= round_to_precision( $_product->tax->rate, 2 );
-				$_item->tax				= round_to_precision( ( $_conversion_rate * ( $_item->total ) ) * $_product->tax->rate, 2 );
-
+				$_item->tax				= $_item->total * $_product->tax->rate;
+				$_item->tax_render		= $this->currency->convert_to_user( $_item->tax );
+				
 				// --------------------------------------------------------------------------
 
 				//	Is there a voucher which applies to products, or a particular product type?
@@ -327,8 +327,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 								endif;
 
-								$_discount_total += $_discount;
-								$_basket->discount->items += $_discount;
+								$_basket->discount->items	+= $_discount;
 
 							endif;
 
@@ -341,11 +340,12 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				// --------------------------------------------------------------------------
 				
 				//	Update basket totals
-				$_basket->totals->sub			+= $_item->total;
-				$_basket->totals->shipping		+= $_item->shipping;
-				$_basket->totals->tax_shipping	+= $_item->shipping_tax;
-				$_basket->totals->tax_items		+= $_item->tax;
-				$_basket->totals->grand			+= $_item->tax + $_item->shipping_tax + $_item->total + $_item->shipping - $_discount;
+				$_basket->totals->sub					+= $_item->total;
+				$_basket->totals->shipping				+= $_item->shipping;
+				$_basket->totals->tax_shipping			+= $_item->shipping_tax;
+				$_basket->totals->tax_items				+= $_item->tax;
+				$_basket->totals->tax_items_render		+= $_item->tax;
+				$_basket->totals->grand					+= $_item->tax + $_item->shipping_tax + $_item->total + $_item->shipping - $_discount;
 
 				// --------------------------------------------------------------------------
 
@@ -493,7 +493,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				//	Simple percentage, just knock that off the product and shipping totals
 
 				//	Check free shipping threshold
-				if ( $_basket->totals->sub < shop_setting( 'free_shipping_threshold' ) ) :
+				if ( ! shop_setting( 'free_shipping_threshold' ) || $_basket->totals->sub < shop_setting( 'free_shipping_threshold' ) ) :
 
 					$_discount_shipping = ( $_basket->totals->shipping + $_basket->totals->tax_shipping ) * ( $_basket->voucher->discount_value / 100 );
 					$_basket->discount->shipping += $_discount_shipping;
@@ -570,6 +570,19 @@ class NAILS_Shop_basket_model extends NAILS_Model
 			endforeach;
 		
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Convert totals
+		$_basket->totals->sub_render			= $this->currency->convert_to_user( $_basket->totals->sub );
+		$_basket->totals->shipping_render		= $this->currency->convert_to_user( $_basket->totals->shipping );
+		$_basket->totals->tax_shipping_render	= $this->currency->convert_to_user( $_basket->totals->tax_shipping );
+		$_basket->totals->tax_items_render		= $this->currency->convert_to_user( $_basket->totals->tax_items );
+		$_basket->totals->grand_render			= $this->currency->convert_to_user( $_basket->totals->grand );
+
+		$_basket->discount->shipping_render		= $this->currency->convert_to_user( $_basket->discount->shipping );
+		$_basket->discount->items_render		= $this->currency->convert_to_user( $_basket->discount->items );
+
 		
 		// --------------------------------------------------------------------------
 		
@@ -606,10 +619,10 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 	
 	
-	public function get_basket_total( $include_symbol = FALSE )
+	public function get_basket_total( $include_symbol = FALSE, $include_thousands = FALSE )
 	{
-		//	Fetchh & Format
-		return shop_format_price( $this->get_basket()->totals->sub, $include_symbol );
+		//	Fetch & Format
+		return shop_format_price( $this->get_basket()->totals->grand_render, $include_symbol, $include_thousands );
 	}
 	
 	

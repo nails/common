@@ -95,7 +95,7 @@
 		<div class="box">
 			<p>
 				If you don't already have an account you can register one now. We'll add this order to your account so you can
-				track it's progress.
+				track its progress.
 			</p>
 			<?php
 			

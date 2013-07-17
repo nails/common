@@ -399,8 +399,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			
 			// --------------------------------------------------------------------------
 			
-			$this->data['page']->title = 'Checkout &rsaquo; Confirm Your Order';
-			
+			$this->data['page']->title	= 'Checkout &rsaquo; Confirm Your Order';
+			$this->data['currencies']	= $this->currency->get_all();
+
 			// --------------------------------------------------------------------------
 			
 			$this->load->view( 'structure/header',		$this->data );
