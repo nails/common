@@ -13,6 +13,11 @@
 	</thead>
 	<tbody>
 	<?php
+
+		//	Shortcut variable for base and order currencies
+		$_ocurrency = $order->currency->order->id;
+		$_bcurrency = $order->currency->base->id;
+		$_exchange	= $order->currency->exchange_rate;
 	
 		foreach ( $order->items AS $item ) :
 		
@@ -29,11 +34,11 @@
 			
 			if ( $item->was_on_sale ) :
 			
-				echo '<td class="center">' . $order->currency->order->symbol . number_format( $item->sale_price, $order->currency->order->precision ) . '</td>';
+				echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->sale_price, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 				
 			else :
 			
-				echo '<td class="center">' . $order->currency->order->symbol . number_format( $item->price, $order->currency->order->precision ) . '</td>';
+				echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->price, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 			
 			endif;
 			
@@ -43,7 +48,7 @@
 
 				if ( $item->shipping ) :
 				 
-					echo '<td class="center">' . $order->currency->order->symbol . number_format( $item->shipping, $order->currency->order->precision ) . '</td>';
+					echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 					
 				else :
 				
@@ -53,7 +58,7 @@
 
 			endif;
 
-			echo '<td class="center">' . $order->currency->order->symbol . number_format( $item->total, $order->currency->order->precision ) . '</td>';
+			echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->total, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 
 			echo '</tr>';
 		
@@ -64,16 +69,16 @@
 	<tr>
 		<td colspan="4" class="right"><strong>Sub Total</strong></td>
 		<?php if ( $order->requires_shipping ) : ?>
-		<td class="center"><?=$order->currency->order->symbol . number_format( $order->totals->shipping, $order->currency->order->precision )?></td>
+		<td class="center"><?=shop_format_price( shop_convert_using_rate( $order->totals->shipping, $_exchange ), TRUE, TRUE, $_ocurrency )?></td>
 		<?php endif; ?>
-		<td class="center"><?=$order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision )?></td>
+		<td class="center"><?=shop_format_price( shop_convert_using_rate( $order->totals->sub, $_exchange ), TRUE, TRUE, $_ocurrency )?></td>
 	</tr>
 	<tr>
 		<td colspan="4" class="right"><strong>Tax</strong></td>
 		<?php if ( $order->requires_shipping ) : ?>
-		<td class="center"><?=$order->currency->order->symbol . number_format( $order->totals->tax_shipping, $order->currency->order->precision )?></td>
+		<td class="center"><?=shop_format_price( shop_convert_using_rate( $order->totals->tax_shipping, $_exchange ), TRUE, TRUE, $_ocurrency )?></td>
 		<?php endif; ?>
-		<td class="center"><?=$order->currency->order->symbol . number_format( $order->totals->tax_items, $order->currency->order->precision )?></td>
+		<td class="center"><?=shop_format_price( shop_convert_using_rate( $order->totals->tax_items, $_exchange ), TRUE, TRUE, $_ocurrency )?></td>
 	</tr>
 	<?php
 
@@ -83,7 +88,7 @@
 			echo '<td colspan="4" class="right"><strong>Discounts</strong></td>';
 			if ( $order->requires_shipping && $order->discount->shipping ) :
 
-				echo '<td class="center">' . $order->currency->order->symbol . number_format( $order->discount->shipping, $order->currency->order->precision ) . '</td>';
+				echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->discount->shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 
 			elseif( $order->requires_shipping ) :
 
@@ -93,7 +98,7 @@
 
 			if ( $order->discount->items ) :
 
-				echo '<td class="center">' . $order->currency->order->symbol . number_format( $order->discount->items, $order->currency->order->precision ) . '</td>';
+				echo '<td class="center">' . shop_format_price( shop_convert_using_rate( $item->discount->items, $_exchange ), TRUE, TRUE, $_ocurrency ) . '</td>';
 
 			else :
 
@@ -110,7 +115,7 @@
 		<?php if ( $order->requires_shipping ) : ?>
 		<td class="center">&nbsp;</td>
 		<?php endif; ?>
-		<td class="center"><?=$order->currency->order->symbol . number_format( $order->totals->grand, $order->currency->order->precision )?></td>
+		<td class="center"><?=shop_format_price( shop_convert_using_rate( $order->totals->grand, $_exchange ), TRUE, TRUE, $_ocurrency )?></td>
 	</tr>
 	</tbody>
 </table>

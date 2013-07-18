@@ -81,9 +81,21 @@ class NAILS_View_Online extends NAILS_Email_Controller
 		// --------------------------------------------------------------------------
 		
 		//	Load template
-		$_out  = $this->load->view( 'email/structure/header',			$_data, TRUE );
-		$_out .= $this->load->view( 'email/' . $_email->template_file,	$_data, TRUE );
-		$_out .= $this->load->view( 'email/structure/footer',			$_data, TRUE );
+		if ( $this->input->get( 'pt' ) ) :
+
+			$_out  = '<html><head><title>' . $_email->subject . '</title></head><body><pre>';
+			$_out .= $this->load->view( 'email/structure/header_plaintext',	$_data, TRUE );
+			$_out .= $this->load->view( 'email/' . $_email->template_file . '_plaintext',	$_data, TRUE );
+			$_out .= $this->load->view( 'email/structure/footer_plaintext',	$_data, TRUE );
+			$_out .= '</pre></body></html>';
+
+		else :
+
+			$_out  = $this->load->view( 'email/structure/header',			$_data, TRUE );
+			$_out .= $this->load->view( 'email/' . $_email->template_file,	$_data, TRUE );
+			$_out .= $this->load->view( 'email/structure/footer',			$_data, TRUE );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 		

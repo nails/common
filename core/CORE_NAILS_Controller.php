@@ -64,6 +64,13 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Do we need to instanciate the database?
 		$this->_instanciate_db();
 
+		if ( NAILS_DB_ENABLED ) :
+
+			$this->db->trans_start();
+			$this->db->db_debug = FALSE;
+
+		endif;
+
 		// --------------------------------------------------------------------------
 
 		//	Instanciate the user model
@@ -91,6 +98,22 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Profiling
 		$this->_instanciate_profiler();
+
+		// --------------------------------------------------------------------------
+
+		if ( NAILS_DB_ENABLED ) :
+
+			$this->db->trans_complete();
+
+			if ( $this->db->trans_status() === FALSE ) :
+
+				show_error( lang( 'startup_db_error' ) );
+
+			endif;
+
+			$this->db->db_debug = TRUE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 		

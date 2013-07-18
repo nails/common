@@ -63,7 +63,7 @@
 
 								?>
 							</td>
-							<td class="price"><?=shop_format_price( $item->price, TRUE )?></td>
+							<td class="price"><?=shop_format_price( $item->price, TRUE, TRUE, SHOP_BASE_CURRENCY_ID )?></td>
 							<td class="sold-available">
 								<?php
 

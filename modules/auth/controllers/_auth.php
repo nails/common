@@ -13,7 +13,7 @@ class NAILS_Auth_Controller extends NAILS_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
 		
 		//	Check this module is enabled in settings
@@ -33,6 +33,15 @@ class NAILS_Auth_Controller extends NAILS_Controller
 		
 		//	Load language file
 		$this->lang->load( 'auth', RENDER_LANG_SLUG );
+
+		// --------------------------------------------------------------------------
+
+		//	DB enabled?
+		if ( ! NAILS_DB_ENABLED ) :
+
+			show_error( lang( 'auth_no_db' ) );
+
+		endif;
 	}
 }
 

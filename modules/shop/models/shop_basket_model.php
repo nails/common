@@ -260,9 +260,9 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				endif;
 				
 				$_item->shipping			= $_shipping;
-				$_item->shipping_render		= $this->currency->convert_to_user( $_shipping );
+				$_item->shipping_render		= shop_convert_to_user( $_shipping );
 				$_item->shipping_tax		= $_shipping_tax;
-				$_item->shipping_tax_render	= $this->currency->convert_to_user( $_shipping_tax );
+				$_item->shipping_tax_render	= shop_convert_to_user( $_shipping_tax );
 				
 				// --------------------------------------------------------------------------
 				
@@ -277,7 +277,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				
 				endif;
 
-				$_item->total_render = $this->currency->convert_to_user( $_item->total );
+				$_item->total_render = shop_convert_to_user( $_item->total );
 
 				// --------------------------------------------------------------------------
 
@@ -287,7 +287,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				$_item->tax_rate->label	= round_to_precision( 100 * $_product->tax->rate, 2 ) . '%';
 				$_item->tax_rate->rate	= round_to_precision( $_product->tax->rate, 2 );
 				$_item->tax				= $_item->total * $_product->tax->rate;
-				$_item->tax_render		= $this->currency->convert_to_user( $_item->tax );
+				$_item->tax_render		= shop_convert_to_user( $_item->tax );
 				
 				// --------------------------------------------------------------------------
 
@@ -574,14 +574,14 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Convert totals
-		$_basket->totals->sub_render			= $this->currency->convert_to_user( $_basket->totals->sub );
-		$_basket->totals->shipping_render		= $this->currency->convert_to_user( $_basket->totals->shipping );
-		$_basket->totals->tax_shipping_render	= $this->currency->convert_to_user( $_basket->totals->tax_shipping );
-		$_basket->totals->tax_items_render		= $this->currency->convert_to_user( $_basket->totals->tax_items );
-		$_basket->totals->grand_render			= $this->currency->convert_to_user( $_basket->totals->grand );
+		$_basket->totals->sub_render			= shop_convert_to_user( $_basket->totals->sub );
+		$_basket->totals->shipping_render		= shop_convert_to_user( $_basket->totals->shipping );
+		$_basket->totals->tax_shipping_render	= shop_convert_to_user( $_basket->totals->tax_shipping );
+		$_basket->totals->tax_items_render		= shop_convert_to_user( $_basket->totals->tax_items );
+		$_basket->totals->grand_render			= shop_convert_to_user( $_basket->totals->grand );
 
-		$_basket->discount->shipping_render		= $this->currency->convert_to_user( $_basket->discount->shipping );
-		$_basket->discount->items_render		= $this->currency->convert_to_user( $_basket->discount->items );
+		$_basket->discount->shipping_render		= shop_convert_to_user( $_basket->discount->shipping );
+		$_basket->discount->items_render		= shop_convert_to_user( $_basket->discount->items );
 
 		
 		// --------------------------------------------------------------------------

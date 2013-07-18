@@ -583,7 +583,16 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 	public function convert_to_user( $value )
 	{
-		return $value * SHOP_USER_CURRENCY_BASE_EXCHANGE;
+		return $this->convert_using_rate( $value, SHOP_USER_CURRENCY_BASE_EXCHANGE );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function convert_using_rate( $value, $rate )
+	{
+		return $value * $rate;
 	}
 }
 

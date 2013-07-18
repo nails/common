@@ -40,7 +40,19 @@
 								$this->load->view( 'admin/_utilities/table-cell-user',		$order->user );
 
 							?>
-							<td class="value"><?=SHOP_BASE_CURRENCY_SYMBOL . number_format( $order->totals->grand, SHOP_BASE_CURRENCY_PRECISION )?></td>
+							<td class="value">
+							<?php
+
+								echo shop_format_price( $order->totals->grand, TRUE, TRUE, $order->currency->base->id );
+
+								if ( $order->currency->order->id !== $order->currency->base->id ) :
+
+									echo '<small>' . shop_format_price( shop_convert_using_rate( $order->totals->grand, $order->currency->exchange_rate ), TRUE, TRUE, $order->currency->order->id ) . '</small>';
+
+								endif;
+
+							?>
+							</td>
 							<td class="status <?=$order->status?>"><?=$order->status?></td>
 							<?php
 

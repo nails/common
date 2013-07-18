@@ -19,6 +19,7 @@
 	
 	
 	//	Generic errors
+	$lang['auth_no_db']									= 'No database is configured.';
 	$lang['auth_no_access_already_logged_in']			= '<strong>Sorry,</strong> you can\'t access that page while logged in (currently logged in as <strong>%s</strong>).';
 	$lang['auth_no_access']								= '<strong>Sorry,</strong> you do not have permission to access that content.';
 	

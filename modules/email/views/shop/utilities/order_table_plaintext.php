@@ -1,5 +1,10 @@
 <?php
 
+	//	Shortcut variable for base and order currencies
+	$_ocurrency = $order->currency->order->id;
+	$_bcurrency = $order->currency->base->id;
+	$_exchange	= $order->currency->exchange_rate;
+
 	foreach ( $order->items AS $item ) :
 
 		//	Load the 'details' view; in a separate view so apps can easily customise the layout/content
@@ -11,11 +16,11 @@
 		
 		if ( $item->was_on_sale ) :
 		
-			echo 'Price: ' . $order->currency->order->symbol . number_format( $item->sale_price, $order->currency->order->precision ) . "\n";
+			echo 'Price: ' . shop_format_price( shop_convert_using_rate( $item->sale_price, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 			
 		else :
 		
-			echo 'Price: ' . $order->currency->order->symbol . number_format( $item->price, $order->currency->order->precision ) . "\n";
+			echo 'Price: ' . shop_format_price( shop_convert_using_rate( $item->price, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 		
 		endif;
 		
@@ -25,7 +30,7 @@
 
 			if ( $item->shipping ) :
 			 
-				echo 'Shipping: ' . $order->currency->order->symbol . number_format( $item->shipping, $order->currency->order->precision ) . "\n";
+				echo 'Shipping: ' . shop_format_price( shop_convert_using_rate( $item->shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 				
 			else :
 			
@@ -35,7 +40,7 @@
 
 		endif;
 
-		echo 'Price: ' . $order->currency->order->symbol . number_format( $item->total, $order->currency->order->precision ) . "\n";
+		echo 'Item Total: ' . shop_format_price( shop_convert_using_rate( $item->total, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 		
 		echo "\n";
 	
@@ -46,12 +51,12 @@
 	if ( $order->requires_shipping ) :
 
 		echo 'SUB TOTAL' . "\n";
-		echo 'Shipping: ' . $order->currency->order->symbol . number_format( $order->totals->shipping, $order->currency->order->precision ) . "\n";
-		echo 'Items: ' . $order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision ) . "\n";
+		echo 'Shipping: ' . shop_format_price( shop_convert_using_rate( $order->totals->shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
+		echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->totals->sub, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 		echo "\n";
 		echo 'TAX' . "\n";
-		echo 'Shipping: ' . $order->currency->order->symbol . number_format( $order->totals->tax_shipping, $order->currency->order->precision ) . "\n";
-		echo 'Items: ' . $order->currency->order->symbol . number_format( $order->totals->tax_items, $order->currency->order->precision ) . "\n";
+		echo 'Shipping: ' . shop_format_price( shop_convert_using_rate( $order->totals->tax_shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
+		echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->totals->tax_items, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 		if ( $order->discount->shipping || $order->discount->items ) :
 
@@ -60,13 +65,13 @@
 
 			if ( $order->discount->shipping ) :
 
-				echo 'Shipping: ' . $order->currency->order->symbol . number_format( $order->discount->shipping, $order->currency->order->precision ) . "\n";
+				echo 'Shipping: ' . shop_format_price( shop_convert_using_rate( $order->discount->shipping, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 			endif;
 
 			if ( $order->discount->items ) :
 
-				echo 'Items: ' . $order->currency->order->symbol . number_format( $order->discount->items, $order->currency->order->precision ) . "\n";
+				echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->discount->items, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 			endif;
 
@@ -75,10 +80,10 @@
 	else :
 
 		echo 'SUB TOTAL' . "\n";
-		echo 'Items: ' . $order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision ) . "\n";
+		echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->totals->sub, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 		echo "\n";
 		echo 'TAX' . "\n";
-		echo 'Items: ' . $order->currency->order->symbol . number_format( $order->totals->tax_items, $order->currency->order->precision ) . "\n";
+		echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->totals->tax_items, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 		if ( $order->discount->items ) :
 
@@ -87,7 +92,7 @@
 
 			if ( $order->discount->items ) :
 
-				echo 'Items: ' . $order->currency->order->symbol . number_format( $order->discount->items, $order->currency->order->precision ) . "\n";
+				echo 'Items: ' . shop_format_price( shop_convert_using_rate( $order->discount->items, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 			endif;
 
@@ -97,7 +102,7 @@
 
 	echo "\n";
 	echo 'GRAND TOTAL' . "\n";
-	echo $order->currency->order->symbol . number_format( $order->totals->grand, $order->currency->order->precision ) . "\n";
+	echo shop_format_price( shop_convert_using_rate( $order->totals->grand, $_exchange ), TRUE, TRUE, $_ocurrency ) . "\n";
 
 
 

@@ -42,7 +42,17 @@ class NAILS_Language_model extends NAILS_Model
 		
 		$this->db->select( 'l.id,l.name,l.slug,l.priority,l.supported' );
 		$this->db->order_by( 'l.name' );
-		return $this->db->get( 'language l' )->result();
+		$_result = $this->db->get( 'language l' );
+
+		if ( $_result ) :
+
+			$_result->result();
+
+		else :
+
+			return array();
+
+		endif;
 	}
 	
 	

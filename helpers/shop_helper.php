@@ -263,7 +263,7 @@ if ( ! function_exists( 'shop_setting' ) )
  */
 if ( ! function_exists( 'shop_format_price' ) )
 {
-	function shop_format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE )
+	function shop_format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE, $for_currency = NULL, $decode_symbol = FALSE )
 	{
 		//	Load the shop model, if not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'shop' ) ) :
@@ -274,7 +274,63 @@ if ( ! function_exists( 'shop_format_price' ) )
 		
 		// --------------------------------------------------------------------------
 		
-		return get_instance()->shop->format_price( $price, $include_symbol, $include_thousands );
+		return get_instance()->shop->format_price( $price, $include_symbol, $include_thousands, $for_currency, $decode_symbol );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Helper for quickly converting shop prices
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'shop_convert_to_user' ) )
+{
+	function shop_convert_to_user( $price )
+	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'currency' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_currency_model', 'currency' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->currency->convert_to_user( $price);
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Helper for quickly converting shop prices
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'shop_convert_using_rate' ) )
+{
+	function shop_convert_using_rate( $price, $rate )
+	{
+		//	Load the shop model, if not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'currency' ) ) :
+		
+			get_instance()->load->model( 'shop/shop_currency_model', 'currency' );
+		
+		endif;
+		
+		// --------------------------------------------------------------------------
+		
+		return get_instance()->currency->convert_using_rate( $price, $rate );
 	}
 }
 

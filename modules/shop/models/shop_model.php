@@ -192,23 +192,130 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE )
+	public function format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE, $for_currency = NULL, $decode_symbol = FALSE )
 	{
-		//	SHOP_USER_CURRENCY_THOUSANDS
-		$_thousands	= $include_thousands ? SHOP_USER_CURRENCY_THOUSANDS : '';
-		$_value		= number_format( $price, SHOP_USER_CURRENCY_PRECISION, SHOP_USER_CURRENCY_DECIMALS, $_thousands );
+		//	Foratting for which currency? If null or emptyt, assume user currency
+		if ( is_null( $for_currency ) || ! $for_currency ) :
 
-		if ( $include_symbol ) :
+			$_code		= SHOP_USER_CURRENCY_CODE;
+			$_symbol	= SHOP_USER_CURRENCY_SYMBOL;
+			$_thousands	= $include_thousands ? SHOP_USER_CURRENCY_THOUSANDS : '';
+			$_precision	= SHOP_USER_CURRENCY_PRECISION;
+			$_decimals	= SHOP_USER_CURRENCY_DECIMALS;
+			$_position	= SHOP_USER_CURRENCY_SYMBOL_POS;
 
-			if ( SHOP_USER_CURRENCY_SYMBOL_POS == 'BEFORE' ) :
+		else :
 
-				return SHOP_USER_CURRENCY_SYMBOL . $_value;
+			//	Fetch the currency in question - check cache first
+			$_currency = $this->_get_cache( 'format_price-' . $for_currency );
+
+			if ( $_currency ) :
+
+				$_code		= $_currency->code;
+				$_symbol	= $_currency->symbol;
+				$_thousands	= $include_thousands ? $_currency->thousands : '';
+				$_precision	= $_currency->precision;
+				$_decimals	= $_currency->decimals;
+				$_position	= $_currency->position;
 
 			else :
 
-				return $_value . SHOP_USER_CURRENCY_SYMBOL;
+				//	Fetch currency
+
+				//	Load the currency model, if not already loaded
+				if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+				
+					$this->load->model( 'shop/shop_currency_model', 'currency' );
+				
+				endif;
+
+				if ( is_numeric( $for_currency ) ) :
+
+					$_currency = $this->currency->get_by_id( $for_currency );
+
+				else :
+
+					$_currency = $this->currency->get_by_code( $for_currency );
+
+				endif;
+
+				if ( $_currency ) :
+
+					$_code		= $_currency->code;
+					$_symbol	= $_currency->symbol;
+					$_thousands	= $include_thousands ? $_currency->thousands_seperator : '';
+					$_precision	= $_currency->decimal_precision;
+					$_decimals	= $_currency->decimal_symbol;
+					$_position	= $_currency->symbol_position;
+
+					//	Cache it
+					$_cache				= new stdClass();
+					$_cache->code		= $_code;
+					$_cache->symbol		= $_symbol;
+					$_cache->thousands	= $_thousands;
+					$_cache->precision	= $_precision;
+					$_cache->decimals	= $_decimals;
+					$_cache->position	= $_position;
+
+					$this->_set_cache( 'format_price-' . $for_currency, $_cache );
+
+				else :
+
+					return FALSE;
+
+				endif;
 
 			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_value = number_format( $price, $_precision, $_decimals, $_thousands );
+
+		if ( $include_symbol ) :
+
+			if ( $decode_symbol ) :
+
+				//	ENT_HTML5 added in PHP 5.4.0, use that if you can, if not replace certain strings manually
+				if ( version_compare( phpversion(), '5.4.0', '>=' ) ) :
+
+					$_symbol = html_entity_decode( $_symbol, ENT_COMPAT | ENT_HTML5, 'UTF-8' );
+
+				else :
+
+					$_symbol = html_entity_decode( $_symbol, ENT_COMPAT, 'UTF-8' );
+
+					$_replace				= array();
+					$_replace['&dollar;']	= '$';
+
+					$_symbol = str_replace( array_keys( $_replace ), $_replace, $_symbol );
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			if ( $_position == 'BEFORE' ) :
+
+				$_return =  $_symbol . $_value;
+
+			else :
+
+				$_return =   $_value . $_symbol;
+
+			endif;
+
+			if ( ! $_symbol || $_symbol == '&curren;' ) :
+
+				$_return .= ' ' . $_code;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			return $_return;
 
 		else :
 

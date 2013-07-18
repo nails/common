@@ -6,6 +6,11 @@
 * Description:  Generic language file for Nails
 * 
 */
+	//	Startup notices
+	$lang['startup_db_error']	= 'There was a problem starting the application, the database is perhaps configured incorrectly.';
+
+	// --------------------------------------------------------------------------
+
 	//	Default header/footer
 	$lang['nails_footer_powered_by']	= 'Powered by <a href="http://nailsapp.co.uk">Nails. v%s</a>';
 	$lang['nails_footer_developed_by']	= 'Developed by <a href="http://shedcollective.org">Shed Collective</a> &copy; 2012 - 2013';
