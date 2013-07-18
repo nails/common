@@ -19,7 +19,7 @@
 
 class NAILS_User_model extends NAILS_Model
 {
-
+	protected $_me;
 	protected $active_user;
 	protected $remember_cookie;
 	protected $is_remembered;
@@ -141,6 +141,7 @@ class NAILS_User_model extends NAILS_Model
 			//	User was validated, log them in!
 			$this->update_last_login( $_u->id );
 			$this->set_login_data( $_u->id, $_u->email, $_u->group_id );
+			$this->_me = $_u->id;
 			
 		endif;
 	}
@@ -1566,8 +1567,18 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 		
 		//	No-one's home...
-		if ( ! $_me )
-			return FALSE;
+		if ( ! $_me ) :
+
+
+			$_me = $this->_me;
+
+			if ( ! $_me ) :
+
+				return FALSE;
+
+			endif;
+
+		endif;
 		
 		// --------------------------------------------------------------------------
 		

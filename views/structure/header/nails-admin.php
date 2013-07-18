@@ -25,6 +25,17 @@
 		window.NAILS_URL	= '<?=NAILS_URL?>';
 		window.NAILS_LANG	= {};
 	</script>
+
+	<noscript>
+		<style type="text/css">
+
+			.js-only
+			{
+				display:none;
+			}
+
+		</style>
+	</noscript>
 	
 	<!--	JS LOCALISATION	-->
 	<script tyle="text/javascript">
