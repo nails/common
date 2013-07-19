@@ -4,17 +4,17 @@
 * Name:			Admin : Shop
 *
 * Description:	Shop Manager
-* 
+*
 */
 
 require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Shop extends NAILS_Admin_Controller
@@ -38,31 +38,31 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$d = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Configurations
 		$d->name				= 'Shop';					//	Display name.
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Navigation options
 		$d->funcs				= array();
 		$d->funcs['inventory']		= 'Manage Inventory';				//	Sub-nav function.
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
 		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Only announce the controller if the user has permission to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns an array of notifications for various methods
 	 *
@@ -75,18 +75,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	{
 		$_ci =& get_instance();
 		$_notifications = array();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		get_instance()->load->model( 'shop/shop_order_model', 'order' );
 
 		$_notifications['orders']			= array();
 		$_notifications['orders']['type']	= 'alert';
 		$_notifications['orders']['title']	= 'Unfulfilled orders';
 		$_notifications['orders']['value']	= get_instance()->order->count_unfulfilled_orders();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_notifications;
 	}
 
@@ -136,9 +136,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Defaults defaults
 		$this->shop_inventory_group			= FALSE;
 		$this->shop_inventory_where			= array();
@@ -154,9 +154,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->shop_vouchers_where			= array();
 		$this->shop_vouchers_actions		= array();
 		$this->shop_vouchers_sortfields		= array();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->shop_inventory_sortfields[] = array( 'label' => 'ID',				'col' => 'p.id' );
 		$this->shop_inventory_sortfields[] = array( 'label' => 'Title',				'col' => 'p.title' );
 		$this->shop_inventory_sortfields[] = array( 'label' => 'Type',				'col' => 'pt.label' );
@@ -173,18 +173,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the helper and base model
-		$this->load->helper( 'shop' );
+		//	Load models which this model depends on
 		$this->load->model( 'shop/shop_model', 'shop' );
 		$this->load->model( 'shop/shop_currency_model', 'currency' );
 		$this->load->model( 'shop/shop_product_model', 'product' );
 		$this->load->model( 'shop/shop_tax_model', 'tax' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Manage the inventory
 	 *
@@ -219,28 +218,28 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Searching, sorting, ordering and paginating.
 		$_hash = 'search_' . md5( uri_string() ) . '_';
-		
+
 		if ( $this->input->get( 'reset' ) ) :
-		
+
 			$this->session->unset_userdata( $_hash . 'per_page' );
 			$this->session->unset_userdata( $_hash . 'sort' );
 			$this->session->unset_userdata( $_hash . 'order' );
-		
+
 		endif;
-		
+
 		$_default_per_page	= $this->session->userdata( $_hash . 'per_page' ) ? $this->session->userdata( $_hash . 'per_page' ) : 50;
 		$_default_sort		= $this->session->userdata( $_hash . 'sort' ) ? 	$this->session->userdata( $_hash . 'sort' ) : 'p.id';
 		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'desc';
-		
+
 		//	Define vars
 		$_search = array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
-		
+
 		foreach ( $this->shop_inventory_sortfields AS $field ) :
-		
+
 			$_search['columns'][strtolower( $field['label'] )] = $field['col'];
-		
+
 		endforeach;
-		
+
 		$_limit		= array(
 						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
 						$this->input->get( 'offset' ) ? $this->input->get( 'offset' ) : 0
@@ -249,12 +248,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
 						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
-					
+
 		//	Set sorting and ordering info in session data so it's remembered for when user returns
 		$this->session->set_userdata( $_hash . 'per_page', $_limit[0] );
 		$this->session->set_userdata( $_hash . 'sort', $_order[0] );
 		$this->session->set_userdata( $_hash . 'order', $_order[1] );
-		
+
 		//	Set values for the page
 		$this->data['search']				= new stdClass();
 		$this->data['search']->per_page		= $_limit[0];
@@ -267,13 +266,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$_where = NULL;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Pass any extra data to the view
 		$this->data['actions']		= $this->shop_inventory_actions;
 		$this->data['sortfields']	= $this->shop_inventory_sortfields;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch orders
 		$this->load->model( 'shop/shop_product_model', 'product' );
 
@@ -283,9 +282,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Work out pagination
 		$this->data['items']->pagination				= new stdClass();
 		$this->data['items']->pagination->total_results	= $this->product->count_all( FALSE, $_where, $_search );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'admin/shop/inventory/index',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
@@ -313,7 +312,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Fetch data
 		$this->data['product_types']	= $this->product->get_product_types_flat();
 		$this->data['tax_rates']		= $this->tax->get_all_flat();
-		
+
 		array_unshift( $this->data['tax_rates'], 'No Tax');
 
 		// --------------------------------------------------------------------------
@@ -358,10 +357,10 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	{
 		dump( 'restore inventory' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
+
 
 	public function orders()
 	{
@@ -376,7 +375,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endswitch;
 	}
 
-	
+
 	// --------------------------------------------------------------------------
 
 
@@ -396,28 +395,28 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Searching, sorting, ordering and paginating.
 		$_hash = 'search_' . md5( uri_string() ) . '_';
-		
+
 		if ( $this->input->get( 'reset' ) ) :
-		
+
 			$this->session->unset_userdata( $_hash . 'per_page' );
 			$this->session->unset_userdata( $_hash . 'sort' );
 			$this->session->unset_userdata( $_hash . 'order' );
-		
+
 		endif;
-		
+
 		$_default_per_page	= $this->session->userdata( $_hash . 'per_page' ) ? $this->session->userdata( $_hash . 'per_page' ) : 50;
 		$_default_sort		= $this->session->userdata( $_hash . 'sort' ) ? 	$this->session->userdata( $_hash . 'sort' ) : 'o.id';
 		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'desc';
-		
+
 		//	Define vars
 		$_search = array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
-		
+
 		foreach ( $this->shop_orders_sortfields AS $field ) :
-		
+
 			$_search['columns'][strtolower( $field['label'] )] = $field['col'];
-		
+
 		endforeach;
-		
+
 		$_limit		= array(
 						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
 						$this->input->get( 'offset' ) ? $this->input->get( 'offset' ) : 0
@@ -426,12 +425,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
 						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
-					
+
 		//	Set sorting and ordering info in session data so it's remembered for when user returns
 		$this->session->set_userdata( $_hash . 'per_page', $_limit[0] );
 		$this->session->set_userdata( $_hash . 'sort', $_order[0] );
 		$this->session->set_userdata( $_hash . 'order', $_order[1] );
-		
+
 		//	Set values for the page
 		$this->data['search']				= new stdClass();
 		$this->data['search']->per_page		= $_limit[0];
@@ -439,7 +438,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['search']->order		= $_order[1];
 		$this->data['search']->show			= $this->input->get( 'show' );
 		$this->data['search']->fulfilled	= $this->input->get( 'fulfilled' );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Prepare the where
@@ -498,13 +497,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Pass any extra data to the view
 		$this->data['actions']		= $this->shop_orders_actions;
 		$this->data['sortfields']	= $this->shop_orders_sortfields;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch orders
 		$this->load->model( 'shop/shop_order_model', 'order' );
 
@@ -514,9 +513,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Work out pagination
 		$this->data['orders']->pagination					= new stdClass();
 		$this->data['orders']->pagination->total_results	= $this->order->count_orders( $_where, $_search );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/orders/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
@@ -580,9 +579,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Set method info
 		$this->data['page']->title = 'View Order &rsaquo; ' . $this->data['order']->ref;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $this->input->get( 'is_fancybox' ) ) :
 
 			$this->data['header_override'] = 'structure/header/blank';
@@ -624,17 +623,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	PROCESSSSSS...
 		$this->order->process( $_order );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Send a receipt to the customer
 		$this->order->send_receipt( $_order );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Send a notification to the store owner(s)
 		$this->order->send_order_notification( $_order );
 
@@ -724,11 +723,11 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Manage vouchers
 	 *
@@ -767,28 +766,28 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Searching, sorting, ordering and paginating.
 		$_hash = 'search_' . md5( uri_string() ) . '_';
-		
+
 		if ( $this->input->get( 'reset' ) ) :
-		
+
 			$this->session->unset_userdata( $_hash . 'per_page' );
 			$this->session->unset_userdata( $_hash . 'sort' );
 			$this->session->unset_userdata( $_hash . 'order' );
-		
+
 		endif;
-		
+
 		$_default_per_page	= $this->session->userdata( $_hash . 'per_page' ) ? $this->session->userdata( $_hash . 'per_page' ) : 50;
 		$_default_sort		= $this->session->userdata( $_hash . 'sort' ) ? 	$this->session->userdata( $_hash . 'sort' ) : 'v.id';
 		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'desc';
-		
+
 		//	Define vars
 		$_search = array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
-		
+
 		foreach ( $this->shop_vouchers_sortfields AS $field ) :
-		
+
 			$_search['columns'][strtolower( $field['label'] )] = $field['col'];
-		
+
 		endforeach;
-		
+
 		$_limit		= array(
 						$this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : $_default_per_page,
 						$this->input->get( 'offset' ) ? $this->input->get( 'offset' ) : 0
@@ -797,19 +796,19 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
 						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
-					
+
 		//	Set sorting and ordering info in session data so it's remembered for when user returns
 		$this->session->set_userdata( $_hash . 'per_page', $_limit[0] );
 		$this->session->set_userdata( $_hash . 'sort', $_order[0] );
 		$this->session->set_userdata( $_hash . 'order', $_order[1] );
-		
+
 		//	Set values for the page
 		$this->data['search']				= new stdClass();
 		$this->data['search']->per_page		= $_limit[0];
 		$this->data['search']->sort			= $_order[0];
 		$this->data['search']->order		= $_order[1];
 		$this->data['search']->show			= $this->input->get( 'show' );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Prepare the where
@@ -842,13 +841,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Pass any extra data to the view
 		$this->data['actions']		= $this->shop_vouchers_actions;
 		$this->data['sortfields']	= $this->shop_vouchers_sortfields;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch vouchers
 		$this->data['vouchers']		= new stdClass();
 		$this->data['vouchers']->data = $this->voucher->get_all( FALSE, $_order, $_limit, $_where, $_search );
@@ -856,9 +855,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Work out pagination
 		$this->data['vouchers']->pagination					= new stdClass();
 		$this->data['vouchers']->pagination->total_results	= $this->voucher->count_vouchers( FALSE, $_where, $_search );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/vouchers/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
@@ -976,7 +975,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'is_unique',			'Code already in use.' );
-			
+
 
 			if ( $this->form_validation->run( $this ) ) :
 
@@ -1018,7 +1017,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$_data['product_type_id']	= $this->input->post( 'product_type_id' );
 
 				endif;
-				
+
 				// --------------------------------------------------------------------------
 
 				//	Attempt to create
@@ -1152,7 +1151,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Check $str is a valid date
 		$_date = date( 'Y-m-d H:i:s', strtotime( $str ) );
-		
+
 		//	Check format of str
 		if ( preg_match( '/^\d\d\d\d\-\d\d\-\d\d$/', trim( $str ) ) ) :
 
@@ -1160,7 +1159,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$str = trim( $str ) . ' 00:00:00';
 
 		endif;
-		
+
 		if ( $_date != $str ) :
 
 			$this->form_validation->set_message( '_callback_voucher_valid_to', 'Invalid date.' );
@@ -1261,18 +1260,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Set method info
 		$this->data['page']->title = 'Generate Reports';
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Process POST
 		if ( $this->input->post() ) :
-		
+
 			//	TODO
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/reports/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
@@ -1285,28 +1284,28 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter  instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP' ) ) :
 
 	class Shop extends NAILS_Shop
