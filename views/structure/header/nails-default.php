@@ -4,20 +4,22 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 	<head>
-	
+
 		<!--	META	-->
 		<meta charset="utf-8">
 		<title><?=isset( $page->title ) && $page->title ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 		<meta name="description" content="<?=isset( $page->description ) && $page->description ? $page->description : ''?>">
 		<meta name="description" content="<?=isset( $page->keywords ) && $page->keywords ? $page->keywords : ''?>">
-		
+
 		<!--	JS GLOBALS	-->
+		<script type="text/javascript" src="<?=NAILS_URL?>config/assets.json?uid=<?=uniqid()?>"></script>
 		<script type="text/javascript">
-			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
-			window.SITE_URL		= '<?=site_url()?>';
-			window.NAILS_URL	= '<?=NAILS_URL?>';
-			window.NAILS_LANG	= {};
+			var ENVIRONMENT				= '<?=ENVIRONMENT?>';
+			window.SITE_URL				= '<?=site_url()?>';
+			window.NAILS_URL			= '<?=NAILS_URL?>';
+			window.NAILS_LANG			= {};
+			window.NAILS_ASSETS_RELEASE = <?=NAILS_ASSETS_RELEASE?>;
 		</script>
 
 		<noscript>
@@ -30,38 +32,38 @@
 
 			</style>
 		</noscript>
-		
+
 		<!--	STYLES	-->
 		<?php
 
 			$this->asset->output();
 
 		?>
-		
+
 		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
 		<!--[if lt IE 9]>
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-		
+
 	</head>
 	<body>
-	
+
 	<div class="container">
-	
+
 		<!--	HEADER	-->
 		<div class="row" id="nails-default-header">
 			<div class="sixteen columns">
 				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
 			</div>
 		</div>
-	
-	
+
+
 		<!--	CONTENT	-->
 		<div class="row" id="nails-default-content">
 			<div class="sixteen columns">
-			
+
 				<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
-				
+
 				<!--	SYSTEM ALERTS	-->
 				<?php if ( isset( $error ) && $error ) : ?>
 					<div class="system-alert error">
@@ -72,7 +74,7 @@
 						</div>
 					</div>
 				<?php endif; ?>
-				
+
 				<?php if ( isset( $success ) && $success ) : ?>
 					<div class="system-alert success">
 						<div class="padder">
@@ -82,7 +84,7 @@
 						</div>
 					</div>
 				<?php endif; ?>
-				
+
 				<?php if ( isset( $message ) && $message ) : ?>
 					<div class="system-alert message">
 						<div class="padder">
@@ -92,7 +94,7 @@
 						</div>
 					</div>
 				<?php endif; ?>
-				
+
 				<?php if ( isset( $notice ) && $notice ) : ?>
 					<div class="system-alert notice">
 						<div class="padder">

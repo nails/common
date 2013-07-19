@@ -169,6 +169,31 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Assets release number
+		$_assets_config = @file_get_contents( NAILS_URL . 'config/config.json?uniqid=' . time() );
+
+		if ( $_assets_config ) :
+
+			$_json = @json_decode( $_assets_config );
+
+			if ( isset( $_json->release ) ) :
+
+				define( 'NAILS_ASSETS_RELEASE', (int) $_json->release );
+
+			else :
+
+				define( 'NAILS_ASSETS_RELEASE', 0 );
+
+			endif;
+
+		else :
+
+			define( 'NAILS_ASSETS_RELEASE', 0 );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Default common API credentials
 		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
 
