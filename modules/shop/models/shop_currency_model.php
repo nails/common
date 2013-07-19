@@ -4,22 +4,22 @@
  * Name:			shop_currency_model.php
  *
  * Description:		This model handles everything to do with currencies
- * 
+ *
  **/
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Shop_currency_model extends NAILS_Model
 {
 	/**
 	 * Creates a new object
-	 * 
+	 *
 	 * @access public
 	 * @param array $data The data to create the object with
 	 * @param bool $return_obj Whether to return just the new ID or the full object
@@ -29,43 +29,43 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		if ( $data )
 			$this->db->set( $data );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->set( 'created_by', active_user( 'id' ) );
-		
+
 		$this->db->insert( 'shop_currency' );
-		
+
 		if ( $return_obj ) :
-		
+
 			if ( $this->db->affected_rows() ) :
-			
+
 				$_id = $this->db->insert_id();
-				
+
 				return $this->get_by_id( $_id );
-			
+
 			else :
-			
+
 				return FALSE;
-			
+
 			endif;
-		
+
 		else :
-		
+
 			return $this->db->affected_rows() ? $this->db->insert_id() : FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Updates an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to update
 	 * @param array $data The data to update the object with
@@ -75,9 +75,9 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		if ( ! $data )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( is_numeric( $id ) ) :
 
 			$this->db->where( 'id', $id );
@@ -93,17 +93,17 @@ class NAILS_Shop_currency_model extends NAILS_Model
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->update( 'shop_currency' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Deletes an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to delete
 	 * @return bool
@@ -112,17 +112,17 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		$this->db->where( 'id', $id );
 		$this->db->delete( 'shop_currency' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches all objects
-	 * 
+	 *
 	 * @access public
 	 * @param none
 	 * @return array
@@ -149,14 +149,14 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		return $_results;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches all objects
-	 * 
+	 *
 	 * @access public
 	 * @param none
 	 * @return array
@@ -174,14 +174,14 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		return $_out;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's ID
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
 	 * @return	stdClass
@@ -190,24 +190,24 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		$this->db->where( 'c.id', $id );
 		$_result = $this->get_all( FALSE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's code
-	 * 
+	 *
 	 * @access public
 	 * @param string $code The code of the object to fetch
 	 * @return	stdClass
@@ -216,15 +216,78 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		$this->db->where( 'c.code', $code );
 		$_result = $this->get_all( FALSE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_by_country( $country )
+	{
+		$this->db->select( 'sc.*' );
+
+		// --------------------------------------------------------------------------
+
+		//	What are we dealing with?
+		if ( is_numeric( $country ) ) :
+
+			//	An ID
+			$this->db->where( 'scc.country_id', $country );
+
+		elseif( is_string( $country ) ) :
+
+			if ( strlen( $country ) == 2 ) :
+
+				$this->db->where( 'c.iso_code', $country );
+				$this->db->join( 'country c', 'c.id = scc.country_id' );
+
+			elseif ( strlen( $country ) == 3 ) :
+
+				$this->db->where( 'c.iso_code_3', $country );
+				$this->db->join( 'country c', 'c.id = scc.country_id' );
+
+			else :
+
+				//	Unknown
+				return NULL;
+
+			endif;
+
+		else :
+
+			//	Unknown
+			return NULL;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->join( 'shop_currency sc', 'sc.id = scc.currency_id' );
+		$_result = $this->db->get( 'shop_currency_country scc' );
+
+		if ( $_result && $_result->row() ) :
+
+			$_result = $_result->row();
+
+			//	Format
+			$this->_format_currency_object( $_result );
+
+			return $_result;
+
+		else :
+
+			return NULL;
+
+		endif;
 	}
 
 
@@ -252,7 +315,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 			if ( $this->db->affected_rows() ) :
 
 				return TRUE;
-			
+
 			else :
 
 				$this->_set_error( 'Unable to enable currencies' );
@@ -299,16 +362,16 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		//	Check to see if a logger object has been passed, if not create
 		//	a dummy method so we don't get errors
-		
+
 		if ( ! method_exists( $logger, 'line' ) ) :
-		
+
 			//	It hasn't, define a dummy
 			$_logger = function( $line ) {};
-			
+
 		else :
-		
+
 			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -557,7 +620,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 				endif;
 
 				// --------------------------------------------------------------------------
-				
+
 				return TRUE;
 
 			else :
@@ -602,28 +665,28 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter  instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_CURRENCY_MODEL' ) ) :
 
 	class Shop_currency_model extends NAILS_Shop_currency_model

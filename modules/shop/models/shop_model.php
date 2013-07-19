@@ -63,20 +63,33 @@ class NAILS_Shop_model extends NAILS_Model
 			//	If not, fall back to base currency
 
 			$this->load->library('geoip');
-			$this->geoip->InfoIP();
+			$this->geoip->InfoIP('90.221.187.105');
 			$_country_code = $this->geoip->result_country_code();
 
 			if ( $_country_code ) :
 
-				//	We know the code, attempt does it have a known currency?
-				//	TODO
+				//	We know the code, does it have a known currency?
+				$_country_currency = $this->currency->get_by_country( $_country_code );
+
+				if ( $_country_currency ) :
+
+					$_currency_id = $_country_currency->id;
+
+				else :
+
+					//	Fall back to default
+					$_currency_id = $_base->id;
+
+				endif;
 
 			else :
 
 				$_currency_id = $_base->id;
-				$this->session->set_userdata( 'shop_currency', $_currency_id );
 
 			endif;
+
+			//	Save to session
+			$this->session->set_userdata( 'shop_currency', $_currency_id );
 
 		endif;
 
