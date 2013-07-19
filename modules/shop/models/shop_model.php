@@ -4,15 +4,15 @@
  * Name:			shop_model.php
  *
  * Description:		This model primarily handles shop settings
- * 
+ *
  **/
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Shop_model extends NAILS_Model
@@ -33,7 +33,7 @@ class NAILS_Shop_model extends NAILS_Model
 		$_base = $this->get_base_currency();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Shop's base currency (i.e what the products are listed in etc)
 		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL' ) )		define( 'SHOP_BASE_CURRENCY_SYMBOL',		$_base->symbol );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_BASE_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
@@ -44,7 +44,7 @@ class NAILS_Shop_model extends NAILS_Model
 		//	Formatting constants
 		if ( ! defined( 'SHOP_BASE_CURRENCY_THOUSANDS' ) )	define( 'SHOP_BASE_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_DECIMALS' ) )	define( 'SHOP_BASE_CURRENCY_DECIMALS',		$_base->decimal_symbol );
-		
+
 		//	User's preferred currency
 		if ( $this->session->userdata( 'shop_currency' ) ) :
 
@@ -59,9 +59,24 @@ class NAILS_Shop_model extends NAILS_Model
 
 		else :
 
-			//	Use the base currency
-			$_currency_id = $_base->id;
-			$this->session->set_userdata( 'shop_currency', $_currency_id );
+			//	Can we determine the user's location and set a currency based on that?
+			//	If not, fall back to base currency
+
+			$this->load->library('geoip');
+			$this->geoip->InfoIP();
+			$_country_code = $this->geoip->result_country_code();
+
+			if ( $_country_code ) :
+
+				//	We know the code, attempt does it have a known currency?
+				//	TODO
+
+			else :
+
+				$_currency_id = $_base->id;
+				$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+			endif;
 
 		endif;
 
@@ -104,34 +119,34 @@ class NAILS_Shop_model extends NAILS_Model
 	public function settings( $key = NULL, $force_refresh = FALSE )
 	{
 		if ( ! $this->_settings || $force_refresh ) :
-		
+
 			$_settings = $this->db->get( 'shop_settings' )->result();
-			
+
 			foreach ( $_settings AS $setting ) :
-			
+
 				$this->_settings[ $setting->key ] = unserialize( $setting->value );
-			
+
 			endforeach;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $key ) :
-		
+
 			return $this->_settings;
-		
+
 		else :
-		
+
 			return isset( $this->_settings[$key] ) ? $this->_settings[$key] : NULL;
-			
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	public function set_settings( $key_values )
 	{
 		foreach ( $key_values AS $key => $value ) :
@@ -153,11 +168,11 @@ class NAILS_Shop_model extends NAILS_Model
 
 		return TRUE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	public function get_base_currency()
 	{
 		$_cache = $this->_get_cache( 'base_currency' );
@@ -172,9 +187,9 @@ class NAILS_Shop_model extends NAILS_Model
 
 		//	Load the currency model, if not already loaded
 		if ( ! $this->load->model_is_loaded( 'currency' ) ) :
-		
+
 			$this->load->model( 'shop/shop_currency_model', 'currency' );
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -224,9 +239,9 @@ class NAILS_Shop_model extends NAILS_Model
 
 				//	Load the currency model, if not already loaded
 				if ( ! $this->load->model_is_loaded( 'currency' ) ) :
-				
+
 					$this->load->model( 'shop/shop_currency_model', 'currency' );
-				
+
 				endif;
 
 				if ( is_numeric( $for_currency ) ) :
@@ -331,28 +346,28 @@ class NAILS_Shop_model extends NAILS_Model
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter  instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_MODEL' ) ) :
 
 	class Shop_model extends NAILS_Shop_model

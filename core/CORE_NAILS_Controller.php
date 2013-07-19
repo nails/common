@@ -4,9 +4,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected $data;
 	private $_supported_lang;
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	/**
 	 * Build the main framework. All autoloaded items have been loaded and
 	 * instanciated by this point and are safe to use.
@@ -14,7 +14,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function __construct()
 	{
@@ -24,16 +24,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
-		
+
 			echo '<strong style="color:red;">ERROR:</strong> Nails. environment not correctly configured; config file not found.';
 			exit( 0 );
-		
+
 		endif;
-		
+
 		require_once( NAILS_PATH . '/config/_nails.php' );
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Define data array (used extensively in views)
 		$this->data	= array();
 
@@ -43,7 +43,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_define_constants();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Is Nails in maintenance mode?
 		$this->_maintenance_mode();
 
@@ -55,21 +55,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_staging();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Load these items, everytime.
 		$this->_autoload_items();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Do we need to instanciate the database?
 		$this->_instanciate_db();
-
-		if ( NAILS_DB_ENABLED ) :
-
-			$this->db->trans_start();
-			$this->db->db_debug = FALSE;
-
-		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -77,7 +70,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_instanciate_user();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Instanciate languages
 		$this->_instanciate_languages();
 
@@ -90,7 +83,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->_is_user_suspended();
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Instanciate DateTime
 		$this->_instanciate_datetime();
 
@@ -101,32 +94,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		if ( NAILS_DB_ENABLED ) :
-
-			$this->db->trans_complete();
-
-			if ( $this->db->trans_status() === FALSE ) :
-
-				show_error( lang( 'startup_db_error' ) );
-
-			endif;
-
-			$this->db->db_debug = TRUE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-		
 		//	Set alerts
-		
+
 		//	These are hooks for code to add feedback messages to the user.
 		$this->data['notice']	= $this->session->flashdata( 'notice' );
 		$this->data['message']	= $this->session->flashdata( 'message' );
 		$this->data['error']	= $this->session->flashdata( 'error' );
 		$this->data['success']	= $this->session->flashdata( 'success' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Other defaults
 		$this->data['page']					= new stdClass();
 		$this->data['page']->title			= '';
@@ -206,37 +183,37 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( NAILS_MAINTENANCE ) :
 
 			$whitelist_ip = explode(',', NAILS_MAINTENANCE_WHITELIST );
-			
+
 			if ( array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
-			
+
 				header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
 				header( 'Status: 503 Service Temporarily Unavailable' );
 				header( 'Retry-After: 7200' );
-				
+
 				// --------------------------------------------------------------------------
-				
+
 		 		//	Look for an app override
 		 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
-		 		
+
 		 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
-		 		
+
 		 		//	Fall back to the Nails maintenance page
 		 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
-		 		
+
 		 			require NAILS_PATH . 'views/maintenance/maintenance.php';
-		 		
+
 		 		//	Fall back, back to plain text
 		 		else :
-		 		
+
 		 			echo '<h1>Down for maintenance</h1>';
-		 		
+
 		 		endif;
-		 		
+
 		 		// --------------------------------------------------------------------------
-		 		
+
 		 		//	Halt script execution
 	 			exit(0);
-		 		
+
 		 	endif;
 
 		endif;
@@ -300,20 +277,20 @@ class CORE_NAILS_Controller extends MX_Controller {
 			<head>
 				<title><?=APP_NAME?> - Unauthorised</title>
 				<meta charset="utf-8">
-				
+
 				<!--	STYLES	-->
 				<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
-				
+
 				<style type="text/css">
-				
+
 					#main-col
 					{
 						text-align:center;
 						margin-top:100px;
 					}
-				
+
 				</style>
-				
+
 			</head>
 			<body>
 				<div class="container row">
@@ -322,7 +299,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 						<hr />
 						<p>This staging environment restrticted to authorised users only.</p>
 					</div>
-				</div>	
+				</div>
 			</body>
 		</html>
 		<?php
@@ -336,14 +313,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instanciate_db()
 	{
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
-		
+
 			define( 'NAILS_DB_ENABLED', TRUE );
 			$this->load->database();
-		
+
 		else :
-		
+
 			define( 'NAILS_DB_ENABLED', FALSE );
-		
+
 		endif;
 	}
 
@@ -390,20 +367,20 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instanciate_profiler()
 	{
 		if ( defined( 'PROFILING' ) && PROFILING ) :
-			
+
 			/**
 			 * Enable profiler if not AJAX or CI request and there's no user_token. user_token
 			 * is used by uploadify to validate the upload due to uploadify not passing
 			 * the session during upload.
-			 * 
+			 *
 			 **/
-			
+
 			if ( ! $this->input->is_cli_request() && ! $this->input->is_ajax_request() && ! $this->input->post( 'user_token' ) ) :
-			
+
 				$this->output->enable_profiler( TRUE );
-				
+
 			endif;
-		
+
 		endif;
 	}
 
@@ -419,14 +396,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Check default lang is supported by nails
 		$this->_supported	= array();
 		$this->_supported[]	= 'english';
-		
+
 		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
-		
+
 	 		header( 'HTTP/1.1 500 Bad Request' );
 			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
-		
+
 		endif;
-		
+
 		define( 'APP_DEFAULT_LANG_ID',		$this->language->get_default_id() );
 		define( 'APP_DEFAULT_LANG_NAME',	$this->language->get_default_name() );
 
@@ -436,22 +413,22 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->lang->load( 'nails' );
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Set any global preferences for this user, e.g languages, fall back to
 		//	the app's default language (defined in config.php).
-		
+
 		$_user_pref = active_user( 'language_setting' );
-		
+
 		if ( isset( $_user_pref->slug ) && $_user_pref->slug ) :
-		
+
 			define( 'RENDER_LANG_SLUG',	$_user_pref->slug );
 			define( 'RENDER_LANG_ID',	$_user_pref->id );
-		
+
 		else :
-		
+
 			define( 'RENDER_LANG_SLUG',	APP_DEFAULT_LANG_SLUG );
 			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
-		
+
 		endif;
 	}
 
@@ -580,17 +557,17 @@ class CORE_NAILS_Controller extends MX_Controller {
 	{
 		//	Set a $user variable (for the views)
 		$this->data['user'] =& $this->user;
-		
+
 		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
 		//	reference the user model
-		
+
 		define( 'NAILS_USR_OBJ', 'user' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Find a remembered user and initialise the user model; this routine checks
 		//	the user's cookies and set's up the session for an existing or new user.
-		
+
 		$this->user->find_remembered_user();
 		$this->user->init();
 	}
