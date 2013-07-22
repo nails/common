@@ -13,17 +13,17 @@
 			</tr>
 		</thead>
 		<tbody>
-		
+
 			<!--	ITEMS	-->
 			<?php
-			
+
 				$_i = 0;
-				
+
 				foreach ( $basket->items AS $key => $item ) :
-				
+
 					$_stripe = $_i % 2 ? 'odd' : 'even';
 					$_i++;
-					
+
 					?>
 					<tr data-product_id="<?=$item->id?>" data-key="<?=$key?>" class="<?=$_stripe?>">
 						<td class="item">
@@ -38,66 +38,73 @@
 						</td>
 						<td class="quantity">
 						<?php
-						
+
 							//	Decrement
 							if ( ! isset( $no_changes ) || ! $no_changes ) :
-							
+
 								echo anchor( shop_setting( 'shop_url' ) . 'basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
-								
+
 							endif;
-							
+
 							//	Quantity
 							echo '<span class="value">' . $item->quantity . '</span>';
-							
+
 							//	Increment
 							if ( ! isset( $no_changes ) || ! $no_changes ) :
-							
+
 								if ( ! isset( $item->type->max_per_order ) || is_null( $item->type->max_per_order ) || $item->quantity < $item->type->max_per_order ) :
-								
+
 									echo anchor( shop_setting( 'shop_url' ) . 'basket/increment/' . $item->id, 'Increment', 'class="increment"' );
-									
+
 								endif;
-							
+
 							endif;
-							
+
 						?>
 						</td>
 						<?php
-						
+
 							if ( $item->is_on_sale ) :
-							
+
 								echo '<td class="price on-sale">';
 								echo '<span>' . shop_format_price( $item->sale_price_render, TRUE, TRUE ) . '</span>';
 								echo '<span class="ribbon"></span>';
 								echo '<del>was ' . shop_format_price( $item->price_render, TRUE, TRUE ) . '</del>';
 								echo '</td>';
-							
+
 							else :
-							
+
 								echo '<td class="price">';
 								echo shop_format_price( $item->price_render, TRUE, TRUE );
 								echo '</td>';
-							
+
 							endif;
-							
+
 						?>
-						<td class="tax"><?=$item->tax_rate->label?></td>
+						<td class="tax">
 						<?php
-						
+
+							echo $item->tax_rate->label;
+							echo '<small>' . shop_format_price( $item->tax_render, TRUE, TRUE ) . '</small>';
+
+						?>
+						</td>
+						<?php
+
 							if ( $basket->requires_shipping ) :
 
 								if ( $item->type->requires_shipping && $item->shipping_render ) :
-								
+
 									echo '<td class="shipping">';
 									echo shop_format_price( $item->shipping_render, TRUE, TRUE );
 									echo '</td>';
-								
+
 								elseif ( $item->type->requires_shipping && ! $item->shipping ) :
-								
+
 									echo '<td class="shipping free">';
 									echo 'FREE';
 									echo '</td>';
-								
+
 								else :
 
 									echo '<td class="shipping free">';
@@ -107,14 +114,14 @@
 								endif;
 
 							endif;
-							
+
 						?>
 						<td class="total"><?=shop_format_price( $item->total_render, TRUE, TRUE )?></td>
 					</tr>
 					<?php
-			
+
 				endforeach;
-				
+
 			?>
 
 			<!--	CURRENCY CHOOSER	-->
@@ -222,7 +229,7 @@
 				endif;
 
 			?>
-			
+
 			<!--	TOTALS	-->
 			<tr class="total sub">
 				<td class="label" colspan="4">Sub Total</td>
@@ -231,35 +238,35 @@
 					if ( $basket->requires_shipping ) :
 
 						echo '<td class="value">';
-						
+
 						if ( $basket->totals->shipping_render ) :
-						
+
 							echo shop_format_price( $basket->totals->shipping_render, TRUE, TRUE );
-						
+
 						else :
-						
+
 							echo 'FREE';
-							
+
 						endif;
 
 						echo '</td>';
 
 					endif;
-					
+
 				?>
 				<td class="value">
 				<?php
-					
+
 					if ( $basket->totals->sub_render ) :
-					
+
 						echo shop_format_price( $basket->totals->sub_render, TRUE, TRUE );
-					
+
 					else :
-					
+
 						echo 'FREE';
-						
+
 					endif;
-					
+
 				?>
 				</td>
 			</tr>
@@ -317,7 +324,7 @@
 				<?php endif; ?>
 				<td class="value"><?=shop_format_price( $basket->totals->grand_render, TRUE, TRUE )?></td>
 			</tr>
-			
+
 		</tbody>
 	</table>
 </div>

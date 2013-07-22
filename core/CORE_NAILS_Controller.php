@@ -169,6 +169,31 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Assets release number
+		$_assets_config = @file_get_contents( NAILS_URL . 'config/config.json?uniqid=' . time() );
+
+		if ( $_assets_config ) :
+
+			$_json = @json_decode( $_assets_config );
+
+			if ( isset( $_json->release ) ) :
+
+				define( 'NAILS_ASSETS_RELEASE', (int) $_json->release );
+
+			else :
+
+				define( 'NAILS_ASSETS_RELEASE', 0 );
+
+			endif;
+
+		else :
+
+			define( 'NAILS_ASSETS_RELEASE', 0 );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Default common API credentials
 		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
 
@@ -471,8 +496,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Load the system helper
+		$this->load->helper( 'system' );
+
+		// --------------------------------------------------------------------------
+
 		$_helpers		= array();
-		$_helpers[]		= 'system';	//	To maintain sanity, load this first.
 		$_helpers[]		= 'site';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
@@ -484,9 +513,38 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'text';
 		$_helpers[]		= 'exception';
 		$_helpers[]		= 'typography';
-		$_helpers[]		= 'cdn';
 		$_helpers[]		= 'event';
 
+		//	Module specific helpers
+		//	CDN
+		if ( module_is_enabled( 'cdn' ) ) :
+
+			$_helpers[]	= 'cdn';
+
+		endif;
+
+		//	Shop
+		if ( module_is_enabled( 'shop' ) ) :
+
+			$_helpers[]	= 'shop';
+
+		endif;
+
+		//	Blog
+		if ( module_is_enabled( 'blog' ) ) :
+
+			$_helpers[]	= 'blog';
+
+		endif;
+
+		//	CMS
+		if ( module_is_enabled( 'cms' ) ) :
+
+			$_helpers[]	= 'cms';
+
+		endif;
+
+		//	Load...
 		foreach ( $_helpers AS $helper ) :
 
 			$this->load->helper( $helper );

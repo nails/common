@@ -9,7 +9,7 @@
 			$_field['label']		= 'ID';
 			$_field['default']		= $order->id;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 			$_field['label']		= 'Reference';
 			$_field['default']		= $order->ref;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 			$_field['label']		= 'Order Status';
 			$_field['default']		= $order->status;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -42,7 +42,7 @@
 			$_field['label']		= 'Customer Name';
 			$_field['default']		= $order->user->first_name . ' ' . $order->user->last_name;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 
@@ -54,7 +54,7 @@
 			$_field['label']		= 'Customer Group';
 			$_field['default']		= $order->user->group->id ? $order->user->group->label : 'Unregistered User';
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -65,7 +65,7 @@
 			$_field['label']		= 'Customer Email';
 			$_field['default']		= $order->user->email;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -76,7 +76,7 @@
 			$_field['label']		= 'Checked out using';
 			$_field['default']		= $order->payment_gateway->label;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -91,7 +91,7 @@
 					$_field['label']		= 'PayPal Transaction ID';
 					$_field['default']		= $order->pp_txn_id;
 					$_field['readonly']		= TRUE;
-					
+
 					echo form_field( $_field );
 
 				break;
@@ -111,7 +111,6 @@
 			//	Shortcut variable for base and order currencies
 			$_ocurrency = $order->currency->order->id;
 			$_bcurrency = $order->currency->base->id;
-			$_exchange	= $order->currency->exchange_rate;
 
 			// --------------------------------------------------------------------------
 
@@ -126,10 +125,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->sub, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->sub_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				//	Shipping Total
@@ -141,10 +140,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->shipping, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->shipping_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -158,10 +157,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->tax_items, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->tax_items_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 
@@ -176,10 +175,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->tax_shipping, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->tax_shipping_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -195,10 +194,10 @@
 
 					if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-						$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->discount->items, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+						$_field['default'] .= ' (' . shop_format_price( $order->discount->items_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 					endif;
-					
+
 					$_tip = 'Used voucher/gift card \'' . $order->voucher->code . '\'';
 
 					echo form_field( $_field, $_tip );
@@ -216,10 +215,10 @@
 
 					if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-						$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->discount->shipping, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+						$_field['default'] .= ' (' . shop_format_price( $order->discount->shipping, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 					endif;
-					
+
 					$_tip = 'Used voucher/gift card \'' . $order->voucher->code . '\'';
 
 					echo form_field( $_field, $_tip );
@@ -237,10 +236,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->grand, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->grand, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -251,7 +250,7 @@
 				$_field['label']	= 'Payment Gateway Fee';
 				$_field['readonly']	= TRUE;
 				$_field['default']	= shop_format_price( $order->totals->fees, TRUE, TRUE, $_bcurrency, TRUE );
-				
+
 				echo form_field( $_field );
 
 			else :
@@ -265,10 +264,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->sub, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->sub_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -282,10 +281,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->tax_items, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->tax_items_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -302,10 +301,10 @@
 
 					if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-						$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->discount->items, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+						$_field['default'] .= ' (' . shop_format_price( $order->discount->items_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 					endif;
-					
+
 					$_tip = 'Used voucher/gift card \'' . $order->voucher->code . '\'';
 
 					echo form_field( $_field, $_tip );
@@ -323,10 +322,10 @@
 
 				if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-					$_field['default'] .= ' (' . shop_format_price( shop_convert_using_rate( $order->totals->grand, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+					$_field['default'] .= ' (' . shop_format_price( $order->totals->grand_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 				endif;
-				
+
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
@@ -337,8 +336,8 @@
 				$_field['label']	= 'Payment Gateway Fee';
 				$_field['default']	= $_symbol . number_format( $order->totals->fees, $_precision );
 				$_field['readonly']	= TRUE;
-				$_field['default']	= shop_format_price( $order->totals->tax_shipping, TRUE, TRUE, $_bcurrency, TRUE );
-				
+				$_field['default']	= shop_format_price( $order->totals->fees, TRUE, TRUE, $_bcurrency, TRUE );
+
 				echo form_field( $_field );
 
 			endif;
@@ -351,7 +350,7 @@
 			$_field['label']	= 'Checkout Currency';
 			$_field['default']	= $order->currency->order->code;
 			$_field['readonly']	= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -362,7 +361,7 @@
 			$_field['label']	= 'Base Currency at time';
 			$_field['default']	= $order->currency->base->code;
 			$_field['readonly']	= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -373,7 +372,7 @@
 			$_field['label']	= 'Exchange Rate Used';
 			$_field['default']	= $order->currency->exchange_rate;
 			$_field['readonly']	= TRUE;
-			
+
 			echo form_field( $_field );
 
 		?>
@@ -390,7 +389,7 @@
 			$_field['label']		= 'Addressee';
 			$_field['default']		= $order->shipping_details->addressee;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -401,7 +400,7 @@
 			$_field['label']		= 'Line 1';
 			$_field['default']		= $order->shipping_details->line_1;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -412,7 +411,7 @@
 			$_field['label']		= 'line_2';
 			$_field['default']		= $order->shipping_details->line_2;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -423,7 +422,7 @@
 			$_field['label']		= 'Town';
 			$_field['default']		= $order->shipping_details->town;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -434,7 +433,7 @@
 			$_field['label']		= 'PostCode';
 			$_field['default']		= $order->shipping_details->postcode;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -445,7 +444,7 @@
 			$_field['label']		= 'State';
 			$_field['default']		= $order->shipping_details->state;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -456,7 +455,7 @@
 			$_field['label']		= 'Country';
 			$_field['default']		= $order->shipping_details->country;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -467,7 +466,7 @@
 			$_field['label']		= 'Shipping Courier';
 			$_field['default']		= $order->shipping_method->courier;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
@@ -478,7 +477,7 @@
 			$_field['label']		= 'Shipping Method';
 			$_field['default']		= $order->shipping_method->method;
 			$_field['readonly']		= TRUE;
-			
+
 			echo form_field( $_field );
 
 		?>
@@ -531,7 +530,7 @@
 
 						if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-							echo ' (' . shop_format_price( shop_convert_using_rate( $item->sale_price, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+							echo ' (' . shop_format_price( $item->sale_price_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 						endif;
 
@@ -541,7 +540,7 @@
 
 							if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-								echo ' (' . shop_format_price( shop_convert_using_rate( $item->price, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+								echo ' (' . shop_format_price( $item->price_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 							endif;
 
@@ -553,7 +552,7 @@
 
 						if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-							echo ' (' . shop_format_price( shop_convert_using_rate( $item->price, $_exchange ), TRUE, TRUE, $_ocurrency, TRUE ) . ')';
+							echo ' (' . shop_format_price( $item->price_render, TRUE, TRUE, $_ocurrency, TRUE ) . ')';
 
 						endif;
 
@@ -595,7 +594,7 @@
 								echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/processed' . $_is_fancybox, 'Mark as Processed', 'class="awesome small green"' );
 
 							else :
-								
+
 								echo '<span class="blank">&mdash;</span>';
 
 							endif;

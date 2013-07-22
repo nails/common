@@ -4,7 +4,7 @@
 		<title><?=APP_NAME?> Invoice #<?=$order->ref?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<style type="text/css">
-		
+
 			#container
 			{
 				width:700px;
@@ -12,24 +12,24 @@
 				margin:25px auto;
 				border:1px solid #CCC;
 				background:#EFEFEF;
-				font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+				font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 				font-weight: 300;
 				position:relative;
 			}
-		
-			
+
+
 			#title
 			{
 				text-align:center;
 			}
-			
+
 			hr
 			{
 				margin:20px 0;
 				clear:both;
 				border-top:1px dotted #CCC;
 			}
-			
+
 			table
 			{
 				width:100%;
@@ -37,7 +37,7 @@
 				border-collapse: collapse;
 				margin-bottom:20px;
 			}
-			
+
 			th,td
 			{
 				padding:10px;
@@ -46,30 +46,30 @@
 				border-bottom:1px dotted #CCC;
 				vertical-align:middle;
 			}
-			
+
 			td
 			{
 				background:#FEFEFE;
 			}
-			
+
 			td.th
 			{
 				width:150px;
 			}
-			
+
 			td small
 			{
 				display:block;
 				color:#777;
 				margin-top:0.5em;
 			}
-			
+
 			td.status
 			{
 				font-weight:bold;
 				color:red;
 			}
-			
+
 			td.status.paid
 			{
 				color:green;
@@ -102,7 +102,7 @@
 				font-weight:bold;
 				text-align:center;
 			}
-			
+
 			td.sub.label,
 			td.tax.label,
 			td.discount.label,
@@ -110,7 +110,7 @@
 			{
 				text-align:right;
 			}
-			
+
 			td.sub.spacer,
 			td.tax.spacer,
 			td.discount.spacer,
@@ -118,12 +118,17 @@
 			{
 				border-right:0px;
 			}
-		
+
+			p small
+			{
+				font-size:0.75em;
+			}
+
 		</style>
 	</head>
 	<body>
 	<div id="container">
-	
+
 		<h1 id="title"><?=APP_NAME?> Invoice</h1>
 		<table>
 			<tbody>
@@ -132,36 +137,54 @@
 					<td>
 						<strong><?=$order->shipping_details->addressee?></strong>
 						<?php
-						
+
 							if ( $order->shipping_details->addressee ) :
-							
+
 								echo '<strong>' . $order->shipping_details->addressee . '</strong>';
-							
+
 							elseif ( $order->user->first_name ) :
-							
+
 								echo '<strong>' . $order->user->first_name . ' ' . $order->user->last_name . '</strong>';
 								echo '<br />' . $order->user->email;
-								
+
 							else :
-							
+
 								echo '<strong>' . $order->user->email . '</strong>';
-							
+
 							endif;
-							
+
 							// --------------------------------------------------------------------------
-							
+
 							echo $order->shipping_details->line_1	? '<br />' . $order->shipping_details->line_1 : '';
 							echo $order->shipping_details->line_2	? '<br />' . $order->shipping_details->line_2 : '';
 							echo $order->shipping_details->town		? '<br />' . $order->shipping_details->town : '';
 							echo $order->shipping_details->postcode	? '<br />' . $order->shipping_details->postcode : '';
-						
+
 						?>
 					</td>
 				</tr>
 				<tr>
 					<td class="th">Sender</td>
 					<td>
-						<strong><?=shop_setting( 'invoice_company' )?></strong>
+						<strong>
+						<?php
+
+							if ( shop_setting( 'invoice_company' ) ) :
+
+								echo shop_setting( 'invoice_company' );
+
+							elseif ( APP_NAME ) :
+
+								echo APP_NAME;
+
+							else :
+
+								echo site_url();
+
+							endif;
+
+						?>
+						</strong>
 						<?=shop_setting( 'invoice_address' ) ? '<br />' . nl2br( shop_setting( 'invoice_address' ) ) : ''?>
 						<?=shop_setting( 'invoice_vat_no' ) ? '<small>VAT No.: ' . nl2br( shop_setting( 'invoice_vat_no' ) ) . '</small>' : ''?>
 						<?=shop_setting( 'invoice_company_no' ) ? '<small>Company No.: ' . nl2br( shop_setting( 'invoice_company_no' ) ) . '</small>' : ''?>
@@ -178,7 +201,7 @@
 				</tr>
 				<tr>
 					<td class="th">Dated</td>
-					<td><?=date ( 'jS M Y, H:i:s', strtotime( $order->created ) )?></td>
+					<td><?=user_datetime( $order->created )?></td>
 				</tr>
 				<tr>
 					<td class="th">Due</td>
@@ -190,7 +213,7 @@
 				</tr>
 			</tbody>
 		</table>
-		
+
 		<table>
 			<thead>
 				<tr>
@@ -218,30 +241,30 @@
 
 					?>
 					</td>
-					<td class="unit"><?=$order->currency->order->symbol . number_format( $item->price, $order->currency->order->precision )?></td>
+					<td class="unit"><?=shop_format_price( $item->price_render, TRUE, TRUE )?></td>
 					<td class="vat"><?=$item->tax_rate->rate*100?>%</td>
 
 					<?php if ( $order->requires_shipping ) : ?>
-					<td class="shipping"><?=$order->currency->order->symbol . number_format( $item->shipping, $order->currency->order->precision )?></td>
+					<td class="shipping"><?=shop_format_price( $item->shipping_render, TRUE, TRUE )?></td>
 					<?php endif; ?>
 
-					<td class="total"><?=$order->currency->order->symbol . number_format( $item->total, $order->currency->order->precision )?></td>
+					<td class="total"><?=shop_format_price( $item->total_render, TRUE, TRUE )?></td>
 				</tr>
 				<?php endforeach; ?>
-				
+
 				<tr>
 					<td class="sub label" colspan="4">Sub Total</td>
 					<?php if ( $order->requires_shipping ) : ?>
-					<td class="sub value"><?=$order->currency->order->symbol . number_format( $order->totals->shipping, $order->currency->order->precision )?></td>
+					<td class="sub value"><?=shop_format_price( $order->totals->shipping_render, TRUE, TRUE )?></td>
 					<?php endif;?>
-					<td class="sub value"><?=$order->currency->order->symbol . number_format( $order->totals->sub, $order->currency->order->precision )?></td>
+					<td class="sub value"><?=shop_format_price( $order->totals->sub_render, TRUE, TRUE )?></td>
 				</tr>
 				<tr>
 					<td class="tax label" colspan="4">Tax</td>
 					<?php if ( $order->requires_shipping ) : ?>
-					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->tax_shipping, $order->currency->order->precision )?></td>
+					<td class="tax value"><?=shop_format_price( $order->totals->tax_shipping_render, TRUE, TRUE )?></td>
 					<?php endif;?>
-					<td class="tax value"><?=$order->currency->order->symbol . number_format( $order->totals->tax_items, $order->currency->order->precision )?></td>
+					<td class="tax value"><?=shop_format_price( $order->totals->tax_items_render, TRUE, TRUE )?></td>
 				</tr>
 				<?php if ( $order->discount->shipping || $order->discount->items ) : ?>
 				<tr>
@@ -251,7 +274,7 @@
 						if ( $order->requires_shipping && $order->discount->shipping  ) :
 
 							echo '<td class="discount value">';
-							echo $order->currency->order->symbol . number_format( $order->discount->shipping, $order->currency->order->precision );
+							echo shop_format_price( $order->discount->shipping_render, TRUE, TRUE );
 							echo '</td>';
 
 						elseif ( $order->requires_shipping ) :
@@ -266,7 +289,7 @@
 						if ( $order->discount->items  ) :
 
 							echo '<td class="discount value">';
-							echo $order->currency->order->symbol . number_format( $order->discount->items, $order->currency->order->precision );
+							echo shop_format_price( $order->discount->items_render, TRUE, TRUE );
 							echo '</td>';
 
 						else :
@@ -284,10 +307,22 @@
 					<?php if ( $order->requires_shipping ) : ?>
 					<td class="grand label spacer">&nbsp;</td>
 					<?php endif;?>
-					<td class="grand value"><?=$order->currency->order->symbol . number_format( $order->totals->grand, $order->currency->order->precision )?></td>
+					<td class="grand value"><?=shop_format_price( $order->totals->grand_render, TRUE, TRUE )?></td>
 				</tr>
 			</tbody>
 		</table>
+		<?php
+
+			if ( $order->currency->order->id != $order->currency->base->id ) :
+
+				echo '<p><small>';
+				echo '<strong>Please Note:</strong> Currency conversions are estimates, exchange rate used at the time of ordering: ';
+				echo '1 ' . $order->currency->base->code  . ' = ' . $order->currency->exchange_rate . ' ' . $order->currency->order->code;
+				echo '</small></p>';
+
+			endif;
+
+		?>
 	</div>
 	</body>
 </html>

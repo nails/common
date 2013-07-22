@@ -4,10 +4,10 @@
 	</p>
 
 	<?php
-	
+
 		$this->load->view( 'admin/shop/orders/utilities/search' );
 		$this->load->view( 'admin/shop/orders/utilities/pagination' );
-	
+
 	?>
 
 	<table>
@@ -25,11 +25,11 @@
 		</thead>
 		<tbody>
 			<?php
-			
+
 				if ( $orders->data ) :
-				
+
 					foreach ( $orders->data AS $order ) :
-					
+
 						?>
 						<tr id="order-<?=$order->id?>">
 							<td class="id"><?=$order->id?></td>
@@ -47,7 +47,7 @@
 
 								if ( $order->currency->order->id !== $order->currency->base->id ) :
 
-									echo '<small>' . shop_format_price( shop_convert_using_rate( $order->totals->grand, $order->currency->exchange_rate ), TRUE, TRUE, $order->currency->order->id ) . '</small>';
+									echo '<small>' . shop_format_price( $order->totals->grand_render, TRUE, TRUE, $order->currency->order->id ) . '</small>';
 
 								endif;
 
@@ -108,9 +108,9 @@
 							</td>
 						</tr>
 						<?php
-						
+
 					endforeach;
-					
+
 				else :
 					?>
 					<tr>
@@ -120,14 +120,14 @@
 					</tr>
 					<?php
 				endif;
-			
+
 			?>
 		</tbody>
 	</table>
 	<?php
-	
+
 		$this->load->view( 'admin/shop/orders/utilities/pagination' );
-	
+
 	?>
 </div>
 

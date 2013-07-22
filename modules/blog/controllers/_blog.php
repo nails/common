@@ -4,7 +4,7 @@
  * Name:		NALS_BLOG_Controller
  *
  * Description:	This controller executes various bits of common Blog functionality
- * 
+ *
  **/
 
 
@@ -13,33 +13,28 @@ class NAILS_Blog_Controller extends NAILS_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Check this module is enabled in settings
 		if ( ! module_is_enabled( 'blog' ) ) :
-		
+
 			//	Cancel execution, module isn't enabled
 			show_404();
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load language file
 		$this->lang->load( 'blog', RENDER_LANG_SLUG );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the models
 		$this->load->model( 'blog_model',			'blog' );
 		$this->load->model( 'blog_post_model',		'post' );
 		$this->load->model( 'blog_widget_model',	'widget' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load the helper
-		$this->load->helper( 'blog' );
 
 		// --------------------------------------------------------------------------
 
@@ -60,16 +55,16 @@ class NAILS_Blog_Controller extends NAILS_Controller
 
 		//	Fetch the Blog URL
 		$this->data['blog_url'] = blog_setting( 'blog_url' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the styles
 		$this->asset->load( 'nails.blog.css', TRUE );
 
 		if ( file_exists( FCPATH . 'assets/css/blog.css' ) ) :
-		
+
 			$this->asset->load( 'blog.css' );
-		
+
 		endif;
 	}
 }
