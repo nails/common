@@ -146,30 +146,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 					if ( (float) $price['price'] || (float) $price['sale_price'] ) :
 
-						$_temp = array(
-							'product_id'	=> $_id,
-							'currency_id'	=> $price['id']
-						);
-
-						if ( (float) $price['price'] ) :
-
-							$_temp['price'] = (float) $price['price'];
-
-						else :
-
-							$_temp['price'] = NULL;
-
-						endif;
-
-						if ( (float) $price['sale_price'] ) :
-
-							$_temp['sale_price'] = (float) $price['sale_price'];
-
-						else :
-
-							$_temp['sale_price'] = NULL;
-
-						endif;
+						$_temp					= array();
+						$_temp['product_id']	= $_id;
+						$_temp['currency_id']	= $price['id'];
+						$_temp['price']			= (float) $price['price'] ? (float) $price['price'] : NULL;
+						$_temp['sale_price']	= (float) $price['sale_price'] ? (float) $price['sale_price'] : NULL;
 
 						$_data[] = $_temp;
 
@@ -292,22 +273,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 					if ( (float) $price['price'] || (float) $price['sale_price'] ) :
 
-						$_temp = array(
-							'product_id'	=> $id,
-							'currency_id'	=> $price['id']
-						);
-
-						if ( (float) $price['price'] ) :
-
-							$_temp['price'] = (float) $price['price'];
-
-						endif;
-
-						if ( (float) $price['sale_price'] ) :
-
-							$_temp['sale_price'] = (float) $price['sale_price'];
-
-						endif;
+						$_temp					= array();
+						$_temp['product_id']	= $id;
+						$_temp['currency_id']	= $price['id'];
+						$_temp['price']			= (float) $price['price'] ? (float) $price['price'] : NULL;
+						$_temp['sale_price']	= (float) $price['sale_price'] ? (float) $price['sale_price'] : NULL;
 
 						$_data[] = $_temp;
 
