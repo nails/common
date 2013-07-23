@@ -102,7 +102,7 @@ class NAILS_Shop_model extends NAILS_Model
 			$_user_currency = $_base;
 			$this->session->unset_userdata( 'shop_currency', $_currency_id );
 
-			if ( $thus->user->is_logged_in() ) :
+			if ( $this->user->is_logged_in() ) :
 
 				$this->user->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
 
