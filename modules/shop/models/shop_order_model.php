@@ -1053,17 +1053,6 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->load->helper( 'email' );
-		if ( ! valid_email( shop_setting( 'notify_order' ) ) ) :
-
-			$_logger( 'Invalid notification email' );
-			$this->_set_error( 'Invalid notification email.' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
@@ -1083,6 +1072,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->load->library( 'emailer' );
+		$this->load->helper( 'email' );
 
 		$_email							= new stdClass();
 		$_email->type					= 'shop_notify';
@@ -1093,17 +1083,21 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		foreach ( $_recipients AS $recipient ) :
 
-			$_email->to_email = $recipient;
+			$_email->to_email = trim( $recipient );
+
+			if ( ! valid_email( shop_setting( 'notify_order' ) ) ) :
+
+				continue;
+
+			endif;
 
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 				//	Email failed to send, alert developers
-				$_logger( '!! Failed to send order notification, alerting developers.' );
+				$_logger( '!! Failed to send order notification to ' . $_email->to_email . ', alerting developers.' );
 				$_logger( implode( "\n", $this->emailer->get_errors() ) );
 
-				send_developer_mail( 'Unable to send order notification email', 'Unable to send the order notification to ' . shop_setting( 'notify_order' ) . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
-
-				return FALSE;
+				send_developer_mail( 'Unable to send order notification email', 'Unable to send the order notification to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
 			endif;
 
