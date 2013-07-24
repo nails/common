@@ -4,19 +4,19 @@
 * Name:			CDN
 *
 * Description:	A Library for dealing with content in the CDN
-* 
+*
 */
 
 class Cdn {
-	
+
 	private $_ci;
 	private $_cdn;
 	private $db;
 	private $_errors;
-	
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
@@ -37,33 +37,33 @@ class Cdn {
 		$this->_ci->lang->load( 'cdn/cdn', RENDER_LANG_SLUG );
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the helper
 		$this->_ci->load->helper( 'cdn' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the storage driver
 		$_class = $this->_include_driver( );
 		$this->_cdn = new $_class( $options );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	private function _include_driver()
 	{
 		switch ( strtolower( CDN_DRIVER ) ) :
-		
+
 			case 'local':
 			default:
-			
+
 				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/local.php';
 				return 'Local_CDN';
-			
+
 			break;
-		
+
 		endswitch;
 	}
 
@@ -86,14 +86,14 @@ class Cdn {
 
 		throw new Exception( 'Call to undefined method Cdn::' . $method . '()' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! OBJECT METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
 
 
@@ -103,14 +103,14 @@ class Cdn {
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
-		
+
 		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
 		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
-		
+
 		$_objects = $this->db->get( 'cdn_object o' )->result();
-		
+
 		foreach ( $_objects AS $obj ) :
 
 			//	Format the object, make it pretty
@@ -131,14 +131,14 @@ class Cdn {
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
-		
+
 		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
 		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
-		
+
 		$_objects = $this->db->get( 'cdn_object_trash o' )->result();
-		
+
 		foreach ( $_objects AS $obj ) :
 
 			//	Format the object, make it pretty
@@ -164,27 +164,27 @@ class Cdn {
 	public function get_object( $object, $bucket = NULL )
 	{
 		if ( is_numeric( $object ) ) :
-		
+
 			$this->db->where( 'o.id', $object );
-		
+
 		else :
-		
+
 			$this->db->where( 'o.filename', $object );
-			
+
 			if ( $bucket ) :
-			
+
 				if ( is_numeric( $bucket ) ) :
-				
+
 					$this->db->where( 'b.id', $bucket );
-				
+
 				else :
-				
+
 					$this->db->where( 'b.slug', $bucket );
-				
+
 				endif;
-			
+
 			endif;
-		
+
 		endif;
 
 		$_objects = $this->get_objects();
@@ -210,27 +210,27 @@ class Cdn {
 	public function get_object_from_trash( $object, $bucket = NULL )
 	{
 		if ( is_numeric( $object ) ) :
-		
+
 			$this->db->where( 'o.id', $object );
-		
+
 		else :
-		
+
 			$this->db->where( 'o.filename', $object );
-			
+
 			if ( $bucket ) :
-			
+
 				if ( is_numeric( $bucket ) ) :
-				
+
 					$this->db->where( 'b.id', $bucket );
-				
+
 				else :
-				
+
 					$this->db->where( 'b.slug', $bucket );
-				
+
 				endif;
-			
+
 			endif;
-		
+
 		endif;
 
 		$_objects = $this->get_objects_from_trash();
@@ -261,8 +261,8 @@ class Cdn {
 
 
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the upload method of the driver
 	 *
@@ -275,92 +275,92 @@ class Cdn {
 	{
 		//	Define variables we'll need
 		$_data = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Clear errors
 		$this->errors = array();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch the contents of the file
 		if ( ! $is_raw ) :
-		
+
 			//	Check file exists in $_FILES
 			if ( ! isset( $_FILES[ $object ] ) || $_FILES[ $object ]['size'] == 0 ) :
-			
+
 				//	If it's not in $_FILES does that file exist on the file system?
 				if ( ! file_exists( $object ) ) :
-				
+
 					$this->set_error( lang( 'cdn_error_no_file' ) );
 					return FALSE;
-				
+
 				else :
-				
+
 					$_file	= $object;
 					$_name	= $object;
-				
+
 				endif;
-			
+
 			else :
-			
+
 				$_file	= $_FILES[ $object ]['tmp_name'];
 				$_name	= $_FILES[ $object ]['name'];
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			//	Specify the file specifics
-			
+
 			//	Content-type; using finfo because the $_FILES variable can't be trusted
 			//	(uploads from Uploadify always report as application/octet-stream;
 			//	stupid flash.
-			
+
 			$_data->mime = $this->get_mime_type_from_file( $_file );
-			
+
 			//	Now set the actual file data
 			$_data->file = $_file;
-			
+
 		else :
-		
+
 			//	We've been given a data stream, use that. If no content-type has been set
 			//	then fall over - we need to know what we're dealing with
-			
+
 			if ( ! isset( $options['content-type'] ) ) :
-			
+
 				$this->set_error( lang( 'cdn_stream_content_type' ) );
 				return FALSE;
-			
+
 			else :
-			
+
 				//	Write the file to the cache temporarily
 				if ( is_writeable( APP_CACHE ) ) :
-				
+
 					$_cache_file = sha1( microtime() . rand( 0 ,999 ) . active_user( 'id' ) );
 					$_fp = fopen( APP_CACHE . $_cache_file, 'w' );
 					fwrite( $_fp, $object );
 					fclose( $_fp );
-					
+
 					// --------------------------------------------------------------------------
-					
+
 					//	Specify the file specifics
 					$_file			= APP_CACHE . $_cache_file;
 					$_name			= $_cache_file;
 					$_data->file	= APP_CACHE . $_cache_file;
 					$_data->mime	= $options['content-type'];
-				
+
 				else :
-				
+
 					$this->set_error( lang( 'cdn_error_cache_write_fail' ) );
 					return FALSE;
-				
+
 				endif;
-				
+
 			endif;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Test and set the bucket, if it doesn't exist, create it
@@ -373,133 +373,133 @@ class Cdn {
 			$_bucket = $bucket;
 
 		endif;
-		
+
 		if ( ! $_bucket ) :
-		
+
 			if ( $this->bucket_create( $bucket ) ) :
-			
+
 				$_bucket = $this->get_bucket( $bucket );
-				
+
 				$_data->bucket_id	= $_bucket->id;
 				$_data->bucket_slug	= $_bucket->slug;
-			
+
 			else :
-			
+
 				return FALSE;
-			
+
 			endif;
-			
+
 		else :
-		
+
 			$_data->bucket_id	= $_bucket->id;
 			$_data->bucket_slug	= $_bucket->slug;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Does the user have permission to write to the bucket?
 		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Is this an acceptable file? Check against the allowed_types array (if present)
-		
+
 		$_ext	= $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
-		
+
 		if ( $_bucket->allowed_types ) :
-		
+
 			//	Handle stupid bloody MS Office 'x' documents
 			//	If the returned extension is doc, xls or ppt compare it to the uploaded
 			//	extension but append an x, if they match then force the x version.
 			//	Also override the mime type
-			
+
 			//	Makka sense? Hate M$.
 			$_user_ext = substr( $_FILES[$object]['name'], strrpos( $_FILES[$object]['name'], '.' ) + 1 );
-			
+
 			switch ( $_ext ) :
-			
+
 				case 'doc' :
-				
+
 					if ( $_user_ext == 'docx' ) :
-					
+
 						$_ext			= 'docx';
 						$_data->mime	= 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-					
+
 					endif;
-				
+
 				break;
-				
+
 				case 'ppt' :
-				
+
 					if ( $_user_ext == 'pptx' ) :
-					
+
 						$_ext			= 'pptx';
 						$_data->mime	= 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-					
+
 					endif;
-				
+
 				break;
-				
+
 				case 'xls' :
-				
+
 					if ( $_user_ext == 'xlsx' ) :
-					
+
 						$_ext			= 'xlsx';
 						$_data->mime	= 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-					
+
 					endif;
-				
+
 				break;
-			
+
 			endswitch;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( array_search( $_ext, $_bucket->allowed_types ) === FALSE ) :
-			
+
 				if ( count( $_bucket->allowed_types ) > 1 ) :
-				
+
 					array_splice( $_bucket->allowed_types, count( $_bucket->allowed_types ) - 1, 0, array( ' and ' ) );
 					$_accepted = implode( ', .', $_bucket->allowed_types );
 					$_accepted = str_replace( ', . and , ', ' and ', $_accepted );
 					$this->set_error(  lang( 'cdn_error_bad_mime_plural', $_accepted ) );
-				
+
 				else :
-				
+
 					$_accepted = implode( '', $_bucket->allowed_types );
 					$this->set_error(  lang( 'cdn_error_bad_mime', $_accepted ) );
-				
+
 				endif;
-				
+
 				return FALSE;
-			
+
 			endif;
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Is the file within the filesize limit?
 		$_data->filesize = filesize( $_data->file );
-		
+
 		if ( $_bucket->max_size ) :
-		
+
 			if ( $_data->filesize > $_bucket->max_size ) :
-			
+
 				$_fs_in_kb = format_bytes( $_bucket->max_size );
 				$this->set_error( lang( 'cdn_error_filesize', $_fs_in_kb ) );
 				return FALSE;
-			
+
 			endif;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Is the object an image?
@@ -530,107 +530,107 @@ class Cdn {
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	What about dimension limits? Obviously this only applies to images.
 		if ( isset( $_data->img ) && isset( $options['dimensions'] ) ) :
-		
+
 			//	Fetch info about the file
 			$error = FALSE;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( isset( $options['dimensions']['max_width'] ) ) :
-			
+
 				if ( $_data->img->width > $options['dimensions']['max_width'] ) :
-				
+
 					$this->set_error( lang( 'cdn_error_maxwidth', $options['dimensions']['max_width'] ) );
 					$error = TRUE;
-					
+
 				endif;
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( isset( $options['dimensions']['max_height'] ) ) :
-			
+
 				if ( $_data->img->height > $options['dimensions']['max_height'] ) :
-				
+
 					$this->set_error( lang( 'cdn_error_maxheight', $options['dimensions']['max_height'] ) );
 					$error = TRUE;
-				
+
 				endif;
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( isset( $options['dimensions']['min_width'] ) ) :
-			
+
 				if ( $_data->img->width < $options['dimensions']['min_width'] ) :
-				
+
 					$this->set_error( lang( 'cdn_error_minwidth', $options['dimensions']['min_width'] ) );
 					$error = TRUE;
-				
+
 				endif;
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( isset( $options['dimensions']['min_height'] ) ) :
-			
+
 				if ( $_data->img->height < $options['dimensions']['min_height'] ) :
-				
+
 					$this->set_error( lang( 'cdn_error_minheight', $options['dimensions']['min_height'] ) );
 					$error = TRUE;
-				
+
 				endif;
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			if ( $error ) :
-			
+
 				return FALSE;
-				
+
 			endif;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Has a tag been defined?
 		if ( isset( $options['tag'] ) ) :
-		
+
 			$_data->tag_id = $options['tag'];
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	If a certain filename has been specified then send that to the CDN (this
 		//	will overwrite any existing file so use with caution)
-		
+
 		if ( isset( $options['filename'] ) && $options['filename'] == 'USE_ORIGINAL' ) :
-		
+
 			$_data->filename =  $_FILES[$object]['name'];
-			
+
 		elseif ( isset( $options['filename'] ) && $options['filename'] ) :
-		
+
 			$_data->filename = $options['filename'];
-			
+
 		else :
-		
+
 			//	Generate a filename
 			$_data->filename = time() . '_' . md5( active_user( 'id' ) . microtime( TRUE ) . rand( 0, 999 ) ) . '.' . $_ext;
-		
+
 		endif;
-		
+
 		//	And set the display name
 		$_data->name	= $_name;
-		
+
 		// --------------------------------------------------------------------------
 
 		$_upload = $this->_cdn->upload( $_data->bucket_slug, $_data->file, $_data->filename );
@@ -663,54 +663,54 @@ class Cdn {
 
 		//	If a cachefile was created then we should remove it
 		if ( isset( $_cache_file ) && $_cache_file ) :
-		
+
 			@unlink( APP_CACHE . $_cache_file );
-			
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		return $_status;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
 
 
 	public function object_delete( $object )
 	{
 		if ( ! $object ) :
-		
+
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$_object = $this->get_object( $object );
-		
-		if ( ! $_object ) :
-		
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-		
-		if ( ! $this->_can_edit_object( $_object ) ) :
-		
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
+		$_object = $this->get_object( $object );
+
+		if ( ! $_object ) :
+
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Can the user modify the bucket/objects? Admins always can but if the bucket
+		//	has a user then the current user must be the owner
+
+		if ( ! $this->_can_edit_object( $_object ) ) :
+
+			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_data						= array();
 		$_data['id']				= $_object->id;
 		$_data['bucket_id']			= $_object->bucket->id;
@@ -732,7 +732,7 @@ class Cdn {
 
 		$this->db->set( $_data );
 		$this->db->set( 'trashed', 'NOW()', FALSE );
-		
+
 		//	Start transaction
 		$this->db->trans_start();
 
@@ -764,37 +764,37 @@ class Cdn {
 	public function object_restore( $object )
 	{
 		if ( ! $object ) :
-		
+
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$_object = $this->get_object_from_trash( $object );
-		
-		if ( ! $_object ) :
-		
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-		
-		if ( ! $this->_can_edit_object( $_object ) ) :
-		
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
+		$_object = $this->get_object_from_trash( $object );
+
+		if ( ! $_object ) :
+
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Can the user modify the bucket/objects? Admins always can but if the bucket
+		//	has a user then the current user must be the owner
+
+		if ( ! $this->_can_edit_object( $_object ) ) :
+
+			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_data						= array();
 		$_data['id']				= $_object->id;
 		$_data['bucket_id']			= $_object->bucket->id;
@@ -820,7 +820,7 @@ class Cdn {
 
 		$this->db->set( $_data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		
+
 		//	Start transaction
 		$this->db->trans_start();
 
@@ -846,8 +846,8 @@ class Cdn {
 	}
 
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Permenantly deletes an object
 	 *
@@ -859,37 +859,37 @@ class Cdn {
 	public function object_destroy( $object )
 	{
 		if ( ! $object ) :
-		
+
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		$_object = $this->get_object( $object );
-		
-		if ( ! $_object ) :
-		
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
-		
-		endif;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-		
-		if ( ! $this->_can_edit_object( $_object ) ) :
-		
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
+		$_object = $this->get_object( $object );
+
+		if ( ! $_object ) :
+
+			$this->set_error( lang( 'cdn_error_object_invalid' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Can the user modify the bucket/objects? Admins always can but if the bucket
+		//	has a user then the current user must be the owner
+
+		if ( ! $this->_can_edit_object( $_object ) ) :
+
+			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->_cdn->delete( $_object->filename, $_object->bucket->slug ) ) :
 
 			//	Remove the database entry
@@ -904,11 +904,11 @@ class Cdn {
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Copies an object from one bucket to another
 	 *
@@ -922,11 +922,11 @@ class Cdn {
 		//	TODO: Copy object between buckets
 		return FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Moves an object from one bucket to another
 	 *
@@ -940,11 +940,11 @@ class Cdn {
 		//	TODO: Move object between buckets
 		return FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Uploads an object and, if successful, deletes the old object
 	 *
@@ -957,11 +957,11 @@ class Cdn {
 	{
 		//	Firstly, attempt the upload
 		$_upload = $this->object_create( $replace_with, $bucket, $options, $is_raw );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $_upload ) :
-		
+
 			$_object = $this->get_object( $object );
 
 			if ( $_object ) :
@@ -970,22 +970,22 @@ class Cdn {
 				$this->delete( $_object->id, $bucket );
 
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			return $_upload;
-		
+
 		else :
-		
+
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Adds a tag to an object
 	 *
@@ -998,66 +998,66 @@ class Cdn {
 	{
 		//	Valid object?
 		$_object = $this->get_object( $object_id );
-		
+
 		if ( ! $_object ) :
-		
+
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
-		
+
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Valid tag?
 		$this->db->where( 't.id', $tag_id );
 		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
-		
+
 		if ( ! $_tag ) :
-		
+
 			$this->set_error( lang( 'cdn_error_tag_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Can the user modify the bucket/objects? Admins always can but if the bucket
 		//	has a user then the current user must be the owner
-		
+
 		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Test if tag has already been applied to the object, if it has gracefully fail
 		$this->db->where( 'object_id', $_object->id );
 		$this->db->where( 'tag_id', $_tag->id );
 		if ( $this->db->count_all_results( 'cdn_object_tag' ) ) :
-		
+
 			return TRUE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Seems good, add the tag
 		$this->db->set( 'object_id', $_object->id );
 		$this->db->set( 'tag_id', $_tag->id );
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->insert( 'cdn_object_tag' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Deletes a tag from an object
 	 *
@@ -1070,53 +1070,53 @@ class Cdn {
 	{
 		//	Valid object?
 		$_object = $this->get_object( $object_id );
-		
+
 		if ( ! $_object ) :
-		
+
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Valid tag?
 		$this->db->where( 't.id', $tag_id );
 		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
-		
+
 		if ( ! $_tag ) :
-		
+
 			$this->set_error( lang( 'cdn_error_tag_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Can the user modify the bucket/objects? Admins always can but if the bucket
 		//	has a user then the current user must be the owner
-		
+
 		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Seems good, delete the tag
 		$this->db->where( 'object_id', $_object->id );
 		$this->db->where( 'tag_id', $_tag->id );
 		$this->db->delete( 'cdn_object_tag' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Counts the number of objects a tag contains
 	 *
@@ -1147,7 +1147,7 @@ class Cdn {
 	public function object_increment_count( $action, $object, $bucket = NULL )
 	{
 		switch ( strtoupper( $action ) ) :
-		
+
 			case 'SERVE'	:
 
 				$this->db->set( 'o.serves', 'o.serves+1', FALSE );
@@ -1206,17 +1206,17 @@ class Cdn {
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! BUCKET METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns an array of all bucket objects
 	 *
@@ -1230,40 +1230,40 @@ class Cdn {
 		$this->db->select( 'b.id,b.slug,b.label,b.allowed_types,b.max_size,b.created,b.created_by,b.modified,b.modified_by' );
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( '(SELECT COUNT(*) FROM cdn_object WHERE bucket_id = b.id) object_count' );
-		
+
 		$this->db->join( 'user u', 'u.id = b.created_by', 'LEFT' );
 
 		$_buckets = $this->db->get( 'cdn_bucket b' )->result();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		foreach ( $_buckets AS &$bucket ) :
-		
+
 			//	Format bucket object
 			$this->_format_bucket( $bucket );
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			//	List contents
 			if ( $list_bucket ) :
-			
+
 				$bucket->objects = $this->bucket_list( $bucket->id, $filter_tag, $include_deleted );
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			//	Fetch tags & counts
 			$this->db->select( 'bt.id,bt.label,bt.created' );
 			$this->db->select( '(SELECT COUNT(*) FROM cdn_object_tag ot JOIN cdn_object o ON o.id = ot.object_id WHERE tag_id = bt.id ) total' );
 			$this->db->order_by( 'bt.label' );
 			$this->db->where( 'bt.bucket_id', $bucket->id );
 			$bucket->tags = $this->db->get( 'cdn_bucket_tag bt' )->result();
-		
+
 		endforeach;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_buckets;
 	}
 
@@ -1282,13 +1282,13 @@ class Cdn {
 	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE )
 	{
 		if ( is_numeric( $bucket ) ) :
-		
+
 			$this->db->where( 'b.id', $bucket );
-		
+
 		else :
-		
+
 			$this->db->where( 'b.slug', $bucket );
-		
+
 		endif;
 
 		$_bucket = $this->get_buckets( $list_bucket, $filter_tag, TRUE );
@@ -1299,7 +1299,7 @@ class Cdn {
 		return $_bucket[0];
 	}
 
-	
+
 	// --------------------------------------------------------------------------
 
 
@@ -1315,15 +1315,15 @@ class Cdn {
 	{
 		//	Test if bucket exists, if it does stop, job done.
 		$_bucket = $this->get_bucket( $bucket );
-		
+
 		if ( $_bucket ) :
-		
+
 			return $_bucket->id;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$_bucket = $this->_cdn->bucket_create( $bucket );
 
 		if ( $_bucket ) :
@@ -1340,27 +1340,27 @@ class Cdn {
 			endif;
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
-			
+
 			if ( get_userobject()->is_logged_in() ) :
-			
+
 				$this->db->set( 'created_by',	active_user( 'id' ) );
 				$this->db->set( 'modified_by',	active_user( 'id' ) );
-			
+
 			endif;
-			
+
 			$this->db->insert( 'cdn_bucket' );
-			
+
 			if ( $this->db->affected_rows() ) :
-				
+
 				return $this->db->insert_id();
-			
+
 			else :
-			
+
 				$this->_cdn->destroy( $bucket );
-				
+
 				$this->set_error( lang( 'cdn_error_bucket_insert' ) );
 				return FALSE;
-			
+
 			endif;
 
 		else :
@@ -1369,11 +1369,11 @@ class Cdn {
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Lists the contents of a bucket
 	 *
@@ -1386,33 +1386,33 @@ class Cdn {
 	{
 		//	Filtering by tag?
 		if ( $filter_tag ) :
-		
+
 			$this->db->join( 'cdn_object_tag ft', 'ft.object_id = o.id AND ft.tag_id = ' . $filter_tag );
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Filter by bucket
 		if ( is_numeric( $bucket ) ) :
-		
+
 			$this->db->where( 'b.id', $bucket );
-		
+
 		else :
-		
+
 			$this->db->where( 'b.slug', $bucket );
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		return $this->get_objects();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Permenantly delete a bucket and its contents
 	 *
@@ -1426,11 +1426,11 @@ class Cdn {
 		//	TODO: Delete a bucket and its contents
 		return FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Adds a tag to a bucket
 	 *
@@ -1442,14 +1442,14 @@ class Cdn {
 	public function bucket_tag_add( $bucket, $label )
 	{
 		$label = trim( $label );
-		
+
 		if ( ! $label ) :
-		
+
 			$this->set_error( lang( 'cdn_error_tag_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Test bucket
@@ -1462,51 +1462,51 @@ class Cdn {
 			$_bucket = $bucket;
 
 		endif;
-		
+
 		if ( ! $_bucket ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		//	If the bucket has an owner/user then only the owner user can add tags to the bucket
 		//	Administrators can add to any bucket
 
 		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Test tag
 		$this->db->where( 'bucket_id', $_bucket->id );
 		$this->db->where( 'label', $label );
 		if ( $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_tag_exists' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Seems good, add the tag
 		$this->db->set( 'bucket_id', $_bucket->id );
 		$this->db->set( 'label', $label );
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->insert( 'cdn_bucket_tag' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Deletes a tag from a bucket
 	 *
@@ -1527,71 +1527,71 @@ class Cdn {
 			$_bucket = $bucket;
 
 		endif;
-		
+
 		if ( ! $_bucket ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_invalid' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		//	If the bucket has an owner/user then only the owner user can delete tags from the bucket
 		//	Administrators can add to any bucket
-		
+
 		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Test tag
 		$this->db->where( 'bucket_id', $_bucket->id );
-		
+
 		if ( is_numeric( $label ) ) :
-		
+
 			$this->db->where( 'id', $label );
-			
+
 		else :
-		
+
 			$this->db->where( 'label', $label );
-		
+
 		endif;
-		
-		
+
+
 		if ( ! $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
-		
+
 			$this->set_error( lang( 'cdn_error_tag_notexist' ) );
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Seems good, delete the tag
 		$this->db->where( 'bucket_id', $_bucket->id );
-		
+
 		if ( is_numeric( $label ) ) :
-		
+
 			$this->db->where( 'id', $label );
-			
+
 		else :
-		
+
 			$this->db->where( 'label', $label );
-		
+
 		endif;
-		
+
 		$this->db->delete( 'cdn_bucket_tag' );
-		
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Renames a bucket tag
 	 *
@@ -1605,17 +1605,17 @@ class Cdn {
 		//	TODO: Rename a bucket tag
 		return FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! HELPER METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the error array
 	 *
@@ -1658,21 +1658,21 @@ class Cdn {
 		$this->db->set( 'filesize',			$data->filesize );
 		$this->db->set( 'created',			'NOW()', FALSE );
 		$this->db->set( 'modified',			'NOW()', FALSE );
-		
+
 		if ( get_userobject()->is_logged_in() ) :
-		
+
 			$this->db->set( 'created_by',	active_user( 'id' ) );
 			$this->db->set( 'modified_by',	active_user( 'id' ) );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		if ( isset( $data->img->width ) && isset( $data->img->height ) ) :
-				
+
 			$this->db->set( 'img_width',	$data->img->height );
 			$this->db->set( 'img_height',	$data->img->width );
-			
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -1691,32 +1691,32 @@ class Cdn {
 			endif;
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->insert( 'cdn_object' );
 
 		$_object_id = $this->db->insert_id();
-		
+
 		if ( $this->db->affected_rows() ) :
-		
+
 			//	Add a tag if there's one defined
 			if ( isset( $data->tag_id ) && ! empty( $data->tag_id ) ) :
-			
+
 				$this->db->where( 'id', $data->tag_id );
-				
+
 				if ( $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
-				
+
 					$this->db->set( 'object_id',	$_object_id );
 					$this->db->set( 'tag_id',		$data->tag_id );
 					$this->db->set( 'created',		'NOW()', FALSE );
 
 					$this->db->insert( 'cdn_object_tag' );
-				
+
 				endif;
-			
+
 			endif;
-			
+
 			// --------------------------------------------------------------------------
 
 			if ( $return_object ) :
@@ -1728,11 +1728,11 @@ class Cdn {
 				return $_object_id;
 
 			endif;
-			
+
 		else :
-		
+
 			return FALSE;
-			
+
 		endif;
 	}
 
@@ -1760,9 +1760,9 @@ class Cdn {
 		$object->thumbs			= (int) $object->thumbs;
 		$object->scales			= (int) $object->scales;
 		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$object->creator				= new stdClass();
 		$object->creator->id			= $object->created_by ? (int) $object->created_by : NULL;
 		$object->creator->first_name	= $object->first_name;
@@ -1770,7 +1770,7 @@ class Cdn {
 		$object->creator->email			= $object->email;
 		$object->creator->profile_img	= $object->profile_img;
 		$object->creator->gender		= $object->gender;
-		
+
 		unset( $object->created_by );
 		unset( $object->first_name );
 		unset( $object->last_name );
@@ -1823,7 +1823,7 @@ class Cdn {
 		$bucket->id				= (int) $bucket->id;
 		$bucket->object_count	= (int) $bucket->object_count;
 		$bucket->max_size		= (int) $bucket->max_size;
-		$bucket->allowed_types	= explode( '|', $bucket->allowed_types );
+		$bucket->allowed_types	= array_filter( explode( '|', $bucket->allowed_types ) );
 		$bucket->modified_by	= $bucket->modified_by ? (int) $bucket->modified_by : NULL;
 
 		// --------------------------------------------------------------------------
@@ -1835,7 +1835,7 @@ class Cdn {
 		$bucket->creator->email			= $bucket->email;
 		$bucket->creator->profile_img	= $bucket->profile_img;
 		$bucket->creator->gender		= $bucket->gender;
-		
+
 		unset( $bucket->created_by );
 		unset( $bucket->first_name );
 		unset( $bucket->last_name );
@@ -1876,9 +1876,9 @@ class Cdn {
 
 		//	Admins can always read/write to objects
 		if ( $_usrobj->is_admin( $_user ) ) :
-		
+
 			return TRUE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -1924,9 +1924,9 @@ class Cdn {
 
 		//	Admins can always read/write to buckets
 		if ( $_usrobj->is_admin( $_user ) ) :
-		
+
 			return TRUE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -1995,11 +1995,11 @@ class Cdn {
 			return(false);
 		}
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the error array
 	 *
@@ -2011,139 +2011,139 @@ class Cdn {
 	{
 		//	Returns the system MIME type mapping of extensions to MIME types, as defined in /etc/mime.types.
 		//	Thanks, 'chaos' - http://stackoverflow.com/a/1147952/789224
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Before we start map some common mime-types which are troublesome with the system.
 		//	Please forgive me future dev.
-		
+
 		switch ( $mime_type ) :
-		
+
 			case 'application/vnd.ms-office' :	return 'doc';	break;	//	OpenOffice .doc
 			case 'text/rtf' :					return 'rtf';	break;	//	Rich Text Format
-		
+
 		endswitch;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$_file	= fopen( CDN_MAGIC, 'r' );
 		$_ext	= NULL;
-		
+
 		while( ( $line = fgets( $_file ) ) !== FALSE ) :
-		
+
 			$line = trim( preg_replace( '/#.*/', '', $line ) );
-			
+
 			if ( ! $line )
 				continue;
-				
+
 			$_parts = preg_split( '/\s+/', $line );
-			
+
 			if ( count( $_parts ) == 1 )
 				continue;
-				
+
 			$_type = array_shift( $_parts );
-			
+
 			foreach ( $_parts as $part ) :
-			
+
 				if ( $_type == strtolower( $mime_type ) ) :
-				
+
 					$_ext = $part;
-					
+
 					break;
-					
+
 				endif;
-				
+
 			endforeach;
-				
+
 		endwhile;
-		
+
 		fclose( $_file );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Being anal here, some extensions *need* to be forced
 		switch ( $_ext ) :
-		
+
 			case 'jpeg' : $_ext = 'jpg';	break;
-		
+
 		endswitch;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_ext;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	public function get_mimetype_from_ext( $ext )
 	{
 		//	Prep $ext, make sure it has no dots
 		$ext = substr( $ext, (int) strrpos( $ext, '.' ) + 1 );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Returns the system MIME type mapping of extensions to MIME types, as defined in /etc/mime.types.
 		//	Thanks, 'chaos' - http://stackoverflow.com/a/1147952/789224
-		
+
 		$_file = fopen( CDN_MAGIC, 'r' );
 		$_mime = NULL;
-		
-		
+
+
 		while( ( $line = fgets( $_file ) ) !== FALSE ) :
-		
+
 			$line = trim( preg_replace( '/#.*/', '', $line ) );
-			
+
 			if ( ! $line )
 				continue;
-				
+
 			$_parts = preg_split( '/\s+/', $line );
-			
+
 			if ( count( $_parts ) == 1 )
 				continue;
-			
+
 			$_part = array_shift( $_parts );
-			
+
 			foreach( $_parts as $_ext ) :
-			
+
 				if ( strtolower( $_ext ) == strtolower( $ext ) ) :
-				
+
 					$_mime = $_part;
-					
+
 					break;
-					
+
 				endif;
-				
+
 			endforeach;
-				
+
 		endwhile;
-		
+
 		fclose( $_file );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_mime;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	public function get_mime_type_from_file( $object )
 	{
 		$_fi = finfo_open( FILEINFO_MIME_TYPE );
-		
+
 		//	Use normal magic
 		$_result = finfo_file( $_fi, $object );
-		
+
 		//	If normal magic responds with a ZIP, use specific magic to test if it's
 		//	an office doc - doing this because Jon T told us that specifying the file
 		//	to use might cause the funciton to 'forget' it's other magic, so using
 		//	defaults first and falling back to this.
-		
+
 		if ( $_result == 'application/zip' ) :
-		
+
 			$_fi = @finfo_open( FILEINFO_MIME_TYPE, CDN_MAGIC );
 
 			if ( $_fi ) :
@@ -2151,29 +2151,29 @@ class Cdn {
 				$_result	= finfo_file( $_fi, $object );
 
 			endif;
-			
+
 			//	If this comes back as an octet stream then fallback to application/zip
 			if ( $_result == 'application/octet-stream' ) :
-			
+
 				$_result = 'application/zip';
-			
+
 			endif;
-		
+
 		endif;
-		
+
 		return $_result;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! URL GENERATOR METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_serve_url method
 	 *
@@ -2199,11 +2199,11 @@ class Cdn {
 
 		return $this->_cdn->url_serve( $_object->filename, $_object->bucket->slug );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_serve_url_scheme method
 	 *
@@ -2216,11 +2216,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_serve_scheme();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_thumb_url method
 	 *
@@ -2247,11 +2247,11 @@ class Cdn {
 
 		return $this->_cdn->url_thumb( $_object->filename, $_object->bucket->slug, $width, $height );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_thumb_url_scheme method
 	 *
@@ -2264,11 +2264,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_thumb_scheme();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_thumb_url method
 	 *
@@ -2293,14 +2293,14 @@ class Cdn {
 			$_object->bucket->slug	= '';
 
 		endif;
-		
+
 		return $this->_cdn->url_scale( $_object->filename, $_object->bucket->slug, $width, $height );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_serve_url_scheme method
 	 *
@@ -2313,11 +2313,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_scale_scheme();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_placeholder_url method
 	 *
@@ -2332,11 +2332,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_placeholder( $width, $height, $border );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_serve_url_scheme method
 	 *
@@ -2349,11 +2349,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_placeholder_scheme();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_blank_avatar_url method
 	 *
@@ -2368,11 +2368,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_blank_avatar( $width, $height, $sex );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_serve_url_scheme method
 	 *
@@ -2385,11 +2385,11 @@ class Cdn {
 	{
 		return $this->_cdn->url_blank_avatar_scheme();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_expiring_url method
 	 *
@@ -2416,11 +2416,11 @@ class Cdn {
 
 		return $this->_cdn->url_expiring( $_object->filename, $_object->bucket->slug, $expires );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Calls the driver's public cdn_expiring_url_scheme method
 	 *
