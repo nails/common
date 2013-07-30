@@ -1,16 +1,28 @@
 <div class="group-shop inventory create">
 
-	<?=form_open()?>
+	<?=form_open( NULL, 'id="product-form"' )?>
 	<ul class="tabs">
-		<li class="tab">
+		<li class="tab active">
 			<a href="#" data-tab="tab-basics">Product Info</a>
+		</li>
+
+		<li class="tab">
+			<a href="#" data-tab="tab-pricing">Pricing</a>
 		</li>
 
 		<li class="tab">
 			<a href="#" data-tab="tab-variations">Variations</a>
 		</li>
 
-		<li class="tab active">
+		<li class="tab">
+			<a href="#" data-tab="tab-attributes">Attributes</a>
+		</li>
+
+		<li class="tab">
+			<a href="#" data-tab="tab-ranges-collections">Ranges & Collections</a>
+		</li>
+
+		<li class="tab">
 			<a href="#" data-tab="tab-gallery">Gallery</a>
 		</li>
 
@@ -25,7 +37,17 @@
 
 	<section class="tabs pages">
 
-		<div class="tab page basics" id="tab-basics" style="display:none;">
+		<div class="tab page basics" id="tab-basics" style="display:block;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Move pricing stuff to the pricing tab</li>
+					<li style="margin-bottom:0">&rsaquo; Add extra fields such as barcode, unique seller ID</li>
+					<li style="margin-bottom:0">&rsaquo; Add field for brands (inc. fancybox manager)</li>
+					<li style="margin-bottom:0">&rsaquo; Add field for category/ies (inc. fancybox manager)</li>
+					<li style="margin-bottom:0">&rsaquo; Add field for tag/s (inc fancybox manager)</li>
+				</ul>
+			</div>
 			<fieldset id="shop-inventory-create-basic">
 				<legend>Basic Information</legend>
 				<?php
@@ -135,12 +157,28 @@
 			<fieldset id="shop-inventory-create-meta">
 				<legend>Extended Information</legend>
 			</fieldset>
+		</div>
 
+		<div class="tab page pricing" id="tab-pricing" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Build a manager for specifying the price points for supported currencies.</li>
+					<li style="margin-bottom:0">&rsaquo; Remember to include a section for setting the price of variations.</li>
+				</ul>
+			</div>
 		</div>
 
 		<div class="tab page variations" id="tab-variations" style="display:none;">
+
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Link through to the pricing tab for setting price alterations</li>
+				</ul>
+			</div>
 			<p>
-				Variations allow you to offer the same product but with different attributes (e.g colours).
+				Variations allow you to offer the same product but with different attributes (e.g colours or sizes).
 				A variation can also affect the base price.
 			</p>
 			<table id="product-variations">
@@ -160,40 +198,54 @@
 			</p>
 		</div>
 
-		<div class="tab page gallery" id="tab-gallery" style="display:block;">
+		<div class="tab page attributes" id="tab-attributes" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Build a manager for specifying attributes for this product. Include fancybox manager for editing/updating attributes.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Facility to specify to which range/collection (if any) this product belongs.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="tab page gallery" id="tab-gallery" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Actually make the API call when deleting an image (so it's actually deleted)</li>
+				</ul>
+			</div>
 			<p>
 				Upload images to the product gallery.
 				<small>
 					Images only, max file size is 2MB.
 				</small>
 			</p>
-			<p class="system-alert message no-close">
-				<strong>Uploads will work like this:</strong>
-				<br />1. Uploads are automatic/immediate
-				<br />2. On each successful upload a new gallery item should be created containing the returned upload ID
-				<br />3. Mega bonus points for a progress bar which renders over the image (like Vimeo, using onUploadProgress). Maybe hide the queue and somehow mimic the progress bar.
-				<br />4. Form is submitted like normal
-			</p>
 			<p>
-				<input type="file" id="uploadify" />
+				<input type="file" id="file_upload" />
 			</p>
-			<ul id="gallery-items">
-				<li class="gallery-item crunching">
-					<a href="#" class="remove"></a>
-					<div class="progress" style="height:100%"></div>
-				</li>
-				<li class="gallery-item">
-					<a href="#" class="remove"></a>
-					<div class="progress" style="height:0%"></div>
-				</li>
-				<li class="gallery-item">
-					<a href="#" class="remove"></a>
-					<div class="progress" style="height:0%"></div>
+			<ul id="gallery-items" class="empty">
+				<li class="empty">
+					No images, why not upload some?
 				</li>
 			</ul>
 		</div>
 
 		<div class="tab page shipping" id="tab-shipping" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; This entire tab</li>
+				</ul>
+			</div>
 			<p>
 				By default the product will inherit the global shipping options as defined in the shop settings.
 				If you wish to override these defaults for this product then please add options here.
@@ -201,6 +253,12 @@
 		</div>
 
 		<div class="tab page seo" id="tab-seo" style="display:none;">
+			<div class="system-alert message no-close">
+				<strong>ToDo:</strong>
+				<ul>
+					<li style="margin-bottom:0">&rsaquo; Add a bit of guidance as to how best to set this information.</li>
+				</ul>
+			</div>
 			<fieldset id="shop-inventory-create-seo">
 				<legend>Search Engine Optimisation</legend>
 				<?php
@@ -252,7 +310,7 @@
 	$(function(){
 
 		_CREATE =  new NAILS_Admin_Shop_Inventory_Add();
-		_CREATE.init();
+		_CREATE.init( '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
 
 	});
 
@@ -275,7 +333,15 @@
 	</tr>
 </script>
 <script type="text/template" id="template-uploadify">
-	<li class="uploadify-item">
-	
+	<li class="gallery-item uploadify-queue-item" id="${fileID}" data-instance_id="${instanceID}" data-file_id="${fileID}">
+		<a href="#" data-instance_id="${instanceID}" data-file_id="${fileID}" class="remove"></a>
+		<div class="progress" style="height:0%"></div>
+		<div class="data data-cancel">CANCELLED</div>
+	</li>
+</script>
+<script type="text/template" id="template-gallery-item">
+	<li class="gallery-item crunching">
+		<div class="crunching"></div>
+		<?=form_hidden( 'gallery[]' )?>
 	</li>
 </script>

@@ -258,6 +258,15 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function set_active_user( $user )
+	{
+		$this->active_user = $user;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Sets the login data for a user
 	 *

@@ -1633,6 +1633,24 @@ class Cdn {
 
 
 	/**
+	 * Returns the last error
+	 *
+	 * @access	public
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	public function error()
+	{
+		$_error = end( $this->_errors );
+		reset( $this->_errors );
+		return $_error;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Adds an error message
 	 *
 	 * @access	public
@@ -2432,6 +2450,166 @@ class Cdn {
 	public function url_expiring_scheme()
 	{
 		return $this->_cdn->url_expiring_scheme();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function generate_api_upload_token( $user_id, $duration = 7200, $restrict_ip = TRUE )
+	{
+		$_user = get_userobject()->get_by_id( $user_id );
+
+		if ( ! $_user ) :
+
+			$this->set_error( 'Invalid user ID' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+
+		$_token		= array();
+		$_token[]	= (int) $_user->id;			//	User ID
+		$_token[]	= $_user->password_md5;		//	User Password
+		$_token[]	= $_user->email;			//	User Email
+		$_token[]	= time() + (int) $duration;	//	Expire time (+2hours)
+
+		if ( $restrict_ip ) :
+
+			$_token[]	= get_instance()->input->ip_address();
+
+		else :
+
+			$_token[]	= FALSE;
+
+		endif;
+
+		//	Hash
+		$_token[]	= md5( serialize( $_token ) . APP_PRIVATE_KEY );
+
+		//	Encrypt and return
+		return get_instance()->encrypt->encode( implode( '|', $_token ), APP_PRIVATE_KEY );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function validate_api_upload_token( $token )
+	{
+		$_token = get_instance()->encrypt->decode( $token, APP_PRIVATE_KEY );
+
+		if ( ! $_token ) :
+
+			//	Error #1: Could not decrypot
+			$this->set_error( 'Invalid Token (Error #1)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_token	 = explode( '|', $_token );
+
+		if ( !$_token ) :
+
+			//	Error #2: Could not explode
+			$this->set_error( 'Invalid Token (Error #2)' );
+			return FALSE;
+
+		elseif ( count( $_token ) != 6 ) :
+
+			//	Error #3: Bad count
+			$this->set_error( 'Invalid Token (Error #3)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Correct data types
+		$_token[0]	= (int) $_token[0];
+		$_token[3]	= (int) $_token[3];
+
+		// --------------------------------------------------------------------------
+
+		//	Check hash
+		$_hash = $_token[5];
+		unset( $_token[5]);
+
+		if ( $_hash != md5( serialize( $_token ) . APP_PRIVATE_KEY ) ) :
+
+			//	Error #4: Bad hash
+			$this->set_error( 'Invalid Token (Error #4)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch and check user
+		$_user = get_userobject()->get_by_id( $_token[0] );
+
+		//	User exists?
+		if ( ! $_user ) :
+
+			//	Error #5: User not found
+			$this->set_error( 'Invalid Token (Error #5)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid email?
+		if ( $_user->email != $_token[2] ) :
+
+			//	Error #6: Invalid Email
+			$this->set_error( 'Invalid Token (Error #6)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid password?
+		if ( $_user->password_md5 != $_token[1] ) :
+
+			//	Error #7: Invalid password
+			$this->set_error( 'Invalid Token (Error #7)' );
+			return FALSE;
+
+		endif;
+
+		//	User suspended?
+		if ( $_user->is_suspended ) :
+
+			//	Error #8: User suspended
+			$this->set_error( 'Invalid Token (Error #8)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid IP?
+		if ( ! $_token[4] && $_token[4] != get_instance()->input->ip_address() ) :
+
+			//	Error #9: Invalid IP
+			$this->set_error( 'Invalid Token (Error #9)' );
+			return FALSE;
+
+		endif;
+
+		//	Expired?
+		if ( $_token[3] < time() ) :
+
+			//	Error #10: Token expired
+			$this->set_error( 'Invalid Token (Error #10)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	If we got here then the token is valid
+		return $_user;
 	}
 }
 

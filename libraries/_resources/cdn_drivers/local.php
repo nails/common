@@ -4,18 +4,18 @@
 * Name:			CDN
 *
 * Description:	A Library for dealing with content in the Local CDN
-* 
+*
 */
 
 class Local_CDN {
-	
+
 	private $cdn;
 	public $errors;
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
@@ -26,7 +26,7 @@ class Local_CDN {
 	 **/
 	public function __construct( $options = NULL )
 	{
-		//	Shortcut to CDN and DB
+		//	Shortcut to CDN
 		$this->cdn		=& get_instance()->cdn;
 		$this->errors	= array();
 
@@ -38,17 +38,17 @@ class Local_CDN {
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! OBJECT METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Creates a new object
 	 *
@@ -61,31 +61,31 @@ class Local_CDN {
 	{
 		//	Check bucket is writeable
 		if ( ! is_writable( CDN_PATH . $bucket ) ) :
-		
+
 			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', CDN_PATH . $bucket ) );
 			return FALSE;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Move the file
 		if ( move_uploaded_file( $file, CDN_PATH . $bucket . '/' . $filename ) ) :
-		
+
 			return TRUE;
-			
+
 		else :
-		
+
 			$this->cdn->set_error( lang( 'cdn_error_couldnotmove' ) );
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Destroys (permenantly deletes) an object
 	 *
@@ -98,40 +98,40 @@ class Local_CDN {
 	{
 		$_file		= urldecode( $object );
 		$_bucket	= urldecode( $bucket );
-		
+
 		if ( file_exists( CDN_PATH . $bucket . '/' . $_file ) ) :
-		
+
 			if ( @unlink( CDN_PATH . $bucket . '/' . $_file ) ) :
 
 				//	TODO: Delete Cache items
 
 				return TRUE;
-			
+
 			else :
 
 				$this->cdn->set_error( lang( 'cdn_error_delete' ) );
 				return FALSE;
-			
+
 			endif;
-		
+
 		else :
-		
+
 			$this->cdn->set_error( lang( 'cdn_error_delete_nofile' ) );
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! BUCKET METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Creates a new bucket
 	 *
@@ -143,14 +143,14 @@ class Local_CDN {
 	public function bucket_create( $bucket )
 	{
 		if ( @mkdir( CDN_PATH . $bucket ) ) :
-		
+
 			return TRUE;
-		
+
 		else :
-		
+
 			$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir' ) );
 			return FALSE;
-		
+
 		endif;
 	}
 
@@ -161,27 +161,27 @@ class Local_CDN {
 	public function bucket_delete( $bucket )
 	{
 		if ( @unlink( CDN_PATH . $bucket ) ) :
-		
+
 			return TRUE;
-		
+
 		else :
-		
+
 			$this->cdn->set_error( lang( 'cdn_error_bucket_unlink' ) );
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/*	! URL GENERATOR METHODS */
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates the correct URL for serving up a file
 	 *
@@ -196,16 +196,16 @@ class Local_CDN {
 		$_out  = 'cdn/serve/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'serve' urls
 	 *
@@ -218,11 +218,11 @@ class Local_CDN {
 	{
 		return site_url( 'cdn/serve/{{bucket}}/{{file}}' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates the correct URL for using the thumb utility
 	 *
@@ -240,16 +240,16 @@ class Local_CDN {
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'thumb' urls
 	 *
@@ -262,11 +262,11 @@ class Local_CDN {
 	{
 		return site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates the correct URL for using the scale utility
 	 *
@@ -284,16 +284,16 @@ class Local_CDN {
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'scale' urls
 	 *
@@ -306,11 +306,11 @@ class Local_CDN {
 	{
 		return site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates the correct URL for using the placeholder utility
 	 *
@@ -325,16 +325,16 @@ class Local_CDN {
 	{
 		$_out  = 'cdn/placeholder/';
 		$_out .= $width . '/' . $height . '/' . $border;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'placeholder' urls
 	 *
@@ -347,11 +347,11 @@ class Local_CDN {
 	{
 		return site_url( 'cdn/placeholder/{{width}}/{{height}}/{{border}}' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates the correct URL for using the placeholder utility
 	 *
@@ -366,16 +366,16 @@ class Local_CDN {
 	{
 		$_out  = 'cdn/blank_avatar/';
 		$_out .= $width . '/' . $height . '/' . $sex;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'blank_avatar' urls
 	 *
@@ -388,11 +388,11 @@ class Local_CDN {
 	{
 		return site_url( 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generates a properly hashed expiring url
 	 *
@@ -408,18 +408,18 @@ class Local_CDN {
 		//	Hash the expirey time
 		$_hash = get_instance()->encrypt->encode( $bucket . '|' . $object . '|' . $expires . '|' . time() . '|' . md5( time() . $bucket . $object . $expires . APP_PRIVATE_KEY ), APP_PRIVATE_KEY );
 		$_hash = urlencode( $_hash );
-		
+
 		$_out  = 'cdn/serve?token=' . $_hash;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return site_url( $_out );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Returns the scheme of 'expiring' urls
 	 *

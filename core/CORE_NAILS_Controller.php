@@ -464,7 +464,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _autoload_items()
 	{
 		$_packages		= array();
-		$_packages[]	= APPPATH . 'third_party';
 		$_packages[]	= NAILS_PATH;
 
 		foreach ( $_packages AS $package ) :
