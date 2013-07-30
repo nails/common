@@ -4,7 +4,7 @@
  * Name:		Admin - Utilities
  *
  * Description:	-
- * 
+ *
  **/
 
 
@@ -13,12 +13,12 @@ require_once '_admin.php';
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
- 
+
 class NAILS_Utilities extends NAILS_Admin_Controller
 {
 	protected $_export_sources;
@@ -39,19 +39,19 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	static function announce()
 	{
 		$d = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the laguage file
 		get_instance()->lang->load( 'admin_utilities', RENDER_LANG_SLUG );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Configurations
 		$d->name = lang( 'utilities_module_name' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Navigation options
 		$d->funcs					= array();
 		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
@@ -59,9 +59,9 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$d->funcs['languages']		= lang( 'utilities_nav_languages' );
 		$d->funcs['export']			= lang( 'utilities_nav_export' );
 
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Only announce the controller if the user has permisison to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
@@ -103,9 +103,9 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->_export_formats[]	= array( 'PHP Serialize', 'Export as an object serialized using PHP\'s serialize() function', 'serialize' );
 		$this->_export_formats[]	= array( 'JSON', 'Export as a JSON array', 'json' );
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
+
 
 	/**
 	 * Send test email
@@ -119,60 +119,60 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		//	Page Title
 		$this->data['page']->title = lang ( 'utilities_test_email_title' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $this->input->post() ) :
-		
+
 			//	Form validation and update
 			$this->load->library( 'form_validation' );
-			
+
 			//	Define rules
 			$this->form_validation->set_rules( 'recipient',	lang( 'utilities_test_email_field_name' ), 'xss_clean|required|valid_email' );
-			
+
 			//	Set Messages
 			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
-			
+
 			//	Execute
 			if ( $this->form_validation->run() ) :
-			
+
 				//	Prepare date
 				$_email				= new stdClass();
 				$_email->to_email	= $this->input->post( 'recipient' );
 				$_email->type		= 'test_email';
-				
+
 				//	Send the email
 				$this->load->library( 'emailer' );
-				
+
 				if ( $this->emailer->send( $_email ) ) :
-				
+
 					$this->data['success'] = lang( 'utilities_test_email_success', array( $_email->to_email, date( 'Y-m-d H:i:s' ) ) );
-					
+
 				else:
-				
+
 					echo '<h1>' . lang( 'utilities_test_email_error' ) . '</h1>';
 					echo $this->email->print_debugger();
 					return;
-				
+
 				endif;
-				
+
 			endif;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load views
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/utilities/send_test',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Manage user groups ACL's
 	 *
@@ -185,23 +185,23 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		//	Page Title
 		$this->data['page']->title = lang ( 'utilities_user_access_title' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->data['groups'] = $this->user->get_groups();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'admin/utilities/user_access',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Edit a group
 	 *
@@ -213,14 +213,14 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	public function edit_group()
 	{
 		$_gid = $this->uri->segment( 4, NULL );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $this->input->post() ) :
-		
+
 			//	Load library
 			$this->load->library( 'form_validation' );
-			
+
 			//	Define rules
 			$this->form_validation->set_rules( 'display_name',			lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
 			$this->form_validation->set_rules( 'name',					lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
@@ -231,63 +231,63 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'acl[superuser]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
 			$this->form_validation->set_rules( 'acl[admin]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
 			$this->form_validation->set_rules( 'acl[admin][]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			
+
 			//	Set messages
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
-			
+
 			if ( $this->form_validation->run() ) :
-			
+
 				$_data = array();
 				$_data['display_name']			= $this->input->post( 'display_name' );
 				$_data['name']					= url_title( $this->input->post( 'name' ), 'dash', TRUE );
 				$_data['description']			= $this->input->post( 'description' );
 				$_data['default_homepage']		= $this->input->post( 'default_homepage' );
 				$_data['registration_redirect']	= $this->input->post( 'registration_redirect' );
-				
+
 				//	Parse ACL's
 				$_acl = $this->input->post( 'acl' );
-				
+
 				if ( isset( $_acl['admin'] ) ) :
-				
-					//	Remove ACLs which have no enabled methods - pointless	
+
+					//	Remove ACLs which have no enabled methods - pointless
 					$_acl['admin'] = array_filter( $_acl['admin'] );
-				
+
 				endif;
-				
+
 				$_data['acl']				= serialize( $_acl );
-				
+
 				$this->user->update_group( $_gid, $_data );
-				
+
 				$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
 				redirect( 'admin/utilities/user_access' );
 				return;
-				
+
 			else :
-			
+
 				$this->data['error'] = validation_errors();
-			
+
 			endif;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->data['group'] = $this->user->get_group( $_gid );
-		
+
 		if ( ! $this->data['group'] ) :
-		
+
 			$this->session->set_flashdata( 'error', 'Group does not exist.' );
 			redirect( 'admin/utilities/user_access' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Page title
 		$this->data['page']->title = lang( 'utilities_edit_group_title', $this->data['group']->display_name );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'admin/utilities/edit_group',	$this->data );
@@ -302,13 +302,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		//	Page Title
 		$this->data['page']->title = lang ( 'utilities_languages_title' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->data['languages'] = $this->language->get_all();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
 		$this->load->view( 'admin/utilities/languages/index',	$this->data );
@@ -367,14 +367,14 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 			//	Form validation and update
 			$this->load->library( 'form_validation' );
-			
+
 			//	Define rules
 			$this->form_validation->set_rules( 'source',	lang( 'utilities_export_field_source' ), 'xss_clean|required' );
 			$this->form_validation->set_rules( 'format',	lang( 'utilities_export_field_format' ), 'xss_clean|required' );
-			
+
 			//	Set Messages
 			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
-			
+
 			//	Execute
 			if ( $this->form_validation->run() && isset( $this->_export_sources[$this->input->post( 'source' )] ) && isset( $this->_export_formats[$this->input->post( 'format' )] ) ) :
 
@@ -430,7 +430,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 				$this->data['error'] = lang( 'utilities_export_error_format' );
 
-			else: 
+			else:
 
 				$this->data['error'] = lang( 'fv_there_were_errors' );
 
@@ -457,7 +457,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _export_source_users_all()
+	protected function _export_source_users_all( $out = array() )
 	{
 		$_acl = active_user( 'acl' );
 		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
@@ -471,35 +471,60 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Prepare our out array
+		$_out		= $out;
+		$_counter	= count( $_out );
 
 		//	User
-		$_out				= array();
-		$_out[0]			= new stdClass();
-		$_out[0]->filename	= 'user';
-		$_out[0]->fields	= array();
-		$_out[0]->data		= array();
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'user';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
 
 		//	user_group
-		$_out[1]			= new stdClass();
-		$_out[1]->filename	= 'user_group';
-		$_out[1]->fields	= array();
-		$_out[1]->data		= array();
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'user_group';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
 
 		//	user_auth_method
-		$_out[2]			= new stdClass();
-		$_out[2]->filename	= 'user_auth_method';
-		$_out[2]->fields	= array();
-		$_out[2]->data		= array();
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'user_auth_method';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
 
 		//	user_meta
-		$_out[3]			= new stdClass();
-		$_out[3]->filename	= 'user_meta';
-		$_out[3]->fields	= array();
-		$_out[3]->data		= array();
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'user_meta';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
+
+		//	date_format_date
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'date_format_date';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
+
+		//	date_format_time
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'date_format_time';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
+
+		//	langauge
+		$_out[$_counter]			= new stdClass();
+		$_out[$_counter]->filename	= 'language';
+		$_out[$_counter]->fields	= array();
+		$_out[$_counter]->data		= array();
+		$_counter++;
 
 		//	All other user_meta_* tables
 		$_tables = $this->db->query( 'SHOW TABLES LIKE \'user_meta_%\'' )->result();
-		$_counter = 4;
 		foreach( $_tables AS $table ) :
 
 			$_table = array_values((array)$table);
@@ -608,7 +633,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
 
 		$_out[0]->data = $this->db->get( 'shop_order o' )->result_array();
-		
+
 		if ( $_out[0]->data ) :
 
 			$_out[0]->fields = array_keys( $_out[0]->data[0] );
@@ -627,7 +652,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
 		$_out[1]->data = $this->db->get( 'shop_order_product op' )->result_array();
-		
+
 		if ( $_out[1]->data ) :
 
 			$_out[1]->fields = array_keys( $_out[1]->data[0] );
@@ -635,7 +660,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		return $_out;
 	}
 
@@ -668,7 +693,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'v.valid_to,v.use_count,v.limited_use_limit,v.gift_card_balance,v.product_type_id,v.created' );
 		$this->db->select( 'v.modified,v.is_active,v.is_deleted' );
 		$_out->data = $this->db->get( 'shop_voucher v' )->result_array();
-		
+
 		if ( $_out->data ) :
 
 			$_out->fields = array_keys( $_out->data[0] );
@@ -857,28 +882,28 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter instanciates a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_UTILITIES' ) ) :
 
 	class Utilities extends NAILS_Utilities
