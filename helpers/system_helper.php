@@ -14,12 +14,12 @@ if ( ! function_exists( 'get_userobject' ) )
 	{
 		if ( ! defined( 'NAILS_USR_OBJ' ) )
 			return FALSE;
-			
+
 		$_ci =& get_instance();
-		
+
 		if ( ! isset( $_ci->{NAILS_USR_OBJ} ) )
 			return FALSE;
-		
+
 		return $_ci->{NAILS_USR_OBJ};
 	}
 }
@@ -43,15 +43,15 @@ if ( ! function_exists( 'active_user' ) )
 	function active_user( $keys = FALSE, $delimiter = ' ' )
 	{
 		$_usr_obj =& get_userobject();
-		
+
 		if ( $_usr_obj ) :
-		
+
 			return $_usr_obj->active_user( $keys, $delimiter );
-			
+
 		else :
-		
+
 			return FALSE;
-		
+
 		endif;
 	}
 }
@@ -74,53 +74,53 @@ if ( ! function_exists( 'get_loaded_modules' ) )
 {
 	function get_loaded_modules()
 	{
-		//	If we already know which modules are loaded then return that, save 
+		//	If we already know which modules are loaded then return that, save
 		//	the [small] overhead of working out the modules again and again.
-		
+
 		if ( isset( $GLOBALS['NAILS_LOADED_MODULES'] ) ) :
-		
+
 			return $GLOBALS['NAILS_LOADED_MODULES'];
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Determine which modules are to be loaded
 		$_app_modules	= explode( ',', APP_NAILS_MODULES );
 		$_app_modules	= array_unique( $_app_modules );
 		$_app_modules	= array_filter( $_app_modules );
-		
+
 		//	Prevent errors from being thrown if there are no elements
 		if ( $_app_modules ) :
-		
+
 			$_app_modules	= array_combine( $_app_modules, $_app_modules );
-			
+
 		endif;
-		
+
 		$_nails_modules = array();
 		foreach ( $_app_modules AS $module ) :
-		
+
 			preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
-			
+
 			if ( isset( $_matches[1] ) && isset( $_matches[3] ) ) :
-			
+
 				$_nails_modules[$_matches[1]] = explode( '|', $_matches[3] );
-			
+
 			elseif ( isset( $_matches[1] ) ) :
-			
+
 				$_nails_modules[$_matches[1]] = array();
-			
+
 			endif;
-		
+
 		endforeach;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Save as a $GLOBAL for next time
 		$GLOBALS['NAILS_LOADED_MODULES'] = $_nails_modules;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_nails_modules;
 	}
 }
@@ -143,32 +143,59 @@ if ( ! function_exists( 'module_is_enabled' ) )
 	function module_is_enabled( $module )
 	{
 		$_nails_modules = get_loaded_modules();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
-		
+
 		$_module	= isset( $_matches[1] ) ? $_matches[1] : '';
 		$_submodule	= isset( $_matches[3] ) ? $_matches[3] : '';
-		
+
 		if ( isset( $_nails_modules[$_module] ) ) :
-		
+
 			//	Are we testing for a submodule in particular?
 			if ( $_submodule ) :
-			
+
 				return array_search( $_submodule, $_nails_modules[$_module] ) !== FALSE;
-			
+
 			else :
-			
+
 				return TRUE;
-			
+
 			endif;
-		
+
 		else :
-		
+
 			return FALSE;
-		
+
 		endif;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * is_https()
+ *
+ * Determine whether the current connection is using SSL
+ *
+ *
+ * @access	public
+ * @return	boolean
+ */
+if ( ! function_exists( 'is_https' ) )
+{
+	function is_https()
+	{
+		if ( ! isset( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] == 'off' || ! $_SERVER['HTTPS'] ) :
+
+			return FALSE;
+
+		endif;
+
+		return TRUE;
 	}
 }
 
@@ -180,7 +207,7 @@ if ( ! function_exists( 'module_is_enabled' ) )
  * send_developer_mail()
  *
  * Quickly send a high priority email via mail() to the APP_DEVELOPER
- * 
+ *
  *
  * @access	public
  * @param	string $subject The subject of the email
@@ -208,7 +235,7 @@ if ( ! function_exists( 'send_developer_mail' ) )
 					  'X-Priority: 1 (Highest)' . "\r\n" .
 					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
 					  'Importance: High';
-					  
+
 		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
 	}
 }
