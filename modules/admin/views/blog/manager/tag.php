@@ -59,7 +59,6 @@
 	if ( $_is_fancybox && $rebuild ) :
 
 		echo '<script type="text/javascript">';
-	echo 'console.log("rebuilding");';
 		echo 'parent.rebuild_select( \'tags\', ' . json_encode( $tags ) . ');';
 		echo '</script>';
 

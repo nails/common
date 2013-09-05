@@ -135,13 +135,11 @@
 
 	function mark_fulfilled( order_id )
 	{
-		console.log( 'fulfilling ' + order_id );
 		$( '#order-' + order_id ).find( 'td.fulfilment' ).removeClass( 'no' ).addClass( 'yes' ).text( '<?=lang( 'yes' )?>' );
 	}
 
 	function mark_unfulfilled( order_id )
 	{
-		console.log( 'unfulfilling ' + order_id );
 		$( '#order-' + order_id ).find( 'td.fulfilment' ).removeClass( 'yes' ).addClass( 'no' ).text( '<?=lang( 'no' )?>' );
 	}
 </script>
