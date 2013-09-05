@@ -1,5 +1,5 @@
 <div class="group-cms blocks edit">
-	
+
 	<div class="details">
 		<p>
 			<strong>Title:</strong> <?=$block->title?>
@@ -14,7 +14,7 @@
 			<strong>Located:</strong> <?=$block_types[$block->type]?>
 		</p>
 	</div>
-	
+
 	<?=form_open()?>
 	<fieldset>
 	<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
@@ -24,8 +24,8 @@
 			added if needed. Translations will only be used when viewing the site in a particular language (if supported).
 			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_NAME?>.
 		</p>
-		
-		
+
+
 		<!--	DEFAULT LANG	-->
 		<fieldset class="translation" data-lang_id="<?=$default_id?>">
 			<legend><?=APP_DEFAULT_LANG_NAME?></legend>
@@ -41,36 +41,36 @@
 				<strong>Oops!</strong> Please ensure a value is set.
 			</div>
 			<?php
-			
+
 				//	Render the correct display
 				switch ( $block->type ) :
-				
+
 					case 'plaintext' :
-					
+
 						echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
-					
+
 					break;
-					
+
 					// --------------------------------------------------------------------------
-					
+
 					case 'richtext' :
-					
+
 						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="ckeditor"' );
-						
+
 						echo '<p class="system-alert notice no-close">';
 						echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
 						echo 'due to application stylesheets on the front end which are not loaded here.';
 						echo '</p>';
-					
+
 					break;
-				
+
 				endswitch;
-				
+
 				// --------------------------------------------------------------------------
-				
+
 				//	Revisions
 				if ( $block->default_value_revisions ) :
-				
+
 					?>
 					<ul class="revisions">
 						<li class="summary">
@@ -86,25 +86,25 @@
 						<?php endforeach; ?>
 					</ul>
 					<?php
-				
+
 				endif;
-			
+
 			?>
 		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		</fieldset>
 		<?php else : ?>
 		</div>
 		<?php endif; ?>
-		
+
 		<!--	OTHER LANGUAGES	-->
 		<?php
-		
+
 			$_counter = 1;
 			foreach ( $block->translations AS $translation ) :
-			
+
 				if ( $translation->lang->slug == APP_DEFAULT_LANG_SLUG )
 					continue;
-			
+
 				?>
 				<fieldset class="translation" data-lang_id="<?=$translation->lang->id?>">
 					<legend>
@@ -116,22 +116,22 @@
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>
 					<?php
-					
+
 						//	Render the correct display
 						switch ( $block->type ) :
-						
+
 							case 'plaintext' :
-							
+
 								echo '<textarea name="translation[' . $_counter . '][value]">' . $translation->value . '</textarea>';
-							
+
 							break;
-							
+
 							// --------------------------------------------------------------------------
-							
+
 							case 'richtext' :
-							
+
 								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="ckeditor"' );
-								
+
 								if ( $block->type == 'richtext' ) :
 
 									echo '<p class="system-alert notice no-close">';
@@ -140,11 +140,11 @@
 									echo '</p>';
 
 								endif;
-							
+
 							break;
-						
+
 						endswitch;
-					
+
 					?>
 					<?php if ( $translation->revisions ) : ?>
 					<ul class="revisions">
@@ -163,12 +163,12 @@
 					<?php endif; ?>
 				</fieldset>
 				<?php
-			
+
 			$_counter++;
 			endforeach;
-		
+
 		?>
-		
+
 
 		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		<!--	ACTIONS	-->
@@ -176,13 +176,13 @@
 			<a href="#" class="awesome small right" id="new-translation">Add Translation</a>
 		</p>
 		<?php endif; ?>
-		
+
 	</fieldset>
-	
+
 	<p>
 		<?=form_submit( 'submit', lang( 'action_save_changes' ), 'class="awesome"' )?>
 	</p>
-	
+
 	<?=form_close()?>
 
 </div>
@@ -204,14 +204,14 @@
 	<?php endif; ?>
 </script>
 
-<script style="text/javascript">
+<script type="text/javascript">
 <!--//
 
 	$(function(){
-	
+
 		var CMS_Blocks = new NAILS_Admin_CMS_Blocks;
 		CMS_Blocks.init_edit( '<?=$block->type?>' );
-	
+
 	});
 
 //-->
