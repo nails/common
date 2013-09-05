@@ -11,10 +11,10 @@ class CORE_NAILS_Model extends CI_Model {
 	private $_cache_values;
 	private $_cache_keys;
 	private $_cache_method;
-	
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Construct the model
 	 *
@@ -25,12 +25,12 @@ class CORE_NAILS_Model extends CI_Model {
 	public function __construct( )
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
 		if ( function_exists( 'get_userobject' ) ) :
-		
+
 			$this->user = get_userobject();
 
 		endif;
@@ -44,7 +44,7 @@ class CORE_NAILS_Model extends CI_Model {
 		$this->_cache_keys		= array();
 		$this->_cache_method	= 'LOCAL';
 	}
-	
+
 
 	// --------------------------------------------------------------------------
 
@@ -63,16 +63,16 @@ class CORE_NAILS_Model extends CI_Model {
 
 			foreach ( $this->_cache_keys AS $key ) :
 
-				
+
 				$this->_unset_cache( $key );
 
 			endforeach;
 
 		endif;
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
+
 
 	/**
 	 * Set a generic error
@@ -86,10 +86,10 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		$this->_error[] = $error;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
+
 
 	/**
 	 * Get any errors
@@ -122,7 +122,7 @@ class CORE_NAILS_Model extends CI_Model {
 			return FALSE;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Prep the key, the key should have a prefix unique to this model
 		$_prefix = $this->_cache_prefix();
 
@@ -221,7 +221,7 @@ class CORE_NAILS_Model extends CI_Model {
 			return FALSE;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Prep the key, the key should have a prefix unique to this model
 		$_prefix = $this->_cache_prefix();
 
@@ -280,7 +280,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	/**
 	 * Creates a new object
-	 * 
+	 *
 	 * @access public
 	 * @param array $data The data to create the object with
 	 * @param bool $return_obj Whether to return just the new ID or the full object
@@ -290,17 +290,17 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::create() Table variable not set' );
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
 
 		if ( $data )
 			$this->db->set( $data );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
@@ -310,9 +310,9 @@ class CORE_NAILS_Model extends CI_Model {
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 
 		endif;
-		
+
 		$this->db->insert( $this->_table );
-		
+
 		if ( $this->db->affected_rows() ) :
 
 			$_id =  $this->db->insert_id();
@@ -320,19 +320,19 @@ class CORE_NAILS_Model extends CI_Model {
 			// --------------------------------------------------------------------------
 
 			if ( $return_object ) :
-				
+
 				return $this->get_by_id( $_id );
-			
+
 			else :
-			
+
 				return $_id;
-			
+
 			endif;
-		
+
 		else :
-		
+
 			return FALSE;
-		
+
 		endif;
 	}
 
@@ -342,7 +342,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	/**
 	 * Updates an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to update
 	 * @param array $data The data to update the object with
@@ -352,7 +352,7 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::update() Table variable not set' );
 
 		else :
 
@@ -365,9 +365,9 @@ class CORE_NAILS_Model extends CI_Model {
 
 		if ( ! $data )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( $data );
 		$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
 
@@ -379,7 +379,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		$this->db->where( $_prefix . 'id', $id );
 		$this->db->update( $_table );
-		
+
 		if ( $this->db->affected_rows() ) :
 
 			return TRUE;
@@ -397,7 +397,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	/**
 	 * Deletes an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to delete
 	 * @return bool
@@ -406,7 +406,7 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::delete() Table variable not set' );
 
 		endif;
 
@@ -414,7 +414,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		$this->db->where( 'id', $id );
 		$this->db->delete( $this->_table );
-		
+
 		if ( $this->db->affected_rows() ) :
 
 			return TRUE;
@@ -425,14 +425,14 @@ class CORE_NAILS_Model extends CI_Model {
 
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches all objects
-	 * 
+	 *
 	 * @access public
 	 * @param none
 	 * @return array
@@ -441,7 +441,7 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::get_all() Table variable not set' );
 
 		else :
 
@@ -450,7 +450,7 @@ class CORE_NAILS_Model extends CI_Model {
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		return $this->db->get( $_table )->result();
 	}
 
@@ -460,7 +460,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	/**
 	 * Fetches all objects as a flat array
-	 * 
+	 *
 	 * @access public
 	 * @param string $label_col The name of the column to use as the label
 	 * @param string $id_col The name of the column to use as the ID
@@ -472,7 +472,7 @@ class CORE_NAILS_Model extends CI_Model {
 		$_out	= array();
 
 		foreach( $_items AS $item ) :
-		
+
 			$_out[$item->{$id_col}] = $item->{$label_col};
 
 		endforeach;
@@ -486,7 +486,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 	/**
 	 * Counts all objects
-	 * 
+	 *
 	 * @access public
 	 * @param none
 	 * @return int
@@ -495,7 +495,7 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::count() Table variable not set' );
 
 		else :
 
@@ -504,17 +504,17 @@ class CORE_NAILS_Model extends CI_Model {
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		return $this->db->count_all_results( $_table );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's ID
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
 	 * @return	stdClass
@@ -523,7 +523,7 @@ class CORE_NAILS_Model extends CI_Model {
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::get_by_id() Table variable not set' );
 
 		else :
 
@@ -535,36 +535,36 @@ class CORE_NAILS_Model extends CI_Model {
 
 		$this->db->where( $_prefix . 'id', $id );
 		$_result = $this->get_all();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result ) :
 
 			return FALSE;
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's slug
-	 * 
+	 *
 	 * @access public
 	 * @param int $slug The slug of the object to fetch
 	 * @return	stdClass
 	 **/
-	public function get_by_slug( $slug )
+	public function get_by_slug( $slug, $slug_field = 'slug' )
 	{
 		if ( ! $this->_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::get_by_slug() Table variable not set' );
 
 		else :
 
@@ -574,19 +574,19 @@ class CORE_NAILS_Model extends CI_Model {
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . 'slug', $slug );
+		$this->db->where( $_prefix . $slug_field, $slug );
 		$_result = $this->get_all();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result ) :
 
 			return FALSE;
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
 	}
 
@@ -605,20 +605,20 @@ class CORE_NAILS_Model extends CI_Model {
 
 		if ( ! $_table ) :
 
-			show_error( 'Table variable not set' );
+			show_error( get_called_class() . '::_generate_slug() Table variable not set' );
 
 		endif;
 
 		if ( ! $_column ) :
 
-			show_error( 'Column variable not set' );
+			show_error( get_called_class() . '::_generate_slug() Column variable not set' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		$_counter = 0;
-		
+
 		do
 		{
 			$_slug = url_title( $label, 'dash', TRUE );
