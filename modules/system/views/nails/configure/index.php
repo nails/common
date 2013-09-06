@@ -2,7 +2,7 @@
 	<div id="nails-configure">
 		<h1>Nails. Configuration Manager</h1>
 		<p class="system-alert notice no-close testing">
-			<?=img( NAILS_URL . 'img/loader/20px-000000-TRANS.gif' )?>
+			<?=img( NAILS_URL . 'img/loader/20px-TRANS.gif' )?>
 			<strong>Hey!</strong> Please exscuse me while I run some tests...
 		</p>
 
@@ -17,7 +17,7 @@
 			</li>
 
 		</ul>
-		
+
 		<section class="tabs pages">
 
 			<?php $_display = $this->input->post( 'update' ) == 'app' || ! $this->input->post() ? 'block' : 'none'?>

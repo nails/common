@@ -27,7 +27,7 @@ class Emailer
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function __construct()
+	public function __construct( $config = array() )
 	{
 		$this->ci =& get_instance();
 
@@ -36,7 +36,17 @@ class Emailer
 		//	Set email related settings
 		$this->from			= new stdClass();
 		$this->from->name	= APP_EMAIL_FROM_NAME;
-		$this->from->email	= APP_EMAIL_FROM_EMAIL;
+
+		if ( APP_EMAIL_FROM_EMAIL ) :
+
+			$this->from->email = APP_EMAIL_FROM_EMAIL;
+
+		else :
+
+			$_url = parse_url( site_url() );
+			$this->from->email = 'nobody@' . $_url['host'];
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -56,6 +66,44 @@ class Emailer
 		$this->email_type		= array();
 		$this->track_link_cache	= array();
 		$this->_errors			= array();
+
+		// --------------------------------------------------------------------------
+
+		//	Check SMTP is configured
+		if ( ! SMTP_HOST || ! SMTP_PORT ) :
+
+			$_error = 'EMAILER: SMTP not configured';
+
+			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
+
+				$this->_set_error( $_error );
+
+			else :
+
+				show_error( $_error );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Ensure there is a DB
+		if ( ! NAILS_DB_ENABLED ) :
+
+			$_error = 'EMAILER: Database not available';
+
+			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
+
+				$this->_set_error( $_error );
+
+			else :
+
+				show_error( $_error );
+
+			endif;
+
+		endif;
 	}
 
 

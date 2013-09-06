@@ -139,7 +139,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Default app constants (if not already defined)
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
-		if ( ! defined( 'APP_EMAL_FROM_NAME' ) )			define( 'APP_EMAL_FROM_NAME',			APP_NAME );
+		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
 		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
 		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
@@ -149,6 +149,15 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Email
+		if ( ! defined( 'SMTP_HOST' ) )						define( 'SMTP_HOST',					'' );
+		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
+		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
+		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
+
 
 		// --------------------------------------------------------------------------
 
