@@ -121,20 +121,42 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 								case 'THUMB' :
 
-									$_w = isset( $_format[2] ) ? $_format[2] : '';
-									$_h = isset( $_format[3] ) ? $_format[3] : '';
+									//	Generate a url for each request
+									$_out['object_url']	= array();
+									$_sizes				= explode( ',', $_format[2] );
 
-									$_out['object_url']	= cdn_thumb( $_upload->id, $_w, $_h );
+									foreach ( $_sizes AS $sizes ) :
+
+										$_size = explode( 'x', $sizes );
+
+										$_w = isset( $_size[0] )	? $_size[0] : '';
+										$_h = isset( $_size[1] )	? $_size[1] : '';
+
+										$_out['object_url'][] = cdn_thumb( $_upload->id, $_w, $_h );
+
+									endforeach;
+
 									$_out['object_id']	= $_upload->id;
 
 								break;
 
 								case 'SCALE' :
 
-									$_w = isset( $_format[2] ) ? $_format[2] : '';
-									$_h = isset( $_format[3] ) ? $_format[3] : '';
+									//	Generate a url for each request
+									$_out['object_url']	= array();
+									$_sizes				= explode( ',', $_format[2] );
 
-									$_out['object_url']	= cdn_scale( $_upload->id, $_w, $_h );
+									foreach ( $_sizes AS $sizes ) :
+
+										$_size = explode( 'x', $sizes );
+
+										$_w = isset( $_size[0] )	? $_size[0] : '';
+										$_h = isset( $_size[1] )	? $_size[1] : '';
+
+										$_out['object_url'][] = cdn_scale( $_upload->id, $_w, $_h );
+
+									endforeach;
+
 									$_out['object_id']	= $_upload->id;
 
 								break;

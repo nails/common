@@ -90,7 +90,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	If alt_price's have beens et,s ave them for later
+		//	If alt_price's have been set, save them for later
 		if ( array_key_exists( 'alt_price', $data ) ) :
 
 			$_alt_price = $data['alt_price'];
@@ -349,7 +349,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
 		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.requires_shipping type_requires_shipping,pt.max_per_order type_max_per_order' );
-		$this->db->select( 'spp.price render_price, spp.sale_price render_sale_price' );
+		//$this->db->select( 'spp.price render_price, spp.sale_price render_sale_price' );
 
 		// --------------------------------------------------------------------------
 
@@ -437,7 +437,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
 		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
 		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
-		$this->db->join( 'shop_product_price spp', 'spp.product_id = p.id AND spp.currency_id = ' . SHOP_USER_CURRENCY_ID, 'LEFT' );
+		//$this->db->join( 'shop_product_price spp', 'spp.product_id = p.id AND spp.currency_id = ' . SHOP_USER_CURRENCY_ID, 'LEFT' );
 
 		$this->db->where( 'p.is_deleted', FALSE );
 
@@ -579,6 +579,32 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->where( 'product_id', $product_id );
 
 		return $this->db->get( 'shop_product_price spp' )->result();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function product_type_meta_fields_download()
+	{
+		$_out = array();
+
+		// --------------------------------------------------------------------------
+
+		//	TODO: This array should be a form builder config array - when that library is complete.
+
+		//	Download ID
+		$_out[0]				= new stdClass();
+		$_out[0]->type			= 'cdn_object';
+		$_out[0]->key			= 'download_id';
+		$_out[0]->label			= 'Download';
+		$_out[0]->bucket		= 'shop-download';
+		$_out[0]->tip			= '';
+		$_out[0]->validation	= 'required';
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
 	}
 
 

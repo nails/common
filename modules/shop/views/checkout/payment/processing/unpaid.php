@@ -26,25 +26,25 @@
 		This can take up to 60 seconds but is usually much quicker.
 	</p>
 	<p>
-		<?=img( NAILS_URL . '/img/loader/20px-000000-TRANS.gif' )?>
+		<?=img( NAILS_URL . '/img/loader/20px-TRANS.gif' )?>
 	</p>
 	<?php
-	
+
 		if ( ENVIRONMENT != 'production' ) :
-		
+
 			//	Not on production so offer a button to test the notification
 			switch( $order->payment_gateway->slug ) :
-			
+
 				case 'paypal' :
-				
+
 					echo '<p>' . anchor( shop_setting( 'shop_url' ) . 'checkout/notify/' . $order->payment_gateway->slug . '?testing=true&ref='. $order->ref, 'Testing: Simulate Successful Payment', 'class="awesome small"' ) . '</p>';
-				
+
 				break;
-			
+
 			endswitch;
-		
+
 		endif;
-	
+
 	?>
 </body>
 </html>

@@ -51,6 +51,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$d->funcs['inventory']		= 'Manage Inventory';				//	Sub-nav function.
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
+		$d->funcs['sales']		= 'Manage Sales';				//	Sub-nav function.
 		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
 
 		// --------------------------------------------------------------------------
@@ -309,19 +310,56 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Load additional models
+		$this->load->model( 'shop/shop_brand_model', 'brand' );
+		$this->load->model( 'shop/shop_category_model', 'category' );
+		$this->load->model( 'shop/shop_tag_model', 'tag' );
+
+		// --------------------------------------------------------------------------
+
 		//	Fetch data
-		$this->data['product_types']	= $this->product->get_product_types_flat();
-		$this->data['tax_rates']		= $this->tax->get_all_flat();
+		$this->data['product_types']		= $this->product->get_product_types();
+		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
+		$this->data['tax_rates']			= $this->tax->get_all_flat();
+		$this->data['brands']				= $this->brand->get_all_flat();
+		$this->data['categories']			= $this->category->get_all_nested_flat();
+		$this->data['tags']					= $this->tag->get_all_flat();
+		$this->data['currencies']			= $this->currency->get_all();
 
 		array_unshift( $this->data['tax_rates'], 'No Tax');
 
 		// --------------------------------------------------------------------------
 
+		//	Fetch product meta fields
+		$_product_types						= $this->product->get_product_types();
+		$this->data['product_types_meta']	= array();
+
+		foreach ( $_product_types AS $type ) :
+
+			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
+
+				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
+
+			else :
+
+				$this->data['product_types_meta'][$type->id] = array();
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
 		//	Assets
-		$this->asset->load( 'nails.admin.shop.inventory.add.min.js', TRUE );
+		$this->asset->load( 'nails.admin.shop.inventory.add_edit.min.js', TRUE );
 		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Libraries
+		$this->load->library( 'mustache' );
 
 		// --------------------------------------------------------------------------
 
@@ -1240,6 +1278,320 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endif;
 
 		redirect( 'admin/shop/vouchers' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Other managers
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function sales()
+	{
+		switch( $this->uri->segment( '4' ) ) :
+
+			case 'add' :		$this->_sales_add();	break;
+			case 'edit' :		$this->_sales_edit();	break;
+			case 'delete' :		$this->_sales_delete();	break;
+			case 'index' :
+			default :			$this->_sales_index();	break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sales_index()
+	{
+		dump( 'List Sales' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sales_add()
+	{
+		dump( 'Add Sale' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sales_edit()
+	{
+		dump( 'Edit Sale' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sales_delete()
+	{
+		dump( 'Delete Sale' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Other managers
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function manage()
+	{
+		//	Load voucher model
+		$this->load->model( 'shop/shop_voucher_model', 'voucher' );
+
+		// --------------------------------------------------------------------------
+
+		switch( $this->uri->segment( '4' ) ) :
+
+			case 'attributes' :			$this->_manage_attributes();			break;
+			case 'brands' :				$this->_manage_brands();				break;
+			case 'categories' :			$this->_manage_categories();			break;
+			case 'ranges_collections' :	$this->_manage_ranges_collections();	break;
+			case 'tags' :				$this->_manage_tags();					break;
+			case 'tax_rates' :			$this->_manage_tax_rates();				break;
+			case 'types' :				$this->_manage_types();					break;
+
+			// --------------------------------------------------------------------------
+
+			case 'index' :
+			default :					show_404();								break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_attributes()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/attributes',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_brands()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/manage/brands',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_categories()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/categories',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_ranges_collections()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( 'admin/shop/manage/ranges_collections',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_tags()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/manage/tags',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_tax_rates()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/tax_rates',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_types()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/manage/types',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 
