@@ -7,6 +7,10 @@
 		</li>
 
 		<li class="tab">
+			<a href="#" id="tabber-description" data-tab="tab-description">Description</a>
+		</li>
+
+		<li class="tab">
 			<a href="#" id="tabber-variations" data-tab="tab-variations">Variations</a>
 		</li>
 
@@ -48,18 +52,6 @@
 				$_field['label']		= 'Title';
 				$_field['required']		= TRUE;
 				$_field['placeholder']	= 'Give this product a title';
-
-				echo form_field( $_field );
-
-				// --------------------------------------------------------------------------
-
-				$_field					= array();
-				$_field['key']			= 'description';
-				$_field['label']		= 'Description';
-				$_field['sub_label']	= 'Basic HTML allowed.';
-				$_field['required']		= TRUE;
-				$_field['placeholder']	= 'Give this product a description';
-				$_field['type']			= 'textarea';
 
 				echo form_field( $_field );
 
@@ -120,6 +112,15 @@
 			?>
 		</div>
 
+		<div class="tab page description" id="tab-description" style="display:none">
+			<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
+			<textarea class="ckeditor" name="body"><?=set_value( 'body' )?></textarea>
+			<p class="system-alert notice no-close" style="margin-top:10px;">
+				<strong>Note:</strong> The editor's display might not be a true representation of the final layout
+				due to application stylesheets on the front end which are not loaded here.
+			</p>
+		</div>
+
 		<div class="tab page variations" id="tab-variations" style="display:none;">
 			<p>
 				Variations allow you to offer the same product but with different attributes (e.g colours or sizes).
@@ -146,19 +147,12 @@
 				</p>
 				<p class="disabled">
 					<a class="awesome grey small">Add Variation</a>
-					<span class="no-more-variations">The specified product type does not allow for any more variations to be added.</a>
+					<span class="no-more-variations">The specified product type does not allow for any more variations to be added.</span>
 				</p>
 			</div>
 		</div>
 
 		<div class="tab page gallery" id="tab-gallery" style="display:none;">
-			<div class="system-alert message no-close">
-				<strong>ToDo:</strong>
-				<ul>
-					<li style="margin-bottom:0">&rsaquo; Once uploaded add the image to the gallery list in the JS so variations can choose which images feature their product.</li>
-					<li style="margin-bottom:0">&rsaquo; Actually make the API call when deleting an image (so it's actually deleted)</li>
-				</ul>
-			</div>
 			<p>
 				Upload images to the product gallery. Once uploaded you can specify which variations are featured on the <a href="#" class="switch-to-variations">variations tab</a>.
 				<small>
@@ -200,12 +194,42 @@
 		</div>
 
 		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:none;">
-			<div class="system-alert message no-close">
-				<strong>ToDo:</strong>
-				<ul>
-					<li style="margin-bottom:0">&rsaquo; Facility to specify to which range/collection (if any) this product belongs.</li>
-				</ul>
-			</div>
+			<p>
+				Specify which ranges and/or collections this product should appear in.
+			</p>
+			<p>
+				<strong>Ranges</strong>
+			</p>
+			<select name="ranges[]" class="ranges" multiple="multiple" style="width:100%">
+			<?php
+
+				echo '<option value="Thingy1">Thingy1</option>';
+				echo '<option value="Thingy2">Thingy2</option>';
+				echo '<option value="Thingy3">Thingy3</option>';
+				echo '<option value="Thingy4">Thingy4</option>';
+				echo '<option value="Thingy5">Thingy5</option>';
+				echo '<option value="Thingy6">Thingy6</option>';
+				echo '<option value="Thingy7">Thingy7</option>';
+
+			?>
+			</select>
+
+			<p>
+				<strong>Collections</strong>
+			</p>
+			<select name="collections[]" class="collections" multiple="multiple" style="width:100%">
+			<?php
+
+				echo '<option value="Thingy1">Thingy1</option>';
+				echo '<option value="Thingy2">Thingy2</option>';
+				echo '<option value="Thingy3">Thingy3</option>';
+				echo '<option value="Thingy4">Thingy4</option>';
+				echo '<option value="Thingy5">Thingy5</option>';
+				echo '<option value="Thingy6">Thingy6</option>';
+				echo '<option value="Thingy7">Thingy7</option>';
+
+			?>
+			</select>
 		</div>
 
 		<div class="tab page seo" id="tab-seo" style="display:none;">
@@ -262,7 +286,7 @@
 	var _CREATE;
 	$(function(){
 
-		_CREATE =  new NAILS_Admin_Shop_Inventory_Add_Edit();
+		_CREATE	= new NAILS_Admin_Shop_Inventory_Add_Edit();
 		_CREATE.init( '_CREATE', <?=json_encode( $product_types )?>, '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
 
 	});
@@ -271,7 +295,9 @@
 <script type="text/template" id="template-variation">
 <?php
 
-	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant' );
+	$_data		= array( 'is_first' => FALSE );
+
+	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data );
 
 ?>
 </script>
@@ -314,9 +340,15 @@
 
 				$_options	= array();
 				$_options[]	= '';
-				$_options[123]	= 'something or other';
-				$_options[456]	= 'Something else';
-				$_options[789]	= 'Another thing';
+				$_options[1231]	= 'something or other';
+				$_options[4562]	= 'Something else';
+				$_options[7893]	= 'Another thing';
+				$_options[1234]	= 'something or other';
+				$_options[4565]	= 'Something else';
+				$_options[7895]	= 'Another thing';
+				$_options[1236]	= 'something or other';
+				$_options[4567]	= 'Something else';
+				$_options[7898]	= 'Another thing';
 
 				$_selected	= NULL;
 

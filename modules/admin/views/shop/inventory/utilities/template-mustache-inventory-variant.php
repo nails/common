@@ -143,6 +143,13 @@
 		</div>
 
 		<div class="tab page" id="tab-varitation-{{counter}}-pricing" style="display:none">
+			<?php if ( count( $currencies ) > 1 ) : ?>
+			<p>
+				Define the price points for this variation. If you'd like to set a specific price for a certain
+				currency then define that also otherwise the system will calculate automatically using current
+				exchange rates.
+			</p>
+			<?php endif; ?>
 			<table>
 				<thead>
 					<tr>
@@ -160,10 +167,10 @@
 							<?=form_hidden( 'variation[{{counter}}][pricing][0][currency_id]', SHOP_BASE_CURRENCY_ID, 'placeholder="Calculate automatically"' )?>
 						</td>
 						<td class="price">
-							<?=form_input( 'variation[{{counter}}][pricing][0][price]', NULL, 'placeholder="Price"' )?>
+							<?=form_input( 'variation[{{counter}}][pricing][0][price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Price"' )?>
 						</td>
 						<td class="price-sale">
-							<?=form_input( 'variation[{{counter}}][pricing][0][sale_price]', NULL, 'placeholder="Sale price"' )?>
+							<?=form_input( 'variation[{{counter}}][pricing][0][sale_price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Sale price"' )?>
 						</td>
 					</tr>
 
@@ -182,10 +189,10 @@
 										<?=form_hidden( 'variation[{{counter}}][pricing][' . $_counter . '][currency_id]', $currency->id, 'placeholder="Calculate automatically"' )?>
 									</td>
 									<td class="price">
-										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][price]', NULL, 'placeholder="Calculate automatically"' )?>
+										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][price]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' )?>
 									</td>
 									<td class="price-sale">
-										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][sale_price]', NULL, 'placeholder="Calculate automatically"' )?>
+										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][sale_price]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' )?>
 									</td>
 								</tr>
 								<?php
