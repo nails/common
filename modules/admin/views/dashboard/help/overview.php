@@ -1,9 +1,9 @@
 <div class="group-dashboard help">
-	
+
 	<p><?=lang( 'dashboard_help_intro' )?></p>
-	
+
 	<hr />
-	
+
 	<table>
 		<thead>
 			<tr>
@@ -14,11 +14,11 @@
 		</thead>
 		<tbody>
 			<?php
-			
+
 				if ( $videos ) :
-				
+
 					foreach ( $videos AS $v ) :
-					
+
 					echo '<tr>';
 					echo '<td class="id">' . $v->id . '</td>';
 					echo '<td class="name-desc">';
@@ -29,30 +29,30 @@
 					echo '<a href="http://player.vimeo.com/video/' . $v->vimeo_id . '?autoplay=true" class="awesome small video-button">' . lang( 'action_view' ) . '</a>';
 					echo '</td>';
 					echo '</tr>';
-					
+
 					endforeach;
-				
+
 				else :
-				
+
 					echo '<tr>';
 					echo '<td id="no_records" colspan="3"><p>' . lang( 'no_records_found' ) . '</p></td>';
 					echo '</tr>';
-				
+
 				endif;
-			
+
 			?>
 		</tbody>
 	</table>
-	
-	<script tyle="text/javascript">
+
+	<script style="text/javascript">
 	<!--//
-	
+
 		$(function(){
-		
+
 			$( 'a.video-button' ).fancybox({ type : 'iframe' });
-		
+
 		});
-	
+
 	//-->
 	</script>
 </div>
