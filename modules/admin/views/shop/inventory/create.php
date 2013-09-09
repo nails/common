@@ -286,7 +286,7 @@
 	var _CREATE;
 	$(function(){
 
-		_CREATE	= new NAILS_Admin_Shop_Inventory_Add_Edit();
+		_CREATE	= new NAILS_Admin_Shop_Inventory_Create_Edit();
 		_CREATE.init( '_CREATE', <?=json_encode( $product_types )?>, '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
 
 	});

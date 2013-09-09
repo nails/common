@@ -353,7 +353,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Assets
 		$this->asset->library( 'ckeditor' );
 		$this->asset->library( 'nails_api' );
-		$this->asset->load( 'nails.admin.shop.inventory.add_edit.min.js', TRUE );
+		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
+		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js', TRUE );
 		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
