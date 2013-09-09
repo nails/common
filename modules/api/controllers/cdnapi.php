@@ -58,7 +58,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 	// --------------------------------------------------------------------------
 
 
-	public function upload()
+	public function object_create()
 	{
 		//	Define $_out array
 		$_out = array();
@@ -212,6 +212,32 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		//	not return the server response to the script when a non-200 status code is detected
 
 		$this->_out( $_out, 'JSON', FALSE );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function object_delete()
+	{
+		//	Define $_out array
+		$_out = array();
+
+		// --------------------------------------------------------------------------
+
+		$_object_id	= $this->input->post( 'object_id' );
+		$_delete	= $this->cdn->object_delete( $_object_id );
+
+		if ( ! $_delete ) :
+
+			$_out['status']	= 400;
+			$_out['error']	= implode( '', $this->cdn->errors() );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->_out( $_out, 'JSON' );
 	}
 
 	// --------------------------------------------------------------------------
