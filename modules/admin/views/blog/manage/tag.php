@@ -13,7 +13,16 @@
 		endif;
 	?>
 	<p>
-		Use tags to group specific post topics together. For example, a tag might be 'New Year <?=date( 'Y')?>', or 'Coursework'. For broader subjects (e.g 'Music' or 'Travel') consider using a <?=anchor( 'admin/blog/manager_category' . $_is_fancybox, 'category' )?>.
+		Use tags to group specific post topics together. For example, a tag might be 'New Year <?=date( 'Y')?>', or 'Coursework'.
+		<?php
+
+			if ( blog_setting( 'categories_enabled' ) ) :
+
+				echo 'For broader subjects (e.g "Music" or "Travel") consider using a ' . anchor( 'admin/blog/manage/categories' . $_is_fancybox, 'category' ) . '.';
+
+			endif;
+
+		?>
 	</p>
 	<p><strong>Create new Tag</strong></p>
 	<?php
@@ -56,10 +65,25 @@
 
 <?php
 
-	if ( $_is_fancybox && $rebuild ) :
+	echo '<script type="text/javascript">';
 
-		echo '<script type="text/javascript">';
-		echo 'parent.rebuild_select( \'tags\', ' . json_encode( $tags ) . ');';
-		echo '</script>';
+	//	This variable holds the current state of objects and is read
+	//	by the calling script when closing the fancybox, feel free to
+	//	update this during the lietime of the fancybox.
 
-	endif;
+	$_data					= array();				//	An array of objects in the format {id,label}
+
+	foreach ( $tags AS $tag ) :
+
+		$_temp			= new stdClass();
+		$_temp->id		= $tag->id;
+		$_temp->label	= $tag->label;
+
+		$_data[] = $_temp;
+
+	endforeach;
+
+	echo 'var _DATA = ' . json_encode( $_data ) . ';';
+	echo '</script>';
+
+	// --------------------------------------------------------------------------
