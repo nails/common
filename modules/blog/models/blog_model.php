@@ -95,7 +95,7 @@ class NAILS_Blog_model extends NAILS_Model
 				//	Fetch current associations if a post_id has been supplied
 				if ( $post_id ) :
 
-					$assoc->current = $this->db->query( $assoc->source->sql . ' WHERE ' . $assoc->source->sql_where )->result();
+					$assoc->current = $this->db->query( $assoc->source->sql . ' WHERE ' . sprintf( $assoc->source->sql_where, $post_id ) )->result();
 
 				else :
 
