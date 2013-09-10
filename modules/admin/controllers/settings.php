@@ -4,7 +4,7 @@
  * Name:		Admin - Settings
  *
  * Description:	A holder for all site settings
- * 
+ *
  **/
 
 
@@ -13,16 +13,16 @@ require_once '_admin.php';
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
- 
+
 class NAILS_Settings extends NAILS_Admin_Controller
 {
-	
-	
+
+
 	/**
 	 * Announces this module's details to anyone who asks.
 	 *
@@ -34,23 +34,23 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	static function announce()
 	{
 		$d = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the laguage file
 		get_instance()->lang->load( 'admin_settings', RENDER_LANG_SLUG );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Configurations
 		$d->name = lang( 'settings_module_name' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Navigation options
 		$d->funcs = array();
 		$d->funcs['site']	= lang( 'settings_nav_site' );
-		
+
 		if ( module_is_enabled( 'blog' ) ) :
 
 			$d->funcs['blog']	= lang( 'settings_nav_blog' );
@@ -73,9 +73,9 @@ class NAILS_Settings extends NAILS_Admin_Controller
 			return FALSE;
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Only announce the controller if the user has permisison to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
@@ -100,12 +100,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load models
 		$this->load->model( 'system/system_model', 'blog' );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Process POST
 		if ( $this->input->post() ) :
-		
+
 			switch ( $this->input->post( 'update' ) ) :
 
 				case 'analytics' :
@@ -123,7 +123,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				break;
 
 			endswitch;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -135,9 +135,9 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/settings/site',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
@@ -195,12 +195,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load models
 		$this->load->model( 'blog/blog_model', 'blog' );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Process POST
 		if ( $this->input->post() ) :
-		
+
 			switch ( $this->input->post( 'update' ) ) :
 
 				case 'settings' :
@@ -224,7 +224,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				break;
 
 			endswitch;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -236,9 +236,9 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/settings/blog',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
@@ -332,12 +332,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->load->model( 'shop/shop_currency_model',			'currency' );
 		$this->load->model( 'shop/shop_shipping_model',			'shipping' );
 		$this->load->model( 'shop/shop_tax_model',				'tax' );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Process POST
 		if ( $this->input->post() ) :
-		
+
 			switch ( $this->input->post( 'update' ) ) :
 
 				case 'settings' :
@@ -379,7 +379,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				break;
 
 			endswitch;
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -407,12 +407,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$this->asset->load( 'nails.admin.shop.settings.min.js', TRUE );
-		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
-		
+
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/settings/shop',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
@@ -505,7 +504,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				$_where_in[] = $id;
 
 			endforeach;
-			
+
 			if ( $this->currency->set_active_currencies( $_where_in ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
@@ -546,7 +545,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 			//	Active?
 			$method['is_active']	= isset( $method['is_active'] ) ? TRUE : FALSE;
-			
+
 			if ( $_id ) :
 
 				$this->shipping->update( $_id, $method );
@@ -592,7 +591,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 			//	If there's an ID we'll be updating (remove for safety)
 			$_id = isset( $rate['id'] ) ? $rate['id'] : NULL;
 			unset( $rate['id'] );
-			
+
 			if ( $_id ) :
 
 				$this->tax->update( $_id, $rate );
@@ -631,28 +630,28 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter instanciates a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SETTINGS' ) ) :
 
 	class Settings extends NAILS_Settings

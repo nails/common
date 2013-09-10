@@ -355,7 +355,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->asset->library( 'nails_api' );
 		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
 		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js', TRUE );
-		$this->asset->load( 'jquery.ui.min.js', TRUE );
 		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
 
@@ -1093,7 +1092,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->library( 'jqueryui' );
 		$this->asset->load( 'nails.admin.shop.vouchers.min.js', TRUE );
 
 		// --------------------------------------------------------------------------

@@ -157,6 +157,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'nails.default.min.js', TRUE );
 		$this->asset->load( 'nails.admin.min.js', TRUE );
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
+		$this->asset->library( 'jqueryui' );
 
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :

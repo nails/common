@@ -4,7 +4,7 @@
 * Name:			Admin : Stats
 *
 * Description:	Stats manager
-* 
+*
 */
 
 require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
@@ -22,19 +22,19 @@ class Stats extends NAILS_Admin_Controller
 	static function announce()
 	{
 		$d = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Configurations
 		$d->name				= 'Statistics';					//	Display name.
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Navigation options
 		$d->funcs['index']		= 'Browse Events';					//	Sub-nav function.
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Only announce the controller if the user has permission to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
@@ -67,7 +67,7 @@ class Stats extends NAILS_Admin_Controller
 	{
 		//	Set method info
 		$this->data['page']->title = 'Browse Events';
-		
+
 		// --------------------------------------------------------------------------
 
 		//	Define limit and order
@@ -110,9 +110,9 @@ class Stats extends NAILS_Admin_Controller
 		endif;
 
 		$_where = implode( ' AND ', $_where );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Are we downloading? Or viewing?
 		if ( $this->input->get( 'dl' ) ) :
 
@@ -153,11 +153,10 @@ class Stats extends NAILS_Admin_Controller
 			//	Fetch users
 			$this->data['users'] = $this->user->get_all_minimal();
 			$this->data['types'] = $this->event->get_types_flat();
-			
+
 			// --------------------------------------------------------------------------
 
 			//	Load assets
-			$this->asset->library( 'jqueryui' );
 			$this->asset->load( 'jquery.chosen.min.js', TRUE );
 
 			// --------------------------------------------------------------------------
