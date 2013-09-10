@@ -340,7 +340,6 @@
 
 
 	<div class="content">
-		<div class="padder">
 		<div class="content_inner">
 
 			<?php

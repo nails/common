@@ -500,21 +500,11 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 					$post->associations[$index] = $assoc;
 
-
 					//	Fetch the association data from the source, fail ungracefully - the dev should have this configured correctly.
-					if ( isset( $assoc->source->sql ) && $assoc->source->sql ) :
-
-						//	Fetch current associations
-						$post->associations[$index]->current = $this->db->query( $assoc->source->sql . ' WHERE ' . sprintf( $assoc->source->sql_where, $post->id ) )->result();
-
-					else :
-
-						$this->db->select( 'src.' . $assoc->source->id . ' id, src.' . $assoc->source->label . ' label' );
-						$this->db->join( $assoc->source->table . ' src', 'src.' . $assoc->source->id . '=target.associated_id', 'LEFT' );
-						$this->db->where( 'target.post_id', $post->id );
-						$post->associations[$index]->current = $this->db->get( $assoc->target . ' target')->result();
-
-					endif;
+					$this->db->select( 'src.' . $assoc->source->id . ' id, src.' . $assoc->source->label . ' label' );
+					$this->db->join( $assoc->source->table . ' src', 'src.' . $assoc->source->id . '=target.associated_id', 'LEFT' );
+					$this->db->where( 'target.post_id', $post->id );
+					$post->associations[$index]->current = $this->db->get( $assoc->target . ' target')->result();
 
 				endforeach;
 

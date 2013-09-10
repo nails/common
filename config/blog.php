@@ -30,6 +30,7 @@
 
 		$config['blog_post_associations']					= array();
 		$config['blog_post_associations'][0]				= new stdClass();
+		$config['blog_post_associations'][0]->widget_title	= 'The title of the widget in the front end ';
 		$config['blog_post_associations'][0]->legend		= 'The <fieldset>\'s legend';
 		$config['blog_post_associations'][0]->description	= 'The <fieldset>\'s description';
 		$config['blog_post_associations'][0]->multiple		= TRUE;

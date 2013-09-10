@@ -88,44 +88,23 @@ class NAILS_Blog_model extends NAILS_Model
 
 		foreach( $_associations AS &$assoc ) :
 
-
 			//	Fetch the association data from the source, fail ungracefully - the dev should have this configured correctly.
-			if ( isset( $assoc->source->sql ) && $assoc->source->sql ) :
+			//	Fetch current associations if a post_id has been supplied
+			if ( $post_id ) :
 
-				//	Fetch current associations if a post_id has been supplied
-				if ( $post_id ) :
-
-					$assoc->current = $this->db->query( $assoc->source->sql . ' WHERE ' . sprintf( $assoc->source->sql_where, $post_id ) )->result();
-
-				else :
-
-					$assoc->current = array();
-
-				endif;
-
-				//	Fetch the raw data
-				$assoc->data = $this->db->query( $assoc->source->sql )->result();
+				$this->db->where( 'post_id', $post_id );
+				$assoc->current = $this->db->get( $assoc->target )->result();
 
 			else :
 
-				//	Fetch current associations if a post_id has been supplied
-				if ( $post_id ) :
-
-					$this->db->where( 'post_id', $post_id );
-					$assoc->current = $this->db->get( $assoc->target )->result();
-
-				else :
-
-					$assoc->current = array();
-
-				endif;
-
-				//	Fetch the raw data
-				$this->db->select( $assoc->source->id . ' id, ' . $assoc->source->label . ' label' );
-				$this->db->order_by( 'label' );
-				$assoc->data = $this->db->get( $assoc->source->table )->result();
+				$assoc->current = array();
 
 			endif;
+
+			//	Fetch the raw data
+			$this->db->select( $assoc->source->id . ' id, ' . $assoc->source->label . ' label' );
+			$this->db->order_by( 'label' );
+			$assoc->data = $this->db->get( $assoc->source->table )->result();
 
 		endforeach;
 
