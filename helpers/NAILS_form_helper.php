@@ -151,7 +151,6 @@ if ( ! function_exists( 'form_field' ) )
 		$_out .= '</span>';
 
 		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -294,7 +293,6 @@ if ( ! function_exists( 'form_field_mm' ) )
 		endif;
 
 		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -475,7 +473,6 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		endif;
 
 		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -705,7 +702,6 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_out .= '</span>';
 
 		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -833,7 +829,6 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_out .= '</span';
 
 		$_out .= '</label>';
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -931,7 +926,6 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -1048,7 +1042,6 @@ if ( ! function_exists( 'form_field_radio' ) )
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -1207,7 +1200,6 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
@@ -1242,7 +1234,6 @@ if ( ! function_exists( 'form_field_submit' ) )
 		//	field
 		$_out .= form_submit( $button_name, $button_value, 'class=""' );
 
-		$_out .= '<div class="clear"></div>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------

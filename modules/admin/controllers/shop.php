@@ -1364,7 +1364,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			case 'attributes' :			$this->_manage_attributes();			break;
 			case 'brands' :				$this->_manage_brands();				break;
 			case 'categories' :			$this->_manage_categories();			break;
-			case 'ranges_collections' :	$this->_manage_ranges_collections();	break;
+			case 'collections' :		$this->_manage_collections();				break;
+			case 'ranges' :				$this->_manage_ranges();				break;
+			case 'shipping_methods' :	$this->_manage_shipping_methods();		break;
 			case 'tags' :				$this->_manage_tags();					break;
 			case 'tax_rates' :			$this->_manage_tax_rates();				break;
 			case 'types' :				$this->_manage_types();					break;
@@ -1475,7 +1477,69 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges_collections()
+	protected function _manage_collections()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/collections',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_ranges()
+	{
+		if ( $this->input->post() ) :
+
+			dumpanddie( $_POST );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/ranges',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_shipping_methods()
 	{
 		if ( $this->input->post() ) :
 
@@ -1498,7 +1562,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		endif;
 
 		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/ranges_collections',	$this->data );
+		$this->load->view( 'admin/shop/manage/shipping_methods',	$this->data );
 		$this->load->view( 'structure/footer',						$this->data );
 	}
 

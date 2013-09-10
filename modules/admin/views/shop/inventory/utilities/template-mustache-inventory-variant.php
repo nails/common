@@ -19,7 +19,7 @@
 			<a href="#" data-tab="tab-varitation-{{counter}}-gallery">Gallery</a>
 		</li>
 		<li class="tab">
-			<a href="#" data-tab="tab-varitation-{{counter}}-shipping">Shipping</a>
+			<a href="#" class="tabber-variation-shipping" data-tab="tab-varitation-{{counter}}-shipping">Shipping</a>
 		</li>
 		{{^is_first}}
 		<li class="action">
@@ -150,7 +150,7 @@
 				exchange rates.
 			</p>
 			<?php endif; ?>
-			<table>
+			<table class="pricing-options">
 				<thead>
 					<tr>
 						<th>Currency</th>
@@ -220,7 +220,25 @@
 
 		<div class="tab page" id="tab-varitation-{{counter}}-shipping" style="display:none">
 			<p>
-				<a href="#" class="awesome small green">Add Shipping Option</a>
+				Define the shipping options available for this variant. Shipping options do not have to be the same between variations.
+			</p>
+			<table class="shipping-options empty">
+				<thead>
+					<tr>
+						<th class="courier">Courier &amp; Method</th>
+						<th class="price">Price</th>
+						<th class="price-additional">Additonal</th>
+						<th class="delete">&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="empty">
+						<td colspan="4" class="no-data">No shipping methods defined</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>
+				<a href="#" id="add-shipping-option" data-variation-counter="{{counter}}" class="awesome small green">Add Shipping Option</a>
 			</p>
 		</div>
 	</section>

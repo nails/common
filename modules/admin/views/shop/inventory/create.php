@@ -214,6 +214,8 @@
 			?>
 			</select>
 
+			<hr />
+
 			<p>
 				<strong>Collections</strong>
 			</p>
@@ -302,18 +304,10 @@
 ?>
 </script>
 
-<div id="dialog-confirm-delete-variation" title="Confirm Delete" style="display:none;">
+<div id="dialog-confirm-delete" title="Confirm Delete" style="display:none;">
 	<p>
 		<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
 		This variation will be removed from the interface and cannot be recovered.
-		<strong>Are you sure?</strong>
-	</p>
-</div>
-
-<div id="dialog-confirm-delete-image" title="Confirm Delete" style="display:none;">
-	<p>
-		<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
-		This image will be removed from the interface and cannot be recovered.
 		<strong>Are you sure?</strong>
 	</p>
 </div>
@@ -361,6 +355,76 @@
 		</td>
 		<td class="delete">
 			<a href="#" class="delete">Delete</a>
+		</td>
+	</tr>
+</script>
+
+<script type="text/template" id="template-shipping-option">
+	<tr class="shipping-option">
+		<td class="courier-method">
+			<?php
+
+				$_options = array
+				(
+					1 => 'Option one - method',
+					2 => 'Option two - method',
+					3 => 'Option three - method',
+					4 => 'Option four - method'
+				);
+
+				echo form_dropdown( 'variation[{{counter}}][shipping][{{shipping_counter}}][0][courier_method_id]', $_options, NULL, 'class="shipping_methods"');
+
+			?>
+		</td>						<td class="price">
+			<?php
+
+				echo form_hidden( 'variation[{{counter}}][shipping][{{shipping_counter}}][0][currency_id]', SHOP_BASE_CURRENCY_ID );
+				echo form_input( 'variation[{{counter}}][shipping][{{shipping_counter}}][0][price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Price"' );
+
+				//	Other currencies
+
+				$_counter = 1;
+				foreach ( $currencies AS $currency ) :
+
+					if ( $currency->id != SHOP_BASE_CURRENCY_ID ) :
+
+
+						echo form_hidden( 'variation[{{counter}}][shipping][{{shipping_counter}}][' . $_counter . '][currency_id]', $currency->id );
+						echo form_input( 'variation[{{counter}}][shipping][{{shipping_counter}}][' . $_counter . '][price]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' );
+
+						$_counter++;
+
+					endif;
+
+				endforeach;
+
+			?>
+		</td>
+		<td class="price-additional">
+			<?php
+
+				echo form_input( 'variation[{{counter}}][shipping][{{shipping_counter}}][0][price_additional]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Price"' );
+
+				//	Other currencies
+
+				$_counter = 1;
+				foreach ( $currencies AS $currency ) :
+
+					if ( $currency->id != SHOP_BASE_CURRENCY_ID ) :
+
+
+						echo form_input( 'variation[{{counter}}][shipping][{{shipping_counter}}][' . $_counter . '][price_additional]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' );
+
+						$_counter++;
+
+					endif;
+
+				endforeach;
+
+			?>
+		</td>
+		<td class="delete">
+			<a href="#" class="delete-shipping">Delete</a>
 		</td>
 	</tr>
 </script>
