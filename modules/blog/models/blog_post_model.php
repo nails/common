@@ -777,6 +777,38 @@ class NAILS_Blog_post_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function get_with_association( $association_index, $associated_id )
+	{
+		$this->config->load( 'blog', FALSE, TRUE );
+
+		$_associations	= $this->config->item( 'blog_post_associations' );
+
+		if ( ! isset( $_associations[$association_index] ) ) :
+
+			return array();
+
+		endif;
+
+		$this->db->select( 'post_id' );
+		$this->db->where( 'associated_id', $associated_id );
+		$_posts = $this->db->get( $_associations[$association_index]->target )->result();
+
+		$_ids = array();
+		foreach ( $_posts AS $post ) :
+
+			$_ids[] = $post->post_id;
+
+		endforeach;
+
+		$this->db->where_in( 'bp.id', $_ids );
+		return $this->get_all();
+
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_post_object( &$post )
 	{
 		//	Type casting

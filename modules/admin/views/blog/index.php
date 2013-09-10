@@ -83,7 +83,7 @@
 
 					echo '<td class="actions">';
 					echo anchor( 'admin/blog/edit/' . $post->id, lang( 'action_edit' ), 'class="awesome small"' );
-					echo anchor( 'admin/blog/delete/' . $post->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-confirm="Are you sure you want to delete this post?"' );
+					echo anchor( 'admin/blog/delete/' . $post->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-title="Confirm Delete" data-body="Are you sure you want to delete this post?"' );
 					echo '</td>';
 
 					echo '</tr>';

@@ -49,11 +49,13 @@
 	- The name of the column which is the ID (usually ID if you're following any kind of sensible norm)
 	- The name of the lable column, i.e what will be shown in the list. specify an array of column
 	  and they'll be merged into one joined with a space.
+	- The `WHERE` field, if any.
 
 		$config['blog_post_associations'][0]->source			= new stdClass();
 		$config['blog_post_associations'][0]->source->table		= 'hills';
 		$config['blog_post_associations'][0]->source->id		= 'id';
 		$config['blog_post_associations'][0]->source->label		= 'name';
+		$config['blog_post_associations'][0]->source->label		= '';
 
 	If you need to run a complex query to get this information you can specify a `sql` property
 	so long as it returns a field called `id` and another called `label`. If you use this approach
@@ -86,29 +88,20 @@
 	Helpers / Rendering
 	-----------------------
 
-	You can get the associations by calling blog_post_associations(), which accepts two required parameters:
+	The blog sidebar will automatically render a list of the associations, by default simply as a text list.
+	If you want or need to change this behaviour you must specify a callback in this config. This callback
+	can either be called per item or it can be called once and passed an array of IDs.
 
-	 - $post_id
-	 - $association_index (the index of this config array which you're interested in)
+	To call it once per ID define the following:
 
-	You can optionally define (in this array) the model and method which the helper should use when returning data
-	(if none are specified or the method is not callable then the raw IDs will be returned):
+		$config['blog_post_associations'][0]->widget->callback = function( $id, $label, $index ) { return 'formatted string' };
 
-		$config['blog_post_associations'][0]->model		= 'hill_model';
-		$config['blog_post_associations'][0]->method	= 'get_by_ids';
+	Note that this function must return the HTML which'll be placed in a <li></li>.
 
-	This method will be passed an array of IDs and the output of this method will be returned by the helper.
+	Alternatively, you can define `callback_batch`, like so:
 
-	A third boolean parameter can also be defined:
+		$config['blog_post_associations'][0]->widget->callback_batch = function( $ids ) { return 'formatted string' };
 
-	 - $return_html
-
-	If you set this to TRUE then an additional config item must be set, the view to load:
-
-		$config['blog_post_associations'][0]->view	= 'blog/associations/hill';
-
-	This view will be passed the data set (either an array of IDs or the result of the model/method specified earlier)
-	as a parameter called `$data`. If no view is set or the view is invalid an empty string will be returned.
-
+	This will be passed an array ob objects, each with two properties: `id` and `label`; you are responsible for rendering *all* the HTML.
 
 */

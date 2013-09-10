@@ -49,12 +49,25 @@
 			if ( $assoc->current ) :
 
 				echo '<li class="widget associations association-' . $index . '">';
-				echo '<h5>' . $assoc->widget_title . '</h5>';
+				echo '<h5>' . $assoc->widget->title . '</h5>';
 
 				echo '<ul>';
-				foreach( $assoc->current AS $current ) :
+				foreach( $assoc->current AS $item_index => $current ) :
 
-					echo '<li>' . $current->label . '</li>';
+					//	If a callback has been defined and is callable then use that,
+					//	otherwise a simple text label will do nicely
+
+					echo '<li class="item-id-' . $item_index . '">';
+					if ( isset( $assoc->widget->callback ) && is_callable( $assoc->widget->callback ) ) :
+
+						echo call_user_func( $assoc->widget->callback, $current, $item_index );
+
+					else :
+
+						$current->label;
+
+					endif;
+					echo '</li>';
 
 				endforeach;
 				echo '</ul>';

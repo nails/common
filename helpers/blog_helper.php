@@ -13,13 +13,13 @@ if ( ! function_exists( 'blog_setting' ) )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'blog' ) ) :
-		
+
 			get_instance()->load->model( 'blog/blog_model', 'blog' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return get_instance()->blog->settings( $key, $force_refresh );
 	}
 }
@@ -41,13 +41,13 @@ if ( ! function_exists( 'blog_latest_posts' ) )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
-		
+
 			get_instance()->load->model( 'blog/blog_post_model', 'post' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return get_instance()->post->get_latest( $limit );
 	}
 }
@@ -69,13 +69,13 @@ if ( ! function_exists( 'blog_posts_with_tag' ) )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
-		
+
 			get_instance()->load->model( 'blog/blog_post_model', 'post' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return get_instance()->post->get_with_tag( $id_slug, $only_published, $include_body, $exclude_deleted );
 	}
 }
@@ -97,14 +97,42 @@ if ( ! function_exists( 'blog_posts_with_category' ) )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
-		
+
 			get_instance()->load->model( 'blog/blog_post_model', 'post' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return get_instance()->post->get_with_category( $id_slug, $only_published, $include_body, $exclude_deleted );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Get all posts which contain a certain association
+ *
+ * @access	public
+ * @param	none
+ * @return	void
+ */
+if ( ! function_exists( 'blog_posts_with_association' ) )
+{
+	function blog_posts_with_association( $association_index, $associated_id )
+	{
+		//	Load the model if it's not already loaded
+		if ( ! get_instance()->load->model_is_loaded( 'post' ) ) :
+
+			get_instance()->load->model( 'blog/blog_post_model', 'post' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return get_instance()->post->get_with_association( $association_index, $associated_id );
 	}
 }
 

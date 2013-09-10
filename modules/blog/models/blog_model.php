@@ -90,6 +90,7 @@ class NAILS_Blog_model extends NAILS_Model
 
 			//	Fetch the association data from the source, fail ungracefully - the dev should have this configured correctly.
 			//	Fetch current associations if a post_id has been supplied
+
 			if ( $post_id ) :
 
 				$this->db->where( 'post_id', $post_id );
@@ -104,6 +105,12 @@ class NAILS_Blog_model extends NAILS_Model
 			//	Fetch the raw data
 			$this->db->select( $assoc->source->id . ' id, ' . $assoc->source->label . ' label' );
 			$this->db->order_by( 'label' );
+
+			if ( isset( $assoc->source->where ) && $assoc->source->where ) :
+
+				$this->db->where( $assoc->source->where  );
+
+			endif;
 			$assoc->data = $this->db->get( $assoc->source->table )->result();
 
 		endforeach;

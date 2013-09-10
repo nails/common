@@ -267,7 +267,7 @@
 		</section>
 
 		<p>
-			<?=form_submit( 'submit', lang( 'action_edit' ) )?>
+			<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 		</p>
 
 	<?=form_close()?>
