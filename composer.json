@@ -1,0 +1,7 @@
+{
+	"name" : "shedcollective/nails",
+	"require":
+	{
+		"aws/aws-sdk-php": "2.4.5"
+	}
+}
