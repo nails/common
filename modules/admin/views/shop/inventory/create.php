@@ -307,7 +307,7 @@
 <div id="dialog-confirm-delete" title="Confirm Delete" style="display:none;">
 	<p>
 		<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
-		This variation will be removed from the interface and cannot be recovered.
+		This item will be removed from the interface and cannot be recovered.
 		<strong>Are you sure?</strong>
 	</p>
 </div>

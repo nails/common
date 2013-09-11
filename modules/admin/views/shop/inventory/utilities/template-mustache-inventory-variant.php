@@ -161,16 +161,31 @@
 				<tbody>
 
 					<!--	BASE CURRENCY	-->
+					<?php
+
+						if ( $is_first ) :
+
+							$_attr_price		= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '" class="base-price"';
+							$_attr_price_sale	= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '" class="base-price-sale"';
+
+						else :
+
+							$_attr_price		= 'class="variation-price ' . SHOP_BASE_CURRENCY_CODE . '"';
+							$_attr_price_sale	= 'class="variation-price-sale ' . SHOP_BASE_CURRENCY_CODE . '"';
+
+						endif;
+
+					?>
 					<tr>
 						<td class="currency">
 							<?=SHOP_BASE_CURRENCY_CODE?>
-							<?=form_hidden( 'variation[{{counter}}][pricing][0][currency_id]', SHOP_BASE_CURRENCY_ID, 'placeholder="Calculate automatically"' )?>
+							<?=form_hidden( 'variation[{{counter}}][pricing][0][currency_id]', SHOP_BASE_CURRENCY_ID )?>
 						</td>
 						<td class="price">
-							<?=form_input( 'variation[{{counter}}][pricing][0][price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Price"' )?>
+							<?=form_input( 'variation[{{counter}}][pricing][0][price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price . ' placeholder="Price"' )?>
 						</td>
 						<td class="price-sale">
-							<?=form_input( 'variation[{{counter}}][pricing][0][sale_price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" placeholder="Sale price"' )?>
+							<?=form_input( 'variation[{{counter}}][pricing][0][sale_price]', NULL, 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price_sale . ' placeholder="Sale price"' )?>
 						</td>
 					</tr>
 
@@ -182,17 +197,29 @@
 
 							if ( $currency->id != SHOP_BASE_CURRENCY_ID ) :
 
+								if ( $is_first ) :
+
+									$_attr_price		= 'data-code="' . $currency->code . '" class="base-price"';
+									$_attr_price_sale	= 'data-code="' . $currency->code . '" class="base-price-sale"';
+
+								else :
+
+									$_attr_price		= 'class="variation-price ' . $currency->code . '"';
+									$_attr_price_sale	= 'class="variation-price-sale ' . $currency->code . '"';
+
+								endif;
+
 								?>
 								<tr>
 									<td class="currency">
 										<?=$currency->code?>
-										<?=form_hidden( 'variation[{{counter}}][pricing][' . $_counter . '][currency_id]', $currency->id, 'placeholder="Calculate automatically"' )?>
+										<?=form_hidden( 'variation[{{counter}}][pricing][' . $_counter . '][currency_id]', $currency->id )?>
 									</td>
 									<td class="price">
-										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][price]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' )?>
+										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][price]', NULL, 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . ' placeholder="Calculate automatically"' )?>
 									</td>
 									<td class="price-sale">
-										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][sale_price]', NULL, 'data-prefix="' . $currency->symbol . '" placeholder="Calculate automatically"' )?>
+										<?=form_input( 'variation[{{counter}}][pricing][' . $_counter . '][sale_price]', NULL, 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . ' placeholder="Calculate automatically"' )?>
 									</td>
 								</tr>
 								<?php
@@ -207,6 +234,17 @@
 
 				</tbody>
 			</table>
+			<?php
+
+				if ( $is_first ) :
+
+					echo '<p id="variation-sync-prices" style="display:none">';
+					echo '<a href="#" class="awesome small orange">Sync Prices</a>';
+					echo '</p>';
+
+				endif;
+
+			?>
 		</div>
 
 		<div class="tab page" id="tab-varitation-{{counter}}-gallery" style="display:none">
@@ -215,6 +253,11 @@
 			</p>
 			<ul class="gallery-associations empty">
 				<li class="empty">No images have been uploaded; upload some using the <a href="#">Gallery tab</a></li>
+				<li class="actions">
+					<a href="#" data-function="all" class="action awesome small orange">Select All</a>
+					<a href="#" data-function="none" class="action awesome small orange">Select None</a>
+					<a href="#" data-function="toggle" class="action awesome small orange">Toggle</a>
+				</li>
 			</ul>
 		</div>
 
@@ -239,6 +282,15 @@
 			</table>
 			<p>
 				<a href="#" id="add-shipping-option" data-variation-counter="{{counter}}" class="awesome small green">Add Shipping Option</a>
+				<?php
+
+					if ( $is_first ) :
+
+						echo '<a href="#" id="sync-shipping-options" data-variation-counter="{{counter}}" class="awesome small orange" style="display:none;">Sync Shipping Options</a>';
+
+					endif;
+
+				?>
 			</p>
 		</div>
 	</section>
