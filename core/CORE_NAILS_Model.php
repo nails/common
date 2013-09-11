@@ -108,6 +108,22 @@ class CORE_NAILS_Model extends CI_Model {
 
 
 	/**
+	 * Get last error
+	 *
+	 * @access	public
+	 * @return	mixed
+	 * @author	Pablo
+	 **/
+	public function last_error()
+	{
+		return end( $this->_error );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Provides models with the an easy interface for saving data to a cache.
 	 *
 	 * @access	protected
