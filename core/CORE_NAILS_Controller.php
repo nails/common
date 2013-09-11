@@ -22,15 +22,42 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Error styles
+		$_styles = <<<EOT
+
+			<style type="text/css">
+
+				p {font-family:monospace;margin:20px 10px;}
+				strong { color:red;}
+				code { padding:5px;border:1px solid #CCC;background:#EEE }
+
+			</style>
+
+EOT;
+
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
 
-			echo '<strong style="color:red;">ERROR:</strong> Nails. environment not correctly configured; config file not found.';
+			echo $_styles;
+			echo '<p><strong>ERROR:</strong> Nails. environment not correctly configured; config file not found.</p>';
 			exit( 0 );
 
 		endif;
 
 		require_once( NAILS_PATH . '/config/_nails.php' );
+
+		// --------------------------------------------------------------------------
+
+		//	Include the composer autoloader
+		if ( ! file_exists( NAILS_PATH . '/vendor/autoload.php' ) ) :
+
+			echo $_styles;
+			echo '<p><strong>ERROR:</strong> Composer autoloader not found; run <code>composer install</code> to install dependencies.</p>';
+			exit( 0 );
+
+		endif;
+
+		require_once( NAILS_PATH . '/vendor/autoload.php' );
 
 		// --------------------------------------------------------------------------
 
