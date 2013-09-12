@@ -156,11 +156,6 @@ class Stats extends NAILS_Admin_Controller
 
 			// --------------------------------------------------------------------------
 
-			//	Load assets
-			$this->asset->load( 'jquery.chosen.min.js', TRUE );
-
-			// --------------------------------------------------------------------------
-
 			//	Load views
 			$this->load->view( 'structure/header',		$this->data );
 			$this->load->view( 'admin/stats/index',	$this->data );
