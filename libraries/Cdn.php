@@ -56,6 +56,15 @@ class Cdn {
 	{
 		switch ( strtolower( CDN_DRIVER ) ) :
 
+			case 'aws_local' :
+
+				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/aws_local.php';
+				return 'Aws_local_CDN';
+
+			break;
+
+			// --------------------------------------------------------------------------
+
 			case 'local':
 			default:
 
@@ -633,7 +642,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_upload = $this->_cdn->upload( $_data->bucket_slug, $_data->file, $_data->filename );
+		$_upload = $this->_cdn->object_create( $_data->bucket_slug, $_data->file, $_data->filename );
 
 		// --------------------------------------------------------------------------
 
@@ -890,7 +899,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_cdn->delete( $_object->filename, $_object->bucket->slug ) ) :
+		if ( $this->_cdn->object_delete( $_object->filename, $_object->bucket->slug ) ) :
 
 			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
@@ -1364,7 +1373,7 @@ class Cdn {
 			endif;
 
 		else :
-
+			here($this->last_error());
 			return FALSE;
 
 		endif;
@@ -1626,6 +1635,22 @@ class Cdn {
 	public function errors()
 	{
 		return $this->_errors;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the last error
+	 *
+	 * @access	public
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	public function last_error()
+	{
+		return end( $this->_errors );
 	}
 
 

@@ -462,6 +462,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		//	Set fields to ignore by default
 		$this->data['ignored_fields'] = array();
+		$this->data['ignored_fields'][] = 'id';
 		$this->data['ignored_fields'][] = 'user_id';
 
 		//	If no cols were found, DESCRIBE the user_meta table - where possible
@@ -766,8 +767,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->data['footer_override'] = 'structure/footer/blank';
 
 		endif;
-
-		$this->asset->load( 'jquery.chosen.min.js', TRUE );
 
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/accounts/edit/index',	$this->data );

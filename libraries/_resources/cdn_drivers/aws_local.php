@@ -3,15 +3,19 @@
 /**
 * Name:			CDN
 *
-* Description:	A Library for dealing with content in the Local CDN
+* Description:	A Library for dealing with content stored on Amazon's Web Services but using local processing
 *
 */
 
-class Local_CDN
-{
+//	Namespace malarky
+use Aws\S3\S3Client;
 
+class Aws_local_CDN
+{
 	private $cdn;
 	public $errors;
+	private $_bucket;
+	private $_s3;
 
 
 	// --------------------------------------------------------------------------
@@ -27,22 +31,57 @@ class Local_CDN
 	 **/
 	public function __construct( $options = NULL )
 	{
-		//	Shortcut to CDN
+		//	Shortcut to CDN Library (mainly for setting errors)
 		$this->cdn		=& get_instance()->cdn;
+
+		//	Define error array
 		$this->errors	= array();
 
 		// --------------------------------------------------------------------------
 
 		//	Load langfile
-		get_instance()->lang->load( 'cdn/cdn_driver_local', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'cdn/cdn_driver_aws_local', RENDER_LANG_SLUG );
 
 		// --------------------------------------------------------------------------
 
-		if ( ! defined( 'CDN_PATH' ) ) :
+		//	Check all the constants are defined properly
+		//	CDN_DRIVER_AWS_IAM_ACCESS_ID
+		//	CDN_DRIVER_AWS_IAM_ACCESS_SECRET
+		//	CDN_DRIVER_AWS_S3_BUCKET
 
+		if ( ! defined( 'CDN_DRIVER_AWS_IAM_ACCESS_ID' ) ) :
+
+			//	TODO: Specify correct lang
 			show_error( lang( 'cdn_error_not_configured' ) );
 
 		endif;
+
+		if ( ! defined( 'CDN_DRIVER_AWS_IAM_ACCESS_SECRET' ) ) :
+
+			//	TODO: Specify correct lang
+			show_error( lang( 'cdn_error_not_configured' ) );
+
+		endif;
+
+		if ( ! defined( 'CDN_DRIVER_AWS_S3_BUCKET' ) ) :
+
+			//	TODO: Specify correct lang
+			show_error( lang( 'cdn_error_not_configured' ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Instanciate the AWS PHP SDK
+		$this->_s3 = S3Client::factory(array(
+			'key'		=> CDN_DRIVER_AWS_IAM_ACCESS_ID,
+			'secret'	=> CDN_DRIVER_AWS_IAM_ACCESS_SECRET,
+		));
+
+		// --------------------------------------------------------------------------
+
+		//	Set the bucket we're using
+		$this->_bucket = CDN_DRIVER_AWS_S3_BUCKET;
 	}
 
 
@@ -65,27 +104,21 @@ class Local_CDN
 	 **/
 	public function object_create( $bucket, $file, $filename )
 	{
-		//	Check bucket is writeable
-		if ( ! is_writable( CDN_PATH . $bucket ) ) :
-
-			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', CDN_PATH . $bucket ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Move the file
-		if ( move_uploaded_file( $file, CDN_PATH . $bucket . '/' . $filename ) ) :
+		try
+		{
+			$_result = $this->_s3->putObject(array(
+				'Bucket'		=> $this->_bucket,
+				'Key'			=> $bucket . '/' . $filename,
+				'SourceFile'	=> $file
+			));
 
 			return TRUE;
-
-		else :
-
-			$this->cdn->set_error( lang( 'cdn_error_couldnotmove' ) );
+		}
+		catch ( Exception $e )
+		{
+			$this->cdn->set_error( 'AWS-SDK EXCEPTION: ' . get_class( $e ) . ': ' . $e->getMessage() );
 			return FALSE;
-
-		endif;
+		}
 	}
 
 
@@ -102,30 +135,20 @@ class Local_CDN
 	 **/
 	public function object_delete( $object, $bucket )
 	{
-		$_file		= urldecode( $object );
-		$_bucket	= urldecode( $bucket );
+		try
+		{
+			$_result = $this->_s3->deleteObject(array(
+				'Bucket'	=> $this->_bucket,
+				'Key'		=> $bucket . '/' . $object
+			));
 
-		if ( file_exists( CDN_PATH . $bucket . '/' . $_file ) ) :
-
-			if ( @unlink( CDN_PATH . $bucket . '/' . $_file ) ) :
-
-				//	TODO: Delete Cache items
-
-				return TRUE;
-
-			else :
-
-				$this->cdn->set_error( lang( 'cdn_error_delete' ) );
-				return FALSE;
-
-			endif;
-
-		else :
-
-			$this->cdn->set_error( lang( 'cdn_error_delete_nofile' ) );
+			return TRUE;
+		}
+		catch ( Exception $e )
+		{
+			$this->cdn->set_error( 'AWS-SDK EXCEPTION: ' . get_class( $e ) . ': ' . $e->getMessage() );
 			return FALSE;
-
-		endif;
+		}
 	}
 
 
@@ -148,14 +171,29 @@ class Local_CDN
 	 **/
 	public function bucket_create( $bucket )
 	{
-		if ( @mkdir( CDN_PATH . $bucket ) ) :
+		//	Attempt to create a 'folder' object on S3
+		if ( ! $this->_s3->doesObjectExist( $this->_bucket, $bucket . '/' ) ) :
 
-			return TRUE;
+			try
+			{
+				$_result = $this->_s3->putObject(array(
+					'Bucket'	=> $this->_bucket,
+					'Key'		=> $bucket . '/',
+					'Body'		=> ''
+				));
+
+				return TRUE;
+			}
+			catch ( Exception $e )
+			{
+				$this->cdn->set_error( 'AWS-SDK ERROR: ' . $e->getMessage() );
+				return FALSE;
+			}
 
 		else :
 
-			$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir' ) );
-			return FALSE;
+			//	Bucket already exists.
+			return TRUE;
 
 		endif;
 	}
@@ -166,16 +204,7 @@ class Local_CDN
 
 	public function bucket_delete( $bucket )
 	{
-		if ( @unlink( CDN_PATH . $bucket ) ) :
-
-			return TRUE;
-
-		else :
-
-			$this->cdn->set_error( lang( 'cdn_error_bucket_unlink' ) );
-			return FALSE;
-
-		endif;
+		//	TODO
 	}
 
 
@@ -459,6 +488,15 @@ class Local_CDN
 		endif;
 
 		return $url;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function testybobber()
+	{
+		dumpanddie( 'boobs' );
 	}
 }
 
