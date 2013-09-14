@@ -93,6 +93,13 @@ class Cdn {
 
 		endif;
 
+		//	Test the drive
+		if ( method_exists( $this->_cdn, $method ) ) :
+
+			return call_user_func_array( array( $this->_cdn, $method ), $arguments );
+
+		endif;
+
 		throw new Exception( 'Call to undefined method Cdn::' . $method . '()' );
 	}
 
@@ -642,7 +649,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_upload = $this->_cdn->object_create( $_data->bucket_slug, $_data->file, $_data->filename );
+		$_upload = $this->_cdn->object_create( $_data->bucket_slug, $_data->filename, $_data->file, $_data->mime );
 
 		// --------------------------------------------------------------------------
 
@@ -2226,7 +2233,7 @@ class Cdn {
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve( $object )
+	public function url_serve( $object, $force_download = FALSE )
 	{
 		$_object = $this->get_object( $object );
 
@@ -2240,7 +2247,7 @@ class Cdn {
 
 		endif;
 
-		return $this->_cdn->url_serve( $_object->filename, $_object->bucket->slug );
+		return $this->_cdn->url_serve( $_object->filename, $_object->bucket->slug, $force_download );
 	}
 
 

@@ -7,7 +7,8 @@
 *
 */
 
-class Asset {
+class Asset
+{
 
 	private $CI;
 	private $unload_assets;

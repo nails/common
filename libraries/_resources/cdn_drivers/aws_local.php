@@ -14,6 +14,7 @@ class Aws_local_CDN
 {
 	private $cdn;
 	public $errors;
+	private $_bucket_url;
 	private $_bucket;
 	private $_s3;
 
@@ -82,6 +83,11 @@ class Aws_local_CDN
 
 		//	Set the bucket we're using
 		$this->_bucket = CDN_DRIVER_AWS_S3_BUCKET;
+
+		// --------------------------------------------------------------------------
+
+		//	Finally, define the bucket endpoint/url, in case they change it.
+		$this->_bucket_url = '.s3.amazonaws.com/';
 	}
 
 
@@ -102,17 +108,43 @@ class Aws_local_CDN
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_create( $bucket, $file, $filename )
+	public function object_create( $bucket, $filename, $sourcefile, $mime )
 	{
 		try
 		{
 			$_result = $this->_s3->putObject(array(
 				'Bucket'		=> $this->_bucket,
 				'Key'			=> $bucket . '/' . $filename,
-				'SourceFile'	=> $file
+				'SourceFile'	=> $sourcefile,
+				'ContentType'	=> $mime,
+				'ACL'			=> 'public-read'
 			));
 
-			return TRUE;
+			//	Now try to duplicate the file and set the appropriate meta tag so there's
+			//	a downloadable version
+
+			try
+			{
+
+				$_filename	= strtolower( substr( $filename, 0, strrpos( $filename, '.' ) ) );
+				$_extension	= strtolower( substr( $filename, strrpos( $filename, '.' ) ) );
+
+				$_result = $this->_s3->copyObject(array(
+					'Bucket'			=> $this->_bucket,
+					'CopySource'		=> $this->_bucket . '/' . $bucket . '/' . $filename,
+					'Key'				=> $bucket . '/' . $_filename . '-download' . $_extension,
+					'ContentType'		=> 'application/octet-stream',
+					'MetadataDirective'	=> 'REPLACE',
+					'ACL'				=> 'public-read'
+				));
+
+				return TRUE;
+			}
+			catch( Exception $e )
+			{
+				$this->cdn->set_error( 'AWS-SDK EXCEPTION: ' . get_class( $e ) . ': ' . $e->getMessage() );
+				return FALSE;
+			}
 		}
 		catch ( Exception $e )
 		{
@@ -226,14 +258,34 @@ class Aws_local_CDN
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve( $object, $bucket )
+	public function url_serve( $object, $bucket, $force_download )
 	{
-		$_out  = 'cdn/serve/';
-		$_out .= $bucket . '/';
-		$_out .= $object;
-		$_out  = site_url( $_out );
 
-		return $this->_url_make_secure( $_out );
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING;
+		$_out .= $bucket . '/';
+
+		if ( $force_download ) :
+
+			//	If we're forcing the download we need to reference a slightly different file
+			//	On upload two instances were created, the "normal" streaming type one and another
+			//	with the appropriate content-types set so that the browser downloads as oppossed
+			//	to renders it
+
+			$_filename	= strtolower( substr( $object, 0, strrpos( $object, '.' ) ) );
+			$_extension	= strtolower( substr( $object, strrpos( $object, '.' ) ) );
+
+			$_out .= $_filename;
+			$_out .= '-download';
+			$_out .= $_extension;
+
+		else :
+
+			//	If we're not forcing the download we can serve straight out of S3
+			$_out .= $object;
+
+		endif;
+
+		return $this->_url_make_secure( $_out, FALSE );
 	}
 
 
@@ -250,7 +302,7 @@ class Aws_local_CDN
 	 **/
 	public function url_serve_scheme()
 	{
-		$_out = site_url( 'cdn/serve/{{bucket}}/{{file}}' );
+		$_out = CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING . 'cdn/serve/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -272,11 +324,10 @@ class Aws_local_CDN
 	 **/
 	public function url_thumb( $object, $bucket, $width, $height )
 	{
-		$_out  = 'cdn/thumb/';
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/';
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -295,7 +346,7 @@ class Aws_local_CDN
 	 **/
 	public function url_thumb_scheme()
 	{
-		$_out = site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}' );
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -317,11 +368,10 @@ class Aws_local_CDN
 	 **/
 	public function url_scale( $object, $bucket, $width, $height )
 	{
-		$_out  = 'cdn/scale/';
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/';
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -340,7 +390,7 @@ class Aws_local_CDN
 	 **/
 	public function url_scale_scheme()
 	{
-		$_out = site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}' );
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -361,9 +411,8 @@ class Aws_local_CDN
 	 **/
 	public function url_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
-		$_out  = 'cdn/placeholder/';
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/';
 		$_out .= $width . '/' . $height . '/' . $border;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -382,7 +431,7 @@ class Aws_local_CDN
 	 **/
 	public function url_placeholder_scheme()
 	{
-		$_out = site_url( 'cdn/placeholder/{{width}}/{{height}}/{{border}}' );
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/{{width}}/{{height}}/{{border}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -403,9 +452,8 @@ class Aws_local_CDN
 	 **/
 	public function url_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
 	{
-		$_out  = 'cdn/blank_avatar/';
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/';
 		$_out .= $width . '/' . $height . '/' . $sex;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -424,7 +472,7 @@ class Aws_local_CDN
 	 **/
 	public function url_blank_avatar_scheme()
 	{
-		$_out = site_url( 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}' );
+		$_out  = CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -445,6 +493,8 @@ class Aws_local_CDN
 	 **/
 	public function url_expiring( $object, $bucket, $expires )
 	{
+		dumpanddie( 'TODO: If cloudfront is configured, then generate a secure url and pass pack, if not serve through the processing mechanism. Maybe.' );
+
 		//	Hash the expirey time
 		$_hash = get_instance()->encrypt->encode( $bucket . '|' . $object . '|' . $expires . '|' . time() . '|' . md5( time() . $bucket . $object . $expires . APP_PRIVATE_KEY ), APP_PRIVATE_KEY );
 		$_hash = urlencode( $_hash );
@@ -469,6 +519,8 @@ class Aws_local_CDN
 	 **/
 	public function url_expiring_scheme()
 	{
+		dumpanddie( 'TODO: If cloudfront is configured, then generate a secure url and pass pack, if not serve through the processing mechanism. Maybe.' );
+
 		$_out = site_url( 'cdn/serve?token={{token}}' );
 
 		return $this->_url_make_secure( $_out );
@@ -478,12 +530,20 @@ class Aws_local_CDN
 	// --------------------------------------------------------------------------
 
 
-	protected function _url_make_secure( $url )
+	protected function _url_make_secure( $url, $is_processing = TRUE )
 	{
 		if ( is_https() ) :
 
 			//	Make the URL secure
-			$url = preg_replace( '/^http:\/\//', 'https://', $url );
+			if ( $is_processing ) :
+
+				$url = str_replace( CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING, CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING_SECURE, $url );
+
+			else :
+
+				$url = str_replace( CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING, CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING_SECURE, $url );
+
+			endif;
 
 		endif;
 
@@ -494,9 +554,24 @@ class Aws_local_CDN
 	// --------------------------------------------------------------------------
 
 
-	public function testybobber()
+	public function fetch_from_s3( $bucket, $object, $save_as )
 	{
-		dumpanddie( 'boobs' );
+		//	Now attempt to save the S3 Object
+		try
+		{
+			$_result = $this->_s3->getObject(array(
+				'Bucket'	=> $this->_bucket,
+				'Key'		=> $bucket . '/' . $object,
+				'SaveAs'	=> $save_as
+			));
+
+			return TRUE;
+		}
+		catch ( Exception $e )
+		{
+			$this->cdn->set_error( 'AWS-SDK EXCEPTION: ' . get_class( $e ) . ': ' . $e->getMessage() );
+			return FALSE;
+		}
 	}
 }
 

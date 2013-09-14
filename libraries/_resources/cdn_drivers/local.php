@@ -63,7 +63,7 @@ class Local_CDN
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_create( $bucket, $file, $filename )
+	public function object_create( $bucket, $filename, $sourcefile, $mime )
 	{
 		//	Check bucket is writeable
 		if ( ! is_writable( CDN_PATH . $bucket ) ) :
@@ -76,7 +76,7 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Move the file
-		if ( move_uploaded_file( $file, CDN_PATH . $bucket . '/' . $filename ) ) :
+		if ( move_uploaded_file( $sourcefile, CDN_PATH . $bucket . '/' . $filename ) ) :
 
 			return TRUE;
 
@@ -197,12 +197,18 @@ class Local_CDN
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve( $object, $bucket )
+	public function url_serve( $object, $bucket, $force_download )
 	{
 		$_out  = 'cdn/serve/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
 		$_out  = site_url( $_out );
+
+		if ( $force_download ) :
+
+			$_out .= '?dl=1';
+
+		endif;
 
 		return $this->_url_make_secure( $_out );
 	}

@@ -58,6 +58,33 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 	// --------------------------------------------------------------------------
 
 
+	public function get_upload_token()
+	{
+		//	Define $_out array
+		$_out = array();
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->user->is_logged_in() ) :
+
+			$_out['token'] = $this->cdn->generate_api_upload_token( active_user( 'id' ) );
+
+		else :
+
+			$_out['status'] = 400;
+			$_out['error']	= 'You must be logged in to generate an upload token.';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->_out( $_out );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function object_create()
 	{
 		//	Define $_out array
