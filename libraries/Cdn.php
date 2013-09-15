@@ -2488,8 +2488,14 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
-	public function generate_api_upload_token( $user_id, $duration = 7200, $restrict_ip = TRUE )
+	public function generate_api_upload_token( $user_id = NULL, $duration = 7200, $restrict_ip = TRUE )
 	{
+		if ( $user_id === NULL ) :
+
+			$user_id = active_user( 'id' );
+
+		endif;
+
 		$_user = get_userobject()->get_by_id( $user_id );
 
 		if ( ! $_user ) :
