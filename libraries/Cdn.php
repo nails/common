@@ -314,7 +314,7 @@ class Cdn {
 				else :
 
 					$_file	= $object;
-					$_name	= $object;
+					$_name	= basename( $object );
 
 				endif;
 
@@ -331,9 +331,18 @@ class Cdn {
 
 			//	Content-type; using finfo because the $_FILES variable can't be trusted
 			//	(uploads from Uploadify always report as application/octet-stream;
-			//	stupid flash.
+			//	stupid flash. Unless, of course, the content-type has beens et explicityly
+			//	by the developer
 
-			$_data->mime = $this->get_mime_type_from_file( $_file );
+			if ( isset( $options['content-type'] ) ) :
+
+				$_data->mime = $options['content-type'];
+
+			else :
+
+				$_data->mime = $this->get_mime_type_from_file( $_file );
+
+			endif;
 
 			//	Now set the actual file data
 			$_data->file = $_file;

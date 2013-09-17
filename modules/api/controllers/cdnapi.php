@@ -188,6 +188,15 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 								break;
 
+								case 'SERVE_DL' :
+								case 'DOWNLOAD' :
+								case 'SERVE_DOWNLOAD' :
+
+									$_out['object_url']	= cdn_serve( $_upload->id, TRUE );
+									$_out['object_id']	= $_upload->id;
+
+								break;
+
 								case 'SERVE' :
 								default :
 
