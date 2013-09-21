@@ -1,5 +1,16 @@
 {
-	"name" : "shedcollective/nails",
+	"name": "shed/nails",
+	"description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
+	"authors": [
+		{
+			"name": "Pablo de la Pena",
+			"email": "p@shedcollective.org"
+		},
+		{
+			"name": "Gary Duncan",
+			"email": "g@shedcollective.org"
+		}
+	],
 	"require":
 	{
 		"aws/aws-sdk-php": "2.4.5",
