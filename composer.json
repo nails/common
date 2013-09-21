@@ -1,14 +1,22 @@
 {
 	"name": "shed/nails",
+	"type": "framework",
+	"keywords": ["CodeIgniter"],
+	"homepage": "http://nailsapp.co.uk",
 	"description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
+	"license":"proprietary",
 	"authors": [
 		{
 			"name": "Pablo de la Pena",
-			"email": "p@shedcollective.org"
+			"email": "p@shedcollective.org",
+            "homepage": "http://shedcollective.org",
+            "role": "Developer"
 		},
 		{
 			"name": "Gary Duncan",
-			"email": "g@shedcollective.org"
+			"email": "g@shedcollective.org",
+            "homepage": "http://shedcollective.org",
+            "role": "Developer"
 		}
 	],
 	"require":
