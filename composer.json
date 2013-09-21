@@ -22,7 +22,7 @@
 	"require":
 	{
 		"aws/aws-sdk-php": "2.4.5",
-		"dompdf/dompdf": "dev-master",
+
 		"facebook/php-sdk": "v3.2.2",
 		"geoip/geoip": "v1.13",
 		"mustache/mustache": "v2.4.1",
