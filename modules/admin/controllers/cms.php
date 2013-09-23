@@ -187,7 +187,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 			//	Set Rules
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|required|callback__callback_slug' );
+			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|callback__callback_slug' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
 
