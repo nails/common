@@ -9,20 +9,20 @@
 		{
 			"name": "Pablo de la Pena",
 			"email": "p@shedcollective.org",
-            "homepage": "http://shedcollective.org",
-            "role": "Developer"
+			"homepage": "http://shedcollective.org",
+			"role": "Developer"
 		},
 		{
 			"name": "Gary Duncan",
 			"email": "g@shedcollective.org",
-            "homepage": "http://shedcollective.org",
-            "role": "Developer"
+			"homepage": "http://shedcollective.org",
+			"role": "Developer"
 		}
 	],
 	"require":
 	{
 		"aws/aws-sdk-php": "2.4.5",
-
+		"dompdf/dompdf": "dev-master",
 		"facebook/php-sdk": "v3.2.2",
 		"geoip/geoip": "v1.13",
 		"mustache/mustache": "v2.4.1",
