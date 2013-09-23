@@ -301,10 +301,143 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Fetch data, this data is used in bth the view and the form submission
+		$this->data['product_types']	= $this->product->get_product_types();
+		$this->data['currencies']		= $this->currency->get_all();
+
+		// --------------------------------------------------------------------------
+
 		//	Process POST
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			//	Form validation, this'll be fun...
+			$this->load->library( 'form_validation' );
+
+	//		dumpanddie($_POST);
+
+			//	Product Info
+			//	============
+			$this->form_validation->set_rules( 'type_id',			'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'brands',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'categories',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'tags',				'',	'xss_clean' );
+			$this->form_validation->set_rules( 'tax_rate_id',		'',	'xss_clean|required' );
+
+			// --------------------------------------------------------------------------
+
+			//	Description
+			//	===========
+			$this->form_validation->set_rules( 'description',		'',	'required' );
+
+			// --------------------------------------------------------------------------
+
+			//	Variants - Loop variants
+			//	========================
+			foreach ( $this->input->post( 'variation' ) AS $index => $v ) :
+
+				//	Details
+				//	-------
+
+				$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|is_natural' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_sold]',		'',	'xss_clean|is_natural' );
+
+				//	Meta
+				//	----
+
+				//	If this product type is_physical then ensure that the dimensions are specified
+				foreach( $this->data['product_types'] AS $type ) :
+
+					if ( $type->id == $this->input->post( 'type_id' ) ) :
+
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][length]',			'',	'xss_clean|numeric' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][width]',			'',	'xss_clean|numeric' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][height]',			'',	'xss_clean|numeric' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][measurement_unit]',	'',	'xss_clean|required' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight]',			'',	'xss_clean|numeric' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight_unit]',		'',	'xss_clean|required' );
+						break;
+
+					endif;
+
+				endforeach;
+
+				//	Any custom checks for the extra meta fields
+				//	TODO
+
+				//	Pricing
+				//	-------
+				if ( isset( $v['pricing'] ) ) :
+
+					foreach( $v['pricing'] AS $price_index => $price ) :
+
+						$_required	= $price['currency_id'] == SHOP_BASE_CURRENCY_ID ? '|required' : '';
+
+						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][price]',		'',	'xss_clean|numeric' . $_required );
+						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][sale_price]',	'',	'xss_clean|numeric' . $_required );
+
+					endforeach;
+
+				endif;
+
+				//	Gallery Associations
+				//	--------------------
+				if ( isset( $v['gallery'] ) ) :
+
+					foreach( $v['gallery'] AS $gallery_index => $image ) :
+
+						$this->form_validation->set_rules( 'variation[' . $index . '][gallery][' . $gallery_index . ']',			'',	'xss_clean' );
+
+					endforeach;
+
+				endif;
+
+				//	Shipping
+				//	--------
+
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',						'',	'xss_clean' );
+
+			endforeach;
+
+
+			// --------------------------------------------------------------------------
+
+			//	Gallery
+			$this->form_validation->set_rules( 'gallery',			'',	'xss_clean' );
+
+			// --------------------------------------------------------------------------
+
+			//	Attributes
+			$this->form_validation->set_rules( 'attributes',		'',	'xss_clean' );
+
+			// --------------------------------------------------------------------------
+
+			//	Ranges & Collections
+			$this->form_validation->set_rules( 'ranges',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'collections',		'',	'xss_clean' );
+
+			// --------------------------------------------------------------------------
+
+			//	SEO
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+
+			if ( $this->form_validation->run() ) :
+
+				//	Validated! Create the product
+				dump( 'valid!' );
+				dumpanddie($_POST);
+
+			else :
+
+				dump( 'validation_failed' );
+				//dump(validation_errors());
+
+			endif;
 
 		endif;
 
@@ -317,14 +450,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch data
-		$this->data['product_types']		= $this->product->get_product_types();
+		//	Fetch additional data
 		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
 		$this->data['tax_rates']			= $this->tax->get_all_flat();
 		$this->data['brands']				= $this->brand->get_all_flat();
 		$this->data['categories']			= $this->category->get_all_nested_flat();
 		$this->data['tags']					= $this->tag->get_all_flat();
-		$this->data['currencies']			= $this->currency->get_all();
 
 		array_unshift( $this->data['tax_rates'], 'No Tax');
 

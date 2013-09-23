@@ -2,9 +2,9 @@
 	<p>
 		Configure various aspects of the shop.
 	</p>
-	
+
 	<hr />
-	
+
 		<ul class="tabs">
 			<?php $_active = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
@@ -31,7 +31,7 @@
 				<a href="#" data-tab="tab-tax-rates">Tax Rates</a>
 			</li>
 		</ul>
-		
+
 		<section class="tabs pages">
 
 			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'block' : 'none'?>
@@ -52,7 +52,7 @@
 						$_field['label']		= 'Order Notifications';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Who should be notified of new orders';
-						
+
 						echo form_field( $_field, 'Specify multiple addresses with a comma.' );
 
 					?>
@@ -74,8 +74,104 @@
 						$_field['key']			= 'free_shipping_threshold';
 						$_field['label']		= 'Threshold';
 						$_field['default']		= $settings[$_field['key']];
-						
+
 						echo form_field( $_field );
+
+					?>
+				</fieldset>
+
+				<fieldset id="shop-settings-warehouse-collection">
+					<legend>Warehouse Collection</legend>
+					<p>
+						If you wish to give your customers the option of collecting from your warehouse or store then turn this feature on here. Also provide the address of the warehouse or store so we can let the customer know where to go.
+					</p>
+					<?php
+
+						//	Order Notifications
+						$_field					= array();
+						$_field['key']			= 'warehouse_collection_enabled';
+						$_field['label']		= 'Enabled';
+						$_field['default']		= $settings[$_field['key']];
+						$_field['id']			= 'warehouse_collection_enabled';
+
+						echo form_field_boolean( $_field );
+
+						// --------------------------------------------------------------------------
+
+						if ( $this->input->post( $_field['key'] ) ) :
+
+							$_display = $this->input->post( $_field['key'] ) ? 'block' : 'none';
+
+						else :
+
+							$_display = $settings[$_field['key']] ? 'block' : 'none';
+
+						endif;
+
+						echo '<div id="warehouse-collection-address" style="display:' . $_display . '">';
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_addressee';
+							$_field['label']		= 'Addressee';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_line1';
+							$_field['label']		= 'Address Line 1';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_line2';
+							$_field['label']		= 'Address Line 2';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_town';
+							$_field['label']		= 'Town';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_postcode';
+							$_field['label']		= 'Postcode';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_state';
+							$_field['label']		= 'State/County';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'warehouse_addr_country';
+							$_field['label']		= 'Country';
+							$_field['default']		= $settings[$_field['key']];
+
+							echo form_field( $_field );
+
+						echo '</div>';
 
 					?>
 				</fieldset>
@@ -111,7 +207,7 @@
 						$_field['label']		= 'Shop URL';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Customise the Shop\'s URL (include trialing slash)';
-						
+
 						echo form_field( $_field );
 
 					?>
@@ -130,7 +226,7 @@
 						$_field['label']		= 'Company Name';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'The registered company name.';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -142,7 +238,7 @@
 						$_field['type']			= 'textarea';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'The address to show on the invoice.';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -153,7 +249,7 @@
 						$_field['label']		= 'VAT Number';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Your VAT number, if any.';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -164,7 +260,7 @@
 						$_field['label']		= 'Company Number';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'Your company number.';
-						
+
 						echo form_field( $_field );
 
 					?>
@@ -173,7 +269,7 @@
 				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 				<?=form_close()?>
 			</div>
-			
+
 			<?php $_display = $this->input->post( 'update' ) == 'paymentgateways' ? 'block' : 'none'?>
 			<div id="tab-paymentgateway" class="tab page paymentgateway" style="display:<?=$_display?>;">
 				<p>
@@ -210,7 +306,7 @@
 							$_field['key']			= 'paymentgateway[' . $pg->id . '][enabled]';
 							$_field['label']		= 'Supported';
 							$_field['default']		= $pg->enabled;
-							
+
 							echo form_field_boolean( $_field );
 
 						endif;
@@ -223,7 +319,7 @@
 						$_field['label']		= 'Account ID';
 						$_field['default']		= $pg->account_id;
 						$_field['placeholder']	= 'The unique account identifier';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -234,7 +330,7 @@
 						$_field['label']		= 'API Key';
 						$_field['default']		= $pg->api_key;
 						$_field['placeholder']	= 'The key for accessing this payment gateway\'s API';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -245,7 +341,7 @@
 						$_field['label']		= 'API Secret';
 						$_field['default']		= $pg->api_secret;
 						$_field['placeholder']	= 'The secret or password for accessing this payment gateway\'s API';
-						
+
 						echo form_field( $_field );
 
 						// --------------------------------------------------------------------------
@@ -258,7 +354,7 @@
 							$_field['label']		= 'Sandbox Account ID';
 							$_field['default']		= $pg->sandbox_account_id;
 							$_field['placeholder']	= 'The unique account identifier';
-							
+
 							echo form_field( $_field );
 
 							// --------------------------------------------------------------------------
@@ -269,7 +365,7 @@
 							$_field['label']		= 'Sandbox API Key';
 							$_field['default']		= $pg->sandbox_api_key;
 							$_field['placeholder']	= 'The key for accessing this payment gateway\'s API';
-							
+
 							echo form_field( $_field );
 
 							// --------------------------------------------------------------------------
@@ -280,7 +376,7 @@
 							$_field['label']		= 'Sandbox API Secret';
 							$_field['default']		= $pg->sandbox_api_secret;
 							$_field['placeholder']	= 'The secret or password for accessing this payment gateway\'s API';
-							
+
 							echo form_field( $_field );
 
 						endif;

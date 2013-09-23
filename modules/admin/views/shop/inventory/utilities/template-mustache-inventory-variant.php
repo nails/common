@@ -3,11 +3,11 @@
 		<p>
 			<strong>The specified product type has a limited number of variations it can support.</strong>
 			This variation will be deleted when you submit this form.
-		</p>
+		</p>]
 	</div>
 	<ul class="tabs" data-tabgroup="variation-{{counter}}">
 		<li class="tab active">
-			<a href="#" data-tab="tab-varitation-{{counter}}-details">Details</a>
+			<a href="#" class="tabber-variation-details" data-tab="tab-varitation-{{counter}}-details">Details</a>
 		</li>
 		<li class="tab">
 			<a href="#" data-tab="tab-varitation-{{counter}}-meta">Meta</a>
@@ -44,7 +44,6 @@
 				$_field					= array();
 				$_field['key']			= 'variation[{{counter}}][sku]';
 				$_field['label']		= 'SKU';
-				$_field['required']		= TRUE;
 				$_field['placeholder']	= 'This variation\'s Stock Keeping Unit; a unique offline identifier (e.g for POS or warehouses)';
 
 				echo form_field( $_field );
@@ -73,73 +72,148 @@
 		</div>
 
 		<div class="tab page fieldset" id="tab-varitation-{{counter}}-meta" style="display:none">
-			<p>
-				The following meta information is dependant on the product type.
-			</p>
-			<?php
-
-				foreach ( $product_types_meta AS $id => $fields ) :
-
-					echo '<div class="meta-fields meta-fields-' . $id . '" style="display:none;">';
-
-					if ( $fields ) :
-
-						//	TODO: use the form builder library
-						foreach ( $fields AS $field ) :
+			<div class="fields-is-physical">
+				<fieldset>
+					<legend>Physical Dimensions</legend>
+					<div class="physical-fields">
+						<?php
 
 							$_field					= array();
-							$_field['key']			= 'meta[' . $field->key . ']';
-							$_field['label']		= $field->label;
-							$_field['required']		= array_search( 'required', explode( '|', $field->validation ) ) ? TRUE : FALSE;
+							$_field['key']			= 'variation[{{counter}}][meta][length]';
+							$_field['label']		= 'Length';
+							$_field['placeholder']	= 'The length of the item';
 
-							switch( $field->type ) :
+							echo form_field( $_field );
 
-								case 'cdn_object' :
+							// --------------------------------------------------------------------------
 
-									$_field['bucket'] = $field->bucket;
+							$_field					= array();
+							$_field['key']			= 'variation[{{counter}}][meta][width]';
+							$_field['label']		= 'Width';
+							$_field['placeholder']	= 'The width of the item';
 
-									$_field_out = form_field_mm( $_field, $field->tip );
+							echo form_field( $_field );
 
-								break;
+							// --------------------------------------------------------------------------
 
-								// --------------------------------------------------------------------------
+							$_field					= array();
+							$_field['key']			= 'variation[{{counter}}][meta][height]';
+							$_field['label']		= 'Height';
+							$_field['placeholder']	= 'The height of the item';
 
-								case 'text' :
-								default :
+							echo form_field( $_field );
 
-									$_field_out = form_field( $_field, $field->tip );
+							// --------------------------------------------------------------------------
 
-								break;
+							$_field					= array();
+							$_field['key']			= 'variation[{{counter}}][meta][measurement_unit]';
+							$_field['label']		= 'L/W/H Unit of measurement';
+							$_field['class']		= 'chosen';
 
-							endswitch;
+							$_options				= array();
+							$_options['mm']			= 'Millimeter';
+							$_options['cm']			= 'Centimetre';
+							$_options['m']			= 'Metre';
+
+							echo form_field_dropdown( $_field, $_options );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'variation[{{counter}}][meta][weight]';
+							$_field['label']		= 'Weight';
+							$_field['placeholder']	= 'The weight of the item';
+
+							echo form_field( $_field );
+
+							// --------------------------------------------------------------------------
+
+							$_field					= array();
+							$_field['key']			= 'variation[{{counter}}][meta][weight_unit]';
+							$_field['label']		= 'Weight unit of measurement';
+							$_field['class']		= 'chosen';
+
+							$_options				= array();
+							$_options['g']			= 'Gram';
+							$_options['kg']			= 'Kilogram';
+
+							echo form_field_dropdown( $_field, $_options );
+
+						?>
+					</div>
+					<p class="no-dimensions" style="display:none;">
+						This product has no dimensions.
+					</p>
+				</fieldset>
+			</div>
+
+			<fieldset>
+				<legend>Other Meta Data</legend>
+				<?php
+
+					foreach ( $product_types_meta AS $id => $fields ) :
+
+						echo '<div class="meta-fields meta-fields-' . $id . '" style="display:none;">';
+
+						if ( $fields ) :
+
+							//	TODO: use the form builder library
+							foreach ( $fields AS $field ) :
+
+								$_field					= array();
+								$_field['key']			= 'variation[{{counter}}][meta][' . $field->key . ']';
+								$_field['label']		= $field->label;
+								$_field['required']		= array_search( 'required', explode( '|', $field->validation ) ) ? TRUE : FALSE;
+
+								switch( $field->type ) :
+
+									case 'cdn_object' :
+
+										$_field['bucket'] = $field->bucket;
+
+										$_field_out = form_field_mm( $_field, $field->tip );
+
+									break;
+
+									// --------------------------------------------------------------------------
+
+									case 'text' :
+									default :
+
+										$_field_out = form_field( $_field, $field->tip );
+
+									break;
+
+								endswitch;
 
 
-							//	Don't do this for the first iteration as it's being done in PHP.
-							if ( ! isset( $is_first ) || ! $is_first ) :
+								//	Don't do this for the first iteration as it's being done in PHP.
+								if ( ! isset( $is_first ) || ! $is_first ) :
 
-								//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS
-								//	Otherwise it prematurely closes the template.
+									//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS
+									//	Otherwise it prematurely closes the template.
 
-								$_field_out = str_replace( '<script type="text/javascript">', '<!--script type="text/javascript"-->', $_field_out );
-								$_field_out = str_replace( '</script>', '<!--/script-->', $_field_out );
+									$_field_out = str_replace( '<script type="text/javascript">', '<!--script type="text/javascript"-->', $_field_out );
+									$_field_out = str_replace( '</script>', '<!--/script-->', $_field_out );
 
-							endif;
+								endif;
 
-							echo $_field_out;
+								echo $_field_out;
 
-						endforeach;
+							endforeach;
 
-					else :
+						else :
 
-						echo '<p>There are no extra fields for this product type.</p>';
+							echo '<p>There are no extra fields for this product type.</p>';
 
-					endif;
+						endif;
 
-					echo '</div>';
+						echo '</div>';
 
-				endforeach;
+					endforeach;
 
-			?>
+				?>
+			</fieldset>
 		</div>
 
 		<div class="tab page" id="tab-varitation-{{counter}}-pricing" style="display:none">
@@ -265,33 +339,17 @@
 			<p>
 				Define the shipping options available for this variant. Shipping options do not have to be the same between variations.
 			</p>
-			<table class="shipping-options empty">
-				<thead>
-					<tr>
-						<th class="courier">Courier &amp; Method</th>
-						<th class="price">Price</th>
-						<th class="price-additional">Additonal</th>
-						<th class="delete">&nbsp;</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="empty">
-						<td colspan="4" class="no-data">No shipping methods defined</td>
-					</tr>
-				</tbody>
-			</table>
-			<p>
-				<a href="#" id="add-shipping-option" data-variation-counter="{{counter}}" class="awesome small green">Add Shipping Option</a>
-				<?php
+			<?php
 
-					if ( $is_first ) :
+				$_field					= array();
+				$_field['key']			= 'variation[{{counter}}][shipping][collection_only]';
+				$_field['label']		= 'Collection Only';
+				$_field['readonly']		= ! shop_setting( 'warehouse_collection_enabled' );
+				$_tip					= 'Items marked as collection only will be handled differently in checkout and reporting. They also dont contribute to the overall dimensions and weight of the order when calculating shipping costs.';
 
-						echo '<a href="#" id="sync-shipping-options" data-variation-counter="{{counter}}" class="awesome small orange" style="display:none;">Sync Shipping Options</a>';
+				echo form_field_boolean( $_field, $_tip );
 
-					endif;
-
-				?>
-			</p>
+			?>
 		</div>
 	</section>
 </div>

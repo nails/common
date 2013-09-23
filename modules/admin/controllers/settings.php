@@ -424,14 +424,22 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	protected function _shop_update_settings()
 	{
 		//	Prepare update
-		$_settings								= array();
-		$_settings['notify_order']				= $this->input->post( 'notify_order' );
-		$_settings['shop_url']					= $this->input->post( 'shop_url' );
-		$_settings['free_shipping_threshold']	= (float) $this->input->post( 'free_shipping_threshold' );
-		$_settings['invoice_company']			= $this->input->post( 'invoice_company' );
-		$_settings['invoice_address']			= $this->input->post( 'invoice_address' );
-		$_settings['invoice_vat_no']			= $this->input->post( 'invoice_vat_no' );
-		$_settings['invoice_company_no']		= $this->input->post( 'invoice_company_no' );
+		$_settings									= array();
+		$_settings['notify_order']					= $this->input->post( 'notify_order' );
+		$_settings['shop_url']						= $this->input->post( 'shop_url' );
+		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );
+		$_settings['warehouse_collection_enabled']	= (bool) $this->input->post( 'warehouse_collection_enabled' );
+		$_settings['warehouse_addr_addressee']		= $this->input->post( 'warehouse_addr_addressee' );
+		$_settings['warehouse_addr_line1']			= $this->input->post( 'warehouse_addr_line1' );
+		$_settings['warehouse_addr_line2']			= $this->input->post( 'warehouse_addr_line2' );
+		$_settings['warehouse_addr_town']			= $this->input->post( 'warehouse_addr_town' );
+		$_settings['warehouse_addr_postcode']		= $this->input->post( 'warehouse_addr_postcode' );
+		$_settings['warehouse_addr_state']			= $this->input->post( 'warehouse_addr_state' );
+		$_settings['warehouse_addr_country']		= $this->input->post( 'warehouse_addr_country' );
+		$_settings['invoice_company']				= $this->input->post( 'invoice_company' );
+		$_settings['invoice_address']				= $this->input->post( 'invoice_address' );
+		$_settings['invoice_vat_no']				= $this->input->post( 'invoice_vat_no' );
+		$_settings['invoice_company_no']			= $this->input->post( 'invoice_company_no' );
 
 		// --------------------------------------------------------------------------
 

@@ -60,7 +60,7 @@
 				$_field					= array();
 				$_field['key']			= 'is_active';
 				$_field['label']		= 'Is Active';
-				$_field['required']		= TRUE;
+				$_field['default']		= TRUE;
 				$_field['text_on']		= strtoupper( lang( 'yes' ) );
 				$_field['text_off']		= strtoupper( lang( 'no' ) );
 
@@ -71,7 +71,6 @@
 				$_field					= array();
 				$_field['key']			= 'brands[]';
 				$_field['label']		= 'Brands';
-				$_field['required']		= TRUE;
 				$_field['class']		= 'brands';
 				$_tip					= 'If this product contains multiple brands (e.g a hamper) specify them all here.';
 
@@ -82,7 +81,6 @@
 				$_field					= array();
 				$_field['key']			= 'categories[]';
 				$_field['label']		= 'Categories';
-				$_field['required']		= TRUE;
 				$_field['class']		= 'categories';
 				$_tip					= 'Specify which categories this product falls into.';
 
@@ -93,7 +91,6 @@
 				$_field					= array();
 				$_field['key']			= 'tags[]';
 				$_field['label']		= 'Tags';
-				$_field['required']		= TRUE;
 				$_field['class']		= 'tags';
 				$_tip					= 'Use tags to associate products together, e.g. events.';
 
@@ -113,8 +110,8 @@
 		</div>
 
 		<div class="tab page description" id="tab-description" style="display:none">
-			<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
-			<textarea class="ckeditor" name="body"><?=set_value( 'body' )?></textarea>
+			<?=form_error( 'description', '<p class="system-alert error no-close">', '</p>' )?>
+			<textarea class="ckeditor" name="description"><?=set_value( 'description' )?></textarea>
 			<p class="system-alert notice no-close" style="margin-top:10px;">
 				<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 				due to application stylesheets on the front end which are not loaded here.
@@ -244,19 +241,8 @@
 				<?php
 
 					$_field					= array();
-					$_field['key']			= 'seo_title';
-					$_field['label']		= 'Title';
-					$_field['required']		= TRUE;
-					$_field['placeholder']	= 'Search Engine Optimised title';
-
-					echo form_field( $_field, 'Keep this relevant and below 60 characters' );
-
-					// --------------------------------------------------------------------------
-
-					$_field					= array();
 					$_field['key']			= 'seo_description';
 					$_field['label']		= 'Description';
-					$_field['required']		= TRUE;
 					$_field['placeholder']	= 'Search Engine Optimised description';
 					$_field['type']			= 'textarea';
 
@@ -268,7 +254,6 @@
 					$_field					= array();
 					$_field['key']			= 'seo_keywords';
 					$_field['label']		= 'Keywords';
-					$_field['required']		= TRUE;
 					$_field['placeholder']	= 'Comma separated keywords';
 
 					echo form_field( $_field, 'Comma seperated keywords. Try to keep to 10 or fewer.' );
@@ -346,12 +331,12 @@
 
 				$_selected	= NULL;
 
-				echo form_dropdown( 'attribute[0][attribute]', $_options, $_selected	, 'class="attributes"' );
+				echo form_dropdown( 'attributes[{{counter}}][attribute]', $_options, $_selected	, 'class="attributes"' );
 
 			?>
 		</td>
 		<td class="value">
-			<?=form_input( 'attribute[0][attribute]', '', 'placeholder="Specify the value"' )?>
+			<?=form_input( 'attributes[{{counter}}][value]', '', 'placeholder="Specify the value"' )?>
 		</td>
 		<td class="delete">
 			<a href="#" class="delete">Delete</a>
