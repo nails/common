@@ -49,7 +49,6 @@ class NAILS_Nails extends NAILS_System_Controller
 		$_out->nails->major			= isset( $_version[0] ) ? (int) $_version[0] : 0;
 		$_out->nails->minor			= isset( $_version[1] ) ? (int) $_version[1] : 0;
 		$_out->nails->patch			= isset( $_version[2] ) ? (int) $_version[2] : 0;
-		$_out->nails->revision		= NAILS_REVISION;
 		$_out->nails->environment	= NAILS_ENVIRONMENT;
 
 		$_out->app->name			= APP_NAME;

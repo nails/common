@@ -18,14 +18,18 @@
 	<meta name="description" content="" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 
-	<!--	JS GLOBALS	-->
+	<!--	NAILS JS GLOBALS	-->
 	<script style="text/javascript">
-		var ENVIRONMENT				= '<?=ENVIRONMENT?>';
-		window.SITE_URL				= '<?=site_url()?>';
-		window.NAILS				= {};
-		window.NAILS.URL			= '<?=NAILS_URL?>';
-		window.NAILS.LANG			= {};
-		window.NAILS.ASSETS_RELEASE = <?=NAILS_ASSETS_RELEASE?>;
+		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+		window.SITE_URL					= '<?=site_url()?>';
+		window.NAILS					= {};
+		window.NAILS.URL				= '<?=NAILS_URL?>';
+		window.NAILS.LANG				= {};
+		window.NAILS.USER				= {};
+		window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
+		window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
+		window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
+		window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 	</script>
 
 	<noscript>

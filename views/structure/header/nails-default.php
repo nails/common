@@ -20,7 +20,6 @@
 			window.NAILS				= {}
 			window.NAILS.URL			= '<?=NAILS_URL?>';
 			window.NAILS.LANG			= {};
-			window.NAILS.ASSETS_RELEASE = <?=NAILS_ASSETS_RELEASE?>;
 		</script>
 
 		<noscript>
