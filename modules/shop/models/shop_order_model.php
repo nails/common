@@ -197,7 +197,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
-		$this->db->insert( 'shop_order' );
+		$this->db->insert( NAILS_DB_PREFIX . 'shop_order' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -263,7 +263,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 				//	Failed to insert products, delete order
 				$this->db->where( 'id', $_order->id );
-				$this->db->delete( 'shop_order' );
+				$this->db->delete( NAILS_DB_PREFIX . 'shop_order' );
 
 				//	Set error message
 				$this->_set_error( 'Unable to add products to order, aborting.' );
@@ -302,7 +302,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'shop_order' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_order' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -321,7 +321,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	public function delete( $id )
 	{
 		$this->db->where( 'id', $id );
-		$this->db->delete( 'shop_order' );
+		$this->db->delete( NAILS_DB_PREFIX . 'shop_order' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -372,7 +372,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_orders = $this->db->get( 'shop_order o' )->result();
+		$_orders = $this->db->get( NAILS_DB_PREFIX . 'shop_order o' )->result();
 
 		foreach ( $_orders AS $order ) :
 
@@ -446,13 +446,13 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 	protected function _getcount_orders_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
-		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
-		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
-		$this->db->join( 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
-		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
-		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
 
 		// --------------------------------------------------------------------------
 
@@ -640,17 +640,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 
-		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
 		$this->db->where( 'op.order_id', $order_id );
-		$_items = $this->db->get( 'shop_order_product op' )->result();
+		$_items = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result();
 
 		foreach ( $_items AS $item ) :
 
 			$this->db->where( 'product_id', $item->product_id );
-			$item->meta = $this->db->get( 'shop_product_meta' )->row();
+			$item->meta = $this->db->get( NAILS_DB_PREFIX . 'shop_product_meta' )->row();
 			$this->_format_item( $item );
 
 		endforeach;
@@ -686,10 +686,10 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 
-		$this->db->join( 'shop_order o', 'o.id = op.order_id', 'LEFT' );
-		$this->db->join( 'shop_product p', 'p.id = op.product_id', 'LEFT' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id', 'LEFT' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_order o', 'o.id = op.order_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
 		$this->db->where( 'o.status', 'PAID' );
@@ -708,12 +708,12 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		endif;
 
-		$_items = $this->db->get( 'shop_order_product op' )->result();
+		$_items = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result();
 
 		foreach ( $_items AS $item ) :
 
 			$this->db->where( 'product_id', $item->product_id );
-			$item->meta = $this->db->get( 'shop_product_meta' )->row();
+			$item->meta = $this->db->get( NAILS_DB_PREFIX . 'shop_product_meta' )->row();
 			$this->_format_item( $item );
 
 		endforeach;
@@ -953,7 +953,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			//	Mark items as processed
 			$this->db->set( 'processed', TRUE );
 			$this->db->where_in( 'id', $_ids );
-			$this->db->update( 'shop_order_product' );
+			$this->db->update( NAILS_DB_PREFIX . 'shop_order_product' );
 
 		else :
 

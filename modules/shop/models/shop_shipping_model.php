@@ -4,15 +4,15 @@
  * Name:			shop_shipping_model.php
  *
  * Description:		This model handles shipping methods
- * 
+ *
  **/
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Shop_shipping_model extends NAILS_Model
@@ -22,7 +22,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 		parent::__construct();
 
 		// --------------------------------------------------------------------------
-		
+
 		$this->_table			= 'shop_shipping_method';
 		$this->_table_prefix	= 'sm';
 	}
@@ -35,7 +35,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 	{
 		$this->db->select( 'sm.*, tr.id tr_id, tr.label tr_label, tr.rate tr_rate' );
 
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = sm.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = sm.tax_rate_id', 'LEFT' );
 
 		if ( $only_active ) :
 
@@ -51,7 +51,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 
 		$this->db->order_by( 'sm.order' );
 
-		$_methods = $this->db->get( 'shop_shipping_method sm' )->result();
+		$_methods = $this->db->get( NAILS_DB_PREFIX . 'shop_shipping_method sm' )->result();
 
 		foreach ( $_methods AS $method ) :
 
@@ -116,7 +116,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 		//	Look in the product_shipping_method table for a price override
 		$this->db->where( 'product_id', $product_id );
 		$this->db->where( 'shipping_method_id', $_method->id );
-		$_override = $this->db->get( 'shop_product_shipping_method' )->row();
+		$_override = $this->db->get( NAILS_DB_PREFIX . 'shop_product_shipping_method' )->row();
 
 		if ( $_override ) :
 
@@ -144,7 +144,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 	public function validate( $shipping_method )
 	{
 		$_method = $this->get_by_id( $shipping_method );
-		
+
 		if ( ! $_method ) :
 
 			$this->_set_error( 'Invalid Shipping Method.' );
@@ -197,28 +197,28 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter  instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_SHIPPING_MODEL' ) ) :
 
 	class Shop_shipping_model extends NAILS_Shop_shipping_model

@@ -224,7 +224,7 @@ class NAILS_Datetime_model extends NAILS_Model
 
 	public function get_all_date_format()
 	{
-		return $this->db->get( 'date_format_date dfd' )->result();
+		return $this->db->get( NAILS_DB_PREFIX . 'date_format_date dfd' )->result();
 	}
 
 
@@ -255,7 +255,7 @@ class NAILS_Datetime_model extends NAILS_Model
 
 	public function get_all_time_format()
 	{
-		return $this->db->get( 'date_format_time dft' )->result();
+		return $this->db->get( NAILS_DB_PREFIX . 'date_format_time dft' )->result();
 	}
 
 

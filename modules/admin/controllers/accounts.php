@@ -700,7 +700,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 			$this->db->select( implode( ',', array_keys( $this->data['user_meta_cols'] ) ) );
 			$this->db->where( 'user_id', $_user->id );
-			$_user_meta = $this->db->get( 'user_meta' )->row();
+			$_user_meta = $this->db->get( NAILS_DB_PREFIX . 'user_meta' )->row();
 
 		else :
 

@@ -628,11 +628,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'v.discount_value voucher_discount_value,v.discount_application voucher_discount_application' );
 		$this->db->select( 'v.label voucher_label, v.valid_from voucher_valid_from,v.valid_to voucher_valid_to, v.use_count voucher_use_count' );
 
-		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
-		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
-		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
 
-		$_out[0]->data = $this->db->get( 'shop_order o' )->result_array();
+		$_out[0]->data = $this->db->get( NAILS_DB_PREFIX . 'shop_order o' )->result_array();
 
 		if ( $_out[0]->data ) :
 
@@ -647,11 +647,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'op.was_on_sale,op.shipping,op.tax,op.shipping_tax,op.total,tr.label tax_rate_label,tr.rate tax_rate,op.processed' );
 		$this->db->select( 'op.refunded,op.refunded_date,op.extra_data' );
 
-		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
-		$_out[1]->data = $this->db->get( 'shop_order_product op' )->result_array();
+		$_out[1]->data = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result_array();
 
 		if ( $_out[1]->data ) :
 
@@ -692,7 +692,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'v.id,v.code,v.type,v.discount_type,v.discount_value,v.discount_application,v.label,v.valid_from' );
 		$this->db->select( 'v.valid_to,v.use_count,v.limited_use_limit,v.gift_card_balance,v.product_type_id,v.created' );
 		$this->db->select( 'v.modified,v.is_active,v.is_deleted' );
-		$_out->data = $this->db->get( 'shop_voucher v' )->result_array();
+		$_out->data = $this->db->get( NAILS_DB_PREFIX . 'shop_voucher v' )->result_array();
 
 		if ( $_out->data ) :
 

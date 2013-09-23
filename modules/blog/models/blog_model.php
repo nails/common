@@ -35,7 +35,7 @@ class NAILS_Blog_model extends NAILS_Model
 	{
 		if ( ! $this->_settings || $force_refresh ) :
 
-			$_settings = $this->db->get( 'blog_settings' )->result();
+			$_settings = $this->db->get( NAILS_DB_PREFIX . 'blog_settings' )->result();
 
 			foreach ( $_settings AS $setting ) :
 
@@ -68,7 +68,7 @@ class NAILS_Blog_model extends NAILS_Model
 
 			$this->db->where( 'key', $key );
 			$this->db->set( 'value', serialize( $value ) );
-			$this->db->update( 'blog_settings' );
+			$this->db->update( NAILS_DB_PREFIX . 'blog_settings' );
 
 		endforeach;
 

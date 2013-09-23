@@ -530,7 +530,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		$q = $this->db->get( 'user u' );
+		$q = $this->db->get( NAILS_DB_PREFIX . 'user u' );
 
 		if ( ! $q ) :
 
@@ -700,7 +700,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		$q		= $this->db->get( 'user u' );
+		$q		= $this->db->get( NAILS_DB_PREFIX . 'user u' );
 		$_user	= $q->result();
 
 		// --------------------------------------------------------------------------
@@ -760,12 +760,12 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _getcount_users_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user_meta um',			'u.id = um.user_id',				'left' );
-		$this->db->join( 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
-		$this->db->join( 'user_group ug',			'u.group_id = ug.id',				'left' );
-		$this->db->join( 'date_format_date dfd',	'u.date_format_date_id = dfd.id',	'left' );
-		$this->db->join( 'date_format_time dft',	'u.date_format_time_id = dft.id',	'left' );
-		$this->db->join( 'language ul',				'u.language_id = ul.id',			'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_meta um',			'u.id = um.user_id',				'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_group ug',			'u.group_id = ug.id',				'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'date_format_date dfd',	'u.date_format_date_id = dfd.id',	'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'date_format_time dft',	'u.date_format_time_id = dft.id',	'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'language ul',				'u.language_id = ul.id',			'left' );
 
 		// --------------------------------------------------------------------------
 
@@ -1287,13 +1287,13 @@ class NAILS_User_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 
 			//	Update the meta table
-			$this->db->update( 'user' );
+			$this->db->update( NAILS_DB_PREFIX . 'user' );
 
 			if ( $_data_meta ) :
 
 				$this->db->where( 'user_id', (int) $_uid );
 				$this->db->set( $_data_meta );
-				$this->db->update( 'user_meta' );
+				$this->db->update( NAILS_DB_PREFIX . 'user_meta' );
 
 			endif;
 
@@ -1306,7 +1306,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$this->db->set( 'last_update', 'NOW()', FALSE );
 			$this->db->where( 'id', (int) $_uid );
-			$this->db->update( 'user' );
+			$this->db->update( NAILS_DB_PREFIX . 'user' );
 
 		endif;
 
@@ -1439,7 +1439,7 @@ class NAILS_User_model extends NAILS_Model
 
 		$this->db->set( 'remember_code', $_salt );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'user' );
+		$this->db->update( NAILS_DB_PREFIX . 'user' );
 
 		// --------------------------------------------------------------------------
 
@@ -1550,7 +1550,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->select( 'password, salt' );
 		$this->db->where( 'email', $email );
 		$this->db->limit( 1 );
-		$_q = $this->db->get( 'user' );
+		$_q = $this->db->get( NAILS_DB_PREFIX . 'user' );
 
 		// --------------------------------------------------------------------------
 
@@ -1606,7 +1606,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Update user's 'last_seen' flag
 		$_data['last_seen'] = date( 'Y-m-d H:i:s' );
 		$this->db->where( 'id', $_me );
-		$this->db->update( 'user', $_data );
+		$this->db->update( NAILS_DB_PREFIX . 'user', $_data );
 	}
 
 
@@ -1909,7 +1909,7 @@ class NAILS_User_model extends NAILS_Model
 		unset( $data['date_format_time_id'] );
 		unset( $data['language_id'] );
 
-		$this->db->insert( 'user', $_data );
+		$this->db->insert( NAILS_DB_PREFIX . 'user', $_data );
 
 		$_id = $this->db->insert_id();
 
@@ -1950,7 +1950,7 @@ class NAILS_User_model extends NAILS_Model
 
 		$this->db->set( 'id_md5', md5( $_id ) );
 		$this->db->where( 'id', $_id );
-		$this->db->update( 'user' );
+		$this->db->update( NAILS_DB_PREFIX . 'user' );
 
 
 		// --------------------------------------------------------------------------
@@ -1964,7 +1964,7 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'user_meta' );
+		$this->db->insert( NAILS_DB_PREFIX . 'user_meta' );
 
 		// --------------------------------------------------------------------------
 
@@ -1990,7 +1990,7 @@ class NAILS_User_model extends NAILS_Model
 	public function destroy( $id )
 	{
 		$this->db->where( 'id', $id );
-		$this->db->delete( 'user' );
+		$this->db->delete( NAILS_DB_PREFIX . 'user' );
 
 		// --------------------------------------------------------------------------
 
@@ -2057,7 +2057,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Update the user
 		$this->db->set( 'forgotten_password_code', $_ttl . ':' . $_key[0] );
 		$this->db->where( 'email', $email );
-		$this->db->update( 'user');
+		$this->db->update( NAILS_DB_PREFIX . 'user');
 
 		// --------------------------------------------------------------------------
 
@@ -2093,7 +2093,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->db->like( 'forgotten_password_code', ':' . $code, 'before' );
-		$_q = $this->db->get( 'user' );
+		$_q = $this->db->get( NAILS_DB_PREFIX . 'user' );
 
 		// --------------------------------------------------------------------------
 
@@ -2132,7 +2132,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$this->db->where( 'forgotten_password_code', $_user->forgotten_password_code );
 			$this->db->set( $_data );
-			$this->db->update( 'user' );
+			$this->db->update( NAILS_DB_PREFIX . 'user' );
 
 			return $_password;
 
@@ -2161,7 +2161,7 @@ class NAILS_User_model extends NAILS_Model
 			$this->db->select( 'id' );
 			$this->db->where( 'activation_code', $code );
 			$this->db->limit( 1 );
-			$_user = $this->db->get( 'user' )->row();
+			$_user = $this->db->get( NAILS_DB_PREFIX . 'user' )->row();
 
 			// --------------------------------------------------------------------------
 
@@ -2247,7 +2247,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_groups()
 	{
-		$_groups = $this->db->get( 'user_group' )->result();
+		$_groups = $this->db->get( NAILS_DB_PREFIX . 'user_group' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -2336,7 +2336,7 @@ class NAILS_User_model extends NAILS_Model
 	{
 		$this->db->set( $data );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'user_group' );
+		$this->db->update( NAILS_DB_PREFIX . 'user_group' );
 	}
 
 

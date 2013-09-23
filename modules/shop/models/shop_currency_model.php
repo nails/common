@@ -36,7 +36,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->set( 'created_by', active_user( 'id' ) );
 
-		$this->db->insert( 'shop_currency' );
+		$this->db->insert( NAILS_DB_PREFIX . 'shop_currency' );
 
 		if ( $return_obj ) :
 
@@ -92,7 +92,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		$this->db->update( 'shop_currency' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_currency' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -111,7 +111,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	public function delete( $id )
 	{
 		$this->db->where( 'id', $id );
-		$this->db->delete( 'shop_currency' );
+		$this->db->delete( NAILS_DB_PREFIX . 'shop_currency' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -139,7 +139,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_results = $this->db->get( 'shop_currency c' )->result();
+		$_results = $this->db->get( NAILS_DB_PREFIX . 'shop_currency c' )->result();
 
 		foreach ( $_results aS $result ) :
 
@@ -248,12 +248,12 @@ class NAILS_Shop_currency_model extends NAILS_Model
 			if ( strlen( $country ) == 2 ) :
 
 				$this->db->where( 'c.iso_code', $country );
-				$this->db->join( 'country c', 'c.id = scc.country_id' );
+				$this->db->join( NAILS_DB_PREFIX . 'country c', 'c.id = scc.country_id' );
 
 			elseif ( strlen( $country ) == 3 ) :
 
 				$this->db->where( 'c.iso_code_3', $country );
-				$this->db->join( 'country c', 'c.id = scc.country_id' );
+				$this->db->join( NAILS_DB_PREFIX . 'country c', 'c.id = scc.country_id' );
 
 			else :
 
@@ -271,8 +271,8 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->join( 'shop_currency sc', 'sc.id = scc.currency_id' );
-		$_result = $this->db->get( 'shop_currency_country scc' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_currency sc', 'sc.id = scc.currency_id' );
+		$_result = $this->db->get( NAILS_DB_PREFIX . 'shop_currency_country scc' );
 
 		if ( $_result && $_result->row() ) :
 
@@ -304,13 +304,13 @@ class NAILS_Shop_currency_model extends NAILS_Model
 		endif;
 
 		$this->db->set( 'is_active', FALSE );
-		$this->db->update( 'shop_currency' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_currency' );
 
 		if ( $this->db->affected_rows() ) :
 
 			$this->db->set( 'is_active', TRUE );
 			$this->db->where_in( 'id', $ids );
-			$this->db->update( 'shop_currency' );
+			$this->db->update( NAILS_DB_PREFIX . 'shop_currency' );
 
 			if ( $this->db->affected_rows() ) :
 

@@ -174,6 +174,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	These should be specified in settings/app.php
 
 		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					BASE_URL . 'vendor/shed/nails/assets/' );
+		if ( ! defined( 'NAILS_DB_PREFIX' ) )				define( 'NAILS_DB_PREFIX',				'nails_' );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
 		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
@@ -185,6 +186,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
+		if ( ! defined( 'APP_CDN_DRIVER' ) )				define( 'APP_CDN_DRIVER',				'local' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 
 		// --------------------------------------------------------------------------

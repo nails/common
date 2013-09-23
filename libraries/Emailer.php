@@ -193,7 +193,7 @@ class Emailer
 			$this->ci->db->select( 'eqt.id, eqt.cron_run, eqt.type' );
 			$this->ci->db->where( 'eqt.slug', $input->type );
 
-			$this->email_type[ $input->type ] = $this->ci->db->get( 'email_queue_type eqt' )->row();
+			$this->email_type[ $input->type ] = $this->ci->db->get( NAILS_DB_PREFIX . 'email_queue_type eqt' )->row();
 
 			if ( ! $this->email_type[ $input->type ] ) :
 
@@ -484,13 +484,13 @@ class Emailer
 		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 
-		$this->ci->db->join( 'user u', 'u.id = eqa.user_id OR u.email = eqa.user_email', 'LEFT' );
-		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
+		$this->ci->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = eqa.user_id OR u.email = eqa.user_email', 'LEFT' );
+		$this->ci->db->join( NAILS_DB_PREFIX . 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
 
 		$this->ci->db->order_by( $order, $sort );
 		$this->ci->db->limit( $per_page, $offset );
 
-		$_emails = $this->ci->db->get( 'email_queue_archive eqa' )->result();
+		$_emails = $this->ci->db->get( NAILS_DB_PREFIX . 'email_queue_archive eqa' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -539,8 +539,8 @@ class Emailer
 		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img' );
 		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
 
-		$this->ci->db->join( 'user u', 'u.id = eq.user_id', 'LEFT' );
-		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eq.type_id' );
+		$this->ci->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = eq.user_id', 'LEFT' );
+		$this->ci->db->join( NAILS_DB_PREFIX . 'email_queue_type eqt', 'eqt.id = eq.type_id' );
 
 		if ( $cron_run ) :
 
@@ -560,7 +560,7 @@ class Emailer
 
 		$this->ci->db->order_by( 'eq.time_queued', 'ASC' );
 
-		$_emails = $this->ci->db->get( 'email_queue eq' )->result();
+		$_emails = $this->ci->db->get( NAILS_DB_PREFIX . 'email_queue eq' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -761,7 +761,7 @@ class Emailer
 
 			$this->ci->db->set( 'eq.queue_id', $_queue_id );
 			$this->ci->db->where_in( 'eq.id', $_queue_ids );
-			$this->ci->db->update( 'email_queue eq' );
+			$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue eq' );
 
 			// --------------------------------------------------------------------------
 
@@ -888,7 +888,7 @@ class Emailer
 
 					$this->ci->db->set( 'eq.queue_id', $_queue_id );
 					$this->ci->db->where_in( 'eq.id', $_queue_ids );
-					$this->ci->db->update( 'email_queue eq' );
+					$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue eq' );
 
 				endif;
 
@@ -914,7 +914,7 @@ class Emailer
 
 					$this->ci->db->where_in( 'ref', $_crunch['refs'] );
 					$this->ci->db->set( 'ref', $_crunch['email']->ref );
-					$this->ci->db->update( 'email_queue_archive' );
+					$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
 
 				else :
 
@@ -939,7 +939,7 @@ class Emailer
 
 			$this->ci->logger->line( 'Clearing ' . count( $_unqueue ) . ' items from the queue...');
 			$this->ci->db->where_in( 'id', $_unqueue );
-			$this->ci->db->delete( 'email_queue' );
+			$this->ci->db->delete( NAILS_DB_PREFIX . 'email_queue' );
 
 		endif;
 
@@ -948,7 +948,7 @@ class Emailer
 		//	Releasing items from this queue_id
 		$this->ci->db->set( 'queue_id', NULL );
 		$this->ci->db->where( 'queue_id', $_queue_id );
-		$this->ci->db->update( 'email_queue' );
+		$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue' );
 
 		// --------------------------------------------------------------------------
 
@@ -1220,7 +1220,7 @@ class Emailer
 			//	Mail sent, mark the time
 			$this->ci->db->set( 'time_sent', 'NOW()', FALSE );
 			$this->ci->db->where( 'id', $_email->id );
-			$this->ci->db->update( 'email_queue_archive' );
+			$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
 
 			return TRUE;
 
@@ -1331,7 +1331,7 @@ class Emailer
 			} while( ! $_ref_ok );
 
 			$this->ci->db->where( 'ref', $ref );
-			$_query = $this->ci->db->get( 'email_queue_archive' );
+			$_query = $this->ci->db->get( NAILS_DB_PREFIX . 'email_queue_archive' );
 
 		} while( $_query->num_rows() );
 
@@ -1509,7 +1509,7 @@ class Emailer
 		$this->ci->db->where( 'u.is_verified', TRUE );
 		$this->ci->db->where( 'um.email_' . $email_type, TRUE );
 
-		$this->ci->db->join( 'user u', 'u.id = um.user_id' );
+		$this->ci->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = um.user_id' );
 
 		return (bool) $this->ci->db->count_all_results( 'user_meta um' );
 	}
@@ -1543,7 +1543,7 @@ class Emailer
 			//	Update the read count and a add a track data point
 			$this->ci->db->set( 'read_count', 'read_count+1', FALSE );
 			$this->ci->db->where( 'id', $_email->id );
-			$this->ci->db->update( 'email_queue_archive' );
+			$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
 
 			$this->ci->db->set( 'created', 'NOW()', FALSE );
 			$this->ci->db->set( 'email_id', $_email->id );
@@ -1554,7 +1554,7 @@ class Emailer
 
 			endif;
 
-			$this->ci->db->insert( 'email_queue_track_open' );
+			$this->ci->db->insert( NAILS_DB_PREFIX . 'email_queue_track_open' );
 
 			return TRUE;
 
@@ -1589,14 +1589,14 @@ class Emailer
 			$this->ci->db->select( 'url' );
 			$this->ci->db->where( 'email_id', $_email->id );
 			$this->ci->db->where( 'id', $link_id );
-			$_link = $this->ci->db->get( 'email_queue_link' )->row();
+			$_link = $this->ci->db->get( NAILS_DB_PREFIX . 'email_queue_link' )->row();
 
 			if ( $_link ) :
 
 				//	Update the read count and a add a track data point
 				$this->ci->db->set( 'link_click_count', 'link_click_count+1', FALSE );
 				$this->ci->db->where( 'id', $_email->id );
-				$this->ci->db->update( 'email_queue_archive' );
+				$this->ci->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
 
 				//	Add a link trackback
 				$this->ci->db->set( 'created', 'NOW()', FALSE );
@@ -1609,7 +1609,7 @@ class Emailer
 
 				endif;
 
-				$this->ci->db->insert( 'email_queue_track_link' );
+				$this->ci->db->insert( NAILS_DB_PREFIX . 'email_queue_track_link' );
 
 				//	Return the URL to go to
 				return $_link->url;
@@ -1730,7 +1730,7 @@ class Emailer
 			$this->ci->db->set( 'title', $title );
 			$this->ci->db->set( 'created', 'NOW()', FALSE );
 			$this->ci->db->set( 'is_html', $is_html );
-			$this->ci->db->insert( 'email_queue_link' );
+			$this->ci->db->insert( NAILS_DB_PREFIX . 'email_queue_link' );
 
 			$_id = $this->ci->db->insert_id();
 

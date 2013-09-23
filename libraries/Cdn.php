@@ -54,7 +54,7 @@ class Cdn {
 
 	private function _include_driver()
 	{
-		switch ( strtolower( CDN_DRIVER ) ) :
+		switch ( strtolower( APP_CDN_DRIVER ) ) :
 
 			case 'aws_local' :
 
@@ -120,12 +120,12 @@ class Cdn {
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 
-		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
-		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
 
-		$_objects = $this->db->get( 'cdn_object o' )->result();
+		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object o' )->result();
 
 		foreach ( $_objects AS $obj ) :
 
@@ -148,12 +148,12 @@ class Cdn {
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 
-		$this->db->join( 'user u', 'u.id = o.created_by', 'LEFT' );
-		$this->db->join( 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
 
-		$_objects = $this->db->get( 'cdn_object_trash o' )->result();
+		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object_trash o' )->result();
 
 		foreach ( $_objects AS $obj ) :
 
@@ -762,11 +762,11 @@ class Cdn {
 		$this->db->trans_start();
 
 			//	Create trash object
-			$this->db->insert( 'cdn_object_trash' );
+			$this->db->insert( NAILS_DB_PREFIX . 'cdn_object_trash' );
 
 			//	Remove original object
 			$this->db->where( 'id', $_object->id );
-			$this->db->delete( 'cdn_object' );
+			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object' );
 
 		$this->db->trans_complete();
 
@@ -850,11 +850,11 @@ class Cdn {
 		$this->db->trans_start();
 
 			//	Restore object
-			$this->db->insert( 'cdn_object' );
+			$this->db->insert( NAILS_DB_PREFIX . 'cdn_object' );
 
 			//	Remove trash object
 			$this->db->where( 'id', $_object->id );
-			$this->db->delete( 'cdn_object_trash' );
+			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object_trash' );
 
 		$this->db->trans_complete();
 
@@ -919,7 +919,7 @@ class Cdn {
 
 			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
-			$this->db->delete( 'cdn_object' );
+			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object' );
 
 			return TRUE;
 
@@ -1036,7 +1036,7 @@ class Cdn {
 
 		//	Valid tag?
 		$this->db->where( 't.id', $tag_id );
-		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
+		$_tag = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket_tag t' )->row();
 
 		if ( ! $_tag ) :
 
@@ -1074,7 +1074,7 @@ class Cdn {
 		$this->db->set( 'object_id', $_object->id );
 		$this->db->set( 'tag_id', $_tag->id );
 		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->insert( 'cdn_object_tag' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cdn_object_tag' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -1107,7 +1107,7 @@ class Cdn {
 
 		//	Valid tag?
 		$this->db->where( 't.id', $tag_id );
-		$_tag = $this->db->get( 'cdn_bucket_tag t' )->row();
+		$_tag = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket_tag t' )->row();
 
 		if ( ! $_tag ) :
 
@@ -1133,7 +1133,7 @@ class Cdn {
 		//	Seems good, delete the tag
 		$this->db->where( 'object_id', $_object->id );
 		$this->db->where( 'tag_id', $_tag->id );
-		$this->db->delete( 'cdn_object_tag' );
+		$this->db->delete( NAILS_DB_PREFIX . 'cdn_object_tag' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -1153,7 +1153,7 @@ class Cdn {
 	public function object_tag_count( $tag_id )
 	{
 		$this->db->where( 'ot.tag_id', $tag_id );
-		$this->db->join( 'cdn_object o', 'o.id = ot.object_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'cdn_object o', 'o.id = ot.object_id' );
 		return $this->db->count_all_results( 'cdn_object_tag ot' );
 	}
 
@@ -1218,16 +1218,16 @@ class Cdn {
 		if ( $bucket && is_numeric( $bucket ) ) :
 
 			$this->db->where( 'o.bucket_id', $bucket );
-			$this->db->update( 'cdn_object o' );
+			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o' );
 
 		elseif ( $bucket ) :
 
 			$this->db->where( 'b.slug', $bucket );
-			$this->db->update( 'cdn_object o JOIN cdn_bucket b ON b.id = o.bucket_id' );
+			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o JOIN cdn_bucket b ON b.id = o.bucket_id' );
 
 		else :
 
-			$this->db->update( 'cdn_object o' );
+			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o' );
 
 		endif;
 	}
@@ -1256,9 +1256,9 @@ class Cdn {
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( '(SELECT COUNT(*) FROM cdn_object WHERE bucket_id = b.id) object_count' );
 
-		$this->db->join( 'user u', 'u.id = b.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = b.created_by', 'LEFT' );
 
-		$_buckets = $this->db->get( 'cdn_bucket b' )->result();
+		$_buckets = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket b' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -1283,7 +1283,7 @@ class Cdn {
 			$this->db->select( '(SELECT COUNT(*) FROM cdn_object_tag ot JOIN cdn_object o ON o.id = ot.object_id WHERE tag_id = bt.id ) total' );
 			$this->db->order_by( 'bt.label' );
 			$this->db->where( 'bt.bucket_id', $bucket->id );
-			$bucket->tags = $this->db->get( 'cdn_bucket_tag bt' )->result();
+			$bucket->tags = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket_tag bt' )->result();
 
 		endforeach;
 
@@ -1373,7 +1373,7 @@ class Cdn {
 
 			endif;
 
-			$this->db->insert( 'cdn_bucket' );
+			$this->db->insert( NAILS_DB_PREFIX . 'cdn_bucket' );
 
 			if ( $this->db->affected_rows() ) :
 
@@ -1412,7 +1412,7 @@ class Cdn {
 		//	Filtering by tag?
 		if ( $filter_tag ) :
 
-			$this->db->join( 'cdn_object_tag ft', 'ft.object_id = o.id AND ft.tag_id = ' . $filter_tag );
+			$this->db->join( NAILS_DB_PREFIX . 'cdn_object_tag ft', 'ft.object_id = o.id AND ft.tag_id = ' . $filter_tag );
 
 		endif;
 
@@ -1523,7 +1523,7 @@ class Cdn {
 		$this->db->set( 'bucket_id', $_bucket->id );
 		$this->db->set( 'label', $label );
 		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->insert( 'cdn_bucket_tag' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cdn_bucket_tag' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -1608,7 +1608,7 @@ class Cdn {
 
 		endif;
 
-		$this->db->delete( 'cdn_bucket_tag' );
+		$this->db->delete( NAILS_DB_PREFIX . 'cdn_bucket_tag' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -1753,7 +1753,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$this->db->insert( 'cdn_object' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cdn_object' );
 
 		$_object_id = $this->db->insert_id();
 
@@ -1770,7 +1770,7 @@ class Cdn {
 					$this->db->set( 'tag_id',		$data->tag_id );
 					$this->db->set( 'created',		'NOW()', FALSE );
 
-					$this->db->insert( 'cdn_object_tag' );
+					$this->db->insert( NAILS_DB_PREFIX . 'cdn_object_tag' );
 
 				endif;
 

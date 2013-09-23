@@ -453,7 +453,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				$this->db->where( 'block_id', $this->data['block']->id );
 				$this->db->where_not_in( 'lang_id', $_updated );
-				$this->db->delete( 'cms_block_translation' );
+				$this->db->delete( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 			endif;
 

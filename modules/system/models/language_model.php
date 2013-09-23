@@ -42,7 +42,7 @@ class NAILS_Language_model extends NAILS_Model
 
 		$this->db->select( 'l.id,l.name,l.slug,l.priority,l.supported' );
 		$this->db->order_by( 'l.name' );
-		$_result = $this->db->get( 'language l' );
+		$_result = $this->db->get( NAILS_DB_PREFIX . 'language l' );
 
 		if ( $_result ) :
 
@@ -273,7 +273,7 @@ class NAILS_Language_model extends NAILS_Model
 
 		$this->db->set( $data );
 		$this->db->where( 'id', $id );
-		return $this->db->update( 'language' );
+		return $this->db->update( NAILS_DB_PREFIX . 'language' );
 	}
 }
 

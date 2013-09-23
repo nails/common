@@ -56,7 +56,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'cms_block' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cms_block' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -75,7 +75,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 			endif;
 
-			$this->db->insert( 'cms_block_translation' );
+			$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 			if ( $this->db->affected_rows() ) :
 
@@ -92,7 +92,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			else :
 
 				$this->db->where( 'id', $_id );
-				$this->db->delete( 'cms_block' );
+				$this->db->delete( NAILS_DB_PREFIX . 'cms_block' );
 				return FALSE;
 
 			endif;
@@ -137,7 +137,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 		endif;
 
 		$this->db->where( 'id', $id );
-		$this->db->update( 'cms_block' );
+		$this->db->update( NAILS_DB_PREFIX . 'cms_block' );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -165,7 +165,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->delete( 'cms_block' );
+		$this->db->delete( NAILS_DB_PREFIX . 'cms_block' );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -203,7 +203,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'cms_block_translation' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -237,7 +237,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 		//	Get existing translation
 		$this->db->where( 'block_id', $block_id );
 		$this->db->where( 'lang_id', $lang_id );
-		$_old = $this->db->get( 'cms_block_translation' )->row();
+		$_old = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation' )->row();
 
 		if ( ! $_old )
 			return FALSE;
@@ -265,7 +265,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		$this->db->where( 'block_id', $block_id );
 		$this->db->where( 'lang_id', $lang_id );
-		$this->db->update( 'cms_block_translation' );
+		$this->db->update( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -273,7 +273,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			$this->db->select( 'id' );
 			$this->db->where( 'block_id', $block_id );
 			$this->db->where( 'lang_id', $lang_id );
-			$_block_translation = $this->db->get( 'cms_block_translation' )->row();
+			$_block_translation = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation' )->row();
 
 			if ( $_block_translation ) :
 
@@ -281,7 +281,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 				$this->db->set( 'value', $_old->value );
 				$this->db->set( 'created', $_old->created );
 				$this->db->set( 'created_by', $_old->modified_by );
-				$this->db->insert( 'cms_block_translation_revision' );
+				$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation_revision' );
 
 				//	Upate the main block's modified date and user
 				$this->update_block( $_old->block_id );
@@ -313,7 +313,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 	{
 		$this->db->where( 'block_id', $block_id );
 		$this->db->where( 'lang_id', $lang_id );
-		$this->db->delete( 'cms_block_translation' );
+		$this->db->delete( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -344,13 +344,13 @@ class NAILS_Cms_block_model extends NAILS_Model
 	{
 		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, u.email, u.last_name, l.name lang_name, l.slug lang_slug, u.gender, u.profile_img' );
 
-		$this->db->join( 'cms_block cb', 'cb.id = cbv.block_id' );
-		$this->db->join( 'user u', 'u.id = cbv.created_by', 'LEFT' );
-		$this->db->join( 'language l', 'l.id = cbv.lang_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'cms_block cb', 'cb.id = cbv.block_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbv.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'language l', 'l.id = cbv.lang_id', 'LEFT' );
 
 		$this->db->order_by( 'cb.title' );
 
-		$_blocks = $this->db->get( 'cms_block_translation cbv' )->result();
+		$_blocks = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation cbv' )->result();
 
 		$_out = array();
 
@@ -402,9 +402,9 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 				$this->db->select( 'cbtr.*, u.email, u.first_name, u.last_name, u.gender, u.profile_img' );
 				$this->db->where( 'cbtr.block_translation_id', $_blocks[$i]->id );
-				$this->db->join( 'user u', 'u.id = cbtr.created_by', 'LEFT' );
+				$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbtr.created_by', 'LEFT' );
 				$this->db->order_by( 'created', 'DESC' );
-				$_temp->revisions = $this->db->get( 'cms_block_translation_revision cbtr' )->result();
+				$_temp->revisions = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation_revision cbtr' )->result();
 
 				foreach( $_temp->revisions AS $revision ) :
 

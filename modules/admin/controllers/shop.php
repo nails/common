@@ -860,7 +860,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->db->where( 'order_id',	$_order_id );
 		$this->db->where( 'id',			$_product_id );
 
-		$this->db->update( 'shop_order_product' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_order_product' );
 
 		if ( $this->db->affected_rows() ) :
 

@@ -27,7 +27,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Which driver is being used?
-		$this->_driver = strtolower( CDN_DRIVER );
+		$this->_driver = strtolower( APP_CDN_DRIVER );
 
 		//	Sanity checks; driver specific
 		switch ( $this->_driver ) :

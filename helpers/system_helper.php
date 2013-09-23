@@ -146,6 +146,18 @@ if ( ! function_exists( 'module_is_enabled' ) )
 
 		// --------------------------------------------------------------------------
 
+		//	Allow wildcard
+		reset( $_nails_modules );
+		$_wildcard = key( $_nails_modules );
+
+		if ( $_wildcard == '*' ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
 
 		$_module	= isset( $_matches[1] ) ? $_matches[1] : '';

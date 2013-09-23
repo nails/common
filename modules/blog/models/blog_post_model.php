@@ -101,7 +101,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'blog_post' );
+		$this->db->insert( NAILS_DB_PREFIX . 'blog_post' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -202,7 +202,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->select( 'is_published' );
 		$this->db->where( 'id', $id );
-		$_current = $this->db->get( 'blog_post' )->row();
+		$_current = $this->db->get( NAILS_DB_PREFIX . 'blog_post' )->row();
 
 		if ( ! $_current->is_published && $data['is_published'] ) :
 
@@ -278,7 +278,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->where( 'id', $id );
 
-		$this->db->update( 'blog_post' );
+		$this->db->update( NAILS_DB_PREFIX . 'blog_post' );
 
 		// --------------------------------------------------------------------------
 
@@ -287,7 +287,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			//	Delete all categories
 			$this->db->where( 'post_id', $id );
-			$this->db->delete( 'blog_post_category' );
+			$this->db->delete( NAILS_DB_PREFIX . 'blog_post_category' );
 
 			//	Recreate new ones
 			if ( $data['categories'] ) :
@@ -310,7 +310,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			//	Delete all tags
 			$this->db->where( 'post_id', $id );
-			$this->db->delete( 'blog_post_tag' );
+			$this->db->delete( NAILS_DB_PREFIX . 'blog_post_tag' );
 
 			//	Recreate new ones
 			if ( $data['tags'] ) :
@@ -390,7 +390,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->set( 'is_deleted', TRUE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'blog_post' );
+		$this->db->update( NAILS_DB_PREFIX . 'blog_post' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -419,7 +419,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->set( 'is_deleted', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'blog_post' );
+		$this->db->update( NAILS_DB_PREFIX . 'blog_post' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -449,7 +449,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
-		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
 
 		if ( $only_published ) :
 
@@ -465,7 +465,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->order_by( 'published', 'DESC' );
 
-		$_posts = $this->db->get( 'blog_post bp' )->result();
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post bp' )->result();
 
 		foreach ( $_posts AS $post ) :
 
@@ -475,19 +475,19 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			//	Fetch associated categories
 			$this->db->select( 'c.id,c.slug,c.label' );
-			$this->db->join( 'blog_category c', 'c.id = pc.category_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'blog_category c', 'c.id = pc.category_id' );
 			$this->db->where( 'pc.post_id', $post->id );
 			$this->db->group_by( 'c.id' );
 			$this->db->order_by( 'c.label' );
-			$post->categories = $this->db->get( 'blog_post_category pc' )->result();
+			$post->categories = $this->db->get( NAILS_DB_PREFIX . 'blog_post_category pc' )->result();
 
 			//	Fetch associated tags
 			$this->db->select( 't.id,t.slug,t.label' );
-			$this->db->join( 'blog_tag t', 't.id = pt.tag_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'blog_tag t', 't.id = pt.tag_id' );
 			$this->db->where( 'pt.post_id', $post->id );
 			$this->db->group_by( 't.id' );
 			$this->db->order_by( 't.label' );
-			$post->tags = $this->db->get( 'blog_post_tag pt' )->result();
+			$post->tags = $this->db->get( NAILS_DB_PREFIX . 'blog_post_tag pt' )->result();
 
 			// --------------------------------------------------------------------------
 
@@ -521,7 +521,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				$this->db->where( 'post_id', $post->id );
 				$this->db->order_by( 'order' );
-				$post->gallery = $this->db->get( 'blog_post_image' )->result();
+				$post->gallery = $this->db->get( NAILS_DB_PREFIX . 'blog_post_image' )->result();
 
 			else :
 
@@ -555,7 +555,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
-		$_posts	= $this->db->get( 'blog_post bp' )->result();
+		$_posts	= $this->db->get( NAILS_DB_PREFIX . 'blog_post bp' )->result();
 		$_out		= array();
 
 		foreach ( $_posts AS $post ) :
@@ -678,8 +678,8 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
-		$this->db->join( 'blog_post bp', 'bp.id = bc.post_id' );
-		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bc.post_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
 
 		if ( $only_published ) :
 
@@ -702,11 +702,11 @@ class NAILS_Blog_post_model extends NAILS_Model
 		else :
 
 			$this->db->where( 'c.slug = ', $id_slug );
-			$this->db->join( 'blog_category c', 'c.id = bc.category_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'blog_category c', 'c.id = bc.category_id' );
 
 		endif;
 
-		$_posts = $this->db->get( 'blog_post_category bc' )->result();
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_category bc' )->result();
 
 		foreach ( $_posts AS $post ) :
 
@@ -734,8 +734,8 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
 
-		$this->db->join( 'blog_post bp', 'bp.id = bt.post_id' );
-		$this->db->join( 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bt.post_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
 
 		if ( $only_published ) :
 
@@ -758,11 +758,11 @@ class NAILS_Blog_post_model extends NAILS_Model
 		else :
 
 			$this->db->where( 't.slug = ', $id_slug );
-			$this->db->join( 'blog_tag t', 't.id = bt.tag_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'blog_tag t', 't.id = bt.tag_id' );
 
 		endif;
 
-		$_posts = $this->db->get( 'blog_post_tag bt' )->result();
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_tag bt' )->result();
 
 		foreach ( $_posts AS $post ) :
 

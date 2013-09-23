@@ -54,7 +54,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		$this->db->where( 'is_deleted', FALSE );
 		$this->db->limit( $_config->limit );
 		$this->db->order_by( 'published', 'DESC' );
-		$_posts = $this->db->get( 'blog_post' )->result();
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		endif;
 
 		$this->db->order_by( 'c.label' );
-		$_cats = $this->db->get( 'blog_category c' )->result();
+		$_cats = $this->db->get( NAILS_DB_PREFIX . 'blog_category c' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -220,7 +220,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		endif;
 
 		$this->db->order_by( 't.label' );
-		$_tags = $this->db->get( 'blog_tag t' )->result();
+		$_tags = $this->db->get( NAILS_DB_PREFIX . 'blog_tag t' )->result();
 
 		// --------------------------------------------------------------------------
 

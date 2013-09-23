@@ -133,7 +133,7 @@ class NAILS_Shop_model extends NAILS_Model
 	{
 		if ( ! $this->_settings || $force_refresh ) :
 
-			$_settings = $this->db->get( 'shop_settings' )->result();
+			$_settings = $this->db->get( NAILS_DB_PREFIX . 'shop_settings' )->result();
 
 			foreach ( $_settings AS $setting ) :
 
@@ -166,7 +166,7 @@ class NAILS_Shop_model extends NAILS_Model
 
 			$this->db->where( 'key', $key );
 			$this->db->set( 'value', serialize( $value ) );
-			$this->db->update( 'shop_settings' );
+			$this->db->update( NAILS_DB_PREFIX . 'shop_settings' );
 
 			// --------------------------------------------------------------------------
 

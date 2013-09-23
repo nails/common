@@ -250,17 +250,21 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		foreach( $_modules['admin'] AS $module ) :
+		if ( isset( $_modules['admin'] ) && $_modules['admin'] ) :
 
-			$_module = $this->admin_model->find_module( $module );
+			foreach( $_modules['admin'] AS $module ) :
 
-			if ( (array) $_module ) :
+				$_module = $this->admin_model->find_module( $module );
 
-				$this->_loaded_modules[$module] = $_module;
+				if ( (array) $_module ) :
 
-			endif;
+					$this->_loaded_modules[$module] = $_module;
 
-		endforeach;
+				endif;
+
+			endforeach;
+
+		endif;
 	}
 
 

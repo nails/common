@@ -348,7 +348,7 @@ class NAILS_Test extends NAILS_System_Controller
 		// --------------------------------------------------------------------------
 
 		//	Check CDN buckets/dirs
-		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
+		if ( module_is_enabled( 'cdn' ) && APP_CDN_DRIVER == 'LOCAL' ) :
 
 			$_dirs[]	= DEPLOY_CDN_PATH;
 

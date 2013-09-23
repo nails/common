@@ -265,7 +265,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 				//	Delete previous
 				$this->db->where( 'product_id', $id );
-				$this->db->delete( 'shop_product_price' );
+				$this->db->delete( NAILS_DB_PREFIX . 'shop_product_price' );
 
 				//	Insert new
 				$_data = array();
@@ -437,7 +437,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->join( $this->_table_meta . ' pm', 'p.id = pm.product_id' );
 		$this->db->join( $this->_table_type . ' pt', 'p.type_id = pt.id' );
 		$this->db->join( $this->_table_tax . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
-		//$this->db->join( 'shop_product_price spp', 'spp.product_id = p.id AND spp.currency_id = ' . SHOP_USER_CURRENCY_ID, 'LEFT' );
+		//$this->db->join( NAILS_DB_PREFIX . 'shop_product_price spp', 'spp.product_id = p.id AND spp.currency_id = ' . SHOP_USER_CURRENCY_ID, 'LEFT' );
 
 		$this->db->where( 'p.is_deleted', FALSE );
 
@@ -572,13 +572,13 @@ class NAILS_Shop_product_model extends NAILS_Model
 		elseif ( $currency && is_string( $currency ) ) :
 
 			$this->db->where( 'c.code', $currency );
-			$this->db->join( 'shop_currency c', 'c.id = spp.currency_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'shop_currency c', 'c.id = spp.currency_id' );
 
 		endif;
 
 		$this->db->where( 'product_id', $product_id );
 
-		return $this->db->get( 'shop_product_price spp' )->result();
+		return $this->db->get( NAILS_DB_PREFIX . 'shop_product_price spp' )->result();
 	}
 
 

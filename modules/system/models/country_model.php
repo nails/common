@@ -34,9 +34,9 @@ class NAILS_Country_model extends NAILS_Model
 	public function get_all()
 	{
 		$this->db->select( 'c.*, l.slug lang_slug,l.name lang_label' );
-		$this->db->join( 'language l', 'l.id = c.language_id', 'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'language l', 'l.id = c.language_id', 'left' );
 		$this->db->order_by( 'c.iso_name' );
-		$_result = $this->db->get( 'country c' );
+		$_result = $this->db->get( NAILS_DB_PREFIX . 'country c' );
 
 		if ( ! $_result ) :
 

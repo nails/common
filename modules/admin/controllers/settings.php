@@ -578,7 +578,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->db->update( 'shop_shipping_method' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_shipping_method' );
 
 		// --------------------------------------------------------------------------
 
@@ -624,7 +624,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->db->update( 'shop_tax_rate' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_tax_rate' );
 
 		// --------------------------------------------------------------------------
 

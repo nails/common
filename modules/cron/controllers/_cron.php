@@ -101,7 +101,7 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		$this->db->set( $_data );
 		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->insert( 'log_cron' );
+		$this->db->insert( NAILS_DB_PREFIX . 'log_cron' );
 	}
 }
 
