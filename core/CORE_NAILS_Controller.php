@@ -145,7 +145,7 @@ EOT;
 	protected function _define_constants()
 	{
 		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.0.0' );
+		define( 'NAILS_VERSION',	'0.1.0' );
 
 		// --------------------------------------------------------------------------
 
