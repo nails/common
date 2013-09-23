@@ -479,7 +479,7 @@ class Asset
 		foreach ( $this->css_nails AS $asset ) :
 
 			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'css/' . $asset ;
-			$out .= link_tag( $url . '?release=' . NAILS_ASSETS_RELEASE ) . "\n";
+			$out .= link_tag( $url ) . "\n";
 
 		endforeach;
 
@@ -553,7 +553,7 @@ class Asset
 		foreach ( $this->js_nails AS $asset ) :
 
 			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'js/' . $asset ;
-			$out .= '<script type="text/javascript" src="' . $url . '?release=' . NAILS_ASSETS_RELEASE . '"></script>' . "\n";
+			$out .= '<script type="text/javascript" src="' . $url . '"></script>' . "\n";
 
 		endforeach;
 		return $out;
