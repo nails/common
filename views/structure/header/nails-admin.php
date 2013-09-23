@@ -18,13 +18,18 @@
 	<meta name="description" content="" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 
-	<!--	JS GLOBALS	-->
-	<script tyle="text/javascript">
-		var ENVIRONMENT				= '<?=ENVIRONMENT?>';
-		window.SITE_URL				= '<?=site_url()?>';
-		window.NAILS_URL			= '<?=NAILS_URL?>';
-		window.NAILS_LANG			= {};
-		window.NAILS_ASSETS_RELEASE = <?=NAILS_ASSETS_RELEASE?>;
+	<!--	NAILS JS GLOBALS	-->
+	<script style="text/javascript">
+		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+		window.SITE_URL					= '<?=site_url()?>';
+		window.NAILS					= {};
+		window.NAILS.URL				= '<?=NAILS_URL?>';
+		window.NAILS.LANG				= {};
+		window.NAILS.USER				= {};
+		window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
+		window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
+		window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
+		window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 	</script>
 
 	<noscript>
@@ -39,9 +44,9 @@
 	</noscript>
 
 	<!--	JS LOCALISATION	-->
-	<script tyle="text/javascript">
-		window.NAILS_LANG.non_html5	= '<?=str_replace( "'", "\'", lang( 'js_error_non_html5' ) )?>';
-		window.NAILS_LANG.no_save	= '<?=str_replace( "'", "\'", lang( 'js_error_saving' ) )?>';
+	<script style="text/javascript">
+		window.NAILS.LANG.non_html5	= '<?=str_replace( "'", "\'", lang( 'js_error_non_html5' ) )?>';
+		window.NAILS.LANG.no_save	= '<?=str_replace( "'", "\'", lang( 'js_error_saving' ) )?>';
 	</script>
 
 	<!--	ASSETS	-->
@@ -68,8 +73,8 @@
 				</a>
 			</li>
 			<li><?=anchor( 'admin', lang( 'admin_home' ) )?></li>
-			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name . '</li>' : NULL?></li>
-			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title . '</li>' : NULL?></li>
+			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
+			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
 		</ul>
 
 		<ul class="right shaded">
@@ -339,7 +344,6 @@
 
 
 	<div class="content">
-		<div class="padder">
 		<div class="content_inner">
 
 			<?php

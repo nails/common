@@ -4,165 +4,165 @@
  * Name:			Admin_Controller
  *
  * Description:	This controller executes various bits of common admin functionality
- * 
+ *
  **/
 
 
 class NAILS_Admin_Controller extends NAILS_Controller
 {
 	protected $_loaded_modules;
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Common constructor for all admin pages
-	 * 
+	 *
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Check this module is enabled in settings
 		if ( ! module_is_enabled( 'auth' ) || ! module_is_enabled( 'admin' ) ) :
-		
+
 			//	Cancel execution, module isn't enabled
 			show_404();
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Admins only please
 		if ( ! $this->user->is_admin() ) :
-		
+
 			unauthorised();
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load up the generic admin langfile
 		$this->lang->load( 'admin_generic', RENDER_LANG_SLUG );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load admin helper and config
 		$this->load->model( 'admin_model' );
-		
+		$this->config->load( 'admin' );
 		if ( file_exists( FCPATH . 'application/config/admin.php' ) ) :
-		
+
 			$this->config->load( 'admin' );
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load up the modules which have been enabled for this installation and the
 		//	user has permission to see.
-		
+
 		$this->_loaded_modules			= array();
 		$this->data['loaded_modules']	=& $this->_loaded_modules;
 		$this->_load_active_modules();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Check the user has permission to view this module (skip the dashboard
 		//	we need to show them _something_)
-		
+
 		$_active_module	= $this->uri->segment( 2 );
 		$_active_method	= $this->uri->segment( 3, 'index' );
 		$_acl			= active_user( 'acl' );
-		
+
 		if ( ! $this->user->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
-		
+
 			//	If this is the dashboard, we should see if the user has permission to
 			//	access any other modules before we 404 their ass.
-			
+
 			if ( $_active_module == 'dashboard' || $_active_module == '' ) :
-			
+
 				//	Look at the user's ACL
 				if ( isset( $_acl['admin'] )  ) :
-				
+
 					//	If they have other modules defined, loop them until one is found
 					//	which appears in the loaded modules list. If this doesn't happen
 					//	then they'll fall back to the 'no loaded modules' page.
-					
+
 					foreach( $_acl['admin'] AS $module => $methods ) :
-					
+
 						if ( isset( $this->_loaded_modules[$module] ) ) :
-						
+
 							redirect( 'admin/' . $module );
 							break;
-						
+
 						endif;
-					
+
 					endforeach;
-				
+
 				endif;
-			
+
 			else :
-			
-				// Oh well, it's not, 404 bitches!	
+
+				// Oh well, it's not, 404 bitches!
 				show_404();
-				
+
 			endif;
-		
+
 		elseif ( ! $this->user->is_superuser() ) :
-		
+
 			//	Module is OK, check to make sure they can access this method
 			if ( ! isset( $_acl['admin'][$_active_module][$_active_method] ) ) :
-			
+
 				unauthorised();
-			
+
 			endif;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load libraries and helpers
 		$this->load->library( 'cdn' );
 		$this->load->helper( 'admin' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Add the current module to the $page variable (for convenience)
 		$this->data['page'] = new stdClass();
-		
+
 		if ( isset( $this->_loaded_modules[ $this->uri->segment( 2 ) ] ) ) :
-		
+
 			$this->data['page']->module = $this->_loaded_modules[ $this->uri->segment( 2 ) ];
-		
+
 		else :
-		
+
 			$this->data['page']->moduled = FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Unload any previously loaded assets, admin handles it's own assets
 		$this->asset->clear_all();
-		
+
 		//	Load admin styles and JS
 		$this->asset->load( 'nails.admin.css', TRUE );
 		$this->asset->load( 'nails.default.min.js', TRUE );
 		$this->asset->load( 'nails.admin.min.js', TRUE );
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
-		
+
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :
-		
+
 			$this->asset->load( 'admin.css' );
-		
+
 		endif;
 
 		//	Inline assets
@@ -182,84 +182,84 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		$this->asset->inline( '<script>' . $_js . '</script>' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Determines wether the active_user() can access the specified module
-	 * 
+	 *
 	 * @access	static
 	 * @param	$module A reference to the module definition
 	 * @param	$file The file we're checking
 	 * @return	mixed
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	static function _can_access( &$module, $file )
 	{
 		$_acl		= active_user( 'acl' );
 		$_module	= basename( $file, '.php' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Super users can see what they like
 		if ( get_userobject()->is_superuser() ) :
-		
+
 			return $module;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Everyone else needs to have the correct ACL
 		if ( isset( $_acl['admin'][$_module] ) ) :
-		
+
 			return $module;
-		
+
 		else :
-		
+
 			return NULL;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Loop through the enabled modules and see if a controller exists for it; if
 	 * it does load it up and execute the annouce static method to see if we can
 	 * display it to the active user.
-	 * 
+	 *
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	private function _load_active_modules()
 	{
 		$_modules = get_loaded_modules();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Dashboard, always present, and always first
 		$this->_loaded_modules['dashboard'] = $this->admin_model->find_module( 'dashboard' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		foreach( $_modules['admin'] AS $module ) :
-		
+
 			$_module = $this->admin_model->find_module( $module );
-			
+
 			if ( (array) $_module ) :
-			
+
 				$this->_loaded_modules[$module] = $_module;
-				
+
 			endif;
-		
+
 		endforeach;
 	}
 
@@ -269,11 +269,11 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 	/**
 	 * Basic definition of the announce() static method
-	 * 
+	 *
 	 * @access	public
 	 * @return	NULL
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	static function announce()
 	{
@@ -286,11 +286,11 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 	/**
 	 * Basic definition of the notifications() static method
-	 * 
+	 *
 	 * @access	public
 	 * @return	array
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	static function notifications()
 	{
@@ -303,11 +303,11 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 	/**
 	 * Basic definition of the permissions() static method
-	 * 
+	 *
 	 * @access	public
 	 * @return	array
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	static function permissions()
 	{

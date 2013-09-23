@@ -56,6 +56,15 @@ class Cdn {
 	{
 		switch ( strtolower( CDN_DRIVER ) ) :
 
+			case 'aws_local' :
+
+				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/aws_local.php';
+				return 'Aws_local_CDN';
+
+			break;
+
+			// --------------------------------------------------------------------------
+
 			case 'local':
 			default:
 
@@ -81,6 +90,13 @@ class Cdn {
 		if ( isset( $_shortcuts[$method] ) ) :
 
 			return call_user_func_array( array( $this, $_shortcuts[$method] ), $arguments );
+
+		endif;
+
+		//	Test the drive
+		if ( method_exists( $this->_cdn, $method ) ) :
+
+			return call_user_func_array( array( $this->_cdn, $method ), $arguments );
 
 		endif;
 
@@ -298,7 +314,7 @@ class Cdn {
 				else :
 
 					$_file	= $object;
-					$_name	= $object;
+					$_name	= basename( $object );
 
 				endif;
 
@@ -315,9 +331,18 @@ class Cdn {
 
 			//	Content-type; using finfo because the $_FILES variable can't be trusted
 			//	(uploads from Uploadify always report as application/octet-stream;
-			//	stupid flash.
+			//	stupid flash. Unless, of course, the content-type has beens et explicityly
+			//	by the developer
 
-			$_data->mime = $this->get_mime_type_from_file( $_file );
+			if ( isset( $options['content-type'] ) ) :
+
+				$_data->mime = $options['content-type'];
+
+			else :
+
+				$_data->mime = $this->get_mime_type_from_file( $_file );
+
+			endif;
 
 			//	Now set the actual file data
 			$_data->file = $_file;
@@ -633,7 +658,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_upload = $this->_cdn->upload( $_data->bucket_slug, $_data->file, $_data->filename );
+		$_upload = $this->_cdn->object_create( $_data->bucket_slug, $_data->filename, $_data->file, $_data->mime );
 
 		// --------------------------------------------------------------------------
 
@@ -890,7 +915,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_cdn->delete( $_object->filename, $_object->bucket->slug ) ) :
+		if ( $this->_cdn->object_delete( $_object->filename, $_object->bucket->slug ) ) :
 
 			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
@@ -1364,7 +1389,7 @@ class Cdn {
 			endif;
 
 		else :
-
+			here($this->last_error());
 			return FALSE;
 
 		endif;
@@ -1626,6 +1651,40 @@ class Cdn {
 	public function errors()
 	{
 		return $this->_errors;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the last error
+	 *
+	 * @access	public
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	public function last_error()
+	{
+		return end( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the last error
+	 *
+	 * @access	public
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	public function error()
+	{
+		$_error = end( $this->_errors );
+		reset( $this->_errors );
+		return $_error;
 	}
 
 
@@ -2183,7 +2242,7 @@ class Cdn {
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve( $object )
+	public function url_serve( $object, $force_download = FALSE )
 	{
 		$_object = $this->get_object( $object );
 
@@ -2197,7 +2256,7 @@ class Cdn {
 
 		endif;
 
-		return $this->_cdn->url_serve( $_object->filename, $_object->bucket->slug );
+		return $this->_cdn->url_serve( $_object->filename, $_object->bucket->slug, $force_download );
 	}
 
 
@@ -2432,6 +2491,172 @@ class Cdn {
 	public function url_expiring_scheme()
 	{
 		return $this->_cdn->url_expiring_scheme();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function generate_api_upload_token( $user_id = NULL, $duration = 7200, $restrict_ip = TRUE )
+	{
+		if ( $user_id === NULL ) :
+
+			$user_id = active_user( 'id' );
+
+		endif;
+
+		$_user = get_userobject()->get_by_id( $user_id );
+
+		if ( ! $_user ) :
+
+			$this->set_error( 'Invalid user ID' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+
+		$_token		= array();
+		$_token[]	= (int) $_user->id;			//	User ID
+		$_token[]	= $_user->password_md5;		//	User Password
+		$_token[]	= $_user->email;			//	User Email
+		$_token[]	= time() + (int) $duration;	//	Expire time (+2hours)
+
+		if ( $restrict_ip ) :
+
+			$_token[]	= get_instance()->input->ip_address();
+
+		else :
+
+			$_token[]	= FALSE;
+
+		endif;
+
+		//	Hash
+		$_token[]	= md5( serialize( $_token ) . APP_PRIVATE_KEY );
+
+		//	Encrypt and return
+		return get_instance()->encrypt->encode( implode( '|', $_token ), APP_PRIVATE_KEY );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function validate_api_upload_token( $token )
+	{
+		$_token = get_instance()->encrypt->decode( $token, APP_PRIVATE_KEY );
+
+		if ( ! $_token ) :
+
+			//	Error #1: Could not decrypot
+			$this->set_error( 'Invalid Token (Error #1)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_token	 = explode( '|', $_token );
+
+		if ( !$_token ) :
+
+			//	Error #2: Could not explode
+			$this->set_error( 'Invalid Token (Error #2)' );
+			return FALSE;
+
+		elseif ( count( $_token ) != 6 ) :
+
+			//	Error #3: Bad count
+			$this->set_error( 'Invalid Token (Error #3)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Correct data types
+		$_token[0]	= (int) $_token[0];
+		$_token[3]	= (int) $_token[3];
+
+		// --------------------------------------------------------------------------
+
+		//	Check hash
+		$_hash = $_token[5];
+		unset( $_token[5]);
+
+		if ( $_hash != md5( serialize( $_token ) . APP_PRIVATE_KEY ) ) :
+
+			//	Error #4: Bad hash
+			$this->set_error( 'Invalid Token (Error #4)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch and check user
+		$_user = get_userobject()->get_by_id( $_token[0] );
+
+		//	User exists?
+		if ( ! $_user ) :
+
+			//	Error #5: User not found
+			$this->set_error( 'Invalid Token (Error #5)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid email?
+		if ( $_user->email != $_token[2] ) :
+
+			//	Error #6: Invalid Email
+			$this->set_error( 'Invalid Token (Error #6)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid password?
+		if ( $_user->password_md5 != $_token[1] ) :
+
+			//	Error #7: Invalid password
+			$this->set_error( 'Invalid Token (Error #7)' );
+			return FALSE;
+
+		endif;
+
+		//	User suspended?
+		if ( $_user->is_suspended ) :
+
+			//	Error #8: User suspended
+			$this->set_error( 'Invalid Token (Error #8)' );
+			return FALSE;
+
+		endif;
+
+		//	Valid IP?
+		if ( ! $_token[4] && $_token[4] != get_instance()->input->ip_address() ) :
+
+			//	Error #9: Invalid IP
+			$this->set_error( 'Invalid Token (Error #9)' );
+			return FALSE;
+
+		endif;
+
+		//	Expired?
+		if ( $_token[3] < time() ) :
+
+			//	Error #10: Token expired
+			$this->set_error( 'Invalid Token (Error #10)' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	If we got here then the token is valid
+		return $_user;
 	}
 }
 

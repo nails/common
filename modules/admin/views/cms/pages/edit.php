@@ -3,7 +3,7 @@
 	<fieldset id="cms-page-edit-meta">
 		<legend>Meta Data</legend>
 			<?php
-			
+
 			//	Title
 			$_field					= array();
 			$_field['key']			= 'title';
@@ -11,11 +11,11 @@
 			$_field['required']		= TRUE;
 			$_field['default']		= $cmspage->title;
 			$_field['placeholder']	= 'The title of the page';
-			
+
 			echo form_field( $_field );
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			//	Slug
 			$_field					= array();
 			$_field['key']			= 'slug';
@@ -23,7 +23,7 @@
 			$_field['required']		= TRUE;
 			$_field['default']		= $cmspage->slug;
 			$_field['placeholder']	= 'The Page\'s slug.';
-			
+
 			echo form_field( $_field );
 
 			?>
@@ -35,7 +35,7 @@
 			<?php
 
 				$_layout = $this->input->post( 'layout' ) ? $this->input->post( 'layout' ) : $cmspage->layout;
-				
+
 			?>
 			<li class="hero-sidebar-left">
 				<label>
@@ -85,7 +85,7 @@
 			</label>
 		</p>
 	</fieldset>
-	
+
 	<?php
 
 		//	Hero editor
@@ -120,14 +120,14 @@
 		$this->load->view( 'admin/cms/pages/_editor', $_config  );
 
 	?>
-	
+
 	<fieldset id="cms-page-edit-seo">
 		<legend>Search Engine Optimisation</legend>
 			<p>
 				These fields are not visible anywhere but help Search Engines index and understand the page.
 			</p>
 			<?php
-			
+
 			//	Description
 			$_field					= array();
 			$_field['key']			= 'seo_description';
@@ -136,11 +136,11 @@
 			$_field['required']		= TRUE;
 			$_field['default']		= $cmspage->seo_description;
 			$_field['placeholder']	= 'The page\'s SEO description';
-			
+
 			echo form_field( $_field, 'This should be kept short (< 160 characters) and concise. It\'ll be shown in search result listings and search engines will use it to help determine the page\'s content.' );
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			//	Keywords
 			$_field					= array();
 			$_field['key']			= 'seo_keywords';
@@ -148,28 +148,28 @@
 			$_field['required']		= TRUE;
 			$_field['default']		= $cmspage->seo_keywords;
 			$_field['placeholder']	= 'Comma separated keywords relating to the content of the page.';
-			
+
 			echo form_field( $_field, 'SEO good practice recommend keeping the number of keyword phrases below 10 and less than 160 characters in total.' );
-			
+
 			?>
 	</fieldset>
-	
+
 	<p>
 		<?php
-		
+
 			echo form_submit( 'submit', lang( 'action_save_changes' ) );
 			echo form_close();
-			
+
 		?>
 	</p>
 
 </div>
 
-<script style="text/javascript">
+<script type="text/javascript">
 <!--//
 
 	$(function(){
-	
+
 		//	Hero
 		var CMS_Pages_hero = new NAILS_Admin_CMS_Pages_Editor;
 		CMS_Pages_hero.init( 'hero' );
@@ -245,7 +245,7 @@
 		//	Process the current layout
 		sort_layout( '<?=$_layout?>' );
 
-	
+
 	});
 
 //-->
@@ -255,9 +255,9 @@
 
 	//	Get the widget templates and functions
 	foreach( $widgets AS $widget ) :
-	
+
 		$_class = $widgets[$widget->slug]->iam;
-		
+
 		echo '<script type="text/template" id="' . $widget->slug . '">';
 		echo '<h2 class="handle">';
 		echo $_class::details()->name;
@@ -268,10 +268,10 @@
 		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'widgets_{{key}}[new-{{counter}}]' );
 		echo '</div>';
 		echo '</script>';
-		
+
 		echo '<script type="text/javascript">';
 		echo $this->cms_page->get_widget_editor_functions( $widget->slug, NULL, 'widgets__{{key}}[new-{{counter}}]' );
 		echo '</script>';
-	
-	endforeach;	
+
+	endforeach;
 ?>

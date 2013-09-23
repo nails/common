@@ -22,15 +22,42 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Error styles
+		$_styles = <<<EOT
+
+			<style type="text/css">
+
+				p {font-family:monospace;margin:20px 10px;}
+				strong { color:red;}
+				code { padding:5px;border:1px solid #CCC;background:#EEE }
+
+			</style>
+
+EOT;
+
 		//	Include the environment Nails config
 		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
 
-			echo '<strong style="color:red;">ERROR:</strong> Nails. environment not correctly configured; config file not found.';
+			echo $_styles;
+			echo '<p><strong>ERROR:</strong> Nails. environment not correctly configured; config file not found.</p>';
 			exit( 0 );
 
 		endif;
 
 		require_once( NAILS_PATH . '/config/_nails.php' );
+
+		// --------------------------------------------------------------------------
+
+		//	Include the composer autoloader
+		if ( ! file_exists( NAILS_PATH . '/vendor/autoload.php' ) ) :
+
+			echo $_styles;
+			echo '<p><strong>ERROR:</strong> Composer autoloader not found; run <code>composer install</code> to install dependencies.</p>';
+			exit( 0 );
+
+		endif;
+
+		require_once( NAILS_PATH . '/vendor/autoload.php' );
 
 		// --------------------------------------------------------------------------
 
@@ -118,19 +145,18 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _define_constants()
 	{
 		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.0.0' );
-		define( 'NAILS_RELEASED',	'Never Released' );
+		define( 'NAILS_VERSION',	'0.1.0' );
 
 		// --------------------------------------------------------------------------
 
 		//	Default Nails. constants
 		//	These should be defined in config/_nails.php
-		if ( ! defined( 'NAILS_REVISION') )					define( 'NAILS_REVISION',				0 );
+
 		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
 		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
 		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
+		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
 		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		serialize( array() ) );
 		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
 
@@ -139,7 +165,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Default app constants (if not already defined)
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
-		if ( ! defined( 'APP_EMAL_FROM_NAME' ) )			define( 'APP_EMAL_FROM_NAME',			APP_NAME );
+		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
 		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
 		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
@@ -149,6 +175,15 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Email
+		if ( ! defined( 'SMTP_HOST' ) )						define( 'SMTP_HOST',					'' );
+		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
+		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
+		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
+
 
 		// --------------------------------------------------------------------------
 
@@ -164,31 +199,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 				define( 'DB_DEBUG', TRUE );
 
 			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Assets release number
-		$_assets_config = @file_get_contents( NAILS_URL . 'config/config.json?uniqid=' . time() );
-
-		if ( $_assets_config ) :
-
-			$_json = @json_decode( $_assets_config );
-
-			if ( isset( $_json->release ) ) :
-
-				define( 'NAILS_ASSETS_RELEASE', (int) $_json->release );
-
-			else :
-
-				define( 'NAILS_ASSETS_RELEASE', 0 );
-
-			endif;
-
-		else :
-
-			define( 'NAILS_ASSETS_RELEASE', 0 );
 
 		endif;
 
@@ -464,7 +474,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _autoload_items()
 	{
 		$_packages		= array();
-		$_packages[]	= APPPATH . 'third_party';
 		$_packages[]	= NAILS_PATH;
 
 		foreach ( $_packages AS $package ) :

@@ -17,9 +17,9 @@
 		<script type="text/javascript">
 			var ENVIRONMENT				= '<?=ENVIRONMENT?>';
 			window.SITE_URL				= '<?=site_url()?>';
-			window.NAILS_URL			= '<?=NAILS_URL?>';
-			window.NAILS_LANG			= {};
-			window.NAILS_ASSETS_RELEASE = <?=NAILS_ASSETS_RELEASE?>;
+			window.NAILS				= {}
+			window.NAILS.URL			= '<?=NAILS_URL?>';
+			window.NAILS.LANG			= {};
 		</script>
 
 		<noscript>

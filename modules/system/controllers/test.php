@@ -4,7 +4,7 @@
  * Name:		Tests
  *
  * Description:	This controller handles the execution of Nails and App tests
- * 
+ *
  **/
 
 //	Include System_controller; executes common tests functionality.
@@ -12,10 +12,10 @@ require_once '_system.php';
 
 /**
  * OVERLOADING NAILS' TEST MODULE
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Test extends NAILS_System_Controller
@@ -28,11 +28,11 @@ class NAILS_Test extends NAILS_System_Controller
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function __construct()
 	{
@@ -89,11 +89,11 @@ class NAILS_Test extends NAILS_System_Controller
 
 	/**
 	 * Lists the tests, the purpose of each, the test to be executed and the expected result
-	 * 
+	 *
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function view()
 	{
@@ -104,7 +104,7 @@ class NAILS_Test extends NAILS_System_Controller
 				$_test = $this->_tests[$i];
 				$this->_tests[$i] = clone( $this->{'_info_' . $this->_tests[$i] }() );
 				$this->_tests[$i]->test = $_test;
-			
+
 			else :
 
 				$this->_tests[$i] = FALSE;
@@ -131,7 +131,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' ); 
+				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_output( json_encode( $this->_tests ) );
 
@@ -183,11 +183,11 @@ class NAILS_Test extends NAILS_System_Controller
 
 	/**
 	 * Actually runs the tests
-	 * 
+	 *
 	 * @access	public
 	 * @return	void
 	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function run()
 	{
@@ -266,7 +266,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' ); 
+				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_output( json_encode( $this->data['summary'] ) );
 
@@ -308,13 +308,13 @@ class NAILS_Test extends NAILS_System_Controller
 				endif;
 
 			break;
-			
+
 		endswitch;
 	}
 
 
 	// --------------------------------------------------------------------------
-	
+
 
 	//	THE TESTS
 
@@ -349,13 +349,13 @@ class NAILS_Test extends NAILS_System_Controller
 
 		//	Check CDN buckets/dirs
 		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
-			
+
 			$_dirs[]	= CDN_PATH;
 
 			//	Get all the buckets and check that directories exist and are writable
 			$this->load->library( 'cdn' );
 			$_buckets = $this->cdn->get_buckets();
-			
+
 			foreach ( $_buckets AS $bucket ) :
 
 				$_dirs[] = CDN_PATH . $bucket->slug . '/';
@@ -421,7 +421,7 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Reset result
 		$this->_result->pass	= TRUE;
 		$this->_result->errors	= array();
-		
+
 		// --------------------------------------------------------------------------
 
 		$_email				= new stdClass();
@@ -436,13 +436,24 @@ class NAILS_Test extends NAILS_System_Controller
 		else :
 
 			//	Send the email
-			$this->load->library( 'emailer' );
-			
-			if ( ! $this->emailer->send( $_email, TRUE ) ) :
-			
-				$this->_result->pass		= FALSE;
-				$this->_result->errors[]	= 'Email failed to send; error: ' . implode( ', ', $this->emailer->get_errors() );
-			
+			$_config = array( 'graceful_startup' => TRUE );
+			$this->load->library( 'emailer', $_config );
+
+			//	Any startup errorS?
+			if ( $this->emailer->get_errors() ) :
+
+				$this->_result->pass	= FALSE;
+				$this->_result->errors	= $this->_result->errors + $this->emailer->get_errors();
+
+			else :
+
+				if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+					$this->_result->pass		= FALSE;
+					$this->_result->errors[]	= 'Email failed to send; error: ' . implode( ', ', $this->emailer->get_errors() );
+
+				endif;
+
 			endif;
 
 		endif;
@@ -471,28 +482,28 @@ class NAILS_Test extends NAILS_System_Controller
 
 /**
  * OVERLOADING NAILS' TESTS MODULES
- * 
+ *
  * The following block of code makes it simple to extend one of the core tests
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
+ *
  * CodeIgniter  instanciate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclre class X' errors
  * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_TESTS' ) ) :
 
 	class Test extends NAILS_Test

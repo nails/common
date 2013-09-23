@@ -258,6 +258,15 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function set_active_user( $user )
+	{
+		$this->active_user = $user;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Sets the login data for a user
 	 *
@@ -787,7 +796,7 @@ class NAILS_User_model extends NAILS_Model
 		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
 
 			//	Parse the keywords, look for specific column searches
-			preg_match_all('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', $search['keywords'], $_matches );
+			preg_match_all('/\(([a-zA-Z0-9\.\- \_]+)=\"(.+?)\"\)/', $search['keywords'], $_matches );
 
 			if ( $_matches[1] && $_matches[2] ) :
 

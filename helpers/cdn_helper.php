@@ -9,11 +9,11 @@
  */
 if ( ! function_exists( 'cdn_serve' ) )
 {
-	function cdn_serve( $object )
+	function cdn_serve( $object, $force_download = FALSE )
 	{
 		get_instance()->load->library( 'cdn' );
-		
-		return get_instance()->cdn->url_serve( $object );
+
+		return get_instance()->cdn->url_serve( $object, $force_download );
 	}
 }
 
@@ -35,7 +35,7 @@ if ( ! function_exists( 'cdn_thumb' ) )
 	function cdn_thumb( $object, $width, $height )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->url_thumb( $object, $width, $height );
 	}
 }
@@ -58,7 +58,7 @@ if ( ! function_exists( 'cdn_scale' ) )
 	function cdn_scale( $object, $width, $height )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->url_scale( $object, $width, $height );
 	}
 }
@@ -80,7 +80,7 @@ if ( ! function_exists( 'cdn_placeholder' ) )
 	function cdn_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->url_placeholder( $width, $height, $border );
 	}
 }
@@ -102,7 +102,7 @@ if ( ! function_exists( 'cdn_blank_avatar' ) )
 	function cdn_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->url_blank_avatar( $width, $height, $sex );
 	}
 }
@@ -124,7 +124,7 @@ if ( ! function_exists( 'cdn_expiring_url' ) )
 	function cdn_expiring_url( $object, $expires )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->url_expiring( $object, $expires );
 	}
 }
@@ -144,7 +144,7 @@ if ( ! function_exists( 'get_ext_from_mimetype' ) )
 	function get_ext_from_mimetype( $mime_type )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->get_ext_from_mimetype( $mime_type );
 	}
 }
@@ -164,7 +164,7 @@ if ( ! function_exists( 'get_mimetype_from_ext' ) )
 	function get_mimetype_from_ext( $ext )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->get_mimetype_from_ext( $ext );
 	}
 }
@@ -184,7 +184,7 @@ if ( ! function_exists( 'get_mime_type_from_file' ) )
 	function get_mime_type_from_file( $file )
 	{
 		get_instance()->load->library( 'cdn' );
-		
+
 		return get_instance()->cdn->get_mime_type_from_file( $file );
 	}
 }

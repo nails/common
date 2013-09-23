@@ -4,7 +4,7 @@
  * Name:		NALS_API_Controller
  *
  * Description:	This controller executes various bits of common admin API functionality
- * 
+ *
  **/
 
 
@@ -12,124 +12,133 @@ class NAILS_API_Controller extends NAILS_Controller
 {
 	/**
 	 *	Execute common functionality
-	 *	
+	 *
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
 	 *	@author Pablo
-	 *	
+	 *
 	 **/
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Check this module is enabled in settings
 		if ( ! module_is_enabled( 'api' ) ) :
-		
+
 			//	Cancel execution, module isn't enabled
 			show_404();
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load language file
 		$this->lang->load( 'api', RENDER_LANG_SLUG );
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 *	Take the input and spit it out as JSON
-	 *	
+	 *
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
 	 *	@author Pablo
-	 *	
+	 *
 	 **/
-	protected function _out( $out = array(), $format = 'JSON' )
+	protected function _out( $out = array(), $format = 'JSON', $send_header = TRUE )
 	{
 		//	Set JSON headers
 		$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		$this->output->set_header( 'Content-type: application/json' ); 
+		$this->output->set_header( 'Content-type: application/json' );
 		$this->output->set_header( 'Pragma: no-cache' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Send the correct status header, default to 200 OK
 		if ( isset( $out['status'] ) ) :
-		
-			switch ( $out['status'] ) :
-			
-				case 400 :	$this->output->set_header( 'HTTP/1.0 400 Bad Request' );			break;
-				case 401 :	$this->output->set_header( 'HTTP/1.0 401 Unauthorized' );			break;
-				case 404 :	$this->output->set_header( 'HTTP/1.0 404 Not Found' );				break;
-				case 500 :	$this->output->set_header( 'HTTP/1.0 500 Internal Server Error' );	break;
-				default  :	$this->output->set_header( 'HTTP/1.0 200 OK' );						break;
-			
-			endswitch;
-			
+
+			if ( $send_header ) :
+
+				switch ( $out['status'] ) :
+
+					case 400 :	$this->output->set_header( 'HTTP/1.0 400 Bad Request' );			break;
+					case 401 :	$this->output->set_header( 'HTTP/1.0 401 Unauthorized' );			break;
+					case 404 :	$this->output->set_header( 'HTTP/1.0 404 Not Found' );				break;
+					case 500 :	$this->output->set_header( 'HTTP/1.0 500 Internal Server Error' );	break;
+					default  :	$this->output->set_header( 'HTTP/1.0 200 OK' );						break;
+
+				endswitch;
+
+			endif;
+
 		else:
-		
+
 			$out['status'] = 200;
-			$this->output->set_header( 'HTTP/1.0 200 OK' );
-		
+
+			if ( $send_header ) :
+
+				$this->output->set_header( 'HTTP/1.0 200 OK' );
+
+			endif;
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Output content
 		$this->output->set_output( json_encode( $out ) );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 *	Take the input and spit it out as JSON
-	 *	
+	 *
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
 	 *	@author Pablo
-	 *	
+	 *
 	 **/
 	public function _remap( $method )
 	{
 		if ( method_exists( $this, $method ) ) :
-		
+
 			$this->{$method}();
-		
+
 		else :
-		
+
 			$this->_method_not_found( $method );
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 *	Output JSON for when a method is not found (or enabled)
-	 *	
+	 *
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
 	 *	@author Pablo
-	 *	
+	 *
 	 **/
 	protected function _method_not_found( $method )
 	{
 		 $this->_out( array( 'status' => 400, 'error' => lang( 'not_valid_method', $method ) ) );
-		 
+
 		 //	Careful now, this might break in future updates of CI
 		 echo $this->output->_display();
 		 exit(0);

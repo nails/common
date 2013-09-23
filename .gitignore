@@ -1,3 +1,4 @@
 .DS_Store
 config/_nails.php
 libraries/_resources/geoip/GeoLiteCity.dat
+vendor*

@@ -3,8 +3,8 @@
 /**
 * Name:			CDN Langfile
 *
-* Description:  Language file for Nails Local CDN
-* 
+* Description:  Generic language file for Nails CDN module & libraries
+*
 */
 
 	//	General Errors

@@ -7,7 +7,8 @@
 *
 */
 
-class Asset {
+class Asset
+{
 
 	private $CI;
 	private $unload_assets;
@@ -127,6 +128,28 @@ class Asset {
 			case 'ibutton' :
 
 				$this->load( 'libraries/jquery.ibutton/lib/jquery.ibutton.min.js', TRUE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'nails_api' :
+
+				//	Generate the api credentials
+
+				//	Load the assets
+				$this->load( 'nails.api.min.js', TRUE );
+
+				//	Inline assets
+				$_js  = '$(function(){';
+
+				$_js .= 'if ( typeof( NAILS_API ) === \'function\' ){';
+				$_js .= 'window.NAILS.API = new NAILS_API();';
+				$_js .= 'window.NAILS.API.init( \'\', \'\' );}';
+
+				$_js .= '});';
+
+				$this->inline( '<script>' . $_js . '</script>' );
 
 			break;
 
@@ -456,7 +479,7 @@ class Asset {
 		foreach ( $this->css_nails AS $asset ) :
 
 			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'css/' . $asset ;
-			$out .= link_tag( $url . '?release=' . NAILS_ASSETS_RELEASE ) . "\n";
+			$out .= link_tag( $url ) . "\n";
 
 		endforeach;
 
@@ -530,7 +553,7 @@ class Asset {
 		foreach ( $this->js_nails AS $asset ) :
 
 			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'js/' . $asset ;
-			$out .= '<script type="text/javascript" src="' . $url . '?release=' . NAILS_ASSETS_RELEASE . '"></script>' . "\n";
+			$out .= '<script type="text/javascript" src="' . $url . '"></script>' . "\n";
 
 		endforeach;
 		return $out;
