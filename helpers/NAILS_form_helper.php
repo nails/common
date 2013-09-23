@@ -873,6 +873,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_field['text_on']		= isset( $field['text_on'] ) ? $field['text_on'] : 'ON';
 		$_field['text_off']		= isset( $field['text_off'] ) ? $field['text_off'] : 'OFF';
 		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
@@ -881,11 +882,13 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
-		$_error = form_error( $_field['key'] ) ? 'error' : '';
+		$_error			= form_error( $_field['key'] ) ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
-		$_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '">';
+		$_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '">';
 
 		//	Does the field have an id?
 		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -909,7 +912,8 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		if ( $_ci->input->post( $_field['key'] ) ) :
 
-			$_selected = $_ci->input->post( $_field['key'] ) == $_field['default'] ? TRUE : FALSE;
+			//	If this field is present, because it's a boolean consider it TRUE
+			$_selected = TRUE;
 
 		else :
 
@@ -918,7 +922,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		endif;
 
 		$_out .= '<div class="toggle toggle-modern"></div>';
-		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data );
+		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly );
 
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
