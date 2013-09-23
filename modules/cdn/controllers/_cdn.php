@@ -59,29 +59,29 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		//	Common
 
-		//	CACHE_DIR must be defined; the CDN can be very process heavy so caching is a
+		//	DEPLOY_CACHE_DIR must be defined; the CDN can be very process heavy so caching is a
 		//	requirement and if not defined it is considered a configuration error and
 		//	execution should be halted
 
-		if ( ! defined( 'CACHE_DIR' ) ) :
+		if ( ! defined( 'DEPLOY_CACHE_DIR' ) ) :
 
-			log_message( 'error', 'CDN: CACHE_DIR not defined' );
-			show_error( 'CDN: CACHE_DIR not defined' );
+			log_message( 'error', 'CDN: DEPLOY_CACHE_DIR not defined' );
+			show_error( 'CDN: DEPLOY_CACHE_DIR not defined' );
 
 		endif;
 
 		//	Cache must be writeable
-		if ( ! is_writable( CACHE_DIR ) ) :
+		if ( ! is_writable( DEPLOY_CACHE_DIR ) ) :
 
 			//	Inform developers
 			$_subject	= 'Cache (CDN) dir not writeable';
 			$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
-			$_message	.= 'Dir: ' . CACHE_DIR . "\n\n";
+			$_message	.= 'Dir: ' . DEPLOY_CACHE_DIR . "\n\n";
 			$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
 
 			send_developer_mail( $_subject, $_message );
 
-			show_error( 'CDN: CACHE_DIR not writeable' );
+			show_error( 'CDN: DEPLOY_CACHE_DIR not writeable' );
 
 		endif;
 
@@ -89,7 +89,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		//	Define variables
 		$this->_cdn_root	= NAILS_PATH . 'modules/cdn/';
-		$this->_cachedir	= CACHE_DIR;
+		$this->_cachedir	= DEPLOY_CACHE_DIR;
 
 		// --------------------------------------------------------------------------
 

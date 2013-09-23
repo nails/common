@@ -340,7 +340,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->db->where( 'id !=', $this->uri->segment( 5 ) );
 		$this->db->where( 'slug', $str );
 
-		if ( $this->db->count_all_results( 'cms_page' ) ) :
+		if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cms_page' ) ) :
 
 			$this->form_validation->set_message( '_callback_slug', 'Slug must be unique.' );
 			return FALSE;

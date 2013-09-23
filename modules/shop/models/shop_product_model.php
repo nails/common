@@ -488,7 +488,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_product p' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_product p' );
 	}
 
 

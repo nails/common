@@ -87,7 +87,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_notifications['index']			= array();
-		$_notifications['index']['value']	= $_ci->db->count_all( 'user' );
+		$_notifications['index']['value']	= $_ci->db->count_all( NAILS_DB_PREFIX . 'user' );
 
 		// --------------------------------------------------------------------------
 
@@ -470,7 +470,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		if ( is_null( $this->data['user_meta_cols'] ) ) :
 
-			$_describe = $this->db->query( 'DESCRIBE `user_meta`' )->result();
+			$_describe = $this->db->query( 'DESCRIBE `' . NAILS_DB_PREFIX . 'user_meta`' )->result();
 			$this->data['user_meta_cols'] = array();
 
 			foreach ( $_describe AS $col ) :

@@ -65,7 +65,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			$this->db->where( 'slug', $_slug );
 
-		} while( $this->db->count_all_results( 'blog_post' ) );
+		} while( $this->db->count_all_results( NAILS_DB_PREFIX . 'blog_post' ) );
 
 		// --------------------------------------------------------------------------
 
@@ -227,7 +227,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 				$this->db->where( 'id !=', $id );
 				$this->db->where( 'slug', $_slug );
 
-			} while( $this->db->count_all_results( 'blog_post' ) );
+			} while( $this->db->count_all_results( NAILS_DB_PREFIX . 'blog_post' ) );
 
 			// --------------------------------------------------------------------------
 

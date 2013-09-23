@@ -868,7 +868,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->db->where( 'order_id', $_order_id );
 			$this->db->where( 'processed', FALSE );
 
-			if ( ! $this->db->count_all_results( 'shop_order_product' ) ) :
+			if ( ! $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order_product' ) ) :
 
 				//	No unprocessed items, consider order FULFILLED
 				$this->load->model( 'shop/shop_order_model', 'order' );

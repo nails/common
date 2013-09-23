@@ -91,7 +91,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 			$this->db->where( 'id !=', $page_id );
 			$this->db->where( 'slug', $data->slug );
 
-			if ( $this->db->count_all_results( 'cms_page' ) ) :
+			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cms_page' ) ) :
 
 				$this->_set_error( 'Slug must be unique.' );
 				return FALSE;

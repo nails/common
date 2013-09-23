@@ -80,7 +80,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			//	Test it
 			$this->db->where( 'ref', $_order->ref );
 
-		} while ( $this->db->count_all_results( 'shop_order' ) );
+		} while ( $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order' ) );
 
 		// --------------------------------------------------------------------------
 
@@ -411,7 +411,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_order o' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order o' );
 	}
 
 
@@ -437,7 +437,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_order o' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order o' );
 	}
 
 
@@ -894,7 +894,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->where( 'order_id', $order->id );
 		$this->db->where( 'processed', FALSE );
 
-		if ( ! $this->db->count_all_results( 'shop_order_product' ) ) :
+		if ( ! $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order_product' ) ) :
 
 			//	No unprocessed items, consider order FULFILLED
 			$this->fulfil( $order->id );

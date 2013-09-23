@@ -741,7 +741,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'user u' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'user u' );
 	}
 
 
@@ -1215,7 +1215,7 @@ class NAILS_User_model extends NAILS_Model
 				$this->db->where( 'u.id !=', (int) $_uid );
 				$this->db->where( 'u.email', $data['email'] );
 
-				if ( $this->db->count_all_results( 'user u' ) ) :
+				if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'user u' ) ) :
 
 					//	We found a user who isn't the current user who is already
 					//	using this email address.
@@ -1796,7 +1796,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Check email against DB
 		$this->db->where( 'email', $email );
-		if (  $this->db->count_all_results( 'user' ) ) :
+		if (  $this->db->count_all_results( NAILS_DB_PREFIX . 'user' ) ) :
 
 			$this->_set_error( 'This email is already in use.' );
 			return FALSE;
@@ -1922,7 +1922,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$this->db->where( 'username' , trim( $data['username'] ) );
 
-			if ( $this->db->count_all_results( 'user' ) ) :
+			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'user' ) ) :
 
 				//	Not unique, use user ID
 				$this->db->set( 'username', 'user' . $_id );

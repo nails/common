@@ -1062,7 +1062,7 @@ class Cdn {
 		//	Test if tag has already been applied to the object, if it has gracefully fail
 		$this->db->where( 'object_id', $_object->id );
 		$this->db->where( 'tag_id', $_tag->id );
-		if ( $this->db->count_all_results( 'cdn_object_tag' ) ) :
+		if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_object_tag' ) ) :
 
 			return TRUE;
 
@@ -1154,7 +1154,7 @@ class Cdn {
 	{
 		$this->db->where( 'ot.tag_id', $tag_id );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_object o', 'o.id = ot.object_id' );
-		return $this->db->count_all_results( 'cdn_object_tag ot' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_object_tag ot' );
 	}
 
 
@@ -1510,7 +1510,7 @@ class Cdn {
 		//	Test tag
 		$this->db->where( 'bucket_id', $_bucket->id );
 		$this->db->where( 'label', $label );
-		if ( $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
+		if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_bucket_tag' ) ) :
 
 			$this->set_error( lang( 'cdn_error_tag_exists' ) );
 			return FALSE;
@@ -1586,7 +1586,7 @@ class Cdn {
 		endif;
 
 
-		if ( ! $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
+		if ( ! $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_bucket_tag' ) ) :
 
 			$this->set_error( lang( 'cdn_error_tag_notexist' ) );
 			return FALSE;
@@ -1764,7 +1764,7 @@ class Cdn {
 
 				$this->db->where( 'id', $data->tag_id );
 
-				if ( $this->db->count_all_results( 'cdn_bucket_tag' ) ) :
+				if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_bucket_tag' ) ) :
 
 					$this->db->set( 'object_id',	$_object_id );
 					$this->db->set( 'tag_id',		$data->tag_id );

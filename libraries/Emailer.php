@@ -519,7 +519,7 @@ class Emailer
 	 **/
 	public function count_all()
 	{
-		return $this->ci->db->count_all_results( 'email_queue_archive' );
+		return $this->ci->db->count_all_results( NAILS_DB_PREFIX . 'email_queue_archive' );
 	}
 
 
@@ -1511,7 +1511,7 @@ class Emailer
 
 		$this->ci->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = um.user_id' );
 
-		return (bool) $this->ci->db->count_all_results( 'user_meta um' );
+		return (bool) $this->ci->db->count_all_results( NAILS_DB_PREFIX . 'user_meta um' );
 	}
 
 

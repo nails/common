@@ -250,6 +250,28 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Handle wildcard
+		reset( $_modules );
+		if ( key( $_modules ) == '*' ) :
+
+			$_modules['admin']	= array();
+			$_controllers		= scandir( NAILS_PATH . 'modules/admin/controllers/' );
+			$_ignore			= array( '.','..','_admin.php' );
+
+			foreach ( $_controllers AS $controller ) :
+
+				if ( array_search( $controller, $_ignore ) === FALSE ) :
+
+					$_modules['admin'][] = pathinfo( $controller )['filename'];
+
+				endif;
+
+			endforeach;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		if ( isset( $_modules['admin'] ) && $_modules['admin'] ) :
 
 			foreach( $_modules['admin'] AS $module ) :

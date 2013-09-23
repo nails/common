@@ -339,9 +339,9 @@ class NAILS_Test extends NAILS_System_Controller
 		$_dirs		= array();
 
 		//	Cache directory
-		if ( defined( 'CACHE_DIR' ) ) :
+		if ( defined( 'DEPLOY_CACHE_DIR' ) ) :
 
-			$_dirs[]	= CACHE_DIR;
+			$_dirs[]	= DEPLOY_CACHE_DIR;
 
 		endif;
 

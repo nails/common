@@ -363,7 +363,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_voucher v' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_voucher v' );
 	}
 
 
