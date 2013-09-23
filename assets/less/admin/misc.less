@@ -1,0 +1,155 @@
+/* -------------------------------------------------------------- 
+   Miscallaneous Elements
+-------------------------------------------------------------- */
+
+/* -------------------------------------------------------------- 
+   CKEditor - if no JS style the textarea nicely
+   Duplicated in common/_nails_default.less
+-------------------------------------------------------------- */
+textarea.ckeditor
+{
+	width:99%;
+	height:150px;
+}
+
+
+/* -------------------------------------------------------------- 
+   Search Box
+-------------------------------------------------------------- */
+.search
+{
+	.nifty-drop-shadow();
+	background:#F5F5F5;
+	padding:10px;
+	position:relative;
+	
+	.mask
+	{
+		background:url('@{imgPath}1px/FFFFFF-70.png');
+		position:absolute;
+		left:0px;
+		top:0px;
+		width:100%;
+		height:100%;
+		z-index:999;
+		text-align:center;
+		line-height:100px;
+		display:none;
+	}
+	
+	form
+	{
+		margin:0;
+	}
+	
+	.search-text
+	{
+		background:#FFF;
+		padding:0px 6px;
+		border:1px solid #CCC;
+		.rounded(4px);
+		.drop-shadow( 0px, 0px, 3px );
+		margin-bottom:1em;
+
+		input[type=text]
+		{
+			display:block;
+			margin-bottom:0;
+			width:100%;
+			padding:6px 0;
+			border:0;
+		}
+		input[type=text]:focus
+		{
+			.drop-shadow( 0px, 0px, 0px, 0 );
+		}
+	}
+	
+	select
+	{
+		display:inline;
+		max-width:125px;
+		margin:0.5em;
+	}
+	
+	.awesome
+	{
+		margin-top:5px;
+	}
+}
+	
+	
+/* -------------------------------------------------------------- 
+   Pagination
+-------------------------------------------------------------- */
+
+.pagination
+{
+	ul
+	{
+		float:right;
+		margin-bottom:15px;
+		
+		li.page
+		{
+			display:inline;
+			margin-left:5px;
+			
+			a,
+			span.current
+			{
+				border:1px solid #CFCFCF;
+				padding:5px 8px;
+				.rounded( 3px );
+				.nifty-drop-shadow();
+				text-decoration: none;
+			}
+			a:hover
+			{
+				background:#F4F4F4;
+			}
+			a:active
+			{
+				position:relative;
+				top:1px;
+			}
+			
+			span.current
+			{
+				background:#EFEFEF;
+				font-weight:bold;
+			}
+		}
+	}
+}
+	
+	
+/* -------------------------------------------------------------- 
+   Elements
+-------------------------------------------------------------- */
+
+hr
+{
+	border: none;
+	width:100%;
+	margin:20px auto 16px auto;
+	border-bottom: 1px dotted #ccc;
+}
+
+.search-text
+{
+	font-size: 10px;
+	text-align: center;
+}
+
+.inline_indicator
+{
+	font-size: 9px;
+	padding: 4px;
+	background-color: #ededed;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	margin-right: 3px;
+	color: #333;
+}

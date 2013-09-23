@@ -146,18 +146,17 @@ EOT;
 	{
 		//	Define the Nails version constant
 		define( 'NAILS_VERSION',	'0.0.0' );
-		define( 'NAILS_RELEASED',	'Never Released' );
 
 		// --------------------------------------------------------------------------
 
 		//	Default Nails. constants
 		//	These should be defined in config/_nails.php
-		if ( ! defined( 'NAILS_REVISION') )					define( 'NAILS_REVISION',				0 );
+
 		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
 		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
 		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
 		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					'' );
+		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
 		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		serialize( array() ) );
 		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
 
@@ -200,31 +199,6 @@ EOT;
 				define( 'DB_DEBUG', TRUE );
 
 			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Assets release number
-		$_assets_config = @file_get_contents( NAILS_URL . 'config/config.json?uniqid=' . time() );
-
-		if ( $_assets_config ) :
-
-			$_json = @json_decode( $_assets_config );
-
-			if ( isset( $_json->release ) ) :
-
-				define( 'NAILS_ASSETS_RELEASE', (int) $_json->release );
-
-			else :
-
-				define( 'NAILS_ASSETS_RELEASE', 0 );
-
-			endif;
-
-		else :
-
-			define( 'NAILS_ASSETS_RELEASE', 0 );
 
 		endif;
 

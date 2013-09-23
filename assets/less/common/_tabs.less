@@ -1,0 +1,114 @@
+ul.tabs
+{
+	border-bottom:1px solid #CECECE;
+	margin-bottom:0;
+	position:relative;
+
+	li.tab
+	{
+		margin-bottom:0;
+		margin-left:5px;
+		display:inline-block;
+
+		a
+		{
+			padding:5px 20px;
+			display:block;
+			border:1px solid #CECECE;
+			background:#efefef;
+			position:relative;
+			left:13px;
+			margin-top:7px;
+			top:1px;
+			text-decoration:none;
+			text-align:center;
+			.border-radius(3px,  0, 0, 3px);
+			min-height:24px;
+			box-sizing:border-box;
+		}
+
+		a.disabled
+		{
+			background:#FAFAFA;
+			color:#C2C2C2;
+			cursor:default;
+			border-color:#F0F0F0;
+			border-bottom-color:#CECECE;
+		}
+
+		a.error
+		{
+			background:#B52130 !important;
+			color:#FFF;
+		}
+	}
+
+	li.tab.active
+	{
+		a
+		{
+			background:#fff;
+			border-bottom:1px solid #fff;
+			font-weight:bold;
+			margin-top: 2px;
+			padding-top: 10px;
+		}
+		a.disabled
+		{
+			color:#000;
+			border-color:#CECECE;
+			border-bottom-color:#FFF;
+		}
+	}
+}
+
+// ul.tabs:after
+// {
+// 	content: '\0020';
+// 	display: block;
+// 	overflow: hidden;
+// 	visibility: hidden;
+// 	width: 0;
+// 	height: 0;
+// 	clear:left;
+// }
+
+section.tabs.pages
+{
+	position:relative;
+	position:-1px;
+	margin-bottom:1em;
+
+	div.tab.page
+	{
+		border:1px solid #CECECE;
+		border-top-color:transparent;
+		padding:15px;
+
+		//	Tabs within tabs should be slightly smaller.
+		ul.tabs
+		{
+			li.tab
+			{
+				a
+				{
+					margin-top: 0;
+					padding:2px 7px;
+				}
+			}
+			li.tab.active
+			{
+				a
+				{
+					margin-top: -2px;
+					padding-top: 4px;
+				}
+			}
+		}
+
+		fieldset:last-of-type
+		{
+			margin-bottom:0;
+		}
+	}
+}
