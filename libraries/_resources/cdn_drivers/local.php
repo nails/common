@@ -38,7 +38,7 @@ class Local_CDN
 
 		// --------------------------------------------------------------------------
 
-		if ( ! defined( 'CDN_PATH' ) ) :
+		if ( ! defined( 'DEPLOY_CDN_PATH' ) ) :
 
 			show_error( lang( 'cdn_error_not_configured' ) );
 
@@ -66,9 +66,9 @@ class Local_CDN
 	public function object_create( $bucket, $filename, $sourcefile, $mime )
 	{
 		//	Check bucket is writeable
-		if ( ! is_writable( CDN_PATH . $bucket ) ) :
+		if ( ! is_writable( DEPLOY_CDN_PATH . $bucket ) ) :
 
-			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', CDN_PATH . $bucket ) );
+			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', DEPLOY_CDN_PATH . $bucket ) );
 			return FALSE;
 
 		endif;
@@ -76,7 +76,7 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Move the file
-		if ( move_uploaded_file( $sourcefile, CDN_PATH . $bucket . '/' . $filename ) ) :
+		if ( move_uploaded_file( $sourcefile, DEPLOY_CDN_PATH . $bucket . '/' . $filename ) ) :
 
 			return TRUE;
 
@@ -105,9 +105,9 @@ class Local_CDN
 		$_file		= urldecode( $object );
 		$_bucket	= urldecode( $bucket );
 
-		if ( file_exists( CDN_PATH . $bucket . '/' . $_file ) ) :
+		if ( file_exists( DEPLOY_CDN_PATH . $bucket . '/' . $_file ) ) :
 
-			if ( @unlink( CDN_PATH . $bucket . '/' . $_file ) ) :
+			if ( @unlink( DEPLOY_CDN_PATH . $bucket . '/' . $_file ) ) :
 
 				//	TODO: Delete Cache items
 
@@ -148,7 +148,7 @@ class Local_CDN
 	 **/
 	public function bucket_create( $bucket )
 	{
-		if ( @mkdir( CDN_PATH . $bucket ) ) :
+		if ( @mkdir( DEPLOY_CDN_PATH . $bucket ) ) :
 
 			return TRUE;
 
@@ -166,7 +166,7 @@ class Local_CDN
 
 	public function bucket_delete( $bucket )
 	{
-		if ( @unlink( CDN_PATH . $bucket ) ) :
+		if ( @unlink( DEPLOY_CDN_PATH . $bucket ) ) :
 
 			return TRUE;
 

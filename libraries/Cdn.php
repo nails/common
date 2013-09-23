@@ -2085,7 +2085,7 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_file	= fopen( CDN_MAGIC, 'r' );
+		$_file	= fopen( DEPLOY_CDN_MAGIC, 'r' );
 		$_ext	= NULL;
 
 		while( ( $line = fgets( $_file ) ) !== FALSE ) :
@@ -2146,7 +2146,7 @@ class Cdn {
 		//	Returns the system MIME type mapping of extensions to MIME types, as defined in /etc/mime.types.
 		//	Thanks, 'chaos' - http://stackoverflow.com/a/1147952/789224
 
-		$_file = fopen( CDN_MAGIC, 'r' );
+		$_file = fopen( DEPLOY_CDN_MAGIC, 'r' );
 		$_mime = NULL;
 
 
@@ -2203,7 +2203,7 @@ class Cdn {
 
 		if ( $_result == 'application/zip' ) :
 
-			$_fi = @finfo_open( FILEINFO_MIME_TYPE, CDN_MAGIC );
+			$_fi = @finfo_open( FILEINFO_MIME_TYPE, DEPLOY_CDN_MAGIC );
 
 			if ( $_fi ) :
 

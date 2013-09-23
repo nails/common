@@ -42,14 +42,14 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 			case 'local' :
 
-				//	CDN_PATH must be defined, while it might not be used for all scenarios
+				//	DEPLOY_CDN_PATH must be defined, while it might not be used for all scenarios
 				//	it's lack of presence is a configuration issue and so execution should
 				//	be halted.
 
-				if ( ! defined( 'CDN_PATH' ) ) :
+				if ( ! defined( 'DEPLOY_CDN_PATH' ) ) :
 
-					log_message( 'error', 'CDN: CDN_PATH not defined' );
-					show_error( 'CDN: CDN_PATH not defined' );
+					log_message( 'error', 'CDN: DEPLOY_CDN_PATH not defined' );
+					show_error( 'CDN: DEPLOY_CDN_PATH not defined' );
 
 				endif;
 
@@ -189,17 +189,17 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	If we're using the local driver then we need to check the source file exists
-		//	in the CDN_PATH.
+		//	in the DEPLOY_CDN_PATH.
 
-		elseif ( $this->_driver == 'local' && file_exists( CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		elseif ( $this->_driver == 'local' && file_exists( DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
 
 			//	Object exists, time for manipulation fun times :>
-			return CDN_PATH . $this->_bucket . '/' . $this->_object;
+			return DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object;
 
 		else :
 
 			//	This object does not exist / something went wrong
-			log_message( 'error', 'CDN: Thumb: File not found; ' . CDN_PATH . $this->_bucket . '/' . $this->_object );
+			log_message( 'error', 'CDN: Thumb: File not found; ' . DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object );
 			return FALSE;
 
 		endif;
@@ -218,7 +218,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	 **/
 	protected function _bad_src( $width = 100, $height = 100 )
 	{
-		if ( $this->_driver == 'local' && ! defined( 'CDN_PATH' ) ) :
+		if ( $this->_driver == 'local' && ! defined( 'DEPLOY_CDN_PATH' ) ) :
 
 			$this->output->set_header( 'Cache-Control: no-cache, must-revalidate' );
 			$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );

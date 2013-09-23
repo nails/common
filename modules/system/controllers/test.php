@@ -350,7 +350,7 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Check CDN buckets/dirs
 		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
 
-			$_dirs[]	= CDN_PATH;
+			$_dirs[]	= DEPLOY_CDN_PATH;
 
 			//	Get all the buckets and check that directories exist and are writable
 			$this->load->library( 'cdn' );
@@ -358,7 +358,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 			foreach ( $_buckets AS $bucket ) :
 
-				$_dirs[] = CDN_PATH . $bucket->slug . '/';
+				$_dirs[] = DEPLOY_CDN_PATH . $bucket->slug . '/';
 
 			endforeach;
 
