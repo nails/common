@@ -1090,7 +1090,7 @@ class Emailer
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 
-		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_EMAIL_DEVELOPER' ) && APP_EMAIL_DEVELOPER ) && $_error->error_has_occurred() ) :
+		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_DEVELOPER_EMAIL' ) && APP_DEVELOPER_EMAIL ) && $_error->error_has_occurred() ) :
 
 			//	The templates error'd, abort the send and let dev know
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';

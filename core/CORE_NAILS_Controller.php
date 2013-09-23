@@ -22,36 +22,19 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Error styles
-		$_styles = <<<EOT
-
-			<style type="text/css">
-
-				p {font-family:monospace;margin:20px 10px;}
-				strong { color:red;}
-				code { padding:5px;border:1px solid #CCC;background:#EEE }
-
-			</style>
-
-EOT;
-
-		//	Include the environment Nails config
-		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
-
-			echo $_styles;
-			echo '<p><strong>ERROR:</strong> Nails. environment not correctly configured; config file not found.</p>';
-			exit( 0 );
-
-		endif;
-
-		require_once( NAILS_PATH . '/config/_nails.php' );
+		//	Set the level of error reporting
+		$this->_set_error_reporting();
 
 		// --------------------------------------------------------------------------
 
 		//	Include the composer autoloader
 		if ( ! file_exists( NAILS_PATH . '/vendor/autoload.php' ) ) :
 
-			echo $_styles;
+			echo '<style type="text/css">';
+			echo 'p {font-family:monospace;margin:20px 10px;}';
+			echo 'strong { color:red;}';
+			echo 'code { padding:5px;border:1px solid #CCC;background:#EEE }';
+			echo '</style>';
 			echo '<p><strong>ERROR:</strong> Composer autoloader not found; run <code>composer install</code> to install dependencies.</p>';
 			exit( 0 );
 
@@ -142,6 +125,33 @@ EOT;
 	// --------------------------------------------------------------------------
 
 
+	protected function _set_error_reporting()
+	{
+	 	switch( ENVIRONMENT ) :
+
+	 		case 'production' :
+
+	 			//	Suppress all errors on production
+	 			error_reporting( 0 );
+
+	 		break;
+
+	 		// --------------------------------------------------------------------------
+
+	 		default :
+
+	 			//	Show errors everywhere else
+	 			error_reporting( E_ALL|E_STRICT );
+
+	 		break;
+
+	 	endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _define_constants()
 	{
 		//	Define the Nails version constant
@@ -149,32 +159,39 @@ EOT;
 
 		// --------------------------------------------------------------------------
 
-		//	Default Nails. constants
-		//	These should be defined in config/_nails.php
+		//	These settings can be specified wherever it makes msot sense (e.g if
+		//	maintenance mode needs enabled app wide, then specify it in app.php, if
+		//	only a single server needs to be put in maintenance mode then define in
+		//	deploy.php
 
-		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
-		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
-		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
-		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
-		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		serialize( array() ) );
-		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
+		if ( ! defined( 'MAINTENANCE') )					define( 'MAINTENANCE',					FALSE );
+		if ( ! defined( 'MAINTENANCE_WHITELIST') )			define( 'MAINTENANCE_WHITELIST',		'127.0.0.1' );
 
 		// --------------------------------------------------------------------------
 
 		//	Default app constants (if not already defined)
+		//	These should be specified in settings/app.php
+
+		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
 		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
 		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
-		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
+		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) )			define( 'APP_DEVELOPER_EMAIL',			'' );
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
 		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
 		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
 		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
-		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
+		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	Deployment specific constants (if not already defined)
+		//	These should be specified in settings/deploy.php
+
+		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
 
 		// --------------------------------------------------------------------------
 
@@ -260,7 +277,7 @@ EOT;
 
 	protected function _staging()
 	{
-		$_users_nails	= @unserialize( NAILS_STAGING_USERPASS );
+		$_users_nails	= @unserialize( STAGING_USERPASS );
 		$_users_app		= @unserialize( APP_STAGING_USERPASS );
 
 		if ( ENVIRONMENT == 'staging' && ( $_users_nails || $_users_app ) ) :
@@ -371,7 +388,7 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		//	Set the timezones
-		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : NAILS_DEFAULT_TIMEZONE;
+		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : DEPLOY_SYSTEM_TIMEZONE;
 		$this->datetime->set_timezones( 'UTC', $_timezone_user );
 
 		// --------------------------------------------------------------------------

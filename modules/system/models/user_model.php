@@ -1872,9 +1872,9 @@ class NAILS_User_model extends NAILS_Model
 
 			$_data['timezone'] = $data['timezone'];
 
-		elseif ( defined( 'NAILS_DEFAULT_TIMEZONE' ) && NAILS_DEFAULT_TIMEZONE ) :
+		elseif ( defined( 'DEPLOY_SYSTEM_TIMEZONE' ) && DEPLOY_SYSTEM_TIMEZONE ) :
 
-			$_data['timezone'] = NAILS_DEFAULT_TIMEZONE;
+			$_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
 
 		endif;
 

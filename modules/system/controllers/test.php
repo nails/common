@@ -426,12 +426,12 @@ class NAILS_Test extends NAILS_System_Controller
 
 		$_email				= new stdClass();
 		$_email->type		= 'test_email';
-		$_email->to_email	= APP_EMAIL_DEVELOPER ? APP_EMAIL_DEVELOPER : NAILS_EMAIL_DEVELOPER;
+		$_email->to_email	= APP_DEVELOPER_EMAIL ? APP_DEVELOPER_EMAIL : APP_DEVELOPER_EMAIL;
 
 		if ( ! $_email->to_email ) :
 
 			$this->_result->pass		= FALSE;
-			$this->_result->errors[]	= 'APP_EMAIL_DEVELOPER and NAILS_EMAIL_DEVELOPER are blank.';
+			$this->_result->errors[]	= 'APP_DEVELOPER_EMAIL and APP_DEVELOPER_EMAIL are blank.';
 
 		else :
 

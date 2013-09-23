@@ -392,7 +392,7 @@
 
 					echo '<p class="system-alert message no-close">';
 					echo '<strong>No Payment gateways have been enabled.</strong>';
-					echo '<br />No payment gateways have been enabled for this site. Please contact the developers on ' . mailto( APP_EMAIL_DEVELOPER ) . ' for assistance.';
+					echo '<br />No payment gateways have been enabled for this site. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
 					echo '</p>';
 
 				endif;
