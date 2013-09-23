@@ -28,7 +28,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Include the composer autoloader
-		if ( ! file_exists( NAILS_PATH . '/vendor/autoload.php' ) ) :
+
+		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
 			echo '<style type="text/css">';
 			echo 'p {font-family:monospace;margin:20px 10px;}';
@@ -40,7 +41,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
-		require_once( NAILS_PATH . '/vendor/autoload.php' );
+		require_once( FCPATH . 'vendor/autoload.php' );
 
 		// --------------------------------------------------------------------------
 
@@ -172,7 +173,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Default app constants (if not already defined)
 		//	These should be specified in settings/app.php
 
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
+		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					BASE_URL . 'vendor/shed/nails/assets/' );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
 		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
@@ -234,9 +235,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _maintenance_mode()
 	{
-		if ( NAILS_MAINTENANCE ) :
+		if ( MAINTENANCE ) :
 
-			$whitelist_ip = explode(',', NAILS_MAINTENANCE_WHITELIST );
+			$whitelist_ip = explode(',', MAINTENANCE_WHITELIST );
 
 			if ( array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
 
