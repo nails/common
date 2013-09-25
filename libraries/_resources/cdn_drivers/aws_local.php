@@ -46,25 +46,25 @@ class Aws_local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Check all the constants are defined properly
-		//	APP_CDN_DRIVER_AWS_IAM_ACCESS_ID
-		//	APP_CDN_DRIVER_AWS_IAM_ACCESS_SECRET
-		//	APP_CDN_DRIVER_AWS_S3_BUCKET
+		//	DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_ID
+		//	DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_SECRET
+		//	DEPLOY_CDN_DRIVER_AWS_S3_BUCKET
 
-		if ( ! defined( 'APP_CDN_DRIVER_AWS_IAM_ACCESS_ID' ) ) :
-
-			//	TODO: Specify correct lang
-			show_error( lang( 'cdn_error_not_configured' ) );
-
-		endif;
-
-		if ( ! defined( 'APP_CDN_DRIVER_AWS_IAM_ACCESS_SECRET' ) ) :
+		if ( ! defined( 'DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_ID' ) ) :
 
 			//	TODO: Specify correct lang
 			show_error( lang( 'cdn_error_not_configured' ) );
 
 		endif;
 
-		if ( ! defined( 'APP_CDN_DRIVER_AWS_S3_BUCKET' ) ) :
+		if ( ! defined( 'DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_SECRET' ) ) :
+
+			//	TODO: Specify correct lang
+			show_error( lang( 'cdn_error_not_configured' ) );
+
+		endif;
+
+		if ( ! defined( 'DEPLOY_CDN_DRIVER_AWS_S3_BUCKET' ) ) :
 
 			//	TODO: Specify correct lang
 			show_error( lang( 'cdn_error_not_configured' ) );
@@ -75,14 +75,14 @@ class Aws_local_CDN
 
 		//	Instanciate the AWS PHP SDK
 		$this->_s3 = S3Client::factory(array(
-			'key'		=> APP_CDN_DRIVER_AWS_IAM_ACCESS_ID,
-			'secret'	=> APP_CDN_DRIVER_AWS_IAM_ACCESS_SECRET,
+			'key'		=> DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_ID,
+			'secret'	=> DEPLOY_CDN_DRIVER_AWS_IAM_ACCESS_SECRET,
 		));
 
 		// --------------------------------------------------------------------------
 
 		//	Set the bucket we're using
-		$this->_bucket = APP_CDN_DRIVER_AWS_S3_BUCKET;
+		$this->_bucket = DEPLOY_CDN_DRIVER_AWS_S3_BUCKET;
 
 		// --------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ class Aws_local_CDN
 	public function url_serve( $object, $bucket, $force_download )
 	{
 
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING;
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING;
 		$_out .= $bucket . '/';
 
 		if ( $force_download ) :
@@ -302,7 +302,7 @@ class Aws_local_CDN
 	 **/
 	public function url_serve_scheme()
 	{
-		$_out = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING . 'cdn/serve/{{bucket}}/{{file}}';
+		$_out = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING . 'cdn/serve/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -324,7 +324,7 @@ class Aws_local_CDN
 	 **/
 	public function url_thumb( $object, $bucket, $width, $height )
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/';
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
@@ -346,7 +346,7 @@ class Aws_local_CDN
 	 **/
 	public function url_thumb_scheme()
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -368,7 +368,7 @@ class Aws_local_CDN
 	 **/
 	public function url_scale( $object, $bucket, $width, $height )
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/';
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
@@ -390,7 +390,7 @@ class Aws_local_CDN
 	 **/
 	public function url_scale_scheme()
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -411,7 +411,7 @@ class Aws_local_CDN
 	 **/
 	public function url_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/';
 		$_out .= $width . '/' . $height . '/' . $border;
 
 		return $this->_url_make_secure( $_out );
@@ -431,7 +431,7 @@ class Aws_local_CDN
 	 **/
 	public function url_placeholder_scheme()
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/{{width}}/{{height}}/{{border}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/placeholder/{{width}}/{{height}}/{{border}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -452,7 +452,7 @@ class Aws_local_CDN
 	 **/
 	public function url_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/';
 		$_out .= $width . '/' . $height . '/' . $sex;
 
 		return $this->_url_make_secure( $_out );
@@ -472,7 +472,7 @@ class Aws_local_CDN
 	 **/
 	public function url_blank_avatar_scheme()
 	{
-		$_out  = APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -537,11 +537,11 @@ class Aws_local_CDN
 			//	Make the URL secure
 			if ( $is_processing ) :
 
-				$url = str_replace( APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING, APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING_SECURE, $url );
+				$url = str_replace( DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING, DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING_SECURE, $url );
 
 			else :
 
-				$url = str_replace( APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING, APP_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING_SECURE, $url );
+				$url = str_replace( DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING, DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING_SECURE, $url );
 
 			endif;
 

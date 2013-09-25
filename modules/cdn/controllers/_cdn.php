@@ -130,7 +130,57 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 	protected function _serve_not_modified( $file )
 	{
-		$_headers = apache_request_headers();
+		if ( function_exists( 'apache_request_headers' ) ) :
+
+			$_headers = apache_request_headers();
+
+		elseif ( isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) :
+
+			$_headers					= array();
+			$_headers['If-None-Match']	= $_SERVER['HTTP_IF_NONE_MATCH'];
+
+		elseif( isset( $_SERVER ) ) :
+
+			//	Can we work the headers out for ourself?
+			//	Credit: http://www.php.net/manual/en/function.apache-request-headers.php#70810
+
+			$_headers	= array();
+			$rx_http	= '/\AHTTP_/';
+			foreach ( $_SERVER as $key => $val ) :
+
+				if ( preg_match( $rx_http, $key ) ) :
+
+					$arh_key	= preg_replace($rx_http, '', $key);
+					$rx_matches	= array();
+
+					// do some nasty string manipulations to restore the original letter case
+					// this should work in most cases
+					$rx_matches = explode('_', $arh_key);
+
+					if ( count( $rx_matches ) > 0 && strlen( $arh_key ) > 2 ) :
+
+						foreach ( $rx_matches as $ak_key => $ak_val ) :
+
+							$rx_matches[$ak_key] = ucfirst( $ak_val );
+
+						endforeach;
+
+						$arh_key = implode( '-', $rx_matches );
+
+					endif;
+
+					$_headers[$arh_key] = $val;
+
+				endif;
+
+			endforeach;
+
+		else :
+
+			//	Give up.
+			return FALSE;
+
+		endif;
 
 		if ( isset( $_headers['If-None-Match'] ) && ( $_headers['If-None-Match'] == '"' . md5( $file ) . '"' ) ) :
 

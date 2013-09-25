@@ -262,7 +262,8 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 				if ( array_search( $controller, $_ignore ) === FALSE ) :
 
-					$_modules['admin'][] = pathinfo( $controller )['filename'];
+					$_temp					= pathinfo( $controller );
+					$_modules['admin'][]	= $_temp['filename'];
 
 				endif;
 
