@@ -60,11 +60,6 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 		//	no random values)
 
 		$this->_cache_file	= 'blank_avatar-' . $this->_width . 'x' . $this->_height . '-' . $this->_sex . '.png';
-
-		// --------------------------------------------------------------------------
-
-		//	Load phpThumb
-		require_once $this->_cdn_root. '_resources/classes/phpthumb/phpthumb.php';
 	}
 
 
@@ -141,16 +136,14 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 
 				//	Object exists, time for manipulation fun times :>
 
-				//	Set some PHPThumbFactory options
+				//	Set some PHPThumb options
 				$_options['resizeUp']		= TRUE;
 
 				// --------------------------------------------------------------------------
 
-				//	Perform the resize (3rd param tells PHPThumbFactory that we're using a
-				//	data stream rather than a file).
-
-				$thumb = PhpThumbFactory::create( $_src, $_options );
-				$thumb->adaptiveResize( $this->_width, $this->_height );
+				//	Perform the resize
+				$PHPThumb = new PHPThumb\GD( $_src, $_options );
+				$PHPThumb->adaptiveResize( $this->_width, $this->_height );
 
 				// --------------------------------------------------------------------------
 
@@ -162,14 +155,14 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				// --------------------------------------------------------------------------
 
 				//	Output the newly rendered file to the browser
-				$thumb->show();
+				$PHPThumb->show();
 
 				// --------------------------------------------------------------------------
 
 				//	Save local version
 				if ( defined( 'DEPLOY_CACHE_DIR' ) && is_writable( DEPLOY_CACHE_DIR ) ) :
 
-					$thumb->save( DEPLOY_CACHE_DIR . $this->_cache_file );
+					$PHPThumb->save( DEPLOY_CACHE_DIR . $this->_cache_file );
 
 				elseif( defined( 'DEPLOY_CACHE_DIR' ) ) :
 
@@ -241,5 +234,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_BLANK_AVATAR' ) ) :
 endif;
 
 
-/* End of file thumb.php */
-/* Location: ./application/modules/cdn/controllers/thumb.php */
+/* End of file blank_avatar.php */
+/* Location: ./modules/cdn/controllers/blank_avatar.php */

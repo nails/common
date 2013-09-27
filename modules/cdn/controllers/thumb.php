@@ -10,6 +10,7 @@
 //	Include _cdn.php; executes common functionality
 require_once '_cdn.php';
 
+
 /**
  * OVERLOADING NAILS' CDN MODULES
  *
@@ -52,11 +53,6 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 		$this->_bucket		= $this->uri->segment( 5 );
 		$this->_object		= urldecode( $this->uri->segment( 6 ) );
 		$this->_extension	= ( ! empty( $this->_object ) ) ? strtolower( substr( $this->_object, strrpos( $this->_object, '.' ) ) ) : FALSE;
-
-		// --------------------------------------------------------------------------
-
-		//	Load phpThumb
-		require_once $this->_cdn_root . '_resources/classes/phpthumb/phpthumb.php';
 	}
 
 
@@ -77,9 +73,9 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 
 		switch ( $_cropmethod ) :
 
-			case 'SCALE'	:	$_phpthumbfactory_method = 'resize';			break;
+			case 'SCALE'	:	$_phpthumb_method = 'resize';			break;
 			case 'THUMB'	:
-			default			:	$_phpthumbfactory_method = 'adaptiveResize';	break;
+			default			:	$_phpthumb_method = 'adaptiveResize';	break;
 
 		endswitch;
 
@@ -139,16 +135,16 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 
 			//	Time to start Image processing
 
-			//	Set some PHPThumbFactory options
-			$_options					= array();
-			$_options['resizeUp']		= TRUE;
-			$_options['jpegQuality']	= 80;
+			//	Are we dealing with an animated Gif? If so handle differently - extract each
+			//	frame, resize, then recompile. Otherwise, just resize
 
-			// --------------------------------------------------------------------------
+			$_object = $this->cdn->get_object( $this->_object, $this->_bucket );
 
-			//	Perform the resize
-			$phpThumbFactory = PhpThumbFactory::create( $_usefile, $_options );
-			$phpThumbFactory->{$_phpthumbfactory_method}( $this->_width, $this->_height );
+			if ( ! $_object ) :
+
+				return $this->_bad_src( $this->_width, $this->_height );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
@@ -159,20 +155,141 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 
 			// --------------------------------------------------------------------------
 
-			//	Output the newly rendered file to the browser
-			$phpThumbFactory->show();
+			//	Handle the actual resize
+			if ( $_object->is_animated ) :
+
+				$this->_resize_animated( $_usefile, $_phpthumb_method );
+
+			else :
+
+				$this->_resize( $_usefile, $_phpthumb_method );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
 			//	Bump the counter
-			$this->cdn->object_increment_count( $_cropmethod, $this->_object, $this->_bucket );
+			$this->cdn->object_increment_count( $_cropmethod, $_object->id );
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _resize( $usefile, $PHPThumb_method )
+	{
+		//	Set some PHPThumb options
+		$_options					= array();
+		$_options['resizeUp']		= TRUE;
+		$_options['jpegQuality']	= 80;
+
+		// --------------------------------------------------------------------------
+
+		//	Perform the resize
+		$PHPThumb = new PHPThumb\GD( $usefile, $_options );
+		$PHPThumb->{$PHPThumb_method}( $this->_width, $this->_height );
+
+		// --------------------------------------------------------------------------
+
+		//	Output the newly rendered file to the browser
+		$PHPThumb->show();
+
+		// --------------------------------------------------------------------------
+
+		//	Save cache version
+		$PHPThumb->save( $this->_cachedir . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _resize_animated( $usefile, $PHPThumb_method )
+	{
+		$_hash			= md5( microtime( TRUE ) . uniqid() ) . uniqid();
+		$_frames		= array();
+		$_cachefiles	= array();
+		$_durations		= array();
+		$_gfe			= new GifFrameExtractor\GifFrameExtractor();
+		$_gc			= new GifCreator\GifCreator();
+
+		// --------------------------------------------------------------------------
+
+		//	Extract all the frames, resize them and save to the cache
+		$_gfe->extract( $usefile );
+
+		$_i = 0;
+		foreach ( $_gfe->getFrames() as $frame ) :
+
+			//	Define the filename
+			$_filename		= $_hash . '-' . $_i . '.gif';
+			$_temp_filename	= $_hash . '-' . $_i . '-original.gif';
+			$_i++;
+
+			//	Set these for recompiling
+			$_frames[]		= $this->_cachedir . $_filename;
+			$_cachefiles[]	= $this->_cachedir . $_temp_filename;
+			$_durations[]	= $frame['duration'];
+
+			// --------------------------------------------------------------------------
+
+			//	Set some PHPThumb options
+			$_options					= array();
+			$_options['resizeUp']		= TRUE;
+
+			// --------------------------------------------------------------------------
+
+			//	Perform the resize; first save the original frame to disk
+			imagegif( $frame['image'], $this->_cachedir . $_temp_filename );
+
+			$PHPThumb = new PHPThumb\GD( $this->_cachedir . $_temp_filename, $_options );
+			$PHPThumb->{$PHPThumb_method}( $this->_width, $this->_height );
 
 			// --------------------------------------------------------------------------
 
 			//	Save cache version
-			$phpThumbFactory->save( $this->_cachedir . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+			$PHPThumb->save( $this->_cachedir . $_filename , strtoupper( substr( $this->_extension, 1 ) ) );
 
-		endif;
+		endforeach;
+
+		//	Recompile the resized images back into an animated gif and save to the cache
+		//	TODO: We assume the gif loops infinitely but we should really check.
+		//	Issue made on the libraries gitHub asking for this feature.
+		//	View here: https://github.com/Sybio/GifFrameExtractor/issues/3
+
+		$_gc->create( $_frames, $_durations, 0 );
+		$_data = $_gc->getGif();
+
+		// --------------------------------------------------------------------------
+
+		//	Output to browser
+		header('Content-type: image/gif');
+		echo $_data;
+
+		// --------------------------------------------------------------------------
+
+		//	Save to cache
+		$this->load->helper( 'file' );
+		write_file( $this->_cachedir . $this->_cache_file, $_data );
+
+		// --------------------------------------------------------------------------
+
+		//	Remove cache frames
+		foreach ( $_frames as $frame ) :
+
+			@unlink( $frame );
+
+		endforeach;
+
+		foreach ( $_cachefiles as $frame ) :
+
+			@unlink( $frame );
+
+		endforeach;
+
+
 	}
 
 

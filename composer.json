@@ -26,6 +26,9 @@
 		"facebook/php-sdk": "v3.2.2",
 		"geoip/geoip": "v1.13",
 		"mustache/mustache": "v2.4.1",
-		"mynetx/codebird-php": "2.4.1"
+		"mynetx/codebird-php": "2.4.1",
+		"masterexploder/phpthumb": "v2.0",
+		"sybio/gif-creator": "1.0.0",
+		"sybio/gif-frame-extractor": "1.0.0"
 	}
 }
