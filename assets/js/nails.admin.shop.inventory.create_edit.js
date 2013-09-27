@@ -443,7 +443,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$('#file_upload').uploadify({
 			'debug': false,
 			'auto': true,
-			'swf': SITE_URL + 'nails_assets/proxy/swf/jquery.uploadify/uploadify.swf',
+			'swf': SITE_URL + 'vendor/shed/nails/assets/swf/jquery.uploadify/uploadify.swf',
 			'queueID': 'gallery-items',
 			'uploader': SITE_URL + 'api/cdnapi/object_create/script.php',
 			'fileSizeLimit': 2048,
