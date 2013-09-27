@@ -78,10 +78,10 @@
 
 global $GEOIP_REGION_NAME;
 
-require_once NAILS_PATH . 'libraries/_resources/geoip/geoipcity.inc';
-require_once NAILS_PATH . 'libraries/_resources/geoip/geoipregionvars.php';
+require_once FCPATH . 'vendor/geoip/geoip/geoipcity.inc';
+require_once FCPATH . 'vendor/geoip/geoip/geoipregionvars.php';
 
-class Geoip{
+class Geo_ip{
 
 	protected $CI;
 	protected $_Ip;
