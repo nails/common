@@ -241,15 +241,15 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	If we're using the local driver then we need to check the source file exists
 		//	in the DEPLOY_CDN_PATH.
 
-		elseif ( $this->_driver == 'local' && file_exists( DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object ) ) :
+		elseif ( $this->_driver == 'local' && file_exists( DEPLOY_CDN_PATH . $bucket . '/' . $object ) ) :
 
 			//	Object exists, time for manipulation fun times :>
-			return DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object;
+			return DEPLOY_CDN_PATH . $bucket . '/' . $object;
 
 		else :
 
 			//	This object does not exist / something went wrong
-			log_message( 'error', 'CDN: Thumb: File not found; ' . DEPLOY_CDN_PATH . $this->_bucket . '/' . $this->_object );
+			log_message( 'error', 'CDN: Thumb: File not found; ' . DEPLOY_CDN_PATH . $bucket . '/' . $object );
 			return FALSE;
 
 		endif;

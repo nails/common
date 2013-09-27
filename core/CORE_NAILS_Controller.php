@@ -196,7 +196,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		if ( ! defined( 'DEPLOY_CACHE_DIR') )				define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
-		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'/etc/mime.types' );
+		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'' );
 		if ( ! defined( 'DEPLOY_CDN_PATH') )				define( 'DEPLOY_CDN_PATH',				FCPATH . 'assets/uploads/' );
 
 		// --------------------------------------------------------------------------

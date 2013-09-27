@@ -13,6 +13,7 @@ class Cdn {
 	private $_cdn;
 	private $db;
 	private $_errors;
+	private $_magic;
 
 	// --------------------------------------------------------------------------
 
@@ -46,6 +47,46 @@ class Cdn {
 		//	Load the storage driver
 		$_class = $this->_include_driver( );
 		$this->_cdn = new $_class( $options );
+
+		// --------------------------------------------------------------------------
+
+		//	Define the mime.magic file
+		if ( ! defined( 'DEPLOY_CDN_MAGIC' ) || ! DEPLOY_CDN_MAGIC ) :
+
+			$_found			= FALSE;
+			$_locations		= array();
+			$_locations[]	= '/etc/mime.types';
+			$_locations[]	= '/private/etc/apache2/mime.types';
+
+			foreach( $_locations AS $location ) :
+
+				if ( file_exists( $location ) ) :
+
+					$_found	= $location;
+					break;
+
+				endif;
+
+			endforeach;
+
+			//	Did we find anything?
+			if ( $_found ) :
+
+				//	Whoop! We totes did.
+				$this->_magic = $_found;;
+
+			else :
+
+				//	Hmm, set this to NULL so that PHP uses it's internal database
+				$this->_magic = NULL;
+
+			endif;
+
+		else :
+
+			$this->_magic = DEPLOY_CDN_MAGIC;
+
+		endif;
 	}
 
 
@@ -435,8 +476,7 @@ class Cdn {
 
 		//	Is this an acceptable file? Check against the allowed_types array (if present)
 
-		$_ext	= $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
-
+		$_ext = $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
 		if ( $_bucket->allowed_types ) :
 
 			//	Handle stupid bloody MS Office 'x' documents
@@ -1223,7 +1263,7 @@ class Cdn {
 		elseif ( $bucket ) :
 
 			$this->db->where( 'b.slug', $bucket );
-			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o JOIN cdn_bucket b ON b.id = o.bucket_id' );
+			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o JOIN ' . NAILS_DB_PREFIX . 'cdn_bucket b ON b.id = o.bucket_id' );
 
 		else :
 
@@ -1254,7 +1294,7 @@ class Cdn {
 	{
 		$this->db->select( 'b.id,b.slug,b.label,b.allowed_types,b.max_size,b.created,b.created_by,b.modified,b.modified_by' );
 		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
-		$this->db->select( '(SELECT COUNT(*) FROM cdn_object WHERE bucket_id = b.id) object_count' );
+		$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX . 'cdn_object WHERE bucket_id = b.id) object_count' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = b.created_by', 'LEFT' );
 
@@ -1280,7 +1320,7 @@ class Cdn {
 
 			//	Fetch tags & counts
 			$this->db->select( 'bt.id,bt.label,bt.created' );
-			$this->db->select( '(SELECT COUNT(*) FROM cdn_object_tag ot JOIN cdn_object o ON o.id = ot.object_id WHERE tag_id = bt.id ) total' );
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX . 'cdn_object_tag ot JOIN ' . NAILS_DB_PREFIX . 'cdn_object o ON o.id = ot.object_id WHERE tag_id = bt.id ) total' );
 			$this->db->order_by( 'bt.label' );
 			$this->db->where( 'bt.bucket_id', $bucket->id );
 			$bucket->tags = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket_tag bt' )->result();
@@ -2085,38 +2125,84 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_file	= fopen( DEPLOY_CDN_MAGIC, 'r' );
-		$_ext	= NULL;
+		if ( ! $this->_magic ) :
 
-		while( ( $line = fgets( $_file ) ) !== FALSE ) :
+			$_file	= fopen( $this->_magic, 'r' );
+			$_ext	= NULL;
 
-			$line = trim( preg_replace( '/#.*/', '', $line ) );
+			while( ( $line = fgets( $_file ) ) !== FALSE ) :
 
-			if ( ! $line )
-				continue;
+				$line = trim( preg_replace( '/#.*/', '', $line ) );
 
-			$_parts = preg_split( '/\s+/', $line );
+				if ( ! $line )
+					continue;
 
-			if ( count( $_parts ) == 1 )
-				continue;
+				$_parts = preg_split( '/\s+/', $line );
 
-			$_type = array_shift( $_parts );
+				if ( count( $_parts ) == 1 )
+					continue;
 
-			foreach ( $_parts as $part ) :
+				$_type = array_shift( $_parts );
 
-				if ( $_type == strtolower( $mime_type ) ) :
+				foreach ( $_parts as $part ) :
 
-					$_ext = $part;
+					if ( $_type == strtolower( $mime_type ) ) :
 
-					break;
+						$_ext = $part;
+
+						break;
+
+					endif;
+
+				endforeach;
+
+			endwhile;
+
+			fclose( $_file );
+
+		else :
+
+			//	We don't have a magic database, eep. Try to work it out using CodeIgniter's mapping
+			require FCPATH . APPPATH . 'config/mimes.php';
+
+			$_ext = FALSE;
+
+			foreach ( $mimes AS $ext => $mime ) :
+
+				if ( is_array( $mime ) ) :
+
+					foreach( $mime AS $submime ) :
+
+						if ( $submime == $mime_type ) :
+
+							$_ext = $ext;
+							break;
+
+						endif;
+
+					endforeach;
+
+					if ( $_ext ) :
+
+						break;
+
+					endif;
+
+				else :
+
+					if ( $mime == $mime_type ) :
+
+						$_ext = $ext;
+						break;
+
+					endif;
 
 				endif;
 
 			endforeach;
 
-		endwhile;
 
-		fclose( $_file );
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2146,7 +2232,7 @@ class Cdn {
 		//	Returns the system MIME type mapping of extensions to MIME types, as defined in /etc/mime.types.
 		//	Thanks, 'chaos' - http://stackoverflow.com/a/1147952/789224
 
-		$_file = fopen( DEPLOY_CDN_MAGIC, 'r' );
+		$_file = fopen( $this->_magic, 'r' );
 		$_mime = NULL;
 
 
@@ -2203,11 +2289,11 @@ class Cdn {
 
 		if ( $_result == 'application/zip' ) :
 
-			$_fi = @finfo_open( FILEINFO_MIME_TYPE, DEPLOY_CDN_MAGIC );
+			$_fi = @finfo_open( FILEINFO_MIME_TYPE, $this->_magic );
 
 			if ( $_fi ) :
 
-				$_result	= finfo_file( $_fi, $object );
+				$_result = finfo_file( $_fi, $object );
 
 			endif;
 
