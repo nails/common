@@ -63,7 +63,6 @@ class CORE_NAILS_Model extends CI_Model {
 
 			foreach ( $this->_cache_keys AS $key ) :
 
-
 				$this->_unset_cache( $key );
 
 			endforeach;
@@ -467,7 +466,24 @@ class CORE_NAILS_Model extends CI_Model {
 
 		// --------------------------------------------------------------------------
 
-		return $this->db->get( $_table )->result();
+		$_results = $this->db->get( $_table )->result();
+
+		for ( $i = 0; $i < count( $_results ); $i++ ) :
+
+			$this->_format_object( $_results[$i] );
+
+		endfor;
+
+		return $_results;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_object( &$object )
+	{
+		//	Extend this method to format the returned objects
 	}
 
 
