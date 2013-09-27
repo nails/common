@@ -36,11 +36,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_table			= 'shop_product';
-		$this->_table_gallery	= 'shop_product_gallery';
-		$this->_table_meta		= 'shop_product_meta';
-		$this->_table_type		= 'shop_product_type';
-		$this->_table_tax		= 'shop_tax_rate';
+		$this->_table			= NAILS_DB_PREFIX . 'shop_product';
+		$this->_table_gallery	= NAILS_DB_PREFIX . 'shop_product_gallery';
+		$this->_table_meta		= NAILS_DB_PREFIX . 'shop_product_meta';
+		$this->_table_type		= NAILS_DB_PREFIX . 'shop_product_type';
+		$this->_table_tax		= NAILS_DB_PREFIX . 'shop_tax_rate';
 	}
 
 

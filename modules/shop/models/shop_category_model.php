@@ -17,7 +17,12 @@
 
 class NAILS_Shop_category_model extends NAILS_Model
 {
-	protected $_table = 'shop_category';
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->_table = NAILS_DB_PREFIX . 'shop_category';
+	}
 }
 
 
@@ -86,7 +91,7 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_CATEGORY_MODEL' ) ) :
 		// --------------------------------------------------------------------------
 
 
-		public function get_all_nested_flat( $separator = ' &rsaquo; ' )
+		public function get_all_nested_flat( $separator = ' &rsaquo; ', $murder_parents_of_children = TRUE )
 		{
 			$_out			= array();
 			$_categories	= $this->get_all();
@@ -98,6 +103,38 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_CATEGORY_MODEL' ) ) :
 			endforeach;
 
 			sort( $_out );
+
+			// --------------------------------------------------------------------------
+
+			//	Remove parents from the array if they have any children
+			if ( $murder_parents_of_children ) :
+
+				for ( $i = 0; $i < count( $_out ); $i++ ) :
+
+					$_found		= FALSE;
+					$_needle	= $_out[$i] . $separator;
+
+					//	Hat tip - http://uk3.php.net/manual/en/function.array-search.php#90711
+					foreach ( $_out as $item ) :
+
+						if ( strpos( $item, $_needle ) !== FALSE ) :
+
+							$_found = TRUE;
+							break;
+
+						endif;
+
+					endforeach;
+
+					if ( $_found)	 :
+
+						unset( $_out[$i] );
+
+					endif;
+
+				endfor;
+
+			endif;
 
 			return $_out;
 		}

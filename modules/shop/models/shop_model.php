@@ -62,9 +62,8 @@ class NAILS_Shop_model extends NAILS_Model
 			//	Can we determine the user's location and set a currency based on that?
 			//	If not, fall back to base currency
 
-			$this->load->library('geoip');
-			$this->geoip->InfoIP('90.221.187.105');
-			$_country_code = $this->geoip->result_country_code();
+			$this->load->library('geo_ip');
+			$_country_code = $this->geo_ip->result_country_code();
 
 			if ( $_country_code ) :
 

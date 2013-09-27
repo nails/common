@@ -23,7 +23,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_table			= 'shop_shipping_method';
+		$this->_table			= NAILS_DB_PREFIX . 'shop_shipping_method';
 		$this->_table_prefix	= 'sm';
 	}
 

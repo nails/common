@@ -17,7 +17,12 @@
 
 class NAILS_Shop_brand_model extends NAILS_Model
 {
-	protected $_table = 'shop_brand';
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->_table = NAILS_DB_PREFIX . 'shop_brand';
+	}
 }
 
 

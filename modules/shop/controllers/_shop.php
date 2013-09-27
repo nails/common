@@ -54,4 +54,4 @@ class NAILS_Shop_Controller extends NAILS_Controller
 }
 
 /* End of file _shop.php */
-/* Location: ./application/modules/shop/controllers/_shop.php */
+/* Location: ./modules/shop/controllers/_shop.php */
