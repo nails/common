@@ -17,9 +17,7 @@ class Mustache
 
 	public function __construct()
 	{
-		require NAILS_PATH . 'libraries/_resources/Mustache/Autoloader.php';
 		Mustache_Autoloader::register();
-
 		$this->_mustachio = new Mustache_Engine;
 	}
 
