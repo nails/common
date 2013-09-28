@@ -4,13 +4,13 @@ class CORE_NAILS_Model extends CI_Model {
 
 	protected $data;
 	protected $user;
-	protected $_error = array();
+	protected $_errors;
 	protected $_table;
 	protected $_table_prefix;
 
-	private $_cache_values;
-	private $_cache_keys;
-	private $_cache_method;
+	protected $_cache_values;
+	protected $_cache_keys;
+	protected $_cache_method;
 
 	// --------------------------------------------------------------------------
 
@@ -39,10 +39,16 @@ class CORE_NAILS_Model extends CI_Model {
 
 		//	Set the cache method
 		//	TODO: check for availability of things like memcached
+		//	TODO: apply same logic to CDN library
 
 		$this->_cache_values	= array();
 		$this->_cache_keys		= array();
 		$this->_cache_method	= 'LOCAL';
+
+		// --------------------------------------------------------------------------
+
+		//	Define defaults
+		$this->_errors = array();
 	}
 
 
@@ -83,7 +89,7 @@ class CORE_NAILS_Model extends CI_Model {
 	 **/
 	protected function _set_error( $error )
 	{
-		$this->_error[] = $error;
+		$this->_errors[] = $error;
 	}
 
 
@@ -97,9 +103,9 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	public function get_error()
+	public function get_errors()
 	{
-		return $this->_error;
+		return $this->_errors;
 	}
 
 
@@ -115,7 +121,7 @@ class CORE_NAILS_Model extends CI_Model {
 	 **/
 	public function last_error()
 	{
-		return end( $this->_error );
+		return end( $this->_errors );
 	}
 
 

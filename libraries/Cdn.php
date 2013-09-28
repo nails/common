@@ -14,6 +14,9 @@ class Cdn {
 	private $db;
 	private $_errors;
 	private $_magic;
+	private $_cache_values;
+	private $_cache_keys;
+	private $_cache_method;
 
 	// --------------------------------------------------------------------------
 
@@ -31,6 +34,15 @@ class Cdn {
 		$this->_ci		=& get_instance();
 		$this->db		=& get_instance()->db;
 		$this->_errors	= array();
+
+		// --------------------------------------------------------------------------
+
+		//	Set the cache method
+		//	TODO: check for availability of things like memcached
+
+		$this->_cache_values	= array();
+		$this->_cache_keys		= array();
+		$this->_cache_method	= 'LOCAL';
 
 		// --------------------------------------------------------------------------
 
@@ -93,6 +105,31 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Destruct the model
+	 *
+	 * @access	public
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function __destruct()
+	{
+		//	Clear cache's
+		if ( isset( $this->_cache_keys ) && $this->_cache_keys ) :
+
+			foreach ( $this->_cache_keys AS $key ) :
+
+				$this->_unset_cache( $key );
+
+			endforeach;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	private function _include_driver()
 	{
 		switch ( strtolower( APP_CDN_DRIVER ) ) :
@@ -115,6 +152,252 @@ class Cdn {
 			break;
 
 		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/*	! CACHE METHODS */
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Provides models with the an easy interface for saving data to a cache.
+	 *
+	 * @access	protected
+	 * @param string $key The key for the cached item
+	 * @param mixed $value The data to be cached
+	 * @return	array
+	 * @author	Pablo
+	 **/
+	protected function _set_cache( $key, $value )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				$this->_cache_values[md5( $_prefix . $key )] = serialize( $value );
+				$this->_cache_keys[]	= $key;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Lookup a cache item
+	 *
+	 * @access	protected
+	 * @param	string	$key	The key to fetch
+	 * @return	mixed
+	 * @author	Pablo
+	 **/
+	protected function _get_cache( $key )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				if ( isset( $this->_cache_values[md5( $_prefix . $key )] ) ) :
+
+					return unserialize( $this->_cache_values[md5( $_prefix . $key )] );
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Unset a cache item
+	 *
+	 * @access	protected
+	 * @param	string	$key	The key to fetch
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	protected function _unset_cache( $key )
+	{
+		if ( ! $key )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'LOCAL' :
+
+				unset( $this->_cache_values[md5( $_prefix . $key )] );
+
+				$_key = array_search( $key, $this->_cache_keys );
+
+				if ( $_key !== FALSE ) :
+
+					unset( $this->_cache_keys[$_key] );
+
+				endif;
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Unset an object from the cache in one fell swoop
+	 *
+	 * @access	protected
+	 * @param	object	$object	The object to remove from the cache
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	protected function _unset_cache_object( $object )
+	{
+		$this->_unset_cache( 'object-' . $object->id );
+		$this->_unset_cache( 'object-' . $object->filename );
+		$this->_unset_cache( 'object-' . $object->filename . '-' . $object->bucket->id );
+		$this->_unset_cache( 'object-' . $object->filename . '-' . $object->bucket->slug );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Define the cache key prefix
+	 *
+	 * @access	private
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	private function _cache_prefix()
+	{
+		return 'CDN_';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/*	! ERROR METHODS */
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_errors()
+	{
+		return $this->_errors;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the last error
+	 *
+	 * @access	public
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	public function last_error()
+	{
+		return end( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Adds an error message; not protected like model _set_error because the
+	 * driver needs to be able to call it.
+	 *
+	 * @access	public
+	 * @param	array	$error	The error message to add
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	public function set_error( $error )
+	{
+		$this->_errors[] = $error;
 	}
 
 
@@ -222,9 +505,34 @@ class Cdn {
 	{
 		if ( is_numeric( $object ) ) :
 
+			//	Check the cache
+			$_cache_key	= 'object-' . $object;
+			$_cache		= $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
 			$this->db->where( 'o.id', $object );
 
 		else :
+
+			//	Check the cache
+			$_cache_key	 = 'object-' . $object;
+			$_cache_key .= $bucket ? '-' . $bucket : '';
+			$_cache		 = $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
 
 			$this->db->where( 'o.filename', $object );
 
@@ -246,8 +554,18 @@ class Cdn {
 
 		$_objects = $this->get_objects();
 
-		if ( ! $_objects )
+		if ( ! $_objects ) :
+
 			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Cache the object
+		$this->_set_cache( $_cache_key, $_objects[0] );
+
+		// --------------------------------------------------------------------------
 
 		return $_objects[0];
 	}
@@ -812,6 +1130,11 @@ class Cdn {
 
 		if ( $this->db->trans_status() !== FALSE ) :
 
+			//	Clear caches
+			$this->_unset_cache_object( $_object );
+
+			// --------------------------------------------------------------------------
+
 			return TRUE;
 
 		else :
@@ -960,6 +1283,11 @@ class Cdn {
 			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
 			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object' );
+
+			// --------------------------------------------------------------------------
+
+			//	Clear the caches
+			$this->_unset_cache_object( $_object );
 
 			return TRUE;
 
@@ -1270,6 +1598,233 @@ class Cdn {
 			$this->db->update( NAILS_DB_PREFIX . 'cdn_object o' );
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Creates a new object record in the DB; called from various other methods
+	 *
+	 * @access	public
+	 * @param	array
+	 * @param	boolean
+	 * @return	string
+	 * @author	Pablo
+	 **/
+	private function _create_object( $data, $return_object = FALSE )
+	{
+		$this->db->set( 'bucket_id',		$data->bucket_id );
+		$this->db->set( 'filename',			$data->filename );
+		$this->db->set( 'filename_display',	$data->name );
+		$this->db->set( 'mime',				$data->mime );
+		$this->db->set( 'filesize',			$data->filesize );
+		$this->db->set( 'created',			'NOW()', FALSE );
+		$this->db->set( 'modified',			'NOW()', FALSE );
+
+		if ( get_userobject()->is_logged_in() ) :
+
+			$this->db->set( 'created_by',	active_user( 'id' ) );
+			$this->db->set( 'modified_by',	active_user( 'id' ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( isset( $data->img->width ) && isset( $data->img->height ) ) :
+
+			$this->db->set( 'img_width',	$data->img->height );
+			$this->db->set( 'img_height',	$data->img->width );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Check whether file is animated gif
+		if ( $data->mime == 'image/gif' ) :
+
+			if ( isset( $data->img->is_animated ) ) :
+
+				$this->db->set( 'is_animated', $data->img->is_animated );
+
+			else :
+
+				$this->db->set( 'is_animated', FALSE );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->insert( NAILS_DB_PREFIX . 'cdn_object' );
+
+		$_object_id = $this->db->insert_id();
+
+		if ( $this->db->affected_rows() ) :
+
+			//	Add a tag if there's one defined
+			if ( isset( $data->tag_id ) && ! empty( $data->tag_id ) ) :
+
+				$this->db->where( 'id', $data->tag_id );
+
+				if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_bucket_tag' ) ) :
+
+					$this->db->set( 'object_id',	$_object_id );
+					$this->db->set( 'tag_id',		$data->tag_id );
+					$this->db->set( 'created',		'NOW()', FALSE );
+
+					$this->db->insert( NAILS_DB_PREFIX . 'cdn_object_tag' );
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			if ( $return_object ) :
+
+				return $this->get_object( $_object_id );
+
+			else :
+
+				return $_object_id;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Formats an object object
+	 *
+	 * @access	private
+	 * @param	object	$object	The object to format
+	 * @return	void
+	 * @author	Pablo
+	 **/
+	private function _format_object( &$object )
+	{
+		$object->id				= (int) $object->id;
+		$object->filesize		= (int) $object->filesize;
+		$object->img_width		= (int) $object->img_width;
+		$object->img_height		= (int) $object->img_height;
+		$object->is_animated	= (bool) $object->is_animated;
+		$object->serves			= (int) $object->serves;
+		$object->downloads		= (int) $object->downloads;
+		$object->thumbs			= (int) $object->thumbs;
+		$object->scales			= (int) $object->scales;
+		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
+
+		// --------------------------------------------------------------------------
+
+		$object->creator				= new stdClass();
+		$object->creator->id			= $object->created_by ? (int) $object->created_by : NULL;
+		$object->creator->first_name	= $object->first_name;
+		$object->creator->last_name		= $object->last_name;
+		$object->creator->email			= $object->email;
+		$object->creator->profile_img	= $object->profile_img;
+		$object->creator->gender		= $object->gender;
+
+		unset( $object->created_by );
+		unset( $object->first_name );
+		unset( $object->last_name );
+		unset( $object->email );
+		unset( $object->profile_img );
+		unset( $object->gender );
+
+		// --------------------------------------------------------------------------
+
+		$object->bucket			= new stdClass();
+		$object->bucket->id		= $object->bucket_id;
+		$object->bucket->slug	= $object->bucket_slug;
+
+		unset( $object->bucket_id );
+		unset( $object->bucket_slug );
+
+		// --------------------------------------------------------------------------
+
+		//	Quick flag for detecting images
+		$object->is_img = FALSE;
+
+		switch( $object->mime ) :
+
+			case 'image/jpg' :
+			case 'image/jpeg' :
+			case 'image/gif' :
+			case 'image/png' :
+
+				$object->is_img = TRUE;
+
+			break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Determines whether the specified user can edit an object
+	 *
+	 * @access	private
+	 * @param	mixed	$object		The object to format
+	 * @param	int		$user_id	The ID of the user to check against
+	 * @return	boolean
+	 * @author	Pablo
+	 **/
+	private function _can_edit_object( $object, $user_id = NULL )
+	{
+		if ( is_numeric( $object ) || is_string( $object ) ) :
+
+			$_object = $this->get_object( $object );
+
+		else :
+
+			$_object = $object;
+
+		endif;
+
+		if ( is_null( $user_id ) ) :
+
+			$_user = active_user();
+
+		else :
+
+			$_user = get_userobject()->get_by_id( $user_id );
+
+		endif;
+
+		$_usrobj =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		//	Admins can always read/write to objects
+		if ( $_usrobj->is_admin( $_user ) ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! $_object->creator->id || $_object->creator->id == $_user->id ) :
+
+			return TRUE;
+
+		endif;
+
+		return FALSE;
 	}
 
 
@@ -1675,240 +2230,6 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
-	/*	! HELPER METHODS */
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns the error array
-	 *
-	 * @access	public
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function errors()
-	{
-		return $this->_errors;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns the last error
-	 *
-	 * @access	public
-	 * @return	string
-	 * @author	Pablo
-	 **/
-	public function last_error()
-	{
-		return end( $this->_errors );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns the last error
-	 *
-	 * @access	public
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function error()
-	{
-		$_error = end( $this->_errors );
-		reset( $this->_errors );
-		return $_error;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Adds an error message
-	 *
-	 * @access	public
-	 * @param	array	$message	The error message to add
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function set_error( $message )
-	{
-		$this->_errors[] = $message;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _create_object( $data, $return_object = FALSE )
-	{
-		$this->db->set( 'bucket_id',		$data->bucket_id );
-		$this->db->set( 'filename',			$data->filename );
-		$this->db->set( 'filename_display',	$data->name );
-		$this->db->set( 'mime',				$data->mime );
-		$this->db->set( 'filesize',			$data->filesize );
-		$this->db->set( 'created',			'NOW()', FALSE );
-		$this->db->set( 'modified',			'NOW()', FALSE );
-
-		if ( get_userobject()->is_logged_in() ) :
-
-			$this->db->set( 'created_by',	active_user( 'id' ) );
-			$this->db->set( 'modified_by',	active_user( 'id' ) );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( isset( $data->img->width ) && isset( $data->img->height ) ) :
-
-			$this->db->set( 'img_width',	$data->img->height );
-			$this->db->set( 'img_height',	$data->img->width );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Check whether file is animated gif
-		if ( $data->mime == 'image/gif' ) :
-
-			if ( isset( $data->img->is_animated ) ) :
-
-				$this->db->set( 'is_animated', $data->img->is_animated );
-
-			else :
-
-				$this->db->set( 'is_animated', FALSE );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->insert( NAILS_DB_PREFIX . 'cdn_object' );
-
-		$_object_id = $this->db->insert_id();
-
-		if ( $this->db->affected_rows() ) :
-
-			//	Add a tag if there's one defined
-			if ( isset( $data->tag_id ) && ! empty( $data->tag_id ) ) :
-
-				$this->db->where( 'id', $data->tag_id );
-
-				if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_bucket_tag' ) ) :
-
-					$this->db->set( 'object_id',	$_object_id );
-					$this->db->set( 'tag_id',		$data->tag_id );
-					$this->db->set( 'created',		'NOW()', FALSE );
-
-					$this->db->insert( NAILS_DB_PREFIX . 'cdn_object_tag' );
-
-				endif;
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			if ( $return_object ) :
-
-				return $this->get_object( $_object_id );
-
-			else :
-
-				return $_object_id;
-
-			endif;
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Formats an object object
-	 *
-	 * @access	private
-	 * @param	object	$object	The object to format
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	private function _format_object( &$object )
-	{
-		$object->id				= (int) $object->id;
-		$object->filesize		= (int) $object->filesize;
-		$object->img_width		= (int) $object->img_width;
-		$object->img_height		= (int) $object->img_height;
-		$object->is_animated	= (bool) $object->is_animated;
-		$object->serves			= (int) $object->serves;
-		$object->downloads		= (int) $object->downloads;
-		$object->thumbs			= (int) $object->thumbs;
-		$object->scales			= (int) $object->scales;
-		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
-
-		// --------------------------------------------------------------------------
-
-		$object->creator				= new stdClass();
-		$object->creator->id			= $object->created_by ? (int) $object->created_by : NULL;
-		$object->creator->first_name	= $object->first_name;
-		$object->creator->last_name		= $object->last_name;
-		$object->creator->email			= $object->email;
-		$object->creator->profile_img	= $object->profile_img;
-		$object->creator->gender		= $object->gender;
-
-		unset( $object->created_by );
-		unset( $object->first_name );
-		unset( $object->last_name );
-		unset( $object->email );
-		unset( $object->profile_img );
-		unset( $object->gender );
-
-		// --------------------------------------------------------------------------
-
-		$object->bucket			= new stdClass();
-		$object->bucket->id		= $object->bucket_id;
-		$object->bucket->slug	= $object->bucket_slug;
-
-		unset( $object->bucket_id );
-		unset( $object->bucket_slug );
-
-		// --------------------------------------------------------------------------
-
-		//	Quick flag for detecting images
-		$object->is_img = FALSE;
-
-		switch( $object->mime ) :
-
-			case 'image/jpg' :
-			case 'image/jpeg' :
-			case 'image/gif' :
-			case 'image/png' :
-
-				$object->is_img = TRUE;
-
-			break;
-
-		endswitch;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	/**
 	 * Formats a bucket object
 	 *
@@ -1941,54 +2262,6 @@ class Cdn {
 		unset( $bucket->email );
 		unset( $bucket->profile_img );
 		unset( $bucket->gender );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _can_edit_object( $object, $user_id = NULL )
-	{
-		if ( is_numeric( $object ) || is_string( $object ) ) :
-
-			$_object = $this->get_object( $object );
-
-		else :
-
-			$_object = $object;
-
-		endif;
-
-		if ( is_null( $user_id ) ) :
-
-			$_user = active_user();
-
-		else :
-
-			$_user = get_userobject()->get_by_id( $user_id );
-
-		endif;
-
-		$_usrobj =& get_userobject();
-
-		// --------------------------------------------------------------------------
-
-		//	Admins can always read/write to objects
-		if ( $_usrobj->is_admin( $_user ) ) :
-
-			return TRUE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_object->creator->id || $_object->creator->id == $_user->id ) :
-
-			return TRUE;
-
-		endif;
-
-		return FALSE;
 	}
 
 

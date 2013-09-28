@@ -106,7 +106,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 			if ( ! $this->cms_page->can_write_routes() ) :
 
-				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system: ' . implode( '', $this->cms_page->get_error() );
+				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system: ' . $this->cms_page->last_error();
 
 			endif;
 
@@ -254,7 +254,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( $this->cms_page->get_error() );
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( ', ', $this->cms_page->get_errors() );
 
 				endif;
 
@@ -299,7 +299,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem writing the routes:<br />' . array_pop( $this->cms_page->get_error() ) );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem writing the routes:<br />' . $this->cms_page->last_error() );
 
 		endif;
 

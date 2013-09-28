@@ -98,7 +98,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		if ( ! $_user ) :
 
 			$_out['status']	= 400;
-			$_out['error']	= $this->cdn->error();
+			$_out['error']	= $this->cdn->last_error();
 
 			$this->_out( $_out, 'JSON', FALSE );
 			return;
@@ -238,7 +238,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		else :
 
 			$_out['status']	= 400;
-			$_out['error']	= $this->cdn->error();
+			$_out['error']	= $this->cdn->last_error();
 
 		endif;
 
@@ -267,7 +267,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		if ( ! $_delete ) :
 
 			$_out['status']	= 400;
-			$_out['error']	= implode( '', $this->cdn->errors() );
+			$_out['error']	= $this->cdn->last_error();
 
 		endif;
 
@@ -298,7 +298,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 			$_out = array(
 				'status'	=> 400,
-				'error'		=> implode( $this->cdn->errors() )
+				'error'		=> $this->cdn->last_error()
 			);
 
 		endif;
@@ -331,7 +331,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 			$_out = array(
 				'status'	=> 400,
-				'error'		=> implode( $this->cdn->errors() )
+				'error'		=> $this->cdn->last_error()
 			);
 
 		endif;

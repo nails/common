@@ -365,7 +365,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo;' . implode( '<br />&rsaquo; ', $this->user->get_error() );
+					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo;' . implode( '<br />&rsaquo; ', $this->user->get_errors() );
 
 				endif;
 
@@ -608,7 +608,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 					else :
 
-						$this->data['upload_error']	= $this->cdn->errors();
+						$this->data['upload_error']	= $this->cdn->get_errors();
 						$this->data['error']		= lang( 'accounts_edit_error_profile_img' );
 
 					endif;
@@ -677,7 +677,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					//	The account failed to update, feedback to user
 					else:
 
-						$this->data['error'] = lang( 'accounts_edit_fail', implode( ', ', $this->user->get_error() ) );
+						$this->data['error'] = lang( 'accounts_edit_fail', implode( ', ', $this->user->get_errors() ) );
 
 					endif;
 
@@ -1096,7 +1096,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				else :
 
-					$this->session->set_flashdata( 'error', lang( 'accounts_delete_img_error', implode( '", "', $this->cdn->errors() ) ) );
+					$this->session->set_flashdata( 'error', lang( 'accounts_delete_img_error', implode( '", "', $this->cdn->get_errors() ) ) );
 
 				endif;
 
