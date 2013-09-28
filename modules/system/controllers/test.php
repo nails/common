@@ -338,6 +338,9 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Directories to test
 		$_dirs		= array();
 
+		//	Log folder
+		$_dirs[]	= FCPATH . APPPATH . 'logs/';
+
 		//	Cache directory
 		if ( defined( 'DEPLOY_CACHE_DIR' ) ) :
 
@@ -512,5 +515,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_TESTS' ) ) :
 
 endif;
 
-/* End of file admin.php */
-/* Location: ./application/modules/api/controllers/admin.php */
+/* End of file test.php */
+/* Location: ./modules/system/controllers/test.php */

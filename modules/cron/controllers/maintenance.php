@@ -19,6 +19,17 @@ require_once '_cron.php';
 
 class NAILS_Maintenance extends NAILS_Cron_Controller
 {
+	public function index()
+	{
+		//	TODO: Running the index method should automatically determine
+		//	which tasks hould be run. Either it knows that it runs every hour
+		//	and tracks what's been going on, or it looks at the time and works
+		//	out when the last items were run etc. Think about it.
+	}
+
+	// --------------------------------------------------------------------------
+
+
 	public function hourly()
 	{
 		$this->_start( 'maintenance', 'hourly', 'Hourly Maintenance Tasks' );
@@ -85,7 +96,7 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 		//	Weekly Tasks
 
 		//	CDN AWS Sourcefile clearout
-		//	TODO
+		//	Log file zip up and cleanup
 
 		// --------------------------------------------------------------------------
 
