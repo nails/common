@@ -45,10 +45,6 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->library( 'logger' );
-
-		// --------------------------------------------------------------------------
-
 		//	E_ALL E_STRICT error reporting, for as error free code as possible
 		error_reporting( E_ALL|E_STRICT );
 	}
@@ -65,11 +61,10 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Set logger details
-		$this->logger->log_dir( 'cron/' . $log_dir . '/' );
-		$this->logger->log_file( $log_file . '-' . date( 'Y-m-d' ) . '.php' );
-		$this->logger->line( 'Starting job [' . $this->task . ']...' );
-		$this->logger->line();
+		//	Set log details
+		_LOG_FILE( 'cron/' . $log_dir . '/' . $log_file . '-' . date( 'Y-m-d' ) . '.php' );
+		_LOG( 'Starting job [' . $this->task . ']...' );
+		_LOG();
 	}
 
 
@@ -84,12 +79,12 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->logger->line();
-		$this->logger->line( 'Finished job [' . $this->task . ']' );
-		$this->logger->line( 'Job took ' . number_format( $_duration, 5 ) . ' seconds' );
-		$this->logger->line();
-		$this->logger->line( '----------------------------------------' );
-		$this->logger->line();
+		_LOG();
+		_LOG( 'Finished job [' . $this->task . ']' );
+		_LOG( 'Job took ' . number_format( $_duration, 5 ) . ' seconds' );
+		_LOG();
+		_LOG( '----------------------------------------' );
+		_LOG();
 
 		// --------------------------------------------------------------------------
 

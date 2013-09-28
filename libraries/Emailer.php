@@ -9,7 +9,6 @@
 
 class Emailer
 {
-
 	public $from;
 	private $ci;
 	private $email_type;
@@ -730,7 +729,7 @@ class Emailer
 
 
 			//	Fetch all emails in the queue
-			$this->ci->logger->line( 'Fetching queue items for "' . $cron_run . '" cron run...' );
+			_LOG( 'Fetching queue items for "' . $cron_run . '" cron run...' );
 			$_emails = $this->get_queue( $cron_run );
 
 			// --------------------------------------------------------------------------
@@ -738,7 +737,7 @@ class Emailer
 			//	If there are no queue items then we're done
 			if ( ! count( $_emails ) ) :
 
-				$this->ci->logger->line( '...nothing here. Terminating.' );
+				_LOG( '...nothing here. Terminating.' );
 				return '0 emails processed.';
 
 			endif;
@@ -747,7 +746,7 @@ class Emailer
 
 			//	We found something, process...
 			$_stats['total'] = count( $_emails );
-			$this->ci->logger->line( $_stats['total'] . ' queue items found. Processing...' );
+			_LOG( $_stats['total'] . ' queue items found. Processing...' );
 
 			// --------------------------------------------------------------------------
 
@@ -769,7 +768,7 @@ class Emailer
 
 			foreach ( $_emails AS $e ) :
 
-				$this->ci->logger->line( '...sending email ref: ' . $e->ref . ' to: ' . $e->send_to . $e->user_email );
+				_LOG( '...sending email ref: ' . $e->ref . ' to: ' . $e->send_to . $e->user_email );
 
 				if ( $this->_send( $e, FALSE, FALSE ) ) :
 
@@ -778,7 +777,7 @@ class Emailer
 				else :
 
 					$_stats['failed']++;
-					$this->ci->logger->line( 'Email to  ' . $e->send_to . ' failed to send. Queue item: ' . $e->id );
+					_LOG( 'Email to  ' . $e->send_to . ' failed to send. Queue item: ' . $e->id );
 
 				endif;
 
@@ -794,7 +793,7 @@ class Emailer
 			//	Get a distinct list of user ID's and types we're going to be sending to, we'll then use this to
 			//	cherry pick the emails we need to compile and send
 
-			$this->ci->logger->line( 'Fetching queue items for "' . $cron_run . '" cron run...' );
+			_LOG( 'Fetching queue items for "' . $cron_run . '" cron run...' );
 
 			//	Fetch user ID's
 			$_sql = 'SELECT
@@ -824,7 +823,7 @@ class Emailer
 			//	If there are no queue items then we're done
 			if ( ! count( $_values ) ) :
 
-				$this->ci->logger->line( '...nothing here. Terminating.' );
+				_LOG( '...nothing here. Terminating.' );
 				return '0 emails processed.';
 
 			endif;
@@ -832,7 +831,7 @@ class Emailer
 			// --------------------------------------------------------------------------
 
 			//	We found something, process...
-			$this->ci->logger->line( count( $_values ) . ' queue items found. Processing...' );
+			_LOG( count( $_values ) . ' queue items found. Processing...' );
 
 			//	We loop through these results and pull out the relevant emails from the database, each one of these
 			//	represents a single email which must be crunched down into a single entity and then sent
@@ -841,13 +840,13 @@ class Emailer
 
 			foreach ( $_values AS $item ) :
 
-				$this->ci->logger->line( '' );
+				_LOG( '' );
 
 				if ( isset( $item->user_id ) )
-					$this->ci->logger->line( 'Beginning processing for user #' . $item->user_id );
+					_LOG( 'Beginning processing for user #' . $item->user_id );
 
 				if ( isset( $item->user_email ) )
-					$this->ci->logger->line( 'Beginning processing for email ' . $item->user_email );
+					_LOG( 'Beginning processing for email ' . $item->user_email );
 
 				//	Fetch the appropriate queue items from the DB
 				if ( isset( $item->user_id ) )
@@ -864,12 +863,12 @@ class Emailer
 
 				if ( ! $_emails ) :
 
-					$this->ci->logger->line( '...No queue items found, weird, oh well - finished for this guy.' );
+					_LOG( '...No queue items found, weird, oh well - finished for this guy.' );
 					continue;
 
 				else :
 
-					$this->ci->logger->line( '...' . $_count . ' emails found, getting ready to crunch!' );
+					_LOG( '...' . $_count . ' emails found, getting ready to crunch!' );
 
 				endif;
 
@@ -896,12 +895,12 @@ class Emailer
 
 				$_crunch = $this->_crunch_data( $_emails );
 
-				$this->ci->logger->line( '...finished crunching data' );
+				_LOG( '...finished crunching data' );
 
 				// --------------------------------------------------------------------------
 
 				//	Send the email now
-				$this->ci->logger->line( '...sending email' );
+				_LOG( '...sending email' );
 
 				if ( $this->_send( $_crunch['email'] ) ) :
 
@@ -910,7 +909,7 @@ class Emailer
 					// --------------------------------------------------------------------------
 
 					//	Update all the emails in the archive to have a common ref
-					$this->ci->logger->line( '...sent successfully, reassigning email refs.' );
+					_LOG( '...sent successfully, reassigning email refs.' );
 
 					$this->ci->db->where_in( 'ref', $_crunch['refs'] );
 					$this->ci->db->set( 'ref', $_crunch['email']->ref );
@@ -919,7 +918,7 @@ class Emailer
 				else :
 
 					$_stats['failed']++;
-					$this->ci->logger->line( '...email failed to send.' );
+					_LOG( '...email failed to send.' );
 
 				endif;
 
@@ -937,7 +936,7 @@ class Emailer
 		//	Clearing the queue
 		if ( $_unqueue ) :
 
-			$this->ci->logger->line( 'Clearing ' . count( $_unqueue ) . ' items from the queue...');
+			_LOG( 'Clearing ' . count( $_unqueue ) . ' items from the queue...');
 			$this->ci->db->where_in( 'id', $_unqueue );
 			$this->ci->db->delete( NAILS_DB_PREFIX . 'email_queue' );
 
@@ -1668,6 +1667,10 @@ class Emailer
 		return $body;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
 	private function __process_link_html( $link )
 	{
 		$_html	= isset( $link[0] ) && $link[0] ? $link[0] : '';
@@ -1689,6 +1692,10 @@ class Emailer
 		return $_html;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
 	private function __process_link_url( $url )
 	{
 		$_html	= isset( $url[0] ) && $url[0] ? $url[0] : '';
@@ -1706,6 +1713,10 @@ class Emailer
 
 		return $_html;
 	}
+
+
+	// --------------------------------------------------------------------------
+
 
 	private function __process_link_generate( $html, $url, $title, $is_html )
 	{
@@ -1766,6 +1777,15 @@ class Emailer
 	public function get_errors()
 	{
 		return $this->_errors;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function last_error()
+	{
+		return end( $this->_errors );
 	}
 
 

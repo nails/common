@@ -511,6 +511,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_libraries[]	= 'session';
 		$_libraries[]	= 'encrypt';
 		$_libraries[]	= 'asset';
+		$_libraries[]	= 'logger';
 
 		foreach ( $_libraries AS $library ) :
 
@@ -546,6 +547,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'exception';
 		$_helpers[]		= 'typography';
 		$_helpers[]		= 'event';
+		$_helpers[]		= 'log';
 
 		//	Module specific helpers
 		//	CDN

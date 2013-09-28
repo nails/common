@@ -254,24 +254,8 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function sync( &$logger = NULL )
+	public function sync()
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		if ( defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID' ) && NAILS_SHOP_OPENEXCHANGERATES_APP_ID ) :
 
 			//	Make sure we know what the base currency is
@@ -281,7 +265,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 			endif;
 
-			$_logger( '... Base Currency is ' . SHOP_BASE_CURRENCY_CODE );
+			_LOG( '... Base Currency is ' . SHOP_BASE_CURRENCY_CODE );
 
 			//	Set up the cURL request
 			$this->load->library( 'curl' );
@@ -305,13 +289,13 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 						$_data = array( 'base_exchange' => $rate );
 						$this->update( $code, $_data );
-						$_logger( '... ' . $code . ' > ' . $rate );
+						_LOG( '... ' . $code . ' > ' . $rate );
 
 					endforeach;
 
 				else :
 
-					$_logger( '... API base is ' . $_result->base . '; calculating differences...' );
+					_LOG( '... API base is ' . $_result->base . '; calculating differences...' );
 
 					$_base = 1;
 					foreach ( $_result->rates AS $code => $rate ) :
@@ -334,7 +318,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 						$_new_rate = $rate / $_base;
 						$_data = array( 'base_exchange' => $_new_rate );
 						$this->update( $code, $_data );
-						$_logger( '... Calculating and saving new exchange rate for ' . SHOP_BASE_CURRENCY_CODE . ' > ' . $code . ' (' . $_new_rate . ')' );
+						_LOG( '... Calculating and saving new exchange rate for ' . SHOP_BASE_CURRENCY_CODE . ' > ' . $code . ' (' . $_new_rate . ')' );
 
 					endforeach;
 
@@ -347,8 +331,8 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 			else :
 
-				$_logger( '... An error occurred when querying the API:' );
-				$_logger( '... ' . $_result->status . ' ' . $_result->message . ' - ' . $_result->description );
+				_LOG( '... An error occurred when querying the API:' );
+				_LOG( '... ' . $_result->status . ' ' . $_result->message . ' - ' . $_result->description );
 				return FALSE;
 
 			endif;
@@ -356,7 +340,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		else :
 
-			$_logger( '... NAILS_SHOP_OPENEXCHANGERATES_APP_ID is not defined. Sync aborted.' );
+			_LOG( '... NAILS_SHOP_OPENEXCHANGERATES_APP_ID is not defined. Sync aborted.' );
 			return FALSE;
 
 		endif;

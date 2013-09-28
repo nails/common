@@ -47,7 +47,7 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 		//	Shop related tasks
 		if ( module_is_enabled( 'shop' ) ) :
 
-			$this->logger->line( 'Shop Module Enabled. Beginning Shop Tasks.' );
+			_LOG( 'Shop Module Enabled. Beginning Shop Tasks.' );
 
 			// --------------------------------------------------------------------------
 
@@ -58,12 +58,12 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 			// --------------------------------------------------------------------------
 
 			//	Sync Currencies
-			$this->logger->line( '... Synching Currencies' );
-			$this->currency->sync( $this->logger );
+			_LOG( '... Synching Currencies' );
+			$this->currency->sync();
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line( 'Finished Shop Tasks' );
+			_LOG( 'Finished Shop Tasks' );
 
 		endif;
 

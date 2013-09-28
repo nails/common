@@ -818,9 +818,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		//	Testing, testing, 1, 2, 3?
 		$this->data['testing'] = $this->_notify_is_testing();
 
-		//	Load the logger
-		$this->load->library( 'logger' );
-
 		//	Handle the notification in a way appropriate to the payment gateway
 		switch( $this->uri->rsegment( 3 ) ) :
 
@@ -839,13 +836,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _notify_paypal()
 	{
-		//	Configure logger
-		$this->logger->log_dir( shop_setting( 'shop_url' ) . 'notify/paypal' );
-		$this->logger->log_file( 'ipn-' . date( 'Y-m-d' ) . '.php' );
+		//	Configure log
+		_LOG_FILE( shop_setting( 'shop_url' ) . 'notify/paypal/ipn-' . date( 'Y-m-d' ) . '.php' );
 
-		$this->logger->line();
-		$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-		$this->logger->line( 'Waking up IPN responder; handling with PayPal' );
+		_LOG();
+		_LOG( '- - - - - - - - - - - - - - - - - - -' );
+		_LOG( 'Waking up IPN responder; handling with PayPal' );
 
 		// --------------------------------------------------------------------------
 
@@ -860,9 +856,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		if ( ! $this->data['testing'] && ! $this->input->post() ) :
 
-			$this->logger->line( 'No POST data, going back to sleep...' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'No POST data, going back to sleep...' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 			return;
 
@@ -874,19 +870,19 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( $this->data['testing'] ) :
 
 			$_ipn = TRUE;
-			$this->logger->line();
-			$this->logger->line( '**TESTING**' );
-			$this->logger->line( '**Simulating data sent from PayPal**' );
-			$this->logger->line();
+			_LOG();
+			_LOG( '**TESTING**' );
+			_LOG( '**Simulating data sent from PayPal**' );
+			_LOG();
 
 			//	Check order exists
 			$_order = $this->order->get_by_ref( $this->input->get( 'ref' ) );
 
 			if ( ! $_order ) :
 
-				$this->logger->line( 'Invalid order reference, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Invalid order reference, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -906,7 +902,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		else :
 
-			$this->logger->line( 'Validating the IPN call' );
+			_LOG( 'Validating the IPN call' );
 			$this->load->library( 'paypal' );
 
 			$_ipn		= $this->paypal->validate_ipn();
@@ -916,9 +912,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			if ( ! $_order ) :
 
-				$this->logger->line( 'Invalid order ID, aborting. Likely a transaction not initiated by the site.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Invalid order ID, aborting. Likely a transaction not initiated by the site.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -931,14 +927,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		//	Did the IPN validate?
 		if ( $_ipn ) :
 
-			$this->logger->line( 'IPN Verified with PayPal' );
-			$this->logger->line();
+			_LOG( 'IPN Verified with PayPal' );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Extra verification step, check the 'custom' variable decodes appropriately
-			$this->logger->line( 'Verifying data' );
-			$this->logger->line();
+			_LOG( 'Verifying data' );
+			_LOG();
 
 			$_verification = $this->encrypt->decode( $_paypal['custom'], APP_PRIVATE_KEY );
 
@@ -949,9 +945,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				);
 				$this->order->fail( $_order->id, $_data );
 
-				$this->logger->line( 'Order failed secondary verification, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Order failed secondary verification, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				// --------------------------------------------------------------------------
 
@@ -966,14 +962,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			//	Only bother to handle certain types
 			//	TODO: handle refunds
-			$this->logger->line( 'Checking txn_type is supported' );
-			$this->logger->line();
+			_LOG( 'Checking txn_type is supported' );
+			_LOG();
 
 			if ( $_paypal['txn_type'] != 'cart' ) :
 
-				$this->logger->line( '"' . $_paypal['txn_type'] . '" is not a supported PayPal txn_type, gracefully aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( '"' . $_paypal['txn_type'] . '" is not a supported PayPal txn_type, gracefully aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -982,29 +978,29 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	Check if order has already been processed
-			$this->logger->line( 'Checking if order has already been processed' );
-			$this->logger->line();
+			_LOG( 'Checking if order has already been processed' );
+			_LOG();
 
 			if ( ENVIRONMENT == 'production' && $_order->status != 'UNPAID' ) :
 
-				$this->logger->line( 'Order has already been processed, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Order has already been processed, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
 			elseif ( ENVIRONMENT != 'production' && $_order->status != 'UNPAID' ) :
 
-				$this->logger->line( 'Order has already been processed, but not on production so continuing anyway.' );
-				$this->logger->line();
+				_LOG( 'Order has already been processed, but not on production so continuing anyway.' );
+				_LOG();
 
 			endif;
 
 			// --------------------------------------------------------------------------
 
 			//	Check the status of the payment
-			$this->logger->line( 'Checking the status of the payment' );
-			$this->logger->line();
+			_LOG( 'Checking the status of the payment' );
+			_LOG();
 
 
 			switch( strtolower( $_paypal['payment_status'] ) ) :
@@ -1013,7 +1009,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				case 'completed' :
 
 					//	Do nothing, this transaction is OK
-					$this->logger->line( 'Payment status is "completed"; continuing...' );
+					_LOG( 'Payment status is "completed"; continuing...' );
 
 				break;
 
@@ -1022,7 +1018,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				case 'reversed' :
 
 					//	Transaction was cancelled, mark order as FAILED
-					$this->logger->line( 'Payment was reversed, marking as failed and aborting' );
+					_LOG( 'Payment was reversed, marking as failed and aborting' );
 
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
@@ -1038,18 +1034,18 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					//	Check the pending_reason, if it's 'paymentreview' then gracefully stop
 					//	processing; PayPal will send a further IPN once the payment is complete
 
-					$this->logger->line( 'Payment status is "pending"; check the reason.' );
+					_LOG( 'Payment status is "pending"; check the reason.' );
 
 					if ( strtolower( $_paypal['pending_reason'] ) == 'paymentreview' ) :
 
 						//	The transaction is pending review, gracefully stop proicessing, but don't cancel the order
-						$this->logger->line( 'Payment is pending review by PayPal, gracefully aborting just now.' );
+						_LOG( 'Payment is pending review by PayPal, gracefully aborting just now.' );
 						$this->order->pending( $_order->id );
 						return;
 
 					else :
 
-						$this->logger->line( 'Unsupported payment reason "' . $_paypal['pending_reason'] . '", aborting.' );
+						_LOG( 'Unsupported payment reason "' . $_paypal['pending_reason'] . '", aborting.' );
 
 						// --------------------------------------------------------------------------
 
@@ -1078,7 +1074,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				default :
 
 					//	Unknown/invalid payment status
-					$this->logger->line( 'Invalid payment status' );
+					_LOG( 'Invalid payment status' );
 
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
@@ -1098,11 +1094,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	All seems good, continue with order processing
-			$this->logger->line( 'All seems well, continuing...' );
-			$this->logger->line();
+			_LOG( 'All seems well, continuing...' );
+			_LOG();
 
-			$this->logger->line( 'Setting txn_id (' . $_paypal['txn_id'] . ') and fees_deducted (' . $_paypal['mc_fee'] . ').' );
-			$this->logger->line();
+			_LOG( 'Setting txn_id (' . $_paypal['txn_id'] . ') and fees_deducted (' . $_paypal['mc_fee'] . ').' );
+			_LOG();
 
 			$_data = array(
 				'pp_txn_id'		=> $_paypal['txn_id'],
@@ -1113,41 +1109,41 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	PROCESSSSSS...
-			$this->order->process( $_order, $this->logger );
-			$this->logger->line();
+			$this->order->process( $_order );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a receipt to the customer
-			$this->logger->line( 'Sending receipt to customer: ' . $_order->user->email );
-			$this->order->send_receipt( $_order, $this->logger );
-			$this->logger->line();
+			_LOG( 'Sending receipt to customer: ' . $_order->user->email );
+			$this->order->send_receipt( $_order );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a notification to the store owner(s)
-			$this->logger->line( 'Sending notification to store owner(s): ' . shop_setting( 'notify_order' ) );
-			$this->order->send_order_notification( $_order, $this->logger );
+			_LOG( 'Sending notification to store owner(s): ' . shop_setting( 'notify_order' ) );
+			$this->order->send_order_notification( $_order );
 
 			// --------------------------------------------------------------------------
 
 			if ( $_order->voucher ) :
 
 				//	Redeem the voucher, if it's there
-				$this->logger->line( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
+				_LOG( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
 				$this->voucher->redeem( $_order->voucher->id, $_order );
 
 			endif;
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line();
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line( 'All done here, going back to sleep...' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'All done here, going back to sleep...' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 			if ( $this->data['testing'] ) :
 
@@ -1157,9 +1153,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		else :
 
-			$this->logger->line( 'PayPal did not verify this IPN call, aborting.' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'PayPal did not verify this IPN call, aborting.' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 		endif;
 	}

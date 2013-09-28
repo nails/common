@@ -808,33 +808,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function process( $order, &$logger = NULL )
+	public function process( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID' );
 				return FALSE;
 
@@ -844,7 +828,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_logger( 'Processing order #' . $order->id );
+		_LOG( 'Processing order #' . $order->id );
 
 		//	Loop through all the items in the order. If there's a proccessor method
 		//	for the object type then begin grouping the products so we can execute
@@ -854,7 +838,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		foreach ( $order->items AS $item ) :
 
-			$_logger( 'Processing item #' . $item->id . ': ' . $item->title . ' (' . $item->type->label . ')' );
+			_LOG( 'Processing item #' . $item->id . ': ' . $item->title . ' (' . $item->type->label . ')' );
 
 			if ( $item->type->ipn_method && method_exists( $this, '_process_' . $item->type->ipn_method ) ) :
 
@@ -875,12 +859,12 @@ class NAILS_Shop_order_model extends NAILS_Model
 		//	Execute the processors
 		if ( $_processors ) :
 
-			$_logger( 'Executing processors...' );
+			_LOG( 'Executing processors...' );
 
 			foreach ( $_processors AS $method => $products ) :
 
-				$_logger( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
-				call_user_func_array( array( $this, $method), array( &$_logger, &$products, &$order ) );
+				_LOG( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
+				call_user_func_array( array( $this, $method), array( &$products, &$order ) );
 
 			endforeach;
 
@@ -910,7 +894,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _process_download( &$_logger, &$items, &$order )
+	protected function _process_download( &$items, &$order )
 	{
 		//	Generate links for all the items
 		$_urls		= array();
@@ -933,7 +917,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Send the user an email with the links
-		$_logger( 'Sending download email to ' . $order->user->email  . '; email contains ' . count( $_urls ) . ' expiring URLs' );
+		_LOG( 'Sending download email to ' . $order->user->email  . '; email contains ' . count( $_urls ) . ' expiring URLs' );
 
 		$this->load->library( 'emailer' );
 
@@ -958,8 +942,8 @@ class NAILS_Shop_order_model extends NAILS_Model
 		else :
 
 			//	Email failed to send, alert developers
-			$_logger( '!! Failed to send download links, alerting developers' );
-			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			_LOG( '!! Failed to send download links, alerting developers' );
+			_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 			send_developer_mail( 'Unable to send download email', 'Unable to send the email with download links to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
@@ -970,33 +954,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function send_receipt( $order, $logger = NULL )
+	public function send_receipt( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID' );
 				return FALSE;
 
@@ -1017,8 +985,8 @@ class NAILS_Shop_order_model extends NAILS_Model
 		if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 			//	Email failed to send, alert developers
-			$_logger( '!! Failed to send receipt, alerting developers' );
-			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			_LOG( '!! Failed to send receipt, alerting developers' );
+			_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 			send_developer_mail( 'Unable to send receipt email', 'Unable to send the email receipt to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
@@ -1035,33 +1003,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function send_order_notification( $order, $logger = NULL )
+	public function send_order_notification( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID.' );
 				return FALSE;
 
@@ -1094,8 +1046,8 @@ class NAILS_Shop_order_model extends NAILS_Model
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 				//	Email failed to send, alert developers
-				$_logger( '!! Failed to send order notification to ' . $_email->to_email . ', alerting developers.' );
-				$_logger( implode( "\n", $this->emailer->get_errors() ) );
+				_LOG( '!! Failed to send order notification to ' . $_email->to_email . ', alerting developers.' );
+				_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 				send_developer_mail( 'Unable to send order notification email', 'Unable to send the order notification to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
