@@ -141,6 +141,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 				$_email				= new stdClass();
 				$_email->to_email	= $this->input->post( 'recipient' );
 				$_email->type		= 'test_email';
+				$_email->data		= array();
 
 				//	Send the email
 				$this->load->library( 'emailer' );

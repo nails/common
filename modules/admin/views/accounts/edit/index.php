@@ -13,6 +13,7 @@
 	endif;
 
 	$this->load->view( 'accounts/edit/inc-basic' );
+	$this->load->view( 'accounts/edit/inc-emails' );
 	$this->load->view( 'accounts/edit/inc-password' );
 	$this->load->view( 'accounts/edit/inc-meta' );
 	$this->load->view( 'accounts/edit/inc-profile-img' );

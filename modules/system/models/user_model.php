@@ -501,6 +501,7 @@ class NAILS_User_model extends NAILS_Model
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
+		$this->db->select( 'ue.email, ue.is_verified email_is_verified' );
 		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
@@ -678,7 +679,7 @@ class NAILS_User_model extends NAILS_Model
 	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		//	Write selects
-		$this->db->select( 'u.id, u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'u.id, ue.email, ue.is_verified email_is_verified, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		// --------------------------------------------------------------------------
 
@@ -760,12 +761,13 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _getcount_users_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( NAILS_DB_PREFIX . 'user_meta um',			'u.id = um.user_id',				'left' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_auth_method uam',	'u.auth_method_id = uam.id',		'left' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_group ug',			'u.group_id = ug.id',				'left' );
-		$this->db->join( NAILS_DB_PREFIX . 'date_format_date dfd',	'u.date_format_date_id = dfd.id',	'left' );
-		$this->db->join( NAILS_DB_PREFIX . 'date_format_time dft',	'u.date_format_time_id = dft.id',	'left' );
-		$this->db->join( NAILS_DB_PREFIX . 'language ul',				'u.language_id = ul.id',			'left' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue',			'u.id = ue.user_id AND ue.is_primary = 1',	'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_meta um',			'u.id = um.user_id',						'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_auth_method uam',	'u.auth_method_id = uam.id',				'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_group ug',			'u.group_id = ug.id',						'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'date_format_date dfd',	'u.date_format_date_id = dfd.id',			'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'date_format_time dft',	'u.date_format_time_id = dft.id',			'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'language ul',				'u.language_id = ul.id',				'LEFT' );
 
 		// --------------------------------------------------------------------------
 
@@ -954,13 +956,28 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_by_email( $email, $extended = FALSE )
 	{
-		if ( ! is_string( $email ) )
+		if ( ! is_string( $email ) ) :
+
 			return FALSE;
 
-		$this->db->where( 'u.email', $email );
-		$user = $this->get_all( $extended );
+		endif;
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		// --------------------------------------------------------------------------
+
+		//	Look up the email, and if we find an ID then fetch that user
+		$this->db->select( 'user_id' );
+		$this->db->where( 'email', $email );
+		$_id = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
+
+		if ( $_id ) :
+
+			return $this->get_by_id( $_id->user_id );
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 
@@ -1111,6 +1128,20 @@ class NAILS_User_model extends NAILS_Model
 	}
 
 
+
+	// --------------------------------------------------------------------------
+
+
+
+	public function get_emails_for_user( $id )
+	{
+		$this->db->where( 'user_id', $id );
+		$this->db->order_by( 'is_primary', 'DESC' );
+		$this->db->order_by( 'email', 'ASC' );
+		return $this->db->get( NAILS_DB_PREFIX . 'user_email' )->result();
+	}
+
+
 	// --------------------------------------------------------------------------
 
 
@@ -1172,14 +1203,12 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'password';
 			$_cols[]	= 'password_md5';
 			$_cols[]	= 'salt';
-			$_cols[]	= 'email';
 			$_cols[]	= 'activation_code';
 			$_cols[]	= 'forgotten_password_code';
 			$_cols[]	= 'remember_code';
 			$_cols[]	= 'created';
 			$_cols[]	= 'last_login';
 			$_cols[]	= 'last_seen';
-			$_cols[]	= 'is_verified';
 			$_cols[]	= 'is_suspended';
 			$_cols[]	= 'temp_pw';
 			$_cols[]	= 'failed_login_count';
@@ -1204,28 +1233,6 @@ class NAILS_User_model extends NAILS_Model
 			//	Safety first, no updating of user's ID.
 			unset( $data->id );
 			unset( $data->id_md5 );
-
-			//	If we're updatig the email of a user check to see if
-			//	the new email already exists; can't be having two identical
-			//	emails in the user table.
-
-			if (  array_key_exists( 'email', $data ) ) :
-
-				//	Exclude the current user, we're only interested in other users
-				$this->db->where( 'u.id !=', (int) $_uid );
-				$this->db->where( 'u.email', $data['email'] );
-
-				if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'user u' ) ) :
-
-					//	We found a user who isn't the current user who is already
-					//	using this email address.
-
-					$this->_set_error( 'Email already in use.' );
-					return FALSE;
-
-				endif;
-
-			endif;
 
 			//	If we're updating the user's password we should generate a new hash
 			if (  array_key_exists( 'password', $data ) ) :
@@ -1343,6 +1350,112 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function email_add( $user_id, $email, $is_primary = FALSE, $is_verified = FALSE, $send_email = TRUE )
+	{
+		$_code = $this->salt();
+
+		$this->db->set( 'user_id', $user_id );
+		$this->db->set( 'email', $email );
+		$this->db->set( 'code', $_code );
+		$this->db->set( 'is_verified', $is_verified );
+		$this->db->set( 'is_primary', TRUE );
+		$this->db->set( 'date_added', 'NOW()', FALSE );
+
+		$this->db->insert( NAILS_DB_PREFIX . 'user_email' );
+
+		if ( $this->db->affected_rows() ) :
+
+			//	Send off the verification email
+			if ( $send_email ) :
+
+				//	TODO: Send an email with a verification link
+
+			endif;
+
+			return $_code;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function email_delete( $email )
+	{
+		$this->db->where( 'is_primary', FALSE );
+		$this->db->where( 'email', $email );
+		$this->db->delete( NAILS_DB_PREFIX . 'user_email' );
+
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function email_verify( $email )
+	{
+		$this->db->set( 'is_verified', TRUE );
+		$this->db->set( 'date_verified', 'NOW()', FALSE );
+		$this->db->where( 'email', $email );
+		$this->db->where( 'is_verified', FALSE );
+		$this->db->update( NAILS_DB_PREFIX . 'user_email' );
+
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function email_make_primary( $email )
+	{
+		//	Fetch other emails
+		$this->db->select( 'user_id' );
+		$this->db->where( 'email', $email );
+		$_user_id = $this->db->get()->row();
+
+		if ( ! $_user_id ) :
+
+			return FALSE;
+
+		endif;
+
+		//	Update
+		$this->db->trans_begin();
+
+			$this->db->set( 'is_primary', FALSE );
+			$this->db->where( 'user_id', $_user_id->user_id );
+			$this->db->update( NAILS_DB_PREFIX . 'user_email' );
+
+			$this->db->set( 'is_primary', TRUE );
+			$this->db->where( 'email', $email );
+			$this->db->update( NAILS_DB_PREFIX . 'user_email' );
+
+		$this->db->trans_complete();
+
+		if ( $this->db->trans_status() === FALSE ) :
+
+			$this->db->trans_rollback();
+			return FALSE;
+
+		else :
+
+			$this->db->trans_commit();
+			return TRUE;
+
+		endif;
 	}
 
 
@@ -1547,10 +1660,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->select( 'password, salt' );
-		$this->db->where( 'email', $email );
+		$this->db->select( 'u.password, u.salt' );
+		$this->db->where( 'ue.email', $email );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'u.id = ue.user_id' );
 		$this->db->limit( 1 );
-		$_q = $this->db->get( NAILS_DB_PREFIX . 'user' );
+		$_q = $this->db->get( NAILS_DB_PREFIX . 'user u' );
 
 		// --------------------------------------------------------------------------
 
@@ -1796,7 +1910,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Check email against DB
 		$this->db->where( 'email', $email );
-		if (  $this->db->count_all_results( NAILS_DB_PREFIX . 'user' ) ) :
+		if (  $this->db->count_all_results( NAILS_DB_PREFIX . 'user_email' ) ) :
 
 			$this->_set_error( 'This email is already in use.' );
 			return FALSE;
@@ -1807,7 +1921,6 @@ class NAILS_User_model extends NAILS_Model
 
 		//	All should be ok, go ahead and create the account
 		$_ip_address		= $this->input->ip_address();
-		$_activation_code	= $this->salt();
 
 		// --------------------------------------------------------------------------
 
@@ -1830,16 +1943,13 @@ class NAILS_User_model extends NAILS_Model
 		// Users table
 		$_data['password']			= $_password[0];
 		$_data['password_md5']		= md5( $_password[0] );
-		$_data['email']				= trim( $email );
 		$_data['group_id']			= $group_id;
 		$_data['ip_address']		= $_ip_address;
 		$_data['last_ip']			= $_ip_address;
 		$_data['created']			= date( 'Y-m-d H:i:s' );
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
-		$_data['is_verified']		= ( isset( $data['is_verified'] ) && $data['is_verified'] )	? 1	: 0 ;
 		$_data['is_suspended']		= ( isset( $data['is_suspended'] ) && $data['is_suspended'] )	? 1	: 0 ;
 		$_data['salt']				= $_password[1];
-		$_data['activation_code']	= $_activation_code;
 		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )	? 1	: 0 ;
 		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )				? $data['auth_method_id']	: 1 ;
 
@@ -1968,9 +2078,16 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Finally add the email address to the user_email table
+		$_verified = isset( $data['is_verified'] ) && $data['is_verified'] ? TRUE : FALSE ;
+
+		$_code = $this->email_add( $_id, $email, TRUE, $_verified, FALSE );
+
+		// --------------------------------------------------------------------------
+
 		//	Return useful user info
 		$_out['id']			= $_id;
-		$_out['activation']	= $_activation_code;
+		$_out['activation']	= $_code;
 
 		return $_out;
 	}
@@ -2018,7 +2135,7 @@ class NAILS_User_model extends NAILS_Model
 		while ( 1 > 0 ) :
 
 			$referral = random_string( 'alnum', 8 );
-			$q = $this->db->get_where( 'user', array( 'referral' => $referral ) );
+			$q = $this->db->get_where( NAILS_DB_PREFIX . 'user', array( 'referral' => $referral ) );
 			if ( $q->num_rows() == 0 )
 				break;
 
@@ -2055,13 +2172,25 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Update the user
-		$this->db->set( 'forgotten_password_code', $_ttl . ':' . $_key[0] );
+		$this->db->select( 'id' );
 		$this->db->where( 'email', $email );
-		$this->db->update( NAILS_DB_PREFIX . 'user');
+		$_id = $this->db->get( NAILS_DBPREFIX . 'user_email' )->row();
 
-		// --------------------------------------------------------------------------
+		if ( $_id ) :
 
-		return (bool) $this->db->affected_rows();
+			$this->db->set( 'forgotten_password_code', $_ttl . ':' . $_key[0] );
+			$this->db->where( 'id', $_id->id );
+			$this->db->update( NAILS_DB_PREFIX . 'user');
+
+			// --------------------------------------------------------------------------
+
+			return (bool) $this->db->affected_rows();
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 
@@ -2124,7 +2253,6 @@ class NAILS_User_model extends NAILS_Model
 			$_data['password']					= $_hash[0];
 			$_data['password_md5']				= md5( $_hash[0] );
 			$_data['salt']						= $_hash[1];
-			$_data['is_verified']				= TRUE;
 			$_data['temp_pw']					= TRUE;
 			$_data['forgotten_password_code']	= NULL;
 
@@ -2137,63 +2265,6 @@ class NAILS_User_model extends NAILS_Model
 			return $_password;
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Activate a user
-	 *
-	 * @access	public
-	 * @param	int		$id		The user to activate
-	 * @param	string	$code	If present the user will only be activated if the code matches
-	 * @return	boolean
-	 * @author	Pablo
-	 **/
-	public function verify( $id, $code = FALSE )
-	{
-		//	Code is present, use it in the check
-		if ( $code !== FALSE ) :
-
-			//	Get the user
-			$this->db->select( 'id' );
-			$this->db->where( 'activation_code', $code );
-			$this->db->limit( 1 );
-			$_user = $this->db->get( NAILS_DB_PREFIX . 'user' )->row();
-
-			// --------------------------------------------------------------------------
-
-			if ( empty( $_user ) ) :
-
-				//	Failed to verify code.
-				return FALSE;
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $this->update( $id, array( 'is_verified' => TRUE, 'activation_code' => NULL ) );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Deactivate a user
-	 *
-	 * @access	public
-	 * @param	int		$id		The user to deactivate
-	 * @return	boolean
-	 * @author	Pablo
-	 **/
-	public function unverify( $id )
-	{
-		return $this->update( $id, array( 'is_verified' => FALSE, 'activation_code' => $this->salt() ) );
 	}
 
 
@@ -2369,9 +2440,9 @@ class NAILS_User_model extends NAILS_Model
 			$user->failed_login_count	= (int) $user->failed_login_count;
 
 			//	Bools
-			$user->temp_pw			= (bool) $user->temp_pw;
-			$user->is_verified		= (bool) $user->is_verified;
-			$user->is_suspended		= (bool) $user->is_suspended;
+			$user->temp_pw				= (bool) $user->temp_pw;
+			$user->is_suspended			= (bool) $user->is_suspended;
+			$user->email_is_verified	= (bool) $user->email_is_verified;
 
 			//	Dates (TODO)
 

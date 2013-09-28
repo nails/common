@@ -441,10 +441,11 @@ class Cdn {
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
-		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
@@ -469,10 +470,11 @@ class Cdn {
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
-		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
@@ -1848,10 +1850,11 @@ class Cdn {
 	public function get_buckets( $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
 	{
 		$this->db->select( 'b.id,b.slug,b.label,b.allowed_types,b.max_size,b.created,b.created_by,b.modified,b.modified_by' );
-		$this->db->select( 'u.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX . 'cdn_object WHERE bucket_id = b.id) object_count' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = b.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = b.created_by', 'LEFT' );
 
 		$_buckets = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket b' )->result();
 

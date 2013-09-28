@@ -287,7 +287,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	{
 		//	Hat-tip to: https://gist.github.com/serverdensity/82576
 		$_zones		= DateTimeZone::listIdentifiers();
-		$_locations	= array();
+		$_locations	= array( 'UTC' => 'Coordinated Universal Time (UTC/GMT)' );
 
 		foreach ( $_zones as $zone ) :
 
@@ -325,7 +325,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	{
 		//	Hat-tip to: https://gist.github.com/serverdensity/82576
 		$_zones		= DateTimeZone::listIdentifiers();
-		$_locations	= array();
+		$_locations	= array( 'UTC' => 'Coordinated Universal Time (UTC/GMT)' );
 
 		foreach ( $_zones as $zone ) :
 

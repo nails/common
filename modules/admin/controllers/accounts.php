@@ -289,7 +289,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'temp_pw',			'Temp Password',		'xss_clean' );
 			$this->form_validation->set_rules( 'first_name',		'First Name',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'last_name',			'Last Name',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'email',				'Email',				'xss_clean|required|valid_email|is_unique[user.email]' );
+			$this->form_validation->set_rules( 'email',				'Email',				'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
 
 			//	Set messages
 			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
@@ -518,8 +518,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Define user table rules
-			$this->form_validation->set_rules( 'email',					lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[user.email.' . $_post['email_orig'] . ']' );
-			$this->form_validation->set_rules( 'username',				lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[user.username.' . $_post['username_orig'] . ']' );
+			$this->form_validation->set_rules( 'email',					lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[' . NAILS_DB_PREFIX . 'user_email.email.' . $_post['email_orig'] . ']' );
+			$this->form_validation->set_rules( 'username',				lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[' . NAILS_DB_PREFIX . 'user.username.' . $_post['username_orig'] . ']' );
 			$this->form_validation->set_rules( 'first_name',			lang( 'form_label_first_name' ),						'xss_clean|required' );
 			$this->form_validation->set_rules( 'last_name',				lang( 'form_label_last_name' ),							'xss_clean|required' );
 			$this->form_validation->set_rules( 'gender',				lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
@@ -710,6 +710,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Get the user's email addresses
+		$this->data['user_emails'] = $this->user->get_emails_for_user( $_user->id );
+
+		// --------------------------------------------------------------------------
+
 		$this->data['user_edit']	= $_user;
 		$this->data['user_meta']	= $_user_meta;
 
@@ -879,119 +884,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		else :
 
 			$this->session->set_flashdata( 'success', lang( 'accounts_unsuspend_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
-
-		endif;
-
-		redirect( $this->input->get( 'return_to' ) );
-	}
-
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Set a user's email address as verified
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function verify()
-	{
-		//	Get the user's details
-		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_by_id( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
-
-			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
-			redirect( $this->input->get( 'return_to' ) );
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Verify user
-		$this->user->verify( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Get the user's details, again
-		$_user = $this->user->get_by_id( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Define messages
-		if ( ! $_user->is_verified ) :
-
-			$this->session->set_flashdata( 'error', lang( 'accounts_verified_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'accounts_verified_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		redirect( $this->input->get( 'return_to' ) );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Marks a user's email address as unverified
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function unverify()
-	{
-		//	Get the user's details
-		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_by_id( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && $this->user->has_permission( 'superuser', $_user ) ) :
-
-			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
-			redirect( $this->input->get( 'return_to' ) );
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Unverify user
-		$this->user->unverify( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Get the user's details, again
-		$_user = $this->user->get_by_id( $_uid );
-
-		// --------------------------------------------------------------------------
-
-		//	Define messages
-		if ( $_user->is_verified ) :
-
-			$this->session->set_flashdata( 'error', lang( 'accounts_unverified_error', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'accounts_unverified_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 
 		endif;
 
