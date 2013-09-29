@@ -131,7 +131,7 @@ class NAILS_Email extends NAILS_Admin_Controller
 		$_offset = $this->input->get( 'offset' );
 
 		$this->data['emails']		= new stdClass();
-		$this->data['emails']->data	= $this->emailer->get_all( 'eqa.time_queued', 'DESC', $_offset );
+		$this->data['emails']->data	= $this->emailer->get_all( NULL, 'DESC', $_offset );
 
 		//	Work out pagination
 		$this->data['emails']->pagination					= new stdClass();

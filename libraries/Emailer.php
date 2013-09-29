@@ -3,7 +3,7 @@
 /**
 * Name:			Emailer
 *
-* Description:	Easily manage the email queue
+* Description:	Easily send email within apps
 *
 */
 
@@ -305,7 +305,6 @@ class Emailer
 	 * @access	private
 	 * @param	object	$input			The input object
 	 * @param	boolean	$graceful		Whether to fail gracefully or not
-	 * @param	boolean	$use_archive	Whetehr to use the archive or the live queue for the email look up
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
@@ -380,9 +379,7 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	If we're not on a production server, never queue or send out to any
-		//	live addresses please
-
+		//	If we're not on a production server, never send out to any live addresses
 		$_send_to = $_send->to->email;
 
 		if ( ENVIRONMENT != 'production' ) :
@@ -629,8 +626,16 @@ class Emailer
 	 * @return	array
 	 * @author	Pablo
 	 **/
-	public function get_all( $order = 'ea.time_sent', $sort = 'ASC', $offset = 0, $per_page = 25 )
+	public function get_all( $order = NULL, $sort = NULL, $offset = NULL, $per_page = NULL )
 	{
+		//	Set defaults
+		$order		= $order	? $order	: 'ea.time_sent';
+		$sort		= $sort		? $sort		: 'ASC';
+		$offset		= $offset	? $offset	: 0;
+		$per_page	= $per_page	? $per_page	: 25;
+
+		// --------------------------------------------------------------------------
+
 		$this->db->select( 'ea.id, ea.ref, ea.email_vars, ea.user_email sent_to, ea.time_sent, ea.read_count, ea.link_click_count' );
 		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->db->select( 'et.name, et.template_file, et.default_subject' );
@@ -935,7 +940,7 @@ class Emailer
 			//	Update the read count and a add a track data point
 			$this->db->set( 'read_count', 'read_count+1', FALSE );
 			$this->db->where( 'id', $_email->id );
-			$this->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
+			$this->db->update( NAILS_DB_PREFIX . 'email_archive' );
 
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'email_id', $_email->id );
@@ -946,7 +951,7 @@ class Emailer
 
 			endif;
 
-			$this->db->insert( NAILS_DB_PREFIX . 'email_queue_track_open' );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_track_open' );
 
 			return TRUE;
 
@@ -981,14 +986,14 @@ class Emailer
 			$this->db->select( 'url' );
 			$this->db->where( 'email_id', $_email->id );
 			$this->db->where( 'id', $link_id );
-			$_link = $this->db->get( NAILS_DB_PREFIX . 'email_queue_link' )->row();
+			$_link = $this->db->get( NAILS_DB_PREFIX . 'email_link' )->row();
 
 			if ( $_link ) :
 
 				//	Update the read count and a add a track data point
 				$this->db->set( 'link_click_count', 'link_click_count+1', FALSE );
 				$this->db->where( 'id', $_email->id );
-				$this->db->update( NAILS_DB_PREFIX . 'email_queue_archive' );
+				$this->db->update( NAILS_DB_PREFIX . 'email_archive' );
 
 				//	Add a link trackback
 				$this->db->set( 'created', 'NOW()', FALSE );
@@ -1001,7 +1006,7 @@ class Emailer
 
 				endif;
 
-				$this->db->insert( NAILS_DB_PREFIX . 'email_queue_track_link' );
+				$this->db->insert( NAILS_DB_PREFIX . 'email_track_link' );
 
 				//	Return the URL to go to
 				return $_link->url;
@@ -1134,7 +1139,7 @@ class Emailer
 			$this->db->set( 'title', $title );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'is_html', $is_html );
-			$this->db->insert( NAILS_DB_PREFIX . 'email_queue_link' );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_link' );
 
 			$_id = $this->db->insert_id();
 
