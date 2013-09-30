@@ -468,6 +468,22 @@ NAILS_JS = function()
 
 			return false;
 		});
+
+		// --------------------------------------------------------------------------
+
+		//	Look for tabs which contain error'd fields
+		$( 'li.tab a' ).each(function(){
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' div.field.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' .system-alert.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+		});
 	};
 
 
