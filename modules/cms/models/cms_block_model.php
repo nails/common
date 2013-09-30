@@ -342,10 +342,11 @@ class NAILS_Cms_block_model extends NAILS_Model
 	 **/
 	public function get_all( $include_revisions = FALSE )
 	{
-		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, u.email, u.last_name, l.name lang_name, l.slug lang_slug, u.gender, u.profile_img' );
+		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, ue.email, u.last_name, l.name lang_name, l.slug lang_slug, u.gender, u.profile_img' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'cms_block cb', 'cb.id = cbv.block_id' );
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbv.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'language l', 'l.id = cbv.lang_id', 'LEFT' );
 
 		$this->db->order_by( 'cb.title' );
@@ -400,9 +401,10 @@ class NAILS_Cms_block_model extends NAILS_Model
 			//	Are we including revisions?
 			if ( $include_revisions ) :
 
-				$this->db->select( 'cbtr.*, u.email, u.first_name, u.last_name, u.gender, u.profile_img' );
+				$this->db->select( 'cbtr.*, ue.email, u.first_name, u.last_name, u.gender, u.profile_img' );
 				$this->db->where( 'cbtr.block_translation_id', $_blocks[$i]->id );
 				$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbtr.created_by', 'LEFT' );
+				$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 				$this->db->order_by( 'created', 'DESC' );
 				$_temp->revisions = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation_revision cbtr' )->result();
 

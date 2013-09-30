@@ -447,9 +447,10 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
-		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
+		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		if ( $only_published ) :
 
@@ -676,10 +677,11 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
-		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
+		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bc.post_id' );
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		if ( $only_published ) :
 
@@ -732,10 +734,11 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
-		$this->db->select( 'u.first_name, u.last_name, u.email, u.profile_img, u.gender' );
+		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bt.post_id' );
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		if ( $only_published ) :
 

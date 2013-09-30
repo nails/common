@@ -306,7 +306,7 @@ class Event {
 	{
 		//	Fetch all objects from the table
 		$this->db->select( 'e.*, et.slug type_slug, et.label type_label, et.description type_description, et.ref_join_table, et.ref_join_column' );
-		$this->db->select( 'u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
+		$this->db->select( 'ue.email,u.first_name,u.last_name,u.profile_img,u.gender' );
 
 		//	Set Order
 		if ( is_array( $order ) ) :
@@ -397,6 +397,7 @@ class Event {
 	{
 		$this->db->join( NAILS_DB_PREFIX . 'event_type et', 'e.type_id = et.id', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = e.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		// --------------------------------------------------------------------------
 

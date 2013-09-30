@@ -788,7 +788,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$search							= array( 'keywords' => $search, 'columns' => array() );
 			$search['columns']['id']		= 'u.id';
-			$search['columns']['email']		= 'u.email';
+			$search['columns']['email']		= 'ue.email';
 			$search['columns']['username']	= 'u.username';
 			$search['columns']['name']		= array( ' ', 'u.first_name', 'u.last_name' );
 

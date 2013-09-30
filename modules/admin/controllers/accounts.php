@@ -152,7 +152,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_group_id' ),	'col' => 'u.group_id' );
 		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_first' ),		'col' => 'u.first_name' );
 		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_last' ),		'col' => 'u.last_name' );
-		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_email' ),		'col' => 'u.email' );
+		$this->accounts_sortfields[] = array( 'label' => lang( 'accounts_sort_email' ),		'col' => 'ue.email' );
 	}
 
 

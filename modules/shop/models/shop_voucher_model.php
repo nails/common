@@ -246,7 +246,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	 **/
 	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
-		$this->db->select( 'v.*, u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
+		$this->db->select( 'v.*, ue.email,u.first_name,u.last_name,u.profile_img,u.gender' );
 
 		// --------------------------------------------------------------------------
 
@@ -373,6 +373,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	protected function _getcount_vouchers_common( $where = NULL, $search = NULL )
 	{
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = v.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		//	Set Where
 		if ( $where ) :
