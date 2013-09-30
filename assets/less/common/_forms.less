@@ -140,7 +140,7 @@ div.field
 {
 	padding:10px;
 	border-bottom:1px solid #EFEFEF;
-	clear:right;
+	clear:both;
 	min-height:30px;
 	//overflow:auto;
 
@@ -315,6 +315,14 @@ div.field
 		margin-top:10px;
 		display:none;
 	}
+}
+div.field:after
+{
+	position:relative;
+	display:block;
+	content: '';
+	float:none;
+	clear:both;
 }
 div.field:hover
 {
