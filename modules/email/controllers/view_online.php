@@ -71,7 +71,7 @@ class NAILS_View_Online extends NAILS_Email_Controller
 
 
 		$_data['sent_to']				= new stdClass();
-		$_data['sent_to']->email		= $_email->user_email ? $_email->user_email : $_email->send_to;
+		$_data['sent_to']->email		= $_email->sent_to;
 		$_data['sent_to']->first		= $_email->first_name;
 		$_data['sent_to']->last			= $_email->last_name;
 		$_data['sent_to']->id			= (int) $_email->user_id;
