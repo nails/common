@@ -348,7 +348,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->select( 'p.*' );
 		$this->db->select( 'tr.id tax_id, tr.label tax_label, tr.rate tax_rate' );
 		$this->db->select( $this->_get_meta_columns() );
-		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.requires_shipping type_requires_shipping,pt.max_per_order type_max_per_order' );
+		$this->db->select( 'pt.slug type_slug, pt.label type_label, pt.is_physical type_is_physical,pt.max_per_order type_max_per_order' );
 		//$this->db->select( 'spp.price render_price, spp.sale_price render_sale_price' );
 
 		// --------------------------------------------------------------------------
@@ -652,11 +652,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Type
-		$product->type						= new stdClass();
-		$product->type->id					= (int) $product->type_id;
-		$product->type->slug				= $product->type_slug;
-		$product->type->label				= $product->type_label;
-		$product->type->requires_shipping	= (bool) $product->type_requires_shipping;
+		$product->type				= new stdClass();
+		$product->type->id			= (int) $product->type_id;
+		$product->type->slug		= $product->type_slug;
+		$product->type->label		= $product->type_label;
+		$product->type->is_physical	= (bool) $product->type_is_physical;
 
 		if ( ! is_null( $product->type_max_per_order ) ) :
 
@@ -667,7 +667,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		unset( $product->type_id );
 		unset( $product->type_slug );
 		unset( $product->type_label );
-		unset( $product->type_requires_shipping );
+		unset( $product->type_is_physical );
 		unset( $product->type_max_per_order );
 	}
 }

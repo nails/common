@@ -44,8 +44,8 @@ NAILS_Admin = function() {
 
 		$('.box .toggle').each(function() {
 
-			_id = $(this).parents('.box').attr('id');
-			_state = _this._get('adminbox-' + _id);
+			_id		= $(this).parents('.box').attr('id');
+			_state	= _this._get('adminbox-' + _id);
 
 			// --------------------------------------------------------------------------
 
@@ -57,10 +57,10 @@ NAILS_Admin = function() {
 
 			// --------------------------------------------------------------------------
 
-			if (_state === 'closed') {
-				_this._close_box(this, false, false);
-			} else {
+			if (_state === 'open') {
 				_this._open_box(this, false, false);
+			} else {
+				_this._close_box(this, false, false);
 			}
 
 		});

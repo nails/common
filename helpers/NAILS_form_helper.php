@@ -655,8 +655,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		//	Get the selected options
 		if ( $_POST ) :
 
-			$_key = str_replace( '[]', '', $_field['key'] );
-			$_selected = isset( $_POST[$_key] ) ? $_POST[$_key] : '';
+			$_selected = set_value( $_field['key'] );
 
 		else :
 
@@ -909,17 +908,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_out .= '</span>';
 
 		//	Field
-
-		if ( $_ci->input->post( $_field['key'] ) ) :
-
-			//	If this field is present, because it's a boolean consider it TRUE
-			$_selected = TRUE;
-
-		else :
-
-			$_selected = (bool) $_field['default'];
-
-		endif;
+		$_selected = set_value( $_field['key'], (bool) $_field['default'] );
 
 		$_out .= '<div class="toggle toggle-modern"></div>';
 		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly );

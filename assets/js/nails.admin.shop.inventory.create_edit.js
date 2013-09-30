@@ -637,6 +637,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 				$.each(_ids, function(index, id)
 				{
+					console.log('li.image.object-id-' + id);
 					//	Find the appropriate item(s) and move it to the beginning of the list
 					$('li.image.object-id-' + id).each(function()
 					{
@@ -908,11 +909,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			width: '100%'
 		});
 
-		$(_target.courier_method).chosen({
-			footer_html: '<a href="#" class="manage-shipping-options">Manage Shipping Options</a>',
-			width: '100%'
-		});
-
 		// --------------------------------------------------------------------------
 
 		//	Bind fancybox to chosens
@@ -996,16 +992,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			return false;
 		});
 
-		$(document).on('click', 'a.manage-shipping-options', function() {
-			$.fancybox.open(_url.courier_method, {
-				type: 'iframe',
-				beforeClose: function() {
-					_this._rebuild_chosen(_target.courier_method);
-				}
-			});
-			return false;
-		});
-
 		// --------------------------------------------------------------------------
 
 		//	Ensure all chosens are updated when their tab is shown
@@ -1021,7 +1007,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				$(_target.attributes).trigger( 'chosen:updated' );
 				$(_target.ranges).trigger( 'chosen:updated' );
 				$(_target.collections).trigger( 'chosen:updated' );
-				$(_target.courier_method).trigger( 'chosen:updated' );
 			}, 1);
 		});
 	};

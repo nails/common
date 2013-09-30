@@ -434,7 +434,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			else :
 
-				dump( 'validation_failed' );
+				//dump( 'validation_failed' );
 				//dump(validation_errors());
 
 			endif;
@@ -444,17 +444,23 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load additional models
-		$this->load->model( 'shop/shop_brand_model', 'brand' );
-		$this->load->model( 'shop/shop_category_model', 'category' );
-		$this->load->model( 'shop/shop_tag_model', 'tag' );
+		$this->load->model( 'shop/shop_attribute_model',	'attribute' );
+		$this->load->model( 'shop/shop_brand_model',		'brand' );
+		$this->load->model( 'shop/shop_category_model',		'category' );
+		$this->load->model( 'shop/shop_collection_model',	'collection' );
+		$this->load->model( 'shop/shop_range_model',		'range' );
+		$this->load->model( 'shop/shop_tag_model',			'tag' );
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch additional data
 		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
 		$this->data['tax_rates']			= $this->tax->get_all_flat();
+		$this->data['attributes']			= $this->attribute->get_all_flat();
 		$this->data['brands']				= $this->brand->get_all_flat();
 		$this->data['categories']			= $this->category->get_all_nested_flat();
+		$this->data['collections']			= $this->collection->get_all();
+		$this->data['ranges']				= $this->range->get_all();
 		$this->data['tags']					= $this->tag->get_all_flat();
 
 		array_unshift( $this->data['tax_rates'], 'No Tax');
@@ -1056,7 +1062,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			//	Common
 			$this->form_validation->set_rules( 'type',					'', 'required|callback__callback_voucher_valid_type' );
-			$this->form_validation->set_rules( 'code',					'', 'required|is_unique[shop_voucher.code]|callback__callback_voucher_valid_code' );
+			$this->form_validation->set_rules( 'code',					'', 'required|is_unique[' . NAILS_DB_PREFIX . 'shop_voucher.code]|callback__callback_voucher_valid_code' );
 			$this->form_validation->set_rules( 'label',					'', 'required' );
 			$this->form_validation->set_rules( 'valid_from',			'', 'required|callback__callback_voucher_valid_from' );
 			$this->form_validation->set_rules( 'valid_to',				'', 'callback__callback_voucher_valid_to' );

@@ -33,7 +33,7 @@
 
 	<section class="tabs pages main-product">
 
-		<div class="tab page basics fieldset" id="tab-basics" style="display:block;">
+		<div class="tab page basics fieldset" id="tab-basics" style="display:none;">
 			<?php
 
 				$_field					= array();
@@ -128,13 +128,35 @@
 				<?php
 
 					//	Data which will be passed to template
-					$_data		= array( 'is_first' => TRUE, 'counter' => 0 );
+					$_data				= array();
+					$_data['is_first']	= TRUE;
+					$_data['is_php']	= TRUE;
+					$_data['counter']	= 0;
 
-					//	Template, sort out the <script> issue
-					$_template	= $this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data, TRUE );
+					//	Render, if there's POST then make sure we render it enough times
 
-					//	Render
-					echo $this->mustache->render( $_template, $_data );
+					if ( $this->input->post( 'variation' ) ) :
+
+						foreach ( $this->input->post( 'variation' ) AS $variation ) :
+
+							$_data['variation'] = $variation;
+
+							$_template	= $this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data, TRUE );
+
+							echo $this->mustache->render( $_template, $_data );
+
+							$_data['counter']++;
+							$_data['is_first'] = FALSE;
+
+						endforeach;
+
+					else :
+
+						$_template	= $this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data, TRUE );
+
+						echo $this->mustache->render( $_template, $_data );
+
+					endif;
 
 				?>
 			</div>
@@ -163,10 +185,23 @@
 				<strong>Please be patient while files upload.</strong>
 				<br />Tabs have been disabled until uploads are complete.
 			</p>
-			<ul id="gallery-items" class="empty">
+			<ul id="gallery-items" class="<?=$this->input->post( 'gallery' ) ? '' : 'empty' ?>">
 				<li class="empty">
 					No images, why not upload some?
 				</li>
+				<?php
+
+					if ( $this->input->post( 'gallery' ) ) :
+
+						foreach( $this->input->post( 'gallery' ) AS $image ) :
+
+							$this->load->view( 'admin/shop/inventory/utilities/template-mustache-gallery-item', array( 'object_id' => $image ) );
+
+						endforeach;
+
+					endif;
+
+				?>
 			</ul>
 		</div>
 
@@ -183,6 +218,23 @@
 					</tr>
 				</thead>
 				<tbody id="product-attributes">
+					<?php
+
+						if ( $this->input->post( 'attributes' ) ) :
+
+							$_counter = 0;
+							foreach ( $this->input->post( 'attributes' ) AS $attribute ) :
+
+								$_data = array( 'attribute' => $attribute, 'counter' => $_counter );
+								$this->load->view( 'admin/shop/inventory/utilities/template-mustache-attribute', $_data );
+
+								$_counter++;
+
+							endforeach;
+
+						endif;
+
+					?>
 				</tbody>
 			</table>
 			<p>
@@ -190,7 +242,7 @@
 			</p>
 		</div>
 
-		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:none;">
+		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:block;">
 			<p>
 				Specify which ranges and/or collections this product should appear in.
 			</p>
@@ -200,13 +252,17 @@
 			<select name="ranges[]" class="ranges" multiple="multiple" style="width:100%">
 			<?php
 
-				echo '<option value="Thingy1">Thingy1</option>';
-				echo '<option value="Thingy2">Thingy2</option>';
-				echo '<option value="Thingy3">Thingy3</option>';
-				echo '<option value="Thingy4">Thingy4</option>';
-				echo '<option value="Thingy5">Thingy5</option>';
-				echo '<option value="Thingy6">Thingy6</option>';
-				echo '<option value="Thingy7">Thingy7</option>';
+				$_selected = $this->input->post( 'ranges' ) ? : array();
+
+				foreach ( $ranges AS $range ) :
+
+					$_checked = array_search( $range->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
+
+					echo '<option value="' . $range->id . '" ' . $_checked . '>';
+					echo $range->label . ' - ' . $range->description_short;
+					echo '</option>';
+
+				endforeach;
 
 			?>
 			</select>
@@ -219,13 +275,17 @@
 			<select name="collections[]" class="collections" multiple="multiple" style="width:100%">
 			<?php
 
-				echo '<option value="Thingy1">Thingy1</option>';
-				echo '<option value="Thingy2">Thingy2</option>';
-				echo '<option value="Thingy3">Thingy3</option>';
-				echo '<option value="Thingy4">Thingy4</option>';
-				echo '<option value="Thingy5">Thingy5</option>';
-				echo '<option value="Thingy6">Thingy6</option>';
-				echo '<option value="Thingy7">Thingy7</option>';
+				$_selected = $this->input->post( 'collections' ) ? : array();
+
+				foreach ( $collections AS $collection ) :
+
+					$_checked = array_search( $collection->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
+
+					echo '<option value="' . $collection->id . '" ' . $_checked . '>';
+					echo $collection->label . ' - ' . $collection->description_short;
+					echo '</option>';
+
+				endforeach;
 
 			?>
 			</select>
@@ -282,7 +342,7 @@
 <script type="text/template" id="template-variation">
 <?php
 
-	$_data		= array( 'is_first' => FALSE );
+	$_data = array( 'is_first' => FALSE );
 
 	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data );
 
@@ -306,42 +366,20 @@
 </script>
 
 <script type="text/template" id="template-gallery-item">
-	<li class="gallery-item crunching">
-		<div class="crunching"></div>
-		<?=form_hidden( 'gallery[]' )?>
-	</li>
+<?php
+
+	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-gallery-item' );
+
+?>
 </script>
 
 <script type="text/template" id="template-attribute">
-	<tr class="attribute">
-		<td class="attribute">
-			<?php
+<?php
 
-				$_options	= array();
-				$_options[]	= '';
-				$_options[1231]	= 'something or other';
-				$_options[4562]	= 'Something else';
-				$_options[7893]	= 'Another thing';
-				$_options[1234]	= 'something or other';
-				$_options[4565]	= 'Something else';
-				$_options[7895]	= 'Another thing';
-				$_options[1236]	= 'something or other';
-				$_options[4567]	= 'Something else';
-				$_options[7898]	= 'Another thing';
+	$_data = array( 'attribute' => NULL );
+	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-attribute', $_data );
 
-				$_selected	= NULL;
-
-				echo form_dropdown( 'attributes[{{counter}}][attribute]', $_options, $_selected	, 'class="attributes"' );
-
-			?>
-		</td>
-		<td class="value">
-			<?=form_input( 'attributes[{{counter}}][value]', '', 'placeholder="Specify the value"' )?>
-		</td>
-		<td class="delete">
-			<a href="#" class="delete">Delete</a>
-		</td>
-	</tr>
+?>
 </script>
 
 <script type="text/template" id="template-shipping-option">

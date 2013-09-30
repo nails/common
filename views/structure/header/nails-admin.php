@@ -116,7 +116,7 @@
 
 	</div>
 
-	<div class="sidebar left">
+	<div class="sidebar">
 		<div class="padder">
 
 		<div class="nav-search">
