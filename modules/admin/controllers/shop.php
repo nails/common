@@ -313,7 +313,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			//	Form validation, this'll be fun...
 			$this->load->library( 'form_validation' );
 
-	//		dumpanddie($_POST);
 
 			//	Product Info
 			//	============
@@ -342,28 +341,34 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
 				$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
-				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|is_natural' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|callback__callback_inventory_valid_quantity' );
 				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_sold]',		'',	'xss_clean|is_natural' );
 
 				//	Meta
 				//	----
 
 				//	If this product type is_physical then ensure that the dimensions are specified
+				$_rules			= 'xss_clean';
+				$_rules_unit	= 'xss_clean';
+
 				foreach( $this->data['product_types'] AS $type ) :
 
-					if ( $type->id == $this->input->post( 'type_id' ) ) :
+					if ( $type->id == $this->input->post( 'type_id' ) && $type->is_physical ) :
 
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][length]',			'',	'xss_clean|numeric' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][width]',			'',	'xss_clean|numeric' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][height]',			'',	'xss_clean|numeric' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][measurement_unit]',	'',	'xss_clean|required' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight]',			'',	'xss_clean|numeric' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight_unit]',		'',	'xss_clean|required' );
+						$_rules			.= '|required|numeric';
+						$_rules_unit	.= '|required';
 						break;
 
 					endif;
 
 				endforeach;
+
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][length]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][width]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][height]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][measurement_unit]',	'',	$_rules_unit );
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight_unit]',		'',	$_rules_unit );
 
 				//	Any custom checks for the extra meta fields
 				//	TODO
@@ -376,8 +381,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						$_required	= $price['currency_id'] == SHOP_BASE_CURRENCY_ID ? '|required' : '';
 
-						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][price]',		'',	'xss_clean|numeric' . $_required );
-						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][sale_price]',	'',	'xss_clean|numeric' . $_required );
+						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][price]',		'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
+						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][sale_price]',	'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
 
 					endforeach;
 
@@ -389,7 +394,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					foreach( $v['gallery'] AS $gallery_index => $image ) :
 
-						$this->form_validation->set_rules( 'variation[' . $index . '][gallery][' . $gallery_index . ']',			'',	'xss_clean' );
+						$this->form_validation->set_rules( 'variation[' . $index . '][gallery][' . $gallery_index . ']',	'',	'xss_clean' );
 
 					endforeach;
 
@@ -398,7 +403,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				//	Shipping
 				//	--------
 
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',						'',	'xss_clean' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',	'',	'xss_clean' );
 
 			endforeach;
 
@@ -425,8 +430,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
+			// --------------------------------------------------------------------------
 
-			if ( $this->form_validation->run() ) :
+			//	Set messages
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'numeric',		lang( 'fv_numeric' ) );
+			$this->form_validation->set_message( 'is_natural',	lang( 'fv_is_natural' ) );
+
+			// --------------------------------------------------------------------------
+
+			if ( $this->form_validation->run( $this ) ) :
 
 				//	Validated! Create the product
 				dump( 'valid!' );
@@ -434,8 +447,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			else :
 
-				//dump( 'validation_failed' );
-				//dump(validation_errors());
+				$this->data['error'] = '<strong>Whoops!</strong> There are some problems with the form.';
 
 			endif;
 
@@ -506,6 +518,51 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',				$this->data );
 		$this->load->view( 'admin/shop/inventory/create',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function _callback_inventory_valid_price( $str )
+	{
+		$str = trim( $str );
+
+		if ( $str && ! is_numeric( $str ) ) :
+
+			$this->form_validation->set_message( '_callback_inventory_valid_price', 'This is not a valid price' );
+			return FALSE;
+
+		else :
+
+			return TRUE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function _callback_inventory_valid_quantity( $str )
+	{
+		$str = trim( $str );
+
+		if ( $str && ! is_numeric( $str ) ) :
+
+			$this->form_validation->set_message( '_callback_inventory_valid_quantity', 'This is not a valid quantity' );
+			return FALSE;
+
+		elseif ( $str && is_numeric( $str ) && $str < 0 ) :
+
+			$this->form_validation->set_message( '_callback_inventory_valid_quantity', lang( 'fv_is_natural' ) );
+			return FALSE;
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
 
 

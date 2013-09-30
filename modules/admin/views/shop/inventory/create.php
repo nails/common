@@ -33,7 +33,7 @@
 
 	<section class="tabs pages main-product">
 
-		<div class="tab page basics fieldset" id="tab-basics" style="display:none;">
+		<div class="tab page basics fieldset" id="tab-basics" style="display:block;">
 			<?php
 
 				$_field					= array();
@@ -242,7 +242,7 @@
 			</p>
 		</div>
 
-		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:block;">
+		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:none;">
 			<p>
 				Specify which ranges and/or collections this product should appear in.
 			</p>
@@ -342,7 +342,7 @@
 <script type="text/template" id="template-variation">
 <?php
 
-	$_data = array( 'is_first' => FALSE );
+	$_data = array( 'is_first' => FALSE, 'is_php' => FALSE );
 
 	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data );
 

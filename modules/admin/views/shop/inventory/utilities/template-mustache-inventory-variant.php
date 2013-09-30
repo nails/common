@@ -13,7 +13,7 @@
 		<p>
 			<strong>The specified product type has a limited number of variations it can support.</strong>
 			This variation will be deleted when you submit this form.
-		</p>]
+		</p>
 	</div>
 	<ul class="tabs" data-tabgroup="variation-<?=$_counter?>">
 		<li class="tab active">
@@ -92,6 +92,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][length]';
 							$_field['label']		= 'Length';
 							$_field['placeholder']	= 'The length of the item';
+							$_field['required']		= TRUE;
 
 							echo form_field( $_field );
 
@@ -101,6 +102,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][width]';
 							$_field['label']		= 'Width';
 							$_field['placeholder']	= 'The width of the item';
+							$_field['required']		= TRUE;
 
 							echo form_field( $_field );
 
@@ -110,6 +112,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][height]';
 							$_field['label']		= 'Height';
 							$_field['placeholder']	= 'The height of the item';
+							$_field['required']		= TRUE;
 
 							echo form_field( $_field );
 
@@ -119,6 +122,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][measurement_unit]';
 							$_field['label']		= 'L/W/H Unit of measurement';
 							$_field['class']		= 'chosen';
+							$_field['required']		= TRUE;
 
 							$_options				= array();
 							$_options['mm']			= 'Millimeter';
@@ -133,6 +137,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][weight]';
 							$_field['label']		= 'Weight';
 							$_field['placeholder']	= 'The weight of the item';
+							$_field['required']		= TRUE;
 
 							echo form_field( $_field );
 
@@ -142,6 +147,7 @@
 							$_field['key']			= 'variation[' . $_counter . '][meta][weight_unit]';
 							$_field['label']		= 'Weight unit of measurement';
 							$_field['class']		= 'chosen';
+							$_field['required']		= TRUE;
 
 							$_options				= array();
 							$_options['g']			= 'Gram';
@@ -198,7 +204,6 @@
 
 
 								//	Don't do this for the first iteration as it's being done in PHP.
-								dump($is_php);
 								if ( ( ! isset( $is_first ) || ! $is_first ) && ( ! isset( $is_php ) || ! $is_php ) ) :
 
 									//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS

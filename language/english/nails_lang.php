@@ -4,7 +4,7 @@
 * Name:			Generic Langfile
 *
 * Description:  Generic language file for Nails
-* 
+*
 */
 	//	Startup notices
 	$lang['startup_db_error']	= 'There was a problem starting the application, the database is perhaps configured incorrectly.';
@@ -14,10 +14,10 @@
 	//	Default header/footer
 	$lang['nails_footer_powered_by']	= 'Powered by <a href="http://nailsapp.co.uk">Nails. v%s</a>';
 	$lang['nails_footer_developed_by']	= 'Developed by <a href="http://shedcollective.org">Shed Collective</a> &copy; 2012 - 2013';
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
+
 
 	//	Verbs / common actions
 	$lang['action_save']			= 'Save';
@@ -54,11 +54,11 @@
 	$lang['action_verify']			= 'Verify';
 	$lang['action_unverify']		= 'Unverify';
 	$lang['action_choose']			= 'Choose';
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	//	Common form validation
 	$lang['fv_there_were_errors']			= '<strong>Sorry,</strong> there were errors. Please check highlighted fields.';
 	$lang['fv_required']					= 'This field is required.';
@@ -94,11 +94,15 @@
 	$lang['fv_datetime_before_field']		= 'The %s field must be before the %s field.';
 	$lang['fv_datetime_after']				= 'This must be after the %2$s field.';
 	$lang['fv_datetime_after_field']		= 'The %s field must be before the %s field.';
-	
-	
+	$lang['fv_numeric']						= 'This field must be numeric.';
+	$lang['fv_numeric_field']				= 'The %s field must be numeric.';
+	$lang['fv_is_natural']					= 'This field must be a positive number.';
+	$lang['fv_is_natural_field']			= 'The %s field must contain only positive numbers.';
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	//	Common form field labels
 	$lang['form_label_email']				= 'Email';
 	$lang['form_label_password']			= 'Password';
@@ -107,9 +111,9 @@
 	$lang['form_label_last_name']			= 'Surname';
 	$lang['form_label_title']				= 'Title';
 	$lang['form_label_body']				= 'Body';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	Common strings
 	$lang['yes']							= 'Yes';
 	$lang['no']								= 'No';

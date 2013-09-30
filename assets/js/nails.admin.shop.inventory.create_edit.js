@@ -26,6 +26,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		this._init_attributes();
 		this._init_chosens();
 		this._init_submit();
+		this._init_errors();
 	};
 
 
@@ -1093,5 +1094,26 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 		//	Got here? All is good!
 		return true;
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_errors = function()
+	{
+		//	Look for tabs which contain error'd fields
+		$( 'li.tab a' ).each(function(){
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' div.field.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' .system-alert.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+		});
 	};
 };
