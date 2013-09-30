@@ -226,6 +226,17 @@ class Emailer
 
 			endif;
 
+		else :
+
+			//	Sending to an ID, fetch the user's email
+			$_user = get_userobject()->get_by_id( $input->to_id );
+
+			if ( $_user ) :
+
+				$input->to_email	= $_user->email;
+
+			endif;
+
 		endif;
 
 		// --------------------------------------------------------------------------
