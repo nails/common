@@ -2,7 +2,7 @@
 
 if ( ! function_exists( '_LOG' ) )
 {
-	function _LOG( $line )
+	function _LOG( $line = '' )
 	{
 		return get_instance()->logger->line( $line );
 	}
@@ -10,7 +10,7 @@ if ( ! function_exists( '_LOG' ) )
 
 if ( ! function_exists( '_LOG_FILE' ) )
 {
-	function _LOG_FILE( $file )
+	function _LOG_FILE( $file = NULL )
 	{
 		return get_instance()->logger->set_file( $file );
 	}
