@@ -652,7 +652,6 @@ class Emailer
 		$this->db->select( 'et.name, et.template_file, et.default_subject' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ea.user_id OR u.id = ea.user_email', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'email_type et', 'et.id = ea.type_id' );
 
 		$this->db->order_by( $order, $sort );
@@ -1242,13 +1241,6 @@ class Emailer
 		$email->user->last_name		= $email->last_name;
 		$email->user->profile_img	= $email->profile_img;
 		$email->user->gender		= $email->gender;
-
-		//	If the email is still empty, fallback to another
-		if ( ! $email->user->email ) :
-
-			$email->user->email = $email->user_email;
-
-		endif;
 	}
 
 }
