@@ -10,4 +10,4 @@ Your password is <?=$password?><?=isset( $temp_pw ) && $temp_pw ? ', you will be
 
 We would appreciate it if you could take a second to verify your email address using the link below, we do this to ensure the integrity of our database.
 
-{unwrap}<?=site_url( 'auth/activate/' . $user->id . '/' . $user->activation_code )?>{/unwrap}
+{unwrap}<?=site_url( 'auth/activate/' . $user->id . '/' . $code )?>{/unwrap}

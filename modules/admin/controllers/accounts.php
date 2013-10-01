@@ -332,6 +332,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						$_email->data['user']			= $this->user->get_by_id( $_new_user['id'] );
 						$_email->data['password']		= $_password;
 						$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
+						$_email->data['code']			= $_new_user['activation'];
 
 						$this->load->library( 'emailer' );
 

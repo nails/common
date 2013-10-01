@@ -140,12 +140,13 @@ class NAILS_Register extends NAILS_Auth_Controller
 					//	Registration was successfull, send the activation email...
 					$this->load->library( 'emailer' );
 
-					$_email							= new stdClass();
-					$_email->type					= 'verify_email_' . APP_USER_DEFAULT_GROUP;
-					$_email->to_id					= $_uid['id'];
-					$_email->data					= array();
-					$_email->data['user']			= $_user;
-					$_email->data['group']			= $_group->display_name;
+					$_email					= new stdClass();
+					$_email->type			= 'verify_email_' . APP_USER_DEFAULT_GROUP;
+					$_email->to_id			= $_uid['id'];
+					$_email->data			= array();
+					$_email->data['user']	= $_user;
+					$_email->data['group']	= $_group->display_name;
+					$_email->data['code']	= $_uid['activation'];
 
 					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 

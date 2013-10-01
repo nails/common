@@ -1203,7 +1203,6 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'password';
 			$_cols[]	= 'password_md5';
 			$_cols[]	= 'salt';
-			$_cols[]	= 'activation_code';
 			$_cols[]	= 'forgotten_password_code';
 			$_cols[]	= 'remember_code';
 			$_cols[]	= 'created';
@@ -1246,8 +1245,9 @@ class NAILS_User_model extends NAILS_Model
 			endif;
 
 			//	Set the data
-			$_data_user	= array();
-			$_data_meta	= array();
+			$_data_user		= array();
+			$_data_meta		= array();
+			$_data_email	= '';
 
 			foreach ( $data AS $key => $val ) :
 
@@ -1271,6 +1271,10 @@ class NAILS_User_model extends NAILS_Model
 
 					endswitch;
 
+				elseif ( $key == 'email' ) :
+
+					$_data_email = $val;
+
 				else :
 
 					$_data_meta[$key] = $val;
@@ -1278,6 +1282,12 @@ class NAILS_User_model extends NAILS_Model
 				endif;
 
 			endforeach;
+
+			// --------------------------------------------------------------------------
+
+			//	Begin transaction
+			$_rollback = FALSE;
+			$this->db->trans_begin();
 
 			// --------------------------------------------------------------------------
 
@@ -1291,11 +1301,11 @@ class NAILS_User_model extends NAILS_Model
 
 			endif;
 
+			$this->db->update( NAILS_DB_PREFIX . 'user' );
+
 			// --------------------------------------------------------------------------
 
 			//	Update the meta table
-			$this->db->update( NAILS_DB_PREFIX . 'user' );
-
 			if ( $_data_meta ) :
 
 				$this->db->where( 'user_id', (int) $_uid );
@@ -1304,6 +1314,68 @@ class NAILS_User_model extends NAILS_Model
 
 			endif;
 
+			// --------------------------------------------------------------------------
+
+			//	If an email has been passed then attempt to update the user's email too
+			if ( $_data_email ) :
+
+				$this->load->helper( 'email' );
+
+				if ( valid_email( $_data_email ) ) :
+
+					//	Check if the email is already being used
+					$this->db->where( 'email', $_data_email );
+					$_email = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
+
+					if ( $_email ) :
+
+						//	Email is in use, if it's in use by the ID of ths user then
+						//	set it as the primary email for this account. If it's in use
+						//	by another user then error
+
+						if ( $_email->user_id == $_uid ) :
+
+							$this->email_make_primary( $_email->email );
+
+						else :
+
+							$this->_set_error( 'Email is already in use.' );
+							$_rollback = TRUE;
+
+						endif;
+
+					else :
+
+						//	Doesn't appear to be in use, add as a new email address and
+						//	make it the primary one
+
+						$this->email_add( (int) $_uid, $_data_email, TRUE );
+
+					endif;
+
+				else :
+
+					//	Error, not a valid email; roll back transaction
+					$this->_set_error( '"' . $_data_email . '" is not a valid email address.' );
+					$_rollback = TRUE;
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	How'd we get on?
+			if ( ! $_rollback && $this->db->trans_status() !== FALSE ) :
+
+				$this->db->trans_commit();
+
+			else :
+
+				$this->db->trans_rollback();
+				return FALSE;
+
+			endif;
 
 		else :
 
@@ -1360,21 +1432,37 @@ class NAILS_User_model extends NAILS_Model
 	{
 		$_code = $this->salt();
 
-		$this->db->set( 'user_id', $user_id );
-		$this->db->set( 'email', $email );
-		$this->db->set( 'code', $_code );
-		$this->db->set( 'is_verified', $is_verified );
-		$this->db->set( 'is_primary', TRUE );
-		$this->db->set( 'date_added', 'NOW()', FALSE );
+		$this->db->set( 'user_id',		(int) $user_id );
+		$this->db->set( 'email',		trim( strtolower( $email ) ) );
+		$this->db->set( 'code',			$_code );
+		$this->db->set( 'is_verified',	(bool) $is_verified );
+		$this->db->set( 'date_added',	'NOW()', FALSE );
 
 		$this->db->insert( NAILS_DB_PREFIX . 'user_email' );
 
 		if ( $this->db->affected_rows() ) :
 
+			//	Make it the primary email address?
+			if ( $is_primary ) :
+
+				$this->email_make_primary( $this->db->insert_id() );
+
+			endif;
+
 			//	Send off the verification email
 			if ( $send_email ) :
 
 				//	TODO: Send an email with a verification link
+				$_email					= new stdClass();
+				$_email->to_id			= $user_id;
+				$_email->type			= 'verify_email';
+				$_email->data			= array();
+				$_email->data['user']	= $this->get_by_id( $user_id );
+				$_email->data['group']	= $_email->data['user']->group_name;
+				$_email->data['code']	= $_code;
+
+				$this->load->library( 'emailer' );
+				$this->emailer->send( $_email );
 
 			endif;
 
@@ -1422,11 +1510,21 @@ class NAILS_User_model extends NAILS_Model
 	public function email_make_primary( $email )
 	{
 		//	Fetch other emails
-		$this->db->select( 'user_id' );
-		$this->db->where( 'email', $email );
-		$_user_id = $this->db->get()->row();
+		$this->db->select( 'id,user_id,email' );
 
-		if ( ! $_user_id ) :
+		if( is_numeric( $email ) ) :
+
+			$this->db->where( 'id', $email );
+
+		else :
+
+			$this->db->where( 'email', $email );
+
+		endif;
+
+		$_email = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
+
+		if ( ! $_email ) :
 
 			return FALSE;
 
@@ -1436,11 +1534,11 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->trans_begin();
 
 			$this->db->set( 'is_primary', FALSE );
-			$this->db->where( 'user_id', $_user_id->user_id );
+			$this->db->where( 'user_id', $_email->user_id );
 			$this->db->update( NAILS_DB_PREFIX . 'user_email' );
 
 			$this->db->set( 'is_primary', TRUE );
-			$this->db->where( 'email', $email );
+			$this->db->where( 'id', $_email->id );
 			$this->db->update( NAILS_DB_PREFIX . 'user_email' );
 
 		$this->db->trans_complete();
@@ -1718,9 +1816,9 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Update user's 'last_seen' flag
-		$_data['last_seen'] = date( 'Y-m-d H:i:s' );
+		$this->db->set( 'last_seen', 'NOW()', FALSE );
 		$this->db->where( 'id', $_me );
-		$this->db->update( NAILS_DB_PREFIX . 'user', $_data );
+		$this->db->update( NAILS_DB_PREFIX . 'user' );
 	}
 
 
@@ -2174,7 +2272,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Update the user
 		$this->db->select( 'id' );
 		$this->db->where( 'email', $email );
-		$_id = $this->db->get( NAILS_DBPREFIX . 'user_email' )->row();
+		$_id = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
 
 		if ( $_id ) :
 
