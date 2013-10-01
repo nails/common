@@ -429,16 +429,17 @@ class NAILS_Test extends NAILS_System_Controller
 
 		$_email				= new stdClass();
 		$_email->type		= 'test_email';
-		$_email->to_email	= APP_DEVELOPER_EMAIL ? APP_DEVELOPER_EMAIL : APP_DEVELOPER_EMAIL;
 
-		if ( ! $_email->to_email ) :
+		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) || ! APP_DEVELOPER_EMAIL ) :
 
 			$this->_result->pass		= FALSE;
-			$this->_result->errors[]	= 'APP_DEVELOPER_EMAIL and APP_DEVELOPER_EMAIL are blank.';
+			$this->_result->errors[]	= 'APP_DEVELOPER_EMAIL is not defined.';
 
 		else :
 
 			//	Send the email
+			$_email->to_email	= APP_DEVELOPER_EMAIL;
+
 			$_config = array( 'graceful_startup' => TRUE );
 			$this->load->library( 'emailer', $_config );
 

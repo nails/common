@@ -230,17 +230,17 @@ if ( ! function_exists( 'send_developer_mail' ) )
 {
 	function send_developer_mail( $subject, $message )
 	{
-		if ( ! APP_DEVELOPER_EMAIL && ! APP_DEVELOPER_EMAIL ) :
+		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) || ! APP_DEVELOPER_EMAIL ) :
 
 			//	Log the fact there's no email
-			log_message( 'error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL and APP_DEVELOPER_EMAIL are not defined.' );
+			log_message( 'error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.' );
 			return FALSE;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$_to		= APP_DEVELOPER_EMAIL ? APP_DEVELOPER_EMAIL : APP_DEVELOPER_EMAIL;
+		$_to		= APP_DEVELOPER_EMAIL;
 		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
 					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
 					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
