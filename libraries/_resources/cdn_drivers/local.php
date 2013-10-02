@@ -225,9 +225,15 @@ class Local_CDN
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve_scheme()
+	public function url_serve_scheme( $force_download )
 	{
-		$_out = site_url( 'cdn/serve/{{bucket}}/{{file}}' );
+		$_out = site_url( 'cdn/serve/{{bucket}}/{{filename}}{{extension}}' );
+
+		if ( $force_download ) :
+
+			$_out .= '?dl=1';
+
+		endif;
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -272,7 +278,7 @@ class Local_CDN
 	 **/
 	public function url_thumb_scheme()
 	{
-		$_out = site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}' );
+		$_out = site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}' );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -317,7 +323,7 @@ class Local_CDN
 	 **/
 	public function url_scale_scheme()
 	{
-		$_out = site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}' );
+		$_out = site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}' );
 
 		return $this->_url_make_secure( $_out );
 	}

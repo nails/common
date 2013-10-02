@@ -9,55 +9,55 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 		$_d->slug	= 'Widget_image';
 		$_d->iam	= 'Nails_CMS_Widget_image';
 		$_d->info	= 'A single image.';
-		
+
 		return $_d;
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	private $_key;
 	private $_body;
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	public function __construct()
 	{
 		$this->_key		= 'image';
 		$this->_image	= '';
 		$this->_align	= 'center';
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	public function setup( $data )
 	{
 		if ( isset( $data['image'] ) ) :
-		
+
 			$this->_image = $data['image'];
-		
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		if ( isset( $data['align'] ) ) :
-		
+
 			$this->_align = $data['align'];
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( isset( $data['key'] ) && ! is_null( $data['key'] ) ) :
-		
+
 			$this->_key = $data['key'];
-		
+
 		endif;
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	public function render()
 	{
 		$_img = array();
@@ -66,20 +66,20 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 
 		return '<div class="row">' . img( $_img ) . '</div>';
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	public function get_editor_html()
 	{
 		$_details = self::details();
-		
+
 		get_instance()->load->library( 'cdn' );
 
 		//	Include the slug as a hidden field, required for form rebuilding
 		$_out = form_hidden( $this->_key . '[slug]', $_details->slug );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Return editor HTML
 		$_nonce		= uniqid();
 		$_bucket	= urlencode( get_instance()->encrypt->encode( 'cms|' . $_nonce , APP_PRIVATE_KEY ) );
@@ -111,20 +111,23 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 
 		//	Callback
 		$_url_scheme = get_instance()->cdn->url_serve_scheme();
-		$_url_scheme = str_replace( '{{bucket}}',	'cms',		$_url_scheme );
-		$_url_scheme = str_replace( '{{file}}',		'[[file]]',	$_url_scheme );
+		$_url_scheme = str_replace( '{{bucket}}',		'cms',				$_url_scheme );
+		$_url_scheme = str_replace( '{{filename}}',		'[[filename]]',		$_url_scheme );
+		$_url_scheme = str_replace( '{{extension}}',	'[[extension]]',	$_url_scheme );
 
 		$_out .= '<script type="text/javascript">';
 		$_out .= '$(\'a.fancybox-' . $_nonce . '\').fancybox();';
 		$_out .= 'function callback_' . md5( $this->_key . $_nonce ) . '( file ) {';
 		$_out .= 'var _url = \'' . $_url_scheme . '\';';
-		$_out .= '_url = _url.replace( \'[[file]]\', file );';
+		$_out .= 'var _file = file.split( \'.\' );';
+		$_out .= '_url = _url.replace( \'[[filename]]\', _file[0] );';
+		$_out .= '_url = _url.replace( \'[[extension]]\', \'.\' + _file[1] );';
 		$_out .= '$(\'#image-url-' . $_nonce . '\').val(_url);';
 		$_out .= '}';
 		$_out .= '</script>';
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_out;
 	}
 }

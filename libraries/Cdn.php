@@ -445,7 +445,7 @@ class Cdn {
 		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by AND ue.is_primary = 1', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
 		$this->db->order_by( 'o.filename_display' );
@@ -2633,9 +2633,9 @@ class Cdn {
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve_scheme()
+	public function url_serve_scheme( $force_download = FALSE )
 	{
-		return $this->_cdn->url_serve_scheme();
+		return $this->_cdn->url_serve_scheme( $force_download );
 	}
 
 

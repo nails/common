@@ -202,26 +202,6 @@ div.field
 				box-sizing:border-box;
 			}
 		}
-
-		span.error
-		{
-			display:none;
-			border:1px solid #CCCCCC;
-			padding:2px 7px;
-			position:relative;
-			top:1px;
-			.rounded(3px);
-			background:#B52130;
-			color:#FFF;
-			border-color:#B52130;
-			margin:0;
-			margin-top:3px;
-
-			a
-			{
-				color:inherit;
-			}
-		}
 	}
 
 	span.input.with-tip
@@ -262,6 +242,26 @@ div.field
 			.rounded(2px);
 			vertical-align: middle;
 			margin-left:5px;
+		}
+	}
+
+	span.error
+	{
+		display:none;
+		border:1px solid #CCCCCC;
+		padding:2px 7px;
+		position:relative;
+		top:1px;
+		.rounded(3px);
+		background:#B52130;
+		color:#FFF;
+		border-color:#B52130;
+		margin:0;
+		margin-top:3px;
+
+		a
+		{
+			color:inherit;
 		}
 	}
 
@@ -406,10 +406,6 @@ div.field.error
 {
 	span.input
 	{
-		span.error
-		{
-			display:inline-block;
-		}
 		input[type=text],
 		input[type=password],
 		input[type=email],
@@ -423,6 +419,10 @@ div.field.error
 		{
 			border:1px solid #B52130;
 		}
+	}
+	span.error
+	{
+		display:inline-block;
 	}
 	.mm-image-preview
 	{

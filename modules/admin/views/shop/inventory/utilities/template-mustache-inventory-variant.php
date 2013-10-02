@@ -331,7 +331,7 @@
 										<?php
 
 											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][price]';
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . ' placeholder="Calculate automatically"' );
+											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
 
 										?>
 									</td>
@@ -339,7 +339,7 @@
 										<?php
 
 											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][sale_price]';
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . ' placeholder="Calculate automatically"' );
+											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
 
 										?>
 									</td>

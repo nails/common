@@ -124,7 +124,7 @@ if ( ! function_exists( 'form_field' ) )
 
 				default :
 
-					$_out .= anchor( cdn_serve( $_field['default'] ) . '?dl=1', 'Download', 'class="awesome small" target="_blank"' );
+					$_out .= anchor( cdn_serve( $_field['default'], TRUE ), 'Download', 'class="awesome small" target="_blank"' );
 
 				break;
 
@@ -255,23 +255,23 @@ if ( ! function_exists( 'form_field_mm' ) )
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
 
+		//	If there's post data, use that value instead
+		if ( get_instance()->input->post() ) :
+
+			$_field['default'] =set_value( $_field['key'] );
+
+		endif;
+
 		//	Remove button
 		$_display = $_field['default'] ? 'inline-block' : 'none';
 
 		$_out .= '<br /><a href="#" class="awesome small red mm-file-remove" id="' . $_id . '-remove" style="display:' . $_display . '" onclick="return remove_' . $_id . '();">' . lang( 'action_remove' ) . '</a>';
 
-		//	If there's post data, use that value instead
-		if ( get_instance()->input->post() ) :
-
-			$_field['default'] = get_instance()->input->post( $_field['key'] );
-
-		endif;
-
 		//	If a default has been specified then show a download link
 		$_out .= '<span id="' . $_id . '-preview" class="mm-file-download">';
 		if ( $_field['default'] ) :
 
-			$_out .= anchor( cdn_serve( $_field['default'] ) . '?dl=true', 'Download File' );
+			$_out .= anchor( cdn_serve( $_field['default'], TRUE ), 'Download File' );
 
 		endif;
 		$_out .= '</span>';
@@ -279,18 +279,18 @@ if ( ! function_exists( 'form_field_mm' ) )
 		//	The actual field which is submitted
 		$_out .= '<input type="hidden" name="' . $_field['key'] . '" id="' . $_id . '-field" value="' . $_field['default'] . '" />';
 
-		$_out .= '</div>';
-
 		//	Error
-		if ( $_field['error'] ) :
+		if ( $_error && $_field['error'] ) :
 
 			$_out .= '<span class="error">' . $_field['error'] . '</span>';
 
-		else :
+		elseif( $_error ) :
 
 			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
 		endif;
+
+		$_out .= '</div>';
 
 		$_out .= '</label>';
 		$_out .= '</div>';
@@ -299,9 +299,15 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		//	Quick script to instanciate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
-		$_scheme = get_instance()->cdn->url_serve_scheme();
+		$_scheme = get_instance()->cdn->url_serve_scheme( TRUE );
 
 		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
+
+		//	Replace the Mustache style syntax; this could/does get used in mustache templates
+		//	so these fields get stripped out
+
+		$_scheme = str_replace( '{{filename}}', '{[filename]}', $_scheme );
+		$_scheme = str_replace( '{{extension}}', '{[extension]}', $_scheme );
 
 $_out .= <<<EOT
 
@@ -318,8 +324,12 @@ $_out .= <<<EOT
 			// --------------------------------------------------------------------------
 
 			var _scheme = '$_scheme';
-			_scheme = _scheme.replace( '{{file}}', file );
-			$( '#$_id-preview' ).html( '<a href="' + _scheme + '?dl=1">Download</a>' );
+			var _file	= file.split( '.' );
+
+			_scheme = _scheme.replace( '{[filename]}', _file[0] );
+			_scheme = _scheme.replace( '{[extension]}', '.' + _file[1] );
+
+			$( '#$_id-preview' ).html( '<a href="' + _scheme + '">Download</a>' );
 			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );
 		}
@@ -413,7 +423,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		//	If there's post data, sue that value instead
 		if ( get_instance()->input->post() ) :
 
-			$_field['default'] = get_instance()->input->post( $_field['key'] );
+			$_field['default'] = set_value( $_field['key'] );
 
 		endif;
 
@@ -462,11 +472,11 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_out .= $_help['title'] ? img( $_help ) : '';
 
 		//	Error
-		if ( $_field['error'] ) :
+		if ( $_error && $_field['error'] ) :
 
 			$_out .= '<span class="error">' . $_field['error'] . '</span>';
 
-		else :
+		elseif( $_error ) :
 
 			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
@@ -499,8 +509,12 @@ $_out .= <<<EOT
 
 			// --------------------------------------------------------------------------
 
-			var _scheme = '$_scheme';
-			_scheme = _scheme.replace( '{{file}}', file );
+			var _scheme	= '$_scheme';
+			var _file	= file.split( '.' );
+
+			_scheme = _scheme.replace( '{{filename}}', _file[0] );
+			_scheme = _scheme.replace( '{{extension}}', '.' + _file[1] );
+
 			$( '#$_id-preview' ).html( '<img src="' + _scheme + '" / >' );
 			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );

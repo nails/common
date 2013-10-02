@@ -260,7 +260,6 @@ class Aws_local_CDN
 	 **/
 	public function url_serve( $object, $bucket, $force_download )
 	{
-
 		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING;
 		$_out .= $bucket . '/';
 
@@ -300,9 +299,26 @@ class Aws_local_CDN
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	public function url_serve_scheme()
+	public function url_serve_scheme( $force_download )
 	{
-		$_out = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING . 'cdn/serve/{{bucket}}/{{file}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_SERVING;
+		$_out .= '{{bucket}}/';
+
+		if ( $force_download ) :
+
+			//	If we're forcing the download we need to reference a slightly different file
+			//	On upload two instances were created, the "normal" streaming type one and another
+			//	with the appropriate content-types set so that the browser downloads as oppossed
+			//	to renders it
+
+			$_out .= '{{filename}}-download{{extension}}';
+
+		else :
+
+			//	If we're not forcing the download we can serve straight out of S3
+			$_out .= '{{filename}}{{extension}}';
+
+		endif;
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -346,7 +362,7 @@ class Aws_local_CDN
 	 **/
 	public function url_thumb_scheme()
 	{
-		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{file}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -390,7 +406,7 @@ class Aws_local_CDN
 	 **/
 	public function url_scale_scheme()
 	{
-		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{file}}';
+		$_out  = DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}';
 
 		return $this->_url_make_secure( $_out );
 	}

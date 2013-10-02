@@ -301,9 +301,27 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch data, this data is used in bth the view and the form submission
+		//	Fetch data, this data is used in both the view and the form submission
 		$this->data['product_types']	= $this->product->get_product_types();
 		$this->data['currencies']		= $this->currency->get_all();
+
+		//	Fetch product meta fields
+		$_product_types						= $this->product->get_product_types();
+		$this->data['product_types_meta']	= array();
+
+		foreach ( $_product_types AS $type ) :
+
+			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
+
+				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
+
+			else :
+
+				$this->data['product_types_meta'][$type->id] = array();
+
+			endif;
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
@@ -343,7 +361,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
 				$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
 				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|callback__callback_inventory_valid_quantity' );
-				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_sold]',		'',	'xss_clean|is_natural' );
+				$this->form_validation->set_rules( 'variation[' . $index . '][quantity_sold]',		'',	'xss_clean|callback__callback_inventory_valid_quantity' );
 
 				//	Meta
 				//	----
@@ -372,7 +390,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight_unit]',		'',	$_rules_unit );
 
 				//	Any custom checks for the extra meta fields
-				//	TODO
+				if ( isset( $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) && $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) :
+
+					//	Process each rule
+					foreach( $this->data['product_types_meta'][$this->input->post( 'type_id' )] AS $field ) :
+
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][' . $field->key . ']',	'',	$field->validation );
+
+					endforeach;
+
+				endif;
 
 				//	Pricing
 				//	-------
@@ -443,8 +470,19 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			if ( $this->form_validation->run( $this ) ) :
 
 				//	Validated! Create the product
-				dump( 'valid!' );
-				dumpanddie($_POST);
+				$_product = $this->product->create( $this->input->post() );
+
+				if ( $_product ) :
+
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product was created successfully.' );
+					redirect( 'admin/shop/inventory' );
+					return;
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the product. ' . $this->product->last_error();
+
+				endif;
 
 			else :
 
@@ -477,26 +515,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['tags']					= $this->tag->get_all_flat();
 
 		array_unshift( $this->data['tax_rates'], 'No Tax');
-
-		// --------------------------------------------------------------------------
-
-		//	Fetch product meta fields
-		$_product_types						= $this->product->get_product_types();
-		$this->data['product_types_meta']	= array();
-
-		foreach ( $_product_types AS $type ) :
-
-			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
-
-				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
-
-			else :
-
-				$this->data['product_types_meta'][$type->id] = array();
-
-			endif;
-
-		endforeach;
 
 		// --------------------------------------------------------------------------
 
