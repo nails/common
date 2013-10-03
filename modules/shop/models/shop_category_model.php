@@ -42,9 +42,10 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 					foreach( $cat->children AS $child ) :
 
-					$this->db->where( 'category_id', $child->id );
-					$this->db->group_by( 'product_id' );
-					$child->product_count = $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_product_category' );
+						$_ids = array_merge( array( $child->id ), $this->get_ids_of_all_children( $cat->id ) );
+						$this->db->select( 'COUNT( DISTINCT( `product_id` ) ) total' );
+						$this->db->where_in( 'category_id', $_ids );
+						$child->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category' )->row()->total;
 
 					endforeach;
 
@@ -58,9 +59,10 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 			foreach( $_all AS $cat ) :
 
-				$this->db->where( 'category_id', $cat->id );
-				$this->db->group_by( 'product_id' );
-				$cat->product_count = $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_product_category' );
+				$_ids = array_merge( array( $cat->id ), $this->get_ids_of_all_children( $cat->id ) );
+				$this->db->select( 'COUNT( DISTINCT( `product_id` ) ) total' );
+				$this->db->where_in( 'category_id', $_ids );
+				$cat->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category' )->row()->total;
 
 			endforeach;
 
@@ -326,6 +328,19 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 	public function get_ids_of_all_children( $category_id )
 	{
+		//	Check the cache
+		$_cache_key = 'get_ids_of_all_children-' . $category_id;
+		$_cache = $this->_get_cache( $_cache_key );
+
+		if ( $_cache ) :
+
+			return $_cache;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Not in cache? Bugger
 		$_out = array();
 
 		$this->db->select( 'id' );
@@ -336,7 +351,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 			foreach( $_result AS $result ) :
 
-				$_out[] = $result->id;
+				$_out[] = (int) $result->id;
 
 				//	Look for children of this dude
 				$_children = $this->get_ids_of_all_children( $result->id );
@@ -351,28 +366,14 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
+		//	Cache this
+		$this->_set_cache( $_cache_key, $_out );
+
+		// --------------------------------------------------------------------------
+
 		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	protected function _get_ids_of_all_children( $category_id )
-	{
-		$result = array();
-
-		for ( $i = 0, $c = count( $list ); $i < $c; $i++ ) :
-
-			if ( $list[$i]->parent_id == $parent ) :
-
-				$list[$i]->children	= $this->_nest_categories( $list, $list[$i]->id );
-				$result[]			= $list[$i];
-
-			endif;
-
-		endfor;
-
-		return $result;
 	}
 
 

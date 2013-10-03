@@ -362,13 +362,16 @@ if ( ! function_exists( 'shop_nested_categories_html' ) )
 		foreach( $categories AS $category ) :
 
 			$_out .= '<li class="category">';
-			$_out .= '<span class="label">' . $category->label . '</span>';
+			$_out .= '<a href="' . site_url( shop_setting( 'shop_url' ) ) . '/category/' . $category->slug . '" class="label">';
+			$_out .= $category->label;;
 
 			if ( $include_count && isset( $category->product_count ) ) :
 
 				$_out .= '<span class="count">' . $category->product_count . '</span>';
 
 			endif;
+
+			$_out .= '</a>';
 
 			if ( $category->children ) :
 

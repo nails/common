@@ -85,11 +85,6 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 **/
 	public function _category()
 	{
-		//	Page title
-		$this->data['page']->title = 'Shop/category';
-
-		// --------------------------------------------------------------------------
-
 		//	Categories
 		//	==========
 
@@ -97,11 +92,18 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 			//	Find a specific category; placing into an array for consitency with the toplevel
 			$this->data['categories']	= array( $this->category->get_by_slug( $this->_slug, TRUE, TRUE ) );
+			$this->data['category']		= $this->category->get_by_slug( $this->_slug );
+
+			$this->data['page']->title		= $this->data['category']->label;
+			$this->data['page']->subtitle	= implode( ' &rsaquo; ', explode( '|', $this->data['category']->label_nested ) );
 
 		else :
 
 			//	Fetch top level categories
 			$this->data['categories']	= $this->category->get_top_level( TRUE, TRUE );
+
+			$this->data['page']->title		= '';
+			$this->data['page']->subtitle	= '';
 
 		endif;
 

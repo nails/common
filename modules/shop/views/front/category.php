@@ -1,18 +1,18 @@
-<div class="shopfront">
-	<div class="sidebar">
-		<div class="categories">
-			<h2>Categories</h2>
-			<ul>
-			<?php
-
-				echo shop_nested_categories_html( $categories, TRUE );
-
-			?>
-			</ul>
-		</div>
+<div id="shop" class="shopfront">
+	<div class="sidebar four columns first">
+		<h2 class="sidebar-title">Categories</h2>
+		<?=shop_nested_categories_html( $categories, TRUE )?>
 	</div>
-	<div class="items">
-		<ul>
+	<div class="browse twelve columns last">
+
+		<?php
+
+			echo $page->title ? '<h1 class="page-title">' . $page->title . '</h1>' : '';
+			echo $page->subtitle ? '<h6 class="page-subtitle">' . $page->subtitle . '</h6>' : '';
+
+
+		?>
+		<ul class="browse">
 		<?php
 
 			foreach( $products AS $product ) :
