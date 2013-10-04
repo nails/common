@@ -7,7 +7,7 @@
 		//	Left hand sidebar?
 		if ( blog_setting( 'sidebar_position' ) == 'left' ) :
 
-			$this->load->view( 'blog/sidebar' );
+			echo $this->load->view( 'blog/sidebar', NULL, TRUE );
 
 			echo '<ul class="posts eleven columns offset-by-one last">';
 
@@ -63,7 +63,7 @@
 
 	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
 
-		$this->load->view( 'blog/sidebar' );
+		echo $this->load->view( 'blog/sidebar', NULL, TRUE );
 
 	endif;
 
