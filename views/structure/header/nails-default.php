@@ -13,7 +13,6 @@
 		<meta name="description" content="<?=isset( $page->keywords ) && $page->keywords ? $page->keywords : ''?>">
 
 		<!--	JS GLOBALS	-->
-		<script type="text/javascript" src="<?=NAILS_URL?>config/assets.json?uid=<?=uniqid()?>"></script>
 		<script type="text/javascript">
 			var ENVIRONMENT				= '<?=ENVIRONMENT?>';
 			window.SITE_URL				= '<?=site_url()?>';

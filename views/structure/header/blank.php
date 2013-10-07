@@ -32,10 +32,6 @@
 		</script>
 
 		<!-- JAVASCRIPT[S] -->
-
-		<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.default.min.js'?>"></script>
-		<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.admin.min.js'?>"></script>
-
 		<?=$this->asset->output( 'js' )?>
 
 	</head>

@@ -262,9 +262,7 @@ class Asset
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function clear(	$css = FALSE, $css_nails = FALSE,
-							$css_inline = TRUE, $js = FALSE, $js_nails = FALSE,
-							$js_inline = TRUE )
+public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
 	{
 		//	CSS
 		if ( $css === TRUE )

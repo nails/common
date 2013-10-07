@@ -81,6 +81,42 @@ class NAILS_Test extends NAILS_System_Controller
 		$this->_tests[] = 'cansendemail';
 
 		$this->data['tests'] =& $this->_tests;
+
+		// --------------------------------------------------------------------------
+
+		//	Clear assets
+		$this->asset->clear_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Prepare tests
+		for ( $i=0; $i < count( $this->_tests ); $i++ ) :
+
+			if ( method_exists( $this, '_info_' . $this->_tests[$i] ) ) :
+
+				$_test	= $this->_tests[$i];
+				$_info	= $this->{'_info_' . $this->_tests[$i] }();
+
+				if ( $_info ) :
+
+					$this->_tests[$i] = clone( $_info );
+					$this->_tests[$i]->test = $_test;
+
+				else :
+
+					$this->_tests[$i] = FALSE;
+
+				endif;
+
+			else :
+
+				$this->_tests[$i] = FALSE;
+
+			endif;
+
+		endfor;
+
+		$this->_tests = array_values( array_filter( $this->_tests ) );
 	}
 
 
@@ -97,26 +133,6 @@ class NAILS_Test extends NAILS_System_Controller
 	 **/
 	public function view()
 	{
-		for ( $i=0; $i < count( $this->_tests ); $i++ ) :
-
-			if ( method_exists( $this, '_info_' . $this->_tests[$i] ) ) :
-
-				$_test = $this->_tests[$i];
-				$this->_tests[$i] = clone( $this->{'_info_' . $this->_tests[$i] }() );
-				$this->_tests[$i]->test = $_test;
-
-			else :
-
-				$this->_tests[$i] = FALSE;
-
-			endif;
-
-		endfor;
-
-		$this->_tests = array_values( array_filter( $this->_tests ) );
-
-		// --------------------------------------------------------------------------
-
 		//	Overrides & page data
 		$this->data['header_override']	= 'structure/header/blank';
 		$this->data['footer_override']	= 'structure/footer/blank';
@@ -211,7 +227,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 		for ( $i=0; $i < count( $_tests ); $i++ ) :
 
-			if ( method_exists( $this, '_test_' . $_tests[$i] ) ) :
+			if ( method_exists( $this, '_test_' . $_tests[$i]->test ) ) :
 
 				//	Reset defaults
 				$this->_result->pass	= TRUE;
@@ -219,8 +235,8 @@ class NAILS_Test extends NAILS_System_Controller
 
 				// --------------------------------------------------------------------------
 
-				$_result		= clone( $this->{'_test_' . $_tests[$i] }() );
-				$_result->info	= clone( $this->{'_info_' . $_tests[$i] }() );
+				$_result		= clone( $this->{'_test_' . $_tests[$i]->test }() );
+				$_result->info	= clone( $this->{'_info_' . $_tests[$i]->test }() );
 				$_results[]		= $_result;
 
 			endif;
@@ -476,7 +492,16 @@ class NAILS_Test extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
-		return $this->_info;
+		//	Only return if the test makes sense to run, i.e email is configured
+		if ( defined( 'SMTP_HOST' ) && SMTP_HOST ) :
+
+			return $this->_info;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 }
 

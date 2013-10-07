@@ -283,10 +283,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _staging()
 	{
-		$_users_nails	= @unserialize( STAGING_USERPASS );
-		$_users_app		= @unserialize( APP_STAGING_USERPASS );
+		$_users		= @unserialize( APP_STAGING_USERPASS );
 
-		if ( ENVIRONMENT == 'staging' && ( $_users_nails || $_users_app ) ) :
+		if ( ENVIRONMENT == 'staging' && $_users ) :
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
@@ -297,7 +296,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
 
 				//	Determine the users
-				$_users			= array_filter( array_merge( (array) $_users_nails, (array) $_users_app ) );
+				$_users			= array_filter( $_users );
 				$_user_check	= array();
 
 				foreach ( $_users AS $user ) :
