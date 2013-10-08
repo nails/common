@@ -238,7 +238,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _maintenance_mode()
 	{
-		if ( MAINTENANCE ) :
+		if ( MAINTENANCE || file_exists( FCPATH . '.MAINTENANCE' ) ) :
 
 			$whitelist_ip = explode(',', MAINTENANCE_WHITELIST );
 
