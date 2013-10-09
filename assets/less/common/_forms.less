@@ -142,7 +142,6 @@ div.field
 	border-bottom:1px solid #EFEFEF;
 	clear:both;
 	min-height:30px;
-	//overflow:auto;
 
 	label
 	{
@@ -158,8 +157,8 @@ div.field
 		margin-right:20px;
 		text-align:right;
 		margin-top:5px;
-		border-right:1px solid #EFEFEF;
 		padding-right:15px;
+		vertical-align:top;
 
 		small
 		{
@@ -170,9 +169,9 @@ div.field
 
 	span.input
 	{
-		margin-left:235px;
 		border:1px dashed transparent;	//	Don't ask me why this is required, but it is. - Pablo.
 		display:block;
+		margin-left: 235px;
 		position:relative;
 
 		input[type=text],
@@ -202,6 +201,15 @@ div.field
 				box-sizing:border-box;
 			}
 		}
+	}
+
+	span.input:after
+	{
+		float:none;
+		clear:both;
+		content: ' ';
+		position:relative;
+		display:block;
 	}
 
 	span.input.with-tip

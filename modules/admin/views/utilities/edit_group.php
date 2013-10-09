@@ -133,6 +133,7 @@
 					// Options
 					$_acl_post	= $this->input->post( 'acl' );
 					$_label		= '';
+
 					foreach ( $detail->methods AS $method => $label ) :
 
 						echo '<label>';
@@ -152,6 +153,8 @@
 							echo '</span>';
 
 						endif;
+
+						echo '<span class="input">';
 
 						$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>' . lang( 'utilities_edit_group_permissions_dashboard_warn' ) . '</small>' : '';
 
@@ -174,6 +177,8 @@
 
 						echo form_checkbox( $_options['key'], TRUE, $_selected, 'class="admin_check method ' . $method . ' ' . $_module_hash  . '"' ) . '<span class="text">' . $_options['label'] . '</span>';
 
+						echo '</span>';
+
 						echo '</label>';
 
 					endforeach;
@@ -185,6 +190,7 @@
 
 						echo '<label>';
 						echo '<span class="label">&nbsp;</span>';
+						echo '<span class="input">';
 
 						$_options = array(
 							'key'		=> 'acl[admin][' . $module . '][' . $permission . ']',
@@ -205,6 +211,7 @@
 
 						echo form_checkbox( $_options['key'], TRUE, $_selected, 'class="admin_check method ' . $permission . ' ' . $_module_hash  . '"' ) . '<span class="text">' . $label . '</span>';
 
+						echo '</span>';
 						echo '</label>';
 
 					endforeach;

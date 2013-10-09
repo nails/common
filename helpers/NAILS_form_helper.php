@@ -922,6 +922,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_out .= '</span>';
 
 		//	Field
+		$_out .= '<span class="input">';
 		$_selected = set_value( $_field['key'], (bool) $_field['default'] );
 
 		$_out .= '<div class="toggle toggle-modern"></div>';
@@ -933,6 +934,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
 
+		$_out .= '</span>';
 		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
