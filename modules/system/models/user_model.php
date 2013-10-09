@@ -2270,14 +2270,14 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Update the user
-		$this->db->select( 'id' );
+		$this->db->select( 'user_id' );
 		$this->db->where( 'email', $email );
 		$_id = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
 
 		if ( $_id ) :
 
 			$this->db->set( 'forgotten_password_code', $_ttl . ':' . $_key[0] );
-			$this->db->where( 'id', $_id->id );
+			$this->db->where( 'id', $_id->user_id );
 			$this->db->update( NAILS_DB_PREFIX . 'user');
 
 			// --------------------------------------------------------------------------
