@@ -248,6 +248,43 @@ if ( ! function_exists( 'send_developer_mail' ) )
 					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
 					  'Importance: High';
 
+		$_message	 = $message;
+
+		// --------------------------------------------------------------------------
+
+		$_ci =& get_instance();
+
+		$_info = array(
+			'uri'				=> isset( $_ci->uri )			? $_ci->uri->uri_string()					: '',
+
+			'session'			=> isset( $_ci->session )		? json_encode( $_ci->session->userdata )	: '',
+			'post'				=> isset( $_POST )				? json_encode( $_POST )						: '',
+			'get'				=> isset( $_GET )				? json_encode( $_GET )						: '',
+			'server'			=> isset( $_SERVER )			? json_encode( $_SERVER )					: '',
+			'globals'			=> isset( $GLOBALS['error'] )	? json_encode( $GLOBALS['error'] )			: '',
+
+			'debug_backtrace'	=> json_encode( debug_backtrace() )
+		);
+
+		$_message	.= '' . "\n";
+		$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
+		$_message	.= '' . "\n";
+		$_message	.= 'DEBUGGING DATA' . "\n";
+		$_message	.= '' . "\n";
+		$_message	.= 'URI: ' .		$_info['uri'] . "\n\n";
+		$_message	.= 'SESSION: ' .	$_info['session'] . "\n\n";
+		$_message	.= 'POST: ' .		$_info['post'] . "\n\n";
+		$_message	.= 'GET: ' .		$_info['get'] . "\n\n";
+		$_message	.= 'SERVER: ' .		$_info['server'] . "\n\n";
+		$_message	.= 'GLOBALS: ' .	$_info['globals'] . "\n\n";
+		$_message	.= 'BACKTRACE: ' .	$_info['debug_backtrace'] . "\n\n";
+
+		if ( defined( 'NAILS_DB_ENABLED' ) && NAILS_DB_ENABLED ) :
+
+			$_message	.= 'LAST KNOWN QUERY: ' . $_ci->db->last_query() . "\n\n";
+
+		endif;
+
 		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
 	}
 }
