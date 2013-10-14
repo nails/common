@@ -1116,6 +1116,8 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 
+		$_out .= '<span class="input">';
+
 		//	Does the field have an id?
 		$_id = isset( $options[0]['id'] ) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
 
@@ -1155,6 +1157,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';
 
+		$_out .= '</span>';
 		$_out .= '</label>';
 
 
@@ -1165,6 +1168,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 
 			//	Label
 			$_out .= '<span class="label">&nbsp;</span>';
+			$_out .= '<span class="input">';
 
 			//	Does the field have an id?
 			$_id = isset( $options[$i]['id'] ) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
@@ -1202,6 +1206,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 
 			$_out .= form_checkbox( $_key, $options[$i]['value'], $_selected, $_id ) . '<span class="text">' . $options[$i]['label'] . '</span>';
 
+			$_out .= '</span>';
 			$_out .= '</label>';
 
 		endfor;

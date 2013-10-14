@@ -356,12 +356,20 @@ class Emailer
 		$_send->template_pt			= $_email->template_file . '_plaintext';
 		$_send->data				= $_email->email_vars;
 
+		if ( ! is_array( $_send->data ) ) :
+
+			$_send->data			= array();
+
+		endif;
+
+		$_send->data['ci']			=& get_instance();
+
 		// --------------------------------------------------------------------------
 
 		//	From user
 		$_send->from				= new stdClass();
 
-		if ( isset( $_send->data['email_from_email'] ) ) :
+		if ( ! empty( $_send->data['email_from_email'] ) ) :
 
 			$_send->from->email			= $_send->data['email_from_email'];
 			$_send->from->name			= isset( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];

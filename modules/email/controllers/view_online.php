@@ -63,6 +63,7 @@ class NAILS_View_Online extends NAILS_Email_Controller
 		//	Prep data
 		$_data					= $_email->email_vars;
 
+		$_data['ci']			=& get_instance();
 		$_data['email_ref']		= $_email->ref;
 		$_data['sent_from']		= $this->emailer->from;
 		$_data['email_subject']	= $_email->subject;
