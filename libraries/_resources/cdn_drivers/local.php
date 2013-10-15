@@ -148,7 +148,16 @@ class Local_CDN
 	 **/
 	public function bucket_create( $bucket )
 	{
-		if ( @mkdir( DEPLOY_CDN_PATH . $bucket ) ) :
+		$_dir = DEPLOY_CDN_PATH . $bucket;
+		if ( is_dir( $_dir ) && is_writeable( $_dir ) ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( @mkdir( $_dir ) ) :
 
 			return TRUE;
 
@@ -156,7 +165,7 @@ class Local_CDN
 
 			if ( get_userobject()->is_superuser() ) :
 
-				$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir_su', DEPLOY_CDN_PATH . $bucket ) );
+				$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir_su', $_dir ) );
 
 			else :
 
