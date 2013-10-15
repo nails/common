@@ -441,12 +441,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 			//	Loop through and update translations, keep track of translations which have been updated
 			$_updated = array();
-			foreach ( $this->input->post( 'translation' ) AS $translation ) :
 
-				$this->cms_block->update_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
-				$_updated[] = $translation['lang_id'];
+			if ( $this->input->post( 'translation' ) ) :
 
-			endforeach;
+				foreach ( $this->input->post( 'translation' ) AS $translation ) :
+
+					$this->cms_block->update_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+					$_updated[] = $translation['lang_id'];
+
+				endforeach;
+
+			endif;
 
 			//	Delete translations that weren't updated (they have been removed)
 			if ( $_updated ) :
@@ -458,11 +463,15 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			endif;
 
 			//	Loop through and add new translations
-			foreach ( $this->input->post( 'new_translation' ) AS $translation ) :
+			if ( $this->input->post( 'new_translation' ) ) :
 
-				$this->cms_block->create_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+				foreach ( $this->input->post( 'new_translation' ) AS $translation ) :
 
-			endforeach;
+					$this->cms_block->create_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+
+				endforeach;
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
