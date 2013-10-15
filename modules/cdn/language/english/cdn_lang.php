@@ -15,6 +15,7 @@
 
 	//	Bucket errors
 	$lang['cdn_error_bucket_mkdir']			= 'Failed to create bucket directory.';
+	$lang['cdn_error_bucket_mkdir_su']		= 'Failed to create bucket directory (%s).';
 	$lang['cdn_error_bucket_insert']		= 'Failed to create bucket record.';
 	$lang['cdn_error_bucket_unlink']		= 'Failed to destroy bucket.';
 	$lang['cdn_error_bucket_invalid']		= 'Not a valid bucket';

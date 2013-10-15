@@ -154,7 +154,15 @@ class Local_CDN
 
 		else :
 
-			$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir' ) );
+			if ( get_userobject()->is_superuser() ) :
+
+				$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir_su', DEPLOY_CDN_PATH . $bucket ) );
+
+			else :
+
+				$this->cdn->set_error( lang( 'cdn_error_bucket_mkdir' ) );
+
+			endif;
 			return FALSE;
 
 		endif;
