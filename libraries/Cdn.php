@@ -1987,7 +1987,7 @@ class Cdn {
 			endif;
 
 		else :
-			here($this->last_error());
+
 			return FALSE;
 
 		endif;
