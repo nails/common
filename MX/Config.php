@@ -49,7 +49,7 @@ class MX_Config extends CI_Config
 		// --------------------------------------------------------------------------
 
 		//	If SSL routing is enabled then parse the URL
-		if ( SSL_ROUTING ) :
+		if ( APP_SSL_ROUTING ) :
 
 			//	Only swap onto 'real' SSL on the live box.
 			if ( ENVIRONMENT == 'production' ) :

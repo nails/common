@@ -187,7 +187,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
 		if ( ! defined( 'APP_CDN_DRIVER' ) )				define( 'APP_CDN_DRIVER',				'local' );
-		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
+		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
+		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 
 		// --------------------------------------------------------------------------
 
@@ -392,8 +393,30 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Set the timezones
-		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : DEPLOY_SYSTEM_TIMEZONE;
+		//	Set the timezones.
+
+		//	Choose the user's timezone - starting with their rpeference, followed by
+		//	the app's default, followed by the system and if all that fails (how?!)
+		//	then default to UTC
+
+		if ( active_user( 'timezone' ) ) :
+
+			$_timezone_user = active_user( 'timezone' );
+
+		elseif( defined( 'APP_DEFAULT_TIMEZONE' ) && APP_DEFAULT_TIMEZONE ) :
+
+			$_timezone_user = APP_DEFAULT_TIMEZONE;
+
+		elseif( defined( 'DEPLOY_SYSTEM_TIMEZONE' ) && DEPLOY_SYSTEM_TIMEZONE ) :
+
+			$_timezone_user = DEPLOY_SYSTEM_TIMEZONE;
+
+		else :
+
+			$_timezone_user = 'UTC';
+
+		endif;
+
 		$this->datetime->set_timezones( 'UTC', $_timezone_user );
 
 		// --------------------------------------------------------------------------
