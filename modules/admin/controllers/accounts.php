@@ -205,6 +205,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
 						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
+					
+		$this->accounts_group = ( $this->input->get( 'filter' ) );
 
 		//	Set sorting and ordering info in session data so it's remembered for when user returns
 		$this->session->set_userdata( $_hash . 'per_page', $_limit[0] );

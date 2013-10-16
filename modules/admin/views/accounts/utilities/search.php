@@ -42,6 +42,26 @@
 		echo form_dropdown( 'per_page', $_perpage, $search->per_page );
 		echo lang( 'admin_search_per_page' );
 		
+		// --------------------------------------------------------------------------
+		
+		echo '<br>';
+		
+		// --------------------------------------------------------------------------		
+
+		$_user_groups_obj = $user->get_groups();
+		$_groups = array();
+		foreach ( $_user_groups_obj AS $g ) :
+		
+			$_groups[$g->id] = $g->display_name;
+		
+		endforeach;
+					
+		// --------------------------------------------------------------------------
+		
+		echo 'Filter by Group Type ' . form_dropdown( 'filter', $_groups, $this->input->get( 'filter' ) );
+		
+		// --------------------------------------------------------------------------
+		
 		echo anchor( uri_string() . '?reset=true', lang( 'action_reset' ), 'class="awesome small right"' );
 		echo form_submit( 'submit', lang( 'action_search' ), 'class="awesome small right"' );
 
