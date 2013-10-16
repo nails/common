@@ -2080,9 +2080,17 @@ class NAILS_User_model extends NAILS_Model
 
 			$_data['timezone'] = $data['timezone'];
 
+		elseif ( defined( 'APP_DEFAULT_TIMEZONE' ) && APP_DEFAULT_TIMEZONE ) :
+
+			$_data['timezone'] = APP_DEFAULT_TIMEZONE;
+
 		elseif ( defined( 'DEPLOY_SYSTEM_TIMEZONE' ) && DEPLOY_SYSTEM_TIMEZONE ) :
 
 			$_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
+
+		else :
+
+			$_data['timezone'] = 'UTC';
 
 		endif;
 
@@ -2117,7 +2125,8 @@ class NAILS_User_model extends NAILS_Model
 		unset( $data['date_format_time_id'] );
 		unset( $data['language_id'] );
 
-		$this->db->insert( NAILS_DB_PREFIX . 'user', $_data );
+		$this->db->set( $_data );
+		$this->db->insert( NAILS_DB_PREFIX . 'user' );
 
 		$_id = $this->db->insert_id();
 
