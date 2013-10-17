@@ -317,7 +317,7 @@ class NAILS_User_model extends NAILS_Model
 			$this->_set_error( $_error );
 			return FALSE;
 
-		elseif( $user->is_suspended ) :
+		elseif( $_user->is_suspended ) :
 
 			$this->_set_error( 'User is suspended.' );
 			return FALSE;
