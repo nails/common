@@ -164,7 +164,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'], $email, APP_USER_DEFAULT_GROUP );
+					$this->user->set_login_data( $_uid['id'] );
 
 					// --------------------------------------------------------------------------
 

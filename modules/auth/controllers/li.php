@@ -435,7 +435,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Set login details
-		$this->user->set_login_data( $user->id, $user->email, $user->group_id, $user->lang );
+		$this->user->set_login_data( $user->id );
 
 		// --------------------------------------------------------------------------
 
@@ -639,7 +639,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'], $email, $_group_id );
+					$this->user->set_login_data( $_uid['id'] );
 
 					// --------------------------------------------------------------------------
 

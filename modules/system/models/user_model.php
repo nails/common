@@ -140,7 +140,7 @@ class NAILS_User_model extends NAILS_Model
 
 			//	User was validated, log them in!
 			$this->update_last_login( $_u->id );
-			$this->set_login_data( $_u->id, $_u->email, $_u->group_id );
+			$this->set_login_data( $_u->id );
 			$this->_me = $_u->id;
 
 		endif;
@@ -278,11 +278,63 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 *
 	 **/
-	public function set_login_data( $id, $email, $group_id )
+	public function set_login_data( $id )
 	{
-		$this->session->set_userdata( 'id',			$id );
-		$this->session->set_userdata( 'email',		$email );
-		$this->session->set_userdata( 'group_id',	$group_id );
+		//	Valid user?
+		if ( is_numeric( $id ) ) :
+
+			$_user	= $this->get_by_id( $id );
+			$_error	= 'Invalid User ID.';
+
+		elseif( is_string( $id ) ) :
+
+			$this->load->helper( 'email' );
+
+			if ( valid_email( $id ) ) :
+
+				$_user	= $this->get_by_email( $id );
+				$_error	= 'Invalid User email.';
+
+			else :
+
+				$this->_set_error( 'Invalid User email.' );
+				return FALSE;
+
+			endif;
+
+		else :
+
+			$this->_set_error( 'Invalid user ID or email.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Test user
+		if ( ! $_user ) :
+
+			$this->_set_error( $_error );
+			return FALSE;
+
+		elseif( $user->is_suspended ) :
+
+			$this->_set_error( 'User is suspended.' );
+			return FALSE;
+
+		else :
+
+			//	Set session variables
+			$this->session->set_userdata( 'id',			$_user->id );
+			$this->session->set_userdata( 'email',		$_user->email );
+			$this->session->set_userdata( 'group_id',	$_user->group_id );
+
+			//	Set the active user
+			$this->set_active_user( $_user );
+
+			return TRUE;
+
+		endif;
 	}
 
 
