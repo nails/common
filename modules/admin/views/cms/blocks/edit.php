@@ -5,6 +5,9 @@
 			<strong>Title:</strong> <?=$block->title?>
 		</p>
 		<p>
+			<strong>Slug:</strong> <?=$block->slug?>
+		</p>
+		<p>
 			<strong>Description:</strong> <?=$block->description?>
 		</p>
 		<p>

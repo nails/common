@@ -40,7 +40,7 @@
 		$_field['key']			= 'description';
 		$_field['label']		= 'Description';
 		$_field['default']		= '';
-		$_field['required']		= TRUE;
+		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'A description of what this block\'s value should be';
 
 		echo form_field( $_field );
@@ -52,7 +52,7 @@
 		$_field['key']			= 'located';
 		$_field['label']		= 'Located';
 		$_field['default']		= '';
-		$_field['required']		= TRUE;
+		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'A brief outline of where this block might be used';
 
 		echo form_field( $_field );

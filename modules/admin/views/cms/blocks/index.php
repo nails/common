@@ -38,10 +38,11 @@
 					echo '<tr class="block" data-title="' . $block->title . '">';
 
 					echo '<td class="title">';
-					echo $block->title;
+					echo '<strong>' . $block->title . '</strong>';
 					echo '<small>';
+					echo 'Slug: ' . $block->slug . '<br />';
 					echo 'Description: ' . $block->description . '<br />';
-					echo 'Located: ' . $block->located . '<br />';
+					echo ( ! empty( $block->located ) ? 'Located: ' . $block->located . '<br />' : NULL );
 					echo 'Type: ' . $block_types[$block->type] . '<br />';
 					echo '</small>';
 					echo '</td>';
