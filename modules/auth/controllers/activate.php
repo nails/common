@@ -69,7 +69,7 @@ class NAILS_Activate extends NAILS_Auth_Controller
 				else :
 
 					//	Nope, log in as normal
-					$this->user->set_login_data( $_u->id, $_u->email, $_u->group_id );
+					$this->user->set_login_data( $_u->id );
 
 					// --------------------------------------------------------------------------
 

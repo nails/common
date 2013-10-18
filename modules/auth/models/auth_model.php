@@ -125,7 +125,7 @@ class NAILS_Auth_model extends NAILS_Model
 				$this->user->reset_failed_login( $user->id );
 
 				//	Set login data for this user
-				$this->user->set_login_data( $user->id, $user->email, $user->group_id );
+				$this->user->set_login_data( $user->id );
 
 				//	If we're remembering this user set a cookie
 				if ( $remember ) :
