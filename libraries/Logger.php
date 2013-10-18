@@ -122,6 +122,7 @@ class Logger
 		//	If we're not on production and the request is not CLI then echo to the browser
 		if ( ENVIRONMENT != 'production' && ! $this->_is_cli ) :
 
+			@ob_start();
 			echo $line . "<br />\n";
 			@ob_flush();
 
