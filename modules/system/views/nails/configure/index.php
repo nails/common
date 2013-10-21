@@ -20,8 +20,8 @@
 
 		<section class="tabs pages">
 
-			<?php $_display = $this->input->post( 'update' ) == 'app' || ! $this->input->post() ? 'block' : 'none'?>
-			<div id="tab-modules" class="tab page modules" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'app' || ! $this->input->post() ? 'active' : ''?>
+			<div id="tab-modules" class="tab page <?=$_display?> modules">
 				<table class="modules">
 					<thead>
 						<tr>
@@ -56,8 +56,8 @@
 				</table>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'deploy' ? 'block' : 'none'?>
-			<div id="tab-deploy" class="tab page deploy" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'deploy' ? 'active' : ''?>
+			<div id="tab-deploy" class="tab page <?=$_display?> deploy">
 				<p>
 					These settings are specific to this deployment only.
 				</p>

@@ -505,8 +505,8 @@ NAILS_JS = function()
 
 		//	Show results
 		var _tab = switch_to.attr( 'data-tab' );
-		$( 'section.tabs' + _tabgroup + ' > div.tab.page' ).hide();
-		$( '#' + _tab ).show();
+		$( 'section.tabs' + _tabgroup + ' > div.tab.page' ).removeClass( 'active' );
+		$( '#' + _tab ).addClass( 'active' );
 
 		// --------------------------------------------------------------------------
 

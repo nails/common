@@ -859,24 +859,38 @@ class NAILS_Shop_product_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_product_types()
+	public function get_product_types( $include_count = FALSE )
 	{
+		$this->db->select( 'pt.id,pt.slug,pt.label,pt.description,pt.is_physical,pt.ipn_method,pt.max_per_order,pt.max_variations,pt.created,pt.modified' );
+
+		if ( $include_count ) :
+
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product WHERE type_id = pt.id) product_count' );
+
+		endif;
+
 		$this->db->order_by( 'label' );
-		return $this->db->get( $this->_table_type )->result();
+		return $this->db->get( $this->_table_type . ' pt' )->result();
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_product_types_flat()
+	public function get_product_types_flat( $include_count = FALSE )
 	{
-		$_types	= $this->get_product_types();
+		$_types	= $this->get_product_types( $include_count );
 		$_out	= array();
 
 		foreach ( $_types AS $type ) :
 
 			$_out[$type->id] = $type->label;
+
+			if ( $include_count ) :
+
+				$_out[$type->id] .= ' (' . $type->product_count . ')';
+
+			endif;
 
 		endforeach;
 
@@ -896,6 +910,186 @@ class NAILS_Shop_product_model extends NAILS_Model
 			return FALSE;
 
 		return $_types[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create_product_type( $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = $data->label;
+
+		else :
+
+			$this->db->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = $data->description;
+
+		endif;
+
+		if ( isset( $data->is_physical ) ) :
+
+			$_data->is_physical = $data->is_physical;
+
+		endif;
+
+		if ( isset( $data->ipn_method ) ) :
+
+			$_data->ipn_method = $data->ipn_method;
+
+		endif;
+
+		if ( isset( $data->max_per_order ) ) :
+
+			$_data->max_per_order = $data->max_per_order;
+
+		endif;
+
+		if ( isset( $data->max_variations ) ) :
+
+			$_data->max_variations =  $data->max_variations;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$_data->slug = $this->_generate_slug( $data->label, NAILS_DB_PREFIX . 'shop_product_type', 'slug' );
+			$this->db->set( $_data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->insert( NAILS_DB_PREFIX . 'shop_product_type' );
+
+			if ( $this->db->affected_rows() ) :
+
+				return $this->db->insert_id();
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete_product_type( $id )
+	{
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
+		$this->db->trans_begin();
+		$this->db->where( 'id', $id );
+		$this->db->delete( NAILS_DB_PREFIX . 'shop_product_type' );
+		$_affected_rows = $this->db->affected_rows();
+
+		if ($this->db->trans_status() === FALSE) :
+
+		    $this->db->trans_rollback();
+
+			$_return = FALSE;
+
+		else :
+
+		    $this->db->trans_commit();
+			$_return = (bool) $_affected_rows;
+
+		endif;
+
+		//	Put DB errors back as they were
+		$this->db->db_debug = $_previous;
+
+		return $_return;
+	}
+
+
+	public function update_product_type( $id, $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = $data->label;
+
+		else :
+
+			$this->db->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = $data->description;
+
+		endif;
+
+		if ( isset( $data->is_physical ) ) :
+
+			$_data->is_physical = $data->is_physical;
+
+		endif;
+
+		if ( isset( $data->ipn_method ) ) :
+
+			$_data->ipn_method = $data->ipn_method;
+
+		endif;
+
+		if ( isset( $data->max_per_order ) ) :
+
+			$_data->max_per_order = $data->max_per_order;
+
+		endif;
+
+		if ( isset( $data->max_variations ) ) :
+
+			$_data->max_variations =  $data->max_variations;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			$this->db->set( $_data );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->where( 'id', $id );
+			$this->db->update( NAILS_DB_PREFIX . 'shop_product_type' );
+
+			if ( $this->db->affected_rows() ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 

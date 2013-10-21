@@ -38,7 +38,7 @@
 		{{/is_first}}
 	</ul>
 	<section class="tabs pages variation-<?=$_counter?>">
-		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-details" style="display:block">
+		<div class="tab page active fieldset" id="tab-varitation-<?=$_counter?>-details">
 			<?php
 
 				$_field					= array();
@@ -81,7 +81,7 @@
 			?>
 		</div>
 
-		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-meta" style="display:none">
+		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-meta">
 			<div class="fields-is-physical">
 				<fieldset>
 					<legend>Physical Dimensions</legend>
@@ -232,7 +232,7 @@
 			</fieldset>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-pricing" style="display:none">
+		<div class="tab page" id="tab-varitation-<?=$_counter?>-pricing">
 			<?php if ( count( $currencies ) > 1 ) : ?>
 			<p>
 				Define the price points for this variation. If you'd like to set a specific price for a certain
@@ -369,7 +369,7 @@
 			?>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-gallery" style="display:none">
+		<div class="tab page" id="tab-varitation-<?=$_counter?>-gallery">
 			<p>
 				Specify which, if any, of the uploaded gallery images feature this product variation.
 			</p>
@@ -404,7 +404,7 @@
 			</ul>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-shipping" style="display:none">
+		<div class="tab page" id="tab-varitation-<?=$_counter?>-shipping">
 			<p>
 				Define the shipping options available for this variant. Shipping options do not have to be the same between variations.
 			</p>

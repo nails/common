@@ -2,20 +2,20 @@
 	<p>
 		Configure various aspects of the shop.
 	</p>
-	
+
 	<hr />
-	
+
 		<ul class="tabs">
 			<?php $_active = $this->input->post( 'update' ) == 'analytics' || ! $this->input->post() ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-analytics">Analytics</a>
 			</li>
 		</ul>
-		
+
 		<section class="tabs pages">
 
-			<?php $_display = $this->input->post( 'update' ) == 'analytics' || ! $this->input->post() ? 'block' : 'none'?>
-			<div id="tab-general" class="tab page analytics" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'analytics' || ! $this->input->post() ? 'active' : ''?>
+			<div id="tab-general" class="tab page <?=$_display?> analytics">
 				<?=form_open()?>
 				<?=form_hidden( 'update', 'analytics' )?>
 				<p>
@@ -32,7 +32,7 @@
 						$_field['label']		= 'Profile ID';
 						$_field['default']		= $settings[$_field['key']];
 						$_field['placeholder']	= 'UA-XXXXX-YY';
-						
+
 						echo form_field( $_field );
 
 					?>

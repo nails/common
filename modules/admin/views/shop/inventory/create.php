@@ -33,7 +33,7 @@
 
 	<section class="tabs pages main-product">
 
-		<div class="tab page basics fieldset" id="tab-basics" style="display:block;">
+		<div class="tab page active basics fieldset" id="tab-basics">
 			<?php
 
 				$_field					= array();
@@ -109,7 +109,7 @@
 			?>
 		</div>
 
-		<div class="tab page description" id="tab-description" style="display:none">
+		<div class="tab page description" id="tab-description">
 			<?=form_error( 'description', '<p class="system-alert error no-close">', '</p>' )?>
 			<textarea class="ckeditor" name="description"><?=set_value( 'description' )?></textarea>
 			<p class="system-alert notice no-close" style="margin-top:10px;">
@@ -118,7 +118,7 @@
 			</p>
 		</div>
 
-		<div class="tab page variations" id="tab-variations" style="display:none;">
+		<div class="tab page variations" id="tab-variations">
 			<p>
 				Variations allow you to offer the same product but with different attributes (e.g colours or sizes).
 				Shoppers will be given the choice of which variation they wish to purchase. There must always be at
@@ -171,7 +171,7 @@
 			</div>
 		</div>
 
-		<div class="tab page gallery" id="tab-gallery" style="display:none;">
+		<div class="tab page gallery" id="tab-gallery" >
 			<p>
 				Upload images to the product gallery. Once uploaded you can specify which variations are featured on the <a href="#" class="switch-to-variations">variations tab</a>.
 				<small>
@@ -205,7 +205,7 @@
 			</ul>
 		</div>
 
-		<div class="tab page attributes" id="tab-attributes" style="display:none;">
+		<div class="tab page attributes" id="tab-attributes">
 			<p>
 				Specify specific product attributes, e..g for a pair of jeans you might specify a 'Style' attribute and give it a value of 'Bootcut'. Attributes should be common across all variations of the product.
 			</p>
@@ -242,7 +242,7 @@
 			</p>
 		</div>
 
-		<div class="tab page ranges-collections" id="tab-ranges-collections" style="display:none;">
+		<div class="tab page ranges-collections" id="tab-ranges-collections">
 			<p>
 				Specify which ranges and/or collections this product should appear in.
 			</p>
@@ -291,7 +291,7 @@
 			</select>
 		</div>
 
-		<div class="tab page seo" id="tab-seo" style="display:none;">
+		<div class="tab page seo" id="tab-seo">
 			<p>
 				Define some meta information here which will help search engines understand the product. Keep it relevant and
 				concise, trying too hard and 'keyword flooding' can have the opposite effect.

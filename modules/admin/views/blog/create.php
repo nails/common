@@ -37,7 +37,7 @@
 		</ul>
 		<section class="tabs pages">
 
-			<div class="tab page fieldset" id="tab-meta" style="display:block">
+			<div class="tab page fieldset" id="tab-meta">
 				<?php
 
 				//	Published
@@ -87,7 +87,7 @@
 				?>
 			</div>
 
-			<div class="tab page" id="tab-body" style="display:none">
+			<div class="tab page" id="tab-body">
 				<p id="body-error" class="system-alert error no-close" style="display:<?=form_error( 'body' ) ? 'block' : 'none'?>">
 					<?=form_error( 'body', ' ', ' ' )?>
 				</p>
@@ -99,7 +99,7 @@
 			</div>
 
 			<?php if ( blog_setting( 'categories_enabled' ) ) : ?>
-				<div class="tab page" id="tab-categories" style="display:none";>
+				<div class="tab page" id="tab-categories">
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Categories allow for a broad grouping of post topics and should be considered top-level 'containers' for posts of similar content.">categories</u>.
 					</p>
@@ -129,7 +129,7 @@
 			<?php endif; ?>
 
 			<?php if ( blog_setting( 'tags_enabled' ) ) : ?>
-				<div class="tab page" id="tab-tags" style="display:none";>
+				<div class="tab page" id="tab-tags">
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Tags are generally used to describe your post in more detail.">tags</u>.
 					</p>
@@ -160,7 +160,7 @@
 
 
 			<?php if ( $associations ) : ?>
-			<div class="tab page" id="tab-associations" style="display:none">
+			<div class="tab page" id="tab-associations">
 
 				<p>
 					It's possible for you to associate this blog post with other bits of related content. The following associations can be defined.
@@ -193,13 +193,13 @@
 			</div>
 			<?php endif; ?>
 
-			<div class="tab page" id="tab-gallery" style="display:none">
+			<div class="tab page" id="tab-gallery">
 				<p class="system-alert no-close message">
 					<strong>Coming soon!</strong> We're working on a simple way of attaching images to your blog posts which can be displayed in an attractive slideshow.
 				</p>
 			</div>
 
-			<div class="tab page fieldset" id="tab-seo" style="display:none">
+			<div class="tab page fieldset" id="tab-seo">
 				<p>
 					These fields are not visible anywhere but help Search Engines index and understand the page.
 				</p>

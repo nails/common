@@ -34,8 +34,8 @@
 
 		<section class="tabs pages">
 
-			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'block' : 'none'?>
-			<div id="tab-general" class="tab page general" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
+			<div id="tab-general" class="tab page <?=$_display?> general">
 				<?=form_open()?>
 				<?=form_hidden( 'update', 'settings' )?>
 				<p>
@@ -270,8 +270,8 @@
 				<?=form_close()?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'paymentgateways' ? 'block' : 'none'?>
-			<div id="tab-paymentgateway" class="tab page paymentgateway" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'paymentgateways' ? 'active' : ''?>
+			<div id="tab-paymentgateway" class="tab page <?=$_display?> paymentgateway">
 				<p>
 					Set Payment Gateway credentials.
 				</p>
@@ -400,8 +400,8 @@
 				?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'currencies' ? 'block' : 'none'?>
-			<div id="tab-currencies" class="tab page currencies" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'currencies' ? 'active' : ''?>
+			<div id="tab-currencies" class="tab page <?=$_display?> currencies">
 				<?=form_open()?>
 				<?=form_hidden( 'update', 'currencies' )?>
 				<p>
@@ -450,8 +450,8 @@
 			</div>
 
 
-			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'block' : 'none'?>
-			<div id="tab-shipping-methods" class="tab page shipping-methods" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'active' : ''?>
+			<div id="tab-shipping-methods" class="tab page <?=$_display?> shipping-methods">
 				<?=form_open( NULL, 'id="form-shipping-methods"' )?>
 				<?=form_hidden( 'update', 'shipping_methods' )?>
 				<p>
@@ -577,8 +577,8 @@
 			</div>
 
 
-			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'block' : 'none'?>
-			<div id="tab-tax-rates" class="tab page tax-rates" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'active' : ''?>
+			<div id="tab-tax-rates" class="tab page <?=$_display?> tax-rates">
 				<?=form_open( NULL, 'id="form-tax-rates"' )?>
 				<?=form_hidden( 'update', 'tax_rates' )?>
 				<p>

@@ -2,9 +2,9 @@
 	<p>
 		Configure various aspects of the blog.
 	</p>
-	
+
 	<hr />
-	
+
 		<ul class="tabs">
 			<?php $_active = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
@@ -16,11 +16,11 @@
 				<a href="#" data-tab="tab-blog-sidebar">Sidebar</a>
 			</li>
 		</ul>
-		
+
 		<section class="tabs pages">
 
-			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'block' : 'none'?>
-			<div id="tab-general" class="tab page general" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
+			<div id="tab-general" class="tab page <?=$_display?> general">
 				<?=form_open()?>
 				<?=form_hidden( 'update', 'settings' )?>
 				<p>
@@ -58,7 +58,7 @@
 						$_field['label']		= 'Blog URL';
 						$_field['default']		= $settings['blog_url'];
 						$_field['placeholder']	= 'Customise the Blog\'s URL (include trialing slash)';
-						
+
 						echo form_field( $_field );
 
 					?>
@@ -73,7 +73,7 @@
 						$_field['key']			= 'categories_enabled';
 						$_field['label']		= 'Categories';
 						$_field['default']		= $settings['categories_enabled'];
-						
+
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
@@ -83,7 +83,7 @@
 						$_field['key']			= 'tags_enabled';
 						$_field['label']		= 'Tags';
 						$_field['default']		= $settings['tags_enabled'];
-						
+
 						echo form_field_boolean( $_field );
 
 					?>
@@ -92,8 +92,8 @@
 				<?=form_close()?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'sidebar'  ? 'block' : 'none'?>
-			<div id="tab-blog-sidebar" class="tab page blog-sidebar" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'sidebar'  ? 'active' : ''?>
+			<div id="tab-blog-sidebar" class="tab page <?=$_display?> blog-sidebar">
 				<?=form_open()?>
 				<?=form_hidden( 'update', 'sidebar' )?>
 				<fieldset id="blog-settings-blog-sidebar">
@@ -105,7 +105,7 @@
 						$_field['key']			= 'sidebar_enabled';
 						$_field['label']		= 'Enabled';
 						$_field['default']		= $settings['sidebar_enabled'];
-						
+
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
@@ -116,7 +116,7 @@
 						$_field['label']		= 'Position';
 						$_field['default']		= $settings['sidebar_position'];
 						$_field['class']		= 'chosen';
-						
+
 						echo form_field_dropdown( $_field, array( 'left' => 'Left', 'right' => 'Right' ) );
 
 					?>

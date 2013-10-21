@@ -915,6 +915,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-types', function() {
 			$.fancybox.open(_url.types, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.types);
 				}
@@ -925,6 +927,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-brands', function() {
 			$.fancybox.open(_url.brands, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.brands);
 				}
@@ -935,6 +939,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-categories', function() {
 			$.fancybox.open(_url.categories, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.categories);
 				}
@@ -945,6 +951,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-tags', function() {
 			$.fancybox.open(_url.tags, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.tags);
 				}
@@ -955,6 +963,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-tax-rates', function() {
 			$.fancybox.open(_url.tax_rates, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.tax_rates);
 				}
@@ -965,6 +975,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-attributes', function() {
 			$.fancybox.open(_url.attributes, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.attributes);
 				}
@@ -975,6 +987,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-ranges', function() {
 			$.fancybox.open(_url.ranges, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.ranges);
 				}
@@ -985,6 +999,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-collections', function() {
 			$.fancybox.open(_url.collections, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
 					_this._rebuild_chosen(_target.collections);
 				}

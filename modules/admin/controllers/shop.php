@@ -1849,14 +1849,123 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	{
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'is_physical',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'ipn_method',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'max_per_order',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'max_variations',	'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->is_physical		= $this->input->post( 'is_physical' );
+						$_data->ipn_method		= $this->input->post( 'ipn_method' );
+						$_data->max_per_order	= $this->input->post( 'max_per_order' );
+						$_data->max_variations	= $this->input->post( 'max_variations' );
+
+						if ( $this->product->create_product_type( $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Product Type created successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type.';
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[is_physical]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[ipn_method]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[max_per_order]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[max_variations]',	'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->is_physical		= isset( $_POST[$_id]['is_physical'] )		? $_POST[$_id]['is_physical']		: NULL;
+						$_data->ipn_method		= isset( $_POST[$_id]['ipn_method'] )		? $_POST[$_id]['ipn_method']		: NULL;
+						$_data->max_per_order	= isset( $_POST[$_id]['max_per_order'] )	? $_POST[$_id]['max_per_order']		: NULL;
+						$_data->max_variations	= isset( $_POST[$_id]['max_variations'] )	? $_POST[$_id]['max_variations']	: NULL;
+
+						if ( $this->product->update_product_type( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Product Type saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type.';
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->product->delete_product_type( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Product Type was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Product Type; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['types'] = $this->product->get_product_types( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Product Types';
 
 		// --------------------------------------------------------------------------
 

@@ -1238,15 +1238,17 @@ if ( ! function_exists( 'form_field_checkbox' ) )
  */
 if ( ! function_exists( 'form_field_submit' ) )
 {
-	function form_field_submit( $button_value = 'Submit', $button_name = 'submit', $odd_even = '' )
+	function form_field_submit( $button_value = 'Submit', $button_name = 'submit', $button_attributes = '' )
 	{
-		$_out  = '<div class="field submit ' . $odd_even . '">';
+		$_out  = '<div class="field submit">';
 
 		//	Label
 		$_out .= '<span class="label">&nbsp;</span>';
 
 		//	field
-		$_out .= form_submit( $button_name, $button_value, 'class=""' );
+		$_out .= '<span class="input">';
+		$_out .= form_submit( $button_name, $button_value, $button_attributes );
+		$_out .= '</span>';
 
 		$_out .= '</div>';
 
