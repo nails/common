@@ -30,7 +30,6 @@
 		"aws/aws-sdk-php": "2.4.5",
 		"dompdf/dompdf": "dev-master",
 		"facebook/php-sdk": "v3.2.2",
-		"geoip2/geoip2": "0.4.*",
 		"mustache/mustache": "v2.4.1",
 		"jublonet/codebird-php": "2.4.1",
 		"masterexploder/phpthumb": "v2.0",

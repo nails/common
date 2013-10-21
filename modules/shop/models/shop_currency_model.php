@@ -175,7 +175,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 			$_result = $_result->row();
 
 			//	Format
-			$this->_format_currency_object( $_result );
+			$this->_format_object( $_result );
 
 			return $_result;
 

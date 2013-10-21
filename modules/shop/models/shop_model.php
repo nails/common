@@ -63,12 +63,13 @@ class NAILS_Shop_model extends NAILS_Model
 			//	If not, fall back to base currency
 
 			$this->load->library('geo_ip');
-			$_country_code = $this->geo_ip->result_country_code();
 
-			if ( $_country_code ) :
+			$_lookup = $this->geo_ip->country();
+
+			if ( ! empty( $_lookup->status ) && $_lookup->status == 200 ) :
 
 				//	We know the code, does it have a known currency?
-				$_country_currency = $this->currency->get_by_country( $_country_code );
+				$_country_currency = $this->currency->get_by_country( $_lookup->country->iso );
 
 				if ( $_country_currency ) :
 
