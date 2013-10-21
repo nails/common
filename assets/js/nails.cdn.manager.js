@@ -1,19 +1,21 @@
 var NAILS_CDN_Manager;
 NAILS_CDN_Manager =  function() {
 
-	this.handler		= '';
-	this.callback		= '';
-	this.url_schemes	= {};
-	this.is_fancybox	= '';
+	this.handler			= '';
+	this.callback			= '';
+	this.url_schemes		= {};
+	this.is_fancybox		= '';
+	this.reopen_fancybox	= '';
 
 	// --------------------------------------------------------------------------
 
-	this.init = function( handler, callback, url_schemes, is_fancybox )
+	this.init = function( handler, callback, url_schemes, is_fancybox, reopen_fancybox )
 	{
-		this.handler		= handler;
-		this.callback		= callback;
-		this.url_schemes	= url_schemes;
-		this.is_fancybox	= is_fancybox;
+		this.handler			= handler;
+		this.callback			= callback;
+		this.url_schemes		= url_schemes;
+		this.is_fancybox		= is_fancybox;
+		this.reopen_fancybox	= reopen_fancybox;
 
 		this._init_submit();
 		this._init_alerts();
@@ -135,8 +137,6 @@ NAILS_CDN_Manager =  function() {
 			});
 
 			return false;
-
-			return confirm( 'Are you sure?\n\n' );
 		});
 	};
 
@@ -216,11 +216,11 @@ NAILS_CDN_Manager =  function() {
 	{
 		if ( this.is_fancybox )
 		{
-			parent[this.callback].call( bucket, file, id );
+			parent[this.callback].call( bucket, file, id, this.reopen_fancybox );
 		}
 		else
 		{
-			window.opener[this.callback].call( bucket, file, id );
+			window.opener[this.callback].call( bucket, file, id, this.reopen_fancybox );
 		}
 	};
 

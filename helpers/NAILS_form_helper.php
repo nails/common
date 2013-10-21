@@ -241,7 +241,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		endif;
 
-		//	Is the site running on SSL? If so then change the protocol so as to avoice 'protocols don't match' errors
+		//	Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
 		if ( isset( $_SERVER['HTTPS'] ) && strtoupper( $_SERVER['HTTPS'] ) == 'ON' ) :
 
 			$_url = str_replace( 'http://', 'https://', $_url );
@@ -256,11 +256,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_out .= $_help['title'] ? img( $_help ) : '';
 
 		//	If there's post data, use that value instead
-		if ( get_instance()->input->post() ) :
-
-			$_field['default'] =set_value( $_field['key'] );
-
-		endif;
+		$_field['default'] = set_value( $_field['key'], $_field['default'] );
 
 		//	Remove button
 		$_display = $_field['default'] ? 'inline-block' : 'none';
@@ -313,11 +309,46 @@ $_out .= <<<EOT
 
 	<script type="text/javascript">
 
-		function callback_$_id( file, id )
+		$( '#$_id-choose' ).on( 'click', function()
+		{
+			var _href = $(this).attr( 'href' );
+			_href += _href.indexOf( '?' ) >= 0 ? '&is_fancybox=1' : '?is_fancybox=1';
+
+			if ( $.fancybox.isOpen && $.fancybox.opts.type != 'iframe' )
+			{
+				_href += '&reopen_fancybox=' + encodeURIComponent( $.fancybox.opts.href );
+				$.fancybox.close();
+			}
+
+			var _w = $(this).data( 'width' ) ? $(this).data( 'width' ) : null;
+			var _h = $(this).data( 'height' ) ? $(this).data( 'height' ) : null;
+
+			$.fancybox.open({
+				href: _href,
+				type: 'iframe',
+				width: _w,
+				height: _h
+			});
+
+			return false;
+		});
+
+		function callback_$_id( file, id, reopen )
 		{
 			if ( file.length == 0 )
 			{
 				remove_$_id();
+
+				// --------------------------------------------------------------------------
+
+				//	Reopen facybox?
+				if ( reopen.length )
+				{
+					$.fancybox.open({
+						href:reopen
+					});
+				}
+
 				return;
 			}
 
@@ -332,6 +363,16 @@ $_out .= <<<EOT
 			$( '#$_id-preview' ).html( '<a href="' + _scheme + '">Download</a>' );
 			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );
+
+			// --------------------------------------------------------------------------
+
+			//	Reopen facybox?
+			if ( reopen.length )
+			{
+				$.fancybox.open({
+					href:reopen
+				});
+			}
 		}
 
 		function remove_$_id()
@@ -421,11 +462,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		//	Field
 
 		//	If there's post data, sue that value instead
-		if ( get_instance()->input->post() ) :
-
-			$_field['default'] = set_value( $_field['key'] );
-
-		endif;
+		$_field['default'] = set_value( $_field['key'], $_field['default'] );
 
 		//	If a default has been specified then show a preview
 		$_out .= '<span id="' . $_id . '-preview" class="mm-image-preview">';
@@ -451,14 +488,14 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 		endif;
 
-		//	Is the site running on SSL? If so then change the protocol so as to avoice 'protocols don't match' errors
+		//	Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
 		if ( isset( $_SERVER['HTTPS'] ) && strtoupper( $_SERVER['HTTPS'] ) == 'ON' ) :
 
 			$_url = str_replace( 'http://', 'https://', $_url );
 
 		endif;
 
-		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="fancybox awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
+		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
 
 		//	Remove button
 		$_display = $_field['default'] ? 'inline-block' : 'none';
@@ -499,11 +536,46 @@ $_out .= <<<EOT
 
 	<script type="text/javascript">
 
-		function callback_$_id( file, id )
+		$( '#$_id-choose' ).on( 'click', function()
+		{
+			var _href = $(this).attr( 'href' );
+			_href += _href.indexOf( '?' ) >= 0 ? '&is_fancybox=1' : '?is_fancybox=1';
+
+			if ( $.fancybox.isOpen && $.fancybox.opts.type != 'iframe' )
+			{
+				_href += '&reopen_fancybox=' + encodeURIComponent( $.fancybox.opts.href );
+				$.fancybox.close();
+			}
+
+			var _w = $(this).data( 'width' ) ? $(this).data( 'width' ) : null;
+			var _h = $(this).data( 'height' ) ? $(this).data( 'height' ) : null;
+
+			$.fancybox.open({
+				href: _href,
+				type: 'iframe',
+				width: _w,
+				height: _h
+			});
+
+			return false;
+		});
+
+		function callback_$_id( file, id, reopen )
 		{
 			if ( file.length == 0 )
 			{
 				remove_$_id();
+
+				// --------------------------------------------------------------------------
+
+				//	Reopen facybox?
+				if ( reopen.length )
+				{
+					$.fancybox.open({
+						href:reopen
+					});
+				}
+
 				return;
 			}
 
@@ -518,6 +590,16 @@ $_out .= <<<EOT
 			$( '#$_id-preview' ).html( '<img src="' + _scheme + '" / >' );
 			$( '#$_id-field' ).val( id );
 			$( '#$_id-remove' ).css( 'display', 'inline-block' );
+
+			// --------------------------------------------------------------------------
+
+			//	Reopen facybox?
+			if ( reopen.length )
+			{
+				$.fancybox.open({
+					href:reopen
+				});
+			}
 		}
 
 		function remove_$_id()
