@@ -1629,16 +1629,126 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_brands()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_brand_model', 'brand' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'logo_id',			'',	'xss_clean' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->logo_id			= $this->input->post( 'logo_id' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+						if ( $this->brand->create( $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Brand created successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand.';
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[logo_id]',			'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->logo_id			= isset( $_POST[$_id]['logo_id'] )			? $_POST[$_id]['logo_id']			: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+
+						if ( $this->brand->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Brand saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand.';
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->brand->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Brand was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Brand; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['brands'] = $this->brand->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Brands';
 
 		// --------------------------------------------------------------------------
 

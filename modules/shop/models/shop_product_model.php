@@ -870,7 +870,15 @@ class NAILS_Shop_product_model extends NAILS_Model
 		endif;
 
 		$this->db->order_by( 'label' );
-		return $this->db->get( $this->_table_type . ' pt' )->result();
+		$_result = $this->db->get( $this->_table_type . ' pt' )->result();
+
+		foreach( $_result AS &$r ) :
+
+			$this->_format_product_type_object( $r );
+
+		endforeach;
+
+		return $_result;
 	}
 
 
@@ -901,13 +909,18 @@ class NAILS_Shop_product_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_product_type_by_id( $id )
+	public function get_product_type_by_id( $id, $include_count = FALSE  )
 	{
 		$this->db->where( 'id', $id );
-		$_types = $this->get_product_types();
+		$_types = $this->get_product_types( $include_count );
 
-		if ( ! $_types )
+		if ( ! $_types ) :
+
 			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
 
 		return $_types[0];
 	}
@@ -968,6 +981,14 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$this->db->set( $_data );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
 			$this->db->insert( NAILS_DB_PREFIX . 'shop_product_type' );
 
 			if ( $this->db->affected_rows() ) :
@@ -985,7 +1006,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 			return FALSE;
 
 		endif;
-
 	}
 
 
@@ -1073,9 +1093,8 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$this->db->set( $_data );
 			$this->db->set( 'modified', 'NOW()', FALSE );
 			$this->db->where( 'id', $id );
-			$this->db->update( NAILS_DB_PREFIX . 'shop_product_type' );
 
-			if ( $this->db->affected_rows() ) :
+			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_product_type' ) ) :
 
 				return TRUE;
 
@@ -1196,6 +1215,20 @@ class NAILS_Shop_product_model extends NAILS_Model
 	{
 		//	Type casting
 		$variation->id			= (int) $variation->id;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_product_type_object( &$obj )
+	{
+		//	Type casting
+		$obj->id				= (int) $obj->id;
+		$obj->max_per_order		= is_numeric( $obj->max_per_order ) ? (int) $obj->max_per_order : $obj->max_per_order;
+		$obj->max_variations	= (int) $obj->max_variations;
+		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
+		$obj->is_physical		= (bool) $obj->is_physical;
 	}
 }
 

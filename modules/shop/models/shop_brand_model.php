@@ -23,6 +23,193 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 		$this->_table = NAILS_DB_PREFIX . 'shop_brand';
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all( $include_count  = FALSE)
+	{
+		$this->db->select( 'b.id,b.slug,b.label,b.logo_id,b.description,b.seo_description,b.seo_keywords,b.created,b.modified' );
+
+		if ( $include_count ) :
+
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_brand WHERE brand_id = b.id) product_count' );
+
+		endif;
+
+		$this->db->order_by( 'label' );
+		$_result = $this->db->get( $this->_table . ' b' )->result();
+
+		foreach( $_result AS &$r ) :
+
+			$this->_format_object( $r );
+
+		endforeach;
+
+		return $_result;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_object( &$obj )
+	{
+		$obj->id				= (int) $obj->id;
+		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create( $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = $data->label;
+
+		else :
+
+			$this->db->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->logo_id ) ) :
+
+			$_data->logo_id = ! empty( $data->logo_id ) ? (int) $data->logo_id : NULL;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = $data->description;
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = $data->seo_description;
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = $data->seo_keywords;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$_data->slug = $this->_generate_slug( $data->label, NAILS_DB_PREFIX . 'shop_brand', 'slug' );
+			$this->db->set( $_data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			$this->db->insert( NAILS_DB_PREFIX . 'shop_brand' );
+
+			if ( $this->db->affected_rows() ) :
+
+				return $this->db->insert_id();
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function update( $id, $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = $data->label;
+
+		else :
+
+			$this->db->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->logo_id ) ) :
+
+			$_data->logo_id = ! empty( $data->logo_id ) ? (int) $data->logo_id : NULL;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = $data->description;
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = $data->seo_description;
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = $data->seo_keywords;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$this->db->set( $_data );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->where( 'id', $id );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_brand' ) ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
 }
 
 
