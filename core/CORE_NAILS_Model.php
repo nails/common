@@ -632,7 +632,7 @@ class CORE_NAILS_Model extends CI_Model {
 	// --------------------------------------------------------------------------
 
 
-	protected function _generate_slug( $label, $table = NULL, $column = NULL )
+	protected function _generate_slug( $label, $table = NULL, $column = NULL, $_add_prefix = '', $_add_suffix = '' )
 	{
 		//	Prep table and column
 		$_prefix	= ! $table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
@@ -663,11 +663,11 @@ class CORE_NAILS_Model extends CI_Model {
 
 			if ( $_counter ) :
 
-				$_slug_test = $_slug . '-' . $_counter;
+				$_slug_test = $_add_prefix . $_slug . $_add_suffix . '-' . $_counter;
 
 			else :
 
-				$_slug_test = $_slug;
+				$_slug_test = $_add_prefix . $_slug . $_add_suffix;
 
 			endif;
 
