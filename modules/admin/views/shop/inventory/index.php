@@ -73,7 +73,7 @@
 
 									if ( $user->has_permission( 'admin.shop.edit' ) ) :
 
-										$_buttons[] = anchor( 'admin/shop/inventory/edit/' . $item->id, lang( 'action_edit' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+										$_buttons[] = anchor( 'admin/shop/inventory/edit/' . $item->id, lang( 'action_edit' ), 'class="awesome small"' );
 
 									endif;
 

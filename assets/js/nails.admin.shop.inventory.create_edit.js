@@ -637,7 +637,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 				$.each(_ids, function(index, id)
 				{
-					console.log('li.image.object-id-' + id);
 					//	Find the appropriate item(s) and move it to the beginning of the list
 					$('li.image.object-id-' + id).each(function()
 					{
@@ -1086,14 +1085,12 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			var _template = $('<div>').html($.parseHTML($.trim($('#' + template).html(), null, true)));
 
 			var _target = $( 'select', _template ).empty();
-console.log(_target);
+
 			$.each(_DATA, function() {
 				var _option = $('<option>');
 
 				_option.val(this.id);
 				_option.html(this.label);
-
-				console.log(_option);
 
 				$(_target).append(_option);
 			});
