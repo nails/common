@@ -935,18 +935,18 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		if ( isset( $data->label ) ) :
 
-			$_data->label = $data->label;
+			$_data->label = strip_tags( $data->label );
 
 		else :
 
-			$this->db->_set_error( 'Label is required.' );
+			$this->_set_error( 'Label is required.' );
 			return FALSE;
 
 		endif;
 
 		if ( isset( $data->description ) ) :
 
-			$_data->description = $data->description;
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
 
 		endif;
 
@@ -1049,18 +1049,18 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		if ( isset( $data->label ) ) :
 
-			$_data->label = $data->label;
+			$_data->label = strip_tags( $data->label );
 
 		else :
 
-			$this->db->_set_error( 'Label is required.' );
+			$this->_set_error( 'Label is required.' );
 			return FALSE;
 
 		endif;
 
 		if ( isset( $data->description ) ) :
 
-			$_data->description = $data->description;
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
 
 		endif;
 

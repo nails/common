@@ -480,7 +480,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the product. ' . $this->product->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the Product. ' . $this->product->last_error();
 
 				endif;
 
@@ -1281,7 +1281,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the voucher.';
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the voucher. '  . $this->voucher->last_error();
 
 				endif;
 
@@ -1456,7 +1456,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem activating the voucher.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem activating the voucher. ' . $this->voucher->last_error() );
 
 		endif;
 
@@ -1487,7 +1487,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem suspending the voucher.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem suspending the voucher. ' . $this->voucher->last_error() );
 
 		endif;
 
@@ -1661,11 +1661,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						if ( $this->brand->create( $_data ) ) :
 
-							$this->data['success']	= '<strong>Success!</strong> Brand created successfully.';
+							//	Redirect to clear form
+							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Brand created successfully.' );
+							redirect( 'admin/shop/manage/brands?' . $_SERVER['QUERY_STRING'] );
+							return;
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand.';
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand. ' . $this->brand->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -1707,7 +1710,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand.';
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand. ' . $this->brand->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -1771,16 +1774,129 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_categories()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_category_model', 'category' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'parent_id',			'',	'xss_clean' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->parent_id		= $this->input->post( 'parent_id' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+						if ( $this->category->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Category created successfully.' );
+							redirect( 'admin/shop/manage/categories?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Category. ' . $this->category->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Category.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[logo_id]',			'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->logo_id			= isset( $_POST[$_id]['logo_id'] )			? $_POST[$_id]['logo_id']			: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+
+						if ( $this->category->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Category saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Category. ' . $this->category->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Category.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->category->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Category was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Category; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['categories'] = $this->category->get_all( FALSE, TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Categories';
 
 		// --------------------------------------------------------------------------
 
@@ -1986,11 +2102,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						if ( $this->product->create_product_type( $_data ) ) :
 
-							$this->data['success']	= '<strong>Success!</strong> Product Type created successfully.';
+							//	Redirect to clear form
+							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
+							redirect( 'admin/shop/manage/types?' . $_SERVER['QUERY_STRING'] );
+							return;
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type.';
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type. ' . $this->product->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2034,7 +2153,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type.';
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type. ' . $this->product->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;

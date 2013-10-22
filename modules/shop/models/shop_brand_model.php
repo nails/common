@@ -70,11 +70,11 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 		if ( isset( $data->label ) ) :
 
-			$_data->label = $data->label;
+			$_data->label = strip_tags( $data->label );
 
 		else :
 
-			$this->db->_set_error( 'Label is required.' );
+			$this->_set_error( 'Label is required.' );
 			return FALSE;
 
 		endif;
@@ -87,19 +87,19 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 		if ( isset( $data->description ) ) :
 
-			$_data->description = $data->description;
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
 
 		endif;
 
 		if ( isset( $data->seo_description ) ) :
 
-			$_data->seo_description = $data->seo_description;
+			$_data->seo_description = strip_tags( $data->seo_description );
 
 		endif;
 
 		if ( isset( $data->seo_keywords ) ) :
 
-			$_data->seo_keywords = $data->seo_keywords;
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
 
 		endif;
 
@@ -147,11 +147,11 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 		if ( isset( $data->label ) ) :
 
-			$_data->label = $data->label;
+			$_data->label = strip_tags( $data->label );
 
 		else :
 
-			$this->db->_set_error( 'Label is required.' );
+			$this->_set_error( 'Label is required.' );
 			return FALSE;
 
 		endif;
@@ -164,19 +164,19 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 		if ( isset( $data->description ) ) :
 
-			$_data->description = $data->description;
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
 
 		endif;
 
 		if ( isset( $data->seo_description ) ) :
 
-			$_data->seo_description = $data->seo_description;
+			$_data->seo_description = strip_tags( $data->seo_description );
 
 		endif;
 
 		if ( isset( $data->seo_keywords ) ) :
 
-			$_data->seo_keywords = $data->seo_keywords;
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
 
 		endif;
 
@@ -210,6 +210,39 @@ class NAILS_Shop_brand_model extends NAILS_Model
 		endif;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $id )
+	{
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
+		$this->db->trans_begin();
+		$this->db->where( 'id', $id );
+		$this->db->delete( $this->_table );
+		$_affected_rows = $this->db->affected_rows();
+
+		if ($this->db->trans_status() === FALSE) :
+
+		    $this->db->trans_rollback();
+
+			$_return = FALSE;
+
+		else :
+
+		    $this->db->trans_commit();
+			$_return = (bool) $_affected_rows;
+
+		endif;
+
+		//	Put DB errors back as they were
+		$this->db->db_debug = $_previous;
+
+		return $_return;
+	}
 }
 
 

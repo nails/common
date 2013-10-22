@@ -838,31 +838,31 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		var _url = {};
 
 		_target.types = '#tab-basics select.type_id';
-		_url.types = SITE_URL + 'admin/shop/manage/types?mode=' + _this.mode + '&is_fancybox=1';
+		_url.types = SITE_URL + 'admin/shop/manage/types?is_fancybox=1';
 
 		_target.brands = '#tab-basics select.brands';
-		_url.brands = SITE_URL + 'admin/shop/manage/brands?mode=' + _this.mode + '&is_fancybox=1';
+		_url.brands = SITE_URL + 'admin/shop/manage/brands?is_fancybox=1';
 
 		_target.categories = '#tab-basics select.categories';
-		_url.categories = SITE_URL + 'admin/shop/manage/categories?mode=' + _this.mode + '&is_fancybox=1';
+		_url.categories = SITE_URL + 'admin/shop/manage/categories?is_fancybox=1';
 
 		_target.tags = '#tab-basics select.tags';
-		_url.tags = SITE_URL + 'admin/shop/manage/tags?mode=' + _this.mode + '&is_fancybox=1';
+		_url.tags = SITE_URL + 'admin/shop/manage/tags?is_fancybox=1';
 
 		_target.tax_rates = '#tab-basics select.tax_rate_id';
-		_url.tax_rates = SITE_URL + 'admin/shop/manage/tax_rates?mode=' + _this.mode + '&is_fancybox=1';
+		_url.tax_rates = SITE_URL + 'admin/shop/manage/tax_rates?is_fancybox=1';
 
 		_target.attributes = '#tab-attributes select.attributes';
-		_url.attributes = SITE_URL + 'admin/shop/manage/attributes?mode=' + _this.mode + '&is_fancybox=1';
+		_url.attributes = SITE_URL + 'admin/shop/manage/attributes?is_fancybox=1';
 
 		_target.ranges = '#tab-ranges-collections select.ranges';
-		_url.ranges = SITE_URL + 'admin/shop/manage/ranges?mode=' + _this.mode + '&is_fancybox=1';
+		_url.ranges = SITE_URL + 'admin/shop/manage/ranges?is_fancybox=1';
 
 		_target.collections = '#tab-ranges-collections select.collections';
-		_url.collections = SITE_URL + 'admin/shop/manage/collections?mode=' + _this.mode + '&is_fancybox=1';
+		_url.collections = SITE_URL + 'admin/shop/manage/collections?is_fancybox=1';
 
 		_target.courier_method = '#tab-variations select.shipping_methods';
-		_url.courier_method = SITE_URL + 'admin/shop/manage/shipping_methods?mode=' + _this.mode + '&is_fancybox=1';
+		_url.courier_method = SITE_URL + 'admin/shop/manage/shipping_methods?is_fancybox=1';
 
 		// --------------------------------------------------------------------------
 

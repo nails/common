@@ -29,6 +29,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 	public function get_all( $include_children = FALSE, $include_product_count = FALSE )
 	{
+		$this->db->order_by( 'order,label' );
 		$_all = parent::get_all();
 
 		if ( $include_children ) :
@@ -77,7 +78,6 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 	public function get_all_nested()
 	{
-		$this->db->order_by( 'order,label' );
 		return $this->_nest_categories( $this->get_all() );
 	}
 
@@ -374,6 +374,222 @@ class NAILS_Shop_category_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create( $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->parent_id ) ) :
+
+			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+
+			//	Work out the slug, prefix it with nested parents
+			$_parent = $this->get_by_id( $_data->parent_id );
+
+			if ( $_data->parent_id && ! $_parent ) :
+
+				$this->_set_error( 'Invalid Parent ID.' );
+				return FALSE;
+
+			endif;
+
+			if ( $_data->parent_id ) :
+
+				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug', $_parent->slug . '/' );
+				$_data->label_nested	= $_parent->label_nested . '|' . $_data->label;
+
+			else :
+
+				//	No parent, slug is just the label
+				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug' );
+				$_data->label_nested	= $_data->label;
+
+			endif;
+
+		else :
+
+			//	No parent, slug is just the label
+			$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug' );
+			$_data->label_nested	= $_data->label;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			$this->db->set( $_data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			$this->db->insert( $this->_table );
+
+			if ( $this->db->affected_rows() ) :
+
+				return $this->db->insert_id();
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function update( $id, $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->parent_id ) ) :
+
+			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+
+			//	TODO: work out new slug
+
+		else :
+
+			//	TODO: work out new slug
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			$this->db->set( $_data );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->where( 'id', $id );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_brand' ) ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $id )
+	{
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
+		$this->db->trans_begin();
+		$this->db->where( 'id', $id );
+		$this->db->delete( $this->_table );
+		$_affected_rows = $this->db->affected_rows();
+
+		if ($this->db->trans_status() === FALSE) :
+
+		    $this->db->trans_rollback();
+
+			$_return = FALSE;
+
+		else :
+
+		    $this->db->trans_commit();
+			$_return = (bool) $_affected_rows;
+
+		endif;
+
+		//	Put DB errors back as they were
+		$this->db->db_debug = $_previous;
+
+		return $_return;
 	}
 
 

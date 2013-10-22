@@ -67,7 +67,7 @@
 						echo '<td class="count">' . $type->product_count . '</td>';
 						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $type->modified ), TRUE );
 						echo '<td class="actions">';
-						echo '<a href="#edit-' . $type->id . '" class="fancybox awesome small">' . lang( 'action_edit' ) . '</a>';
+						echo '<a href="#edit-' . $type->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
 
 						echo form_open( 'admin/shop/manage/types' . $_is_fancybox, 'class="delete"' );
 						echo form_hidden( 'action', 'delete' );
@@ -85,7 +85,7 @@
 			</table>
 		</div>
 
-		<div class="tab page <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>" id="create">
+		<div class="tab page fieldset <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>" id="create">
 			<?php
 
 				echo form_open( 'admin/shop/manage/types' . $_is_fancybox );
@@ -94,6 +94,7 @@
 				$_field				= array();
 				$_field['key']		= 'label';
 				$_field['label']	= 'Label';
+				$_field['required']	= TRUE;
 
 				echo form_field( $_field );
 
@@ -158,6 +159,7 @@
 	foreach( $types AS $type ) :
 
 		echo '<div id="edit-' . $type->id . '" style="display:none">';
+		echo '<div class="fieldset">';
 		echo form_open( 'admin/shop/manage/types' . $_is_fancybox );
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $type->id );
@@ -166,6 +168,7 @@
 		$_field['key']		= $type->id . '[label]';
 		$_field['label']	= 'Label';
 		$_field['default']	= $type->label;
+		$_field['required']	= TRUE;
 
 		echo form_field( $_field );
 
@@ -223,6 +226,7 @@
 
 		echo form_close();
 		echo '</div>';
+		echo '</div>';
 
 	endforeach;
 
@@ -236,6 +240,8 @@
 		echo '$.fancybox.open({href:"#edit-' . $this->input->post( 'id' ) . '"});';
 
 	endif;
+
+	echo '$( \'a.edit-open\' ).fancybox({width:650, autoSize:false, afterShow : function(){ _nails.add_stripes(); } });';
 
 	//	Set _DATA
 	echo 'var _DATA = ' . json_encode( $types ) . ';';
