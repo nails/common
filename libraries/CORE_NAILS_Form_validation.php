@@ -415,6 +415,41 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		return strtotime( $datetime ) > strtotime( $CI->input->post( $field ) );
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
+	public function in_range( $str, $field )
+	{
+		$_range = explode( '-', $field );
+		$_low	= isset( $_range[0] ) ? (float) $_range[0] : NULL;
+		$_high	= isset( $_range[1] ) ? (float) $_range[1] : NULL;
+
+		if ( is_null( $_low ) || is_null( $_high ) ) :
+
+			return TRUE;
+
+		endif;
+
+		if ( (float) $str >= $_low && (float) $str <= $_high ) :
+
+			return TRUE;
+
+		else :
+
+			$CI =& get_instance();
+
+			if ( ! array_key_exists( 'in_range', $CI->form_validation->_error_messages ) ) :
+
+				$CI->form_validation->set_message( 'in_range', lang( 'fv_in_range_field' ) );
+
+			endif;
+
+			return FALSE;
+
+		endif;
+	}
+
 }
 
 

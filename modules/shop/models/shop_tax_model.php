@@ -33,6 +33,7 @@ class NAILS_Shop_tax_model extends NAILS_Model
 	public function get_all()
 	{
 		$this->db->where( 'is_deleted', FALSE );
+		$this->db->order_by( 'label' );
 		return parent::get_all();
 	}
 
@@ -52,6 +53,152 @@ class NAILS_Shop_tax_model extends NAILS_Model
 		endforeach;
 
 		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_object( &$obj )
+	{
+		$obj->id				= (int) $obj->id;
+		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create( $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->rate ) ) :
+
+			$_data->rate = (float) $data->rate;
+
+		else :
+
+			$this->_set_error( 'Rate is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$this->db->set( $_data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			$this->db->insert( $this->_table );
+
+			if ( $this->db->affected_rows() ) :
+
+				return $this->db->insert_id();
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function update( $id, $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->rate ) ) :
+
+			$_data->rate = (float) $data->rate;
+
+		else :
+
+			$this->_set_error( 'Rate is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$this->db->set( $_data );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->where( 'id', $id );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			if ( $this->db->update( $this->_table ) ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $id )
+	{
+		$this->db->set( 'is_deleted', TRUE );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		$this->db->where( 'id', $id );
+		$this->db->update( $this->_table );
+		return (bool) $this->db->affected_rows();
 	}
 }
 

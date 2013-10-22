@@ -98,6 +98,8 @@
 	$lang['fv_numeric_field']				= 'The %s field must be numeric.';
 	$lang['fv_is_natural']					= 'This field must be a positive number.';
 	$lang['fv_is_natural_field']			= 'The %s field must contain only positive numbers.';
+	$lang['fv_in_range']					= 'This field must be within the range %2$s.';
+	$lang['fv_in_range_field']				= 'The %s field must be within the range %s.';
 
 
 	// --------------------------------------------------------------------------

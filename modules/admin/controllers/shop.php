@@ -1598,16 +1598,125 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_attributes()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_attribute_model', 'attribute' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+						if ( $this->attribute->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Attribute created successfully.' );
+							redirect( 'admin/shop/manage/attributes?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Attribute. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Attribute.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+
+						if ( $this->attribute->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Attribute saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Attribute. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Attribute.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->attribute->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Attribute was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Attribute; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['attributes'] = $this->attribute->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Attributes';
 
 		// --------------------------------------------------------------------------
 
@@ -2011,7 +2120,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_tags()
 	{
-//	Load model
+		//	Load model
 		$this->load->model( 'shop/shop_tag_model', 'tag' );
 
 		// --------------------------------------------------------------------------
@@ -2151,16 +2260,119 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_tax_rates()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_tax_model', 'tax' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',	'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'rate',	'',	'xss_clean|required|in_range[0-1]' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+					$this->form_validation->set_message( 'in_range', lang( 'fv_in_range' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data			= new stdClass();
+						$_data->label	= $this->input->post( 'label' );
+						$_data->rate	= $this->input->post( 'rate' );
+
+						if ( $this->tax->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tax Rate created successfully.' );
+							redirect( 'admin/shop/manage/tax_rates?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tax Rate. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tax Rate.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',	'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[rate]',		'',	'xss_clean|required|in_range[0-1]' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+					$this->form_validation->set_message( 'in_range', lang( 'fv_in_range' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data			= new stdClass();
+						$_data->label	= isset( $_POST[$_id]['label'] )	? $_POST[$_id]['label']		: NULL;
+						$_data->rate	= isset( $_POST[$_id]['rate'] )		? $_POST[$_id]['rate']		: NULL;
+
+						if ( $this->tax->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Tax Rate saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tax Rate. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tax Rate.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->tax->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Tax Rate was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Tax Rate; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['rates'] = $this->tax->get_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Tax Rates';
 
 		// --------------------------------------------------------------------------
 

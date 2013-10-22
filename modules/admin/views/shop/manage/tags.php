@@ -92,6 +92,7 @@
 				$_field				= array();
 				$_field['key']		= 'seo_description';
 				$_field['label']	= 'SEO Description';
+				$_field['type']		= 'textarea';
 
 				echo form_field( $_field );
 
@@ -150,6 +151,7 @@
 		$_field['key']		= $tag->id . '[seo_description]';
 		$_field['label']	= 'SEO Description';
 		$_field['default']	= $tag->seo_description;
+		$_field['type']		= 'textarea';
 
 		echo form_field( $_field );
 

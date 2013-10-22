@@ -259,7 +259,7 @@
 					$_checked = array_search( $range->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
 					echo '<option value="' . $range->id . '" ' . $_checked . '>';
-					echo $range->label . ' - ' . $range->description_short;
+					echo $range->label . ' - ' . word_limiter( $range->description, 25 );
 					echo '</option>';
 
 				endforeach;
@@ -282,7 +282,7 @@
 					$_checked = array_search( $collection->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
 					echo '<option value="' . $collection->id . '" ' . $_checked . '>';
-					echo $collection->label . ' - ' . $collection->description_short;
+					echo $collection->label . ' - ' . word_limiter( $collection->description, 25 );
 					echo '</option>';
 
 				endforeach;

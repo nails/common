@@ -215,13 +215,13 @@ class NAILS_Shop_tag_model extends NAILS_Model
 
 		if ($this->db->trans_status() === FALSE) :
 
-		    $this->db->trans_rollback();
+			$this->db->trans_rollback();
 
 			$_return = FALSE;
 
 		else :
 
-		    $this->db->trans_commit();
+			$this->db->trans_commit();
 			$_return = (bool) $_affected_rows;
 
 		endif;

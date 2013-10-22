@@ -978,7 +978,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				width: '95%',
 				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.attributes);
+					_this._rebuild_chosen(_target.attributes, 'template-attribute');
 				}
 			});
 			return false;
@@ -1031,7 +1031,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._rebuild_chosen = function(target)
+	this._rebuild_chosen = function(target, template)
 	{
 		var _DATA = $('.fancybox-iframe').get(0).contentWindow._DATA;
 
@@ -1079,6 +1079,27 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			//	Trigger the chosen
 			$(this).trigger('chosen:updated');
 		});
+
+		//	Rebuild template
+		if ( template )
+		{
+			var _template = $('<div>').html($.parseHTML($.trim($('#' + template).html(), null, true)));
+
+			var _target = $( 'select', _template ).empty();
+console.log(_target);
+			$.each(_DATA, function() {
+				var _option = $('<option>');
+
+				_option.val(this.id);
+				_option.html(this.label);
+
+				console.log(_option);
+
+				$(_target).append(_option);
+			});
+
+			$('#' + template).html($(_template).html());
+		}
 	};
 
 
