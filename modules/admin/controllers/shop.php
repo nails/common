@@ -1662,7 +1662,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						if ( $this->brand->create( $_data ) ) :
 
 							//	Redirect to clear form
-							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Brand created successfully.' );
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Brand created successfully.' );
 							redirect( 'admin/shop/manage/brands?' . $_SERVER['QUERY_STRING'] );
 							return;
 
@@ -1807,7 +1807,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						if ( $this->category->create( $_data ) ) :
 
 							//	Redirect to clear form
-							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Category created successfully.' );
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category created successfully.' );
 							redirect( 'admin/shop/manage/categories?' . $_SERVER['QUERY_STRING'] );
 							return;
 
@@ -2011,16 +2011,125 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_tags()
 	{
+//	Load model
+		$this->load->model( 'shop/shop_tag_model', 'tag' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+						if ( $this->tag->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag created successfully.' );
+							redirect( 'admin/shop/manage/tags?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tag. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tag.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+
+						if ( $this->tag->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Tag saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tag. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tag.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->tag->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Tag was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Tag; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['tags'] = $this->tag->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Tags';
 
 		// --------------------------------------------------------------------------
 
@@ -2103,7 +2212,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						if ( $this->product->create_product_type( $_data ) ) :
 
 							//	Redirect to clear form
-							$this->session->Set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
 							redirect( 'admin/shop/manage/types?' . $_SERVER['QUERY_STRING'] );
 							return;
 

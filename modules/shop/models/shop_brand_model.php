@@ -106,7 +106,7 @@ class NAILS_Shop_brand_model extends NAILS_Model
 		if ( ! empty( (array) $_data ) ) :
 
 			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label, NAILS_DB_PREFIX . 'shop_brand', 'slug' );
+			$_data->slug = $this->_generate_slug( $data->label, $this->_table, 'slug' );
 			$this->db->set( $_data );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
@@ -118,7 +118,7 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 			endif;
 
-			$this->db->insert( NAILS_DB_PREFIX . 'shop_brand' );
+			$this->db->insert( $this->_table );
 
 			if ( $this->db->affected_rows() ) :
 
@@ -193,7 +193,7 @@ class NAILS_Shop_brand_model extends NAILS_Model
 
 			endif;
 
-			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_brand' ) ) :
+			if ( $this->db->update( $this->_table ) ) :
 
 				return TRUE;
 

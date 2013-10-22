@@ -23,6 +23,214 @@ class NAILS_Shop_tag_model extends NAILS_Model
 
 		$this->_table = NAILS_DB_PREFIX . 'shop_tag';
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all( $include_count  = FALSE)
+	{
+		$this->db->select( 't.id,t.slug,t.label,t.description,t.seo_description,t.seo_keywords,t.created,t.modified' );
+
+		if ( $include_count ) :
+
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_tag WHERE tag_id = t.id) product_count' );
+
+		endif;
+
+		$this->db->order_by( 'label' );
+		$_result = $this->db->get( $this->_table . ' t' )->result();
+
+		foreach( $_result AS &$r ) :
+
+			$this->_format_object( $r );
+
+		endforeach;
+
+		return $_result;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _format_object( &$obj )
+	{
+		$obj->id				= (int) $obj->id;
+		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create( $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$_data->slug = $this->_generate_slug( $data->label, $this->_table, 'slug' );
+			$this->db->set( $_data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			$this->db->insert( $this->_table );
+
+			if ( $this->db->affected_rows() ) :
+
+				return $this->db->insert_id();
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function update( $id, $data )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->label ) ) :
+
+			$_data->label = strip_tags( $data->label );
+
+		else :
+
+			$this->_set_error( 'Label is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
+
+		endif;
+
+		if ( ! empty( (array) $_data ) ) :
+
+			//	Generate a slug
+			$this->db->set( $_data );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->where( 'id', $id );
+
+			if ( active_user( 'id' ) ) :
+
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			endif;
+
+			if ( $this->db->update( $this->_table ) ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $id )
+	{
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
+		$this->db->trans_begin();
+		$this->db->where( 'id', $id );
+		$this->db->delete( $this->_table );
+		$_affected_rows = $this->db->affected_rows();
+
+		if ($this->db->trans_status() === FALSE) :
+
+		    $this->db->trans_rollback();
+
+			$_return = FALSE;
+
+		else :
+
+		    $this->db->trans_commit();
+			$_return = (bool) $_affected_rows;
+
+		endif;
+
+		//	Put DB errors back as they were
+		$this->db->db_debug = $_previous;
+
+		return $_return;
+	}
 }
 
 
