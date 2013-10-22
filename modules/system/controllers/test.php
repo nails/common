@@ -77,8 +77,20 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Each test listed here should be a valid callback, if a callback is not found the test will be silently discarded
 
 		$this->_tests = array();
-		$this->_tests[] = 'canwritedirs';
-		$this->_tests[] = 'cansendemail';
+
+		if ( $this->input->post( 'test' ) ) :
+
+			$this->_tests	= $this->input->post( 'test' );
+
+		else :
+
+			$this->_tests[] = module_is_enabled( 'shop' ) ? 'shop' : NULL;
+			$this->_tests[] = 'canwritedirs';
+			$this->_tests[] = 'cansendemail';
+
+		endif;
+
+		$this->_tests = array_filter( $this->_tests );
 
 		$this->data['tests'] =& $this->_tests;
 
@@ -207,18 +219,9 @@ class NAILS_Test extends NAILS_System_Controller
 	 **/
 	public function run()
 	{
-		//	which tests are we running?
-		if ( $this->input->post( 'test' ) ) :
+		//	Which tests are we running?
+		$_tests =& $this->_tests;
 
-			//	The posted tests!
-			$_tests =& $this->input->post( 'test' );
-
-		else :
-
-			//	All the tests!
-			$_tests =& $this->_tests;
-
-		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -338,6 +341,78 @@ class NAILS_Test extends NAILS_System_Controller
 	//	It is important that TESTNAME is the same for both.
 	//	_test_TESTNAME() methods update the $this->_result variable
 	//	_info_TESTNAME() methods update the $this->_info variable
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _test_shop()
+	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+
+		// --------------------------------------------------------------------------
+
+		$_buckets	= array();
+		$_buckets[]	= 'shop-product-images';
+		$_buckets[]	= 'shop-brand-logos';
+		$_buckets[]	= 'shop-download';
+
+		// --------------------------------------------------------------------------
+
+		//	CDN Enabled?
+		if ( ! module_is_enabled( 'cdn' ) ) :
+
+			$this->_result->pass		= FALSE;
+			$this->_result->errors[]	= 'CDN is not enabled.';
+			return $this->_result;
+
+		else :
+
+			$this->load->library( 'cdn' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute test
+		foreach ( $_buckets AS $bucket ) :
+
+			$this->db->where( 'slug', $bucket );
+			$_bucket = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket' );
+
+			if ( ! $_bucket ) :
+
+				//	Attempt to create
+				if ( ! $this->cdn->bucket_create( $bucket ) ) :
+
+					$this->_result->pass		= FALSE;
+					$this->_result->errors[]	= '"' . $bucket . '" does not exist and is required, could not crete bucket (' . $this->cdn->last_error() . ').';
+					continue;
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		return $this->_result;
+	}
+
+	protected function _info_shop()
+	{
+		$this->_info->label			= 'Shop is configured correctly';
+		$this->_info->description	= 'This test will check that the shop is configured correctly.';
+		$this->_info->testing		= 'Tests that the databse is correctly formed and that the appropriate CDN bucket exists.';
+		$this->_info->expecting		= 'Normal databases and presence of CDN buckets (if they don\'t exist, the test will attempt to create them).';
+
+		// --------------------------------------------------------------------------
+
+		return $this->_info;
+	}
 
 
 	// --------------------------------------------------------------------------
