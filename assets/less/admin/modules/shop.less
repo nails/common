@@ -933,6 +933,8 @@
 		td.max-po,
 		th.max-v,
 		td.max-v,
+		th.active,
+		td.active,
 		th.count,
 		td.count
 		{
@@ -940,6 +942,16 @@
 			text-align:center;
 		}
 
+
+		td.active.yes
+		{
+			background:#E0F2CB !important;
+		}
+
+		td.active.no
+		{
+			background:#FFEBE8 !important;
+		}
 
 		th.modified,
 		td.datetime
@@ -957,6 +969,31 @@
 				display:inline;
 				width:auto;
 				margin:0;
+			}
+		}
+	}
+}
+
+.group-shop.manage.index
+{
+	ul
+	{
+		li
+		{
+			display:inline-block;
+			margin-right:10px;
+			margin-bottom:10px;
+
+			a
+			{
+				.nifty-drop-shadow();
+				width:100px;
+				text-align:center;
+				.rounded(3px);
+				display:block;
+				border:1px solid #CCC;
+				background:#EFEFEF;
+				padding:25px 25px;
 			}
 		}
 	}

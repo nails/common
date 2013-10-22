@@ -259,6 +259,11 @@
 					$_checked = array_search( $range->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
 					echo '<option value="' . $range->id . '" ' . $_checked . '>';
+					if ( ! $range->is_active ) :
+
+						echo '[INACTIVE] ';
+
+					endif;
 					echo $range->label . ' - ' . word_limiter( $range->description, 25 );
 					echo '</option>';
 
@@ -282,6 +287,11 @@
 					$_checked = array_search( $collection->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
 					echo '<option value="' . $collection->id . '" ' . $_checked . '>';
+					if ( ! $collection->is_active ) :
+
+						echo '[INACTIVE] ';
+
+					endif;
 					echo $collection->label . ' - ' . word_limiter( $collection->description, 25 );
 					echo '</option>';
 

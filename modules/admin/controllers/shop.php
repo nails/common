@@ -52,6 +52,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
 		$d->funcs['sales']		= 'Manage Sales';				//	Sub-nav function.
+		$d->funcs['manage']		= 'Other Managers';				//	Sub-nav function.
 		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
 
 		// --------------------------------------------------------------------------
@@ -1577,7 +1578,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			case 'attributes' :			$this->_manage_attributes();			break;
 			case 'brands' :				$this->_manage_brands();				break;
 			case 'categories' :			$this->_manage_categories();			break;
-			case 'collections' :		$this->_manage_collections();				break;
+			case 'collections' :		$this->_manage_collections();			break;
 			case 'ranges' :				$this->_manage_ranges();				break;
 			case 'shipping_methods' :	$this->_manage_shipping_methods();		break;
 			case 'tags' :				$this->_manage_tags();					break;
@@ -1587,9 +1588,30 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			case 'index' :
-			default :					show_404();								break;
+			default :					$this->_manage_index();					break;
 
 		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _manage_index()
+	{
+		//	Page data
+		$this->data['page']->title = 'Manage';
+
+		if ( $this->input->get( 'is_fancybox' ) ) :
+
+			$this->data['header_override'] = 'structure/header/blank';
+			$this->data['footer_override'] = 'structure/footer/blank';
+
+		endif;
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/manage/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 
@@ -1615,6 +1637,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -1625,6 +1648,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->description		= $this->input->post( 'description' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+						$_data->is_active		= $this->input->post( 'is_active' );
 
 						if ( $this->attribute->create( $_data ) ) :
 
@@ -1658,6 +1682,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -1668,6 +1693,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: NULL;
 
 						if ( $this->attribute->update( $_id, $_data ) ) :
 
@@ -2027,16 +2053,129 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_collections()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_collection_model', 'collection' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+						$_data->is_active		= $this->input->post( 'is_active' );
+
+						if ( $this->collection->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Collection created successfully.' );
+							redirect( 'admin/shop/manage/collections?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Collection. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Collection.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
+
+						if ( $this->collection->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Collection saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Collection. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Collection.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->collection->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Collection was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Collection; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['collections'] = $this->collection->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Collections';
 
 		// --------------------------------------------------------------------------
 
@@ -2058,16 +2197,129 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _manage_ranges()
 	{
+		//	Load model
+		$this->load->model( 'shop/shop_range_model', 'range' );
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
-			dumpanddie( $_POST );
+			switch( $this->input->post( 'action' ) ) :
+
+				case 'create' :
+
+					$this->load->library( 'form_validation' );
+
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= $this->input->post( 'label' );
+						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_description	= $this->input->post( 'seo_description' );
+						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+						$_data->is_active		= (bool) $this->input->post( 'is_active' );
+
+						if ( $this->range->create( $_data ) ) :
+
+							//	Redirect to clear form
+							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Range created successfully.' );
+							redirect( 'admin/shop/manage/ranges?' . $_SERVER['QUERY_STRING'] );
+							return;
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Range. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'create';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Range.';
+						$this->data['show_tab']	= 'create';
+
+					endif;
+
+				break;
+
+				case 'edit' :
+
+					$this->load->library( 'form_validation' );
+
+					$_id = $this->input->post( 'id' );
+					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
+
+					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+					if ( $this->form_validation->run() ) :
+
+						$_data					= new stdClass();
+						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
+						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
+						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
+						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
+
+						if ( $this->range->update( $_id, $_data ) ) :
+
+							$this->data['success']	= '<strong>Success!</strong> Range saved successfully.';
+
+						else :
+
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Range. ' . $this->brand->last_error();
+							$this->data['show_tab']	= 'edit';
+
+						endif;
+
+					else :
+
+						$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Range.';
+						$this->data['show_tab']	= 'edit';
+
+					endif;
+
+				break;
+
+				case 'delete' :
+
+					$_id = $this->input->post( 'id' );
+					if ( $this->range->delete( $_id ) ) :
+
+						$this->data['success'] = '<strong>Success!</strong> Range was deleted successfully.';
+
+					else :
+
+						$this->data['error'] = '<strong>Sorry,</strong> there was a problem deleting the Range; it may be in use.';
+
+					endif;
+
+				break;
+
+			endswitch;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		//	TODO
+		$this->data['ranges'] = $this->range->get_all( TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Page data
+		$this->data['page']->title = 'Manage &rsaquo; Ranges';
 
 		// --------------------------------------------------------------------------
 
@@ -2078,40 +2330,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/manage/ranges',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _manage_shipping_methods()
-	{
-		if ( $this->input->post() ) :
-
-			dumpanddie( $_POST );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Fetch data
-		//	TODO
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->input->get( 'is_fancybox' ) ) :
-
-			$this->data['header_override'] = 'structure/header/blank';
-			$this->data['footer_override'] = 'structure/footer/blank';
-
-		endif;
-
-		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/shipping_methods',	$this->data );
-		$this->load->view( 'structure/footer',						$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 

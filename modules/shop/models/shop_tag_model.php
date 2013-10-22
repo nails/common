@@ -38,7 +38,7 @@ class NAILS_Shop_tag_model extends NAILS_Model
 
 		endif;
 
-		$this->db->order_by( 'label' );
+		$this->db->order_by( 't.label' );
 		$_result = $this->db->get( $this->_table . ' t' )->result();
 
 		foreach( $_result AS &$r ) :

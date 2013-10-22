@@ -114,7 +114,7 @@
 				else :
 					?>
 					<tr>
-						<td colspan="7" class="no-data">
+						<td colspan="8" class="no-data">
 							<p>No Orders found</p>
 						</td>
 					</tr>
