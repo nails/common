@@ -1,19 +1,19 @@
 <div class="search">
-	<div class="mask"><?=img( NAILS_URL . 'img/loader/30px-000000-TRANS.gif' )?></div>
+	<div class="mask"><?=img( NAILS_URL . 'img/loader/30px-TRANS.gif' )?></div>
 	<?php
-	
+
 		$_form = array(
 			'method'	=> 'GET'
 		);
 		echo form_open( NULL, $_form );
-		
+
 		// --------------------------------------------------------------------------
 
 		//	User
 		echo '<span class="label">';
 			echo '<span class="text">Show only events created by the following user(s):</span>';
 			echo '<select multiple="multiple" name="user_id[]" class="chosen user" data-placeholder="Choose some users. Leave blank to include all users.">';
-			
+
 			foreach ( $users AS $user ) :
 
 				$_selected = $this->input->get( 'user_id' ) && array_search( $user->id, $this->input->get( 'user_id' ) ) !== FALSE ? 'selected="selected"' : '';
@@ -101,11 +101,11 @@
 		$_url = $_SERVER['REQUEST_URI'];
 		$_url .= strpos( $_url, '?' ) !== FALSE ? '&dl=1' : '?dl=1';
 		echo anchor( $_url, 'Download as CSV', 'class="awesome small right"' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		echo form_close();
-	
+
 	?>
 </div>
 
@@ -139,6 +139,6 @@
 				}
 			}
 		});
-		
+
 	})
 </script>
