@@ -659,7 +659,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		do
 		{
-			$_slug = url_title( $label, 'dash', TRUE );
+			$_slug = url_title( str_replace( '/', '-', $label ), 'dash', TRUE );
 
 			if ( $_counter ) :
 

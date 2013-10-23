@@ -345,7 +345,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		$this->db->select( 'id' );
 		$this->db->where( 'parent_id', $category_id );
-		$_result = $this->db->get( NAILS_DB_PREFIX . 'shop_category' )->result();
+		$_result = $this->db->get( $this->_table )->result();
 
 		if ( $_result ) :
 
@@ -412,12 +412,16 @@ class NAILS_Shop_category_model extends NAILS_Model
 			if ( $_data->parent_id ) :
 
 				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug', $_parent->slug . '/' );
+
+				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
+				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
 				$_data->label_nested	= $_parent->label_nested . '|' . $_data->label;
 
 			else :
 
 				//	No parent, slug is just the label
 				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug' );
+				$_data->slug_end		= $_data->slug;
 				$_data->label_nested	= $_data->label;
 
 			endif;
@@ -486,11 +490,32 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 	public function update( $id, $data )
 	{
-		$_data = new stdClass();
+		//	Fetch the current category, incldue the children - we may need to
+		//	update them if the label changes
+
+		$_current = $this->get_by_id( $id );
+		$_children = $this->get_ids_of_all_children( $_current->id );
+
+		if ( ! $_current ) :
+
+			$this->_set_error( 'Invalid Category ID.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_data			= new stdClass();
+		$_regenerate	= FALSE;
 
 		if ( isset( $data->label ) ) :
 
-			$_data->label = strip_tags( $data->label );
+			if ( $_current->label !== $data->label ) :
+
+				$_data->label	= strip_tags( $data->label );
+				$_regenerate	= TRUE;
+
+			endif;
 
 		else :
 
@@ -501,13 +526,46 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		if ( isset( $data->parent_id ) ) :
 
-			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+			if ( $_current->parent_id != $data->parent_id ) :
 
-			//	TODO: work out new slug
+				$_data->parent_id	= ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+				$_regenerate		= TRUE;
 
-		else :
+			endif;
 
-			//	TODO: work out new slug
+		endif;
+
+		//	If we need to regenerate the slug then do so here
+		if ( $_regenerate ) :
+
+			//	Get the new slug prefix
+			if ( ! empty( $_data->parent_id ) ) :
+
+				$_parent = $this->get_by_id( $_data->parent_id );
+				if ( ! $_parent ) :
+
+					$this->_set_error( 'Invalid Parent ID.' );
+					return FALSE;
+
+				endif;
+
+				$_parent_slug			= $_parent->slug . '/';
+				$_parent_label_nested	= $_parent->label_nested . '|';
+
+			else :
+
+				$_parent_slug			= '';
+				$_parent_label_nested	= '';
+
+			endif;
+
+			//	Get new slug details
+			$_label					= isset( $_data->label ) ? $_data->label : $_current->label;
+			$_data->slug			= $this->_generate_slug( $_label, $this->_table, 'slug', $_parent_slug );
+
+			//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
+			$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent_slug ) . '#', '', $_data->slug );
+			$_data->label_nested	= $_parent_label_nested . $_label;
 
 		endif;
 
@@ -531,6 +589,9 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		if ( ! empty( (array) $_data ) ) :
 
+			//	Start the transaction
+			$this->db->trans_begin();
+
 			$this->db->set( $_data );
 			$this->db->set( 'modified', 'NOW()', FALSE );
 			$this->db->where( 'id', $id );
@@ -541,11 +602,55 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 			endif;
 
-			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_brand' ) ) :
+			if ( $this->db->update( $this->_table ) ) :
+
+				//	Regenerate anything? This may seem like magic, future Pabs, but we're just
+				//	glueing stuff together from the  other stuffs we made up there^^
+
+				if ( $_regenerate ) :
+
+					//	Update children's slugs and nested labels
+					$_children = $this->get_ids_of_all_children( $id );
+
+					if ( $_children ) :
+
+						$this->db->set( 'label_nested', 'CONCAT( "' . $_data->label_nested . '|", label )', FALSE );
+						$this->db->set( 'slug', 'CONCAT( "' . $_data->slug . '/", slug_end )', FALSE );
+						$this->db->where_in( 'id', $_children );
+						$this->db->update( $this->_table );
+
+						if ( $this->db->trans_status() !== FALSE ) :
+
+							$this->db->trans_commit();
+							return TRUE;
+
+						else :
+
+							$this->db->trans_rollback();
+							return FALSE;
+
+						endif;
+
+					else :
+
+						$this->db->trans_commit();
+						return TRUE;
+
+					endif;
+
+				else :
+
+					//	Complete, commit transaction
+					$this->db->trans_commit();
+
+				endif;
 
 				return TRUE;
 
 			else :
+
+				//	Failed, roll back
+				$this->db->trans_rollback();
 
 				return FALSE;
 
@@ -553,7 +658,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		else :
 
-			return FALSE;
+			return TRUE;
 
 		endif;
 	}
