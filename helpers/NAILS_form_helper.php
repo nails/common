@@ -629,36 +629,29 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 	function form_field_multiimage( $field, $help = '' )
 	{
 		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
-		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field_id			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field_type		= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field_oddeven		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field_key			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field_label		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field_default		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field_sub_label	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field_required	= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field_placeholder	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field_readonly	= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field_error		= isset( $field['error'] ) ? $field['error'] : FALSE;
+		$_field_bucket		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
+		$_field_class		= isset( $field['class'] ) ? $field['class'] : FALSE;
 
-		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
-		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
-		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
-		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
-
-		// --------------------------------------------------------------------------
-
-		//	Sanitize the key
-		$_field['key'] .= substr( $_field['key'], -2 ) != '[]' ? '[]' : '';
+		$_error			= form_error( $_field_key ) || $_field_error ? 'error' : '';
+		$_readonly		= $_field_readonly ? 'readonly="readonly"' : '';
+		$_readonly_cls	= $_field_readonly ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -667,88 +660,56 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 
 		// --------------------------------------------------------------------------
 
-		$_out  = '<div class="field multiimage ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
-		$_out .= '<label>';
+		//	Sanitize the key
+		$_field_key .= substr( $_field_key, -2 ) != '[]' ? '[]' : '';
 
-		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
+		// --------------------------------------------------------------------------
 
-		//	Does the field have an id?
-		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		//	Is the label required?
+		$_field_label .= $_field_required ? '*' : '';
 
-		//	Field
-		$_out .= '<span class="input">';
+		//	Prep sublabel
+		$_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
-		//	Set the default
-		$_field['default'] = set_value( $_field['key'], $_field['default'] );
+		// --------------------------------------------------------------------------
 
-		//	Uploadify not available error
-		$_out .= '<p class="system-alert error no-close" id="' . $_id . '-uploadify-not-available">';
-		$_out .= '<strong>Configuration Error.</strong> Uploadify is not available.';
-		$_out .= '</p>';
-
-		$_out .= '<div id="' . $_id . '-uploadify-available" style="display:none;">';
-
-		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		//	Set the defaults
+		$_field_default	= set_value( $_field_key, $_field_default );
+		$_default_html	= '';
 
 		//	Render any defaults
-		if ( is_array( $_field['default'] ) ) :
+		if ( is_array( $_field_default ) ) :
 
-			$_tipclass = $_help['title'] ? 'has-tip' : '';
-			$_out .= '<ul id="' . $_id . '-filelist" class="filelist ' . $_tipclass . '">';
-			foreach( $_field['default'] AS $file ) :
+			foreach( $_field_default AS $file ) :
 
-				$_out .= '<li class="item">';
-				$_out .= '<a href="#" class="delete"></a>';
-				$_out .= img( cdn_thumb( $file, 92, 92 ) );
-				$_out .= form_hidden( $_field['key'], $file );
-				$_out .= '</li>';
+				$_default_html .= '<li class="item">';
+				$_default_html .= '<a href="#" class="delete" data-object_id="' . $file . '"></a>';
+				$_default_html .= img( cdn_thumb( $file, 92, 92 ) );
+				$_default_html .= form_hidden( $_field_key, $file );
+				$_default_html .= '</li>';
 
 			endforeach;
-			$_out .= '</ul>';
-
-		else :
-
-			$_tipclass = $_help['title'] ? 'has-tip' : '';
-			$_out .= '<ul id="' . $_id . '-filelist" class="filelist ' . $_tipclass . '">';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
-			$_out .= '<li class="empty">No Images, add some now.</li>';
-			$_out .= '</ul>';
 
 		endif;
 
-		//	Show the upload button
-		$_out .= '<button id="' . $_id . '-uploadify">Choose Images</button>';
-
-		$_out .= '</div>';
-
+		// --------------------------------------------------------------------------
 
 		//	Error
-		if ( $_error && $_field['error'] ) :
+		if ( $_error && $_field_error ) :
 
-			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			$_error = '<span class="error">' . $_field_error . '</span>';
 
 		elseif( $_error ) :
 
-			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+			$_error = form_error( $_field_key, '<span class="error">', '</span>' );
 
 		endif;
 
-		$_out .= '</span>';
-		$_out .= '</label>';
-		$_out .= '</div>';
+		// --------------------------------------------------------------------------
+
+		//	Tip
+		$_tip				= $_help['title'] ? img( $_help ) : '';
+		$_filelist_class	= $_help['title'] ? 'has-tip ' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -758,9 +719,53 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		$_movie_url		= NAILS_URL . 'swf/jquery.uploadify/uploadify.swf';
 		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php' );
 		$_upload_token	= get_instance()->cdn->generate_api_upload_token();
-		$_bucket		= $_field['bucket'];
+		$_bucket		= $_field_bucket;
 
-$_out .= <<<EOT
+$_out = <<<EOT
+
+
+	<div class="field multiimage $_error $_field_oddeven $_readonly_cls $_field_type" id="$_id">
+		<label>
+			<span class="label">
+				$_field_label
+				$_field_sub_label
+			</span>
+			<span class="input">
+				<p class="system-alert error no-close" id="$_id-uploadify-not-available">
+					<strong>Configuration Error.</strong> Uploadify is not available.
+				</p>
+				<div id="$_id-uploadify-available" style="display:none;">
+					<ul id="$_id-filelist" class="filelist ">
+						$_default_html
+						<li class="empty">No Images, add some now.</li>
+					</ul>
+					<button id="$_id-uploadify">Choose Images</button>
+				</div>
+				$_error
+			<span>
+		</label>
+	</div>
+
+	<script type="text/template" id="$_id-template-uploadify">
+		<li class="item uploadify-queue-item" id="$_id-\${fileID}" data-instance_id="\${instanceID}" data-file_id="\${fileID}">
+			<a href="#" data-instance_id="\${instanceID}" data-file_id="\${fileID}" class="remove"></a>
+			<div class="progress" style="height:0%"></div>
+			<div class="data data-cancel">CANCELLED</div>
+		</li>
+	</script>
+	<script type="text/template" id="$_id-template-item">
+		<li class="item crunching">
+			<div class="crunching"></div>
+			<input type="hidden" name="$_field_key" />
+		</li>
+	</script>
+	<div id="$_id-dialog-confirm-delete" title="Confirm Delete" style="display:none;">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
+			This item will be removed from the interface and cannot be recovered.
+			<strong>Are you sure?</strong>
+		</p>
+	</div>
 
 	<script type="text/javascript">
 
@@ -774,7 +779,7 @@ $_out .= <<<EOT
 		$( '#$_id-uploadify' ).uploadify(
 		{
 			'debug': false,
-			'auto': false,
+			'auto': true,
 			'swf': '$_movie_url',
 			'uploader': '$_upload_url',
 			'fileObjName': 'upload',
@@ -784,9 +789,9 @@ $_out .= <<<EOT
 			{
 				'token': '$_upload_token',
 				'bucket': '$_bucket',
-				'return': 'URL|THUMB|100x100,34x34'
+				'return': 'URL|THUMB|92x92'
 			},
-			'itemTemplate': '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>',
+			'itemTemplate': $('#$_id-template-uploadify').html(),
 			'onSelect': function()
 			{
 				if ( $( '#$_id-filelist li' ).length )
@@ -794,6 +799,101 @@ $_out .= <<<EOT
 					$('#$_id-filelist').removeClass( 'empty' );
 				}
 			},
+			'onUploadStart': function()
+			{
+				window.onbeforeunload = function()
+				{
+					return 'Uploads are in progress. Leaving this page will cause them to stop.';
+				};
+
+				//	Disable tabs - SWFUpload aborts uploads if it is hidden.
+				$('ul.tabs li a').addClass('disabled');
+			},
+			'onQueueComplete': function()
+			{
+				window.onbeforeunload = null;
+				$('ul.tabs li a').removeClass('disabled');
+			},
+			'onUploadProgress': function(file, bytesUploaded, bytesTotal)
+			{
+				var _percent = bytesUploaded / bytesTotal * 100;
+				$('#$_id-' + file.id + ' .progress').css('height', _percent + '%');
+			},
+			'onUploadSuccess': function(file, data)
+			{
+				var _data = JSON.parse(data);
+
+				// --------------------------------------------------------------------------
+
+				var _html = $.trim($('#$_id-template-item').html());
+				var _item = $($.parseHTML(_html));
+
+				_item.attr('id', '$_id-' + file.id + '-complete');
+				$('#$_id-' + file.id).replaceWith(_item);
+
+				// --------------------------------------------------------------------------
+
+				var _target = $('#$_id-' + file.id + '-complete');
+
+				if (!_target.length)
+				{
+					_html = $.trim($('#$_id-template-item').html());
+					_item = $($.parseHTML(_html));
+
+					_item.attr('id', '$_id-' + file.id + '-complete');
+					$('#' + file.id).replaceWith(_item);
+
+					_target = $('#$_id-' + file.id + '-complete');
+				}
+
+				// --------------------------------------------------------------------------
+
+				//	Switch the response code
+				if (_data.status === 200)
+				{
+					//	Insert the image
+					var _img = $('<img>').attr('src', _data.object_url[0]).on('load', function() {
+						_target.removeClass('crunching');
+					});
+					var _del = $('<a>').attr({
+						'href': '#',
+						'class': 'delete',
+						'data-object_id': _data.object_id
+					});
+
+					_target.append(_img).append(_del).find('input').val(_data.object_id);
+
+				}
+				else
+				{
+					//	An error occurred
+					var _filename = $('<p>').addClass('filename').text(file.name);
+					var _message = $('<p>').addClass('message').text(_data.error);
+
+					_target.addClass('error').append(_filename).append(_message).removeClass('crunching');
+				}
+			},
+			'onUploadError': function(file, errorCode, errorMsg, errorString)
+			{
+				var _target = $('#$_id-' + file.id + '-complete');
+
+				if (!_target.length)
+				{
+					var _html = $.trim($('#$_id-template-item').html());
+					var _item = $($.parseHTML(_html));
+
+					_item.attr('id', '$_id-' + file.id + '-complete');
+					$('#$_id-' + file.id).replaceWith(_item);
+
+					_target = $('#$_id-' + file.id + '-complete');
+				}
+
+				var _filename = $('<p>').addClass('filename').text(file.name);
+				var _message = $('<p>').addClass('message').text(errorString);
+
+				_target.addClass('error').append(_filename).append(_message).removeClass('crunching');
+			}
+
 		});
 
 		if ( typeof( $.fn.sortable ) === 'function' )
@@ -803,6 +903,87 @@ $_out .= <<<EOT
 				items: "li.item"
 			});
 		}
+
+		//	Remove an item from the queue
+		$(document).on('click', '#$_id-filelist .item .remove', function()
+		{
+			var _instance_id = $(this).data('instance_id');
+			var _file_id = $(this).data('file_id');
+
+			$('#$_id-' + _instance_id).uploadify('cancel', _file_id);
+			$('#$_id-' + _file_id + ' .data-cancel').text('Cancelled').show();
+			$('#$_id-' + _file_id).addClass('cancelled');
+
+			if ($('#$_id-filelist li.item:not(.cancelled)').length === 0)
+			{
+				$('#$_id-filelist').addClass('empty');
+				$('#$_id-filelist li.empty').css('opacity', 0).delay(1000).animate({
+					opacity: 1
+				}, 250);
+			}
+
+			return false;
+
+		});
+
+		//	Deletes an uploaded image
+		$(document).on('click', '#$_id-filelist .item .delete', function()
+		{
+			var _object = this;
+
+			$('#$_id-dialog-confirm-delete').dialog(
+			{
+				resizable: false,
+				draggable: false,
+				modal: true,
+				dialogClass: "no-close",
+				buttons:
+				{
+					"Delete Image": function()
+					{
+						var _object_id = $(_object).data('object_id');
+
+						//	Send off the delete request
+						var _call = {
+							'controller'	: 'cdnapi',
+							'method'		: 'object_delete',
+							'action'		: 'POST',
+							'data'			:
+							{
+								'object_id': _object_id
+							}
+						};
+						window.NAILS.API.call(_call);
+
+						// --------------------------------------------------------------------------
+
+						$(_object).closest('li.item').addClass('deleted').fadeOut('slow', function()
+						{
+							$(_object).remove();
+						});
+
+						// --------------------------------------------------------------------------
+
+						//	Show the empty screens
+						if ($('#$_id-filelist li.item:not(.deleted)').length === 0)
+						{
+							$('#$_id-filelist').addClass('empty');
+						}
+
+						// --------------------------------------------------------------------------
+
+						//	Close dialog
+						$(this).dialog("close");
+					},
+					Cancel: function()
+					{
+						$(this).dialog("close");
+					}
+				}
+			});
+
+			return false;
+		});
 	}
 
 	</script>
