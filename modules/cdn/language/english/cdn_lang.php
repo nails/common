@@ -19,11 +19,9 @@
 	$lang['cdn_error_bucket_insert']		= 'Failed to create bucket record.';
 	$lang['cdn_error_bucket_unlink']		= 'Failed to destroy bucket.';
 	$lang['cdn_error_bucket_invalid']		= 'Not a valid bucket';
-	$lang['cdn_error_bucket_nopermission']	= 'You do not have permission to modify that bucket.';
 
 	//	Object Errors
 	$lang['cdn_error_object_invalid']		= 'Not a valid object';
-	$lang['cdn_error_object_nopermission']	= 'You do not have permission to modify that object.';
 
 	//	Object Upload Errors
 	$lang['cdn_stream_content_type']		= 'A Content-Type must be defined for data stream uploads.';

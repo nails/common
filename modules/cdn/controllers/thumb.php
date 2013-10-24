@@ -44,7 +44,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 	public function __construct()
 	{
 		parent::__construct();
-
+here();
 		// --------------------------------------------------------------------------
 
 		//	Determine dynamic values

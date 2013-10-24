@@ -448,7 +448,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			'uploader': SITE_URL + 'api/cdnapi/object_create/script.php',
 			'fileSizeLimit': 2048,
 			'fileObjName': 'upload',
-			'fileTypeExts': '*.gif; *.jpg; *.png',
+			'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',
 			'formData': {
 				'token': this.upload_token,
 				'bucket': 'shop-product-images',

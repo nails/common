@@ -76,7 +76,14 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Move the file
-		if ( move_uploaded_file( $sourcefile, DEPLOY_CDN_PATH . $bucket . '/' . $filename ) ) :
+		$_dest = DEPLOY_CDN_PATH . $bucket . '/' . $filename;
+
+		if ( move_uploaded_file( $sourcefile, $_dest ) ) :
+
+			return TRUE;
+
+		//	Hmm, failed to move, try copying it.
+		elseif( copy( $sourcefile, $_dest ) ) :
 
 			return TRUE;
 
@@ -100,7 +107,7 @@ class Local_CDN
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_delete( $object, $bucket )
+	public function object_destroy( $object, $bucket )
 	{
 		$_file		= urldecode( $object );
 		$_bucket	= urldecode( $bucket );
@@ -181,9 +188,9 @@ class Local_CDN
 	// --------------------------------------------------------------------------
 
 
-	public function bucket_delete( $bucket )
+	public function bucket_destroy( $bucket )
 	{
-		if ( @unlink( DEPLOY_CDN_PATH . $bucket ) ) :
+		if ( rmdir( DEPLOY_CDN_PATH . $bucket ) ) :
 
 			return TRUE;
 

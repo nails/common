@@ -10,5 +10,12 @@
 
 		endif;
 
+		$_field				= array();
+		$_field['label']	= 'Some Images';
+		$_field['key']		= 'someimages';
+		$_field['bucket']	= 'some-bucket';
+		$_field['default']	= array( 10,11,12);
+		echo form_field_multiimage( $_field );
+
 	?>
 </div>

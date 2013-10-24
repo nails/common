@@ -85,6 +85,7 @@ class NAILS_Test extends NAILS_System_Controller
 		else :
 
 			$this->_tests[] = module_is_enabled( 'shop' ) ? 'shop' : NULL;
+			$this->_tests[] = module_is_enabled( 'cdn' ) ? 'cdn' : NULL;
 			$this->_tests[] = 'canwritedirs';
 			$this->_tests[] = 'cansendemail';
 
@@ -418,6 +419,44 @@ class NAILS_Test extends NAILS_System_Controller
 	// --------------------------------------------------------------------------
 
 
+	protected function _test_cdn()
+	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+
+		// --------------------------------------------------------------------------
+
+		//	Execute tests
+		$this->load->library( 'cdn' );
+		if ( ! $this->cdn->run_tests() ) :
+
+			$this->_result->pass	= FALSE;
+			$this->_result->errors	= $this->cdn->get_errors();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $this->_result;
+	}
+
+	protected function _info_cdn()
+	{
+		$this->_info->label			= 'CDN is functioning correctly';
+		$this->_info->description	= 'This test will check that the CDN is configured correctly and functioning.';
+		$this->_info->testing		= 'Tests that each bucket is configured correcty and that a small file can be written, moved, copied, deleted then destroyed.';
+		$this->_info->expecting		= 'All buckets to exist and be writeable.';
+
+		// --------------------------------------------------------------------------
+
+		return $this->_info;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _test_canwritedirs()
 	{
 		//	Reset result
@@ -436,25 +475,6 @@ class NAILS_Test extends NAILS_System_Controller
 		if ( defined( 'DEPLOY_CACHE_DIR' ) ) :
 
 			$_dirs[]	= DEPLOY_CACHE_DIR;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Check CDN buckets/dirs
-		if ( module_is_enabled( 'cdn' ) && APP_CDN_DRIVER == 'LOCAL' ) :
-
-			$_dirs[]	= DEPLOY_CDN_PATH;
-
-			//	Get all the buckets and check that directories exist and are writable
-			$this->load->library( 'cdn' );
-			$_buckets = $this->cdn->get_buckets();
-
-			foreach ( $_buckets AS $bucket ) :
-
-				$_dirs[] = DEPLOY_CDN_PATH . $bucket->slug . '/';
-
-			endforeach;
 
 		endif;
 

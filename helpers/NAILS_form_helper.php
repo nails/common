@@ -624,6 +624,201 @@ EOT;
 
 // --------------------------------------------------------------------------
 
+if ( ! function_exists( 'form_field_multiimage' ) )
+{
+	function form_field_multiimage( $field, $help = '' )
+	{
+		//	Set var defaults
+		$_field					= array();
+		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
+		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
+		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+
+		$_help			= array();
+		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
+		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+
+		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
+		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+
+		// --------------------------------------------------------------------------
+
+		//	Sanitize the key
+		$_field['key'] .= substr( $_field['key'], -2 ) != '[]' ? '[]' : '';
+
+		// --------------------------------------------------------------------------
+
+		//	Generate a unique ID for this field
+		$_id = 'field_multiimage_' . md5( microtime() );
+
+		// --------------------------------------------------------------------------
+
+		$_out  = '<div class="field multiimage ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
+		$_out .= '<label>';
+
+		//	Label
+		$_out .= '<span class="label">';
+		$_out .= $_field['label'];
+		$_out .= $_field['required'] ? '*' : '';
+		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+		$_out .= '</span>';
+
+		//	Does the field have an id?
+		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+		//	Field
+		$_out .= '<span class="input">';
+
+		//	Set the default
+		$_field['default'] = set_value( $_field['key'], $_field['default'] );
+
+		//	Uploadify not available error
+		$_out .= '<p class="system-alert error no-close" id="' . $_id . '-uploadify-not-available">';
+		$_out .= '<strong>Configuration Error.</strong> Uploadify is not available.';
+		$_out .= '</p>';
+
+		$_out .= '<div id="' . $_id . '-uploadify-available" style="display:none;">';
+
+		//	Tip
+		$_out .= $_help['title'] ? img( $_help ) : '';
+
+		//	Render any defaults
+		if ( is_array( $_field['default'] ) ) :
+
+			$_tipclass = $_help['title'] ? 'has-tip' : '';
+			$_out .= '<ul id="' . $_id . '-filelist" class="filelist ' . $_tipclass . '">';
+			foreach( $_field['default'] AS $file ) :
+
+				$_out .= '<li class="item">';
+				$_out .= '<a href="#" class="delete"></a>';
+				$_out .= img( cdn_thumb( $file, 92, 92 ) );
+				$_out .= form_hidden( $_field['key'], $file );
+				$_out .= '</li>';
+
+			endforeach;
+			$_out .= '</ul>';
+
+		else :
+
+			$_tipclass = $_help['title'] ? 'has-tip' : '';
+			$_out .= '<ul id="' . $_id . '-filelist" class="filelist ' . $_tipclass . '">';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>';
+			$_out .= '<li class="empty">No Images, add some now.</li>';
+			$_out .= '</ul>';
+
+		endif;
+
+		//	Show the upload button
+		$_out .= '<button id="' . $_id . '-uploadify">Choose Images</button>';
+
+		$_out .= '</div>';
+
+
+		//	Error
+		if ( $_error && $_field['error'] ) :
+
+			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+
+		elseif( $_error ) :
+
+			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+
+		endif;
+
+		$_out .= '</span>';
+		$_out .= '</label>';
+		$_out .= '</div>';
+
+		// --------------------------------------------------------------------------
+
+		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		get_instance()->load->library( 'cdn' );
+
+		$_movie_url		= NAILS_URL . 'swf/jquery.uploadify/uploadify.swf';
+		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php' );
+		$_upload_token	= get_instance()->cdn->generate_api_upload_token();
+		$_bucket		= $_field['bucket'];
+
+$_out .= <<<EOT
+
+	<script type="text/javascript">
+
+	if ( typeof( $.fn.uploadify ) === 'function' )
+	{
+		$( '#$_id-uploadify-not-available' ).hide();
+		$( '#$_id-uploadify-available' ).show();
+
+		// --------------------------------------------------------------------------
+
+		$( '#$_id-uploadify' ).uploadify(
+		{
+			'debug': false,
+			'auto': false,
+			'swf': '$_movie_url',
+			'uploader': '$_upload_url',
+			'fileObjName': 'upload',
+			'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',
+			'queueID': '$_id-filelist',
+			'formData':
+			{
+				'token': '$_upload_token',
+				'bucket': '$_bucket',
+				'return': 'URL|THUMB|100x100,34x34'
+			},
+			'itemTemplate': '<li class="item"><a href="#" class="delete"></a><div class="progress"></div></li>',
+			'onSelect': function()
+			{
+				if ( $( '#$_id-filelist li' ).length )
+				{
+					$('#$_id-filelist').removeClass( 'empty' );
+				}
+			},
+		});
+
+		if ( typeof( $.fn.sortable ) === 'function' )
+		{
+			$('#$_id-filelist').disableSelection().sortable({
+				placeholder: 'item placeholder',
+				items: "li.item"
+			});
+		}
+	}
+
+	</script>
+
+EOT;
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
+	}
+}
+
+
+
+// --------------------------------------------------------------------------
+
 
 /**
  * form_field_date

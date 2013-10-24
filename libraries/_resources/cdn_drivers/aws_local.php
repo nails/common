@@ -165,14 +165,21 @@ class Aws_local_CDN
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_delete( $object, $bucket )
+	public function object_destroy( $object, $bucket )
 	{
 		try
 		{
-			$_result = $this->_s3->deleteObject(array(
-				'Bucket'	=> $this->_bucket,
-				'Key'		=> $bucket . '/' . $object
-			));
+
+			$_filename	= strtolower( substr( $object, 0, strrpos( $object, '.' ) ) );
+			$_extension	= strtolower( substr( $object, strrpos( $object, '.' ) ) );
+
+			$_options				= array();
+			$_options['Bucket']		= $this->_bucket;
+			$_options['Objects']	= array();
+			$_options['Objects'][]	= array( 'Key' => $bucket . '/' . $_filename . $_extension );
+			$_options['Objects'][]	= array( 'Key' => $bucket . '/' . $_filename . '-download' . $_extension );
+
+			$_result = $this->_s3->deleteObjects( $_options );
 
 			return TRUE;
 		}
@@ -234,9 +241,19 @@ class Aws_local_CDN
 	// --------------------------------------------------------------------------
 
 
-	public function bucket_delete( $bucket )
+	public function bucket_destroy( $bucket )
 	{
-		//	TODO
+		try
+		{
+			$_result = $this->_s3->deleteMatchingObjects( $this->_bucket, $bucket . '/' );
+
+			return TRUE;
+		}
+		catch ( Exception $e )
+		{
+			$this->cdn->set_error( 'AWS-SDK ERROR: ' . $e->getMessage() );
+			return FALSE;
+		}
 	}
 
 

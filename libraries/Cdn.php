@@ -132,9 +132,9 @@ class Cdn {
 
 	private function _include_driver()
 	{
-		switch ( strtolower( APP_CDN_DRIVER ) ) :
+		switch ( strtoupper( APP_CDN_DRIVER ) ) :
 
-			case 'aws_local' :
+			case 'AWS_LOCAL' :
 
 				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/aws_local.php';
 				return 'Aws_local_CDN';
@@ -143,7 +143,7 @@ class Cdn {
 
 			// --------------------------------------------------------------------------
 
-			case 'local':
+			case 'LOCAL':
 			default:
 
 				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/local.php';
@@ -327,12 +327,44 @@ class Cdn {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	protected function _unset_cache_object( $object )
+	protected function _unset_cache_object( $object, $clear_cachedir = TRUE )
 	{
 		$this->_unset_cache( 'object-' . $object->id );
 		$this->_unset_cache( 'object-' . $object->filename );
 		$this->_unset_cache( 'object-' . $object->filename . '-' . $object->bucket->id );
 		$this->_unset_cache( 'object-' . $object->filename . '-' . $object->bucket->slug );
+
+		// --------------------------------------------------------------------------
+
+		//	Clear out any
+		if ( $clear_cachedir ) :
+
+			// Create a handler for the directory
+			$_bucket	= $object->bucket->slug;
+			$_object	= $object->filename;
+
+			$_pattern	= '#^' . $_bucket . '-' . substr( $_object, 0, strrpos( $_object, '.' ) ) . '#';
+			$_fh		= opendir( DEPLOY_CACHE_DIR );
+
+			// Open directory and walk through the filenames
+			while ( $file = readdir( $_fh ) ) :
+
+				// If file isn't this directory or its parent, add it to the results
+				if ( $file != '.' && $file != '..' ) :
+
+					// Check with regex that the file format is what we're expecting and not something else
+					if( preg_match( $_pattern, $file ) ) :
+
+						// add to our file array for later use
+						@unlink( DEPLOY_CACHE_DIR . $file );
+
+					endif;
+
+				endif;
+
+			endwhile;
+
+		endif;
 	}
 
 
@@ -784,16 +816,6 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		//	Does the user have permission to write to the bucket?
-		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-
-			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Is this an acceptable file? Check against the allowed_types array (if present)
 
 		$_ext = $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
@@ -805,7 +827,7 @@ class Cdn {
 			//	Also override the mime type
 
 			//	Makka sense? Hate M$.
-			$_user_ext = substr( $_FILES[$object]['name'], strrpos( $_FILES[$object]['name'], '.' ) + 1 );
+			$_user_ext = substr( $_name, strrpos( $_name, '.' ) + 1 );
 
 			switch ( $_ext ) :
 
@@ -1000,7 +1022,7 @@ class Cdn {
 
 		if ( isset( $options['filename'] ) && $options['filename'] == 'USE_ORIGINAL' ) :
 
-			$_data->filename =  $_FILES[$object]['name'];
+			$_data->filename =  $_name;
 
 		elseif ( isset( $options['filename'] ) && $options['filename'] ) :
 
@@ -1084,18 +1106,6 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-
-		if ( ! $this->_can_edit_object( $_object ) ) :
-
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		$_data						= array();
 		$_data['id']				= $_object->id;
 		$_data['bucket_id']			= $_object->bucket->id;
@@ -1173,18 +1183,6 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-
-		if ( ! $this->_can_edit_object( $_object ) ) :
-
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		$_data						= array();
 		$_data['id']				= $_object->id;
 		$_data['bucket_id']			= $_object->bucket->id;
@@ -1246,9 +1244,9 @@ class Cdn {
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function object_destroy( $object )
+	public function object_destroy( $object_id )
 	{
-		if ( ! $object ) :
+		if ( ! $object_id ) :
 
 			$this->set_error( lang( 'cdn_error_object_invalid' ) );
 			return FALSE;
@@ -1257,34 +1255,55 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		$_object = $this->get_object( $object );
+		$_object = $this->get_object( $object_id );
 
-		if ( ! $_object ) :
+		if ( $_object ) :
 
-			$this->set_error( lang( 'cdn_error_object_invalid' ) );
-			return FALSE;
+			//	Delete the object first
+			if ( ! $this->object_delete( $_object->id ) ) :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			//	Object doesn't exist but may exist in the trash
+			$_object = $this->get_object_from_trash( $object_id );
+
+			if ( ! $_object ) :
+
+				$this->set_error( 'Nothing to destroy.' );
+				return FALSE;
+
+			endif;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
+		//	Attempt to remove the file
+		if ( $this->_cdn->object_destroy( $_object->filename, $_object->bucket->slug ) ) :
 
-		if ( ! $this->_can_edit_object( $_object ) ) :
+			//	Remove the database entries
+			$this->db->trans_begin();
 
-			$this->set_error( lang( 'cdn_error_object_nopermission' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->_cdn->object_delete( $_object->filename, $_object->bucket->slug ) ) :
-
-			//	Remove the database entry
 			$this->db->where( 'id', $_object->id );
 			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object' );
+
+			$this->db->where( 'id', $_object->id );
+			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object_trash' );
+
+			if ( $this->db->trans_status() === FALSE ) :
+
+				$this->db->trans_rollback();
+				return FALSE;
+
+			else :
+
+				$this->db->trans_commit();
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
@@ -1417,18 +1436,6 @@ class Cdn {
 
 		// --------------------------------------------------------------------------
 
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-
-		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
-
-			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Test if tag has already been applied to the object, if it has gracefully fail
 		$this->db->where( 'object_id', $_object->id );
 		$this->db->where( 'tag_id', $_tag->id );
@@ -1482,18 +1489,6 @@ class Cdn {
 		if ( ! $_tag ) :
 
 			$this->set_error( lang( 'cdn_error_tag_invalid' ) );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Can the user modify the bucket/objects? Admins always can but if the bucket
-		//	has a user then the current user must be the owner
-
-		if ( ! $this->_can_edit_bucket( $_tag->bucket_id ) ) :
-
-			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
 
 		endif;
@@ -1776,63 +1771,6 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Determines whether the specified user can edit an object
-	 *
-	 * @access	private
-	 * @param	mixed	$object		The object to format
-	 * @param	int		$user_id	The ID of the user to check against
-	 * @return	boolean
-	 * @author	Pablo
-	 **/
-	private function _can_edit_object( $object, $user_id = NULL )
-	{
-		if ( is_numeric( $object ) || is_string( $object ) ) :
-
-			$_object = $this->get_object( $object );
-
-		else :
-
-			$_object = $object;
-
-		endif;
-
-		if ( is_null( $user_id ) ) :
-
-			$_user = active_user();
-
-		else :
-
-			$_user = get_userobject()->get_by_id( $user_id );
-
-		endif;
-
-		$_usrobj =& get_userobject();
-
-		// --------------------------------------------------------------------------
-
-		//	Admins can always read/write to objects
-		if ( $_usrobj->is_admin( $_user ) ) :
-
-			return TRUE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_object->creator->id || $_object->creator->id == $_user->id ) :
-
-			return TRUE;
-
-		endif;
-
-		return FALSE;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	/*	! BUCKET METHODS */
 
 
@@ -1854,7 +1792,7 @@ class Cdn {
 		$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX . 'cdn_object WHERE bucket_id = b.id) object_count' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = b.created_by', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = b.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = b.created_by AND ue.is_primary = 1', 'LEFT' );
 
 		$_buckets = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket b' )->result();
 
@@ -2044,10 +1982,55 @@ class Cdn {
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function bucket_delete( $bucket )
+	public function bucket_destroy( $bucket )
 	{
-		//	TODO: Delete a bucket and its contents
-		return FALSE;
+		$_bucket = $this->get_bucket( $bucket, TRUE );
+
+		if ( ! $_bucket ) :
+
+			$this->set_error( lang( 'cdn_error_bucket_invalid' ) );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Destroy any containing objects
+		$_errors = 0;
+		foreach( $_bucket->objects AS $obj ) :
+
+			if ( ! $this->object_destroy( $obj->id ) ) :
+
+				$this->set_error( 'Unable to delete object "' . $obj->filename_display . '" (ID:' . $obj->id . ').' );
+				$_errors++;
+
+			endif;
+
+		endforeach;
+
+		if ( $_errors ) :
+
+			$this->set_error( 'Unable to delete bucket, bucket not empty.' );
+			return FALSE;
+
+		else :
+
+			//	Remove the bucket
+			if ( $this->_cdn->bucket_destroy( $_bucket->slug ) ) :
+
+				$this->db->where( 'id', $_bucket->id );
+				$this->db->delete( NAILS_DB_PREFIX . 'cdn_bucket' );
+
+				return TRUE;
+
+			else :
+
+				$this->set_error( 'Unable to remove empty bucket directory.' );
+				return FALSE;
+
+			endif;
+
+		endif;
 	}
 
 
@@ -2089,16 +2072,6 @@ class Cdn {
 		if ( ! $_bucket ) :
 
 			$this->set_error( lang( 'cdn_error_bucket_invalid' ) );
-			return FALSE;
-
-		endif;
-
-		//	If the bucket has an owner/user then only the owner user can add tags to the bucket
-		//	Administrators can add to any bucket
-
-		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-
-			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
 
 		endif;
@@ -2154,16 +2127,6 @@ class Cdn {
 		if ( ! $_bucket ) :
 
 			$this->set_error( lang( 'cdn_error_bucket_invalid' ) );
-			return FALSE;
-
-		endif;
-
-		//	If the bucket has an owner/user then only the owner user can delete tags from the bucket
-		//	Administrators can add to any bucket
-
-		if ( ! $this->_can_edit_bucket( $_bucket ) ) :
-
-			$this->set_error( lang( 'cdn_error_bucket_nopermission' ) );
 			return FALSE;
 
 		endif;
@@ -2265,54 +2228,6 @@ class Cdn {
 		unset( $bucket->email );
 		unset( $bucket->profile_img );
 		unset( $bucket->gender );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _can_edit_bucket( $bucket, $user_id = NULL )
-	{
-		if ( is_numeric( $bucket ) || is_string( $bucket ) ) :
-
-			$_bucket = $this->get_bucket( $bucket );
-
-		else :
-
-			$_bucket = $bucket;
-
-		endif;
-
-		if ( is_null( $user_id ) ) :
-
-			$_user = active_user();
-
-		else :
-
-			$_user = get_userobject()->get_by_id( $user_id );
-
-		endif;
-
-		$_usrobj =& get_userobject();
-
-		// --------------------------------------------------------------------------
-
-		//	Admins can always read/write to buckets
-		if ( $_usrobj->is_admin( $_user ) ) :
-
-			return TRUE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_bucket->creator->id || $_bucket->creator->id == $_user->id ) :
-
-			return TRUE;
-
-		endif;
-
-		return FALSE;
 	}
 
 
@@ -3019,6 +2934,224 @@ class Cdn {
 
 		//	If we got here then the token is valid
 		return $_user;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function run_tests()
+	{
+		//	If defined, run the pre_test method for the driver
+		$_result = TRUE;
+		if ( method_exists( $this->_cdn, 'pre_test' ) ) :
+
+			call_user_func( array( $this->_cdn, 'pre_test' ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Run tests
+		$this->_ci->load->library( 'curl' );
+
+		// --------------------------------------------------------------------------
+
+		//	Create a test bucket
+		$_test_id			= md5( microtime( TRUE ) . uniqid() );
+		$_test_bucket		= 'test-' . $_test_id;
+		$_test_bucket_id	= $this->bucket_create( $_test_bucket, $_test_bucket );
+
+		if ( ! $_test_bucket_id ) :
+
+			$this->set_error( 'Failed to create a new bucket.' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch and test all buckets
+		$_buckets = $this->get_buckets();
+
+		foreach ( $_buckets AS $bucket ) :
+
+			//	Can fetch bucket by ID?
+			$_bucket = $this->get_bucket( $bucket->id );
+
+			if( ! $_bucket ) :
+
+				$this->set_error( 'Unable to fetch bucket by ID; ID: ' . $bucket->id );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can fetch bucket by slug?
+			$_bucket = $this->get_bucket( $bucket->slug );
+
+			if( ! $_bucket ) :
+
+				$this->set_error( 'Unable to fetch bucket by slug; slug: ' . $bucket->slug );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we write a small image to the bucket?
+			$_file = NAILS_PATH . 'assets/tests/cdn/pablo.jpg';
+
+			//	Copy this file temporarily to the cache
+			$_cachefile = DEPLOY_CACHE_DIR . 'test-' . $bucket->slug . '-' . $_test_id . '.jpg';
+
+			if ( ! copy( $_file, $_cachefile ) ) :
+
+				$this->set_error( 'Unable to create temporary cache file.' );
+				continue;
+
+			endif;
+
+			$_upload = $this->object_create( $_cachefile, $_bucket->id );
+
+			if ( ! $_upload ) :
+
+				$this->set_error( 'Unable to create a new object in bucket "' . $bucket->id . ' / ' . $bucket->slug . '"' );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we serve the object?
+			$_url = $this->url_serve( $_upload->id );
+
+			if ( ! $_url ) :
+
+				$this->set_error( 'Unable to generate serve URL for uploaded file' );
+				continue;
+
+			endif;
+
+			$_test	= $this->_ci->curl->simple_get( $_url );
+			$_code	= ! empty( $this->_ci->curl->info['http_code'] ) ? $this->_ci->curl->info['http_code'] : '';
+
+			if ( ! $_test || $_code != 200 ) :
+
+				$this->set_error( 'Failed to serve object with 200 OK (' . $bucket->slug . ' / ' . $_upload->filename . ').<small>' . $_url . '</small>' );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we thumb the object?
+			$_url = $this->url_thumb( $_upload->id, 10, 10 );
+
+			if ( ! $_url ) :
+
+				$this->set_error( 'Unable to generate thumb URL for object.' );
+				continue;
+
+			endif;
+
+			$_test	= $this->_ci->curl->simple_get( $_url );
+			$_code	= ! empty( $this->_ci->curl->info['http_code'] ) ? $this->_ci->curl->info['http_code'] : '';
+
+			if ( ! $_test || $_code != 200 ) :
+
+				$this->set_error( 'Failed to thumb object with 200 OK (' . $bucket->slug . ' / ' . $_upload->filename . ').<small>' . $_url . '</small>' );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we scale the object?
+			$_url = $this->url_scale( $_upload->id, 10, 10 );
+
+			if ( ! $_url ) :
+
+				$this->set_error( 'Unable to generate scale URL for object.' );
+				continue;
+
+			endif;
+
+			$_test	= $this->_ci->curl->simple_get( $_url );
+			$_code	= ! empty( $this->_ci->curl->info['http_code'] ) ? $this->_ci->curl->info['http_code'] : '';
+
+			if ( ! $_test || $_code != 200 ) :
+
+				$this->set_error( 'Failed to scale object with 200 OK (' . $bucket->slug . ' / ' . $_upload->filename . ').<small>' . $_url . '</small>' );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we delete the object?
+			$_test = $this->object_delete( $_upload->id );
+
+			if ( ! $_test ) :
+
+				$this->set_error( 'Unable to delete test object (' . $bucket->slug . '/' . $_upload->filename . '; ID: ' . $_upload->id . ').' );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Can we destroy the object?
+			$_test = $this->object_destroy( $_upload->id );
+
+			if ( ! $_test ) :
+
+				$this->set_error( 'Unable to destroy test object (' . $bucket->slug . '/' . $_upload->filename . '; ID: ' . $_upload->id . ').' );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Delete the cache files
+			if ( ! @unlink( $_cachefile ) ) :
+
+				$this->set_error( 'Unable to delete temporary cache file: ' . $_cachefile );
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Attempt to destroy the test bucket
+		$_test = $this->bucket_destroy( $_test_bucket_id );
+
+		if ( ! $_test ) :
+
+			$this->set_error( 'Unable to destroy test bucket: ' . $_test_bucket_id );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	If defined, run the post_test method fo the driver
+		if ( method_exists( $this->_cdn, 'post_test' ) ) :
+
+			call_user_func( array( $this->_cdn, 'post_test' ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Any errors?
+		if ( $this->get_errors() ) :
+
+			return FALSE;
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
 }
 
