@@ -92,6 +92,7 @@ class NAILS_Test extends NAILS_System_Controller
 		endif;
 
 		$this->_tests = array_filter( $this->_tests );
+		$this->_tests = array_values( $this->_tests );
 
 		$this->data['tests'] =& $this->_tests;
 
