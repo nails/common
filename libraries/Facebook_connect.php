@@ -4,19 +4,20 @@
 * Name:			Facebook
 *
 * Description:	Gateway to the FB PHP SDK
-* 
+*
 */
 
-class Facebook_Connect {
-	
-	private $ci;
-	private $settings;
-	private $facebook;
-	
-	
+class Facebook_Connect
+{
+
+	private $_ci;
+	private $_settings;
+	private $_facebook;
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
@@ -25,27 +26,26 @@ class Facebook_Connect {
 	 **/
 	public function __construct()
 	{
-		$this->ci =& get_instance();
-		
+		$this->_ci =& get_instance();
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch our config variables
-		$this->ci->config->load( 'facebook' );
-		$this->settings = $this->ci->config->item( 'facebook' );
-		array_unshift( $this->settings['scope'], 'email' );
-		
+		$this->_ci->config->load( 'facebook' );
+		$this->_settings = $this->_ci->config->item( 'facebook' );
+		array_unshift( $this->_settings['scope'], 'email' );
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fire up and initialize the SDK
-		require NAILS_PATH . 'libraries/_resources/facebook-php-sdk/src/facebook.php';
-		$this->facebook = new Facebook( $this->settings );
-		
+		$this->_facebook = new Facebook( $this->_settings );
+
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Determines whether the active user has already linked their Facebook profile
 	 *
@@ -56,11 +56,11 @@ class Facebook_Connect {
 	{
 		return (bool) active_user( 'fb_id' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches the login URL
 	 *
@@ -70,20 +70,19 @@ class Facebook_Connect {
 	 * @return	void
 	 **/
 	public function get_login_url( $success, $fail )
-	{	
+	{
 		//	Prep params
-		//$_params['scope']			= 'email,user_location,user_photos,user_birthday,user_work_history,friends_education_history,friends_work_history';
-		$_params['scope']			= implode( ',', $this->settings['scope'] );
+		$_params['scope']			= implode( ',', $this->_settings['scope'] );
 		$_params['redirect_uri']	= $this->_get_redirect_url( $success, $fail );
 		$_params['display']			= 'page';
-		
-		return $this->getLoginUrl( $_params );
+
+		return $this->_facebook->getLoginUrl( $_params );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Gets the URL where the user will be redirected to after connecting/logging in
 	 *
@@ -98,18 +97,18 @@ class Facebook_Connect {
 		$_data									= array();
 		$_data['nailsFBConnectReturnTo']		= $success ? $success : active_user( 'group_homepage' );
 		$_data['nailsFBConnectReturnToFail']	= $fail ? $fail : $success;
-		
+
 		//	Filter out empty items
 		$_data = array_filter( $_data );
 		$_query_string = $_data ? '?' . http_build_query( $_data ) : NULL;
-		
+
 		return site_url( 'auth/fb/connect/verify' . $_query_string  );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches a user's access token
 	 *
@@ -122,27 +121,28 @@ class Facebook_Connect {
 	public function get_access_token( $code, $success, $fail )
 	{
 		$_url	= 'https://graph.facebook.com/oauth/access_token?client_id=' .
-				  $this->settings['appId'] . '&redirect_uri=' . urlencode( $this->_get_redirect_url( $success, $fail ) ) .
-				  '&client_secret=' . $this->settings['secret'] . '&code=' . $code;
-		
-		$_data	= @file_get_contents( $_url );
-		
+				  $this->_settings['appId'] . '&redirect_uri=' . urlencode( $this->_get_redirect_url( $success, $fail ) ) .
+				  '&client_secret=' . $this->_settings['secret'] . '&code=' . $code;
+
+		$this->_ci->load->library( 'curl' );
+		$_data = $this->_ci->curl->simple_get( $_url );
+
 		if ( $_data ) :
-		
+
 			parse_str( $_data, $_access_token );
 			return $_access_token;
-		
+
 		else :
-		
+
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Sets a user's access token
 	 *
@@ -152,13 +152,13 @@ class Facebook_Connect {
 	 **/
 	public function set_access_token( $access_token )
 	{
-		$this->setAccessToken( $access_token );
+		$this->_facebook->setAccessToken( $access_token );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Unlinks a local account from Facebook
 	 *
@@ -170,26 +170,37 @@ class Facebook_Connect {
 	{
 		//	TODO Use the supplied user_id rather than the active_user
 		//	Attempt to revoke permissions on Facebook
-		
-		$this->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
-		
+
+		$this->_facebook->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
+
 		// --------------------------------------------------------------------------
-		
-		$this->destroySession();
-		
+
+		$this->_facebook->destroySession();
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Update our user
-		$_data['fb_id']		= NULL;
-		$_data['fb_token']	= NULl;
-		
-		return get_userobject()->update( $user_id, $_data );
+		$_userobj =& get_userobject();
+
+		if ( is_callable( array( $_userobj, 'update' ) ) ) :
+
+			$_data				= array();
+			$_data['fb_id']		= NULL;
+			$_data['fb_token']	= NULl;
+
+			return $_userobj->update( $user_id, $_data );
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Map method calls to the FB library
 	 *
@@ -198,14 +209,14 @@ class Facebook_Connect {
 	 **/
 	public function __call( $method, $arguments )
 	{
-		if ( method_exists( $this->facebook, $method ) ) :
-		
-			return call_user_func_array( array( $this->facebook, $method ), $arguments );
-		
+		if ( is_callable( array( $this->_facebook, $method ) ) ) :
+
+			return call_user_func_array( array( $this->_facebook, $method ), $arguments );
+
 		else:
-		
+
 			show_error( 'Method does not exist Facebook::' . $method );
-		
+
 		endif;
 	}
 }

@@ -290,8 +290,6 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	If we recognise the user, update their access token, if not create a new account
-		$_user = $this->user->get_by_fbid( $_me['id'] );
-
 		if ( ! $_user ) :
 
 			//	Not recognised via Facebook ID, what about via their email?
@@ -317,10 +315,22 @@ class NAILS_Fb extends NAILS_Auth_Controller
 				//	An account has been found which uses this email but this Facebook
 				//	ID is not associated with any account. We need to alert the user that the email
 				//	is already regsitered to an account and that they need to log in and link the
-				//	account from their settings page.
+				//	account from their settings page, if one is defined.
 
-				$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use', array( 'Facebook', APP_NAME ) ) );
-				$this->_redirect( 'auth/login?return_to=' . urlencode( $this->settings['settings_url'] ) );
+				$_settings = $this->config->load( 'facebook' );
+
+				if ( ! empty( $_settings['settings_url'] ) ) :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use', array( 'Facebook', APP_NAME ) ) );
+					$this->_redirect( 'auth/login?return_to=' . urlencode( $_settings['settings_url'] ) );
+
+				else :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'Facebook', APP_NAME, site_url( 'auth/forgotten_password?email=' . urlencode( $_me['email'] ) ) ) ) );
+					$this->_redirect( 'auth/login' );
+
+				endif;
+
 				return;
 
 			endif;

@@ -72,6 +72,7 @@
 	$lang['auth_social_no_access_token']				= '<strong>There was a problem.</strong> We could not validate your account with %s, you may be able to try again.';
 	$lang['auth_social_account_in_use']					= '<strong>Sorry</strong>, the %s account you\'re currently logged into is already linked with another %s account.';
 	$lang['auth_social_email_in_use']					= '<strong>You\'ve been here before?</strong> We noticed that the email associated with your %1$s account is already registered with %2$s. In order to use %1$s to sign in you\'ll need to link your accounts via your Settings page. Log in below using your email address and we\'ll get you started.';
+	$lang['auth_social_email_in_use_no_settings']		= '<strong>You\'ve been here before?</strong> We noticed that the email associated with your %1$s account is already registered with %2$s. Please sign in using your email address and password. <a href="%3$s">Forgotten your password</a>?';
 	$lang['auth_social_linked_ok']						= '<strong>Success</strong>, your %s account is now linked.';
 	$lang['auth_social_register_ok']					= '<strong>Hi, %s!</strong> Your account has been set up and is ready to be used.';
 	$lang['auth_social_register_disabled']				= '<strong>Sorry,</strong> new registrations are not permitted.';

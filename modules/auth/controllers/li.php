@@ -131,7 +131,24 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Redirect the user to the LinkedIn Authorisation page, specifying a callback
-		$this->_redirect( $this->li->get_auth_url( site_url( 'auth/li/connect/verify?nailsLIConnectReturnTo=' . urlencode( $this->_return_to ) . '&nailsLIConnectReturnToFail=' . urlencode( $this->_return_to_fail ) ) ) );
+		$_params								= array();
+		$_params['nailsLIConnectReturnTo']		= $this->_return_to;
+		$_params['nailsLIConnectReturnToFail']	= $this->_return_to_fail;
+		$_params = array_filter( $_params );
+
+		$_callback = site_url( 'auth/li/connect/verify' ) . '?' . http_build_query( $_params );
+
+		//	Set and save the state
+		$_state			= array();
+		$_state['guid']	= uniqid();
+		$_state['time']	= time();
+		$_state['ip']	= $this->input->ip_address();
+		$_state['hash']	= md5( $_state['guid'] . $_state['time'] . $_state['ip'] . APP_PRIVATE_KEY );
+
+		$_state = $this->encrypt->encode( implode( '|', $_state ), APP_PRIVATE_KEY );
+		$this->session->set_userdata( 'li_state', $_state );
+
+		$this->_redirect( $this->li->get_auth_url( $_callback, $_state ) );
 	}
 
 
@@ -147,60 +164,94 @@ class NAILS_Li extends NAILS_Auth_Controller
 	 **/
 	private function _connect_verify()
 	{
-		//	If there is an access_token in the session then use that, this will have been set just
-		//	before the auth flow was interrupted to request more data from the user.
+		//	Check the state
+		$_code			= $this->input->get( 'code' );
+		$_state			= $this->input->get( 'state' );
+		$_session_state	= $this->session->userdata( 'li_state' );
 
-		if ( ! $this->session->userdata( 'li_access_token' ) ) :
+		if ( $_state !== $_session_state ) :
 
-			$_request_token = $this->session->userdata( 'li_request_token' );
-			//$this->session->unset_userdata( 'li_request_token' );
-
-			if ( $_request_token ) :
-
-				//	Set the token to use
-				$this->li->set_access_token( $_request_token['oauth_token'], $_request_token['oauth_token_secret'] );
-
-				$_access_token = $this->li->get_access_token( $this->input->get( 'oauth_verifier' ) );
-
-				if ( ! isset( $_access_token['oauth_token'] ) || ! isset( $_access_token['oauth_token_secret'] )  ) :
-
-					$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'LinkedIn' ) );
-					$this->_connect_fail();
-					return;
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				//	We have a valid access token, continue
-				$this->li->set_access_token( $_access_token['oauth_token'], $_access_token['oauth_token_secret'] );
-				$this->_connect_success( $_access_token );
-
-			else :
-
-				$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'LinkedIn' ) );
-				$this->_connect_fail();
-				return;
-
-			endif;
+			//	Possible CSRF
+			//	TODO
+			dumpanddie( 'bad state' );
 
 		else :
 
-			$_access_token = $this->session->userdata( 'li_access_token' );
+			//	Check integrity of state
+			$_state = $this->encrypt->decode( $_session_state, APP_PRIVATE_KEY );
+			$_state = explode( '|', $_state );
 
-			if ( ! isset( $_access_token['oauth_token'] ) || ! isset( $_access_token['oauth_token_secret'] )  ) :
+			//	Same IP?
 
-				$this->session->set_flashdata( 'error', lang( 'auth_social_no_access_token', 'LinkedIn' ) );
-				$this->_connect_fail();
-				return;
+			if ( $this->input->ip_address() != $_state[2] ) :
+
+				//	TODO
+				dumpanddie( 'bad IP' );
 
 			endif;
 
-			// --------------------------------------------------------------------------
+			//	Hash ok?
+			$_hash = md5( $_state[0] . $_state[1] . $_state[2] . APP_PRIVATE_KEY );
 
-			//	We have a valid access token, continue
-			$this->li->set_access_token( $_access_token['oauth_token'], $_access_token['oauth_token_secret'] );
+			if ( $_hash != $_state[3]) :
+
+				//	TODO
+				dumpanddie( 'bad hash' );
+
+			endif;
+
+		endif;
+
+		//$this->session->unset_userdata( 'li_state' );
+
+		// --------------------------------------------------------------------------
+
+		//	Errors?
+		if ( $this->input->get( 'error' ) ) :
+
+			$this->_connect_fail();
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Request an access token
+		$_params								= array();
+		$_params['nailsLIConnectReturnTo']		= $this->_return_to;
+		$_params['nailsLIConnectReturnToFail']	= $this->_return_to_fail;
+		$_params = array_filter( $_params );
+
+		$_callback = site_url( 'auth/li/connect/verify' ) . '?' . http_build_query( $_params );
+
+		$_access_token	= $this->li->get_access_token( $_callback, $_code );
+
+		// --------------------------------------------------------------------------
+
+		if ( ! empty( $_access_token->access_token ) ) :
+
+			//	Fetch the user's ID
+			$_me = $this->li->get( 'people/~:(id,firstName,lastName,email-address)' );
+
+			if ( empty( $_me->id ) ) :
+
+				$this->_connect_fail();
+				return;
+
+			else :
+
+				$_access_token->user_id		= $_me->id;
+				$_access_token->first_name	= $_me->firstName;
+				$_access_token->last_name	= $_me->lastName;
+				$_access_token->email		= $_me->emailAddress;
+
+			endif;
+
 			$this->_connect_success( $_access_token );
+
+		else :
+
+			$this->_connect_fail();
 
 		endif;
 	}
@@ -219,19 +270,10 @@ class NAILS_Li extends NAILS_Auth_Controller
 	 **/
 	protected function _connect_success( $access_token )
 	{
-		//	Set the user ID if it's not already set
-		if ( ! isset( $access_token['user_id'] ) ) :
-
-			$access_token['user_id'] = $this->li->call( 'people/~/id' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Check if the user has previously connected this LinkedIn account
 		//	to another registered account
 
-		$_user = $this->user->get_by_liid( $access_token['user_id'] );
+		$_user = $this->user->get_by_liid( $access_token->user_id );
 
 		if ( $this->user->is_logged_in() && $_user ) :
 
@@ -297,20 +339,49 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	If we recognise the user, update their access token, if not create a new account
-		$_user = $this->user->get_by_liid( $access_token['user_id'] );
 
 		if ( ! $_user ) :
 
-			//	OK, fine, this is a new user! Registerm buyt only if registration is allowed
-			if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+			//	Not recognised via LinkedIn ID, what about via their email?
+			$_user = $this->user->get_by_email( $access_token->email );
 
-				$this->_create_user( $access_token );
+			if ( ! $_user ) :
+
+				//	OK, fine, this is a new user! Registerm buyt only if registration is allowed
+				if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+
+					$this->_create_user( $access_token );
+
+				else :
+
+					//	Registration is not enabled, fail with error
+					$this->session->set_flashdata( 'error', lang( 'auth_social_register_disabled' ) );
+					$this->_redirect( $this->_return_to_fail );
+
+				endif;
 
 			else :
 
-				//	Registration is not enabled, fail with error
-				$this->session->set_flashdata( 'error', lang( 'auth_social_register_disabled' ) );
-				$this->_redirect( $this->_return_to_fail );
+				//	An account has been found which uses this email but this LinkedIn ID
+				//	is not associated with any account. We need to alert the user that the email
+				//	is already regsitered to an account and that they need to log in and link the
+				//	account from their settings page, if one is defined.
+
+				$_settings = $this->config->load( 'linkedin' );
+
+				if ( ! empty( $_settings['settings_url'] ) ) :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use', array( 'LinkedIn', APP_NAME ) ) );
+					$this->_redirect( 'auth/login?return_to=' . urlencode( $_settings['settings_url'] ) );
+
+				else :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'LinkedIn', APP_NAME, site_url( 'auth/forgotten_password?email=' . urlencode( $access_token->email ) ) ) ) );
+					$this->_redirect( 'auth/login' );
+
+				endif;
+
+				return;
 
 			endif;
 
@@ -350,7 +421,8 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 	public function disconnect()
 	{
-		dumpanddie( 'TODO Handle disconnection' );
+		//	TODO: handle doisconnection
+		return FALSE;
 	}
 
 
@@ -370,11 +442,10 @@ class NAILS_Li extends NAILS_Auth_Controller
 	 **/
 	protected function _link_user( $access_token )
 	{
-		//	Set Twitter details
+		//	Set LinkeDInm details
 		$_data				= array();
-		$_data['li_id']		= $access_token['user_id'];
-		$_data['li_token']	= $access_token['oauth_token'];
-		$_data['li_secret']	= $access_token['oauth_token_secret'];
+		$_data['li_id']		= $access_token->user_id;
+		$_data['li_token']	= $access_token->access_token;
 
 		// --------------------------------------------------------------------------
 
@@ -428,8 +499,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Update token
-		$_data['li_token']	= $access_token['oauth_token'];
-		$_data['li_secret']	= $access_token['oauth_token_secret'];
+		$_data['li_token']	= $access_token->access_token;
 		$this->user->update( $user->id, $_data );
 
 		// --------------------------------------------------------------------------
@@ -495,209 +565,119 @@ class NAILS_Li extends NAILS_Auth_Controller
 	 **/
 	protected function _create_user( $access_token )
 	{
-		//	Fetch some information about this user
-		$_fields = array(
-			'first-name',
-			'last-name'
-		);
-		$_me = $this->li->call( 'people/~:(' . implode( ',', $_fields ) . ')' );
+		$email		= $access_token->email;
+		$password	= NULL;
+		$remember	= TRUE;
 
-		//	Try and determine the user's first name and surname
-		if ( isset( $_me->firstName ) ) :
+		$_data = array();
+		$_data['li_id']				= $access_token->user_id;
+		$_data['li_token']			= $access_token->access_token;
+		$_data['auth_method_id']	= 5;	//	LinkedIn, obviously.
+		$_data['first_name']		= trim( $access_token->first_name );
+		$_data['last_name']			= trim( $access_token->last_name );
 
-			$this->data['first_name']	= trim( $_me->firstName );
+		// --------------------------------------------------------------------------
 
-		else :
+		//	Handle referrals
+		if ( $this->session->userdata( 'referred_by' ) ) :
 
-			$this->data['first_name']	= '';
-
-		endif;
-
-		if ( isset( $_me->lastName ) ) :
-
-			$this->data['last_name']	= trim( $_me->lastName );
-
-		else :
-
-			$this->data['last_name']	= '';
+			$_data['referred_by'] = $this->session->userdata( 'referred_by' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->input->post() ) :
+		//	Which group?
+		//	If there's a register_token set, use that if not fall back to the default
 
-			//	Validate the form and attempt the registration
-			$this->load->library( 'form_validation' );
+		if ( ! empty( $this->_register_token['group'] ) ) :
 
-			//	Set rules
-			$this->form_validation->set_rules( 'email',	'Email',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+			$_group_id = $this->_register_token['group'];
 
-			if ( ! $this->data['first_name'] || ! $this->data['last_name'] ) :
+		else :
 
-				$this->form_validation->set_rules( 'first_name',	'First Name',	'xss_clean|required' );
-				$this->form_validation->set_rules( 'last_name',		'Surname',		'xss_clean|required' );
+			$_group_id = APP_USER_DEFAULT_GROUP;
+
+		endif;
+
+		//	Create new user
+		$_uid = $this->user->create( $email, $password, $_group_id, $_data );
+
+		if ( $_uid ) :
+
+			//	Fetch user and group data
+			$_user	= $this->user->get_by_id( $_uid['id'] );
+			$_group	= $this->user->get_group( $_group_id );
+
+			// --------------------------------------------------------------------------
+
+			//	Some nice data...
+			$this->data['email']	= $email;
+			$this->data['user_id']	= $_uid['id'];
+			$this->data['hash']		= $_uid['activation'];
+
+			// --------------------------------------------------------------------------
+
+			//	Registration was successfull, send the welcome email...
+			$this->load->library( 'emailer' );
+
+			$_email							= new stdClass();
+			$_email->type					= 'verify_email_' . $_group_id;
+			$_email->to_id					= $_uid['id'];
+			$_email->data					= array();
+			$_email->data['user']			= $_user;
+			$_email->data['group']			= $_group->display_name;
+
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+				//	Failed to send using the group email, try using the generic email
+				$_email->type = 'register_li';
+
+				if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+					//	Email failed to send, for now, do nothing.
+
+				endif;
 
 			endif;
 
-			//	Set messages
-			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
-			$this->form_validation->set_message( 'is_unique',	lang( 'fv_email_already_registered' ) );
+			// --------------------------------------------------------------------------
 
-			//	Execute
-			if ( $this->form_validation->run() ) :
+			//	Log the user in
+			$this->user->set_login_data( $_uid['id'] );
 
-				$email		= $this->input->post( 'email' );
-				$password	= NULL;
-				$remember	= TRUE;
+			// --------------------------------------------------------------------------
 
-				$_data = array();
+			//	Create an event for this event
+			create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'linkedin' ) );
 
-				//	Meta data
-				if ( ! $this->data['first_name'] || ! $this->data['last_name'] ) :
+			// --------------------------------------------------------------------------
 
-					$_data['first_name']	= $this->input->post( 'first_name' );
-					$_data['last_name']		= $this->input->post( 'last_name' );
+			//	Delete register token
+			delete_cookie( 'liRegisterToken' );
 
-				else :
+			// --------------------------------------------------------------------------
 
-					$_data['first_name']	= $this->data['first_name'];
-					$_data['last_name']		= $this->data['last_name'];
+			//	Redirect
+			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
+			$this->session->set_flashdata( 'from_linkedin', TRUE );
 
-				endif;
+			//	Registrations will be forced to the registration redirect, regardless of what else has been set
+			if ( $this->_register_use_return ) :
 
-				$_data['li_id']				= $access_token['user_id'];
-				$_data['li_token']			= $access_token['oauth_token'];
-				$_data['li_secret']			= $access_token['oauth_token_secret'];
-				$_data['auth_method_id']	= 5;	//	LinkedIn, obviously.
-
-				// --------------------------------------------------------------------------
-
-				//	Handle referrals
-				if ( $this->session->userdata( 'referred_by' ) ) :
-
-					$_data['referred_by'] = $this->session->userdata( 'referred_by' );
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				//	Which group?
-				//	If there's a register_token set, use that if not fall back to the default
-
-				if ( isset( $this->_register_token['group'] ) && $this->_register_token['group'] ) :
-
-					$_group_id = $this->_register_token['group'];
-
-				else :
-
-					$_group_id = APP_USER_DEFAULT_GROUP;
-
-				endif;
-
-				//	Create new user
-				$_uid = $this->user->create( $email, $password, $_group_id, $_data );
-
-				if ( $_uid ) :
-
-					//	Fetch user and group data
-					$_user	= $this->user->get_by_id( $_uid['id'] );
-					$_group	= $this->user->get_group( $_group_id );
-
-					// --------------------------------------------------------------------------
-
-					//	Some nice data...
-					$this->data['email']	= $email;
-					$this->data['user_id']	= $_uid['id'];
-					$this->data['hash']		= $_uid['activation'];
-
-					// --------------------------------------------------------------------------
-
-					//	Registration was successfull, send the welcome email...
-					$this->load->library( 'emailer' );
-
-					$_email							= new stdClass();
-					$_email->type					= 'verify_email_' . $_group_id;
-					$_email->to_id					= $_uid['id'];
-					$_email->data					= array();
-					$_email->data['user']			= $_user;
-					$_email->data['group']			= $_group->display_name;
-
-					if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-						//	Failed to send using the group email, try using the generic email
-						$_email->type = 'register_li';
-
-						if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-							//	Email failed to send, for now, do nothing.
-
-						endif;
-
-					endif;
-
-					// --------------------------------------------------------------------------
-
-					//	Log the user in
-					$this->user->set_login_data( $_uid['id'] );
-
-					// --------------------------------------------------------------------------
-
-					//	Create an event for this event
-					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'linkedin' ) );
-
-					// --------------------------------------------------------------------------
-
-					//	Delete register token
-					delete_cookie( 'liRegisterToken' );
-
-					// --------------------------------------------------------------------------
-
-					//	Redirect
-					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
-					$this->session->set_flashdata( 'from_linkedin', TRUE );
-
-					//	Registrations will be forced to the registration redirect, regardless of what else has been set
-					if ( $this->_register_use_return ) :
-
-						$_redirect = $this->_return_to;
-
-					else :
-
-						$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
-
-					endif;
-
-					$this->_redirect( $_redirect );
-					return;
-
-				endif;
+				$_redirect = $this->_return_to;
 
 			else :
 
-				$this->data['error'] = lang( 'fv_there_were_errors' );
+				$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
 
 			endif;
 
+			$this->_redirect( $_redirect );
+			return;
+
 		endif;
 
-		// --------------------------------------------------------------------------
-
-		//	Store the access token in the Session so we can interrupt the auth flow cleanly
-		$this->session->set_userdata( 'li_access_token', $access_token );
-
-		// --------------------------------------------------------------------------
-
-		//	Set some view data
-		$this->data['page']				= new stdClass();
-		$this->data['page']->title		= lang( 'auth_register_extra_title' );
-
-		$this->data['return_to']		= $this->_return_to;
-		$this->data['return_to_fail']	= $this->_return_to_fail;
-
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'auth/register/extra-info',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 
