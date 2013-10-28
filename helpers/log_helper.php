@@ -16,5 +16,13 @@ if ( ! function_exists( '_LOG_FILE' ) )
 	}
 }
 
+if ( ! function_exists( '_LOG_MUTE_OUTPUT' ) )
+{
+	function _LOG_MUTE_OUTPUT( $mute_output = TRUE )
+	{
+		get_instance()->logger->mute_output = $mute_output;
+	}
+}
+
 /* End of file log_helper.php */
 /* Location: ./helpers/log_helper.php */

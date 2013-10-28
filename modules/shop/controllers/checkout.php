@@ -445,6 +445,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
+			//	Mute the logger (causes issues on non-production environments)
+			_LOG_MUTE_OUTPUT();
+
+			// --------------------------------------------------------------------------
+
 			//	Is the order a zero-value order? If so, just mark it as paid and send
 			//	to processing immediately
 

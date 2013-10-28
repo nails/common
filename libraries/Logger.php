@@ -11,6 +11,7 @@ class Logger
 {
 	private $_log;
 	private $_is_cli;
+	public $mute_output;
 
 
 	// --------------------------------------------------------------------------
@@ -40,6 +41,7 @@ class Logger
 		$this->_log			= new stdClass();
 		$this->_log->exists	= FALSE;
 		$this->_log->file	= FCPATH . APPPATH . 'logs/' .  date( 'Y-m-d' ) . '.php';
+		$this->mute_output	= FALSE;
 	}
 
 
@@ -120,7 +122,7 @@ class Logger
 		// --------------------------------------------------------------------------
 
 		//	If we're not on production and the request is not CLI then echo to the browser
-		if ( ENVIRONMENT != 'production' && ! $this->_is_cli ) :
+		if ( ENVIRONMENT != 'production' && ! $this->_is_cli && ! $this->mute_output ) :
 
 			@ob_start();
 			echo $line . "<br />\n";
