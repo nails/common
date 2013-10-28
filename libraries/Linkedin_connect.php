@@ -259,7 +259,6 @@ class Linkedin_connect
 		//	Update our user
 		$_data['li_id']		= NULL;
 		$_data['li_token']	= NULl;
-		$_data['li_secret']	= NULl;
 
 		return get_userobject()->update( $user_id, $_data );
 	}

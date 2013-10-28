@@ -1248,7 +1248,6 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'tw_secret';
 			$_cols[]	= 'li_id';
 			$_cols[]	= 'li_token';
-			$_cols[]	= 'li_secret';
 			$_cols[]	= 'ip_address';
 			$_cols[]	= 'last_ip';
 			$_cols[]	= 'username';
@@ -2115,7 +2114,6 @@ class NAILS_User_model extends NAILS_Model
 		//	Linkedin oauth details
 		$_data['li_id']				= ( isset( $data['li_id'] ) )		? $data['li_id']		: NULL ;
 		$_data['li_token']			= ( isset( $data['li_token'] ) )	? $data['li_token']		: NULL ;
-		$_data['li_secret']			= ( isset( $data['li_secret'] ) )	? $data['li_secret']	: NULL ;
 
 		//	Referral code
 		$_data['referral']			= $this->_generate_referral();
@@ -2167,7 +2165,6 @@ class NAILS_User_model extends NAILS_Model
 		unset( $data['tw_secret'] );
 		unset( $data['li_id'] );
 		unset( $data['li_token'] );
-		unset( $data['li_secret'] );
 		unset( $data['salutation'] );
 		unset( $data['first_name'] );
 		unset( $data['last_name'] );
