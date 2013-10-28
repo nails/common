@@ -255,15 +255,15 @@ if ( ! function_exists( 'send_developer_mail' ) )
 		$_ci =& get_instance();
 
 		$_info = array(
-			'uri'				=> isset( $_ci->uri )			? $_ci->uri->uri_string()					: '',
+			'uri'				=> isset( $_ci->uri )			? $_ci->uri->uri_string()				: '',
 
-			'session'			=> isset( $_ci->session )		? json_encode( $_ci->session->userdata )	: '',
-			'post'				=> isset( $_POST )				? json_encode( $_POST )						: '',
-			'get'				=> isset( $_GET )				? json_encode( $_GET )						: '',
-			'server'			=> isset( $_SERVER )			? json_encode( $_SERVER )					: '',
-			'globals'			=> isset( $GLOBALS['error'] )	? json_encode( $GLOBALS['error'] )			: '',
+			'session'			=> isset( $_ci->session )		? serialize( $_ci->session->userdata )	: '',
+			'post'				=> isset( $_POST )				? serialize( $_POST )					: '',
+			'get'				=> isset( $_GET )				? serialize( $_GET )					: '',
+			'server'			=> isset( $_SERVER )			? serialize( $_SERVER )					: '',
+			'globals'			=> isset( $GLOBALS['error'] )	? serialize( $GLOBALS['error'] )		: '',
 
-			'debug_backtrace'	=> json_encode( debug_backtrace() )
+			'debug_backtrace'	=> serialize( debug_backtrace() )
 		);
 
 		$_message	.= '' . "\n";
