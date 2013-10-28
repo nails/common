@@ -173,16 +173,13 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';
 		$_js .= '_nails = new NAILS_JS();';
-		$_js .= '_nails.init();}';
-
-
-		$_js .= 'if ( typeof( NAILS_Admin ) === \'function\' ){';
-		$_js .= '_nails_admin = new NAILS_Admin();';
-		$_js .= '_nails_admin.init();}';
+		$_js .= '_nails.init();';
+		$_js .= '}';
 
 		$_js .= 'if ( typeof( NAILS_Admin ) === \'function\' ){';
 		$_js .= '_nails_admin = new NAILS_Admin();';
-		$_js .= '_nails_admin.init();}';
+		$_js .= '_nails_admin.init();';
+		$_js .= '}';
 
 		$_js .= '});';
 
