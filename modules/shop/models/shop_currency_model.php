@@ -129,10 +129,6 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 	public function get_by_country( $country )
 	{
-		$this->db->select( 'sc.*' );
-
-		// --------------------------------------------------------------------------
-
 		//	What are we dealing with?
 		if ( is_numeric( $country ) ) :
 
@@ -167,6 +163,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		$this->db->select( 'sc.*' );
 		$this->db->join( NAILS_DB_PREFIX . 'shop_currency sc', 'sc.id = scc.currency_id' );
 		$_result = $this->db->get( NAILS_DB_PREFIX . 'shop_currency_country scc' );
 
