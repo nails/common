@@ -423,7 +423,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 	{
 		if ( $this->user->is_logged_in() ) :
 
-			if ( $this->fli->user_is_linked() ) :
+			if ( $this->li->user_is_linked() ) :
 
 				//	User is currently linked, disconnect them
 				if ( $this->li->unlink_user() ) :
