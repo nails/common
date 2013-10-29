@@ -79,7 +79,7 @@ class Twitter_Connect
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function unlink_user( $user_id )
+	public function unlink_user( $user_id = NULL )
 	{
 		//	Grab reference to the userobject
 		$_userobj =& get_userobject();
