@@ -16,99 +16,100 @@ if ( ! function_exists( 'form_field' ) )
 	function form_field( $field, $help = '' )
 	{
 		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
-		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
+		$_field				= array();
+		$_field_id			= isset( $field['id'] )				? $field['id']			: NULL;
+		$_field_type		= isset( $field['type'] )			? $field['type']		: 'text';
+		$_field_oddeven		= isset( $field['oddeven'] )		? $field['oddeven']		: NULL;
+		$_field_key			= isset( $field['key'] )			? $field['key']			: NULL;
+		$_field_label		= isset( $field['label'] )			? $field['label']		: NULL;
+		$_field_default		= isset( $field['default'] )		? $field['default']		: NULL;
+		$_field_sub_label	= isset( $field['sub_label'] )		? $field['sub_label']	: NULL;
+		$_field_required	= isset( $field['required'] )		? $field['required']	: FALSE;
+		$_field_placeholder	= isset( $field['placeholder'] )	? $field['placeholder']	: NULL;
+		$_field_readonly	= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
+		$_field_error		= isset( $field['error'] )			? $field['error']		: FALSE;
+		$_field_bucket		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
+		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field_data		= isset( $field['data'] )			? $field['data'] 		: array();
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_help				= array();
+		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_URL . 'img/form/help.png';
+		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
+		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy';
+		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
+		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
 
-		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
-		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
-		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		$_error				= form_error( $_field_key ) || $_field_error ? 'error' : '';
+		$_error_class		= $_error ? 'error' : '';
+		$_readonly			= $_field_readonly ? 'readonly="readonly"' : '';
+		$_readonly_cls		= $_field_readonly ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
-		$_out  = '<div class="field ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '">';
-		$_out .= '<label>';
+		//	Is the label required?
+		$_field_label .= $_field_required ? '*' : '';
 
-		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
+		//	Prep sublabel
+		$_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
+
+		//	Has the field got a tip?
+		$_tipclass	= $_help['title'] ? 'with-tip' : '';
+		$_tip 		= $_help['title'] ? img( $_help ) : '';
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the field's attributes
+		$_attr = '';
 
 		//	Does the field have an id?
-		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+		$_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
 
 		//	Any data attributes?
-		$_data = '';
-		foreach( $_field['data'] AS $attr => $value ) :
+		foreach( $_field_data AS $attr => $value ) :
 
-			$_data .= ' data-' . $attr . '="' . $value . '"';
+			$_attr .= ' data-' . $attr . '="' . $value . '"';
 
 		endforeach;
 
-		//	Field
-		$_withtip = $_help['title'] ? 'with-tip' : '';
-		$_out .= '<span class="input ' . $_withtip . '">';
+		// --------------------------------------------------------------------------
 
-		switch ( $_field['type'] ) :
+		//	Generate the field's HTML
+		switch ( $_field_type ) :
 
 			case 'password' :
 
-				$_out .= form_password( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly . $_data );
+				$_field_html = form_password( $_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
 			case 'textarea' :
 
-				$_out .= form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_field_html = form_textarea( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
 			case 'upload' :
 			case 'file' :
 
-				$_out .= form_upload( $_field['key'] );
+				$_field_html = form_upload( $_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
 			case 'text' :
 			default :
 
-				$_out .= form_input( $_field['key'], set_value( $_field['key'], $_field['default'] ), $_field['id'] . 'class="' . $_field['class'] . '" placeholder="' . $_field['placeholder'] . '" ' . $_readonly );
+				$_field_html = form_input( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
 		endswitch;
 
-		//	Tip
-		$_out .= $_withtip ? img( $_help ) : '';
-
 		//	Download original file, if type is file and original is available
-		if ( ( $_field['type'] == 'file' || $_field['type'] == 'upload' ) && $_field['default'] ) :
+		if ( ( $_field_type == 'file' || $_field_type == 'upload' ) && $_field_default ) :
 
-			$_out .= '<span class="file-download">';
+			$_field_html .= '<span class="file-download">';
 
-			$_ext = end( explode( '.', $_field['default'] ) );
+			$_ext = end( explode( '.', $_field_default ) );
 
 			switch ( $_ext ) :
 
@@ -116,7 +117,7 @@ if ( ! function_exists( 'form_field' ) )
 				case 'png' :
 				case 'gif' :
 
-					$_out .= 'Download: ' . anchor( cdn_serve( $_field['default'] ), img( cdn_thumb( $_field['default'], 35, 35 ) ), 'class="fancybox"' );
+					$_field_html .= 'Download: ' . anchor( cdn_serve( $_field_default ), img( cdn_thumb( $_field_default, 35, 35 ) ), 'class="fancybox"' );
 
 				break;
 
@@ -124,34 +125,49 @@ if ( ! function_exists( 'form_field' ) )
 
 				default :
 
-					$_out .= anchor( cdn_serve( $_field['default'], TRUE ), 'Download', 'class="awesome small" target="_blank"' );
+					$_field_html .= anchor( cdn_serve( $_field_default, TRUE ), 'Download', 'class="awesome small" target="_blank"' );
 
 				break;
 
 			endswitch;
 
-			$_out .= '</span>';
+			$_field_html .= '</span>';
 
 		endif;
 
-		//	Error
-		$_out .= '<span class="error">';
-		if ( $_field['error'] ) :
+		// --------------------------------------------------------------------------
 
-			$_out .= $_field['error'] ;
+		//	Errors
+		if ( $_error && $_field_error ) :
 
-		else :
+			$_error = '<span class="error">' . $_field_error . '</span>';
 
-			$_out .= form_error( $_field['key'], ' ', ' ' );
+		elseif( $_error ) :
+
+			$_error = form_error( $_field_key, '<span class="error">', '</span>' );
 
 		endif;
-		$_out .= '</span>';
 
-		//	End .input
-		$_out .= '</span>';
+		// --------------------------------------------------------------------------
 
-		$_out .= '</label>';
-		$_out .= '</div>';
+$_out = <<<EOT
+
+	<div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type">
+		<label>
+			<span class="label">
+				$_field_label
+				$_field_sub_label
+			</span>
+			<span class="input $_tipclass">
+				$_field_html
+				$_tip
+				$_error
+			<span>
+		</label>
+	</div>
+
+
+EOT;
 
 		// --------------------------------------------------------------------------
 
@@ -179,30 +195,31 @@ if ( ! function_exists( 'form_field_mm' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
-		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['id']			= isset( $field['id'] )				? $field['id']			: NULL;
+		$_field['type']			= isset( $field['type'] )			? $field['type']		: 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] )		? $field['oddeven']		: NULL;
+		$_field['key']			= isset( $field['key'] )			? $field['key']			: NULL;
+		$_field['label']		= isset( $field['label'] )			? $field['label']		: NULL;
+		$_field['default']		= isset( $field['default'] )		? $field['default']		: NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] )		? $field['sub_label']	: NULL;
+		$_field['required']		= isset( $field['required'] )		? $field['required']	: FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] )	? $field['placeholder']	: NULL;
+		$_field['readonly']		= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
+		$_field['error']		= isset( $field['error'] )			? $field['error']		: FALSE;
+		$_field['bucket']		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
+		$_field['class']		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field['data']			= isset( $field['data'] )			? $field['data'] 		: array();
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_help					= array();
+		$_help['src']			= is_array( $help ) && isset( $help['src'] )	? $help['src'] : NAILS_URL . 'img/form/help.png';
+		$_help['class']			= is_array( $help ) && isset( $help['class'] )	? $help['class'] : 'help';
+		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy';
+		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
+		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
 
-		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
-		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
-		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		$_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
+		$_readonly_cls			= $_field['readonly'] ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -629,29 +646,31 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 	function form_field_multiimage( $field, $help = '' )
 	{
 		//	Set var defaults
-		$_field_id			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field_type		= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field_oddeven		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field_key			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field_label		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field_default		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field_sub_label	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field_required	= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field_placeholder	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field_readonly	= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field_error		= isset( $field['error'] ) ? $field['error'] : FALSE;
-		$_field_bucket		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
-		$_field_class		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field_id			= isset( $field['id'] )				? $field['id']			: NULL;
+		$_field_type		= isset( $field['type'] )			? $field['type']		: 'text';
+		$_field_oddeven		= isset( $field['oddeven'] )		? $field['oddeven']		: NULL;
+		$_field_key			= isset( $field['key'] )			? $field['key']			: NULL;
+		$_field_label		= isset( $field['label'] )			? $field['label']		: NULL;
+		$_field_default		= isset( $field['default'] )		? $field['default']		: NULL;
+		$_field_sub_label	= isset( $field['sub_label'] )		? $field['sub_label']	: NULL;
+		$_field_required	= isset( $field['required'] )		? $field['required']	: FALSE;
+		$_field_placeholder	= isset( $field['placeholder'] )	? $field['placeholder']	: NULL;
+		$_field_readonly	= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
+		$_field_error		= isset( $field['error'] )			? $field['error']		: FALSE;
+		$_field_bucket		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
+		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
 
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_help				= array();
+		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_URL . 'img/form/help.png';
+		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
+		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy';
+		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
+		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
 
-		$_error			= form_error( $_field_key ) || $_field_error ? 'error' : '';
-		$_readonly		= $_field_readonly ? 'readonly="readonly"' : '';
-		$_readonly_cls	= $_field_readonly ? 'readonly' : '';
+		$_error				= form_error( $_field_key ) || $_field_error ? 'error' : '';
+		$_error_class		= $_error ? 'error' : '';
+		$_readonly			= $_field_readonly ? 'readonly="readonly"' : '';
+		$_readonly_cls		= $_field_readonly ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -723,8 +742,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 
 $_out = <<<EOT
 
-
-	<div class="field multiimage $_error $_field_oddeven $_readonly_cls $_field_type" id="$_id">
+	<div class="field multiimage $_error_class $_field_oddeven $_readonly_cls $_field_type" id="$_id">
 		<label>
 			<span class="label">
 				$_field_label
@@ -1698,17 +1716,20 @@ if ( ! function_exists( 'form_field_submit' ) )
 {
 	function form_field_submit( $button_value = 'Submit', $button_name = 'submit', $button_attributes = '' )
 	{
-		$_out  = '<div class="field submit">';
+		$_field_html = form_submit( $button_name, $button_value, $button_attributes );
 
-		//	Label
-		$_out .= '<span class="label">&nbsp;</span>';
+		// --------------------------------------------------------------------------
 
-		//	field
-		$_out .= '<span class="input">';
-		$_out .= form_submit( $button_name, $button_value, $button_attributes );
-		$_out .= '</span>';
+$_out = <<<EOT
 
-		$_out .= '</div>';
+	<div class="field submit">
+		<span class="label">&nbsp;</span>
+		<span class="input">
+			$_field_html
+		</span>
+	</div>
+
+EOT;
 
 		// --------------------------------------------------------------------------
 
