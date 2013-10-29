@@ -35,45 +35,53 @@ class NAILS_Activate extends NAILS_Auth_Controller
 
 		// --------------------------------------------------------------------------
 
-		// Validate activation code
-		if ( $_id !== NULL && $_code !== NULL && $this->user->verify( $_id, $_code ) ) :
+		//	Fetch the user
+		$_u = $this->user->get_by_id( $_id );
 
-			//	Fetch the user
-			$_u = $this->user->get_by_id( $_id );
+		if ( $_u && $_code ) :
 
-			// --------------------------------------------------------------------------
+			//	User found, attempt to verify
+			if ( $this->user->email_verify( $_u->id, $_code ) ) :
 
-			//	Reward referrer (if any
-			if ( ! empty( $_u->referred_by ) ) :
+				//	Reward referrer (if any
+				if ( ! empty( $_u->referred_by ) ) :
 
-				$this->user->reward_referral( $_id, $_u->referred_by );
+					$this->user->reward_referral( $_u->id, $_u->referred_by );
 
-			endif;
+				endif;
 
-			// --------------------------------------------------------------------------
+				// --------------------------------------------------------------------------
 
-			//	Set success message
-			$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
+				//	Set success message
+				$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
 
-			// --------------------------------------------------------------------------
+				// --------------------------------------------------------------------------
 
-			//	Send user on their way
-			if ( ! $this->user->is_logged_in() ) :
+				//	Send user on their way
+				if ( ! $this->user->is_logged_in() ) :
 
-				//	If a password change is requested, then redirect here
-				if ( $_u->temp_pw ) :
+					//	If a password change is requested, then redirect here
+					if ( $_u->temp_pw ) :
 
-					//	Send user on their merry way
-					redirect( 'auth/reset_password/' . $_u->id . '/' . md5( $_u->salt ) );
+						//	Send user on their merry way
+						redirect( 'auth/reset_password/' . $_u->id . '/' . md5( $_u->salt ) );
+						return;
+
+					else :
+
+						//	Nope, log in as normal
+						$this->user->set_login_data( $_u->id );
+
+						// --------------------------------------------------------------------------
+
+						//	Where are we redirecting too?
+						redirect( $_u->group_homepage );
+						return;
+
+					endif;
 
 				else :
 
-					//	Nope, log in as normal
-					$this->user->set_login_data( $_u->id );
-
-					// --------------------------------------------------------------------------
-
-					//	Where are we redirecting too?
 					redirect( $_u->group_homepage );
 					return;
 
@@ -82,7 +90,6 @@ class NAILS_Activate extends NAILS_Auth_Controller
 			endif;
 
 		endif;
-
 
 		// --------------------------------------------------------------------------
 

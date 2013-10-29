@@ -1543,12 +1543,29 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function email_verify( $email )
+	public function email_verify( $id_email, $code = NULL )
 	{
 		$this->db->set( 'is_verified', TRUE );
 		$this->db->set( 'date_verified', 'NOW()', FALSE );
-		$this->db->where( 'email', $email );
+
+		if ( is_numeric( $id_email ) ) :
+
+			$this->db->where( 'user_id', $id_email );
+
+		else :
+
+			$this->db->where( 'email', $id_email );
+
+		endif;
+
 		$this->db->where( 'is_verified', FALSE );
+
+		if ( $code ) :
+
+			$this->db->where( 'code', $code );
+
+		endif;
+
 		$this->db->update( NAILS_DB_PREFIX . 'user_email' );
 
 		return (bool) $this->db->affected_rows();
