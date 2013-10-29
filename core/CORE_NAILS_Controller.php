@@ -243,7 +243,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			$whitelist_ip = explode(',', MAINTENANCE_WHITELIST );
 
-			if ( array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
+			if ( ! $this->input->is_cli_request() && array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
 
 				header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
 				header( 'Status: 503 Service Temporarily Unavailable' );
@@ -251,24 +251,50 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 				// --------------------------------------------------------------------------
 
-		 		//	Look for an app override
-		 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
+				//	If the request is an AJAX request, or the URL is on the API then spit back JSON
+				if ( $this->input->is_ajax_request() || $this->uri->segment( 1 ) == 'api' ) :
 
-		 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+					header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+					header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+					header( 'Content-type: application/json' );
+					header( 'Pragma: no-cache' );
 
-		 		//	Fall back to the Nails maintenance page
-		 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+					$_out = array( 'status' => 503, 'error' => 'Down for Maintenance' );
 
-		 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+					echo json_encode( $_out );
 
-		 		//	Fall back, back to plain text
-		 		else :
+				//	Otherwise, render some HTML
+				else :
 
-		 			echo '<h1>Down for maintenance</h1>';
+			 		//	Look for an app override
+			 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
+
+			 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+
+			 		//	Fall back to the Nails maintenance page
+			 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+
+			 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+
+			 		//	Fall back, back to plain text
+			 		else :
+
+			 			echo '<h1>Down for maintenance</h1>';
+
+			 		endif;
 
 		 		endif;
 
-		 		// --------------------------------------------------------------------------
+				// --------------------------------------------------------------------------
+
+		 		//	Halt script execution
+	 			exit(0);
+
+	 		elseif ( $this->input->is_cli_request() ) :
+
+	 			echo 'Down for Maintenance' . "\n";
+
+				// --------------------------------------------------------------------------
 
 		 		//	Halt script execution
 	 			exit(0);
