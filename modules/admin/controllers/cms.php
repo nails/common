@@ -524,7 +524,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'description',	'Description',	'xss_clean' );
 			$this->form_validation->set_rules( 'located',		'Located',		'xss_clean' );
 			$this->form_validation->set_rules( 'type',			'Block Type',	'xss_clean|required|callback__fvcallback_block_type' );
-			$this->form_validation->set_rules( 'value',			'Value',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'value',			'Value',		'xss_clean' );
 
 			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'string_to_boolean',	lang( 'fv_required' ) );

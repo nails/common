@@ -83,7 +83,7 @@
 						<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
 							<li class="revision">
 								<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
-									<?=$revision->value?>
+									<?=$revision->value ? $revision->value : '<span class="no-data">No Value</span>'?>
 								</span>
 							</li>
 						<?php endforeach; ?>

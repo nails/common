@@ -279,7 +279,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 				$this->db->set( 'block_translation_id', $_block_translation->id );
 				$this->db->set( 'value', $_old->value );
-				$this->db->set( 'created', $_old->created );
+				$this->db->set( 'created', $_old->modified );
 				$this->db->set( 'created_by', $_old->modified_by );
 				$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation_revision' );
 

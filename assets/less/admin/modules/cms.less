@@ -6,7 +6,7 @@
 		{
 			.title
 			{
-				
+
 			}
 			.url
 			{
@@ -50,15 +50,15 @@
 			margin-bottom:0;
 		}
 	}
-	
+
 	table
 	{
 		th.title,
 		td.title
 		{
-			
+
 		}
-		
+
 		th.default,
 		td.default
 		{
@@ -67,13 +67,13 @@
 			text-overflow:ellipsis;
 			max-width:225px;
 		}
-		
+
 		th.translations,
 		td.translations
 		{
 			max-width:305px;
 		}
-		
+
 		td.translations
 		{
 			ul
@@ -82,7 +82,7 @@
 				padding:0;
 				margin:0;
 				max-width:350px;
-				
+
 				li
 				{
 					border:1px solid #CCC;
@@ -93,20 +93,20 @@
 					overflow: hidden;
 					text-overflow:ellipsis;
 					max-width:100%;
-					
+
 					.lang,
 					.value
 					{
 
 					}
-					
+
 					.lang
 					{
 						display:inline-block;
 						white-space: nowrap;
 						overflow: hidden;
 						text-overflow:ellipsis;
-						
+
 						width:75px;
 						background:#EEE;
 						padding:3px 10px 5px 10px;
@@ -114,21 +114,21 @@
 						margin-right:7px;
 					}
 				}
-				
+
 				li:last-of-type
 				{
 					margin-bottom: 0px;
 				}
 			}
 		}
-		
+
 		th.actions,
 		td.actions
 		{
 			text-align:center;
 		}
 	}
-	
+
 	.new-block
 	{
 		margin-top:20px;
@@ -143,11 +143,11 @@
 		background: #f5f5f5;
 		padding: 10px;
 		.nifty-drop-shadow();
-		
+
 		p
 		{
 			margin-bottom:2px;
-			
+
 			strong
 			{
 				float:left;
@@ -158,7 +158,7 @@
 			}
 		}
 	}
-	
+
 	.translation
 	{
 		legend
@@ -185,23 +185,23 @@
 				background-position-y: top;
 			}
 		}
-		
+
 		.system-alert.error
 		{
 			display:none;
 			margin-bottom:10px;
 		}
-		
+
 		.system-alert.notice
 		{
 			margin-top:10px;
 		}
-		
+
 		textarea
 		{
 			width:99%;
 		}
-		
+
 		.revisions
 		{
 			font-size:0.8em;
@@ -209,17 +209,17 @@
 			margin-top:10px;
 			padding:5px;
 			.rounded(4px);
-			
+
 			.summary
 			{
 				margin-bottom:0px;
 			}
-			
+
 			.revision
 			{
 				display:none;
 				margin-top:5px;
-				
+
 				.revision-content
 				{
 					display:block;
@@ -227,9 +227,14 @@
 					padding:3px 10px;
 					background:#FCFCFC;
 					border:1px solid #CCC;
+
+					.no-data
+					{
+						color:#CACACA;
+					}
 				}
 			}
-			
+
 			.revision:last-of-type
 			{
 				margin-bottom:0px;
@@ -243,7 +248,7 @@
 			}
 		}
 	}
-	
+
 	.add-translation
 	{
 		margin-top:10px;
@@ -259,13 +264,13 @@
 		background:#F8F8F8;
 		padding:5px;
 	}
-	
+
 	textarea
 	{
 		width:99%;
 		height:150px;
 	}
-	
+
 	#default-value,
 	ckeditor-warn
 	{
@@ -352,7 +357,7 @@
 	.editor
 	{
 		position:relative;
-		
+
 		.widgets
 		{
 			float:left;
@@ -360,7 +365,7 @@
 			height:100%;
 			padding:0;
 			margin:0;
-			
+
 			.widget
 			{
 				list-style-type: none;
@@ -377,29 +382,29 @@
 				overflow: hidden;
 				white-space: nowrap;
 			}
-			
+
 			.widget:hover
 			{
 				background-color:#E6E6E6;
 			}
-			
+
 			.widget.Widget_richtext
 			{
 				background-image:url(../img/modules/cms/new-message-icon.png);
 			}
-			
+
 			.widget.Widget_html
 			{
 				background-image:url(../img/modules/cms/code-icon.png);
 				background-position: 10px 13px;
 			}
-			
+
 			.widget.Widget_slider
 			{
 				background-image:url(../img/modules/cms/image-icon.png);
 			}
 		}
-		
+
 		.holders
 		{
 			float:left;
@@ -409,7 +414,7 @@
 			margin:0;
 			border-left:1px solid #CCC;
 			border:1px dotted #EFEFEF;
-			
+
 			.empty
 			{
 				display:none;
@@ -420,7 +425,7 @@
 				font-size:1.3em;
 				color:#999;
 			}
-			
+
 			.holder
 			{
 				list-style-type: none;
@@ -429,7 +434,7 @@
 				margin:5px 5px 10px 5px;
 				position: relative;
 				background:#FFF;
-				
+
 				.handle
 				{
 					padding:10px;
@@ -446,7 +451,7 @@
 					background-image:url(../img/modules/cms/list-icon3.png);
 					background-position: 10px 13px;
 					background-repeat: no-repeat;
-					
+
 					small
 					{
 						display:block;
@@ -454,7 +459,7 @@
 						position: relative;
 						top:-3px;
 					}
-					
+
 					a.close
 					{
 						position:absolute;
@@ -477,22 +482,22 @@
 						background-position-y: top;
 					}
 				}
-				
+
 				.editor-content
 				{
 					float:none;
 					margin-top:43px;
-					
+
 					.system-alert
 					{
 						margin-bottom:7px;
 					}
-					
+
 					.coming-soon
 					{
 						padding:50px;
 						text-align:center;
-						
+
 						strong
 						{
 							display:block;
@@ -502,13 +507,13 @@
 					}
 				}
 			}
-			
+
 			.holder.target
 			{
 				height:150px;
 				background:#FAFAFA;
 			}
-			
+
 			.holder.Widget_richtext,
 			.holder.Widget_html
 			{
@@ -528,7 +533,7 @@
 					box-shadow: none;
 				}
 			}
-			
+
 			.holder.Widget_image
 			{
 				label
