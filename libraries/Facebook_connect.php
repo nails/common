@@ -52,9 +52,19 @@ class Facebook_Connect
 	 * @access	public
 	 * @return	void
 	 **/
-	public function user_is_linked()
+	public function user_is_linked( $user_id = NULL )
 	{
-		return (bool) active_user( 'fb_id' );
+		if ( is_null( $user_id ) ) :
+
+			return (bool) active_user( 'fb_id' );
+
+		else :
+
+			$_u = get_userobject()->get_by_id( $user_id );
+
+			return ! empty( $_u->fb_id );
+
+		endif;
 	}
 
 
@@ -166,12 +176,47 @@ class Facebook_Connect
 	 * @param	int	$user_id The ID of the user to unlink
 	 * @return	void
 	 **/
-	public function unlink_user( $user_id )
+	public function unlink_user( $user_id = NULL )
 	{
-		//	TODO Use the supplied user_id rather than the active_user
-		//	Attempt to revoke permissions on Facebook
+		//	Grab reference to the userobject
+		$_userobj =& get_userobject();
 
-		$this->_facebook->api( '/' . active_user( 'fb_id' ) . '/permissions', 'DELETE' );
+		// --------------------------------------------------------------------------
+
+		if ( is_null( $user_id ) ) :
+
+			$_uid	= active_user( 'id' );
+			$_fb_id	= active_user( 'fb_id' );
+
+		else :
+
+			if ( is_callable( array( $_userobj, 'get_by_id' ) ) ) :
+
+				$_u = get_userobject()->get_by_id( $user_id );
+
+				if ( ! empty( $_u->fb_id ) ) :
+
+					$_uid	= $_u->id;
+					$_fb_id	= $_u->fb_id;
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Attempt to revoke permissions on Facebook
+		$this->_facebook->api( '/' . $_fb_id . '/permissions', 'DELETE' );
 
 		// --------------------------------------------------------------------------
 
@@ -180,15 +225,13 @@ class Facebook_Connect
 		// --------------------------------------------------------------------------
 
 		//	Update our user
-		$_userobj =& get_userobject();
-
 		if ( is_callable( array( $_userobj, 'update' ) ) ) :
 
 			$_data				= array();
 			$_data['fb_id']		= NULL;
 			$_data['fb_token']	= NULl;
 
-			return $_userobj->update( $user_id, $_data );
+			return $_userobj->update( $_uid, $_data );
 
 		else :
 

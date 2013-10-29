@@ -52,9 +52,19 @@ class Linkedin_connect
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function user_is_linked()
+	public function user_is_linked( $user_id = NULL )
 	{
-		return (bool) active_user( 'li_id' );
+		if ( is_null( $user_id ) ) :
+
+			return (bool) active_user( 'li_id' );
+
+		else :
+
+			$_u = get_userobject()->get_by_id( $user_id );
+
+			return ! empty( $_u->li_id );
+
+		endif;
 	}
 
 
@@ -256,11 +266,55 @@ class Linkedin_connect
 	 **/
 	public function unlink_user( $user_id )
 	{
-		//	Update our user
-		$_data['li_id']		= NULL;
-		$_data['li_token']	= NULl;
+		//	Grab reference to the userobject
+		$_userobj =& get_userobject();
 
-		return get_userobject()->update( $user_id, $_data );
+		// --------------------------------------------------------------------------
+
+		if ( is_null( $user_id ) ) :
+
+			$_uid = active_user( 'id' );
+
+		else :
+
+			if ( is_callable( array( $_userobj, 'get_by_id' ) ) ) :
+
+				$_u = get_userobject()->get_by_id( $user_id );
+
+				if ( ! empty( $_u->id ) ) :
+
+					$_uid	= $_u->id;
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Update our user
+		if ( is_callable( array( $_userobj, 'update' ) ) ) :
+
+			$_data				= array();
+			$_data['li_id']		= NULL;
+			$_data['li_token']	= NULl;
+
+			return $_userobj->update( $_uid, $_data );
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
 }
 

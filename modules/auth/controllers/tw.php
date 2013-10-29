@@ -352,7 +352,36 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 	public function disconnect()
 	{
-		dumpanddie( 'TODO Handle disconnection' );
+		if ( $this->user->is_logged_in() ) :
+
+			if ( $this->tw->user_is_linked() ) :
+
+				//	User is currently linked, disconnect them
+				if ( $this->tw->unlink_user() ) :
+
+					$this->session->set_flashdata( 'success', lang( 'auth_social_disconnect_ok', 'Twitter' ) );
+					$this->_redirect( $this->_return_to );
+
+				else :
+
+					$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_not_linked', 'Twitter' ) );
+					$this->_redirect( $this->_return_to_fail );
+
+				endif;
+
+			else :
+
+				$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_not_linked', 'Twitter' ) );
+				$this->_redirect( $this->_return_to_fail );
+
+			endif;
+
+		else :
+
+			$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_not_logged_in', 'Twitter' ) );
+			$this->_redirect( $this->_return_to_fail );
+
+		endif;
 	}
 
 

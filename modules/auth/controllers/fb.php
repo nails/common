@@ -378,7 +378,36 @@ class NAILS_Fb extends NAILS_Auth_Controller
 	 **/
 	public function disconnect()
 	{
-		dumpanddie( 'TODO Handle disconnection' );
+		if ( $this->user->is_logged_in() ) :
+
+			if ( $this->fb->user_is_linked() ) :
+
+				//	User is currently linked, disconnect them
+				if ( $this->fb->unlink_user() ) :
+
+					$this->session->set_flashdata( 'success', lang( 'auth_social_disconnect_ok', 'Facebook' ) );
+					$this->_redirect( $this->_return_to );
+
+				else :
+
+					$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_fail', 'Facebook' ) );
+					$this->_redirect( $this->_return_to_fail );
+
+				endif;
+
+			else :
+
+				$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_not_linked', 'Facebook' ) );
+				$this->_redirect( $this->_return_to_fail );
+
+			endif;
+
+		else :
+
+			$this->session->set_flashdata( 'error', lang( 'auth_social_no_disconnect_not_logged_in', 'Facebook' ) );
+			$this->_redirect( $this->_return_to_fail );
+
+		endif;
 	}
 
 

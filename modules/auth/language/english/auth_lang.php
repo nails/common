@@ -76,6 +76,10 @@
 	$lang['auth_social_linked_ok']						= '<strong>Success</strong>, your %s account is now linked.';
 	$lang['auth_social_register_ok']					= '<strong>Hi, %s!</strong> Your account has been set up and is ready to be used.';
 	$lang['auth_social_register_disabled']				= '<strong>Sorry,</strong> new registrations are not permitted.';
+	$lang['auth_social_disconnect_ok']					= '<strong>Success!</strong> Your %s account was successfully disconnected.';
+	$lang['auth_social_no_disconnect_fail']				= '<strong>Sorry,</strong> there was a problem disconnecting your %s account.';
+	$lang['auth_social_no_disconnect_not_linked']		= '<strong>Sorry,</strong> your account is not currently linked to a %s account.';
+	$lang['auth_social_no_disconnect_not_logged_in']	= '<strong>Sorry,</strong> you must be logged in to disconnect your %s account.';
 
 	// --------------------------------------------------------------------------
 
