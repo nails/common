@@ -195,7 +195,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Deployment specific constants (if not already defined)
 		//	These should be specified in settings/deploy.php
 
-		if ( ! defined( 'DEPLOY_CACHE_DIR') )				define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
 		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'' );
 		if ( ! defined( 'DEPLOY_CDN_PATH') )				define( 'DEPLOY_CDN_PATH',				FCPATH . 'assets/uploads/' );
@@ -208,6 +207,13 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
 		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
 
+		// --------------------------------------------------------------------------
+
+		//	Caching
+		if ( ! defined( 'DEPLOY_CACHE_DIR') )				define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
+
+		//	Update the system configs to use this cache dir
+		$this->config->set_item( 'cache_path', DEPLOY_CACHE_DIR );
 
 		// --------------------------------------------------------------------------
 
