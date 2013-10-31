@@ -362,7 +362,7 @@ class NAILS_Datetime_model extends NAILS_Model
 
 	// --------------------------------------------------------------------------
 
-	public function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
+	static function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
 		if( empty( $date ) || $date == '0000-00-00' ) :
 
@@ -464,6 +464,29 @@ class NAILS_Datetime_model extends NAILS_Model
 			return "{$difference} {$periods[$j]} {$tense}";
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	static function get_code_from_timezone( $timezone )
+	{
+		$_abbreviations = DateTimeZone::listAbbreviations();
+
+		foreach( $_abbreviations AS $code => $values ) :
+
+			foreach ( $values AS $v ):
+
+				if ( $v['timezone_id'] == $timezone ) :
+
+					return strtoupper( $code );
+
+				endif;
+
+			endforeach;
+
+		endforeach;
 	}
 
 	// --------------------------------------------------------------------------
