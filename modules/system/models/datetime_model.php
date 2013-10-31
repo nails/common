@@ -58,7 +58,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		//	Has a specific timestamp been given?
 		if ( is_null( $timestamp ) ) :
 
-			$timestamp = date( 'Y-m-d H:i:s' );
+			$timestamp = date( 'Y-m-d' );
 
 		else :
 
@@ -464,6 +464,59 @@ class NAILS_Datetime_model extends NAILS_Model
 			return "{$difference} {$periods[$j]} {$tense}";
 
 		endif;
+	}
+
+	// --------------------------------------------------------------------------
+
+	//	CONVERSION METHODS
+
+	// --------------------------------------------------------------------------
+
+	static function convert_datetime( $timestamp, $to_tz, $from_tz = 'UTC' )
+	{
+		//	Has a specific timestamp been given?
+		if ( is_null( $timestamp ) ) :
+
+			$timestamp = date( 'Y-m-d H:i:s' );
+
+		else :
+
+			//	Are we dealing with a UNIX timestamp or a datetime?
+			if ( ! is_numeric( $timestamp ) ) :
+
+				if ( ! $timestamp || $timestamp == '0000-00-00' ) :
+
+					return '';
+
+				endif;
+
+				$timestamp = date( 'Y-m-d H:i:s', strtotime( $timestamp ) );
+
+			else :
+
+				if ( ! $timestamp ) :
+
+					return '';
+
+				endif;
+
+				$timestamp = date( 'Y-m-d H:i:s', $timestamp );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Perform the conversion
+		$_from_tz	= new DateTimeZone( $from_tz );
+		$_out		= new Datetime( $timestamp, $_from_tz );
+
+		//	Set the output timezone
+		$_to_tz		= new DateTimeZone( $to_tz );
+		$_out->setTimeZone( $_to_tz );
+
+		return $_out->format( 'Y-m-d H:i:s' );
 	}
 }
 
