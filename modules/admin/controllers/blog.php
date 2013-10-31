@@ -164,7 +164,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 			if ( $this->form_validation->run() ) :
 
 				//	Prepare data
-				$_data = array();
+				$_data						= array();
 				$_data['title']				= $this->input->post( 'title' );
 				$_data['excerpt']			= $this->input->post( 'excerpt' );
 				$_data['image_id']			= $this->input->post( 'image_id' );

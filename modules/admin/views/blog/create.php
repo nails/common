@@ -37,7 +37,7 @@
 		</ul>
 		<section class="tabs pages">
 
-			<div class="tab page fieldset" id="tab-meta">
+			<div class="tab page fieldset active" id="tab-meta">
 				<?php
 
 				//	Published

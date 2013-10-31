@@ -37,7 +37,7 @@
 		</ul>
 		<section class="tabs pages">
 
-			<div class="tab page fieldset" id="tab-meta">
+			<div class="tab page fieldset active" id="tab-meta">
 				<?php
 
 				//	Published
@@ -61,7 +61,7 @@
 				$_field['default']		= $post->title;
 				$_field['placeholder']	= 'The title of the post';
 
-				echo form_field( $_field, 'tippy tip tip' );
+				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@
 				$_field['default']		= $post->excerpt;
 				$_field['placeholder']	= 'A short excerpt of the post, this will be shown in locations where a summary is required.';
 
-				echo form_field( $_field, 'tipy tip tip' );
+				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
