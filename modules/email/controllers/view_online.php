@@ -69,7 +69,7 @@ class NAILS_View_Online extends NAILS_Email_Controller
 		$_data['email_subject']	= $_email->subject;
 		$_data['site_url']		= site_url();
 		$_data['secret']		= APP_PRIVATE_KEY;
-
+		$_data['email_type_id']	= $_email->type_id;
 
 		$_data['sent_to']				= new stdClass();
 		$_data['sent_to']->email		= $_email->sent_to;

@@ -39,7 +39,23 @@ class NAILS_Login extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Where are we returning user to?
-		$this->data['return_to'] = $this->input->get( 'return_to' );
+		$_return_to = site_url( $this->input->get( 'return_to' ) );
+		$_return_to = parse_url( $_return_to );
+
+		//	urlencode the query if there is one
+		if ( ! empty( $_return_to['query'] ) ) :
+
+			//	Break it apart and glue it together (urlencoded)
+			$_query = parse_str( $_return_to['query'], $_query_ar );
+			$_return_to['query'] = http_build_query( $_query_ar );
+
+		endif;
+
+		$this->data['return_to']  = '';
+		$this->data['return_to'] .= ! empty( $_return_to['scheme'] )	? $_return_to['scheme'] . '://'	: 'http://';
+		$this->data['return_to'] .= ! empty( $_return_to['host'] )		? $_return_to['host']			: site_url();
+		$this->data['return_to'] .= ! empty( $_return_to['path'] )		? $_return_to['path']			: '';
+		$this->data['return_to'] .= ! empty( $_return_to['query'] )		? '?' . $_return_to['query']	: '';
 
 		// --------------------------------------------------------------------------
 

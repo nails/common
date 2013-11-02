@@ -244,10 +244,7 @@ class Emailer
 		//	Check to see if the user has opted out of receiving these emails
 		if ( $input->to_id ) :
 
-			$this->db->where( 'user_id', $input->to_id );
-			$this->db->where( 'type_id', $this->email_type[ $input->type ]->id );
-
-			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'user_email_blocker' ) ) :
+			if ( $this->user_has_unsubscribed( $input->to_id, $this->email_type[ $input->type ]->id ) ) :
 
 				//	User doesn't want to receive these notifications; abort.
 				return TRUE;
@@ -310,6 +307,61 @@ class Emailer
 	// --------------------------------------------------------------------------
 
 
+	public function user_has_unsubscribed( $user_id, $type_id )
+	{
+		$this->db->where( 'user_id', $user_id );
+		$this->db->where( 'type_id', $type_id );
+
+		return (bool) $this->db->count_all_results( NAILS_DB_PREFIX . 'user_email_blocker' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function unsubscribe_user( $user_id, $type_id )
+	{
+		if ( $this->user_has_unsubscribed( $user_id, $type_id ) ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->set( 'user_id', $user_id );
+		$this->db->set( 'type_id', $type_id );
+		$this->db->set( 'created', 'NOW()', FALSE );
+		$this->db->insert( NAILS_DB_PREFIX . 'user_email_blocker' );
+
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function subscribe_user( $user_id, $type_id )
+	{
+		if ( ! $this->user_has_unsubscribed( $user_id, $type_id ) ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->where( 'user_id', $user_id );
+		$this->db->where( 'type_id', $type_id );
+		$this->db->delete( NAILS_DB_PREFIX . 'user_email_blocker' );
+
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Send a templated email immediately
 	 *
@@ -351,6 +403,7 @@ class Emailer
 		$_send->to->id				= (int) $_email->user_id;
 		$_send->to->group_id		= $_email->user_group;
 		$_send->to->login_url		= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
+		$_send->email_type_id		= $_email->type_id;
 		$_send->subject				= $_email->subject;
 		$_send->template			= $_email->template_file;
 		$_send->template_pt			= $_email->template_file . '_plaintext';
@@ -655,7 +708,7 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		$this->db->select( 'ea.id, ea.ref, ea.email_vars, ea.user_email sent_to, ea.time_sent, ea.read_count, ea.link_click_count' );
+		$this->db->select( 'ea.id, ea.ref, ea.type_id, ea.email_vars, ea.user_email sent_to, ea.time_sent, ea.read_count, ea.link_click_count' );
 		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->db->select( 'et.name, et.template_file, et.default_subject' );
 
