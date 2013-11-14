@@ -77,11 +77,11 @@ class NAILS_User_model extends NAILS_Model
 	public function find_remembered_user()
 	{
 		$_ci =& get_instance();
-
+;
 		// --------------------------------------------------------------------------
 
 		//	User is already logged in, nothing to do.
-		if ( (bool) $_ci->session->userdata( 'email' ) )
+		if ( (bool) $this->is_logged_in() )
 			return;
 
 		// --------------------------------------------------------------------------
@@ -123,25 +123,33 @@ class NAILS_User_model extends NAILS_Model
 		//	Only attempt to log in a user if they are remembered.
 		//	This constant is set in User_Model::find_remembered_user();
 
-		if ( ! defined( 'LOGIN_REMEMBERED_USER' ) || ! LOGIN_REMEMBERED_USER )
+		if ( ! defined( 'LOGIN_REMEMBERED_USER' ) || ! LOGIN_REMEMBERED_USER ) :
+
 			return;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Get the credentials from the constant set earlier
-		list( $_email, $_code ) = explode( '|', LOGIN_REMEMBERED_USER );
+		$_remember = explode( '|', LOGIN_REMEMBERED_USER );
 
-		// --------------------------------------------------------------------------
+		$_email	= isset( $_remember[0] ) ? $_remember[0] : NULL;
+		$_code	= isset( $_remember[1] ) ? $_remember[1] : NULL;
 
-		//	Look up the user so we can cross-check the codes
-		$_u = $this->get_by_email( $_email, TRUE );
+		if ( $_email && $_code ) :
 
-		if ( $_u && $_code === $_u->remember_code ) :
+			//	Look up the user so we can cross-check the codes
+			$_u = $this->get_by_email( $_email, TRUE );
 
-			//	User was validated, log them in!
-			$this->update_last_login( $_u->id );
-			$this->set_login_data( $_u->id );
-			$this->_me = $_u->id;
+			if ( $_u && $_code === $_u->remember_code ) :
+
+				//	User was validated, log them in!
+				$this->update_last_login( $_u->id );
+				$this->set_login_data( $_u->id );
+				$this->_me = $_u->id;
+
+			endif;
 
 		endif;
 	}

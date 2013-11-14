@@ -39,7 +39,8 @@ class NAILS_Login extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Where are we returning user to?
-		$_return_to = site_url( $this->input->get( 'return_to' ) );
+		$_return_to = $this->input->get( 'return_to' );
+		$_return_to = preg_match( '#^(http|https)\://#', $_return_to ) ? $_return_to : site_url( $_return_to );
 		$_return_to = parse_url( $_return_to );
 
 		//	urlencode the query if there is one
@@ -81,7 +82,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		if ( $this->user->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
-			redirect( '/' );
+			redirect( $this->data['return_to'] );
 
 		endif;
 
@@ -167,7 +168,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 						endif;
 
-						$_redirect = ( $this->data['return_to'] ) ? $this->data['return_to'] : $_login['homepage'];
+						$_redirect = $this->data['return_to'] != site_url() ? $this->data['return_to'] : $_login['homepage'];
 
 						// --------------------------------------------------------------------------
 
@@ -296,7 +297,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Redirect user
-			if ( $this->data['return_to'] ) :
+			if ( $this->data['return_to'] != site_url() ) :
 
 				//	We have somewhere we want to go
 				redirect( $this->data['return_to'] );
@@ -312,7 +313,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 			//	Bad lookup, invalid hash.
 			$this->session->set_flashdata( 'error', lang( 'auth_with_hashes_autologin_fail' ) );
-			redirect( '/' );
+			redirect( $this->data['return_to'] );
 
 		endif;
 	}
