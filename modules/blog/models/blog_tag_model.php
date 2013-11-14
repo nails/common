@@ -74,7 +74,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function create( $label )
 	{
-		$_slug = $this->_generate_slug( $label, 'blog_tag' );
+		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_tag' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $label );
 		$this->db->set( 'created', 'NOW()', FALSE );
@@ -97,7 +97,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function update( $id_slug, $label )
 	{
-		$_slug = $this->_generate_slug( $label, 'blog_tag' );
+		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_tag' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );

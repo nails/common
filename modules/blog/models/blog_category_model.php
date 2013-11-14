@@ -23,7 +23,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM blog_post_category WHERE category_id = c.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category WHERE category_id = c.id) post_count' );
 
 		endif;
 
@@ -75,7 +75,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function create( $label )
 	{
-		$_slug = $this->_generate_slug( $label, 'blog_category' );
+		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_category' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $label );
 		$this->db->set( 'created', 'NOW()', FALSE );
@@ -98,7 +98,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function update( $id_slug, $label )
 	{
-		$_slug = $this->_generate_slug( $label, 'blog_category' );
+		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_category' );
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );
