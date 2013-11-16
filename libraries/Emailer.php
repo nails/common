@@ -415,7 +415,11 @@ class Emailer
 
 		endif;
 
-		$_send->data['ci']			=& get_instance();
+		if ( defined( 'EMAIL_DEBUG' ) && ! EMAIL_DEBUG ) :
+
+			$_send->data['ci']			=& get_instance();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -442,6 +446,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Add some extra, common variables for the template
+		$_send->data['email_type_id']	= $_email->type_id;
 		$_send->data['email_ref']		= $_email->ref;
 		$_send->data['sent_from']		= $_send->from;
 		$_send->data['sent_to']			= $_send->to;
