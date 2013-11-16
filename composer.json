@@ -4,7 +4,7 @@
 	"keywords": ["CodeIgniter"],
 	"homepage": "http://nailsapp.co.uk",
 	"description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
-	"license":"proprietary",
+	"license":"MIT",
 	"authors": [
 		{
 			"name": "Pablo de la Pena",
