@@ -132,7 +132,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 						if ( $this->data['return_to'] ) :
 
-							$_query['return_to'] = urlencode( $this->data['return_to'] );
+							$_query['return_to'] = $this->data['return_to'];
 
 						endif;
 
