@@ -65,6 +65,22 @@ class Local_CDN
 	 **/
 	public function object_create( $bucket, $filename, $sourcefile, $mime )
 	{
+		//	Check directory exists
+		if ( ! is_dir( DEPLOY_CDN_PATH . $bucket ) ) :
+
+			//	Hmm, not writeable, can we create it?
+			if ( ! @mkdir( DEPLOY_CDN_PATH . $bucket ) ) :
+
+				//	Nope, failed to create the directory - we iz gonna have problems if we continue, innit.
+				$this->cdn->set_error( lang( 'cdn_error_target_write_fail_mkdir', DEPLOY_CDN_PATH . $bucket ) );
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Check bucket is writeable
 		if ( ! is_writable( DEPLOY_CDN_PATH . $bucket ) ) :
 

@@ -8,10 +8,11 @@
 */
 
 	//	General Errors
-	$lang['cdn_error_not_configured']		= 'CDN Not configured correctly';
-	$lang['cdn_error_no_file']				= 'You did not select a file to upload.';
-	$lang['cdn_error_cache_write_fail']		= 'Cache directory is not writeable.';
-	$lang['cdn_error_target_write_fail']	= 'The target directory is not writable. <small>(%s)</small>';
+	$lang['cdn_error_not_configured']			= 'CDN Not configured correctly';
+	$lang['cdn_error_no_file']					= 'You did not select a file to upload.';
+	$lang['cdn_error_cache_write_fail']			= 'Cache directory is not writeable.';
+	$lang['cdn_error_target_write_fail_mkdir']	= 'The target directory does not exist and could not be created. <small>(%s)</small>';
+	$lang['cdn_error_target_write_fail']		= 'The target directory is not writable. <small>(%s)</small>';
 
 	//	Bucket errors
 	$lang['cdn_error_bucket_mkdir']			= 'Failed to create bucket directory.';
