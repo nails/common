@@ -92,7 +92,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		if ( $this->input->post() ) :
 
 			//	Validate input
-			$this->form_validation->set_rules( 'email',		'Email',	'required|xss_clean|valid_email' );
+			$this->form_validation->set_rules( 'email',		'Email',	'required|xss_clean|trim|valid_email' );
 			$this->form_validation->set_rules( 'password',	'Password',	'required|xss_clean' );
 
 			$this->form_validation->set_message( 'required',		lang( 'fv_required' ) );
