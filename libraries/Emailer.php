@@ -408,16 +408,11 @@ class Emailer
 		$_send->template			= $_email->template_file;
 		$_send->template_pt			= $_email->template_file . '_plaintext';
 		$_send->data				= $_email->email_vars;
+		$_send->data['ci']			=& get_instance();
 
 		if ( ! is_array( $_send->data ) ) :
 
 			$_send->data			= array();
-
-		endif;
-
-		if ( defined( 'EMAIL_DEBUG' ) && ! EMAIL_DEBUG ) :
-
-			$_send->data['ci']			=& get_instance();
 
 		endif;
 
@@ -906,6 +901,15 @@ class Emailer
 	private function _debugger( $input, $body, $plaintext, $recent_errors )
 	{
 		//	Debug mode, output data and don't actually send
+
+		//	Remove the reference to CI; takes up a ton'na space
+		if ( isset( $input->data['ci'] ) ) :
+
+			$input->data['ci'] = '**REFERENCE TO CODEIGNITER INSTANCE**';
+
+		endif;
+
+		// --------------------------------------------------------------------------
 
 		//	Input variables
 		echo '<pre>';
