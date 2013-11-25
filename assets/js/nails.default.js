@@ -530,12 +530,17 @@ NAILS_JS = function()
 			//	Date pickers
 			$( 'div.field.date input.date' ).each(function()
 			{
-				//	Fetch some info which may be available in the data- attributes
+				//	Fetch some info which may be available in the data attributes
+				var _dateformat	= $(this).data( 'datepicker-dateformat' ) || 'yy-mm-dd';
+				var _yearrange	= $(this).data( 'datepicker-yearrange' ) || 'c-100:c+10';
+
+				//	Instanciate datepicker
 				$(this).datepicker(
 				{
-					dateFormat:'yy-mm-dd',
-					changeMonth: true,
-					changeYear: true
+					dateFormat	: _dateformat,
+					changeMonth	: true,
+					changeYear	: true,
+					yearRange	: _yearrange
 				}).prop( 'readonly', true );
 			});
 		}
@@ -549,10 +554,18 @@ NAILS_JS = function()
 			//	Datetime pickers
 			$( 'div.field.datetime input.datetime' ).each( function()
 			{
+				//	Fetch some info which may be available in the data attributes
+				var _dateformat	= $(this).data( 'datepicker-dateformat' ) || 'yy-mm-dd';
+				var _timeformat	= $(this).data( 'datepicker-timeformat' ) || 'HH:mm:ss';
+				var _yearrange	= $(this).data( 'datepicker-yearrange' ) || 'c-100:c+10';
+
 				$(this).datetimepicker(
 				{
-					dateFormat:'yy-mm-dd',
-					timeFormat:'HH:mm:ss'
+					dateFormat	: _dateformat,
+					timeFormat	: _timeformat,
+					changeMonth	: true,
+					changeYear	: true,
+					yearRange	: _yearrange
 				}).prop( 'readonly', true );
 
 			});
