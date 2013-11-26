@@ -240,7 +240,7 @@ if ( ! function_exists( 'send_developer_mail' ) )
 
 		// --------------------------------------------------------------------------
 
-		$_to		= APP_DEVELOPER_EMAIL;
+		$_to		= ENVIRONMENT != 'production' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
 					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
 					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
