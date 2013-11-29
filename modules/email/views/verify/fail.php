@@ -10,6 +10,6 @@
 	 *
 	 *	You can completely overload this view by creating a view at:
 	 *
-	 *	application/views/auth/activate/fail
+	 *	application/views/email/verify/fail
 	 *
 	 **/

@@ -152,7 +152,7 @@ class Twitter_Connect
 
 		$_request_token = $this->_twitter->oauth_requestToken( $_params );
 
-		if ( ! $_request_token ) :
+		if ( ! $_request_token || ( ! empty( $_request_token->httpstatus && $_request_token->httpstatus !== 200 ) ) ) :
 
 			return FALSE;
 

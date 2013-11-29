@@ -1489,9 +1489,20 @@ class NAILS_User_model extends NAILS_Model
 
 	public function email_add( $user_id, $email, $is_primary = FALSE, $is_verified = FALSE, $send_email = TRUE )
 	{
+		$_u = $this->get_by_id( $user_id );
+
+		if ( ! $_u ) :
+
+			$this->_set_error( 'Invalid User ID' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_code = $this->salt();
 
-		$this->db->set( 'user_id',		(int) $user_id );
+		$this->db->set( 'user_id',		$_u->id );
 		$this->db->set( 'email',		trim( strtolower( $email ) ) );
 		$this->db->set( 'code',			$_code );
 		$this->db->set( 'is_verified',	(bool) $is_verified );
@@ -1509,19 +1520,29 @@ class NAILS_User_model extends NAILS_Model
 			endif;
 
 			//	Send off the verification email
-			if ( $send_email ) :
-
-				//	TODO: Send an email with a verification link
-				$_email					= new stdClass();
-				$_email->to_id			= $user_id;
-				$_email->type			= 'verify_email';
-				$_email->data			= array();
-				$_email->data['user']	= $this->get_by_id( $user_id );
-				$_email->data['group']	= $_email->data['user']->group_name;
-				$_email->data['code']	= $_code;
+			if ( $send_email && ! $is_verified ) :
 
 				$this->load->library( 'emailer' );
-				$this->emailer->send( $_email );
+
+				$_email						= new stdClass();
+				$_email->type				= 'verify_email_' . $_u->group_id;
+				$_email->to_id				= $_u->id;
+				$_email->data				= array();
+				$_email->data['user_id']	= $_u->id;
+				$_email->data['code']		= $_code;
+
+				if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+					//	Failed to send using the group email, try using the generic email template
+					$_email->type = 'verify_email';
+
+					if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+						//	Email failed to send, for now, do nothing.
+
+					endif;
+
+				endif;
 
 			endif;
 
@@ -1551,28 +1572,48 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function email_verify( $id_email, $code = NULL )
+	public function email_verify( $id_email, $code )
 	{
-		$this->db->set( 'is_verified', TRUE );
-		$this->db->set( 'date_verified', 'NOW()', FALSE );
-
+		//	Check user exists
 		if ( is_numeric( $id_email ) ) :
 
-			$this->db->where( 'user_id', $id_email );
+			$_user = $this->get_by_id( $id_email );
 
 		else :
 
-			$this->db->where( 'email', $id_email );
+			$_user = $this->get_by_email( $id_email );
 
 		endif;
 
+		if ( ! $_user ) :
+
+			$this->_set_error( 'User does not exist.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Check if email has already been verified
+		$this->db->where( 'user_id', $_user->id );
+		$this->db->where( 'is_verified', TRUE );
+		$this->db->where( 'code', $code );
+
+		if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'user_email' ) ) :
+
+			$this->_set_error( 'Email has already been verified.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Go ahead and set as verified
+		$this->db->set( 'is_verified', TRUE );
+		$this->db->set( 'date_verified', 'NOW()', FALSE );
+		$this->db->where( 'user_id', $_user->id );
 		$this->db->where( 'is_verified', FALSE );
-
-		if ( $code ) :
-
-			$this->db->where( 'code', $code );
-
-		endif;
+		$this->db->where( 'code', $code );
 
 		$this->db->update( NAILS_DB_PREFIX . 'user_email' );
 
@@ -2075,10 +2116,13 @@ class NAILS_User_model extends NAILS_Model
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function create( $email, $password, $group_id, $data = FALSE )
+	public function create( $email, $password, $group_id = NULL, $data = FALSE )
 	{
-		if ( ! $email || ! $group_id )
+		if ( ! $email || ! $group_id ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2094,7 +2138,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	All should be ok, go ahead and create the account
-		$_ip_address		= $this->input->ip_address();
+		$_ip_address = $this->input->ip_address();
 
 		// --------------------------------------------------------------------------
 
@@ -2114,7 +2158,75 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Check that we're dealing with a valid group
+		if ( is_null( $group_id ) ) :
+
+			$group_id = APP_USER_DEFAULT_GROUP;
+
+		endif;
+
+		$_group = $this->get_group( $group_id );
+
+		if ( ! $_group ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Check we're dealing with a valid auth_method
+		if ( ! empty( $data['auth_method_id'] ) ) :
+
+			if ( is_numeric( $data['auth_method_id'] ) ) :
+
+				$this->db->where( 'id', (int) $data['auth_method_id'] );
+
+			else :
+
+				//	TODO: Change this column to be called `slug`
+				$this->db->where( 'type', $data['auth_method_id'] );
+
+			endif;
+
+			$_auth_method = $this->db->get( NAILS_DB_PREFIX . 'user_auth_method' )->row();
+
+			if ( ! $_auth_method ) :
+
+				//	Define a use friendly error (this may be shown to them)
+				$this->_set_error( 'There was an error creating the user account - Error #001' );
+
+				//	This is a problem, email devs
+				send_developer_mail( 'No auth method available for the supplied auth_method_id', 'The user_model->create() method was called with an invalid auth_method_id ("' . $data['auth_method_id'] . '"). This needs investigated and corrected.' );
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			//	TODO: this column should be `slug`
+			$this->db->where( 'type', 'native' );
+			$_auth_method = $this->db->get( NAILS_DB_PREFIX . 'user_auth_method' )->row();
+
+			if ( ! $_auth_method ) :
+
+				//	Define a use friendly error (this may be shown to them)
+				$this->_set_error( 'There was an error creating the user account - Error #002' );
+
+				//	This is a problem, email devs
+				send_developer_mail( 'No Native Authentication Method', 'There is no authentication method defined in the database for native registrations.' );
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		// Users table
+		$_data						= array();
 		$_data['password']			= $_password[0];
 		$_data['password_md5']		= md5( $_password[0] );
 		$_data['group_id']			= $group_id;
@@ -2122,34 +2234,37 @@ class NAILS_User_model extends NAILS_Model
 		$_data['last_ip']			= $_ip_address;
 		$_data['created']			= date( 'Y-m-d H:i:s' );
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
-		$_data['is_suspended']		= ( isset( $data['is_suspended'] ) && $data['is_suspended'] )	? 1	: 0 ;
+		$_data['is_suspended']		= isset( $data['is_suspended'] ) && $data['is_suspended']	? 1	: 0 ;
 		$_data['salt']				= $_password[1];
-		$_data['temp_pw']			= ( isset( $data['temp_pw'] ) && $data['temp_pw'] )	? 1	: 0 ;
-		$_data['auth_method_id']	= ( isset( $data['auth_method_id'] ) )				? $data['auth_method_id']	: 1 ;
+		$_data['temp_pw']			= ! empty( $data['temp_pw'] )			? TRUE	: FALSE ;
+		$_data['auth_method_id']	= $_auth_method->id;
 
 		//	Facebook oauth details
-		$_data['fb_token']			= ( isset( $data['fb_token'] ) )	? $data['fb_token']		: NULL ;
-		$_data['fb_id']				= ( isset( $data['fb_id'] ) )		? $data['fb_id']		: NULL ;
+		$_data['fb_token']			= ! empty( $data['fb_token'] )	? $data['fb_token']		: NULL ;
+		$_data['fb_id']				= ! empty( $data['fb_id'] )		? $data['fb_id']		: NULL ;
 
 		//	Twitter oauth details
-		$_data['tw_id']				= ( isset( $data['tw_id'] ) )		? $data['tw_id']		: NULL ;
-		$_data['tw_token']			= ( isset( $data['tw_token'] ) )	? $data['tw_token']		: NULL ;
-		$_data['tw_secret']			= ( isset( $data['tw_secret'] ) )	? $data['tw_secret']	: NULL ;
+		$_data['tw_id']				= ! empty( $data['tw_id'] )		? $data['tw_id']		: NULL ;
+		$_data['tw_token']			= ! empty( $data['tw_token'] )	? $data['tw_token']		: NULL ;
+		$_data['tw_secret']			= ! empty( $data['tw_secret'] )	? $data['tw_secret']	: NULL ;
 
 		//	Linkedin oauth details
-		$_data['li_id']				= ( isset( $data['li_id'] ) )		? $data['li_id']		: NULL ;
-		$_data['li_token']			= ( isset( $data['li_token'] ) )	? $data['li_token']		: NULL ;
+		$_data['li_id']				= ! empty( $data['li_id'] )		? $data['li_id']		: NULL ;
+		$_data['li_token']			= ! empty( $data['li_token'] )	? $data['li_token']		: NULL ;
 
 		//	Referral code
 		$_data['referral']			= $this->_generate_referral();
 
 		//	Other data
-		$_data['salutation']		= ( isset( $data['salutation'] ) )	? $data['salutation']	: NULL ;
-		$_data['first_name']		= ( isset( $data['first_name'] ) )	? $data['first_name']	: NULL ;
-		$_data['last_name']			= ( isset( $data['last_name'] ) )	? $data['last_name']	: NULL ;
+		$_data['salutation']		= ! empty( $data['salutation'] )	? $data['salutation']	: NULL ;
+		$_data['first_name']		= ! empty( $data['first_name'] )	? $data['first_name']	: NULL ;
+		$_data['last_name']			= ! empty( $data['last_name'] )		? $data['last_name']	: NULL ;
 
-		if ( isset( $data['gender'] ) )
+		if ( isset( $data['gender'] ) ) :
+
 			$_data['gender'] = $data['gender'];
+
+		endif;
 
 		if ( isset( $data['timezone'] ) ) :
 
@@ -2169,14 +2284,23 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		if ( isset( $data['date_format_date_id'] ) )
+		if ( isset( $data['date_format_date_id'] ) ) :
+
 			$_data['date_format_date_id'] = $data['date_format_date_id'];
 
-		if ( isset( $data['date_format_time_id'] ) )
+		endif;
+
+		if ( isset( $data['date_format_time_id'] ) ) :
+
 			$_data['date_format_time_id'] = $data['date_format_time_id'];
 
-		if ( isset( $data['language_id'] ) )
+		endif;
+
+		if ( isset( $data['language_id'] ) ) :
+
 			$_data['language_id'] = $data['language_id'];
+
+		endif;
 
 		//	Unset extra data fields which have been used already
 		unset( $data['temp_pw'] );
@@ -2262,7 +2386,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Finally add the email address to the user_email table
 		$_verified = isset( $data['is_verified'] ) && $data['is_verified'] ? TRUE : FALSE ;
 
-		$_code = $this->email_add( $_id, $email, TRUE, $_verified, FALSE );
+		$_code = $this->email_add( $_id, $email, TRUE, $_verified, TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2563,7 +2687,18 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_group( $group_id )
 	{
-		$this->db->where( 'id', $group_id );
+		if ( is_numeric( $group_id ) ) :
+
+			$this->db->where( 'id', (int) $group_id );
+
+		else :
+
+			//	TODO: change this column to `slug`
+			$this->db->where( 'name', $group_id );
+
+		endif;
+
+
 		$_group = $this->get_groups();
 
 		// --------------------------------------------------------------------------

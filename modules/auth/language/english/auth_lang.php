@@ -102,13 +102,14 @@
 	$lang['auth_register_label_accept_tc']				= 'I accept the <a href="%s">T&amp;C\'s</a>';
 
 	$lang['auth_register_social_message']				= 'Or, to save time, register using your preferred social network.';
-	$lang['auth_register_social_signin']				= 'Register with %s';
+	$lang['auth_register_social_signin']				= 'Sign in with %s';
+	$lang['auth_register_social_register']				= 'Register with %s';
 
 	//	Extra info
 	$lang['auth_register_extra_message']				= 'In order to complete setting up your account we need a little more information from you.';
 
 	//	Wait for activation email
-	$lang['auth_register_wait_message']					= 'An activation email with a link to activate your account has been sent to:';
+	$lang['auth_register_wait_message']					= 'An email with a link to verify your email address has been sent to:';
 	$lang['auth_register_wait_next_title']				= 'What to do next';
 	$lang['auth_register_wait_next_message']			= 'Check your e-mail (including spam folders) and click on the link to activate your account! It can take up to 60 seconds to receive your activation e-mail. If you have not received it, use the link below.';
 	$lang['auth_register_wait_help_title']				= 'Help! I Didn\'t Receive an E-mail';
@@ -123,19 +124,6 @@
 
 	//	Extra info lang strings
 	$lang['auth_register_extra_title']					= 'Almost there!';
-
-
-	// --------------------------------------------------------------------------
-
-
-	//	Activate lang strings
-	$lang['auth_email_verify_ok']						= '<strong>Success!</strong> Email verified successfully, thanks!';
-
-	//	Verify fail
-	$lang['auth_verify_fail_error']						= '<strong>Oh snap!</strong> We couldn\'t verify your account: ';
-	$lang['auth_failed_verify_verified']				= 'Account already verified.';
-	$lang['auth_failed_verify_invalid_user']			= 'User does not exist.';
-	$lang['auth_failed_verify_invalid_code']			= 'Invalid or expired activation code.';
 
 
 	// --------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Auth [activate]
+ * Name:		Email [verify]
  *
- * Description:	This controller handles activating users
+ * Description:	This controller handles verifying email addresses
  *
  **/
 
@@ -15,9 +15,9 @@
  *
  **/
 
-require_once '_auth.php';
+require_once '_email.php';
 
-class NAILS_Activate extends NAILS_Auth_Controller
+class NAILS_Verify extends NAILS_Email_Controller
 {
 	/**
 	 * Attempt to validate the user's activation code
@@ -53,7 +53,7 @@ class NAILS_Activate extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 
 				//	Set success message
-				$this->session->set_flashdata( 'success', lang( 'auth_email_verify_ok' ) );
+				$this->session->set_flashdata( 'success', lang( 'email_verify_ok' ) );
 
 				// --------------------------------------------------------------------------
 
@@ -93,12 +93,10 @@ class NAILS_Activate extends NAILS_Auth_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['error'] = lang( 'auth_verify_fail_error' ) . lang( $this->user->last_error() );
+		$this->session->set_flashdata( 'error', lang( 'email_verify_fail_error' ) . ' ' . $this->user->last_error() );
 
 		//	Load the views
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'auth/activate/fail',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		redirect( '/' );
 	}
 
 
@@ -124,9 +122,9 @@ class NAILS_Activate extends NAILS_Auth_Controller
 
 
 /**
- * OVERLOADING NAILS' AUTH MODULE
+ * OVERLOADING NAILS' EMAIL MODULE
  *
- * The following block of code makes it simple to extend one of the core auth
+ * The following block of code makes it simple to extend one of the core email
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -149,11 +147,11 @@ class NAILS_Activate extends NAILS_Auth_Controller
 
 if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
 
-	class Activate extends NAILS_Activate
+	class Verify extends NAILS_Verify
 	{
 	}
 
 endif;
 
-/* End of file activate.php */
-/* Location: ./application/modules/auth/controllers/activate.php */
+/* End of file verify.php */
+/* Location: ./application/modules/email/controllers/verify.php */

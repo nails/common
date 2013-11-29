@@ -130,32 +130,23 @@ class NAILS_Register extends NAILS_Auth_Controller
 
 					// --------------------------------------------------------------------------
 
-					//	Some nice data...
-					$this->data['email']	= $email;
-					$this->data['user_id']	= $_uid['id'];
-					$this->data['hash']		= $_uid['activation'];
-
-					// --------------------------------------------------------------------------
-
-					//	Registration was successfull, send the activation email...
+					//	Send the user the welcome email (that is, if there is one)
 					$this->load->library( 'emailer' );
 
 					$_email					= new stdClass();
-					$_email->type			= 'verify_email_' . APP_USER_DEFAULT_GROUP;
-					$_email->to_id			= $_uid['id'];
+					$_email->type			= 'new_user_' . $_group->id;
+					$_email->to_id			= $_user->id;
 					$_email->data			= array();
-					$_email->data['user']	= $_user;
-					$_email->data['group']	= $_group->display_name;
-					$_email->data['code']	= $_uid['activation'];
+					$_email->data['method']	= 'native';
 
 					if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
-						//	Failed to send using the group email, try using the generic email
-						$_email->type = 'verify_email';
+						//	Failed to send using the group email, try using the generic email template
+						$_email->type = 'new_user';
 
 						if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
-							//	Email failed to send, for now, do nothing.
+							//	Email failed to send, musn't exist, oh well.
 
 						endif;
 
@@ -164,17 +155,17 @@ class NAILS_Register extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_uid['id'] );
+					$this->user->set_login_data( $_user->id );
 
 					// --------------------------------------------------------------------------
 
 					//	Create an event for this event
-					create_event( 'did_register', $_uid['id'], 0, NULL, array( 'method' => 'native' ) );
+					create_event( 'did_register', $_user->id, 0, NULL, array( 'method' => 'native' ) );
 
 					// --------------------------------------------------------------------------
 
 					//	Redirect to the group homepage
-					//	TODO There should be the option to enable/disable forced activation
+					//	TODO: There should be the option to enable/disable forced activation
 
 					$this->session->set_flashdata( 'success', lang( 'auth_register_flashdata_welcome', $_user->first_name ) );
 

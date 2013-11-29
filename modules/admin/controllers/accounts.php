@@ -205,7 +205,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : $_default_sort,
 						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : $_default_order
 					);
-					
+
 		$this->accounts_group = ( $this->input->get( 'filter' ) );
 
 		//	Set sorting and ordering info in session data so it's remembered for when user returns
@@ -323,25 +323,25 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				if ( $_new_user ) :
 
-					//	If appropriate, send the activation email
+					//	If appropriate, send new user email
 					if ( string_to_boolean( $this->input->post( 'send_activation' ) ) ) :
 
 						$_email							= new stdClass();
-						$_email->type					= 'verify_email_' . $_group_id;
+						$_email->type					= 'new_user' . $_group_id;
 						$_email->to_id					= $_new_user['id'];
 						$_email->data					= array();
 						$_email->data['admin']			= active_user( 'first_name,last_name' );
-						$_email->data['user']			= $this->user->get_by_id( $_new_user['id'] );
 						$_email->data['password']		= $_password;
-						$_email->data['group']			= $this->user->get_group( $_group_id )->display_name;
-						$_email->data['code']			= $_new_user['activation'];
+						$_email->data['temp_pw']		= $_meta['temp_pw'];
+						$_email->data['group_name']		= $this->user->get_group( $_group_id )->display_name;
+						$_email->data['method']			= 'native';
 
 						$this->load->library( 'emailer' );
 
 						if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 							//	Failed to send using the group email, try using the generic email
-							$_email->type = 'verify_email';
+							$_email->type = 'new_user';
 
 							if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
