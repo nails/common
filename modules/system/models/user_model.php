@@ -1300,6 +1300,11 @@ class NAILS_User_model extends NAILS_Model
 				$data['password']		= $_hash[0];
 				$data['password_md5']	= md5( $_hash[0] );
 				$data['salt']			= $_hash[1];
+				$_password_updated		= TRUE;
+
+			else :
+
+				$_password_updated		= FALSE;
 
 			endif;
 
@@ -1428,6 +1433,24 @@ class NAILS_User_model extends NAILS_Model
 			if ( ! $_rollback && $this->db->trans_status() !== FALSE ) :
 
 				$this->db->trans_commit();
+
+				// --------------------------------------------------------------------------
+
+				//	If the user's password was updated send them a notification
+				if ( $_password_updated ) :
+
+					$this->load->library( 'emailer' );
+
+					$_email						= new stdClass();
+					$_email->type				= 'password_updated';
+					$_email->to_id				= $_uid;
+					$_email->data				= array();
+					$_email->data['updated_at']	= date( 'Y-m-d H:i:s' );
+					$_email->data['updated_by'] = array( 'id' => active_user( 'id' ), 'name' => active_user( 'first_name,last_name' ) );
+
+					$this->emailer->send( $_email, TRUE );
+
+				endif;
 
 			else :
 
