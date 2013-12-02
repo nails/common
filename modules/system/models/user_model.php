@@ -561,7 +561,7 @@ class NAILS_User_model extends NAILS_Model
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
-		$this->db->select( 'ue.email, ue.is_verified email_is_verified' );
+		$this->db->select( 'ue.email, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on' );
 		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
@@ -739,7 +739,7 @@ class NAILS_User_model extends NAILS_Model
 	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		//	Write selects
-		$this->db->select( 'u.id, ue.email, ue.is_verified email_is_verified, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'u.id, ue.email, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		// --------------------------------------------------------------------------
 
@@ -1489,7 +1489,8 @@ class NAILS_User_model extends NAILS_Model
 
 	public function email_add( $user_id, $email, $is_primary = FALSE, $is_verified = FALSE, $send_email = TRUE )
 	{
-		$_u = $this->get_by_id( $user_id );
+		$_email	= trim( strtolower( $email ) );
+		$_u		= $this->get_by_id( $user_id );
 
 		if ( ! $_u ) :
 
@@ -1500,10 +1501,62 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Test email, if it's in use and for the same user then return true. If
+		//	it's in use by a different user then return an error.
+
+		$this->db->select( 'id, user_id, is_verified, code' );
+		$this->db->where( 'email', $_email );
+		$_test = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
+
+		if ( $_test ) :
+
+			if ( $_test->user_id == $_u->id ) :
+
+				//	In use, but belongs to the same user - return the code
+				//	(immitates behaviour of newly added email)
+
+				if ( $is_primary ) :
+
+					$this->email_make_primary( $_test->id );
+
+				endif;
+
+				//	Resend verification email?
+				if ( ! $_test->is_verified ) :
+
+					$this->_email_add_send_verify( $_u->id, $_u->group_id, $_test->code );
+
+				endif;
+
+				return $_test->code;
+
+			else :
+
+				//	In use, but belongs to another user
+				$this->_set_error( 'Email in use by another user.' );
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Make sure the email is valid
+		$this->load->helper( 'email' );
+		if ( ! valid_email( $_email ) ) :
+
+			$this->set_error( '"' . $_email . '" is not a valid email address' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_code = $this->salt();
 
 		$this->db->set( 'user_id',		$_u->id );
-		$this->db->set( 'email',		trim( strtolower( $email ) ) );
+		$this->db->set( 'email',		$_email );
 		$this->db->set( 'code',			$_code );
 		$this->db->set( 'is_verified',	(bool) $is_verified );
 		$this->db->set( 'date_added',	'NOW()', FALSE );
@@ -1522,27 +1575,7 @@ class NAILS_User_model extends NAILS_Model
 			//	Send off the verification email
 			if ( $send_email && ! $is_verified ) :
 
-				$this->load->library( 'emailer' );
-
-				$_email						= new stdClass();
-				$_email->type				= 'verify_email_' . $_u->group_id;
-				$_email->to_id				= $_u->id;
-				$_email->data				= array();
-				$_email->data['user_id']	= $_u->id;
-				$_email->data['code']		= $_code;
-
-				if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-					//	Failed to send using the group email, try using the generic email template
-					$_email->type = 'verify_email';
-
-					if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-						//	Email failed to send, for now, do nothing.
-
-					endif;
-
-				endif;
+				$this->_email_add_send_verify( $_u->id, $_u->group_id, $_code );
 
 			endif;
 
@@ -1551,6 +1584,35 @@ class NAILS_User_model extends NAILS_Model
 		else :
 
 			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _email_add_send_verify( $user_id, $user_group, $code )
+	{
+		$this->load->library( 'emailer' );
+
+		$_email						= new stdClass();
+		$_email->type				= 'verify_email_' . $user_group;
+		$_email->to_id				= $user_id;
+		$_email->data				= array();
+		$_email->data['user_id']	= $user_id;
+		$_email->data['code']		= $code;
+
+		if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+			//	Failed to send using the group email, try using the generic email template
+			$_email->type = 'verify_email';
+
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+				//	Email failed to send, for now, do nothing.
+
+			endif;
 
 		endif;
 	}
@@ -2759,6 +2821,7 @@ class NAILS_User_model extends NAILS_Model
 			$user->temp_pw				= (bool) $user->temp_pw;
 			$user->is_suspended			= (bool) $user->is_suspended;
 			$user->email_is_verified	= (bool) $user->email_is_verified;
+			$user->email_is_verified_on	= $user->email_is_verified_on;
 
 			//	Dates (TODO)
 
