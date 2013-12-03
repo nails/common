@@ -232,7 +232,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		//	If you're logged in you shouldn't be accessing this method
 		if ( $this->user->is_logged_in() ) :
 
-			$this->session->set_flashdata( 'error', lang( 'no_access_already_logged_in', active_user( 'email' ) ) );
+			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
 
 		endif;

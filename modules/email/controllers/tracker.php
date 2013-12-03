@@ -108,6 +108,7 @@ class NAILS_Tracker extends NAILS_Email_Controller
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_email' ) ) ) );
+				log_message( 'error', 'Emailer link failed with reason BAD_HASH' );
 
 			break;
 
@@ -119,6 +120,7 @@ class NAILS_Tracker extends NAILS_Email_Controller
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_link' ) ) ) );
+				log_message( 'error', 'Emailer link failed with reason BAD_LINK' );
 
 			break;
 
