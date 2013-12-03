@@ -551,7 +551,7 @@ class Emailer
 
 		$this->track_link_cache = array();
 
-		if ( ENVIRONMENT != 'production' ) :
+		if ( ENVIRONMENT == 'production' ) :
 
 			if ( ! $_send->to->email_verified ) :
 
@@ -585,7 +585,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Parse the body for URLs and replace with a tracking URL (production only)
-		if ( ENVIRONMENT != 'production' ) :
+		if ( ENVIRONMENT == 'production' ) :
 
 			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE, $_needs_verified );
 

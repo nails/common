@@ -52,13 +52,22 @@ class NAILS_Verify extends NAILS_Email_Controller
 
 				// --------------------------------------------------------------------------
 
-				//	Set success message
-				$this->session->set_flashdata( 'success', lang( 'email_verify_ok' ) );
-
-				// --------------------------------------------------------------------------
-
 				//	Send user on their way
-				if ( ! $this->user->is_logged_in() ) :
+				if ( $this->input->get( 'return_to' ) ) :
+
+					//	Let the next page handle wetehr the user is logged in or not etc.
+					//	Ahh, go on set a wee notice that the user's email has been verified
+
+					$this->session->set_flashdata( 'message', lang( 'email_verify_ok_subtle' ) );
+
+					redirect( $this->input->get( 'return_to' ) );
+
+				elseif ( ! $this->user->is_logged_in() ) :
+
+					//	Set success message
+					$this->session->set_flashdata( 'success', lang( 'email_verify_ok' ) );
+
+					// --------------------------------------------------------------------------
 
 					//	If a password change is requested, then redirect here
 					if ( $_u->temp_pw ) :
@@ -82,6 +91,13 @@ class NAILS_Verify extends NAILS_Email_Controller
 
 				else :
 
+
+					//	Set success message
+					$this->session->set_flashdata( 'success', lang( 'email_verify_ok' ) );
+
+					// --------------------------------------------------------------------------
+
+					//	And bounce, bounce, c'mon, bounce.
 					redirect( $_u->group_homepage );
 					return;
 
@@ -94,8 +110,6 @@ class NAILS_Verify extends NAILS_Email_Controller
 		// --------------------------------------------------------------------------
 
 		$this->session->set_flashdata( 'error', lang( 'email_verify_fail_error' ) . ' ' . $this->user->last_error() );
-
-		//	Load the views
 		redirect( '/' );
 	}
 
