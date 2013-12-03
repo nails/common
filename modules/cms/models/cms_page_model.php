@@ -389,18 +389,22 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$_nails_widgets = directory_map( $this->_nails_widgets_dir );
 
 		//	Look for app widgets
-		$_app_widgets = directory_map( $this->_app_widgets_dir );
+		if ( is_dir( $this->_app_widgets_dir ) ) :
+
+			$_app_widgets = directory_map( $this->_app_widgets_dir );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Sanitise
-		if ( $_nails_widgets === FALSE ) :
+		if ( empty( $_nails_widgets ) ) :
 
 			$_nails_widgets = array();
 
 		endif;
 
-		if ( $_app_widgets === FALSE ) :
+		if ( empty( $_app_widgets ) ) :
 
 			$_app_widgets = array();
 
