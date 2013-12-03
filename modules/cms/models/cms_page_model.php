@@ -41,19 +41,12 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->_nails_prefix		= 'NAILS_CMS_';
 		$this->_app_prefix			= 'CMS_';
 
+		$this->_table				= NAILS_DB_PREFIX . 'cms_page';
+
 		// --------------------------------------------------------------------------
 
 		//	Load the generic widget
 		include_once $this->_nails_widgets_dir . '_widget.php';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function create()
-	{
-		//	TODO Create a new blank page
 	}
 
 

@@ -125,6 +125,85 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
+	public function _pages_create()
+	{
+		if ( ! $this->user->is_superuser() ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Load form validation (for error checking in the view, always needs to be available)
+		$this->load->library( 'form_validation' );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->post() ) :
+
+			//	Set Rules
+			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|callback__callback_slug' );
+			$this->form_validation->set_rules( 'layout',			'Layout',			'xss_clean' );
+			$this->form_validation->set_rules( 'sidebar_width',		'Sidebar Width',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+
+			//	Set messages
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+			//	Execute
+			if ( $this->form_validation->run( $this ) ) :
+
+				//	Update the page
+				$_data					= new stdClass();
+				$_data->title			= $this->input->post( 'title' );
+				$_data->slug			= $this->input->post( 'slug' );
+				$_data->layout			= $this->input->post( 'layout' );
+				$_data->sidebar_width	= $this->input->post( 'sidebar_width' );
+				$_data->seo_description	= $this->input->post( 'seo_description' );
+				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
+
+				$_page_id = $this->cms_page->create( $_data );
+
+				if ( $_page_id ) :
+
+					//	Saved!
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page created, go ahead and add widgets.' );
+					$this->session->set_flashdata( 'widgets_only', TRUE );
+					redirect( 'admin/cms/pages/edit/' . $_page_id );
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( ', ', $this->cms_page->get_errors() );
+
+				endif;
+
+			else :
+
+				$this->data['error'] = lang( 'fv_there_were_errors' );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set method info
+		$this->data['page']->title	= 'Create Page';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/cms/pages/create',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Manage pages of content
 	 *
@@ -173,12 +252,14 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		if ( ! $this->data['cmspage'] ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> no page found by that ID' );
+			redirect( 'admin/cms/pages' );
+			return;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Load form validation (for error checking in the view, always needs t be available)
+		//	Load form validation (for error checking in the view, always needs to be available)
 		$this->load->library( 'form_validation' );
 
 		// --------------------------------------------------------------------------
@@ -188,6 +269,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			//	Set Rules
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|callback__callback_slug' );
+			$this->form_validation->set_rules( 'layout',			'Layout',			'xss_clean' );
+			$this->form_validation->set_rules( 'sidebar_width',		'Sidebar Width',	'xss_clean' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
 
@@ -273,6 +356,9 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		//	Get available widgets
 		$this->data['widgets']	= $this->cms_page->get_available_widgets();
+
+		//	Only showing widgets? Create page requests that widgets be hidden
+		$this->data['widgets_only'] = $this->session->flashdata( 'widgets_only' ) || $this->input->get( 'widgets_only' ) ? TRUE : FALSE;
 
 		// --------------------------------------------------------------------------
 

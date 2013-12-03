@@ -190,15 +190,19 @@ NAILS_CDN_Manager =  function() {
 		//	Choose the scheme to use (TODO, make this dynamic)
 		var _scheme = this.url_schemes.serve;
 
+		//	Break into filename and extensions
+		alert(file);
+
 		//	Define the data object
 		var _data = {
-			bucket	: bucket,
-			file	: file,
-			id		: id,
-			width	: 0,		//	TODO
-			height	: 0,		//	TODO
-			sex		: '',		//	TODO
-			border	: 0			//	TODO
+			bucket		: bucket,
+			filename	: _filename,
+			extension	: _extension,
+			id			: id,
+			width		: 0,		//	TODO
+			height		: 0,		//	TODO
+			sex			: '',		//	TODO
+			border		: 0			//	TODO
 		};
 
 		//	Apply the scheme

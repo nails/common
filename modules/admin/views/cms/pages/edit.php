@@ -1,6 +1,6 @@
 <div class="group-cms pages edit">
 	<?=form_open()?>
-	<fieldset id="cms-page-edit-meta">
+	<fieldset id="cms-page-edit-meta" <?=$widgets_only ? 'style="display:none;"' : ''?>>
 		<legend>Meta Data</legend>
 			<?php
 
@@ -29,7 +29,7 @@
 			?>
 	</fieldset>
 
-	<fieldset id="cms-page-edit-layout" class="layout">
+	<fieldset id="cms-page-edit-layout" class="layout" <?=$widgets_only ? 'style="display:none;"' : ''?>>
 		<legend>Page Layout</legend>
 		<ul>
 			<?php
@@ -121,7 +121,7 @@
 
 	?>
 
-	<fieldset id="cms-page-edit-seo">
+	<fieldset id="cms-page-edit-seo" <?=$widgets_only ? 'style="display:none;"' : ''?>>
 		<legend>Search Engine Optimisation</legend>
 			<p>
 				These fields are not visible anywhere but help Search Engines index and understand the page.

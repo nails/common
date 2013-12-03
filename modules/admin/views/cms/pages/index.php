@@ -63,6 +63,18 @@
 		</tbody>
 	</table>
 
+	<?php
+
+		if ( $user->is_superuser() ) :
+
+			echo '<p class="new-page">';
+			echo anchor( 'admin/cms/pages/create', 'Create New Page', 'class="awesome small"' );
+			echo '</p>';
+
+		endif;
+
+	?>
+
 	<hr />
 
 	<p>
