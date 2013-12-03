@@ -2201,7 +2201,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @return	boolean
 	 * @author	Pablo
 	 **/
-	public function create( $email, $password, $group_id = NULL, $data = FALSE )
+	public function create( $email, $password, $group_id = NULL, $data = FALSE, $send_welcome = TRUE )
 	{
 		if ( ! $email || ! $group_id ) :
 
@@ -2240,6 +2240,12 @@ class NAILS_User_model extends NAILS_Model
 			$_password = $this->hash_password( $password );
 
 		endif;
+
+		//	Do we need to inform the user of their password? This might be set
+		//	if an admin created the account, or if the system generated a new password
+
+		$_inform_user_pw = ! empty( $data['inform_user_pw'] ) ? TRUE : FALSE;
+		unset( $data['inform_user_pw'] );
 
 		// --------------------------------------------------------------------------
 
@@ -2321,7 +2327,7 @@ class NAILS_User_model extends NAILS_Model
 		$_data['last_update']		= date( 'Y-m-d H:i:s' );
 		$_data['is_suspended']		= isset( $data['is_suspended'] ) && $data['is_suspended']	? 1	: 0 ;
 		$_data['salt']				= $_password[1];
-		$_data['temp_pw']			= ! empty( $data['temp_pw'] )			? TRUE	: FALSE ;
+		$_data['temp_pw']			= ! empty( $data['temp_pw'] )	? TRUE	: FALSE ;
 		$_data['auth_method_id']	= $_auth_method->id;
 
 		//	Facebook oauth details
@@ -2471,7 +2477,72 @@ class NAILS_User_model extends NAILS_Model
 		//	Finally add the email address to the user_email table
 		$_verified = isset( $data['is_verified'] ) && $data['is_verified'] ? TRUE : FALSE ;
 
-		$_code = $this->email_add( $_id, $email, TRUE, $_verified, TRUE );
+		$_code = $this->email_add( $_id, $email, TRUE, $_verified, FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	Send the user the welcome email
+		if ( $send_welcome ) :
+
+			$this->load->library( 'emailer' );
+
+			$_email								= new stdClass();
+			$_email->type						= 'new_user_' . $group_id;
+			$_email->to_id						= $_id;
+			$_email->data						= array();
+			$_email->data['method']				= $_auth_method;
+
+			//	If this user is created by an admin then take note of that.
+			if ( $this->is_admin() ) :
+
+				$_email->data['admin']				= new stdClass();
+				$_email->data['admin']->id			= active_user( 'id' );
+				$_email->data['admin']->first_name	= active_user( 'first_name' );
+				$_email->data['admin']->last_name	= active_user( 'last_name' );
+				$_email->data['admin']->group		= new stdClass();
+				$_email->data['admin']->group->id	= $_group->id;
+				$_email->data['admin']->group->name	= $_group->display_name;
+
+			endif;
+
+			if ( ! empty( $_inform_user_pw ) ) :
+
+				$_email->data['password'] = $password;
+
+				//	Is this a temp password? We should let them know that too
+				if ( $_data['temp_pw'] ) :
+
+					$_email->data['temp_pw'] = $_data['temp_pw'];
+
+				endif;
+
+			endif;
+
+			//	If the email isn't verified we'll want to include a note asking them to do so
+			if ( ! $_verified ) :
+
+				$_email->data['verification_code']	= $_code;
+
+			endif;
+
+			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+				//	Failed to send using the group email, try using the generic email template
+				$_email->type = 'new_user';
+
+				if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+					//	Email failed to send, musn't exist, oh well.
+					$_error  = 'Failed to send welcome email.';
+					$_error .= ! empty( $_inform_user_pw ) ? ' Inform the user their password is <strong>' . $password . '</strong>' : '';
+
+					$this->_set_error( $_error );
+
+				endif;
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

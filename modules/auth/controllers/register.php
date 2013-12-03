@@ -130,30 +130,6 @@ class NAILS_Register extends NAILS_Auth_Controller
 
 					// --------------------------------------------------------------------------
 
-					//	Send the user the welcome email (that is, if there is one)
-					$this->load->library( 'emailer' );
-
-					$_email					= new stdClass();
-					$_email->type			= 'new_user_' . $_group->id;
-					$_email->to_id			= $_user->id;
-					$_email->data			= array();
-					$_email->data['method']	= 'native';
-
-					if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-						//	Failed to send using the group email, try using the generic email template
-						$_email->type = 'new_user';
-
-						if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-							//	Email failed to send, musn't exist, oh well.
-
-						endif;
-
-					endif;
-
-					// --------------------------------------------------------------------------
-
 					//	Log the user in
 					$this->user->set_login_data( $_user->id );
 

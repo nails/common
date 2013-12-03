@@ -314,50 +314,23 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				endif;
 
-				$_meta					= array();
-				$_meta['first_name']	= $this->input->post( 'first_name' );
-				$_meta['last_name']		= $this->input->post( 'last_name' );
-				$_meta['temp_pw']		= (bool) $this->input->post( 'temp_pw' );
+				$_meta						= array();
+				$_meta['first_name']		= $this->input->post( 'first_name' );
+				$_meta['last_name']			= $this->input->post( 'last_name' );
+				$_meta['temp_pw']			= (bool) $this->input->post( 'temp_pw' );
+				$_meta['inform_user_pw']	= TRUE;
 
-				$_new_user = $this->user->create( $_email, $_password, $_group_id, $_meta );
+				$_new_user = $this->user->create( $_email, $_password, $_group_id, $_meta, string_to_boolean( $this->input->post( 'send_activation' ) ) );
 
 				if ( $_new_user ) :
 
-					//	If appropriate, send new user email
-					if ( string_to_boolean( $this->input->post( 'send_activation' ) ) ) :
+					//	Any errors happen? While the user can be created successfully other problems might happen along the way
+					if ( $this->user->get_errors() ) :
 
-						$_email							= new stdClass();
-						$_email->type					= 'new_user' . $_group_id;
-						$_email->to_id					= $_new_user['id'];
-						$_email->data					= array();
-						$_email->data['admin']			= active_user( 'first_name,last_name' );
-						$_email->data['password']		= $_password;
-						$_email->data['temp_pw']		= $_meta['temp_pw'];
-						$_email->data['group_name']		= $this->user->get_group( $_group_id )->display_name;
-						$_email->data['method']			= 'native';
+						$_message  = '<strong>Please Note,</strong> while the user was created successfully, the following issues were encountered:';
+						$_message .= '<ul><li>' . implode( '</li><li>', $this->user->get_errors() ) . '</li></ul>';
 
-						$this->load->library( 'emailer' );
-
-						if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-							//	Failed to send using the group email, try using the generic email
-							$_email->type = 'new_user';
-
-							if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-								$_message = '<strong>Just a heads-up</strong>, while the account was created the welcome email failed to send.';
-
-								if ( ! trim( $this->input->post( 'password' ) ) ) :
-
-									$_message .= ' You\'ll need to inform the user manually of their password, which is: <strong>' . $_password . '</strong>';
-
-								endif;
-
-								$this->session->set_flashdata( 'message', $_message );
-
-							endif;
-
-						endif;
+						$this->session->set_flashdata( 'message', $_message );
 
 					endif;
 
