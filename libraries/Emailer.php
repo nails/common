@@ -395,20 +395,22 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		$_send						= new stdClass();
-		$_send->to					= new stdClass();
-		$_send->to->email			= $_email->sent_to;
-		$_send->to->first			= $_email->first_name;
-		$_send->to->last			= $_email->last_name;
-		$_send->to->id				= (int) $_email->user_id;
-		$_send->to->group_id		= $_email->user_group;
-		$_send->to->login_url		= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
-		$_send->email_type_id		= $_email->type_id;
-		$_send->subject				= $_email->subject;
-		$_send->template			= $_email->template_file;
-		$_send->template_pt			= $_email->template_file . '_plaintext';
-		$_send->data				= $_email->email_vars;
-		$_send->data['ci']			=& get_instance();
+		$_send							= new stdClass();
+		$_send->to						= new stdClass();
+		$_send->to->email				= $_email->sent_to;
+		$_send->to->email_verified		= (bool) $_email->email_verified;
+		$_send->to->email_verified_code	= $_email->email_verified_code;
+		$_send->to->first				= $_email->first_name;
+		$_send->to->last				= $_email->last_name;
+		$_send->to->id					= (int) $_email->user_id;
+		$_send->to->group_id			= $_email->user_group;
+		$_send->to->login_url			= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
+		$_send->email_type_id			= $_email->type_id;
+		$_send->subject					= $_email->subject;
+		$_send->template				= $_email->template_file;
+		$_send->template_pt				= $_email->template_file . '_plaintext';
+		$_send->data					= $_email->email_vars;
+		$_send->data['ci']				=& get_instance();
 
 		if ( ! is_array( $_send->data ) ) :
 
@@ -549,9 +551,22 @@ class Emailer
 
 		$this->track_link_cache = array();
 
-		if ( ENVIRONMENT == 'production' ) :
+		if ( ENVIRONMENT != 'production' ) :
 
-			$body = $this->_parse_links( $body, $_email->id, $_email->ref, TRUE );
+			if ( ! $_send->to->email_verified ) :
+
+				$_needs_verified = array(
+					'id' => $_send->to->id,
+					'code' => $_send->to->email_verified_code
+				);
+
+			else :
+
+				$_needs_verified = FALSE;
+
+			endif;
+
+			$body = $this->_parse_links( $body, $_email->id, $_email->ref, TRUE, $_needs_verified );
 
 		endif;
 
@@ -570,9 +585,9 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Parse the body for URLs and replace with a tracking URL (production only)
-		if ( ENVIRONMENT == 'production' ) :
+		if ( ENVIRONMENT != 'production' ) :
 
-			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE );
+			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE, $_needs_verified );
 
 		endif;
 
@@ -708,12 +723,13 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		$this->db->select( 'ea.id, ea.ref, ea.type_id, ea.email_vars, ea.user_email sent_to, ea.time_sent, ea.read_count, ea.link_click_count' );
+		$this->db->select( 'ea.id, ea.ref, ea.type_id, ea.email_vars, ea.user_email sent_to, ue.is_verified email_verified, ue.code email_verified_code, ea.time_sent, ea.read_count, ea.link_click_count' );
 		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
 		$this->db->select( 'et.name, et.template_file, et.default_subject' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ea.user_id OR u.id = ea.user_email', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'email_type et', 'et.id = ea.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.email = ea.user_email', 'LEFT' );
 
 		$this->db->order_by( $order, $sort );
 		$this->db->limit( $per_page, $offset );
@@ -1116,17 +1132,18 @@ class Emailer
 	 * @return	string
 	 * @author	Pablo
 	 **/
-	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE )
+	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE, $needs_verified = FALSE )
 	{
 		//	Set the class variables for the ID and ref (need those in the callbacks)
-		$this->_generate_tracking_email_id	= $email_id;
-		$this->_generate_tracking_email_ref	= $email_ref;
+		$this->_generate_tracking_email_id			= $email_id;
+		$this->_generate_tracking_email_ref			= $email_ref;
+		$this->_generate_tracking_needs_verified	= $needs_verified;
 
 		// --------------------------------------------------------------------------
 
 		if ( $is_html ) :
 
-			$body = preg_replace_callback( '/<a .*?(href="(.*?)").*?>(.*)<\/a>/', array( $this, '__process_link_html' ), $body );
+			$body = preg_replace_callback( '/<a .*?(href="(.*?)").*?>(.*?)<\/a>/', array( $this, '__process_link_html' ), $body );
 
 		else :
 
@@ -1137,8 +1154,9 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	And null these again, so nothing gets confused
-		$this->_generate_tracking_email_id	= NULL;
-		$this->_generate_tracking_email_ref	= NULL;
+		$this->_generate_tracking_email_id			= NULL;
+		$this->_generate_tracking_email_ref			= NULL;
+		$this->_generate_tracking_needs_verified	= NULL;
 
 		// --------------------------------------------------------------------------
 
@@ -1214,8 +1232,36 @@ class Emailer
 			//	database and generate the new tracking link (inc. hashes etc). We'll cache
 			//	this link so we don't have to process it again.
 
+			//	If the email we're sending to hasn't been verified yet we should set the
+			//	actual URL as the return_to value of the email verifier, that means that
+			//	every link in this email behaves as a verifying email. Obviously we shouldn't
+			//	do this for the actual email verifier...
+
+			if ( $this->_generate_tracking_needs_verified ) :
+
+				//	Make sure we're not applying this to an activation URL
+				if ( ! preg_match( '#email/verify/[0-9]*?/(.*?)#', $url ) ) :
+
+					$_user_id	= $this->_generate_tracking_needs_verified['id'];
+					$_code		= $this->_generate_tracking_needs_verified['code'];
+					$_return	= urlencode( $url );
+
+					$_url = site_url( 'email/verify/' . $_user_id . '/' . $_code . '?return_to=' . $_return );
+
+				else :
+
+					$_url = $url;
+
+				endif;
+
+			else :
+
+				$_url = $url;
+
+			endif;
+
 			$this->db->set( 'email_id', $this->_generate_tracking_email_id );
-			$this->db->set( 'url', $url );
+			$this->db->set( 'url', $_url );
 			$this->db->set( 'title', $title );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'is_html', $is_html );
