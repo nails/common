@@ -191,13 +191,13 @@ NAILS_CDN_Manager =  function() {
 		var _scheme = this.url_schemes.serve;
 
 		//	Break into filename and extensions
-		alert(file);
+		var _file = file.split( '.' );
 
 		//	Define the data object
 		var _data = {
 			bucket		: bucket,
-			filename	: _filename,
-			extension	: _extension,
+			filename	: _file[0],
+			extension	: '.' + _file[1],
 			id			: id,
 			width		: 0,		//	TODO
 			height		: 0,		//	TODO
