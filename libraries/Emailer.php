@@ -1031,7 +1031,7 @@ class Emailer
 
 			endif;
 
-			$this->db->insert( NAILS_DB_PREFIX . 'email_track_open' );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_archive_track_open' );
 
 			return TRUE;
 
@@ -1066,7 +1066,7 @@ class Emailer
 			$this->db->select( 'url' );
 			$this->db->where( 'email_id', $_email->id );
 			$this->db->where( 'id', $link_id );
-			$_link = $this->db->get( NAILS_DB_PREFIX . 'email_link' )->row();
+			$_link = $this->db->get( NAILS_DB_PREFIX . 'email_archive_link' )->row();
 
 			if ( $_link ) :
 
@@ -1086,7 +1086,7 @@ class Emailer
 
 				endif;
 
-				$this->db->insert( NAILS_DB_PREFIX . 'email_track_link' );
+				$this->db->insert( NAILS_DB_PREFIX . 'email_archive_track_link' );
 
 				//	Return the URL to go to
 				return $_link->url;
