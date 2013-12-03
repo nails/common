@@ -1219,7 +1219,7 @@ class Emailer
 			$this->db->set( 'title', $title );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'is_html', $is_html );
-			$this->db->insert( NAILS_DB_PREFIX . 'email_link' );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_archive_link' );
 
 			$_id = $this->db->insert_id();
 
