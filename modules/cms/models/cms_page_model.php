@@ -416,6 +416,15 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$_widgets = array();
 		foreach( $_nails_widgets AS $widget ) :
 
+			//	Ignore the base widget
+			if ( $widget == '_widget.php' ) :
+
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
 			include_once $this->_nails_widgets_dir . $widget;
 
 			//	Can we call the static details method?
