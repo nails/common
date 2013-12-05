@@ -188,7 +188,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Lookup the email type (caching it as we go)
-		if ( ! isset( $this->email_type[ $input->type ] ) ) :
+		if ( empty( $this->email_type[ $input->type ] ) ) :
 
 			$this->db->where( 'et.slug', $input->type );
 
