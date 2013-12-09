@@ -1,6 +1,5 @@
 {
 	"name": "shed/nails",
-	"type": "framework",
 	"keywords": ["CodeIgniter"],
 	"homepage": "http://nailsapp.co.uk",
 	"description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
@@ -19,6 +18,9 @@
 			"role": "Developer"
 		}
 	],
+	"support": {
+		"email": "hello@shedcollective.org"
+	},
 	"require":
 	{
 		"aws/aws-sdk-php": "~2.4.5",
