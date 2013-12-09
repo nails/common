@@ -19,12 +19,6 @@
 			"role": "Developer"
 		}
 	],
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/jublonet/codebird-php"
-		}
-	],
 	"require":
 	{
 		"aws/aws-sdk-php": "~2.4.5",
