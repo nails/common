@@ -23,10 +23,10 @@
 	{
 		"aws/aws-sdk-php": "~2.4.5",
 		"dompdf/dompdf": "dev-master",
-		"facebook/php-sdk": "~v3.2.2",
-		"mustache/mustache": "~v2.4.1",
+		"facebook/php-sdk": "v3.2.2",
+		"mustache/mustache": "v2.4.1",
 		"jublonet/codebird-php": "~2.4.1",
-		"masterexploder/phpthumb": "~v2.0",
+		"masterexploder/phpthumb": "v2.0",
 		"sybio/gif-creator": "~1.0.0",
 		"sybio/gif-frame-extractor": "~1.0.0"
 	}
