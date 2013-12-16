@@ -75,7 +75,7 @@ class Emailer
 
 			$_error = 'EMAILER: SMTP not configured';
 
-			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
+			if ( ! empty( $config['graceful_startup'] ) ) :
 
 				$this->_set_error( $_error );
 
@@ -94,7 +94,7 @@ class Emailer
 
 			$_error = 'EMAILER: Database not available';
 
-			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
+			if ( ! empty( $config['graceful_startup'] ) ) :
 
 				$this->_set_error( $_error );
 
@@ -152,7 +152,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	If no email has been given make sure it's NULL
-		if ( ! isset( $input->to_email ) ) :
+		if ( empty( $input->to_email ) ) :
 
 			$input->to_email = NULL;
 
@@ -161,7 +161,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	If no id has been given make sure it's NULL
-		if ( ! isset( $input->to_id ) ) :
+		if ( empty( $input->to_id ) ) :
 
 			$input->to_id = NULL;
 
@@ -170,7 +170,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	If no internal_ref has been given make sure it's NULL
-		if ( ! isset( $input->internal_ref ) ) :
+		if ( empty( $input->internal_ref ) ) :
 
 			$input->internal_ref = NULL;
 
@@ -179,7 +179,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Make sure that at least empty data is available
-		if ( ! isset( $input->data ) ) :
+		if ( empty( $input->data ) ) :
 
 			$input->data = array();
 
@@ -426,7 +426,7 @@ class Emailer
 		if ( ! empty( $_send->data['email_from_email'] ) ) :
 
 			$_send->from->email			= $_send->data['email_from_email'];
-			$_send->from->name			= isset( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
+			$_send->from->name			= ! empty( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
 
 		else :
 
@@ -498,7 +498,7 @@ class Emailer
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 
-		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_DEVELOPER_EMAIL' ) && APP_DEVELOPER_EMAIL ) && $_error->error_has_occurred() ) :
+		if ( empty( EMAIL_DEBUG ) && ! empty( APP_DEVELOPER_EMAIL ) && $_error->error_has_occurred() ) :
 
 			//	The templates error'd, abort the send and let dev know
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';
@@ -553,7 +553,7 @@ class Emailer
 
 		if ( ENVIRONMENT == 'production' ) :
 
-			if ( ! $_send->to->email_verified ) :
+			if ( $_send->to->id && ! $_send->to->email_verified ) :
 
 				$_needs_verified = array(
 					'id' => $_send->to->id,
@@ -624,7 +624,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Debugging?
-		if ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) :
+		if ( ! empty( EMAIL_DEBUG ) ) :
 
 			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;
@@ -633,8 +633,16 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	Send!
+		//	Send! Turn off error reporting, if it fails we should handle it gracefully
+		$_previous_error_reporting = error_reporting();
+		error_reporting(0);
+
 		if ( $this->ci->email->send() ) :
+
+			//	Put error reporting back as it was
+			error_reporting( $_previous_error_reporting );
+
+			// --------------------------------------------------------------------------
 
 			//	Mail sent, mark the time
 			$this->db->set( 'time_sent', 'NOW()', FALSE );
@@ -644,6 +652,11 @@ class Emailer
 			return TRUE;
 
 		else:
+
+			//	Put error reporting back as it was
+			error_reporting( $_previous_error_reporting );
+
+			// --------------------------------------------------------------------------
 
 			//	Failed to send, notify developers
 			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
@@ -1169,9 +1182,9 @@ class Emailer
 
 	private function __process_link_html( $link )
 	{
-		$_html	= isset( $link[0] ) && $link[0] ? $link[0] : '';
-		$_href	= isset( $link[1] ) && $link[1] ? $link[1] : '';
-		$_url	= isset( $link[2] ) && $link[2] ? $link[2] : '';
+		$_html	= ! empty( $link[0] ) ? $link[0] : '';
+		$_href	= ! empty( $link[1] ) ? $link[1] : '';
+		$_url	= ! empty( $link[2] ) ? $link[2] : '';
 		$_title	= isset( $link[3] ) && strip_tags( $link[3] ) ? strip_tags( $link[3] ) : $_url;
 
 		// --------------------------------------------------------------------------
@@ -1194,7 +1207,7 @@ class Emailer
 
 	private function __process_link_url( $url )
 	{
-		$_html	= isset( $url[0] ) && $url[0] ? $url[0] : '';
+		$_html	= ! empty( $url[0] ) ? $url[0] : '';
 		$_url	= $_html;
 		$_title	= $_html;
 
