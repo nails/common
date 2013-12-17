@@ -23,7 +23,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM blog_post_tag WHERE tag_id = t.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag WHERE tag_id = t.id) post_count' );
 
 		endif;
 
