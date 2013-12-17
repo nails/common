@@ -41,10 +41,19 @@ class MX_Config extends CI_Config
 	// --------------------------------------------------------------------------
 
 
-	public function site_url( $uri = '' )
+	public function site_url( $uri = '', $force_secure = TRUE )
 	{
 		//	Prepare the URI as normal
 		$_uri = parent::site_url( $uri );
+
+		// --------------------------------------------------------------------------
+
+		//	If forcing secure just return now
+		if ( $force_secure ) :
+
+			return preg_replace( '#^' . BASE_URL . '#', SECURE_BASE_URL, $_uri );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -101,35 +110,13 @@ class MX_Config extends CI_Config
 
 			if ( isset( $_SERVER ) ) :
 
-				if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
-
-					//	Page is being served through HTTPS
-					$_https_on = TRUE;
-
-				else :
-
-					//	Not being served through HTTPS, but does the URL of the page begin
-					//	with SECURE_BASE_URL
-
-					$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-
-					if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
-
-						$_https_on = TRUE;
-
-					else :
-
-						$_https_on = FALSE;
-
-					endif;
-
-				endif;
+				$_page_is_secure = page_is_secure();
 
 				if (
 					   ( $i )
-					|| ( $_https_on && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
-					|| ( $_https_on && preg_match( '#^' . NAILS_URL . '.*#', $_uri ) )
-					|| ( $_https_on && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . NAILS_URL . '.*#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
 				) :
 
 					//	SSL is off and there was a match, turn SSL on

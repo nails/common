@@ -154,5 +154,50 @@ function string_to_boolean( $string )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+
+
+/**
+ * Detects wether the current page is secure or not
+ *
+ * @access	public
+ * @param	string
+ * @return	bool
+ */
+function page_is_secure()
+{
+	if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
+
+		//	Page is being served through HTTPS
+		return TRUE;
+
+	else :
+
+		//	Not being served through HTTPS, but does the URL of the page begin
+		//	with SECURE_BASE_URL
+
+		$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+		if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Unknown, assume not
+	return FALSE;
+}
+
+
 /* End of file tools_helper.php */
 /* Location: ./helpers/tools_helper.php */

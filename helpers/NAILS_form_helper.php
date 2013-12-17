@@ -244,17 +244,19 @@ if ( ! function_exists( 'form_field_mm' ) )
 		//	Field
 
 		//	Choose image button
+		$_force_secure = page_is_secure();
+
 		if ( $_field['bucket'] ) :
 
 			$_nonce		= time();
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 
-			$_url		= site_url( 'cdn/manager/browse' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
 
 		else :
 
-			$_url		= site_url( 'cdn/manager/browse' );
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure );
 
 		endif;
 
@@ -491,17 +493,19 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_out .= '</span>';
 
 		//	Choose image button
+		$_force_secure = page_is_secure();
+
 		if ( $_field['bucket'] ) :
 
 			$_nonce		= time();
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 
-			$_url		= site_url( 'cdn/manager/browse' ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
 
 		else :
 
-			$_url		= site_url( 'cdn/manager/browse' );
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure );
 
 		endif;
 
@@ -736,7 +740,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		get_instance()->load->library( 'cdn' );
 
 		$_movie_url		= NAILS_URL . 'swf/jquery.uploadify/uploadify.swf';
-		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php' );
+		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php', page_is_secure() );
 		$_upload_token	= get_instance()->cdn->generate_api_upload_token();
 		$_bucket		= $_field_bucket;
 
