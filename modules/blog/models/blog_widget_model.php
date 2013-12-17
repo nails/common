@@ -244,7 +244,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 				$_out .= '<li class="' . $_config->li_class . '">';
 
 				$_count = $_config->show_count ? ' (' . $tag->post_count . ')' : '';
-				$_out .= '&rsaquo; ' . anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, $tag->label ) . $_count;
+				$_out .= anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, '&rsaquo; ' . $tag->label . $_count );
 				$_out .= '</li>';
 
 			endforeach;
