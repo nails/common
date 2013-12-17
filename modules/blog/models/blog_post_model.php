@@ -132,7 +132,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				endforeach;
 
-				$this->db->insert_batch( 'blog_post_tag', $_data );
+				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_tag', $_data );
 
 			endif;
 
@@ -323,7 +323,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				endforeach;
 
-				$this->db->insert_batch( 'blog_post_tag', $_data );
+				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_tag', $_data );
 
 			endif;
 
