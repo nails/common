@@ -51,17 +51,8 @@ class MX_Config extends CI_Config
 		//	If SSL routing is enabled then parse the URL
 		if ( APP_SSL_ROUTING ) :
 
-			//	Only swap onto 'real' SSL on the live box.
-			if ( ENVIRONMENT == 'production' ) :
-
-				$_prefix = 'https://';
-				$this->load( 'routes_ssl' );
-
-			else :
-
-				$_prefix = 'http://';
-
-			endif;
+			$_prefix = 'https://';
+			$this->load( 'routes_ssl' );
 
 			// --------------------------------------------------------------------------
 
@@ -105,14 +96,46 @@ class MX_Config extends CI_Config
 			//	calls for anything to the assets folder or the favicon (so secure content
 			//	is shown).
 
-			if (
-				   ( $i )
-				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
-				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
-			) :
+			//	HTTPS is considered on if the domain matches that given in SECURE_BASE_URL
+			//	or if the page is being served through HTTPS
 
-				//	SSL is off and there was a match, turn SSL on
-				$_uri = preg_replace( '/^http:\/\//', $_prefix, $_uri );
+			if ( isset( $_SERVER ) ) :
+
+				if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
+
+					//	Page is being served through HTTPS
+					$_https_on = TRUE;
+
+				else :
+
+					//	Not being served through HTTPS, but does the URL of the page begin
+					//	with SECURE_BASE_URL
+
+					$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+					if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
+
+						$_https_on = TRUE;
+
+					else :
+
+						$_https_on = FALSE;
+
+					endif;
+
+				endif;
+
+				if (
+					   ( $i )
+					|| ( $_https_on && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
+					|| ( $_https_on && preg_match( '#^' . NAILS_URL . '.*#', $_uri ) )
+					|| ( $_https_on && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
+				) :
+
+					//	SSL is off and there was a match, turn SSL on
+					$_uri = preg_replace( '#^' . BASE_URL . '#', SECURE_BASE_URL, $_uri );
+
+				endif;
 
 			endif;
 

@@ -206,6 +206,24 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
 		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
 		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
+		if ( ! defined( 'EMAIL_DEBUG' ) )					define( 'EMAIL_DEBUG',					FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	SSL
+		//	If a SECURE_BASE_URL is not defined then assume the secure URL is simply
+		//	https://BASE_URL
+
+		if ( ! defined( 'SECURE_BASE_URL' ) || empty( SECURE_BASE_URL ) ) :
+
+			//	Not defined, assume https://BASE_URL
+			$_secure = BASE_URL;
+			$_secure = preg_replace( '/^http:\/\//', 'https://', $_secure );
+
+			define( 'SECURE_BASE_URL', $_secure );
+
+		endif;
+
 
 		// --------------------------------------------------------------------------
 

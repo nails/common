@@ -262,7 +262,7 @@ class Asset
 	 * @return	void
 	 * @author	Pablo
 	 **/
-public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
+	public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
 	{
 		//	CSS
 		if ( $css === TRUE )
@@ -320,6 +320,7 @@ public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js
 		$loaded->js			= $this->js;
 		$loaded->css_inline	= $this->css_inline;
 		$loaded->js_inline	= $this->js_inline;
+
 		return $loaded;
 	}
 
@@ -476,8 +477,7 @@ public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js
 
 		foreach ( $this->css_nails AS $asset ) :
 
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'css/' . $asset ;
-			$out .= link_tag( $url ) . "\n";
+			$out .= link_tag( 'vendor/shed/nails/assets/css/' . $asset ) . "\n";
 
 		endforeach;
 
@@ -499,11 +499,16 @@ public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js
 	private function _print_css_inline()
 	{
 		$out = '';
+
 		foreach ( $this->css_inline AS $asset ) :
-			$out .= $asset."\n";
+
+			$out .= $asset . "\n";
+
 		endforeach;
+
 		$out = preg_replace( '/<\/?style.*?>/si', '', $out );
-		return '<style type="text/css">'.$out.'</style>';
+
+		return '<style type="text/css">' . $out . '</style>';
 	}
 
 
@@ -550,10 +555,10 @@ public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js
 
 		foreach ( $this->js_nails AS $asset ) :
 
-			$url = ( preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ) ? $asset : NAILS_URL . 'js/' . $asset ;
-			$out .= '<script type="text/javascript" src="' . $url . '"></script>' . "\n";
+			$out .= '<script type="text/javascript" src="' . site_url( 'vendor/shed/nails/assets/js/' . $asset ) . '"></script>' . "\n";
 
 		endforeach;
+
 		return $out;
 	}
 
@@ -580,7 +585,7 @@ public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js
 
 		$out = preg_replace( '/<\/?script.*?>/si', '', $out );
 
-		return '<script type="text/javascript">'.$out.'</script>';
+		return '<script type="text/javascript">' . $out . '</script>';
 	}
 }
 
