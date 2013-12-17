@@ -41,7 +41,7 @@ class MX_Config extends CI_Config
 	// --------------------------------------------------------------------------
 
 
-	public function site_url( $uri = '', $force_secure = TRUE )
+	public function site_url( $uri = '', $force_secure = FALSE )
 	{
 		//	Prepare the URI as normal
 		$_uri = parent::site_url( $uri );
