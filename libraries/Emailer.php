@@ -630,7 +630,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Debugging?
-		if ( ! empty( EMAIL_DEBUG ) ) :
+		if ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) :
 
 			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;
