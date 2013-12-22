@@ -10,6 +10,7 @@ class Faux_session
 	public function userdata(){			return FALSE;	}
 	public function all_userdata(){		return FALSE;	}
 	public function set_userdata(){		return FALSE;	}
+	public function unset_userdata(){	return FALSE;	}
 	public function set_flashdata(){	return FALSE;	}
 	public function keep_flashdata(){	return FALSE;	}
 	public function flashdata(){		return FALSE;	}
