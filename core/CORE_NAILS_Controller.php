@@ -580,7 +580,22 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_libraries		= array();
-		$_libraries[]	= 'session';
+
+		//	Test that $_SERVER is available, the session library needs this
+		//	Generally not available when running on the command line. If it's
+		//	not available then load up the faux session which has the same methods
+		//	as the session library, but behave as if logged out - comprende?
+
+		if ( !isset( $_SERVER ) ) :
+
+			$_libraries[]	= 'session';
+
+		else :
+
+			$_libraries[]	= array( 'faux_session', 'session' );
+
+		endif;
+
 		$_libraries[]	= 'encrypt';
 		$_libraries[]	= 'asset';
 		$_libraries[]	= 'logger';
@@ -589,7 +604,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			if ( is_array( $library ) ) :
 
-				$this->load->library( $library[0], $library[1] );
+				$this->load->library( $library[0], array(), $library[1] );
 
 			else :
 
