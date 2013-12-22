@@ -477,7 +477,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		//	User
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user';
+		$_out[$_counter]->filename	= 'nails_user';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
