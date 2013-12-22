@@ -586,7 +586,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	not available then load up the faux session which has the same methods
 		//	as the session library, but behave as if logged out - comprende?
 
-		if ( !isset( $_SERVER ) ) :
+		if ( $this->input->server( 'REMOTE_ADDR' ) ) :
 
 			$_libraries[]	= 'session';
 
