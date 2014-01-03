@@ -33,7 +33,7 @@
 
 	<section class="tabs pages main-product">
 
-		<div class="tab page basics fieldset" id="tab-basics">
+		<div class="tab page basics active fieldset" id="tab-basics">
 			<?php
 
 				$_field					= array();
@@ -171,7 +171,7 @@
 			</div>
 		</div>
 
-		<div class="tab page active gallery" id="tab-gallery" >
+		<div class="tab page gallery" id="tab-gallery" >
 			<p>
 				Upload images to the product gallery. Once uploaded you can specify which variations are featured on the <a href="#" class="switch-to-variations">variations tab</a>.
 				<small>

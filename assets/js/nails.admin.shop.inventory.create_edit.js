@@ -45,7 +45,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	this.info_chosen_type_change = function()
 	{
 		//	Make sure the appropriate meta fields are being displayed
-		var _type_id = $('#tab-basics select[name=type_id]').val();
+		var _type_id = parseInt( $('#tab-basics select[name=type_id]').val(), 10 );
 
 		//	We'll be updating the template, so fetch it now
 		var _template = $('<div>').html($.parseHTML($.trim($('#template-variation').html(), null, true)));
@@ -66,11 +66,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Does this product type require shipping?
-		var _is_physical = 0;
+		var _is_physical = false;
+
 		for (var _key in this.product_types)
 		{
-			if (this.product_types[_key].id === _type_id) {
-				_is_physical = parseInt(this.product_types[_key].is_physical, 10);
+			if (this.product_types[_key].id === _type_id)
+			{
+				_is_physical = this.product_types[_key].is_physical;
+				break;
 			}
 		}
 
