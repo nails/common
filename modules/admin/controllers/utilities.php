@@ -477,58 +477,73 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		//	User
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'nails_user';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_group
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_group';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_group';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_auth_method
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_auth_method';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_auth_method';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_meta
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_meta';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_meta';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	date_format_date
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'date_format_date';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'date_format_date';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	date_format_time
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'date_format_time';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'date_format_time';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	langauge
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'language';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'language';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
+
+		//	Nails user_meta_* tables
+		$_tables = $this->db->query( 'SHOW TABLES LIKE \'' . NAILS_DB_PREFIX . 'user_meta_%\'' )->result();
+		foreach( $_tables AS $table ) :
+
+			$_table = array_values( (array) $table );
+
+			$_out[$_counter]			= new stdClass();
+			$_out[$_counter]->filename	= $_table[0];
+			$_out[$_counter]->fields	= array();
+			$_out[$_counter]->data		= array();
+
+			$_counter++;
+
+		endforeach;
 
 		//	All other user_meta_* tables
 		$_tables = $this->db->query( 'SHOW TABLES LIKE \'user_meta_%\'' )->result();
 		foreach( $_tables AS $table ) :
 
-			$_table = array_values((array)$table);
+			$_table = array_values( (array) $table );
 
 			$_out[$_counter]			= new stdClass();
 			$_out[$_counter]->filename	= $_table[0];
@@ -545,10 +560,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		foreach( $_out AS &$out ) :
 
 			$_fields = $this->db->query( 'DESCRIBE ' . $out->filename )->result();
-			foreach ( $_fields AS $field )
+			foreach ( $_fields AS $field ) :
+
 				$out->fields[] = $field->Field;
 
-			$out->data		= $this->db->get( $out->filename )->result_array();
+			endforeach;
+
+			$out->data	= $this->db->get( $out->filename )->result_array();
 
 		endforeach;
 
@@ -606,13 +624,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Orders
 		$_out				= array();
 		$_out[0]			= new stdClass();
-		$_out[0]->filename	= 'shop_orders';
+		$_out[0]->filename	= NAILS_DB_PREFIX . 'shop_orders';
 		$_out[0]->fields	= array();
 		$_out[0]->data		= array();
 
 		//	Order_products
 		$_out[1]			= new stdClass();
-		$_out[1]->filename	= 'shop_order_products';
+		$_out[1]->filename	= NAILS_DB_PREFIX . 'shop_order_products';
 		$_out[1]->fields	= array();
 		$_out[1]->data		= array();
 
@@ -683,7 +701,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_out			= new stdClass();
-		$_out->filename	= 'shop_vouchers';
+		$_out->filename	= NAILS_DB_PREFIX . 'shop_vouchers';
 		$_out->fields	= array();
 		$_out->data		= array();
 
