@@ -25,10 +25,16 @@
 
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
-			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
-			window.SITE_URL		= '<?=site_url()?>';
-			window.NAILS_URL	= '<?=NAILS_URL?>';
-			window.NAILS_LANG	= {};
+			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+			window.SITE_URL					= '<?=site_url()?>';
+			window.NAILS					= {};
+			window.NAILS.URL				= '<?=NAILS_URL?>';
+			window.NAILS.LANG				= {};
+			window.NAILS.USER				= {};
+			window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
+			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
+			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
+			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 		</script>
 
 		<!-- JAVASCRIPT[S] -->

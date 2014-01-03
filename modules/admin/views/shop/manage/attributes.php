@@ -20,7 +20,7 @@
 			<a href="#" data-tab="overview">Overview</a>
 		</li>
 		<li class="tab <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>">
-			<a href="#" data-tab="create">Create Tag</a>
+			<a href="#" data-tab="create">Create Attribute</a>
 		</li>
 	</ul>
 	<section class="tabs pages">

@@ -17,23 +17,23 @@ if ( ! function_exists( 'unique_for_url' ) )
 	{
 		//	Prep the string
 		$str = url_title( $str, 'dash', TRUE );
-		
+
 		//	Check if unique
 		$ci =& get_instance();
 		$i	= 0;
-		
+
 		do {
-			
-			$check = ( $i === 0 ) ? $str : $str. '-' . $i; 
+
+			$check = ( $i === 0 ) ? $str : $str. '-' . $i;
 			$ci->db->where( $col, $check );
-			
+
 			if ( $ci->db->count_all_results( $table ) === 0 )
 				break;
-			
+
 			$i++;
-			
+
 		} while ( 1 );
-		
+
 		return $check;
 	}
 }
@@ -55,5 +55,14 @@ if ( ! function_exists( 'shorten_url' ) )
 		$ci =& get_instance();
 		$ci->load->model( 'mini_model' );
 		return $ci->mini_model->shorten( $url );
+	}
+}
+
+
+if ( ! function_exists('secure_site_url'))
+{
+	function secure_site_url($uri = '')
+	{
+		return SECURE_BASE_URL . $uri;
 	}
 }

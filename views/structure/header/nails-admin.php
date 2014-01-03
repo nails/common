@@ -21,7 +21,7 @@
 	<!--	NAILS JS GLOBALS	-->
 	<script style="text/javascript">
 		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
-		window.SITE_URL					= '<?=site_url()?>';
+		window.SITE_URL					= '<?=SECURE_BASE_URL ? SECURE_BASE_URL : BASE_URL?>';
 		window.NAILS					= {};
 		window.NAILS.URL				= '<?=NAILS_URL?>';
 		window.NAILS.LANG				= {};

@@ -735,7 +735,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 						$(_object).closest('li.gallery-item').addClass('deleted').fadeOut('slow', function()
 						{
-							$(_object).remove();
+							$(_object).closest('li.gallery-item').remove();
 						});
 
 						//	Remove the image from any variations
