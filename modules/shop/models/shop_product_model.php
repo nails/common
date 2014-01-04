@@ -81,7 +81,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		endif;
 
 		$_data->title		= isset( $data['title'] )			? $data['title']			: NULL;
-		$_data->is_active	= isset( $data['is_active'] )		? (bool) $data['is_active']	: NULL;
+		$_data->is_active	= isset( $data['is_active'] )		? (bool) $data['is_active']	: FALSE;
 		$_data->brands		= isset( $data['brands'] )			? $data['brands']			: NULL;
 		$_data->categories	= isset( $data['categories'] )		? $data['categories']		: NULL;
 		$_data->tags		= isset( $data['tags'] )			? $data['tags']				: NULL;
@@ -436,7 +436,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 					$this->db->set( (array) $v->meta );
 					$this->db->set( 'shipping_collection_only',	$v->shipping->collection_only );
 
-					$this->db->insert( $this->_table_variation_price );
+					$this->db->insert( $this->_table_variation_meta );
 
 
 					//	Product Variation: Price

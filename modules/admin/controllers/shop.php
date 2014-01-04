@@ -515,7 +515,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['ranges']				= $this->range->get_all();
 		$this->data['tags']					= $this->tag->get_all_flat();
 
-		array_unshift( $this->data['tax_rates'], 'No Tax');
+		$this->data['tax_rates'] = array( 'No Tax' ) + $this->data['tax_rates'];
 
 		// --------------------------------------------------------------------------
 
