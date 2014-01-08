@@ -87,6 +87,21 @@
 					<legend>Physical Dimensions</legend>
 					<div class="physical-fields">
 						<?php
+						
+							$_field					= array();
+							$_field['key']			= 'variation[' . $_counter . '][meta][measurement_unit]';
+							$_field['label']		= 'L/W/H Unit of measurement';
+							$_field['class']		= 'chosen';
+							$_field['required']		= TRUE;
+
+							$_options				= array();
+							$_options['mm']			= 'Millimeter';
+							$_options['cm']			= 'Centimetre';
+							$_options['m']			= 'Metre';
+
+							echo form_field_dropdown( $_field, $_options );
+
+							// --------------------------------------------------------------------------
 
 							$_field					= array();
 							$_field['key']			= 'variation[' . $_counter . '][meta][length]';
@@ -119,31 +134,6 @@
 							// --------------------------------------------------------------------------
 
 							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][measurement_unit]';
-							$_field['label']		= 'L/W/H Unit of measurement';
-							$_field['class']		= 'chosen';
-							$_field['required']		= TRUE;
-
-							$_options				= array();
-							$_options['mm']			= 'Millimeter';
-							$_options['cm']			= 'Centimetre';
-							$_options['m']			= 'Metre';
-
-							echo form_field_dropdown( $_field, $_options );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][weight]';
-							$_field['label']		= 'Weight';
-							$_field['placeholder']	= 'The weight of the item';
-							$_field['required']		= TRUE;
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
 							$_field['key']			= 'variation[' . $_counter . '][meta][weight_unit]';
 							$_field['label']		= 'Weight unit of measurement';
 							$_field['class']		= 'chosen';
@@ -154,6 +144,16 @@
 							$_options['kg']			= 'Kilogram';
 
 							echo form_field_dropdown( $_field, $_options );
+
+							// --------------------------------------------------------------------------
+							
+							$_field					= array();
+							$_field['key']			= 'variation[' . $_counter . '][meta][weight]';
+							$_field['label']		= 'Weight';
+							$_field['placeholder']	= 'The weight of the item';
+							$_field['required']		= TRUE;
+
+							echo form_field( $_field );
 
 						?>
 					</div>
