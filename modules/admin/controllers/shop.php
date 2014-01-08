@@ -600,7 +600,31 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_delete()
 	{
-		dump( 'delete inventory' );
+		$_product = $this->product->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $_product ) :
+
+			$this->session->set_flashdata( 'error', 'Sorry, a product with that ID could not be found.' );
+			redirect( 'admin/shop/inventory/index' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->product->delete( $_product->id ) ) :
+
+			$this->session->set_flashdata( 'success', 'Product successfully deleted! You can restore this product by ' . anchor( '/admin/shop/inventory/restore/' . $_product->id, 'clicking here' ) );
+
+		else :
+
+			$this->session->set_flashdata( 'error', 'Sorry, that product could not be deleted' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		redirect( 'admin/shop/inventory/index' );
 	}
 
 
@@ -609,7 +633,31 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_restore()
 	{
-		dump( 'restore inventory' );
+		$_product = $this->product->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $_product ) :
+
+			$this->session->set_flashdata( 'error', 'Sorry, a product with that ID could not be found.' );
+			redirect( 'admin/shop/inventory/index' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->product->restore( $_product->id ) ) :
+
+			$this->session->set_flashdata( 'success', 'Product successfully restored' );
+
+		else :
+
+			$this->session->set_flashdata( 'error', 'Sorry, that product could not be restored' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		redirect( 'admin/shop/inventory/index' );
 	}
 
 
