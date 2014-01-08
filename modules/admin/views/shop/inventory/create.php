@@ -247,6 +247,15 @@
 				Specify which ranges and/or collections this product should appear in.
 			</p>
 			<p>
+				A range is an actual line of stock, or a range of products from one of your
+				suppliers. For example this might be the 'Larsson' range from 'Neptune'.
+			</p>
+			<p>	
+				Collections offer you a unique way to combine stock into 'smart' categories, 
+				for example you might create collections for 'Gifts for Him', 'Gifts for Her',
+				'Valentines Day Gifts', 'Stocking Fillers' etc.
+			</p>
+			<p>
 				<strong>Ranges</strong>
 			</p>
 			<select name="ranges[]" class="ranges" multiple="multiple" style="width:100%">
