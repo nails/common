@@ -95,7 +95,7 @@ class NAILS_Shop_tax_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
 			$this->db->set( $_data );
@@ -158,7 +158,7 @@ class NAILS_Shop_tax_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
 			$this->db->set( $_data );

@@ -974,7 +974,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
 			$_data->slug = $this->_generate_slug( $data->label, NAILS_DB_PREFIX . 'shop_product_type', 'slug' );
@@ -1088,7 +1088,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			$this->db->set( $_data );
 			$this->db->set( 'modified', 'NOW()', FALSE );

@@ -97,7 +97,7 @@ class NAILS_Shop_attribute_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
 			$_data->slug = $this->_generate_slug( $data->label, $this->_table, 'slug' );
@@ -168,7 +168,7 @@ class NAILS_Shop_attribute_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
 			$this->db->set( $_data );
