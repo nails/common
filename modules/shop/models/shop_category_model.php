@@ -452,7 +452,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			$this->db->set( $_data );
 			$this->db->set( 'created', 'NOW()', FALSE );
@@ -587,7 +587,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( (array) $_data ) ) :
+		if ( ! empty( $_data ) ) :
 
 			//	Start the transaction
 			$this->db->trans_begin();
