@@ -43,7 +43,8 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 					foreach( $cat->children AS $child ) :
 
-						$_ids = array_merge( array( $child->id ), $this->get_ids_of_all_children( $cat->id ) );
+						$_ids = array_merge( array( $child->id ), $this->get_ids_of_all_children( $child->id ) );
+
 						$this->db->select( 'COUNT( DISTINCT( `product_id` ) ) total' );
 						$this->db->where_in( 'category_id', $_ids );
 						$child->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category' )->row()->total;
@@ -120,17 +121,17 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endforeach;
 
-		sort( $_out );
+		asort( $_out );
 
 		// --------------------------------------------------------------------------
 
 		//	Remove parents from the array if they have any children
 		if ( $murder_parents_of_children ) :
 
-			for ( $i = 0; $i < count( $_out ); $i++ ) :
+			foreach( $_out AS $key => &$cat ) :
 
 				$_found		= FALSE;
-				$_needle	= $_out[$i] . $separator;
+				$_needle	= $cat . $separator;
 
 				//	Hat tip - http://uk3.php.net/manual/en/function.array-search.php#90711
 				foreach ( $_out as $item ) :
@@ -144,13 +145,13 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 				endforeach;
 
-				if ( $_found)	 :
+				if ( $_found ) :
 
-					unset( $_out[$i] );
+					unset( $_out[$key] );
 
 				endif;
 
-			endfor;
+			endforeach;
 
 		endif;
 

@@ -45,7 +45,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	this.info_chosen_type_change = function()
 	{
 		//	Make sure the appropriate meta fields are being displayed
-		var _type_id = parseInt( $('#tab-basics select[name=type_id]').val(), 10 );
+		var _type_id = parseInt( $('#tab-basics .type_id:input').val(), 10 );
 
 		//	We'll be updating the template, so fetch it now
 		var _template = $('<div>').html($.parseHTML($.trim($('#template-variation').html(), null, true)));

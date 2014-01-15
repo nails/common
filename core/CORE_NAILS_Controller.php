@@ -214,13 +214,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	If a SECURE_BASE_URL is not defined then assume the secure URL is simply
 		//	https://BASE_URL
 
-		if ( ! defined( 'SECURE_BASE_URL' ) || ! SECURE_BASE_URL ) :
+		if ( ! defined( 'SECURE_BASE_URL' ) ) :
 
-			//	Not defined, assume https://BASE_URL
-			$_secure = BASE_URL;
-			$_secure = preg_replace( '/^http:\/\//', 'https://', $_secure );
-
-			define( 'SECURE_BASE_URL', $_secure );
+			//	Not defined, play it safe and just copy the BASE_URL
+			define( 'SECURE_BASE_URL', BASE_URL );
 
 		endif;
 

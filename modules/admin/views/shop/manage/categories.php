@@ -223,7 +223,7 @@
 	echo '$( \'a.edit-open\' ).fancybox({width:650, autoSize:false, afterShow : function(){ _nails.add_stripes(); } });';
 
 	//	Set _DATA
-	echo 'var _DATA = ' . json_encode( $categories ) . ';';
+	echo 'var _DATA = ' . json_encode( $categories_nested ) . ';';
 	echo '</script>';
 
 ?>

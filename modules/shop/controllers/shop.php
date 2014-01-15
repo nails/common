@@ -90,7 +90,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		if ( $this->_slug ) :
 
-			//	Find a specific category; placing into an array for consitency with the toplevel
+			//	Find a specific category; placing into an array for consistency with the top level
 			$this->data['categories']	= array( $this->category->get_by_slug( $this->_slug, TRUE, TRUE ) );
 			$this->data['category']		= $this->category->get_by_slug( $this->_slug );
 

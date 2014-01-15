@@ -97,16 +97,15 @@
 				$_field['type']		= 'textarea';
 
 				echo form_field( $_field );
-				
+
 				// --------------------------------------------------------------------------
-				
+
 				//	Hidden?
 				$_field					= array();
 				$_field['key']			= 'is_hidden';
 				$_field['label']		= 'Hide this Brand?';
 				$_field['text_on']		= 'YES';
 				$_field['text_off']		= 'NO';
-				$_field['default']		= $brand->is_hidden;
 				$_field['required']		= TRUE;
 
 				echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
@@ -188,7 +187,7 @@
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Hidden?
 		$_field					= array();
 		$_field['key']			= $brand->id . '[is_hidden]';
@@ -199,7 +198,7 @@
 		$_field['required']		= TRUE;
 
 		echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
-		
+
 		// --------------------------------------------------------------------------
 
 		$_field				= array();

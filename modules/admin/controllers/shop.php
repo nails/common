@@ -2077,7 +2077,22 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['categories'] = $this->category->get_all( FALSE, TRUE );
+		$this->data['categories']			= $this->category->get_all( FALSE, TRUE );
+		$this->data['categories_nested']	= array();
+		$_categories_nested					= $this->category->get_all_nested_flat();
+
+		//	Prep the nested categories so it's DATA suitable.
+		foreach( $_categories_nested AS $id => $label ) :
+
+			$_temp			= new stdClass();
+			$_temp->id		= $id;
+			$_temp->label	= $label;
+
+			$this->data['categories_nested'][] = $_temp;
+
+			unset( $_temp );
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
@@ -2854,12 +2869,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter  instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);

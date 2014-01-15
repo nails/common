@@ -43,7 +43,19 @@
 				$_field['class']		= 'type_id';
 				$_field['id']			= 'type_id';
 
-				echo form_field_dropdown( $_field, $product_types_flat );
+				if ( count( $product_types_flat ) == 2 ) :
+
+					reset( $product_types_flat );
+					$_id = key( $product_types_flat );
+
+					//	Only one product type, no need to render a drop down
+					echo '<input type="hidden" name="' . $_field['key'] . '" value="' . $_id . '" class="' . $_field['key'] . '">';
+
+				else :
+
+					echo form_field_dropdown( $_field, $product_types_flat );
+
+				endif;
 
 				// --------------------------------------------------------------------------
 
@@ -250,8 +262,8 @@
 				A range is an actual line of stock, or a range of products from one of your
 				suppliers. For example this might be the 'Larsson' range from 'Neptune'.
 			</p>
-			<p>	
-				Collections offer you a unique way to combine stock into 'smart' categories, 
+			<p>
+				Collections offer you a unique way to combine stock into 'smart' categories,
 				for example you might create collections for 'Gifts for Him', 'Gifts for Her',
 				'Valentines Day Gifts', 'Stocking Fillers' etc.
 			</p>

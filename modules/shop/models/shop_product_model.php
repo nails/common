@@ -82,9 +82,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		$_data->title		= isset( $data['title'] )			? $data['title']			: NULL;
 		$_data->is_active	= isset( $data['is_active'] )		? (bool) $data['is_active']	: FALSE;
-		$_data->brands		= isset( $data['brands'] )			? $data['brands']			: NULL;
-		$_data->categories	= isset( $data['categories'] )		? $data['categories']		: NULL;
-		$_data->tags		= isset( $data['tags'] )			? $data['tags']				: NULL;
+		$_data->brands		= isset( $data['brands'] )			? $data['brands']			: array();
+		$_data->categories	= isset( $data['categories'] )		? $data['categories']		: array();
+		$_data->tags		= isset( $data['tags'] )			? $data['tags']				: array();
 
 		$_data->tax_rate_id	= isset( $data['tax_rate_id'] ) &&	(int) $data['tax_rate_id']	? (int) $data['tax_rate_id']	: NULL;
 
@@ -235,18 +235,18 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Gallery
-		$_data->gallery			= isset( $data['gallery'] )			? $data['gallery']			: NULL;
+		$_data->gallery			= isset( $data['gallery'] )			? $data['gallery']			: array();
 
 		// --------------------------------------------------------------------------
 
 		//	Attributes
-		$_data->attributes		= isset( $data['attributes'] )		? $data['attributes']		: NULL;
+		$_data->attributes		= isset( $data['attributes'] )		? $data['attributes']		: array();
 
 		// --------------------------------------------------------------------------
 
 		//	Ranges & Collections
-		$_data->ranges			= isset( $data['ranges'] )			? $data['ranges']			: NULL;
-		$_data->collections		= isset( $data['collections'] )		? $data['collections']		: NULL;
+		$_data->ranges			= isset( $data['ranges'] )			? $data['ranges']			: array();
+		$_data->collections		= isset( $data['collections'] )		? $data['collections']		: array();
 
 		// --------------------------------------------------------------------------
 
