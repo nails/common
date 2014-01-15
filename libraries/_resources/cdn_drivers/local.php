@@ -94,12 +94,12 @@ class Local_CDN
 		//	Move the file
 		$_dest = DEPLOY_CDN_PATH . $bucket . '/' . $filename;
 
-		if ( move_uploaded_file( $sourcefile, $_dest ) ) :
+		if ( @move_uploaded_file( $sourcefile, $_dest ) ) :
 
 			return TRUE;
 
 		//	Hmm, failed to move, try copying it.
-		elseif( copy( $sourcefile, $_dest ) ) :
+		elseif( @copy( $sourcefile, $_dest ) ) :
 
 			return TRUE;
 

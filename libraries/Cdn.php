@@ -3005,7 +3005,7 @@ class Cdn {
 			//	Copy this file temporarily to the cache
 			$_cachefile = DEPLOY_CACHE_DIR . 'test-' . $bucket->slug . '-' . $_test_id . '.jpg';
 
-			if ( ! copy( $_file, $_cachefile ) ) :
+			if ( ! @copy( $_file, $_cachefile ) ) :
 
 				$this->set_error( 'Unable to create temporary cache file.' );
 				continue;
