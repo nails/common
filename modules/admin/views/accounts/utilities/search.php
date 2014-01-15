@@ -49,7 +49,7 @@
 		// --------------------------------------------------------------------------
 
 		$_user_groups_obj = $user->get_groups();
-		$_groups = array();
+		$_groups = array( '' => 'All Groups' );
 		foreach ( $_user_groups_obj AS $g ) :
 
 			$_groups[$g->id] = $g->display_name;
