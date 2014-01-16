@@ -30,7 +30,6 @@
 				<thead>
 					<tr>
 						<th class="label">Label &amp; Description</th>
-						<th class="count">Products</th>
 						<th class="modified">Modified</th>
 						<th class="actions">Actions</th>
 					</tr>
@@ -38,33 +37,54 @@
 				<tbody>
 				<?php
 
-					foreach( $categories AS $category ) :
+					if ( $categories ) :
+
+						foreach( $categories AS $category ) :
+
+							echo '<tr>';
+								echo '<td class="label indentosaurus indent-' . $category->depth . '">';
+
+									echo str_repeat( '<div class="indentor"></div>', $category->depth );
+
+									echo '<div class="indentor-content">';
+
+										echo $category->label;
+
+										echo $category->product_count ? '<span class="product-count">' . $category->product_count . '</span>' : '';
+
+										$_label_nested = explode( '|', $category->label_nested );
+										array_pop( $_label_nested );
+
+										echo $_label_nested ? '<small>' . implode( ' &rsaquo; ', $_label_nested ) . '</small>' : '<small>Top Level Category</small>';
+										echo $category->description ? '<small>' . $category->description . '</small>' : '';
+
+									echo '</div>';
+
+								echo '</td>';
+								echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $category->modified ), TRUE );
+								echo '<td class="actions">';
+									echo '<a href="#edit-' . $category->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
+
+									echo form_open( 'admin/shop/manage/categories' . $_is_fancybox, 'class="delete"' );
+									echo form_hidden( 'action', 'delete' );
+									echo form_hidden( 'id', $category->id );
+									echo form_submit( 'submit', lang( 'action_delete' ), 'class="awesome red small confirm"' );
+									echo form_close();
+
+								echo '</td>';
+							echo '</tr>';
+
+						endforeach;
+
+					else :
 
 						echo '<tr>';
-						echo '<td class="label">';
-						echo $category->label;
-
-						$_label_nested = explode( '|', $category->label_nested );
-						array_pop( $_label_nested );
-
-						echo $_label_nested ? '<small>' . implode( ' &rsaquo; ', $_label_nested ) . '</small>' : '<small>Top Level Category</small>';
-						echo $category->description ? '<small>' . $category->description . '</small>' : '';
-						echo '</td>';
-						echo '<td class="count">' . $category->product_count . '</td>';
-						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $category->modified ), TRUE );
-						echo '<td class="actions">';
-						echo '<a href="#edit-' . $category->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
-
-						echo form_open( 'admin/shop/manage/categories' . $_is_fancybox, 'class="delete"' );
-						echo form_hidden( 'action', 'delete' );
-						echo form_hidden( 'id', $category->id );
-						echo form_submit( 'submit', lang( 'action_delete' ), 'class="awesome red small confirm"' );
-						echo form_close();
-
-						echo '</td>';
+							echo '<td colspan="3" class="no-data">';
+								echo 'No Categories, add one!';
+							echo '</td>';
 						echo '</tr>';
 
-					endforeach;
+					endif;
 
 				?>
 				</tbody>
@@ -77,10 +97,11 @@
 				echo form_open( 'admin/shop/manage/categories' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The label to give your category';
 
 				echo form_field( $_field );
 
@@ -105,27 +126,30 @@
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text may be used on the category\'s overview page.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'seo_description';
+				$_field['label']		= 'SEO Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
+				$_field					= array();
+				$_field['key']			= 'seo_keywords';
+				$_field['label']		= 'SEO Keywords';
+				$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 				echo form_field( $_field );
 

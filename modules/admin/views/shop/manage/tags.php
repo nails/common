@@ -29,7 +29,6 @@
 				<thead>
 					<tr>
 						<th class="label">Label &amp; Description</th>
-						<th class="count">Products</th>
 						<th class="modified">Modified</th>
 						<th class="actions">Actions</th>
 					</tr>
@@ -37,28 +36,42 @@
 				<tbody>
 				<?php
 
-					foreach( $tags AS $tag ) :
+					if ( $tags ) :
+
+						foreach( $tags AS $tag ) :
+
+							echo '<tr>';
+								echo '<td class="label">';
+
+									echo $tag->label;
+									echo $tag->product_count ? '<span class="product-count">' . $tag->product_count . '</span>' : '';
+									echo $tag->description ? '<small>' . $tag->description . '</small>' : '';
+
+								echo '</td>';
+								echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $tag->modified ), TRUE );
+								echo '<td class="actions">';
+									echo '<a href="#edit-' . $tag->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
+
+									echo form_open( 'admin/shop/manage/tags' . $_is_fancybox, 'class="delete"' );
+									echo form_hidden( 'action', 'delete' );
+									echo form_hidden( 'id', $tag->id );
+									echo form_submit( 'submit', lang( 'action_delete' ), 'class="awesome red small confirm"' );
+									echo form_close();
+
+								echo '</td>';
+							echo '</tr>';
+
+						endforeach;
+
+					else :
 
 						echo '<tr>';
-						echo '<td class="label">';
-						echo $tag->label;
-						echo $tag->description ? '<small>' . $tag->description . '</small>' : '';
-						echo '</td>';
-						echo '<td class="count">' . $tag->product_count . '</td>';
-						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $tag->modified ), TRUE );
-						echo '<td class="actions">';
-						echo '<a href="#edit-' . $tag->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
-
-						echo form_open( 'admin/shop/manage/tags' . $_is_fancybox, 'class="delete"' );
-						echo form_hidden( 'action', 'delete' );
-						echo form_hidden( 'id', $tag->id );
-						echo form_submit( 'submit', lang( 'action_delete' ), 'class="awesome red small confirm"' );
-						echo form_close();
-
-						echo '</td>';
+							echo '<td colspan="3" class="no-data">';
+								echo 'No Tags, add one!';
+							echo '</td>';
 						echo '</tr>';
 
-					endforeach;
+					endif;
 
 				?>
 				</tbody>
@@ -71,36 +84,40 @@
 				echo form_open( 'admin/shop/manage/tags' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The label to give your tag';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text may be used on the tag\'s overview page.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'seo_description';
+				$_field['label']		= 'SEO Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
+				$_field					= array();
+				$_field['key']			= 'seo_keywords';
+				$_field['label']		= 'SEO Keywords';
+				$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 				echo form_field( $_field );
 

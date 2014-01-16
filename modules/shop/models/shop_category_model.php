@@ -27,9 +27,25 @@ class NAILS_Shop_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all( $include_children = FALSE, $include_product_count = FALSE )
+	public function get_all( $include_children = FALSE, $include_product_count = FALSE, $order_style = 'NORMAL' )
 	{
-		$this->db->order_by( 'order,label' );
+		switch( $order_style ) :
+
+			case 'NORMAL' :
+
+				$this->db->order_by( 'order,label' );
+
+			break;
+
+			case 'NESTED' :
+
+				$this->db->order_by( 'slug' );
+
+			break;
+
+		endswitch;
+
+
 		$_all = parent::get_all();
 
 		if ( $include_children ) :
@@ -715,6 +731,8 @@ class NAILS_Shop_category_model extends NAILS_Model
 		$object->created_by		= $object->created_by ? (int) $object->created_by : NULL;
 		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
 		$object->children		= array();
+
+		$object->depth			= count( explode( '/', $object->slug ) ) - 1;
 	}
 }
 

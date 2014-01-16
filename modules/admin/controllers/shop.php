@@ -2107,7 +2107,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['categories']			= $this->category->get_all( FALSE, TRUE );
+		$this->data['categories']			= $this->category->get_all( FALSE, TRUE, 'NESTED' );
 		$this->data['categories_nested']	= array();
 		$_categories_nested					= $this->category->get_all_nested_flat();
 
