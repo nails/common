@@ -44,7 +44,7 @@
 							<td class="image">
 								<?php
 
-									if ( ! isset( $item->gallery[0] ) ) :
+									if ( isset( $item->gallery[0] ) ) :
 
 										echo img( cdn_scale( $item->gallery[0], 64, 64 ) );
 
