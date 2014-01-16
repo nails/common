@@ -69,6 +69,20 @@ class NAILS_Shop_product_model extends NAILS_Model
 		//	Quick check of incoming data
 		$_data = new stdClass();
 
+		if ( empty( $data['title'] ) ) :
+
+			$this->_set_error( 'Title is a required field.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Slug
+		//	====
+
+		$_data->slug	= $this->_generate_slug( $data['title'], $this->_table_product );
+
 		//	Product Info
 		//	============
 		$_data->type_id		= isset( $data['type_id'] )			? (int) $data['type_id']	: NULL;
@@ -80,7 +94,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		endif;
 
-		$_data->title		= isset( $data['title'] )			? $data['title']			: NULL;
+		$_data->title		= isset( $data['title'] )			? trim( $data['title'] )	: NULL;
 		$_data->is_active	= isset( $data['is_active'] )		? (bool) $data['is_active']	: FALSE;
 		$_data->brands		= isset( $data['brands'] )			? $data['brands']			: array();
 		$_data->categories	= isset( $data['categories'] )		? $data['categories']		: array();
