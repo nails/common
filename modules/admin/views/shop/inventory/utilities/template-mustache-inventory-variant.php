@@ -5,7 +5,10 @@
 	//	to prefill the fields. The form_helper functions don't pick up the fields
 	//	automatically because of the Mustache ' . $_counter . ' variable.
 
-	$_counter = isset( $variation ) ? $counter : '{{counter}}';
+	//	Additionally, make sure it's not === FALSE as the value can persist when
+//	this view is loaded multiple times.
+
+	$_counter = isset( $variation ) && $counter !== FALSE ? $counter : '{{counter}}';
 
 ?>
 <div id="variation-<?=$_counter?>" class="variation" data-counter="<?=$_counter?>">
@@ -87,7 +90,7 @@
 					<legend>Physical Dimensions</legend>
 					<div class="physical-fields">
 						<?php
-						
+
 							$_field					= array();
 							$_field['key']			= 'variation[' . $_counter . '][meta][measurement_unit]';
 							$_field['label']		= 'L/W/H Unit of measurement';
@@ -146,7 +149,7 @@
 							echo form_field_dropdown( $_field, $_options );
 
 							// --------------------------------------------------------------------------
-							
+
 							$_field					= array();
 							$_field['key']			= 'variation[' . $_counter . '][meta][weight]';
 							$_field['label']		= 'Weight';
@@ -255,13 +258,19 @@
 
 						if ( $is_first ) :
 
-							$_attr_price		= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '" class="base-price"';
-							$_attr_price_sale	= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '" class="base-price-sale"';
+							$_attr_price		= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '"';
+							$_attr_price_sale	= 'data-code="' . SHOP_BASE_CURRENCY_CODE . '"';
+
+							$_class_price		= array( 'base-price' );
+							$_class_price_sale	= array( 'base-price-sale' );
 
 						else :
 
-							$_attr_price		= 'class="variation-price ' . SHOP_BASE_CURRENCY_CODE . '"';
-							$_attr_price_sale	= 'class="variation-price-sale ' . SHOP_BASE_CURRENCY_CODE . '"';
+							$_attr_price		= '';
+							$_attr_price_sale	= '';
+
+							$_class_price		= array( 'base-price', SHOP_BASE_CURRENCY_CODE );
+							$_class_price_sale	= array( 'base-price-sale', SHOP_BASE_CURRENCY_CODE );
 
 						endif;
 
@@ -280,8 +289,20 @@
 						<td class="price">
 							<?php
 
-								$_key = 'variation[' . $_counter . '][pricing][0][price]';
-								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price . ' placeholder="Price"' );
+								$_key	= 'variation[' . $_counter . '][pricing][0][price]';
+								$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+								$_class = $_class_price;
+
+								if ( $_error ) :
+
+									$_class[] = 'error';
+
+								endif;
+
+								$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
+
+								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price . $_class . ' placeholder="Price"' );
+								echo $_error;
 
 							?>
 						</td>
@@ -289,7 +310,19 @@
 							<?php
 
 								$_key = 'variation[' . $_counter . '][pricing][0][sale_price]';
-								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price_sale . ' placeholder="Sale Price"' );
+								$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+								$_class = $_class_price_sale;
+
+								if ( $_error ) :
+
+									$_class[] = 'error';
+
+								endif;
+
+								$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
+
+								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price_sale . $_class . ' placeholder="Sale Price"' );
+								echo $_error;
 
 							?>
 						</td>
@@ -305,13 +338,19 @@
 
 								if ( $is_first ) :
 
-									$_attr_price		= 'data-code="' . $currency->code . '" class="base-price"';
-									$_attr_price_sale	= 'data-code="' . $currency->code . '" class="base-price-sale"';
+									$_attr_price		= 'data-code="' . $currency->code . '"';;
+									$_attr_price_sale	= 'data-code="' . $currency->code . '"';
+
+									$_class_price		= array( 'base-price' );
+									$_class_price_sale	= array( 'base-price-sale' );
 
 								else :
 
-									$_attr_price		= 'class="variation-price ' . $currency->code . '"';
-									$_attr_price_sale	= 'class="variation-price-sale ' . $currency->code . '"';
+									$_attr_price		= '';
+									$_attr_price_sale	= '';
+
+									$_class_price		= array( 'variation-price', $currency->code );
+									$_class_price_sale	= array( 'variation-price-sale', $currency->code );
 
 								endif;
 
@@ -331,7 +370,19 @@
 										<?php
 
 											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][price]';
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+											$_class = $_class_price_sale;
+
+											if ( $_error ) :
+
+												$_class[] = 'error';
+
+											endif;
+
+											$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
+
+											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											echo $_error;
 
 										?>
 									</td>
@@ -339,7 +390,18 @@
 										<?php
 
 											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][sale_price]';
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+											$_class = $_class_price_sale;
+
+											if ( $_error ) :
+
+												$_class[] = 'error';
+
+											endif;
+
+											$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
+											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											echo $_error;
 
 										?>
 									</td>

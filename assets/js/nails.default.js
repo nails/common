@@ -483,6 +483,11 @@ NAILS_JS = function()
 			{
 				$(this).addClass( 'error' );
 			}
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' .error.show-in-tabs' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
 		});
 	};
 

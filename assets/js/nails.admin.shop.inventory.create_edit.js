@@ -331,6 +331,19 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
+		//	Helper: copy the fill price to the sale price on blur
+		$( 'input.base-price, input.variation-price' ).on( 'blur', function()
+		{
+			var _price = $(this).val();
+			var _sale_price = $(this).closest( 'tr' ).find( 'input.base-price-sale, input.variation-price' );
+
+			if ( $.trim( _sale_price.val() ).length === 0 )
+			{
+				_sale_price.val( _price );
+			}
+
+		});
+
 		//	Sync prices
 		$( '#variation-sync-prices a' ).on( 'click', function()
 		{

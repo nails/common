@@ -43,7 +43,7 @@
 				$_field['class']		= 'type_id';
 				$_field['id']			= 'type_id';
 
-				if ( count( $product_types_flat ) == 2 ) :
+				if ( count( $product_types_flat ) == 1 ) :
 
 					reset( $product_types_flat );
 					$_id = key( $product_types_flat );
@@ -373,7 +373,7 @@
 <script type="text/template" id="template-variation">
 <?php
 
-	$_data = array( 'is_first' => FALSE, 'is_php' => FALSE );
+	$_data = array( 'is_first' => FALSE, 'is_php' => FALSE, 'counter' => FALSE );
 
 	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data );
 
