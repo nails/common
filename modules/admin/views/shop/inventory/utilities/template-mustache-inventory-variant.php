@@ -64,22 +64,50 @@
 				// --------------------------------------------------------------------------
 
 				$_field					= array();
-				$_field['key']			= 'variation[' . $_counter . '][quantity_available]';
-				$_field['label']		= 'Quantity Available';
+				$_field['key']			= 'variation[' . $_counter . '][stock_status]';
+				$_field['label']		= 'Stock Status';
+				$_field['class']		= 'chosen stock-status';
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= 'How many units of this variation are available? Leave blank for unlimited';
+				$_field['default']		= 'IN_STOCK';
 
-				echo form_field( $_field );
+				$_options					= array();
+				$_options['IN_STOCK']		= 'In Stock';
+				$_options['TO_ORDER']		= 'To Order';
+				$_options['OUT_OF_STOCK']	= 'Out of Stock';
+
+				echo form_field_dropdown( $_field, $_options );
 
 				// --------------------------------------------------------------------------
 
-				$_field					= array();
-				$_field['key']			= 'variation[' . $_counter . '][quantity_sold]';
-				$_field['label']		= 'Quantity Sold';
-				$_field['required']		= TRUE;
-				$_field['placeholder']	= 'How many units have been sold (offline, in store or otherwise)';
+				$_status = set_value( 'variation[' . $_counter . '][stock_status]', 'IN_STOCK' );
 
-				echo form_field( $_field );
+				$_display = $_status == 'IN_STOCK' ? 'block' : 'none';
+				echo '<div class="stock-status-field IN_STOCK" style="display:' . $_display . '">';
+
+					$_field					= array();
+					$_field['key']			= 'variation[' . $_counter . '][quantity_available]';
+					$_field['label']		= 'Quantity Available';
+					$_field['required']		= TRUE;
+					$_field['placeholder']	= 'How many units of this variation are available? Leave blank for unlimited';
+
+					echo form_field( $_field );
+
+				echo '</div>';
+
+				// --------------------------------------------------------------------------
+
+				$_display = $_status == 'TO_ORDER' ? 'block' : 'none';
+				echo '<div class="stock-status-field TO_ORDER" style="display:' . $_display . '">';
+
+					$_field					= array();
+					$_field['key']			= 'variation[' . $_counter . '][lead_time]';
+					$_field['label']		= 'Lead Time (days)';
+					$_field['required']		= TRUE;
+					$_field['placeholder']	= 'How long is the lead time on orders for this product?';
+
+					echo form_field( $_field );
+
+				echo '</div>';
 
 			?>
 		</div>

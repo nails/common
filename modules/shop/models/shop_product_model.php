@@ -146,8 +146,38 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$_data->variation[$index]						= new stdClass();
 			$_data->variation[$index]->label				= isset( $v['label'] )				? $v['label']				: NULL;
 			$_data->variation[$index]->sku					= isset( $v['sku'] )				? $v['sku']					: NULL;
-			$_data->variation[$index]->quantity_available	= isset( $v['quantity_available'] )	? $v['quantity_available']	: NULL;
-			$_data->variation[$index]->quantity_sold		= isset( $v['quantity_sold'] )		? $v['quantity_sold']		: NULL;
+
+			//	Stock
+			//	-----
+			$_data->variation[$index]->stock_status	= isset( $v['stock_status'] )	? $v['stock_status']	: 'OUT_OF_STOCK';
+
+
+			switch ( $_data->variation[$index]->stock_status ) :
+
+				case 'IN_STOCK' :
+
+					$_data->variation[$index]->quantity_available	= isset( $v['quantity_available'] ) ? $v['quantity_available'] : NULL;
+					$_data->variation[$index]->lead_time			= NULL;
+
+				break;
+
+				case 'TO_ORDER' :
+
+					$_data->variation[$index]->quantity_available	= NULL;
+					$_data->variation[$index]->lead_time			= isset( $v['lead_time'] ) ? $v['lead_time'] : NULL;
+
+				break;
+
+				case 'OUT_OF_STOCK' :
+
+					//	Shhh, be vewy qwiet, we're huntin' wabbits.
+
+					$_data->variation[$index]->quantity_available	= NULL;
+					$_data->variation[$index]->lead_time			= NULL;
+
+				break;
+
+			endswitch;
 
 			//	Meta
 			//	----
@@ -415,8 +445,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 				$this->db->set( 'product_id',			$_id );
 				$this->db->set( 'label',				$v->label );
 				$this->db->set( 'sku',					$v->sku );
+				$this->db->set( 'stock_status',			$v->stock_status );
 				$this->db->set( 'quantity_available',	$v->quantity_available );
-				$this->db->set( 'quantity_sold',		$v->quantity_sold );
+				$this->db->set( 'lead_time',			$v->lead_time );
 				$this->db->set( 'order',				$_counter );
 
 				if ( $this->db->insert( $this->_table_variation ) ) :
@@ -1228,6 +1259,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	protected function _format_variation_object( &$variation )
 	{
 		//	Type casting
+		$variation->id			= (int) $variation->id;
 		$variation->id			= (int) $variation->id;
 	}
 

@@ -204,6 +204,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
+		//	Stock status
+		$('#product-variations').on('change', 'select.stock-status', function()
+		{
+			_this._variation_stock_status_change( $(this) );
+		});
+
+		// --------------------------------------------------------------------------
+
 		//	Toggle gallery associations
 		$('#product-variations').on('click', 'ul.gallery-associations li:not(.actions)', function(e)
 		{
@@ -445,6 +453,22 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			//	Remove any variations which were previously disabled
 			$('#product-variations .variation.not-applicable').removeClass('not-applicable');
 		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._variation_stock_status_change = function( obj )
+	{
+		//	Get parent
+		var _parent = obj.closest( '.variation' );
+
+		//	Hide all fields
+		_parent.find( 'div.stock-status-field' ).hide();
+
+		//	Show the ones we're interested in
+		_parent.find( 'div.stock-status-field.' + obj.val() ).show();
 	};
 
 

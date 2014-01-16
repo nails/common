@@ -24,6 +24,7 @@
 			<tr>
 				<th class="id">ID</th>
 				<th class="image">Image</th>
+				<th class="active">Active</th>
 				<th class="title">Title &amp; Description</th>
 				<th class="type">Type</th>
 				<th class="datetime">Modified</th>
@@ -54,6 +55,9 @@
 									endif;
 
 								?>
+							</td>
+							<td class="id">
+								<?=$item->is_active ? '&#10004;' : '&#10006;' ?>
 							</td>
 							<td class="title">
 								<?=$item->title?>
