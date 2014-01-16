@@ -477,7 +477,7 @@ class Asset
 
 		foreach ( $this->css_nails AS $asset ) :
 
-			$out .= link_tag( 'vendor/shed/nails/assets/css/' . $asset ) . "\n";
+			$out .= link_tag( NAILS_URL . 'css/' . $asset ) . "\n";
 
 		endforeach;
 
