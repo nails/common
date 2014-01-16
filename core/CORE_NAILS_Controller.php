@@ -173,7 +173,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Default app constants (if not already defined)
 		//	These should be specified in settings/app.php
 
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					BASE_URL . 'vendor/shed/nails/assets/' );
 		if ( ! defined( 'NAILS_DB_PREFIX' ) )				define( 'NAILS_DB_PREFIX',				'nails_' );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
@@ -218,6 +217,23 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			//	Not defined, play it safe and just copy the BASE_URL
 			define( 'SECURE_BASE_URL', BASE_URL );
+
+		endif;
+
+		//	Set NAILS_URL here as it's dependent on knowing whether SSL is set or not
+		//	and if the current page is secure.
+
+		if ( ! defined( 'NAILS_URL') ) :
+
+			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
+
+				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/assets/' );
+
+			else :
+
+				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/assets/' );
+
+			endif;
 
 		endif;
 
@@ -772,6 +788,42 @@ class CORE_NAILS_Controller extends MX_Controller {
 			redirect( '/' );
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _page_is_secure()
+	{
+		if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
+
+			//	Page is being served through HTTPS
+			return TRUE;
+
+		elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && defined( 'SECURE_BASE_URL' ) ) :
+
+			//	Not being served through HTTPS, but does the URL of the page begin
+			//	with SECURE_BASE_URL
+
+			$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+			if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Unknown, assume not
+		return FALSE;
 	}
 }
 

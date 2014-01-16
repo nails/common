@@ -262,7 +262,7 @@ class Asset
 	 * @return	void
 	 * @author	Pablo
 	 **/
-	public function clear(	$css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
+	public function clear( $css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
 	{
 		//	CSS
 		if ( $css === TRUE )
@@ -555,7 +555,7 @@ class Asset
 
 		foreach ( $this->js_nails AS $asset ) :
 
-			$out .= '<script type="text/javascript" src="' . site_url( 'vendor/shed/nails/assets/js/' . $asset ) . '"></script>' . "\n";
+			$out .= '<script type="text/javascript" src="' . NAILS_URL . 'js/' . $asset . '"></script>' . "\n";
 
 		endforeach;
 
