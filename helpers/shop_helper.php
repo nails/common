@@ -361,6 +361,13 @@ if ( ! function_exists( 'shop_nested_categories_html' ) )
 
 		foreach( $categories AS $category ) :
 
+			//	Don't show if we know there's no products in it
+			if ( isset( $category->product_count ) && ! $category->product_count ) :
+
+				continue;
+
+			endif;
+
 			$_out .= '<li class="category">';
 			$_out .= '<a href="' . site_url( shop_setting( 'shop_url' ) ) . '/category/' . $category->slug . '" class="label">';
 			$_out .= $category->label;;
