@@ -34,7 +34,7 @@ class NAILS_Shop_tag_model extends NAILS_Model
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_tag WHERE tag_id = t.id) product_count' );
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_tag spt LEFT JOIN ' . NAILS_DB_PREFIX . 'shop_product p ON p.id = spt.product_id  WHERE spt.tag_id = t.id AND p.is_active = 1) product_count' );
 
 		endif;
 

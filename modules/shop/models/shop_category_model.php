@@ -45,9 +45,11 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 						$_ids = array_merge( array( $child->id ), $this->get_ids_of_all_children( $child->id ) );
 
-						$this->db->select( 'COUNT( DISTINCT( `product_id` ) ) total' );
-						$this->db->where_in( 'category_id', $_ids );
-						$child->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category' )->row()->total;
+						$this->db->select( 'COUNT( DISTINCT( `spc`.`product_id` ) ) total' );
+						$this->db->where_in( 'spc.category_id', $_ids );
+						$this->db->where( 'p.is_active', TRUE );
+						$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = spc.product_id' );
+						$child->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category spc' )->row()->total;
 
 					endforeach;
 
@@ -62,9 +64,11 @@ class NAILS_Shop_category_model extends NAILS_Model
 			foreach( $_all AS $cat ) :
 
 				$_ids = array_merge( array( $cat->id ), $this->get_ids_of_all_children( $cat->id ) );
-				$this->db->select( 'COUNT( DISTINCT( `product_id` ) ) total' );
+				$this->db->select( 'COUNT( DISTINCT( `spc`.`product_id` ) ) total' );
 				$this->db->where_in( 'category_id', $_ids );
-				$cat->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category' )->row()->total;
+				$this->db->where( 'p.is_active', TRUE );
+				$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = spc.product_id' );
+				$cat->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category spc' )->row()->total;
 
 			endforeach;
 
