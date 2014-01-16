@@ -81,8 +81,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		{
 			//	Ensure shipping tabs are hidden and the physical fields are not showing
 			$( 'li.tab a.tabber-variation-shipping' ).addClass( 'disabled' ).hide();
-			$( '.fields-is-physical .physical-fields' ).hide();
-			$( '.fields-is-physical .no-dimensions' ).show();
 
 			//	If the shipping tab is active, make it non active
 			$( 'li.tab a.tabber-variation-shipping' ).each(function()
@@ -105,21 +103,15 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 			//	Update template
 			$( 'li.tab a.tabber-variation-shipping', _template ).addClass( 'disabled' ).hide();
-			$( '.fields-is-physical .physical-fields', _template ).hide();
-			$( '.fields-is-physical .no-dimensions', _template ).show();
 
 		}
 		else
 		{
 			//	Enable shipping tabs and show physical fields
 			$( 'li.tab a.tabber-variation-shipping' ).removeClass( 'disabled' ).css( 'display', 'inline-block' );
-			$( '.fields-is-physical .physical-fields' ).show();
-			$( '.fields-is-physical .no-dimensions' ).hide();
 
 			//	Update template
 			$( 'li.tab a.tabber-variation-shipping', _template ).removeClass( 'disabled' ).css( 'display', 'inline-block' );
-			$( '.fields-is-physical .physical-fields', _template ).show();
-			$( '.fields-is-physical .no-dimensions', _template ).hide();
 		}
 
 		// --------------------------------------------------------------------------

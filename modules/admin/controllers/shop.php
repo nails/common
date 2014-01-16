@@ -396,36 +396,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				//	Meta
 				//	----
 
-				//	If this product type is_physical then ensure that the dimensions are specified
-				$_rules			= 'xss_clean';
-				$_rules_unit	= 'xss_clean';
-
-				foreach( $this->data['product_types'] AS $type ) :
-
-					if ( $type->id == $this->input->post( 'type_id' ) && $type->is_physical ) :
-
-						$_rules			.= '|required|numeric';
-						$_rules_unit	.= '|required';
-						break;
-
-					endif;
-
-				endforeach;
-
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][length]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][width]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][height]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][measurement_unit]',	'',	$_rules_unit );
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][meta][weight_unit]',		'',	$_rules_unit );
-
 				//	Any custom checks for the extra meta fields
 				if ( isset( $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) && $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) :
 
 					//	Process each rule
 					foreach( $this->data['product_types_meta'][$this->input->post( 'type_id' )] AS $field ) :
 
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][' . $field->key . ']',	'',	$field->validation );
+						$this->form_validation->set_rules( 'variation[' . $index . '][meta][' . $field->key . ']',	$field->label,	$field->validation );
 
 					endforeach;
 
@@ -461,10 +438,31 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				//	Shipping
 				//	--------
 
+				//	If this product type is_physical then ensure that the dimensions are specified
+				$_rules			= 'xss_clean';
+				$_rules_unit	= 'xss_clean';
+
+				foreach( $this->data['product_types'] AS $type ) :
+
+					if ( $type->id == $this->input->post( 'type_id' ) && $type->is_physical ) :
+
+						$_rules			.= '|required|numeric';
+						$_rules_unit	.= '|required';
+						break;
+
+					endif;
+
+				endforeach;
+
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][length]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][width]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][height]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][measurement_unit]',	'',	$_rules_unit );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight]',			'',	$_rules );
+				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight_unit]',		'',	$_rules_unit );
 				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',	'',	'xss_clean' );
 
 			endforeach;
-
 
 			// --------------------------------------------------------------------------
 

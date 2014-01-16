@@ -113,154 +113,71 @@
 		</div>
 
 		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-meta">
-			<div class="fields-is-physical">
-				<fieldset>
-					<legend>Physical Dimensions</legend>
-					<div class="physical-fields">
-						<?php
+			<?php
+
+				foreach ( $product_types_meta AS $id => $fields ) :
+
+					echo '<div class="meta-fields meta-fields-' . $id . '" style="display:none;">';
+
+					if ( $fields ) :
+
+						//	TODO: use the form builder library
+						foreach ( $fields AS $field ) :
 
 							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][measurement_unit]';
-							$_field['label']		= 'L/W/H Unit of measurement';
-							$_field['class']		= 'chosen';
-							$_field['required']		= TRUE;
+							$_field['key']			= 'variation[' . $_counter . '][meta][' . $field->key . ']';
+							$_field['label']		= ! empty( $field->label )			? $field->label : '';
+							$_field['placeholder']	= ! empty( $field->placeholder )	? $field->placeholder : '';
+							$_field['required']		= array_search( 'required', explode( '|', $field->validation ) ) ? TRUE : FALSE;
 
-							$_options				= array();
-							$_options['mm']			= 'Millimeter';
-							$_options['cm']			= 'Centimetre';
-							$_options['m']			= 'Metre';
+							switch( $field->type ) :
 
-							echo form_field_dropdown( $_field, $_options );
+								case 'cdn_object' :
 
-							// --------------------------------------------------------------------------
+									$_field['bucket'] = $field->bucket;
 
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][length]';
-							$_field['label']		= 'Length';
-							$_field['placeholder']	= 'The length of the item';
-							$_field['required']		= TRUE;
+									$_field_out = form_field_mm( $_field, $field->tip );
 
-							echo form_field( $_field );
+								break;
 
-							// --------------------------------------------------------------------------
+								// --------------------------------------------------------------------------
 
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][width]';
-							$_field['label']		= 'Width';
-							$_field['placeholder']	= 'The width of the item';
-							$_field['required']		= TRUE;
+								case 'text' :
+								default :
 
-							echo form_field( $_field );
+									$_field_out = form_field( $_field, $field->tip );
 
-							// --------------------------------------------------------------------------
+								break;
 
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][height]';
-							$_field['label']		= 'Height';
-							$_field['placeholder']	= 'The height of the item';
-							$_field['required']		= TRUE;
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][weight_unit]';
-							$_field['label']		= 'Weight unit of measurement';
-							$_field['class']		= 'chosen';
-							$_field['required']		= TRUE;
-
-							$_options				= array();
-							$_options['g']			= 'Gram';
-							$_options['kg']			= 'Kilogram';
-
-							echo form_field_dropdown( $_field, $_options );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'variation[' . $_counter . '][meta][weight]';
-							$_field['label']		= 'Weight';
-							$_field['placeholder']	= 'The weight of the item';
-							$_field['required']		= TRUE;
-
-							echo form_field( $_field );
-
-						?>
-					</div>
-					<p class="no-dimensions" style="display:none;">
-						This product has no dimensions.
-					</p>
-				</fieldset>
-			</div>
-
-			<fieldset>
-				<legend>Other Meta Data</legend>
-				<?php
-
-					foreach ( $product_types_meta AS $id => $fields ) :
-
-						echo '<div class="meta-fields meta-fields-' . $id . '" style="display:none;">';
-
-						if ( $fields ) :
-
-							//	TODO: use the form builder library
-							foreach ( $fields AS $field ) :
-
-								$_field					= array();
-								$_field['key']			= 'variation[' . $_counter . '][meta][' . $field->key . ']';
-								$_field['label']		= $field->label;
-								$_field['required']		= array_search( 'required', explode( '|', $field->validation ) ) ? TRUE : FALSE;
-
-								switch( $field->type ) :
-
-									case 'cdn_object' :
-
-										$_field['bucket'] = $field->bucket;
-
-										$_field_out = form_field_mm( $_field, $field->tip );
-
-									break;
-
-									// --------------------------------------------------------------------------
-
-									case 'text' :
-									default :
-
-										$_field_out = form_field( $_field, $field->tip );
-
-									break;
-
-								endswitch;
+							endswitch;
 
 
-								//	Don't do this for the first iteration as it's being done in PHP.
-								if ( ( ! isset( $is_first ) || ! $is_first ) && ( ! isset( $is_php ) || ! $is_php ) ) :
+							//	Don't do this for the first iteration as it's being done in PHP.
+							if ( ( ! isset( $is_first ) || ! $is_first ) && ( ! isset( $is_php ) || ! $is_php ) ) :
 
-									//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS
-									//	Otherwise it prematurely closes the template.
+								//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS
+								//	Otherwise it prematurely closes the template.
 
-									$_field_out = str_replace( '<script type="text/javascript">', '<!--script type="text/javascript"-->', $_field_out );
-									$_field_out = str_replace( '</script>', '<!--/script-->', $_field_out );
+								$_field_out = str_replace( '<script type="text/javascript">', '<!--script type="text/javascript"-->', $_field_out );
+								$_field_out = str_replace( '</script>', '<!--/script-->', $_field_out );
 
-								endif;
+							endif;
 
-								echo $_field_out;
+							echo $_field_out;
 
-							endforeach;
+						endforeach;
 
-						else :
+					else :
 
-							echo '<p>There are no extra fields for this product type.</p>';
+						echo '<p>There are no extra fields for this product type.</p>';
 
-						endif;
+					endif;
 
-						echo '</div>';
+					echo '</div>';
 
-					endforeach;
+				endforeach;
 
-				?>
-			</fieldset>
+			?>
 		</div>
 
 		<div class="tab page" id="tab-varitation-<?=$_counter?>-pricing">
@@ -494,11 +411,80 @@
 			</ul>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-shipping">
+		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-shipping">
 			<p>
 				Define the shipping options available for this variant. Shipping options do not have to be the same between variations.
 			</p>
 			<?php
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][measurement_unit]';
+				$_field['label']		= 'L/W/H Unit of measurement';
+				$_field['class']		= 'chosen';
+				$_field['required']		= TRUE;
+
+				$_options				= array();
+				$_options['mm']			= 'Millimeter';
+				$_options['cm']			= 'Centimetre';
+				$_options['m']			= 'Metre';
+
+				echo form_field_dropdown( $_field, $_options );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][length]';
+				$_field['label']		= 'Boxed Length';
+				$_field['placeholder']	= 'The length of the item';
+				$_field['required']		= TRUE;
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][width]';
+				$_field['label']		= 'Boxed Width';
+				$_field['placeholder']	= 'The width of the item';
+				$_field['required']		= TRUE;
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][height]';
+				$_field['label']		= 'Boxed Height';
+				$_field['placeholder']	= 'The height of the item';
+				$_field['required']		= TRUE;
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][weight_unit]';
+				$_field['label']		= 'Weight unit of measurement';
+				$_field['class']		= 'chosen';
+				$_field['required']		= TRUE;
+
+				$_options				= array();
+				$_options['g']			= 'Gram';
+				$_options['kg']			= 'Kilogram';
+
+				echo form_field_dropdown( $_field, $_options );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'variation[' . $_counter . '][shipping][weight]';
+				$_field['label']		= 'Boxed Weight';
+				$_field['placeholder']	= 'The weight of the item';
+				$_field['required']		= TRUE;
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
 
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][shipping][collection_only]';

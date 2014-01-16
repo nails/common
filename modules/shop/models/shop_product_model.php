@@ -185,28 +185,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	If this product type is_physical then ensure that the dimensions are specified
 			$_data->variation[$index]->meta = new stdClass();
 
-			if ( $_product_type->is_physical ) :
-
-				$_data->variation[$index]->meta->length				= isset( $v['meta']['length'] )				? $v['meta']['length']				: NULL;
-				$_data->variation[$index]->meta->width				= isset( $v['meta']['width'] )				? $v['meta']['width']				: NULL;
-				$_data->variation[$index]->meta->height				= isset( $v['meta']['height'] )				? $v['meta']['height']				: NULL;
-				$_data->variation[$index]->meta->measurement_unit	= isset( $v['meta']['measurement_unit'] )	? $v['meta']['measurement_unit']	: NULL;
-				$_data->variation[$index]->meta->weight				= isset( $v['meta']['weight'] )				? $v['meta']['weight']				: NULL;
-				$_data->variation[$index]->meta->weight_unit		= isset( $v['meta']['weight_unit'] )		? $v['meta']['weight_unit']			: NULL;
-
-				foreach( $_data->variation[$index]->meta AS $key => $field ) :
-
-					if ( ! $field ) :
-
-						$this->_set_error( 'Physical dimensions must be supplied for all variants.' );
-						return FALSE;
-
-					endif;
-
-				endforeach;
-
-			endif;
-
 			//	Any custom checks for the extra meta fields
 
 			//	Process each field
@@ -271,8 +249,19 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	Shipping
 			//	--------
 
-			$_data->variation[$index]->shipping						= new stdClass();
-			$_data->variation[$index]->shipping->collection_only	= isset( $v['shipping']['collection_only'] )	? (bool) $v['shipping']['collection_only']	: FALSE;
+			$_data->variation[$index]->shipping							= new stdClass();
+
+			if ( $_product_type->is_physical ) :
+
+				$_data->variation[$index]->shipping->length				= isset( $v['shipping']['length'] )				? $v['shipping']['length']					: NULL;
+				$_data->variation[$index]->shipping->width				= isset( $v['shipping']['width'] )				? $v['shipping']['width']					: NULL;
+				$_data->variation[$index]->shipping->height				= isset( $v['shipping']['height'] )				? $v['shipping']['height']					: NULL;
+				$_data->variation[$index]->shipping->measurement_unit	= isset( $v['shipping']['measurement_unit'] )	? $v['shipping']['measurement_unit']		: 'MM';
+				$_data->variation[$index]->shipping->weight				= isset( $v['shipping']['weight'] )				? $v['shipping']['weight']					: NULL;
+				$_data->variation[$index]->shipping->weight_unit		= isset( $v['shipping']['weight_unit'] )		? $v['shipping']['weight_unit']				: 'G';
+				$_data->variation[$index]->shipping->collection_only	= isset( $v['shipping']['collection_only'] )	? (bool) $v['shipping']['collection_only']	: FALSE;
+
+			endif;
 
 		endforeach;
 
@@ -302,7 +291,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// ==========================================================================
 		// --------------------------------------------------------------------------
 
-		//	Now we shove all this lvoely data into the database. Yummy!
+		//	Now we shove all this lovely data into the database. Yummy!
 
 		//	Start the transaction, safety first!
 		$this->db->trans_begin();
@@ -442,13 +431,36 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$_counter = 0;
 			foreach( $_data->variation AS $index => $v ) :
 
+				//	Product Variation: Details
+				//	==========================
+
 				$this->db->set( 'product_id',			$_id );
 				$this->db->set( 'label',				$v->label );
 				$this->db->set( 'sku',					$v->sku );
+				$this->db->set( 'order',				$_counter );
+
+				//	Product Variation: Stock Status
+				//	===============================
+
 				$this->db->set( 'stock_status',			$v->stock_status );
 				$this->db->set( 'quantity_available',	$v->quantity_available );
 				$this->db->set( 'lead_time',			$v->lead_time );
-				$this->db->set( 'order',				$_counter );
+
+				//	Product Variation: Shipping
+				//	===========================
+
+				$this->db->set( 'ship_collection_only',			$v->shipping->collection_only );
+
+				if ( $_product_type->is_physical ) :
+
+					$this->db->set( 'ship_length',				$v->shipping->length );
+					$this->db->set( 'ship_width',				$v->shipping->width );
+					$this->db->set( 'ship_height',				$v->shipping->height );
+					$this->db->set( 'ship_measurement_unit',	$v->shipping->measurement_unit );
+					$this->db->set( 'ship_weight',				$v->shipping->weight );
+					$this->db->set( 'ship_weight_unit',			$v->shipping->weight_unit );
+
+				endif;
 
 				if ( $this->db->insert( $this->_table_variation ) ) :
 
@@ -476,13 +488,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 					//	Product Variation: Meta
 					//	=======================
 
-					$this->db->set( 'product_id',	$_id );
 					$this->db->set( 'variation_id',	$_variation_id );
 					$this->db->set( (array) $v->meta );
-					$this->db->set( 'shipping_collection_only',	$v->shipping->collection_only );
-
 					$this->db->insert( $this->_table_variation_meta );
-
 
 					//	Product Variation: Price
 					//	========================
@@ -774,8 +782,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 				$this->db->where( 'variation_id', $v->id );
 				$v->meta = $this->db->get( $this->_table_variation_meta )->row();
 
-				unset( $v->meta->id );
-				unset( $v->meta->product_id );
 				unset( $v->meta->variation_id );
 
 				//	Meta
@@ -796,6 +802,8 @@ class NAILS_Shop_product_model extends NAILS_Model
 				$this->db->where( 'pvp.variation_id', $v->id );
 				$this->db->join( NAILS_DB_PREFIX . 'shop_currency c', 'c.id = pvp.currency_id' );
 				$v->price = $this->db->get( $this->_table_variation_price . ' pvp' )->result();
+
+				$this->_format_variation_object( $v );
 
 			endforeach;
 
@@ -1259,8 +1267,25 @@ class NAILS_Shop_product_model extends NAILS_Model
 	protected function _format_variation_object( &$variation )
 	{
 		//	Type casting
-		$variation->id			= (int) $variation->id;
-		$variation->id			= (int) $variation->id;
+		$variation->id							= (int) $variation->id;
+
+		//	Shipping data
+		$variation->shipping					= new stdClass();
+		$variation->shipping->length			= $variation->ship_length;
+		$variation->shipping->width				= $variation->ship_width;
+		$variation->shipping->height			= $variation->ship_height;
+		$variation->shipping->measurement_unit	= $variation->ship_measurement_unit;
+		$variation->shipping->weight			= $variation->ship_weight;
+		$variation->shipping->weight_unit		= $variation->ship_weight_unit;
+		$variation->shipping->collection_only	= (bool) $variation->ship_collection_only;
+
+		unset( $variation->ship_length );
+		unset( $variation->ship_width );
+		unset( $variation->ship_height );
+		unset( $variation->ship_measurement_unit );
+		unset( $variation->ship_weight );
+		unset( $variation->ship_weight_unit );
+		unset( $variation->ship_collection_only );
 	}
 
 
