@@ -413,7 +413,11 @@
 
 		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-shipping">
 			<p>
-				Define the shipping options available for this variant. Shipping options do not have to be the same between variations.
+				Define the following information for shipping. The system will use this information to
+				calculate a shipping quote for the user, where appropriate.
+			</p>
+			<p class="system-alert message no-close">
+				<strong>Please note:</strong> specify dimensions of the item as it'll be shipped, not assembled.
 			</p>
 			<?php
 
