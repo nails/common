@@ -33,7 +33,7 @@
 
 	);
 
-	//	If there's a 'return_to' variable set it as a GET variable in case there;'s a form
+	//	If there's a 'return_to' variable set it as a GET variable in case there's a form
 	//	validation error. Otherwise don't show it - cleaner. Using site_url() as the return_to variable
 	//	will most likely contain a full URL, causing form_open() not to site_url() it (resulting in the
 	//	form posting to auth/login rather than /auth/login).
