@@ -1,25 +1,34 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin Help Model
+ * Name:		Deploy
  *
- * Description:	This model contains logic for the admin help pages.
+ * Description:	These methods can be run after a deploy to perform any pre or post deployment actions (e.g run tests or migrate the database)
  *
- */
+ **/
 
 /**
- * OVERLOADING NAILS' MODELS
+ * OVERLOADING NAILS' DEPLOY MODULE
  *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
  *
  **/
 
-class NAILS_Admin_help_model extends NAILS_Model
+class NAILS_Deploy extends NAILS_Controller
 {
-	public function __construct()
+	public function pre()
 	{
-		$this->_table = NAILS_DB_PREFIX . 'admin_help_video';
+
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function post()
+	{
+
 	}
 }
 
@@ -28,10 +37,10 @@ class NAILS_Admin_help_model extends NAILS_Model
 
 
 /**
- * OVERLOADING NAILS' MODELS
+ * OVERLOADING NAILS' DEPLOY MODULE
  *
- * The following block of code makes it simple to extend one of the core Nails
- * models. Some might argue it's a little hacky but it's a simple 'fix'
+ * The following block of code makes it simple to extend one of the core deploy
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
@@ -45,19 +54,16 @@ class NAILS_Admin_help_model extends NAILS_Model
  * We solve this by prefixing the main class with NAILS_ and then conditionally
  * declaring this helper class below; the helper gets instantiated et voila.
  *
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_ADMIN_HELP_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_DEPLOY' ) ) :
 
-	class Admin_help_model extends NAILS_Admin_help_model
+	class Deploy extends NAILS_Deploy
 	{
 	}
 
 endif;
-
-/* End of file admin_help_model.php */
-/* Location: ./application/models/admin_help_model.php */

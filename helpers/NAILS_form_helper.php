@@ -312,7 +312,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		// --------------------------------------------------------------------------
 
-		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		//	Quick script to instantiate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
 		$_scheme = get_instance()->cdn->url_serve_scheme( TRUE );
 
@@ -545,7 +545,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 		// --------------------------------------------------------------------------
 
-		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		//	Quick script to instantiate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
 		$_scheme = get_instance()->cdn->url_scale_scheme();
 
@@ -736,7 +736,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 
 		// --------------------------------------------------------------------------
 
-		//	Quick script to instanciate the field, not indented due to heredoc syntax
+		//	Quick script to instantiate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn' );
 
 		$_movie_url		= NAILS_URL . 'swf/jquery.uploadify/uploadify.swf';

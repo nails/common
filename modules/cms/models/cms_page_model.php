@@ -476,7 +476,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function render( $page )
 	{
-		//	Loop through all the widgets, instanciate the appropriate widget and execute
+		//	Loop through all the widgets, instantiate the appropriate widget and execute
 		//	it's render function, append the result to the $_out variable and spit that back
 
 		$_out	= array( 'hero' => '', 'body' => '', 'sidebar' => '' );
@@ -736,12 +736,12 @@ class NAILS_Cms_page_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

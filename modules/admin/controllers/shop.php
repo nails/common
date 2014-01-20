@@ -2897,7 +2897,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instantiate a class with the same name as the file, therefore
+ * CodeIgniter instantiate a class with the same name as the file, therefore
  * when we try to extend the parent class we get 'cannot redeclare class X' errors
  * and if we call our overloading class something else it will never get instantiated.
  *

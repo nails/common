@@ -67,7 +67,7 @@ class NAILS_User_model extends NAILS_Model
 
 	/**
 	 * Checks for the rememebred user cookies, if found we need to tell the
-	 * user_model class to set the data when it instanciates.
+	 * user_model class to set the data when it instantiates.
 	 *
 	 * @access	static
 	 * @return	void
@@ -2987,12 +2987,12 @@ class NAILS_User_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

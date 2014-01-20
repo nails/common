@@ -9,7 +9,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	/**
 	 * Build the main framework. All autoloaded items have been loaded and
-	 * instanciated by this point and are safe to use.
+	 * instantiated by this point and are safe to use.
 	 *
 	 * @access	public
 	 * @return	void
@@ -72,18 +72,18 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Do we need to instanciate the database?
-		$this->_instanciate_db();
+		//	Do we need to instantiate the database?
+		$this->_instantiate_db();
 
 		// --------------------------------------------------------------------------
 
 		//	Instanciate the user model
-		$this->_instanciate_user();
+		$this->_instantiate_user();
 
 		// --------------------------------------------------------------------------
 
 		//	Instanciate languages
-		$this->_instanciate_languages();
+		$this->_instantiate_languages();
 
 		// --------------------------------------------------------------------------
 
@@ -96,12 +96,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Instanciate DateTime
-		$this->_instanciate_datetime();
+		$this->_instantiate_datetime();
 
 		// --------------------------------------------------------------------------
 
 		//	Profiling
-		$this->_instanciate_profiler();
+		$this->_instantiate_profiler();
 
 		// --------------------------------------------------------------------------
 
@@ -431,7 +431,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_db()
+	protected function _instantiate_db()
 	{
 		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 
@@ -449,7 +449,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_datetime()
+	protected function _instantiate_datetime()
 	{
 		//	Pass the user object to the datetime model
 		$this->datetime->set_usr_obj( $this->user );
@@ -507,7 +507,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_profiler()
+	protected function _instantiate_profiler()
 	{
 		if ( defined( 'PROFILING' ) && PROFILING ) :
 
@@ -531,7 +531,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_languages()
+	protected function _instantiate_languages()
 	{
 		//	Pass the user object to the language model
 		$this->language->set_usr_obj( $this->user );
@@ -745,7 +745,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_user()
+	protected function _instantiate_user()
 	{
 		//	Set a $user variable (for the views)
 		$this->data['user'] =& $this->user;
