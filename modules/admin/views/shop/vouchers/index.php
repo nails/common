@@ -3,7 +3,7 @@
 		Browse all vouchers (including gift cards) which are associated with the shop.
 		<?php
 
-			if ( $user->has_permission( 'admin.shop.vouchers_create' ) ) :
+			if ( user_has_permission( 'admin.shop.vouchers_create' ) ) :
 
 				echo anchor( 'admin/shop/vouchers/create', 'Create Voucher', 'class="awesome small green right"' );
 
@@ -13,10 +13,10 @@
 	</p>
 
 	<?php
-	
+
 		$this->load->view( 'admin/shop/vouchers/utilities/search' );
 		$this->load->view( 'admin/shop/vouchers/utilities/pagination' );
-	
+
 	?>
 
 	<table>
@@ -34,11 +34,11 @@
 		</thead>
 		<tbody>
 			<?php
-			
+
 				if ( $vouchers->data ) :
-				
+
 					foreach ( $vouchers->data AS $voucher ) :
-					
+
 						?>
 						<tr id="order-<?=number_format( $voucher->id )?>">
 							<td class="code"><?=$voucher->code?></td>
@@ -170,14 +170,14 @@
 							<td class="uses"><?=number_format( $voucher->use_count )?></td>
 							<td class="actions">
 								<?php
-								
+
 									$_buttons = array();
 
 									// --------------------------------------------------------------------------
 
 									if ( $voucher->is_active ) :
 
-										if ( $user->has_permission( 'admin.shop.vouchers_deactivate' ) ) :
+										if ( user_has_permission( 'admin.shop.vouchers_deactivate' ) ) :
 
 											$_buttons[] = anchor( 'admin/shop/vouchers/deactivate/' . $voucher->id, 'Suspend', 'class="awesome small red confirm"' );
 
@@ -185,7 +185,7 @@
 
 									else :
 
-										if ( $user->has_permission( 'admin.shop.vouchers_activate' ) ) :
+										if ( user_has_permission( 'admin.shop.vouchers_activate' ) ) :
 
 											$_buttons[] = anchor( 'admin/shop/vouchers/activate/' . $voucher->id, 'Activate', 'class="awesome small green"' );
 
@@ -213,9 +213,9 @@
 							</td>
 						</tr>
 						<?php
-						
+
 					endforeach;
-					
+
 				else :
 					?>
 					<tr>
@@ -225,13 +225,13 @@
 					</tr>
 					<?php
 				endif;
-			
+
 			?>
 		</tbody>
 	</table>
 	<?php
-	
+
 		$this->load->view( 'admin/shop/vouchers/utilities/pagination' );
-	
+
 	?>
 </div>

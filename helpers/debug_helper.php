@@ -153,5 +153,24 @@ if ( ! function_exists( 'lastquery' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+/**
+ * alias of lastquery()
+ *
+ * @access	public
+ * @param	mixed
+ * @return	void
+ */
+if ( ! function_exists( 'last_query' ) )
+{
+	function last_query( $return = FALSE )
+	{
+		return last_query();
+	}
+}
+
+
 /* End of file debug_helper.php */
 /* Location: ./helpers/debug_helper.php */

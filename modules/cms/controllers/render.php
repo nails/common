@@ -36,7 +36,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->_slug = uri_string();
+		$this->_page_id = $this->uri->rsegment( 3 );
 	}
 
 
@@ -45,13 +45,20 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 	public function page()
 	{
-		$_page = $this->cms_page->get_by_slug( $this->_slug, TRUE );
+		$_page = $this->cms_page->get_by_id( $this->_page_id, TRUE );
 
-		if ( ! $_page ) :
+		if ( ! $_page || $_page->is_deleted ) :
 
 			show_404();
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	If a page is in draft mode, unless you're logged in with permission to edit
+		//	pages you should get a 404 as well.
+
+		if ( ! $_page->is_published && ! $this->user->is_logged_in() && ! user )
 
 		// --------------------------------------------------------------------------
 

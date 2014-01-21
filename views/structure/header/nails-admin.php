@@ -181,7 +181,7 @@
 						//	Notifications for this method?
 						if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
 
-							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
+							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'neutral';
 							$_temp->notification->title		= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
 							$_temp->notification->value		= isset( $_notifications[$method]['value'] ) ? $_notifications[$method]['value'] : '';
 							$_temp->notification->options	= isset( $_notifications[$method]['options'] ) ? $_notifications[$method]['options'] : '';
@@ -249,7 +249,7 @@
 
 												foreach ( $option->notification->options AS $notification ) :
 
-													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'info';
+													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'neutral';
 													$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
 
 													if ( $notification['value'] ) :

@@ -82,7 +82,7 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Check bucket is writeable
-		if ( ! is_writable( DEPLOY_CDN_PATH . $bucket ) ) :
+		if ( ! is_really_writable( DEPLOY_CDN_PATH . $bucket ) ) :
 
 			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', DEPLOY_CDN_PATH . $bucket ) );
 			return FALSE;
@@ -242,7 +242,6 @@ class Local_CDN
 		$_out  = 'cdn/serve/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		$_out  = site_url( $_out );
 
 		if ( $force_download ) :
 
@@ -267,7 +266,7 @@ class Local_CDN
 	 **/
 	public function url_serve_scheme( $force_download )
 	{
-		$_out = site_url( 'cdn/serve/{{bucket}}/{{filename}}{{extension}}' );
+		$_out = 'cdn/serve/{{bucket}}/{{filename}}{{extension}}';
 
 		if ( $force_download ) :
 
@@ -299,7 +298,6 @@ class Local_CDN
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -318,7 +316,7 @@ class Local_CDN
 	 **/
 	public function url_thumb_scheme()
 	{
-		$_out = site_url( 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}' );
+		$_out = 'cdn/thumb/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -344,7 +342,6 @@ class Local_CDN
 		$_out .= $width . '/' . $height . '/';
 		$_out .= $bucket . '/';
 		$_out .= $object;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -363,7 +360,7 @@ class Local_CDN
 	 **/
 	public function url_scale_scheme()
 	{
-		$_out = site_url( 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}' );
+		$_out = 'cdn/scale/{{width}}/{{height}}/{{bucket}}/{{filename}}{{extension}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -386,7 +383,6 @@ class Local_CDN
 	{
 		$_out  = 'cdn/placeholder/';
 		$_out .= $width . '/' . $height . '/' . $border;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -405,7 +401,7 @@ class Local_CDN
 	 **/
 	public function url_placeholder_scheme()
 	{
-		$_out = site_url( 'cdn/placeholder/{{width}}/{{height}}/{{border}}' );
+		$_out = 'cdn/placeholder/{{width}}/{{height}}/{{border}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -428,7 +424,6 @@ class Local_CDN
 	{
 		$_out  = 'cdn/blank_avatar/';
 		$_out .= $width . '/' . $height . '/' . $sex;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -447,7 +442,7 @@ class Local_CDN
 	 **/
 	public function url_blank_avatar_scheme()
 	{
-		$_out = site_url( 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}' );
+		$_out = 'cdn/blank_avatar/{{width}}/{{height}}/{{sex}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -473,7 +468,6 @@ class Local_CDN
 		$_hash = urlencode( $_hash );
 
 		$_out  = 'cdn/serve?token=' . $_hash;
-		$_out  = site_url( $_out );
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -492,7 +486,7 @@ class Local_CDN
 	 **/
 	public function url_expiring_scheme()
 	{
-		$_out = site_url( 'cdn/serve?token={{token}}' );
+		$_out = 'cdn/serve?token={{token}}';
 
 		return $this->_url_make_secure( $_out );
 	}
@@ -503,14 +497,7 @@ class Local_CDN
 
 	protected function _url_make_secure( $url )
 	{
-		if ( is_https() ) :
-
-			//	Make the URL secure
-			$url = preg_replace( '/^http:\/\//', 'https://', $url );
-
-		endif;
-
-		return $url;
+		return site_url( $url, page_is_secure() );
 	}
 }
 

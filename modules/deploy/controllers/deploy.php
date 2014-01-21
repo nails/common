@@ -19,7 +19,9 @@ class NAILS_Deploy extends NAILS_Controller
 {
 	public function pre()
 	{
-
+		//	Potential tasks
+		//	Run Tests
+		//	Note deployment start
 	}
 
 
@@ -28,7 +30,12 @@ class NAILS_Deploy extends NAILS_Controller
 
 	public function post()
 	{
-
+		//	Potential tasks
+		//	Migrate DB
+		//	Run Tests
+		//	Clear caches (?)
+		//	Module specific tasks - e.g rewrite routes file
+		//	Note deployment end
 	}
 }
 

@@ -501,7 +501,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 			endif;
 
-			if ( ! is_writable( $dir ) ) :
+			if ( ! is_really_writable( $dir ) ) :
 
 				$this->_result->pass		= FALSE;
 				$this->_result->errors[]	= '"' . $dir . '" is not writable.';

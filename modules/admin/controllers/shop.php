@@ -864,7 +864,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 **/
 	protected function _orders_view()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.orders_view' ) ) :
+		if ( ! user_has_permission( 'admin.shop.orders_view' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to view order details.' );
 			redirect( 'admin/shop/orders' );
@@ -930,7 +930,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _orders_reprocess()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.orders_reprocess' ) ) :
+		if ( ! user_has_permission( 'admin.shop.orders_reprocess' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to reprocess orders.' );
 			redirect( 'admin/shop/orders' );
@@ -989,7 +989,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _orders_process()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.orders_process' ) ) :
+		if ( ! user_has_permission( 'admin.shop.orders_process' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to process order items.' );
 			redirect( 'admin/shop/orders' );
@@ -1199,7 +1199,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_create()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.vouchers_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.vouchers_create' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to create vouchers.' );
 			redirect( 'admin/shop/vouchers' );
@@ -1515,7 +1515,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_activate()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.vouchers_activate' ) ) :
+		if ( ! user_has_permission( 'admin.shop.vouchers_activate' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to activate vouchers.' );
 			redirect( 'admin/shop/vouchers' );
@@ -1546,7 +1546,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _vouchers_deactivate()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.vouchers_deactivate' ) ) :
+		if ( ! user_has_permission( 'admin.shop.vouchers_deactivate' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to suspend vouchers.' );
 			redirect( 'admin/shop/vouchers' );
@@ -2852,7 +2852,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	public function reports()
 	{
-		if ( ! $this->user->has_permission( 'admin.shop.reports' ) ) :
+		if ( ! user_has_permission( 'admin.shop.reports' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to generate reports.' );
 			redirect( 'admin/shop/vouchers' );

@@ -7,7 +7,6 @@ class Nails_CMS_Widget_image extends Nails_CMS_Widget
 		$_d			= parent::details();
 		$_d->name	= 'Image';
 		$_d->slug	= 'Widget_image';
-		$_d->iam	= 'Nails_CMS_Widget_image';
 		$_d->info	= 'A single image.';
 
 		return $_d;

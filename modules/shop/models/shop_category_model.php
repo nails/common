@@ -401,7 +401,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function create( $data )
+	public function create( $data, $return_obj = FALSE )
 	{
 		$_data = new stdClass();
 
@@ -473,36 +473,9 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endif;
 
-		if ( ! empty( $_data ) ) :
+		// --------------------------------------------------------------------------
 
-			$this->db->set( $_data );
-			$this->db->set( 'created', 'NOW()', FALSE );
-			$this->db->set( 'modified', 'NOW()', FALSE );
-
-			if ( active_user( 'id' ) ) :
-
-				$this->db->set( 'created_by', active_user( 'id' ) );
-				$this->db->set( 'modified_by', active_user( 'id' ) );
-
-			endif;
-
-			$this->db->insert( $this->_table );
-
-			if ( $this->db->affected_rows() ) :
-
-				return $this->db->insert_id();
-
-			else :
-
-				return FALSE;
-
-			endif;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return parent::create( $_data, $return_obj );
 	}
 
 
@@ -626,7 +599,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 			if ( $this->db->update( $this->_table ) ) :
 
 				//	Regenerate anything? This may seem like magic, future Pabs, but we're just
-				//	glueing stuff together from the  other stuffs we made up there^^
+				//	gluing stuff together from the other stuffs we made up there^^
 
 				if ( $_regenerate ) :
 
@@ -699,10 +672,9 @@ class NAILS_Shop_category_model extends NAILS_Model
 		$this->db->delete( $this->_table );
 		$_affected_rows = $this->db->affected_rows();
 
-		if ($this->db->trans_status() === FALSE) :
+		if ( $this->db->trans_status() === FALSE ) :
 
 		    $this->db->trans_rollback();
-
 			$_return = FALSE;
 
 		else :

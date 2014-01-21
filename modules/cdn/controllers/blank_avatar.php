@@ -160,7 +160,7 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				// --------------------------------------------------------------------------
 
 				//	Save local version
-				if ( defined( 'DEPLOY_CACHE_DIR' ) && is_writable( DEPLOY_CACHE_DIR ) ) :
+				if ( defined( 'DEPLOY_CACHE_DIR' ) && is_really_writable( DEPLOY_CACHE_DIR ) ) :
 
 					$PHPThumb->save( DEPLOY_CACHE_DIR . $this->_cache_file );
 

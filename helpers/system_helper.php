@@ -1,67 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * get_userobject()
- *
- * Gets a reference to the IA user object
- *
- * @access	public
- * @return	object
- */
-if ( ! function_exists( 'get_userobject' ) )
-{
-	function get_userobject()
-	{
-		if ( ! defined( 'NAILS_USR_OBJ' ) )
-			return FALSE;
-
-		$_ci =& get_instance();
-
-		if ( ! isset( $_ci->{NAILS_USR_OBJ} ) )
-			return FALSE;
-
-		return $_ci->{NAILS_USR_OBJ};
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-
-/**
- * active_user()
- *
- * Handy way of getting data from the active user object
- *
- * @access	public
- * @param	string	$key	The key(s) to fetch
- * @return	object
- */
-if ( ! function_exists( 'active_user' ) )
-{
-	function active_user( $keys = FALSE, $delimiter = ' ' )
-	{
-		$_usr_obj =& get_userobject();
-
-		if ( $_usr_obj ) :
-
-			return $_usr_obj->active_user( $keys, $delimiter );
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-
-/**
  * get_loaded_modules()
  *
  * Fetch the loaded modules for this app
@@ -189,26 +128,42 @@ if ( ! function_exists( 'module_is_enabled' ) )
 
 
 /**
- * is_https()
- *
- * Determine whether the current connection is using SSL
- *
+ * Detects whether the current page is secure or not
  *
  * @access	public
- * @return	boolean
+ * @param	string
+ * @return	bool
  */
-if ( ! function_exists( 'is_https' ) )
+function page_is_secure()
 {
-	function is_https()
-	{
-		if ( ! isset( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] == 'off' || ! $_SERVER['HTTPS'] ) :
+	if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
+
+		//	Page is being served through HTTPS
+		return TRUE;
+
+	elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && defined( 'SECURE_BASE_URL' ) ) :
+
+		//	Not being served through HTTPS, but does the URL of the page begin
+		//	with SECURE_BASE_URL
+
+		$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+		if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
+
+			return TRUE;
+
+		else :
 
 			return FALSE;
 
 		endif;
 
-		return TRUE;
-	}
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Unknown, assume not
+	return FALSE;
 }
 
 

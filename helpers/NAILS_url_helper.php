@@ -1,6 +1,29 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
+ * Site URL
+ *
+ * Create a local URL based on your basepath. Segments can be passed via the
+ * first parameter either as a string or an array.
+ *
+ * @access	public
+ * @param	string
+ * @return	string
+ */
+if ( ! function_exists('site_url'))
+{
+	function site_url( $uri = '', $force_secure = FALSE )
+	{
+		$CI =& get_instance();
+		return $CI->config->site_url( $uri, $force_secure );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * unique_for_url
  *
  * Takes a string, makes it URL safe and returns it (will check the DB to make sure that the string is unique)
@@ -39,6 +62,9 @@ if ( ! function_exists( 'unique_for_url' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
 /**
  * shorten_url
  *
@@ -59,6 +85,9 @@ if ( ! function_exists( 'shorten_url' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
 if ( ! function_exists('secure_site_url'))
 {
 	function secure_site_url($uri = '')
@@ -66,3 +95,7 @@ if ( ! function_exists('secure_site_url'))
 		return SECURE_BASE_URL . $uri;
 	}
 }
+
+
+/* End of file url_helper.php */
+/* Location: ./helpers/url_helper.php */

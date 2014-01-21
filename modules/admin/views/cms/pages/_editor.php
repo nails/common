@@ -1,12 +1,14 @@
 <fieldset id="cms-page-edit-<?=$config['area']?>" class="editor">
-	<legend><?=$config['title']?></legend>
-	<p>
-		<?=$config['description']?>
-	</p>
-	<div class="widgets">
 	<?php
 
+		//	Legend and description, if applicable
+		echo $config['title'] ? '<legend>' . $config['title'] . '</legend>' : '';
+		echo $config['description'] ? '<p>' . $config['description'] . '</p>' : '';
+
+		// --------------------------------------------------------------------------
+
 		//	Get the widget draggables
+		echo '<div class="widgets">';
 
 		foreach( $widgets AS $widget ) :
 
@@ -21,10 +23,10 @@
 			endif;
 
 		endforeach;
-	?>
-	</div>
 
-	<?php
+		echo '</div>';
+
+		// --------------------------------------------------------------------------
 
 		//	If post data has been defined, use that
 		if ( is_array( $this->input->post( 'widgets_' . $config['area'] ) ) ) :

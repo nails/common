@@ -130,7 +130,7 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 
 			//	Save local version, make sure cache is writable
-			if ( defined( 'DEPLOY_CACHE_DIR' ) && is_writable( DEPLOY_CACHE_DIR ) ) :
+			if ( defined( 'DEPLOY_CACHE_DIR' ) && is_really_writable( DEPLOY_CACHE_DIR ) ) :
 
 				imagepng( $_img, DEPLOY_CACHE_DIR . $this->_cache_file );
 

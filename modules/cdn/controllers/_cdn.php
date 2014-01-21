@@ -71,7 +71,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		endif;
 
 		//	Cache must be writeable
-		if ( ! is_writable( DEPLOY_CACHE_DIR ) ) :
+		if ( ! is_really_writable( DEPLOY_CACHE_DIR ) ) :
 
 			//	Inform developers
 			$_subject	= 'Cache (CDN) dir not writeable';

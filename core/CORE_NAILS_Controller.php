@@ -629,8 +629,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Load the system helper
+		//	Load the system & user helper
 		$this->load->helper( 'system' );
+		$this->load->helper( 'user' );
 
 		// --------------------------------------------------------------------------
 

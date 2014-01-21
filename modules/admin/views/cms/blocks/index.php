@@ -1,6 +1,19 @@
 <div class="group-cms blocks overview">
+
 	<p>
-		CMS Blocks allow you to update a single block of content. Blocks might appear in more than one place so any updates will be reflected across
+		Browse editable blocks.
+		<?php
+
+			if ( user_has_permission( 'admin.cms.can_create_block' ) ) :
+
+				echo anchor( 'admin/cms/blocks/create', 'Add New Block', 'class="awesome small green right"' );
+
+			endif;
+
+		?>
+	</p>
+	<p>
+		Blocks allow you to update a single block of content. Blocks might appear in more than one place so any updates will be reflected across
 		all instances. Blocks must have an <?=APP_DEFAULT_LANG_NAME?> value defined, but translations can also be created, when viewing the site in another language (if
 		supported for this site) the appropriate language will be used.
 	</p>
@@ -100,18 +113,6 @@
 		?>
 		</tbody>
 	</table>
-
-	<?php
-
-		if ( $user->is_superuser() ) :
-
-			echo '<p class="new-block">';
-			echo anchor( 'admin/cms/blocks/create', 'Create New Block', 'class="awesome small"' );
-			echo '</p>';
-
-		endif;
-
-	?>
 </div>
 
 <script type="text/javascript">

@@ -1,28 +1,3 @@
-.group-cms.overview
-{
-	table
-	{
-		.title
-		{
-			.title
-			{
-
-			}
-			.url
-			{
-				display:block;
-				font-size:0.8em;
-			}
-			.no-data
-			{
-				color:#ccc;
-			}
-		}
-	}
-}
-
-// --------------------------------------------------------------------------
-
 //	Generic CMS
 .group-cms
 {
@@ -286,77 +261,120 @@
 {
 }
 
-
-// --------------------------------------------------------------------------
-
-
 //	Pages overview
 .group-cms.pages.overview
 {
-	.new-page
+	table
 	{
-		margin-top:20px;
+		th.actions,
+		td.actions
+		{
+			width:145px;
+		}
 	}
 }
 
 //	Pages edit
 .group-cms.pages.edit
 {
-	.layout
+	.templates
 	{
 		li
 		{
 			display:inline-block;
-			border:1px solid;
-			height:64px;
-			line-height:64px;
-			border:1px solid #CCC;
-			background:#EFEFEF url(../img/modules/cms/layout-sprite.png) no-repeat top left;
+			padding-right:10px;
+			padding-bottom:10px;
 			margin:0;
-			margin-right:10px;
-			margin-bottom:5px;
-			.rounded(4px);
+			box-sizing:border-box;
+		}
 
-			label
+		.template
+		{
+			box-sizing:border-box;
+			display:table;
+			border:1px solid #CCC;
+			background:#FFF;
+			.rounded(3px);
+			width:150px;
+			height:150px;
+			padding:5px;
+			text-align:center;
+			vertical-align:middle;
+			cursor:pointer;
+			.opacity(0.75);
+			-webkit-transition: -webkit-opacity 0.2s ease-out;
+			-moz-transition: -moz-opacity 0.2s ease-out;
+			transition: opacit 0.2s ease-out;
+
+			input
 			{
-				padding-left:70px;
-				padding-right:5px;
-				cursor: pointer;
+				display:none;
+			}
+
+			.icon
+			{
+				background:#F5F5F5 url(../img/admin/modules/cms/template-no-preview.png) center no-repeat;
+				display:table-cell;
+				height:107px;
+				width:100%;
+				vertical-align:middle;
+				border:1px solid #EAE9EB;
+			}
+
+			.newrow
+			{
+				display:table-row;
+			}
+
+			.name
+			{
+				background:transparent;
+				height:37px;
+				width:100%;
+				display:table-cell;
+				vertical-align:middle;
+
+				.checkmark
+				{
+					color:#669933;
+					display:none;
+					font-size:1.5em;
+					position:relative;
+					top:3px;
+				}
 			}
 		}
 
-		li.hero-sidebar-right
+		.template:hover
 		{
-			background-position-y:-64px;
-		}
-		li.hero-full-width
-		{
-			background-position-y:-128px;
-		}
-		li.no-hero-sidebar-left
-		{
-			background-position-y:-192px;
-		}
-		li.no-hero-sidebar-right
-		{
-			background-position-y:-256px;
-		}
-		li.no-hero-full-width
-		{
-			background-position-y:-320px;
+			border-color:#AAA;
+			.opacity(1);
+			-webkit-transition: -webkit-opacity 0.2s ease-out;
+			-moz-transition: -moz-opacity 0.2s ease-out;
+			transition: opacit 0.2s ease-out;
 		}
 
-		#cms-page-edit-sidebar-width
+		.template.selected
 		{
-			margin-top:1em;
+			border-color:#999;
+			.drop-shadow( 0, 0, 7px, 0.3 );
+			.opacity(1);
+			-webkit-transition: -webkit-opacity 0.2s ease-out;
+			-moz-transition: -moz-opacity 0.2s ease-out;
+			transition: opacit 0.2s ease-out;
 
-			select
+			.name
 			{
-				display:inline-block;
-				margin-left:10px;
+				.checkmark
+				{
+					display:inline;
+					padding-right:0.5em;
+				}
 			}
 		}
 	}
+
+	// --------------------------------------------------------------------------
 
 	.editor
 	{
@@ -576,5 +594,61 @@
 				display:block;
 			}
 		}
+	}
+}
+
+.group-cms.pages.widgeteditor
+{
+	@padding:10px;
+	@margin:10px;
+	@header_height:40px;
+	@widgets_width:200px;
+
+	position:fixed;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,0.75);
+	z-index:999;
+	display:none;
+
+	.header,
+	.widgets,
+	.dropzone
+	{
+		border:1px solid;
+		position:absolute;
+		background:rgba(255,255,255,0.9);
+		padding:@padding;
+		border:1px solid #CCC;
+
+		color:#333;
+	}
+
+	.header
+	{
+		top:@margin;
+		bottom:auto;
+		left:@margin;
+		right:@margin;
+		height:@header_height;
+	}
+
+	.widgets
+	{
+		top:2*@margin+2*@padding+@header_height;
+		bottom:@margin;
+		left:@margin;
+		right:auto;
+		width:@widgets_width;
+	}
+
+	.dropzone
+	{
+		top:2*@margin+2*@padding+@header_height;
+		right:@margin;
+		left:@widgets_width+2*@padding+2*@margin;
+		bottom:@margin;
 	}
 }

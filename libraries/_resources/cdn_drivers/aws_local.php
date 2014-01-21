@@ -565,7 +565,7 @@ class Aws_local_CDN
 
 	protected function _url_make_secure( $url, $is_processing = TRUE )
 	{
-		if ( is_https() ) :
+		if ( page_is_secure() ) :
 
 			//	Make the URL secure
 			if ( $is_processing ) :

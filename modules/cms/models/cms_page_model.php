@@ -19,6 +19,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 {
 	protected $_routes_dir;
 	protected $_available_widgets;
+	protected $_nails_templates_dir;
+	protected $_app_templates_dir;
 	protected $_nails_widgets_dir;
 	protected $_app_widgets_dir;
 	protected $_nails_prefix;
@@ -35,6 +37,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_routes_dir			= FCPATH . APPPATH . 'config/';
+
+		$this->_nails_templates_dir	= NAILS_PATH . 'modules/cms/templates/';
+		$this->_app_templates_dir		= FCPATH . APPPATH . 'modules/cms/templates/';
+
 		$this->_nails_widgets_dir	= NAILS_PATH . 'modules/cms/widgets/';
 		$this->_app_widgets_dir		= FCPATH . APPPATH . 'modules/cms/widgets/';
 
@@ -45,8 +51,105 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Load the generic widget
+		//	Load the generic template & widget
+		include_once $this->_nails_templates_dir . '_template.php';
 		include_once $this->_nails_widgets_dir . '_widget.php';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function create( $data, $return_obj = FALSE )
+	{
+		$_data = new stdClass();
+
+		if ( isset( $data->title ) ) :
+
+			$_data->title = strip_tags( $data->title );
+
+		else :
+
+			$this->_set_error( 'Title is required.' );
+			return FALSE;
+
+		endif;
+
+		if ( isset( $data->parent_id ) ) :
+
+			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+
+			//	Work out the slug, prefix it with nested parents
+			$_parent = $this->get_by_id( $_data->parent_id );
+
+			if ( $_data->parent_id && ! $_parent ) :
+
+				$this->_set_error( 'Invalid Parent ID.' );
+				return FALSE;
+
+			endif;
+
+			if ( $_data->parent_id ) :
+
+				$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug', $_parent->slug . '/' );
+
+				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
+				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
+				$_data->title_nested	= $_parent->title_nested . '|' . $_data->title;
+
+			else :
+
+				//	No parent, slug is just the title
+				$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug' );
+				$_data->slug_end		= $_data->slug;
+				$_data->title_nested	= $_data->title;
+
+			endif;
+
+		else :
+
+			//	No parent, slug is just the title
+			$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug' );
+			$_data->title_nested	= $_data->title;
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		if ( isset( $data->seo_keywords ) ) :
+
+			$_data->seo_keywords = strip_tags( $data->seo_keywords );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_return = parent::create( $_data, $return_obj );
+
+		if ( $_return ) :
+
+			//	Rewrite the routes file
+			if ( $this->write_routes() ) :
+
+				return $_return;
+
+			else :
+
+				$_id = $return_obj ? $_return->id : $_return;
+				$this->destroy( $_id );
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 
@@ -68,7 +171,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 			endif;
 
 		endforeach;
-
 
 		//	Next, check the slug is unique, encode it to be safe
 		if ( isset( $data->slug ) ) :
@@ -93,7 +195,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		endif;
 
-		//	Then update the page's meta data if needed
+		// --------------------------------------------------------------------------
+
+		//	Start the transaction
+		$this->db->trans_begin();
+		$_rollback = FALSE;
+
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
+		//	Update the page's meta data if needed
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
@@ -144,9 +256,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 							//	Old widget, update
 							$this->db->where( 'id', $key[1] );
 
-							$this->db->update( NAILS_DB_PREFIX . 'cms_page_widget' );
+							if ( $this->db->update( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
 
-							$_processed_widgets[] = $key[1];
+								$_processed_widgets[] = $key[1];
+
+							else :
+
+								$_rollback = TRUE;
+								$this->_set_error( 'Unable to update widget ID:' . $key[1] );
+								break;
+
+							endif;
 
 						elseif ( $key[0] == 'new' ) :
 
@@ -162,13 +282,24 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 							endif;
 
-							$this->db->insert( NAILS_DB_PREFIX . 'cms_page_widget' );
+							if ( $this->db->insert( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
 
-							$_processed_widgets[] = $this->db->insert_id();
+								$_processed_widgets[] = $this->db->insert_id();
+
+							else :
+
+								$_rollback = TRUE;
+								$this->_set_error( 'Unable to create widget TYPE:' . $_type );
+								break;
+
+							endif;
 
 						else :
 
 							//	Que?
+							$this->_set_error( 'An unknown error occurred while processing widgets.' );
+							$_rollback = TRUE;
+							break;
 
 						endif;
 
@@ -182,7 +313,13 @@ class NAILS_Cms_page_model extends NAILS_Model
 					$this->db->where( 'page_id', $page_id );
 					$this->db->where( 'widget_area', $area );
 					$this->db->where_not_in( 'id', $_processed_widgets );
-					$this->db->delete( NAILS_DB_PREFIX . 'cms_page_widget' );
+					if ( ! $this->db->delete( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
+
+						$this->_set_error( 'Unable to remove old widgets.' );
+						$_rollback = TRUE;
+						break;
+
+					endif;
 
 				endif;
 
@@ -191,11 +328,23 @@ class NAILS_Cms_page_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 
 			//	Update the routes file
-			if ( $this->write_routes() ) :
+			if ( $this->db->trans_status() !== FALSE && ! $_rollback && $this->write_routes() ) :
+
+				//	Commit changes
+				$this->db->trans_commit();
+
+				//	Put DB errors back as they were
+				$this->db->db_debug = $_previous;
 
 				return TRUE;
 
 			else :
+
+				//	Rollback changes
+				$this->db->trans_rollback();
+
+				//	Put DB errors back as they were
+				$this->db->db_debug = $_previous;
 
 				return FALSE;
 
@@ -203,11 +352,16 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		else :
 
+			//	Rollback changes
 			$this->_set_error( 'Could not update page.' );
+			$this->db->trans_rollback();
+
+			//	Put DB errors back as they were
+			$this->db->db_debug = $_previous;
+
 			return FALSE;
 
 		endif;
-
 	}
 
 
@@ -215,18 +369,41 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 
 
-	public function delete()
+	public function delete( $id )
 	{
-		//	TODO Delete a page
+		$_data = array( 'is_deleted' => TRUE );
+		return $this->update( $id, $_data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_all( $include_widgets = FALSE, $include_deleted = FALSE )
+	public function restore( $id )
 	{
-		$this->db->select( 'p.id,p.slug,p.title,p.layout,p.sidebar_width,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by,p.is_deleted' );
+		$_data = array( 'is_deleted' => FALSE );
+		return $this->update( $id, $_data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function destroy( $id )
+	{
+		$this->db->where( 'id', $id );
+		$this->db->delete( $this->_table );
+
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all( $include_deleted = FALSE )
+	{
+		$this->db->select( 'p.id,p.slug,p.slug_end,p.parent_id,p.template,p.template_data,p.title,p.title_nested,p.is_published,p.is_deleted,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = p.modified_by', 'LEFT' );
@@ -238,37 +415,13 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		endif;
 
-		$this->db->order_by( 'p.title' );
+		$this->db->order_by( 'p.slug' );
 		$_pages = $this->db->get( NAILS_DB_PREFIX . 'cms_page p' )->result();
 
 		foreach ( $_pages AS $page ) :
 
 			//	Format the page object
 			$this->_format_page_object( $page );
-
-			// --------------------------------------------------------------------------
-
-			//	Fetch widgets
-			if ( $include_widgets ) :
-
-				$this->db->where( 'page_id', $page->id );
-				$this->db->where( 'widget_area', 'hero' );
-				$this->db->order_by( 'order' );
-				$page->widgets_hero = $this->db->get( NAILS_DB_PREFIX . 'cms_page_widget' )->result();
-
-				$this->db->where( 'page_id', $page->id );
-				$this->db->where( 'widget_area', 'body' );
-				$this->db->order_by( 'order' );
-				$page->widgets_body = $this->db->get( NAILS_DB_PREFIX . 'cms_page_widget' )->result();
-
-				$this->db->where( 'page_id', $page->id );
-				$this->db->where( 'widget_area', 'sidebar' );
-				$this->db->order_by( 'order' );
-				$page->widgets_sidebar = $this->db->get( NAILS_DB_PREFIX . 'cms_page_widget' )->result();
-
-			endif;
-
-			// --------------------------------------------------------------------------
 
 		endforeach;
 
@@ -279,11 +432,173 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function get_all_nested()
+	{
+		return $this->_nest_pages( $this->get_all() );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 *	Hat tip to Timur; http://stackoverflow.com/a/9224696/789224
+	 **/
+	protected function _nest_pages( &$list, $parent = NULL )
+	{
+		$result = array();
+
+		for ( $i = 0, $c = count( $list ); $i < $c; $i++ ) :
+
+			if ( $list[$i]->parent_id == $parent ) :
+
+				$list[$i]->children	= $this->_nest_pages( $list, $list[$i]->id );
+				$result[]			= $list[$i];
+
+			endif;
+
+		endfor;
+
+		return $result;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_nested_flat( $separator = ' &rsaquo; ', $murder_parents_of_children = TRUE )
+	{
+		$_out	= array();
+		$_pages	= $this->get_all();
+
+		foreach ( $_pages AS $page ) :
+
+			$_out[$page->id] = $this->_find_parents( $page->parent_id, $_pages, $separator ) . $page->title;
+
+		endforeach;
+
+		asort( $_out );
+
+		// --------------------------------------------------------------------------
+
+		//	Remove parents from the array if they have any children
+		if ( $murder_parents_of_children ) :
+
+			foreach( $_out AS $key => &$page ) :
+
+				$_found		= FALSE;
+				$_needle	= $page . $separator;
+
+				//	Hat tip - http://uk3.php.net/manual/en/function.array-search.php#90711
+				foreach ( $_out as $item ) :
+
+					if ( strpos( $item, $_needle ) !== FALSE ) :
+
+						$_found = TRUE;
+						break;
+
+					endif;
+
+				endforeach;
+
+				if ( $_found ) :
+
+					unset( $_out[$key] );
+
+				endif;
+
+			endforeach;
+
+		endif;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _find_parents( $parent_id, &$source, $separator )
+	{
+		if ( ! $parent_id ) :
+
+			//	No parent ID, end of the line señor!
+			return '';
+
+		else :
+
+			//	There is a parent, look for it
+			foreach ( $source AS $src ) :
+
+				if ( $src->id == $parent_id ) :
+
+					$_parent = $src;
+
+				endif;
+
+			endforeach;
+
+			if ( isset( $_parent ) && $_parent ) :
+
+				//	Parent was found, does it have any parents?
+				if ( $_parent->parent_id ) :
+
+					//	Yes it does, repeat!
+					$_return = $this->_find_parents( $_parent->parent_id, $source, $separator );
+
+					return $_return ? $_return . $_parent->title . $separator : $_parent->title;
+
+				else :
+
+					//	Nope, end of the line mademoiselle
+					return $_parent->title . $separator;
+
+				endif;
+
+
+			else :
+
+				//	Did not find parent, give up.
+				return '';
+
+			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_flat()
+	{
+		$_out	= array();
+		$_pages	= $this->get_all();
+
+		foreach( $_pages AS $page ) :
+
+			$_out[$page->id] = $page->title;
+
+		endforeach;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_page_object( &$page )
 	{
 		$page->id				= (int) $page->id;
-		$page->sidebar_width	= (int) $page->sidebar_width;
+		$page->is_published		= (bool) $page->is_published;
 		$page->is_deleted		= (bool) $page->is_deleted;
+		$page->depth			= count( explode( '/', $page->slug ) ) - 1;
+
+		$_template_slug			= $page->template;
+		$page->template			= new stdClass();
+		$page->template->slug	= $_template_slug;
+		$page->template->data	= unserialize( $page->template_data );
 
 		// --------------------------------------------------------------------------
 
@@ -302,6 +617,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		unset( $page->email );
 		unset( $page->profile_img );
 		unset( $page->gender );
+		unset( $page->template_data );
 	}
 
 
@@ -313,18 +629,20 @@ class NAILS_Cms_page_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
-	 * @param bool $include_revisions Whether to include translation revisions
 	 * @return stdClass
 	 **/
-	public function get_by_id( $id, $include_widgets = FALSE )
+	public function get_by_id( $id )
 	{
 		$this->db->where( 'p.id', $id );
-		$_result = $this->get_all( $include_widgets, TRUE );
+		$_result = $this->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $_result )
+		if ( ! $_result ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -340,18 +658,20 @@ class NAILS_Cms_page_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param string $slug The slug of the object to fetch
-	 * @param bool $include_revisions Whether to include translation revisions
 	 * @return stdClass
 	 **/
-	public function get_by_slug( $slug, $include_widgets = FALSE )
+	public function get_by_slug( $slug )
 	{
 		$this->db->where( 'p.slug', $slug );
-		$_result = $this->get_all( $include_widgets, TRUE );
+		$_result = $this->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $_result )
+		if ( ! $_result ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -365,9 +685,12 @@ class NAILS_Cms_page_model extends NAILS_Model
 	public function get_available_widgets()
 	{
 		//	Have we done this already? Don't do it again.
-		if ( ! is_null( $this->_available_widgets ) ) :
+		$_key	= 'cms-page-available-widgets';
+		$_cache	= $this->_get_cache( $_key );
 
-			return $this->_avilable_widgets;
+		if ( $_cache ) :
+
+			return $_cache;
 
 		endif;
 
@@ -466,8 +789,131 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		return $_widgets;
+		//	Save to the cache
+		$this->_set_cache( $_key, $_widgets );
 
+		// --------------------------------------------------------------------------
+
+		return $_widgets;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_available_templates()
+	{
+		//	Have we done this already? Don't do it again.
+		$_key	= 'cms-page-available-templates';
+		$_cache	= $this->_get_cache( $_key );
+
+		if ( $_cache ) :
+
+			return $_cache;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Search the Nails. widget folder, and then the App's widget folder.
+		//	Widgets in the app folder trump widgets in the Nails folder
+
+		$this->load->helper( 'directory' );
+
+		//	Look for nails widgets
+		$_nails_templates = directory_map( $this->_nails_templates_dir );
+
+		//	Look for app widgets
+		if ( is_dir( $this->_app_templates_dir ) ) :
+
+			$_app_templates = directory_map( $this->_app_templates_dir );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Sanitise
+		if ( empty( $_nails_templates ) ) :
+
+			$_nails_templates = array();
+
+		endif;
+
+		if ( empty( $_app_templates ) ) :
+
+			$_app_templates = array();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Test and merge templates
+		$_templates = array();
+		foreach( $_nails_templates AS $template ) :
+
+			//	Ignore the base template
+			if ( $template == '_template.php' ) :
+
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			include_once $this->_nails_templates_dir . $template;
+
+			//	Can we call the static details method?
+			$_template	= ucfirst( substr( $template, 0, strrpos( $template, '.' ) ) );
+			$_class		= $this->_nails_prefix . $_template;
+
+			if ( ! method_exists( $_class, 'details' ) ) :
+
+				continue;
+
+			endif;
+
+			$_details = $_class::details();
+
+			if ( $_details ) :
+
+				$_templates[$_template] = $_class::details();
+
+			endif;
+
+		endforeach;
+
+		//	Now test app templates
+		foreach( $_app_templates AS $template ) :
+
+			include_once $this->_app_templates_dir . $template;
+
+			//	Can we call the static details method?
+			$_template	= ucfirst( substr( $template, 0, strrpos( $template, '.' ) ) );
+			$_class		= $this->_app_prefix . $template;
+
+			if ( ! method_exists( $_class, 'details' ) ) :
+
+				continue;
+
+			endif;
+
+			$_templates[$_template] = $_class::details();
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Sort into some alphabetical order
+		ksort( $_templates );
+
+		// --------------------------------------------------------------------------
+
+		//	Save to the cache
+		$this->_set_cache( $_key, $_templates );
+
+		// --------------------------------------------------------------------------
+
+		return $_templates;
 	}
 
 
@@ -632,7 +1078,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	First, test if file exists, if it does is it writable?
 		if ( file_exists( $this->_routes_dir . 'routes_cms_page.php' ) ) :
 
-			if ( is_writable( $this->_routes_dir . 'routes_cms_page.php' ) ) :
+			if ( is_really_writable( $this->_routes_dir . 'routes_cms_page.php' ) ) :
 
 				return TRUE;
 
@@ -645,14 +1091,14 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 				else :
 
-					$this->_set_error( 'The route config exists, but is not writeable.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
+					$this->_set_error( 'The route config exists, but is not writeable. <small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
 					return FALSE;
 
 				endif;
 
 			endif;
 
-		elseif ( is_writable( $this->_routes_dir ) ) :
+		elseif ( is_really_writable( $this->_routes_dir ) ) :
 
 			return TRUE;
 
@@ -665,7 +1111,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			else :
 
-				$this->_set_error( 'The route directory is not writeable.<small>' . $this->_routes_dir . '</small>' );
+				$this->_set_error( 'The route directory is not writeable. <small>' . $this->_routes_dir . '</small>' );
 				return FALSE;
 
 			endif;
@@ -694,7 +1140,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		foreach ( $_pages AS $page ) :
 
-			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page\';' . "\n";
+			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page/' . $page->id . '\';' . "\n";
 
 		endforeach;
 

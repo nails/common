@@ -184,6 +184,33 @@ table
 				text-transform: none;
 				text-align:left;
 			}
+			td.indentosaurus
+			{
+				position:relative;
+
+				.indentor
+				{
+					display:inline-block;
+					float:left;
+					left:0px;
+					margin-top:2px;
+					height:15px;
+					width:15px;
+					margin-right:3px;
+					.rounded(10px);
+					background:#CCC;
+					border-right:1px solid #FFF;
+				}
+			}
+
+			td.indentosaurus.indent-1	.indentor-content {	margin-left:20*1px; }
+			td.indentosaurus.indent-2	.indentor-content {	margin-left:20*2px; }
+			td.indentosaurus.indent-3	.indentor-content {	margin-left:20*3px; }
+			td.indentosaurus.indent-4	.indentor-content {	margin-left:20*4px; }
+			td.indentosaurus.indent-5	.indentor-content {	margin-left:20*5px; }
+			td.indentosaurus.indent-6	.indentor-content {	margin-left:20*6px; }
+			td.indentosaurus.indent-7	.indentor-content {	margin-left:20*7px; }
+			td.indentosaurus.indent-8	.indentor-content {	margin-left:20*8px; }
 		}
 		tr:hover
 		{

@@ -12,7 +12,7 @@ if ( ! function_exists( 'login_as_url' ) )
 {
 	function login_as_url( $uid, $upassword )
 	{
-		if ( get_instance()->user->has_permission( 'admin.accounts.can_login_as' ) ) :
+		if ( user_has_permission( 'admin.accounts.can_login_as' ) ) :
 
 			//	Generate the return string
 			$_url = uri_string();
@@ -30,11 +30,11 @@ if ( ! function_exists( 'login_as_url' ) )
 				endif;
 
 			endif;
-			
+
 			$_return_string = '?return_to=' . urlencode( $_url );
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			return site_url( 'auth/override/login_as/' . md5( $uid ) . '/' . md5( $upassword ) . $_return_string );
 
 		else :
@@ -61,7 +61,7 @@ if ( ! function_exists( 'login_as_button' ) )
 {
 	function login_as_button( $uid, $upassword, $text = '', $attr = 'class="awesome small grey"' )
 	{
-		if ( get_instance()->user->has_permission( 'admin.accounts.can_login_as' ) ) :
+		if ( user_has_permission( 'admin.accounts.can_login_as' ) ) :
 
 			$text =  ! $text ? lang( 'admin_login_as' ) : $text;
 			return anchor( login_as_url( $uid, $upassword ), $text, $attr );

@@ -75,7 +75,7 @@
 
 									// --------------------------------------------------------------------------
 
-									if ( $user->has_permission( 'admin.shop.orders_view' ) ) :
+									if ( user_has_permission( 'admin.shop.orders_view' ) ) :
 
 										$_buttons[] = anchor( 'admin/shop/orders/view/' . $order->id, lang( 'action_view' ), 'class="awesome small fancybox" data-fancybox-type="iframe"' );
 
@@ -83,7 +83,7 @@
 
 									// --------------------------------------------------------------------------
 
-									if ( $user->has_permission( 'admin.shop.orders_reprocess' ) ) :
+									if ( user_has_permission( 'admin.shop.orders_reprocess' ) ) :
 
 										$_buttons[] = anchor( 'admin/shop/orders/reprocess/' . $order->id, 'Process', 'class="awesome small confirm" data-confirm="Are you sure?\n\nProcessing the order again may result in multiple dispatch of items."' );
 

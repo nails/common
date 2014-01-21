@@ -67,7 +67,7 @@
 		<?php
 
 			//	Actions, only super users can do anything to other superusers
-			if ( ! $user->is_superuser() && $user->has_permission( 'superuser', $member ) ) :
+			if ( ! $user->is_superuser() && user_has_permission( 'superuser', $member ) ) :
 
 				//	Member is a superuser and the admin is not a super user, no editing facility
 				echo '<span class="not-editable">' . lang( 'accounts_index_noteditable' ) . '</span>';
@@ -81,7 +81,7 @@
 				// --------------------------------------------------------------------------
 
 				//	Login as?
-				if ( $member->id != active_user( 'id' ) && $user->has_permission( 'admin.accounts.can_login_as' ) ) :
+				if ( $member->id != active_user( 'id' ) && user_has_permission( 'admin.accounts.can_login_as' ) ) :
 
 					$_buttons[] = login_as_button( $member->id, $member->password );
 
@@ -90,7 +90,7 @@
 				// --------------------------------------------------------------------------
 
 				//	Edit
-				if ( $member->id == active_user( 'id' ) || $user->has_permission( 'admin.accounts.can_edit_others' ) ) :
+				if ( $member->id == active_user( 'id' ) || user_has_permission( 'admin.accounts.can_edit_others' ) ) :
 
 					$_buttons[] = anchor( 'admin/accounts/edit/' . $member->id . $_return, lang( 'action_edit' ), 'data-fancybox-type="iframe" class="edit fancybox-max awesome small grey"' );
 
@@ -101,7 +101,7 @@
 				//	Suspend user
 				if ( $member->is_suspended ) :
 
-					if ( $user->has_permission( 'admin.accounts.unsuspend' ) ) :
+					if ( user_has_permission( 'admin.accounts.unsuspend' ) ) :
 
 						$_buttons[] = anchor( 'admin/accounts/unsuspend/' . $member->id . $_return, lang( 'action_unsuspend' ), 'class="awesome small green"' );
 
@@ -109,7 +109,7 @@
 
 				else :
 
-					if ( $user->has_permission( 'admin.accounts.suspend' ) ) :
+					if ( user_has_permission( 'admin.accounts.suspend' ) ) :
 
 						$_buttons[] = anchor( 'admin/accounts/suspend/' . $member->id . $_return, lang( 'action_suspend' ), 'class="awesome small red"' );
 
@@ -122,7 +122,7 @@
 				//	Verify user
 				if ( $member->email_is_verified ) :
 
-					if ( $user->has_permission( 'admin.accounts.unverify' ) ) :
+					if ( user_has_permission( 'admin.accounts.unverify' ) ) :
 
 						$_buttons[] = anchor( 'admin/accounts/unverify/' . $member->id . $_return, lang( 'action_unverify' ), 'class="awesome small red"' );
 
@@ -130,7 +130,7 @@
 
 				else :
 
-					if ( $user->has_permission( 'admin.accounts.verify' ) ) :
+					if ( user_has_permission( 'admin.accounts.verify' ) ) :
 
 						$_buttons[] = anchor( 'admin/accounts/verify/' . $member->id . $_return, lang( 'action_verify' ), 'class="awesome small green"' );
 
@@ -138,7 +138,7 @@
 
 				endif;
 
-				if ( $user->has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) && $member->group_id != 1 ) :
+				if ( user_has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) && $member->group_id != 1 ) :
 
 					$_buttons[] = anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
 

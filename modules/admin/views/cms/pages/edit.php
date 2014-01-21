@@ -1,141 +1,54 @@
 <div class="group-cms pages edit">
 	<?=form_open()?>
-	<fieldset id="cms-page-edit-meta" <?=$widgets_only ? 'style="display:none;"' : ''?>>
-		<legend>Meta Data</legend>
-			<?php
+
+	<fieldset>
+		<legend>Page Data</legend>
+		<?php
 
 			//	Title
 			$_field					= array();
 			$_field['key']			= 'title';
 			$_field['label']		= 'Title';
 			$_field['required']		= TRUE;
-			$_field['default']		= $cmspage->title;
+			$_field['default']		= isset( $cmspage->title ) ? $cmspage->title : '';
 			$_field['placeholder']	= 'The title of the page';
 
 			echo form_field( $_field );
 
 			// --------------------------------------------------------------------------
 
+			//	Title
+			$_field					= array();
+			$_field['key']			= 'is_published';
+			$_field['label']		= 'Published';
+			$_field['required']		= TRUE;
+			$_field['default']		= isset( $cmspage->is_published ) ? $cmspage->is_published : '';
+			$_field['placeholder']	= 'The title of the page';
+
+			echo form_field_boolean( $_field );
+
+			// --------------------------------------------------------------------------
+
 			//	Slug
 			$_field					= array();
-			$_field['key']			= 'slug';
-			$_field['label']		= 'Slug';
-			$_field['required']		= TRUE;
-			$_field['default']		= $cmspage->slug;
-			$_field['placeholder']	= 'The Page\'s slug.';
+			$_field['key']			= 'parent_id';
+			$_field['label']		= 'Parent Page';
+			$_field['placeholder']	= 'The Page\'s parent.';
+			$_field['class']		= 'chosen';
+			$_field['default']		= isset( $cmspage->parent_id ) ? $cmspage->parent_id : '';
 
-			echo form_field( $_field );
+			$pages_nested_flat = array( '' => 'No Parent Page' ) + $pages_nested_flat;
 
-			?>
-	</fieldset>
+			echo form_field_dropdown( $_field, $pages_nested_flat );
 
-	<fieldset id="cms-page-edit-layout" class="layout" <?=$widgets_only ? 'style="display:none;"' : ''?>>
-		<legend>Page Layout</legend>
-		<ul>
-			<?php
-
-				$_layout = $this->input->post( 'layout' ) ? $this->input->post( 'layout' ) : $cmspage->layout;
-
-			?>
-			<li class="hero-sidebar-left">
-				<label>
-					<?=form_radio( 'layout', 'hero-sidebar-left', ( $_layout == 'hero-sidebar-left' ) )?>
-				</label>
-			</li>
-			<li class="hero-sidebar-right">
-				<label>
-					<?=form_radio( 'layout', 'hero-sidebar-right', ( $_layout == 'hero-sidebar-right' ) )?>
-				</label>
-			</li>
-			<li class="hero-full-width">
-				<label>
-					<?=form_radio( 'layout', 'hero-full-width', ( $_layout == 'hero-full-width' ) )?>
-				</label>
-			</li>
-			<li class="no-hero-sidebar-left">
-				<label>
-					<?=form_radio( 'layout', 'no-hero-sidebar-left', ( $_layout == 'no-hero-sidebar-left' ) )?>
-				</label>
-			</li>
-			<li class="no-hero-sidebar-right">
-				<label>
-					<?=form_radio( 'layout', 'no-hero-sidebar-right', ( $_layout == 'no-hero-sidebar-right' ) )?>
-				</label>
-			</li>
-			<li class="no-hero-full-width">
-				<label>
-					<?=form_radio( 'layout', 'no-hero-full-width', ( $_layout == 'no-hero-full-width' ) )?>
-				</label>
-			</li>
-		</ul>
-		<p id="cms-page-edit-sidebar-width">
-			<label>
-				Sidebar Width:
-				<?php
-
-					$_columns = array();
-					for( $i=1; $i<=8; $i++ ) :
-
-						$_columns[$i] = $i . ' columns';
-
-					endfor;
-					echo form_dropdown( 'sidebar_width', $_columns, set_value( 'sidebar_width', $cmspage->sidebar_width ) );
-
-				?>
-			</label>
-		</p>
-	</fieldset>
-
-	<?php
-
-		//	Hero editor
-		$_config = array( 'config' => array() );
-		$_config['config']['area']					= 'hero';
-		$_config['config']['accept_widgets_for']	= array( 'ALL', 'HERO', 'HERO_BODY', 'HERO_SIDEBAR' );
-		$_config['config']['title']					= 'Page Hero';
-		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
-
-		$this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-		// --------------------------------------------------------------------------
-
-		//	Body editor
-		$_config = array( 'config' => array() );
-		$_config['config']['area']					= 'body';
-		$_config['config']['accept_widgets_for']	= array( 'ALL', 'BODY', 'HERO_BODY', 'BODY_SIDEBAR' );
-		$_config['config']['title']					= 'Page Body';
-		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
-
-		$this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-		// --------------------------------------------------------------------------
-
-		//	Sidebar editor
-		$_config = array( 'config' => array() );
-		$_config['config']['area']					= 'sidebar';
-		$_config['config']['accept_widgets_for']	= array( 'ALL', 'SIDEBAR', 'HERO_SIDEBAR', 'BODY_SIDEBAR' );
-		$_config['config']['title']					= 'Page Sidebar';
-		$_config['config']['description']			= 'Drag widgets to the right to build your page. Change the order of widgets by dragging the handle of the editor.';
-
-		$this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-	?>
-
-	<fieldset id="cms-page-edit-seo" <?=$widgets_only ? 'style="display:none;"' : ''?>>
-		<legend>Search Engine Optimisation</legend>
-			<p>
-				These fields are not visible anywhere but help Search Engines index and understand the page.
-			</p>
-			<?php
+			// --------------------------------------------------------------------------
 
 			//	Description
 			$_field					= array();
 			$_field['key']			= 'seo_description';
-			$_field['type']			= 'textarea';
-			$_field['label']		= 'Description';
-			$_field['required']		= TRUE;
-			$_field['default']		= $cmspage->seo_description;
-			$_field['placeholder']	= 'The page\'s SEO description';
+			$_field['label']		= 'SEO Description';
+			$_field['default']		= isset( $cmspage->seo_description ) ? $cmspage->seo_description : '';
+			$_field['placeholder']	= 'The page\'s SEO description, keep this short and concise. Recommended to keep below 160 characters.';
 
 			echo form_field( $_field, 'This should be kept short (< 160 characters) and concise. It\'ll be shown in search result listings and search engines will use it to help determine the page\'s content.' );
 
@@ -144,14 +57,144 @@
 			//	Keywords
 			$_field					= array();
 			$_field['key']			= 'seo_keywords';
-			$_field['label']		= 'Keywords';
-			$_field['required']		= TRUE;
-			$_field['default']		= $cmspage->seo_keywords;
-			$_field['placeholder']	= 'Comma separated keywords relating to the content of the page.';
+			$_field['label']		= 'SEO Keywords';
+			$_field['default']		= isset( $cmspage->seo_keywords ) ? $cmspage->seo_keywords : '';
+			$_field['placeholder']	= 'Comma separated keywords relating to the content of the page. A maximum of 10 keywords is recommended.';
 
 			echo form_field( $_field, 'SEO good practice recommend keeping the number of keyword phrases below 10 and less than 160 characters in total.' );
 
-			?>
+		?>
+	</fieldset>
+
+	<fieldset>
+		<legend>Template</legend>
+		<ul class="templates">
+		<?php
+
+			//	Set the default template; either the one being used by the page, or the first in the list.
+			$_default_template = isset( $cmspage->template->slug ) ? $cmspage->template->slug : NULL;
+
+			if ( $_default_template === NULL ) :
+
+			endif;
+
+			foreach( $templates AS $template ) :
+
+				echo '<li>';
+
+					//	Define attributes
+					$_attr							= array();
+					$_attr['class']					= $cmspage->template->slug == $template->slug ? 'template selected' : 'template';
+					$_attr['data-template-slug']	= $template->slug;
+
+					//	Glue together
+					$_attr_str = '';
+					foreach ( $_attr AS $key => $value ) :
+
+						$_attr_str .= $key . '="' . $value . '" ';
+
+					endforeach;
+
+					echo '<label ' . trim( $_attr_str ) . '>';
+
+						echo form_radio( 'template', $template->slug, set_radio( 'template', $template->slug, ( $cmspage->template->slug == $template->slug ) ) );
+
+						$_background = $template->img->icon ? 'style="background-image:url(' . $template->img->icon . ');background-position:center top;"' : '';
+						echo '<span class="icon" ' . $_background . '></span>';
+						echo '<span class="newrow"></span>';
+						echo '<span class="name">';
+							echo '<span class="checkmark ion-checkmark-circled"></span>';
+							echo '<span>' . $template->name . '</span>';
+						echo '</span>';
+					echo '</label>';
+				echo '</li>';
+
+			endforeach;
+
+		?>
+		</ul>
+	</fieldset>
+
+	<fieldset>
+		<legend>Page Content</legend>
+		<p>
+			Choose which area of the page you'd like to edit.
+		</p>
+		<p>
+		<?php
+
+			foreach( $templates AS $template ) :
+
+				foreach ( $template->widget_areas AS $slug => $area ) :
+
+					$_data				= array();
+					$_data['area-slug']	= $slug;
+
+					$_attr = '';
+					foreach ( $_data AS $key => $value ) :
+
+						$_attr .= 'data-' . $key . '="' . $value . '" ';
+
+					endforeach;
+
+					//	Define attributes
+					$_attr					= array();
+					$_attr['class']			= 'awesome launch-editor template-' . $template->slug;
+					$_attr['style']			= set_checkbox( 'template', $template->slug, $cmspage->template->slug == $template->slug ) ? 'display:inline-block;' : 'display:none;';
+					$_attr['data-template']	= $template->slug;
+					$_attr['data-area']		= $slug;
+
+					//	Glue together
+					$_attr_str = '';
+					foreach ( $_attr AS $key => $value ) :
+
+						$_attr_str .= $key . '="' . $value . '" ';
+
+					endforeach;
+
+					echo '<a href="#" ' . trim( $_attr_str ) . '>' . $area->title . '</a>';
+
+				endforeach;
+
+			endforeach;
+
+		?>
+		</p>
+		<?php
+
+			// //	Hero editor
+			// $_config = array( 'config' => array() );
+			// $_config['config']['area']					= 'hero';
+			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'HERO', 'HERO_BODY', 'HERO_SIDEBAR' );
+			// $_config['config']['title']					= 'Page Hero';
+			// $_config['config']['description']			= '';
+
+			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+			// // --------------------------------------------------------------------------
+
+			// //	Body editor
+			// $_config = array( 'config' => array() );
+			// $_config['config']['area']					= 'body';
+			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'BODY', 'HERO_BODY', 'BODY_SIDEBAR' );
+			// $_config['config']['title']					= 'Page Body';
+			// $_config['config']['description']			= '';
+
+			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+			// // --------------------------------------------------------------------------
+
+			// //	Sidebar editor
+			// $_config = array( 'config' => array() );
+			// $_config['config']['area']					= 'sidebar';
+			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'SIDEBAR', 'HERO_SIDEBAR', 'BODY_SIDEBAR' );
+			// $_config['config']['title']					= 'Page Sidebar';
+			// $_config['config']['description']			= '';
+
+			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
+
+
+		?>
 	</fieldset>
 
 	<p>
@@ -165,6 +208,7 @@
 
 </div>
 
+<?php /*
 <script type="text/javascript">
 <!--//
 
@@ -275,3 +319,18 @@
 
 	endforeach;
 ?>
+
+<?php */ ?>
+
+<script type="text/javascript">
+<!--//
+
+	$(function(){
+
+		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
+		CMS_PAGES.init( 'hero' );
+
+	});
+
+//-->
+</script>
