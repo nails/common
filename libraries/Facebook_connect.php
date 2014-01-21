@@ -54,7 +54,7 @@ class Facebook_Connect
 	 **/
 	public function user_is_linked( $user_id = NULL )
 	{
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			return (bool) active_user( 'fb_id' );
 
@@ -183,7 +183,7 @@ class Facebook_Connect
 
 		// --------------------------------------------------------------------------
 
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			$_uid	= active_user( 'id' );
 			$_fb_id	= active_user( 'fb_id' );

@@ -294,7 +294,7 @@ class NAILS_User_model extends NAILS_Model
 			$_user	= $this->get_by_id( $id );
 			$_error	= 'Invalid User ID.';
 
-		elseif( is_string( $id ) ) :
+		elseif ( is_string( $id ) ) :
 
 			$this->load->helper( 'email' );
 
@@ -325,7 +325,7 @@ class NAILS_User_model extends NAILS_Model
 			$this->_set_error( $_error );
 			return FALSE;
 
-		elseif( $_user->is_suspended ) :
+		elseif ( $_user->is_suspended ) :
 
 			$this->_set_error( 'User is suspended.' );
 			return FALSE;
@@ -396,7 +396,7 @@ class NAILS_User_model extends NAILS_Model
 	public function is_remembered()
 	{
 		//	Deja vu?
-		if ( ! is_null( $this->is_remembered ) ) :
+		if ( NULL !== $this->is_remembered ) :
 
 			return $this->is_remembered;
 
@@ -858,7 +858,7 @@ class NAILS_User_model extends NAILS_Model
 		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
 
 			//	Parse the keywords, look for specific column searches
-			preg_match_all('/\(([a-zA-Z0-9\.\- \_]+)=\"(.+?)\"\)/', $search['keywords'], $_matches );
+			preg_match_all( '/\(([a-zA-Z0-9\.\- \_]+)=\"(.+?)\"\)/', $search['keywords'], $_matches );
 
 			if ( $_matches[1] && $_matches[2] ) :
 
@@ -892,7 +892,7 @@ class NAILS_User_model extends NAILS_Model
 				// --------------------------------------------------------------------------
 
 				//	Remove controls from search string
-				$search['keywords'] = preg_replace('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
+				$search['keywords'] = preg_replace( '/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
 
 			endif;
 
@@ -1221,7 +1221,7 @@ class NAILS_User_model extends NAILS_Model
 		$data = (array) $data;
 
 		//	Get the user ID to update
-		if ( ! is_null( $user_id ) && $user_id !== FALSE ) :
+		if ( NULL !== $user_id && $user_id !== FALSE ) :
 
 			$_uid = $user_id;
 
@@ -1714,7 +1714,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Fetch other emails
 		$this->db->select( 'id,user_id,email' );
 
-		if( is_numeric( $email ) ) :
+		if ( is_numeric( $email ) ) :
 
 			$this->db->where( 'id', $email );
 
@@ -2230,7 +2230,7 @@ class NAILS_User_model extends NAILS_Model
 		//	If a password has been passed then generate the encrypted strings, otherwise
 		//	just generate a salt.
 
-		if ( is_null( $password ) ) :
+		if ( NULL === $password ) :
 
 			$_password[] = NULL;
 			$_password[] = $this->salt();
@@ -2250,7 +2250,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Check that we're dealing with a valid group
-		if ( is_null( $group_id ) ) :
+		if ( NULL === $group_id ) :
 
 			$group_id = APP_USER_DEFAULT_GROUP;
 

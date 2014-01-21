@@ -444,7 +444,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	If no cols were found, DESCRIBE the user_meta table - where possible
 		//	you should manually set columns, including datatypes
 
-		if ( is_null( $this->data['user_meta_cols'] ) ) :
+		if ( NULL === $this->data['user_meta_cols'] ) :
 
 			$_describe = $this->db->query( 'DESCRIBE `' . NAILS_DB_PREFIX . 'user_meta`' )->result();
 			$this->data['user_meta_cols'] = array();

@@ -54,7 +54,7 @@ class Linkedin_connect
 	 **/
 	public function user_is_linked( $user_id = NULL )
 	{
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			return (bool) active_user( 'li_id' );
 
@@ -271,7 +271,7 @@ class Linkedin_connect
 
 		// --------------------------------------------------------------------------
 
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			$_uid = active_user( 'id' );
 

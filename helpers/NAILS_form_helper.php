@@ -1159,7 +1159,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endif;
 
 		//	Build the select
-		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
 		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 
@@ -1293,7 +1293,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		endif;
 
 		//	Build the select
-		$_placeholder = ! is_null( $_field['placeholder'] ) ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
 		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :

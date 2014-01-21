@@ -201,13 +201,13 @@ class NAILS_Shop_basket_model extends NAILS_Model
 			endif;
 
 
-			if ( $_product && $_product->is_active && ( is_null( $_product->quantity_available ) || $_product->quantity_available ) ) :
+			if ( $_product && $_product->is_active && ( NULL === $_product->quantity_available || $_product->quantity_available ) ) :
 
 				//	Product is still available, calculate all we need to calculate
 				//	and format the basket object
 
 				//	Do we need to adjust quantities?
-				if ( ! is_null( $_product->quantity_available ) && $_product->quantity_available < $item->quantity ) :
+				if ( NULL !== $_product->quantity_available && $_product->quantity_available < $item->quantity ) :
 
 					$_basket->quantity_adjusted = $_product->title;
 
@@ -718,7 +718,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Check quantity is available, if more are being requested, then reduce.
-		if ( ! is_null( $_product->quantity_available ) && $quantity > $_product->quantity_available ) :
+		if ( NULL !== $_product->quantity_available && $quantity > $_product->quantity_available ) :
 
 			$quantity = $_product->quantity_available;
 

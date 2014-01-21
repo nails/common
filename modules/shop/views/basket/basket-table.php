@@ -52,7 +52,7 @@
 							//	Increment
 							if ( ! isset( $no_changes ) || ! $no_changes ) :
 
-								if ( ! isset( $item->type->max_per_order ) || is_null( $item->type->max_per_order ) || $item->quantity < $item->type->max_per_order ) :
+								if ( ! isset( $item->type->max_per_order ) || NULL === $item->type->max_per_order || $item->quantity < $item->type->max_per_order ) :
 
 									echo anchor( shop_setting( 'shop_url' ) . 'basket/increment/' . $item->id, 'Increment', 'class="increment"' );
 

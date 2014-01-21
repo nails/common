@@ -231,8 +231,8 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	protected function _format_object( &$object )
 	{
 		$object->id				= (int) $object->id;
-		$object->created_by		= is_null( $object->created_by ) ? NULL : (int) $object->created_by;
-		$object->modified_by	= is_null( $object->modified_by ) ? NULL : (int) $object->modified_by;
+		$object->created_by		= NULL === $object->created_by	? NULL : (int) $object->created_by;
+		$object->modified_by	= NULL === $object->modified_by	? NULL : (int) $object->modified_by;
 		$object->is_active		= (bool) $object->is_active;
 		$object->base_exchange	= (float) $object->base_exchange;
 

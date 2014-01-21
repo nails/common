@@ -55,7 +55,7 @@ class Twitter_Connect
 	 **/
 	public function user_is_linked( $user_id = NULL )
 	{
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			return (bool) active_user( 'tw_id' );
 
@@ -86,7 +86,7 @@ class Twitter_Connect
 
 		// --------------------------------------------------------------------------
 
-		if ( is_null( $user_id ) ) :
+		if ( NULL === $user_id ) :
 
 			$_uid = active_user( 'id' );
 

@@ -234,12 +234,19 @@ class Asset
 	 **/
 	public function inline( $script = NULL )
 	{
-		if ( is_null( $script ) ) return;
+		if ( NULL === $script ) :
+
+			return;
+
+		endif;
 
 		$type = $this->_determine_type( $script );
+
 		switch ( $type ) :
+
 			case 'css_inline':	$this->css_inline[]	= $script;	break;
 			case 'js_inline':	$this->js_inline[]	= $script;	break;
+
 		endswitch;
 	}
 

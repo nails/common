@@ -597,7 +597,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		//	Voucher expired?
-		if ( ! is_null( $_voucher->valid_to ) && $_voucher->valid_to != '0000-00-00 00:00:00' && strtotime( $_voucher->valid_to ) < time() ) :
+		if ( NULL !== $_voucher->valid_to && $_voucher->valid_to != '0000-00-00 00:00:00' && strtotime( $_voucher->valid_to ) < time() ) :
 
 			$this->_set_error( 'Voucher has expired.' );
 			return FALSE;
@@ -605,7 +605,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		//	Is this a shipping voucher being applied to an order with no shippable items?
-		if ( ! is_null( $basket ) && $_voucher->discount_application == 'SHIPPING' && ! $basket->requires_shipping ) :
+		if ( NULL !== $basket && $_voucher->discount_application == 'SHIPPING' && ! $basket->requires_shipping ) :
 
 			$this->_set_error( 'Your order does not contian any items which require shipping, voucher not needed!' );
 			return FALSE;
@@ -616,7 +616,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		//	and the threshold has been reached then prevent it being added as it
 		//	doesn't make sense.
 
-		if ( ! is_null( $basket ) && shop_setting( 'free_shipping_threshold' ) && $_voucher->discount_application == 'SHIPPING' ) :
+		if ( NULL !== $basket && shop_setting( 'free_shipping_threshold' ) && $_voucher->discount_application == 'SHIPPING' ) :
 
 			if ( $basket->totals->sub >= shop_setting( 'free_shipping_threshold' ) ) :
 
@@ -628,10 +628,10 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 
-		//	If the voucher applies to a particular product type, check the absket contains
+		//	If the voucher applies to a particular product type, check the basket contains
 		//	that product, otherwise it doesn't make sense to add it
 
-		if ( ! is_null( $basket ) && $_voucher->discount_application == 'PRODUCT_TYPES' ) :
+		if ( NULL !== $basket && $_voucher->discount_application == 'PRODUCT_TYPES' ) :
 
 			$_matched = FALSE;
 

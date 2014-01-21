@@ -133,7 +133,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		endif;
 
-		if ( ! is_null( $_config->limit ) && is_numeric( $_config->limit ) ) :
+		if ( NULL !== $_config->limit && is_numeric( $_config->limit ) ) :
 
 			$this->db->limit( $_config->limit );
 
@@ -213,7 +213,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		endif;
 
-		if ( ! is_null( $_config->limit ) && is_numeric( $_config->limit ) ) :
+		if ( NULL !== $_config->limit && is_numeric( $_config->limit ) ) :
 
 			$this->db->limit( $_config->limit );
 

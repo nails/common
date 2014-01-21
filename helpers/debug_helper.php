@@ -105,7 +105,7 @@ if ( ! function_exists( 'here' ) )
 		$_now = gmdate( 'H:i:s' );
 
 		//	Dump payload if there
-		if ( ! is_null( $dump ) ) :
+		if ( NULL !== $dump ) :
 
 			dump( $dump );
 

@@ -56,7 +56,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	public function user_date( $timestamp = NULL, $format_date = NULL )
 	{
 		//	Has a specific timestamp been given?
-		if ( is_null( $timestamp ) ) :
+		if ( NULL === $timestamp ) :
 
 			$timestamp = date( 'Y-m-d' );
 
@@ -90,7 +90,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Has a date/time format been supplied? If so overwrite the defaults
-		$_format_date = is_null( $format_date ) ? $this->_format_date : $format_date;
+		$_format_date = NULL === $format_date ? $this->_format_date : $format_date;
 
 		// --------------------------------------------------------------------------
 
@@ -100,8 +100,11 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If the user's timezone is different from the Nails. timezone then set it so.
-		if ( $this->_timezone_nails != $this->_timezone_user )
+		if ( $this->_timezone_nails != $this->_timezone_user ) :
+
 			$_datetime->setTimeZone( new DateTimeZone( $this->_timezone_user ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -116,7 +119,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	public function user_datetime( $timestamp = NULL, $format_date = NULL, $format_time = NULL )
 	{
 		//	Has a specific timestamp been given?
-		if ( is_null( $timestamp ) ) :
+		if ( NULL === $timestamp ) :
 
 			$timestamp = date( 'Y-m-d H:i:s' );
 
@@ -150,8 +153,8 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Has a date/time format been supplied? If so overwrite the defaults
-		$_format_date	= is_null( $format_date ) ? $this->_format_date : $format_date;
-		$_format_time	= is_null( $format_time ) ? $this->_format_time : $format_time;
+		$_format_date	= NULL === $format_date ? $this->_format_date : $format_date;
+		$_format_time	= NULL === $format_time ? $this->_format_time : $format_time;
 
 		// --------------------------------------------------------------------------
 
@@ -161,8 +164,11 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If the user's timezone is different from the Nails. timezone then set it so.
-		if ( $this->_timezone_nails != $this->_timezone_user )
+		if ( $this->_timezone_nails != $this->_timezone_user ) :
+
 			$_datetime->setTimeZone( new DateTimeZone( $this->_timezone_user ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -177,7 +183,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	public function user_rdate( $timestamp = NULL, $format = 'date' )
 	{
 		//	Has a specific timestamp been given?
-		if ( is_null( $timestamp ) ) :
+		if ( NULL === $timestamp ) :
 
 			$timestamp = date( 'Y-m-d H:i:s' );
 
@@ -206,8 +212,11 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If the user's timezone is different from the Nails. timezone then set it so.
-		if ( $this->_timezone_nails != $this->_timezone_user )
+		if ( $this->_timezone_nails != $this->_timezone_user ) :
+
 			$_datetime->setTimeZone( new DateTimeZone( $this->_timezone_nails ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -235,7 +244,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		$_out		= array();
 		$_formats	= $this->get_all_date_format();
 
-		for( $i=0; $i<count( $_formats ); $i++ ) :
+		for ( $i=0; $i<count( $_formats ); $i++ ) :
 
 			$_out[$_formats[$i]->id] = $_formats[$i]->label;
 
@@ -266,7 +275,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		$_out		= array();
 		$_formats	= $this->get_all_time_format();
 
-		for( $i=0; $i<count( $_formats ); $i++ ) :
+		for ( $i=0; $i<count( $_formats ); $i++ ) :
 
 			$_out[$_formats[$i]->id] = $_formats[$i]->label;
 
@@ -364,7 +373,7 @@ class NAILS_Datetime_model extends NAILS_Model
 
 	static function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
-		if( empty( $date ) || $date == '0000-00-00' ) :
+		if ( empty( $date ) || $date == '0000-00-00' ) :
 
 			if ( $opt_bad_msg ) :
 
@@ -378,10 +387,9 @@ class NAILS_Datetime_model extends NAILS_Model
 
 		endif;
 
-		$periods		= array( 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade' );
-		$lengths		= array( 60,60,24,7,'4.35', 12, 10 );
-
-		$now			= time();
+		$periods	= array( 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade' );
+		$lengths	= array( 60,60,24,7,'4.35', 12, 10 );
+		$now		= time();
 
 		if ( is_int( $date ) ) :
 
@@ -394,7 +402,7 @@ class NAILS_Datetime_model extends NAILS_Model
 		endif;
 
 		//	Check date supplied is valid
-		if( empty( $unix_date ) ) :
+		if ( empty( $unix_date ) ) :
 
 			if ( $opt_bad_msg ) :
 
@@ -409,59 +417,82 @@ class NAILS_Datetime_model extends NAILS_Model
 		endif;
 
 		//	If date is effectively NULL
-		if ( $date == '0000-00-00 00:00:00' )
+		if ( $date == '0000-00-00 00:00:00' ) :
+
 			return 'Unknown';
 
+		endif;
+
 		//	Determine past or future date
-		if( $now >= $unix_date ) :
+		if ( $now >= $unix_date ) :
+
 			$difference = $now - $unix_date;
 
-			if( $tense === TRUE ) :
+			if ( $tense === TRUE ) :
+
 				$tense = 'ago';
+
 			endif;
 
 		else :
+
 			$difference = $unix_date - $now;
-			if( $tense === TRUE ) :
+			if ( $tense === TRUE ) :
+
 				$tense = 'from now';
+
 			endif;
+
 		endif;
 
-		for( $j = 0; $difference >= $lengths[$j] && $j < count( $lengths )-1; $j++ ) :
+		for ( $j = 0; $difference >= $lengths[$j] && $j < count( $lengths )-1; $j++ ) :
+
 			$difference /= $lengths[$j];
+
 		endfor;
 
 		$difference = round( $difference );
 
-		if( $difference != 1 ) :
+		if ( $difference != 1 ) :
+
 			$periods[$j] .= 's';
+
 		endif;
 
 		// If it's greater than 1 week and $greater_1_week is defined, return that
-		if ( substr( $periods[$j], 0, 4 ) == 'week' && $greater_1_week !== NULL)
+		if ( substr( $periods[$j], 0, 4 ) == 'week' && $greater_1_week !== NULL ) :
+
 			return $greater_1_week;
 
+		endif;
+
 		// If it's less than 20 seconds, return 'Just now'
-		if ( is_null( $less_10_mins ) && substr( $periods[$j], 0, 6 ) == 'second' && $difference <=20 )
+		if ( NULL === $less_10_mins && substr( $periods[$j], 0, 6 ) == 'second' && $difference <=20 ) :
+
 			return 'a moment ago';
 
+		endif;
+
 		//	If $less_10_mins is set then return that if less than 10 minutes
-		if (	! is_null( $less_10_mins )
+		if ( NULL !== $less_10_mins
 				&&
 				(
-					(substr( $periods[$j], 0, 6 ) == 'minute'	&& $difference <=10)||
-					(substr( $periods[$j], 0, 6 ) == 'second'	&& $difference <=60)
+					( substr( $periods[$j], 0, 6 ) == 'minute' && $difference <= 10 ) ||
+					( substr( $periods[$j], 0, 6 ) == 'second' && $difference <= 60 )
 				)
-			)
+			) :
+
 			return $less_10_mins;
 
-		if( "{$difference} {$periods[$j]} {$tense}" == '1 day ago') :
+		endif;
+
+		if ( $difference . ' ' . $periods[$j] . ' ' . $tense == '1 day ago' ) :
 
 			return 'Yesterday';
 
 		else :
 
-			return "{$difference} {$periods[$j]} {$tense}";
+			return $difference . ' ' . $periods[$j] . ' ' . $tense;
 
 		endif;
 	}
@@ -498,7 +529,7 @@ class NAILS_Datetime_model extends NAILS_Model
 	static function convert_datetime( $timestamp, $to_tz, $from_tz = 'UTC' )
 	{
 		//	Has a specific timestamp been given?
-		if ( is_null( $timestamp ) ) :
+		if ( NULL === $timestamp ) :
 
 			$timestamp = date( 'Y-m-d H:i:s' );
 

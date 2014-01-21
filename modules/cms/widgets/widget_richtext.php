@@ -40,7 +40,7 @@ class Nails_CMS_Widget_richtext extends Nails_CMS_Widget
 
 		// --------------------------------------------------------------------------
 
-		if ( isset( $data['key'] ) && ! is_null( $data['key'] ) ) :
+		if ( isset( $data['key'] ) && NULL !== $data['key'] ) :
 
 			$this->_key = $data['key'];
 

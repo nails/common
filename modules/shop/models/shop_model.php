@@ -222,8 +222,8 @@ class NAILS_Shop_model extends NAILS_Model
 
 	public function format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE, $for_currency = NULL, $decode_symbol = FALSE )
 	{
-		//	Foratting for which currency? If null or emptyt, assume user currency
-		if ( is_null( $for_currency ) || ! $for_currency ) :
+		//	Formatting for which currency? If null or emptyt, assume user currency
+		if ( NULL === $for_currency || ! $for_currency ) :
 
 			$_code		= SHOP_USER_CURRENCY_CODE;
 			$_symbol	= SHOP_USER_CURRENCY_SYMBOL;

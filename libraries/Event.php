@@ -557,7 +557,7 @@ class Event {
 		//	Ints
 		$obj->id	= (int) $obj->id;
 		$obj->level	= (int) $obj->level;
-		$obj->ref	= is_null( $obj->ref ) ? NULL : (int) $obj->ref;
+		$obj->ref	= NULL === $obj->ref ? NULL : (int) $obj->ref;
 
 		//	Type
 		$obj->type					= new stdClass();

@@ -2,7 +2,7 @@
 
 /**
  * Modular Extensions HMVC
- * 
+ *
  * @package		Nails
  * @subpackage	MX
  * @author		wiredesignz
@@ -14,70 +14,70 @@ require NAILS_PATH . 'MX/Loader.php';
 
 class CORE_NAILS_Loader extends MX_Loader {
 
-	
+
 	public function model_is_loaded($model)
 	{
 		return array_search( $model, $this->_ci_models ) !== FALSE;
 	}
-	
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 *	Overloading this method so that if a view is supplied with the prefix of '/' then we
 	 *	load that view directly rather than try and do anythign clever with the path
 	 *
 	 **/
-	
+
 	public function view($view, $vars = array(), $return = FALSE) {
-	
+
 		if ( strpos( $view, '/' ) === 0 ) :
-		
+
 			//	The supplied view is an absolute path, so use it.
-			
+
 			//	Add on .php if it's not there (so pathinfo() works as expected)
 			if ( substr( $view, -4 ) != '.php' )
 				$view .= '.php';
-			
+
 			//	Get path information about the view
 			$_pathinfo = pathinfo( $view );
 			$_path	= $_pathinfo['dirname'] . '/';
 			$_view	=  $_pathinfo['filename'];
-			
+
 			//	Set the view path so the laoder knows where to look
 			$this->_ci_view_paths = array($_path => TRUE) + $this->_ci_view_paths;
-			
+
 			//	Load the view
 			return $this->_ci_load(array('_ci_view' => $_view, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return));
-		
+
 		else :
-		
+
 			//	Try looking in the application folder second - prevents Nails views being loaded
 			//	over an application view.
 			$_view = FCPATH . APPPATH . 'views/' . $view;
-			
+
 			if ( substr( $_view, -4 ) != '.php' )
 				$_view .= '.php';
-			
+
 			if ( file_exists( $_view ) ) :
-			
+
 				//	Try again with this view
 				return $this->view( $_view, $vars, $return );
-			
+
 			else :
-			
+
 				//	Fall back to the old method
 				return parent::view( $view, $vars, $return );
-				
+
 			endif;
-			
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Load Helper
 	 *
@@ -94,32 +94,32 @@ class CORE_NAILS_Loader extends MX_Loader {
 		//	Need to make the $helpers variable into an array immediately and loop through
 		//	it so MX knows what to do. Also specify a to_load variable which will contain
 		//	helpers which the fallback, CI, method will attempt to load.
-		
+
 		$_helpers	= $this->_ci_prep_filename($helpers, '_helper');
 		$_to_load	= array();
-		
+
 		//	Modded MX Loader:
 		foreach ( $_helpers AS $helper ) :
-			
+
 			if (isset($this->_ci_helpers[$helper]))	return;
-	
+
 			list($path, $_helper) = Modules::find($helper.'_helper', $this->_module, 'helpers/');
-	
+
 			if ($path === FALSE) :
-			
+
 				$_to_load[] = $helper;
-				
+
 			else:
-	
+
 				Modules::load_file($_helper, $path);
 				$this->_ci_helpers[$_helper] = TRUE;
-				
+
 			endif;
-		
+
 		endforeach;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		foreach ($_to_load as $helper)
 		{
 			if (isset($this->_ci_helpers[$helper]))
@@ -143,28 +143,28 @@ class CORE_NAILS_Loader extends MX_Loader {
 				}
 
 				include_once($ext_helper);
-				
+
 				//	If a Nails version exists, load that too; allows the app to overload the nails version
 				//	but also allows the app to extend the nails version without destorying existing functions
 				if (file_exists($_nails_ext_helper)) :
-				
+
 					include_once($_nails_ext_helper);
-				
-				//	If there isn't an explicit Nails version, check the current module for one	
+
+				//	If there isn't an explicit Nails version, check the current module for one
 				elseif($_nails_ext_module_helper&&file_exists($_nails_ext_module_helper)):
-				
+
 					include_once($_nails_ext_module_helper);
 
-				
+
 				endif;
-					
+
 				include_once($base_helper);
 
 				$this->_ci_helpers[$helper] = TRUE;
 				log_message('debug', 'Helper loaded: '.$helper);
 				continue;
 			}
-			
+
 			//	App version didn't exist, see if a Nails version does
 			if (file_exists($_nails_ext_helper))
 			{
@@ -182,7 +182,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 				log_message('debug', 'Helper loaded: '.$helper);
 				continue;
 			}
-			
+
 			//	See if the helper resides within the current Nails module
 			if (file_exists($_nails_module_helper))
 			{
@@ -193,7 +193,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 				log_message('debug', 'Helper loaded: '.$helper);
 				continue;
 			}
-			
+
 			// Try to load the helper
 			foreach ($this->_ci_helper_paths as $path)
 			{
@@ -214,10 +214,10 @@ class CORE_NAILS_Loader extends MX_Loader {
 			}
 		}
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
+
 	/**
 	 * Load class
 	 *
@@ -271,7 +271,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 					// Before we deem this to be a duplicate request, let's see
 					// if a custom object name is being supplied.  If so, we'll
 					// return a new instance of the object
-					if ( ! is_null($object_name))
+					if ( NULL !== $object_name )
 					{
 						$CI =& get_instance();
 						if ( ! isset($CI->$object_name))
@@ -286,21 +286,21 @@ class CORE_NAILS_Loader extends MX_Loader {
 				}
 
 				include_once($baseclass);
-				
+
 				//	If a Nails version exists, load that too; allows the app to overload the nails version
 				//	but also allows the app to extend the nails version without destorying existing functions
 				if (file_exists($nailsclass)) :
 					include_once($nailsclass);
 					$this->_ci_loaded_files[] = $nailsclass;
 				endif;
-					
+
 				include_once($subclass);
 				$this->_ci_loaded_files[] = $subclass;
 
 				return $this->_ci_init_class($class, config_item('subclass_prefix'), $params, $object_name);
 			}
-			
-			
+
+
 			// Ok, so it wasn't a subclass request, but does the subclass exist within Nails?
 			if (file_exists($nailsclass))
 			{
@@ -318,7 +318,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 					// Before we deem this to be a duplicate request, let's see
 					// if a custom object name is being supplied.  If so, we'll
 					// return a new instance of the object
-					if ( ! is_null($object_name))
+					if ( NULL !== $object_name )
 					{
 						$CI =& get_instance();
 						if ( ! isset($CI->$object_name))
@@ -334,12 +334,12 @@ class CORE_NAILS_Loader extends MX_Loader {
 
 				include_once($baseclass);
 				include_once($nailsclass);
-					
+
 				$this->_ci_loaded_files[] = $nailsclass;
-				
+
 				return $this->_ci_init_class($class, 'CORE_'.config_item('subclass_prefix'), $params, $object_name);
 			}
-			
+
 
 			// Lets search for the requested library file and load it.
 			$is_duplicate = FALSE;
@@ -359,7 +359,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 					// Before we deem this to be a duplicate request, let's see
 					// if a custom object name is being supplied.  If so, we'll
 					// return a new instance of the object
-					if ( ! is_null($object_name))
+					if ( NULL !== $object_name )
 					{
 						$CI =& get_instance();
 						if ( ! isset($CI->$object_name))

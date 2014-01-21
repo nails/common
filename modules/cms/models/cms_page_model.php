@@ -951,7 +951,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function get_widget_editor( $widget, $data = NULL, $key = NULL )
 	{
-		if ( ! is_null( $key ) ) :
+		if ( NULL !== $key ) :
 
 			$data = unserialize( $data );
 
@@ -981,7 +981,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function get_widget_editor_functions( $widget, $data = NULL, $key = NULL )
 	{
-		if ( ! is_null( $key ) ) :
+		if ( NULL !== $key ) :
 
 			$data = unserialize( $data );
 

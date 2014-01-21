@@ -813,7 +813,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			// if ( SHOP_BASE_CURRENCY_ID != SHOP_USER_CURRENCY_ID ) :
 
 			// 	//	Has a set price been defined for this currency?
-			// 	if ( ! is_null( $product->render_price ) ) :
+			// 	if ( NULL !== $product->render_price ) :
 
 			// 		$product->price_render = $product->render_price;
 
@@ -824,7 +824,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			// 	endif;
 
 			// 	//	What about a set sale price?
-			// 	if ( ! is_null( $product->render_sale_price ) ) :
+			// 	if ( NULL !== $product->render_sale_price ) :
 
 			// 		$product->sale_price_render = $product->render_sale_price;
 
