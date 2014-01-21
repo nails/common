@@ -1,3 +1,22 @@
+<?php
+
+	//	Set the default template; either POST data, the one being used by the page, or the first in the list.
+	if ( $this->input->post( 'template' ) ) :
+
+		$_default_template = $this->input->post( 'template' );
+
+	elseif ( isset( $cmspage->template->slug ) ) :
+
+		$_default_template = $cmspage->template->slug;
+
+	else :
+
+		reset( $templates );
+		$_default_template = key( $templates );
+
+	endif;
+
+?>
 <div class="group-cms pages edit">
 	<?=form_open()?>
 
@@ -71,20 +90,16 @@
 		<ul class="templates">
 		<?php
 
-			//	Set the default template; either the one being used by the page, or the first in the list.
-			$_default_template = isset( $cmspage->template->slug ) ? $cmspage->template->slug : NULL;
-
-			if ( $_default_template === NULL ) :
-
-			endif;
-
 			foreach( $templates AS $template ) :
 
 				echo '<li>';
 
+					//	This template selected?
+					$_selected = $_default_template == $template->slug ? TRUE : FALSE;
+
 					//	Define attributes
 					$_attr							= array();
-					$_attr['class']					= $cmspage->template->slug == $template->slug ? 'template selected' : 'template';
+					$_attr['class']					= $_selected ? 'template selected' : 'template';
 					$_attr['data-template-slug']	= $template->slug;
 
 					//	Glue together
@@ -97,7 +112,7 @@
 
 					echo '<label ' . trim( $_attr_str ) . '>';
 
-						echo form_radio( 'template', $template->slug, set_radio( 'template', $template->slug, ( $cmspage->template->slug == $template->slug ) ) );
+						echo form_radio( 'template', $template->slug, set_radio( 'template', $template->slug, $_selected ) );
 
 						$_background = $template->img->icon ? 'style="background-image:url(' . $template->img->icon . ');background-position:center top;"' : '';
 						echo '<span class="icon" ' . $_background . '></span>';
@@ -125,8 +140,12 @@
 
 			foreach( $templates AS $template ) :
 
+				//	This template selected?
+				$_selected = $_default_template == $template->slug ? TRUE : FALSE;
+
 				foreach ( $template->widget_areas AS $slug => $area ) :
 
+					//	Define attributes
 					$_data				= array();
 					$_data['area-slug']	= $slug;
 
@@ -140,7 +159,7 @@
 					//	Define attributes
 					$_attr					= array();
 					$_attr['class']			= 'awesome launch-editor template-' . $template->slug;
-					$_attr['style']			= set_checkbox( 'template', $template->slug, $cmspage->template->slug == $template->slug ) ? 'display:inline-block;' : 'display:none;';
+					$_attr['style']			= $_selected ? 'display:inline-block;' : 'display:none;';
 					$_attr['data-template']	= $template->slug;
 					$_attr['data-area']		= $slug;
 
@@ -333,4 +352,46 @@
 	});
 
 //-->
+</script>
+<script type="text/template" id="template-header">
+	<ul>
+		<li>
+			Currently editing: XXX
+		</li>
+	</ul>
+	<ul class="rhs">
+		<li><a href="#" data-action="apply">Apply Changes</a></li>
+		<li><a href="#" data-action="preview">Preview</a></li>
+		<li><a href="#" data-action="help">Help</a></li>
+		<li><a href="#" data-action="close">Close</a></li>
+	</ul>
+</script>
+<script type="text/template" id="template-widget-search">
+	<input type="search" placeholder="Search widget library" />
+	<a href="#" class="minimiser">
+		<span class="ion-navicon-round"></span>
+	</a>
+</script>
+<script type="text/template" id="template-widget-grouping">
+	<li class="grouping open" data-group="{{group}}">
+		<span class="icon ion-ios7-folder"></span>
+		<span class="label">{{name}}</span>
+		<span class="toggle-open right ion-arrow-down-b"></span>
+		<span class="toggle-closed right ion-arrow-right-b"></span>
+	</li>
+</script>
+<script type="text/template" id="template-widget">
+	<li class="widget {{group}}" data-keywords="{{keywords}}">
+		<span class="icon ion-arrow-move"></span>
+		<span class="label">{{name}}</span>
+	</li>
+</script>
+<script type="text/template" id="template-dropzone-empty">
+	<li class="empty">
+		<div class="valigned">
+			<p class="title">No widgets</p>
+			<p class="label">Drag widgets from the left to start building your page.</p>
+		</div>
+		<div class="valigned-helper"></div>
+	</li>
 </script>

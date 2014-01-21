@@ -269,19 +269,27 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Set method info
-		$this->data['page']->title	= 'Create Page';
-
-		// --------------------------------------------------------------------------
-
 		//	Get data
 		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
 
+		//	Set method info
+		$this->data['page']->title	= 'Create New Page';
+
+		//	Get available templates & widgets
+		$this->data['templates']	= $this->cms_page->get_available_templates();
+		$this->data['widgets']		= $this->cms_page->get_available_widgets();
+
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'admin/cms/pages/create',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		//	Assets
+		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/cms/pages/edit',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 
 
@@ -453,14 +461,10 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->data['templates']	= $this->cms_page->get_available_templates();
 		$this->data['widgets']		= $this->cms_page->get_available_widgets();
 
-		//	Only showing widgets? Create page requests that widgets be hidden
-		$this->data['widgets_only'] = $this->session->flashdata( 'widgets_only' ) || $this->input->get( 'widgets_only' ) ? TRUE : FALSE;
-
 		// --------------------------------------------------------------------------
 
 		//	Assets
 		$this->asset->load( 'mustache.min.js', TRUE );
-		//$this->asset->load( 'nails.admin.cms.pages.editor.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
 
 		// --------------------------------------------------------------------------
