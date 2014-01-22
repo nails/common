@@ -561,9 +561,10 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
+	 * @param string $id_column The name of the id column
 	 * @return	stdClass
 	 **/
-	public function get_by_id( $id )
+	public function get_by_id( $id, $id_column = 'id' )
 	{
 		if ( ! $this->_table ) :
 
@@ -577,7 +578,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . 'id', $id );
+		$this->db->where( $_prefix . $id_column, $id );
 		$_result = $this->get_all();
 
 		// --------------------------------------------------------------------------
@@ -602,9 +603,10 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access public
 	 * @param int $slug The slug of the object to fetch
+	 * @param string $slug_column The name of the slug column
 	 * @return	stdClass
 	 **/
-	public function get_by_slug( $slug, $slug_field = 'slug' )
+	public function get_by_slug( $slug, $slug_column = 'slug' )
 	{
 		if ( ! $this->_table ) :
 
@@ -618,7 +620,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . $slug_field, $slug );
+		$this->db->where( $_prefix . $slug_column, $slug );
 		$_result = $this->get_all();
 
 		// --------------------------------------------------------------------------
@@ -632,6 +634,56 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 
 		return $_result[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetch an object by it's id or slug
+	 *
+	 * Auto-detects whether to use the ID or slug as the selector when fetching
+	 * an object. Note that this method uses is_numeric() to determine whether
+	 * an ID or a slug has been passed, thus numeric slugs (which are against
+	 * Nails style guidelines) will be interpreted incorrectly.
+	 *
+	 * @access public
+	 * @param int $id_slug The ID or slug of the object to fetch
+	 * @param int $id_slug_column The name of the ID or slug column
+	 * @return	stdClass
+	 **/
+	public function get_by_id_or_slug( $id_slug, $id_slug_column = NULL )
+	{
+		if ( is_numeric( $id_slug ) ) :
+
+			if ( $id_slug_column ) :
+
+				//	ID column has been provided, use it
+				return $this->get_by_id( $id_slug, $id_slug_column );
+
+			else :
+
+				//	ID column has not been provided, let the get_by_*() method determine it
+				return $this->get_by_id( $id_slug );
+
+			endif;
+
+		else :
+
+			if ( $id_slug_column ) :
+
+				//	Slug column has been provided, use it
+				return $this->get_by_slug( $id_slug, $id_slug_column );
+
+			else :
+
+				//	Slug column has not been provided, let the get_by_*() method determine it
+				return $this->get_by_slug( $id_slug );
+
+			endif;
+
+		endif;
 	}
 
 
