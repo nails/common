@@ -30,7 +30,7 @@ if ( ! function_exists( 'array_unique_multi' ) )
 
 			endif;
 
-		endif;
+		endforeach;
 
 		unset( $array_hashes );
 		unset( $key );
