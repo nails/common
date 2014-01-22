@@ -407,15 +407,7 @@ class CORE_NAILS_Model extends CI_Model {
 		$this->db->where( $_prefix . 'id', $id );
 		$this->db->update( $_table );
 
-		if ( $this->db->affected_rows() ) :
-
-			return TRUE;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return (bool) $this->db->affected_rows();
 	}
 
 
@@ -442,15 +434,7 @@ class CORE_NAILS_Model extends CI_Model {
 		$this->db->where( 'id', $id );
 		$this->db->delete( $this->_table );
 
-		if ( $this->db->affected_rows() ) :
-
-			return TRUE;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return (bool) $this->db->affected_rows();
 	}
 
 
