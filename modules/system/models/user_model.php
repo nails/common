@@ -306,7 +306,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @author	Pablo
 	 *
 	 **/
-	public function set_login_data( $id )
+	public function set_login_data( $id, $set_session_data = TRUE )
 	{
 		//	Valid user?
 		if ( is_numeric( $id ) ) :
@@ -356,9 +356,13 @@ class NAILS_User_model extends NAILS_Model
 			$this->_is_logged_in = TRUE;
 
 			//	Set session variables
-			$this->session->set_userdata( 'id',			$_user->id );
-			$this->session->set_userdata( 'email',		$_user->email );
-			$this->session->set_userdata( 'group_id',	$_user->group_id );
+			if ( $set_session_data ) :
+
+				$this->session->set_userdata( 'id',			$_user->id );
+				$this->session->set_userdata( 'email',		$_user->email );
+				$this->session->set_userdata( 'group_id',	$_user->group_id );
+
+			endif;
 
 			//	Set the active user
 			$this->set_active_user( $_user );
