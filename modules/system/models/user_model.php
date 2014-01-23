@@ -20,9 +20,10 @@
 class NAILS_User_model extends NAILS_Model
 {
 	protected $_me;
-	protected $active_user;
-	protected $remember_cookie;
-	protected $is_remembered;
+	protected $_active_user;
+	protected $_remember_cookie;
+	protected $_is_remembered;
+	protected $_is_logged_in;
 
 	// --------------------------------------------------------------------------
 
@@ -33,9 +34,14 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->active_user		= new stdClass();
-		$this->remember_cookie	= 'nailsrememberme';
-		$this->is_remembered	= NULL;
+		//	Set defaults
+		$this->_remember_cookie	= 'nailsrememberme';
+		$this->_is_remembered	= NULL;
+
+		// --------------------------------------------------------------------------
+
+		//	Clear the active_user
+		$this->clear_active_user();
 	}
 
 
@@ -88,7 +94,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Look for a cookie
 		$_ci->load->helper( 'cookie' );
-		$_remember_me = get_cookie( $this->remember_cookie );
+		$_remember_me = get_cookie( $this->_remember_cookie );
 
 		// --------------------------------------------------------------------------
 
@@ -132,10 +138,9 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Get the credentials from the constant set earlier
-		$_remember = explode( '|', LOGIN_REMEMBERED_USER );
-
-		$_email	= isset( $_remember[0] ) ? $_remember[0] : NULL;
-		$_code	= isset( $_remember[1] ) ? $_remember[1] : NULL;
+		$_remember	= explode( '|', LOGIN_REMEMBERED_USER );
+		$_email		= isset( $_remember[0] ) ? $_remember[0] : NULL;
+		$_code		= isset( $_remember[1] ) ? $_remember[1] : NULL;
 
 		if ( $_email && $_code ) :
 
@@ -163,7 +168,7 @@ class NAILS_User_model extends NAILS_Model
 	 * that interfacing with active user data is consistent.
 	 *
 	 * @access	public
-	 * @param	string	$keys		The key to look up in userdata
+	 * @param	string	$keys		The key to look up in active_user
 	 * @param	string	$delimiter	If multiple fields are requested they'll be joined by this string
 	 * @return	mixed
 	 * @author	Pablo
@@ -172,21 +177,27 @@ class NAILS_User_model extends NAILS_Model
 	public function active_user( $keys = FALSE, $delimiter = ' '  )
 	{
 		//	Only look for a value if we're logged in
-		if ( ! $this->is_logged_in() )
+		if ( ! $this->is_logged_in() ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	If $keys is FALSE just return the user object in its entirety
-		if ( $keys === FALSE )
-			return $this->active_user;
+		if ( $keys === FALSE ) :
+
+			return $this->_active_user;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Only stitch items together if we have more than one key
 		if ( strpos( $keys, ',' ) === FALSE ) :
 
-			$_val = ( isset( $this->active_user->{$keys} ) ) ? $this->active_user->{$keys} : FALSE;
+			$_val = ( isset( $this->_active_user->{$keys} ) ) ? $this->_active_user->{$keys} : FALSE;
 
 			//	If something is found, then use that
 			if ( $_val !== FALSE ) :
@@ -199,10 +210,10 @@ class NAILS_User_model extends NAILS_Model
 				if ( preg_match( '/^user_meta_(.*)/', $keys ) ) :
 
 					//	Look up the extra table
-					$_val = $this->extra_table_fetch( $keys, NULL, $this->active_user->id );
+					$_val = $this->extra_table_fetch( $keys, NULL, $this->_active_user->id );
 
 					//	Save it to active_user so that we don't do this lookup twice
-					$this->active_user->{$keys} = $_val;
+					$this->_active_user->{$keys} = $_val;
 
 					//	...and return the data to the user.
 					return $_val;
@@ -221,7 +232,7 @@ class NAILS_User_model extends NAILS_Model
 
 		foreach ( $keys AS $key ) :
 
-			$_val = ( isset( $this->active_user->{trim( $key )} ) ) ? $this->active_user->{trim( $key )} : FALSE;
+			$_val = ( isset( $this->_active_user->{trim( $key )} ) ) ? $this->_active_user->{trim( $key )} : FALSE;
 
 			//	If something is found, use that.
 			if ( $_val !== FALSE ) :
@@ -234,10 +245,10 @@ class NAILS_User_model extends NAILS_Model
 				if ( preg_match( '/^user_meta_(.*)/', $key ) ) :
 
 					//	Look up the extra table
-					$_val = $this->extra_table_fetch( $key, NULL, $this->active_user->id );
+					$_val = $this->extra_table_fetch( $key, NULL, $this->_active_user->id );
 
 					//	Save it to active_user so that we don't do this lookup twice
-					$this->active_user->{$key} = $_val;
+					$this->_active_user->{$key} = $_val;
 
 					//	...and return the data to the user.
 					//	(Normally doesn't really make sense as this will just return the word Array because
@@ -268,7 +279,16 @@ class NAILS_User_model extends NAILS_Model
 
 	public function set_active_user( $user )
 	{
-		$this->active_user = $user;
+		$this->_active_user = $user;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function clear_active_user()
+	{
+		$this->_active_user = new stdClass();
 	}
 
 
@@ -332,6 +352,9 @@ class NAILS_User_model extends NAILS_Model
 
 		else :
 
+			//	Set the flag
+			$this->_is_logged_in = TRUE;
+
 			//	Set session variables
 			$this->session->set_userdata( 'id',			$_user->id );
 			$this->session->set_userdata( 'email',		$_user->email );
@@ -359,9 +382,16 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function clear_login_data()
 	{
+		//	Clear the session
 		$this->session->unset_userdata( 'id' );
 		$this->session->unset_userdata( 'email' );
 		$this->session->unset_userdata( 'group_id' );
+
+		//	Set the flag
+		$this->_is_logged_in = FALSE;
+
+		//	Reset the active_user
+		$this->clear_active_user();
 	}
 
 
@@ -378,7 +408,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function is_logged_in()
 	{
-		return (bool) $this->session->userdata( 'email' );
+		return $this->_is_logged_in;
 	}
 
 
@@ -396,9 +426,9 @@ class NAILS_User_model extends NAILS_Model
 	public function is_remembered()
 	{
 		//	Deja vu?
-		if ( NULL !== $this->is_remembered ) :
+		if ( NULL !== $this->_is_remembered ) :
 
-			return $this->is_remembered;
+			return $this->_is_remembered;
 
 		endif;
 
@@ -410,12 +440,12 @@ class NAILS_User_model extends NAILS_Model
 
 		$this->load->helper( 'cookie' );
 
-		$_cookie = get_cookie( $this->remember_cookie );
+		$_cookie = get_cookie( $this->_remember_cookie );
 		$_cookie = explode( '|', $_cookie );
 
-		$this->is_remembered = count( $_cookie ) == 2 ? TRUE : FALSE;
+		$this->_is_remembered = count( $_cookie ) == 2 ? TRUE : FALSE;
 
-		return $this->is_remembered;
+		return $this->_is_remembered;
 	}
 
 
@@ -1476,13 +1506,13 @@ class NAILS_User_model extends NAILS_Model
 		//	If we just updated the active user we should probably update their session info
 		if ( $_uid == active_user( 'id' ) ) :
 
-			$this->active_user->last_update = date( 'Y-m-d H:i:s' );
+			$this->_active_user->last_update = date( 'Y-m-d H:i:s' );
 
 			if ( $data ) :
 
 				foreach( $data AS $key => $val ) :
 
-					$this->active_user->{$key} = $val;
+					$this->_active_user->{$key} = $val;
 
 				endforeach;
 
@@ -1493,7 +1523,7 @@ class NAILS_User_model extends NAILS_Model
 			//	If there's a remember me cookie then update that too, but only if the password
 			//	or email address has changed
 
-			if ( ( isset( $data['email'] ) || isset( $data['password'] ) ) && $this->is_remembered() ) :
+			if ( ( isset( $data['email'] ) || isset( $data['password'] ) ) && $this->_is_remembered() ) :
 
 				$this->set_remember_cookie();
 
@@ -1858,7 +1888,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Set the cookie
 		$_data				= array();
-		$_data['name']		= $this->remember_cookie;
+		$_data['name']		= $this->_remember_cookie;
 		$_data['value']		= $email . '|' . $_salt;
 		$_data['expire']	= 1209600; //	2 weeks
 
@@ -1867,7 +1897,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Update the flag
-		$this->is_remembered = TRUE;
+		$this->_is_remembered = TRUE;
 	}
 
 
@@ -1887,12 +1917,12 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		delete_cookie( $this->remember_cookie );
+		delete_cookie( $this->_remember_cookie );
 
 		// --------------------------------------------------------------------------
 
 		//	Update the flag
-		$this->is_remembered = FALSE;
+		$this->_is_remembered = FALSE;
 	}
 
 
@@ -1999,7 +2029,6 @@ class NAILS_User_model extends NAILS_Model
 		//	No-one's home...
 		if ( ! $_me ) :
 
-
 			$_me = $this->_me;
 
 			if ( ! $_me ) :
@@ -2013,7 +2042,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Store this entire user in memory
-		$this->active_user = $this->get_by_id( $_me );
+		$this->set_active_user( $this->get_by_id( $_me ) );
 
 		// --------------------------------------------------------------------------
 
