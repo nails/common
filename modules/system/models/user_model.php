@@ -87,8 +87,11 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	User is already logged in, nothing to do.
-		if ( (bool) $this->is_logged_in() )
+		if ( (bool) $this->is_logged_in() ) :
+
 			return;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -99,8 +102,11 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If we're missing anything then there's nothing to do
-		if ( ! $_remember_me )
+		if ( ! $_remember_me ) :
+
 			return;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -264,13 +270,16 @@ class NAILS_User_model extends NAILS_Model
 		endforeach;
 
 		//	If nothing was found, just return FALSE
-		if ( empty( $_out ) )
+		if ( empty( $_out ) ) :
+
 			return FALSE;
+
+		endif;
 
 		//	If we have more than 1 element then stitch them together,
 		//	if not just return the single element
 
-		return ( count( $_out > 1 ) ) ? implode( $delimiter, $_out ) : $_out[0];
+		return count( $_out > 1 ) ? implode( $delimiter, $_out ) : $_out[0];
 	}
 
 
@@ -466,8 +475,11 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function is_admin( $user = NULL )
 	{
-		if ( $this->is_superuser( $user ) )
+		if ( $this->is_superuser( $user ) ) :
+
 			return TRUE;
+
+		endif;
 
 		return $this->has_permission( 'admin', $user );
 	}
@@ -506,7 +518,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function was_admin()
 	{
-		return ( $this->session->userdata( 'admin_recovery' ) ) ? TRUE : FALSE;
+		return (bool) $this->session->userdata( 'admin_recovery' );
 	}
 
 
@@ -514,7 +526,7 @@ class NAILS_User_model extends NAILS_Model
 
 
 	/**
-	 * Determines whether the aspecified user has a certain acl permission
+	 * Determines whether the specified user has a certain ACL permission
 	 *
 	 * @access	public
 	 * @param	string	$permission	The permission to check for, in the format admin.account.view
@@ -608,14 +620,20 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set Order
-		if ( is_array( $order ) )
+		if ( is_array( $order ) ) :
+
 			$this->db->order_by( $order[0], $order[1] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Set Limit
-		if ( is_array( $limit ) )
+		if ( is_array( $limit ) ) :
+
 			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -633,7 +651,7 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$_user	= $q->result();
+		$_user = $q->result();
 
 		// --------------------------------------------------------------------------
 
@@ -701,8 +719,8 @@ class NAILS_User_model extends NAILS_Model
 			//	If the user has an ACL set then we'll need to extract and merge that
 			if ( $user->user_acl ) :
 
-				$user->user_acl = unserialize( $user->user_acl );
-				$user->acl = array();
+				$user->user_acl	= unserialize( $user->user_acl );
+				$user->acl		= array();
 
 				foreach( $user->group_acl AS $key => $value ) :
 
@@ -733,7 +751,6 @@ class NAILS_User_model extends NAILS_Model
 
 				endforeach;
 
-
 			else :
 
 				$user->acl = $user->group_acl;
@@ -741,7 +758,6 @@ class NAILS_User_model extends NAILS_Model
 			endif;
 
 			// --------------------------------------------------------------------------
-
 
 			//	Format the user object
 			$this->_format_user_object( $user );
@@ -778,14 +794,20 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set Order
-		if ( is_array( $order ) )
+		if ( is_array( $order ) ) :
+
 			$this->db->order_by( $order[0], $order[1] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Set Limit
-		if ( is_array( $limit ) )
+		if ( is_array( $limit ) ) :
+
 			$this->db->limit( $limit[0], $limit[1] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -908,6 +930,7 @@ class NAILS_User_model extends NAILS_Model
 			if ( $_specifics ) :
 
 				$_temp = array();
+
 				foreach ( $_specifics AS $col => $value ) :
 
 					if ( isset( $search['columns'][ strtolower( $col )] ) ) :
@@ -920,6 +943,7 @@ class NAILS_User_model extends NAILS_Model
 					endif;
 
 				endforeach;
+
 				$_specifics = $_temp;
 				unset( $_temp );
 
@@ -949,7 +973,6 @@ class NAILS_User_model extends NAILS_Model
 				endforeach;
 
 			endif;
-
 
 			// --------------------------------------------------------------------------
 
@@ -1023,13 +1046,16 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_by_id( $user_id, $extended = FALSE )
 	{
-		if ( ! is_numeric( $user_id ) )
+		if ( ! is_numeric( $user_id ) ) :
+
 			return FALSE;
+
+		endif;
 
 		$this->db->where( 'u.id', $user_id );
 		$user = $this->get_all( $extended );
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1093,7 +1119,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'u.fb_id', $fbid );
 		$user = $this->get_all( $extended );
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1115,7 +1141,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'u.tw_id', $twid );
 		$user = $this->get_all( $extended );
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1137,7 +1163,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'u.li_id', $linkedinid );
 		$user = $this->get_all( $extended );
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1158,8 +1184,11 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function get_by_hashes( $_hash_id, $_hash_pw, $extended = FALSE )
 	{
-		if ( empty( $_hash_id ) || empty( $_hash_pw ) )
+		if ( empty( $_hash_id ) || empty( $_hash_pw ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -1197,7 +1226,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'u.referral', $referral_code );
 		$user = $this->get_all( $extended );
 
-		return ( empty( $user ) ) ? FALSE : $user[0];
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1570,7 +1599,7 @@ class NAILS_User_model extends NAILS_Model
 			if ( $_test->user_id == $_u->id ) :
 
 				//	In use, but belongs to the same user - return the code
-				//	(immitates behaviour of newly added email)
+				//	(imitates behavior of newly added email)
 
 				if ( $is_primary ) :
 
@@ -1868,6 +1897,7 @@ class NAILS_User_model extends NAILS_Model
 			if ( ! active_user( 'id' ) ||  ! active_user( 'password' ) || ! active_user( 'email' ) ) :
 
 				return FALSE;
+
 			else :
 
 				$id			= active_user( 'id' );
@@ -1909,7 +1939,7 @@ class NAILS_User_model extends NAILS_Model
 
 
 	/**
-	 * Clear's the user's remember me cookie
+	 * Clears the user's remember me cookie
 	 *
 	 * @access	public
 	 * @return	void
@@ -1961,13 +1991,19 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function hash_password( $password, $salt = FALSE )
 	{
-		if ( empty( $password ) )
+		if ( empty( $password ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $salt )
-			$salt  = $this->salt();
+		if ( ! $salt ) :
+
+			$salt = $this->salt();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -1989,8 +2025,11 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function hash_password_db( $email, $password )
 	{
-		if ( empty( $email ) || empty( $password ) )
+		if ( empty( $email ) || empty( $password ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2002,8 +2041,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( $_q->num_rows() !== 1 )
+		if ( $_q->num_rows() !== 1 ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2050,6 +2092,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Set the user's logged in flag
+		$this->_is_logged_in = TRUE;
+
+		// --------------------------------------------------------------------------
+
 		//	Update user's 'last_seen' flag
 		$this->db->set( 'last_seen', 'NOW()', FALSE );
 		$this->db->where( 'id', $_me );
@@ -2072,18 +2119,21 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function extra_table_insert( $table, $data, $user_id = FALSE )
 	{
-		$_uid = ( ! $user_id ) ? (int) active_user( 'id' ) : $user_id ;
+		$_uid = ! $user_id ? (int) active_user( 'id' ) : $user_id ;
 
 		// --------------------------------------------------------------------------
 
 		//	Unable to determine user ID
-		if ( ! $_uid )
+		if ( ! $_uid ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		$data = (object) $data;
-		$data->user_id = $_uid;
+		$data			= (object) $data;
+		$data->user_id	= $_uid;
 
 		// --------------------------------------------------------------------------
 
@@ -2110,13 +2160,16 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function extra_table_fetch( $table, $id = NULL, $user_id = NULL )
 	{
-		$_uid = ( ! $user_id ) ? (int) active_user( 'id' ) : $user_id ;
+		$_uid = ! $user_id ? (int) active_user( 'id' ) : $user_id ;
 
 		// --------------------------------------------------------------------------
 
 		//	Unable to determine user ID
-		if ( ! $_uid )
+		if ( ! $_uid ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2124,15 +2177,18 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Add restriction of nessecary
-		if ( $id )
+		//	Add restriction if necessary
+		if ( $id ) :
+
 			$this->db->where( 'id', $id );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		$_row = $this->db->get( $table );
 
-		return ( $id ) ? $_row->row() : $_row->result();
+		return $id ? $_row->row() : $_row->result();
 	}
 
 
@@ -2151,13 +2207,16 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function extra_table_update( $table, $data, $user_id = FALSE )
 	{
-		$_uid = ( ! $user_id ) ? (int) active_user( 'id' ) : $user_id ;
+		$_uid = ! $user_id ? (int) active_user( 'id' ) : $user_id ;
 
 		// --------------------------------------------------------------------------
 
 		//	Unable to determine user ID
-		if ( ! $_uid )
+		if ( ! $_uid ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2165,8 +2224,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( ! isset( $data->id ) || empty( $data->id ) )
+		if ( ! isset( $data->id ) || empty( $data->id ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2195,18 +2257,24 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function extra_table_delete( $table, $id, $user_id = FALSE )
 	{
-		$_uid = ( ! $user_id ) ? (int) active_user( 'id' ) : $user_id ;
+		$_uid = ! $user_id ? (int) active_user( 'id' ) : $user_id ;
 
 		// --------------------------------------------------------------------------
 
 		//	Unable to determine user ID
-		if ( ! $_uid )
+		if ( ! $_uid ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( ! isset( $id ) || empty( $id ) )
+		if ( ! isset( $id ) || empty( $id ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2216,7 +2284,7 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		return $this->db->affected_rows() ? TRUE : FALSE ;
+		return (bool) $this->db->affected_rows();
 	}
 
 
@@ -2654,8 +2722,11 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function set_password_token( $email )
 	{
-		if ( empty( $email ) )
+		if ( empty( $email ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2710,8 +2781,11 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function validate_password_token( $code )
 	{
-		if ( empty( $code ) )
+		if ( empty( $code ) ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2720,8 +2794,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( $_q->num_rows() != 1 )
+		if ( $_q->num_rows() != 1 ) :
+
 			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -2850,10 +2927,11 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Loop through results and unserialise the acl
+		//	Loop through results and unserialise the ACL
 		foreach( $_groups AS $group ) :
 
 			$_out[$group->id] = $group->display_name;
+			//	TODO: unserialize the ACL (check it's not being unserialized twice elsewhere)
 
 		endforeach;
 
@@ -2886,7 +2964,6 @@ class NAILS_User_model extends NAILS_Model
 			$this->db->where( 'name', $group_id );
 
 		endif;
-
 
 		$_group = $this->get_groups();
 
@@ -2986,7 +3063,7 @@ class NAILS_User_model extends NAILS_Model
 
 			// --------------------------------------------------------------------------
 
-			//	Tidy up langauge field
+			//	Tidy up language field
 			$user->language_setting			= new stdClass();
 			$user->language_setting->id		= (int) $user->language_id;
 			$user->language_setting->name	= $user->language_name;
