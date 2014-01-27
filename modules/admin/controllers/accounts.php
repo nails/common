@@ -494,7 +494,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Define user table rules
-			$this->form_validation->set_rules( 'email',					lang( 'form_label_email' ),								'xss_clean|required|valid_email|unique_if_diff[' . NAILS_DB_PREFIX . 'user_email.email.' . $_post['email_orig'] . ']' );
 			$this->form_validation->set_rules( 'username',				lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[' . NAILS_DB_PREFIX . 'user.username.' . $_post['username_orig'] . ']' );
 			$this->form_validation->set_rules( 'first_name',			lang( 'form_label_first_name' ),						'xss_clean|required' );
 			$this->form_validation->set_rules( 'last_name',				lang( 'form_label_last_name' ),							'xss_clean|required' );
@@ -599,7 +598,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					$_data['temp_pw']				= string_to_boolean( $_post['temp_pw'] );
 					$_data['first_name']			= $_post['first_name'];
 					$_data['last_name']				= $_post['last_name'];
-					$_data['email']					= $_post['email'];
 					$_data['username']				= $_post['username'];
 					$_data['gender']				= $_post['gender'];
 					$_data['timezone']				= $_post['timezone'];
@@ -643,7 +641,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					//	Update account
 					if ( $this->user->update( $_post['id'], $_data ) ) :
 
-						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ), $_post['email'] ) );
+						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) ) );
 
 						// --------------------------------------------------------------------------
 

@@ -74,7 +74,7 @@
 	$lang['accounts_edit_error_noteditable']	= '<strong>Sorry,</strong> you do not have permission to perform manipulations on that user.';
 
 
-	$lang['accounts_edit_ok']					= '<strong>Success!</strong> Updated user %s (%s)';
+	$lang['accounts_edit_ok']					= '<strong>Success!</strong> Updated user %s';
 	$lang['accounts_edit_fail']					= '<strong>Sorry,</strong> failed to update user: %s';
 	$lang['accounts_edit_editing_self_m']		= '<strong>Hey there handsome!</strong> You are currently editing your own account.';
 	$lang['accounts_edit_editing_self_f']		= '<strong>Hey there beautiful!</strong> You are currently editing your own account.';
