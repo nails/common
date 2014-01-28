@@ -669,5 +669,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SETTINGS' ) ) :
 endif;
 
 
-/* End of file faq.php */
-/* Location: ./application/modules/admin/controllers/faq.php */
+/* End of file settings.php */
+/* Location: ./modules/admin/controllers/settings.php */

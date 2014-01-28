@@ -128,9 +128,9 @@ if ( ! function_exists( 'here' ) )
  */
 if ( ! function_exists( 'lastquery' ) )
 {
-	function lastquery( $return = FALSE )
+	function lastquery( $die = TRUE )
 	{
-		if ( defined( NAILS_DB_ENABLED ) && NAILS_DB_ENABLED ) :
+		if ( defined( 'NAILS_DB_ENABLED' ) && NAILS_DB_ENABLED ) :
 
 			$_last_query = get_instance()->db->last_query();
 
@@ -140,9 +140,11 @@ if ( ! function_exists( 'lastquery' ) )
 
 		endif;
 
-		if ( $return ) :
+		// --------------------------------------------------------------------------
 
-			return $_last_query;
+		if ( $die ) :
+
+			dumpanddie( $_last_query );
 
 		else :
 
@@ -165,9 +167,9 @@ if ( ! function_exists( 'lastquery' ) )
  */
 if ( ! function_exists( 'last_query' ) )
 {
-	function last_query( $return = FALSE )
+	function last_query( $die = TRUE )
 	{
-		return last_query();
+		return lastquery( $die );
 	}
 }
 
