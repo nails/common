@@ -60,6 +60,23 @@ class NAILS_Cms_menu_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function get_by_id( $include_menu_items = FALSE )
+	{
+		$_menu = $this->get_all( $include_menu_items );
+
+		if ( ! $_menu ) :
+
+			return FALSE;
+
+		endif;
+
+		return $_menu[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_menu_items( $menu_id )
 	{
 		$this->db->where( 'menu_id', $menu_id );

@@ -1020,9 +1020,73 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Assets
+		$this->asset->load( 'nails.admin.cms.menus.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/cms/menus/index',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _menus_create()
+	{
+		$this->data['page']->title = 'Create Menu';
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'nails.admin.cms.create_edit.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/cms/menus/edit',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _menus_edit()
+	{
+		$this->data['menu'] = $this->cms_menu->get_by_id( $this->uri->segment( 5 ), TRUE );
+
+		if ( ! $this->data['menu'] ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid menu ID.' );
+			redirect( 'admin/cms/menus' );
+
+		endif;
+
+		$this->data['page']->title = 'Edit Menu "' . $this->data['menu']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'nails.admin.cms.create_edit.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/cms/menus/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _menus_delete()
+	{
+		$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> menu deletion is a TODO just now.' );
+		redirect( 'admin/cms/menus' );
 	}
 }
 

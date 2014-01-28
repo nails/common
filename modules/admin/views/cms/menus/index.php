@@ -6,7 +6,7 @@
 
 			if ( user_has_permission( 'admin.cms.can_create_menu' ) ) :
 
-				echo anchor( 'admin/cms/menu/create', 'Add New Menu', 'class="awesome small green right"' );
+				echo anchor( 'admin/cms/menus/create', 'Add New Menu', 'class="awesome small green right"' );
 
 			endif;
 
@@ -39,7 +39,7 @@
 
 				foreach ( $menus AS $menu ) :
 
-					echo '<tr class="page" data-label="' . $menu->label . '">';
+					echo '<tr class="menu" data-label="' . $menu->label . '">';
 						echo '<td class="label">';
 							echo $menu->label;
 							echo $menu->description ? '<small>' . $menu->description . '</small>' : '';
