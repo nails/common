@@ -477,9 +477,42 @@ class CORE_NAILS_Model extends CI_Model {
 	// --------------------------------------------------------------------------
 
 
-	protected function _format_object( &$object )
+	protected function _format_object( &$obj )
 	{
 		//	Extend this method to format the returned objects
+
+		// --------------------------------------------------------------------------
+
+		//	Some common items
+		if ( ! empty( $obj->id ) ) :
+
+			$obj->id = (int) $obj->id;
+
+		endif;
+
+		if ( ! empty( $obj->parent_id ) ) :
+
+			$obj->parent_id = (int) $obj->parent_id;
+
+		endif;
+
+		if ( ! empty( $obj->user_id ) ) :
+
+			$obj->user_id = (int) $obj->user_id;
+
+		endif;
+
+		if ( ! empty( $obj->created_by ) ) :
+
+			$obj->created_by = (int) $obj->created_by;
+
+		endif;
+
+		if ( ! empty( $obj->modified_by ) ) :
+
+			$obj->modified_by = (int) $obj->modified_by;
+
+		endif;
 	}
 
 
