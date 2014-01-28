@@ -988,9 +988,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function menus()
 	{
 		//	Load common menu items
-		//$this->load->model( 'cms/cms_block_model', 'cms_block' );
-		//$this->asset->load( 'mustache.min.js', TRUE );
-		//$this->asset->load( 'nails.admin.cms.blocks.min.js', TRUE );
+		$this->load->model( 'cms/cms_menu_model', 'cms_menu' );
 
 		// --------------------------------------------------------------------------
 
@@ -998,7 +996,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		if ( method_exists( $this, '_menus_' . $_method ) ) :
 
-			$this->{'_sliders_' . $_method}();
+			$this->{'_menus_' . $_method}();
 
 		else :
 
@@ -1018,13 +1016,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch all the menus in the DB
-		//$this->data['menus'] = $this->cms_page->get_all();
-
-		// --------------------------------------------------------------------------
-
-		//	Assets
-		//$this->asset->load( 'mustache.min.js', TRUE );
-		//$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
+		$this->data['menus'] = $this->cms_menu->get_all();
 
 		// --------------------------------------------------------------------------
 
