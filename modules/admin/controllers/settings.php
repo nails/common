@@ -99,7 +99,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load models
-		$this->load->model( 'system/system_model', 'blog' );
+		$this->load->model( 'system/site_model', 'site' );
 
 		// --------------------------------------------------------------------------
 

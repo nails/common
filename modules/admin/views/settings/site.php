@@ -1,6 +1,6 @@
 <div class="group-shop settings">
 	<p>
-		Configure various aspects of the shop.
+		Configure various aspects of the site.
 	</p>
 
 	<hr />
