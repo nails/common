@@ -113,15 +113,35 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		$_stats = stat( $this->_cachedir . $file );
 
-		header( 'content-type: image/png' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $_stats[9] ) . 'GMT' );
-		header( 'ETag: "' . md5( $file ) . '"' );
-		header( 'X-CDN-CACHE: HIT' );
+		//	Set cache headers
+		$this->_set_cache_headers( $_stats[9], $file, TRUE );
+
+		//	Work out content type
+		$_mime = $this->cdn->get_mime_type_from_file( $this->_cachedir . $file );
+
+		header( 'content-Type: ' . $_mime );
 
 		// --------------------------------------------------------------------------
 
 		//	Send the contents of the file to the browser
 		echo file_get_contents( $this->_cachedir . $file );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _set_cache_headers( $last_modified, $file, $hit )
+	{
+		$_hit = $hit ? 'HIT' : 'MISS';
+
+		// --------------------------------------------------------------------------
+
+		header( 'Cache-Control: max-age=' . APP_CDN_CACHE_MAX_AGE . ', must-revalidate', TRUE );
+		header( 'Last-Modified: ' . date( 'r', $last_modified ), TRUE );
+		header( 'Expires: ' . date( 'r', time() + APP_CDN_CACHE_MAX_AGE ), TRUE );
+		header( 'ETag: "' . md5( $file ) . '"', TRUE );
+		header( 'X-CDN-CACHE: ' . $_hit, TRUE );
 	}
 
 
@@ -184,7 +204,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		if ( isset( $_headers['If-None-Match'] ) && ( $_headers['If-None-Match'] == '"' . md5( $file ) . '"' ) ) :
 
-			header( 'Not Modified', TRUE, 304 );
+			header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified', TRUE, 304 );
 			return TRUE;
 
 		endif;
@@ -270,10 +290,10 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	{
 		if ( $this->_driver == 'local' && ! defined( 'DEPLOY_CDN_PATH' ) ) :
 
-			$this->output->set_header( 'Cache-Control: no-cache, must-revalidate' );
-			$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-			$this->output->set_header( 'Content-type: application/json' );
-			$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
+			header( 'Cache-Control: no-cache, must-revalidate', TRUE );
+			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
+			header( 'Content-type: application/json', TRUE );
+			header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
 
 			// --------------------------------------------------------------------------
 
@@ -310,8 +330,8 @@ class NAILS_CDN_Controller extends NAILS_Controller
 			// --------------------------------------------------------------------------
 
 			//	Output to browser
-			header( 'Content-type: image/png' );
-			header( 'HTTP/1.0 400 Bad Request' );
+			header( 'Content-type: image/png', TRUE );
+			header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
 			imagepng( $_bg );
 
 			// --------------------------------------------------------------------------

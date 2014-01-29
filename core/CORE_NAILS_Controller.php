@@ -185,7 +185,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
 		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
 		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
-		if ( ! defined( 'APP_CDN_DRIVER' ) )				define( 'APP_CDN_DRIVER',				'local' );
 		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
 		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 
@@ -195,8 +194,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	These should be specified in settings/deploy.php
 
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
-		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'' );
-		if ( ! defined( 'DEPLOY_CDN_PATH') )				define( 'DEPLOY_CDN_PATH',				FCPATH . 'assets/uploads/' );
 
 		// --------------------------------------------------------------------------
 
@@ -206,6 +203,20 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
 		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
 		if ( ! defined( 'EMAIL_DEBUG' ) )					define( 'EMAIL_DEBUG',					FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	CDN
+		if ( ! defined( 'APP_CDN_DRIVER' ) )				define( 'APP_CDN_DRIVER',				'local' );
+		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'' );
+		if ( ! defined( 'DEPLOY_CDN_PATH') )				define( 'DEPLOY_CDN_PATH',				FCPATH . 'assets/uploads/' );
+
+		//	Define how long CDN items should be cached for, this is a maximum age in seconds
+		//	According to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html this shouldn't be
+		//	more than 1 year.
+
+		if ( ! defined( 'APP_CDN_CACHE_MAX_AGE' ) )			define( 'APP_CDN_CACHE_MAX_AGE',		'31536000' ); // 1 year
+
 
 		// --------------------------------------------------------------------------
 
@@ -241,7 +252,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Caching
-		if ( ! defined( 'DEPLOY_CACHE_DIR') )				define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
+		if ( ! defined( 'DEPLOY_CACHE_DIR') ) define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
 
 		//	Update the system configs to use this cache dir
 		$this->config->set_item( 'cache_path', DEPLOY_CACHE_DIR );

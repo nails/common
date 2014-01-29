@@ -148,9 +148,7 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				// --------------------------------------------------------------------------
 
 				//	Set the appropriate cache headers
-				header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
-				header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
-				header( 'X-CDN-CACHE: MISS' );
+				$this->_set_cache_headers( time(), $this->_cache_file, FALSE );
 
 				// --------------------------------------------------------------------------
 
@@ -167,7 +165,7 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 				elseif( defined( 'DEPLOY_CACHE_DIR' ) ) :
 
 					//	Inform developers
-					$_subject	= 'Cache (scale) dir not writeable';
+					$_subject	= 'Cache (blank_avatar) dir not writeable';
 					$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
 					$_message	.= 'Dir: ' . DEPLOY_CACHE_DIR . $this->_cache_file . "\n\n";
 					$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];

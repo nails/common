@@ -149,9 +149,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 
 			//	Set the appropriate cache headers
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', time() ) . 'GMT' );
-			header( 'ETag: "' . md5( $this->_cache_file ) . '"' );
-			header( 'X-CDN-CACHE: MISS' );
+			$this->_set_cache_headers( time(), $this->_cache_file, FALSE );
 
 			// --------------------------------------------------------------------------
 
@@ -265,7 +263,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 
 		//	Output to browser
-		header('Content-type: image/gif');
+		header( 'Content-Type: image/gif', TRUE );
 		echo $_data;
 
 		// --------------------------------------------------------------------------

@@ -170,22 +170,22 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		//	Determine headers to send. Are we forcing the download?
 		if ( $this->input->get( 'dl' ) ) :
 
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
+			header( 'Content-Description: File Transfer', TRUE );
+			header( 'Content-Type: application/octet-stream', TRUE );
+			header( 'Content-Transfer-Encoding: binary', TRUE );
+			header( 'Expires: 0', TRUE );
+			header( 'Cache-Control: must-revalidate', TRUE );
+			header( 'Pragma: public', TRUE );
 
 			//	If the object is known about, add some extra headers
 			if ( $_object ) :
 
-				header('Content-Disposition: attachment; filename="' . $_object->filename_display . '"');
-				header( 'Content-Length: ' . $_object->filesize );
+				header( 'Content-Disposition: attachment; filename="' . $_object->filename_display . '"', TRUE );
+				header( 'Content-Length: ' . $_object->filesize, TRUE );
 
 			else :
 
-				header('Content-Disposition: attachment; filename="' . $this->_object . '"');
+				header( 'Content-Disposition: attachment; filename="' . $this->_object . '"', TRUE );
 
 			endif;
 
@@ -196,16 +196,14 @@ class NAILS_Serve extends NAILS_CDN_Controller
 			//	Determine headers to send
 			$_finfo = new finfo( FILEINFO_MIME_TYPE ); // return mime type ala mimetype extension
 
-			header( 'Content-type: ' . $_finfo->file( $_usefile ) );
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $_stats[9] ) . 'GMT' );
-			header( 'ETag: "' . md5( $this->_bucket . $this->_object ) . '"' );
+			$this->_set_cache_headers( $_stats[9], $this->_bucket . $this->_object, FALSE );
 
 			// --------------------------------------------------------------------------
 
 			//	If the object is known about, add some extra headers
 			if ( $_object ) :
 
-				header( 'Content-Length: ' . $_object->filesize );
+				header( 'Content-Length: ' . $_object->filesize, TRUE );
 
 			endif;
 
@@ -240,10 +238,10 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 	protected function _bad_src( $error = NULL )
 	{
-		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Content-type: application/json' );
-		header( 'HTTP/1.0 400 Bad Request' );
+		header( 'Cache-Control: no-cache, must-revalidate', TRUE );
+		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
+		header( 'Content-type: application/json', TRUE );
+		header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
 
 		// --------------------------------------------------------------------------
 
