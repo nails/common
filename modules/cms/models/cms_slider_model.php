@@ -24,9 +24,9 @@ class NAILS_Cms_slider_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_table				= NAILS_DB_PREFIX . 'cms_slider';
-		$this->_table_prefix		= 'm';
+		$this->_table_prefix		= 's';
 		$this->_table_item			= NAILS_DB_PREFIX . 'cms_slider_item';
-		$this->_table_item_prefix	= 'mi';
+		$this->_table_item_prefix	= 'si';
 	}
 
 
@@ -35,9 +35,9 @@ class NAILS_Cms_slider_model extends NAILS_Model
 
 	public function get_all( $include_slider_items = FALSE )
 	{
-		$this->db->select( 'm.*,u.first_name,u.last_name,u.profile_img,u.gender,ue.email' );
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'm.modified_by = u.id' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'm.modified_by = ue.user_id AND ue.is_primary = 1' );
+		$this->db->select( $this->_table_prefix . '.*,u.first_name,u.last_name,u.profile_img,u.gender,ue.email' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', $this->_table_prefix . '.modified_by = u.id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', $this->_table_prefix . '.modified_by = ue.user_id AND ue.is_primary = 1' );
 		$_sliders = parent::get_all();
 
 		foreach ( $_sliders AS $m ) :
@@ -45,7 +45,7 @@ class NAILS_Cms_slider_model extends NAILS_Model
 			if ( $include_slider_items ) :
 
 				//	Fetch the nested slider items
-				$m->items = $this->_nest_items( $this->get_slider_items( $m->id ) );
+				$m->items = $this->get_slider_items( $m->id );
 
 			endif;
 
@@ -96,31 +96,6 @@ class NAILS_Cms_slider_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 *	Hat tip to Timur; http://stackoverflow.com/a/9224696/789224
-	 **/
-	protected function _nest_items( &$list, $parent = NULL )
-	{
-		$result = array();
-
-		for ( $i = 0, $c = count( $list ); $i < $c; $i++ ) :
-
-			if ( $list[$i]->parent_id == $parent ) :
-
-				$list[$i]->children	= $this->_nest_items( $list, $list[$i]->id );
-				$result[]			= $list[$i];
-
-			endif;
-
-		endfor;
-
-		return $result;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	protected function _format_object( &$obj )
 	{
 		$_temp				= new stdClass();
@@ -151,8 +126,10 @@ class NAILS_Cms_slider_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$obj->slider_id	= (int) $obj->slider_id;
-		$obj->parent_id	= $obj->parent_id ? (int) $obj->parent_id : NULL;
+		$obj->object_id	= $obj->object_id ? (int) $obj->object_id : NULL;
 		$obj->page_id	= $obj->page_id ? (int) $obj->page_id : NULL;
+
+		unset( $obj->slider_id );
 	}
 }
 

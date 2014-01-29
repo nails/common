@@ -994,7 +994,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'admin/cms/sldiers/edit',	$this->data );
+		$this->load->view( 'admin/cms/sliders/edit',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
 	}
 

@@ -35,9 +35,9 @@ class NAILS_Cms_menu_model extends NAILS_Model
 
 	public function get_all( $include_menu_items = FALSE )
 	{
-		$this->db->select( 'm.*,u.first_name,u.last_name,u.profile_img,u.gender,ue.email' );
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'm.modified_by = u.id' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'm.modified_by = ue.user_id AND ue.is_primary = 1' );
+		$this->db->select( $this->_table_prefix . '.*,u.first_name,u.last_name,u.profile_img,u.gender,ue.email' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', $this->_table_prefix . '.modified_by = u.id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', $this->_table_prefix . '.modified_by = ue.user_id AND ue.is_primary = 1' );
 		$_menus = parent::get_all();
 
 		foreach ( $_menus AS $m ) :
