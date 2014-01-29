@@ -936,9 +936,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function sliders()
 	{
 		//	Load common slider items
-		//$this->load->model( 'cms/cms_block_model', 'cms_block' );
-		//$this->asset->load( 'mustache.min.js', TRUE );
-		//$this->asset->load( 'nails.admin.cms.blocks.min.js', TRUE );
+		$this->load->model( 'cms/cms_slider_model', 'cms_slider' );
 
 		// --------------------------------------------------------------------------
 
@@ -965,20 +963,78 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch all the sliders in the DB
-		//$this->data['sliders'] = $this->cms_page->get_all();
+		//	Fetch all the menus in the DB
+		$this->data['sliders'] = $this->cms_slider->get_all();
 
 		// --------------------------------------------------------------------------
 
 		//	Assets
-		//$this->asset->load( 'mustache.min.js', TRUE );
-		//$this->asset->load( 'nails.admin.cms.pages.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.sliders.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/cms/sliders/index',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sliders_create()
+	{
+		$this->data['page']->title = 'Create Slider';
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'nails.admin.cms.sliders.create_edit.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/cms/sldiers/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sliders_edit()
+	{
+		$this->data['slider'] = $this->cms_slider->get_by_id( $this->uri->segment( 5 ), TRUE );
+
+		if ( ! $this->data['slider'] ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid slider ID.' );
+			redirect( 'admin/cms/menus' );
+
+		endif;
+
+		$this->data['page']->title = 'Edit Slider "' . $this->data['slider']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->load( 'nails.admin.cms.sliders.create_edit.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/cms/sliders/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _sliders_delete()
+	{
+		$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> slider deletion is a TODO just now.' );
+		redirect( 'admin/cms/sliders' );
 	}
 
 
@@ -1041,7 +1097,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Assets
-		$this->asset->load( 'nails.admin.cms.create_edit.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.menus.create_edit.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -1070,7 +1126,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Assets
-		$this->asset->load( 'nails.admin.cms.create_edit.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.menus.create_edit.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 

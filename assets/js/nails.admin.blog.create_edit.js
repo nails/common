@@ -10,10 +10,6 @@ NAILS_Admin_Blog_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Init everything!
-		// this._init_info();
-		// this._init_variations();
-		// this._init_gallery();
-		// this._init_attributes();
 		this._init_chosens();
 		this._init_submit();
 	};
