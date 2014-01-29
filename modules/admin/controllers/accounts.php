@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Accounts
+ * Name:		Admin: Accounts
  * Description:	Browse and edit user accounts
  *
  **/
@@ -1017,4 +1017,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_ACCOUNTS' ) ) :
 endif;
 
 /* End of file accounts.php */
-/* Location: ./application/modules/admin/controllers/accounts.php */
+/* Location: ./modules/admin/controllers/accounts.php */

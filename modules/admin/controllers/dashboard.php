@@ -1,8 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin
- *
+ * Name:		Admin: Dashboard
  * Description:	Admin dashboard
  *
  **/
@@ -178,5 +177,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_DASHBOARD' ) ) :
 endif;
 
 
-/* End of file admin.php */
-/* Location: ./application/modules/admin/controllers/admin.php */
+/* End of file dashboard.php */
+/* Location: ./modules/admin/controllers/dashboard.php */

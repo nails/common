@@ -249,6 +249,7 @@ class CORE_NAILS_Loader extends MX_Loader {
 		}
 
 		// We'll test for both lowercase and capitalized versions of the file name
+
 		foreach (array(ucfirst($class), strtolower($class)) as $class)
 		{
 			$subclass	= APPPATH.'libraries/'.$subdir.config_item('subclass_prefix').$class.'.php';

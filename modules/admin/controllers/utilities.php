@@ -1,12 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin - Utilities
- *
- * Description:	-
+ * Name:		Admin: Utilities
+ * Description:	Various admin utilities
  *
  **/
-
 
 //	Include Admin_Controller; executes common admin functionality.
 require_once '_admin.php';
@@ -932,5 +930,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_UTILITIES' ) ) :
 endif;
 
 
-/* End of file faq.php */
-/* Location: ./application/modules/admin/controllers/faq.php */
+/* End of file utilities.php */
+/* Location: ./modules/admin/controllers/utilities.php */

@@ -184,6 +184,13 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$_js .= '});';
 
 		$this->asset->inline( '<script>' . $_js . '</script>' );
+
+		// --------------------------------------------------------------------------
+
+		//	Initialise the admin change log model
+		$this->load->model( 'admin_changelog_model' );
+
+		$this->admin_changelog_model->get_all_flat( 'title' );
 	}
 
 

@@ -532,6 +532,34 @@ class CORE_NAILS_Model extends CI_Model {
 		$_items	= $this->get_all();
 		$_out	= array();
 
+		//	Nothing returned? Skip the rest of this method, it's pointless.
+		if ( ! $_items ) :
+
+			return array();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Test columns
+		$_test = reset( $_items );
+
+		if ( ! isset( $_test->{$label_col} ) ) :
+
+			show_error( get_called_class() . '::get_all_flat() "' . $label_col . '" is not a valid column.' );
+
+		endif;
+
+		if ( ! isset( $_test->{$id_col} ) ) :
+
+			show_error( get_called_class() . '::get_all_flat() "' . $id_col . '" is not a valid column.' );
+
+		endif;
+
+		unset( $_test );
+
+		// --------------------------------------------------------------------------
+
 		foreach( $_items AS $item ) :
 
 			$_out[$item->{$id_col}] = $item->{$label_col};

@@ -1,12 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin - Settings
- *
+ * Name:		Admin: Settings
  * Description:	A holder for all site settings
  *
  **/
-
 
 //	Include Admin_Controller; executes common admin functionality.
 require_once '_admin.php';

@@ -28,7 +28,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Include the composer autoloader
-
 		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
 			echo '<style type="text/css">';
@@ -69,6 +68,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Load these items, everytime.
 		$this->_autoload_items();
+
+		// --------------------------------------------------------------------------
+
+		//	Load, instantiate and apply the fatal error handler
+		$this->_fatal_error_handler();
 
 		// --------------------------------------------------------------------------
 
@@ -753,6 +757,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$this->asset->inline( '<script>' . $_js . '</script>' );
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _fatal_error_handler()
+	{
+		$this->load->library( 'Fatal_error_handler' );
+	}
+
 
 	// --------------------------------------------------------------------------
 

@@ -1,12 +1,12 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin : Basic CMS
-*
+* Name:			Admin: CMS
 * Description:	A basic CMS for applications
 *
 */
 
+//	Include Admin_Controller; executes common admin functionality.
 require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
 
 /**
@@ -1183,5 +1183,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_CMS' ) ) :
 endif;
 
 
-/* End of file admin.php */
-/* Location: ./application/modules/admin/controllers/admin.php */
+/* End of file cms.php */
+/* Location: ./modules/admin/controllers/cms.php */

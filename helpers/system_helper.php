@@ -185,62 +185,7 @@ if ( ! function_exists( 'send_developer_mail' ) )
 {
 	function send_developer_mail( $subject, $message )
 	{
-		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) || ! APP_DEVELOPER_EMAIL ) :
-
-			//	Log the fact there's no email
-			log_message( 'error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_to		= ENVIRONMENT != 'production' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
-		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
-					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
-					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-					  'X-Priority: 1 (Highest)' . "\r\n" .
-					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-					  'Importance: High';
-
-		$_message	 = $message;
-
-		// --------------------------------------------------------------------------
-
-		$_ci =& get_instance();
-
-		$_info = array(
-			'uri'				=> isset( $_ci->uri )			? $_ci->uri->uri_string()				: '',
-
-			'session'			=> isset( $_ci->session )		? serialize( $_ci->session->userdata )	: '',
-			'post'				=> isset( $_POST )				? serialize( $_POST )					: '',
-			'get'				=> isset( $_GET )				? serialize( $_GET )					: '',
-			'server'			=> isset( $_SERVER )			? serialize( $_SERVER )					: '',
-			'globals'			=> isset( $GLOBALS['error'] )	? serialize( $GLOBALS['error'] )		: '',
-
-			'debug_backtrace'	=> serialize( debug_backtrace() )
-		);
-
-		$_message	.= '' . "\n";
-		$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'DEBUGGING DATA' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'URI: ' .		$_info['uri'] . "\n\n";
-		$_message	.= 'SESSION: ' .	$_info['session'] . "\n\n";
-		$_message	.= 'POST: ' .		$_info['post'] . "\n\n";
-		$_message	.= 'GET: ' .		$_info['get'] . "\n\n";
-		$_message	.= 'SERVER: ' .		$_info['server'] . "\n\n";
-		$_message	.= 'GLOBALS: ' .	$_info['globals'] . "\n\n";
-		$_message	.= 'BACKTRACE: ' .	$_info['debug_backtrace'] . "\n\n";
-
-		if ( defined( 'NAILS_DB_ENABLED' ) && NAILS_DB_ENABLED ) :
-
-			$_message	.= 'LAST KNOWN QUERY: ' . $_ci->db->last_query() . "\n\n";
-
-		endif;
-
-		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
+		return get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
 	}
 }
 

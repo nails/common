@@ -1,8 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin
- *
+ * Name:		Admin: Email
  * Description:	Admin Email module
  *
  **/
@@ -233,5 +232,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_DASHBOARD' ) ) :
 endif;
 
 
-/* End of file admin.php */
-/* Location: ./application/modules/admin/controllers/admin.php */
+/* End of file email.php */
+/* Location: ./modules/admin/controllers/email.php */

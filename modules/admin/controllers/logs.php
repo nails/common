@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin: Events
- * Description:	Manage events
- *
- **/
+* Name:			Admin: Log
+* Description:	Log manager
+*
+*/
 
 //	Include Admin_Controller; executes common admin functionality.
-require_once '_admin.php';
+require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
@@ -17,16 +17,15 @@ require_once '_admin.php';
  *
  **/
 
-class NAILS_Events extends NAILS_Admin_Controller
+class NAILS_Logs extends NAILS_Admin_Controller
 {
 
 	/**
 	 * Announces this module's details to those in the know.
 	 *
-	 * @access	static
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
+	 * @access static
+	 * @param none
+	 * @return void
 	 **/
 	static function announce()
 	{
@@ -34,23 +33,18 @@ class NAILS_Events extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the laguage file
-		get_instance()->lang->load( 'admin_events', RENDER_LANG_SLUG );
-
-		// --------------------------------------------------------------------------
-
 		//	Configurations
-		$d->name = lang( 'events_module_name' );
+		$d->name				= 'Logs';					//	Display name.
 
 		// --------------------------------------------------------------------------
 
 		//	Navigation options
-		$d->funcs				= array();
-		$d->funcs['index']		= lang( 'events_nav_index' );
+		$d->funcs['index']			= 'Browse Site Logs';	//	Sub-nav function.
+		$d->funcs['changelog']		= 'Browse Admin Logs';	//	Sub-nav function.
 
 		// --------------------------------------------------------------------------
 
-		//	Only announce the controller if the user has permisison to know about it
+		//	Only announce the controller if the user has permission to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
 
@@ -59,23 +53,42 @@ class NAILS_Events extends NAILS_Admin_Controller
 
 
 	/**
-	 * Manage evcents
+	 * Log File browser
 	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
+	 * @access public
+	 * @param none
+	 * @return void
 	 **/
 	public function index()
 	{
-		//	Page Title
-		$this->data['page']->title = lang( 'events_manage_title' );
+		$this->data['page']->title = 'Browse Logs';
 
 		// --------------------------------------------------------------------------
 
-		//	Load views
+		$this->load->view( 'structure/header',	$this->data );
+		$this->load->view( 'admin/logs/index',	$this->data );
+		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Admin Change Log Browser
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function changelog()
+	{
+		$this->data['page']->title = 'Admin Changelog';
+
+		// --------------------------------------------------------------------------
+
 		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'admin/events/index',	$this->data );
+		$this->load->view( 'admin/logs/changelog',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
 	}
 }
@@ -108,14 +121,13 @@ class NAILS_Events extends NAILS_Admin_Controller
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_DASHBOARD' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_LOGS' ) ) :
 
-	class Events extends NAILS_Events
+	class Logs extends NAILS_Logs
 	{
 	}
 
 endif;
 
-
-/* End of file events.php */
-/* Location: ./modules/admin/controllers/events.php */
+/* End of file logs.php */
+/* Location: ./modules/admin/controllers/logs.php */

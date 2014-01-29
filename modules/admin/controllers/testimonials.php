@@ -1,9 +1,8 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Testimonials Admin
- *
- * Description:	Manage events
+ * Name:		Admin: Testimonials
+ * Description:	Manage testimonials
  *
  **/
 
@@ -302,4 +301,4 @@ endif;
 
 
 /* End of file testimonials.php */
-/* Location: ./application/modules/admin/controllers/testimonials.php */
+/* Location: ./modules/admin/controllers/testimonials.php */

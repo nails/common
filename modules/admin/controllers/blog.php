@@ -1,8 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin : Blog
-*
+* Name:			Admin: Blog
 * Description:	Blog Manager
 *
 */
@@ -631,4 +630,4 @@ endif;
 
 
 /* End of file blog.php */
-/* Location: ./application/modules/admin/controllers/blog.php */
+/* Location: ./modules/admin/controllers/blog.php */

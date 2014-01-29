@@ -2,7 +2,6 @@
 
 /**
  * Name:		Admin
- *
  * Description:	Exists purely to redirect users to the dashboard
  *
  **/
@@ -72,4 +71,4 @@ endif;
 
 
 /* End of file admin.php */
-/* Location: ./application/modules/admin/controllers/admin.php */
+/* Location: ./modules/admin/controllers/admin.php */

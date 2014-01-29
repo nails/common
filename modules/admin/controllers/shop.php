@@ -1,12 +1,12 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin : Shop
-*
+* Name:			Admin: Shop
 * Description:	Shop Manager
 *
 */
 
+//	Include Admin_Controller; executes common admin functionality.
 require_once NAILS_PATH . 'modules/admin/controllers/_admin.php';
 
 /**
@@ -2918,5 +2918,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP' ) ) :
 
 endif;
 
-/* End of file universities.php */
-/* Location: ./application/modules/admin/controllers/universities.php */
+/* End of file shop.php */
+/* Location: ./modules/admin/controllers/shop.php */
