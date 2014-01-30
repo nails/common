@@ -289,7 +289,7 @@ else :
 	// if so, cool, if not then...
 
 	$_base_domain			= get_domain_from_url( BASE_URL );
-	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? get_domain_from_url( SECURE_BASE_URL ) : $_base_url;
+	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? get_domain_from_url( SECURE_BASE_URL ) : $_base_domain;
 
 	if ( $_base_domain == $_secure_base_domain ) :
 
