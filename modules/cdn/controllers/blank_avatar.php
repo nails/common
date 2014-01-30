@@ -36,7 +36,6 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -71,7 +70,6 @@ class NAILS_Blank_avatar extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{

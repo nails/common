@@ -2,9 +2,9 @@
 
 /**
  * Name:		System Controller
- * 
+ *
  * Description:	Executes common system functionality
- * 
+ *
  **/
 
 class NAILS_System_Controller extends NAILS_Controller
@@ -15,14 +15,13 @@ class NAILS_System_Controller extends NAILS_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load language file
 		$this->lang->load( 'system', RENDER_LANG_SLUG );
 	}

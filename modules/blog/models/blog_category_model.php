@@ -17,18 +17,31 @@
 
 class NAILS_Blog_category_model extends NAILS_Model
 {
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$this->_table = NAILS_DB_PREFIX . 'blog_category';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_all( $include_count = FALSE )
 	{
-		$this->db->select( 'c.id,c.slug,c.label' );
+		$this->db->select( 'id,slug,label' );
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category WHERE category_id = c.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category WHERE category_id = id) post_count' );
 
 		endif;
 
-		$this->db->order_by( 'c.label' );
-		$_categories = $this->db->get( NAILS_DB_PREFIX . 'blog_category c' )->result();
+		$this->db->order_by( 'label' );
+		$_categories = $this->db->get( $this->_table )->result();
 
 		foreach ( $_categories AS $category ) :
 
@@ -45,11 +58,14 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function get_by_id( $id, $include_count = FALSE )
 	{
-		$this->db->where( 'c.id', $id );
+		$this->db->where( 'id', $id );
 		$_category = $this->get_all( $include_count );
 
-		if ( ! $_category )
+		if ( ! $_category ) :
+
 			return FALSE;
+
+		endif;
 
 		return $_category[0];
 	}
@@ -60,11 +76,14 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function get_by_slug( $slug, $include_count = FALSE )
 	{
-		$this->db->where( 'c.slug', $slug );
+		$this->db->where( 'slug', $slug );
 		$_category = $this->get_all( $include_count );
 
-		if ( ! $_category )
+		if ( ! $_category ) :
+
 			return FALSE;
+
+		endif;
 
 		return $_category[0];
 	}
@@ -75,22 +94,11 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function create( $label )
 	{
-		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_category' );
-		$this->db->set( 'slug', $_slug );
-		$this->db->set( 'label', $label );
-		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->set( 'modified', 'NOW()', FALSE );
+		$_data			= array();
+		$_data['slug']	= $this->_generate_slug( $label );
+		$_data['label']	= $label;
 
-		if ( $this->user->is_logged_in() ) :
-
-			$this->db->set( 'created_by', active_user( 'id' ) );
-			$this->db->set( 'modified_by', active_user( 'id' ) );
-
-		endif;
-
-		$this->db->insert( NAILS_DB_PREFIX . 'blog_category' );
-
-		return (bool) $this->db->affected_rows();
+		return parent::create( $_data );
 	}
 
 	// --------------------------------------------------------------------------
@@ -98,7 +106,8 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function update( $id_slug, $label )
 	{
-		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_category' );
+		$_slug = $this->_generate_slug( $label );
+
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );
@@ -119,7 +128,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 		endif;
 
-		$this->db->update( NAILS_DB_PREFIX . 'blog_category' );
+		$this->db->update( $this->_table );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -148,7 +157,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 		endif;
 
-		$this->db->delete( NAILS_DB_PREFIX . 'blog_category' );
+		$this->db->delete( $this->_table );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -168,11 +177,11 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	protected function _format_category( &$category )
 	{
-		$category->id	= (int) $category->id;
+		$category->id = (int) $category->id;
 
 		if ( isset( $category->post_count ) ) :
 
-			$category->post_count	= (int) $category->post_count;
+			$category->post_count = (int) $category->post_count;
 
 		endif;
 	}
@@ -216,4 +225,4 @@ endif;
 
 
 /* End of file blog_category_model.php */
-/* Location: ./application/models/blog_category_model.php */
+/* Location: ./modules/blog/models/blog_category_model.php */

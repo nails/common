@@ -339,7 +339,6 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_vouchers( $only_active = TRUE, $where = NULL, $search = NULL )

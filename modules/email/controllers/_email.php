@@ -2,9 +2,9 @@
 
 /**
  * Name:		Email Controller
- * 
+ *
  * Description:	Executes common email functionality
- * 
+ *
  **/
 
 class NAILS_Email_Controller extends NAILS_Controller
@@ -15,14 +15,13 @@ class NAILS_Email_Controller extends NAILS_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load language file
 		$this->lang->load( 'email', RENDER_LANG_SLUG );
 	}

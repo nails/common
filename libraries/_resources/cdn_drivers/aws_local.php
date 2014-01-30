@@ -28,7 +28,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( $options = NULL )
 	{
@@ -106,7 +105,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_create( $bucket, $filename, $sourcefile, $mime )
 	{
@@ -163,7 +161,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_destroy( $object, $bucket )
 	{
@@ -206,7 +203,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_create( $bucket )
 	{
@@ -273,7 +269,6 @@ class Aws_local_CDN
 	 * @param	string	$bucket	The bucket which the image resides in
 	 * @param	string	$object	The filename of the object
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_serve( $object, $bucket, $force_download )
 	{
@@ -314,7 +309,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_serve_scheme( $force_download )
 	{
@@ -353,7 +347,6 @@ class Aws_local_CDN
 	 * @param	string	$width	The width of the thumbnail
 	 * @param	string	$height	The height of the thumbnail
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_thumb( $object, $bucket, $width, $height )
 	{
@@ -375,7 +368,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_thumb_scheme()
 	{
@@ -397,7 +389,6 @@ class Aws_local_CDN
 	 * @param	string	$width	The width of the scaled image
 	 * @param	string	$height	The height of the scaled image
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_scale( $object, $bucket, $width, $height )
 	{
@@ -419,7 +410,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_scale_scheme()
 	{
@@ -440,7 +430,6 @@ class Aws_local_CDN
 	 * @param	int		$height	The height of the placeholder
 	 * @param	int		border	The width of the border round the placeholder
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
@@ -460,7 +449,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_placeholder_scheme()
 	{
@@ -481,7 +469,6 @@ class Aws_local_CDN
 	 * @param	int		$height	The height of the placeholder
 	 * @param	int		border	The width of the border round the placeholder
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
 	{
@@ -501,7 +488,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_blank_avatar_scheme()
 	{
@@ -522,7 +508,6 @@ class Aws_local_CDN
 	 * @param	string	$object		The object to be served
 	 * @param	string	$expires	The length of time the URL should be valid for, in seconds
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_expiring( $object, $bucket, $expires )
 	{
@@ -548,7 +533,6 @@ class Aws_local_CDN
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_expiring_scheme()
 	{

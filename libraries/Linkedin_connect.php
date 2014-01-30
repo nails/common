@@ -23,7 +23,6 @@ class Linkedin_connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -50,7 +49,6 @@ class Linkedin_connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function user_is_linked( $user_id = NULL )
 	{
@@ -77,7 +75,6 @@ class Linkedin_connect
 	 * @access	public
 	 * @param	string	$callback	The callback to return to the user to.
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function get_auth_url( $callback, $state )
 	{
@@ -101,7 +98,6 @@ class Linkedin_connect
 	 * @access	public
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_access_token( $callback, $code, $set_token_on_success = TRUE )
 	{
@@ -147,7 +143,6 @@ class Linkedin_connect
 	 * @access	public
 	 * @param	string	$token			The token
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function set_access_token( $token )
 	{
@@ -165,7 +160,6 @@ class Linkedin_connect
 	 * @param	string	$method		The API method to call
 	 * @param	array	$params		Parameters to send along with the request
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	private function _call( $method, $api_method, $params = array() )
 	{
@@ -262,7 +256,6 @@ class Linkedin_connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function unlink_user( $user_id = NULL )
 	{

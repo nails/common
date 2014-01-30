@@ -37,10 +37,9 @@ class NAILS_Testimonial_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all()
+	protected function _getcount_common( $search = NULL )
 	{
 		$this->db->order_by( 'order' );
-		return parent::get_all();
 	}
 }
 

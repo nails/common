@@ -30,6 +30,10 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		$this->_table	= NAILS_DB_PREFIX . 'blog_post';
+
+		// --------------------------------------------------------------------------
+
 		//	Define reserved words (for slugs, basically just controller methods)
 		$this->_reserved = array( 'index', 'single', 'category','tag', 'archive' );
 	}

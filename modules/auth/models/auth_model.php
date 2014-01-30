@@ -33,7 +33,6 @@ class NAILS_Auth_model extends NAILS_Model
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -68,7 +67,6 @@ class NAILS_Auth_model extends NAILS_Model
 	 * @param	string	$password	The user's password
 	 * @param	boolean	$remember	Whether to 'remember' the user or not
 	 * @return	object
-	 * @author	Pablo
 	 **/
 	public function login( $email, $password, $remember = FALSE )
 	{
@@ -223,7 +221,6 @@ class NAILS_Auth_model extends NAILS_Model
 	 * @access	public
 	 * @param	none
 	 * @return	bool
-	 * @author	Pablo
 	 **/
 	public function logout()
 	{
@@ -272,7 +269,6 @@ class NAILS_Auth_model extends NAILS_Model
 	 * @param	string	$error	The error string
 	 * @param	array	$vars	Variables to parse into the error string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	protected function _set_error( $error, $vars = NULL )
 	{
@@ -298,7 +294,6 @@ class NAILS_Auth_model extends NAILS_Model
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function get_errors()
 	{

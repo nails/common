@@ -119,25 +119,6 @@
 
 				// --------------------------------------------------------------------------
 
-				//	Verify user
-				if ( $member->email_is_verified ) :
-
-					if ( user_has_permission( 'admin.accounts.unverify' ) ) :
-
-						$_buttons[] = anchor( 'admin/accounts/unverify/' . $member->id . $_return, lang( 'action_unverify' ), 'class="awesome small red"' );
-
-					endif;
-
-				else :
-
-					if ( user_has_permission( 'admin.accounts.verify' ) ) :
-
-						$_buttons[] = anchor( 'admin/accounts/verify/' . $member->id . $_return, lang( 'action_verify' ), 'class="awesome small green"' );
-
-					endif;
-
-				endif;
-
 				if ( user_has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) && $member->group_id != 1 ) :
 
 					$_buttons[] = anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );

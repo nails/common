@@ -26,7 +26,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
@@ -66,7 +65,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function notifications()
 	{
@@ -96,7 +94,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -117,7 +114,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
@@ -154,7 +150,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function compose()
 	{
@@ -179,7 +174,6 @@ class NAILS_Email extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function campaign()
 	{

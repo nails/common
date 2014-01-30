@@ -81,7 +81,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		//	Slug
 		//	====
 
-		$_data->slug	= $this->_generate_slug( $data['title'], $this->_table_product );
+		$_data->slug	= $this->_generate_slug( $data['title'], '', '', $this->_table_product );
 
 		//	Product Info
 		//	============
@@ -870,7 +870,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_all( $only_active = FALSE, $where = NULL, $search = NULL )
@@ -1030,7 +1029,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label, NAILS_DB_PREFIX . 'shop_product_type', 'slug' );
+			$_data->slug = $this->_generate_slug( $data->label, '', '', $this->_table_type );
 			$this->db->set( $_data );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
@@ -1042,7 +1041,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			endif;
 
-			$this->db->insert( NAILS_DB_PREFIX . 'shop_product_type' );
+			$this->db->insert( $this->_table_type );
 
 			if ( $this->db->affected_rows() ) :
 
@@ -1073,7 +1072,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		$this->db->trans_begin();
 		$this->db->where( 'id', $id );
-		$this->db->delete( NAILS_DB_PREFIX . 'shop_product_type' );
+		$this->db->delete( $this->_table_type );
 		$_affected_rows = $this->db->affected_rows();
 
 		if ($this->db->trans_status() === FALSE) :
@@ -1147,7 +1146,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			$this->db->set( 'modified', 'NOW()', FALSE );
 			$this->db->where( 'id', $id );
 
-			if ( $this->db->update( NAILS_DB_PREFIX . 'shop_product_type' ) ) :
+			if ( $this->db->update( $this->_table_type ) ) :
 
 				return TRUE;
 

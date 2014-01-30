@@ -53,7 +53,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function init()
@@ -77,7 +76,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	static
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function find_remembered_user()
@@ -127,7 +125,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	protected
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	protected function _login_remembered_user()
@@ -177,7 +174,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$keys		The key to look up in active_user
 	 * @param	string	$delimiter	If multiple fields are requested they'll be joined by this string
 	 * @return	mixed
-	 * @author	Pablo
 	 *
 	 **/
 	public function active_user( $keys = FALSE, $delimiter = ' '  )
@@ -312,7 +308,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$email		The user's email
 	 * @param	int		$group_id	The user's group
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function set_login_data( $id, $set_session_data = TRUE )
@@ -390,7 +385,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function clear_login_data()
@@ -416,7 +410,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	bool
-	 * @author	Pablo
 	 *
 	 **/
 	public function is_logged_in()
@@ -433,7 +426,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	bool
-	 * @author	Pablo
 	 *
 	 **/
 	public function is_remembered()
@@ -470,7 +462,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	boolean
-	 * @author	Pablo
 	 *
 	 **/
 	public function is_admin( $user = NULL )
@@ -494,7 +485,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	boolean
-	 * @author	Pablo
 	 *
 	 **/
 	public function is_superuser( $user = NULL )
@@ -513,7 +503,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	boolean
-	 * @author	Pablo
 	 *
 	 **/
 	public function was_admin()
@@ -532,7 +521,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$permission	The permission to check for, in the format admin.account.view
 	 * @param	mixed	$user		The user to check for; if null uses active user, if numeric, fetches suer, if object uses that object
 	 * @return	boolean
-	 * @author	Pablo
 	 *
 	 **/
 	public function has_permission( $permission, $user = NULL )
@@ -600,7 +588,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	string
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_all( $extended = NULL, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
@@ -783,7 +770,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	string
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
@@ -848,7 +834,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_all( $where = NULL, $search = NULL )
@@ -872,7 +857,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	protected function _getcount_users_common( $where = NULL, $search = NULL )
@@ -1041,7 +1025,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$user_id	The user's ID
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_id( $user_id, $extended = FALSE )
@@ -1071,7 +1054,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$email		The user's email address
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_email( $email, $extended = FALSE )
@@ -1111,7 +1093,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$fbid		The user's Facebook ID
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_fbid( $fbid, $extended = FALSE )
@@ -1133,7 +1114,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$twid		The user's Twitter ID
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_twid( $twid, $extended = FALSE )
@@ -1155,7 +1135,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$fbid		The user's LinkedIn ID
 	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_liid( $linkedinid, $extended = FALSE )
@@ -1179,7 +1158,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$_hash_id	The user's id as an MD5 hash
 	 * @param	mixed	$_hash_pw	The user's hashed password as an MD5 hash
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_hashes( $_hash_id, $_hash_pw, $extended = FALSE )
@@ -1218,7 +1196,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string	$referral_code	The user's referral code
 	 * @param	mixed	$extended		Specific extra tables to join, TRUE for all user_meta_*
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_by_referral( $referral_code, $extended = FALSE  )
@@ -1240,7 +1217,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int			$limit		The number of user's to return
 	 * @param	boolean		$extended	Whether to include extended data or not
 	 * @return	object
-	 * @author	Pablo
 	 *
 	 **/
 	public function get_new_users( $limit = 25, $extended = FALSE )
@@ -1276,7 +1252,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @return	int		$id		The ID of the user to update
 	 * @return	array	$data	Any data to be updated
-	 * @author	Pablo
 	 *
 	 **/
 	public function update( $user_id = NULL, $data = NULL )
@@ -1832,7 +1807,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$user_id	The ID of the user to increment
 	 * @param	int		$expires	Time (in seconds) until expiration
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function increment_failed_login( $user_id, $expires = 300 )
 	{
@@ -1851,7 +1825,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$user_id	The ID of the user to reset
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function reset_failed_login( $user_id )
 	{
@@ -1870,7 +1843,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$user_id	The ID of the user to update
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function update_last_login( $user_id )
 	{
@@ -1888,7 +1860,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function set_remember_cookie( $id = NULL, $password = NULL, $email = NULL )
 	{
@@ -1943,7 +1914,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function clear_remember_cookie()
 	{
@@ -1969,7 +1939,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function salt()
 	{
@@ -1987,7 +1956,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string
 	 * @param	string
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function hash_password( $password, $salt = FALSE )
 	{
@@ -2021,7 +1989,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string
 	 * @param	string
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function hash_password_db( $email, $password )
 	{
@@ -2062,7 +2029,6 @@ class NAILS_User_model extends NAILS_Model
 	 *
 	 * @access	protected
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	protected function _refresh_session()
@@ -2115,7 +2081,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	object	$data		The data to insert
 	 * @param	int		$user_id	If not updating the active user specify the user ID
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function extra_table_insert( $table, $data, $user_id = FALSE )
 	{
@@ -2156,7 +2121,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$id			The ID of the row to fetch
 	 * @param	int		$user_id	If not fetching for the active user specify the user ID
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function extra_table_fetch( $table, $id = NULL, $user_id = NULL )
 	{
@@ -2203,7 +2167,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	object	$data		The data to update
 	 * @param	int		$user_id	If not updating the active user specify the user ID
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function extra_table_update( $table, $data, $user_id = FALSE )
 	{
@@ -2253,7 +2216,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$id			The ID of the row to delete
 	 * @param	int		$user_id	If not updating the active user specify the user ID
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function extra_table_delete( $table, $id, $user_id = FALSE )
 	{
@@ -2300,7 +2262,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$group_id	The user's group
 	 * @param	array	$data		Any meta data to be stored alongside the user
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function create( $email, $password, $group_id = NULL, $data = FALSE, $send_welcome = TRUE )
 	{
@@ -2664,7 +2625,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$id	The ID of the user to delete
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function destroy( $id )
 	{
@@ -2686,7 +2646,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	protected
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	protected function _generate_referral()
 	{
@@ -2718,7 +2677,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$group_id	The ID of the group to fetch
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function set_password_token( $email )
 	{
@@ -2777,7 +2735,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	string
 	 * @return	string or boolean FALSE
-	 * @author	Pablo
 	 **/
 	public function validate_password_token( $code )
 	{
@@ -2848,7 +2805,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$id	The ID of the user to suspend
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	 public function suspend( $id )
 	 {
@@ -2865,7 +2821,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$id	The ID of the user to unsuspend
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	 public function unsuspend( $id )
 	 {
@@ -2885,7 +2840,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	array
 	 * @param	string
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_groups()
 	{
@@ -2918,7 +2872,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	array
 	 * @param	string
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_groups_flat()
 	{
@@ -2950,7 +2903,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @access	public
 	 * @param	int		$group_id	The ID of the group to fetch
 	 * @return	object
-	 * @author	Pablo
 	 **/
 	public function get_group( $group_id )
 	{
@@ -2983,7 +2935,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	int		$id		The ID of the group to update
 	 * @param	array	$data	The data to use in the update
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function update_group( $id, $data )
 	{
@@ -3003,7 +2954,6 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	object	$user	The user object to format
 	 * @param	array	$data	The data to use in the update
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	protected function _format_user_object( &$user, $minimal = FALSE )
 	{

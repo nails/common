@@ -71,7 +71,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function notifications()
 	{
@@ -133,7 +132,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -1601,7 +1599,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _sales_index()
 	{
-		dump( 'List Sales' );
+		$this->data['page']->title = 'Manage Sales';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/sales/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 

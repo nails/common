@@ -16,7 +16,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	public function __construct()
@@ -48,7 +47,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	protected function _out( $out = array(), $format = 'JSON', $send_header = TRUE )
@@ -106,7 +104,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	public function _remap( $method )
@@ -132,7 +129,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	protected function _method_not_found( $method )

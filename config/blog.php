@@ -8,7 +8,7 @@
 | Configure extended blog functionality
 |
 | Full details of configurable options are available at
-| http://docs.nailsapp.co.uk/modules/blog/config
+| TODO: link to docs
 |
 */
 

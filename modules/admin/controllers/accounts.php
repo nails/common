@@ -37,7 +37,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
@@ -77,7 +76,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	static function notifications()
 	{
@@ -104,7 +102,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	static function permissions()
 	{
@@ -131,7 +128,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -165,7 +161,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
@@ -376,7 +371,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function edit()
 	{
@@ -762,7 +756,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function suspend()
 	{
@@ -819,7 +812,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function unsuspend()
 	{
@@ -874,7 +866,6 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function delete()
 	{

@@ -21,7 +21,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
 			<div id="tab-general" class="tab page <?=$_display?> general">
-				<?=form_open()?>
+				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
 				<?=form_hidden( 'update', 'settings' )?>
 				<p>
 					Generic blog settings. Use these to control some blog behaviours.
@@ -88,7 +88,9 @@
 
 					?>
 				</fieldset>
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
 				<?=form_close()?>
 			</div>
 
@@ -121,7 +123,9 @@
 
 					?>
 				</fieldset>
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
 				<?=form_close()?>
 			</div>
 		</section>

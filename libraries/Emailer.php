@@ -25,7 +25,6 @@ class Emailer
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( $config = array() )
 	{
@@ -118,7 +117,6 @@ class Emailer
 	 * @param	object	$input		The input object
 	 * @param	bool	$graceful	Whether to gracefully fail or not
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function send( $input, $graceful = FALSE )
 	{
@@ -369,7 +367,6 @@ class Emailer
 	 * @param	object	$input			The input object
 	 * @param	boolean	$graceful		Whether to fail gracefully or not
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	private function _send( $email_id = FALSE, $graceful = FALSE )
 	{
@@ -730,7 +727,6 @@ class Emailer
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_all( $order = NULL, $sort = NULL, $offset = NULL, $per_page = NULL )
 	{
@@ -778,7 +774,6 @@ class Emailer
 	 *
 	 * @access	public
 	 * @return	int
-	 * @author	Pablo
 	 **/
 	public function count_all()
 	{
@@ -794,7 +789,6 @@ class Emailer
 	 *
 	 * @access	public
 	 * @return	object
-	 * @author	Pablo
 	 **/
 	public function get_by_id( $id )
 	{
@@ -820,7 +814,6 @@ class Emailer
 	 * @access	public
 	 * @param	string	$ref	The reference of the item to get
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_ref( $ref, $guid = FALSE, $hash = FALSE )
 	{
@@ -861,7 +854,6 @@ class Emailer
 	 * @access	private
 	 * @param	string	file to add
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	private function _add_attachment( $file )
 	{
@@ -892,7 +884,6 @@ class Emailer
 	 * @access	public
 	 * @param	array $exclude An array of strings to exclude
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	private function _generate_reference( $exclude = array() )
 	{
@@ -931,7 +922,6 @@ class Emailer
 	 * @param	string
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _debugger( $input, $body, $plaintext, $recent_errors )
 	{
@@ -1044,7 +1034,6 @@ class Emailer
 	 * @param	string $guid the unique counter used to generate the hash
 	 * @param	string $hash The secutiry hash to check (i.e verify the ref and guid).
 	 * @return	bool
-	 * @author	Pablo
 	 **/
 	public function track_open( $ref, $guid, $hash )
 	{
@@ -1089,7 +1078,6 @@ class Emailer
 	 * @param	string $url
 	 * @param	string $type
 	 * @return	bool
-	 * @author	Pablo
 	 **/
 	public function track_link( $ref, $guid, $hash, $link_id )
 	{
@@ -1149,7 +1137,6 @@ class Emailer
 	 * @param	int $email_id The ID of the email being processed
 	 * @param	bool $is_html Whether body is HTML (i.e look for <a> tags) or plaintext (i.e look for plain URL)
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE, $needs_verified = FALSE )
 	{

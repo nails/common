@@ -34,7 +34,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function index()
@@ -350,7 +349,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function confirm()

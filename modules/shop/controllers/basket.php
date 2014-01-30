@@ -42,7 +42,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function index()
@@ -119,7 +118,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function add()
@@ -148,7 +146,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function remove()
@@ -177,7 +174,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function destroy()
@@ -198,7 +194,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function increment()
@@ -219,7 +214,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function decrement()
@@ -240,7 +234,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function add_voucher()
@@ -274,7 +267,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function remove_voucher()
@@ -296,7 +288,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function set_shipping_method()
@@ -330,7 +321,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function set_currency()

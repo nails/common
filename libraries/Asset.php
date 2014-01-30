@@ -31,7 +31,6 @@ class Asset
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -50,7 +49,6 @@ class Asset
  	 * @param	boolean
  	 * @param	boolean
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function load( $assets, $nails_asset = FALSE, $force_type = FALSE )
 	{
@@ -101,7 +99,6 @@ class Asset
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function library( $library )
 	{
@@ -166,7 +163,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _load_nails( $assets )
 	{
@@ -207,7 +203,6 @@ class Asset
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function unload( $assets )
 	{
@@ -230,7 +225,6 @@ class Asset
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function inline( $script = NULL )
 	{
@@ -267,7 +261,6 @@ class Asset
 	 * @param	boolean
 	 * @param	boolean
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function clear( $css = FALSE, $css_nails = FALSE, $css_inline = TRUE, $js = FALSE, $js_nails = FALSE, $js_inline = TRUE )
 	{
@@ -302,7 +295,6 @@ class Asset
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function clear_all()
 	{
@@ -318,7 +310,6 @@ class Asset
 	 *
 	 * @access	public
 	 * @return	object
-	 * @author	Pablo
 	 **/
 	public function get_loaded()
 	{
@@ -342,7 +333,6 @@ class Asset
 	 * @param	string
 	 * @param	boolean
 	 * @return	object
-	 * @author	Pablo
 	 **/
 	public function output( $type = 'all', $return = FALSE )
 	{
@@ -417,7 +407,6 @@ class Asset
 	 * @param	string
 	 * @param	string
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _determine_type( $input, $force_type = FALSE )
 	{
@@ -452,7 +441,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_css()
 	{
@@ -476,7 +464,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_css_nails()
 	{
@@ -501,7 +488,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_css_inline()
 	{
@@ -528,7 +514,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_js()
 	{
@@ -554,7 +539,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_js_nails()
 	{
@@ -579,7 +563,6 @@ class Asset
 	 * @access	private
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _print_js_inline()
 	{

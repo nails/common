@@ -401,7 +401,6 @@ class NAILS_Shop_order_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_orders( $where = NULL, $search = NULL )
@@ -426,7 +425,6 @@ class NAILS_Shop_order_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_unfulfilled_orders( $where = NULL, $search = NULL )

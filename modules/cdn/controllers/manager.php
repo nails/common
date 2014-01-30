@@ -25,7 +25,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -174,7 +173,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function browse()
 	{
@@ -214,19 +212,18 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function upload()
 	{
 		//	Returning to...?
-		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 
 		// --------------------------------------------------------------------------
 
 		//	User is authorised to upload?
 		if ( ! $this->data['enabled'] ) :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . $this->data['type_single'] . ' uploads are not available right now.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> uploads are not available right now.' );
 			redirect( $_return );
 			return;
 
@@ -266,7 +263,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function delete()
 	{
 		//	Returning to...?
-		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 
 		// --------------------------------------------------------------------------
 
@@ -309,7 +306,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 		if ( $_delete ) :
 
-			$_url = site_url( 'cdn/manager/restore/' . $this->uri->segment( 4 ) . '?' . $_SERVER['QUERY_STRING'] );
+			$_url = site_url( 'cdn/manager/restore/' . $this->uri->segment( 4 ) . '?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File deleted successfully! <a href="' . $_url . '">Undo?</a>' );
 
 			if ( strpos( $_return, '?' ) ) :
@@ -342,7 +339,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function restore()
 	{
 		//	Returning to...?
-		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 
 		// --------------------------------------------------------------------------
 
@@ -417,7 +414,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function new_tag()
 	{
 		//	Returning to...?
-		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 
 		// --------------------------------------------------------------------------
 
@@ -445,7 +442,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function delete_tag()
 	{
 		//	Returning to...?
-		$_return = 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'];
+		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
 
 		// --------------------------------------------------------------------------
 

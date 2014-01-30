@@ -23,7 +23,6 @@ class Twitter_Connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -51,7 +50,6 @@ class Twitter_Connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function user_is_linked( $user_id = NULL )
 	{
@@ -77,7 +75,6 @@ class Twitter_Connect
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function unlink_user( $user_id = NULL )
 	{
@@ -233,7 +230,6 @@ class Twitter_Connect
 	 *
 	 * @access	public
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function __call( $method, $arguments )
 	{

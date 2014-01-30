@@ -24,7 +24,6 @@ class Event {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -58,7 +57,6 @@ class Event {
 	 * @param	int			$ref				A numeric reference to store alongside the event (e.g the id of the object the event relates to)
 	 * @param	string		$recorded			A strtotime() friendly string of the date to use instead of NOW() for the created date
 	 * @return	int or boolean
-	 * @author	Pablo
 	 **/
 	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $data = NULL, $ref = NULL, $recorded = NULL )
 	{
@@ -258,7 +256,6 @@ class Event {
 	 * @access	public
 	 * @param	int		$id		The ID of the event object to destroy
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function destroy( $id )
 	{
@@ -300,7 +297,6 @@ class Event {
 	 * @access	public
 	 * @param	array	$limit	An optional limit value
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $include_interested_parties = FALSE )
 	{
@@ -376,7 +372,6 @@ class Event {
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_all( $where = NULL )
@@ -419,7 +414,6 @@ class Event {
 	 * @access	public
 	 * @param	int		$id		the ID of the event to fetch
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_id( $id )
 	{
@@ -450,7 +444,6 @@ class Event {
 	 * @access	public
 	 * @param	string	$type	The Type of event to fetch
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_type( $type )
 	{
@@ -477,7 +470,6 @@ class Event {
 	 * @access	public
 	 * @param	int		$id		The Id of the user who created the objects
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_user( $user_id )
 	{
@@ -524,7 +516,6 @@ class Event {
 	 * @access	public
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function errors()
 	{
@@ -541,7 +532,6 @@ class Event {
 	 * @access	private
 	 * @param	string	$error the error to add to the $_error array
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _add_error( $error )
 	{

@@ -22,7 +22,6 @@ class NAILS_Cron_Controller extends NAILS_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{

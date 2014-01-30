@@ -30,7 +30,7 @@
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
 			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
-			window.SITE_URL		= '<?=site_url()?>';
+			window.SITE_URL		= '<?=site_url( '', page_is_secure() )?>';
 			window.NAILS_URL	= '<?=NAILS_URL?>';
 			window.NAILS_LANG	= {};
 		</script>
@@ -94,17 +94,17 @@
 							<li class="tags">
 
 								<?php if ( $this->input->get( 'filter-tag' ) && $bucket->objects ) : ?>
-								<div class="info remove-object-tag" data-id="<?=$this->input->get( 'filter-tag' )?>">
-									<p>Drag files here to remove from tag</p>
-								</div>
+									<div class="info remove-object-tag" data-id="<?=$this->input->get( 'filter-tag' )?>">
+										<p>Drag files here to remove from tag</p>
+									</div>
 								<?php elseif( $bucket->tags && $bucket->objects ): ?>
-								<div class="info">
-									<p>Drag files onto tags to organise</p>
-								</div>
+									<div class="info">
+										<p>Drag files onto tags to organise</p>
+									</div>
 								<?php else : ?>
-								<div class="info">
-									<p>Use tags to organise your uploads</p>
-								</div>
+									<div class="info">
+										<p>Use tags to organise your uploads</p>
+									</div>
 								<?php endif; ?>
 
 								<ul>
@@ -131,7 +131,7 @@
 											$_selected = $this->input->get( 'filter-tag' ) == $tag->id ? 'selected' : '';
 
 											echo '<li class="tag droppable ' . $_selected . '" data-id="' . $tag->id . '">';
-											echo '<a href="' . site_url( 'cdn/manager/delete_tag/' . $tag->id . '/?' . $_SERVER['QUERY_STRING'] ) .'" class="confirm delete-tag" data-confirm="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
+											echo '<a href="' . site_url( 'cdn/manager/delete_tag/' . $tag->id . '/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) .'" class="confirm delete-tag" data-confirm="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
 											echo '<a href="' . $_uri . 'filter-tag=' . $tag->id . '" class="tag">';
 											echo $tag->label;
 											echo '<span class="count">' . $tag->total . '</span>';
@@ -143,7 +143,7 @@
 										// --------------------------------------------------------------------------
 
 										echo '<li class="new-tag">';
-										echo form_open( 'cdn/manager/new_tag/?' . $_SERVER['QUERY_STRING'] );
+										echo form_open( site_url( 'cdn/manager/new_tag/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) );
 										echo form_input( 'label', '', 'placeholder="New Tag"' );
 										echo form_submit( 'submit', 'Add', 'class="awesome small green"' );
 										echo form_close();
@@ -155,7 +155,7 @@
 							<li class="toolbar">
 								<?php
 
-									echo form_open_multipart( 'cdn/manager/upload/?' . $_SERVER['QUERY_STRING'] );
+									echo form_open_multipart( site_url( 'cdn/manager/upload/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) );
 									echo form_hidden( 'tag-id', $this->input->get( 'filter-tag' ) );
 									echo form_submit( 'submit', 'Upload', 'class="awesome green"' );
 									echo form_upload( 'userfile' );
@@ -196,16 +196,19 @@
 									<?php
 
 										//	Filter out any existing filter-view=
-										$_uri		 = preg_replace( '/&{1,}filter\-view=([a-z]*)/', '', $_uri_raw );
+										$_uri_orig	= preg_replace( '/&{1,}filter\-view=([a-z]*)/', '', $_uri_raw );
 
-										$_selected = $_filter_view == 'thumb' ? 'selected ' . $_selected . '' : '';
-										echo anchor( $_uri . 'filter-view=thumb', 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
+										$_selected	= $_filter_view == 'thumb' ? 'selected ' . $_selected . '' : '';
+										$_uri		= site_url( $_uri_orig . 'filter-view=thumb', page_is_secure() );
+										echo anchor( $_uri, 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
 
-										$_selected = $_filter_view == 'list' ? 'selected' : '';
-										echo anchor( $_uri . 'filter-view=list', 'List', 'class="list ' . $_selected . '"' );
+										$_selected	= $_filter_view == 'list' ? 'selected' : '';
+										$_uri		= site_url( $_uri_orig . 'filter-view=list', page_is_secure() );
+										echo anchor( $_uri, 'List', 'class="list ' . $_selected . '"' );
 
-										$_selected = $_filter_view == 'detail' ? 'selected' : '';
-										echo anchor( $_uri . 'filter-view=detail', 'Details', 'class="detail ' . $_selected . '"' );
+										$_selected	= $_filter_view == 'detail' ? 'selected' : '';
+										$_uri		= site_url( $_uri_orig . 'filter-view=detail', page_is_secure() );
+										echo anchor( $_uri, 'Details', 'class="detail ' . $_selected . '"' );
 									?>
 								</span>
 							</li>

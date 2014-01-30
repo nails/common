@@ -108,7 +108,7 @@ class NAILS_Shop_collection_model extends NAILS_Model
 		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label, $this->_table, 'slug' );
+			$_data->slug = $this->_generate_slug( $data->label );
 			$this->db->set( $_data );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );

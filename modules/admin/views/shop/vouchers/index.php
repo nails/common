@@ -70,7 +70,7 @@
 									case 'GIFT_CARD' :
 
 										echo '<small>Type: Gift card</small>';
-										echo '<small>Remaining Balance:' . SHOP_BASE_CURRENCY_SYMBOL . number_format( $voucher->gift_card_balance, SHOP_BASE_CURRENCY_PRECISION ). '</small>';
+										echo '<small>Remaining Balance: ' . SHOP_BASE_CURRENCY_SYMBOL . number_format( $voucher->gift_card_balance, SHOP_BASE_CURRENCY_PRECISION ). '</small>';
 
 									break;
 

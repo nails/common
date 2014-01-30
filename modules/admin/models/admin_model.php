@@ -29,7 +29,6 @@ class NAILS_Admin_Model extends NAILS_Model
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -59,7 +58,6 @@ class NAILS_Admin_Model extends NAILS_Model
 	 * @access	public
 	 * @param	string	$module	The name of the module to search for
 	 * @return	stdClass
-	 * @author	Pablo
 	 **/
 	public function find_module( $module )
 	{

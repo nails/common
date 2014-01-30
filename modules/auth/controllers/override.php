@@ -25,7 +25,6 @@ class NAILS_Override extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -52,7 +51,6 @@ class NAILS_Override extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function login_as( )
 	{

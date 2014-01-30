@@ -27,7 +27,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function track_open()
 	{
@@ -70,7 +69,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function track_link()
 	{
@@ -143,7 +141,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap( $method )
 	{

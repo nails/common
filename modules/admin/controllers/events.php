@@ -26,7 +26,6 @@ class NAILS_Events extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
@@ -64,7 +63,6 @@ class NAILS_Events extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{

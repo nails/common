@@ -25,7 +25,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -52,7 +51,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
@@ -165,7 +163,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	 * @access	private
 	 * @param	string	$code	The code to validate
 	 * @return	void
-	 * @author	Pablo
 	 */
 	public function _validate( $code )
 	{
@@ -225,7 +222,6 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap( $method )
 	{

@@ -100,7 +100,7 @@ class NAILS_Shop_tag_model extends NAILS_Model
 		if ( ! empty( $_data ) ) :
 
 			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label, $this->_table, 'slug' );
+			$_data->slug = $this->_generate_slug( $data->label );
 
 		endif;
 

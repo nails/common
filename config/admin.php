@@ -8,7 +8,7 @@
 | Control aspects of admin at the app level with this config file.
 |
 | Full details of configurable options are available at
-| http://docs.nailsapp.co.uk/modules/admin/config
+| TODO: Link to docs
 |
 */
 

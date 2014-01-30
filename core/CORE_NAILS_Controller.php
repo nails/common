@@ -13,7 +13,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()

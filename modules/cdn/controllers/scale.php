@@ -26,7 +26,6 @@ class NAILS_Scale extends Thumb
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{

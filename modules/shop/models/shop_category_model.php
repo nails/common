@@ -432,7 +432,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 			if ( $_data->parent_id ) :
 
-				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug', $_parent->slug . '/' );
+				$_data->slug			= $this->_generate_slug( $data->label, $_parent->slug . '/' );
 
 				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
 				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
@@ -441,7 +441,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 			else :
 
 				//	No parent, slug is just the label
-				$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug' );
+				$_data->slug			= $this->_generate_slug( $data->label );
 				$_data->slug_end		= $_data->slug;
 				$_data->label_nested	= $_data->label;
 
@@ -450,7 +450,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 		else :
 
 			//	No parent, slug is just the label
-			$_data->slug			= $this->_generate_slug( $data->label, $this->_table, 'slug' );
+			$_data->slug			= $this->_generate_slug( $data->label );
 			$_data->label_nested	= $_data->label;
 
 		endif;

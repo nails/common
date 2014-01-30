@@ -16,7 +16,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'analytics' || ! $this->input->post() ? 'active' : ''?>
 			<div id="tab-general" class="tab page <?=$_display?> analytics">
-				<?=form_open()?>
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'analytics' )?>
 				<p>
 					Configure your analytics accounts. If field is left empty then that provider will not be used.
@@ -37,8 +37,9 @@
 
 					?>
 				</fieldset>
-
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
 				<?=form_close()?>
 			</div>
 

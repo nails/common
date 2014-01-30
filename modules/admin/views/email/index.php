@@ -50,7 +50,7 @@
 							<td class="reads"><?=$email->read_count?></td>
 							<td class="clicks"><?=$email->link_click_count?></td>
 							<td class="actions">
-								<?=anchor( 'email/view_online/' . $email->ref, lang( 'action_preview' ), 'class="awesome small fancybox fancybox.iframe" target="_blank"' )?>
+								<?=anchor( site_url( 'email/view_online/' . $email->ref, page_is_secure() ), lang( 'action_preview' ), 'class="awesome small fancybox fancybox.iframe" target="_blank"' )?>
 							</td>
 						</tr>
 						<?php

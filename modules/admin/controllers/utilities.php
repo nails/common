@@ -32,7 +32,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
@@ -111,7 +110,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function test_email()
 	{
@@ -178,7 +176,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Gary
 	 **/
 	public function user_access()
 	{
@@ -207,7 +204,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function edit_group()
 	{

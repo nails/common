@@ -23,7 +23,6 @@ class NAILS_Geo_ip_driver
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( )
 	{
@@ -49,7 +48,6 @@ class NAILS_Geo_ip_driver
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __destruct()
 	{
@@ -74,7 +72,6 @@ class NAILS_Geo_ip_driver
 	 * @access	protected
 	 * @param	string	$error	The error message
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	protected function _set_error( $error )
 	{
@@ -90,7 +87,6 @@ class NAILS_Geo_ip_driver
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_errors()
 	{
@@ -106,7 +102,6 @@ class NAILS_Geo_ip_driver
 	 *
 	 * @access	public
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function last_error()
 	{
@@ -124,7 +119,6 @@ class NAILS_Geo_ip_driver
 	 * @param string $key The key for the cached item
 	 * @param mixed $value The data to be cached
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	protected function _set_cache( $key, $value )
 	{
@@ -172,7 +166,6 @@ class NAILS_Geo_ip_driver
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	protected function _get_cache( $key )
 	{
@@ -223,7 +216,6 @@ class NAILS_Geo_ip_driver
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	protected function _unset_cache( $key )
 	{
@@ -277,7 +269,6 @@ class NAILS_Geo_ip_driver
 	 *
 	 * @access	private
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _cache_prefix()
 	{

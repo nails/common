@@ -55,13 +55,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		if ( blog_setting( 'categories_enabled' ) ) :
 
-			$d->funcs['manager_category']	= 'Manage Categories';	//	Sub-nav function.
+			$d->funcs['manage/categories']	= 'Manage Categories';	//	Sub-nav function.
 
 		endif;
 
 		if ( blog_setting( 'tags_enabled' ) ) :
 
-			$d->funcs['manager_tag']		= 'Manage Tags';		//	Sub-nav function.
+			$d->funcs['manage/tags']		= 'Manage Tags';		//	Sub-nav function.
 
 		endif;
 

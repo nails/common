@@ -17,8 +17,6 @@
 
 class NAILS_Admin_changelog_model extends NAILS_Model
 {
-	protected $_table;
-	protected $_table_prefix;
 	protected $_changes;
 	protected $_batch_save;
 
@@ -26,15 +24,19 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 	public function __construct()
 	{
-		$this->_table = NAILS_DB_PREFIX . 'admin_changelog';
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		//	Define data structure
+		$this->_table			= NAILS_DB_PREFIX . 'admin_changelog';
+		$this->_table_prefix	= 'acl';
 
 		// --------------------------------------------------------------------------
 
 		//	Set defaults
-		$this->_table			= NAILS_DB_PREFIX . 'admin_changelog';
-		$this->_table_prefix	= 'acl';
-		$this->_changes			= array();
-		$this->_batch_save		= TRUE;
+		$this->_changes		= array();
+		$this->_batch_save	= TRUE;
 
 		// --------------------------------------------------------------------------
 
@@ -52,7 +54,6 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 			log_message( 'error', 'Admin_changelog_model could not set the post_controller hook to save items in batches.' );
 
 		endif;
-
 	}
 
 
@@ -176,15 +177,17 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all()
+	protected function _getcount_common( $search = NULL )
 	{
+		//	Set the select
 		$this->db->select( $this->_table_prefix . '.*, u.first_name, u.last_name, u.gender, u.profile_img, ue.email' );
+
+		//	Join user tables
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.user_id' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.id = ' . $this->_table_prefix . '.user_id AND ue.is_primary = 1' );
 
+		//	Set the order
 		$this->db->order_by( $this->_table_prefix . '.created', 'DESC' );
-
-		return parent::get_all();
 	}
 
 

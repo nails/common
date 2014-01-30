@@ -36,7 +36,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'settings' || ! $this->input->post() ? 'active' : ''?>
 			<div id="tab-general" class="tab page <?=$_display?> general">
-				<?=form_open()?>
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'settings' )?>
 				<p>
 					Generic store settings. Use these to control some store behaviours.
@@ -265,8 +265,9 @@
 
 					?>
 				</fieldset>
-
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
 				<?=form_close()?>
 			</div>
 
@@ -280,7 +281,7 @@
 
 				if ( $payment_gateways ) :
 
-					echo form_open();
+					echo form_open( NULL, 'style="margin-bottom:0;"' );
 					echo form_hidden( 'update', 'paymentgateways' );
 
 					foreach ( $payment_gateways AS $pg ) :
@@ -384,8 +385,9 @@
 						echo '</fieldset>';
 
 					endforeach;
-
-					echo form_submit( 'submit', lang( 'action_save_changes' ) );
+					echo '<p style="margin-top:1em;margin-bottom:0;">';
+					echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
+					echo '</p>';
 					echo form_close();
 
 				else :
@@ -402,7 +404,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'currencies' ? 'active' : ''?>
 			<div id="tab-currencies" class="tab page <?=$_display?> currencies">
-				<?=form_open()?>
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'currencies' )?>
 				<p>
 					Configure supported currencies.
@@ -445,14 +447,16 @@
 
 					?>
 				</fieldset>
-				<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
 				<?=form_close()?>
 			</div>
 
 
 			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'active' : ''?>
 			<div id="tab-shipping-methods" class="tab page <?=$_display?> shipping-methods">
-				<?=form_open( NULL, 'id="form-shipping-methods"' )?>
+				<?=form_open( NULL, 'id="form-shipping-methods" style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'shipping_methods' )?>
 				<p>
 					Configure supported shipping methods.
@@ -569,9 +573,9 @@
 					?>
 					</tbody>
 				</table>
-				<p>
+				<p style="margin-bottom:0;">
 					<a href="#" id="add-new-shipping" style="float:right" class="awesome green small">Add Shipping Method</a>
-					<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
 			</div>
@@ -579,7 +583,7 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'active' : ''?>
 			<div id="tab-tax-rates" class="tab page <?=$_display?> tax-rates">
-				<?=form_open( NULL, 'id="form-tax-rates"' )?>
+				<?=form_open( NULL, 'id="form-tax-rates" style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'tax_rates' )?>
 				<p>
 					Configure supported Tax Rates
@@ -632,9 +636,9 @@
 					?>
 					</tbody>
 				</table>
-				<p>
+				<p style="margin-bottom:0;">
 					<a href="#" id="add-new-tax-rate" style="float:right" class="awesome green small">Add Tax Rate</a>
-					<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
 			</div>

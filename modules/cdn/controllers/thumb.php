@@ -38,7 +38,6 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -64,7 +63,6 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index( $crop_method = 'THUMB' )
 	{

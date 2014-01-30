@@ -69,7 +69,6 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	static function notifications()
 	{
@@ -98,7 +97,6 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	static function permissions()
 	{

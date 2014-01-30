@@ -26,7 +26,6 @@ class NAILS_System extends NAILS_System_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function render_404()
 	{

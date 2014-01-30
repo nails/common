@@ -91,7 +91,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			if ( $_data->parent_id ) :
 
-				$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug', $_parent->slug . '/' );
+				$_data->slug			= $this->_generate_slug( $data->title, $_parent->slug . '/' );
 
 				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
 				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
@@ -100,7 +100,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 			else :
 
 				//	No parent, slug is just the title
-				$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug' );
+				$_data->slug			= $this->_generate_slug( $data->title );
 				$_data->slug_end		= $_data->slug;
 				$_data->title_nested	= $_data->title;
 
@@ -109,7 +109,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		else :
 
 			//	No parent, slug is just the title
-			$_data->slug			= $this->_generate_slug( $data->title, $this->_table, 'slug' );
+			$_data->slug			= $this->_generate_slug( $data->title );
 			$_data->title_nested	= $_data->title;
 
 		endif;

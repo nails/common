@@ -17,17 +17,30 @@
 
 class NAILS_Blog_tag_model extends NAILS_Model
 {
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$this->_table = NAILS_DB_PREFIX . 'blog_tag';
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_all( $include_count = FALSE )
 	{
-		$this->db->select( 't.id,t.slug,t.label' );
+		$this->db->select( 'id,slug,label' );
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag WHERE tag_id = t.id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag WHERE tag_id = id) post_count' );
 
 		endif;
 
-		$_tags = $this->db->get( NAILS_DB_PREFIX . 'blog_tag t' )->result();
+		$_tags = $this->db->get( $this->_table )->result();
 
 		foreach ( $_tags AS $tag ) :
 
@@ -44,7 +57,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function get_by_id( $id, $include_count = FALSE  )
 	{
-		$this->db->where( 't.id', $id );
+		$this->db->where( 'id', $id );
 		$_tag = $this->get_all( $include_count );
 
 		if ( ! $_tag )
@@ -59,7 +72,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function get_by_slug( $slug, $include_count = FALSE  )
 	{
-		$this->db->where( 't.slug', $slug );
+		$this->db->where( 'slug', $slug );
 		$_tag = $this->get_all( $include_count );
 
 		if ( ! $_tag )
@@ -74,22 +87,11 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function create( $label )
 	{
-		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_tag' );
-		$this->db->set( 'slug', $_slug );
-		$this->db->set( 'label', $label );
-		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->set( 'modified', 'NOW()', FALSE );
+		$_data			= array();
+		$_data['slug']	= $this->_generate_slug( $label );
+		$_data['label']	= $label;
 
-		if ( $this->user->is_logged_in() ) :
-
-			$this->db->set( 'created_by', active_user( 'id' ) );
-			$this->db->set( 'modified_by', active_user( 'id' ) );
-
-		endif;
-
-		$this->db->insert( NAILS_DB_PREFIX . 'blog_tag' );
-
-		return (bool) $this->db->affected_rows();
+		return parent::create( $_data );
 	}
 
 	// --------------------------------------------------------------------------
@@ -97,7 +99,8 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function update( $id_slug, $label )
 	{
-		$_slug = $this->_generate_slug( $label, NAILS_DB_PREFIX . 'blog_tag' );
+		$_slug = $this->_generate_slug( $label );
+
 		$this->db->set( 'slug', $_slug );
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );
@@ -118,7 +121,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 		endif;
 
-		$this->db->update( NAILS_DB_PREFIX . 'blog_tag' );
+		$this->db->update( $this->_table );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -147,7 +150,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 		endif;
 
-		$this->db->delete( NAILS_DB_PREFIX . 'blog_tag' );
+		$this->db->delete( $this->_table );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -167,11 +170,11 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	protected function _format_tag( &$tag )
 	{
-		$tag->id	= (int) $tag->id;
+		$tag->id = (int) $tag->id;
 
 		if ( isset( $tag->post_count ) ) :
 
-			$tag->post_count	= (int) $tag->post_count;
+			$tag->post_count = (int) $tag->post_count;
 
 		endif;
 	}
@@ -214,4 +217,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_BLOG_TAG_MODEL' ) ) :
 endif;
 
 /* End of file blog_tag_model.php */
-/* Location: ./application/models/blog_tag_model.php */
+/* Location: ./modules/blog/models/blog_tag_model.php */

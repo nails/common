@@ -31,7 +31,6 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -142,7 +141,6 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function view()
@@ -216,7 +214,6 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function run()

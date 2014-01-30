@@ -284,7 +284,6 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	protected function _bad_src( $width = 100, $height = 100 )
 	{

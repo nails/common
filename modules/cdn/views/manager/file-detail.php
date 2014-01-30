@@ -37,7 +37,7 @@
 		echo '<div class="actions">';
 
 			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-			echo anchor( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], 'Delete', 'class="awesome red small delete"' );
+			echo anchor( site_url( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], page_is_secure() ), 'Delete', 'class="awesome red small delete"' );
 			echo '<a href="' . cdn_serve( $object->id ) . '" class="fancybox awesome small">' . $_action_download . '</a>';
 
 		echo '</div>';

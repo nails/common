@@ -27,7 +27,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( $options = NULL )
 	{
@@ -110,7 +109,6 @@ class Cdn {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __destruct()
 	{
@@ -171,7 +169,6 @@ class Cdn {
 	 * @param string $key The key for the cached item
 	 * @param mixed $value The data to be cached
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	protected function _set_cache( $key, $value )
 	{
@@ -219,7 +216,6 @@ class Cdn {
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	protected function _get_cache( $key )
 	{
@@ -270,7 +266,6 @@ class Cdn {
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	protected function _unset_cache( $key )
 	{
@@ -325,7 +320,6 @@ class Cdn {
 	 * @access	protected
 	 * @param	object	$object	The object to remove from the cache
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	protected function _unset_cache_object( $object, $clear_cachedir = TRUE )
 	{
@@ -376,7 +370,6 @@ class Cdn {
 	 *
 	 * @access	private
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _cache_prefix()
 	{
@@ -407,7 +400,6 @@ class Cdn {
 	 *
 	 * @access	public
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function last_error()
 	{
@@ -425,7 +417,6 @@ class Cdn {
 	 * @access	public
 	 * @param	array	$error	The error message to add
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function set_error( $error )
 	{
@@ -533,7 +524,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function get_object( $object, $bucket = NULL )
 	{
@@ -614,7 +604,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function get_object_from_trash( $object, $bucket = NULL )
 	{
@@ -660,7 +649,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function get_objects_for_user( $user_id )
 	{
@@ -678,7 +666,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_create( $object, $bucket, $options = array(), $is_raw = FALSE )
 	{
@@ -1242,7 +1229,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_destroy( $object_id )
 	{
@@ -1329,7 +1315,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_copy( $source, $object, $bucket, $options = array() )
 	{
@@ -1347,7 +1332,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_move( $source, $object, $bucket, $options = array() )
 	{
@@ -1365,7 +1349,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function object_replace( $object, $bucket, $replace_with, $options = array(), $is_raw = FALSE )
 	{
@@ -1406,7 +1389,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function object_tag_add( $object_id, $tag_id )
 	{
@@ -1466,7 +1448,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function object_tag_delete( $object_id, $tag_id )
 	{
@@ -1513,7 +1494,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function object_tag_count( $tag_id )
 	{
@@ -1532,7 +1512,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function object_increment_count( $action, $object, $bucket = NULL )
 	{
@@ -1608,7 +1587,6 @@ class Cdn {
 	 * @param	array
 	 * @param	boolean
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	private function _create_object( $data, $return_object = FALSE )
 	{
@@ -1707,7 +1685,6 @@ class Cdn {
 	 * @access	private
 	 * @param	object	$object	The object to format
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _format_object( &$object )
 	{
@@ -1783,7 +1760,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function get_buckets( $list_bucket = FALSE, $filter_tag = FALSE, $include_deleted = FALSE )
 	{
@@ -1838,7 +1814,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function get_bucket( $bucket, $list_bucket = FALSE, $filter_tag = FALSE )
 	{
@@ -1870,7 +1845,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_create( $bucket, $label = NULL )
 	{
@@ -1941,7 +1915,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_list( $bucket, $filter_tag = FALSE )
 	{
@@ -1980,7 +1953,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_destroy( $bucket )
 	{
@@ -2043,7 +2015,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_tag_add( $bucket, $label )
 	{
@@ -2109,7 +2080,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_tag_delete( $bucket, $label )
 	{
@@ -2184,7 +2154,6 @@ class Cdn {
 	 * @access	public
 	 * @param	string
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function bucket_tag_rename( $bucket, $label, $new_name )
 	{
@@ -2202,7 +2171,6 @@ class Cdn {
 	 * @access	private
 	 * @param	object	$bucket	The bucket to format
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _format_bucket( &$bucket )
 	{
@@ -2241,7 +2209,6 @@ class Cdn {
 	 * @access	private
 	 * @param	string $file the path to the file to check
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	private function _detect_animated_gif( $file )
 	{
@@ -2295,7 +2262,6 @@ class Cdn {
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_ext_from_mimetype( $mime_type )
 	{
@@ -2517,7 +2483,6 @@ class Cdn {
 	 * @param	string	$bucket	The bucket which the image resides in
 	 * @param	string	$object	The filename of the object
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_serve( $object, $force_download = FALSE )
 	{
@@ -2546,7 +2511,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_serve_scheme( $force_download = FALSE )
 	{
@@ -2565,7 +2529,6 @@ class Cdn {
 	 * @param	string	$width	The width of the thumbnail
 	 * @param	string	$height	The height of the thumbnail
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_thumb( $object, $width, $height )
 	{
@@ -2594,7 +2557,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_thumb_scheme()
 	{
@@ -2614,7 +2576,6 @@ class Cdn {
 	 * @param	string	$width	The width of the scaled image
 	 * @param	string	$height	The height of the scaled image
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_scale( $object, $width, $height )
 	{
@@ -2643,7 +2604,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_scale_scheme()
 	{
@@ -2662,7 +2622,6 @@ class Cdn {
 	 * @param	int		$height	The height of the placeholder
 	 * @param	int		border	The width of the border round the placeholder
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_placeholder( $width = 100, $height = 100, $border = 0 )
 	{
@@ -2679,7 +2638,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_placeholder_scheme()
 	{
@@ -2698,7 +2656,6 @@ class Cdn {
 	 * @param	int		$height	The height of the placeholder
 	 * @param	mixed	$sex	The gender of the blank avatar to show
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_blank_avatar( $width = 100, $height = 100, $sex = 'unknown' )
 	{
@@ -2715,7 +2672,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_blank_avatar_scheme()
 	{
@@ -2734,7 +2690,6 @@ class Cdn {
 	 * @param	string	$object		The filename of the image we're 'scaling'
 	 * @param	string	$expires	The length of time the URL should be valid for, in seconds
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_expiring( $object, $expires )
 	{
@@ -2763,7 +2718,6 @@ class Cdn {
 	 * @access	public
 	 * @param	none
 	 * @return	string
-	 * @author	Pablo
 	 **/
 	public function url_expiring_scheme()
 	{

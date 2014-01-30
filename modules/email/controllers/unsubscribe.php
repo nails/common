@@ -27,7 +27,6 @@ class NAILS_Unsubscribe extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
@@ -109,7 +108,6 @@ class NAILS_Unsubscribe extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap()
 	{

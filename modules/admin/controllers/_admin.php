@@ -21,7 +21,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -189,8 +188,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		//	Initialise the admin change log model
 		$this->load->model( 'admin_changelog_model' );
-
-		$this->admin_changelog_model->get_all_flat( 'title' );
 	}
 
 
@@ -198,13 +195,12 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 
 	/**
-	 * Determines wether the active_user() can access the specified module
+	 * Determines whether the active_user() can access the specified module
 	 *
 	 * @access	static
 	 * @param	$module A reference to the module definition
 	 * @param	$file The file we're checking
 	 * @return	mixed
-	 * @author	Pablo
 	 *
 	 **/
 	static function _can_access( &$module, $file )
@@ -241,12 +237,11 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 	/**
 	 * Loop through the enabled modules and see if a controller exists for it; if
-	 * it does load it up and execute the annouce static method to see if we can
+	 * it does load it up and execute the announce static method to see if we can
 	 * display it to the active user.
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	private function _load_active_modules()
@@ -309,7 +304,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	NULL
-	 * @author	Pablo
 	 *
 	 **/
 	static function announce()
@@ -326,7 +320,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 *
 	 **/
 	static function notifications()
@@ -343,7 +336,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 *
 	 **/
 	static function permissions()

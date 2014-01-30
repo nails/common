@@ -47,7 +47,6 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function _home()
@@ -80,7 +79,6 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function _category()
@@ -140,7 +138,6 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function _tag()
@@ -173,7 +170,6 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function _product()

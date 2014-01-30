@@ -25,7 +25,6 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -53,7 +52,6 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 	 * @param	int		$id		The ID fo the user to reset
 	 * @param	strgin	hash	The hash to validate against
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _validate( $id, $hash )
 	{
@@ -168,7 +166,6 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 	 * @access	public
 	 * @param	string	$id	the ID of the user to reset, as per the URL
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap( $id )
 	{

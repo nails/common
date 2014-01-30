@@ -33,7 +33,6 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()

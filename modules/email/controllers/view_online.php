@@ -27,14 +27,13 @@ class NAILS_View_Online extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
 		//	Fetch data; return a string if not set so as not to accidentally skip the
 		//	hash check in get_by_ref();
 
-		$_ref	= $this->uri->segment( 3, 'NULL' );
+		$_ref = $this->uri->segment( 3, 'NULL' );
 
 		if ( $this->user->is_admin() ) :
 
@@ -55,8 +54,11 @@ class NAILS_View_Online extends NAILS_Email_Controller
 
 		$_email = $this->emailer->get_by_ref( $_ref, $_guid, $_hash );
 
-		if ( ! $_email || $_email == 'BAD_HASH' )
+		if ( ! $_email || $_email == 'BAD_HASH' ) :
+
 			show_error( lang( 'invalid_email' ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -117,7 +119,6 @@ class NAILS_View_Online extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap()
 	{

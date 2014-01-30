@@ -23,7 +23,6 @@ class Logger
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -54,7 +53,6 @@ class Logger
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function line( $line = '' )
 	{
@@ -141,7 +139,6 @@ class Logger
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function set_file( $file = NULL )
 	{

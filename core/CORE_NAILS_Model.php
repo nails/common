@@ -1,18 +1,42 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class CORE_NAILS_Model extends CI_Model {
+class CORE_NAILS_Model extends CI_Model
+{
 
+	//	Common data
 	protected $data;
 	protected $user;
-	protected $_errors;
-	protected $_table;
-	protected $_table_prefix;
-
 	protected $_cache_values;
 	protected $_cache_keys;
 	protected $_cache_method;
 
-	// --------------------------------------------------------------------------
+	//	Errors
+	protected $_errors;
+
+	//	Data/Table structure
+	protected $_table;
+	protected $_table_prefix;
+
+	protected $_table_id_column;
+	protected $_table_slug_column;
+	protected $_table_label_column;
+
+	protected $_deleted_flag;
+
+	//	Preferences
+	protected $_destructive_delete;
+	protected $_per_page;
+
+
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * CONSTRUCTOR && DESTRUCTOR
+	 * The constructor preps common variables and sets the model up for user.
+	 * The destructor clears
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
 
 
 	/**
@@ -20,7 +44,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( )
 	{
@@ -48,7 +71,13 @@ class CORE_NAILS_Model extends CI_Model {
 		// --------------------------------------------------------------------------
 
 		//	Define defaults
-		$this->_errors = array();
+		$this->_errors				= $this->clear_errors();
+		$this->_destructive_delete	= TRUE;
+		$this->_table_id_column		= 'id';
+		$this->_table_slug_column	= 'slug';
+		$this->_table_label_column	= 'label';
+		$this->_deleted_flag		= 'is_deleted';
+		$this->_per_page			= 50;
 	}
 
 
@@ -60,10 +89,11 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __destruct()
 	{
+		//	TODO: decide whether this is necessary; should caches be persistent; gut says yes.
+
 		//	Clear cache's
 		if ( isset( $this->_cache_keys ) && $this->_cache_keys ) :
 
@@ -76,7 +106,16 @@ class CORE_NAILS_Model extends CI_Model {
 		endif;
 	}
 
-	// --------------------------------------------------------------------------
+
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * ERROR METHODS
+	 * These methods provide a consistent interface for setting and retrieving
+	 * errors which are generated.
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
 
 
 	/**
@@ -85,7 +124,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @access	protected
 	 * @param	string	$error	The error message
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	protected function _set_error( $error )
 	{
@@ -101,7 +139,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_errors()
 	{
@@ -117,7 +154,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access	public
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function last_error()
 	{
@@ -129,13 +165,50 @@ class CORE_NAILS_Model extends CI_Model {
 
 
 	/**
+	 * Clear the last error
+	 *
+	 * @access	public
+	 * @return	mixed
+	 **/
+	public function clear_last_error()
+	{
+		return array_pop( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Clears all errors
+	 *
+	 * @access	public
+	 * @return	mixed
+	 **/
+	public function clear_errors()
+	{
+		$this->_errors = array();
+	}
+
+
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * CACHE METHODS
+	 * These methods provide a consistent interface for setting and retrieving
+	 * items from the cache
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
+
+
+	/**
 	 * Provides models with the an easy interface for saving data to a cache.
 	 *
 	 * @access	protected
 	 * @param string $key The key for the cached item
 	 * @param mixed $value The data to be cached
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	protected function _set_cache( $key, $value )
 	{
@@ -183,7 +256,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	protected function _get_cache( $key )
 	{
@@ -234,7 +306,6 @@ class CORE_NAILS_Model extends CI_Model {
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	protected function _unset_cache( $key )
 	{
@@ -288,15 +359,25 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access	private
 	 * @return	string
-	 * @author	Pablo
 	 **/
-	private function _cache_prefix()
+	protected function _cache_prefix()
 	{
 		return get_called_class();
 	}
 
 
-	// --------------------------------------------------------------------------
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * MUTATION METHODS
+	 * These methods provide a consistent interface for creating, and manipulating
+	 * objects that this model represents. These methods should be extended if any
+	 * custom functionality is required.
+	 *
+	 * See the docs for more info TODO: link to docs
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
 
 
 	/**
@@ -415,17 +496,105 @@ class CORE_NAILS_Model extends CI_Model {
 
 
 	/**
-	 * Deletes an existing object
+	 * Marks an object as deleted
+	 *
+	 * If destructive deletion is enabled then this method will permanently
+	 * destroy the object. If Non-destructive deletion is enabled then the
+	 * $this->_deleted_flag field will be set to TRUE.
 	 *
 	 * @access public
-	 * @param int $id The ID of the object to delete
+	 * @param int $id The ID of the object to mark as deleted
 	 * @return bool
 	 **/
 	public function delete( $id )
 	{
+		//	Perform this check here so the error message is more easily traced.
 		if ( ! $this->_table ) :
 
 			show_error( get_called_class() . '::delete() Table variable not set' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->_destructive_delete ) :
+
+			//	Destructive delete; nuke that row.
+			return $this->destroy( $id );
+
+		else :
+
+			//	Non-destructive delete, update the flag
+			$_data = array(
+				$this->_deleted_flag => TRUE
+			);
+			return $this->update( $id, $_data );
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Unmarks an object as deleted
+	 *
+	 * If destructive deletion is enabled then this method will return FALSE.
+	 * If Non-destructive deletion is enabled then the $this->_deleted_flag
+	 * field will be set to FALSE.
+	 *
+	 * @access public
+	 * @param int $id The ID of the object to restore
+	 * @return bool
+	 **/
+	public function restore( $id )
+	{
+		//	Perform this check here so the error message is more easily traced.
+		if ( ! $this->_table ) :
+
+			show_error( get_called_class() . '::restore() Table variable not set' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->_destructive_delete ) :
+
+			//	Destructive delete; can't be resurrecting the dead.
+			return FALSE;
+
+		else :
+
+			//	Non-destructive delete, update the flag
+			$_data = array(
+				$this->_deleted_flag => FALSE
+			);
+			return $this->update( $id, $_data );
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Permanently deletes an object
+	 *
+	 * This method will attempt to delete the row from the table, regardless of whether
+	 * destructive deletion is enabled or not.
+	 *
+	 * @access public
+	 * @param int $id The ID of the object to destroy
+	 * @return bool
+	 **/
+	public function destroy( $id )
+	{
+		//	Perform this check here so the error message is more easily traced.
+		if ( ! $this->_table ) :
+
+			show_error( get_called_class() . '::destroy() Table variable not set' );
 
 		endif;
 
@@ -438,17 +607,27 @@ class CORE_NAILS_Model extends CI_Model {
 	}
 
 
-	// --------------------------------------------------------------------------
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * RETRIEVAL & COUNTING METHODS
+	 * These methods provide a consistent interface for retrieving and counting objects
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
 
 
 	/**
-	 * Fetches all objects
+	 * Fetches all objects, optionally paginated.
 	 *
 	 * @access public
-	 * @param none
+	 * @param int $page The page number of the results, if NULL then no pagination
+	 * @param int $per_page How many items per page of paginated results
+	 * @param string $search The search keywords to apply to the query
+	 * @param bool $include_deleted If non-destructive delete is enabled then this flag allows you to include deleted items
 	 * @return array
 	 **/
-	public function get_all()
+	public function get_all( $page = NULL, $per_page = NULL, $search = NULL, $include_deleted = FALSE )
 	{
 		if ( ! $this->_table ) :
 
@@ -459,6 +638,34 @@ class CORE_NAILS_Model extends CI_Model {
 			$_table = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Apply common items; including search
+		$this->_getcount_common( $search );
+
+		// --------------------------------------------------------------------------
+
+		//	Facilitate pagination
+		if ( NULL !== $page ) :
+
+			//	Work out what the offset should be
+			$_per_page	= NULL == $per_page ? $this->_per_page : (int) $per_page;
+			$_offset	= $page * $per_page;
+
+			$this->db->limit( $per_page, $_offset );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	If non-destructive delete is enabled then apply the delete query
+		if ( ! $this->_destructive_delete && ! $include_deleted ) :
+
+			$this->db->where( $this->_deleted_flag, FALSE );
+
+		endif;
+
 
 		// --------------------------------------------------------------------------
 
@@ -477,59 +684,21 @@ class CORE_NAILS_Model extends CI_Model {
 	// --------------------------------------------------------------------------
 
 
-	protected function _format_object( &$obj )
-	{
-		//	Extend this method to format the returned objects
-
-		// --------------------------------------------------------------------------
-
-		//	Some common items
-		if ( ! empty( $obj->id ) ) :
-
-			$obj->id = (int) $obj->id;
-
-		endif;
-
-		if ( ! empty( $obj->parent_id ) ) :
-
-			$obj->parent_id = (int) $obj->parent_id;
-
-		endif;
-
-		if ( ! empty( $obj->user_id ) ) :
-
-			$obj->user_id = (int) $obj->user_id;
-
-		endif;
-
-		if ( ! empty( $obj->created_by ) ) :
-
-			$obj->created_by = (int) $obj->created_by;
-
-		endif;
-
-		if ( ! empty( $obj->modified_by ) ) :
-
-			$obj->modified_by = (int) $obj->modified_by;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	/**
 	 * Fetches all objects as a flat array
 	 *
+	 * The keys of the returned array correlate to the ID of the object, while
+	 * the value of the element is the object's label
+	 *
 	 * @access public
-	 * @param string $label_col The name of the column to use as the label
-	 * @param string $id_col The name of the column to use as the ID
+	 * @param int $page The page number of the results, if NULL then no pagination
+	 * @param int $per_page How many items per page of paginated results
+	 * @param string $search The search keywords to apply to the query
 	 * @return array
 	 **/
-	public function get_all_flat( $label_col = 'label', $id_col = 'id' )
+	public function get_all_flat( $page = NULL, $per_page = NULL, $search = NULL )
 	{
-		$_items	= $this->get_all();
+		$_items	= $this->get_all( $page, $per_page, $search );
 		$_out	= array();
 
 		//	Nothing returned? Skip the rest of this method, it's pointless.
@@ -544,15 +713,15 @@ class CORE_NAILS_Model extends CI_Model {
 		//	Test columns
 		$_test = reset( $_items );
 
-		if ( ! isset( $_test->{$label_col} ) ) :
+		if ( ! isset( $_test->{$this->_table_label_column} ) ) :
 
-			show_error( get_called_class() . '::get_all_flat() "' . $label_col . '" is not a valid column.' );
+			show_error( get_called_class() . '::get_all_flat() "' . $this->_table_label_column . '" is not a valid label column.' );
 
 		endif;
 
-		if ( ! isset( $_test->{$id_col} ) ) :
+		if ( ! isset( $_test->{$this->_table_id_column} ) ) :
 
-			show_error( get_called_class() . '::get_all_flat() "' . $id_col . '" is not a valid column.' );
+			show_error( get_called_class() . '::get_all_flat() "' . $this->_table_id_column . '" is not a valid id column.' );
 
 		endif;
 
@@ -562,7 +731,7 @@ class CORE_NAILS_Model extends CI_Model {
 
 		foreach( $_items AS $item ) :
 
-			$_out[$item->{$id_col}] = $item->{$label_col};
+			$_out[$item->{$this->_table_id_column}] = $item->{$this->_table_label_column};
 
 		endforeach;
 
@@ -574,42 +743,13 @@ class CORE_NAILS_Model extends CI_Model {
 
 
 	/**
-	 * Counts all objects
-	 *
-	 * @access public
-	 * @param none
-	 * @return int
-	 **/
-	public function count()
-	{
-		if ( ! $this->_table ) :
-
-			show_error( get_called_class() . '::count() Table variable not set' );
-
-		else :
-
-			$_table		= $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $this->db->count_all_results( $_table );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
 	 * Fetch an object by it's ID
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
-	 * @param string $id_column The name of the id column
 	 * @return	stdClass
 	 **/
-	public function get_by_id( $id, $id_column = 'id' )
+	public function get_by_id( $id )
 	{
 		if ( ! $this->_table ) :
 
@@ -617,13 +757,13 @@ class CORE_NAILS_Model extends CI_Model {
 
 		else :
 
-			$_prefix	= $this->_table_prefix ? $this->_table_prefix . '.' : '';
+			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . $id_column, $id );
+		$this->db->where( $_prefix . $this->_table_id_column, $id );
 		$_result = $this->get_all();
 
 		// --------------------------------------------------------------------------
@@ -648,10 +788,9 @@ class CORE_NAILS_Model extends CI_Model {
 	 *
 	 * @access public
 	 * @param int $slug The slug of the object to fetch
-	 * @param string $slug_column The name of the slug column
 	 * @return	stdClass
 	 **/
-	public function get_by_slug( $slug, $slug_column = 'slug' )
+	public function get_by_slug( $slug )
 	{
 		if ( ! $this->_table ) :
 
@@ -659,13 +798,13 @@ class CORE_NAILS_Model extends CI_Model {
 
 		else :
 
-			$_prefix	= $this->_table_prefix ? $this->_table_prefix . '.' : '';
+			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . $slug_column, $slug );
+		$this->db->where( $_prefix . $this->_table_slug_column, $slug );
 		$_result = $this->get_all();
 
 		// --------------------------------------------------------------------------
@@ -694,39 +833,18 @@ class CORE_NAILS_Model extends CI_Model {
 	 * Nails style guidelines) will be interpreted incorrectly.
 	 *
 	 * @access public
-	 * @param int $id_slug The ID or slug of the object to fetch
-	 * @param int $id_slug_column The name of the ID or slug column
-	 * @return	stdClass
+	 * @param mixed $id_slug The ID or slug of the object to fetch
+	 * @return stdClass
 	 **/
-	public function get_by_id_or_slug( $id_slug, $id_slug_column = NULL )
+	public function get_by_id_or_slug( $id_slug )
 	{
 		if ( is_numeric( $id_slug ) ) :
 
-			if ( $id_slug_column ) :
-
-				//	ID column has been provided, use it
-				return $this->get_by_id( $id_slug, $id_slug_column );
-
-			else :
-
-				//	ID column has not been provided, let the get_by_*() method determine it
-				return $this->get_by_id( $id_slug );
-
-			endif;
+			return $this->get_by_id( $id_slug );
 
 		else :
 
-			if ( $id_slug_column ) :
-
-				//	Slug column has been provided, use it
-				return $this->get_by_slug( $id_slug, $id_slug_column );
-
-			else :
-
-				//	Slug column has not been provided, let the get_by_*() method determine it
-				return $this->get_by_slug( $id_slug );
-
-			endif;
+			return $this->get_by_slug( $id_slug );
 
 		endif;
 	}
@@ -735,26 +853,83 @@ class CORE_NAILS_Model extends CI_Model {
 	// --------------------------------------------------------------------------
 
 
-	protected function _generate_slug( $label, $table = NULL, $column = NULL, $_add_prefix = '', $_add_suffix = '' )
+	/**
+	 * Counts all objects
+	 *
+	 * @access public
+	 * @param string $search The search keywords to apply to the query
+	 * @return int
+	 **/
+	public function count( $search = NULL )
 	{
-		//	Prep table and column
-		$_prefix = ! $table && $this->_table_prefix ? $this->_table_prefix . '.' : '';
+		if ( ! $this->_table ) :
 
+			show_error( get_called_class() . '::count() Table variable not set' );
+
+		else :
+
+			$_table	 = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Apply common items
+		$this->_getcount_common( $search );
+
+		// --------------------------------------------------------------------------
+
+		return $this->db->count_all_results( $_table );
+	}
+
+
+	/**
+	 * --------------------------------------------------------------------------
+	 *
+	 * HELPER METHODS
+	 * These methods provide additional functionality to models
+	 *
+	 * --------------------------------------------------------------------------
+	 **/
+
+
+	/**
+	 * Applies common conditionals
+	 *
+	 * This method applies the conditionals which are common across the get_*()
+	 * methods and the count() method.
+	 *
+	 * @access public
+	 * @param string $search The search keywords to apply to the query
+	 * @return void
+	 **/
+	protected function _getcount_common( $search = NULL )
+	{}
+
+
+	/**
+	 * Generates a unique slug
+	 *
+	 * This method provides the functionality to generate a unique slug for an item in the database.
+	 *
+	 * @access public
+	 * @param string $label The label from which to generate a slug
+	 * @param string $prefix Any prefix to add to the slug
+	 * @param string $suffix Any suffix to add to the slug
+	 * @return string
+	 **/
+	protected function _generate_slug( $label, $prefix = '', $suffix = '', $table = NULL, $column = NULL )
+	{
+		//	Perform this check here so the error message is more easily traced.
 		if ( NULL === $table ) :
 
-			$_table = $this->_table;
-
-			if ( ! $_table ) :
+			if ( ! $this->_table ) :
 
 				show_error( get_called_class() . '::_generate_slug() Table variable not set' );
 
 			endif;
 
-			if ( $this->_table_prefix ) :
-
-				$_table .= ' ' . $this->_table_prefix;
-
-			endif;
+			$_table = $this->_table;
 
 		else :
 
@@ -762,19 +937,19 @@ class CORE_NAILS_Model extends CI_Model {
 
 		endif;
 
-		$_column = ! $column ? 'slug' : $column;
+		if ( NULL === $column ) :
 
-		// --------------------------------------------------------------------------
+			if ( ! $this->_table_slug_column ) :
 
-		if ( ! $_table ) :
+				show_error( get_called_class() . '::_generate_slug() Column variable not set' );
 
-			show_error( get_called_class() . '::_generate_slug() Table variable not set' );
+			endif;
 
-		endif;
+			$_column = $this->_table_slug_column;
 
-		if ( ! $_column ) :
+		else :
 
-			show_error( get_called_class() . '::_generate_slug() Column variable not set' );
+			$_column = $column;
 
 		endif;
 
@@ -788,20 +963,76 @@ class CORE_NAILS_Model extends CI_Model {
 
 			if ( $_counter ) :
 
-				$_slug_test = $_add_prefix . $_slug . $_add_suffix . '-' . $_counter;
+				$_slug_test = $prefix . $_slug . $suffix . '-' . $_counter;
 
 			else :
 
-				$_slug_test = $_add_prefix . $_slug . $_add_suffix;
+				$_slug_test = $prefix . $_slug . $suffix;
 
 			endif;
 
-			$this->db->where( $_prefix . $_column, $_slug_test );
+			$this->db->where( $_column, $_slug_test );
 			$_counter++;
 
 		} while( $this->db->count_all_results( $_table ) );
 
 		return $_slug_test;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Formats a single object
+	 *
+	 * The get_all() method iterates over each returned item with this method so as to
+	 * correctly format the output. Use this to typecast ID's and/or organise data into objects.
+	 *
+	 * @access public
+	 * @param object $obj A reference to the object being formatted.
+	 * @return void
+	 **/
+	protected function _format_object( &$obj )
+	{
+		//	Extend this method to format the returned objects
+
+		// --------------------------------------------------------------------------
+
+		//	Some common items
+		if ( $this->_table_id_column ) :
+
+			if ( ! empty( $obj->{$this->_table_id_column} ) ) :
+
+				$obj->{$this->_table_id_column} = (int) $obj->{$this->_table_id_column};
+
+			endif;
+
+		endif;
+
+		if ( ! empty( $obj->parent_id ) ) :
+
+			$obj->parent_id = (int) $obj->parent_id;
+
+		endif;
+
+		if ( ! empty( $obj->user_id ) ) :
+
+			$obj->user_id = (int) $obj->user_id;
+
+		endif;
+
+		if ( ! empty( $obj->created_by ) ) :
+
+			$obj->created_by = (int) $obj->created_by;
+
+		endif;
+
+		if ( ! empty( $obj->modified_by ) ) :
+
+			$obj->modified_by = (int) $obj->modified_by;
+
+		endif;
 	}
 }
 

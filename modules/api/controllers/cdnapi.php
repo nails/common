@@ -31,7 +31,6 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
