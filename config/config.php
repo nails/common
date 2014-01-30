@@ -14,6 +14,13 @@
 | path to your installation.
 |
 */
+if ( ! defined( 'BASE_URL' ) ) :
+
+	$_ERROR = 'The <code>BASE_URL</code> constant has not been set.';
+	include NAILS_PATH . 'errors/startup_error.php';
+
+endif;
+
 $config['base_url']	= BASE_URL;
 
 /*
@@ -265,8 +272,39 @@ $config['sess_time_to_update']	= 300;
 |
 */
 $config['cookie_prefix']	= '';
-$config['cookie_domain']	= defined( 'CONF_COOKIE_DOMAIN' ) ? CONF_COOKIE_DOMAIN : '';
 $config['cookie_path']		= '/';
+
+if ( defined( 'CONF_COOKIE_DOMAIN' ) ) :
+
+	//	The developer has specified the specific domain to use for cookies
+	$config['cookie_domain'] = CONF_COOKIE_DOMAIN;
+
+else :
+
+	//	No specific domain has been specified, set a cookie which spans
+	//	the use of all specified BASE_URLs, i.e BASE_URL and SECURE_BASE_URL
+	$config['cookie_domain'] = '';
+
+	//	Are the BASE_URL and SECURE_BASE_URL on the same domain?
+	// if so, cool, if not then...
+
+	$_base_domain			= get_domain_from_url( BASE_URL );
+	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? get_domain_from_url( SECURE_BASE_URL ) : $_base_url;
+
+	if ( $_base_domain == $_secure_base_domain ) :
+
+		//	If the two match, then define it
+		$config['cookie_domain'] = $_base_domain;
+
+	else :
+
+		$_ERROR = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> constants do not share the same domain, this can cause issues with sessions.';
+		include NAILS_PATH . 'errors/startup_error.php';
+
+	endif;
+
+
+endif;
 
 /*
 |--------------------------------------------------------------------------
@@ -366,52 +404,8 @@ $config['proxy_ips'] = '';
 | modules are; because Nails might be anywhere we need to calculate the
 | relative path on the fly.
 |
-| Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
 |
 */
-
-if ( ! function_exists( 'get_relative_path' ) ) :
-
-	function get_relative_path( $from, $to )
-	{
-		$from     = explode( '/', $from );
-		$to       = explode( '/', $to );
-		$relPath  = $to;
-
-		foreach( $from AS $depth => $dir ) :
-
-			//	Find first non-matching dir
-			if( $dir === $to[$depth] ) :
-
-				//	Ignore this directory
-				array_shift( $relPath );
-
-			else :
-
-			//	Get number of remaining dirs to $from
-			$remaining = count( $from ) - $depth;
-
-				if ( $remaining > 1 ) :
-
-					// add traversals up to first matching dir
-					$padLength = ( count( $relPath ) + $remaining - 1 ) * -1;
-					$relPath = array_pad( $relPath, $padLength, '..' );
-					break;
-
-				else :
-
-					$relPath[0] = './' . $relPath[0];
-
-				endif;
-
-			endif;
-
-		endforeach;
-
-		return implode( '/', $relPath );
-	}
-
-endif;
 
 $config['modules_locations'][APPPATH . 'modules/']		= '../modules/';
 $config['modules_locations'][NAILS_PATH . 'modules/']	= get_relative_path( FCPATH . APPPATH . 'controllers/', NAILS_PATH . 'modules/' );

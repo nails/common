@@ -163,7 +163,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	These settings can be specified wherever it makes msot sense (e.g if
+		//	These settings can be specified wherever it makes most sense (e.g if
 		//	maintenance mode needs enabled app wide, then specify it in app.php, if
 		//	only a single server needs to be put in maintenance mode then define in
 		//	deploy.php
