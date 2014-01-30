@@ -2033,12 +2033,28 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _refresh_session()
 	{
-		//	Get the user
-		$_me = $this->session->userdata( 'id' );
+		//	Get the user; be wary of admin's logged in as other people
+		if ( $this->was_admin() ) :
 
-		// --------------------------------------------------------------------------
+			$_admin = $this->session->userdata( 'admin_recovery');
 
-		//	No-one's home...
+			if ( ! empty( $_admin->logged_in_as ) ) :
+
+				$_me = $_admin->logged_in_as;
+
+			else :
+
+				$_me = $this->session->userdata( 'id' );
+
+			endif;
+
+		else :
+
+			$_me = $this->session->userdata( 'id' );
+
+		endif;
+
+		//	Is anybody home? Hello...?
 		if ( ! $_me ) :
 
 			$_me = $this->_me;
@@ -2051,10 +2067,12 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
+		$_me = $this->get_by_id( $_me );
+
 		// --------------------------------------------------------------------------
 
 		//	Store this entire user in memory
-		$this->set_active_user( $this->get_by_id( $_me ) );
+		$this->set_active_user( $_me );
 
 		// --------------------------------------------------------------------------
 
@@ -2065,7 +2083,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Update user's 'last_seen' flag
 		$this->db->set( 'last_seen', 'NOW()', FALSE );
-		$this->db->where( 'id', $_me );
+		$this->db->where( 'id', $_me->id );
 		$this->db->update( NAILS_DB_PREFIX . 'user' );
 	}
 

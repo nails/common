@@ -154,7 +154,7 @@
 	// --------------------------------------------------------------------------
 
 	//	Deleting
-	$lang['accounts_delete_success']		= '<strong>See ya!</strong>User %s was deleted successfully.';
+	$lang['accounts_delete_success']		= '<strong>See ya!</strong> User %s was deleted successfully.';
 	$lang['accounts_delete_error']			= '<strong>Sorry,</strong> there was a problem deleting %s.';
 
 	// --------------------------------------------------------------------------

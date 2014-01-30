@@ -109,6 +109,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		$_recovery_data->hash				= md5( active_user( 'password' ) );
 		$_recovery_data->email				= active_user( 'email' );
 		$_recovery_data->name				= active_user( 'first_name' );
+		$_recovery_data->logged_in_as		= $_u->id;
 		$_recovery_data->now_where_was_i	= $this->input->get( 'return_to' );
 		$_recovery_data->back_to_admin_url	= site_url( 'auth/override/login_as/' . $_recovery_data->id . '/' . $_recovery_data->hash );
 
@@ -116,8 +117,6 @@ class NAILS_Override extends NAILS_Auth_Controller
 
 		//	Replace current user's session data
 		$this->user->set_login_data( $_u->id );
-
-		$this->session->set_flashdata( 'success', lang( 'auth_override_ok', title_case( $_u->first_name . ' ' . $_u->last_name ) ) );
 
 		// --------------------------------------------------------------------------
 
@@ -128,14 +127,35 @@ class NAILS_Override extends NAILS_Auth_Controller
 			$_redirect = $this->session->userdata( 'admin_recovery' )->now_where_was_i;
 			$_redirect = ( $_redirect ) ? $_redirect : $_u->group_homepage;
 
-			$this->session->unset_userdata( 'admin_recovery' );
+			//	Are we logging back in as the original admin? If so, unset the admin recovery,
+			//	if not, leave it as it is so they can log back in in the future.
 
-			//	Change the success message to reflect the user coming back
+			$_original_admin = $this->session->userdata( 'admin_recovery' );
+
+			if ( $_original_admin->id === $_u->id_md5 ) :
+
+				$this->session->unset_userdata( 'admin_recovery' );
+
+			else :
+
+				//	We're logging in as someone else, update the recovery data
+				//	to reflect the new user
+
+				$_recovery_data = $this->session->userdata( 'admin_recovery' );
+				$_recovery_data->logged_in_as = $_u->id;
+				$this->session->set_userdata( 'admin_recovery', $_recovery_data );
+
+			endif;
+
+			//	Welcome home!
 			$this->session->set_flashdata( 'success', lang( 'auth_override_return', $_u->first_name ) );
 
-		//	Otherwise set this variable so we CAN come back.
 		else :
 
+			//	It worked, it actually worked! They said I was crazy but it actually worked!
+			$this->session->set_flashdata( 'success', lang( 'auth_override_ok', title_case( $_u->first_name . ' ' . $_u->last_name ) ) );
+
+			//	Prep redirect variable
 			$_redirect = $_u->group_homepage;
 
 			//	Set a session variable so we can come back as admin
