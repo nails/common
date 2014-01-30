@@ -96,7 +96,7 @@
 		// --------------------------------------------------------------------------
 
 		echo form_submit( 'submit', 'Update Results', 'class="awesome green small"' );
-		echo anchor( 'admin/stats', lang( 'action_reset' ), 'class="awesome small"' );
+		echo anchor( 'admin/logs/event', lang( 'action_reset' ), 'class="awesome small"' );
 
 		$_url = $_SERVER['REQUEST_URI'];
 		$_url .= strpos( $_url, '?' ) !== FALSE ? '&dl=1' : '?dl=1';

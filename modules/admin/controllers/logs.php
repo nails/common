@@ -39,7 +39,8 @@ class NAILS_Logs extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Navigation options
-		$d->funcs['index']			= 'Browse Site Logs';	//	Sub-nav function.
+		$d->funcs['site']			= 'Browse Site Logs';	//	Sub-nav function.
+		$d->funcs['event']			= 'Browse Event Logs';	//	Sub-nav function.
 		$d->funcs['changelog']		= 'Browse Admin Logs';	//	Sub-nav function.
 
 		// --------------------------------------------------------------------------
@@ -59,15 +60,140 @@ class NAILS_Logs extends NAILS_Admin_Controller
 	 * @param none
 	 * @return void
 	 **/
-	public function index()
+	public function site()
 	{
 		$this->data['page']->title = 'Browse Logs';
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'admin/logs/index',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/logs/site/index',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Event Browser
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
+	public function event()
+	{
+		//	Set method info
+		$this->data['page']->title = 'Browse Events';
+
+		// --------------------------------------------------------------------------
+
+		//	Load event library
+		$this->load->library( 'event' );
+
+		// --------------------------------------------------------------------------
+
+		//	Define limit and order
+		//	A little messy but it's because the Event library doesn't follow the
+		//	same standard as the models - it should. TODO.
+
+		$_per_page	= $this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : 50;
+		$_page		= (int) $this->input->get( 'page' );
+		$_page--;
+		$_page		= $_page < 0 ? 0 : $_page;
+
+		$_offset	= $_page * $_per_page;
+
+		$_limit		= array( $_per_page, $_offset );
+
+		$_order		= array(
+						$this->input->get( 'sort' ) ? $this->input->get( 'sort' ) : 'e.created',
+						$this->input->get( 'order' ) ? $this->input->get( 'order' ) : 'DESC'
+					);
+
+		// --------------------------------------------------------------------------
+
+		//	Define the data user & type restriction and the date range
+		$_where = array();
+
+		if ( $this->input->get( 'date_from' ) ) :
+
+			$_where[] = '(e.created >= \'' . $this->input->get( 'date_from' ) . '\')';
+
+		endif;
+
+		if ( $this->input->get( 'date_to' ) ) :
+
+			$_where[] = '(e.created <=\'' . $this->input->get( 'date_to' ) . '\')';
+
+		endif;
+
+		if ( $this->input->get( 'user_id' ) ) :
+
+			$_where[] = 'e.created_by IN (' . implode( ',', $this->input->get( 'user_id' ) ) . ')';
+
+		endif;
+
+		if ( $this->input->get( 'event_type' ) ) :
+
+			$_where[] = 'e.type_id IN (' . implode( ',', $this->input->get( 'event_type' ) ) . ')';
+
+		endif;
+
+		$_where = implode( ' AND ', $_where );
+
+		// --------------------------------------------------------------------------
+
+		//	Are we downloading? Or viewing?
+		if ( $this->input->get( 'dl' ) ) :
+
+			//	Fetch events
+			$this->data['events'] = new stdClass();
+			$this->data['events'] = $this->event->get_all( $_order, NULL, $_where );
+
+			// --------------------------------------------------------------------------
+
+			//	Send header
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=stats-export-' . date( 'Y-m-d_h-i-s' ) . '.csv;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+			// --------------------------------------------------------------------------
+
+			//	Render view
+			$this->load->view( 'admin/logs/event/csv',	$this->data );
+
+		else :
+
+			//	Viewing, make sure we paginate
+			//	=======================================
+			$this->data['pagination']				= new stdClass();
+			$this->data['pagination']->page			= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
+			$this->data['pagination']->per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 5;
+			$this->data['pagination']->total_rows	= $this->event->count_all( $_where );
+
+			//	Fetch all the items for this page
+			$this->data['events'] = $this->event->get_all( $_order, $_limit, $_where );
+
+			// --------------------------------------------------------------------------
+
+			//	Fetch users
+			$this->data['users'] = $this->user->get_all_minimal();
+			$this->data['types'] = $this->event->get_types_flat();
+
+			// --------------------------------------------------------------------------
+
+			//	Load views
+			$this->load->view( 'structure/header',			$this->data );
+			$this->load->view( 'admin/logs/event/index',	$this->data );
+			$this->load->view( 'structure/footer',			$this->data );
+
+		endif;
 	}
 
 
@@ -83,13 +209,92 @@ class NAILS_Logs extends NAILS_Admin_Controller
 	 **/
 	public function changelog()
 	{
-		$this->data['page']->title = 'Admin Changelog';
+		//	Set method info
+		$this->data['page']->title = 'Browse Admin Changelog';
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'admin/logs/changelog',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		//	Define the $_data variable, this'll be passed to the get_all() and count_all() methods
+		$_data = array( 'where' => array() );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->get( 'date_from' ) ) :
+
+			$_data['where'][] = array(
+				'column'	=> 'acl.created >=',
+				'value'		=> $this->input->get( 'date_from' )
+			);
+
+		endif;
+
+		if ( $this->input->get( 'date_to' ) ) :
+
+			$_data['where'][] = array(
+				'column'	=> 'acl.created <=',
+				'value'		=> $this->input->get( 'date_to' )
+			);
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Are we downloading? Or viewing?
+		if ( $this->input->get( 'dl' ) ) :
+
+			//	Downloading, fetch the complete dataset
+			//	=======================================
+
+			//	Fetch events
+			$this->data['items'] = new stdClass();
+			$this->data['items'] = $this->admin_changelog_model->get_all( NULL, NULL, $_data );
+
+			// --------------------------------------------------------------------------
+
+			//	Send header
+			$this->output->set_header( 'Pragma: public' );
+			$this->output->set_header( 'Expires: 0' );
+			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			$this->output->set_header( 'Cache-Control: private', FALSE );
+			$this->output->set_header( 'Content-Type: application/octet-stream' );
+			$this->output->set_header( 'Content-Disposition: attachment; filename=admin-changelog-export-' . date( 'Y-m-d_h-i-s' ) . '.csv;' );
+			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
+
+			// --------------------------------------------------------------------------
+
+			//	Render view
+			$this->load->view( 'admin/logs/changelog/csv',	$this->data );
+
+		else :
+
+			//	Viewing, make sure we paginate
+			//	=======================================
+
+			//	Define and populate the pagination object
+			$_page		= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
+			$_per_page	= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 50;
+
+			$this->data['pagination']				= new stdClass();
+			$this->data['pagination']->page			= $_page;
+			$this->data['pagination']->per_page		= $_per_page;
+			$this->data['pagination']->total_rows	= $this->admin_changelog_model->count_all( $_data );
+
+			//	Fetch all the items for this page
+			$this->data['items'] = $this->admin_changelog_model->get_all( $_page, $_per_page, $_data );
+
+			// --------------------------------------------------------------------------
+
+			//	Fetch users
+			$this->data['users'] = $this->user->get_all_minimal();
+
+			// --------------------------------------------------------------------------
+
+			//	Load views
+			$this->load->view( 'structure/header',				$this->data );
+			$this->load->view( 'admin/logs/changelog/index',	$this->data );
+			$this->load->view( 'structure/footer',				$this->data );
+
+		endif;
 	}
 }
 

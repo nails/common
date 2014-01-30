@@ -3,14 +3,14 @@
 	<p>
 		Whenever users interact with the site 'events' are created.
 	</p>
-	
+
 	<?php
-	
-		$this->load->view( 'admin/stats/utilities/search' );
-		$this->load->view( 'admin/stats/utilities/pagination' );
-	
+
+		$this->load->view( 'admin/logs/event/utilities/search' );
+		$this->load->view( 'admin/_utilities/pagination' );
+
 	?>
-	
+
 	<table>
 		<thead>
 			<tr>
@@ -22,16 +22,16 @@
 		</thead>
 		<tbody>
 		<?php
-		
-			if ( $events->data ) :
-			
-				foreach ( $events->data AS $event ) :
+
+			if ( $events ) :
+
+				foreach ( $events AS $event ) :
 
 					echo '<tr class="event">';
 
 					$this->load->view( 'admin/_utilities/table-cell-datetime',	array( 'datetime' => $event->created ) );
 					$this->load->view( 'admin/_utilities/table-cell-user',		$event->user );
-					
+
 					// --------------------------------------------------------------------------
 
 					echo '<td class="event">';
@@ -58,28 +58,28 @@
 						echo '<td class="actions no-data">&mdash;</td>';
 
 					endif;
-					
+
 					echo '</tr>';
-				
+
 				endforeach;
-			
+
 			else :
-			
+
 				echo '<tr>';
 				echo '<td colspan="5" class="no-data">';
 				echo 'No Events found';
 				echo '</td>';
 				echo '</tr>';
-			
+
 			endif;
-		
+
 		?>
 		</tbody>
 	</table>
 
 	<?php
-	
-		$this->load->view( 'admin/stats/utilities/pagination' );
-	
+
+		$this->load->view( 'admin/_utilities/pagination' );
+
 	?>
 </div>

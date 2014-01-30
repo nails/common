@@ -177,36 +177,49 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _getcount_common( $search = NULL )
+	public function get_recent( $limit = 100 )
 	{
+		$_data = array(
+			'limit' => array(
+				'per_page'	=> $limit,
+				'offset'	=> 0
+			)
+		);
+		return $this->get_all( NULL, NULL, $_data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _getcount_common( $data = NULL, $_caller = NULL )
+	{
+		parent::_getcount_common( $data );
+
+		// --------------------------------------------------------------------------
+
 		//	Set the select
-		$this->db->select( $this->_table_prefix . '.*, u.first_name, u.last_name, u.gender, u.profile_img, ue.email' );
+		if ( $_caller !== 'COUNT_ALL' ) :
+
+			$this->db->select( $this->_table_prefix . '.*, u.first_name, u.last_name, u.gender, u.profile_img, ue.email' );
+
+		endif;
 
 		//	Join user tables
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.user_id' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.id = ' . $this->_table_prefix . '.user_id AND ue.is_primary = 1' );
 
 		//	Set the order
-		$this->db->order_by( $this->_table_prefix . '.created', 'DESC' );
-	}
+		$this->db->order_by( $this->_table_prefix . '.created, ' . $this->_table_prefix . '.id', 'DESC' );
+
+		// --------------------------------------------------------------------------
+
+		//	Handle $data
+		if ( ! empty( $data['where'] ) ) :
 
 
-	// --------------------------------------------------------------------------
 
-
-	public function get_range( $start, $end )
-	{
-		dumpanddie( 'Retrieve changelogs based on a date range' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_recent( $limit = 100 )
-	{
-		$this->db->limit( $limit );
-		return $this->get_all();
+		endif;
 	}
 
 

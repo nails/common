@@ -623,11 +623,12 @@ class CORE_NAILS_Model extends CI_Model
 	 * @access public
 	 * @param int $page The page number of the results, if NULL then no pagination
 	 * @param int $per_page How many items per page of paginated results
-	 * @param string $search The search keywords to apply to the query
+	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @param bool $include_deleted If non-destructive delete is enabled then this flag allows you to include deleted items
+	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all( $page = NULL, $per_page = NULL, $search = NULL, $include_deleted = FALSE )
+	public function get_all( $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE, $_caller = 'GET_ALL' )
 	{
 		if ( ! $this->_table ) :
 
@@ -641,13 +642,18 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Apply common items; including search
-		$this->_getcount_common( $search );
+		//	Apply common items; pass $data
+		$this->_getcount_common( $data, $_caller );
 
 		// --------------------------------------------------------------------------
 
 		//	Facilitate pagination
 		if ( NULL !== $page ) :
+
+			//	Adjust the page variable, reduce by one so that the offset is calculated
+			//	correctly. Make sure we don't go into negative numbers
+			$page--;
+			$page = $page < 0 ? 0 : $page;
 
 			//	Work out what the offset should be
 			$_per_page	= NULL == $per_page ? $this->_per_page : (int) $per_page;
@@ -693,12 +699,13 @@ class CORE_NAILS_Model extends CI_Model
 	 * @access public
 	 * @param int $page The page number of the results, if NULL then no pagination
 	 * @param int $per_page How many items per page of paginated results
-	 * @param string $search The search keywords to apply to the query
+	 * @param mixed $data Any data to pass to _getcount_common()
+	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all_flat( $page = NULL, $per_page = NULL, $search = NULL )
+	public function get_all_flat( $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE, $_caller = 'GET_ALL_FLAT' )
 	{
-		$_items	= $this->get_all( $page, $per_page, $search );
+		$_items	= $this->get_all( $page, $per_page, $data, $include_deleted, $_caller );
 		$_out	= array();
 
 		//	Nothing returned? Skip the rest of this method, it's pointless.
@@ -747,9 +754,10 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
+	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return	stdClass
 	 **/
-	public function get_by_id( $id )
+	public function get_by_id( $id, $data = NULL )
 	{
 		if ( ! $this->_table ) :
 
@@ -764,7 +772,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		$this->db->where( $_prefix . $this->_table_id_column, $id );
-		$_result = $this->get_all();
+		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_ID' );
 
 		// --------------------------------------------------------------------------
 
@@ -788,9 +796,10 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access public
 	 * @param int $slug The slug of the object to fetch
+	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return	stdClass
 	 **/
-	public function get_by_slug( $slug )
+	public function get_by_slug( $slug, $data = NULL )
 	{
 		if ( ! $this->_table ) :
 
@@ -805,7 +814,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		$this->db->where( $_prefix . $this->_table_slug_column, $slug );
-		$_result = $this->get_all();
+		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_SLUG' );
 
 		// --------------------------------------------------------------------------
 
@@ -834,17 +843,18 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access public
 	 * @param mixed $id_slug The ID or slug of the object to fetch
+	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_id_or_slug( $id_slug )
+	public function get_by_id_or_slug( $id_slug, $data = NULL )
 	{
 		if ( is_numeric( $id_slug ) ) :
 
-			return $this->get_by_id( $id_slug );
+			return $this->get_by_id( $id_slug, $data );
 
 		else :
 
-			return $this->get_by_slug( $id_slug );
+			return $this->get_by_slug( $id_slug, $data );
 
 		endif;
 	}
@@ -857,10 +867,10 @@ class CORE_NAILS_Model extends CI_Model
 	 * Counts all objects
 	 *
 	 * @access public
-	 * @param string $search The search keywords to apply to the query
+	 * @param mixed $data any data to pass to _getcount_common()
 	 * @return int
 	 **/
-	public function count( $search = NULL )
+	public function count_all( $data = NULL )
 	{
 		if ( ! $this->_table ) :
 
@@ -875,7 +885,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Apply common items
-		$this->_getcount_common( $search );
+		$this->_getcount_common( $data, 'COUNT_ALL' );
 
 		// --------------------------------------------------------------------------
 
@@ -900,11 +910,60 @@ class CORE_NAILS_Model extends CI_Model
 	 * methods and the count() method.
 	 *
 	 * @access public
-	 * @param string $search The search keywords to apply to the query
+	 * @param string $data Data passed from the calling method
+	 * @param string $_caller The name of the calling method
 	 * @return void
 	 **/
-	protected function _getcount_common( $search = NULL )
-	{}
+	protected function _getcount_common( $data = NULL, $_caller = NULL )
+	{
+		//	Handle where
+		if ( ! empty( $data['where'] ) ) :
+
+			if ( is_array( $data['where'] ) ) :
+
+				//	If it's a single dimensional array then just bung that into
+				//	the db->where(). If not, loop it and parse.
+
+				$_first = reset( $data['where'] );
+
+				if ( is_string( $_first ) ) :
+
+					$this->db->where( $data['where'] );
+
+				else :
+
+					foreach( $data['where'] AS $where ) :
+
+						$_column	= ! empty( $where['column'] )	? $where['column']			: NULL;
+						$_value		= isset( $where['value'] )		? $where['value']			: NULL;
+						$_escape	= isset( $where['escape'] )		? (bool) $where['escape']	: TRUE;
+
+						if ( $_column ) :
+
+							$this->db->where( $_column, $_value, $_escape );
+
+						endif;
+
+					endforeach;
+
+				endif;
+
+			elseif ( is_string( $data['where'] ) ) :
+
+				$this->db->where( $data['where'] );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle limiting
+
+		// --------------------------------------------------------------------------
+
+		//	Handle sorting
+	}
 
 
 	/**

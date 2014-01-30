@@ -50,7 +50,7 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 		//	Only show the help option if there are videos available
 		get_instance()->load->model( 'admin_help_model' );
 
-		if ( get_instance()->admin_help_model->count() ) :
+		if ( get_instance()->admin_help_model->count_all() ) :
 
 			$d->funcs['help']		= lang( 'dashboard_nav_help' );
 
