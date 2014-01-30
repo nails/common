@@ -265,6 +265,13 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
 
+			$this->load->model( 'system/routes_model' );
+			if ( ! $this->routes_model->update( 'shop' ) ) :
+
+				$this->data['warning'] = '<strong>Warning:</strong> while the blog settings were updated, the routes file could not be updated. The blog may not behave as expected,';
+
+			endif;
+
 		else :
 
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
@@ -448,6 +455,16 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		if ( $this->shop->set_settings( $_settings ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
+
+			// --------------------------------------------------------------------------
+
+			//	Rewrite routes
+			$this->load->model( 'system/routes_model' );
+			if ( ! $this->routes_model->update( 'shop' ) ) :
+
+				$this->data['warning'] = '<strong>Warning:</strong> while the shop settings were updated, the routes file could not be updated. The shop may not behave as expected,';
+
+			endif;
 
 		else :
 

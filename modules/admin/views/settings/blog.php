@@ -41,10 +41,17 @@
 
 							if ( ! preg_match( $_pattern, $_routes_file) ) :
 
-								echo '<p class="system-alert message no-close">';
-								echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> file or the blog will not work.';
-								echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( $settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?\'] = \'blog/$2\';</code>';
-								echo '</p>';
+								//	Check the routes_app file
+								$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
+
+								if ( ! preg_match( $_pattern, $_routes_file ) ) :
+
+									echo '<p class="system-alert message no-close">';
+									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the blog may not work as expected.';
+									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( $settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?\'] = \'blog/$2\';</code>';
+									echo '</p>';
+
+								endif;
 
 							endif;
 

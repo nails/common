@@ -188,6 +188,7 @@ class CORE_NAILS_Model extends CI_Model
 	public function clear_errors()
 	{
 		$this->_errors = array();
+		return array();
 	}
 
 

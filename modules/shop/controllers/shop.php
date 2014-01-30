@@ -213,6 +213,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Switcheroo
 		switch( $this->_action ) :
 
+			case '' :
 			case 'index' :		$this->_home();		break;
 			case 'category' :	$this->_category();	break;
 			case 'tag' :		$this->_tag();		break;

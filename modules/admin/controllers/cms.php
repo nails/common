@@ -173,6 +173,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	{
 		//	Load common blocks items
 		$this->load->model( 'cms/cms_page_model', 'cms_page' );
+		$this->load->model( 'system/routes_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -181,7 +182,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		if ( method_exists( $this, '_pages_' . $_method ) ) :
 
 
-			if ( ! $this->cms_page->can_write_routes() ) :
+			if ( ! $this->routes_model->can_write_routes() ) :
 
 				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system: ' . $this->cms_page->last_error();
 
@@ -589,13 +590,15 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _pages_rewrite_routes()
 	{
-		if ( $this->cms_page->write_routes() ) :
+		$this->load->model( 'system/routes_model' );
+
+		if ( $this->routes_model->update( 'cms' ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Routes rewritten successfully.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem writing the routes:<br />' . $this->cms_page->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem writing the routes. ' . $this->routes_model->last_error() );
 
 		endif;
 

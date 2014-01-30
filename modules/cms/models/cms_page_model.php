@@ -17,7 +17,6 @@
 
 class NAILS_Cms_page_model extends NAILS_Model
 {
-	protected $_routes_dir;
 	protected $_available_widgets;
 	protected $_nails_templates_dir;
 	protected $_app_templates_dir;
@@ -35,8 +34,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 		parent::__construct();
 
 		// --------------------------------------------------------------------------
-
-		$this->_routes_dir			= FCPATH . APPPATH . 'config/';
 
 		$this->_nails_templates_dir	= NAILS_PATH . 'modules/cms/templates/';
 		$this->_app_templates_dir	= FCPATH . APPPATH . 'modules/cms/templates/';
@@ -133,7 +130,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 		if ( $_return ) :
 
 			//	Rewrite the routes file
-			if ( $this->write_routes() ) :
+			$this->load->model( 'system/routes_model' );
+			if ( $this->routes_model->update( 'cms' ) ) :
 
 				return $_return;
 
@@ -328,7 +326,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 
 			//	Update the routes file
-			if ( $this->db->trans_status() !== FALSE && ! $_rollback && $this->write_routes() ) :
+			$this->load->model( 'system/routes_model' );
+			if ( $this->db->trans_status() !== FALSE && ! $_rollback && $this->routes_model->update( 'cms' ) ) :
 
 				//	Commit changes
 				$this->db->trans_commit();
@@ -1068,102 +1067,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 			return $_result;
 
 		endif;
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	public function can_write_routes()
-	{
-		//	First, test if file exists, if it does is it writable?
-		if ( file_exists( $this->_routes_dir . 'routes_cms_page.php' ) ) :
-
-			if ( is_really_writable( $this->_routes_dir . 'routes_cms_page.php' ) ) :
-
-				return TRUE;
-
-			else :
-
-				//	Attempt to chmod the file
-				if ( @chmod( $this->_routes_dir . 'routes_cms_page.php', FILE_WRITE_MODE ) ) :
-
-					return TRUE;
-
-				else :
-
-					$this->_set_error( 'The route config exists, but is not writeable. <small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
-					return FALSE;
-
-				endif;
-
-			endif;
-
-		elseif ( is_really_writable( $this->_routes_dir ) ) :
-
-			return TRUE;
-
-		else :
-
-			//	Attempt to chmod the directory
-			if ( @chmod( $this->_routes_dir, DIR_WRITE_MODE ) ) :
-
-				return TRUE;
-
-			else :
-
-				$this->_set_error( 'The route directory is not writeable. <small>' . $this->_routes_dir . '</small>' );
-				return FALSE;
-
-			endif;
-
-		endif;
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	public function write_routes()
-	{
-		if ( ! $this->can_write_routes() ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Routes are writeable, apparently, give it a bash
-		$_data = '<?php  if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\');' . "\n\n";
-		$_data .= '//	THIS FILE IS CREATED/MODIFIED AUTOMATICALLY, ANY MANUAL EDITS WILL BE OVERWRITTEN'."\n\n";
-
-		$_pages = $this->get_all();
-
-		foreach ( $_pages AS $page ) :
-
-			$_data .= '$route[\'' . $page->slug . '\'] = \'cms/render/page/' . $page->id . '\';' . "\n";
-
-		endforeach;
-
-		$_fh = @fopen( $this->_routes_dir . 'routes_cms_page.php', 'w' );
-
-		if ( ! $_fh ) :
-
-			$this->_set_error( 'Unable to open routes file for writing.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
-			return FALSE;
-
-		endif;
-
-		if ( ! fwrite( $_fh, $_data ) ) :
-
-			fclose( $_fh );
-			$this->_set_error( 'Unable to write data to routes file.<small>Located at: ' . $this->_routes_dir . 'routes_cms_page.php</small>' );
-			return FALSE;
-
-		endif;
-
-		fclose( $_fh );
-
-		return TRUE;
 	}
 }
 

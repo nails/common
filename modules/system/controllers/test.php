@@ -481,7 +481,7 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Is the app routes file writeable? Various modules might require access to it
 		if ( module_is_enabled( 'cms' ) || module_is_enabled( 'blog' ) || module_is_enabled( 'shop' ) ) :
 
-			$_dirs[] = FCPATH . APPPATH . 'config/routes_cms_page.php';
+			$_dirs[] = FCPATH . APPPATH . 'config/routes_app.php';
 
 		endif;
 

@@ -186,14 +186,21 @@
 						if ( $settings['shop_url'] != 'shop/' ) :
 
 							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
-							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', $settings['shop_url'] ) . '\(\:any\)\/\?\'\]\s*?=\s*?\'shop\/\$1\'\;#';
+							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', substr( $settings['shop_url'], 0, -1 ) ) . '\(\/\(\:any\)\?\/\?\)\?\'\]\s*?=\s*?\'shop\/\$2\'\;#';
 
-							if ( ! preg_match( $_pattern, $_routes_file) ) :
+							if ( ! preg_match( $_pattern, $_routes_file ) ) :
 
-								echo '<p class="system-alert message no-close">';
-								echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> file or the shop will not work.';
-								echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . $settings['shop_url'] . '(:any)/?\'] = \'shop/$1\';</code>';
-								echo '</p>';
+								//	Check the routes_app file
+								$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
+
+								if ( ! preg_match( $_pattern, $_routes_file ) ) :
+
+									echo '<p class="system-alert message no-close">';
+									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the shop may not work as expected.';
+									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( $settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?\'] = \'shop/$2\';</code>';
+									echo '</p>';
+
+								endif;
 
 							endif;
 
