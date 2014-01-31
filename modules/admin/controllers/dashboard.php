@@ -80,6 +80,13 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Fetch recent admin changelog events
+		//	TODO: widgitize this and use the API
+
+		$this->data['changelog'] = $this->admin_changelog_model->get_recent();
+
+		// --------------------------------------------------------------------------
+
 		//	Load header
 		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
 		$this->load->view( 'structure/header',	$this->data );
@@ -96,7 +103,7 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 
 		else :
 
-			$this->load->view( 'admin/dashboard/dashboard', $this->data );
+			$this->load->view( 'admin/dashboard/index', $this->data );
 
 		endif;
 

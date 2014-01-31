@@ -179,13 +179,8 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 	public function get_recent( $limit = 100 )
 	{
-		$_data = array(
-			'limit' => array(
-				'per_page'	=> $limit,
-				'offset'	=> 0
-			)
-		);
-		return $this->get_all( NULL, NULL, $_data );
+		$this->db->limit( $limit );
+		return $this->get_all();
 	}
 
 
