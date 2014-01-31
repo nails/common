@@ -130,6 +130,14 @@ class Asset
 
 			// --------------------------------------------------------------------------
 
+			case 'uploadify' :
+
+				$this->load( 'jquery.uploadify.min.js', TRUE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
 			case 'nails_api' :
 
 				//	Generate the api credentials
