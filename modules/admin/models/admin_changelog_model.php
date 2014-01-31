@@ -206,8 +206,8 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 		endif;
 
 		//	Join user tables
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.user_id' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.id = ' . $this->_table_prefix . '.user_id AND ue.is_primary = 1' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.user_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = ' . $this->_table_prefix . '.user_id AND ue.is_primary = 1', 'LEFT' );
 
 		//	Set the order
 		$this->db->order_by( $this->_table_prefix . '.created, ' . $this->_table_prefix . '.id', 'DESC' );

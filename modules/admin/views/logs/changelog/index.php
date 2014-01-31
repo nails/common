@@ -33,7 +33,7 @@
 					echo '<td class="changes">';
 
 					$_sentance		= array();
-					if ( ! empty( $item->user->id ) ) :
+					if ( ! empty( $item->user->first_name ) ) :
 
 						$_sentance[] = $item->user->first_name;
 
