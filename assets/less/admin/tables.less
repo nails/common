@@ -127,6 +127,22 @@ table
 					color:#ccc;
 				}
 			}
+			td.error
+			{
+				background:@error;
+			}
+			td.success
+			{
+				background:@success;
+			}
+			td.notice
+			{
+				background:@notice;
+			}
+			td.message
+			{
+				background:@message;
+			}
 			td:last-of-type
 			{
 				border-right:0px;
@@ -211,6 +227,34 @@ table
 			td.indentosaurus.indent-6	.indentor-content {	margin-left:20*6px; }
 			td.indentosaurus.indent-7	.indentor-content {	margin-left:20*7px; }
 			td.indentosaurus.indent-8	.indentor-content {	margin-left:20*8px; }
+		}
+		tr.error
+		{
+			td
+			{
+				background:@error;
+			}
+		}
+		tr.success
+		{
+			td
+			{
+				background:@success;
+			}
+		}
+		tr.notice
+		{
+			td
+			{
+				background:@notice;
+			}
+		}
+		tr.message
+		{
+			td
+			{
+				background:@message;
+			}
 		}
 		tr:hover
 		{
