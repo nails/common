@@ -191,9 +191,9 @@
 							if ( ! preg_match( $_pattern, $_routes_file ) ) :
 
 								//	Check the routes_app file
-								$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
+								$_routes_file = @file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
 
-								if ( ! preg_match( $_pattern, $_routes_file ) ) :
+								if ( ! $_routes_file || ! preg_match( $_pattern, $_routes_file ) ) :
 
 									echo '<p class="system-alert message no-close">';
 									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the shop may not work as expected.';

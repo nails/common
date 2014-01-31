@@ -114,17 +114,22 @@ class NAILS_Routes_model extends NAILS_Model
 
 	protected function _routes_cms()
 	{
-		$this->load->model( 'cms/cms_page_model' );
-		$_pages = $this->cms_page_model->get_all();
 		$_routes = array();
 
-		$_routes['//BEGIN CMS'] = '';
-		foreach ( $_pages AS $page ) :
+		if ( module_is_enabled( 'cms' ) ) :
 
-			$_routes[$page->slug] = 'cms/render/page/' . $page->id;
+			$this->load->model( 'cms/cms_page_model' );
+			$_pages = $this->cms_page_model->get_all();
 
-		endforeach;
-		$_routes['//END CMS'] = '';
+			$_routes['//BEGIN CMS'] = '';
+			foreach ( $_pages AS $page ) :
+
+				$_routes[$page->slug] = 'cms/render/page/' . $page->id;
+
+			endforeach;
+			$_routes['//END CMS'] = '';
+
+		endif;
 
 		return $_routes;
 	}
@@ -135,16 +140,21 @@ class NAILS_Routes_model extends NAILS_Model
 
 	protected function _routes_shop()
 	{
-		$this->load->model( 'shop/shop_model' );
-		$_settings = $this->shop_model->settings();
 		$_routes = array();
 
-		$_routes['//BEGIN SHOP'] = '';
+		if ( module_is_enabled( 'shop' ) ) :
 
-		//	Shop front page route
-		$_routes[substr( $_settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'shop/$2';
+			$this->load->model( 'shop/shop_model' );
+			$_settings = $this->shop_model->settings();
 
-		$_routes['//END SHOP'] = '';
+			$_routes['//BEGIN SHOP'] = '';
+
+			//	Shop front page route
+			$_routes[substr( $_settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'shop/$2';
+
+			$_routes['//END SHOP'] = '';
+
+		endif;
 
 		return $_routes;
 	}
@@ -155,17 +165,22 @@ class NAILS_Routes_model extends NAILS_Model
 
 	protected function _routes_blog()
 	{
-		$this->load->model( 'blog/blog_model' );
-		$_settings = $this->blog_model->settings();
 		$_routes = array();
 
-		$_routes['//BEGIN BLOG'] = '';
+		if ( module_is_enabled( 'blog' ) ) :
 
-		//	Blog front page route
-		//substr( $settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'
-		$_routes[substr( $_settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'blog/$2';
+			$this->load->model( 'blog/blog_model' );
+			$_settings = $this->blog_model->settings();
 
-		$_routes['//END BLOG'] = '';
+			$_routes['//BEGIN BLOG'] = '';
+
+			//	Blog front page route
+			//substr( $settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'
+			$_routes[substr( $_settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'blog/$2';
+
+			$_routes['//END BLOG'] = '';
+
+		endif;
 
 		return $_routes;
 	}
