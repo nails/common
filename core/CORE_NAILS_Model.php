@@ -1062,7 +1062,7 @@ class CORE_NAILS_Model extends CI_Model
 		//	Some common items
 		if ( $this->_table_id_column ) :
 
-			if ( ! empty( $obj->{$this->_table_id_column} ) ) :
+			if ( ! empty( $obj->{$this->_table_id_column} ) && is_numeric( $obj->{$this->_table_id_column} ) ) :
 
 				$obj->{$this->_table_id_column} = (int) $obj->{$this->_table_id_column};
 
@@ -1070,27 +1070,35 @@ class CORE_NAILS_Model extends CI_Model
 
 		endif;
 
-		if ( ! empty( $obj->parent_id ) ) :
+		if ( ! empty( $obj->parent_id ) && is_numeric( $obj->parent_id ) ) :
 
 			$obj->parent_id = (int) $obj->parent_id;
 
 		endif;
 
-		if ( ! empty( $obj->user_id ) ) :
+		if ( ! empty( $obj->user_id ) && is_numeric( $obj->user_id ) ) :
 
 			$obj->user_id = (int) $obj->user_id;
 
 		endif;
 
-		if ( ! empty( $obj->created_by ) ) :
+		if ( ! empty( $obj->created_by ) && is_numeric( $obj->created_by ) ) :
 
 			$obj->created_by = (int) $obj->created_by;
 
 		endif;
 
-		if ( ! empty( $obj->modified_by ) ) :
+		if ( ! empty( $obj->modified_by ) && is_numeric( $obj->modified_by ) ) :
 
 			$obj->modified_by = (int) $obj->modified_by;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! empty( $obj->order ) && is_numeric( $obj->order ) ) :
+
+			$obj->order = (int) $obj->order;
 
 		endif;
 	}
