@@ -184,7 +184,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 			if ( ! $this->routes_model->can_write_routes() ) :
 
-				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system. ' . $this->routes_model->last_error();
+				$this->data['message'] = '<strong>Hey!</strong> There\'s a problem with the routing system. ' . $this->routes_model->cant_write_reason();
 
 			endif;
 
