@@ -1531,7 +1531,7 @@ class NAILS_User_model extends NAILS_Model
 			//	If there's a remember me cookie then update that too, but only if the password
 			//	or email address has changed
 
-			if ( ( isset( $data['email'] ) || isset( $data['password'] ) ) && $this->_is_remembered() ) :
+			if ( ( isset( $data['email'] ) || isset( $data['password'] ) ) && $this->is_remembered() ) :
 
 				$this->set_remember_cookie();
 
