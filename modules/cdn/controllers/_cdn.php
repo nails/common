@@ -154,7 +154,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 			$_headers = apache_request_headers();
 
-		elseif ( isset( $this->input->server( 'HTTP_IF_NONE_MATCH' ) ) ) :
+		elseif ( $this->input->server( 'HTTP_IF_NONE_MATCH' ) ) :
 
 			$_headers					= array();
 			$_headers['If-None-Match']	= $this->input->server( 'HTTP_IF_NONE_MATCH' );

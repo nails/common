@@ -724,9 +724,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$_widgets = array();
 		foreach( $_nails_widgets AS $widget => $details ) :
 
+			//	Ignore base template
+			if ( $details == '_widget.php' ) :
+
+				continue;
+
+			endif;
+
 			//	Ignore malformed widgets
 			if ( ! is_array( $details ) || array_search( 'widget.php', $details ) === FALSE ) :
 
+				log_message( 'error', 'Ignoring malformed NAILS CMS Widget "' . $widget . '"' );
 				continue;
 
 			endif;
@@ -745,8 +753,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Can we call the static details method?
 			$_class = $this->_nails_prefix . 'Widget_' . $widget;
 
-			if ( ! method_exists( $_class, 'details' ) ) :
+			if ( ! class_exists( $_class ) || ! method_exists( $_class, 'details' ) ) :
 
+				log_message( 'error', 'Cannot call static method "details()" on  NAILS CMS Widget: "' . $widget . '"' );
 				continue;
 
 			endif;
@@ -764,13 +773,24 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	Now test app widgets
 		foreach( $_app_widgets AS $widget => $details ) :
 
+			//	Ignore malformed widgets
+			if ( ! is_array( $details ) || array_search( 'widget.php', $details ) === FALSE ) :
+
+				log_message( 'error', 'Ignoring malformed APP CMS Widget "' . $widget . '"' );
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
 			include_once $this->_app_widgets_dir . $widget . '/widget.php';
 
 			//	Can we call the static details method?
-			$_class		= $this->_app_prefix . 'Widget_' . $widget;
+			$_class	= $this->_app_prefix . 'Widget_' . $widget;
 
-			if ( ! method_exists( $_class, 'details' ) ) :
+			if ( ! class_exists( $_class ) || ! method_exists( $_class, 'details' ) ) :
 
+				log_message( 'error', 'Cannot call static method "details()" on  APP CMS Widget: "' . $widget . '"' );
 				continue;
 
 			endif;
@@ -948,9 +968,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$_templates = array();
 		foreach( $_nails_templates AS $template => $details ) :
 
+			//	Ignore base template
+			if ( $details == '_template.php' ) :
+
+				continue;
+
+			endif;
+
 			//	Ignore malformed templates
 			if ( ! is_array( $details ) || array_search( 'template.php', $details ) === FALSE ) :
 
+				log_message( 'error', 'Ignoring malformed NAILS CMS Template "' . $template . '"' );
 				continue;
 
 			endif;
@@ -969,8 +997,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Can we call the static details method?
 			$_class = $this->_nails_prefix . 'Template_' . $template;
 
-			if ( ! method_exists( $_class, 'details' ) ) :
+			if ( ! class_exists( $_class ) || ! method_exists( $_class, 'details' ) ) :
 
+				log_message( 'error', 'Cannot call static method "details()" on  NAILS CMS Template: "' . $template . '"' );
 				continue;
 
 			endif;
@@ -991,6 +1020,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Ignore malformed templates
 			if ( ! is_array( $details ) || array_search( 'template.php', $details ) === FALSE ) :
 
+				log_message( 'error', 'Ignoring malformed APP CMS Template "' . $template . '"' );
 				continue;
 
 			endif;
@@ -1002,8 +1032,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Can we call the static details method?
 			$_class = $this->_app_prefix . 'Template_' . $template;
 
-			if ( ! method_exists( $_class, 'details' ) ) :
+			if ( ! class_exists( $_class ) || ! method_exists( $_class, 'details' ) ) :
 
+				log_message( 'error', 'Cannot call static method "details()" on  NAILS CMS Template: "' . $template . '"' );
 				continue;
 
 			endif;
