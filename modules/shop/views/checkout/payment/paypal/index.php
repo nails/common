@@ -2,7 +2,7 @@
 <head>
 	<title>Please Wait...</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<link rel="stylesheet" href="<?=NAILS_URL?>css/nails.default.css" type="text/css" media="screen" charset="utf-8"
+	<link rel="stylesheet" href="<?=NAILS_ASSETS_URL?>css/nails.default.css" type="text/css" media="screen" charset="utf-8"
 </head>
 <style type="text/css">
 
@@ -40,11 +40,11 @@
 	Please wait while we redirect you to PayPal
 </h1>
 <h2>
-	<?=img( NAILS_URL . '/img/modules/shop/payment-gateway/lock-locked-icon.png' )?> All transactions are secure.
+	<?=img( NAILS_ASSETS_URL . '/img/modules/shop/payment-gateway/lock-locked-icon.png' )?> All transactions are secure.
 </h2>
 <?php
 
-	echo img( NAILS_URL . '/img/loader/20px-TRANS.gif' );
+	echo img( NAILS_ASSETS_URL . '/img/loader/20px-TRANS.gif' );
 
 	echo form_open( $paypal->url );
 

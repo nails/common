@@ -31,7 +31,7 @@
 		<script type="text/javascript">
 			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
 			window.SITE_URL		= '<?=site_url( '', page_is_secure() )?>';
-			window.NAILS_URL	= '<?=NAILS_URL?>';
+			window.NAILS_ASSETS_URL	= '<?=NAILS_ASSETS_URL?>';
 			window.NAILS_LANG	= {};
 		</script>
 

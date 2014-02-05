@@ -77,7 +77,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 			$_subject	= 'Cache (CDN) dir not writeable';
 			$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
 			$_message	.= 'Dir: ' . DEPLOY_CACHE_DIR . "\n\n";
-			$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
+			$_message	.= 'URL: ' . $this->input->server( 'REQUEST_URI' );
 
 			send_developer_mail( $_subject, $_message );
 
@@ -154,10 +154,10 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 			$_headers = apache_request_headers();
 
-		elseif ( isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) :
+		elseif ( isset( $this->input->server( 'HTTP_IF_NONE_MATCH' ) ) ) :
 
 			$_headers					= array();
-			$_headers['If-None-Match']	= $_SERVER['HTTP_IF_NONE_MATCH'];
+			$_headers['If-None-Match']	= $this->input->server( 'HTTP_IF_NONE_MATCH' );
 
 		elseif( isset( $_SERVER ) ) :
 
@@ -204,7 +204,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		if ( isset( $_headers['If-None-Match'] ) && ( $_headers['If-None-Match'] == '"' . md5( $file ) . '"' ) ) :
 
-			header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified', TRUE, 304 );
+			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 304 Not Modified', TRUE, 304 );
 			return TRUE;
 
 		endif;
@@ -292,7 +292,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 			header( 'Cache-Control: no-cache, must-revalidate', TRUE );
 			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
 			header( 'Content-type: application/json', TRUE );
-			header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
+			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
 
 			// --------------------------------------------------------------------------
 
@@ -330,7 +330,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 			//	Output to browser
 			header( 'Content-type: image/png', TRUE );
-			header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
+			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
 			imagepng( $_bg );
 
 			// --------------------------------------------------------------------------

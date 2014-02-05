@@ -8,16 +8,8 @@ class Nails_CMS_Template_sidebar_right extends Nails_CMS_Template
 		$_d = parent::_details_template();
 
 		//	Basic details; describe the template for the user
-		$_d->label		= 'Sidebar Right';
-		$_d->info		= 'Main body with a sidebar to the right.';
-		$_d->img->icon	= NAILS_URL . 'img/admin/modules/cms/pages/templates/icons/sidebar_right.png';
-
-		//	Which view should be called by this template?
-		//	Nails' views are stored at NAILS_PATH . 'modules/cms/views/page/templates'
-		//	App views should mimic the Nails path, easily override a Nails view by
-		//	placing a replacement at the same path.
-
-		$_d->view	= 'sidebar_right';
+		$_d->label			= 'Sidebar Right';
+		$_d->description	= 'Main body with a sidebar to the right.';
 
 		//	Widget areas; give each a unique index, the index will be passed as
 		//	the variable to the view

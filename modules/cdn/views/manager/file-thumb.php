@@ -12,7 +12,7 @@
 		else :
 
 			//	Generic file
-			echo img( array( 'src' => NAILS_URL . 'img/icons/document-icon-128px.png', 'style' => 'border:none;margin-top:20px;' ) );
+			echo img( array( 'src' => NAILS_ASSETS_URL . 'img/icons/document-icon-128px.png', 'style' => 'border:none;margin-top:20px;' ) );
 			$_action_download = 'Download';
 
 		endif;

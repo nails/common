@@ -450,7 +450,7 @@
     noRatedMsg    : 'Not rated yet!',
     number        : 5,
     numberMax     : 20,
-    path          : NAILS_URL + 'img/jquery.raty/',
+    path          : NAILS_ASSETS_URL + 'img/jquery.raty/',
     precision     : false,
     readOnly      : false,
     round         : { down: .25, full: .6, up: .76 },

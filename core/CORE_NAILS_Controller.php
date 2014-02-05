@@ -234,18 +234,33 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
+
 		//	Set NAILS_URL here as it's dependent on knowing whether SSL is set or not
 		//	and if the current page is secure.
-
 		if ( ! defined( 'NAILS_URL') ) :
 
 			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
 
-				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/assets/' );
+				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/' );
 
 			else :
 
-				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/assets/' );
+				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/' );
+
+			endif;
+
+		endif;
+
+		//	Set the NAILS_ASSETS_URL
+		if ( ! defined( 'NAILS_ASSETS_URL') ) :
+
+			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
+
+				define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
+
+			else :
+
+				define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
 
 			endif;
 
@@ -414,7 +429,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 				<meta charset="utf-8">
 
 				<!--	STYLES	-->
-				<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
+				<link href="<?=NAILS_ASSETS_URL?>css/nails.default.css" rel="stylesheet">
 
 				<style type="text/css">
 

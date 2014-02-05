@@ -297,7 +297,7 @@
 						echo '<legend>';
 						if ( $pg->logo ) :
 
-							echo img( array( 'src' => NAILS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo, 'style' => 'margin-top:-10px;' ) );
+							echo img( array( 'src' => NAILS_ASSETS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo, 'style' => 'margin-top:-10px;' ) );
 
 						else :
 

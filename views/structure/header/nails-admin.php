@@ -23,7 +23,7 @@
 		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
 		window.SITE_URL					= '<?=SECURE_BASE_URL ? SECURE_BASE_URL : BASE_URL?>';
 		window.NAILS					= {};
-		window.NAILS.URL				= '<?=NAILS_URL?>';
+		window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
 		window.NAILS.LANG				= {};
 		window.NAILS.USER				= {};
 		window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
@@ -57,7 +57,7 @@
 		echo $this->asset->output( 'css-inline' );
 
 	?>
-	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_URL . 'css/nails.admin.print.css'?>" />
+	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.print.css'?>" />
 
 </head>
 <body class="<?=!$loaded_modules ? 'no-modules' : ''?>">

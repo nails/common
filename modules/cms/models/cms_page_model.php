@@ -722,10 +722,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		//	Test and merge widgets
 		$_widgets = array();
-		foreach( $_nails_widgets AS $widget ) :
+		foreach( $_nails_widgets AS $widget => $details ) :
 
-			//	Ignore the base widget
-			if ( $widget == '_widget.php' ) :
+			//	Ignore malformed widgets
+			if ( ! is_array( $details ) || array_search( 'widget.php', $details ) === FALSE ) :
+
+				continue;
+
+			endif;
+
+			//	Ignore widgets which have an app override
+			if ( isset( $_app_widgets[$widget] ) && is_array( $_app_widgets[$widget] ) ) :
 
 				continue;
 
@@ -733,11 +740,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			// --------------------------------------------------------------------------
 
-			include_once $this->_nails_widgets_dir . $widget;
+			include_once $this->_nails_widgets_dir . $widget . '/widget.php';
 
 			//	Can we call the static details method?
-			$_widget	= ucfirst( substr( $widget, 0, strrpos( $widget, '.' ) ) );
-			$_class		= $this->_nails_prefix . $_widget;
+			$_class = $this->_nails_prefix . 'Widget_' . $widget;
 
 			if ( ! method_exists( $_class, 'details' ) ) :
 
@@ -749,20 +755,19 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			if ( $_details ) :
 
-				$_widgets[$_widget] = $_class::details();
+				$_widgets[$widget] = $_class::details();
 
 			endif;
 
 		endforeach;
 
 		//	Now test app widgets
-		foreach( $_app_widgets AS $widget ) :
+		foreach( $_app_widgets AS $widget => $details ) :
 
-			include_once $this->_app_widgets_dir . $widget;
+			include_once $this->_app_widgets_dir . $widget . '/widget.php';
 
 			//	Can we call the static details method?
-			$_widget	= ucfirst( substr( $widget, 0, strrpos( $widget, '.' ) ) );
-			$_class		= $this->_app_prefix . $_widget;
+			$_class		= $this->_app_prefix . 'Widget_' . $widget;
 
 			if ( ! method_exists( $_class, 'details' ) ) :
 
@@ -770,7 +775,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			endif;
 
-			$_widgets[$_widget] = $_class::details();
+			$_widgets[$widget] = $_class::details();
 
 		endforeach;
 
@@ -860,7 +865,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	private function _sort_widgets( $a, $b )
+	protected function _sort_widgets( $a, $b )
 	{
 		//	Equal?
 		if ( trim( $a->label ) == trim( $b->label ) ) :
@@ -874,6 +879,31 @@ class NAILS_Cms_page_model extends NAILS_Model
 		sort( $_sort );
 
 		return $_sort[0] == $a->label ? -1 : 1;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_widget( $slug )
+	{
+		$_widgets = $this->get_available_widgets();
+
+		foreach ( $_widgets AS $widget_group ) :
+
+			foreach ( $widget_group->widgets AS $widget ) :
+
+				if ( $slug == $widget->slug ) :
+
+					return $widget;
+
+				endif;
+
+			endforeach;
+
+		endforeach;
+
+		return FALSE;
 	}
 
 
@@ -899,6 +929,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		$this->load->helper( 'directory' );
 
+		$_nails_templates	= array();
+		$_app_templates		= array();
+
 		//	Look for nails widgets
 		$_nails_templates = directory_map( $this->_nails_templates_dir );
 
@@ -911,27 +944,19 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Sanitise
-		if ( empty( $_nails_templates ) ) :
-
-			$_nails_templates = array();
-
-		endif;
-
-		if ( empty( $_app_templates ) ) :
-
-			$_app_templates = array();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Test and merge templates
 		$_templates = array();
-		foreach( $_nails_templates AS $template ) :
+		foreach( $_nails_templates AS $template => $details ) :
 
-			//	Ignore the base template
-			if ( $template == '_template.php' ) :
+			//	Ignore malformed templates
+			if ( ! is_array( $details ) || array_search( 'template.php', $details ) === FALSE ) :
+
+				continue;
+
+			endif;
+
+			//	Ignore templates which have an app override
+			if ( isset( $_app_templates[$template] ) && is_array( $_app_templates[$template] ) ) :
 
 				continue;
 
@@ -939,11 +964,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			// --------------------------------------------------------------------------
 
-			include_once $this->_nails_templates_dir . $template;
+			include_once $this->_nails_templates_dir . $template . '/template.php';
 
 			//	Can we call the static details method?
-			$_template	= ucfirst( substr( $template, 0, strrpos( $template, '.' ) ) );
-			$_class		= $this->_nails_prefix . $_template;
+			$_class = $this->_nails_prefix . 'Template_' . $template;
 
 			if ( ! method_exists( $_class, 'details' ) ) :
 
@@ -955,20 +979,28 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			if ( $_details ) :
 
-				$_templates[$_template] = $_class::details();
+				$_templates[$template] = $_class::details();
 
 			endif;
 
 		endforeach;
 
 		//	Now test app templates
-		foreach( $_app_templates AS $template ) :
+		foreach( $_app_templates AS $template => $details ) :
 
-			include_once $this->_app_templates_dir . $template;
+			//	Ignore malformed templates
+			if ( ! is_array( $details ) || array_search( 'template.php', $details ) === FALSE ) :
+
+				continue;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			include_once $this->_app_templates_dir . $template . '/template.php';
 
 			//	Can we call the static details method?
-			$_template	= ucfirst( substr( $template, 0, strrpos( $template, '.' ) ) );
-			$_class		= $this->_app_prefix . $template;
+			$_class = $this->_app_prefix . 'Template_' . $template;
 
 			if ( ! method_exists( $_class, 'details' ) ) :
 
@@ -976,7 +1008,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			endif;
 
-			$_templates[$_template] = $_class::details();
+			$_templates[$template] = $_class::details();
 
 		endforeach;
 

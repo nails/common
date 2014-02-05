@@ -189,7 +189,7 @@
 				echo form_radio( 'payment_gateway', $pg->id );
 				if ( $pg->logo ) :
 
-					echo img( NAILS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo );
+					echo img( NAILS_ASSETS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo );
 
 				else :
 

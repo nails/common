@@ -508,7 +508,7 @@
 
 					if ( $item->was_on_sale ) :
 
-						echo img( array( 'src' => NAILS_URL . 'img/modules/shop/basket/ribbon-on-sale.png', 'class' => 'ribbon' ) );
+						echo img( array( 'src' => NAILS_ASSETS_URL . 'img/modules/shop/basket/ribbon-on-sale.png', 'class' => 'ribbon' ) );
 
 					endif;
 

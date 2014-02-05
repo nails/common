@@ -162,7 +162,7 @@
 					</ul>
 				</td>
 				<td align="right" valign="top">
-					<?=img( NAILS_URL . 'img/modules/shop/email/post-mark.png' )?>
+					<?=img( NAILS_ASSETS_URL . 'img/modules/shop/email/post-mark.png' )?>
 				</td>
 			</tr>
 		</table>

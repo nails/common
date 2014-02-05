@@ -8,16 +8,9 @@ class Nails_CMS_Template_fullwidth extends Nails_CMS_Template
 		$_d = parent::_details_template();
 
 		//	Basic details; describe the template for the user
-		$_d->label		= 'Full Width';
-		$_d->info		= 'A full width template';
-		$_d->img->icon	= NAILS_URL . 'img/admin/modules/cms/pages/templates/icons/fullwidth.png';
+		$_d->label			= 'Full Width';
+		$_d->description	= 'A full width template';
 
-		//	Which view should be called by this template?
-		//	Nails' views are stored at NAILS_PATH . 'modules/cms/views/page/templates'
-		//	App views should mimic the Nails path, easily override a Nails view by
-		//	placing a replacement at the same path.
-
-		$_d->view	= 'fullwidth';
 
 		//	Widget areas; give each a unique index, the index will be passed as
 		//	the variable to the view

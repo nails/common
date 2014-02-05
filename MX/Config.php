@@ -115,7 +115,7 @@ class MX_Config extends CI_Config
 				if (
 					   ( $i )
 					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
-					|| ( $_page_is_secure && preg_match( '#^' . NAILS_URL . '.*#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . NAILS_ASSETS_URL . '.*#', $_uri ) )
 					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
 				) :
 

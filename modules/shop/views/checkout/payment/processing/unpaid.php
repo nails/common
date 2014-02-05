@@ -3,7 +3,7 @@
 	<title>Please Wait...</title>
 	<meta http-equiv="refresh" content="2">
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<link rel="stylesheet" href="<?=NAILS_URL?>css/nails.default.css" type="text/css" media="screen" charset="utf-8"
+	<link rel="stylesheet" href="<?=NAILS_ASSETS_URL?>css/nails.default.css" type="text/css" media="screen" charset="utf-8"
 </head>
 <style type="text/css">
 
@@ -26,7 +26,7 @@
 		This can take up to 60 seconds but is usually much quicker.
 	</p>
 	<p>
-		<?=img( NAILS_URL . '/img/loader/20px-TRANS.gif' )?>
+		<?=img( NAILS_ASSETS_URL . '/img/loader/20px-TRANS.gif' )?>
 	</p>
 	<?php
 

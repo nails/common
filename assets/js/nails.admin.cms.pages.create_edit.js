@@ -3,15 +3,20 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 {
 	this.editor_id			= Math.floor( Math.random() * 10000000000000001 );
 	this.search_placeholder	= 'Search widget library';
+	this.templates			= [];
 	this.widgets			= [];
 	this._dragging_widget	= false;
 
 	// --------------------------------------------------------------------------
 
 
-	this.init = function( widgets )
+	this.init = function( templates, widgets )
 	{
-		this.widgets = widgets;
+		this.templates	= templates;
+		this.widgets	= widgets;
+
+		// --------------------------------------------------------------------------
+
 		this._template_chooser_init();
 		this._editor_init();
 	};
@@ -46,7 +51,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		//	Generate the editor HTML and inject into DOM
 		var _container		= $( '<div>').attr( 'id', this.editor_id ).addClass( 'group-cms pages widgeteditor ready' );
 		var _loader			= $( '<div>' ).attr( 'id', this.editor_id + '-loader' ).addClass( 'loader' ).html( '<span class="ion-looping"></span>' );
-		var _header			= $( '<ul>' ).attr( 'id', this.editor_id + '-header' ).addClass( 'header' ).html( $( '#template-header' ).html() );
+		var _header			= $( '<ul>' ).attr( 'id', this.editor_id + '-header' ).addClass( 'header' );
 		var _widgets		= $( '<ul>' ).attr( 'id', this.editor_id + '-widgets' ).addClass( 'widgets' ).disableSelection();
 		var _widgets_search	= $( '<li>' ).attr( 'id', this.editor_id + '-search' ).addClass( 'search' ).html( $( '#template-widget-search' ).html() );
 		var _dropzone		= $( '<ul>' ).attr('id',  this.editor_id + '-dropzone' ).addClass( 'dropzone empty' ).html( $( '#template-dropzone-empty' ).html() );
@@ -154,51 +159,102 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
+		//	Init the header
+		var _template,_tpl_header;
+		_template				= this._get_template( template );
+		_template.active_area	= _template.widget_areas[area].title;
+
+		_tpl_header	= $( '#template-header' ).html();
+		_tpl_header	= Mustache.render( _tpl_header, _template );
+
+		$( '#' + this.editor_id + '-header' ).html( _tpl_header );
+
+		// --------------------------------------------------------------------------
+
 		//	Initialise sortables
 		var _tpl_widget = $( '#template-dropzone-widget' ).html();
 		$( '#' + this.editor_id + '-dropzone' ).sortable(
 		{
 			placeholder: 'placeholder',
 			handle: '.sorter',
-			start: function(e, ui ){
+			start: function(e,ui)
+			{
+				console.log('start',e,ui);
 				ui.placeholder.height( ui.helper.height() );
 			},
-			stop: function(e,ui)
+			update: function(e,ui)
 			{
-				//	Define vars
-				var _slug,_widget,_data,_html,_item;
+				console.log('update',e,ui);
+				if ( ! ui.item.hasClass( 'processed' ) )
+				{
+					//	Define vars
+					var _slug,_widget,_data,_html,_item;
 
-				//	What type of widget are we dealing with? Get more info.
-				_slug	= $(ui.item).data( 'slug' );
-				_widget	= _this._get_widget( _slug );
+					//	What type of widget are we dealing with? Get more info.
+					_slug	= $(ui.item).data( 'slug' );
+					_widget	= _this._get_widget( _slug );
 
-				_data = {
-					id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
-					slug		: _slug,
-					label		: _widget.label,
-					description	: _widget.description
-				};
+					_data = {
+						id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
+						slug		: _slug,
+						label		: _widget.label,
+						description	: _widget.description
+					};
 
-				_html = Mustache.render( _tpl_widget, _data );
+					_html = Mustache.render( _tpl_widget, _data );
 
-				_item = $( '<li>' );
-				_item.addClass( 'dropzone-widget ' + _data.slug );
-				_item.attr( 'id', _data.id );
-				_item.data( 'slug', _data.slug );
-				_item.html( _html );
+					_item = $( '<li>' );
+					_item.addClass( 'processed dropzone-widget ' + _data.slug );
+					_item.attr( 'id', _data.id );
+					_item.data( 'id', _data.id );
+					_item.data( 'slug', _data.slug );
+					_item.html( _html );
 
-				ui.item.replaceWith( _item );
+					// --------------------------------------------------------------------------
 
+
+
+					// --------------------------------------------------------------------------
+
+					//	Place it into the DOM
+					ui.item.replaceWith( _item );
+
+					// --------------------------------------------------------------------------
+
+					$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
+					$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
+
+					//	Call the server asking for the widget's editor view
+					var _call =
+					{
+						'controller'	: 'cms/pages',
+						'method'		: 'widget/get_editor',
+						'data'			: { widget: _widget.slug, template: _template.slug, id: _data.id },
+						'success'		: function( data )
+						{
+							$( _item ).find( '.editor' ).html( data.HTML );
+						},
+						'error'			: function( data )
+						{
+							var _data = JSON.parse( data.responseText );
+
+							$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
+
+						},
+					};
+
+					window.NAILS.API.call(_call);
+				}
+			},
+			over: function(e,ui)
+			{
+				console.log('over',e,ui);
 				$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
 				$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
 			},
-			over: function()
+			out: function(e,ui)
 			{
-				$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
-				$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
-			},
-			out: function()
-			{
+				console.log('out',e,ui);
 				var _counter = 0;
 				_counter = _counter + $( '#' + _this.editor_id + '-dropzone li.dropzone-widget' ).length;
 				_counter = _counter + $( '#' + _this.editor_id + '-dropzone li.widget' ).length;
@@ -208,6 +264,52 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					var _tpl_empty = $('#template-dropzone-empty').html();
 					$( '#' + _this.editor_id + '-dropzone' ).addClass( 'empty' ).append( _tpl_empty );
 				}
+			},
+			sort: function(e,ui)
+			{
+				console.log('sort',e,ui);
+			},
+			activate: function(e,ui)
+			{
+				console.log('activate',e,ui);
+			},
+			beforeStop: function(e,ui)
+			{
+				console.log('beforeStop',e,ui);
+			},
+			change: function(e,ui)
+			{
+				console.log('change',e,ui);
+			},
+			create: function(e,ui)
+			{
+				console.log('create',e,ui);
+			},
+			deactivate: function(e,ui)
+			{
+				console.log('deactivate',e,ui);
+			},
+			stop: function(e,ui)
+			{
+				console.log('stop',e,ui);
+				if ( $( '#' + _this.editor_id + '-dropzone li.dropzone-widget' ) <= 0 )
+				{
+					var _tpl_empty = $('#template-dropzone-empty').html();
+					$( '#' + _this.editor_id + '-dropzone' ).addClass( 'empty' ).append( _tpl_empty );
+				}
+				else
+				{
+					$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
+					$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
+				}
+			},
+			remove: function(e,ui)
+			{
+				console.log('remove',e,ui);
+			},
+			receive: function(e,ui)
+			{
+				console.log('receive',e,ui);
 			}
 		});
 
@@ -241,7 +343,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( template, this.widgets[_key].widgets[_key2].restrict_from_template ) !== false )
 					{
-						console.log(this.widgets[_key].widgets[_key2], template, this._array_search( template, this.widgets[_key].widgets[_key2].restrict_from_template ));
 						$( '#' + this.editor_id + '-widgets li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
 					}
 				}
@@ -425,6 +526,26 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	};
 
 
+	// --------------------------------------------------------------------------
+
+
+	this._get_template = function( slug )
+	{
+		for ( var _key in this.templates )
+		{
+			if ( slug === this.templates[_key].slug )
+			{
+				return this.templates[_key];
+			}
+		}
+
+		return false;
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
 	this._get_widget = function( slug )
 	{
 		for ( var _key in this.widgets )
@@ -440,6 +561,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		return false;
 	};
+
 
 
 	// --------------------------------------------------------------------------

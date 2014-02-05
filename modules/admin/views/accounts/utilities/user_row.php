@@ -30,10 +30,10 @@
 			echo '<small>';
 			echo isset( $member->telephone ) && $member->telephone ? $member->telephone . ' | ' : '';
 			echo $member->email;
-			echo $member->email_is_verified ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_verified' ) ) ) : '';
-			echo $member->fb_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Facebook' ) ) ) : '';
-			echo $member->tw_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-twitter.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Twitter' ) ) ) : '';
-			echo $member->li_id ? img( array( 'src' => NAILS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'LinkedIn' ) ) ) : '';
+			echo $member->email_is_verified ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_verified' ) ) ) : '';
+			echo $member->fb_id ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Facebook' ) ) ) : '';
+			echo $member->tw_id ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-twitter.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Twitter' ) ) ) : '';
+			echo $member->li_id ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-linkedin.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'LinkedIn' ) ) ) : '';
 			echo '</small>';
 
 			if ( $member->last_login ) :

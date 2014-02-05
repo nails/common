@@ -2,16 +2,31 @@
 
 class NAILS_CMS_Widget
 {
+	protected $_details;
+	protected $_data;
+
+	// --------------------------------------------------------------------------
+
+
 	static function details()
 	{
-		$_d	= new stdClass();
+		$_d					= new stdClass();
+		$_d->iam			= get_called_class();
+
+		$_reflect 			= new ReflectionClass( $_d->iam );
 
 		$_d->label			= 'Widget';
-		$_d->slug			= 'Widget';
-		$_d->iam			= get_called_class();
 		$_d->description	= '';
 		$_d->keywords		= '';
 		$_d->grouping		= '';
+
+		//	Work out the slug, this should uniquely identify the widget
+		//	Work out slug - this should uniquely identify a type of widget
+
+		$_d->slug	= $_reflect->getFileName();
+		$_d->slug	= pathinfo( $_d->slug );
+		$_d->slug	= explode( '/', $_d->slug['dirname'] );
+		$_d->slug	= array_pop( $_d->slug  );
 
 		//	If a widget should be restricted to a specific templates or areas
 		//	then specify the appropriate slugs below
@@ -25,15 +40,61 @@ class NAILS_CMS_Widget
 		$_d->restrict_from_template	= array();
 		$_d->restrict_from_area		= array();
 
+		//	Define any assets need to be loaded by the widget
+		$_d->assets = array();
+
+		//	Define the views to use for the widget, defaults to 'cms/page/widgets/' . widget_slug . '_[editor/slug]'
+
+		$_d->views			= new stdClass();
+		$_d->views->editor	= '';
+		$_d->views->render	= '';
+
+		//	Define any JS callbacks; these will be properly scoped by the framework
+		$_d->callbacks					= new stdClass();
+		$_d->callbacks->before_drop		= '';
+		$_d->callbacks->after_drop		= '';
+		$_d->callbacks->before_sort		= '';
+		$_d->callbacks->after_sort		= '';
+		$_d->callbacks->before_remove	= '';
+		$_d->callbacks->after_remove	= '';
+
+		//	Path
+		$_d->path = dirname( $_reflect->getFileName() ) . '/';
+
 		return $_d;
+	}
+
+	// --------------------------------------------------------------------------
+
+
+	public function __construct()
+	{
+		$this->_details = $this::details();
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function setup( $data )
+	public function setup( $_data = NULL )
 	{
+		$this->_data = $_data;
+	}
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_editor()
+	{
+		$_view = $this->_details->views->editor ? $this->_details->views->editor : 'cms/page/widgets/' . $this->_details->slug . '/views/editor';
+
+		if ( is_file( $this->_details->path . 'views/editor.php' ) ) :
+
+			return file_get_contents( $this->_details->path . 'views/editor.php' );
+
+		endif;
+
+		return '';
 	}
 
 
@@ -42,65 +103,7 @@ class NAILS_CMS_Widget
 
 	public function render()
 	{
-		return '';
-	}
 
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_editor_html()
-	{
-		return '';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_editor_functions()
-	{
-		$_out		= '';
-
-		//	Called when starting the sort/widget is received
-		$_out		.= 'function start_' . $this::details()->slug . '() {';
-		$_out		.= $this->_editor_function_start();
-		$_out		.= '};'."\n";
-
-		//	Called when user has stopped sorting
-		$_out		.= 'function stop_' . $this::details()->slug . '() {';
-		$_out		.= $this->_editor_function_stop();
-		$_out		.= '};'."\n";
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-
-	protected function _editor_function_start()
-	{
-		return '';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _editor_function_stop()
-	{
-		return '';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_validation_rules( $field )
-	{
-		return '';
 	}
 }
 

@@ -17,7 +17,7 @@
 			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
 			window.SITE_URL					= '<?=site_url()?>';
 			window.NAILS					= {};
-			window.NAILS.URL				= '<?=NAILS_URL?>';
+			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
 			window.NAILS.LANG				= {};
 			window.NAILS.USER				= {};
 			window.NAILS.USER.ID			= <?=active_user( 'id' )?>;

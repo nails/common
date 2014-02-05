@@ -19,8 +19,8 @@
 
 				switch( $basket->voucher->type ) :
 
-					case 'GIFT_CARD' :	echo img( NAILS_URL . 'img/modules/shop/basket/ribbon-gift-card.png' );	break;
-					default:			echo img( NAILS_URL . 'img/modules/shop/basket/ribbon-voucher.png' );	break;
+					case 'GIFT_CARD' :	echo img( NAILS_ASSETS_URL . 'img/modules/shop/basket/ribbon-gift-card.png' );	break;
+					default:			echo img( NAILS_ASSETS_URL . 'img/modules/shop/basket/ribbon-voucher.png' );	break;
 
 				endswitch;
 
@@ -30,7 +30,7 @@
 
 				echo '<div class="twelve columns last">';
 				echo '<span class="label">';
-				
+
 				switch( $basket->voucher->type ) :
 
 					case 'GIFT_CARD' :
@@ -61,7 +61,7 @@
 
 
 	?>
-	
+
 	<!--	SHIPPING	-->
 	<?php
 
@@ -107,7 +107,7 @@
 
 			echo '<section class="row sixteen columns first last">';
 			echo '<h2 class="row">Payment Option</h2>';
-			
+
 			echo '<ul class="payment-gateways">';
 			foreach ($payment_gateways AS $pg ) :
 
@@ -117,13 +117,13 @@
 					echo '<li>';
 					echo '<label style="cursor:default;">';
 					if ( $pg->logo ) :
-					
-						echo img( NAILS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo );
-						
+
+						echo img( NAILS_ASSETS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo );
+
 					else :
-					
+
 						echo $pg->label;
-					
+
 					endif;
 					echo '</label>';
 					echo '</li>';
@@ -149,5 +149,5 @@
 		echo '</div>';
 
 	?>
-	
+
 </div>

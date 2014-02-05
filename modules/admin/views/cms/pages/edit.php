@@ -198,7 +198,7 @@
 	$(function(){
 
 		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
-		CMS_PAGES.init(<?=json_encode( $widgets )?>);
+		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>);
 
 	});
 
@@ -207,7 +207,7 @@
 <script type="text/template" id="template-header">
 	<ul>
 		<li>
-			Currently editing: {{area}}
+			Currently editing: {{active_area}}
 		</li>
 	</ul>
 	<ul class="rhs">
@@ -257,8 +257,10 @@
 		{{#description}}<span class="description">{{description}}</span>{{/description}}
 	</div>
 	<div class="editor">
-		<p>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur placerat nibh nisl, at aliquet urna sagittis blandit. Phasellus nec justo vitae dolor convallis vestibulum nec sit amet ipsum. Etiam id luctus metus. Proin rutrum lacus in luctus sagittis. Proin ac euismod sem. Vestibulum in hendrerit sapien. Maecenas accumsan hendrerit tellus, sed imperdiet nisl placerat quis. Donec feugiat neque id pulvinar semper.
+		<p style="text-align:center;">
+			<span class="ion-looping"></span>
+			<br />
+			Please wait, loading widget
 		</p>
 	</div>
 </script>

@@ -172,7 +172,7 @@ class NAILS_Auth extends NAILS_API_Controller
 /**
  * OVERLOADING NAILS' API MODULES
  *
- * The following block of code makes it simple to extend one of the core admin
+ * The following block of code makes it simple to extend one of the core API
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -202,4 +202,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_AUTH' ) ) :
 endif;
 
 /* End of file auth.php */
-/* Location: ./application/modules/api/controllers/auth.php */
+/* Location: ./modules/api/controllers/auth.php */

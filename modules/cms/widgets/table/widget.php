@@ -6,7 +6,6 @@ class NAILS_CMS_Widget_table extends NAILS_CMS_Widget
 	{
 		$_d					= parent::details();
 		$_d->label			= 'Table';
-		$_d->slug			= 'Widget_table';
 		$_d->description	= 'Easily build a table';
 		$_d->keywords		= 'table,tabular data,data';
 

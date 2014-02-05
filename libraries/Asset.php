@@ -479,7 +479,7 @@ class Asset
 
 		foreach ( $this->css_nails AS $asset ) :
 
-			$out .= link_tag( NAILS_URL . 'css/' . $asset ) . "\n";
+			$out .= link_tag( NAILS_ASSETS_URL . 'css/' . $asset ) . "\n";
 
 		endforeach;
 
@@ -554,7 +554,7 @@ class Asset
 
 		foreach ( $this->js_nails AS $asset ) :
 
-			$out .= '<script type="text/javascript" src="' . NAILS_URL . 'js/' . $asset . '"></script>' . "\n";
+			$out .= '<script type="text/javascript" src="' . NAILS_ASSETS_URL . 'js/' . $asset . '"></script>' . "\n";
 
 		endforeach;
 

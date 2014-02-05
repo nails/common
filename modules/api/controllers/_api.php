@@ -66,11 +66,11 @@ class NAILS_API_Controller extends NAILS_Controller
 
 				switch ( $out['status'] ) :
 
-					case 400 :	$this->output->set_header( 'HTTP/1.0 400 Bad Request' );			break;
-					case 401 :	$this->output->set_header( 'HTTP/1.0 401 Unauthorized' );			break;
-					case 404 :	$this->output->set_header( 'HTTP/1.0 404 Not Found' );				break;
-					case 500 :	$this->output->set_header( 'HTTP/1.0 500 Internal Server Error' );	break;
-					default  :	$this->output->set_header( 'HTTP/1.0 200 OK' );						break;
+					case 400 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );			break;
+					case 401 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 401 Unauthorized' );			break;
+					case 404 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 404 Not Found' );				break;
+					case 500 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 500 Internal Server Error' );	break;
+					default  :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 200 OK' );						break;
 
 				endswitch;
 
