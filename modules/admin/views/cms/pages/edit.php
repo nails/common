@@ -119,7 +119,7 @@
 						echo '<span class="newrow"></span>';
 						echo '<span class="name">';
 							echo '<span class="checkmark ion-checkmark-circled"></span>';
-							echo '<span>' . $template->name . '</span>';
+							echo '<span>' . $template->label . '</span>';
 						echo '</span>';
 					echo '</label>';
 				echo '</li>';
@@ -179,41 +179,6 @@
 
 		?>
 		</p>
-		<?php
-
-			// //	Hero editor
-			// $_config = array( 'config' => array() );
-			// $_config['config']['area']					= 'hero';
-			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'HERO', 'HERO_BODY', 'HERO_SIDEBAR' );
-			// $_config['config']['title']					= 'Page Hero';
-			// $_config['config']['description']			= '';
-
-			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-			// // --------------------------------------------------------------------------
-
-			// //	Body editor
-			// $_config = array( 'config' => array() );
-			// $_config['config']['area']					= 'body';
-			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'BODY', 'HERO_BODY', 'BODY_SIDEBAR' );
-			// $_config['config']['title']					= 'Page Body';
-			// $_config['config']['description']			= '';
-
-			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-			// // --------------------------------------------------------------------------
-
-			// //	Sidebar editor
-			// $_config = array( 'config' => array() );
-			// $_config['config']['area']					= 'sidebar';
-			// $_config['config']['accept_widgets_for']	= array( 'ALL', 'SIDEBAR', 'HERO_SIDEBAR', 'BODY_SIDEBAR' );
-			// $_config['config']['title']					= 'Page Sidebar';
-			// $_config['config']['description']			= '';
-
-			// $this->load->view( 'admin/cms/pages/_editor', $_config  );
-
-
-		?>
 	</fieldset>
 
 	<p>
@@ -227,127 +192,13 @@
 
 </div>
 
-<?php /*
-<script type="text/javascript">
-<!--//
-
-	$(function(){
-
-		//	Hero
-		var CMS_Pages_hero = new NAILS_Admin_CMS_Pages_Editor;
-		CMS_Pages_hero.init( 'hero' );
-
-		//	Body
-		var CMS_Pages_body = new NAILS_Admin_CMS_Pages_Editor;
-		CMS_Pages_body.init( 'body' );
-
-		//	Sidebar
-		var CMS_Pages_sidebar = new NAILS_Admin_CMS_Pages_Editor;
-		CMS_Pages_sidebar.init( 'sidebar' );
-
-		// --------------------------------------------------------------------------
-
-		//	Handle the layout selector
-		function sort_layout( type )
-		{
-			switch ( type )
-			{
-				case 'hero-sidebar-left' :
-				case 'hero-sidebar-right' :
-
-					$( '#cms-page-edit-hero' ).show();
-					$( '#cms-page-edit-body' ).show();
-					$( '#cms-page-edit-sidebar' ).show();
-					$( '#cms-page-edit-sidebar-width' ).show();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'hero-full-width' :
-
-					$( '#cms-page-edit-hero' ).show();
-					$( '#cms-page-edit-body' ).show();
-					$( '#cms-page-edit-sidebar' ).hide();
-					$( '#cms-page-edit-sidebar-width' ).hide();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'no-hero-sidebar-left' :
-				case 'no-hero-sidebar-right' :
-
-					$( '#cms-page-edit-hero' ).hide();
-					$( '#cms-page-edit-body' ).show();
-					$( '#cms-page-edit-sidebar' ).show();
-					$( '#cms-page-edit-sidebar-width' ).show();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'no-hero-full-width' :
-
-					$( '#cms-page-edit-hero' ).hide();
-					$( '#cms-page-edit-body' ).show();
-					$( '#cms-page-edit-sidebar' ).hide();
-					$( '#cms-page-edit-sidebar-width' ).hide();
-
-				break;
-
-			}
-		}
-
-		//	Catch selections
-		$( 'input[name=layout]' ).on( 'click', function()
-		{
-			sort_layout( $(this).val());
-		});
-
-		//	Process the current layout
-		sort_layout( '<?=$_layout?>' );
-
-
-	});
-
-//-->
-</script>
-
-<?php
-
-	//	Get the widget templates and functions
-	foreach( $widgets AS $widget ) :
-
-		$_class = $widgets[$widget->slug]->iam;
-
-		echo '<script type="text/template" id="' . $widget->slug . '">';
-		echo '<h2 class="handle">';
-		echo $_class::details()->name;
-		echo '<small>' . $_class::details()->info . '</small>';
-		echo '<a href="#" class="close">Close</a>';
-		echo '</h2>';
-		echo '<div class="editor-content">';
-		echo $this->cms_page->get_widget_editor( $widget->slug, NULL, 'widgets_{{key}}[new-{{counter}}]' );
-		echo '</div>';
-		echo '</script>';
-
-		echo '<script type="text/javascript">';
-		echo $this->cms_page->get_widget_editor_functions( $widget->slug, NULL, 'widgets__{{key}}[new-{{counter}}]' );
-		echo '</script>';
-
-	endforeach;
-?>
-
-<?php */ ?>
-
 <script type="text/javascript">
 <!--//
 
 	$(function(){
 
 		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
-		CMS_PAGES.init( 'hero' );
+		CMS_PAGES.init(<?=json_encode( $widgets )?>);
 
 	});
 
@@ -356,7 +207,7 @@
 <script type="text/template" id="template-header">
 	<ul>
 		<li>
-			Currently editing: XXX
+			Currently editing: {{area}}
 		</li>
 	</ul>
 	<ul class="rhs">
@@ -381,9 +232,10 @@
 	</li>
 </script>
 <script type="text/template" id="template-widget">
-	<li class="widget {{group}}" data-keywords="{{keywords}}">
+	<li class="widget {{group}} {{slug}}" data-slug="{{slug}}" data-title="{{name}} Widget" data-keywords="{{keywords}}">
 		<span class="icon ion-arrow-move"></span>
 		<span class="label">{{name}}</span>
+		{{#description}}<span class="description">{{description}}</span>{{/description}}
 	</li>
 </script>
 <script type="text/template" id="template-dropzone-empty">
@@ -394,4 +246,19 @@
 		</div>
 		<div class="valigned-helper"></div>
 	</li>
+</script>
+<script type="text/template" id="template-dropzone-widget">
+	<div class="header-bar">
+		<span class="sorter">
+			<span class="ion-arrow-move"></span>
+		</span>
+		<span class="label">{{label}}</span>
+		<span class="closer ion-trash-a"></span>
+		{{#description}}<span class="description">{{description}}</span>{{/description}}
+	</div>
+	<div class="editor">
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur placerat nibh nisl, at aliquet urna sagittis blandit. Phasellus nec justo vitae dolor convallis vestibulum nec sit amet ipsum. Etiam id luctus metus. Proin rutrum lacus in luctus sagittis. Proin ac euismod sem. Vestibulum in hendrerit sapien. Maecenas accumsan hendrerit tellus, sed imperdiet nisl placerat quis. Donec feugiat neque id pulvinar semper.
+		</p>
+	</div>
 </script>

@@ -1,13 +1,14 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget_image extends Nails_CMS_Widget
+class NAILS_CMS_Widget_image extends NAILS_CMS_Widget
 {
 	static function details()
 	{
-		$_d			= parent::details();
-		$_d->name	= 'Image';
-		$_d->slug	= 'Widget_image';
-		$_d->info	= 'A single image.';
+		$_d					= parent::details();
+		$_d->label			= 'Image';
+		$_d->slug			= 'Widget_image';
+		$_d->description	= 'A single image.';
+		$_d->keywords		= 'image,images,photo,photos';
 
 		return $_d;
 	}

@@ -1,6 +1,8 @@
 <div class="group-dashboard">
 	<?php
 
+		if ( $has_modules ) :
+
 		echo '<p>' . lang( 'dashboard_welcome_line_1', APP_NAME ) . '</p>';
 		echo '<p>' . lang( 'dashboard_welcome_line_2' ) . '</p>';
 
@@ -14,8 +16,21 @@
 
 	<hr />
 
+	<p class="system-alert no-close">
+		<strong>TODO:</strong> Widgetise the dashboard area so that individual users can pick and
+		choose which widgets appear here. Widgets should be customiseable at the app level and also
+		be orderable per user and persists across sessions.
+	</p>
+
+	<ul id="widgets" class="widgets">
+		<li class="add-widget">
+			<a href="#" id="add-widget"></a>
+		</li>
+		<li class="clear"></li>
+	</ul>
+
 	<!-- TODO: Don't use tables for layout -->
-	<table>
+	<table style="display:none;">
 		<tbody>
 			<tr>
 				<td style="max-width:50%;min-width:50%;width:50%;padding:0;padding-right:10px;vertical-align:top;background:#FFF !important;">
@@ -93,6 +108,22 @@
 			</tr>
 		</tbody>
 	</table>
+	<script type="text/javascript">
+		var _NAILS_Admin_Dashboard = new NAILS_Admin_Dashboard();
+		_NAILS_Admin_Dashboard.init();
+	</script>
+	<?php
 
+	else :
 
+		//	No modules
+		echo '<p class="system-alert message no-close">';
+			echo '<strong>' . lang( 'dashboard_nomodules_title' ) . '</strong>';
+			echo '<br />';
+			echo lang( 'dashboard_nomodules_message', APP_DEVELOPER_EMAIL );
+		echo '</p>';
+
+	endif;
+
+	?>
 </div>

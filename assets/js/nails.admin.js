@@ -1,5 +1,6 @@
 var NAILS_Admin;
-NAILS_Admin = function() {
+NAILS_Admin = function()
+{
 	this.error_delay = 6000; //	Amount of time the error message will stay on screen.
 
 

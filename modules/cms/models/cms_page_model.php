@@ -402,7 +402,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function get_all( $include_deleted = FALSE )
 	{
-		$this->db->select( 'p.id,p.slug,p.slug_end,p.parent_id,p.template,p.template_data,p.title,p.title_nested,p.is_published,p.is_deleted,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by' );
+		$this->db->select( 'p.id,p.slug,p.slug_end,p.parent_id,p.template,p.template_data,p.draft_template,p.draft_template_data,p.title,p.title_nested,p.is_published,p.is_deleted,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = p.modified_by', 'LEFT' );
@@ -599,6 +599,11 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$page->template->slug	= $_template_slug;
 		$page->template->data	= unserialize( $page->template_data );
 
+		$_template_slug				= $page->draft_template;
+		$page->draft_template		= new stdClass();
+		$page->draft_template->slug	= $_template_slug;
+		$page->draft_template->data	= unserialize( $page->draft_template_data );
+
 		// --------------------------------------------------------------------------
 
 		//	Owner
@@ -700,6 +705,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		$this->load->helper( 'directory' );
 
+		$_nails_widgets	= array();
+		$_app_widgets	= array();
+
 		//	Look for nails widgets
 		$_nails_widgets = directory_map( $this->_nails_widgets_dir );
 
@@ -707,21 +715,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 		if ( is_dir( $this->_app_widgets_dir ) ) :
 
 			$_app_widgets = directory_map( $this->_app_widgets_dir );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Sanitise
-		if ( empty( $_nails_widgets ) ) :
-
-			$_nails_widgets = array();
-
-		endif;
-
-		if ( empty( $_app_widgets ) ) :
-
-			$_app_widgets = array();
 
 		endif;
 
@@ -783,8 +776,75 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Sort into some alphabetical order
-		ksort( $_widgets );
+		//	Sort the widgets into their sub groupings and then alphabetically
+		$_out						= array();
+		$_generic_widgets			= array();
+		$_generic_widget_grouping	= 'Generic';
+
+		foreach ( $_widgets AS $w ) :
+
+			if ( $w->grouping ) :
+
+				$_key = md5( $w->grouping );
+
+				if ( ! isset( $_out[$_key] ) ) :
+
+					$_out[$_key]			= new stdClass();
+					$_out[$_key]->label		= $w->grouping;
+					$_out[$_key]->widgets	= array();
+
+				endif;
+
+				$_out[$_key]->widgets[] = $w;
+
+			else :
+
+				$_key = md5( $_generic_widget_grouping );
+
+				if ( ! isset( $_generic_widgets[$_key] ) ) :
+
+					$_generic_widgets[$_key]			= new stdClass();
+					$_generic_widgets[$_key]->label		= $_generic_widget_grouping;
+					$_generic_widgets[$_key]->widgets	= array();
+
+				endif;
+
+				$_generic_widgets[$_key]->widgets[] = $w;
+
+			endif;
+
+		endforeach;
+
+		//	Sort non-generic widgets into alphabetical order
+		foreach( $_out AS $o ) :
+
+			usort( $o->widgets, array( $this, '_sort_widgets' ) );
+
+		endforeach;
+
+		//	Sort generic
+		usort( $_generic_widgets[md5( $_generic_widget_grouping )]->widgets, array( $this, '_sort_widgets' ) );
+
+		//	Sort the non-generic groupings
+		usort( $_out, function( $a, $b ) use ( $_generic_widget_grouping )
+		{
+			//	Equal?
+			if ( trim( $a->label ) == trim( $b->label ) ) :
+
+				return 0;
+
+			endif;
+
+			//	Not equal, work out which takes precedence
+			$_sort = array( $a->label, $b->label );
+			sort( $_sort );
+
+			return $_sort[0] == $a->label ? -1 : 1;
+
+		});
+
+		//	Glue generic groupings to the beginning of the array
+		$_out = array_merge( $_generic_widgets, $_out );
 
 		// --------------------------------------------------------------------------
 
@@ -793,7 +853,27 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		return $_widgets;
+		return array_values( $_out );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	private function _sort_widgets( $a, $b )
+	{
+		//	Equal?
+		if ( trim( $a->label ) == trim( $b->label ) ) :
+
+			return 0;
+
+		endif;
+
+		//	Not equal, work out which takes precedence
+		$_sort = array( $a->label, $b->label );
+		sort( $_sort );
+
+		return $_sort[0] == $a->label ? -1 : 1;
 	}
 
 

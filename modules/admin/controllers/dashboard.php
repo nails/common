@@ -75,8 +75,9 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 	 **/
 	public function index()
 	{
-		//	Page Title
-		$this->data['page']->title = lang( 'dashboard_welcome_title' );
+		//	Page Data
+		$this->data['page']->title	= lang( 'dashboard_welcome_title' );
+		$this->data['has_modules']	= $this->_loaded_modules ? TRUE : FALSE;
 
 		// --------------------------------------------------------------------------
 
@@ -87,29 +88,14 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load header
-		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
+		//	Assets
+		$this->asset->load( 'nails.admin.dashboard.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
 		$this->load->view( 'structure/header',	$this->data );
-
-		// --------------------------------------------------------------------------
-
-		//	If no modules have been discovered it means that while this user is an admin
-		//	no modules have either a) been enabled for the site or b) for the user. Either
-		//	way we should show a friendly error.
-
-		if ( ! $this->_loaded_modules ) :
-
-			$this->load->view( 'admin/dashboard/no_modules', $this->data );
-
-		else :
-
-			$this->load->view( 'admin/dashboard/index', $this->data );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Footer
+		$this->load->view( 'admin/dashboard/index', $this->data );
 		$this->load->view( 'structure/footer', $this->data );
 	}
 

@@ -720,11 +720,12 @@
 	.widgets,
 	.dropzone
 	{
-		overflow-y:auto;
-		overflow-x:hidden;
+		// overflow-y:auto;
+		// overflow-x:hidden;
 		top:2*@margin+@header_height;
 		bottom:@margin;
 		border:1px solid #CCC;
+		zoom: 1;
 
 		li
 		{
@@ -736,11 +737,27 @@
 		}
 	}
 
+	.widgets:before,
+	.dropzone:before,
+	.widgets:after,
+	.dropzone:after
+	{
+		content: ".";
+		display: block;
+		height: 0;
+		overflow: hidden;
+	}
+
+	.widgets:after,
+	.dropzone:after
+	{
+		clear:both;
+	}
+
 	.widgets
 	{
 		@grouping_background:#CCC;
 		@widget_background: #666;
-
 
 		left:@margin;
 		right:auto;
@@ -750,6 +767,7 @@
 		{
 			padding:3px;
 			z-index: 0;
+			position:relative;
 
 			.icon
 			{
@@ -762,6 +780,32 @@
 			{
 				position:relative;
 				top:-1px;
+			}
+
+			.description
+			{
+				box-sizing: border-box;
+				position: absolute;
+				background: rgba(0,0,0,.75);
+				color: #FFF;
+				padding: 10px;
+				right: -251px;
+				width: 250px;
+				top: -1px;
+				z-index: 1;
+				display: none;
+				padding-left: 20px;
+				text-align:left;
+				.border-radius(3px, 3px, 0, 0);
+				.drop-shadow( 0, 0, 5px, 0.5 );
+			}
+
+			&:hover
+			{
+				.description
+				{
+					display:block;
+				}
 			}
 		}
 
@@ -898,45 +942,65 @@
 
 		li.widget
 		{
-			cursor:move;
+			cursor: url(https://mail.google.com/mail/images/2/openhand.cur), move !important;
 			background:@widget_background;
 			color:#FFF;
 			border-top:1px dashed #555;
 			z-index:0;
-		}
 
-		li.widget.hidden,
-		li.widget.search-miss
-		{
-			display:none;
-		}
+			&:hover
+			{
+				background:darken( @widget_background, 10% );
+			}
 
-		li.widget.search-hit
-		{
-			display:block;
-		}
+			&.disabled
+			{
+				cursor: not-allowed!important;
+				color: #252525;
+			}
 
-		li.widget:hover
-		{
-			background:darken( @widget_background, 10% );
+			&.search-hit
+			{
+				display:block;
+			}
+
+			&.search-miss,
+			&.hidden
+			{
+				display:none;
+			}
 		}
+	}
+
+	.dragging-widget
+	{
+		border:1px solid #CCC;
+		text-align:center;
+		padding:10px;
+		background:#EEE;
+		width:@widgets_width;
+		box-sizing:border-box;
+		.opacity(0.75);
+		font-weight:bold;
+		.rounded(3px);
+		cursor: url(https://mail.google.com/mail/images/2/closedhand.cur), none !important;
 	}
 
 	.dropzone
 	{
 		left:@widgets_width+2*@margin;
 		right:@margin;
-		padding:@padding;
+		padding:@padding - 1;
 		background-image:url(../img/admin/modules/cms/pages/dropzone-grid.png);
 
 		li.empty
 		{
 			background:rgba(255,255,255,0.5);
-			//border:1px dashed #999;
 			height:100%;
 			white-space: nowrap;
 			text-align:center;
 			box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+			display:none;
 
 			div.valigned
 			{
@@ -965,17 +1029,97 @@
 			}
 		}
 
-		li.widget
+		li.dropzone-widget,
+		li.placeholder
 		{
 			margin-bottom: 1em;
+			min-height:100px;
+			border:1px solid #CCC;
+			box-sizing:border-box;
+			background:#EFEFEF;
+			padding:10px;
 		}
-	}
 
-	.dropzone.empty
-	{
-		li.empty
+		li.dropzone-widget
 		{
-			display:block;
+			position:relative;
+			border-color: #888;
+			padding:0;
+
+			.header-bar
+			{
+				border-bottom:1px solid #666;
+				background:#AAA;
+				font-weight:bold;
+				padding:5px;
+
+				.sorter
+				{
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+					background: #D4D3D4;
+					vertical-align: middle;
+					position: relative;
+					top: -1px;
+					margin-right: 3px;
+					text-align: center;
+					padding-right: 1px;
+					.rounded(2px);
+					cursor: url(https://mail.google.com/mail/images/2/openhand.cur), none !important;
+
+				}
+
+				.label
+				{
+
+				}
+
+				.closer
+				{
+					float:right;
+					font-size:1.25em;
+				}
+
+				.description
+				{
+					display:block;
+					font-size:0.85em;
+					font-weight:normal;
+					margin-left:24px;
+				}
+			}
+
+			&.ui-sortable-helper
+			{
+				.header-bar
+				{
+					.sorter
+					{
+						cursor: url(https://mail.google.com/mail/images/2/closedhand.cur), none !important;
+					}
+				}
+			}
+
+			.editor
+			{
+				padding:5px;
+			}
+		}
+
+		li.placeholder
+		{
+			border:1px dashed #666;
+			padding:0;
+			.opacity(0.75);
+		}
+
+		&.empty
+		{
+			li.empty
+			{
+				display:block;
+			}
 		}
 	}
 }

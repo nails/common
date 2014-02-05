@@ -8,7 +8,7 @@ class Nails_CMS_Template_sidebar_left extends Nails_CMS_Template
 		$_d = parent::_details_template();
 
 		//	Basic details; describe the template for the user
-		$_d->name		= 'Sidebar Left';
+		$_d->label		= 'Sidebar Left';
 		$_d->info		= 'Main body with a sidebar to the left.';
 		$_d->img->icon	= NAILS_URL . 'img/admin/modules/cms/pages/templates/icons/sidebar_left.png';
 

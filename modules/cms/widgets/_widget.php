@@ -1,28 +1,29 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget
+class NAILS_CMS_Widget
 {
 	static function details()
 	{
 		$_d	= new stdClass();
 
-		$_d->name			= 'Widget';
+		$_d->label			= 'Widget';
 		$_d->slug			= 'Widget';
 		$_d->iam			= get_called_class();
-		$_d->info			= '';
+		$_d->description	= '';
+		$_d->keywords		= '';
+		$_d->grouping		= '';
 
-		//	To restrict a widget to a certain area, specify one of the
-		//	following values:
+		//	If a widget should be restricted to a specific templates or areas
+		//	then specify the appropriate slugs below
 
-		//	ALL				Can be used in any widget area
-		//	HERO			Can only be used in the Hero area
-		//	BODY			Can only be used in the Body area
-		//	SIDEBAR			Can only be used in the Sidebar area
-		//	HERO_BODY		Can be used in both the Hero and Body areas
-		//	HERO_SIDEBAR	Can be used in both the Hero and Sidebar areas
-		//	BODY_SIDEBAR	Can be used in both the Body and Sidebar areas
+		$_d->restrict_to_template	= array();
+		$_d->restrict_to_area		= array();
 
-		$_d->restrict_area	= 'ALL';
+		//	If a widget should appear anywhere BUT a certain template or area,
+		//	then define that here
+
+		$_d->restrict_from_template	= array();
+		$_d->restrict_from_area		= array();
 
 		return $_d;
 	}

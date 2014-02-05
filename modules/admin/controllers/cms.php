@@ -281,8 +281,13 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Assets
+		$this->asset->library( 'jqueryui' );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
+
+		//	TODO: load the grid file for the editor. Check for an app specific version
+		//	and if found load that instead. Allows the app to ovveride the default 12
+		//	column layout, for example.
 
 		// --------------------------------------------------------------------------
 

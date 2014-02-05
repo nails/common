@@ -1,13 +1,14 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nails_CMS_Widget_slider extends Nails_CMS_Widget
+class NAILS_CMS_Widget_slider extends NAILS_CMS_Widget
 {
 	static function details()
 	{
-		$_d			= parent::details();
-		$_d->name	= 'Slider';
-		$_d->slug	= 'Widget_slider';
-		$_d->info	= 'Embed easily configurable photo sliders into your page.';
+		$_d					= parent::details();
+		$_d->label			= 'Slider';
+		$_d->slug			= 'Widget_slider';
+		$_d->description	= 'Embed easily configurable photo sliders into your page.';
+		$_d->keywords		= 'gallery,slider,image gallery,images';
 
 		return $_d;
 	}

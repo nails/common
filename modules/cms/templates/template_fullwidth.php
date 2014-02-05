@@ -8,7 +8,7 @@ class Nails_CMS_Template_fullwidth extends Nails_CMS_Template
 		$_d = parent::_details_template();
 
 		//	Basic details; describe the template for the user
-		$_d->name		= 'Full Width';
+		$_d->label		= 'Full Width';
 		$_d->info		= 'A full width template';
 		$_d->img->icon	= NAILS_URL . 'img/admin/modules/cms/pages/templates/icons/fullwidth.png';
 

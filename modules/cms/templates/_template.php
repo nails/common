@@ -7,7 +7,7 @@ class Nails_CMS_Template
 		$obj				= new stdClass();
 
 		//	The human friendly name of this template
-		$obj->name			= 'Widget';
+		$obj->label			= 'Widget';
 
 		//	A brief description fo the template, optional
 		$obj->description	= '';
