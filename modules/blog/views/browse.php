@@ -42,10 +42,21 @@
 		echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
 		echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
 		echo '</p>';
-		echo '<p class="excerpt">' . $post->excerpt . '</p>';
-		echo '<p class="meta">';
-		echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
-		echo '</p>';
+
+		//	Excerpts or not?
+		if ( isset( $post->body ) ) :
+
+			echo $post->body;
+
+		else :
+
+			echo '<p class="excerpt">' . $post->excerpt . '</p>';
+			echo '<p class="meta">';
+			echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
+			echo '</p>';
+
+		endif;
+
 
 		if ( $post->image_id ) :
 
@@ -57,9 +68,28 @@
 
 	endforeach;
 
-	echo '</ul>';
+	// --------------------------------------------------------------------------
+
+	//	Pagination
+	$this->load->library('pagination');
+
+	$_config						= array();
+	$_config['base_url']			= site_url( blog_setting( 'blog_url' ) );
+	$_config['total_rows']			= $pagination->total;
+	$_config['per_page']			= $pagination->per_page;
+	$_config['use_page_numbers']	= TRUE;
+	$_config['use_rsegment']		= TRUE;
+	$_config['uri_segment']			= 2;
+	$_config['full_tag_open']		= '<li class="pagination">';
+	$_config['full_tag_close']		= '</li>';
+
+	$this->pagination->initialize( $_config );
+
+	echo $this->pagination->create_links();
 
 	// --------------------------------------------------------------------------
+
+	echo '</ul>';
 
 	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
 

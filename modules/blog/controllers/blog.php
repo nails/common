@@ -35,12 +35,28 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	TODO: Handle pagination
+		//	Handle pagination
+		$_page		= $this->uri->rsegment( 2 );
+		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= $_per_page ? $_per_page : 10;
+
+		$this->data['pagination']			= new stdClass();
+		$this->data['pagination']->page		= $_page;
+		$this->data['pagination']->per_page	= $_per_page;
 
 		// --------------------------------------------------------------------------
 
-		//	Load posts
-		$this->data['posts'] = $this->post->get_all();
+		//	Send any additional data
+		$_data						= array();
+		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
+		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['sort']				= array( 'bp.published', 'desc' );
+
+		// --------------------------------------------------------------------------
+
+		//	Load posts and count
+		$this->data['posts'] = $this->post->get_all( $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->post->count_all( $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -381,6 +397,11 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 			//	Method exists, execute it
 			$this->{$method}();
+
+		elseif( is_numeric( $method ) ) :
+
+			//	Paginating the main blog page
+			$this->index();
 
 		else :
 

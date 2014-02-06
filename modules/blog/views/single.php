@@ -22,7 +22,7 @@
 		echo '<ul class="posts sixteen columns first last">';
 
 	endif;
-	
+
 		echo '<li class="post clearfix">';
 
 		// --------------------------------------------------------------------------
@@ -42,8 +42,13 @@
 		endif;
 
 		echo '</p>';
-		echo '<p class="excerpt">' . $post->excerpt . '</p>';
-		echo '<hr />';
+
+		if ( blog_setting( 'use_excerpts' ) ) :
+
+			echo '<p class="excerpt">' . $post->excerpt . '</p>';
+			echo '<hr />';
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -58,9 +63,9 @@
 
 		echo '<div class="body clearfix">';
 		if ( $post->image_id ) :
-		
+
 			echo img( array( 'src' => cdn_scale( $post->image_id, 200, 200 ), 'class' => 'featured-img' ) );
-		
+
 		endif;
 		echo $post->body;
 		echo '</div>';
@@ -74,7 +79,7 @@
 			echo '<ul class="categories">';
 
 				echo '<li class="label">Categories:</li>';
-				
+
 				foreach ( $post->categories AS $cat ) :
 
 					echo '<li class="category">';
@@ -92,7 +97,7 @@
 			echo '<ul class="tags">';
 
 				echo '<li class="label">Tags:</li>';
-				
+
 				foreach ( $post->tags AS $tag ) :
 
 					echo '<li class="tag">';
@@ -113,13 +118,13 @@
 			$this->load->view( 'blog/_single_gallery' );
 
 		endif;
-		
+
 		echo '</li>';
 
 	echo '</ul>';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
 
 		$this->load->view( 'blog/sidebar' );
