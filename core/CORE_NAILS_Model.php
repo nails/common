@@ -415,6 +415,11 @@ class CORE_NAILS_Model extends CI_Model
 			$this->db->set( 'created_by', active_user( 'id' ) );
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 
+		else :
+
+			$this->db->set( 'created_by', NULL );
+			$this->db->set( 'modified_by', NULL );
+
 		endif;
 
 		$this->db->insert( $this->_table );
@@ -483,6 +488,10 @@ class CORE_NAILS_Model extends CI_Model
 		if ( $this->user->is_logged_in() ) :
 
 			$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
+
+		else :
+
+			$this->db->set( 'modified_by', NULL );
 
 		endif;
 
@@ -959,12 +968,115 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Handle limiting
+		//	Handle sorting
+		if ( ! empty( $data['sort'] ) ) :
+
+			/**
+			 * How we handle sorting
+			 * =====================
+			 *
+			 * - If $data['sort'] is a string assume it's the field to sort on, use the default order
+			 * - If $data['sort'] is a single dimension array then assume the first element (or the element
+			 *   named 'column') is the column; and the second element (or the element named 'order') is the
+			 *   direction to sort in
+			 * - If $data['sort'] is a multidimensional array then loop each element and test as above.
+			 *
+			 **/
+
+
+			if ( is_string( $data['sort'] ) ) :
+
+				//	String
+				$this->db->order_by( $data['sort'] );
+
+			elseif( is_array( $data['sort'] ) ) :
+
+				$_first = reset( $data['sort'] );
+
+				if ( is_string( $_first ) ) :
+
+					//	Single dimension array
+					$_sort = $this->_getcount_common_parse_sort( $data['sort'] );
+
+					if ( ! empty( $_sort['column'] ) ) :
+
+						$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+					endif;
+
+				else :
+
+					//	Multi dimension array
+					foreach( $data['sort'] AS $sort ) :
+
+						$_sort = $this->_getcount_common_parse_sort( $sort );
+
+						if ( ! empty( $_sort['column'] ) ) :
+
+							$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+						endif;
+
+					endforeach;
+
+				endif;
+
+			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _getcount_common_parse_sort( $sort )
+	{
+		$_out = array( 'column' => NULL, 'order' => NULL );
 
 		// --------------------------------------------------------------------------
 
-		//	Handle sorting
+		if ( is_string( $sort ) ) :
+
+			$_out['column'] = $sort;
+			return $_out;
+
+		elseif ( isset( $sort['column'] ) ) :
+
+			$_out['column'] = $sort['column'];
+
+		else :
+
+			//	Take the first element
+			$_out['column'] = reset( $sort );
+			$_out['column'] = is_string( $_out['column'] ) ? $_out['column'] : NULL;
+
+		endif;
+
+		if ( $_out['column'] ) :
+
+			//	Determine order
+			if ( isset( $sort['order'] ) ) :
+
+				$_out['order'] = $sort['order'];
+
+			elseif( count( $sort ) > 1 ) :
+
+				//	Take the last element
+				$_out['order'] = end( $sort );
+				$_out['order'] = is_string( $_out['order'] ) ? $_out['order'] : NULL;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
 	}
+
+
+	// --------------------------------------------------------------------------
 
 
 	/**

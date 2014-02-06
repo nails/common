@@ -35,6 +35,10 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	TODO: Handle pagination
+
+		// --------------------------------------------------------------------------
+
 		//	Load posts
 		$this->data['posts'] = $this->post->get_all();
 
@@ -71,26 +75,32 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	public function single()
 	{
 		//	Get the single post by its slug
-		$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ), TRUE );
+		$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ) );
 
 		// --------------------------------------------------------------------------
 
 		//	Check we have something to show, otherwise, bail out
-		if ( ! $this->data['post'] )
+		if ( ! $this->data['post'] ) :
+
 			show_404();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	If this post's status is not published then 404, unless logged in as an admin
-		if ( ! $this->data['post']->is_published && ! $this->user->is_admin() )
+		if ( ! $this->data['post']->is_published && ! $this->user->is_admin() ) :
+
 			show_404();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Widgets
 		if ( blog_setting( 'sidebar_enabled' ) ) :
 
-			$this->data['widget'] = new stdClass();
+			$this->data['widget']				= new stdClass();
 			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
 			$this->data['widget']->categories	= $this->widget->categories();
 			$this->data['widget']->tags			= $this->widget->tags();

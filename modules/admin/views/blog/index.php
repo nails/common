@@ -5,13 +5,12 @@
 
 	<hr />
 
-	<div class="search">
-		<div class="search-text">
-			<input type="text" name="search" value="" autocomplete="off" placeholder="Search post titles by typing in here...">
-		</div>
-	</div>
+	<?php
 
-	<hr />
+		$this->load->view( 'admin/blog/_utilities/search' );
+		$this->load->view( 'admin/_utilities/pagination' );
+
+	?>
 
 	<table>
 		<thead>
@@ -103,6 +102,12 @@
 		?>
 		</tbody>
 	</table>
+
+	<?php
+
+		$this->load->view( 'admin/_utilities/pagination' );
+
+	?>
 </div>
 
 <script type="text/javascript">

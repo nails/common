@@ -112,8 +112,30 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch posts
-		$this->data['posts'] = $this->post->get_all( FALSE, FALSE );
+		//	Define the $_data variable, this'll be passed to the get_all() and count_all() methods
+		$_data = array( 'where' => array(), 'sort' => array() );
+
+		// --------------------------------------------------------------------------
+
+		//	Define and populate the pagination object
+		$_page			= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
+		$_per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 50;
+		$_sort_on		= $this->input->get( 'sort_on' )	? $this->input->get( 'sort_on' )	: 'bp.published';
+		$_sort_order	= $this->input->get( 'order' )		? $this->input->get( 'order' )		: 'desc';
+		$_search		= $this->input->get( 'search' )		? $this->input->get( 'search' )		: '';
+
+		$this->data['pagination']				= new stdClass();
+		$this->data['pagination']->page			= $_page;
+		$this->data['pagination']->per_page		= $_per_page;
+		$this->data['pagination']->total_rows	= $this->admin_changelog_model->count_all( $_data );
+
+		//	Set sort variables for view and for $_data
+		$this->data['sort_on']		= $_data['sort']['column']	= $_sort_on;
+		$this->data['sort_order']	= $_data['sort']['order']	= $_sort_order;
+		$this->data['search']		= $_data['search']			= $_search;
+
+		//	Fetch all the items for this page
+		$this->data['posts'] = $this->post->get_all( $_page, $_per_page, $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -155,8 +177,8 @@ class NAILS_Blog extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -235,7 +257,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'admin/blog/create',	$this->data );
+		$this->load->view( 'admin/blog/edit',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 
@@ -282,8 +304,8 @@ class NAILS_Blog extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
