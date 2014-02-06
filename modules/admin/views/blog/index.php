@@ -62,19 +62,21 @@
 
 					echo '</td>';
 
-					echo '<td class="status">';
 					if ( $post->is_published ) :
 
-						echo '<span class="yes">Yes</span>';
+						echo '<td class="status success">';
+						echo '<span class="ion-checkmark-circled"></span>';
 						echo '<small class="nice-time">' . user_datetime( $post->published, 'Y-m-d', 'H:i:s' ) . '</small>';
+						echo '</td>';
 
 					else :
 
-						echo '<span class="no">No</span>';
+						echo '<td class="status error">';
+						echo '<span class="ion-close-circled"></span>';
+						echo '</td>';
 
 					endif;
 
-					echo '</td>';
 
 					//	User common cells
 					$this->load->view( 'admin/_utilities/table-cell-user',		$post->author );
@@ -109,17 +111,3 @@
 
 	?>
 </div>
-
-<script type="text/javascript">
-<!--//
-
-	$(function(){
-
-		var Blog = new NAILS_Admin_Blog;
-		Blog.init_search();
-
-
-	});
-
-//-->
-</script>

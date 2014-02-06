@@ -117,22 +117,23 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Define and populate the pagination object
+		//	Set useful vars
 		$_page			= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
 		$_per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 50;
 		$_sort_on		= $this->input->get( 'sort_on' )	? $this->input->get( 'sort_on' )	: 'bp.published';
 		$_sort_order	= $this->input->get( 'order' )		? $this->input->get( 'order' )		: 'desc';
 		$_search		= $this->input->get( 'search' )		? $this->input->get( 'search' )		: '';
 
-		$this->data['pagination']				= new stdClass();
-		$this->data['pagination']->page			= $_page;
-		$this->data['pagination']->per_page		= $_per_page;
-		$this->data['pagination']->total_rows	= $this->admin_changelog_model->count_all( $_data );
-
 		//	Set sort variables for view and for $_data
 		$this->data['sort_on']		= $_data['sort']['column']	= $_sort_on;
 		$this->data['sort_order']	= $_data['sort']['order']	= $_sort_order;
 		$this->data['search']		= $_data['search']			= $_search;
+
+		//	Define and populate the pagination object
+		$this->data['pagination']				= new stdClass();
+		$this->data['pagination']->page			= $_page;
+		$this->data['pagination']->per_page		= $_per_page;
+		$this->data['pagination']->total_rows	= $this->post->count_all( $_data );
 
 		//	Fetch all the items for this page
 		$this->data['posts'] = $this->post->get_all( $_page, $_per_page, $_data );
@@ -412,7 +413,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		if ( $this->post->delete( $_post_id ) ) :
 
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/recover/' . $_post_id, 'Undo?' ) );
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/restore/' . $_post_id, 'Undo?' ) );
 
 		else :
 
@@ -429,7 +430,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	public function recover()
+	public function restore()
 	{
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
@@ -446,13 +447,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->post->recover( $_post_id ) ) :
+		if ( $this->post->restore( $_post_id ) ) :
 
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was recovered successfully. ' );
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was restored successfully. ' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I failed to recover that post.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I failed to restore that post.' );
 
 		endif;
 
