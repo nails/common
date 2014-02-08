@@ -246,7 +246,7 @@ if ( ! function_exists( 'shop_setting' ) )
 
 		// --------------------------------------------------------------------------
 
-		return get_instance()->shop->settings( $key, $force_refresh );
+		return get_instance()->shop->get_settings( $key, $force_refresh );
 	}
 }
 

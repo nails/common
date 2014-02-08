@@ -13,13 +13,13 @@ if ( ! function_exists( 'site_setting' ) )
 	{
 		//	Load the model if it's not already loaded
 		if ( ! get_instance()->load->model_is_loaded( 'site' ) ) :
-		
+
 			get_instance()->load->model( 'system/site_model', 'site' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
-		return get_instance()->site->settings( $key, $force_refresh );
+
+		return get_instance()->site->get_settings( $key, $force_refresh );
 	}
 }

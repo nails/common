@@ -49,17 +49,31 @@ class NAILS_CMS_Widget
 		$_d->views->editor	= '';
 		$_d->views->render	= '';
 
-		//	Define any JS callbacks; these will be properly scoped by the framework
-		$_d->callbacks					= new stdClass();
-		$_d->callbacks->before_drop		= '';
-		$_d->callbacks->after_drop		= '';
-		$_d->callbacks->before_sort		= '';
-		$_d->callbacks->after_sort		= '';
-		$_d->callbacks->before_remove	= '';
-		$_d->callbacks->after_remove	= '';
-
 		//	Path
 		$_d->path = dirname( $_reflect->getFileName() ) . '/';
+
+		//	Define any JS callbacks; these will be properly scoped by the framework
+		$_d->callbacks					= new stdClass();
+		$_d->callbacks->dropped			= '';
+		$_d->callbacks->sort_start		= '';
+		$_d->callbacks->sort_stop		= '';
+		$_d->callbacks->remove_start	= '';
+		$_d->callbacks->remove_stop		= '';
+
+		//	Attempt to auto-populate these fields
+		foreach( $_d->callbacks AS $property => &$callback ) :
+
+			if ( is_file( $_d->path . 'js/' . $property . '.min.js' ) )  :
+
+				$callback = file_get_contents( $_d->path . 'js/' . $property . '.min.js' );
+
+			elseif ( is_file( $_d->path . 'js/' . $property . '.js' ) )  :
+
+				$callback = file_get_contents( $_d->path . 'js/' . $property . '.js' );
+
+			endif;
+
+		endforeach;
 
 		return $_d;
 	}

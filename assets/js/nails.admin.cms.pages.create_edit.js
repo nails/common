@@ -62,7 +62,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		_widgets.append( _widgets_search );
 
 		//	Build the widgets HTML
-		var _group_counter,_tpl_group,_tpl_widget,_data,_html;
+		var _group_counter,_tpl_group,_tpl_widget,_data,_html,_script,_callbacks;
 
 		_group_counter	= 0;
 		_tpl_group		=  $( '#template-widget-grouping' ).html();
@@ -94,6 +94,72 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				_html	= Mustache.render( _tpl_widget, _data );
 
 				_widgets.append( _html );
+
+				// --------------------------------------------------------------------------
+
+				//	Build the callback functions for this widget
+
+				_script = 'var _WIDGET_CALLBACKS_' + this.widgets[_key].widgets[_key2].slug + ' = function(){';
+
+				// --------------------------------------------------------------------------
+
+					//	Dropped
+					_script += 'this.dropped = function( _WIDGETID ){';
+					if ( this.widgets[_key].widgets[_key2].callbacks.dropped.length > 0 )
+					{
+						_script += this.widgets[_key].widgets[_key2].callbacks.dropped;
+					}
+					_script += '};';
+
+					// --------------------------------------------------------------------------
+
+					//	Sort Start
+					_script += 'this.sort_start = function( _WIDGETID ){';
+					if ( this.widgets[_key].widgets[_key2].callbacks.sort_start.length > 0 )
+					{
+						_script += this.widgets[_key].widgets[_key2].callbacks.sort_start;
+					}
+					_script += '};';
+
+					// --------------------------------------------------------------------------
+
+					//	Sort Stop
+					_script += 'this.sort_stop = function( _WIDGETID ){';
+					if ( this.widgets[_key].widgets[_key2].callbacks.sort_stop.length > 0 )
+					{
+						_script += this.widgets[_key].widgets[_key2].callbacks.sort_stop;
+					}
+					_script += '};';
+
+					// --------------------------------------------------------------------------
+
+					//	Remove start
+					_script += 'this.remove_start = function( _WIDGETID ){';
+					if ( this.widgets[_key].widgets[_key2].callbacks.remove_start.length > 0 )
+					{
+						_script += this.widgets[_key].widgets[_key2].callbacks.remove_start;
+					}
+					_script += '};';
+
+					// --------------------------------------------------------------------------
+
+					//	Remove Stop
+					_script += 'this.remove_stop = function( _WIDGETID ){';
+					if ( this.widgets[_key].widgets[_key2].callbacks.remove_stop.length > 0 )
+					{
+						_script += this.widgets[_key].widgets[_key2].callbacks.remove_stop;
+					}
+					_script += '};';
+
+				// --------------------------------------------------------------------------
+
+				_script += '};';
+				_script += 'var _WIDGET_' + this.widgets[_key].widgets[_key2].slug + ' = new _WIDGET_CALLBACKS_' + this.widgets[_key].widgets[_key2].slug + '();';
+
+				_callbacks = $('<script>').attr( 'id', 'callbacks-' + this.widgets[_key].widgets[_key2].slug ).attr( 'type', 'text/javascript' ).html( _script );
+
+				$( 'body' ).append( _callbacks );
+
 			}
 
 			_group_counter++;
@@ -179,8 +245,18 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			handle: '.sorter',
 			start: function(e,ui)
 			{
-				console.log('start',e,ui);
 				ui.placeholder.height( ui.helper.height() );
+
+				// --------------------------------------------------------------------------
+
+				if ( ui.item.hasClass( 'processed' ) )
+				{
+					var _id		= ui.item.attr('id');
+					var _slug	= ui.item.data('slug');
+
+					//	Call the widget's sort_start event
+					window['_WIDGET_' + _slug].sort_start( _id );
+				}
 			},
 			update: function(e,ui)
 			{
@@ -206,13 +282,22 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					_item = $( '<li>' );
 					_item.addClass( 'processed dropzone-widget ' + _data.slug );
 					_item.attr( 'id', _data.id );
-					_item.data( 'id', _data.id );
 					_item.data( 'slug', _data.slug );
 					_item.html( _html );
 
 					// --------------------------------------------------------------------------
 
+					//	Bind onto the closer button
+					$( '.header-bar .closer', _item ).on( 'click', function(e)
+					{
 
+						var _id = $(this).closest( 'li.dropzone-widget' ).attr( 'id' );
+
+						_this._remove_widget( _id );
+
+						e.stopPropagation();
+						return false;
+					});
 
 					// --------------------------------------------------------------------------
 
@@ -233,6 +318,11 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						'success'		: function( data )
 						{
 							$( _item ).find( '.editor' ).html( data.HTML );
+
+							// --------------------------------------------------------------------------
+
+							//	Execute this widget's dropped callback
+							window['_WIDGET_' + _widget.slug].dropped( _data.id );
 						},
 						'error'			: function( data )
 						{
@@ -265,10 +355,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					$( '#' + _this.editor_id + '-dropzone' ).addClass( 'empty' ).append( _tpl_empty );
 				}
 			},
-			sort: function(e,ui)
-			{
-				console.log('sort',e,ui);
-			},
 			activate: function(e,ui)
 			{
 				console.log('activate',e,ui);
@@ -291,7 +377,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			},
 			stop: function(e,ui)
 			{
-				console.log('stop',e,ui);
 				if ( $( '#' + _this.editor_id + '-dropzone li.dropzone-widget' ) <= 0 )
 				{
 					var _tpl_empty = $('#template-dropzone-empty').html();
@@ -301,6 +386,17 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
 					$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
+				}
+
+				// --------------------------------------------------------------------------
+
+				if ( ui.item.hasClass( 'processed' ) )
+				{
+					var _id		= ui.item.attr('id');
+					var _slug	= ui.item.data('slug');
+
+					//	Call the widget's sort_start event
+					window['_WIDGET_' + _slug].sort_stop( _id );
 				}
 			},
 			remove: function(e,ui)
@@ -512,6 +608,36 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		//	Load widgets
 		console.log( 'TODO', template, area );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._remove_widget = function( id )
+	{
+		$('<div>').text('Are you sure you wish to remove this widget from the interface?').dialog({
+			title: 'Are you sure?',
+			resizable: false,
+			draggable: false,
+			modal: true,
+			dialogClass: 'group-cms-editor-alert',
+			buttons:
+			{
+				OK: function()
+				{
+					alert( 'Execute before remove callback' );
+					$(this).dialog('close');
+					alert( 'Execute after remove callback' );
+				},
+				Cancel: function()
+				{
+					$(this).dialog('close');
+				}
+			}
+		});
+
+		$('.ui-widget-overlay').css({zIndex:1000});
 	};
 
 

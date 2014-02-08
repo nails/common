@@ -126,7 +126,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->site->settings( NULL, TRUE );
+		$this->data['settings'] = $this->site->get_settings( NULL, TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -227,7 +227,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->blog->settings( NULL, TRUE );
+		$this->data['settings'] = $this->blog->get_settings( NULL, TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -389,7 +389,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->shop->settings( NULL, TRUE );
+		$this->data['settings'] = $this->shop->get_settings( NULL, TRUE );
 
 		if ( $this->user->is_superuser() ) :
 

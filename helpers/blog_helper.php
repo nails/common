@@ -20,7 +20,7 @@ if ( ! function_exists( 'blog_setting' ) )
 
 		// --------------------------------------------------------------------------
 
-		return get_instance()->blog->settings( $key, $force_refresh );
+		return get_instance()->blog->get_settings( $key, $force_refresh );
 	}
 }
 

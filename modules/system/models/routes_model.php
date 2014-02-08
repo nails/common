@@ -145,7 +145,7 @@ class NAILS_Routes_model extends NAILS_Model
 		if ( module_is_enabled( 'shop' ) ) :
 
 			$this->load->model( 'shop/shop_model' );
-			$_settings = $this->shop_model->settings();
+			$_settings = $this->shop_model->get_settings();
 
 			$_routes['//BEGIN SHOP'] = '';
 
@@ -170,7 +170,7 @@ class NAILS_Routes_model extends NAILS_Model
 		if ( module_is_enabled( 'blog' ) ) :
 
 			$this->load->model( 'blog/blog_model' );
-			$_settings = $this->blog_model->settings();
+			$_settings = $this->blog_model->get_settings();
 
 			$_routes['//BEGIN BLOG'] = '';
 

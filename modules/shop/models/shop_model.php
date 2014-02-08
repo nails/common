@@ -129,7 +129,7 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function settings( $key = NULL, $force_refresh = FALSE )
+	public function get_settings( $key = NULL, $force_refresh = FALSE )
 	{
 		if ( ! $this->_settings || $force_refresh ) :
 
@@ -208,7 +208,7 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Fetch base currency
-		$_base = $this->currency->get_by_id( $this->settings( 'base_currency' ) );
+		$_base = $this->currency->get_by_id( $this->get_settings( 'base_currency' ) );
 
 		//	Cache
 		$this->_set_cache( 'base_currency', $_base );

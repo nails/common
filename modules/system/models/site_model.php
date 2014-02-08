@@ -23,7 +23,7 @@ class NAILS_Site_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function settings( $key = NULL, $force_refresh = FALSE )
+	public function get_settings( $key = NULL, $force_refresh = FALSE )
 	{
 		if ( ! $this->_settings || $force_refresh ) :
 
