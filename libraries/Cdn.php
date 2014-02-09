@@ -740,19 +740,19 @@ class Cdn {
 			else :
 
 				//	Write the file to the cache temporarily
-				if ( is_writeable( APP_CACHE ) ) :
+				if ( is_writeable( DEPLOY_CACHE_DIR ) ) :
 
 					$_cache_file = sha1( microtime() . rand( 0 ,999 ) . active_user( 'id' ) );
-					$_fp = fopen( APP_CACHE . $_cache_file, 'w' );
+					$_fp = fopen( DEPLOY_CACHE_DIR . $_cache_file, 'w' );
 					fwrite( $_fp, $object );
 					fclose( $_fp );
 
 					// --------------------------------------------------------------------------
 
 					//	Specify the file specifics
-					$_file			= APP_CACHE . $_cache_file;
+					$_file			= DEPLOY_CACHE_DIR . $_cache_file;
 					$_name			= $_cache_file;
-					$_data->file	= APP_CACHE . $_cache_file;
+					$_data->file	= DEPLOY_CACHE_DIR . $_cache_file;
 					$_data->mime	= $options['content-type'];
 
 				else :
@@ -1058,7 +1058,7 @@ class Cdn {
 		//	If a cachefile was created then we should remove it
 		if ( isset( $_cache_file ) && $_cache_file ) :
 
-			@unlink( APP_CACHE . $_cache_file );
+			@unlink( DEPLOY_CACHE_DIR . $_cache_file );
 
 		endif;
 
