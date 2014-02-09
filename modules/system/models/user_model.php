@@ -2283,8 +2283,9 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	public function create( $email, $password, $group_id = NULL, $data = FALSE, $send_welcome = TRUE )
 	{
-		if ( ! $email || ! $group_id ) :
+		if ( ! $email ) :
 
+			$this->_set_error( '"email" is a required field' );
 			return FALSE;
 
 		endif;
@@ -2340,6 +2341,7 @@ class NAILS_User_model extends NAILS_Model
 
 		if ( ! $_group ) :
 
+			$this->_set_error( 'Invalid Group ID specified.' );
 			return FALSE;
 
 		endif;
@@ -2538,7 +2540,6 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->where( 'id', $_id );
 		$this->db->update( NAILS_DB_PREFIX . 'user' );
 
-
 		// --------------------------------------------------------------------------
 
 		//	Create the user_meta record, add any extra data if needed
@@ -2555,9 +2556,8 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Finally add the email address to the user_email table
-		$_verified = isset( $data['is_verified'] ) && $data['is_verified'] ? TRUE : FALSE ;
-
-		$_code = $this->email_add( $_id, $email, TRUE, $_verified, FALSE );
+		$_verified	= isset( $data['is_verified'] ) && $data['is_verified'] ? TRUE : FALSE ;
+		$_code		= $this->email_add( $_id, $email, TRUE, $_verified, FALSE );
 
 		// --------------------------------------------------------------------------
 
@@ -2566,11 +2566,11 @@ class NAILS_User_model extends NAILS_Model
 
 			$this->load->library( 'emailer' );
 
-			$_email								= new stdClass();
-			$_email->type						= 'new_user_' . $group_id;
-			$_email->to_id						= $_id;
-			$_email->data						= array();
-			$_email->data['method']				= $_auth_method;
+			$_email					= new stdClass();
+			$_email->type			= 'new_user_' . $group_id;
+			$_email->to_id			= $_id;
+			$_email->data			= array();
+			$_email->data['method']	= $_auth_method;
 
 			//	If this user is created by an admin then take note of that.
 			if ( $this->is_admin() ) :
