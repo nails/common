@@ -694,14 +694,14 @@ class Cdn {
 				else :
 
 					$_file	= $object;
-					$_name	= basename( $object );
+					$_name	= empty( $options['filename_display'] ) ? basename( $object ) : $options['filename_display'];
 
 				endif;
 
 			else :
 
 				$_file	= $_FILES[ $object ]['tmp_name'];
-				$_name	= $_FILES[ $object ]['name'];
+				$_name	= empty( $options['filename_display'] ) ? $_FILES[ $object ]['name'] : $options['filename_display'];
 
 			endif;
 
@@ -751,7 +751,7 @@ class Cdn {
 
 					//	Specify the file specifics
 					$_file			= DEPLOY_CACHE_DIR . $_cache_file;
-					$_name			= $_cache_file;
+					$_name			= empty( $options['filename_display'] ) ? $_cache_file : $options['filename_display'];
 					$_data->file	= DEPLOY_CACHE_DIR . $_cache_file;
 					$_data->mime	= $options['content-type'];
 
