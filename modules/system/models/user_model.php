@@ -2774,7 +2774,7 @@ class NAILS_User_model extends NAILS_Model
 
 			case 'EMAIL' :
 
-				$_user = $this->get_by_username( $identifier );
+				$_user = $this->get_by_email( $identifier );
 
 			break;
 

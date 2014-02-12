@@ -134,7 +134,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 						case 'EMAIL' :
 
-							$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+							$this->data['reset_user'] = $this->user->get_by_email( $_identifier );
 
 						break;
 
