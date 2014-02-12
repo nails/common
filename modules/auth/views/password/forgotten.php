@@ -52,22 +52,22 @@
 			case 'EMAIL' :
 
 				$_name			= lang( 'form_label_email' );
-				$_placeholder	= lang( 'auth_login_email_placeholder' );
+				$_placeholder	= lang( 'auth_forgot_email_placeholder' );
 
 			break;
 
 			case 'USERNAME' :
 
 				$_name			= lang( 'form_label_username' );
-				$_placeholder	= lang( 'auth_login_username_placeholder' );
+				$_placeholder	= lang( 'auth_forgot_username_placeholder' );
 
 			break;
 
 			case 'BOTH' :
 			default :
 
-				$_name			= lang( 'auth_login_both' );
-				$_placeholder	= lang( 'auth_login_both_placeholder' );
+				$_name			= lang( 'auth_forgot_both' );
+				$_placeholder	= lang( 'auth_forgot_both_placeholder' );
 
 			break;
 

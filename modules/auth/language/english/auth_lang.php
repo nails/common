@@ -138,6 +138,9 @@
 	$lang['auth_forgot_new_pass_placeholder']			= 'Type a new password';
 	$lang['auth_forgot_new_pass_confirm_placeholder']	= 'Confirm your new password';
 	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
+	$lang['auth_forgot_username_placeholder']			= 'Your registered username';
+	$lang['auth_forgot_both']							= 'Email or Username';
+	$lang['auth_forgot_both_placeholder']				= 'Your registered email or username';
 	$lang['auth_forgot_action_reset']					= 'Reset Password';
 	$lang['auth_forgot_action_reset_continue']			= 'Change Password & Log In';
 	$lang['auth_forgot_success']						= '<strong>Reset token sent!</strong> Please check your email remembering to look in junk and spam folders.';
