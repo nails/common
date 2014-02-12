@@ -1,3 +1,9 @@
+<style type="text/css">
+	div.ui-front
+	{
+		z-index:1000;
+	}
+</style>
 <?php
 
 	//	Set the default template; either POST data, the one being used by the page, or the first in the list.
@@ -5,9 +11,9 @@
 
 		$_default_template = $this->input->post( 'template' );
 
-	elseif ( isset( $cmspage->template->slug ) ) :
+	elseif ( ! empty( $cmspage->draft->template ) ) :
 
-		$_default_template = $cmspage->template->slug;
+		$_default_template = $cmspage->draft->template;
 
 	else :
 
@@ -18,7 +24,41 @@
 
 ?>
 <div class="group-cms pages edit">
-	<?=form_open()?>
+
+	<?php
+
+		switch( $this->input->get( 'message' ) ) :
+
+			case 'saved' :
+
+				echo '<p class="system-alert success no-close">';
+				echo '<strong>Success!</strong> Your page was saved successfully. ' . anchor( 'cms/render/preview/' . $cmspage->id, 'Preview it here', 'class="launch-preview" target="_blank"' );
+				echo '</p>';
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'published' :
+
+				echo '<p class="system-alert success no-close">';
+				echo '<strong>Success!</strong> Your page was published successfully. ' . anchor( $cmspage->published->url, 'View it here', 'target="_blank"' );
+				echo '</p>';
+
+			break;
+
+		endswitch;
+
+	?>
+
+	<div class="system-alert notice no-close" id="save-status">
+		<p>
+			<small>
+				Last Saved: <span class="last-saved">Not Saved</span>
+				<span class="ion-looping"></span>
+			</small>
+		</p>
+	</div>
 
 	<fieldset>
 		<legend>Page Data</legend>
@@ -29,7 +69,7 @@
 			$_field['key']			= 'title';
 			$_field['label']		= 'Title';
 			$_field['required']		= TRUE;
-			$_field['default']		= isset( $cmspage->title ) ? $cmspage->title : '';
+			$_field['default']		= isset( $cmspage->draft->title ) ? $cmspage->draft->title : '';
 			$_field['placeholder']	= 'The title of the page';
 
 			echo form_field( $_field );
@@ -42,7 +82,6 @@
 			$_field['label']		= 'Published';
 			$_field['required']		= TRUE;
 			$_field['default']		= isset( $cmspage->is_published ) ? $cmspage->is_published : '';
-			$_field['placeholder']	= 'The title of the page';
 
 			echo form_field_boolean( $_field );
 
@@ -54,7 +93,7 @@
 			$_field['label']		= 'Parent Page';
 			$_field['placeholder']	= 'The Page\'s parent.';
 			$_field['class']		= 'chosen';
-			$_field['default']		= isset( $cmspage->parent_id ) ? $cmspage->parent_id : '';
+			$_field['default']		= isset( $cmspage->draft->parent_id ) ? $cmspage->draft->parent_id : '';
 
 			$pages_nested_flat = array( '' => 'No Parent Page' ) + $pages_nested_flat;
 
@@ -66,7 +105,7 @@
 			$_field					= array();
 			$_field['key']			= 'seo_description';
 			$_field['label']		= 'SEO Description';
-			$_field['default']		= isset( $cmspage->seo_description ) ? $cmspage->seo_description : '';
+			$_field['default']		= isset( $cmspage->draft->seo_description ) ? $cmspage->draft->seo_description : '';
 			$_field['placeholder']	= 'The page\'s SEO description, keep this short and concise. Recommended to keep below 160 characters.';
 
 			echo form_field( $_field, 'This should be kept short (< 160 characters) and concise. It\'ll be shown in search result listings and search engines will use it to help determine the page\'s content.' );
@@ -77,7 +116,7 @@
 			$_field					= array();
 			$_field['key']			= 'seo_keywords';
 			$_field['label']		= 'SEO Keywords';
-			$_field['default']		= isset( $cmspage->seo_keywords ) ? $cmspage->seo_keywords : '';
+			$_field['default']		= isset( $cmspage->draft->seo_keywords ) ? $cmspage->draft->seo_keywords : '';
 			$_field['placeholder']	= 'Comma separated keywords relating to the content of the page. A maximum of 10 keywords is recommended.';
 
 			echo form_field( $_field, 'SEO good practice recommend keeping the number of keyword phrases below 10 and less than 160 characters in total.' );
@@ -184,8 +223,9 @@
 	<p>
 		<?php
 
-			echo form_submit( 'submit', lang( 'action_save_changes' ) );
-			echo form_close();
+			echo '<a href="#" id="action-save" class="main-action awesome orange large">' . lang( 'action_save_changes' ) . '</a>';
+			echo '<a href="#" id="action-publish" class="main-action awesome green large ">Save Changes &amp; Publish</a>';
+			echo '<a href="#" id="action-preview" class="main-action awesome large launch-preview">' . lang( 'action_preview' ) . '</a>';
 
 		?>
 	</p>
@@ -198,11 +238,14 @@
 	$(function(){
 
 		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
-		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>);
+		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>, <?=isset( $cmspage->draft->template_data ) ? json_encode( $cmspage->draft->template_data ) : 'null' ?> );
 
 	});
 
 //-->
+</script>
+<script type="text/template" id="template-loader">
+	<span class="ion-looping"></span>
 </script>
 <script type="text/template" id="template-header">
 	<ul>
@@ -211,9 +254,7 @@
 		</li>
 	</ul>
 	<ul class="rhs">
-		<li><a href="#" data-action="apply">Apply Changes</a></li>
 		<li><a href="#" data-action="preview">Preview</a></li>
-		<li><a href="#" data-action="help">Help</a></li>
 		<li><a href="#" data-action="close">Close</a></li>
 	</ul>
 </script>
@@ -256,11 +297,11 @@
 		<span class="closer ion-trash-a"></span>
 		{{#description}}<span class="description">{{description}}</span>{{/description}}
 	</div>
-	<div class="editor">
+	<form class="editor">
 		<p style="text-align:center;">
 			<span class="ion-looping"></span>
 			<br />
 			Please wait, loading widget
 		</p>
-	</div>
+	</form>
 </script>

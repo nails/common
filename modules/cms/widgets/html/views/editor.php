@@ -1,3 +1,1 @@
-<p class="system-alert message no-close">
-	<strong>TODO:</strong> Plain Text Editor
-</p>
+<textarea name="body"><?=isset( $body ) ? $body : '' ?></textarea>

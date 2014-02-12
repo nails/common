@@ -1,3 +1,20 @@
+//	Catch undefined console
+/* jshint ignore:start */
+if ( typeof( console ) === "undefined" )
+{
+	var console;
+	console = {
+		log: function() {},
+		debug: function() {},
+		info: function() {},
+		warn: function() {},
+		error: function() {}
+	};
+}
+/* jshint ignore:end */
+
+// --------------------------------------------------------------------------
+
 var NAILS_Admin;
 NAILS_Admin = function()
 {

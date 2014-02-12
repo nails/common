@@ -1,3 +1,6 @@
+<p class="system-alert message no-close">
+	<strong>TODO:</strong> handle newly created pages who haven't got any published data (at all).
+</p>
 <div class="group-cms pages overview">
 
 	<p>
@@ -39,17 +42,49 @@
 
 				foreach ( $pages AS $page ) :
 
-					echo '<tr class="page" data-title="' . $page->title . '">';
-						echo '<td class="title indentosaurus indent-' . $page->depth . '">';
+					$_data = ! empty( $page->published->hash ) ? $page->published : $page->draft;
 
-							echo str_repeat( '<div class="indentor"></div>', $page->depth );
+					// --------------------------------------------------------------------------
+
+					echo '<tr class="page">';
+						echo '<td class="title indentosaurus indent-' . $_data->depth . '">';
+
+							echo str_repeat( '<div class="indentor"></div>', $_data->depth );
 
 							echo '<div class="indentor-content">';
 
-								echo $page->title;
-								echo $page->is_published ? '' : anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong>(Draft)</strong>' );
+								if ( $_data->title ) :
 
-								$_title_nested = explode( '|', $page->title_nested );
+									echo $_data->title;
+
+								else :
+
+									echo ! empty( $page->draft->title ) ? $page->draft->title : '<em style="color:#777;">Untitled</em>';
+
+								endif;
+
+								//	A little feedback on the status of the page:
+								//	- If it's in draft state then simply show it's in draft
+								//	- If it's published and there are unpublished changes then indicate that
+
+								if ( $page->is_published ) :
+
+									$_published_hash	= ! empty( $page->published->hash )	? $page->published->hash	: 'NOHASH' ;
+									$_draft_hash		= ! empty( $page->draft->hash )		? $page->draft->hash		: 'NOHASH' ;
+
+									if ( $_published_hash !== $_draft_hash ) :
+
+										echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This post is published and visible on site but changes have been made which have not been published.">(Unpublished Changes)</strong>' );
+
+									endif;
+
+								else :
+
+									echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This post is a draft and is not available to your site\'s visitors.">(Draft)</strong>' );
+
+								endif;
+
+								$_title_nested = explode( '|', $_data->title_nested );
 								array_pop( $_title_nested );
 
 								echo '<small>';
@@ -60,7 +95,7 @@
 
 						echo '</td>';
 
-						$this->load->view( 'admin/_utilities/table-cell-user',		$page->user );
+						$this->load->view( 'admin/_utilities/table-cell-user',		$page->modified_by );
 						$this->load->view( 'admin/_utilities/table-cell-datetime',	array( 'datetime' => $page->modified ) );
 
 						echo '<td class="actions">';
@@ -71,7 +106,7 @@
 
 							endif;
 
-							echo anchor( $page->slug, lang( 'action_preview' ), 'target="_blank" class="fancybox awesome small green" data-fancybox-type="iframe" data-width="100%" data-height="100%"' );
+							//echo anchor( $page->url . '?is_preview=1', lang( 'action_preview' ), 'target="_blank" class="fancybox awesome small green" data-fancybox-type="iframe" data-width="100%" data-height="100%"' );
 
 							if ( user_has_permission( 'admin.cms.can_delete_page' ) ) :
 

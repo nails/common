@@ -402,7 +402,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function get_all( $include_deleted = FALSE )
 	{
-		$this->db->select( 'p.id,p.slug,p.slug_end,p.parent_id,p.template,p.template_data,p.draft_template,p.draft_template_data,p.title,p.title_nested,p.is_published,p.is_deleted,p.seo_description,p.seo_keywords,p.created,p.modified,p.modified_by' );
+		$this->db->select( 'p.*' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = p.modified_by', 'LEFT' );
@@ -414,7 +414,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		endif;
 
-		$this->db->order_by( 'p.slug' );
+		$this->db->order_by( 'p.published_slug' );
+		$this->db->order_by( 'p.draft_slug' );
 		$_pages = $this->db->get( NAILS_DB_PREFIX . 'cms_page p' )->result();
 
 		foreach ( $_pages AS $page ) :
@@ -472,7 +473,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		foreach ( $_pages AS $page ) :
 
-			$_out[$page->id] = $this->_find_parents( $page->parent_id, $_pages, $separator ) . $page->title;
+			$_out[$page->id] = $this->_find_parents( $page->draft->parent_id, $_pages, $separator ) . $page->draft->title;
 
 		endforeach;
 
@@ -592,30 +593,53 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$page->id				= (int) $page->id;
 		$page->is_published		= (bool) $page->is_published;
 		$page->is_deleted		= (bool) $page->is_deleted;
-		$page->depth			= count( explode( '/', $page->slug ) ) - 1;
 
-		$_template_slug			= $page->template;
-		$page->template			= new stdClass();
-		$page->template->slug	= $_template_slug;
-		$page->template->data	= unserialize( $page->template_data );
 
-		$_template_slug				= $page->draft_template;
-		$page->draft_template		= new stdClass();
-		$page->draft_template->slug	= $_template_slug;
-		$page->draft_template->data	= unserialize( $page->draft_template_data );
+		//	Loop properties and sort into published data and draft data
+		$page->published	= new stdClass();
+		$page->draft		= new stdClass();
+
+		foreach ( $page AS $property => $value ) :
+
+			preg_match( '/^(published|draft)_(.*)$/', $property, $_match );
+
+			if ( ! empty( $_match[1] ) && ! empty( $_match[2]) && $_match[1] == 'published' ) :
+
+				$page->published->{$_match[2]} = $value;
+				unset($page->{$property});
+
+			elseif ( ! empty( $_match[1] ) && ! empty( $_match[2]) && $_match[1] == 'draft' ) :
+
+				$page->draft->{$_match[2]} = $value;
+				unset($page->{$property});
+
+			endif;
+
+		endforeach;
+
+
+		//	Other data
+		$page->published->depth		= count( explode( '/', $page->published->slug ) ) - 1;
+		$page->published->url		= site_url( $page->published->slug );
+		$page->draft->depth			= count( explode( '/', $page->draft->slug ) ) - 1;
+		$page->draft->url			= site_url( $page->draft->slug );
+
+		//	Decode JSON
+		$page->published->template_data	= json_decode( $page->published->template_data );
+		$page->draft->template_data		= json_decode( $page->draft->template_data );
 
 		// --------------------------------------------------------------------------
 
 		//	Owner
-		$page->user					= new stdClass();
-		$page->user->id				= (int) $page->modified_by;
-		$page->user->first_name		= $page->first_name;
-		$page->user->last_name		= $page->last_name;
-		$page->user->email			= $page->email;
-		$page->user->profile_img	= $page->profile_img;
-		$page->user->gender			= $page->gender;
+		$_modified_by					= (int) $page->modified_by;
+		$page->modified_by				= new stdClass();
+		$page->modified_by->id			= $_modified_by;
+		$page->modified_by->first_name	= $page->first_name;
+		$page->modified_by->last_name	= $page->last_name;
+		$page->modified_by->email		= $page->email;
+		$page->modified_by->profile_img	= $page->profile_img;
+		$page->modified_by->gender		= $page->gender;
 
-		unset( $page->modified_by );
 		unset( $page->first_name );
 		unset( $page->last_name );
 		unset( $page->email );

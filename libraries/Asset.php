@@ -108,6 +108,7 @@ class Asset
 
 				//	Load assets for CKEditor
 				$this->load( 'libraries/ckeditor/ckeditor.js', TRUE );
+				$this->load( 'libraries/ckeditor/adapters/jquery.js', TRUE );
 
 			break;
 

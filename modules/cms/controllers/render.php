@@ -20,7 +20,8 @@ require_once '_cms.php';
 
 class NAILS_Render extends NAILS_CMS_Controller
 {
-	private $_slug;
+	protected $_page_id;
+	protected $_is_preview;
 
 
 	// --------------------------------------------------------------------------
@@ -36,14 +37,15 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->_page_id = $this->uri->rsegment( 3 );
+		$this->_page_id		= $this->uri->rsegment( 3 );
+		$this->_is_preview	= FALSE;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function page()
+	public function page( $preview = FALSE )
 	{
 		$_page = $this->cms_page->get_by_id( $this->_page_id, TRUE );
 
@@ -55,25 +57,61 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	If a page is in draft mode, unless you're logged in with permission to edit
-		//	pages you should get a 404 as well.
+		//	If a page is not published, show_404()
+		if ( ! $_page->is_published ) :
 
-		if ( ! $_page->is_published && ! $this->user->is_logged_in() && ! user )
+			if ( ! $this->_is_preview ) :
 
-		// --------------------------------------------------------------------------
+				show_404();
 
-		//	Get the page HTML
-		$this->data['page']->title			= $_page->title;
-		$this->data['page']->slug			= $_page->slug;
-		$this->data['page']->layout			= $_page->layout;
-		$this->data['page']->sidebar_width	= $_page->sidebar_width;
-		$this->data['rendered_page']		= $this->cms_page->render( $_page );
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
+		//	Determine which data to use
+		if ( $this->_is_preview ) :
+
+			$this->data['page']->title		= $_page->draft->title;
+			$this->data['page']->slug		= $_page->draft->slug;
+			$this->data['rendered_html']	= $_page->draft->rendered_html;
+
+		else :
+
+			$this->data['page']->title		= $_page->published->title;
+			$this->data['page']->slug		= $_page->published->slug;
+			$this->data['rendered_html']	= $_page->published->rendered_html;
+
+		endif;
+
+		//	And reference the main page object as well, should it be required in the views
+		$this->data['cmspage'] &= $_page;
+
+		// --------------------------------------------------------------------------
+
+		//	Load the views
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'cms/page/render',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function preview()
+	{
+		if ( $this->user->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
+
+			$this->_is_preview = TRUE;
+			return $this->page();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 }
 
@@ -105,7 +143,7 @@ class NAILS_Render extends NAILS_CMS_Controller
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_CMS_RENDER' ) ) :
 
 	class Render extends NAILS_Render
 	{

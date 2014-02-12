@@ -5,6 +5,7 @@ class NAILS_CMS_Widget
 	protected $_details;
 	protected $_data;
 
+
 	// --------------------------------------------------------------------------
 
 
@@ -98,13 +99,30 @@ class NAILS_CMS_Widget
 	// --------------------------------------------------------------------------
 
 
-	public function get_editor()
+	public function get_editor( $data = array() )
 	{
 		$_view = $this->_details->views->editor ? $this->_details->views->editor : 'cms/page/widgets/' . $this->_details->slug . '/views/editor';
 
 		if ( is_file( $this->_details->path . 'views/editor.php' ) ) :
 
-			return file_get_contents( $this->_details->path . 'views/editor.php' );
+			//	Extract the variables, so that the veiw can sue them
+			if ( $data ) :
+
+				extract( $data );
+
+			endif;
+
+			//	Start the buffer, basically copying how CI does it's view loading
+			ob_start();
+
+			include $this->_details->path . 'views/editor.php';
+
+			//	Flush buffer
+			$_buffer = ob_get_contents();
+			@ob_end_clean();
+
+			//	Return the HTML
+			return $_buffer;
 
 		endif;
 

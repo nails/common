@@ -113,6 +113,28 @@ button.awesome
 
 // --------------------------------------------------------------------------
 
+//	Disabled buttons
+.awesome.disabled,
+.button.awesome.disabled,
+button.awesome.disabled,
+input[type="submit"].awesome.disabled,
+input[type="reset"].awesome.disabled,
+input[type="button"].awesome.disabled,
+.awesome[disabled="disabled"],
+.button.awesome[disabled="disabled"],
+button.awesome,
+input[type="submit"][disabled="disabled"].awesome,
+input[type="reset"][disabled="disabled"].awesome,
+input[type="button"][disabled="disabled"].awesome
+{
+	cursor: not-allowed;
+	background: #888 !important;
+	color: #EEE !important;
+	text-shadow: 0 1px 0 #444 ;
+}
+
+// --------------------------------------------------------------------------
+
 
 //	Sign in with social network buttons
 a.social-signin
@@ -185,7 +207,7 @@ a.social-signin.fb
 	background: -ms-linear-gradient(top,  rgba(131,155,195,1) 0%,rgba(87,111,163,1) 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  rgba(131,155,195,1) 0%,rgba(87,111,163,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#839bc3', endColorstr='#576fa3',GradientType=0 ); /* IE6-9 */
-	
+
 	-webkit-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;
 	-moz-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;
 	box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;
@@ -231,7 +253,7 @@ a.social-signin.tw
 	background: -ms-linear-gradient(top,  rgba(143,207,247,1) 0%,rgba(0,139,181,1) 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  rgba(143,207,247,1) 0%,rgba(0,139,181,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8fcff7', endColorstr='#008bb5',GradientType=0 ); /* IE6-9 */
-	
+
 	-webkit-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #174F7B, 0 4px 2px #999999;
 	-moz-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #174F7B, 0 4px 2px #999999;
 	box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #174F7B, 0 4px 2px #999999;
@@ -277,7 +299,7 @@ a.social-signin.li
 	background: -ms-linear-gradient(top,  rgba(161,206,229,1) 0%,rgba(0,128,178,1) 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  rgba(161,206,229,1) 0%,rgba(0,128,178,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a1cee5', endColorstr='#0080b2',GradientType=0 ); /* IE6-9 */
-	
+
 	-webkit-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;
 	-moz-box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;
 	box-shadow: 0 1px 0 #CADBFE inset, 0 3px 0 0 #2D447F, 0 4px 2px #999999;

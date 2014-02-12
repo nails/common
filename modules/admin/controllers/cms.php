@@ -147,11 +147,6 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		//	Load helpers
 		$this->load->helper( 'cms' );
-
-		// --------------------------------------------------------------------------
-
-		//	Load the CKEditor librar
-		$this->asset->library( 'ckeditor' );
 	}
 
 
@@ -203,103 +198,6 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	public function _pages_create()
-	{
-		if ( ! user_has_permission( 'admin.cms.can_create_page' ) ) :
-
-			show_404();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Load form validation (for error checking in the view, always needs to be available)
-		$this->load->library( 'form_validation' );
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->input->post() ) :
-
-			//	Set Rules
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|callback__callback_slug' );
-			$this->form_validation->set_rules( 'layout',			'Layout',			'xss_clean' );
-			$this->form_validation->set_rules( 'sidebar_width',		'Sidebar Width',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
-
-			//	Set messages
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
-
-			//	Execute
-			if ( $this->form_validation->run( $this ) ) :
-
-				//	Update the page
-				$_data					= new stdClass();
-				$_data->title			= $this->input->post( 'title' );
-				$_data->parent_id		= $this->input->post( 'parent_id' );
-				$_data->layout			= $this->input->post( 'layout' );
-				$_data->sidebar_width	= $this->input->post( 'sidebar_width' );
-				$_data->seo_description	= $this->input->post( 'seo_description' );
-				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
-
-				$_page_id = $this->cms_page->create( $_data );
-
-				if ( $_page_id ) :
-
-					//	Saved!
-					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page created, go ahead and add widgets.' );
-					$this->session->set_flashdata( 'widgets_only', TRUE );
-					redirect( 'admin/cms/pages/edit/' . $_page_id );
-
-				else :
-
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( ', ', $this->cms_page->get_errors() );
-
-				endif;
-
-			else :
-
-				$this->data['error'] = lang( 'fv_there_were_errors' );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Get data
-		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
-
-		//	Set method info
-		$this->data['page']->title	= 'Create New Page';
-
-		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates();
-		$this->data['widgets']		= $this->cms_page->get_available_widgets();
-
-		// --------------------------------------------------------------------------
-
-		//	Assets
-		$this->asset->library( 'jqueryui' );
-		$this->asset->load( 'mustache.min.js', TRUE );
-		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
-
-		//	TODO: load the grid file for the editor. Check for an app specific version
-		//	and if found load that instead. Allows the app to ovveride the default 12
-		//	column layout, for example.
-
-		// --------------------------------------------------------------------------
-
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'admin/cms/pages/edit',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	/**
 	 * Manage pages of content
 	 *
@@ -327,6 +225,74 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/cms/pages/index',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function _pages_create()
+	{
+		if ( ! user_has_permission( 'admin.cms.can_create_page' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Get data
+		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
+
+		//	Set method info
+		$this->data['page']->title	= 'Create New Page';
+
+		//	Get available templates & widgets
+		$this->data['templates']	= $this->cms_page->get_available_templates();
+		$this->data['widgets']		= $this->cms_page->get_available_widgets();
+
+		// --------------------------------------------------------------------------
+
+		//	Load any widget assets
+		foreach( $this->data['widgets'] AS $grouping ) :
+
+			if ( ! empty( $grouping->widgets ) && is_array( $grouping->widgets  ) ) :
+
+				foreach( $grouping->widgets AS $w ) :
+
+					foreach ( $w->assets AS $asset ) :
+
+						if ( is_array( $asset ) ) :
+
+							$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+							$this->asset->load( $asset[0], $_is_nails );
+
+						elseif ( is_string( $asset ) ) :
+
+							$this->asset->load( $asset );
+
+						endif;
+
+					endforeach;
+
+				endforeach;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/cms/pages/edit',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
 	}
 
@@ -363,103 +329,11 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load form validation (for error checking in the view, always needs to be available)
-		$this->load->library( 'form_validation' );
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->input->post() ) :
-
-			//	Set Rules
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'slug',				'Slug',				'xss_clean|callback__callback_slug' );
-			$this->form_validation->set_rules( 'layout',			'Layout',			'xss_clean' );
-			$this->form_validation->set_rules( 'sidebar_width',		'Sidebar Width',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
-
-			//	Set messages
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
-
-			//	Loop the widgets and get any widget specific validation rules
-			$_areas = array( 'hero', 'body', 'sidebar' );
-
-			foreach ( $_areas AS $area ) :
-
-				if ( is_array( $this->input->post( 'widgets_' . $area ) ) ) :
-
-					foreach( $this->input->post( 'widgets_' . $area ) AS $postkey => $widget ) :
-
-						foreach( $widget AS $field => $value ) :
-
-							//	Skip the slug
-							if ( $field == 'slug' ) :
-
-								continue;
-
-							endif;
-
-							$_rules = $this->cms_page->get_widget_validation_rules( $widget['slug'], $field );
-
-							if ( $_rules ) :
-
-								$this->form_validation->set_rules( 'widgets_' . $area . '[' . $postkey . '][' . $field . ']', $field,	$_rules );
-
-							endif;
-
-						endforeach;
-
-					endforeach;
-
-				endif;
-
-			endforeach;
-
-			//	Execute
-			if ( $this->form_validation->run( $this ) ) :
-
-				//	Update the page
-				$_data					= new stdClass();
-				$_data->title			= $this->input->post( 'title' );
-				$_data->slug			= $this->input->post( 'slug' );
-				$_data->layout			= $this->input->post( 'layout' );
-				$_data->sidebar_width	= $this->input->post( 'sidebar_width' );
-				$_data->seo_description	= $this->input->post( 'seo_description' );
-				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
-
-				foreach ( $_areas AS $area ) :
-
-					$_data->{'widgets_' . $area }	= $this->input->post( 'widgets_' . $area );
-
-				endforeach;
-
-				if ( $this->cms_page->update( $this->uri->segment( 5 ), $_data ) ) :
-
-					//	Saved!
-					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page updated.' );
-					redirect( 'admin/cms/pages' );
-
-				else :
-
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the page: ' . implode( ', ', $this->cms_page->get_errors() );
-
-				endif;
-
-			else :
-
-				$this->data['error'] = lang( 'fv_there_were_errors' );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Get data
 		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
 
 		//	Set method info
-		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->title . '"';
+		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->draft->title . '"';
 
 		//	Get available templates & widgets
 		$this->data['templates']	= $this->cms_page->get_available_templates();
@@ -468,6 +342,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Assets
+		$this->asset->library( 'jqueryui' );
 		$this->asset->load( 'mustache.min.js', TRUE );
 		$this->asset->load( 'nails.admin.cms.pages.create_edit.js', TRUE );
 

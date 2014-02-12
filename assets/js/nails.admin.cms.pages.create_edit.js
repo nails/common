@@ -2,23 +2,475 @@ var NAILS_Admin_CMS_pages_Create_Edit;
 NAILS_Admin_CMS_pages_Create_Edit = function()
 {
 	this.editor_id			= Math.floor( Math.random() * 10000000000000001 );
+	this._editor			= {};
 	this.search_placeholder	= 'Search widget library';
 	this.templates			= [];
+	this.mustache_tpl		= {};
 	this.widgets			= [];
+	this.page_data			= {};
 	this._dragging_widget	= false;
+	this._editor_open		= false;
+	this._saving			= false;
+	this._refreshing		= false;
+	this._autosave			= null;
+	this._autosave_delay	= 5000;
 
 	// --------------------------------------------------------------------------
 
 
-	this.init = function( templates, widgets )
+	this.init = function( templates, widgets, page_data )
 	{
 		this.templates	= templates;
 		this.widgets	= widgets;
 
+		var _key, _key2;
+
+		//	Prepare page_data, if empty create a new object
+		if ( typeof( page_data ) === 'undefined' || page_data === null )
+		{
+			this.page_data =
+			{
+				hash : 'NOHASH',
+				data : {
+					id : null
+				},
+				widget_areas : {}
+			};
+
+			//	Create new page_data object
+			for( _key in this.templates )
+			{
+				this.page_data.widget_areas[_key] = {};
+
+				for ( _key2 in this.templates[_key].widget_areas )
+				{
+					this.page_data.widget_areas[_key][_key2] = [];
+				}
+			}
+
+			this._refresh_page_data();
+		}
+		else
+		{
+			//	Supplied, use the server version
+			//	Check it has everything it should
+			if ( typeof( this.page_data.id ) === 'undefined' )
+			{
+				this.page_data.id = null;
+			}
+
+			for( _key in this.templates )
+			{
+				if ( typeof( this.page_data[_key] ) === 'undefined' )
+				{
+					this.page_data[_key] = {};
+				}
+
+				for ( _key2 in this.templates[_key].widget_areas )
+				{
+					if ( typeof( this.page_data[_key][_key2] ) === 'undefined' )
+					{
+						this.page_data[_key][_key2] = [];
+					}
+				}
+			}
+		}
+
+		//	Set the data hash
+		this.page_data.hash = this._generate_data_hash();
+		console.log( 'Initial page_data:', this.page_data );
 		// --------------------------------------------------------------------------
 
 		this._template_chooser_init();
 		this._editor_init();
+
+		// --------------------------------------------------------------------------
+
+		//	bind onto the unload event
+		var _this = this;
+		window.onbeforeunload = function()
+		{
+			if ( _this._needs_saved() !== false )
+			{
+				//	Attempt to save
+				_this._save();
+			}
+		};
+
+		// --------------------------------------------------------------------------
+
+		//	Bind to the save and publish buttons
+		$( '#action-save' ).on( 'click', function()
+		{
+			var _button = $(this);
+
+			if ( _button.hasClass( 'disabled' ) )
+			{
+				console.log( 'Button disabled, ignoring second request' );
+				return false;
+			}
+
+			var _success = function( data )
+			{
+				_button.text( 'Saved!' );
+				window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=saved';
+			};
+
+			var _error = function( data )
+			{
+				var _oldtext = _button.data( 'oldtext' );
+				_button.text( _oldtext );
+				_this._enable_main_actions();
+
+				// --------------------------------------------------------------------------
+
+				$('<div>').text( data.error ).dialog({
+					title: 'Something went wrong.',
+					resizable: false,
+					draggable: false,
+					modal: true,
+					buttons:
+					{
+						OK: function()
+						{
+							$(this).dialog('close');
+						}
+					}
+				});
+			};
+
+			var _oldtext = _button.text();
+			_button.data( 'oldtext', _oldtext );
+			_button.html( '<span class="ion-looping"></span> Saving...' );
+			_this._disable_main_actions();
+			_this._save( false, _success, _error, true );
+
+			return false;
+		});
+
+		$( '#action-publish' ).on( 'click', function()
+		{
+			var _button = $(this);
+
+			if ( _button.hasClass( 'disabled' ) )
+			{
+				console.log( 'Button disabled, ignoring second request' );
+				return false;
+			}
+
+			var _success = function( data )
+			{
+				_button.text( 'Published!' );
+				window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=published';
+			};
+
+			var _error = function( data )
+			{
+				var _oldtext = _button.data( 'oldtext' );
+				_button.text( _oldtext );
+				_this._enable_main_actions();
+
+				// --------------------------------------------------------------------------
+
+				$('<div>').text( data.error ).dialog({
+					title: 'Something went wrong.',
+					resizable: false,
+					draggable: false,
+					modal: true,
+					buttons:
+					{
+						OK: function()
+						{
+							$(this).dialog('close');
+						}
+					}
+				});
+			};
+
+			var _oldtext = _button.text();
+			_button.data( 'oldtext', _oldtext );
+			_button.html( '<span class="ion-looping"></span> Publishing...' );
+			_this._disable_main_actions();
+			_this._save( false, _success, _error, true, true );
+
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Bind preview buttons
+		$('a.launch-preview').on( 'click', function()
+		{
+			_this._launch_preview();
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Set up autosaving
+		this._autosave_start();
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._disable_main_actions = function()
+	{
+		$( 'a.main-action' ).addClass( 'disabled' );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._enable_main_actions = function()
+	{
+		$( 'a.main-action' ).removeClass( 'disabled' );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._autosave_start = function()
+	{
+		var _this = this;
+		this._autosave = setInterval( function(){ _this._save( true ); }, this._autosave_delay );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+	this._autosave_stop = function()
+	{
+		clearInterval( this._autosave );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._save = function( is_autosave, success_callback, error_callback, force_save, do_publish )
+	{
+		//	If we're already saving ignore any more calls
+		if ( this._saving )
+		{
+			console.log( 'Save in progress, ignoring repeated call.' );
+			return false;
+		}
+
+		//	If we're refreshing, then ignore those calls too
+		if ( this._refreshing )
+		{
+			console.log( 'Refresh in progress, ignoring repeated call.' );
+			return false;
+		}
+
+		// --------------------------------------------------------------------------
+
+		//	Generate the hash of the data
+		var _hash = this._needs_saved();
+
+		if ( _hash !== false || force_save )
+		{
+			if ( force_save !== true )
+			{
+				console.log( 'Data has changed, old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+				this.page_data.hash = _hash;
+			}
+			else
+			{
+				console.log( 'Forced save requested. Saving...' );
+			}
+
+			this._saving = true;
+
+			$( '#save-status' ).removeClass( 'message' ).addClass( 'saving notice' ).show();
+			$( '#save-status .last-saved').text( 'Saving...' );
+
+			//	Send the data to the server and wait for the response. If all OK,
+			//	the server will respond with the page's ID, make sure this is set
+			//	in the page_data object
+
+			var _this = this;
+
+			$.ajax(
+			{
+				type: 'POST',
+				url: window.SITE_URL + 'api/cms/pages/save',
+				data:
+				{
+					page_data : JSON.stringify( this.page_data ),
+					do_publish : do_publish
+				},
+				success: function( data )
+				{
+					//	Use data, if we get 200 OK then save was a success and payload
+					//	will be the page's ID as the server thinks it is.
+
+					if ( data.status === 200 )
+					{
+						//	Set the page ID
+						_this.page_data.data.id = data.id;
+
+						//	Reset the hash
+						_this.page_data.hash = _this._generate_data_hash();
+
+						//	Feedback to the user
+						$( '#save-status' ).removeClass( 'saving' );
+
+						var _date	= new Date();
+						var _hours	= _date.getHours() < 10 ? '0' + _date.getHours() : _date.getHours();
+						var _mins	= _date.getMinutes() < 10 ? '0' + _date.getMinutes() : _date.getMinutes();
+						var _str	= _hours + ':' + _mins;
+
+						if ( is_autosave )
+						{
+							_str += ' (Autosave)';
+						}
+
+						$( '#save-status .last-saved').text( _str );
+
+						console.log( 'Save completed successfully' );
+					}
+					else
+					{
+						$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
+						$( '#save-status .last-saved').text( 'ERROR: ' + data.error );
+						console.log( 'Save failed: ' + data.error );
+					}
+
+					_this._saving = false;
+
+					// --------------------------------------------------------------------------
+
+					//	Execute any custom callback
+					if ( typeof( success_callback ) === 'function' )
+					{
+						success_callback.call( undefined, data );
+					}
+				},
+				error: function( data )
+				{
+					var _data = JSON.parse( data.responseText );
+
+					$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
+					$( '#save-status .last-saved').text( 'ERROR: ' + _data.error );
+
+					console.log( 'Save failed: ' + _data.error );
+
+					_this._saving = false;
+
+					// --------------------------------------------------------------------------
+
+					//	Execute any custom callback
+					if ( typeof( error_callback ) === 'function' )
+					{
+						error_callback.call( undefined, data );
+					}
+				}
+			});
+
+			return true;
+		}
+		else
+		{
+			console.log( 'Page data hasn\'t changed, ignoring call' );
+			return false;
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._needs_saved = function()
+	{
+		this._refresh_page_data();
+
+		// --------------------------------------------------------------------------
+
+		//	Generate the hash of the data
+		var _hash = this._generate_data_hash();
+
+		if ( this.page_data.hash !== _hash )
+		{
+			return _hash;
+		}
+		else
+		{
+			return false;
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._refresh_page_data = function()
+	{
+		//	Set refreshing, so any save calls which come in while we're doing this get ignored
+		this._refreshing = true;
+
+		//	Main data object
+		this.page_data.data.title			= $( 'input[name=title]' ).val();
+		this.page_data.data.is_published	= $( 'input[name=is_published]' ).val();
+		this.page_data.data.parent_id		= $( 'select[name=parent_id]' ).val();
+		this.page_data.data.seo_description	= $( 'input[name=seo_description]' ).val();
+		this.page_data.data.seo_keywords	= $( 'input[name=seo_keywords]' ).val();
+		this.page_data.data.template		= $( 'input[name=template]' ).val();
+
+		// --------------------------------------------------------------------------
+
+		//	If the editor is open, save the state of the visible widgets
+		if ( this._editor_open )
+		{
+			var _this		= this;
+			var _template	= this._editor.dropzone.data('template');
+			var _area		= this._editor.dropzone.data('area');
+
+			if ( typeof( this.page_data.widget_areas[_template] ) === 'undefined' )
+			{
+				this.page_data.widget_areas[_template] = {};
+			}
+
+			//	Clear out the data, we're resetting it, not appending to it.
+			this.page_data.widget_areas[_template][_area] = [];
+
+			//	Find all the widgets
+			this._editor.dropzone.find( 'li.processed.dropzone-widget' ).each(function()
+			{
+				var _data =
+				{
+					widget: $(this).data( 'slug' ),
+					data : $(this).find( 'form.editor' ).serializeArray()
+				};
+				_this.page_data.widget_areas[_template][_area].push( _data );
+			});
+		}
+
+		//	Unset refreshing
+		this._refreshing = false;
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._generate_data_hash = function()
+	{
+		//	Clone the data so we can set an empty hash; doing this so that the
+		//	actual hash doesn't affect the hash, mmkay?
+
+		var _data	= $.extend({},this.page_data);
+		_data.hash	= '';
+
+		//	Convert to a string then pass through MD5
+		var _string	= JSON.stringify( _data );
+		var _hash	= this.md5( _string );
+
+		return _hash;
 	};
 
 
@@ -48,25 +500,38 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	{
 		var _this = this;
 
+		//	Get Mustache templates
+
+		this.mustache_tpl.loader			= $( '#template-loader' ).html();
+		this.mustache_tpl.widget_search		= $( '#template-widget-search' ).html();
+		this.mustache_tpl.dropzone_empty	= $( '#template-dropzone-empty' ).html();
+		this.mustache_tpl.widget_grouping	= $( '#template-widget-grouping' ).html();
+		this.mustache_tpl.widget			= $( '#template-widget' ).html();
+		this.mustache_tpl.header			= $( '#template-header' ).html();
+		this.mustache_tpl.dropzone_empty	= $( '#template-dropzone-empty' ).html();
+		this.mustache_tpl.dropzone_widget	= $( '#template-dropzone-widget' ).html();
+
+		// --------------------------------------------------------------------------
+
 		//	Generate the editor HTML and inject into DOM
-		var _container		= $( '<div>').attr( 'id', this.editor_id ).addClass( 'group-cms pages widgeteditor ready' );
-		var _loader			= $( '<div>' ).attr( 'id', this.editor_id + '-loader' ).addClass( 'loader' ).html( '<span class="ion-looping"></span>' );
-		var _header			= $( '<ul>' ).attr( 'id', this.editor_id + '-header' ).addClass( 'header' );
-		var _widgets		= $( '<ul>' ).attr( 'id', this.editor_id + '-widgets' ).addClass( 'widgets' ).disableSelection();
-		var _widgets_search	= $( '<li>' ).attr( 'id', this.editor_id + '-search' ).addClass( 'search' ).html( $( '#template-widget-search' ).html() );
-		var _dropzone		= $( '<ul>' ).attr('id',  this.editor_id + '-dropzone' ).addClass( 'dropzone empty' ).html( $( '#template-dropzone-empty' ).html() );
+		this._editor.container		= $( '<div>').attr( 'id', this.editor_id ).addClass( 'group-cms pages widgeteditor ready' );
+		this._editor.loader			= $( '<div>' ).attr( 'id', this.editor_id + '-loader' ).addClass( 'loader' ).html( this.mustache_tpl.loader );
+		this._editor.header			= $( '<ul>' ).attr( 'id', this.editor_id + '-header' ).addClass( 'header' );
+		this._editor.widgets		= $( '<ul>' ).attr( 'id', this.editor_id + '-widgets' ).addClass( 'widgets' ).disableSelection();
+		this._editor.widgets_search	= $( '<li>' ).attr( 'id', this.editor_id + '-search' ).addClass( 'search' ).html( this.mustache_tpl.widget_search );
+		this._editor.dropzone		= $( '<ul>' ).attr('id',  this.editor_id + '-dropzone' ).addClass( 'dropzone empty' ).html( this.mustache_tpl.dropzone_empty );
 
 		// --------------------------------------------------------------------------
 
 		//	Get the pritt-stick out
-		_widgets.append( _widgets_search );
+		this._editor.widgets.append( this._editor.widgets_search );
 
 		//	Build the widgets HTML
 		var _group_counter,_tpl_group,_tpl_widget,_data,_html,_script,_callbacks;
 
 		_group_counter	= 0;
-		_tpl_group		=  $( '#template-widget-grouping' ).html();
-		_tpl_widget		=  $( '#template-widget' ).html();
+		_tpl_group		=  this.mustache_tpl.widget_grouping;
+		_tpl_widget		=  this.mustache_tpl.widget;
 
 		for ( var _key in this.widgets )
 		{
@@ -76,9 +541,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				group : 'group-' + _group_counter
 			};
 
-			_html	= Mustache.render( _tpl_group, _data );
+			_html = Mustache.render( _tpl_group, _data );
 
-			_widgets.append( _html );
+			this._editor.widgets.append( _html );
 
 			//	Build this grouping's widgets
 			for ( var _key2 in this.widgets[_key].widgets )
@@ -93,7 +558,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 				_html	= Mustache.render( _tpl_widget, _data );
 
-				_widgets.append( _html );
+				this._editor.widgets.append( _html );
 
 				// --------------------------------------------------------------------------
 
@@ -104,7 +569,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				// --------------------------------------------------------------------------
 
 					//	Dropped
-					_script += 'this.dropped = function( _WIDGETID ){';
+					_script += 'this.dropped = function( ui ){';
 					if ( this.widgets[_key].widgets[_key2].callbacks.dropped.length > 0 )
 					{
 						_script += this.widgets[_key].widgets[_key2].callbacks.dropped;
@@ -114,7 +579,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					// --------------------------------------------------------------------------
 
 					//	Sort Start
-					_script += 'this.sort_start = function( _WIDGETID ){';
+					_script += 'this.sort_start = function( ui ){';
 					if ( this.widgets[_key].widgets[_key2].callbacks.sort_start.length > 0 )
 					{
 						_script += this.widgets[_key].widgets[_key2].callbacks.sort_start;
@@ -124,7 +589,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					// --------------------------------------------------------------------------
 
 					//	Sort Stop
-					_script += 'this.sort_stop = function( _WIDGETID ){';
+					_script += 'this.sort_stop = function( ui ){';
 					if ( this.widgets[_key].widgets[_key2].callbacks.sort_stop.length > 0 )
 					{
 						_script += this.widgets[_key].widgets[_key2].callbacks.sort_stop;
@@ -134,7 +599,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					// --------------------------------------------------------------------------
 
 					//	Remove start
-					_script += 'this.remove_start = function( _WIDGETID ){';
+					_script += 'this.remove_start = function( ui ){';
 					if ( this.widgets[_key].widgets[_key2].callbacks.remove_start.length > 0 )
 					{
 						_script += this.widgets[_key].widgets[_key2].callbacks.remove_start;
@@ -144,7 +609,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					// --------------------------------------------------------------------------
 
 					//	Remove Stop
-					_script += 'this.remove_stop = function( _WIDGETID ){';
+					_script += 'this.remove_stop = function( ui ){';
 					if ( this.widgets[_key].widgets[_key2].callbacks.remove_stop.length > 0 )
 					{
 						_script += this.widgets[_key].widgets[_key2].callbacks.remove_stop;
@@ -165,12 +630,12 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			_group_counter++;
 		}
 
-		_container.append( _loader );
-		_container.append( _header );
-		_container.append( _dropzone );
-		_container.append( _widgets );
+		this._editor.container.append( this._editor.loader );
+		this._editor.container.append( this._editor.header );
+		this._editor.container.append( this._editor.dropzone );
+		this._editor.container.append( this._editor.widgets );
 
-		$( 'body' ).append( _container );
+		$( 'body' ).append( this._editor.container );
 
 		// --------------------------------------------------------------------------
 
@@ -225,21 +690,26 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
+		//	Set data on the editor
+		this._editor.dropzone.data( 'template', template );
+		this._editor.dropzone.data( 'area', area );
+
+		// --------------------------------------------------------------------------
+
 		//	Init the header
 		var _template,_tpl_header;
 		_template				= this._get_template( template );
 		_template.active_area	= _template.widget_areas[area].title;
 
-		_tpl_header	= $( '#template-header' ).html();
+		_tpl_header	= this.mustache_tpl.header;
 		_tpl_header	= Mustache.render( _tpl_header, _template );
 
-		$( '#' + this.editor_id + '-header' ).html( _tpl_header );
+		this._editor.header.html( _tpl_header );
 
 		// --------------------------------------------------------------------------
 
 		//	Initialise sortables
-		var _tpl_widget = $( '#template-dropzone-widget' ).html();
-		$( '#' + this.editor_id + '-dropzone' ).sortable(
+		this._editor.dropzone.sortable(
 		{
 			placeholder: 'placeholder',
 			handle: '.sorter',
@@ -251,161 +721,57 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 				if ( ui.item.hasClass( 'processed' ) )
 				{
-					var _id		= ui.item.attr('id');
-					var _slug	= ui.item.data('slug');
+					var _slug = ui.item.data( 'slug' );
 
 					//	Call the widget's sort_start event
-					window['_WIDGET_' + _slug].sort_start( _id );
+					window['_WIDGET_' + _slug].sort_start( ui.item );
 				}
 			},
 			update: function(e,ui)
 			{
-				console.log('update',e,ui);
 				if ( ! ui.item.hasClass( 'processed' ) )
 				{
-					//	Define vars
-					var _slug,_widget,_data,_html,_item;
-
-					//	What type of widget are we dealing with? Get more info.
-					_slug	= $(ui.item).data( 'slug' );
-					_widget	= _this._get_widget( _slug );
-
-					_data = {
-						id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
-						slug		: _slug,
-						label		: _widget.label,
-						description	: _widget.description
-					};
-
-					_html = Mustache.render( _tpl_widget, _data );
-
-					_item = $( '<li>' );
-					_item.addClass( 'processed dropzone-widget ' + _data.slug );
-					_item.attr( 'id', _data.id );
-					_item.data( 'slug', _data.slug );
-					_item.html( _html );
-
-					// --------------------------------------------------------------------------
-
-					//	Bind onto the closer button
-					$( '.header-bar .closer', _item ).on( 'click', function(e)
-					{
-
-						var _id = $(this).closest( 'li.dropzone-widget' ).attr( 'id' );
-
-						_this._remove_widget( _id );
-
-						e.stopPropagation();
-						return false;
-					});
-
-					// --------------------------------------------------------------------------
-
-					//	Place it into the DOM
-					ui.item.replaceWith( _item );
-
-					// --------------------------------------------------------------------------
-
-					$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
-					$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
-
-					//	Call the server asking for the widget's editor view
-					var _call =
-					{
-						'controller'	: 'cms/pages',
-						'method'		: 'widget/get_editor',
-						'data'			: { widget: _widget.slug, template: _template.slug, id: _data.id },
-						'success'		: function( data )
-						{
-							$( _item ).find( '.editor' ).html( data.HTML );
-
-							// --------------------------------------------------------------------------
-
-							//	Execute this widget's dropped callback
-							window['_WIDGET_' + _widget.slug].dropped( _data.id );
-						},
-						'error'			: function( data )
-						{
-							var _data = JSON.parse( data.responseText );
-
-							$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
-
-						},
-					};
-
-					window.NAILS.API.call(_call);
+					_this._drop_widget( _template.slug, ui.item );
 				}
 			},
-			over: function(e,ui)
+			over: function()
 			{
-				console.log('over',e,ui);
-				$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
-				$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
+				_this._editor.dropzone.removeClass( 'empty' );
+				_this._editor.dropzone.find( 'li.empty' ).remove();
 			},
-			out: function(e,ui)
+			out: function()
 			{
-				console.log('out',e,ui);
 				var _counter = 0;
-				_counter = _counter + $( '#' + _this.editor_id + '-dropzone li.dropzone-widget' ).length;
-				_counter = _counter + $( '#' + _this.editor_id + '-dropzone li.widget' ).length;
+				_counter = _counter + _this._editor.dropzone.find( 'li.dropzone-widget' ).length;
+				_counter = _counter + _this._editor.dropzone.find( 'li.widget' ).length;
 
 				if ( _counter <= 1 )
 				{
-					var _tpl_empty = $('#template-dropzone-empty').html();
-					$( '#' + _this.editor_id + '-dropzone' ).addClass( 'empty' ).append( _tpl_empty );
+					var _tpl_empty = _this.mustache_tpl.dropzone_empty;
+					_this._editor.dropzone.addClass( 'empty' ).append( _tpl_empty );
 				}
-			},
-			activate: function(e,ui)
-			{
-				console.log('activate',e,ui);
-			},
-			beforeStop: function(e,ui)
-			{
-				console.log('beforeStop',e,ui);
-			},
-			change: function(e,ui)
-			{
-				console.log('change',e,ui);
-			},
-			create: function(e,ui)
-			{
-				console.log('create',e,ui);
-			},
-			deactivate: function(e,ui)
-			{
-				console.log('deactivate',e,ui);
 			},
 			stop: function(e,ui)
 			{
-				if ( $( '#' + _this.editor_id + '-dropzone li.dropzone-widget' ) <= 0 )
+				if ( _this._editor.dropzone.find( 'li.dropzone-widget' ).length <= 0 )
 				{
-					var _tpl_empty = $('#template-dropzone-empty').html();
-					$( '#' + _this.editor_id + '-dropzone' ).addClass( 'empty' ).append( _tpl_empty );
+					var _tpl_empty = _this.mustache_tpl.dropzone_empty;
+					_this._editor.dropzone.addClass( 'empty' ).append( _tpl_empty );
 				}
 				else
 				{
-					$( '#' + _this.editor_id + '-dropzone' ).removeClass( 'empty' );
-					$( '#' + _this.editor_id + '-dropzone li.empty' ).remove();
+					_this._editor.dropzone.removeClass( 'empty' );
+					_this._editor.dropzone.find( 'li.empty' ).remove();
 				}
 
 				// --------------------------------------------------------------------------
 
 				if ( ui.item.hasClass( 'processed' ) )
 				{
-					var _id		= ui.item.attr('id');
-					var _slug	= ui.item.data('slug');
-
 					//	Call the widget's sort_start event
-					window['_WIDGET_' + _slug].sort_stop( _id );
+					var _slug = ui.item.data( 'slug' );
+					window['_WIDGET_' + _slug].sort_stop( ui.item );
 				}
-			},
-			remove: function(e,ui)
-			{
-				console.log('remove',e,ui);
-			},
-			receive: function(e,ui)
-			{
-				console.log('receive',e,ui);
 			}
 		});
 
@@ -421,7 +787,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( template, this.widgets[_key].widgets[_key2].restrict_to_template ) === false )
 					{
-						$( '#' + this.editor_id + '-widgets li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
 					}
 				}
 
@@ -430,7 +796,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( area, this.widgets[_key].widgets[_key2].restrict_to_area ) === false )
 					{
-						$( '#' + this.editor_id + '-widgets li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
 					}
 				}
 
@@ -439,7 +805,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( template, this.widgets[_key].widgets[_key2].restrict_from_template ) !== false )
 					{
-						$( '#' + this.editor_id + '-widgets li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
 					}
 				}
 
@@ -448,14 +814,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( area, this.widgets[_key].widgets[_key2].restrict_from_area ) !== false )
 					{
-						$( '#' + this.editor_id + '-widgets li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
 					}
 				}
 			}
 		}
 
 		//	Initialise draggables
-		$( '#' + this.editor_id + '-widgets li.widget:not(.disabled)' ).draggable(
+		this._editor.widgets.find( 'li.widget:not(.disabled)' ).draggable(
 		{
 			helper : function(e)
 			{
@@ -464,7 +830,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			},
 			appendTo: '#' + this.editor_id,
 			zIndex:3,
-			connectToSortable: '#' + this.editor_id + '-dropzone',
+			connectToSortable: this._editor.dropzone,
 			start: function()
 			{
 				_this._dragging_widget = true;
@@ -488,13 +854,13 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		});
 
 		//	Bind the minimiser
-		$( '#' + this.editor_id + '-search a.minimiser' ).on( 'click', function()
+		this._editor.widgets_search.find( 'a.minimiser' ).on( 'click', function()
 		{
 			$( '#' + _this.editor_id ).toggleClass( 'minimised' );
 		});
 
 		//	Bind the search box
-		$( '#' + this.editor_id + '-search input' ).on( 'keyup', function()
+		this._editor.widgets_search.find( 'input' ).on( 'keyup', function()
 		{
 			var _text = $.trim( $(this).val() );
 
@@ -505,7 +871,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 			if ( _text.length > 0 )
 			{
-				$( '#' + _this.editor_id + '-widgets li.widget' ).each( function()
+				_this._editor.widgets.find( 'li.widget' ).each( function()
 				{
 					var _keywords	= $(this).data( 'keywords' ).split( ',' );
 					var _regex		= new RegExp( _text, 'gi' );
@@ -527,22 +893,22 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			else
 			{
 				//	Remove search hit/miss classes
-				$( '#' + _this.editor_id + '-widgets li.widget' ).removeClass( 'search-miss search-hit' );
+				_this._editor.widgets.find( 'li.widget' ).removeClass( 'search-miss search-hit' );
 			}
 
 		});
 
 		//	Bind group containers
-		$( '#' + this.editor_id + '-widgets li.grouping' ).on( 'click', function()
+		this._editor.widgets.find( 'li.grouping' ).on( 'click', function()
 		{
 			$(this).toggleClass( 'open' );
 
 			var _grouping = $(this).data( 'group' );
-			$( '#' + _this.editor_id + '-widgets li.widget.' + _grouping ).toggleClass( 'hidden' );
+			_this._editor.widgets.find( 'li.widget.' + _grouping ).toggleClass( 'hidden' );
 		});
 
 		//	Bind the action buttons
-		$( '#' + this.editor_id + '-header ul.rhs a' ).on( 'click', function()
+		_this._editor.header.find( 'ul.rhs a' ).on( 'click', function()
 		{
 			var _action = $(this).data( 'action' );
 
@@ -553,10 +919,21 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					_this._editor_close();
 
 				break;
+
+				case 'preview' :
+
+					_this._launch_preview();
+
+				break;
 			}
 
 			return false;
 		});
+
+		// --------------------------------------------------------------------------
+
+		//	Mark the editor as opened
+		this._editor_open = true;
 	};
 
 
@@ -566,7 +943,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._editor_destruct = function()
 	{
 		//	Save widget data/state
-		console.log('TODO' );
+		this._save();
 
 		// --------------------------------------------------------------------------
 
@@ -576,22 +953,33 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Remove draggables
-		$( '#' + this.editor_id + '-widgets li.widget:not(.disabled)' ).draggable( 'destroy' );
+		this._editor.widgets.find( 'li.widget:not(.disabled)' ).draggable( 'destroy' );
 
 		//	Remove sortables
-		$( '#' + this.editor_id + '-widgets li.dropzone' ).sortable( 'destroy' );
+		this._editor.widgets.find( 'li.dropzone' ).sortable( 'destroy' );
 
 		//	Enable all widgets
-		$( '#' + this.editor_id + '-widgets li.widget.disabled' ).removeClass( 'disabled' );
+		this._editor.widgets.find( 'li.widget.disabled' ).removeClass( 'disabled' );
 
 		// --------------------------------------------------------------------------
 
 		//	Remove binds
 		$(document).off( 'keyup' );
-		$( '#' + this.editor_id + '-search a.minimiser' ).off( 'click' );
-		$( '#' + this.editor_id + '-search input' ).off( 'keyup' );
-		$( '#' + this.editor_id + '-widgets li.grouping' ).off( 'click' );
-		$( '#' + this.editor_id + '-header ul.rhs a' ).off( 'click' );
+		this._editor.widgets_search.find( 'a.minimiser' ).off( 'click' );
+		this._editor.widgets_search.find( 'input' ).off( 'keyup' );
+		this._editor.widgets.find( 'li.grouping' ).off( 'click' );
+		this._editor.header.find( 'ul.rhs a' ).off( 'click' );
+
+		// --------------------------------------------------------------------------
+
+		//	Unset data on the editor
+		this._editor.dropzone.data( 'template', '' );
+		this._editor.dropzone.data( 'area', '' );
+
+		// --------------------------------------------------------------------------
+
+		//	Mark the editor as opened
+		this._editor_open = false;
 	};
 
 
@@ -601,13 +989,133 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._load_widgets_for_area = function( template, area )
 	{
 		//	Clear the dropzone and make empty
-		var _tpl_empty = $( '#template-dropzone-empty' ).html();
-		$( '#' + this.editor_id + '-dropzone' ).addClass( 'empty' ).html( _tpl_empty );
+		var _tpl_empty = this.mustache_tpl.dropzone_empty;
+		this._editor.dropzone.addClass( 'empty' ).html( _tpl_empty );
 
 		// --------------------------------------------------------------------------
 
 		//	Load widgets
-		console.log( 'TODO', template, area );
+		if ( typeof( this.page_data.widget_areas[template][area] ) !== 'undefined' )
+		{
+			if ( this.page_data.widget_areas[template][area].length )
+			{
+				this._editor.dropzone.removeClass( 'empty' );
+				this._editor.dropzone.find( 'li.empty' ).remove();
+
+				for ( var _key in this.page_data.widget_areas[template][area] )
+				{
+					//	Quick shortcut
+					var _data = this.page_data.widget_areas[template][area][_key];
+
+					//	Create a placeholder item in the list
+					var _placeholder = $('<div>').data( 'slug', _data.widget );
+					this._editor.dropzone.append( _placeholder );
+
+					//	Drop the widget
+					this._drop_widget( template, _placeholder, _data.data );
+				}
+			}
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._drop_widget = function( template, ui, widget_data )
+	{
+		//	Define vars
+		var _slug,_widget,_data,_html,_item;
+
+		//	What type of widget are we dealing with? Get more info.
+		_slug	= $(ui).data( 'slug' );
+		_widget	= this._get_widget( _slug );
+
+		_data = {
+			id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
+			slug		: _slug,
+			label		: _widget.label,
+			description	: _widget.description
+		};
+
+		_html = Mustache.render( this.mustache_tpl.dropzone_widget, _data );
+
+		_item = $( '<li>' );
+		_item.addClass( 'processed dropzone-widget ' + _data.slug );
+		_item.attr( 'id', _data.id );
+		_item.data( 'slug', _data.slug );
+		_item.html( _html );
+
+		// --------------------------------------------------------------------------
+
+		//	Bind onto the closer button
+		var _this = this;
+		$( '.header-bar .closer', _item ).on( 'click', function(e)
+		{
+
+			var _id = $(this).closest( 'li.dropzone-widget' ).attr( 'id' );
+
+			_this._remove_widget( _id );
+
+			e.stopPropagation();
+			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Place it into the DOM
+		ui.replaceWith( _item );
+
+		// --------------------------------------------------------------------------
+
+		this._editor.dropzone.removeClass( 'empty' );
+		this._editor.dropzone.find( 'li.empty' ).remove();
+
+		//	Call the server asking for the widget's editor view
+		var _call =
+		{
+			'controller'	: 'cms/pages',
+			'method'		: 'widget/get_editor',
+			'data'			:
+			{
+				widget: _widget.slug,
+				template: template,
+				id: _data.id,
+				data: JSON.stringify( widget_data )
+			},
+			'success'		: function( data )
+			{
+				$( _item ).find( '.editor' ).html( data.HTML );
+
+				// --------------------------------------------------------------------------
+
+				//	Execute this widget's dropped callback
+				window['_WIDGET_' + _widget.slug].dropped( _item );
+
+				// --------------------------------------------------------------------------
+
+				//	Resize the container to the size of the content
+				var _header_height	= _item.find( '.header-bar' ).outerHeight();
+				var _editor_height	= _item.find( '.editor' ).outerHeight();
+				var _height			= _header_height + _editor_height;
+				_item.animate({height:_height},250);
+
+				// --------------------------------------------------------------------------
+
+				//	Finally, update the page_data
+				_this._refresh_page_data();
+
+			},
+			'error'			: function( data )
+			{
+				var _data = JSON.parse( data.responseText );
+
+				$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
+
+			},
+		};
+
+		window.NAILS.API.call(_call);
 	};
 
 
@@ -616,19 +1124,47 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 	this._remove_widget = function( id )
 	{
+		var _this = this;
+
 		$('<div>').text('Are you sure you wish to remove this widget from the interface?').dialog({
 			title: 'Are you sure?',
 			resizable: false,
 			draggable: false,
 			modal: true,
-			dialogClass: 'group-cms-editor-alert',
 			buttons:
 			{
 				OK: function()
 				{
-					alert( 'Execute before remove callback' );
+					var _item	= $( '#' + id );
+					var _slug	= _item.data( 'slug' );
+
+					//	Before remove calback
+					window['_WIDGET_' + _slug].remove_start( _item );
+
+					//	Close dialog
 					$(this).dialog('close');
-					alert( 'Execute after remove callback' );
+
+					_item.animate({opacity:0,height:0}, 250, function()
+					{
+						//	Remove the widget
+						_item.remove();
+
+						//	Test to see if the list is now empty
+						if ( _this._editor.dropzone.find( 'li.dropzone-widget' ).length <= 0 )
+						{
+							var _tpl_empty = _this.mustache_tpl.dropzone_empty;
+
+							_this._editor.dropzone
+							.addClass( 'empty' )
+							.append( _tpl_empty )
+							.find( 'li.empty' )
+							.css({opacity:0})
+							.animate({opacity:1},250);
+						}
+
+						//	Removed callback
+						window['_WIDGET_' + _slug].remove_stop( _item );
+					});
 				},
 				Cancel: function()
 				{
@@ -649,6 +1185,53 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		$( '#' + this.editor_id ).hide();
 		this._editor_destruct();
 
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._launch_preview = function()
+	{
+		var _overlay = $('<div class="fancybox-overlay" style="width:100%;height:100%;display:block;"></div>').appendTo('body');
+		var _loading = $('<div id="fancybox-loading"><div></div></div>').appendTo('body');
+
+		// --------------------------------------------------------------------------
+
+		var _success = function( data )
+		{
+			_overlay.remove();
+			_loading.remove();
+
+			$.fancybox({
+				type:'iframe',
+				href: window.SITE_URL + 'cms/render/preview/' + data.id,
+				width:'90%',
+				height:'90%',
+			});
+		};
+
+		var _error = function( data )
+		{
+			_overlay.remove();
+			_loading.remove();
+
+			$('<div>').text( data.error ).dialog({
+				title: 'Something went wrong.',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
+				{
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
+				}
+			});
+		};
+
+		this._save( false, _success, _error, true );
 	};
 
 
@@ -693,8 +1276,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
+	/* jshint ignore:start */
 	this._array_search = function( needle, haystack, argStrict  )
 	{
+		/* jshint ignore:start */
 		//  discuss at: http://phpjs.org/functions/array_search/
 		// original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
 		//    input by: Brett Zamir (http://brett-zamir.me)
@@ -736,14 +1321,307 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		for (key in haystack)
 		{
-			/* jshint ignore:start */
 			if ((strict && haystack[key] === needle) || (!strict && haystack[key] == needle))
 			{
 				return key;
 			}
-			/* jshint ignore:end */
 		}
 
 		return false;
 	};
+	/* jshint ignore:end */
+
+
+	// --------------------------------------------------------------------------
+
+	/* jshint ignore:start */
+	this.md5 = function(str)
+	{
+		//    discuss at: http://phpjs.org/functions/md5/
+		// original by: Webtoolkit.info (http://www.webtoolkit.info/)
+		// improved by: Michael White (http://getsprink.com)
+		// improved by: Jack
+		// improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		//        input by: Brett Zamir (http://brett-zamir.me)
+		// bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		//    depends on: utf8_encode
+		//     example 1: md5('Kevin van Zonneveld');
+		//     returns 1: '6e658d4bfcb59cc13f96c14450ac40b9'
+
+		var xl;
+
+		var rotateLeft = function(lValue, iShiftBits) {
+			return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
+		};
+
+		var addUnsigned = function(lX, lY) {
+			var lX4, lY4, lX8, lY8, lResult;
+			lX8 = (lX & 0x80000000);
+			lY8 = (lY & 0x80000000);
+			lX4 = (lX & 0x40000000);
+			lY4 = (lY & 0x40000000);
+			lResult = (lX & 0x3FFFFFFF) + (lY & 0x3FFFFFFF);
+			if (lX4 & lY4) {
+				return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+			}
+			if (lX4 | lY4) {
+				if (lResult & 0x40000000) {
+					return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+				} else {
+					return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+				}
+			} else {
+				return (lResult ^ lX8 ^ lY8);
+			}
+		};
+
+		var _F = function(x, y, z) {
+			return (x & y) | ((~x) & z);
+		};
+		var _G = function(x, y, z) {
+			return (x & z) | (y & (~z));
+		};
+		var _H = function(x, y, z) {
+			return (x ^ y ^ z);
+		};
+		var _I = function(x, y, z) {
+			return (y ^ (x | (~z)));
+		};
+
+		var _FF = function(a, b, c, d, x, s, ac) {
+			a = addUnsigned(a, addUnsigned(addUnsigned(_F(b, c, d), x), ac));
+			return addUnsigned(rotateLeft(a, s), b);
+		};
+
+		var _GG = function(a, b, c, d, x, s, ac) {
+			a = addUnsigned(a, addUnsigned(addUnsigned(_G(b, c, d), x), ac));
+			return addUnsigned(rotateLeft(a, s), b);
+		};
+
+		var _HH = function(a, b, c, d, x, s, ac) {
+			a = addUnsigned(a, addUnsigned(addUnsigned(_H(b, c, d), x), ac));
+			return addUnsigned(rotateLeft(a, s), b);
+		};
+
+		var _II = function(a, b, c, d, x, s, ac) {
+			a = addUnsigned(a, addUnsigned(addUnsigned(_I(b, c, d), x), ac));
+			return addUnsigned(rotateLeft(a, s), b);
+		};
+
+		var convertToWordArray = function(str) {
+			var lWordCount;
+			var lMessageLength = str.length;
+			var lNumberOfWords_temp1 = lMessageLength + 8;
+			var lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
+			var lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
+			var lWordArray = new Array(lNumberOfWords - 1);
+			var lBytePosition = 0;
+			var lByteCount = 0;
+			while (lByteCount < lMessageLength) {
+				lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+				lBytePosition = (lByteCount % 4) * 8;
+				lWordArray[lWordCount] = (lWordArray[lWordCount] | (str.charCodeAt(lByteCount) << lBytePosition));
+				lByteCount++;
+			}
+			lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+			lBytePosition = (lByteCount % 4) * 8;
+			lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80 << lBytePosition);
+			lWordArray[lNumberOfWords - 2] = lMessageLength << 3;
+			lWordArray[lNumberOfWords - 1] = lMessageLength >>> 29;
+			return lWordArray;
+		};
+
+		var wordToHex = function(lValue) {
+			var wordToHexValue = '',
+				wordToHexValue_temp = '',
+				lByte, lCount;
+			for (lCount = 0; lCount <= 3; lCount++) {
+				lByte = (lValue >>> (lCount * 8)) & 255;
+				wordToHexValue_temp = '0' + lByte.toString(16);
+				wordToHexValue = wordToHexValue + wordToHexValue_temp.substr(wordToHexValue_temp.length - 2, 2);
+			}
+			return wordToHexValue;
+		};
+
+		var x = [],
+			k, AA, BB, CC, DD, a, b, c, d, S11 = 7,
+			S12 = 12,
+			S13 = 17,
+			S14 = 22,
+			S21 = 5,
+			S22 = 9,
+			S23 = 14,
+			S24 = 20,
+			S31 = 4,
+			S32 = 11,
+			S33 = 16,
+			S34 = 23,
+			S41 = 6,
+			S42 = 10,
+			S43 = 15,
+			S44 = 21;
+
+		str = this.utf8_encode(str);
+		x = convertToWordArray(str);
+		a = 0x67452301;
+		b = 0xEFCDAB89;
+		c = 0x98BADCFE;
+		d = 0x10325476;
+
+		xl = x.length;
+		for (k = 0; k < xl; k += 16) {
+			AA = a;
+			BB = b;
+			CC = c;
+			DD = d;
+			a = _FF(a, b, c, d, x[k + 0], S11, 0xD76AA478);
+			d = _FF(d, a, b, c, x[k + 1], S12, 0xE8C7B756);
+			c = _FF(c, d, a, b, x[k + 2], S13, 0x242070DB);
+			b = _FF(b, c, d, a, x[k + 3], S14, 0xC1BDCEEE);
+			a = _FF(a, b, c, d, x[k + 4], S11, 0xF57C0FAF);
+			d = _FF(d, a, b, c, x[k + 5], S12, 0x4787C62A);
+			c = _FF(c, d, a, b, x[k + 6], S13, 0xA8304613);
+			b = _FF(b, c, d, a, x[k + 7], S14, 0xFD469501);
+			a = _FF(a, b, c, d, x[k + 8], S11, 0x698098D8);
+			d = _FF(d, a, b, c, x[k + 9], S12, 0x8B44F7AF);
+			c = _FF(c, d, a, b, x[k + 10], S13, 0xFFFF5BB1);
+			b = _FF(b, c, d, a, x[k + 11], S14, 0x895CD7BE);
+			a = _FF(a, b, c, d, x[k + 12], S11, 0x6B901122);
+			d = _FF(d, a, b, c, x[k + 13], S12, 0xFD987193);
+			c = _FF(c, d, a, b, x[k + 14], S13, 0xA679438E);
+			b = _FF(b, c, d, a, x[k + 15], S14, 0x49B40821);
+			a = _GG(a, b, c, d, x[k + 1], S21, 0xF61E2562);
+			d = _GG(d, a, b, c, x[k + 6], S22, 0xC040B340);
+			c = _GG(c, d, a, b, x[k + 11], S23, 0x265E5A51);
+			b = _GG(b, c, d, a, x[k + 0], S24, 0xE9B6C7AA);
+			a = _GG(a, b, c, d, x[k + 5], S21, 0xD62F105D);
+			d = _GG(d, a, b, c, x[k + 10], S22, 0x2441453);
+			c = _GG(c, d, a, b, x[k + 15], S23, 0xD8A1E681);
+			b = _GG(b, c, d, a, x[k + 4], S24, 0xE7D3FBC8);
+			a = _GG(a, b, c, d, x[k + 9], S21, 0x21E1CDE6);
+			d = _GG(d, a, b, c, x[k + 14], S22, 0xC33707D6);
+			c = _GG(c, d, a, b, x[k + 3], S23, 0xF4D50D87);
+			b = _GG(b, c, d, a, x[k + 8], S24, 0x455A14ED);
+			a = _GG(a, b, c, d, x[k + 13], S21, 0xA9E3E905);
+			d = _GG(d, a, b, c, x[k + 2], S22, 0xFCEFA3F8);
+			c = _GG(c, d, a, b, x[k + 7], S23, 0x676F02D9);
+			b = _GG(b, c, d, a, x[k + 12], S24, 0x8D2A4C8A);
+			a = _HH(a, b, c, d, x[k + 5], S31, 0xFFFA3942);
+			d = _HH(d, a, b, c, x[k + 8], S32, 0x8771F681);
+			c = _HH(c, d, a, b, x[k + 11], S33, 0x6D9D6122);
+			b = _HH(b, c, d, a, x[k + 14], S34, 0xFDE5380C);
+			a = _HH(a, b, c, d, x[k + 1], S31, 0xA4BEEA44);
+			d = _HH(d, a, b, c, x[k + 4], S32, 0x4BDECFA9);
+			c = _HH(c, d, a, b, x[k + 7], S33, 0xF6BB4B60);
+			b = _HH(b, c, d, a, x[k + 10], S34, 0xBEBFBC70);
+			a = _HH(a, b, c, d, x[k + 13], S31, 0x289B7EC6);
+			d = _HH(d, a, b, c, x[k + 0], S32, 0xEAA127FA);
+			c = _HH(c, d, a, b, x[k + 3], S33, 0xD4EF3085);
+			b = _HH(b, c, d, a, x[k + 6], S34, 0x4881D05);
+			a = _HH(a, b, c, d, x[k + 9], S31, 0xD9D4D039);
+			d = _HH(d, a, b, c, x[k + 12], S32, 0xE6DB99E5);
+			c = _HH(c, d, a, b, x[k + 15], S33, 0x1FA27CF8);
+			b = _HH(b, c, d, a, x[k + 2], S34, 0xC4AC5665);
+			a = _II(a, b, c, d, x[k + 0], S41, 0xF4292244);
+			d = _II(d, a, b, c, x[k + 7], S42, 0x432AFF97);
+			c = _II(c, d, a, b, x[k + 14], S43, 0xAB9423A7);
+			b = _II(b, c, d, a, x[k + 5], S44, 0xFC93A039);
+			a = _II(a, b, c, d, x[k + 12], S41, 0x655B59C3);
+			d = _II(d, a, b, c, x[k + 3], S42, 0x8F0CCC92);
+			c = _II(c, d, a, b, x[k + 10], S43, 0xFFEFF47D);
+			b = _II(b, c, d, a, x[k + 1], S44, 0x85845DD1);
+			a = _II(a, b, c, d, x[k + 8], S41, 0x6FA87E4F);
+			d = _II(d, a, b, c, x[k + 15], S42, 0xFE2CE6E0);
+			c = _II(c, d, a, b, x[k + 6], S43, 0xA3014314);
+			b = _II(b, c, d, a, x[k + 13], S44, 0x4E0811A1);
+			a = _II(a, b, c, d, x[k + 4], S41, 0xF7537E82);
+			d = _II(d, a, b, c, x[k + 11], S42, 0xBD3AF235);
+			c = _II(c, d, a, b, x[k + 2], S43, 0x2AD7D2BB);
+			b = _II(b, c, d, a, x[k + 9], S44, 0xEB86D391);
+			a = addUnsigned(a, AA);
+			b = addUnsigned(b, BB);
+			c = addUnsigned(c, CC);
+			d = addUnsigned(d, DD);
+		}
+
+		var temp = wordToHex(a) + wordToHex(b) + wordToHex(c) + wordToHex(d);
+
+		return temp.toLowerCase();
+	};
+	/* jshint ignore:end */
+
+	// --------------------------------------------------------------------------
+
+
+	/* jshint ignore:start */
+	this.utf8_encode = function(argString)
+	{
+		//    discuss at: http://phpjs.org/functions/utf8_encode/
+		// original by: Webtoolkit.info (http://www.webtoolkit.info/)
+		// improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// improved by: sowberry
+		// improved by: Jack
+		// improved by: Yves Sucaet
+		// improved by: kirilloid
+		// bugfixed by: Onno Marsman
+		// bugfixed by: Onno Marsman
+		// bugfixed by: Ulrich
+		// bugfixed by: Rafal Kukawski
+		// bugfixed by: kirilloid
+		//     example 1: utf8_encode('Kevin van Zonneveld');
+		//     returns 1: 'Kevin van Zonneveld'
+
+		if (argString === null || typeof argString === 'undefined') {
+			return '';
+		}
+
+		var string = (argString + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+		var utftext = '',
+			start, end, stringl = 0;
+
+		start = end = 0;
+		stringl = string.length;
+		for (var n = 0; n < stringl; n++) {
+			var c1 = string.charCodeAt(n);
+			var enc = null;
+
+			if (c1 < 128) {
+				end++;
+			} else if (c1 > 127 && c1 < 2048) {
+				enc = String.fromCharCode(
+					(c1 >> 6) | 192, (c1 & 63) | 128
+				);
+			} else if (c1 & 0xF800 != 0xD800) {
+				enc = String.fromCharCode(
+					(c1 >> 12) | 224, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+				);
+			} else { // surrogate pairs
+				if (c1 & 0xFC00 != 0xD800) {
+					throw new RangeError('Unmatched trail surrogate at ' + n);
+				}
+				var c2 = string.charCodeAt(++n);
+				if (c2 & 0xFC00 != 0xDC00) {
+					throw new RangeError('Unmatched lead surrogate at ' + (n - 1));
+				}
+				c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+				enc = String.fromCharCode(
+					(c1 >> 18) | 240, ((c1 >> 12) & 63) | 128, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+				);
+			}
+			if (enc !== null) {
+				if (end > start) {
+					utftext += string.slice(start, end);
+				}
+				utftext += enc;
+				start = end = n + 1;
+			}
+		}
+
+		if (end > start) {
+			utftext += string.slice(start, stringl);
+		}
+
+		return utftext;
+	};
+	/* jshint ignore:end */
 };

@@ -83,7 +83,8 @@ class NAILS_Cms extends NAILS_API_Controller
 
 		switch( $this->uri->segment( 4 ) ) :
 
-			case 'widget'	: $this->_pages_widget();	break;
+			case 'widget'	: $this->_pages_widget();								break;
+			case 'save'		: $this->_pages_save();									break;
 			default			: $this->_method_not_found( $this->uri->segment( 4 ) );	break;
 
 		endswitch;
@@ -97,7 +98,7 @@ class NAILS_Cms extends NAILS_API_Controller
 	{
 		switch( $this->uri->segment( 5 ) ) :
 
-			case 'get_editor'	: $this->_pages_widget_get_editor();	break;
+			case 'get_editor'	: $this->_pages_widget_get_editor();					break;
 			default				: $this->_method_not_found( $this->uri->segment( 5 ) );	break;
 
 		endswitch;
@@ -111,8 +112,23 @@ class NAILS_Cms extends NAILS_API_Controller
 	{
 		$_out		= array();
 		$_widget	= $this->input->get_post( 'widget' );
-		$_data		= $this->input->get_post( 'data' );
+		$_data_raw	= json_decode( $this->input->get_post( 'data' ) );
+		$_data		= array();
 		$_template	= $this->input->get_post( 'template' );
+
+		if ( $_data_raw ) :
+
+			foreach ( $_data_raw AS $item ) :
+
+				if ( isset( $item->name ) ) :
+
+					$_data[$item->name] = isset( $item->value ) ? $item->value : NULL;
+
+				endif;
+
+			endforeach;
+
+		endif;
 
 		if ( $_widget ) :
 
@@ -129,7 +145,7 @@ class NAILS_Cms extends NAILS_API_Controller
 
 				$WIDGET->setup( $_data );
 
-				$_editor = $WIDGET->get_editor();
+				$_editor = $WIDGET->get_editor( $_data );
 
 				if ( ! empty( $_editor ) ) :
 
@@ -157,6 +173,15 @@ class NAILS_Cms extends NAILS_API_Controller
 		endif;
 
 		$this->_out( $_out );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _pages_save()
+	{
+		$this->_out(array('id'=>2));
 	}
 }
 

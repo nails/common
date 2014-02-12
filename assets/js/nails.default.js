@@ -5,7 +5,24 @@
 
 // --------------------------------------------------------------------------
 
-//	Import libraries - no need to lead them individually
+//	Catch undefined console
+/* jshint ignore:start */
+if ( typeof( console ) === "undefined" )
+{
+	var console;
+	console = {
+		log: function() {},
+		debug: function() {},
+		info: function() {},
+		warn: function() {},
+		error: function() {}
+	};
+}
+/* jshint ignore:end */
+
+// --------------------------------------------------------------------------
+
+//	Import libraries - no need to load them individually
 //@codekit-prepend 'jquery.js';
 //@codekit-prepend 'jquery.ui.js';
 //@codekit-prepend 'jquery.ui.datetimepicker.js';
