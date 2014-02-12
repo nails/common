@@ -1325,7 +1325,6 @@ class NAILS_User_model extends NAILS_Model
 			$_cols[]	= 'li_token';
 			$_cols[]	= 'ip_address';
 			$_cols[]	= 'last_ip';
-			$_cols[]	= 'username';
 			$_cols[]	= 'password';
 			$_cols[]	= 'password_md5';
 			$_cols[]	= 'salt';
