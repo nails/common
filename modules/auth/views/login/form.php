@@ -68,10 +68,34 @@
 
 			<?php
 
-				$_field			= 'email';
-				$_name			= lang( 'form_label_email' );
-				$_placeholder	= lang( 'auth_login_email_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
+				switch ( APP_NATIVE_LOGIN_USING ) :
+
+					case 'EMAIL' :
+
+						$_name			= lang( 'form_label_email' );
+						$_placeholder	= lang( 'auth_login_email_placeholder' );
+
+					break;
+
+					case 'USERNAME' :
+
+						$_name			= lang( 'form_label_username' );
+						$_placeholder	= lang( 'auth_login_username_placeholder' );
+
+					break;
+
+					case 'BOTH' :
+					default :
+
+						$_name			= lang( 'auth_login_both' );
+						$_placeholder	= lang( 'auth_login_both_placeholder' );
+
+					break;
+
+				endswitch;
+
+				$_field	= 'identifier';
+				$_error	= form_error( $_field ) ? 'error' : NULL
 
 			?>
 			<div class="row <?=$_error?>">

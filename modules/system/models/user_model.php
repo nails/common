@@ -1035,7 +1035,7 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$this->db->where( 'u.id', $user_id );
+		$this->db->where( 'u.id', (int) $user_id );
 		$user = $this->get_all( $extended );
 
 		return empty( $user ) ? FALSE : $user[0];
@@ -1068,7 +1068,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Look up the email, and if we find an ID then fetch that user
 		$this->db->select( 'user_id' );
-		$this->db->where( 'email', $email );
+		$this->db->where( 'email', trim( $email ) );
 		$_id = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
 
 		if ( $_id ) :
@@ -1080,6 +1080,35 @@ class NAILS_User_model extends NAILS_Model
 			return FALSE;
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Get a specific user by their username
+	 *
+	 * @access	public
+	 * @param	string	$user_id	The user's ID
+	 * @param	mixed	$extended	Specific extra tables to join, TRUE for all user_meta_*
+	 * @return	object
+	 *
+	 **/
+	public function get_by_username( $username, $extended = FALSE )
+	{
+		if ( ! is_string( $username ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->where( 'u.username', trim( $username ) );
+		$user = $this->get_all( $extended );
+
+		return empty( $user ) ? FALSE : $user[0];
 	}
 
 
@@ -1350,6 +1379,7 @@ class NAILS_User_model extends NAILS_Model
 			$_data_user		= array();
 			$_data_meta		= array();
 			$_data_email	= '';
+			$_data_username	= '';
 
 			foreach ( $data AS $key => $val ) :
 
@@ -1375,7 +1405,11 @@ class NAILS_User_model extends NAILS_Model
 
 				elseif ( $key == 'email' ) :
 
-					$_data_email = $val;
+					$_data_email = trim( $val );
+
+				elseif ( $key == 'username' ) :
+
+					$_data_username = trim( $val );
 
 				else :
 
@@ -1384,6 +1418,29 @@ class NAILS_User_model extends NAILS_Model
 				endif;
 
 			endforeach;
+
+			// --------------------------------------------------------------------------
+
+			//	If a username has been passed then check if it's available
+			if ( $_data_username ) :
+
+				//	Check if the username is already being used
+				$this->db->where( 'username', $_data_username );
+				$this->db->where( 'id !=', $_uid );
+				$_username = $this->db->get( NAILS_DB_PREFIX . 'user' )->row();
+
+				if ( $_username ) :
+
+					$this->_set_error( 'Username is already in use.' );
+					return FALSE;
+
+				else :
+
+					$_data_user['username'] = $_data_username;
+
+				endif;
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
@@ -1431,7 +1488,7 @@ class NAILS_User_model extends NAILS_Model
 
 					if ( $_email ) :
 
-						//	Email is in use, if it's in use by the ID of ths user then
+						//	Email is in use, if it's in use by the ID of this user then
 						//	set it as the primary email for this account. If it's in use
 						//	by another user then error
 
@@ -1484,7 +1541,8 @@ class NAILS_User_model extends NAILS_Model
 					$_email->to_id				= $_uid;
 					$_email->data				= array();
 					$_email->data['updated_at']	= date( 'Y-m-d H:i:s' );
-					$_email->data['updated_by'] = array( 'id' => active_user( 'id' ), 'name' => active_user( 'first_name,last_name' ) );
+					$_email->data['updated_by']	= array( 'id' => active_user( 'id' ), 'name' => active_user( 'first_name,last_name' ) );
+					$_email->data['ip_address']	= $this->input->ip_address();
 
 					$this->emailer->send( $_email, TRUE );
 
@@ -1990,9 +2048,9 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string
 	 * @return	string
 	 **/
-	public function hash_password_db( $email, $password )
+	public function hash_password_db( $user_id, $password )
 	{
-		if ( empty( $email ) || empty( $password ) ) :
+		if ( empty( $user_id ) || empty( $password ) ) :
 
 			return FALSE;
 
@@ -2001,8 +2059,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->db->select( 'u.password, u.salt' );
-		$this->db->where( 'ue.email', $email );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'u.id = ue.user_id' );
+		$this->db->where( 'u.id', $user_id );
 		$this->db->limit( 1 );
 		$_q = $this->db->get( NAILS_DB_PREFIX . 'user u' );
 
@@ -2693,12 +2750,12 @@ class NAILS_User_model extends NAILS_Model
 	 * Set's a forgotten password token for a user
 	 *
 	 * @access	public
-	 * @param	int		$group_id	The ID of the group to fetch
+	 * @param	string $identifier The identifier to use for setting the token (set by APP_NATIVE_LOGIN_METHOD)
 	 * @return	boolean
 	 **/
-	public function set_password_token( $email )
+	public function set_password_token( $identifier )
 	{
-		if ( empty( $email ) ) :
+		if ( empty( $identifier ) ) :
 
 			return FALSE;
 
@@ -2713,19 +2770,51 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Update the user
-		$this->db->select( 'user_id' );
-		$this->db->where( 'email', $email );
-		$_id = $this->db->get( NAILS_DB_PREFIX . 'user_email' )->row();
+		switch( APP_NATIVE_LOGIN_USING ) :
 
-		if ( $_id ) :
+			case 'EMAIL' :
 
-			$this->db->set( 'forgotten_password_code', $_ttl . ':' . $_key[0] );
-			$this->db->where( 'id', $_id->user_id );
-			$this->db->update( NAILS_DB_PREFIX . 'user');
+				$_user = $this->get_by_username( $identifier );
+
+			break;
 
 			// --------------------------------------------------------------------------
 
-			return (bool) $this->db->affected_rows();
+			case 'USERNAME' :
+
+				$_user = $this->get_by_username( $identifier );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'BOTH' :
+			default:
+
+				$this->load->helper( 'email' );
+
+				if ( valid_email( $identifier ) ) :
+
+					$_user = $this->get_by_email( $identifier );
+
+				else :
+
+					$_user = $this->get_by_username( $identifier );
+
+				endif;
+
+			break;
+
+		endswitch;
+
+		if ( $_user ) :
+
+			$_data = array(
+
+				'forgotten_password_code' => $_ttl . ':' . $_key[0]
+			);
+
+			return $this->update( $_user->id, $_data );
 
 		else :
 

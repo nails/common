@@ -30,7 +30,10 @@
 	//	Login lang strings
 	$lang['auth_login_message']							= 'Sign in to your %s account using your email address and password. Not got an account? <a href="%s">Click here to register</a>.';
 	$lang['auth_login_message_no_register']				= 'Sign in to your %s account using your email address and password.';
-	$lang['auth_login_email_placeholder']				= 'Your registered email address';
+	$lang['auth_login_email_placeholder']				= 'Your registered email ';
+	$lang['auth_login_username_placeholder']			= 'Your registered username';
+	$lang['auth_login_both']							= 'Email or Username';
+	$lang['auth_login_both_placeholder']				= 'Your registered email or username';
 	$lang['auth_login_pass_placeholder']				= 'Your password';
 	$lang['auth_login_label_remember_me']				= 'Remember Me';
 	$lang['auth_login_action_login']					= 'Log In';
@@ -132,7 +135,6 @@
 	//	Forgotten Password
 	$lang['auth_forgot_message']						= 'Please enter your registered email address so we can send you an email with a link which you can use to reset your password.';
 	$lang['auth_forgot_temp_message']					= '<strong>A password reset has been requested for this account</strong><br />Please choose a new password and click "Change Password &amp; Log In"';
-	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
 	$lang['auth_forgot_new_pass_placeholder']			= 'Type a new password';
 	$lang['auth_forgot_new_pass_confirm_placeholder']	= 'Confirm your new password';
 	$lang['auth_forgot_email_placeholder']				= 'Your registered email address';
@@ -140,9 +142,15 @@
 	$lang['auth_forgot_action_reset_continue']			= 'Change Password & Log In';
 	$lang['auth_forgot_success']						= '<strong>Reset token sent!</strong> Please check your email remembering to look in junk and spam folders.';
 	$lang['auth_forgot_email_fail']						= '<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
-	$lang['auth_forgot_code_not_set']					= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
+	$lang['auth_forgot_code_not_set_email']				= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
+	$lang['auth_forgot_code_not_set_username']			= '<strong>Sorry,</strong> we were unable to generate a token for the username <strong>%s</strong>.';
+	$lang['auth_forgot_code_not_set']					= '<strong>Sorry,</strong> we were unable to generate a token for that account.';
 	$lang['auth_forgot_expired_code']					= '<strong>Sorry,</strong> the reset token you are using has expired. You will need to resubmit a password reset request.';
 	$lang['auth_forgot_invalid_code']					= '<strong>Sorry,</strong> Invalid or expired password reset token.';
+	$lang['auth_forgot_reset_badlogin']					= '<strong>Sorry,</strong> something when wrong and you were not logged in. Please try <a href="%s">logging in with your new password</a>.';
 	$lang['auth_forgot_reminder']						= '<strong>In case you forgot,</strong> your temporary password is <strong>%s</strong>. You won\'t be shown this message again.';
 	$lang['auth_forgot_reset_ok']						= 'Please log in using this temporary password: <strong>%s</strong>';
 	$lang['auth_forgot_action_proceed']					= 'Proceed to Log In';
+
+
+

@@ -297,7 +297,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 
 			if ( ! $_user ) :
 
-				//	OK, fine, this is a new user! Registerm buyt only if registration is allowed
+				//	OK, fine, this is a new user! Register but only if registration is allowed
 				if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
 
 					$this->_create_user( $_me );
@@ -326,7 +326,35 @@ class NAILS_Fb extends NAILS_Auth_Controller
 
 				else :
 
-					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'Facebook', APP_NAME, site_url( 'auth/forgotten_password?email=' . urlencode( $_me['email'] ) ) ) ) );
+					switch( APP_NATIVE_LOGIN_USING ) :
+
+						case 'EMAIL' :
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->email ) );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'USERNAME' :
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->username ) );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'BOTH' :
+						default :
+
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->email ) );
+
+						break;
+
+					endswitch;
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'Facebook', APP_NAME, $_forgot_url ) ) );
 					$this->_redirect( 'auth/login' );
 
 				endif;

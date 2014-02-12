@@ -63,19 +63,19 @@ class NAILS_Auth_model extends NAILS_Model
 	 * Log a user in
 	 *
 	 * @access	public
-	 * @param	string	$email		The user's email address
-	 * @param	string	$password	The user's password
-	 * @param	boolean	$remember	Whether to 'remember' the user or not
+	 * @param	string $identifier The identifier to use for the user lookup
+	 * @param	string $password The user's password
+	 * @param	boolean $remember Whether to 'remember' the user or not
 	 * @return	object
 	 **/
-	public function login( $email, $password, $remember = FALSE )
+	public function login( $identifier, $password, $remember = FALSE )
 	{
-		//	Delay execution for a moment (reduces brute force efficienty)
+		//	Delay execution for a moment (reduces brute force efficiently)
 		usleep( $this->brute_force_protection['delay'] );
 
 		// --------------------------------------------------------------------------
 
-		if ( empty( $email ) || empty( $password ) ) :
+		if ( empty( $identifier ) || empty( $password ) ) :
 
 			$this->_set_error( 'auth_login_fail_missing_field' );
 			return FALSE;
@@ -84,21 +84,59 @@ class NAILS_Auth_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$user = $this->user->get_by_email( $email );
+		//	Look up the user, how we do so depends on the login mode that the app is using
+		switch( APP_NATIVE_LOGIN_USING ) :
 
-		if ( $user ) :
+			case 'EMAIL' :
+
+				$_user = $this->user->get_by_email( $identifier );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'USERNAME' :
+
+				$_user = $this->user->get_by_username( $identifier );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'BOTH' :
+			default :
+
+				$this->load->helper( 'email' );
+
+				if ( valid_email( $identifier ) ) :
+
+					$_user = $this->user->get_by_email( $identifier );
+
+				else :
+
+					$_user = $this->user->get_by_username( $identifier );
+
+				endif;
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		if ( $_user ) :
 
 			//	User was recognised; validate credentials
 
 			//	Generate the hashed password to check against
-			$password = $this->user->hash_password_db( $email, $password );
+			$password = $this->user->hash_password_db( $_user->id, $password );
 
-			if ( $user->password === $password ) :
+			if ( $_user->password === $password ) :
 
 				//	Password accepted! Final checks...
 
 				//	Suspended user?
-				if ( $user->is_suspended ) :
+				if ( $_user->is_suspended ) :
 
 					$this->_set_error( 'auth_login_fail_suspended' );
 					return FALSE;
@@ -106,13 +144,13 @@ class NAILS_Auth_model extends NAILS_Model
 				endif;
 
 				//	Exceeded login count, temporarily blocked
-				if ( $user->failed_login_count >= $this->brute_force_protection['limit'] ) :
+				if ( $_user->failed_login_count >= $this->brute_force_protection['limit'] ) :
 
 					//	Check if the block has expired
-					if ( time() < strtotime( $user->failed_login_expires ) ) :
+					if ( time() < strtotime( $_user->failed_login_expires ) ) :
 
-						$block_time= ceil( $this->brute_force_protection['expire']/60 );
-						$this->_set_error( 'auth_login_fail_blocked', $block_time );
+						$_block_time= ceil( $this->brute_force_protection['expire']/60 );
+						$this->_set_error( 'auth_login_fail_blocked', $_block_time );
 						return FALSE;
 
 					endif;
@@ -120,57 +158,85 @@ class NAILS_Auth_model extends NAILS_Model
 				endif;
 
 				//	Reset user's failed login counter and allow login
-				$this->user->reset_failed_login( $user->id );
+				$this->user->reset_failed_login( $_user->id );
 
 				//	Set login data for this user
-				$this->user->set_login_data( $user->id );
+				$this->user->set_login_data( $_user->id );
 
 				//	If we're remembering this user set a cookie
 				if ( $remember ) :
 
-					$this->user->set_remember_cookie( $user->id, $user->password, $user->email );
+					$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
 
 				endif;
 
 				//	Update their last login and increment their login count
-				$this->user->update_last_login( $user->id );
+				$this->user->update_last_login( $_user->id );
 
 				// return some helpful data
-				$return = array(
-					'user_id'		=> $user->id,
-					'first_name'	=> $user->first_name,
-					'last_login'	=> $user->last_login,
-					'homepage'		=> $user->group_homepage
+				$_return = array(
+					'user_id'		=> $_user->id,
+					'first_name'	=> $_user->first_name,
+					'last_login'	=> $_user->last_login,
+					'homepage'		=> $_user->group_homepage
 				);
 
 				//	Temporary password?
-				if ( $user->temp_pw ) :
+				if ( $_user->temp_pw ) :
 
-					$return['temp_pw']['id']	= $user->id;
-					$return['temp_pw']['hash']	= md5( $user->salt );
+					$_return['temp_pw']			= array();
+					$_return['temp_pw']['id']	= $_user->id;
+					$_return['temp_pw']['hash']	= md5( $_user->salt );
 
 				endif;
 
-				return $return;
+				return $_return;
 
 			// --------------------------------------------------------------------------
 
 			//	Is the password NULL? If so it means the account was created using an API of sorts
-			elseif ( $user->password === NULL ) :
+			elseif ( $_user->password === NULL ) :
+
+				switch( APP_NATIVE_LOGIN_USING ) :
+
+					case 'EMAIL' :
+
+						$_identifier = $_user->email;
+
+					break;
+
+					// --------------------------------------------------------------------------
+
+					case 'USERNAME' :
+
+						$_identifier = $_user->username;
+
+					break;
+
+					// --------------------------------------------------------------------------
+
+					case 'BOTH' :
+					default :
+
+						$_identifier = $_user->email;
+
+					break;
+
+				endswitch;
 
 				switch( $user->auth_method_id ) :
 
 					//	Facebook Connect
-					case '2':		$this->_set_error( 'auth_login_fail_social_fb', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '2':		$this->_set_error( 'auth_login_fail_social_fb', site_url( 'auth/forgotten_password?identifier=' . $_identifier ) );	break;
 
 					//	Twitter
-					case '3':		$this->_set_error( 'auth_login_fail_social_tw', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '3':		$this->_set_error( 'auth_login_fail_social_tw', site_url( 'auth/forgotten_password?identifier=' . $_identifier ) );	break;
 
 					//	LinkedIn
-					case '5':		$this->_set_error( 'auth_login_fail_social_li', site_url( 'auth/forgotten_password?email=' . $user->email ) );	break;
+					case '5':		$this->_set_error( 'auth_login_fail_social_li', site_url( 'auth/forgotten_password?identifier=' . $_identifier ) );	break;
 
 					//	Other
-					default:	$this->_set_error( 'auth_login_fail_social', site_url( 'auth/forgotten_password?email=' . $user->email ) );		break;
+					default:		$this->_set_error( 'auth_login_fail_social', site_url( 'auth/forgotten_password?identifier=' . $_identifier ) );	break;
 
 				endswitch;
 				return FALSE;
@@ -183,16 +249,16 @@ class NAILS_Auth_model extends NAILS_Model
 				//	User was recognised but the password was wrong
 
 				//	Increment the user's failed login count
-				$this->user->increment_failed_login( $user->id, $this->brute_force_protection['expire'] );
+				$this->user->increment_failed_login( $_user->id, $this->brute_force_protection['expire'] );
 
 				//	Are we already blocked? Let them know...
-				if ( $user->failed_login_count >= $this->brute_force_protection['limit'] ) :
+				if ( $_user->failed_login_count >= $this->brute_force_protection['limit'] ) :
 
 					//	Check if the block has expired
-					if ( time() < strtotime( $user->failed_login_expires ) ) :
+					if ( time() < strtotime( $_user->failed_login_expires ) ) :
 
-						$block_time= ceil( $this->brute_force_protection['expire']/60 );
-						$this->_set_error( 'auth_login_fail_blocked', $block_time );
+						$_block_time= ceil( $this->brute_force_protection['expire']/60 );
+						$this->_set_error( 'auth_login_fail_blocked', $_block_time );
 						return FALSE;
 
 					endif;

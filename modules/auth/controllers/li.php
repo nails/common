@@ -376,7 +376,35 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 				else :
 
-					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'LinkedIn', APP_NAME, site_url( 'auth/forgotten_password?email=' . urlencode( $access_token->email ) ) ) ) );
+					switch( APP_NATIVE_LOGIN_USING ) :
+
+						case 'EMAIL' :
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->email ) );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'USERNAME' :
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->username ) );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'BOTH' :
+						default :
+
+
+							$_forgot_url = site_url( 'auth/forgotten_password?identifier=' . urlencode( $_user->email ) );
+
+						break;
+
+					endswitch;
+
+					$this->session->set_flashdata( 'message', lang( 'auth_social_email_in_use_no_settings', array( 'LinkedIn', APP_NAME, $_forgot_url ) ) );
 					$this->_redirect( 'auth/login' );
 
 				endif;

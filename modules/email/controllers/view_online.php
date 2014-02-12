@@ -74,12 +74,13 @@ class NAILS_View_Online extends NAILS_Email_Controller
 		$_data['email_type_id']	= $_email->type_id;
 
 		$_data['sent_to']				= new stdClass();
-		$_data['sent_to']->email		= $_email->sent_to;
-		$_data['sent_to']->first		= $_email->first_name;
-		$_data['sent_to']->last			= $_email->last_name;
-		$_data['sent_to']->id			= (int) $_email->user_id;
-		$_data['sent_to']->group_id		= $_email->user_group;
-		$_data['sent_to']->login_url	= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
+		$_data['sent_to']->email		= $_email->user->email;
+		$_data['sent_to']->first		= $_email->user->first_name;
+		$_data['sent_to']->last			= $_email->user->last_name;
+		$_data['sent_to']->id			= (int) $_email->user->id;
+		$_data['sent_to']->username		= $_email->user->username;
+		$_data['sent_to']->group_id		= $_email->user->group_id;
+		$_data['sent_to']->login_url	= $_email->user->id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user->id ) . '/' . md5( $_email->user->password ) ) : NULL;
 
 		// --------------------------------------------------------------------------
 

@@ -107,6 +107,7 @@
 
 	//	Common form field labels
 	$lang['form_label_email']				= 'Email';
+	$lang['form_label_username']			= 'Username';
 	$lang['form_label_password']			= 'Password';
 	$lang['form_label_password_confirm']	= 'Confirm Password';
 	$lang['form_label_first_name']			= 'First Name';

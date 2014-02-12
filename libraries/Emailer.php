@@ -394,14 +394,15 @@ class Emailer
 
 		$_send							= new stdClass();
 		$_send->to						= new stdClass();
-		$_send->to->email				= $_email->sent_to;
+		$_send->to->email				= $_email->user->email;
 		$_send->to->email_verified		= (bool) $_email->email_verified;
 		$_send->to->email_verified_code	= $_email->email_verified_code;
-		$_send->to->first				= $_email->first_name;
-		$_send->to->last				= $_email->last_name;
-		$_send->to->id					= (int) $_email->user_id;
-		$_send->to->group_id			= $_email->user_group;
-		$_send->to->login_url			= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
+		$_send->to->first				= $_email->user->first_name;
+		$_send->to->last				= $_email->user->last_name;
+		$_send->to->id					= (int) $_email->user->id;
+		$_send->to->username			= $_email->user->username;
+		$_send->to->group_id			= $_email->user->group_id;
+		$_send->to->login_url			= $_email->user->id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user->id ) . '/' . md5( $_email->user->password ) ) : NULL;
 		$_send->email_type_id			= $_email->type_id;
 		$_send->subject					= $_email->subject;
 		$_send->template				= $_email->template_file;
@@ -739,7 +740,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		$this->db->select( 'ea.id, ea.ref, ea.type_id, ea.email_vars, ea.user_email sent_to, ue.is_verified email_verified, ue.code email_verified_code, ea.time_sent, ea.read_count, ea.link_click_count' );
-		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
+		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender, u.username' );
 		$this->db->select( 'et.name, et.template_file, et.default_subject' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ea.user_id OR u.id = ea.user_email', 'LEFT' );
@@ -1358,11 +1359,26 @@ class Emailer
 		//	Sent to
 		$email->user 				= new stdClass();
 		$email->user->id			= $email->user_id;
+		$email->user->group_id		= $email->user_group;
 		$email->user->email			= $email->sent_to;
+		$email->user->username		= $email->username;
+		$email->user->password		= $email->user_password;
 		$email->user->first_name	= $email->first_name;
 		$email->user->last_name		= $email->last_name;
 		$email->user->profile_img	= $email->profile_img;
 		$email->user->gender		= $email->gender;
+
+
+		unset( $email->user_id );
+		unset( $email->sent_to );
+		unset( $email->username );
+		unset( $email->first_name );
+		unset( $email->last_name );
+		unset( $email->profile_img );
+		unset( $email->gender );
+		unset( $email->user_group );
+		unset( $email->user_password );
+
 	}
 
 }

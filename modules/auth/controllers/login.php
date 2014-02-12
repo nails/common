@@ -90,20 +90,49 @@ class NAILS_Login extends NAILS_Auth_Controller
 		if ( $this->input->post() ) :
 
 			//	Validate input
-			$this->form_validation->set_rules( 'email',		'Email',	'required|xss_clean|trim|valid_email' );
+
+			//	The rules vary depending on what login methods are enabled.
+			switch( APP_NATIVE_LOGIN_USING ) :
+
+				case 'EMAIL' :
+
+					$this->form_validation->set_rules( 'identifier',	'Email',	'required|xss_clean|trim|valid_email' );
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'USERNAME' :
+
+					$this->form_validation->set_rules( 'identifier',	'Username',	'required|xss_clean|trim' );
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'BOTH' :
+				default:
+
+					$this->form_validation->set_rules( 'identifier',	'Username or Email',	'xss_clean|trim' );
+
+				break;
+
+			endswitch;
+
+			//	Password is always required, obviously.
 			$this->form_validation->set_rules( 'password',	'Password',	'required|xss_clean' );
 
-			$this->form_validation->set_message( 'required',		lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'valid_email',	lang( 'fv_valid_email' ) );
 
 			if ( $this->form_validation->run() ) :
 
 				//	Attempt the log in
-				$_email		= $this->input->post( 'email' );
-				$_password	= $this->input->post( 'password' );
-				$_remember	= $this->input->post( 'remember' );
+				$_identifier	= $this->input->post( 'identifier' );
+				$_password		= $this->input->post( 'password' );
+				$_remember		= $this->input->post( 'remember' );
 
-				$_login = $this->auth_model->login( $_email, $_password, $_remember );
+				$_login = $this->auth_model->login( $_identifier, $_password, $_remember );
 
 				if ( $_login ) :
 

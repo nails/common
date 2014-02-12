@@ -63,26 +63,52 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		endif;
 
 		//	If there's POST data attempt to validate the user
-		if ( $this->input->post() || $this->input->get( 'email' ) ) :
+		if ( $this->input->post() || $this->input->get( 'identifier' ) ) :
 
 			//	Define vars
-			$_email = $this->input->post( 'email' );
+			$_identifier = $this->input->post( 'identifier' );
 
 			//	Override with the $_GET variable if POST failed to return anything.
 			//	Populate the $_POST var with some data so form validation continues
 			//	as normal, feels hacky but works.
 
-			if ( ! $_email && $this->input->get( 'email' ) ) :
+			if ( ! $_identifier && $this->input->get( 'identifier' ) ) :
 
-				$_POST['email']	= $this->input->get( 'email' );
-				$_email			= $this->input->get( 'email' );
+				$_POST['identifier']	= $this->input->get( 'identifier' );
+				$_identifier			= $this->input->get( 'identifier' );
 
 			endif;
 
 			// --------------------------------------------------------------------------
 
 			//	Set rules
-			$this->form_validation->set_rules( 'email', 'email', 'xss_clean|required|trim|valid_email' );
+			//	The rules vary depending on what login methods are enabled.
+			switch( APP_NATIVE_LOGIN_USING ) :
+
+				case 'EMAIL' :
+
+					$this->form_validation->set_rules( 'identifier',	'Email',	'required|xss_clean|trim|valid_email' );
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'USERNAME' :
+
+					$this->form_validation->set_rules( 'identifier',	'Username',	'required|xss_clean|trim' );
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'BOTH' :
+				default:
+
+					$this->form_validation->set_rules( 'identifier',	'Username or Email',	'xss_clean|trim' );
+
+				break;
+
+			endswitch;
 
 			// --------------------------------------------------------------------------
 
@@ -96,7 +122,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			if ( $this->form_validation->run() ) :
 
 				//	Attempt to reset password
-				if ( $this->user->set_password_token( $_email ) ) :
+				if ( $this->user->set_password_token( $_identifier ) ) :
 
 					//	Send email to user; load library
 					$this->load->library( 'emailer' );
@@ -104,19 +130,56 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Define basic email data
-					$this->data['reset_user']	= $this->user->get_by_email( $_email );
+					switch( APP_NATIVE_LOGIN_USING ) :
 
-					$_data				= new stdClass();
-					$_data->to_email	= $this->data['reset_user']->email;
-					$_data->type		= 'forgotten_password';
+						case 'EMAIL' :
+
+							$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'USERNAME' :
+
+							$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'BOTH' :
+						default:
+
+							$this->load->helper( 'email' );
+
+							if ( valid_email( $_identifier ) ) :
+
+								$this->data['reset_user'] = $this->user->get_by_email( $_identifier );
+
+							else :
+
+								$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+
+							endif;
+
+						break;
+
+					endswitch;
+
+					$_data			= new stdClass();
+					$_data->to_id	= $this->data['reset_user']->id;
+					$_data->type	= 'forgotten_password';
 
 					// --------------------------------------------------------------------------
 
 					//	Add data for the email view
 					$_code = explode( ':', $this->data['reset_user']->forgotten_password_code );
 
+					$_data->data							= array();
 					$_data->data['first_name']				= title_case( $this->data['reset_user']->first_name );
 					$_data->data['forgotten_password_code']	= $_code[1];
+					$_data->data['identifier']				= $_identifier;
 
 					// --------------------------------------------------------------------------
 
@@ -133,7 +196,32 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 				else :
 
-					$this->data['error'] = lang( 'auth_forgot_code_not_set', $_email );
+					switch( APP_NATIVE_LOGIN_USING ) :
+
+						case 'EMAIL' :
+
+							$this->data['error'] = lang( 'auth_forgot_code_not_set_email', $_identifier );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'USERNAME' :
+
+							$this->data['error'] = lang( 'auth_forgot_code_not_set_username', $_identifier );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'BOTH' :
+						default:
+
+							$this->data['error'] = lang( 'auth_forgot_code_not_set' );
+
+						break;
+
+					endswitch;
 
 				endif;
 

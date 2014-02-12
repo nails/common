@@ -96,25 +96,58 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					$this->user->update( $id, $_data );
 
 					//	Log the user in
-					$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
+					switch( APP_NATIVE_LOGIN_USING ) :
 
-					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
+						case 'EMAIL' :
 
-					//	Log user in and forward to wherever they need to go
-					if ( $this->input->get( 'return_to' ) ):
+							$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
 
-						redirect( $this->input->get( 'return_to' ) );
-						return;
+						break;
 
-					elseif ( $_user->group_homepage ) :
+						// --------------------------------------------------------------------------
 
-						redirect( $_user->group_homepage );
-						return;
+						case 'USERNAME' :
+
+							$_login = $this->auth_model->login( $_user->username, $this->input->post( 'new_password' ), $_remember );
+
+						break;
+
+						// --------------------------------------------------------------------------
+
+						case 'BOTH' :
+						default :
+
+							$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
+
+						break;
+
+					endswitch;
+
+					if ( $_login ) :
+
+						$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
+
+						//	Log user in and forward to wherever they need to go
+						if ( $this->input->get( 'return_to' ) ):
+
+							redirect( $this->input->get( 'return_to' ) );
+							return;
+
+						elseif ( $_user->group_homepage ) :
+
+							redirect( $_user->group_homepage );
+							return;
+
+						else :
+
+							redirect( '/' );
+							return;
+
+						endif;
 
 					else :
 
-						redirect( '/' );
-						return;
+						$this->data['error'] = lang( 'auth_forgot_reset_badlogin', site_url( 'auth/login' ) );
 
 					endif;
 
