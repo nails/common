@@ -1,6 +1,3 @@
-<p class="system-alert message no-close">
-	<strong>TODO:</strong> handle newly created pages who haven't got any published data (at all).
-</p>
 <div class="group-cms pages overview">
 
 	<p>

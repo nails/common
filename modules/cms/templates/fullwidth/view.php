@@ -1,0 +1,1 @@
+View file for "Fullwidth" template.

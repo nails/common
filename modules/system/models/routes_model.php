@@ -124,7 +124,20 @@ class NAILS_Routes_model extends NAILS_Model
 			$_routes['//BEGIN CMS'] = '';
 			foreach ( $_pages AS $page ) :
 
-				$_routes[$page->slug] = 'cms/render/page/' . $page->id;
+				$_published_slug	= $page->published->slug;
+				$_draft_slug		= $page->draft->slug;
+
+				if ( $_published_slug ) :
+
+					$_routes[$_published_slug] = 'cms/render/page/' . $page->id;
+
+				endif;
+
+				if ( $_draft_slug && $_draft_slug != $_published_slug ) :
+
+					$_routes[$_draft_slug] = 'cms/render/page/' . $page->id;
+
+				endif;
 
 			endforeach;
 			$_routes['//END CMS'] = '';

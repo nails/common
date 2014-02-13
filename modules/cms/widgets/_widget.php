@@ -105,7 +105,7 @@ class NAILS_CMS_Widget
 
 		if ( is_file( $this->_details->path . 'views/editor.php' ) ) :
 
-			//	Extract the variables, so that the veiw can sue them
+			//	Extract the variables, so that the view can use them
 			if ( $data ) :
 
 				extract( $data );
@@ -133,7 +133,7 @@ class NAILS_CMS_Widget
 	// --------------------------------------------------------------------------
 
 
-	public function render()
+	public function render( $data = array() )
 	{
 
 	}

@@ -32,7 +32,7 @@
 			case 'saved' :
 
 				echo '<p class="system-alert success no-close">';
-				echo '<strong>Success!</strong> Your page was saved successfully. ' . anchor( 'cms/render/preview/' . $cmspage->id, 'Preview it here', 'class="launch-preview" target="_blank"' );
+					echo '<strong>Success!</strong> Your page was saved successfully. ' . anchor( 'cms/render/preview/' . $cmspage->id, 'Preview it here', 'class="main-action" data-action="preview" target="_blank"' );
 				echo '</p>';
 
 			break;
@@ -42,7 +42,17 @@
 			case 'published' :
 
 				echo '<p class="system-alert success no-close">';
-				echo '<strong>Success!</strong> Your page was published successfully. ' . anchor( $cmspage->published->url, 'View it here', 'target="_blank"' );
+					echo '<strong>Success!</strong> Your page was published successfully. ' . anchor( $cmspage->published->url, 'View it here', 'target="_blank"' );
+				echo '</p>';
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'unpublished' :
+
+				echo '<p class="system-alert success no-close">';
+					echo '<strong>Success!</strong> Your page was unpublished successfully.';
 				echo '</p>';
 
 			break;
@@ -76,18 +86,7 @@
 
 			// --------------------------------------------------------------------------
 
-			//	Title
-			$_field					= array();
-			$_field['key']			= 'is_published';
-			$_field['label']		= 'Published';
-			$_field['required']		= TRUE;
-			$_field['default']		= isset( $cmspage->is_published ) ? $cmspage->is_published : '';
-
-			echo form_field_boolean( $_field );
-
-			// --------------------------------------------------------------------------
-
-			//	Slug
+			//	Parent ID
 			$_field					= array();
 			$_field['key']			= 'parent_id';
 			$_field['label']		= 'Parent Page';
@@ -220,14 +219,40 @@
 		</p>
 	</fieldset>
 
-	<p>
-		<?php
+	<p class="actions">
+	<?php
 
-			echo '<a href="#" id="action-save" class="main-action awesome orange large">' . lang( 'action_save_changes' ) . '</a>';
-			echo '<a href="#" id="action-publish" class="main-action awesome green large ">Save Changes &amp; Publish</a>';
-			echo '<a href="#" id="action-preview" class="main-action awesome large launch-preview">' . lang( 'action_preview' ) . '</a>';
+		/**
+		 * Generate the buttons
+		 * These buttons change depending on the state of the page.
+		 *
+		 * If page is published:
+		 * - Update Page
+		 * - Save Changes & Make Draft
+		 * - Preview
+		 *
+		 * If page is unpublished:
+		 * - Save Changes
+		 * - Publish
+		 * - Preview
+		 *
+		 **/
 
-		?>
+		if ( ! empty( $cmspage->is_published ) ) :
+
+			echo '<a href="#" data-action="save" class="main-action awesome orange large">Update Page</a>';
+			echo '<a href="#" data-action="unpublish" class="main-action awesome green large ">Save Changes &amp; Make Draft</a>';
+			echo '<a href="#" data-action="preview" class="main-action awesome large launch-preview right">' . lang( 'action_preview' ) . '</a>';
+
+		else :
+
+			echo '<a href="#" data-action="save" class="main-action awesome orange large">Save Changes</a>';
+			echo '<a href="#" data-action="publish" class="main-action awesome green large ">Publish</a>';
+			echo '<a href="#" data-action="preview" class="main-action awesome large launch-preview right">' . lang( 'action_preview' ) . '</a>';
+
+		endif;
+
+	?>
 	</p>
 
 </div>
@@ -254,8 +279,8 @@
 		</li>
 	</ul>
 	<ul class="rhs">
-		<li><a href="#" data-action="preview">Preview</a></li>
-		<li><a href="#" data-action="close">Close</a></li>
+		<li><a href="#" class="main-action" data-action="preview">Preview</a></li>
+		<li><a href="#" class="action" data-action="close">Close</a></li>
 	</ul>
 </script>
 <script type="text/template" id="template-widget-search">

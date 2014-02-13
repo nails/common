@@ -96,6 +96,38 @@ class Nails_CMS_Template
 
 		return $_d;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function render( $data = array())
+	{
+		if ( is_file( $this->_details->path . 'view.php' ) ) :
+
+			//	Extract the variables, so that the view can use them
+			if ( $data ) :
+
+				extract( $data );
+
+			endif;
+
+			//	Start the buffer, basically copying how CI does it's view loading
+			ob_start();
+
+			include $this->_details->path . 'views.php';
+
+			//	Flush buffer
+			$_buffer = ob_get_contents();
+			@ob_end_clean();
+
+			//	Return the HTML
+			return $_buffer;
+
+		endif;
+
+		return '';
+	}
 }
 
 /* End of file _template.php */

@@ -181,7 +181,7 @@ class NAILS_Cms extends NAILS_API_Controller
 
 	protected function _pages_save()
 	{
-		$this->_out(array('id'=>2));
+		$this->_out(array('id'=>1));
 	}
 }
 

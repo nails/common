@@ -2,7 +2,7 @@
  * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  */
- 
+
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.
 	// For the complete reference:
@@ -10,7 +10,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.extraPlugins = 'mediaembed,autogrow,codemirror';
 	config.removePlugins = 'resize,elementspath';
-	
+
 	// The toolbar groups arrangement, optimized for a single toolbar row.
 	config.toolbarGroups = [
 		{ name: 'document',    groups: [ 'mode' ] },
@@ -34,12 +34,16 @@ CKEDITOR.editorConfig = function( config ) {
 	// Considering that the basic setup doesn't provide pasting cleanup features,
 	// it's recommended to force everything to be plain text.
 	config.forcePasteAsPlainText = true;
-	
+
 	//	KCFinder
 	//	Disabled for now until I can work out how to tell KCFinder to look at the current app's
 	//	uplaod directory and not it's own one.
-	
+
 	config.filebrowserImageBrowseUrl	= SITE_URL + 'cdn/manager/browse/image';
 	config.filebrowserFlashBrowseUrl	= SITE_URL + 'cdn/manager/browse/flash';
 	config.filebrowserBrowseUrl			= SITE_URL + 'cdn/manager/browse/file';
+
+	//	Dialog colour; tie it in with the rest of admin
+	config.dialog_backgroundCoverColor		= 'rgb(0,0,0)';
+	config.dialog_backgroundCoverOpacity	= 0.75;
 };

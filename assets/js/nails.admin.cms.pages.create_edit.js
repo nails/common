@@ -10,10 +10,11 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this.page_data			= {};
 	this._dragging_widget	= false;
 	this._editor_open		= false;
+	this._preview_open		= false;
 	this._saving			= false;
 	this._refreshing		= false;
 	this._autosave			= null;
-	this._autosave_delay	= 5000;
+	this._autosave_delay	= 45000;
 
 	// --------------------------------------------------------------------------
 
@@ -52,25 +53,33 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		}
 		else
 		{
+			this.page_data = page_data;
+
 			//	Supplied, use the server version
 			//	Check it has everything it should
-			if ( typeof( this.page_data.id ) === 'undefined' )
+
+			if ( typeof( this.page_data.data.id ) === 'undefined' )
 			{
-				this.page_data.id = null;
+				this.page_data.data.id = null;
 			}
 
 			for( _key in this.templates )
 			{
-				if ( typeof( this.page_data[_key] ) === 'undefined' )
+				if ( typeof( this.page_data.widget_areas ) === 'undefined' )
 				{
-					this.page_data[_key] = {};
+					this.page_data.widget_areas = {};
+				}
+
+				if ( typeof( this.page_data.widget_areas[_key] ) === 'undefined' )
+				{
+					this.page_data.widget_areas[_key] = {};
 				}
 
 				for ( _key2 in this.templates[_key].widget_areas )
 				{
-					if ( typeof( this.page_data[_key][_key2] ) === 'undefined' )
+					if ( typeof( this.page_data.widget_areas[_key][_key2] ) === 'undefined' )
 					{
-						this.page_data[_key][_key2] = [];
+						this.page_data.widget_areas[_key][_key2] = [];
 					}
 				}
 			}
@@ -79,6 +88,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		//	Set the data hash
 		this.page_data.hash = this._generate_data_hash();
 		console.log( 'Initial page_data:', this.page_data );
+
 		// --------------------------------------------------------------------------
 
 		this._template_chooser_init();
@@ -99,109 +109,38 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Bind to the save and publish buttons
-		$( '#action-save' ).on( 'click', function()
+		//	Bind to main-action buttons
+		$(document).on( 'click', 'a.main-action', function(e)
 		{
-			var _button = $(this);
-
-			if ( _button.hasClass( 'disabled' ) )
+			//	Ignore duplicate requests
+			if ( $(this).hasClass( 'disabled' ) )
 			{
-				console.log( 'Button disabled, ignoring second request' );
 				return false;
 			}
 
-			var _success = function( data )
-			{
-				_button.text( 'Saved!' );
-				window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=saved';
-			};
+			// --------------------------------------------------------------------------
 
-			var _error = function( data )
-			{
-				var _oldtext = _button.data( 'oldtext' );
-				_button.text( _oldtext );
-				_this._enable_main_actions();
+			//	Action to perform
+			var _action = $(this).data( 'action' );
 
-				// --------------------------------------------------------------------------
-
-				$('<div>').text( data.error ).dialog({
-					title: 'Something went wrong.',
-					resizable: false,
-					draggable: false,
-					modal: true,
-					buttons:
-					{
-						OK: function()
-						{
-							$(this).dialog('close');
-						}
-					}
-				});
-			};
-
-			var _oldtext = _button.text();
-			_button.data( 'oldtext', _oldtext );
-			_button.html( '<span class="ion-looping"></span> Saving...' );
+			//	Disable the buttons while we process the request
 			_this._disable_main_actions();
-			_this._save( false, _success, _error, true );
 
-			return false;
-		});
-
-		$( '#action-publish' ).on( 'click', function()
-		{
-			var _button = $(this);
-
-			if ( _button.hasClass( 'disabled' ) )
+			switch( _action )
 			{
-				console.log( 'Button disabled, ignoring second request' );
-				return false;
+				case 'preview':		_this._main_action_launch_preview();	break;
+				case 'save' :		_this._main_action_save();				break;
+				case 'publish' :	_this._main_action_publish();			break;
+				case 'unpublish' :	_this._main_action_unpublish();			break;
+				default :
+
+					console.warn( 'Uncaught main-action.' );
+					_this._enable_main_actions();
+
+				break;
 			}
 
-			var _success = function( data )
-			{
-				_button.text( 'Published!' );
-				window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=published';
-			};
-
-			var _error = function( data )
-			{
-				var _oldtext = _button.data( 'oldtext' );
-				_button.text( _oldtext );
-				_this._enable_main_actions();
-
-				// --------------------------------------------------------------------------
-
-				$('<div>').text( data.error ).dialog({
-					title: 'Something went wrong.',
-					resizable: false,
-					draggable: false,
-					modal: true,
-					buttons:
-					{
-						OK: function()
-						{
-							$(this).dialog('close');
-						}
-					}
-				});
-			};
-
-			var _oldtext = _button.text();
-			_button.data( 'oldtext', _oldtext );
-			_button.html( '<span class="ion-looping"></span> Publishing...' );
-			_this._disable_main_actions();
-			_this._save( false, _success, _error, true, true );
-
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		//	Bind preview buttons
-		$('a.launch-preview').on( 'click', function()
-		{
-			_this._launch_preview();
+			e.stopPropagation();
 			return false;
 		});
 
@@ -215,18 +154,188 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._disable_main_actions = function()
+	this._enable_main_actions = function()
 	{
-		$( 'a.main-action' ).addClass( 'disabled' );
+		//	Disable buttons
+		$( 'a.main-action' ).removeClass( 'disabled' );
+
+		//	Hide animated stripes
+		$( 'p.actions' ).removeClass( 'loading' );
 	};
 
 
 	// --------------------------------------------------------------------------
 
 
-	this._enable_main_actions = function()
+	this._disable_main_actions = function()
 	{
-		$( 'a.main-action' ).removeClass( 'disabled' );
+		//	Disable buttons
+		$( 'a.main-action' ).addClass( 'disabled' );
+
+		//	Start animated stripes
+		$( 'p.actions' ).addClass( 'loading' );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._main_action_launch_preview = function()
+	{
+		this._editor.container.addClass( 'loading' );
+		this._preview_open = true;
+
+		// --------------------------------------------------------------------------
+
+		var _this = this;
+		var _success = function( data )
+		{
+			_this._editor.container.removeClass( 'loading' );
+
+			$.fancybox({
+				type:'iframe',
+				href: window.SITE_URL + 'cms/render/preview/' + data.id,
+				width:'90%',
+				height:'90%',
+				afterClose: function()
+				{
+					_this._preview_open = false;
+					_this._enable_main_actions();
+				}
+			});
+		};
+
+		var _error = function( data )
+		{
+			_this._editor.container.removeClass( 'loading' );
+
+			$('<div>').text( data.error ).dialog({
+				title: 'Something went wrong.',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
+				{
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
+				}
+			});
+		};
+
+		this._save( false, _success, _error, true );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._main_action_save = function()
+	{
+		var _this = this;
+
+		var _success = function( data )
+		{
+			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=saved';
+		};
+
+		var _error = function( data )
+		{
+			_this._enable_main_actions();
+
+			// --------------------------------------------------------------------------
+
+			$('<div>').text( data.error ).dialog({
+				title: 'Something went wrong.',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
+				{
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
+				}
+			});
+		};
+
+		_this._save( false, _success, _error, true );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._main_action_publish = function()
+	{
+		var _this = this;
+
+		var _success = function( data )
+		{
+			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=published';
+		};
+
+		var _error = function( data )
+		{
+			_this._enable_main_actions();
+
+			// --------------------------------------------------------------------------
+
+			$('<div>').text( data.error ).dialog({
+				title: 'Something went wrong.',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
+				{
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
+				}
+			});
+		};
+
+		_this._save( false, _success, _error, true, true );
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._main_action_unpublish = function()
+	{
+		var _this = this;
+
+		var _success = function( data )
+		{
+			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=unpublished';
+		};
+
+		var _error = function( data )
+		{
+			_this._enable_main_actions();
+
+			// --------------------------------------------------------------------------
+
+			$('<div>').text( data.error ).dialog({
+				title: 'Something went wrong.',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
+				{
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
+				}
+			});
+		};
+
+		_this._save( false, _success, _error, true, false );
 	};
 
 
@@ -251,7 +360,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._save = function( is_autosave, success_callback, error_callback, force_save, do_publish )
+	this._save = function( is_autosave, success_callback, error_callback, force_save, is_published )
 	{
 		//	If we're already saving ignore any more calls
 		if ( this._saving )
@@ -301,8 +410,8 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				url: window.SITE_URL + 'api/cms/pages/save',
 				data:
 				{
-					page_data : JSON.stringify( this.page_data ),
-					do_publish : do_publish
+					page_data		: JSON.stringify( this.page_data ),
+					is_published	: is_published
 				},
 				success: function( data )
 				{
@@ -657,7 +766,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 	this._editor_launch = function( template, area )
 	{
-		$( '#' + this.editor_id ).removeClass( 'ready' ).show();
+		$( '#' + this.editor_id ).removeClass( 'ready' ).addClass( 'loading' ).show();
 
 		// --------------------------------------------------------------------------
 
@@ -677,7 +786,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Editor ready
-		$( '#' + this.editor_id ).addClass( 'ready' );
+		$( '#' + this.editor_id ).addClass( 'ready' ).removeClass( 'loading' );
 	};
 
 
@@ -844,10 +953,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Bind keyUp event for the escape key
+		//	Bind keyUp event for the escape key, don't close if dragging or previewing
 		$(document).on( 'keyup', function( e )
 		{
-			if ( ! _this._dragging_widget && e.keyCode === 27 )
+			if ( ! _this._dragging_widget && ! _this._preview_open && e.keyCode === 27 )
 			{
 				_this._editor_close();
 			}
@@ -908,7 +1017,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		});
 
 		//	Bind the action buttons
-		_this._editor.header.find( 'ul.rhs a' ).on( 'click', function()
+		_this._editor.header.find( 'ul.rhs a.action' ).on( 'click', function()
 		{
 			var _action = $(this).data( 'action' );
 
@@ -917,12 +1026,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				case 'close' :
 
 					_this._editor_close();
-
-				break;
-
-				case 'preview' :
-
-					_this._launch_preview();
 
 				break;
 			}
@@ -1185,53 +1288,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		$( '#' + this.editor_id ).hide();
 		this._editor_destruct();
 
-	};
-
-
-	// --------------------------------------------------------------------------
-
-
-	this._launch_preview = function()
-	{
-		var _overlay = $('<div class="fancybox-overlay" style="width:100%;height:100%;display:block;"></div>').appendTo('body');
-		var _loading = $('<div id="fancybox-loading"><div></div></div>').appendTo('body');
-
-		// --------------------------------------------------------------------------
-
-		var _success = function( data )
-		{
-			_overlay.remove();
-			_loading.remove();
-
-			$.fancybox({
-				type:'iframe',
-				href: window.SITE_URL + 'cms/render/preview/' + data.id,
-				width:'90%',
-				height:'90%',
-			});
-		};
-
-		var _error = function( data )
-		{
-			_overlay.remove();
-			_loading.remove();
-
-			$('<div>').text( data.error ).dialog({
-				title: 'Something went wrong.',
-				resizable: false,
-				draggable: false,
-				modal: true,
-				buttons:
-				{
-					OK: function()
-					{
-						$(this).dialog('close');
-					}
-				}
-			});
-		};
-
-		this._save( false, _success, _error, true );
 	};
 
 

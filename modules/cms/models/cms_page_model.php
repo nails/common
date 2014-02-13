@@ -45,6 +45,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->_app_prefix			= 'CMS_';
 
 		$this->_table				= NAILS_DB_PREFIX . 'cms_page';
+		$this->_table_prefix		= 'p';
 
 		// --------------------------------------------------------------------------
 
@@ -367,65 +368,16 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-
-	public function delete( $id )
+	public function _getcount_common( $data = array(), $_caller = NULL )
 	{
-		$_data = array( 'is_deleted' => TRUE );
-		return $this->update( $id, $_data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function restore( $id )
-	{
-		$_data = array( 'is_deleted' => FALSE );
-		return $this->update( $id, $_data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function destroy( $id )
-	{
-		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table );
-
-		return (bool) $this->db->affected_rows();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_all( $include_deleted = FALSE )
-	{
-		$this->db->select( 'p.*' );
+		$this->db->select( $this->_table_prefix . '.*' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = p.modified_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.modified_by', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
-		if ( ! $include_deleted ) :
-
-			$this->db->where( 'p.is_deleted', FALSE );
-
-		endif;
-
-		$this->db->order_by( 'p.published_slug' );
-		$this->db->order_by( 'p.draft_slug' );
-		$_pages = $this->db->get( NAILS_DB_PREFIX . 'cms_page p' )->result();
-
-		foreach ( $_pages AS $page ) :
-
-			//	Format the page object
-			$this->_format_page_object( $page );
-
-		endforeach;
-
-		return $_pages;
+		$this->db->order_by( $this->_table_prefix . '.published_slug' );
+		$this->db->order_by( $this->_table_prefix . '.draft_slug' );
 	}
 
 
@@ -588,9 +540,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _format_page_object( &$page )
+	protected function _format_object( &$page )
 	{
-		$page->id				= (int) $page->id;
+		parent::_format_object( $page );
+
 		$page->is_published		= (bool) $page->is_published;
 		$page->is_deleted		= (bool) $page->is_deleted;
 
@@ -646,64 +599,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 		unset( $page->profile_img );
 		unset( $page->gender );
 		unset( $page->template_data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Fetch an object by it's ID
-	 *
-	 * @access public
-	 * @param int $id The ID of the object to fetch
-	 * @return stdClass
-	 **/
-	public function get_by_id( $id )
-	{
-		$this->db->where( 'p.id', $id );
-		$_result = $this->get_all( TRUE );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Fetch an object by it's slug
-	 *
-	 * @access public
-	 * @param string $slug The slug of the object to fetch
-	 * @return stdClass
-	 **/
-	public function get_by_slug( $slug )
-	{
-		$this->db->where( 'p.slug', $slug );
-		$_result = $this->get_all( TRUE );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
 	}
 
 
@@ -1086,154 +981,21 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function render( $page )
+	public function get_template( $slug )
 	{
-		//	Loop through all the widgets, instantiate the appropriate widget and execute
-		//	it's render function, append the result to the $_out variable and spit that back
+		$_templates = $this->get_available_templates();
 
-		$_out	= array( 'hero' => '', 'body' => '', 'sidebar' => '' );
-		$_area	= array( 'hero', 'body', 'sidebar' );
+		foreach ( $_templates AS $template ) :
 
-		foreach ($_area AS $area ) :
+			if ( $slug == $template->slug ) :
 
-			foreach ( $page->{'widgets_' . $area} AS $key => $widget ) :
+				return $widget;
 
-				$_out[$area] .= '<div class="widget ' . $widget->widget_class . '">';
-				$_out[$area] .= $this->_call_widget_method( $widget->widget_class, $widget->widget_data, 'render' );
-				$_out[$area] .= '</div>';
-
-			endforeach;
+			endif;
 
 		endforeach;
 
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_widget_editor( $widget, $data = NULL, $key = NULL )
-	{
-		if ( NULL !== $key ) :
-
-			$data = unserialize( $data );
-
-			if ( ! $data ) :
-
-				$data = array();
-
-			else :
-
-				$_data = (array) $data;
-
-			endif;
-
-			$data['key'] = $key;
-			$data = serialize( $data );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $this->_call_widget_method( $widget, $data, 'get_editor_html' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_widget_editor_functions( $widget, $data = NULL, $key = NULL )
-	{
-		if ( NULL !== $key ) :
-
-			$data = unserialize( $data );
-
-			if ( ! $data ) :
-
-				$data = array();
-
-			else :
-
-				$_data = (array) $data;
-
-			endif;
-
-			$data['key'] = $key;
-			$data = serialize( $data );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $this->_call_widget_method( $widget, $data, 'get_editor_functions' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_widget_validation_rules( $widget, $field )
-	{
-		return $this->_call_widget_method( $widget, NULL, 'get_validation_rules', array( 'field' => $field ) );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _call_widget_method( $widget, $data, $method, $params = array() )
-	{
-		//	Load up widget classes
-		$_class		= strtolower( $widget );
-		$_has_nails	= FALSE;
-		$_has_app	= FALSE;
-
-		//	Nails
-		if ( file_exists( $this->_nails_widgets_dir . $_class . '.php' ) ) :
-
-			include_once $this->_nails_widgets_dir . $_class . '.php';
-			$_has_nails = TRUE;
-
-		endif;
-
-		//	App
-		if ( file_exists( $this->_app_widgets_dir . $_class . '.php' ) ) :
-
-			include_once $this->_app_widgets_dir . $_class . '.php';
-			$_has_app = TRUE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Instanciate the widget
-		if ( $_has_app && class_exists( $this->_app_prefix . $_class ) ) :
-
-			$_class = $this->_app_prefix . $_class;
-
-		elseif( $_has_nails && class_exists( $this->_nails_prefix . $_class ) ) :
-
-			$_class = $this->_nails_prefix . $_class;
-
-		else :
-
-			$_class = NULL;
-
-		endif;
-
-		if ( $_class && method_exists( $_class, $method ) ) :
-
-			$_temp = new $_class();
-			$_temp->setup( unserialize( $data ) );
-			$_result = call_user_func_array( array( $_temp, $method ), $params );
-			unset( $_temp );
-
-			return $_result;
-
-		endif;
+		return FALSE;
 	}
 }
 

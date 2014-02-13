@@ -73,27 +73,13 @@ class NAILS_Render extends NAILS_CMS_Controller
 		//	Determine which data to use
 		if ( $this->_is_preview ) :
 
-			$this->data['page']->title		= $_page->draft->title;
-			$this->data['page']->slug		= $_page->draft->slug;
-			$this->data['rendered_html']	= $_page->draft->rendered_html;
+			$this->output->set_output( $_page->draft->rendered_html );
 
 		else :
 
-			$this->data['page']->title		= $_page->published->title;
-			$this->data['page']->slug		= $_page->published->slug;
-			$this->data['rendered_html']	= $_page->published->rendered_html;
+			$this->output->set_output( $_page->published->rendered_html );
 
 		endif;
-
-		//	And reference the main page object as well, should it be required in the views
-		$this->data['cmspage'] &= $_page;
-
-		// --------------------------------------------------------------------------
-
-		//	Load the views
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'cms/page/render',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
 	}
 
 
