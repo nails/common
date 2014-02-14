@@ -26,7 +26,7 @@ NAILS_Configure = function()
 		//	Make a GET request to the testing environment
 		var _this = this;
 		$.get(
-			SITE_URL + 'system/test/run/json',
+			window.SITE_URL + 'system/test/run/json',
 			{
 				token: this._token,
 				guid: this._guid,
@@ -47,7 +47,7 @@ NAILS_Configure = function()
 		}
 		else
 		{
-			var _url	= SITE_URL + 'system/test/run?token=' + this._token + '&guid=' + this._guid + '&time=' + this._time; 
+			var _url	= window.SITE_URL + 'system/test/run?token=' + this._token + '&guid=' + this._guid + '&time=' + this._time;
 			var _error	= '<strong>Oh no!</strong> Some tests failed. You should probably <a href="' + _url + '">check this out</a>.';
 			$( '.system-alert.testing' ).removeClass( 'notice' ).addClass( 'error' ).html( _error );
 		}

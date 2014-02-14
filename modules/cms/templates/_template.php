@@ -47,20 +47,20 @@ class Nails_CMS_Template
 			if ( is_file( $_icon ) ) :
 
 				$_url = '';
-				if ( preg_match( '#^' . NAILS_PATH . '#', $_icon ) ) :
+				if ( preg_match( '#^' . preg_quote( NAILS_PATH, '#' ) . '#', $_icon ) ) :
 
 					//	Nails asset
-					$_d->img->icon = preg_replace( '#^' . NAILS_PATH . '#', NAILS_URL, $_icon );
+					$_d->img->icon = preg_replace( '#^' . preg_quote( NAILS_PATH, '#' ) . '#', NAILS_URL, $_icon );
 
-				elseif ( preg_match( '#^' . FCPATH . APPPATH . '#', $_icon ) ) :
+				elseif ( preg_match( '#^' . preg_quote( FCPATH . APPPATH, '#' ) . '#', $_icon ) ) :
 
 					if ( page_is_secure() ) :
 
-						$_d->img->icon = preg_replace( '#^' . FCPATH . APPPATH . '#', SECURE_BASE_URL . APPPATH . '', $_icon );
+						$_d->img->icon = preg_replace( '#^' . preg_quote( FCPATH . APPPATH, '#' ) . '#', SECURE_BASE_URL . APPPATH . '', $_icon );
 
 					else :
 
-						$_d->img->icon = preg_replace( '#^' . FCPATH . APPPATH . '#', BASE_URL . APPPATH . '', $_icon );
+						$_d->img->icon = preg_replace( '#^' . preg_quote( FCPATH . APPPATH, '#' ) . '#', BASE_URL . APPPATH . '', $_icon );
 
 					endif;
 
