@@ -118,28 +118,52 @@ class NAILS_Routes_model extends NAILS_Model
 
 		if ( module_is_enabled( 'cms' ) ) :
 
+			$_routes['//BEGIN CMS'] = '';
+
+			// --------------------------------------------------------------------------
+
 			$this->load->model( 'cms/cms_page_model' );
 			$_pages = $this->cms_page_model->get_all();
 
-			$_routes['//BEGIN CMS'] = '';
 			foreach ( $_pages AS $page ) :
 
-				$_published_slug	= $page->published->slug;
-				$_draft_slug		= $page->draft->slug;
+				if ( $page->is_published ) :
 
-				if ( $_published_slug ) :
-
-					$_routes[$_published_slug] = 'cms/render/page/' . $page->id;
-
-				endif;
-
-				if ( $_draft_slug && $_draft_slug != $_published_slug ) :
-
-					$_routes[$_draft_slug] = 'cms/render/page/' . $page->id;
+					$_routes[$page->published->slug] = 'cms/render/page/' . $page->id;
 
 				endif;
 
 			endforeach;
+
+			// --------------------------------------------------------------------------
+
+			/**
+			 *	Make a route for each slug history item, don't overwrite any existing route
+			 *	Doing them second and checking (instead of letting the real pages overwrite
+			 *	the key) in an attempt to optimise, the router takes the first route it comes
+			 *	across so, the logic is that the "current" slug is the one which is getting
+			 *	hit most often, so place it first, if a legacy slug is used (in theory less
+			 *	often) then the router can work a little harder.
+			 **/
+
+			$this->db->select( 'sh.slug,sh.page_id' );
+			$this->db->join( NAILS_DB_PREFIX . 'cms_page p', 'p.id = sh.page_id' );
+			$this->db->where( 'p.is_deleted', FALSE );
+			$this->db->where( 'p.is_published', TRUE );
+			$_slugs = $this->db->get( NAILS_DB_PREFIX . 'cms_page_slug_history sh')->result();
+
+			foreach ( $_slugs AS $route ) :
+
+				if ( ! isset( $_routes[$route->slug] ) ) :
+
+					$_routes[$route->slug] = 'cms/render/legacy_slug/' . $route->page_id;
+
+				endif;
+
+			endforeach;
+
+			// --------------------------------------------------------------------------
+
 			$_routes['//END CMS'] = '';
 
 		endif;

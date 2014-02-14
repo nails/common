@@ -14,12 +14,13 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._saving			= false;
 	this._refreshing		= false;
 	this._autosave			= null;
-	this._autosave_delay	= 45000;
+	this._autosave_delay	= 60000;
+	this._async_save		= true;
 
 	// --------------------------------------------------------------------------
 
 
-	this.init = function( templates, widgets, page_data )
+	this.init = function( templates, widgets, page_id, page_data )
 	{
 		this.templates	= templates;
 		this.widgets	= widgets;
@@ -31,10 +32,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		{
 			this.page_data =
 			{
-				hash : 'NOHASH',
-				data : {
-					id : null
-				},
+				hash : null,
+				id : null,
+				data : {},
 				widget_areas : {}
 			};
 
@@ -53,15 +53,8 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		}
 		else
 		{
-			this.page_data = page_data;
-
-			//	Supplied, use the server version
-			//	Check it has everything it should
-
-			if ( typeof( this.page_data.data.id ) === 'undefined' )
-			{
-				this.page_data.data.id = null;
-			}
+			this.page_data		= page_data;
+			this.page_data.id	= page_id;
 
 			for( _key in this.templates )
 			{
@@ -102,8 +95,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		{
 			if ( _this._needs_saved() !== false )
 			{
-				//	Attempt to save
-				_this._save();
+				return 'You have unsaved changes. Are you sure you want to leave?';
 			}
 		};
 
@@ -128,10 +120,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 			switch( _action )
 			{
-				case 'preview':		_this._main_action_launch_preview();	break;
 				case 'save' :		_this._main_action_save();				break;
 				case 'publish' :	_this._main_action_publish();			break;
-				case 'unpublish' :	_this._main_action_unpublish();			break;
+				case 'preview':		_this._main_action_launch_preview();	break;
 				default :
 
 					console.warn( 'Uncaught main-action.' );
@@ -180,64 +171,13 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._main_action_launch_preview = function()
-	{
-		this._editor.container.addClass( 'loading' );
-		this._preview_open = true;
-
-		// --------------------------------------------------------------------------
-
-		var _this = this;
-		var _success = function( data )
-		{
-			_this._editor.container.removeClass( 'loading' );
-
-			$.fancybox({
-				type:'iframe',
-				href: window.SITE_URL + 'cms/render/preview/' + data.id,
-				width:'90%',
-				height:'90%',
-				afterClose: function()
-				{
-					_this._preview_open = false;
-					_this._enable_main_actions();
-				}
-			});
-		};
-
-		var _error = function( data )
-		{
-			_this._editor.container.removeClass( 'loading' );
-
-			$('<div>').text( data.error ).dialog({
-				title: 'Something went wrong.',
-				resizable: false,
-				draggable: false,
-				modal: true,
-				buttons:
-				{
-					OK: function()
-					{
-						$(this).dialog('close');
-					}
-				}
-			});
-		};
-
-		this._save( false, _success, _error, true );
-	};
-
-
-	// --------------------------------------------------------------------------
-
-
 	this._main_action_save = function()
 	{
 		var _this = this;
 
 		var _success = function( data )
 		{
-			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=saved';
+			_this._redirect( window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=saved' );
 		};
 
 		var _error = function( data )
@@ -274,7 +214,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		var _success = function( data )
 		{
-			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=published';
+			_this._redirect( window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=published' );
 		};
 
 		var _error = function( data )
@@ -304,23 +244,37 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 	// --------------------------------------------------------------------------
 
-
-	this._main_action_unpublish = function()
+	this._main_action_launch_preview = function()
 	{
-		var _this = this;
+		this._editor.container.addClass( 'loading' );
+		this._preview_open = true;
 
+		// --------------------------------------------------------------------------
+
+		var _this = this;
 		var _success = function( data )
 		{
-			window.location.href = window.SITE_URL + 'admin/cms/pages/edit/' + data.id + '?message=unpublished';
+			_this._editor.container.removeClass( 'loading' );
+
+			$.fancybox({
+				type:'iframe',
+				href: window.SITE_URL + 'cms/render/preview/' + data.id,
+				width:'90%',
+				height:'90%',
+				afterClose: function()
+				{
+					_this._preview_open = false;
+					_this._enable_main_actions();
+				}
+			});
 		};
 
 		var _error = function( data )
 		{
-			_this._enable_main_actions();
+			var _data = JSON.parse( data.responseText );
+			_this._editor.container.removeClass( 'loading' );
 
-			// --------------------------------------------------------------------------
-
-			$('<div>').text( data.error ).dialog({
+			$('<div>').text( _data.error ).dialog({
 				title: 'Something went wrong.',
 				resizable: false,
 				draggable: false,
@@ -333,9 +287,12 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					}
 				}
 			});
+
+			_this._preview_open = false;
+			_this._enable_main_actions();
 		};
 
-		_this._save( false, _success, _error, true, false );
+		this._save( false, _success, _error, true );
 	};
 
 
@@ -386,11 +343,15 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			if ( force_save !== true )
 			{
 				console.log( 'Data has changed, old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
-				this.page_data.hash = _hash;
 			}
 			else
 			{
-				console.log( 'Forced save requested. Saving...' );
+				console.log( 'Forced save requested. Saving... old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+			}
+
+			if ( _hash !== false )
+			{
+				this.page_data.hash = _hash;
 			}
 
 			this._saving = true;
@@ -404,14 +365,26 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 			var _this = this;
 
+			var _publish_action;
+
+			if ( is_published === true )
+			{
+				_publish_action = 'PUBLISH';
+			}
+			else
+			{
+				_publish_action = 'NONE';
+			}
+
 			$.ajax(
 			{
 				type: 'POST',
 				url: window.SITE_URL + 'api/cms/pages/save',
+				async: this._async_save,
 				data:
 				{
 					page_data		: JSON.stringify( this.page_data ),
-					is_published	: is_published
+					publish_action	: _publish_action
 				},
 				success: function( data )
 				{
@@ -421,7 +394,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					if ( data.status === 200 )
 					{
 						//	Set the page ID
-						_this.page_data.data.id = data.id;
+						_this.page_data.id = data.id;
 
 						//	Reset the hash
 						_this.page_data.hash = _this._generate_data_hash();
@@ -496,10 +469,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 	this._needs_saved = function()
 	{
-		this._refresh_page_data();
-
-		// --------------------------------------------------------------------------
-
 		//	Generate the hash of the data
 		var _hash = this._generate_data_hash();
 
@@ -523,12 +492,23 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		this._refreshing = true;
 
 		//	Main data object
-		this.page_data.data.title			= $( 'input[name=title]' ).val();
+		this.page_data.data.title			= $( '<div />' ).text( $( 'input[name=title]' ).val() ).html();
 		this.page_data.data.is_published	= $( 'input[name=is_published]' ).val();
-		this.page_data.data.parent_id		= $( 'select[name=parent_id]' ).val();
+
+		var _parent_id = $( 'select[name=parent_id]' );
+
+		if ( _parent_id.length === 1 )
+		{
+			this.page_data.data.parent_id		= _parent_id.val();
+		}
+		else
+		{
+			this.page_data.data.parent_id		= $( 'input[name=parent_id]' ).val();
+		}
+
 		this.page_data.data.seo_description	= $( 'input[name=seo_description]' ).val();
 		this.page_data.data.seo_keywords	= $( 'input[name=seo_keywords]' ).val();
-		this.page_data.data.template		= $( 'input[name=template]' ).val();
+		this.page_data.data.template		= $( 'input[name=template]:checked' ).val();
 
 		// --------------------------------------------------------------------------
 
@@ -569,17 +549,16 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 	this._generate_data_hash = function()
 	{
-		//	Clone the data so we can set an empty hash; doing this so that the
-		//	actual hash doesn't affect the hash, mmkay?
-
-		var _data	= $.extend({},this.page_data);
-		_data.hash	= '';
+		this._refresh_page_data();
+		// --------------------------------------------------------------------------
 
 		//	Convert to a string then pass through MD5
-		var _string	= JSON.stringify( _data );
-		var _hash	= this.md5( _string );
+		var _carrots = { data:{}, widget_areas:{} };
 
-		return _hash;
+		$.extend( _carrots.data,			this.page_data.data );
+		$.extend( _carrots.widget_areas,	this.page_data.widget_areas );
+
+		return this.md5( JSON.stringify( _carrots ) );
 	};
 
 
@@ -1327,6 +1306,15 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		return false;
 	};
 
+
+	// --------------------------------------------------------------------------
+
+
+	this._redirect = function( url )
+	{
+		window.onbeforeunload	= null;
+		window.location.href	= url;
+	};
 
 
 	// --------------------------------------------------------------------------

@@ -249,38 +249,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->data['page']->title	= 'Create New Page';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates();
-		$this->data['widgets']		= $this->cms_page->get_available_widgets();
-
-		// --------------------------------------------------------------------------
-
-		//	Load any widget assets
-		foreach( $this->data['widgets'] AS $grouping ) :
-
-			if ( ! empty( $grouping->widgets ) && is_array( $grouping->widgets  ) ) :
-
-				foreach( $grouping->widgets AS $w ) :
-
-					foreach ( $w->assets AS $asset ) :
-
-						if ( is_array( $asset ) ) :
-
-							$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
-							$this->asset->load( $asset[0], $_is_nails );
-
-						elseif ( is_string( $asset ) ) :
-
-							$this->asset->load( $asset );
-
-						endif;
-
-					endforeach;
-
-				endforeach;
-
-			endif;
-
-		endforeach;
+		$this->data['templates']	= $this->cms_page->get_available_templates( TRUE );
+		$this->data['widgets']		= $this->cms_page->get_available_widgets( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -336,8 +306,11 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->draft->title . '"';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates();
-		$this->data['widgets']		= $this->cms_page->get_available_widgets();
+		$this->data['templates']	= $this->cms_page->get_available_templates( TRUE );
+		$this->data['widgets']		= $this->cms_page->get_available_widgets( TRUE );
+
+		//	Get children of this page
+		$this->data['page_children'] = $this->cms_page->get_ids_of_children( $this->data['cmspage']->id );
 
 		// --------------------------------------------------------------------------
 

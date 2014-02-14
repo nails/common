@@ -39,26 +39,18 @@
 
 				foreach ( $pages AS $page ) :
 
-					$_data = ! empty( $page->published->hash ) ? $page->published : $page->draft;
+					$_data = $page->draft;
 
 					// --------------------------------------------------------------------------
 
 					echo '<tr class="page">';
-						echo '<td class="title indentosaurus indent-' . $_data->depth . '">';
+						echo '<td class="title indentosaurus indent-' . $page->draft->depth . '">';
 
-							echo str_repeat( '<div class="indentor"></div>', $_data->depth );
+							echo str_repeat( '<div class="indentor"></div>', $page->draft->depth );
 
 							echo '<div class="indentor-content">';
 
-								if ( $_data->title ) :
-
-									echo $_data->title;
-
-								else :
-
-									echo ! empty( $page->draft->title ) ? $page->draft->title : '<em style="color:#777;">Untitled</em>';
-
-								endif;
+								echo $page->draft->title;
 
 								//	A little feedback on the status of the page:
 								//	- If it's in draft state then simply show it's in draft
@@ -71,17 +63,17 @@
 
 									if ( $_published_hash !== $_draft_hash ) :
 
-										echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This post is published and visible on site but changes have been made which have not been published.">(Unpublished Changes)</strong>' );
+										echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This page is visible on site but changes have been made which have not been published.">(Unpublished Changes)</strong>' );
 
 									endif;
 
 								else :
 
-									echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This post is a draft and is not available to your site\'s visitors.">(Draft)</strong>' );
+									echo anchor( 'admin/cms/pages/edit/' . $page->id, ' <strong rel="tipsy" title="This page has not been published. It is not available to your site\'s visitors.">(Unpublished)</strong>' );
 
 								endif;
 
-								$_title_nested = explode( '|', $_data->title_nested );
+								$_title_nested = explode( '|', $page->draft->title_nested );
 								array_pop( $_title_nested );
 
 								echo '<small>';

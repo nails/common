@@ -1088,9 +1088,13 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param string $label The label from which to generate a slug
 	 * @param string $prefix Any prefix to add to the slug
 	 * @param string $suffix Any suffix to add to the slug
+	 * @param string $table The table to use defaults to $this->_table
+	 * @param string $column The column to use, defaults to $this->_table_slug_column
+	 * @param int $ignore_id An Id to ignore when searching
+	 * @param string $id_column The column to use for the ID, defaults to $this->_table_id_column
 	 * @return string
 	 **/
-	protected function _generate_slug( $label, $prefix = '', $suffix = '', $table = NULL, $column = NULL )
+	protected function _generate_slug( $label, $prefix = '', $suffix = '', $table = NULL, $column = NULL, $ignore_id = NULL, $id_column = NULL )
 	{
 		//	Perform this check here so the error message is more easily traced.
 		if ( NULL === $table ) :
@@ -1140,6 +1144,13 @@ class CORE_NAILS_Model extends CI_Model
 			else :
 
 				$_slug_test = $prefix . $_slug . $suffix;
+
+			endif;
+
+			if ( $ignore_id ) :
+
+				$_id_column = $id_column ? $id_column : $this->_table_id_column;
+				$this->db->where( $_id_column . ' !=', $ignore_id );
 
 			endif;
 

@@ -8,7 +8,15 @@ class NAILS_CMS_Widget
 
 	// --------------------------------------------------------------------------
 
-
+	/**
+	 * Defines the base widget details object
+	 *
+	 * Widgets should extend this object and customise to their own needs
+	 *
+	 * @param none
+	 * @return stdClass
+	 *
+	 **/
 	static function details()
 	{
 		$_d					= new stdClass();
@@ -44,12 +52,6 @@ class NAILS_CMS_Widget
 		//	Define any assets need to be loaded by the widget
 		$_d->assets = array();
 
-		//	Define the views to use for the widget, defaults to 'cms/page/widgets/' . widget_slug . '_[editor/slug]'
-
-		$_d->views			= new stdClass();
-		$_d->views->editor	= '';
-		$_d->views->render	= '';
-
 		//	Path
 		$_d->path = dirname( $_reflect->getFileName() ) . '/';
 
@@ -79,9 +81,19 @@ class NAILS_CMS_Widget
 		return $_d;
 	}
 
+
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Widget constructor
+	 *
+	 * Sets the widgets details as a class variable
+	 *
+	 * @param none
+	 * @return void
+	 *
+	 **/
 	public function __construct()
 	{
 		$this->_details = $this::details();
@@ -91,24 +103,24 @@ class NAILS_CMS_Widget
 	// --------------------------------------------------------------------------
 
 
-	public function setup( $_data = NULL )
+	/**
+	 * Renders the HTML for the editor view
+	 *
+	 * Returns the HTML for the editor view. Any passed data will be used to
+	 * populate the values of the form elements.
+	 *
+	 * @param stdClass $_wgt_data A normal widget_data object, prefixed to avoid naming collisions
+	 * @return string
+	 *
+	 **/
+	public function get_editor( $_wgt_data = array() )
 	{
-		$this->_data = $_data;
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_editor( $data = array() )
-	{
-		$_view = $this->_details->views->editor ? $this->_details->views->editor : 'cms/page/widgets/' . $this->_details->slug . '/views/editor';
-
 		if ( is_file( $this->_details->path . 'views/editor.php' ) ) :
 
 			//	Extract the variables, so that the view can use them
-			if ( $data ) :
+			if ( $_wgt_data ) :
 
-				extract( $data );
+				extract( $_wgt_data );
 
 			endif;
 
@@ -133,9 +145,42 @@ class NAILS_CMS_Widget
 	// --------------------------------------------------------------------------
 
 
-	public function render( $data = array() )
+	/**
+	 * Renders the HTML for a widget
+	 *
+	 * Called by the template, this method renders the widget's HTML using the
+	 * passed data.
+	 *
+	 * @param stdClass $_wgt_data A normal widget_data object, prefixed to avoid naming collisions
+	 * @return string
+	 *
+	 **/
+	public function render( $_wgt_data = array() )
 	{
+		if ( is_file( $this->_details->path . 'views/render.php' ) ) :
 
+			//	Extract the variables, so that the view can use them
+			if ( $_wgt_data ) :
+
+				extract( $_wgt_data );
+
+			endif;
+
+			//	Start the buffer, basically copying how CI does it's view loading
+			ob_start();
+
+			include $this->_details->path . 'views/render.php';
+
+			//	Flush buffer
+			$_buffer = ob_get_contents();
+			@ob_end_clean();
+
+			//	Return the HTML
+			return $_buffer;
+
+		endif;
+
+		return '';
 	}
 }
 

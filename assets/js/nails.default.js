@@ -125,12 +125,12 @@ NAILS_JS = function()
 	{
 		if ( $.fn.tipsy )
 		{
-			$( '*[rel=tipsy]' ).tipsy();
-			$( '*[rel=tipsy-html]' ).tipsy({html:true});
-			$( '*[rel=tipsy-right]' ).tipsy( { gravity: 'w' } );
-			$( '*[rel=tipsy-left]' ).tipsy( { gravity: 'e' } );
-			$( '*[rel=tipsy-top]' ).tipsy( { gravity: 's' } );
-			$( '*[rel=tipsy-bottom]' ).tipsy( { gravity: 'n' } );
+			$( '*[rel=tipsy]' ).tipsy({ opacity : 0.85 });
+			$( '*[rel=tipsy-html]' ).tipsy({ opacity : 0.85, html: true });
+			$( '*[rel=tipsy-right]' ).tipsy({ opacity : 0.85, gravity: 'w' });
+			$( '*[rel=tipsy-left]' ).tipsy({ opacity : 0.85, gravity: 'e' });
+			$( '*[rel=tipsy-top]' ).tipsy({ opacity : 0.85, gravity: 's' });
+			$( '*[rel=tipsy-bottom]' ).tipsy({ opacity : 0.85, gravity: 'n' });
 		}
 		else
 		{

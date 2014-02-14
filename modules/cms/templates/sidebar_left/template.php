@@ -5,7 +5,7 @@ class Nails_CMS_Template_sidebar_left extends Nails_CMS_Template
 	static function details()
 	{
 		//	Base object
-		$_d = parent::_details_template();
+		$_d = parent::_details();
 
 		//	Basic details; describe the template for the user
 		$_d->label			= 'Sidebar Left';

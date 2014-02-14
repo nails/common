@@ -47,6 +47,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->_table				= NAILS_DB_PREFIX . 'cms_page';
 		$this->_table_prefix		= 'p';
 
+		$this->_destructive_delete	= FALSE;
+
 		// --------------------------------------------------------------------------
 
 		//	Load the generic template & widget
@@ -58,94 +60,41 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function create( $data, $return_obj = FALSE )
+	public function create( $data, &$view_data )
 	{
-		$_data = new stdClass();
+		//	Some basic sanity testing
+		//	Check the data
+		if ( empty( $data->data->template ) ) :
 
-		if ( isset( $data->title ) ) :
-
-			$_data->title = strip_tags( $data->title );
-
-		else :
-
-			$this->_set_error( 'Title is required.' );
+			$this->_set_error( '"data.template" is a required field.' );
 			return FALSE;
-
-		endif;
-
-		if ( isset( $data->parent_id ) ) :
-
-			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
-
-			//	Work out the slug, prefix it with nested parents
-			$_parent = $this->get_by_id( $_data->parent_id );
-
-			if ( $_data->parent_id && ! $_parent ) :
-
-				$this->_set_error( 'Invalid Parent ID.' );
-				return FALSE;
-
-			endif;
-
-			if ( $_data->parent_id ) :
-
-				$_data->slug			= $this->_generate_slug( $data->title, $_parent->slug . '/' );
-
-				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
-				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
-				$_data->title_nested	= $_parent->title_nested . '|' . $_data->title;
-
-			else :
-
-				//	No parent, slug is just the title
-				$_data->slug			= $this->_generate_slug( $data->title );
-				$_data->slug_end		= $_data->slug;
-				$_data->title_nested	= $_data->title;
-
-			endif;
-
-		else :
-
-			//	No parent, slug is just the title
-			$_data->slug			= $this->_generate_slug( $data->title );
-			$_data->title_nested	= $_data->title;
-
-		endif;
-
-		if ( isset( $data->seo_description ) ) :
-
-			$_data->seo_description = strip_tags( $data->seo_description );
-
-		endif;
-
-		if ( isset( $data->seo_keywords ) ) :
-
-			$_data->seo_keywords = strip_tags( $data->seo_keywords );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$_return = parent::create( $_data, $return_obj );
+		$this->db->trans_begin();
 
-		if ( $_return ) :
+		//	Create a new blank row to work with
+		$_id = parent::create();
 
-			//	Rewrite the routes file
-			$this->load->model( 'system/routes_model' );
-			if ( $this->routes_model->update( 'cms' ) ) :
+		if ( ! $_id ) :
 
-				return $_return;
+			$this->_set_error( 'Unable to create base page object.' );
+			$this->db->trans_rollback();
+			return FALSE;
 
-			else :
+		endif;
 
-				$_id = $return_obj ? $_return->id : $_return;
-				$this->destroy( $_id );
-				return FALSE;
+		//	Try and update it depending on how the update went, commit & update or rollback
+		if ( $this->update( $_id, $data, $view_data ) ) :
 
-			endif;
+			$this->db->trans_commit();
+			return $_id;
 
 		else :
 
+			$this->db->trans_rollback();
 			return FALSE;
 
 		endif;
@@ -155,42 +104,244 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function update( $page_id, $data )
+	public function update( $page_id, $data, &$view_data = array() )
 	{
-		//	Firstly, remove and remember the widgets, if any.
-		$_areas = array( 'hero', 'body', 'sidebar' );
+		//	Check the data
+		if ( empty( $data->data->template ) ) :
 
-		foreach ( $_areas AS $area ) :
+			$this->_set_error( '"data.template" is a required field.' );
+			return FALSE;
 
-			if ( isset( $data->{'widgets_' . $area} ) ) :
+		endif;
 
-				${'_widgets_' . $area} = $data->{'widgets_' . $area};
-				unset( $data->{'widgets_' . $area} );
+		// --------------------------------------------------------------------------
 
-			endif;
+		//	Fetch the current version of this page, for reference.
+		$_current = $this->get_by_id( $page_id );
 
-		endforeach;
+		if ( ! $_current ) :
 
-		//	Next, check the slug is unique, encode it to be safe
-		if ( isset( $data->slug ) ) :
+			$this->_set_error( 'Invalid Page ID' );
+			return FALSE;
 
-			$data->slug = explode( '/', trim( $data->slug ) );
-			foreach ( $data->slug AS &$value ) :
+		endif;
 
-				$value = url_title( $value, 'dash', TRUE );
+		// --------------------------------------------------------------------------
 
-			endforeach;
-			$data->slug = implode( '/', $data->slug );
+		//	Clone the data object so we can mutate it without worry. Unset id and
+		//	hash as we don't need to store them
 
-			$this->db->where( 'id !=', $page_id );
-			$this->db->where( 'slug', $data->slug );
 
-			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'cms_page' ) ) :
+		$_clone =clone $data;
+		unset( $_clone->id );
+		unset( $_clone->hash );
 
-				$this->_set_error( 'Slug must be unique.' );
+		// --------------------------------------------------------------------------
+
+		//	Start the transaction
+		$this->db->trans_begin();
+
+		// --------------------------------------------------------------------------
+
+		//	Start prepping the data which doesn't require much thinking
+		$_data = new stdClass();
+
+		$_data->draft_parent_id			= ! empty( $_clone->data->parent_id )		? (int) $_clone->data->parent_id			: NULL;
+		$_data->draft_title				= ! empty( $_clone->data->title )			? trim( $_clone->data->title )				: 'Untitled';
+		$_data->draft_seo_description	= ! empty( $_clone->data->seo_description )	? trim( $_clone->data->seo_description )	: '';
+		$_data->draft_seo_keywords		= ! empty( $_clone->data->seo_keywords )	? trim( $_clone->data->seo_keywords )		: '';
+
+		$_data->draft_template			= $_clone->data->template;
+
+		$_data->draft_template_data		= json_encode( $_clone, JSON_UNESCAPED_SLASHES );
+		$_data->draft_hash				= md5( $_data->draft_template_data );
+
+		// --------------------------------------------------------------------------
+
+		//	Additional sanitising; encode HTML entities. Also encode the pipe character
+		//	in the title, so that it doesn't break our explode
+
+		$_data->draft_title				= htmlentities( str_replace( '|', '&#124;', $_data->draft_title ), ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
+		$_data->draft_seo_description	= htmlentities( $_data->draft_seo_description, ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
+		$_data->draft_seo_keywords		= htmlentities( $_data->draft_seo_keywords, ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	Prep data which requires a little more intensive processing
+
+		// --------------------------------------------------------------------------
+
+		//	Work out the slug
+		if ( $_data->draft_parent_id ) :
+
+			//	There is a parent, so set it's slug as the prefix
+			$_parent = $this->get_by_id( $_data->draft_parent_id );
+
+			if ( ! $_parent ) :
+
+				$this->_set_error( 'Invalid Parent ID.' );
+				$this->db->trans_rollback();
 				return FALSE;
 
 			endif;
+
+			$_prefix = $_parent->draft->slug . '/';
+
+		else :
+
+			//	No parent, no need for a prefix
+			$_prefix = '';
+
+		endif;
+
+		$_data->draft_slug		= $this->_generate_slug( $_data->draft_title, $_prefix, '', NULL, 'draft_slug', $_current->id );
+		$_data->draft_slug_end	= end( explode('/', $_data->draft_slug ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Work out the nested title
+		if ( $_data->draft_parent_id ) :
+
+			//	No need to fetch the parent again, encode it tho as it will have been decoded
+			$_prefix = $_parent->draft->title_nested . '|';
+
+		else :
+
+			//	No parent, no need for a prefix
+			$_prefix = '';
+
+		endif;
+
+		$_data->draft_title_nested = $_prefix . $_data->draft_title;
+
+		// --------------------------------------------------------------------------
+
+		//	Render the template
+		$_tpl_data	= ! empty( $data->widget_areas->{$_data->draft_template} ) ? $data->widget_areas->{$_data->draft_template} : array();
+		$_rendered	= $this->render_template( $_data->draft_template, $_tpl_data, $view_data );
+
+		if ( $_rendered !== FALSE ) :
+
+			$_data->draft_rendered_html = $_rendered;
+
+		else :
+
+			$this->db->trans_rollback();
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( parent::update( $_current->id, $_data ) ) :
+
+			//	Update was successful, if either the slug or the title has changed
+			//	then we need to update all the children.
+
+			if ( $_current->draft->slug != $_data->draft_slug || $_current->draft->title_nested != $_data->draft_title_nested ) :
+
+				//	Fetch the children, returning the data we need for the updates
+				$_children = $this->get_ids_of_children( $_current->id, 'ID_SLUG_TITLE' );
+
+				if ( $_children ) :
+
+					//	Loop each child and update it's details
+					foreach( $_children AS $child ) :
+
+						//	Need to be a bit clever with the slugs & titles, we need to first remove
+						//	the *old* portion of the slug/title so we can append what's left to the
+						//	new slug/title.
+
+						$child['slug']	= preg_replace( '#^' . $_current->draft->slug . '/#', '', $child['slug'] );
+						$child['title']	= preg_replace( '#^' . str_replace( '#', '\#', $_current->draft->title ) . '/#', '', $child['title'] );
+
+						$this->db->set( 'draft_slug', $_data->draft_slug . '/' . $child['slug'] );
+						$this->db->set( 'draft_title_nested', $_data->draft_title_nested . '|' . $child['title'] );
+						$this->db->where( 'id', $child['id'] );
+
+						if ( ! $this->db->update( NAILS_DB_PREFIX . 'cms_page' ) ) :
+
+							$this->_set_error( 'Failed to update a child page\'s data.' );
+							$this->db->trans_rollback();
+							return FALSE;
+
+						endif;
+
+					endforeach;
+
+				endif;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Finish up.
+			$this->db->trans_commit();
+			return TRUE;
+
+		else :
+
+		 	$this->_set_error( 'Failed to update page object.' );
+			$this->db->trans_rollback();
+		 	return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function render_template( $template, $data = array(), &$view_data = array() )
+	{
+		$_template = $this->get_template( $template );
+
+		if ( ! $_template ) :
+
+			$this->_set_error( '"' . $_data->draft_template .'" is not a valid template.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Attempt to instantiate and render the template
+		try
+		{
+			require_once $_template->path . 'template.php';
+
+			$TEMPLATE = new $_template->iam();
+
+			try
+			{
+				return $TEMPLATE->render( (array) $data, $view_data );
+			}
+			catch( Exception $e )
+			{
+				$this->_set_error( 'Could not render template "' . $template . '".' );
+				return FALSE;
+			}
+		}
+		catch( Exception $e )
+		{
+			$this->_set_error( 'Could not instantiate template "' . $template . '".' );
+			return FALSE;
+		}
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function publish( $id )
+	{
+		//	Check the page is valid
+		$_page = $this->get_by_id( $id );
+
+		if ( ! $_page ) :
+
+			$this->_set_message( 'Invalid Page ID' );
+			return FALSE;
 
 		endif;
 
@@ -198,167 +349,126 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		//	Start the transaction
 		$this->db->trans_begin();
-		$_rollback = FALSE;
 
-		//	Turn off DB Errors
-		$_previous = $this->db->db_debug;
-		$this->db->db_debug = FALSE;
+		// --------------------------------------------------------------------------
 
-		//	Update the page's meta data if needed
-		$this->db->set( $data );
-		$this->db->set( 'modified', 'NOW()', FALSE );
+		//	If the slug has changed add an entry to the slug history page
+		$_slug_history = array();
+		if ( $_page->published->slug && $_page->published->slug != $_page->draft->slug ) :
 
-		if ( active_user( 'id' ) ) :
-
-			$this->db->set( 'modified_by', active_user( 'id' ) );
+			$_slug_history[] = array(
+				'slug'		=> $_page->published->slug,
+				'page_id'	=> $id
+			);
 
 		endif;
 
-		$this->db->where( 'id', $page_id );
+		// --------------------------------------------------------------------------
 
-		if ( $this->db->update( NAILS_DB_PREFIX . 'cms_page' ) ) :
+		//	Update the published_* columns to be the same as the draft columns
+		$this->db->set( 'published_hash',				'draft_hash',				FALSE );
+		$this->db->set( 'published_parent_id',			'draft_parent_id',			FALSE );
+		$this->db->set( 'published_slug',				'draft_slug',				FALSE );
+		$this->db->set( 'published_slug_end',			'draft_slug_end',			FALSE );
+		$this->db->set( 'published_template',			'draft_template',			FALSE );
+		$this->db->set( 'published_template_data',		'draft_template_data',		FALSE );
+		$this->db->set( 'published_rendered_html',		'draft_rendered_html',		FALSE );
+		$this->db->set( 'published_title',				'draft_title',				FALSE );
+		$this->db->set( 'published_title_nested',		'draft_title_nested',		FALSE );
+		$this->db->set( 'published_seo_description',	'draft_seo_description',	FALSE );
+		$this->db->set( 'published_seo_keywords',		'draft_seo_keywords',		FALSE );
 
-			//	Are there any widgets which need updating? If not then we're done
-			foreach ( $_areas AS $area ) :
+		$this->db->set( 'is_published',	TRUE );
+		$this->db->set( 'modified',		date('Y-m-d H:i:s') );
 
-				if ( isset( ${'_widgets_' . $area} ) && is_array( ${'_widgets_' . $area} ) ) :
+		if ( $this->user->is_logged_in() ) :
 
-					//	Loop through the $_widgets array, update any `old-` widgets, add `new-` widgets,
-					//	remove widgets which aren't provided and then save the order.
+			$this->db->set( 'modified_by',	active_user( 'id' ) );
 
-					$_order				= 0;
-					$_processed_widgets	= array();
+		endif;
 
-					foreach ( ${'_widgets_' . $area} AS $key => $widget ) :
+		$this->db->where( 'id', $_page->id );
 
-						//	Prepare and set data
-						$_type = $widget['slug'];
-						unset($widget['slug']);
+		if ( $this->db->update( $this->_table ) ) :
 
-						$this->db->set( 'order', $_order );
-						$this->db->set( 'widget_data', serialize( $widget ) );
-						$this->db->set( 'modified', 'NOW()', FALSE );
+			//	Fetch the children, returning the data we need for the updates
+			$_children = $this->get_ids_of_children( $_page->id, 'ID_SLUG_TITLE_PUBLISHED' );
 
-						if ( active_user( 'id' ) ) :
+			if ( $_children ) :
 
-							$this->db->set( 'modified_by', active_user( 'id' ) );
+				//	Loop each child and update it's details
+				foreach( $_children AS $child ) :
 
-						endif;
+					//	Need to be a bit clever with the slugs & titles, we need to first remove
+					//	the *old* portion of the slug/title so we can append what's left to the
+					//	new slug/title.
 
-						// --------------------------------------------------------------------------
+					//	First make a note of the old slug
+					if ( $child['is_published'] ) :
 
-						//	Old or new?
-						$key = explode( '-', $key );
-
-						if ( $key[0] == 'old' ) :
-
-							//	Old widget, update
-							$this->db->where( 'id', $key[1] );
-
-							if ( $this->db->update( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
-
-								$_processed_widgets[] = $key[1];
-
-							else :
-
-								$_rollback = TRUE;
-								$this->_set_error( 'Unable to update widget ID:' . $key[1] );
-								break;
-
-							endif;
-
-						elseif ( $key[0] == 'new' ) :
-
-							//	New widget, insert
-							$this->db->set( 'page_id', $page_id );
-							$this->db->set( 'widget_class', $_type );
-							$this->db->set( 'widget_area', $area );
-							$this->db->set( 'created', 'NOW()', FALSE );
-
-							if ( active_user( 'id' ) ) :
-
-								$this->db->set( 'created_by', active_user( 'id' ) );
-
-							endif;
-
-							if ( $this->db->insert( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
-
-								$_processed_widgets[] = $this->db->insert_id();
-
-							else :
-
-								$_rollback = TRUE;
-								$this->_set_error( 'Unable to create widget TYPE:' . $_type );
-								break;
-
-							endif;
-
-						else :
-
-							//	Que?
-							$this->_set_error( 'An unknown error occurred while processing widgets.' );
-							$_rollback = TRUE;
-							break;
-
-						endif;
-
-						$_order++;
-
-					endforeach;
-
-					// --------------------------------------------------------------------------
-
-					//	Remove old widgets (i.e widgets which were not processed)
-					$this->db->where( 'page_id', $page_id );
-					$this->db->where( 'widget_area', $area );
-					$this->db->where_not_in( 'id', $_processed_widgets );
-					if ( ! $this->db->delete( NAILS_DB_PREFIX . 'cms_page_widget' ) ) :
-
-						$this->_set_error( 'Unable to remove old widgets.' );
-						$_rollback = TRUE;
-						break;
+						$_slug_history[] = array(
+							'slug'		=> $child['slug'],
+							'page_id'	=> $child['id']
+						);
 
 					endif;
 
-				endif;
+					$child['slug']	= preg_replace( '#^' . $_page->draft->slug . '/#', '', $child['slug'] );
+					$child['title']	= preg_replace( '#^' . str_replace( '#', '\#', $_page->draft->title ) . '/#', '', $child['title'] );
+
+					$_slug	= $_page->draft->slug . '/' . $child['slug'];
+					$_title	= $_page->draft->title_nested . '|' . $child['title'];
+
+					$this->db->set( 'draft_slug', $_slug );
+					$this->db->set( 'draft_title_nested', $_title );
+
+					if ( $child['is_published'] ) :
+
+						$this->db->set( 'published_slug', $_slug );
+						$this->db->set( 'published_title_nested', $_title );
+
+					endif;
+
+					$this->db->where( 'id', $child['id'] );
+
+					if ( ! $this->db->update( NAILS_DB_PREFIX . 'cms_page' ) ) :
+
+						$this->_set_error( 'Failed to update a child page\'s data.' );
+						$this->db->trans_rollback();
+						return FALSE;
+
+					endif;
+
+				endforeach;
+
+			endif;
+
+			//	Add any slug_history thingmys
+			foreach ( $_slug_history AS $item ) :
+
+				$this->db->set( 'hash', md5( $item['slug'] . $item['page_id'] ) );
+				$this->db->set( 'slug', $item['slug'] );
+				$this->db->set( 'page_id', $item['page_id'] );
+				$this->db->set( 'created', 'NOW()', FALSE );
+				$this->db->replace( NAILS_DB_PREFIX . 'cms_page_slug_history' );
 
 			endforeach;
 
 			// --------------------------------------------------------------------------
 
-			//	Update the routes file
+			//	Rewrite routes
 			$this->load->model( 'system/routes_model' );
-			if ( $this->db->trans_status() !== FALSE && ! $_rollback && $this->routes_model->update( 'cms' ) ) :
+			$this->routes_model->update( 'cms' );
 
-				//	Commit changes
-				$this->db->trans_commit();
+			$this->db->trans_commit();
 
-				//	Put DB errors back as they were
-				$this->db->db_debug = $_previous;
+			//	TODO: Kill caches for this page and all children
 
-				return TRUE;
-
-			else :
-
-				//	Rollback changes
-				$this->db->trans_rollback();
-
-				//	Put DB errors back as they were
-				$this->db->db_debug = $_previous;
-
-				return FALSE;
-
-			endif;
+			return TRUE;
 
 		else :
 
-			//	Rollback changes
-			$this->_set_error( 'Could not update page.' );
 			$this->db->trans_rollback();
-
-			//	Put DB errors back as they were
-			$this->db->db_debug = $_previous;
-
 			return FALSE;
 
 		endif;
@@ -376,7 +486,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ' . $this->_table_prefix . '.modified_by', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
-		$this->db->order_by( $this->_table_prefix . '.published_slug' );
 		$this->db->order_by( $this->_table_prefix . '.draft_slug' );
 	}
 
@@ -493,17 +602,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 			if ( isset( $_parent ) && $_parent ) :
 
 				//	Parent was found, does it have any parents?
-				if ( $_parent->parent_id ) :
+				if ( $_parent->draft->parent_id ) :
 
 					//	Yes it does, repeat!
-					$_return = $this->_find_parents( $_parent->parent_id, $source, $separator );
+					$_return = $this->_find_parents( $_parent->draft->parent_id, $source, $separator );
 
-					return $_return ? $_return . $_parent->title . $separator : $_parent->title;
+					return $_return ? $_return . $_parent->draft->title . $separator : $_parent->draft->title;
 
 				else :
 
 					//	Nope, end of the line mademoiselle
-					return $_parent->title . $separator;
+					return $_parent->draft->title . $separator;
 
 				endif;
 
@@ -514,6 +623,44 @@ class NAILS_Cms_page_model extends NAILS_Model
 				return '';
 
 			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_ids_of_children( $page_id, $format = 'ID' )
+	{
+		$_out = array();
+
+		$this->db->select('id,draft_slug,draft_title,is_published');
+		$this->db->where( 'draft_parent_id', $page_id );
+		$_children = $this->db->get( NAILS_DB_PREFIX . 'cms_page' )->result();
+
+		if ( $_children ) :
+
+			foreach ( $_children AS $child ) :
+
+				switch( $format ) :
+
+					case 'ID'						: $_out[] = $child->id;	break;
+					case 'ID_SLUG'					: $_out[] = array( 'id' => $child->id, 'slug' => $child->draft_slug );	break;
+					case 'ID_SLUG_TITLE'			: $_out[] = array( 'id' => $child->id, 'slug' => $child->draft_slug, 'title' => $child->draft_title );	break;
+					case 'ID_SLUG_TITLE_PUBLISHED'	: $_out[] = array( 'id' => $child->id, 'slug' => $child->draft_slug, 'title' => $child->draft_title, 'is_published' => (bool) $child->is_published );	break;
+
+				endswitch;
+
+				$_out	= array_merge( $_out, $this->get_ids_of_children( $child->id, $format ) );
+
+			endforeach;
+
+			return $_out;
+
+		else :
+
+			return $_out;
 
 		endif;
 	}
@@ -570,7 +717,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		endforeach;
 
-
 		//	Other data
 		$page->published->depth		= count( explode( '/', $page->published->slug ) ) - 1;
 		$page->published->url		= site_url( $page->published->slug );
@@ -580,6 +726,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	Decode JSON
 		$page->published->template_data	= json_decode( $page->published->template_data );
 		$page->draft->template_data		= json_decode( $page->draft->template_data );
+
+		//	Replace titles
 
 		// --------------------------------------------------------------------------
 
@@ -605,7 +753,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_available_widgets()
+	public function get_available_widgets( $load_assets = FALSE )
 	{
 		//	Have we done this already? Don't do it again.
 		$_key	= 'cms-page-available-widgets';
@@ -757,6 +905,28 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			endif;
 
+			// --------------------------------------------------------------------------
+
+			//	Load the widget's assets if requested
+			if ( $load_assets ) :
+
+				foreach ( $w->assets AS $asset ) :
+
+					if ( is_array( $asset ) ) :
+
+						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+						$this->asset->load( $asset[0], $_is_nails );
+
+					elseif ( is_string( $asset ) ) :
+
+						$this->asset->load( $asset );
+
+					endif;
+
+				endforeach;
+
+			endif;
+
 		endforeach;
 
 		//	Sort non-generic widgets into alphabetical order
@@ -770,6 +940,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 		usort( $_generic_widgets[md5( $_generic_widget_grouping )]->widgets, array( $this, '_sort_widgets' ) );
 
 		//	Sort the non-generic groupings
+		//	TODO: Future Pabs, explain in comment why you're not using the _sort_widgets method. I'm sure
+		//	there's a valid reason you handsome chap, you.
+
 		usort( $_out, function( $a, $b ) use ( $_generic_widget_grouping )
 		{
 			//	Equal?
@@ -849,7 +1022,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_available_templates()
+	public function get_available_templates( $load_assets = FALSE )
 	{
 		//	Have we done this already? Don't do it again.
 		$_key	= 'cms-page-available-templates';
@@ -931,6 +1104,28 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			endif;
 
+			// --------------------------------------------------------------------------
+
+			//	Load the template's assets if requested
+			if ( $load_assets ) :
+
+				foreach ( $_templates[$template]->assets AS $asset ) :
+
+					if ( is_array( $asset ) ) :
+
+						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+						$this->asset->load( $asset[0], $_is_nails );
+
+					elseif ( is_string( $asset ) ) :
+
+						$this->asset->load( $asset );
+
+					endif;
+
+				endforeach;
+
+			endif;
+
 		endforeach;
 
 		//	Now test app templates
@@ -959,6 +1154,28 @@ class NAILS_Cms_page_model extends NAILS_Model
 			endif;
 
 			$_templates[$template] = $_class::details();
+
+			// --------------------------------------------------------------------------
+
+			//	Load the template's assets if requested
+			if ( $load_assets ) :
+
+				foreach ( $_templates[$template]->assets AS $asset ) :
+
+					if ( is_array( $asset ) ) :
+
+						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+						$this->asset->load( $asset[0], $_is_nails );
+
+					elseif ( is_string( $asset ) ) :
+
+						$this->asset->load( $asset );
+
+					endif;
+
+				endforeach;
+
+			endif;
 
 		endforeach;
 
@@ -989,7 +1206,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			if ( $slug == $template->slug ) :
 
-				return $widget;
+				return $template;
 
 			endif;
 

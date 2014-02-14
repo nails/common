@@ -79,7 +79,7 @@
 			$_field['key']			= 'title';
 			$_field['label']		= 'Title';
 			$_field['required']		= TRUE;
-			$_field['default']		= isset( $cmspage->draft->title ) ? $cmspage->draft->title : '';
+			$_field['default']		= isset( $cmspage->draft->title ) ? html_entity_decode( $cmspage->draft->title, ENT_COMPAT | ENT_HTML5, 'UTF-8' ) : '';
 			$_field['placeholder']	= 'The title of the page';
 
 			echo form_field( $_field );
@@ -87,35 +87,70 @@
 			// --------------------------------------------------------------------------
 
 			//	Parent ID
-			$_field					= array();
-			$_field['key']			= 'parent_id';
-			$_field['label']		= 'Parent Page';
-			$_field['placeholder']	= 'The Page\'s parent.';
-			$_field['class']		= 'chosen';
-			$_field['default']		= isset( $cmspage->draft->parent_id ) ? $cmspage->draft->parent_id : '';
+			$_field						= array();
+			$_field['key']				= 'parent_id';
+			$_field['label']			= 'Parent Page';
+			$_field['placeholder']		= 'The Page\'s parent.';
+			$_field['class']			= 'chosen';
+			$_field['default']			= isset( $cmspage->draft->parent_id ) ? $cmspage->draft->parent_id : '';
+			$_field['disabled_options']	= isset( $page_children ) ? $page_children : array();
 
-			$pages_nested_flat = array( '' => 'No Parent Page' ) + $pages_nested_flat;
+			//	Remove this page from the available options; INFINITE LOOP
+			//	We also need to remove any items which are
 
-			echo form_field_dropdown( $_field, $pages_nested_flat );
+			if ( isset( $cmspage ) ) :
+
+				foreach( $pages_nested_flat AS $id => $label ) :
+
+					if ( $id == $cmspage->id ) :
+
+						$_field['disabled_options'][] = $id;
+						break;
+
+					endif;
+
+				endforeach;
+
+			endif;
+
+			if ( count( $pages_nested_flat ) && count( $_field['disabled_options'] ) < count( $pages_nested_flat ) ) :
+
+				$pages_nested_flat = array( '' => 'No Parent Page' ) + $pages_nested_flat;
+
+				// --------------------------------------------------------------------------
+
+				if ( count( $_field['disabled_options'] ) ) :
+
+					$_field['info']	= '<strong>Some options have been disabled.</strong> You cannot set the parent page to this page or any existing child of this page.';
+
+				endif;
+
+				echo form_field_dropdown( $_field, $pages_nested_flat );
+
+			else :
+
+				echo form_hidden( $_field['key'], '' );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
-			//	Description
+			//	SEO Description
 			$_field					= array();
 			$_field['key']			= 'seo_description';
 			$_field['label']		= 'SEO Description';
-			$_field['default']		= isset( $cmspage->draft->seo_description ) ? $cmspage->draft->seo_description : '';
+			$_field['default']		= isset( $cmspage->draft->seo_description ) ? html_entity_decode( $cmspage->draft->seo_description, ENT_COMPAT | ENT_HTML5, 'UTF-8' ) : '';
 			$_field['placeholder']	= 'The page\'s SEO description, keep this short and concise. Recommended to keep below 160 characters.';
 
 			echo form_field( $_field, 'This should be kept short (< 160 characters) and concise. It\'ll be shown in search result listings and search engines will use it to help determine the page\'s content.' );
 
 			// --------------------------------------------------------------------------
 
-			//	Keywords
+			//	SEO Keywords
 			$_field					= array();
 			$_field['key']			= 'seo_keywords';
 			$_field['label']		= 'SEO Keywords';
-			$_field['default']		= isset( $cmspage->draft->seo_keywords ) ? $cmspage->draft->seo_keywords : '';
+			$_field['default']		= isset( $cmspage->draft->seo_keywords ) ? html_entity_decode( $cmspage->draft->seo_keywords, ENT_COMPAT | ENT_HTML5, 'UTF-8' ) : '';
 			$_field['placeholder']	= 'Comma separated keywords relating to the content of the page. A maximum of 10 keywords is recommended.';
 
 			echo form_field( $_field, 'SEO good practice recommend keeping the number of keyword phrases below 10 and less than 160 characters in total.' );
@@ -219,38 +254,24 @@
 		</p>
 	</fieldset>
 
+	<?php
+
+		if ( isset( $cmspage ) && $cmspage->is_published && $cmspage->published->hash !== $cmspage->draft->hash ) :
+
+			echo '<p class="system-alert message no-close">';
+				echo '<strong>You have unpublished changes.</strong><br />This version of the page is more recent than the version currently published on site. When you\'re done make sure you click "Publish Changes" below.';
+			echo '</p>';
+
+		endif;
+
+	?>
+
 	<p class="actions">
 	<?php
 
-		/**
-		 * Generate the buttons
-		 * These buttons change depending on the state of the page.
-		 *
-		 * If page is published:
-		 * - Update Page
-		 * - Save Changes & Make Draft
-		 * - Preview
-		 *
-		 * If page is unpublished:
-		 * - Save Changes
-		 * - Publish
-		 * - Preview
-		 *
-		 **/
-
-		if ( ! empty( $cmspage->is_published ) ) :
-
-			echo '<a href="#" data-action="save" class="main-action awesome orange large">Update Page</a>';
-			echo '<a href="#" data-action="unpublish" class="main-action awesome green large ">Save Changes &amp; Make Draft</a>';
-			echo '<a href="#" data-action="preview" class="main-action awesome large launch-preview right">' . lang( 'action_preview' ) . '</a>';
-
-		else :
-
-			echo '<a href="#" data-action="save" class="main-action awesome orange large">Save Changes</a>';
-			echo '<a href="#" data-action="publish" class="main-action awesome green large ">Publish</a>';
-			echo '<a href="#" data-action="preview" class="main-action awesome large launch-preview right">' . lang( 'action_preview' ) . '</a>';
-
-		endif;
+		echo '<a href="#" data-action="save" class="main-action awesome orange large" rel="tipsy-top" title="Your changes will be saved so you can come back later, but won\'t be published on site.">Save Changes</a>';
+		echo '<a href="#" data-action="publish" class="main-action awesome green large" rel="tipsy-top" title="Your changes will be published on site and will take hold immediately.">Publish Changes</a>';
+		echo '<a href="#" data-action="preview" class="main-action awesome large launch-preview right">' . lang( 'action_preview' ) . '</a>';
 
 	?>
 	</p>
@@ -263,7 +284,7 @@
 	$(function(){
 
 		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
-		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>, <?=isset( $cmspage->draft->template_data ) ? json_encode( $cmspage->draft->template_data ) : 'null' ?> );
+		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>, <?=isset( $cmspage->id ) ? $cmspage->id : 'null' ?>, <?=isset( $cmspage->draft->template_data ) ? json_encode( $cmspage->draft->template_data ) : 'null' ?> );
 
 	});
 

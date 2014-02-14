@@ -202,29 +202,44 @@ div.field
 				box-sizing:border-box;
 			}
 		}
-	}
 
-	span.input:after
-	{
-		float:none;
-		clear:both;
-		content: ' ';
-		position:relative;
-		display:block;
-	}
-
-	span.input.with-tip
-	{
-		padding-right:25px;
-
-		img.help
+		small.info
 		{
-			position:absolute;
-			right:0px;
-			top:4px;
+			display: block;
+			margin-top: 1em;
+			border-left: 2px solid #A9C5DB;
+			padding: 0.1em 0.5em;
+			background: #E4EDF5;
+			.rounded(3px);
+			color:#50606F;
+
+			strong
+			{
+				color:inherit
+			}
+		}
+
+		&:after
+		{
+			float:none;
+			clear:both;
+			content: ' ';
+			position:relative;
+			display:block;
+		}
+
+		&.with-tip
+		{
+			padding-right:25px;
+
+			img.help
+			{
+				position:absolute;
+				right:0px;
+				top:4px;
+			}
 		}
 	}
-
 
 	span.text
 	{

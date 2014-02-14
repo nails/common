@@ -2,7 +2,23 @@
 
 class Nails_CMS_Template
 {
-	static protected function _details_template()
+
+	protected $load;
+	protected $data;
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Defines the base template details object
+	 *
+	 * Templates should extend this object and customise to their own needs
+	 *
+	 * @param none
+	 * @return stdClass
+	 *
+	 **/
+	static protected function _details()
 	{
 		$_d			= new stdClass();
 		$_d->iam	= get_called_class();
@@ -75,6 +91,11 @@ class Nails_CMS_Template
 
 		// --------------------------------------------------------------------------
 
+		//	Define any assets need to be loaded by the template
+		$_d->assets = array();
+
+		// --------------------------------------------------------------------------
+
 		//	Path
 		$_d->path = dirname( $_reflect->getFileName() ) . '/';
 
@@ -86,7 +107,16 @@ class Nails_CMS_Template
 
 	// --------------------------------------------------------------------------
 
-
+	/**
+	 * Defines the base widget area object
+	 *
+	 * Each editable area needs to have certain properties defined. The template
+	 * clone this object for each area and set the values appropriately.
+	 *
+	 * @param none
+	 * @return stdClass
+	 *
+	 **/
 	static protected function _editable_area_template()
 	{
 		$_d				= new stdClass();
@@ -101,21 +131,118 @@ class Nails_CMS_Template
 	// --------------------------------------------------------------------------
 
 
-	public function render( $data = array())
+	/**
+	 * Template constructor
+	 *
+	 * Sets the templates details as a class variable
+	 *
+	 * @param none
+	 * @return void
+	 *
+	 **/
+	public function __construct()
 	{
+		$this->_details = $this::details();
+		$this->load	=& get_instance()->load;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the template with the provided data
+	 *
+	 * This method accepts a template data and renders the page appropriately
+	 *
+	 * @param stdClass $data A normal template_data object, prefixed to avoid naming collisions
+	 * @return string
+	 *
+	 **/
+	public function render( $_tpl_data = array(), &$view_data = array() )
+	{
+		//	If the template wishes to execute any custom pre/post code then this method
+		//	should be extended and parent::render( $_data ) called at the appropriate
+		//	point. But that's obvious, isn't it...?
+
+		// --------------------------------------------------------------------------
+
+		get_instance()->load->model( 'cms/cms_page_model' );
+
+
+		// --------------------------------------------------------------------------
+
+		//	Process each widget area and render the HTML
+		$_widget_areas = array();
+		foreach ( $this->_details->widget_areas AS $key => $details ) :
+
+			$_widget_areas[$key] = '';
+
+			//	Loop through all defined widgets and render each one
+			if ( ! empty( $_tpl_data[$key] ) ) :
+
+				foreach ( $_tpl_data[$key] AS $widget_data ) :
+
+					try
+					{
+						$_widget = get_instance()->cms_page_model->get_widget( $widget_data->widget );
+
+						if ( $_widget ) :
+
+							$_data = array();
+
+							if ( $widget_data->data ) :
+
+								foreach ( $widget_data->data AS $item ) :
+
+									if ( isset( $item->name ) ) :
+
+										$_data[$item->name] = isset( $item->value ) ? $item->value : NULL;
+
+									endif;
+
+								endforeach;
+
+							endif;
+
+							$WIDGET = new $_widget->iam();
+							$_widget_areas[$key] .= $WIDGET->render( $_data );
+
+						endif;
+					}
+					catch ( Exception $e )
+					{
+						log_message( 'error', 'Failed to render widget' );
+					}
+
+				endforeach;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
 		if ( is_file( $this->_details->path . 'view.php' ) ) :
 
-			//	Extract the variables, so that the view can use them
-			if ( $data ) :
+			//	If passed, extract any view data
+			if ( $view_data ) :
 
-				extract( $data );
+				extract( $view_data );
+
+			endif;
+
+			//	Extract the variables, so that the view can use them
+			if ( $_widget_areas ) :
+
+				extract( $_widget_areas );
 
 			endif;
 
 			//	Start the buffer, basically copying how CI does it's view loading
 			ob_start();
 
-			include $this->_details->path . 'views.php';
+			include $this->_details->path . 'view.php';
 
 			//	Flush buffer
 			$_buffer = ob_get_contents();

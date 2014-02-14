@@ -35,7 +35,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_help				= array();
 		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
-		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy';
+		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy-left';
 		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
 		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
 
@@ -213,7 +213,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_help					= array();
 		$_help['src']			= is_array( $help ) && isset( $help['src'] )	? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']			= is_array( $help ) && isset( $help['class'] )	? $help['class'] : 'help';
-		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy';
+		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy-left';
 		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
 		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
 
@@ -450,7 +450,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
@@ -667,7 +667,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		$_help				= array();
 		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
-		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy';
+		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy-left';
 		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
 		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
 
@@ -1092,24 +1092,26 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 	function form_field_dropdown( $field, $options, $help = '' )
 	{
 		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
+		$_field						= array();
+		$_field['id']				= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']				= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']			= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']				= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']			= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']			= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']		= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']			= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']		= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']			= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['readonly']			= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
+		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
+		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
@@ -1166,17 +1168,15 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		foreach ( $options AS $value => $label ) :
 
 			//	Selected?
-			$_checked = $value == $_selected ? 'selected="selected"' : '';
-			$_out .= '<option value="' . $value . '" ' . $_checked . '>' . $label . '</option>';
+			$_checked = $value == $_selected ? ' selected="selected"' : '';
+
+			//	Disabled?
+			$_disabled = array_search( $value, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
+
+			$_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
 
 		endforeach;
 		$_out .= '</select>';
-
-		if ( $_readonly ) :
-
-			$_out .= form_hidden( $_field['key'], $_field['default'] );
-
-		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -1191,6 +1191,9 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+
+		//	Info
+		$_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
 
 		$_out .= '</span>';
 
@@ -1222,24 +1225,26 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 	function form_field_dropdown_multiple( $field, $options, $help = '' )
 	{
 		//	Set var defaults
-		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
+		$_field						= array();
+		$_field['id']				= isset( $field['id'] ) ? $field['id'] : NULL;
+		$_field['type']				= isset( $field['type'] ) ? $field['type'] : 'text';
+		$_field['oddeven']			= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
+		$_field['key']				= isset( $field['key'] ) ? $field['key'] : NULL;
+		$_field['label']			= isset( $field['label'] ) ? $field['label'] : NULL;
+		$_field['default']			= isset( $field['default'] ) ? $field['default'] : NULL;
+		$_field['sub_label']		= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
+		$_field['required']			= isset( $field['required'] ) ? $field['required'] : FALSE;
+		$_field['placeholder']		= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
+		$_field['class']			= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['readonly']			= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
+		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
+		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
@@ -1299,8 +1304,12 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		foreach ( $options AS $value => $label ) :
 
 			//	Selected?
-			$_checked = array_search( $value, $_selected ) !== FALSE ? 'selected="selected"' : '';
-			$_out .= '<option value="' . $value . '" ' . $_checked . '>' . $label . '</option>';
+			$_checked = $value == $_selected ? ' selected="selected"' : '';
+
+			//	Disabled?
+			$_disabled = array_search( $value, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
+
+			$_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
 
 		endforeach;
 		$_out .= '</select>';
@@ -1318,6 +1327,9 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+
+		//	Info
+		$_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
 
 		$_out .= '</span';
 
@@ -1371,7 +1383,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
@@ -1459,7 +1471,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 
@@ -1576,7 +1588,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
 		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy';
+		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
 

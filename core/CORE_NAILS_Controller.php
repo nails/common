@@ -179,9 +179,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'NAILS_DB_PREFIX' ) )				define( 'NAILS_DB_PREFIX',				'nails_' );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
 		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
-		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
-		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
-		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) )			define( 'APP_DEVELOPER_EMAIL',			'' );
+
 		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
 		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
 		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
@@ -191,6 +189,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
 		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 		if ( ! defined( 'APP_NATIVE_LOGIN_USING' ) )		define( 'APP_NATIVE_LOGIN_USING',		'EMAIL' );	//	[EMAIL|USERNAME|BOTH]
+
 
 		// --------------------------------------------------------------------------
 
@@ -202,6 +201,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Email
+		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) )			define( 'APP_DEVELOPER_EMAIL',			'' );
+		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
+		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
 		if ( ! defined( 'SMTP_HOST' ) )						define( 'SMTP_HOST',					'' );
 		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
 		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
@@ -221,6 +223,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		if ( ! defined( 'APP_CDN_CACHE_MAX_AGE' ) )			define( 'APP_CDN_CACHE_MAX_AGE',		'31536000' ); // 1 year
 
+		// --------------------------------------------------------------------------
+
+		//	CMS
+		if ( ! defined( 'DEPLOY_CMS_PAGES_USE_CACHE' ) )	define( 'DEPLOY_CMS_PAGES_USE_CACHE',	TRUE );
 
 		// --------------------------------------------------------------------------
 

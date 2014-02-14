@@ -73,11 +73,33 @@ class NAILS_Render extends NAILS_CMS_Controller
 		//	Determine which data to use
 		if ( $this->_is_preview ) :
 
-			$this->output->set_output( $_page->draft->rendered_html );
+			$_data = $_page->draft;
 
 		else :
 
-			$this->output->set_output( $_page->published->rendered_html );
+			$_data = $_page->published;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Are we using the render caches or not?
+		if ( DEPLOY_CMS_PAGES_USE_CACHE ) :
+
+			$this->output->set_output( $_data->rendered_html );
+
+		else :
+
+			//	Set some page level data
+			$this->data['page']->title			= $_data->title;
+			$this->data['page']->description	= $_data->seo_description;
+			$this->data['page']->keywords		= $_data->seo_keywords;
+
+			//	Render the template
+			$_tpl_data	= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
+			$_html		= $this->cms_page->render_template( $_data->template, $_tpl_data, $this->data );
+
+			$this->output->set_output( $_html );
 
 		endif;
 	}
@@ -98,6 +120,33 @@ class NAILS_Render extends NAILS_CMS_Controller
 			show_404();
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function legacy_slug()
+	{
+		//	Get the page and attempt to 301 redirect
+		$_id = $this->uri->rsegment( 3 );
+
+		if ( $_id ) :
+
+			$_page = $this->cms_page->get_by_id( $_id );
+
+			if ( $_page && $_page->is_published ) :
+
+				redirect( $_page->published->slug, 'location', 301 );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	We don't know what to do, *falls over*
+		show_404();
 	}
 }
 

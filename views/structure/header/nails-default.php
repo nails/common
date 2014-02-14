@@ -7,10 +7,10 @@
 
 		<!--	META	-->
 		<meta charset="utf-8">
-		<title><?=isset( $page->title ) && $page->title ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
+		<title><?=! empty( $page->title ) ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="description" content="<?=isset( $page->description ) && $page->description ? $page->description : ''?>">
-		<meta name="description" content="<?=isset( $page->keywords ) && $page->keywords ? $page->keywords : ''?>">
+		<meta name="description" content="<?=! empty( $page->description ) ? $page->description : ''?>">
+		<meta name="keywords" content="<?=! empty( $page->keywords ) ? $page->keywords : ''?>">
 
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">

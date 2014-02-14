@@ -26,7 +26,7 @@
 	$config['user_meta_cols'][GROUP_ID]	= array();
 
 	$config['user_meta_cols'][GROUP_ID]['COL_NAME'] = array(
-		'datatype'		=> 'string|bool|join|date',
+		'datatype'		=> 'string|bool|id|date',
 		'label'			=> 'Label to render',
 		'required'		=> TRUE|FALSE,
 		'validation'	=> 'form_validation|rules|',
