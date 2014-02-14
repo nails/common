@@ -678,7 +678,8 @@ class CORE_NAILS_Model extends CI_Model
 		//	If non-destructive delete is enabled then apply the delete query
 		if ( ! $this->_destructive_delete && ! $include_deleted ) :
 
-			$this->db->where( $this->_deleted_flag, FALSE );
+			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+			$this->db->where( $_prefix . $this->_deleted_flag, FALSE );
 
 		endif;
 
