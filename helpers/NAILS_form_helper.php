@@ -1304,7 +1304,15 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		foreach ( $options AS $value => $label ) :
 
 			//	Selected?
-			$_checked = $value == $_selected ? ' selected="selected"' : '';
+			if ( is_array( $_selected ) ) :
+				if ( in_array( $value, $_selected ) ) :
+					$_checked = ' selected="selected"';
+				else :
+					$_checked = '';
+				endif;
+			else:
+				$_checked = $value == $_selected ? ' selected="selected"' : '';
+			endif;
 
 			//	Disabled?
 			$_disabled = array_search( $value, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
