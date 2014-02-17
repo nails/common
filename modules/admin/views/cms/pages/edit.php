@@ -319,7 +319,7 @@
 	</li>
 </script>
 <script type="text/template" id="template-widget">
-	<li class="widget {{group}} {{slug}}" data-slug="{{slug}}" data-title="{{name}} Widget" data-keywords="{{keywords}}">
+	<li class="widget {{group}} {{slug}}" data-slug="{{slug}}" data-title="{{name}} Widget" data-keywords="{{keywords}}" title="">
 		<span class="icon ion-arrow-move"></span>
 		<span class="label">{{name}}</span>
 		{{#description}}<span class="description">{{description}}</span>{{/description}}

@@ -15,7 +15,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._saving			= false;
 	this._refreshing		= false;
 	this._autosave			= null;
-	this._autosave_delay	= 60000;
+	this._autosave_delay	= 6000;
 	this._async_save		= true;
 
 	// --------------------------------------------------------------------------
@@ -341,6 +341,13 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			return false;
 		}
 
+		//	Only autosave if there's an ID
+		if ( ! force_save && ! this.page_data.id )
+		{
+			console.log( 'Page ID is not known yet and call is not forced, ignore save.' );
+			return false;
+		}
+
 		// --------------------------------------------------------------------------
 
 		//	Generate the hash of the data
@@ -457,7 +464,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					//	Execute any custom callback
 					if ( typeof( error_callback ) === 'function' )
 					{
-						error_callback.call( undefined, data );
+						error_callback.call( undefined, _data );
 					}
 				}
 			});
@@ -745,6 +752,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 			return false;
 		});
+
+		//	Bind tipsys
+		$( 'li.widget', this._editor.widgets ).tipsy({gravity:'w'});
 	};
 
 
@@ -873,7 +883,8 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Disable widgets which don't apply to this template and/orarea
+		//	Disable widgets which don't apply to this template and/or area
+		var _disabled_msg = 'This widget has been disabled for this template/area.';
 		for( var _key in this.widgets )
 		{
 			for( var _key2 in this.widgets[_key].widgets )
@@ -883,7 +894,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( template, this.widgets[_key].widgets[_key2].restrict_to_template ) === false )
 					{
-						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' ).data( 'original-title', _disabled_msg ).attr( 'title', _disabled_msg );
 					}
 				}
 
@@ -892,7 +903,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( area, this.widgets[_key].widgets[_key2].restrict_to_area ) === false )
 					{
-						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' ).data( 'original-title', _disabled_msg ).attr( 'title', _disabled_msg );
 					}
 				}
 
@@ -901,7 +912,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( template, this.widgets[_key].widgets[_key2].restrict_from_template ) !== false )
 					{
-						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' ).data( 'original-title', _disabled_msg ).attr( 'title', _disabled_msg );
 					}
 				}
 
@@ -910,7 +921,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					if ( this._array_search( area, this.widgets[_key].widgets[_key2].restrict_from_area ) !== false )
 					{
-						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' );
+						this._editor.widgets.find( 'li.widget.' + this.widgets[_key].widgets[_key2].slug ).addClass( 'disabled' ).data( 'original-title', _disabled_msg ).attr( 'title', _disabled_msg );
 					}
 				}
 			}
@@ -1050,7 +1061,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		this._editor.widgets.find( 'li.dropzone' ).sortable( 'destroy' );
 
 		//	Enable all widgets
-		this._editor.widgets.find( 'li.widget.disabled' ).removeClass( 'disabled' );
+		this._editor.widgets.find( 'li.widget.disabled' ).removeClass( 'disabled' ).data( 'original-title', '' ).attr( 'title', '' );
 
 		// --------------------------------------------------------------------------
 
