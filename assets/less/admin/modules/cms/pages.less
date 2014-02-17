@@ -770,6 +770,25 @@
 			.editor
 			{
 				padding:5px;
+				box-sizing:border-box;
+
+				p.system-alert
+				{
+					&:not(.error),
+					&:not(.success),
+					&:not(.message),
+					&:not(.notice)
+					{
+						background:#FFF;
+						border:1px solid #CCC;
+
+						strong
+						{
+							display:block;
+							margin-bottom:0.2em;
+						}
+					}
+				}
 			}
 		}
 
