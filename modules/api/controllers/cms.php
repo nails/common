@@ -251,12 +251,12 @@ class NAILS_Cms extends NAILS_API_Controller
 		//	JSON.stringify doesn't seem to escape forward slashes like PHP does
 		//	Check both in case this is a cross browser issue.
 
-		$_hash				= $_page_data->hash;
+		$_hash						= $_page_data->hash;
 		$_check_obj					= new stdClass();
 		$_check_obj->data			= $_page_data->data;
 		$_check_obj->widget_areas	= $_page_data->widget_areas;
 
-		$_check_hash1		= md5( json_encode( $_check_obj, JSON_UNESCAPED_SLASHES ) );
+		$_check_hash1		= md5( json_encode( $_check_obj, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE ) );
 
 		if ( $_hash !== $_check_hash1 ) :
 

@@ -266,6 +266,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				href: window.SITE_URL + 'cms/render/preview/' + data.id,
 				width:'90%',
 				height:'90%',
+				iframe : {preload: false},
 				afterClose: function()
 				{
 					_this._preview_open = false;
@@ -276,11 +277,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		var _error = function( data )
 		{
-			var _data = JSON.parse( data.responseText );
 			_this._editor.container.removeClass( 'loading' );
 			_this._dialog_open = true;
 
-			$('<div>').text( _data.error ).dialog({
+			$('<div>').text( data.error ).dialog({
 				title: 'Something went wrong.',
 				resizable: false,
 				draggable: false,
@@ -1200,7 +1200,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				id: _data.id,
 				data: JSON.stringify( widget_data )
 			},
-			'success'		: function( data )
+			'success' : function( data )
 			{
 				$( _item ).find( '.editor' ).html( data.HTML );
 
@@ -1245,7 +1245,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				_this._refresh_page_data();
 
 			},
-			'error'			: function( data )
+			'error' : function( data )
 			{
 				var _data = JSON.parse( data.responseText );
 

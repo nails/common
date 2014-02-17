@@ -83,6 +83,17 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	If the page is the homepage and we're viewing it by slug, then redirect to
+		//	the non slugg'd version
+
+		if ( $_page->is_homepage && uri_string() == $_data->slug ) :
+
+			redirect( '', 'location', 301 );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Are we using the render caches or not?
 		if ( DEPLOY_CMS_PAGES_USE_CACHE ) :
 
@@ -121,6 +132,28 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		else :
 
+			show_404();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function homepage()
+	{
+		//	Attempt to get the site's homepage
+		$_homepage = $this->cms_page->get_homepage();
+
+		if ( $_homepage ) :
+
+			$this->_page_id = $_homepage->id;
+			$this->page();
+
+		else :
+
+			log_message( 'error', 'No homepage has been defined.' );
 			show_404();
 
 		endif;

@@ -689,6 +689,24 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function get_homepage()
+	{
+		$this->db->where( $this->_table_prefix . '.is_homepage', TRUE );
+		$_page	= $this->get_all();
+
+		if ( ! $_page ) :
+
+			return FALSE;
+
+		endif;
+
+		return $_page[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_object( &$page )
 	{
 		parent::_format_object( $page );

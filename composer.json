@@ -23,6 +23,7 @@
 	},
 	"require":
 	{
+		"php": ">=5.4.0",
 		"aws/aws-sdk-php": "~2.4.5",
 		"dompdf/dompdf": "dev-master",
 		"facebook/php-sdk": "v3.2.2",

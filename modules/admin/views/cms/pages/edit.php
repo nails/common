@@ -333,9 +333,11 @@
 <script type="text/javascript">
 <!--//
 
+	var CMS_PAGES;
+
 	$(function(){
 
-		var CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
+		CMS_PAGES = new NAILS_Admin_CMS_pages_Create_Edit;
 		CMS_PAGES.init(<?=json_encode( $templates )?>, <?=json_encode( $widgets )?>, <?=isset( $cmspage->id ) ? $cmspage->id : 'null' ?>, <?=isset( $cmspage->draft->template_data ) ? json_encode( $cmspage->draft->template_data ) : 'null' ?> );
 
 	});
