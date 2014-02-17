@@ -275,7 +275,7 @@ class NAILS_Cms extends NAILS_API_Controller
 
 		endif;
 
-		$_page_data->hash	= $_hash;
+		$_page_data->hash = $_hash;
 
 		// --------------------------------------------------------------------------
 
@@ -284,14 +284,25 @@ class NAILS_Cms extends NAILS_API_Controller
 
 		$_data							= new stdClass();
 		$_data->hash					= $_page_data->hash;
-		$_data->id						= ! empty( $_page_data->id )					? (int) $_page_data->id					: NULL;
+		$_data->id						= ! empty( $_page_data->id )						? (int) $_page_data->id					: NULL;
 		$_data->data					= new stdClass();
-		$_data->data->title				= ! empty( $_page_data->data->title )			? $_page_data->data->title				: '';
-		$_data->data->parent_id			= ! empty( $_page_data->data->parent_id )		? (int) $_page_data->data->parent_id	: '';
-		$_data->data->seo_description	= ! empty( $_page_data->data->seo_description )	? $_page_data->data->seo_description	: '';
-		$_data->data->seo_keywords		= ! empty( $_page_data->data->seo_keywords )	? $_page_data->data->seo_keywords		: '';
+		$_data->data->title				= ! empty( $_page_data->data->title )				? $_page_data->data->title				: '';
+		$_data->data->parent_id			= ! empty( $_page_data->data->parent_id )			? (int) $_page_data->data->parent_id	: '';
+		$_data->data->seo_description	= ! empty( $_page_data->data->seo_description )		? $_page_data->data->seo_description	: '';
+		$_data->data->seo_keywords		= ! empty( $_page_data->data->seo_keywords )		? $_page_data->data->seo_keywords		: '';
 		$_data->data->template			= $_page_data->data->template;
-		$_data->widget_areas			= ! empty( $_page_data->widget_areas )			? $_page_data->widget_areas				: new stdClass;
+		$_data->data->additional_fields	= ! empty( $_page_data->data->additional_fields )	? $_page_data->data->additional_fields	: new stdClass;
+		$_data->widget_areas			= ! empty( $_page_data->widget_areas )				? $_page_data->widget_areas				: new stdClass;
+
+		if ( $_data->data->additional_fields ) :
+
+			parse_str( $_data->data->additional_fields, $_additional_fields );
+			$_data->data->additional_fields = ! empty( $_additional_fields['additional_field'] ) ? $_additional_fields['additional_field'] : array();
+
+			//	We're going to encode then decode the additional fields, so they're consistent with the save objects
+			$_data->data->additional_fields = json_decode( json_encode( $_data->data->additional_fields ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

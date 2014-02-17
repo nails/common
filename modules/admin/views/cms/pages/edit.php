@@ -78,7 +78,6 @@
 			$_field					= array();
 			$_field['key']			= 'title';
 			$_field['label']		= 'Title';
-			$_field['required']		= TRUE;
 			$_field['default']		= isset( $cmspage->draft->title ) ? html_entity_decode( $cmspage->draft->title, ENT_COMPAT | ENT_HTML5, 'UTF-8' ) : '';
 			$_field['placeholder']	= 'The title of the page';
 
@@ -201,6 +200,59 @@
 
 		?>
 		</ul>
+	</fieldset>
+
+	<fieldset>
+		<legend>Template Configurations</legend>
+		<?php
+
+			//	Any additional page data for the templates
+			foreach( $templates AS $template ) :
+
+				$_visible = $_default_template == $template->slug ? 'block' : 'none';
+				echo '<div id="additional-fields-' . $template->slug . '" class="additional-fields" style="display:' . $_visible . '">';
+
+				if ( $template->additional_fields ) :
+
+					foreach( $template->additional_fields AS $field ) :
+
+						//	Set the default key
+						$field['default'] = ! empty( $cmspage->draft->template_data->data->additional_fields->{$template->slug}->{$field['key']} ) ? $cmspage->draft->template_data->data->additional_fields->{$template->slug}->{$field['key']} : '';
+
+						//	Override the field key
+						$field['key'] = 'additional_field[' . $template->slug . '][' . $field['key'] . ']';
+
+						switch( $field['type'] ) :
+
+							case 'dropdown' :
+
+								$_options = ! empty( $field['options'] ) ? $field['options'] : array();
+								echo form_field_dropdown( $field, $_options );
+
+							break;
+
+							default :
+
+								form_field( $field );
+
+							break;
+
+						endswitch;
+
+					endforeach;
+
+
+				else :
+
+					echo '<p>This template has no configurable options.</p>';
+
+				endif;
+
+				echo '</div>';
+
+			endforeach;
+
+		?>
 	</fieldset>
 
 	<fieldset>

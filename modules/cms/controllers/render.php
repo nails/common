@@ -95,9 +95,13 @@ class NAILS_Render extends NAILS_CMS_Controller
 			$this->data['page']->description	= $_data->seo_description;
 			$this->data['page']->keywords		= $_data->seo_keywords;
 
-			//	Render the template
-			$_tpl_data	= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
-			$_html		= $this->cms_page->render_template( $_data->template, $_tpl_data, $this->data );
+			//	Prepare data
+			$_render					= new stdClass();
+			$_render->widgets			= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
+			$_render->additional_fields	= isset( $_data->template_data->data->additional_fields->{$_data->template} ) ? $_data->template_data->data->additional_fields->{$_data->template} : array();
+
+			//	Actually render
+			$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields, $this->data );
 
 			$this->output->set_output( $_html );
 

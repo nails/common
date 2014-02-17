@@ -521,9 +521,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			this.page_data.data.parent_id		= $( 'input[name=parent_id]' ).val();
 		}
 
-		this.page_data.data.seo_description	= $( 'input[name=seo_description]' ).val();
-		this.page_data.data.seo_keywords	= $( 'input[name=seo_keywords]' ).val();
-		this.page_data.data.template		= $( 'input[name=template]:checked' ).val();
+		this.page_data.data.seo_description		= $( 'input[name=seo_description]' ).val();
+		this.page_data.data.seo_keywords		= $( 'input[name=seo_keywords]' ).val();
+		this.page_data.data.template			= $( 'input[name=template]:checked' ).val();
+		this.page_data.data.additional_fields	= $( ':input[name^=additional_field]' ).serialize();
 
 		// --------------------------------------------------------------------------
 
@@ -592,6 +593,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			var _template = $(this).data( 'template-slug' );
 			$( 'a.launch-editor' ).hide();
 			$( 'a.launch-editor.template-' + _template ).show();
+
+			//	Show the correct additional data fields
+			$( '.additional-fields' ).hide();
+			$( '#additional-fields-' + _template ).show();
 		});
 	};
 

@@ -217,8 +217,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Render the template
-		$_tpl_data	= ! empty( $data->widget_areas->{$_data->draft_template} ) ? $data->widget_areas->{$_data->draft_template} : array();
-		$_rendered	= $this->render_template( $_data->draft_template, $_tpl_data, $view_data );
+		$_widgets			= ! empty( $data->widget_areas->{$_data->draft_template} ) ? $data->widget_areas->{$_data->draft_template} : array();
+		$_additional_fields	= ! empty( $data->data->additional_fields->{$_data->draft_template} ) ? $data->data->additional_fields->{$_data->draft_template} : array();
+
+		$_rendered			= $this->render_template( $_data->draft_template, $_widgets, $_additional_fields, $view_data );
 
 		if ( $_rendered !== FALSE ) :
 
@@ -292,13 +294,13 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function render_template( $template, $data = array(), &$view_data = array() )
+	public function render_template( $template, $widgets = array(), $additional_fields = array(), &$view_data = array() )
 	{
 		$_template = $this->get_template( $template );
 
 		if ( ! $_template ) :
 
-			$this->_set_error( '"' . $_data->draft_template .'" is not a valid template.' );
+			$this->_set_error( '"' . $template .'" is not a valid template.' );
 			return FALSE;
 
 		endif;
@@ -314,7 +316,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			try
 			{
-				return $TEMPLATE->render( (array) $data, $view_data );
+				return $TEMPLATE->render( (array) $widgets, (array) $additional_fields, $view_data );
 			}
 			catch( Exception $e )
 			{

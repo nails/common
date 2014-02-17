@@ -31,6 +31,11 @@ class Nails_CMS_Template
 		//	A brief description fo the template, optional
 		$_d->description	= '';
 
+		//	Any additional fields to request
+		//	TODO: use the form builder library
+		$_d->additional_fields = array();
+
+		//	An icon/preview to render
 		$_d->img			= new stdClass();
 		$_d->img->icon		= '';
 
@@ -160,16 +165,14 @@ class Nails_CMS_Template
 	 * @return string
 	 *
 	 **/
-	public function render( $_tpl_data = array(), &$view_data = array() )
+	public function render( $_tpl_widgets = array(), $_tpl_additional_fields = array(), &$view_data = array() )
 	{
 		//	If the template wishes to execute any custom pre/post code then this method
 		//	should be extended and parent::render( $_data ) called at the appropriate
 		//	point. But that's obvious, isn't it...?
-
 		// --------------------------------------------------------------------------
 
 		get_instance()->load->model( 'cms/cms_page_model' );
-
 
 		// --------------------------------------------------------------------------
 
@@ -180,9 +183,9 @@ class Nails_CMS_Template
 			$_widget_areas[$key] = '';
 
 			//	Loop through all defined widgets and render each one
-			if ( ! empty( $_tpl_data[$key] ) ) :
+			if ( ! empty( $_tpl_widgets[$key] ) ) :
 
-				foreach ( $_tpl_data[$key] AS $widget_data ) :
+				foreach ( $_tpl_widgets[$key] AS $widget_data ) :
 
 					try
 					{
@@ -230,6 +233,13 @@ class Nails_CMS_Template
 			if ( $view_data ) :
 
 				extract( $view_data );
+
+			endif;
+
+			//	If passed, extract any additional_fields
+			if ( $_tpl_additional_fields ) :
+
+				extract( $_tpl_additional_fields );
 
 			endif;
 
