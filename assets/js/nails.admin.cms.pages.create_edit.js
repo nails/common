@@ -1191,6 +1191,16 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 				// --------------------------------------------------------------------------
 
+				//	Add stripes
+				/* jshint ignore:start */
+				if ( typeof( _nails.add_stripes ) === 'function' )
+				{
+					_nails.add_stripes();
+				}
+				/* jshint ignore:end */
+
+				// --------------------------------------------------------------------------
+
 				//	Execute this widget's dropped callback
 				window['_WIDGET_' + _widget.slug].dropped( _item );
 
