@@ -155,7 +155,8 @@ class Nails_CMS_Template
 	 *
 	 * This method accepts a template data and renders the page appropriately
 	 *
-	 * @param stdClass $data A normal template_data object, prefixed to avoid naming collisions
+	 * @param stdClass $_tpl_data A normal template_data object, prefixed to avoid naming collisions
+	 * @param array $view_data An array of properties to pass to the views. Synonymous with the $this->data variable under normal controllers.
 	 * @return string
 	 *
 	 **/

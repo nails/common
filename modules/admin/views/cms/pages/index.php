@@ -43,7 +43,7 @@
 
 					// --------------------------------------------------------------------------
 
-					echo '<tr class="page">';
+					echo '<tr class="page" data-title="' . htmlentities( $page->draft->title ) . '">';
 						echo '<td class="title indentosaurus indent-' . $page->draft->depth . '">';
 
 							echo str_repeat( '<div class="indentor"></div>', $page->draft->depth );
