@@ -397,11 +397,11 @@
 		<span class="closer ion-trash-a"></span>
 		{{#description}}<span class="description">{{description}}</span>{{/description}}
 	</div>
-	<form class="editor">
+	<div class="editor">
 		<p style="text-align:center;">
 			<span class="ion-looping"></span>
 			<br />
 			Please wait, loading widget
 		</p>
-	</form>
+	</div>
 </script>
