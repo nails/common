@@ -346,7 +346,10 @@ $_out .= <<<EOT
 				href: _href,
 				type: 'iframe',
 				width: _w,
-				height: _h
+				height: _h,
+				iframe: {
+					preload: false // fixes issue with iframe and IE
+				}
 			});
 
 			return false;
@@ -575,7 +578,10 @@ $_out .= <<<EOT
 				href: _href,
 				type: 'iframe',
 				width: _w,
-				height: _h
+				height: _h,
+				iframe: {
+					preload: false // fixes issue with iframe and IE
+				}
 			});
 
 			return false;
