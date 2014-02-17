@@ -969,7 +969,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		//	Bind keyUp event for the escape key, don't close if dragging or previewing
 		$(document).on( 'keyup', function( e )
 		{
-			console.log(_this._dialog_open);
 			if ( ! _this._dragging_widget && ! _this._preview_open && ! _this._dialog_open && e.keyCode === 27 )
 			{
 				_this._editor_close();
