@@ -183,7 +183,7 @@
 
 					endforeach;
 
-					echo '<label ' . trim( $_attr_str ) . '>';
+					echo '<label ' . trim( $_attr_str ) . ' rel="tipsy-top" title="' . $template->description . '">';
 
 						echo form_radio( 'template', $template->slug, set_radio( 'template', $template->slug, $_selected ) );
 

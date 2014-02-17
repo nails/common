@@ -1102,6 +1102,11 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 				$_templates[$template] = $_class::details();
 
+			else :
+
+				//	This template returned no details, ignore it.
+				log_message( 'warning', 'Static method "details()"" of Nails template "' . $template . '" returned empty data.' );
+
 			endif;
 
 			// --------------------------------------------------------------------------
@@ -1153,7 +1158,20 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			endif;
 
-			$_templates[$template] = $_class::details();
+			$_details = $_class::details();
+
+			if ( $_details ) :
+
+				$_templates[$template] = $_class::details();
+
+			else :
+
+				//	This template returned no details, ignore this template. Don't log anything
+				//	as it's likely a developer override to hide a default template.
+
+				continue;
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
