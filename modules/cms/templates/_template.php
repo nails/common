@@ -210,7 +210,7 @@ class Nails_CMS_Template
 							endif;
 
 							$WIDGET = new $_widget->iam();
-							$_widget_areas[$key] .= $WIDGET->render( $_data );
+							$_widget_areas[$key] .= $WIDGET->render( $_data, $view_data );
 
 						endif;
 					}

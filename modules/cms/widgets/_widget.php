@@ -155,9 +155,16 @@ class NAILS_CMS_Widget
 	 * @return string
 	 *
 	 **/
-	public function render( $_wgt_data = array() )
+	public function render( $_wgt_data = array(), &$view_data = array() )
 	{
 		if ( is_file( $this->_details->path . 'views/render.php' ) ) :
+
+			//	If passed, extract any view data
+			if ( $view_data ) :
+
+				extract( $view_data );
+
+			endif;
 
 			//	Extract the variables, so that the view can use them
 			if ( $_wgt_data ) :
