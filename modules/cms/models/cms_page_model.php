@@ -296,7 +296,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 	public function render_template( $template, $widgets = array(), $additional_fields = array(), &$view_data = array() )
 	{
-		$_template = $this->get_template( $template );
+		$_template = $this->get_template( $template, 'RENDER' );
 
 		if ( ! $_template ) :
 
@@ -912,20 +912,30 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Load the widget's assets if requested
 			if ( $load_assets ) :
 
-				foreach ( $w->assets AS $asset ) :
+				//	What type of assets do we want to load, editor or render assets?
+				switch( $load_assets ) :
 
-					if ( is_array( $asset ) ) :
+					case 'EDITOR' :
 
-						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
-						$this->asset->load( $asset[0], $_is_nails );
+						$_assets = $w->assets_editor;
 
-					elseif ( is_string( $asset ) ) :
+					break;
 
-						$this->asset->load( $asset );
+					case 'RENDER' :
 
-					endif;
+						$_assets = $w->assets_render;
 
-				endforeach;
+					break;
+
+					default :
+
+						$_assets = array();
+
+					break;
+
+				endswitch;
+
+				$this->_load_assets( $_assets );
 
 			endif;
 
@@ -999,7 +1009,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_widget( $slug )
+	public function get_widget( $slug, $load_assets = FALSE )
 	{
 		$_widgets = $this->get_available_widgets();
 
@@ -1008,6 +1018,34 @@ class NAILS_Cms_page_model extends NAILS_Model
 			foreach ( $widget_group->widgets AS $widget ) :
 
 				if ( $slug == $widget->slug ) :
+
+					if ( $load_assets ) :
+
+						switch( $load_assets ) :
+
+							case 'EDITOR' :
+
+								$_assets = $widget->assets_editor;
+
+							break;
+
+							case 'RENDER' :
+
+								$_assets = $widget->assets_render;
+
+							break;
+
+							default :
+
+								$_assets = array();
+
+							break;
+
+						endswitch;
+
+						$this->_load_assets( $_assets );
+
+					endif;
 
 					return $widget;
 
@@ -1116,20 +1154,30 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Load the template's assets if requested
 			if ( $load_assets ) :
 
-				foreach ( $_templates[$template]->assets AS $asset ) :
+				//	What type of assets do we want to load, editor or render assets?
+				switch( $load_assets ) :
 
-					if ( is_array( $asset ) ) :
+					case 'EDITOR' :
 
-						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
-						$this->asset->load( $asset[0], $_is_nails );
+						$_assets = $_templates[$template]->assets_editor;
 
-					elseif ( is_string( $asset ) ) :
+					break;
 
-						$this->asset->load( $asset );
+					case 'RENDER' :
 
-					endif;
+						$_assets = $_templates[$template]->assets_render;
 
-				endforeach;
+					break;
+
+					default :
+
+						$_assets = array();
+
+					break;
+
+				endswitch;
+
+				$this->_load_assets( $_assets );
 
 			endif;
 
@@ -1180,20 +1228,29 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Load the template's assets if requested
 			if ( $load_assets ) :
 
-				foreach ( $_templates[$template]->assets AS $asset ) :
+				switch( $load_assets ) :
 
-					if ( is_array( $asset ) ) :
+					case 'EDITOR' :
 
-						$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
-						$this->asset->load( $asset[0], $_is_nails );
+						$_assets = $_templates[$template]->assets_editor;
 
-					elseif ( is_string( $asset ) ) :
+					break;
 
-						$this->asset->load( $asset );
+					case 'RENDER' :
 
-					endif;
+						$_assets = $_templates[$template]->assets_render;
 
-				endforeach;
+					break;
+
+					default :
+
+						$_assets = array();
+
+					break;
+
+				endswitch;
+
+				$this->_load_assets( $_assets );
 
 			endif;
 
@@ -1218,13 +1275,41 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_template( $slug )
+	public function get_template( $slug, $load_assets = FALSE )
 	{
 		$_templates = $this->get_available_templates();
 
 		foreach ( $_templates AS $template ) :
 
 			if ( $slug == $template->slug ) :
+
+				if ( $load_assets ) :
+
+					switch( $load_assets ) :
+
+						case 'EDITOR' :
+
+							$_assets = $template->assets_editor;
+
+						break;
+
+						case 'RENDER' :
+
+							$_assets = $template->assets_render;
+
+						break;
+
+						default :
+
+							$_assets = array();
+
+						break;
+
+					endswitch;
+
+					$this->_load_assets( $_assets );
+
+				endif;
 
 				return $template;
 
@@ -1233,6 +1318,28 @@ class NAILS_Cms_page_model extends NAILS_Model
 		endforeach;
 
 		return FALSE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _load_assets( $assets = array() )
+	{
+		foreach ( $assets AS $asset ) :
+
+			if ( is_array( $asset ) ) :
+
+				$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+				$this->asset->load( $asset[0], $_is_nails );
+
+			elseif ( is_string( $asset ) ) :
+
+				$this->asset->load( $asset );
+
+			endif;
+
+		endforeach;
 	}
 }
 

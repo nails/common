@@ -249,8 +249,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->data['page']->title	= 'Create New Page';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates( TRUE );
-		$this->data['widgets']		= $this->cms_page->get_available_widgets( TRUE );
+		$this->data['templates']	= $this->cms_page->get_available_templates( 'EDITOR' );
+		$this->data['widgets']		= $this->cms_page->get_available_widgets( 'EDITOR' );
 
 		// --------------------------------------------------------------------------
 
@@ -306,8 +306,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->draft->title . '"';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates( TRUE );
-		$this->data['widgets']		= $this->cms_page->get_available_widgets( TRUE );
+		$this->data['templates']	= $this->cms_page->get_available_templates( 'EDITOR' );
+		$this->data['widgets']		= $this->cms_page->get_available_widgets( 'EDITOR' );
 
 		//	Get children of this page
 		$this->data['page_children'] = $this->cms_page->get_ids_of_children( $this->data['cmspage']->id );

@@ -50,7 +50,8 @@ class NAILS_CMS_Widget
 		$_d->restrict_from_area		= array();
 
 		//	Define any assets need to be loaded by the widget
-		$_d->assets = array();
+		$_d->assets_editor = array();
+		$_d->assets_render = array();
 
 		//	Path
 		$_d->path = dirname( $_reflect->getFileName() ) . '/';

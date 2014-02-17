@@ -85,7 +85,6 @@ class Nails_CMS_Template
 		//	Automatically calculated properties
 		$_d->slug	= '';
 
-
 		// --------------------------------------------------------------------------
 
 		//	Work out slug - this should uniquely identify a type of template
@@ -97,7 +96,8 @@ class Nails_CMS_Template
 		// --------------------------------------------------------------------------
 
 		//	Define any assets need to be loaded by the template
-		$_d->assets = array();
+		$_d->assets_editor = array();
+		$_d->assets_render = array();
 
 		// --------------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ class Nails_CMS_Template
 
 					try
 					{
-						$_widget = get_instance()->cms_page_model->get_widget( $widget_data->widget );
+						$_widget = get_instance()->cms_page_model->get_widget( $widget_data->widget, 'RENDER' );
 
 						if ( $_widget ) :
 

@@ -291,7 +291,7 @@ class NAILS_Cms extends NAILS_API_Controller
 		$_data->data->seo_description	= ! empty( $_page_data->data->seo_description )		? $_page_data->data->seo_description	: '';
 		$_data->data->seo_keywords		= ! empty( $_page_data->data->seo_keywords )		? $_page_data->data->seo_keywords		: '';
 		$_data->data->template			= $_page_data->data->template;
-		$_data->data->additional_fields	= ! empty( $_page_data->data->additional_fields )	? $_page_data->data->additional_fields	: new stdClass;
+		$_data->data->additional_fields	= ! empty( $_page_data->data->additional_fields )	? $_page_data->data->additional_fields	: '';
 		$_data->widget_areas			= ! empty( $_page_data->widget_areas )				? $_page_data->widget_areas				: new stdClass;
 
 		if ( $_data->data->additional_fields ) :
