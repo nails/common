@@ -966,7 +966,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _menus_edit()
 	{
-		$this->data['menu'] = $this->cms_menu->get_by_id( $this->uri->segment( 5 ), TRUE );
+		$this->data['menu'] = $this->cms_menu->get_by_id( $this->uri->segment( 5 ), TRUE, FALSE );
 
 		if ( ! $this->data['menu'] ) :
 
@@ -981,6 +981,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		//	Assets
 		$this->asset->load( 'nails.admin.cms.menus.create_edit.min.js', TRUE );
+		$this->asset->library( 'jqueryui' );
 
 		// --------------------------------------------------------------------------
 

@@ -148,19 +148,28 @@ class NAILS_Cms extends NAILS_API_Controller
 				//	Instantiate the widget
 				include_once $_widget->path . 'widget.php';
 
-				$WIDGET		= new $_widget->iam();
-				$_editor	= $WIDGET->get_editor( $_data );
+				try
+				{
 
-				if ( ! empty( $_editor ) ) :
+					$WIDGET		= new $_widget->iam();
+					$_editor	= $WIDGET->get_editor( $_data );
 
-					$_out['HTML'] = $_editor;
+					if ( ! empty( $_editor ) ) :
 
-				else :
+						$_out['HTML'] = $_editor;
 
+					else :
+
+						$_out['HTML'] = '<p class="no-config">This widget has no configurable options.</p>';
+
+					endif;
+
+				}
+				catch ( Exception $e)
+				{
 					$_out['status']	= 500;
 					$_out['error']	= 'This widget has not been configured correctly. Please contact the developer quoting this error message: <strong>"#3:' . $_widget->iam . ':GetEditor"</strong>';
-
-				endif;
+				}
 
 			else :
 

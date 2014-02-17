@@ -15,7 +15,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._saving			= false;
 	this._refreshing		= false;
 	this._autosave			= null;
-	this._autosave_delay	= 6000;
+	this._autosave_delay	= 60000;
 	this._async_save		= true;
 
 	// --------------------------------------------------------------------------
@@ -721,6 +721,16 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 				// --------------------------------------------------------------------------
 
+				//	Helpers
+				_script += 'this.resize_widget = function( ui ){';
+				_script += 'var _header_height	= ui.find( \'.header-bar\' ).outerHeight();';
+				_script += 'var _editor_height	= ui.find( \'.editor\' ).outerHeight();';
+				_script += 'var _height			= _header_height + _editor_height;';
+				_script += 'ui.animate({height:_height},250);';
+				_script += '};';
+
+				// --------------------------------------------------------------------------
+
 				_script += '};';
 				_script += 'var _WIDGET_' + this.widgets[_key].widgets[_key2].slug + ' = new _WIDGET_CALLBACKS_' + this.widgets[_key].widgets[_key2].slug + '();';
 
@@ -1196,6 +1206,18 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				if ( typeof( _nails.add_stripes ) === 'function' )
 				{
 					_nails.add_stripes();
+				}
+				/* jshint ignore:end */
+
+				// --------------------------------------------------------------------------
+
+				//	Chosen
+				/* jshint ignore:start */
+				if ( typeof( $.fn.chosen ) === 'function' )
+				{
+					//$( 'select.chosen' ).chosen();
+
+					//	TODO: get this working with the overflow'd parents
 				}
 				/* jshint ignore:end */
 
