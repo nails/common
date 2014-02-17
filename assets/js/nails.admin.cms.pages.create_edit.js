@@ -34,7 +34,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			this.page_data =
 			{
 				hash : null,
-				id : null,
+				id : typeof( page_id ) !== 'undefined' ? page_id : null,
 				data : {},
 				widget_areas : {}
 			};
