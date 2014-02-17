@@ -11,6 +11,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._dragging_widget	= false;
 	this._editor_open		= false;
 	this._preview_open		= false;
+	this._dialog_open		= false;
 	this._saving			= false;
 	this._refreshing		= false;
 	this._autosave			= null;
@@ -197,7 +198,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						$(this).dialog('close');
 					}
-				}
+				},
+				open : function() { _this._dialog_open = true; },
+				close : function() { setTimeout( function() { _this._dialog_open = false; }, 500 ); }
 			});
 		};
 
@@ -234,7 +237,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						$(this).dialog('close');
 					}
-				}
+				},
+				open : function() { _this._dialog_open = true; },
+				close : function() { setTimeout( function() { _this._dialog_open = false; }, 500 ); }
 			});
 		};
 
@@ -273,6 +278,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		{
 			var _data = JSON.parse( data.responseText );
 			_this._editor.container.removeClass( 'loading' );
+			_this._dialog_open = true;
 
 			$('<div>').text( _data.error ).dialog({
 				title: 'Something went wrong.',
@@ -285,7 +291,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						$(this).dialog('close');
 					}
-				}
+				},
+				open : function() { _this._dialog_open = true; },
+				close : function() { setTimeout( function() { _this._dialog_open = false; }, 500 ); }
 			});
 
 			_this._preview_open = false;
@@ -935,7 +943,8 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		//	Bind keyUp event for the escape key, don't close if dragging or previewing
 		$(document).on( 'keyup', function( e )
 		{
-			if ( ! _this._dragging_widget && ! _this._preview_open && e.keyCode === 27 )
+			console.log(_this._dialog_open);
+			if ( ! _this._dragging_widget && ! _this._preview_open && ! _this._dialog_open && e.keyCode === 27 )
 			{
 				_this._editor_close();
 			}
@@ -1252,7 +1261,9 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					$(this).dialog('close');
 				}
-			}
+			},
+			open : function() { _this._dialog_open = true; },
+			close : function() { setTimeout( function() { _this._dialog_open = false; }, 500 ); }
 		});
 
 		$('.ui-widget-overlay').css({zIndex:1000});
