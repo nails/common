@@ -50,7 +50,7 @@
 
 							echo '<div class="indentor-content">';
 
-								echo $page->draft->title;
+								echo anchor( 'admin/cms/pages/edit/' . $page->id, $page->draft->title );
 
 								//	A little feedback on the status of the page:
 								//	- If it's in draft state then simply show it's in draft
@@ -73,11 +73,27 @@
 
 								endif;
 
-								$_title_nested = explode( '|', $page->draft->title_nested );
-								array_pop( $_title_nested );
+								$_breadcrumbs = $page->draft->breadcrumbs;
+								array_pop( $_breadcrumbs );
 
 								echo '<small>';
-								echo $_title_nested ? implode( ' &rsaquo; ', $_title_nested ) : 'Top Level Page';
+								if ( $_breadcrumbs ) :
+
+									$_out = array();
+
+									foreach ( $_breadcrumbs AS $crumb ) :
+
+										$_out[] = $crumb->title;
+
+									endforeach;
+
+									echo implode( ' // ', $_out );
+
+								else :
+
+									echo 'Top Level Page';
+
+								endif;
 								echo '</small>';
 
 							echo '</div>';

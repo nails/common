@@ -198,60 +198,107 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Work out the nested title
+		//	Generate the breadcrumbs
+		$_data->draft_breadcrumbs = array();
+
 		if ( $_data->draft_parent_id ) :
 
-			//	No need to fetch the parent again, encode it tho as it will have been decoded
-			$_prefix = $_parent->draft->title_nested . '|';
+			//	There is a parent, use it's breadcrumbs array as the starting point.
+			//	No need to fetch the parent again.
 
-		else :
-
-			//	No parent, no need for a prefix
-			$_prefix = '';
+			$_data->draft_breadcrumbs = $_parent->draft->breadcrumbs;
 
 		endif;
 
-		$_data->draft_title_nested = $_prefix . $_data->draft_title;
+		$_temp			= new stdClass();
+		$_temp->id		= $_current->id;
+		$_temp->title	= $_data->draft_title;
+		$_temp->slug	= $_data->draft_slug;
+
+		$_data->draft_breadcrumbs[] = $_temp;
+		unset( $_temp );
+
+		//	Encode the breadcrumbs for the database
+		$_data->draft_breadcrumbs = json_encode( $this->_generate_breadcrumbs( $_current->id ) );
 
 		// --------------------------------------------------------------------------
 
 		if ( parent::update( $_current->id, $_data ) ) :
 
-			//	Update was successful, if either the slug or the title has changed
-			//	then we need to update all the children.
+			//	Update was successful, set the breadcrumbs
+			$_breadcrumbs = $this->_generate_breadcrumbs( $_current->id );
 
-			if ( $_current->draft->slug != $_data->draft_slug || $_current->draft->title_nested != $_data->draft_title_nested ) :
+			$this->db->set( 'draft_breadcrumbs', json_encode( $_breadcrumbs ) );
+			$this->db->where( 'id', $_current->id );
+			if ( ! $this->db->update( $this->_table ) ) :
 
-				//	Fetch the children, returning the data we need for the updates
-				$_children = $this->get_ids_of_children( $_current->id, 'ID_SLUG_TITLE' );
+				$this->_set_error( 'Failed to generate breadcrumbs.' );
+				$this->db->trans_rollback();
+				return FALSE;
 
-				if ( $_children ) :
+			endif;
 
-					//	Loop each child and update it's details
-					foreach( $_children AS $child ) :
+			//	For each child regenerate the breadcrumbs and slugs
+			$_children = $this->get_ids_of_children( $_current->id );
 
-						//	Need to be a bit clever with the slugs & titles, we need to first remove
-						//	the *old* portion of the slug/title so we can append what's left to the
-						//	new slug/title.
+			if ( $_children ) :
 
-						$child['slug']	= preg_replace( '#^' . $_current->draft->slug . '/#', '', $child['slug'] );
-						$child['title']	= preg_replace( '#^' . str_replace( '#', '\#', $_current->draft->title ) . '/#', '', $child['title'] );
+				//	Loop each child and update it's details
+				foreach( $_children AS $child_id ) :
 
-						$this->db->set( 'draft_slug', $_data->draft_slug . '/' . $child['slug'] );
-						$this->db->set( 'draft_title_nested', $_data->draft_title_nested . '|' . $child['title'] );
-						$this->db->where( 'id', $child['id'] );
+					//	We can assume that the children are in a sensible order, loop them and
+					//	process. For nested children, their parent will have been processed by
+					//	the time we process it.
 
-						if ( ! $this->db->update( NAILS_DB_PREFIX . 'cms_page' ) ) :
+					$_child = $this->get_by_id( $child_id );
 
-							$this->_set_error( 'Failed to update a child page\'s data.' );
-							$this->db->trans_rollback();
-							return FALSE;
+					if ( ! $_child ) :
+
+						continue;
+
+					endif;
+
+					$_data = new stdClass();
+
+					//	Generate the breadcrumbs
+					$_data->draft_breadcrumbs = json_encode( $this->_generate_breadcrumbs( $_child->id ) );
+
+					//	Generate the slug
+					if ( $_child->draft->parent_id ) :
+
+						//	Child has a parent, fetch it and use it's slug as the prefix
+						$_parent = $this->get_by_id( $_child->draft->parent_id );
+
+						if ( $_parent ) :
+
+							$_data->draft_slug = $_parent->draft->slug . '/' . $_child->draft->slug_end;
+
+						else :
+
+							//	Parent is bad, make this a parent page. Poor wee orphan.
+							$_data->draft_parent_id	= NULL;
+							$_data->draft_slug		= $_child->draft->slug_end;
 
 						endif;
 
-					endforeach;
+					else :
 
-				endif;
+						//	Would be weird if this happened, but ho hum handle it anyway
+						$_data->draft_parent_id	= NULL;
+						$_data->draft_slug		= $_child->draft->slug_end;
+
+					endif;
+
+					//	Update the child and move on
+					if ( ! parent::update( $_child->id, $_data ) ) :
+
+						$this->_set_error( 'Failed to update breadcrumbs and/or slug of child page.' );
+						$this->db->trans_rollback();
+						return FALSE;
+
+					endif;
+
+				endforeach;
 
 			endif;
 
@@ -268,6 +315,40 @@ class NAILS_Cms_page_model extends NAILS_Model
 		 	return FALSE;
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _generate_breadcrumbs( $id )
+	{
+		$_page = $this->get_by_id( $id );
+
+		if ( ! $_page ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_breadcrumbs = array();
+
+		if ( $_page->draft->parent_id ) :
+
+			$_breadcrumbs = array_merge( $_breadcrumbs, $this->_generate_breadcrumbs( $_page->draft->parent_id ) );
+
+		endif;
+
+		$_temp					= new stdClass();
+		$_temp->id				= $_page->id;
+		$_temp->title			= $_page->draft->title;
+
+		$_breadcrumbs[] = $_temp;
+		unset( $_temp );
+
+		return $_breadcrumbs;
 	}
 
 
@@ -370,7 +451,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->db->set( 'published_template',			'draft_template',			FALSE );
 		$this->db->set( 'published_template_data',		'draft_template_data',		FALSE );
 		$this->db->set( 'published_title',				'draft_title',				FALSE );
-		$this->db->set( 'published_title_nested',		'draft_title_nested',		FALSE );
+		$this->db->set( 'published_breadcrumbs',		'draft_breadcrumbs',		FALSE );
 		$this->db->set( 'published_seo_description',	'draft_seo_description',	FALSE );
 		$this->db->set( 'published_seo_keywords',		'draft_seo_keywords',		FALSE );
 
@@ -388,46 +469,40 @@ class NAILS_Cms_page_model extends NAILS_Model
 		if ( $this->db->update( $this->_table ) ) :
 
 			//	Fetch the children, returning the data we need for the updates
-			$_children = $this->get_ids_of_children( $_page->id, 'ID_SLUG_TITLE_PUBLISHED' );
+			$_children = $this->get_ids_of_children( $_page->id );
 
 			if ( $_children ) :
 
-				//	Loop each child and update it's details
-				foreach( $_children AS $child ) :
+				//	Loop each child and update it's published details
+				foreach( $_children AS $child_id ) :
 
-					//	Need to be a bit clever with the slugs & titles, we need to first remove
-					//	the *old* portion of the slug/title so we can append what's left to the
-					//	new slug/title.
+					$_child = $this->get_by_id( $child_id );
+
+					if ( ! $_child ) :
+
+						continue;
+
+					endif;
 
 					//	First make a note of the old slug
-					if ( $child['is_published'] ) :
+					if ( $_child->is_published ) :
 
 						$_slug_history[] = array(
-							'slug'		=> $child['slug'],
-							'page_id'	=> $child['id']
+							'slug'		=> $_child->draft->slug,
+							'page_id'	=> $_child->id
 						);
 
 					endif;
 
-					$child['slug']	= preg_replace( '#^' . $_page->draft->slug . '/#', '', $child['slug'] );
-					$child['title']	= preg_replace( '#^' . str_replace( '#', '\#', $_page->draft->title ) . '/#', '', $child['title'] );
+					//	Next we set the appropriate fields
+					$this->db->set( 'published_slug',			$_child->draft->slug );
+					$this->db->set( 'published_slug_end',		$_child->draft->slug_end );
+					$this->db->set( 'published_breadcrumbs',	json_encode( $_child->draft->breadcrumbs ) );
+					$this->db->set( 'modified',					date('Y-m-d H:i:s') );
 
-					$_slug	= $_page->draft->slug . '/' . $child['slug'];
-					$_title	= $_page->draft->title_nested . '|' . $child['title'];
+					$this->db->where( 'id', $_child->id );
 
-					$this->db->set( 'draft_slug', $_slug );
-					$this->db->set( 'draft_title_nested', $_title );
-
-					if ( $child['is_published'] ) :
-
-						$this->db->set( 'published_slug', $_slug );
-						$this->db->set( 'published_title_nested', $_title );
-
-					endif;
-
-					$this->db->where( 'id', $child['id'] );
-
-					if ( ! $this->db->update( NAILS_DB_PREFIX . 'cms_page' ) ) :
+					if ( ! $this->db->update( $this->_table ) ) :
 
 						$this->_set_error( 'Failed to update a child page\'s data.' );
 						$this->db->trans_rollback();
@@ -442,10 +517,10 @@ class NAILS_Cms_page_model extends NAILS_Model
 			//	Add any slug_history thingmys
 			foreach ( $_slug_history AS $item ) :
 
-				$this->db->set( 'hash', md5( $item['slug'] . $item['page_id'] ) );
-				$this->db->set( 'slug', $item['slug'] );
-				$this->db->set( 'page_id', $item['page_id'] );
-				$this->db->set( 'created', 'NOW()', FALSE );
+				$this->db->set( 'hash',		md5( $item['slug'] . $item['page_id'] ) );
+				$this->db->set( 'slug',		$item['slug'] );
+				$this->db->set( 'page_id',	$item['page_id'] );
+				$this->db->set( 'created',	'NOW()', FALSE );
 				$this->db->replace( NAILS_DB_PREFIX . 'cms_page_slug_history' );
 
 			endforeach;
@@ -631,7 +706,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	{
 		$_out = array();
 
-		$this->db->select('id,draft_slug,draft_title,is_published');
+		$this->db->select( 'id,draft_slug,draft_title,is_published' );
 		$this->db->where( 'draft_parent_id', $page_id );
 		$_children = $this->db->get( NAILS_DB_PREFIX . 'cms_page' )->result();
 
@@ -740,6 +815,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	Decode JSON
 		$page->published->template_data	= json_decode( $page->published->template_data );
 		$page->draft->template_data		= json_decode( $page->draft->template_data );
+		$page->published->breadcrumbs	= json_decode( $page->published->breadcrumbs );
+		$page->draft->breadcrumbs		= json_decode( $page->draft->breadcrumbs );
 
 		//	Replace titles
 

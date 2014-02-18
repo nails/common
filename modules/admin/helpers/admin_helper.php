@@ -79,11 +79,19 @@ if ( ! function_exists( 'login_as_button' ) )
 
 
 /**
- * Generate a login as button
+ * Add an item to the admin changelog
  *
  * @access	public
- * @param	int		$uid		The ID of the user we're logging in as
- * @param	string	$upassword	The encoded password of the user to log in as
+ * @param	string $verb A verb which best describes the action (e.g updated)
+ * @param	string $article The article associated with $item (e.g a/an)
+ * @param	string $item The item which was verb'd (e.g blog post)
+ * @param	string $item_id The ID of the item which was verb'd
+ * @param	string $title The title to give this item in the front end (e.g pablo updated a blog post, MY BLOG POST)
+ * @param	string $url A url to put around the $title
+ * @param	string $field Which field was updated
+ * @param	string $old_value The old value of $field
+ * @param	string $new_value the new value of $field
+ * @param	string $strict_comparison whether or not to use strict comparisons (=== or ==)
  * @return	string
  */
 if ( ! function_exists( '_ADMIN_CHANGE_ADD' ) )
