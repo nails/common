@@ -36,7 +36,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 		//	Set defaults
 		$this->_changes		= array();
-		$this->_batch_save	= FALSE;
+		$this->_batch_save	= TRUE;
 
 		// --------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 		$_hook['method']	= 'save';
 		$_hook['params']	= '';
 
-		if ( $GLOBALS['EXT']->add_hook( 'post_controller', $_hook ) == FALSE ) :
+		if ( $GLOBALS['EXT']->add_hook( 'post_system', $_hook ) == FALSE ) :
 
 			$this->_batch_save = FALSE;
 			log_message( 'error', 'Admin_changelog_model could not set the post_controller hook to save items in batches.' );
@@ -69,23 +69,23 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 			$new_value = trim( $new_value );
 			$old_value = trim( $old_value );
-	
+
 			if ( $strict_comparison ) :
-	
+
 				if ( $new_value === $old_value ) :
-	
+
 					return FALSE;
-	
+
 				endif;
-	
+
 			else :
-	
+
 				if ( $new_value == $old_value ) :
-	
+
 					return FALSE;
-	
+
 				endif;
-	
+
 			endif;
 
 		endif;
@@ -116,12 +116,16 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 		//	Generate a subkey, so that multiple calls to the same field
 		//	overwrite each other
 
-		$_subkey = md5( $field );
+		if ( $field ) :
 
-		$this->_changes[$_key]['changes'][$_subkey]				= new stdClasS();
-		$this->_changes[$_key]['changes'][$_subkey]->field		= $field;
-		$this->_changes[$_key]['changes'][$_subkey]->old_value	= $old_value;
-		$this->_changes[$_key]['changes'][$_subkey]->new_value	= $new_value;
+			$_subkey = md5( $field );
+
+			$this->_changes[$_key]['changes'][$_subkey]				= new stdClasS();
+			$this->_changes[$_key]['changes'][$_subkey]->field		= $field;
+			$this->_changes[$_key]['changes'][$_subkey]->old_value	= $old_value;
+			$this->_changes[$_key]['changes'][$_subkey]->new_value	= $new_value;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
