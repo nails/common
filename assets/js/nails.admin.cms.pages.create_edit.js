@@ -845,7 +845,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					var _slug = ui.item.data( 'slug' );
 
 					//	Call the widget's sort_start event
-					window['_WIDGET_' + _slug].sort_start( ui.item );
+					try
+					{
+						window['_WIDGET_' + _slug].sort_start( ui.item );
+					}
+					catch( error )
+					{
+						console.log( 'sort_start callback is not defined', error );
+					}
 				}
 			},
 			update: function(e,ui)
@@ -891,7 +898,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					//	Call the widget's sort_start event
 					var _slug = ui.item.data( 'slug' );
-					window['_WIDGET_' + _slug].sort_stop( ui.item );
+					try
+					{
+						window['_WIDGET_' + _slug].sort_stop( ui.item );
+					}
+					catch( error )
+					{
+						console.log( 'sort_stop callback is not defined', error );
+					}
 				}
 			}
 		});
@@ -1228,7 +1242,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				// --------------------------------------------------------------------------
 
 				//	Execute this widget's dropped callback
-				window['_WIDGET_' + _widget.slug].dropped( _item );
+				try
+				{
+					window['_WIDGET_' + _widget.slug].dropped( _item );
+				}
+				catch( error )
+				{
+					console.log( 'dropped callback is not defined', error );
+				}
 
 				// --------------------------------------------------------------------------
 
@@ -1277,7 +1298,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					var _slug	= _item.data( 'slug' );
 
 					//	Before remove calback
-					window['_WIDGET_' + _slug].remove_start( _item );
+					try
+					{
+						window['_WIDGET_' + _slug].remove_start( _item );
+					}
+					catch( error )
+					{
+						console.log( 'remove_start callback is not defined', error );
+					}
 
 					//	Close dialog
 					$(this).dialog('close');
@@ -1301,7 +1329,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						}
 
 						//	Removed callback
-						window['_WIDGET_' + _slug].remove_stop( _item );
+						try
+						{
+							window['_WIDGET_' + _slug].remove_stop( _item );
+						}
+						catch( error )
+						{
+							console.log( 'remove_stop callback is not defined', error );
+						}
 					});
 				},
 				Cancel: function()
