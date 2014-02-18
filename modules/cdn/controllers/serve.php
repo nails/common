@@ -190,11 +190,11 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 		else :
 
-			$_stats = stat( $_usefile );
-
 			//	Determine headers to send
 			$_finfo = new finfo( FILEINFO_MIME_TYPE ); // return mime type ala mimetype extension
+			header( 'Content-type: ' . $_finfo->file($_usefile ), TRUE );
 
+			$_stats = stat( $_usefile );
 			$this->_set_cache_headers( $_stats[9], $this->_bucket . $this->_object, FALSE );
 
 			// --------------------------------------------------------------------------

@@ -119,7 +119,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	Work out content type
 		$_mime = $this->cdn->get_mime_type_from_file( $this->_cachedir . $file );
 
-		header( 'content-Type: ' . $_mime );
+		header( 'Content-Type: ' . $_mime );
 
 		// --------------------------------------------------------------------------
 
