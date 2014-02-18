@@ -354,7 +354,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->db->set( 'published_slug_end',			'draft_slug_end',			FALSE );
 		$this->db->set( 'published_template',			'draft_template',			FALSE );
 		$this->db->set( 'published_template_data',		'draft_template_data',		FALSE );
-		$this->db->set( 'published_rendered_html',		'draft_rendered_html',		FALSE );
 		$this->db->set( 'published_title',				'draft_title',				FALSE );
 		$this->db->set( 'published_title_nested',		'draft_title_nested',		FALSE );
 		$this->db->set( 'published_seo_description',	'draft_seo_description',	FALSE );
