@@ -131,8 +131,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	Clone the data object so we can mutate it without worry. Unset id and
 		//	hash as we don't need to store them
 
-
-		$_clone =clone $data;
+		$_clone = clone $data;
 		unset( $_clone->id );
 		unset( $_clone->hash );
 
@@ -1358,6 +1357,85 @@ class NAILS_Cms_page_model extends NAILS_Model
 			endif;
 
 		endforeach;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $id )
+	{
+		$_page = $this->get_by_id( $id );
+
+		if ( ! $_page ) :
+
+			$this->_set_error( 'Invalid page ID' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->trans_begin();
+
+		$this->db->where( 'id', $id );
+		$this->db->set( 'is_deleted', TRUE );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+
+		if ( $this->user->is_logged_in() ) :
+
+			$this->db->set( 'modified_by', active_user( 'id' ) );
+
+		endif;
+
+		if ( $this->db->update( $this->_table ) ) :
+
+			//	Success, update children
+			$_children = $this->get_ids_of_children( $id );
+
+			if ( $_children ) :
+
+				$this->db->where_in( 'id', $_children );
+				$this->db->set( 'is_deleted', TRUE );
+				$this->db->set( 'modified', 'NOW()', FALSE );
+
+				if ( $this->user->is_logged_in() ) :
+
+					$this->db->set( 'modified_by', active_user( 'id' ) );
+
+				endif;
+
+				if ( ! $this->db->update( $this->_table ) ) :
+
+					$this->_set_error( 'Unable to delete children pages' );
+					$this->db->trans_rollback();
+					return FALSE;
+
+				endif;
+
+			endif;
+
+			$this->db->trans_commit();
+			return TRUE;
+
+		else :
+
+			//	Failed
+			$this->db->trans_rollback();
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function destroy( $id )
+	{
+		//	TODO: implement this?
+		$this->_set_error( 'It is not possible to destroy pages using this system.' );
+		return FALSE;
 	}
 }
 

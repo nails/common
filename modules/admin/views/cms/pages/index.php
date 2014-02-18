@@ -93,13 +93,19 @@
 
 								echo anchor( 'admin/cms/pages/edit/' . $page->id, lang( 'action_edit' ), 'class="awesome small"' );
 
+								if ( ! $page->is_published || $_published_hash !== $_draft_hash ) :
+
+									echo anchor( 'admin/cms/pages/publish/' . $page->id, lang( 'action_publish' ), 'data-title="Are you sure?" data-body="Publish this page immediately?" class="confirm awesome green small"' );
+
+								endif;
+
 							endif;
 
 							//echo anchor( $page->url . '?is_preview=1', lang( 'action_preview' ), 'target="_blank" class="fancybox awesome small green" data-fancybox-type="iframe" data-width="100%" data-height="100%"' );
 
 							if ( user_has_permission( 'admin.cms.can_delete_page' ) ) :
 
-								echo anchor( 'admin/cms/pages/delete/' . $page->id, lang( 'action_delete' ), 'data-title="Are you sure?" data-body="This will remove the page from the site. This action can be undone." class="confirm awesome small red"' );
+								echo anchor( 'admin/cms/pages/delete/' . $page->id, lang( 'action_delete' ), 'data-title="Are you sure?" data-body="This will remove the page, and any of it\'s children, from the site." class="confirm awesome small red"' );
 
 							endif;
 

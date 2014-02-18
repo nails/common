@@ -327,6 +327,47 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	}
 
 
+	// --------------------------------------------------------------------------
+
+
+	protected function _pages_publish()
+	{
+		if ( ! user_has_permission( 'admin.cms.can_edit_page' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_id	= $this->uri->segment( 5 );
+		$_page	= $this->cms_page->get_by_id( $_id );
+
+		if ( $_page && ! $_page->is_deleted ) :
+
+			if ( $this->cms_page->publish( $_id ) ) :
+
+				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was published successfully.' );
+
+			else :
+
+				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not publish page. ' . $this->cms_page->last_error() );
+
+			endif;
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid page ID.' );
+
+		endif;
+
+		redirect( 'admin/cms/pages' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _pages_delete()
 	{
 		if ( ! user_has_permission( 'admin.cms.can_delete_page' ) ) :
@@ -344,7 +385,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 			if ( $this->cms_page->delete( $_id ) ) :
 
-				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was deleted successfully. ' . anchor( 'admin/cms/pages/restore/' . $_id, 'Undo?' ) );
+				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was deleted successfully.' );
 
 			else :
 
