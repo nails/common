@@ -28,12 +28,15 @@ class Nails_CMS_Template
 		//	The human friendly name of this template
 		$_d->label			= 'Widget';
 
-		//	A brief description fo the template, optional
+		//	A brief description of the template, optional
 		$_d->description	= '';
 
 		//	Any additional fields to request
 		//	TODO: use the form builder library
 		$_d->additional_fields = array();
+
+		//	Empty manual_config object
+		$_d->manual_config = '';
 
 		//	An icon/preview to render
 		$_d->img			= new stdClass();
@@ -170,6 +173,7 @@ class Nails_CMS_Template
 		//	If the template wishes to execute any custom pre/post code then this method
 		//	should be extended and parent::render( $_data ) called at the appropriate
 		//	point. But that's obvious, isn't it...?
+
 		// --------------------------------------------------------------------------
 
 		get_instance()->load->model( 'cms/cms_page_model' );

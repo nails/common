@@ -287,6 +287,21 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	Look for manual config items
+		if ( ! empty( $additional_fields->manual_config->assets_render ) ) :
+
+			if ( ! is_array( $additional_fields->manual_config->assets_render ) ) :
+
+				$additional_fields->manual_config->assets_render = (array) $additional_fields->manual_config->assets_render;
+
+			endif;
+
+			$this->_load_assets( $additional_fields->manual_config->assets_render );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Attempt to instantiate and render the template
 		try
 		{

@@ -212,6 +212,17 @@
 				$_visible = $_default_template == $template->slug ? 'block' : 'none';
 				echo '<div id="additional-fields-' . $template->slug . '" class="additional-fields" style="display:' . $_visible . '">';
 
+				//	Common, manual config item
+				$_field					= array();
+				$_field['key']			= 'additional_field[' . $template->slug . '][manual_config]';
+				$_field['label']		= 'Manual Config';
+				$_field['sub_label']	= 'Specify any manual config items here. This field should be '. anchor( 'http://en.wikipedia.org/wiki/JSON', 'JSON encoded', 'class="fancybox" data-fancybox-type="iframe" data-width="90%" data-height="90%"' ) . '.';
+				//	TODO: add a link to the docs here
+				$_field['type']			= 'textarea';
+				$_field['default']		= ! empty( $cmspage->draft->template_data->data->additional_fields->{$template->slug}->manual_config ) ? $cmspage->draft->template_data->data->additional_fields->{$template->slug}->manual_config : '';
+
+				echo form_field( $_field );
+
 				if ( $template->additional_fields ) :
 
 					foreach( $template->additional_fields AS $field ) :
@@ -240,11 +251,6 @@
 						endswitch;
 
 					endforeach;
-
-
-				else :
-
-					echo '<p>This template has no configurable options.</p>';
 
 				endif;
 
