@@ -81,6 +81,8 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		endif;
 
+		$this->data['page_data'] =& $_data;
+
 		// --------------------------------------------------------------------------
 
 		//	If the page is the homepage and we're viewing it by slug, then redirect to
@@ -95,6 +97,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Set some page level data
+		$this->data['page']->id				= $_page->id;
 		$this->data['page']->title			= $_data->title;
 		$this->data['page']->description	= $_data->seo_description;
 		$this->data['page']->keywords		= $_data->seo_keywords;
@@ -103,6 +106,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		$_render					= new stdClass();
 		$_render->widgets			= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
 		$_render->additional_fields	= isset( $_data->template_data->data->additional_fields->{$_data->template} ) ? $_data->template_data->data->additional_fields->{$_data->template} : array();
+
 		//	Decode manual config
 		if ( isset( $_render->additional_fields->manual_config ) ) :
 
