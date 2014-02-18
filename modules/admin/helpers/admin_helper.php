@@ -96,7 +96,7 @@ if ( ! function_exists( 'login_as_button' ) )
  */
 if ( ! function_exists( '_ADMIN_CHANGE_ADD' ) )
 {
-	function _ADMIN_CHANGE_ADD( $verb, $article, $item, $item_id, $title, $url, $field, $old_value, $new_value, $strict_comparison = TRUE )
+	function _ADMIN_CHANGE_ADD( $verb, $article, $item, $item_id, $title, $url, $field = NULL, $old_value = NULL, $new_value = NULL, $strict_comparison = TRUE )
 	{
 		return get_instance()->admin_changelog_model->add( $verb, $article, $item, $item_id, $title, $url, $field, $old_value, $new_value, $strict_comparison );
 	}

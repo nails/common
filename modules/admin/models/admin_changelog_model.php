@@ -36,7 +36,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 		//	Set defaults
 		$this->_changes		= array();
-		$this->_batch_save	= TRUE;
+		$this->_batch_save	= FALSE;
 
 		// --------------------------------------------------------------------------
 
@@ -60,28 +60,32 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function add( $verb, $article, $item, $item_id, $title, $url, $field, $old_value, $new_value, $strict_comparison = TRUE )
+	public function add( $verb, $article, $item, $item_id, $title, $url, $field = NULL, $old_value = NULL, $new_value = NULL, $strict_comparison = TRUE )
 	{
 		//	if the old_value and the new_value are the same then why are you
 		//	logging a change!? Lazy [read: efficient] dev.
 
-		$new_value = trim( $new_value );
-		$old_value = trim( $old_value );
+		if ( $old_value && $new_value ) :
 
-		if ( $strict_comparison ) :
-
-			if ( $new_value === $old_value ) :
-
-				return FALSE;
-
-			endif;
-
-		else :
-
-			if ( $new_value == $old_value ) :
-
-				return FALSE;
-
+			$new_value = trim( $new_value );
+			$old_value = trim( $old_value );
+	
+			if ( $strict_comparison ) :
+	
+				if ( $new_value === $old_value ) :
+	
+					return FALSE;
+	
+				endif;
+	
+			else :
+	
+				if ( $new_value == $old_value ) :
+	
+					return FALSE;
+	
+				endif;
+	
 			endif;
 
 		endif;
