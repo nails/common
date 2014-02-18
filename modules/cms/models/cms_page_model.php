@@ -215,25 +215,6 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Render the template
-		$_widgets			= ! empty( $data->widget_areas->{$_data->draft_template} ) ? $data->widget_areas->{$_data->draft_template} : array();
-		$_additional_fields	= ! empty( $data->data->additional_fields->{$_data->draft_template} ) ? $data->data->additional_fields->{$_data->draft_template} : array();
-
-		$_rendered			= $this->render_template( $_data->draft_template, $_widgets, $_additional_fields, $view_data );
-
-		if ( $_rendered !== FALSE ) :
-
-			$_data->draft_rendered_html = $_rendered;
-
-		else :
-
-			$this->db->trans_rollback();
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		if ( parent::update( $_current->id, $_data ) ) :
 
 			//	Update was successful, if either the slug or the title has changed

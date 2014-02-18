@@ -94,29 +94,20 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Are we using the render caches or not?
-		if ( DEPLOY_CMS_PAGES_USE_CACHE ) :
+		//	Set some page level data
+		$this->data['page']->title			= $_data->title;
+		$this->data['page']->description	= $_data->seo_description;
+		$this->data['page']->keywords		= $_data->seo_keywords;
 
-			$this->output->set_output( $_data->rendered_html );
+		//	Prepare data
+		$_render					= new stdClass();
+		$_render->widgets			= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
+		$_render->additional_fields	= isset( $_data->template_data->data->additional_fields->{$_data->template} ) ? $_data->template_data->data->additional_fields->{$_data->template} : array();
 
-		else :
+		//	Actually render
+		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields, $this->data );
 
-			//	Set some page level data
-			$this->data['page']->title			= $_data->title;
-			$this->data['page']->description	= $_data->seo_description;
-			$this->data['page']->keywords		= $_data->seo_keywords;
-
-			//	Prepare data
-			$_render					= new stdClass();
-			$_render->widgets			= isset( $_data->template_data->widget_areas->{$_data->template} ) ? $_data->template_data->widget_areas->{$_data->template} : array();
-			$_render->additional_fields	= isset( $_data->template_data->data->additional_fields->{$_data->template} ) ? $_data->template_data->data->additional_fields->{$_data->template} : array();
-
-			//	Actually render
-			$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields, $this->data );
-
-			$this->output->set_output( $_html );
-
-		endif;
+		$this->output->set_output( $_html );
 	}
 
 

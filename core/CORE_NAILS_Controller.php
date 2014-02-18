@@ -225,11 +225,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	CMS
-		if ( ! defined( 'DEPLOY_CMS_PAGES_USE_CACHE' ) )	define( 'DEPLOY_CMS_PAGES_USE_CACHE',	TRUE );
-
-		// --------------------------------------------------------------------------
-
 		//	SSL
 		//	If a SECURE_BASE_URL is not defined then assume the secure URL is simply
 		//	https://BASE_URL
