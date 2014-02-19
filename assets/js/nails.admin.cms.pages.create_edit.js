@@ -1208,7 +1208,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		var _call =
 		{
-			'action'		: 'GET',
+			'action'		: 'POST',
 			'controller'	: 'cms/pages',
 			'method'		: 'widget/get_editor',
 			'data'			:
