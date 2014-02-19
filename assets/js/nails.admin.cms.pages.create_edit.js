@@ -549,7 +549,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				var _data =
 				{
 					widget: $(this).data( 'slug' ),
-					data : $(this).find( 'form.editor' ).serializeArray()
+					data : $(this).find( 'form.editor' ).serialize()
 				};
 				_this.page_data.widget_areas[_template][_area].push( _data );
 			});
@@ -859,6 +859,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			{
 				if ( ! ui.item.hasClass( 'processed' ) )
 				{
+					console.log('sortable drop');
 					_this._drop_widget( _template.slug, ui.item );
 				}
 			},
@@ -1142,6 +1143,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					this._editor.dropzone.append( _placeholder );
 
 					//	Drop the widget
+					console.log('load for area drop');
 					this._drop_widget( template, _placeholder, _data.data );
 				}
 			}
@@ -1156,7 +1158,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	{
 		//	Define vars
 		var _slug,_widget,_data,_html,_item;
-
+		console.log(widget_data);
 		//	What type of widget are we dealing with? Get more info.
 		_slug	= $(ui).data( 'slug' );
 		_widget	= this._get_widget( _slug );
@@ -1201,9 +1203,12 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		this._editor.dropzone.removeClass( 'empty' );
 		this._editor.dropzone.find( 'li.empty' ).remove();
 
-		//	Call the server asking for the widget's editor view
+		//	Call the server asking for the widget's editor view, use PSOT in case
+		//	there's a lot of data
+
 		var _call =
 		{
+			'action'		: 'GET',
 			'controller'	: 'cms/pages',
 			'method'		: 'widget/get_editor',
 			'data'			:
@@ -1211,7 +1216,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				widget: _widget.slug,
 				template: template,
 				id: _data.id,
-				data: JSON.stringify( widget_data )
+				data: widget_data
 			},
 			'success' : function( data )
 			{

@@ -198,21 +198,7 @@ class Nails_CMS_Template
 
 						if ( $_widget ) :
 
-							$_data = array();
-
-							if ( $widget_data->data ) :
-
-								foreach ( $widget_data->data AS $item ) :
-
-									if ( isset( $item->name ) ) :
-
-										$_data[$item->name] = isset( $item->value ) ? $item->value : NULL;
-
-									endif;
-
-								endforeach;
-
-							endif;
+							parse_str( $widget_data->data, $_data );
 
 							$WIDGET = new $_widget->iam();
 							$_widget_areas[$key] .= $WIDGET->render( $_data, $view_data );

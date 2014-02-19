@@ -119,23 +119,8 @@ class NAILS_Cms extends NAILS_API_Controller
 	{
 		$_out		= array();
 		$_widget	= $this->input->get_post( 'widget' );
-		$_data_raw	= json_decode( $this->input->get_post( 'data' ) );
-		$_data		= array();
+		parse_str( $this->input->get_post( 'data' ), $_data );
 		$_template	= $this->input->get_post( 'template' );
-
-		if ( $_data_raw ) :
-
-			foreach ( $_data_raw AS $item ) :
-
-				if ( isset( $item->name ) ) :
-
-					$_data[$item->name] = isset( $item->value ) ? $item->value : NULL;
-
-				endif;
-
-			endforeach;
-
-		endif;
 
 		if ( $_widget ) :
 
