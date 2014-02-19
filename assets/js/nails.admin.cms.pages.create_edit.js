@@ -859,7 +859,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			{
 				if ( ! ui.item.hasClass( 'processed' ) )
 				{
-					console.log('sortable drop');
 					_this._drop_widget( _template.slug, ui.item );
 				}
 			},
@@ -1143,7 +1142,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					this._editor.dropzone.append( _placeholder );
 
 					//	Drop the widget
-					console.log('load for area drop');
 					this._drop_widget( template, _placeholder, _data.data );
 				}
 			}
@@ -1158,7 +1156,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	{
 		//	Define vars
 		var _slug,_widget,_data,_html,_item;
-		console.log(widget_data);
+
 		//	What type of widget are we dealing with? Get more info.
 		_slug	= $(ui).data( 'slug' );
 		_widget	= this._get_widget( _slug );
