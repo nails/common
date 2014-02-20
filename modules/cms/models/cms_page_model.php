@@ -830,7 +830,8 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$page->published->breadcrumbs	= json_decode( $page->published->breadcrumbs );
 		$page->draft->breadcrumbs		= json_decode( $page->draft->breadcrumbs );
 
-		//	Replace titles
+		//	Unpublished changes?
+		$page->has_unpublished_changes = $page->is_published && $page->draft->hash != $page->published->hash;
 
 		// --------------------------------------------------------------------------
 

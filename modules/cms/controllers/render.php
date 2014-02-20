@@ -114,6 +114,20 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
+		//	If we're viewing a published page, but there are unpublished changes (and
+		//	the user is someone with edit permissions) then highlight this fact using
+		//	a system alert (which the templates *should* handle).
+
+		if ( ! $this->data['message'] && ! $this->_is_preview && $_page->has_unpublished_changes && $this->user->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
+
+			$this->data['message'] = lang( 'cms_notice_unpublished_changes', array( site_url( 'cms/render/preview/' . $_page->id ), site_url( 'admin/cms/pages/edit/' . $_page->id ) ) );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Actually render
 		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields, $this->data );
 

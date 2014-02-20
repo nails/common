@@ -105,6 +105,8 @@
 
 						echo '<td class="actions">';
 
+							echo anchor( $page->published->url, lang( 'action_view' ), 'class="awesome small" target="_blank"' );
+
 							if ( user_has_permission( 'admin.cms.can_edit_page' ) ) :
 
 								echo anchor( 'admin/cms/pages/edit/' . $page->id, lang( 'action_edit' ), 'class="awesome small"' );

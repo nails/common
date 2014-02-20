@@ -3,37 +3,26 @@
 class NAILS_CMS_Controller extends NAILS_Controller
 {
 	protected $_cdn_root;
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Check this module is enabled in settings
 		if ( ! module_is_enabled( 'cms' ) ) :
-		
+
 			//	Cancel execution, module isn't enabled
 			show_404();
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load language file
 		$this->lang->load( 'cms', RENDER_LANG_SLUG );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Load the styles
-		$this->asset->load( 'nails.cms.css', TRUE );
-
-		if ( file_exists( FCPATH . 'assets/css/cms.css' ) ) :
-		
-			$this->asset->load( 'cms.css' );
-		
-		endif;
 	}
 }
