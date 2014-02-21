@@ -74,27 +74,14 @@ class NAILS_User_model extends NAILS_Model
 	 * Checks for the rememebred user cookies, if found we need to tell the
 	 * user_model class to set the data when it instantiates.
 	 *
-	 * @access	static
+	 * @access	public
 	 * @return	void
 	 *
 	 **/
 	public function find_remembered_user()
 	{
-		$_ci =& get_instance();
-;
-		// --------------------------------------------------------------------------
-
-		//	User is already logged in, nothing to do.
-		if ( (bool) $this->is_logged_in() ) :
-
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Look for a cookie
-		$_ci->load->helper( 'cookie' );
+		$this->load->helper( 'cookie' );
 		$_remember_me = get_cookie( $this->_remember_cookie );
 
 		// --------------------------------------------------------------------------
@@ -153,7 +140,6 @@ class NAILS_User_model extends NAILS_Model
 			if ( $_u && $_code === $_u->remember_code ) :
 
 				//	User was validated, log them in!
-				$this->update_last_login( $_u->id );
 				$this->set_login_data( $_u->id );
 				$this->_me = $_u->id;
 
