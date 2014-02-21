@@ -1155,16 +1155,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endforeach;
 
 		//	Get the selected options
-		if ( $_POST ) :
-
-			$_selected = set_value( $_field['key'] );
-
-		else :
-
-			//	Use the 'default' variabel
-			$_selected = $_field['default'];
-
-		endif;
+		$_selected = set_value( $_field['key'], $_field['default'] );
 
 		//	Build the select
 		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
