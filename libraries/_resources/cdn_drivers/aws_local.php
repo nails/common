@@ -348,7 +348,7 @@ class Aws_local_CDN
 	 **/
 	public function url_serve_zipped( $object_ids, $hash, $filename )
 	{
-		$filename = $filename ? '/' . $filename : '';
+		$filename = $filename ? '/' . urlencode( $filename ) : '';
 		return $this->_url_make_secure( DEPLOY_CDN_DRIVER_AWS_CLOUDFRONT_URL_PROCESSING . 'cdn/zip/' . $object_ids . '/' . $hash . $filename );
 	}
 

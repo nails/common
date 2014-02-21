@@ -31,7 +31,7 @@ class NAILS_Zip extends NAILS_CDN_Controller
 		//	Decode the token
 		$_ids		= $this->uri->segment( 3 );
 		$_hash		= $this->uri->segment( 4 );
-		$_filename	= $this->uri->segment( 5 );
+		$_filename	= urldecode( $this->uri->segment( 5 ) );
 
 		if ( $_ids && $_hash ) :
 

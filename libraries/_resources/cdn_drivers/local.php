@@ -285,7 +285,7 @@ class Local_CDN
 	 **/
 	public function url_serve_zipped( $object_ids, $hash, $filename )
 	{
-		$filename = $filename ? '/' . $filename : '';
+		$filename = $filename ? '/' . urlencode( $filename ) : '';
 		return $this->_url_make_secure( 'cdn/zip/' . $object_ids . '/' . $hash . $filename );
 	}
 
