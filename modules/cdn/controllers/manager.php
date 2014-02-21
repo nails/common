@@ -471,7 +471,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 /**
  * OVERLOADING NAILS' CDN MODULE
  *
- * The following block of code makes it simple to extend one of the core auth
+ * The following block of code makes it simple to extend one of the core CDN
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -501,4 +501,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION' ) ) :
 endif;
 
 /* End of file manager.php */
-/* Location: ./application/modules/cdn/controllers/manager.php */
+/* Location: ./modules/cdn/controllers/manager.php */

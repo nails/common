@@ -305,7 +305,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 /**
  * OVERLOADING NAILS' CDN MODULES
  *
- * The following block of code makes it simple to extend one of the core admin
+ * The following block of code makes it simple to extend one of the core CDN
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -335,4 +335,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_THUMB' ) ) :
 endif;
 
 /* End of file thumb.php */
-/* Location: ./application/modules/cdn/controllers/thumb.php */
+/* Location: ./modules/cdn/controllers/thumb.php */

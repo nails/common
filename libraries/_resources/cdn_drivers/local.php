@@ -276,6 +276,40 @@ class Local_CDN
 
 
 	/**
+	 * Generates the correct URL for serving up a file
+	 *
+	 * @access	public
+	 * @param	string	$bucket	The bucket which the image resides in
+	 * @param	string	$object	The filename of the object
+	 * @return	string
+	 **/
+	public function url_serve_zipped( $object_ids, $hash, $filename )
+	{
+		$filename = $filename ? '/' . $filename : '';
+		return $this->_url_make_secure( 'cdn/zip/' . $object_ids . '/' . $hash . $filename );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the scheme of 'serve' urls
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	string
+	 **/
+	public function url_serve_zipped_scheme()
+	{
+		return $this->_url_make_secure( 'cdn/zip/{{ids}}/{{hash}}/{{filename}}' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Generates the correct URL for using the thumb utility
 	 *
 	 * @access	public

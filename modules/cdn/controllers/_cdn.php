@@ -220,7 +220,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 	protected function _fetch_sourcefile( $bucket, $object )
 	{
-		//	If we're using the AWS Driver then we must check that a source file eists;
+		//	If we're using the AWS Driver then we must check that a source file exists;
 		//	if it doesn't then pull it down and save it. Cache maintenance scripts will
 		//	clear this out every now and then.
 
@@ -248,7 +248,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 				else :
 
 					//	Failed to fetch, maybe it doesnt exist on S3?
-					log_message( 'error', 'CDN: Thumb: Error fetching from S3; S3 said: ' . $this->cdn->last_error() );
+					log_message( 'error', 'CDN: Fetch Source File: Error fetching from S3; S3 said: ' . $this->cdn->last_error() );
 					return FALSE;
 
 				endif;
@@ -269,7 +269,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		else :
 
 			//	This object does not exist / something went wrong
-			log_message( 'error', 'CDN: Thumb: File not found; ' . DEPLOY_CDN_PATH . $bucket . '/' . $object );
+			log_message( 'error', 'CDN: Fetch Source File: File not found; ' . DEPLOY_CDN_PATH . $bucket . '/' . $object );
 			return FALSE;
 
 		endif;

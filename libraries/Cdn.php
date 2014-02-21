@@ -460,18 +460,144 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
-	public function get_objects()
+	public function get_objects( $data = array() )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
-		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
+		$this->db->select( 'b.id bucket_id, b.label bucket_label, b.slug bucket_slug' );
 
 		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by AND ue.is_primary = 1', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
-		$this->db->order_by( 'o.filename_display' );
+		//	Handle wheres
+		$_wheres = array( 'where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in' );
+
+		foreach ( $_wheres AS $where_type ) :
+
+			if ( ! empty( $data[$where_type] ) ) :
+
+				if ( is_array( $data[$where_type] ) ) :
+
+					//	If it's a single dimensional array then just bung that into
+					//	the db->where(). If not, loop it and parse.
+
+					$_first = reset( $data[$where_type] );
+
+					if ( is_string( $_first ) ) :
+
+						$this->db->$where_type( $data[$where_type] );
+
+					else :
+
+						foreach( $data[$where_type] AS $where ) :
+
+							//	Work out column
+							$_column = ! empty( $where['column'] ) ? $where['column'] : NULL;
+							if ( $_column === NULL ) :
+
+								$_column = ! empty( $where[0] ) && is_string( $where[0] ) ? $where[0] : NULL;
+
+							endif;
+
+							//	Work out value
+							$_value = isset( $where['value'] ) ? $where['value'] : NULL;
+							if ( $_value === NULL ) :
+
+								$_value = ! empty( $where[1] ) ? $where[1] : NULL;
+
+							endif;
+
+							$_escape = isset( $where['escape'] ) ? (bool) $where['escape'] : TRUE;
+
+							if ( $_column ) :
+
+								$this->db->$where_type( $_column, $_value, $_escape );
+
+							endif;
+
+						endforeach;
+
+					endif;
+
+				elseif ( is_string( $data[$where_type] ) ) :
+
+					$this->db->$where_type( $data[$where_type] );
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle Likes
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		//	Handle sorting
+		if ( ! empty( $data['sort'] ) ) :
+
+			/**
+			 * How we handle sorting
+			 * =====================
+			 *
+			 * - If $data['sort'] is a string assume it's the field to sort on, use the default order
+			 * - If $data['sort'] is a single dimension array then assume the first element (or the element
+			 *   named 'column') is the column; and the second element (or the element named 'order') is the
+			 *   direction to sort in
+			 * - If $data['sort'] is a multidimensional array then loop each element and test as above.
+			 *
+			 **/
+
+
+			if ( is_string( $data['sort'] ) ) :
+
+				//	String
+				$this->db->order_by( $data['sort'] );
+
+			elseif( is_array( $data['sort'] ) ) :
+
+				$_first = reset( $data['sort'] );
+
+				if ( is_string( $_first ) ) :
+
+					//	Single dimension array
+					$_sort = $this->_getcount_common_parse_sort( $data['sort'] );
+
+					if ( ! empty( $_sort['column'] ) ) :
+
+						$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+					endif;
+
+				else :
+
+					//	Multi dimension array
+					foreach( $data['sort'] AS $sort ) :
+
+						$_sort = $this->_getcount_common_parse_sort( $sort );
+
+						if ( ! empty( $_sort['column'] ) ) :
+
+							$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+						endif;
+
+					endforeach;
+
+				endif;
+
+			endif;
+
+		else :
+
+			$this->db->order_by( 'o.filename_display' );
+
+		endif;
 
 		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object o' )->result();
 
@@ -1720,9 +1846,11 @@ class Cdn {
 
 		$object->bucket			= new stdClass();
 		$object->bucket->id		= $object->bucket_id;
+		$object->bucket->label	= $object->bucket_label;
 		$object->bucket->slug	= $object->bucket_slug;
 
 		unset( $object->bucket_id );
+		unset( $object->bucket_label );
 		unset( $object->bucket_slug );
 
 		// --------------------------------------------------------------------------
@@ -2515,6 +2643,85 @@ class Cdn {
 	public function url_serve_scheme( $force_download = FALSE )
 	{
 		return $this->_cdn->url_serve_scheme( $force_download );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Calls the driver's public cdn_serve_url method
+	 *
+	 * @access	public
+	 * @param	array $objects An array of the Object IDs which should be zipped together
+	 * @return	string
+	 **/
+	public function url_serve_zipped( $objects, $filename = 'download.zip' )
+	{
+		$_data		= array( 'where_in' => array( array( 'o.id', $objects ) ) );
+		$_objects	= $this->get_objects( $_data );
+
+		$_ids		= array();
+		$_ids_hash	= array();
+		foreach ( $_objects AS $obj ) :
+
+			$_ids[]			= $obj->id;
+			$_ids_hash[]	= $obj->id . $obj->bucket->id;
+
+		endforeach;
+
+		$_ids		= implode( '-', $_ids );
+		$_ids_hash	= implode( '-', $_ids_hash );
+		$_hash		= md5( APP_PRIVATE_KEY . $_ids . $_ids_hash . $filename );
+
+		return $this->_cdn->url_serve_zipped( $_ids, $_hash, $filename );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function verify_url_serve_zipped_hash( $hash, $objects, $filename = 'download.zip' )
+	{
+		if ( ! is_array( $objects ) ) :
+
+			$objects = explode( '-', $objects );
+
+		endif;
+
+		$_data		= array( 'where_in' => array( array( 'o.id', $objects ) ) );
+		$_objects	= $this->get_objects( $_data );
+
+		$_ids		= array();
+		$_ids_hash	= array();
+
+		foreach ( $_objects AS $obj ) :
+
+			$_ids[]			= $obj->id;
+			$_ids_hash[]	= $obj->id . $obj->bucket->id;
+
+		endforeach;
+
+		$_ids		= implode( '-', $_ids );
+		$_ids_hash	= implode( '-', $_ids_hash );
+
+		return md5( APP_PRIVATE_KEY . $_ids . $_ids_hash . $filename ) === $hash ? $_objects : FALSE;;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Calls the driver's public cdn_serve_url_scheme method
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	string
+	 **/
+	public function url_serve_zipped_scheme( $filename = NULL )
+	{
+		return $this->_cdn->url_serve_scheme( $filename );
 	}
 
 

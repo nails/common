@@ -4,7 +4,8 @@
 /**
  * Returns the URL for serving raw content from the CDN
  *
- * @param	string	$object	The ID or filename of the object to serve
+ * @param	string $object The ID of the object to serve
+ * @param	boolean $force_download Whether or not the URL should stream to the browser, or forcibly download
  * @return	string
  */
 if ( ! function_exists( 'cdn_serve' ) )
@@ -14,6 +15,26 @@ if ( ! function_exists( 'cdn_serve' ) )
 		get_instance()->load->library( 'cdn' );
 
 		return get_instance()->cdn->url_serve( $object, $force_download );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Returns the URL for serving raw content from the CDN
+ *
+ * @param	array	$object	An array of IDs to zip together
+ * @return	string
+ */
+if ( ! function_exists( 'cdn_serve_zipped' ) )
+{
+	function cdn_serve_zipped( $objects, $filename = 'download.zip' )
+	{
+		get_instance()->load->library( 'cdn' );
+
+		return get_instance()->cdn->url_serve_zipped( $objects, $filename );
 	}
 }
 

@@ -927,6 +927,8 @@ class CORE_NAILS_Model extends CI_Model
 	 **/
 	protected function _getcount_common( $data = NULL, $_caller = NULL )
 	{
+		//	NOTE: The CDN library follows this principle too. Fixes/changes in here? Update there too!
+
 		//	Handle wheres
 		$_wheres = array( 'where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in' );
 

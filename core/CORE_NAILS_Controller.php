@@ -123,6 +123,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->data['page']->title			= '';
 		$this->data['page']->description	= '';
 		$this->data['page']->keywords		= '';
+
+		// dumpanddie(cdn_serve_zipped(array(316,315,321), 'my-files.zip'));
+		// dumpanddie(cdn_serve_zipped(array(342,343), 'my-files.zip'));
 	}
 
 

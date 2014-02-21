@@ -170,7 +170,7 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 /**
  * OVERLOADING NAILS' CDN MODULES
  *
- * The following block of code makes it simple to extend one of the core admin
+ * The following block of code makes it simple to extend one of the core CDN
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -201,4 +201,4 @@ endif;
 
 
 /* End of file placeholder.php */
-/* Location: ./application/modules/cdn/controllers/placeholder.php */
+/* Location: ./modules/cdn/controllers/placeholder.php */

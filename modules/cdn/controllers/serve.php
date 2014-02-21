@@ -240,7 +240,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		header( 'Cache-Control: no-cache, must-revalidate', TRUE );
 		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
 		header( 'Content-type: application/json', TRUE );
-		header( $_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', TRUE, 400 );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
 
 		// --------------------------------------------------------------------------
 
@@ -308,4 +308,4 @@ endif;
 
 
 /* End of file serve.php */
-/* Location: ./application/modules/cdn/controllers/server.php */
+/* Location: ./modules/cdn/controllers/serve.php */
