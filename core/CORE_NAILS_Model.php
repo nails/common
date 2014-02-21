@@ -927,45 +927,70 @@ class CORE_NAILS_Model extends CI_Model
 	 **/
 	protected function _getcount_common( $data = NULL, $_caller = NULL )
 	{
-		//	Handle where
-		if ( ! empty( $data['where'] ) ) :
+		//	Handle wheres
+		$_wheres = array( 'where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in' );
 
-			if ( is_array( $data['where'] ) ) :
+		foreach ( $_wheres AS $where_type ) :
 
-				//	If it's a single dimensional array then just bung that into
-				//	the db->where(). If not, loop it and parse.
+			if ( ! empty( $data[$where_type] ) ) :
 
-				$_first = reset( $data['where'] );
+				if ( is_array( $data[$where_type] ) ) :
 
-				if ( is_string( $_first ) ) :
+					//	If it's a single dimensional array then just bung that into
+					//	the db->where(). If not, loop it and parse.
 
-					$this->db->where( $data['where'] );
+					$_first = reset( $data[$where_type] );
 
-				else :
+					if ( is_string( $_first ) ) :
 
-					foreach( $data['where'] AS $where ) :
+						$this->db->$where_type( $data[$where_type] );
 
-						$_column	= ! empty( $where['column'] )	? $where['column']			: NULL;
-						$_value		= isset( $where['value'] )		? $where['value']			: NULL;
-						$_escape	= isset( $where['escape'] )		? (bool) $where['escape']	: TRUE;
+					else :
 
-						if ( $_column ) :
+						foreach( $data[$where_type] AS $where ) :
 
-							$this->db->where( $_column, $_value, $_escape );
+							//	Work out column
+							$_column = ! empty( $where['column'] ) ? $where['column'] : NULL;
+							if ( $_column === NULL ) :
 
-						endif;
+								$_column = ! empty( $where[0] ) && is_string( $where[0] ) ? $where[0] : NULL;
 
-					endforeach;
+							endif;
+
+							//	Work out value
+							$_value = isset( $where['value'] ) ? $where['value'] : NULL;
+							if ( $_value === NULL ) :
+
+								$_value = ! empty( $where[1] ) ? $where[1] : NULL;
+
+							endif;
+
+							$_escape = isset( $where['escape'] ) ? (bool) $where['escape'] : TRUE;
+
+							if ( $_column ) :
+
+								$this->db->$where_type( $_column, $_value, $_escape );
+
+							endif;
+
+						endforeach;
+
+					endif;
+
+				elseif ( is_string( $data[$where_type] ) ) :
+
+					$this->db->$where_type( $data[$where_type] );
 
 				endif;
 
-			elseif ( is_string( $data['where'] ) ) :
-
-				$this->db->where( $data['where'] );
-
 			endif;
 
-		endif;
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle Likes
+		//	TODO
 
 		// --------------------------------------------------------------------------
 
