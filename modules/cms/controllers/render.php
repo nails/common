@@ -101,6 +101,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		$this->data['page']->title			= $_data->title;
 		$this->data['page']->description	= $_data->seo_description;
 		$this->data['page']->keywords		= $_data->seo_keywords;
+		$this->data['page']->is_preview		= $this->_is_preview;
 
 		//	Prepare data
 		$_render					= new stdClass();

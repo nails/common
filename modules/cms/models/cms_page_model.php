@@ -770,6 +770,33 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function get_siblings( $id, $use_draft = TRUE )
+	{
+		$_page = $this->get_by_id( $id );
+
+		if ( ! $_page ) :
+
+			return array();
+
+		endif;
+
+		if ( $use_draft ) :
+
+			$this->db->where( 'draft_parent_id', $_page->draft->parent_id );
+
+		else :
+
+			$this->db->where( 'published_parent_id', $_page->published->parent_id );
+
+		endif;
+
+		return $this->get_all();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function get_homepage()
 	{
 		$this->db->where( $this->_table_prefix . '.is_homepage', TRUE );
