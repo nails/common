@@ -14,8 +14,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._dialog_open		= false;
 	this._saving			= false;
 	this._refreshing		= false;
-	this._autosave			= null;
-	this._autosave_delay	= 60000;
 	this._async_save		= true;
 
 	// --------------------------------------------------------------------------
@@ -135,11 +133,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			e.stopPropagation();
 			return false;
 		});
-
-		// --------------------------------------------------------------------------
-
-		//	Set up autosaving
-		this._autosave_start();
 	};
 
 
@@ -204,7 +197,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			});
 		};
 
-		_this._save( false, _success, _error, true );
+		_this._save( _success, _error, true );
 	};
 
 
@@ -243,7 +236,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			});
 		};
 
-		_this._save( false, _success, _error, true, true );
+		_this._save( _success, _error, true, true );
 	};
 
 
@@ -300,32 +293,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			_this._enable_main_actions();
 		};
 
-		this._save( false, _success, _error, true );
+		this._save( _success, _error, true );
 	};
 
 
 	// --------------------------------------------------------------------------
 
 
-	this._autosave_start = function()
-	{
-		var _this = this;
-		this._autosave = setInterval( function(){ _this._save( true ); }, this._autosave_delay );
-	};
-
-
-	// --------------------------------------------------------------------------
-
-	this._autosave_stop = function()
-	{
-		clearInterval( this._autosave );
-	};
-
-
-	// --------------------------------------------------------------------------
-
-
-	this._save = function( is_autosave, success_callback, error_callback, force_save, is_published )
+	this._save = function( success_callback, error_callback, force_save, is_published )
 	{
 		//	If we're already saving ignore any more calls
 		if ( this._saving )
@@ -338,13 +313,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		if ( this._refreshing )
 		{
 			console.log( 'Refresh in progress, ignoring repeated call.' );
-			return false;
-		}
-
-		//	Only autosave if there's an ID
-		if ( ! force_save && ! this.page_data.id )
-		{
-			console.log( 'Page ID is not known yet and call is not forced, ignore save.' );
 			return false;
 		}
 
@@ -422,10 +390,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						var _mins	= _date.getMinutes() < 10 ? '0' + _date.getMinutes() : _date.getMinutes();
 						var _str	= _hours + ':' + _mins;
 
-						if ( is_autosave )
-						{
-							_str += ' (Autosave)';
-						}
 
 						$( '#save-status .last-saved').text( _str );
 
