@@ -16,7 +16,7 @@
 				</small>
 			</div>
 		</div>
-		
+
 	</div><!--	/.container	-->
 
 	<!-- JS HOOK -->
@@ -25,10 +25,10 @@
 	<script type="text/javascript">
 	<!--//
 
-		<?php if ( ENVIRONMENT == 'production' && site_settings( 'google_analytics_account' ) ) : ?>
+		<?php if ( ENVIRONMENT == 'production' && site_setting( 'google_analytics_account' ) ) : ?>
 
 		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '<?=site_settings( 'google_analytics_account' )?>]);
+		_gaq.push(['_setAccount', '<?=site_setting( 'google_analytics_account' )?>]);
 		_gaq.push(['_trackPageview']);
 
 		(function() {
@@ -38,7 +38,7 @@
 		})();
 
 		<?php endif; ?>
-	
+
 	//-->
 	</script>
 </body>

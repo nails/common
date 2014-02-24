@@ -96,7 +96,7 @@ class NAILS_Site_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SYSTEM_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SITE_MODEL' ) ) :
 
 	class Site_model extends NAILS_Site_model
 	{
