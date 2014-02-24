@@ -97,5 +97,51 @@ if ( ! function_exists('secure_site_url'))
 }
 
 
+// --------------------------------------------------------------------------
+
+
+
+/**
+ * Header Redirect
+ *
+ * Header redirect in two flavors
+ * For very fine grained control over headers, you could use the Output
+ * Library's set_header() function.
+ *
+ * Overriding so as to call the post_system hook before exit()'ing
+ *
+ * @access	public
+ * @param	string	the URL
+ * @param	string	the method: location or redirect
+ * @return	string
+ */
+if ( ! function_exists('redirect'))
+{
+	function redirect($uri = '', $method = 'location', $http_response_code = 302)
+	{
+		if ( ! preg_match('#^https?://#i', $uri))
+		{
+			$uri = site_url($uri);
+		}
+
+		switch($method)
+		{
+			case 'refresh'	: header("Refresh:0;url=".$uri);
+				break;
+			default			: header("Location: ".$uri, TRUE, $http_response_code);
+				break;
+		}
+
+		//	Call the psot_system hook, the system will be killed in approximately 6 lines
+		//	so this is the last chance to cleanup.
+
+		$_hook =& load_class( 'Hooks', 'core' );
+		$_hook->_call_hook( 'post_system' );
+
+		exit;
+	}
+}
+
+
 /* End of file url_helper.php */
 /* Location: ./helpers/url_helper.php */
