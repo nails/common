@@ -991,8 +991,58 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		$_post = $this->input->post();
+
+		if ( isset( $_post['menu_item'] ) ) :
+
+			//	Validate
+			$_errors = FALSE;
+			$this->load->library( 'form_validation' );
+			$this->form_validation->set_rules( 'label',			'', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',	'', 'xss_clean|required' );
+
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+			foreach( $_post['menu_item'] AS $item ) :
+
+				if ( empty( $item['label'] ) || empty( $item['url']) ) :
+
+					$_errors = 'All menu items are required to have a label and a URL.';
+					break;
+
+				endif;
+
+			endforeach;
+
+			//	Execute
+			if ( $this->form_validation->run() && ! $_errors ) :
+
+				if ( $this->cms_menu->create( $_post ) ) :
+
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was created successfully.' );
+					redirect( 'admin/cms/menus' );
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu->last_error();
+
+				endif;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $_errors;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Assets
 		$this->asset->load( 'nails.admin.cms.menus.create_edit.min.js', TRUE );
+		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'jquery.ui.nestedsortable.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -1018,11 +1068,58 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		$this->data['page']->title = 'Edit Menu "' . $this->data['menu']->label . '"';
 
+		$_post = $this->input->post();
+
+		if ( isset( $_post['menu_item'] ) ) :
+
+			//	Validate
+			$_errors = FALSE;
+			$this->load->library( 'form_validation' );
+			$this->form_validation->set_rules( 'label',			'', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',	'', 'xss_clean|required' );
+
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+
+			foreach( $_post['menu_item'] AS $item ) :
+
+				if ( empty( $item['label'] ) || empty( $item['url']) ) :
+
+					$_errors = 'All menu items are required to have a label and a URL.';
+					break;
+
+				endif;
+
+			endforeach;
+
+			//	Execute
+			if ( $this->form_validation->run() && ! $_errors ) :
+
+				if ( $this->cms_menu->update( $this->data['menu']->id, $_post ) ) :
+
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was updated successfully.' );
+					redirect( 'admin/cms/menus' );
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu->last_error();
+
+				endif;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $_errors;
+
+			endif;
+
+		endif;
+
 		// --------------------------------------------------------------------------
 
 		//	Assets
 		$this->asset->load( 'nails.admin.cms.menus.create_edit.min.js', TRUE );
 		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'jquery.ui.nestedsortable.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
