@@ -2113,6 +2113,23 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
+		//	If the user is isn't found (perhaps deleted) or has been suspended then
+		//	obviously don't proceed with the log in
+
+		if ( ! $_me || ! empty( $_me->is_suspended ) ) :
+
+			$this->clear_remember_cookie();
+			$this->clear_active_user();
+			$this->clear_login_data();
+
+			$this->_is_logged_in = FALSE;
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Store this entire user in memory
 		$this->set_active_user( $_me );
 

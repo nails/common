@@ -92,7 +92,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 	// --------------------------------------------------------------------------
 
-	/* ! CONNECTING TO LINKEDIN */
+	/* ! CONNECTING TO TWITTER */
 
 	// --------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 	 **/
 	protected function _connect_connect()
 	{
-		//	If the Twitter is already linked then we need to acknowledge it
+		//	If Twitter is already linked then we need to acknowledge it
 		if ( ! $this->input->get( 'force' ) && $this->tw->user_is_linked() ) :
 
 			$this->session->set_flashdata( 'message', lang( 'auth_social_already_linked', 'Twitter' ) );
@@ -141,7 +141,13 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->_redirect( $this->tw->get_login_url( $this->_return_to, $this->_return_to_fail ) );
+		//	Generate the login URL
+		$_login_url = $this->tw->get_login_url( $this->_return_to, $this->_return_to_fail );
+
+		// --------------------------------------------------------------------------
+
+		//	Send the user on their way
+		$this->_redirect( $_login_url );
 	}
 
 
@@ -160,7 +166,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		//	If there is an access_token in the session then use that, this will have been set just
 		//	before the auth flow was interrupted to request more data from the user.
 
-		if ( ! $this->session->userdata( 'tw_access_token' ) ) :
+		if ( $this->session->userdata( 'tw_request_token' ) ) :
 
 			$_request_token = $this->session->userdata( 'tw_request_token' );
 			$this->session->unset_userdata( 'tw_request_token' );
@@ -728,7 +734,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 	protected function _redirect( $_goto = FALSE )
 	{
 		//	Where are we going?
-		$_goto = ( $_goto ) ? $_goto : '/';
+		$_goto = $_goto ? $_goto : '/';
 		redirect( $_goto );
 	}
 }
