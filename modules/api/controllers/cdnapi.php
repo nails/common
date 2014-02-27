@@ -91,35 +91,54 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	User must supply a valid upload token
-		$_user = $this->cdn->validate_api_upload_token( $this->input->post( 'token' ) );
+		if ( ! $this->user->is_logged_in() ) :
 
-		if ( ! $_user ) :
+			//	User is not logged in must supply a valid upload token
+			$_token = $this->input->get_post( 'token' );
 
-			$_out['status']	= 400;
-			$_out['error']	= $this->cdn->last_error();
+			if ( ! $_token ) :
 
-			$this->_out( $_out, 'JSON', FALSE );
-			return;
+				//	Sent as a header?
+				$_token = $this->input->get_request_header( 'X-cdn-token' );
 
-		else :
+			endif;
 
-			$this->user->set_active_user( $_user );
+			$_user = $this->cdn->validate_api_upload_token( $_token );
+
+			if ( ! $_user ) :
+
+				$_out['status']	= 400;
+				$_out['error']	= $this->cdn->last_error();
+
+				$this->_out( $_out );
+				return;
+
+			else :
+
+				$this->user->set_active_user( $_user );
+
+			endif;
 
 		endif;
-
 
 		// --------------------------------------------------------------------------
 
 		//	Uploader verified, bucket defined and valid?
-		$_bucket = $this->input->post( 'bucket' );
+		$_bucket = $this->input->get_post( 'bucket' );
+
+		if ( ! $_bucket ) :
+
+			//	Sent as a header?
+			$_bucket = $this->input->get_request_header( 'X-cdn-bucket' );
+
+		endif;
 
 		if ( ! $_bucket ) :
 
 			$_out['status']	= 400;
 			$_out['error']	= 'Bucket not defined.';
 
-			$this->_out( $_out, 'JSON', FALSE );
+			$this->_out( $_out );
 			return;
 
 		endif;
@@ -132,9 +151,18 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		if ( $_upload ) :
 
 			//	Success! Return as per the user's preference
-			if ( $this->input->post( 'return' ) ) :
+			$_return = $this->input->post( 'return' );
 
-				$_format = explode( '|', $this->input->post( 'return' ) );
+			if ( ! $_return ) :
+
+				//	Sent as a header?
+				$_return = $this->input->get_request_header( 'X-cdn-return' );
+
+			endif;
+
+			if ( $_return ) :
+
+				$_format = explode( '|', $_return );
 
 				switch( strtoupper( $_format[0] ) ) :
 
@@ -246,7 +274,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		//	Make sure the _out() method doesn't send a header, annoyingly SWFupload does
 		//	not return the server response to the script when a non-200 status code is detected
 
-		$this->_out( $_out, 'JSON', FALSE );
+		$this->_out( $_out );
 	}
 
 
@@ -255,12 +283,16 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 	public function object_delete()
 	{
+		//	TODO: Have a good think about security here, somehow verify that this
+		//	person has permission to delete objects. Perhaps only an objects creator
+		//	or a super user can delete. Maybe have a CDN permission?
+
 		//	Define $_out array
 		$_out = array();
 
 		// --------------------------------------------------------------------------
 
-		$_object_id	= $this->input->post( 'object_id' );
+		$_object_id	= $this->input->get_post( 'object_id' );
 		$_delete	= $this->cdn->object_delete( $_object_id );
 
 		if ( ! $_delete ) :
@@ -272,7 +304,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->_out( $_out, 'JSON' );
+		$this->_out( $_out );
 	}
 
 	// --------------------------------------------------------------------------
