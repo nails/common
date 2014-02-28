@@ -44,6 +44,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 		//	Determine if browsing/uploading is permitted
 		$this->data['enabled'] = $this->user->is_logged_in() ? TRUE : FALSE;
+		$this->data['enabled'] = TRUE;
 
 		// --------------------------------------------------------------------------
 
@@ -142,6 +143,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 				//	Test bucket, if it doesn't exist, create it
 				$this->data['bucket'] = $this->cdn->get_bucket( $_slug, TRUE, $this->input->get( 'filter-tag' ) );
 
+
 				if ( ! $this->data['bucket'] ) :
 
 					$_bucket_id = $this->cdn->bucket_create( $_slug, $_label );
@@ -216,7 +218,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function upload()
 	{
 		//	Returning to...?
-		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+		$_return = site_url( 'cdn/manager/browse', page_is_secure() );
+		$_return .= $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -263,7 +266,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function delete()
 	{
 		//	Returning to...?
-		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+		$_return = site_url( 'cdn/manager/browse', page_is_secure() );
+		$_return .= $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -306,20 +310,9 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 		if ( $_delete ) :
 
-			$_url = site_url( 'cdn/manager/restore/' . $this->uri->segment( 4 ) . '?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+			$_url = site_url( 'cdn/manager/restore/' . $this->uri->segment( 4 ) . '?' . $this->input->server( 'QUERY_STRING' ), page_is_secure() );
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File deleted successfully! <a href="' . $_url . '">Undo?</a>' );
-
-			if ( strpos( $_return, '?' ) ) :
-
-				$_return .= '&';
-
-			else :
-
-				$_return .= '?';
-
-			endif;
-
-			$_return .= 'deleted=true';
+			$this->session->set_flashdata( 'deleted', TRUE );
 
 		else :
 
@@ -339,7 +332,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function restore()
 	{
 		//	Returning to...?
-		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+		$_return = site_url( 'cdn/manager/browse', page_is_secure() );
+		$_return .= $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -384,18 +378,6 @@ class NAILS_Manager extends NAILS_CDN_Controller
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> File restored successfully!' );
 
-			if ( strpos( $_return, '?' ) ) :
-
-				$_return .= '&';
-
-			else :
-
-				$_return .= '?';
-
-			endif;
-
-			$_return .= 'deleted=true';
-
 		else :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> ' . $this->cdn->last_error() );
@@ -414,7 +396,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function new_tag()
 	{
 		//	Returning to...?
-		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+		$_return = site_url( 'cdn/manager/browse', page_is_secure() );
+		$_return .= $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -442,7 +425,8 @@ class NAILS_Manager extends NAILS_CDN_Controller
 	public function delete_tag()
 	{
 		//	Returning to...?
-		$_return = site_url( 'cdn/manager/browse?' . $_SERVER['QUERY_STRING'], page_is_secure() );
+		$_return = site_url( 'cdn/manager/browse', page_is_secure() );
+		$_return .= $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
 
 		// --------------------------------------------------------------------------
 

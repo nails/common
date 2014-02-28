@@ -1241,6 +1241,10 @@ class Cdn {
 		$this->db->set( $_data );
 		$this->db->set( 'trashed', 'NOW()', FALSE );
 
+		//	Turn off DB Errors
+		$_previous = $this->db->db_debug;
+		$this->db->db_debug = FALSE;
+
 		//	Start transaction
 		$this->db->trans_start();
 
@@ -1252,6 +1256,9 @@ class Cdn {
 			$this->db->delete( NAILS_DB_PREFIX . 'cdn_object' );
 
 		$this->db->trans_complete();
+
+		//	Set DB errors as they were
+		$this->db->db_debug = $_previous;
 
 		if ( $this->db->trans_status() !== FALSE ) :
 

@@ -4,16 +4,35 @@
 
 		echo '<td class="filename">';
 
-			if ( $object->is_img ) :
+		if ( $object->is_img ) :
 
-				echo img( cdn_thumb( $object->id, 30, 30 ) );
-				$_action_download = 'View';
+			//	Thumbnail
+			echo img( array( 'src' => cdn_thumb( $object->id, 30, 30 ), 'class' => 'icon' ) );
+			$_fancybox_class	= 'cdn-fancybox';
+			$_fancybox_type		= '';
+			$_url				= cdn_serve( $object->id );
+			$_action			= 'View';
 
-			else :
 
-				$_action_download = 'Download';
+		elseif ( $object->mime == 'application/pdf' ) :
 
-			endif;
+			//	PDF
+			echo '<div class="icon"><span class="ion-document" style="font-size:2.2em"></span></div>';
+			$_fancybox_class	= 'cdn-fancybox';
+			$_fancybox_type		= 'iframe';
+			$_url				= cdn_serve( $object->id );
+			$_action			= 'View';
+
+		else :
+
+			//	Generic file, force download
+			echo '<div class="icon"><span class="ion-document" style="font-size:2.2em"></span></div>';
+			$_fancybox_class	= '';
+			$_fancybox_type		= '';
+			$_url				= cdn_serve( $object->id, TRUE );
+			$_action			= 'Download';
+
+		endif;
 
 			echo $object->filename_display;
 
@@ -29,7 +48,7 @@
 
 			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
 			echo anchor( site_url( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], page_is_secure() ), 'Delete', 'class="awesome red small delete"' );
-			echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
+			echo anchor( $_url, $_action, 'data-fancybox-title="' . $object->filename_display . '" data-fancybox-type="' . $_fancybox_type . '" class="' . $_fancybox_class . ' awesome small"' );
 
 		echo '</td>';
 

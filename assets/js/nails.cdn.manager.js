@@ -58,6 +58,22 @@ NAILS_CDN_Manager =  function() {
 		{
 			$( 'a.insert' ).remove();
 		}
+
+		// --------------------------------------------------------------------------
+
+		//	Initiate the fancyboxes, doing so here so we can style it slightly differently
+		$( 'a.cdn-fancybox' ).fancybox(
+		{
+			padding:0,
+			wrapCSS: 'cdn-fancybox',
+			helpers :
+			{
+				title:
+				{
+					type: 'over'
+				}
+			}
+		});
 	};
 
 
@@ -77,7 +93,7 @@ NAILS_CDN_Manager =  function() {
 	this._init_alerts = function()
 	{
 		var _this = this;	/*	Ugly Scope Hack	*/
-		$( '.system-alert .awesome' ).on( 'click', function() { _this._hide_alert(); } );
+		$( '.system-alert .awesome' ).on( 'click', function() { _this._hide_alert(); return false; } );
 
 		// --------------------------------------------------------------------------
 

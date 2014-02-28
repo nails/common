@@ -585,8 +585,9 @@
 				{
 					width:auto;
 
-					img
+					.icon
 					{
+						display:inline-block;
 						width:30px;
 						height:30px;
 						padding:3px;
@@ -594,6 +595,7 @@
 						.rounded(2px);
 						margin-right:10px;
 						vertical-align: middle;
+						text-align:center;
 					}
 				}
 				.mime,
@@ -791,5 +793,20 @@
 				color:red;
 			}
 		}
+	}
+}
+
+.cdn-fancybox
+{
+	.fancybox-title
+	{
+		-webkit-border-top-right-radius: 5px;
+		   -moz-border-top-right-radius: 5px;
+		        border-top-right-radius: 5px;
+	}
+
+	.fancybox-inner
+	{
+		background-image:url(../img/backgrounds/faux-transparency.png);
 	}
 }

@@ -7,13 +7,29 @@
 
 			//	Thumbnail
 			echo img( cdn_scale( $object->id, 150, 175 ) );
-			$_action_download = 'View';
+			$_fancybox_class	= 'cdn-fancybox';
+			$_fancybox_type		= '';
+			$_url				= cdn_serve( $object->id );
+			$_action			= 'View';
+
+
+		elseif ( $object->mime == 'application/pdf' ) :
+
+			//	PDF
+			echo '<span class="ion-document" style="font-size:14em"></span>';
+			$_fancybox_class	= 'cdn-fancybox';
+			$_fancybox_type		= 'iframe';
+			$_url				= cdn_serve( $object->id );
+			$_action			= 'View';
 
 		else :
 
-			//	Generic file
-			echo img( array( 'src' => NAILS_ASSETS_URL . 'img/icons/document-icon-128px.png', 'style' => 'border:none;margin-top:20px;' ) );
-			$_action_download = 'Download';
+			//	Generic file, force download
+			echo '<span class="ion-document" style="font-size:14em"></span>';
+			$_fancybox_class	= '';
+			$_fancybox_type		= '';
+			$_url				= cdn_serve( $object->id, TRUE );
+			$_action			= 'Download';
 
 		endif;
 
@@ -21,8 +37,8 @@
 		echo '<div class="actions">';
 
 			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
-			echo anchor( site_url( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], page_is_secure() ), 'Delete', 'class="awesome red small delete"' );
-			echo anchor( cdn_serve( $object->id ), $_action_download, 'class="fancybox awesome small"' );
+			echo anchor( site_url( 'cdn/manager/delete/' . $object->id . $_query_string, page_is_secure() ), 'Delete', 'class="awesome red small delete"' );
+			echo anchor( $_url, $_action, 'data-fancybox-title="' . $object->filename_display . '" data-fancybox-type="' . $_fancybox_type . '" class="' . $_fancybox_class . ' awesome small"' );
 
 		echo '</div>';
 

@@ -14,6 +14,12 @@
 
 	endif;
 
+	$this->session->set_userdata( 'cdn-manager-view', $_filter_view );
+
+	// --------------------------------------------------------------------------
+
+	$_query_string = $this->input->server( 'QUERY_STRING' ) ? '?' . $this->input->server( 'QUERY_STRING' ) : '';
+
 ?><!DOCTYPE html>
 <html>
 	<head>
@@ -110,32 +116,46 @@
 								<ul>
 									<?php
 
-										$_selected		 = ! $this->input->get( 'filter-tag' ) ? 'selected' : '';
-										$_uri_raw		 = $_SERVER['REQUEST_URI'];
-										$_uri_raw		.= strpos( $_SERVER['REQUEST_URI'], '?' ) !== FALSE ? '&' : '?';
+										//	Get the current Query string
+										parse_str( $this->input->server( 'QUERY_STRING' ), $_query );
 
-										//	Filter out any existing filter-tag=
-										$_uri		 = preg_replace( '/&{1,}filter\-tag=([0-9]*)/', '', $_uri_raw );
+										//	Filter out any existing filter-tag, if any
+										unset( $_query['filter-tag'] );
+
+										//	Item is selected?
+										$_selected	= ! $this->input->get( 'filter-tag' ) ? 'selected' : '';
+
+										//	Build the URI for this item
+										$_uri = site_url( uri_string(), page_is_secure() );
+										$_uri .= $_query ? '?' . http_build_query( $_query ) : '';
 
 										echo '<li class="tag ' . $_selected . '">';
-										echo '<a href="' . preg_replace( '/&{1,}$/', '', $_uri ) . '" class="tag">';
-										echo 'All My Files';
-										echo '<span class="count">' . $bucket->object_count . '</span>';
-										echo '</a>';
+											echo '<a href="' . $_uri . '" class="tag">';
+												echo 'All My Files';
+												echo '<span class="count">' . $bucket->object_count . '</span>';
+											echo '</a>';
 										echo '</li>';
 
 										// --------------------------------------------------------------------------
 
 										foreach( $bucket->tags AS $tag ) :
 
+											//	Item is selected?
 											$_selected = $this->input->get( 'filter-tag' ) == $tag->id ? 'selected' : '';
 
+											//	Build the URIs for this item
+											$_query['filter-tag'] = $tag->id;
+											$_uri = site_url( uri_string(), page_is_secure() );
+											$_uri .= $_query ? '?' . http_build_query( $_query ) : '';
+
+											$_uri_delete = site_url( 'cdn/manager/delete_tag/' . $tag->id . $_query_string, page_is_secure() );
+
 											echo '<li class="tag droppable ' . $_selected . '" data-id="' . $tag->id . '">';
-											echo '<a href="' . site_url( 'cdn/manager/delete_tag/' . $tag->id . '/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) .'" class="confirm delete-tag" data-confirm="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
-											echo '<a href="' . $_uri . 'filter-tag=' . $tag->id . '" class="tag">';
-											echo $tag->label;
-											echo '<span class="count">' . $tag->total . '</span>';
-											echo '</a>';
+												echo '<a href="' . $_uri_delete .'" class="confirm delete-tag" data-confirm="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
+												echo '<a href="' . $_uri . '" class="tag">';
+													echo $tag->label;
+													echo '<span class="count">' . $tag->total . '</span>';
+												echo '</a>';
 											echo '</li>';
 
 										endforeach;
@@ -143,7 +163,7 @@
 										// --------------------------------------------------------------------------
 
 										echo '<li class="new-tag">';
-										echo form_open( site_url( 'cdn/manager/new_tag/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) );
+										echo form_open( site_url( 'cdn/manager/new_tag' . $_query_string, page_is_secure() ) );
 										echo form_input( 'label', '', 'placeholder="New Tag"' );
 										echo form_submit( 'submit', 'Add', 'class="awesome small green"' );
 										echo form_close();
@@ -155,7 +175,7 @@
 							<li class="toolbar">
 								<?php
 
-									echo form_open_multipart( site_url( 'cdn/manager/upload/?' . $_SERVER['QUERY_STRING'], page_is_secure() ) );
+									echo form_open_multipart( site_url( 'cdn/manager/upload' . $_query_string, page_is_secure() ) );
 									echo form_hidden( 'tag-id', $this->input->get( 'filter-tag' ) );
 									echo form_submit( 'submit', 'Upload', 'class="awesome green"' );
 									echo form_upload( 'userfile' );
@@ -195,19 +215,47 @@
 								<span class="view-swap">
 									<?php
 
-										//	Filter out any existing filter-view=
-										$_uri_orig	= preg_replace( '/&{1,}filter\-view=([a-z]*)/', '', $_uri_raw );
+										//	Get the query string into an array for mutation
+										parse_str( $this->input->server( 'QUERY_STRING' ), $_query );
 
-										$_selected	= $_filter_view == 'thumb' ? 'selected ' . $_selected . '' : '';
-										$_uri		= site_url( $_uri_orig . 'filter-view=thumb', page_is_secure() );
+										//	Filter out any existing filter-view=
+										unset( $_query['filter-view'] );
+
+										// --------------------------------------------------------------------------
+
+										//	Item is selected?
+										$_selected	= $_filter_view == 'thumb' ? 'selected' : '';
+
+										//	Build the URI for this item
+										$_query['filter-view'] = 'thumb';
+										$_uri = site_url( uri_string(), page_is_secure() );
+										$_uri .= $_query ? '?' . http_build_query( $_query ) : '';
+
 										echo anchor( $_uri, 'Thumbnails', 'class="thumbnail ' . $_selected . '"' );
 
+										// --------------------------------------------------------------------------
+
+										//	Item is selected?
 										$_selected	= $_filter_view == 'list' ? 'selected' : '';
-										$_uri		= site_url( $_uri_orig . 'filter-view=list', page_is_secure() );
+
+
+										//	Build the URI for this item
+										$_query['filter-view'] = 'list';
+										$_uri = site_url( uri_string(), page_is_secure() );
+										$_uri .= $_query ? '?' . http_build_query( $_query ) : '';
+
 										echo anchor( $_uri, 'List', 'class="list ' . $_selected . '"' );
 
+										// --------------------------------------------------------------------------
+
+										//	Item is selected?
 										$_selected	= $_filter_view == 'detail' ? 'selected' : '';
-										$_uri		= site_url( $_uri_orig . 'filter-view=detail', page_is_secure() );
+
+										//	Build the URI for this item
+										$_query['filter-view'] = 'detail';
+										$_uri = site_url( uri_string(), page_is_secure() );
+										$_uri .= $_query ? '?' . http_build_query( $_query ) : '';
+
 										echo anchor( $_uri, 'Details', 'class="detail ' . $_selected . '"' );
 									?>
 								</span>
@@ -251,8 +299,7 @@
 
 											case 'detail' :
 
-												$this->session->set_userdata( 'cdn-manager-view', 'detail' );
-												$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object ) );
+												$this->load->view( 'cdn/manager/file-detail', array( 'object' => &$object, '_query_string' => &$_query_string ) );
 
 											break;
 
@@ -260,8 +307,7 @@
 
 											case 'list' :
 
-												$this->session->set_userdata( 'cdn-manager-view', 'list' );
-												$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object ) );
+												$this->load->view( 'cdn/manager/file-list', array( 'object' => &$object, '_query_string' => &$_query_string ) );
 
 											break;
 
@@ -270,8 +316,7 @@
 											case 'thumb' :
 											default :
 
-												$this->session->set_userdata( 'cdn-manager-view', 'thumb' );
-												$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object ) );
+												$this->load->view( 'cdn/manager/file-thumb', array( 'object' => &$object, '_query_string' => &$_query_string ) );
 
 											break;
 
