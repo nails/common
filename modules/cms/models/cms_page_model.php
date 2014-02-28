@@ -752,14 +752,22 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all_flat()
+	public function get_all_flat( $use_draft = TRUE )
 	{
 		$_out	= array();
 		$_pages	= $this->get_all();
 
 		foreach( $_pages AS $page ) :
 
-			$_out[$page->id] = $page->title;
+			if ( $use_draft ) :
+
+				$_out[$page->id] = $page->draft->title;
+
+			else :
+
+				$_out[$page->id] = $page->published->title;
+
+			endif;
 
 		endforeach;
 
