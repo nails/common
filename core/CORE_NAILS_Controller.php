@@ -44,7 +44,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Define data array (used extensively in views)
-		$this->data	= array();
+		$this->data	=& get_controller_data();
 
 		// --------------------------------------------------------------------------
 

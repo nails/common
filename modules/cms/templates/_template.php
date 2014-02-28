@@ -165,11 +165,10 @@ class Nails_CMS_Template
 	 * This method accepts a template data and renders the page appropriately
 	 *
 	 * @param stdClass $_tpl_data A normal template_data object, prefixed to avoid naming collisions
-	 * @param array $view_data An array of properties to pass to the views. Synonymous with the $this->data variable under normal controllers.
 	 * @return string
 	 *
 	 **/
-	public function render( $_tpl_widgets = array(), $_tpl_additional_fields = array(), &$view_data = array() )
+	public function render( $_tpl_widgets = array(), $_tpl_additional_fields = array() )
 	{
 		//	If the template wishes to execute any custom pre/post code then this method
 		//	should be extended and parent::render( $_data ) called at the appropriate
@@ -201,7 +200,7 @@ class Nails_CMS_Template
 							parse_str( $widget_data->data, $_data );
 
 							$WIDGET = new $_widget->iam();
-							$_widget_areas[$key] .= $WIDGET->render( $_data, $view_data );
+							$_widget_areas[$key] .= $WIDGET->render( $_data );
 
 						endif;
 					}
@@ -221,9 +220,10 @@ class Nails_CMS_Template
 		if ( is_file( $this->_details->path . 'view.php' ) ) :
 
 			//	If passed, extract any view data
-			if ( $view_data ) :
+			$_NAILS_CONTROLLER_DATA =& get_controller_data();
+			if ( $_NAILS_CONTROLLER_DATA ) :
 
-				extract( $view_data );
+				extract( $_NAILS_CONTROLLER_DATA );
 
 			endif;
 

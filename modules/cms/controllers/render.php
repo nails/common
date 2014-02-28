@@ -130,7 +130,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Actually render
-		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields, $this->data );
+		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields );
 
 		$this->output->set_output( $_html );
 	}

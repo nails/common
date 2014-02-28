@@ -60,7 +60,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function create( $data, &$view_data )
+	public function create( $data )
 	{
 		//	Some basic sanity testing
 		//	Check the data
@@ -87,7 +87,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		endif;
 
 		//	Try and update it depending on how the update went, commit & update or rollback
-		if ( $this->update( $_id, $data, $view_data ) ) :
+		if ( $this->update( $_id, $data ) ) :
 
 			$this->db->trans_commit();
 			return $_id;
@@ -104,7 +104,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function update( $page_id, $data, &$view_data = array() )
+	public function update( $page_id, $data )
 	{
 		//	Check the data
 		if ( empty( $data->data->template ) ) :
@@ -359,7 +359,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function render_template( $template, $widgets = array(), $additional_fields = array(), &$view_data = array() )
+	public function render_template( $template, $widgets = array(), $additional_fields = array() )
 	{
 		$_template = $this->get_template( $template, 'RENDER' );
 
@@ -396,7 +396,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			try
 			{
-				return $TEMPLATE->render( (array) $widgets, (array) $additional_fields, $view_data );
+				return $TEMPLATE->render( (array) $widgets, (array) $additional_fields );
 			}
 			catch( Exception $e )
 			{

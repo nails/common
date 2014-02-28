@@ -312,7 +312,7 @@ class NAILS_Cms extends NAILS_API_Controller
 
 			endif;
 
-			$_id = $this->cms_page_model->create( $_data, $this->data );
+			$_id = $this->cms_page_model->create( $_data );
 
 			if ( ! $_id ) :
 
