@@ -275,7 +275,7 @@
 
 										echo '<table>';
 										echo '<thead>';
-										echo '<tr>';
+										echo '<tr class="file list head">';
 										echo '<th class="filename">File</th>';
 										echo '<th class="mime">Type</th>';
 										echo '<th class="filesize">Filesize</th>';

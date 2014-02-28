@@ -387,7 +387,7 @@ NAILS_CDN_Manager =  function() {
 
 	this._do_search = function( term )
 	{
-		$( 'li.file' ).each(function()
+		$( 'li.file,tr.file:not(.head)' ).each(function()
 		{
 			var regex = new RegExp( term, 'gi' );
 
