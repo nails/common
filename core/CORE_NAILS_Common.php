@@ -1,16 +1,29 @@
 <?php
 
 /**
-* Attempts to fetch the real domain from a URL
-*
-* Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
-*
-* Hat tip: http://uk1.php.net/parse_url#104874
-*
-* @access	public
-* @param	string
-* @return	string	The real domain, or FALSE on error
-*/
+ * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
+ * this function provides an easy interface to this array when it's not in scope.
+ *
+ * @access	public
+ * @return	array	A reference to $NAILS_CONTROLLER_DATA
+ **/
+function &get_controller_data()
+{
+	global $NAILS_CONTROLLER_DATA;
+	return $NAILS_CONTROLLER_DATA;
+}
+
+/**
+ * Attempts to fetch the real domain from a URL
+ *
+ * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
+ *
+ * Hat tip: http://uk1.php.net/parse_url#104874
+ *
+ * @access	public
+ * @param	string
+ * @return	string	The real domain, or FALSE on error
+ **/
 if ( ! function_exists('get_domain_from_url')) :
 
 	function get_domain_from_url( $url )
@@ -65,15 +78,15 @@ endif;
 
 
 /**
-* Fetches the relative path between two directories
-*
-* Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
-*
-* @access	public
-* @param	string
-* @param	string
-* @return	string	The relative path between the two directories
-*/
+ * Fetches the relative path between two directories
+ *
+ * Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
+ *
+ * @access	public
+ * @param	string
+ * @param	string
+ * @return	string	The relative path between the two directories
+ **/
 if ( ! function_exists( 'get_relative_path' ) ) :
 
 	function get_relative_path( $from, $to )
