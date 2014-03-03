@@ -42,5 +42,28 @@ if ( ! function_exists( 'array_unique_multi' ) )
 }
 
 
+if ( ! function_exists( 'array_sort_multi' ) )
+{
+	function array_sort_multi( array &$array, $field )
+	{
+		usort( $array, function( $a, $b ) use ( $field )
+		{
+			//	Equal?
+			if ( trim( $a->$field ) == trim( $b->$field ) ) :
+
+				return 0;
+
+			endif;
+
+			//	Not equal, work out which takes precedence
+			$_sort = array( $a->$field, $b->$field );
+			sort( $_sort );
+
+			return $_sort[0] == $a->$field ? -1 : 1;
+		});
+	}
+}
+
+
 /* End of file array_helper.php */
 /* Location: ./helpers/array_helper.php */

@@ -55,8 +55,6 @@ class NAILS_Sitemap extends NAILS_Controller
 	 **/
 	public function _remap()
 	{
-		$this->sitemap_model->generate();
-
 		switch( uri_string() ) :
 
 			case 'sitemap' :				$this->_output_html();	break;
@@ -83,6 +81,24 @@ class NAILS_Sitemap extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		$this->data['sitemap'] = json_decode( file_get_contents( DEPLOY_CACHE_DIR . $this->_filename_json ) );
+
+		if ( empty( $this->data['sitemap'] ) ) :
+
+			//	Something fishy goin' on.
+			//	Send a temporarily unavailable header, we don't want search engines
+			//	unlisting us because of this.
+
+			$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
+			$this->output->set_header( 'Status: 503 Service Temporarily Unavailable' );
+			$this->output->set_header( 'Retry-After: 7200' );
+
+			//	Inform devs
+			send_developer_mail( $this->_filename_json . ' contained no data' , 'The cache file for the site map was found but did not contain any data.' );
+
+			$this->load->view( 'sitemap/error' );
+			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -166,9 +182,9 @@ class NAILS_Sitemap extends NAILS_Controller
 				send_developer_mail( 'Failed to generate sitemap', 'There was no ' . $file . ' data in the cache and I failed to recreate it.' );
 
 				//	Send a temporarily unavailable header, we don't want search engines unlisting us because of this.
-				$tis->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
-				$tis->output->set_header( 'Status: 503 Service Temporarily Unavailable' );
-				$tis->output->set_header( 'Retry-After: 7200' );
+				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
+				$this->output->set_header( 'Status: 503 Service Temporarily Unavailable' );
+				$this->output->set_header( 'Retry-After: 7200' );
 
 				$this->load->view( 'sitemap/error' );
 				return FALSE;

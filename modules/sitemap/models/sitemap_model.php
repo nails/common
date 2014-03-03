@@ -77,7 +77,10 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_map = array();
+		$_map					= new stdClass();
+		$_map->meta				= new stdClass();
+		$_map->meta->generated	= date( DATE_ATOM );
+		$_map->pages			= array();
 
 		foreach ( $this->_writers AS $slug => $method ) :
 
@@ -87,13 +90,19 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 				if ( is_array( $_result ) ) :
 
-					$_map = array_merge( $_map, $_result );
+					$_map->pages = array_merge( $_map->pages, $_result );
 
 				endif;
 
 			endif;
 
 		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Sort the array into a vaguely sensible order
+		$this->load->helper( 'array' );
+		array_sort_multi( $_map->pages, 'location' );
 
 		// --------------------------------------------------------------------------
 
@@ -123,13 +132,13 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 		if ( fwrite( $_fh, $_xml ) ) :
 
-			for ( $i = 0; $i < count( $_map ); $i++ ) :
+			for ( $i = 0; $i < count( $_map->pages ); $i++ ) :
 
 				$_xml  = '<url>' . "\n";
-				$_xml .= '<loc>' . $_map[$i]->location . '</loc>'. "\n";
-				$_xml .= ! empty( $_map[$i]->lastmod )		? '<lastmod>' . $_map[$i]->lastmod . '</lastmod>' . "\n"			: '';
-				$_xml .= ! empty( $_map[$i]->changefreq )	? '<changefreq>' . $_map[$i]->changefreq. '</changefreq>' . "\n"	: '';
-				$_xml .= ! empty( $_map[$i]->priority )		? '<priority>' . $_map[$i]->priority. '</priority>' . "\n"			: '';
+				$_xml .= '<loc>' . $_map->pages[$i]->location . '</loc>'. "\n";
+				$_xml .= ! empty( $_map->pages[$i]->lastmod )		? '<lastmod>' . $_map->pages[$i]->lastmod . '</lastmod>' . "\n"			: '';
+				$_xml .= ! empty( $_map->pages[$i]->changefreq )	? '<changefreq>' . $_map->pages[$i]->changefreq. '</changefreq>' . "\n"	: '';
+				$_xml .= ! empty( $_map->pages[$i]->priority )		? '<priority>' . $_map->pages[$i]->priority. '</priority>' . "\n"		: '';
 				$_xml .= '</url>'. "\n";
 
 				if ( ! fwrite( $_fh, $_xml ) ) :
@@ -153,6 +162,8 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 			endif;
 
+			return TRUE;
+
 		else :
 
 			@unlink( DEPLOY_CACHE_DIR . $this->_filename_xml );
@@ -173,8 +184,9 @@ class NAILS_Sitemap_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$_map[0]				= new stdClass();
-		$_map[0]->title			= htmlentities( APP_NAME );
-		$_map[0]->location		= '';
+		$_map[0]->title			= 'Homepage';
+		$_map[0]->location		= site_url();
+		$_map[0]->breadcrumbs	= '';
 		$_map[0]->changefreq	= 'daily';
 		$_map[0]->priority		= 1;
 
@@ -202,10 +214,11 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 			foreach ( $_pages AS $page ) :
 
-				if ( $page->is_published ) :
+				if ( $page->is_published && ! $page->is_homepage ) :
 
 					$_map[$_counter]				= new stdClass();
 					$_map[$_counter]->title			= htmlentities( $page->published->title );
+					$_map[$_counter]->breadcrumbs	= $page->published->breadcrumbs;
 					$_map[$_counter]->location		= site_url( $page->published->slug );
 					$_map[$_counter]->lastmod		= date( DATE_ATOM, strtotime( $page->modified ) );
 					$_map[$_counter]->changefreq	= 'monthly';
