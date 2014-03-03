@@ -62,21 +62,28 @@
 
 					echo implode( ' ', $_sentance );
 
-					echo '<hr style="margin:0.5em 0;" />';
-					echo '<small>';
-					echo '<ul>';
-					foreach ( $item->changes AS $change ) :
+					if (  $item->changes ) :
 
-						echo '<li>';
-						echo '<strong>' . $change->field . '</strong>: ';
-						echo '<em>' . $change->old_value . '</em>';
-						echo '&nbsp;&rarr;&nbsp;';
-						echo '<em>' . $change->new_value . '</em>';
-						echo '</li>';
+						echo '<hr style="margin:0.5em 0;" />';
+						echo '<small>';
+						echo '<ul>';
+						foreach ( $item->changes AS $change ) :
 
-					endforeach;
-					echo '</ul>';
-					echo '<small>';
+							$_old = $change->old_value == '' ? '<span>blank</span>' : $change->old_value;
+							$_new = $change->new_value == '' ? '<span>blank</span>' : $change->new_value;
+
+							echo '<li>';
+							echo '<strong>' . $change->field . '</strong>: ';
+							echo '<em>' . $_old . '</em>';
+							echo '&nbsp;&rarr;&nbsp;';
+							echo '<em>' . $_new . '</em>';
+							echo '</li>';
+
+						endforeach;
+						echo '</ul>';
+						echo '<small>';
+
+					endif;
 
 					echo '</td>';
 

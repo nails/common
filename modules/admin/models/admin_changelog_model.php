@@ -60,12 +60,12 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function add( $verb, $article, $item, $item_id, $title, $url, $field = NULL, $old_value = NULL, $new_value = NULL, $strict_comparison = TRUE )
+	public function add( $verb, $article, $item, $item_id, $title, $url = NULL, $field = NULL, $old_value = NULL, $new_value = NULL, $strict_comparison = TRUE )
 	{
 		//	if the old_value and the new_value are the same then why are you
 		//	logging a change!? Lazy [read: efficient] dev.
 
-		if ( $old_value && $new_value ) :
+		if ( NULL !== $field) :
 
 			$new_value = trim( $new_value );
 			$old_value = trim( $old_value );
@@ -97,7 +97,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 		$_key = md5( active_user( 'id' ) . '|' . $verb . '|' . $article . '|' . $item . '|' . $item_id . '|' . $title . '|' . $url );
 
-		if ( empty( $this->_changes[active_user( 'id' )][$_key] ) ) :
+		if ( empty( $this->_changes[$_key] ) ) :
 
 			$this->_changes[$_key]				= array();
 			$this->_changes[$_key]['user_id']	= active_user( 'id' ) ? active_user( 'id' ) : NULL;
@@ -105,7 +105,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 			$this->_changes[$_key]['article']	= $article;
 			$this->_changes[$_key]['item']		= $item;
 			$this->_changes[$_key]['item_id']	= $item_id;
-			$this->_changes[$_key]['title']		= $title;
+			$this->_changes[$_key]['title']	= $title;
 			$this->_changes[$_key]['url']		= $url;
 			$this->_changes[$_key]['changes']	= array();
 
@@ -120,7 +120,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 			$_subkey = md5( $field );
 
-			$this->_changes[$_key]['changes'][$_subkey]				= new stdClasS();
+			$this->_changes[$_key]['changes'][$_subkey]			= new stdClass();
 			$this->_changes[$_key]['changes'][$_subkey]->field		= $field;
 			$this->_changes[$_key]['changes'][$_subkey]->old_value	= $old_value;
 			$this->_changes[$_key]['changes'][$_subkey]->new_value	= $new_value;
@@ -213,16 +213,8 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = ' . $this->_table_prefix . '.user_id AND ue.is_primary = 1', 'LEFT' );
 
 		//	Set the order
-		$this->db->order_by( $this->_table_prefix . '.created, ' . $this->_table_prefix . '.id', 'DESC' );
-
-		// --------------------------------------------------------------------------
-
-		//	Handle $data
-		if ( ! empty( $data['where'] ) ) :
-
-
-
-		endif;
+		$this->db->order_by( $this->_table_prefix . '.created', 'DESC' );
+		$this->db->order_by( $this->_table_prefix . '.id', 'DESC');
 	}
 
 

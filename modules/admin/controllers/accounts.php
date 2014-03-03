@@ -331,6 +331,25 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 					// --------------------------------------------------------------------------
 
+					//	Add item to admin changelog
+					$_name = '#' . number_format( $_new_user['id'] );
+
+					if ( $_meta['first_name'] ) :
+
+						$_name .= ' ' . $_meta['first_name'];
+
+					endif;
+
+					if ( $_meta['last_name'] ) :
+
+						$_name .= ' ' . $_meta['last_name'];
+
+					endif;
+
+					_ADMIN_CHANGE_ADD( 'created', 'a', 'user', $_new_user['id'],  $_name, 'admin/accounts/edit/' . $_new_user['id'] );
+
+					// --------------------------------------------------------------------------
+
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> A user account was created for <strong>' . $_meta['first_name'] . '</strong>, update their details now.' );
 					redirect( 'admin/accounts/edit/' . $_new_user['id'] );
 
@@ -639,6 +658,33 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 						// --------------------------------------------------------------------------
 
+						//	Set Admin changelogs
+						$_name = '#' . number_format( $_post['id'] );
+
+						if ( $_data['first_name'] ) :
+
+							$_name .= ' ' . $_data['first_name'];
+
+						endif;
+
+						if ( $_data['last_name'] ) :
+
+							$_name .= ' ' . $_data['last_name'];
+
+						endif;
+
+						foreach ( $_data AS $field => $value ) :
+
+							if ( isset( $_user->$field ) ) :
+
+								_ADMIN_CHANGE_ADD( 'updated', 'a', 'user', $_post['id'],  $_name, 'admin/accounts/edit/' . $_post['id'], $field, $_user->$field, $value, FALSE );
+
+							endif;
+
+						endforeach;
+
+						// --------------------------------------------------------------------------
+
 						//	refresh the user object
 						$_user = $this->user->get_by_id( $_post['id'] );
 
@@ -760,8 +806,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	public function suspend()
 	{
 		//	Get the user's details
-		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_by_id( $_uid );
+		$_uid		= $this->uri->segment( 4 );
+		$_user		= $this->user->get_by_id( $_uid );
+		$_old_value = $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
 
@@ -782,7 +829,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the user's details, again
-		$_user = $this->user->get_by_id( $_uid );
+		$_user		= $this->user->get_by_id( $_uid );
+		$_new_value	= $_user->is_suspended;
+
 
 		// --------------------------------------------------------------------------
 
@@ -796,6 +845,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->session->set_flashdata( 'success', lang( 'accounts_suspend_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Update admin changelog
+		_ADMIN_CHANGE_ADD( 'suspended', 'a', 'user', $_uid,  '#' . number_format( $_uid ) . ' ' . $_user->first_name . ' ' . $_user->last_name, 'admin/accounts/edit/' . $_uid, 'is_suspended', $_old_value, $_new_value, FALSE );
 
 		// --------------------------------------------------------------------------
 
@@ -816,8 +870,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	public function unsuspend()
 	{
 		//	Get the user's details
-		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_by_id( $_uid );
+		$_uid		= $this->uri->segment( 4 );
+		$_user		= $this->user->get_by_id( $_uid );
+		$_old_value	= $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
 
@@ -838,7 +893,8 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the user's details, again
-		$_user = $this->user->get_by_id( $_uid );
+		$_user		= $this->user->get_by_id( $_uid );
+		$_new_value	= $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
 
@@ -852,6 +908,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->session->set_flashdata( 'success', lang( 'accounts_unsuspend_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Update admin changelog
+		_ADMIN_CHANGE_ADD( 'unsuspended', 'a', 'user', $_uid,  '#' . number_format( $_uid ) . ' ' . $_user->first_name . ' ' . $_user->last_name, 'admin/accounts/edit/' . $_uid, 'is_suspended', $_old_value, $_new_value, FALSE );
+
+		// --------------------------------------------------------------------------
 
 		redirect( $this->input->get( 'return_to' ) );
 	}
@@ -889,12 +952,23 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Delete user
 		$_user = $this->user->get_by_id( $_uid );
 
+		if ( ! $_user ) :
+
+			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_unknown_id' ) );
+			redirect( $this->input->get( 'return_to' ) );
+			return;
+
+		endif;
+
 		// --------------------------------------------------------------------------
 
 		//	Define messages
 		if ( $this->user->destroy( $_uid ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'accounts_delete_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
+
+			//	Update admin changelog
+			_ADMIN_CHANGE_ADD( 'deleted', 'a', 'user', $_uid,  '#' . number_format( $_uid ) . ' ' . $_user->first_name . ' ' . $_user->last_name );
 
 		else :
 
