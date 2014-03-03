@@ -22,7 +22,7 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 	public function index()
 	{
 		//	TODO: Running the index method should automatically determine
-		//	which tasks hould be run. Either it knows that it runs every hour
+		//	which tasks should be run. Either it knows that it runs every hour
 		//	and tracks what's been going on, or it looks at the time and works
 		//	out when the last items were run etc. Think about it.
 	}
@@ -70,13 +70,46 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 
 			//	Sync Currencies
 			_LOG( '... Synching Currencies' );
-			$this->currency->sync();
+			if ( ! $this->currency->sync() ) :
+
+				_LOG( '... ... FAILED: ' . $this->currency->last_error() );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
 			_LOG( 'Finished Shop Tasks' );
 
 		endif;
+
+		//	Site map related tasks, makes sense for this one to come last in case any of
+		//	the previous have an impact
+
+		if ( module_is_enabled( 'sitemap' ) ) :
+
+			_LOG( 'Sitemap Module Enabled. Beginning Sitemap Tasks.' );
+
+			// --------------------------------------------------------------------------
+
+			//	Load models
+			$this->load->model( 'sitemap/sitemap_model' );
+
+			// --------------------------------------------------------------------------
+
+			//	Generate sitemap
+			_LOG( '... Generating Sitemap data' );
+			if ( ! $this->sitemap_model->generate() ) :
+
+				_LOG( '... ... FAILED: ' . $this->sitemap_model->last_error() );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			_LOG( 'Finished Site Tasks' );
+
+		endif;
+
 
 		// --------------------------------------------------------------------------
 

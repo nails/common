@@ -316,7 +316,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			if ( ! $this->input->is_cli_request() && array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
 
-				header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
+				header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
 				header( 'Status: 503 Service Temporarily Unavailable' );
 				header( 'Retry-After: 7200' );
 
@@ -425,7 +425,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _staging_request_credentials()
 	{
 		header( 'WWW-Authenticate: Basic realm="' . APP_NAME . ' Staging Area"' );
-		header( 'HTTP/1.0 401 Unauthorized' );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 401 Unauthorized' );
 		?>
 		<!DOCTYPE html>
 		<html>
@@ -576,7 +576,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
 
-	 		header( 'HTTP/1.1 500 Bad Request' );
+	 		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 500 Bad Request' );
 			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
 
 		endif;

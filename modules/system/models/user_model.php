@@ -348,9 +348,12 @@ class NAILS_User_model extends NAILS_Model
 			//	Set session variables
 			if ( $set_session_data ) :
 
-				$this->session->set_userdata( 'id',			$_user->id );
-				$this->session->set_userdata( 'email',		$_user->email );
-				$this->session->set_userdata( 'group_id',	$_user->group_id );
+				$_session = array(
+					'id'		=> $_user->id,
+					'email'		=> $_user->email,
+					'group_id'	=> $_user->group_id,
+				);
+				$this->session->set_userdata( $_session );
 
 			endif;
 

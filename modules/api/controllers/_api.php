@@ -82,7 +82,7 @@ class NAILS_API_Controller extends NAILS_Controller
 
 			if ( $send_header ) :
 
-				$this->output->set_header( 'HTTP/1.0 200 OK' );
+				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 200 OK' );
 
 			endif;
 

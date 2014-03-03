@@ -69,7 +69,7 @@ class NAILS_Orders extends NAILS_Shop_Controller
 		header( 'Cache-Control: no-cache, must-revalidate' );
 		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Content-type: application/json' );
-		header( 'HTTP/1.0 400 Bad Request' );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 
 		// --------------------------------------------------------------------------
 

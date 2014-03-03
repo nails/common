@@ -48,9 +48,10 @@ class NAILS_Routes_model extends NAILS_Model
 		endif;
 
 		//	Default writers
-		$this->_writers['cms']	= array( $this, '_routes_cms' );
-		$this->_writers['blog']	= array( $this, '_routes_blog' );
-		$this->_writers['shop']	= array( $this, '_routes_shop' );
+		$this->_writers['sitemap']	= array( $this, '_routes_sitemap' );
+		$this->_writers['cms']		= array( $this, '_routes_cms' );
+		$this->_writers['blog']		= array( $this, '_routes_blog' );
+		$this->_writers['shop']		= array( $this, '_routes_shop' );
 	}
 
 
@@ -106,6 +107,27 @@ class NAILS_Routes_model extends NAILS_Model
 
 		//	Start writing the file
 		return $this->_write_file();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _routes_sitemap()
+	{
+		$_routes = array();
+
+		if ( module_is_enabled( 'sitemap' ) ) :
+
+			$this->load->model( 'sitemap/sitemap_model' );
+
+			$_routes['//BEGIN SITEMAP'] = '';
+			$_routes = $_routes + $this->sitemap_model->get_routes();
+			$_routes['//END SITEMAP'] = '';
+
+		endif;
+
+		return $_routes;
 	}
 
 
@@ -189,6 +211,8 @@ class NAILS_Routes_model extends NAILS_Model
 			//	Shop front page route
 			$_routes[substr( $_settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'shop/$2';
 
+			//	TODO: all shop product/category/tag/sale routes etc
+
 			$_routes['//END SHOP'] = '';
 
 		endif;
@@ -212,7 +236,6 @@ class NAILS_Routes_model extends NAILS_Model
 			$_routes['//BEGIN BLOG'] = '';
 
 			//	Blog front page route
-			//substr( $settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'
 			$_routes[substr( $_settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'blog/$2';
 
 			$_routes['//END BLOG'] = '';
@@ -376,4 +399,4 @@ endif;
 
 
 /* End of file routes_model.php */
-/* Location: ./system/models/routes_model.php */
+/* Location: ./modules/system/models/routes_model.php */
