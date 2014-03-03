@@ -42,7 +42,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Configurations
-		$d->name				= 'Blog';					//	Display name.
+		$d->name = 'Blog';	//	Display name.
 
 		// --------------------------------------------------------------------------
 
@@ -208,8 +208,16 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 				endif;
 
-				if ( $this->post->create( $_data ) ) :
+				$_post_id = $this->post->create( $_data );
 
+				if ( $_post_id ) :
+
+					//	Update admin changelog
+					_ADMIN_CHANGE_ADD( 'created', 'a', 'blog post', $_post_id, $_data['title'], 'admin/blog/edit/' . $_post_id );
+
+					// --------------------------------------------------------------------------
+
+					//	Set flashdata and redirect
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was created.' );
 					redirect( 'admin/blog' );
 					return;
@@ -338,6 +346,101 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 				if ( $this->post->update( $_post_id, $_data ) ) :
 
+					//	Update admin change log
+					foreach ( $_data AS $field => $value ) :
+
+						if ( isset( $this->data['post']->$field ) ) :
+
+							switch( $field ) :
+
+								case 'associations' :
+
+									//	TODO: changelog associations
+
+								break;
+
+								case 'categories' :
+
+									$_old_categories = array();
+									$_new_categories = array();
+
+									foreach( $this->data['post']->$field AS $v ) :
+
+										$_old_categories[] = $v->label;
+
+									endforeach;
+
+
+									foreach( $value AS $v ) :
+
+										$_temp = $this->category->get_by_id( $v );
+
+										if ( $_temp ) :
+
+											$_new_categories[] = $_temp->label;
+
+										endif;
+
+									endforeach;
+
+									asort( $_old_categories );
+									asort( $_new_categories );
+
+									$_old_categories = implode( ',', $_old_categories );
+									$_new_categories = implode( ',', $_new_categories );
+
+									_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $_old_categories, $_new_categories, FALSE );
+
+								break;
+
+								case 'tags' :
+
+									$_old_tags = array();
+									$_new_tags = array();
+
+									foreach( $this->data['post']->$field AS $v ) :
+
+										$_old_tags[] = $v->label;
+
+									endforeach;
+
+
+									foreach( $value AS $v ) :
+
+										$_temp = $this->tag->get_by_id( $v );
+
+										if ( $_temp ) :
+
+											$_new_tags[] = $_temp->label;
+
+										endif;
+
+									endforeach;
+
+									asort( $_old_tags );
+									asort( $_new_tags );
+
+									$_old_tags = implode( ',', $_old_tags );
+									$_new_tags = implode( ',', $_new_tags );
+
+									_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $_old_tags, $_new_tags, FALSE );
+
+								break;
+
+								default :
+
+										_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $this->data['post']->$field, $value, FALSE );
+
+								break;
+
+							endswitch;
+
+						endif;
+
+					endforeach;
+
+					// --------------------------------------------------------------------------
+
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was updated.' );
 					redirect( 'admin/blog' );
 					return;
@@ -415,6 +518,9 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/restore/' . $_post_id, 'Undo?' ) );
 
+			//	Update admin changelog
+			_ADMIN_CHANGE_ADD( 'deleted', 'a', 'blog post', $_post_id, $_post->title );
+
 		else :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I failed to delete that post.' );
@@ -450,6 +556,9 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		if ( $this->post->restore( $_post_id ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was restored successfully. ' );
+
+			//	Update admin changelog
+			_ADMIN_CHANGE_ADD( 'restored', 'a', 'blog post', $_post_id, $_post->title, 'admin/blog/edit/' . $_post_id );
 
 		else :
 
