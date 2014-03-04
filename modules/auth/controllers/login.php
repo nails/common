@@ -166,7 +166,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 						//	Log the user out and remove the 'remember me' cookie - if we don't do this then the password reset
 						//	page will see a logged in user and go nuts (i.e error).
 
-						if ( $this->user->is_remembered() ) :
+						if ( $_remember ) :
 
 							$_query['remember'] = TRUE;
 
@@ -178,6 +178,27 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 						redirect( 'auth/reset_password/' . $_login['temp_pw']['id'] . '/' . $_login['temp_pw']['hash'] . $_query );
 						return;
+
+					elseif ( APP_AUTH_TWO_FACTOR ) :
+
+						$_query	= array();
+
+						if ( $this->data['return_to'] ) :
+
+							$_query['return_to'] = $this->data['return_to'];
+
+						endif;
+
+						if ( $_remember ) :
+
+							$_query['remember'] = TRUE;
+
+						endif;
+
+						$_query = $_query ? '?' . http_build_query( $_query ) : '';
+
+						//	Login was successful, redirect to the security questions page
+						redirect( 'auth/security_questions/' . $_login['user_id'] . '/' . $_login['two_factor_auth']['salt'] . '/' . $_login['two_factor_auth']['token'] . $_query );
 
 					else :
 

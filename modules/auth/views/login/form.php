@@ -38,7 +38,9 @@
 	//	will most likely contain a full URL, causing form_open() not to site_url() it (resulting in the
 	//	form posting to auth/login rather than /auth/login).
 
-	echo $return_to? form_open( site_url( 'auth/login?return_to=' . $return_to ), $attr ) : form_open( 'auth/login', $attr );
+	$_return_to = $return_to ? '?return_to=' . $return_to : '';
+
+	echo form_open( site_url( 'auth/login' . $_return_to ), $attr );
 
 	// --------------------------------------------------------------------------
 
@@ -166,21 +168,21 @@
 				//	FACEBOOK
 				if ( module_is_enabled( 'auth[facebook]' ) ) :
 
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect', lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect' . $_return_to, lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
 
 				endif;
 
 				//	TWITTER
 				if ( module_is_enabled( 'auth[twitter]' ) ) :
 
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect', lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect' . $_return_to, lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
 
 				endif;
 
 				//	LINKEDIN
 				if ( module_is_enabled( 'auth[linkedin]' ) ) :
 
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect', lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
+					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect' . $_return_to, lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
 
 				endif;
 

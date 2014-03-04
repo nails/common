@@ -2029,6 +2029,172 @@ class NAILS_User_model extends NAILS_Model
 
 
 	/**
+	 * Fetches a random security question for a specific user
+	 *
+	 * @access	public
+	 * @param $user_id int The user's ID
+	 * @return	stdClass
+	 **/
+	public function get_security_question( $user_id )
+	{
+		$this->db->where( 'user_id', $user_id );
+		$this->db->order_by( 'last_requested', 'DESC' );
+		$_questions = $this->db->get( NAILS_DB_PREFIX . 'user_auth_two_factor_question' )->result();
+
+		if ( ! $_questions ) :
+
+			$this->_set_error( 'No security questions available for this user.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Choose a question to return
+		if ( count( $_questions ) == 1 ) :
+
+			//	No choice, just return the lonely question
+			$_out = $_questions[0];
+
+		elseif ( count( $_questions ) > 1 ) :
+
+			//	Has the most recently asked question been asked in the last 10 minutes?
+			//	If so, return that one again (to make harvesting all the user's questions
+			//	a little more time consuming). If not randomly choose one.
+
+			if ( strtotime( $_questions[0]->last_requested ) > strtotime( '-10 MINS' ) ) :
+
+				$_out = $_questions[0];
+
+			else :
+
+				$_out = $_questions[array_rand( $_questions )];
+
+			endif;
+
+		else :
+
+			//	Derp.
+			$this->_set_error( 'Could not determine security question.' );
+			return FALSE;
+
+		endif;
+
+		//	Decode the question
+		$_out->question = $this->encrypt->decode( $_out->question, APP_PRIVATE_KEY . $_out->salt );
+
+		$this->db->set( 'last_requested', 'NOW()', FALSE );
+		$this->db->set( 'last_requested_ip', $this->input->ip_address() );
+		$this->db->where( 'id', $_out->id );
+		$this->db->update( NAILS_DB_PREFIX . 'user_auth_two_factor_question' );
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function validate_security_answer( $question_id, $user_id, $answer )
+	{
+		$this->db->select( 'answer, salt' );
+		$this->db->where( 'id', $question_id );
+		$this->db->where( 'user_id', $user_id );
+		$_question = $this->db->get( NAILS_DB_PREFIX . 'user_auth_two_factor_question' )->row();
+
+		if ( ! $_question ) :
+
+			return FALSE;
+
+		endif;
+
+		$_hash = sha1( sha1( strtolower( $answer ) ) . APP_PRIVATE_KEY . $_question->salt );
+
+		return $_hash === $_question->answer;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetches a random security question for a specific user
+	 *
+	 * @access	public
+	 * @param $user_id int The user's ID
+	 * @return	stdClass
+	 **/
+	public function set_security_questions( $user_id, $data, $clear_old = TRUE )
+	{
+		//	Check input
+		foreach ( $data AS $d ) :
+
+			if ( empty( $d->question ) || empty( $d->answer ) ) :
+
+				$this->_set_error( 'Malformed question/answer data.' );
+				return FALSE;
+
+			endif;
+
+		endforeach;
+
+		//	Begin transaction
+		$this->db->trans_begin();
+
+		//	Delete old questions?
+		if ( $clear_old ) :
+
+			$this->db->where( 'user_id', $user_id );
+			$this->db->delete( NAILS_DB_PREFIX . 'user_auth_two_factor_question' );
+
+		endif;
+
+		$_data		= array();
+		$_counter	= 0;
+
+		foreach ( $data AS $d ) :
+
+			$_data[$_counter]	= array();
+			$_data[$_counter]['user_id']	= $user_id;
+			$_data[$_counter]['salt']		= $this->salt();
+			$_data[$_counter]['question']	= $this->encrypt->encode( $d->question, APP_PRIVATE_KEY . $_data[$_counter]['salt'] );
+			$_data[$_counter]['answer']		= sha1( sha1( strtolower( $d->answer ) ) . APP_PRIVATE_KEY . $_data[$_counter]['salt'] );
+			$_data[$_counter]['created']	= date( 'Y-m-d H:i:s' );
+
+			$_counter++;
+
+		endforeach;
+
+		if ( $_data ) :
+
+			$this->db->insert_batch( NAILS_DB_PREFIX . 'user_auth_two_factor_question', $_data );
+
+			if ( $this->db->trans_status() !== FALSE ) :
+
+				$this->db->trans_commit();
+				return TRUE;
+
+			else :
+
+				$this->db->trans_rollback();
+				return FALSE;
+
+			endif;
+
+		else :
+
+			$this->db->trans_rollback();
+			$this->_set_error( 'No data to save.' );
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * hash a password based on the user's salt (as defined in DB)
 	 *
 	 * @access	public

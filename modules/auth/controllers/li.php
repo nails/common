@@ -560,44 +560,78 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Set login details
-		$this->user->set_login_data( $user->id );
+		//	Two factor auth enabled?
+		if ( APP_AUTH_TWO_FACTOR ) :
 
-		// --------------------------------------------------------------------------
+			//	Generate a token
+			$this->load->model( 'auth_model' );
+			$_token = $this->auth_model->generate_two_factor_token( $user->id );
 
-		//	Set welcome message
-		if ( $user->last_login ) :
+			if ( ! $_token ) :
 
-			$_last_login =  nice_time( $user->last_login );
-			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
+				show_fatal_error( 'Failed to generate two-factor auth token', 'A user tried to login with LinkedIn and the system failed to generate a two-factor auth token.' );
+
+			endif;
+
+			$_query					= array();
+			$_query['return_to']	= $this->_return_to;
+
+			$_query = array_filter( $_query );
+
+			if ( $_query ) :
+
+				$_query = '?' . http_build_query( $_query );
+
+			else :
+
+				$_query = '';
+
+			endif;
+
+			redirect( 'auth/security_questions/' . $user->id . '/' . $_token['salt'] . '/' . $_token['token'] . '/linkedin' . $_query );
 
 		else :
 
-			$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $user->first_name ) ) );
+			//	Set login details
+			$this->user->set_login_data( $user->id );
 
-		endif;
+			// --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+			//	Set welcome message
+			if ( $user->last_login ) :
 
-		//	Update the last login
-		$this->user->update_last_login( $user->id );
+				$_last_login =  nice_time( $user->last_login );
+				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
 
-		// --------------------------------------------------------------------------
+			else :
 
-		//	Create an event for this event
-		create_event( 'did_log_in', $user->id, 0, NULL, array( 'method' => 'linkedin' ) );
+				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $user->first_name ) ) );
 
-		// --------------------------------------------------------------------------
+			endif;
 
-		//	Delete register token
-		delete_cookie( 'liRegisterToken' );
+			// --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+			//	Update the last login
+			$this->user->update_last_login( $user->id );
 
-		//	If no return to value is defined, default to the group homepage
-		if ( ! $this->_return_to ) :
+			// --------------------------------------------------------------------------
 
-			$this->_return_to = $user->group_homepage;
+			//	Create an event for this event
+			create_event( 'did_log_in', $user->id, 0, NULL, array( 'method' => 'linkedin' ) );
+
+			// --------------------------------------------------------------------------
+
+			//	Delete register token
+			delete_cookie( 'liRegisterToken' );
+
+			// --------------------------------------------------------------------------
+
+			//	If no return to value is defined, default to the group homepage
+			if ( ! $this->_return_to ) :
+
+				$this->_return_to = $user->group_homepage;
+
+			endif;
 
 		endif;
 

@@ -192,6 +192,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
 		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 		if ( ! defined( 'APP_NATIVE_LOGIN_USING' ) )		define( 'APP_NATIVE_LOGIN_USING',		'EMAIL' );	//	[EMAIL|USERNAME|BOTH]
+		if ( ! defined( 'APP_AUTH_TWO_FACTOR' ) )			define( 'APP_AUTH_TWO_FACTOR',			FALSE );
 
 
 		// --------------------------------------------------------------------------

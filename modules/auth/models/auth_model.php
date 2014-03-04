@@ -160,26 +160,42 @@ class NAILS_Auth_model extends NAILS_Model
 				//	Reset user's failed login counter and allow login
 				$this->user->reset_failed_login( $_user->id );
 
-				//	Set login data for this user
-				$this->user->set_login_data( $_user->id );
+				//	If two factor auth is enabled then don't _actually_ set login data
+				//	the next process will confirm the login and set this.
 
-				//	If we're remembering this user set a cookie
-				if ( $remember ) :
+				if ( ! APP_AUTH_TWO_FACTOR ) :
 
-					$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
+					//	Set login data for this user
+					$this->user->set_login_data( $_user->id );
+
+					//	If we're remembering this user set a cookie
+					if ( $remember ) :
+
+						$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
+
+					endif;
+
+					//	Update their last login and increment their login count
+					$this->user->update_last_login( $_user->id );
 
 				endif;
 
-				//	Update their last login and increment their login count
-				$this->user->update_last_login( $_user->id );
-
-				// return some helpful data
+				// Return some helpful data
 				$_return = array(
 					'user_id'		=> $_user->id,
 					'first_name'	=> $_user->first_name,
 					'last_login'	=> $_user->last_login,
-					'homepage'		=> $_user->group_homepage
+					'homepage'		=> $_user->group_homepage,
+					'remember'		=> $remember
 				);
+
+				//	Two factor auth?
+				if (  APP_AUTH_TWO_FACTOR ) :
+
+					//	Generate token
+					$_return['two_factor_auth'] = $this->generate_two_factor_token( $_user->id );
+
+				endif;
 
 				//	Temporary password?
 				if ( $_user->temp_pw ) :
@@ -328,6 +344,91 @@ class NAILS_Auth_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function generate_two_factor_token( $user_id )
+	{
+		$_salt		= $this->user->salt();
+		$_ip		= $this->input->ip_address();
+		$_created	= date( 'Y-m-d H:i:s' );
+		$_expires	= date( 'Y-m-d H:i:s', strtotime( '+10 MINS' ) );
+
+		$_token				= array();
+		$_token['token']	= sha1( sha1( APP_PRIVATE_KEY . $user_id . $_created . $_expires . $_ip ) . $_salt );
+		$_token['salt']		= md5( $_salt );
+
+		//	Add this to the DB
+		$this->db->set( 'user_id',	$user_id );
+		$this->db->set( 'token',	$_token['token'] );
+		$this->db->set( 'salt',		$_token['salt'] );
+		$this->db->set( 'created',	$_created );
+		$this->db->set( 'expires',	$_expires );
+		$this->db->set( 'ip',		$_ip );
+
+		if ( $this->db->insert( NAILS_DB_PREFIX . 'user_auth_two_factor_token' ) ) :
+
+			$_token['id'] = $this->db->insert_id();
+
+			return $_token;
+
+		else :
+
+			$this->_set_error( 'auth_twofactor_token_could_not_generate' );
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function verify_two_factor_token( $user_id, $salt, $token, $ip )
+	{
+		$this->db->where( 'user_id',	$user_id );
+		$this->db->where( 'salt',		$salt );
+		$this->db->where( 'token',		$token );
+
+		$_token		= $this->db->get( NAILS_DB_PREFIX . 'user_auth_two_factor_token' )->row();
+		$_return	= TRUE;
+
+		if ( ! $_token ) :
+
+			$this->_set_error( 'auth_twofactor_token_invalid' );
+			return FALSE;
+
+		elseif ( strtotime( $_token->expires ) <= time() ) :
+
+			$this->_set_error( 'auth_twofactor_token_expired' );
+			$_return = FALSE;
+
+		elseif ( $_token->ip != $ip ) :
+
+			$this->_set_error( 'auth_twofactor_token_bad_ip' );
+			$_return = FALSE;
+
+		endif;
+
+		//	Delete the token
+		$this->db->where( 'id', $_token->id );
+		$this->db->delete( NAILS_DB_PREFIX . 'user_auth_two_factor_token' );
+
+		return $_return;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete_two_factor_token( $token_id )
+	{
+		$this->db->where( 'id', $token_id );
+		$this->db->delete( NAILS_DB_PREFIX . 'user_auth_two_factor_token' );
+		return (bool) $this->db->affected_rows();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Sets a new error message
 	 *
@@ -365,17 +466,23 @@ class NAILS_Auth_model extends NAILS_Model
 	{
 		$_output = '';
 
-		if ( ! is_array( $this->_errors ) )
+		if ( ! is_array( $this->_errors ) ) :
+
 			return FALSE;
+
+		endif;
 
 		foreach ( $this->_errors as $error ) :
 
 			if ( ! is_array( $error ) ) :
 
-				$_output .= $this->_error_delimiter[0] . lang( $error ) . $this->_error_delimiter[1];
+				$_error = lang( $error ) ? lang( $error ) : $error;
+				$_output .= $this->_error_delimiter[0] . $_error . $this->_error_delimiter[1];
 
 			else :
+
 				$_output .= $this->_error_delimiter[0] . lang( $error['key'], $error['vars'] ) . $this->_error_delimiter[1];
+
 
 			endif;
 
