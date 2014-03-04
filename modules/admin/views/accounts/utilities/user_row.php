@@ -28,7 +28,6 @@
 			endswitch;
 
 			echo '<small>';
-			echo isset( $member->telephone ) && $member->telephone ? $member->telephone . ' | ' : '';
 			echo $member->email;
 			echo $member->email_is_verified ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-email.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_verified' ) ) ) : '';
 			echo $member->fb_id ? img( array( 'src' => NAILS_ASSETS_URL . '/img/admin/icons/verified-facebook.png', 'class' => 'verified', 'rel' => 'tooltip', 'title' => lang( 'accounts_index_social_connected', 'Facebook' ) ) ) : '';
@@ -121,7 +120,7 @@
 
 				if ( user_has_permission( 'admin.accounts.delete' ) && $member->id != active_user( 'id' ) && $member->group_id != 1 ) :
 
-					$_buttons[] = anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
+					$_buttons[] = anchor( 'admin/accounts/delete/' . $member->id . $_return, lang( 'action_delete' ), 'class="confirm awesome small red" data-title="Delete user &quot;' . $member->first_name . ' ' . $member->last_name . '&quot?" data-body="' . lang( 'admin_confirm_delete' ) . '"' );
 
 				endif;
 

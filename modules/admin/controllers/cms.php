@@ -1135,7 +1135,27 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _menus_delete()
 	{
-		$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> menu deletion is a TODO just now.' );
+		$_menu = $this->cms_menu->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $_menu ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> invalid menu ID.' );
+			redirect( 'admin/cms/menus' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->cms_menu->delete( $_menu->id ) ) :
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was deleted successfully.' );
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> failed to delete menu. ' . $this->cms_menu->last_error() );
+
+		endif;
+
 		redirect( 'admin/cms/menus' );
 	}
 }

@@ -58,7 +58,7 @@
 
 							if ( user_has_permission( 'admin.cms.can_delete_menu' ) ) :
 
-								echo anchor( 'admin/cms/menus/delete/' . $menu->id, lang( 'action_delete' ), 'data-title="Are you sure?" data-body="This will remove the menu from the site. This action can be undone." class="confirm awesome small red"' );
+								echo anchor( 'admin/cms/menus/delete/' . $menu->id, lang( 'action_delete' ), 'data-title="Are you sure?" data-body="This will remove the menu from the site. This action cannot be undone." class="confirm awesome small red"' );
 
 							endif;
 
