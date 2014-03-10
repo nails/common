@@ -233,18 +233,21 @@
 						//	Override the field key
 						$field['key'] = 'additional_field[' . $template->slug . '][' . $field['key'] . ']';
 
+						//	Tip?
+						$_tip = ! empty( $field['tip'] ) ? $field['tip'] : '';
+
 						switch( $field['type'] ) :
 
 							case 'dropdown' :
 
 								$_options = ! empty( $field['options'] ) ? $field['options'] : array();
-								echo form_field_dropdown( $field, $_options );
+								echo form_field_dropdown( $field, $_options, $_tip );
 
 							break;
 
 							default :
 
-								form_field( $field );
+								echo form_field( $field, $_tip );
 
 							break;
 
