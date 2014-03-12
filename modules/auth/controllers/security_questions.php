@@ -255,7 +255,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 									//	Good arrows. Save questions
 									$_data = array();
-									foreach ( $this->input->post( 'question' ) AS $q ) :
+									foreach ( (array) $this->input->post( 'question' ) AS $q ) :
 
 										$_temp				= new stdClass();
 										$_temp->question	= isset( $this->data['questions'][$q['question']-1] ) ? $this->data['questions'][$q['question']-1] : NULL;
@@ -265,7 +265,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 									endforeach;
 
-									foreach ( $this->input->post( 'custom_question' ) AS $q ) :
+									foreach ( (array) $this->input->post( 'custom_question' ) AS $q ) :
 
 										$_temp				= new stdClass();
 										$_temp->question	= trim( $q['question'] );
