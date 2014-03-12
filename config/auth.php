@@ -12,6 +12,8 @@
 |
 */
 
+$config['auth_show_nicetime_on_login']			= TRUE;
+$config['auth_show_last_ip_on_login']			= FALSE;
 
 $config['auth_two_factor_num_questions']		= 1;
 $config['auth_two_factor_num_custom_question']	= 0;

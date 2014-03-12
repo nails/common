@@ -271,6 +271,14 @@ class NAILS_User_model extends NAILS_Model
 	public function set_active_user( $user )
 	{
 		$this->_active_user = $user;
+
+		// --------------------------------------------------------------------------
+
+		//	Set the user's date/time formats
+		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
+		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
+
+		$this->datetime->set_formats( $_format_date, $_format_time );
 	}
 
 

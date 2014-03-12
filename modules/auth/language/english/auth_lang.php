@@ -43,6 +43,7 @@
 
 	//	Messages
 	$lang['auth_login_ok_welcome']						= '<strong>Welcome, %s!</strong> You last logged in %s.';
+	$lang['auth_login_ok_welcome_with_ip']				= '<strong>Welcome, %s!</strong> You last logged in %s from IP address %s.';
 	$lang['auth_login_ok_welcome_notime']				= '<strong>Welcome, %s!</strong> Nice to see you again.';
 
 	//	with_hashes() lang strings

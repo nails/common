@@ -185,6 +185,7 @@ class NAILS_Auth_model extends NAILS_Model
 					'user_id'		=> $_user->id,
 					'first_name'	=> $_user->first_name,
 					'last_login'	=> $_user->last_login,
+					'last_ip'		=> $_user->last_ip,
 					'homepage'		=> $_user->group_homepage,
 					'remember'		=> $remember
 				);

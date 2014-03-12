@@ -600,8 +600,19 @@ class NAILS_Li extends NAILS_Auth_Controller
 			//	Set welcome message
 			if ( $user->last_login ) :
 
-				$_last_login =  nice_time( $user->last_login );
-				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
+				$this->load->helper( 'date' );
+
+				$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $user->last_login ) ) : user_datetime( $user->last_login );
+
+				if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $user->first_name, $_last_login, $user->last_ip ) ) );
+
+				else :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $user->first_name, $_last_login ) ) );
+
+				endif;
 
 			else :
 

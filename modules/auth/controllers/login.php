@@ -203,12 +203,23 @@ class NAILS_Login extends NAILS_Auth_Controller
 					else :
 
 						//	Finally! Send this user on their merry way...
-						$_first_name	= $_login['first_name'];
+						$_first_name = $_login['first_name'];
 
 						if ( $_login['last_login'] ) :
 
-							$_last_login	=  nice_time( strtotime( $_login['last_login'] ) );
-							$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
+							$this->load->helper( 'date' );
+
+							$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_login['last_login'] ) ) : user_datetime( $_login['last_login'] );
+
+							if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_first_name, $_last_login, $_login['last_ip'] ) ) );
+
+							else :
+
+								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_login['last_ip'] ) ) );
+
+							endif;
 
 						else :
 
@@ -333,8 +344,27 @@ class NAILS_Login extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Say hello
-			$_welcome = lang( 'auth_login_ok_welcome', array( $_user->first_name, nice_time( strtotime( $_user->last_login ) ) ) );
-			$this->session->set_flashdata( 'message', $_welcome );
+			if ( $_user->last_login ) :
+
+				$this->load->helper( 'date' );
+
+				$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_user->last_login ) ) : user_datetime( $_user->last_login );
+
+				if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_user->first_name, $_last_login, $_user->last_ip ) ) );
+
+				else :
+
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
+
+				endif;
+
+			else :
+
+				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_first_name ) ) );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 

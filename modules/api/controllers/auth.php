@@ -99,16 +99,30 @@ class NAILS_Auth extends NAILS_API_Controller
 			else :
 
 				//	Finally! Send this user on their merry way...
-				$_first_name	= $_login['first_name'];
+				$_first_name = $_login['first_name'];
 
 				if ( $_login['last_login'] ) :
 
-					$_last_login	=  nice_time( strtotime( $_login['last_login'] ) );
-					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
+					$this->load->helper( 'date' );
+					$this->config->load( 'auth' );
+
+					$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_login['last_login'] ) ) : user_datetime( $_login['last_login'] );
+
+					if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+						$_last_ip = $_login['last_ip'];
+
+						$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_first_name, $_last_login, $_last_ip ) ) );
+
+					else :
+
+						$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
+
+					endif;
 
 				else :
 
-					$this->session->set_flashdata( 'message', '<strong>Hey ' . $_first_name . '!</strong> Nice to see you again.' );
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_first_name ) ) );
 
 				endif;
 

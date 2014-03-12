@@ -125,7 +125,28 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 
 					if ( $_login ) :
 
-						$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array ( title_case( $_login['first_name'] ), nice_time( strtotime( $_login['last_login'] ) ) ) ) );
+						//	Say hello
+						if ( $_login['last_login'] ) :
+
+							$this->load->helper( 'date' );
+
+							$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_login['last_login'] ) ) : user_datetime( $_login['last_login'] );
+
+							if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_login['first_name'], $_last_login, $_login['last_ip'] ) ) );
+
+							else :
+
+								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_login['first_name'], $_last_login ) ) );
+
+							endif;
+
+						else :
+
+							$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_login['first_name'] ) ) );
+
+						endif;
 
 						//	Log user in and forward to wherever they need to go
 						if ( $this->input->get( 'return_to' ) ):
