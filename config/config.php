@@ -273,6 +273,7 @@ $config['sess_time_to_update']	= 300;
 */
 $config['cookie_prefix']	= '';
 $config['cookie_path']		= '/';
+$config['cookie_httponly']	= TRUE;
 
 if ( defined( 'CONF_COOKIE_DOMAIN' ) ) :
 
