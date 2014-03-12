@@ -255,25 +255,34 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 									//	Good arrows. Save questions
 									$_data = array();
-									foreach ( (array) $this->input->post( 'question' ) AS $q ) :
 
-										$_temp				= new stdClass();
-										$_temp->question	= isset( $this->data['questions'][$q['question']-1] ) ? $this->data['questions'][$q['question']-1] : NULL;
-										$_temp->answer		= $q['answer'];
+									if ( $this->input->post( 'question' ) ) :
 
-										$_data[] = $_temp;
+										foreach ( $this->input->post( 'question' ) AS $q ) :
 
-									endforeach;
+											$_temp				= new stdClass();
+											$_temp->question	= isset( $this->data['questions'][$q['question']-1] ) ? $this->data['questions'][$q['question']-1] : NULL;
+											$_temp->answer		= $q['answer'];
 
-									foreach ( (array) $this->input->post( 'custom_question' ) AS $q ) :
+											$_data[] = $_temp;
 
-										$_temp				= new stdClass();
-										$_temp->question	= trim( $q['question'] );
-										$_temp->answer		= $q['answer'];
+										endforeach;
 
-										$_data[] = $_temp;
+									endif;
 
-									endforeach;
+									if ( $this->input->post( 'custom_question' ) ) :
+
+										foreach ( (array) $this->input->post( 'custom_question' ) AS $q ) :
+
+											$_temp				= new stdClass();
+											$_temp->question	= trim( $q['question'] );
+											$_temp->answer		= $q['answer'];
+
+											$_data[] = $_temp;
+
+										endforeach;
+
+									endif;
 
 									if ( $this->user->set_security_questions( $_user->id, $_data ) ) :
 
