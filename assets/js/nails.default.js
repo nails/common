@@ -248,7 +248,7 @@ NAILS_JS = function()
 
 			if ( _body.length )
 			{
-				$('<div>').text(_body).dialog({
+				$('<div>').html(_body).dialog({
 					title: _title,
 					resizable: false,
 					draggable: false,

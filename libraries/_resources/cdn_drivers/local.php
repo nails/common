@@ -113,6 +113,15 @@ class Local_CDN
 	// --------------------------------------------------------------------------
 
 
+	public function object_exists( $filename, $bucket )
+	{
+		return is_file( DEPLOY_CDN_PATH . $bucket . '/' . $filename );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Destroys (permenantly deletes) an object
 	 *

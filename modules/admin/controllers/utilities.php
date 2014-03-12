@@ -56,6 +56,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$d->funcs['languages']		= lang( 'utilities_nav_languages' );
 		$d->funcs['export']			= lang( 'utilities_nav_export' );
 
+		if ( module_is_enabled( 'cdn' ) ) :
+
+			$d->funcs['cdn/orphans']	= 'CDN: Find orphaned objects';
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -63,6 +68,8 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		return self::_can_access( $d, __FILE__ );
 	}
 
+
+	// --------------------------------------------------------------------------
 
 
 	public function __construct()
@@ -887,6 +894,113 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		endif;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function cdn()
+	{
+		switch ( $this->uri->segment( 4 ) ) :
+
+			case 'orphans' :	$this->_cdn_orphans();	break;
+			default :			show_404();				break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _cdn_orphans()
+	{
+		if ( $this->input->is_cli_request() ) :
+
+			return $this->_cdn_orphans_cli();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->post() ) :
+
+			//	A little form validation
+			$_type		= $this->input->post( 'type' );
+			$_parser	= $this->input->post( 'parser' );
+			$_pass		= TRUE;
+
+			if ( $_type == 'db' && $_parser == 'create' ) :
+
+				$_pass	= FALSE;
+				$_error	= 'Cannot use "Add to database" results parser when finding orphaned database objects.';
+
+			endif;
+
+
+			if ( $_pass ) :
+
+				switch( $_type ) :
+
+					case 'db'	:	$this->data['orphans']	= $this->cdn->find_orphaned_objects();				break;
+
+					//	TODO
+					case 'file'	:	$this->data['message']	= '<strong>TODO:</strong> find orphaned files.';	break;
+
+					//	Invalid request
+					default		:	$this->data['error']	= '<strong>Sorry,</strong> invalid search type.';	break;
+
+				endswitch;
+
+				if ( isset( $this->data['orphans'] ) ) :
+
+					switch( $_parser ) :
+
+						case 'list'		:	$this->data['success'] = '<strong>Search complete!</strong> your results are show below.';								break;
+
+						//	TODO: keep the unset(), it prevents the table from rendering
+						case 'purge'	:	$this->data['message']	= '<strong>TODO:</strong> purge results.'; unset( $this->data['orphans'] );						break;
+						case 'create'	:	$this->data['message']	= '<strong>TODO:</strong> create objects using results.'; unset( $this->data['orphans'] );		break;
+
+						//	Invalid request
+						default			:	$this->data['error']	= '<strong>Sorry,</strong> invalid result parse selected.'; unset( $this->data['orphans'] );	break;
+
+					endswitch;
+
+				endif;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> an error occurred. ' . $_error;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['page']->title = 'CDN: Find Orphaned Objects';
+
+		// --------------------------------------------------------------------------
+
+		$this->asset->load( 'nails.admin.utilities.cdn.orphans.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/utilities/cdn/orphans',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _cdn_orphans_cli()
+	{
+		echo 'Sorry, this functionality is not complete yet. If you are experiencing timeouts please increase the timeout limit for PHP.';
+	}
+
 }
 
 

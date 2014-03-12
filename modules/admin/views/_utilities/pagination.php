@@ -71,4 +71,5 @@
 	echo $this->pagination->create_links();
 
 ?>
+<div style="clear:both"></div>
 </div>

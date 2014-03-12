@@ -4,22 +4,22 @@
 * Name:			Utilities Langfile
 *
 * Description:  Generic language file for Nails. Admin Utilities
-* 
+*
 */
 
 	//	Generic for module
 	$lang['utilities_module_name']		= 'Utilities';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	Nav
 	$lang['utilities_nav_test_email']		= 'Send Test Email';
 	$lang['utilities_nav_user_access']		= 'Manage User Access';
 	$lang['utilities_nav_languages']		= 'Manage Languages';
 	$lang['utilities_nav_export']			= 'Export Data';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	Send Test email
 	$lang['utilities_test_email_title']				= 'Send a Test Email';
 	$lang['utilities_test_email_intro']				= 'Use this form to send a test email, useful for testing that emails being sent are received by the end user.';
@@ -29,9 +29,9 @@
 	$lang['utilities_test_email_submit']			= 'Send Test Email';
 	$lang['utilities_test_email_success']			= '<strong>Done!</strong> Test email successfully sent to <strong>%s</strong> at %s';
 	$lang['utilities_test_email_error']				= 'Sending Failed, debugging data below:';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	User Access
 	$lang['utilities_user_access_title']			= 'Manage User Access';
 	$lang['utilities_user_access_intro']			= 'Manage how groups of user\'s can interface with the site, e.g: grant a specific group access to admin and specify which parts of admin they can view.';
@@ -46,7 +46,7 @@
 													  'extra careful and only change things when you know what you\'re doing. Remember that you won\'t see ' .
 													  'the effect of changing the permissions of a group other than your own, check that your changes ' .
 													  'have worked before considering the job done!';
-	
+
 	$lang['utilities_edit_group_basic_legend']							= 'Basics';
 	$lang['utilities_edit_group_basic_field_label_display']				= 'Display Name';
 	$lang['utilities_edit_group_basic_field_placeholder_display']		= 'Type the group\'s display name here.';

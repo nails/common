@@ -460,7 +460,7 @@ class Cdn {
 	// --------------------------------------------------------------------------
 
 
-	public function get_objects( $data = array() )
+	public function get_objects( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS' )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
 		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
@@ -471,6 +471,314 @@ class Cdn {
 		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by AND ue.is_primary = 1', 'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
 
+		// --------------------------------------------------------------------------
+
+		//	Apply common items; pass $data
+		$this->_getcount_objects_common( $data, $_caller );
+
+		// --------------------------------------------------------------------------
+
+		//	Facilitate pagination
+		if ( NULL !== $page ) :
+
+			//	Adjust the page variable, reduce by one so that the offset is calculated
+			//	correctly. Make sure we don't go into negative numbers
+			$page--;
+			$page = $page < 0 ? 0 : $page;
+
+			//	Work out what the offset should be
+			$_per_page	= NULL == $per_page ? 50 : (int) $per_page;
+			$_offset	= $page * $per_page;
+
+			$this->db->limit( $per_page, $_offset );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object o' )->result();
+
+		for ( $i = 0; $i < count( $_objects ); $i++ ) :
+
+			//	Format the object, make it pretty
+			$this->_format_object( $_objects[$i] );
+
+		endfor;
+
+		return $_objects;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_objects_from_trash( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS_FROM_TRASH' )
+	{
+		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
+		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'b.id bucket_id, b.label bucket_label, b.slug bucket_slug' );
+
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by AND ue.is_primary = 1', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
+
+		// --------------------------------------------------------------------------
+
+		//	Apply common items; pass $data
+		$this->_getcount_objects_common( $data, $_caller );
+
+		// --------------------------------------------------------------------------
+
+		//	Facilitate pagination
+		if ( NULL !== $page ) :
+
+			//	Adjust the page variable, reduce by one so that the offset is calculated
+			//	correctly. Make sure we don't go into negative numbers
+			$page--;
+			$page = $page < 0 ? 0 : $page;
+
+			//	Work out what the offset should be
+			$_per_page	= NULL == $per_page ? 50 : (int) $per_page;
+			$_offset	= $page * $per_page;
+
+			$this->db->limit( $per_page, $_offset );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object_trash o' )->result();
+
+		for ( $i = 0; $i < count( $_objects ); $i++ ) :
+
+			//	Format the object, make it pretty
+			$this->_format_object( $_objects[$i] );
+
+		endfor;
+
+		return $_objects;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns a single object object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 **/
+	public function get_object( $object, $bucket = NULL, $data = array() )
+	{
+		if ( is_numeric( $object ) ) :
+
+			//	Check the cache
+			$_cache_key	= 'object-' . $object;
+			$_cache		= $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$this->db->where( 'o.id', $object );
+
+		else :
+
+			//	Check the cache
+			$_cache_key	 = 'object-' . $object;
+			$_cache_key .= $bucket ? '-' . $bucket : '';
+			$_cache		 = $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$this->db->where( 'o.filename', $object );
+
+			if ( $bucket ) :
+
+				if ( is_numeric( $bucket ) ) :
+
+					$this->db->where( 'b.id', $bucket );
+
+				else :
+
+					$this->db->where( 'b.slug', $bucket );
+
+				endif;
+
+			endif;
+
+		endif;
+
+		$_objects = $this->get_objects( NULL, NULL, $data, 'GET_OBJECT' );
+
+		if ( ! $_objects ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Cache the object
+		$this->_set_cache( $_cache_key, $_objects[0] );
+
+		// --------------------------------------------------------------------------
+
+		return $_objects[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns a single object object
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	boolean
+	 **/
+	public function get_object_from_trash( $object, $bucket = NULL, $data = array() )
+	{
+		if ( is_numeric( $object ) ) :
+
+			//	Check the cache
+			$_cache_key	= 'object-trash-' . $object;
+			$_cache		= $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$this->db->where( 'o.id', $object );
+
+		else :
+
+			//	Check the cache
+			$_cache_key	 = 'object-trash-' . $object;
+			$_cache_key .= $bucket ? '-' . $bucket : '';
+			$_cache		 = $this->_get_cache( $_cache_key );
+
+			if ( $_cache ) :
+
+				return $_cache;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			$this->db->where( 'o.filename', $object );
+
+			if ( $bucket ) :
+
+				if ( is_numeric( $bucket ) ) :
+
+					$this->db->where( 'b.id', $bucket );
+
+				else :
+
+					$this->db->where( 'b.slug', $bucket );
+
+				endif;
+
+			endif;
+
+		endif;
+
+		$_objects = $this->get_objects_from_trash( NULL, NULL, $data, 'GET_OBJECT_FROM_TRASH' );
+
+		if ( ! $_objects ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Cache the object
+		$this->_set_cache( $_cache_key, $_objects[0] );
+
+		// --------------------------------------------------------------------------
+
+		return $_objects[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Counts all objects
+	 *
+	 * @access public
+	 * @param mixed $data any data to pass to _getcount_objects_common()
+	 * @return int
+	 **/
+	public function count_all_objects( $data = array() )
+	{
+		//	Apply common items
+		$this->_getcount_objects_common( $data, 'COUNT_ALL_OBJECTS' );
+
+		// --------------------------------------------------------------------------
+
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_object o'  );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Counts all objects
+	 *
+	 * @access public
+	 * @param mixed $data any data to pass to _getcount_objects_common()
+	 * @return int
+	 **/
+	public function count_all_objects_from_trash( $data = array() )
+	{
+		//	Apply common items
+		$this->_getcount_objects_common( $data, 'COUNT_ALL_OBJECTS_FROM_TRASH' );
+
+		// --------------------------------------------------------------------------
+
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'cdn_object_trash o'  );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Applies common conditionals
+	 *
+	 * This method applies the conditionals which are common across the get_*()
+	 * methods and the count() method.
+	 *
+	 * @access public
+	 * @param string $data Data passed from the calling method
+	 * @param string $_caller The name of the calling method
+	 * @return void
+	 **/
+	protected function _getcount_objects_common( $data = array(), $_caller = NULL )
+	{
 		//	Handle wheres
 		$_wheres = array( 'where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in' );
 
@@ -566,7 +874,7 @@ class Cdn {
 				if ( is_string( $_first ) ) :
 
 					//	Single dimension array
-					$_sort = $this->_getcount_common_parse_sort( $data['sort'] );
+					$_sort = $this->_getcount_objects_common_parse_sort( $data['sort'] );
 
 					if ( ! empty( $_sort['column'] ) ) :
 
@@ -579,7 +887,7 @@ class Cdn {
 					//	Multi dimension array
 					foreach( $data['sort'] AS $sort ) :
 
-						$_sort = $this->_getcount_common_parse_sort( $sort );
+						$_sort = $this->_getcount_objects_common_parse_sort( $sort );
 
 						if ( ! empty( $_sort['column'] ) ) :
 
@@ -593,176 +901,56 @@ class Cdn {
 
 			endif;
 
-		else :
-
-			$this->db->order_by( 'o.filename_display' );
-
 		endif;
-
-		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object o' )->result();
-
-		foreach ( $_objects AS $obj ) :
-
-			//	Format the object, make it pretty
-			$this->_format_object( $obj );
-
-		endforeach;
-
-		return $_objects;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_objects_from_trash()
+	protected function _getcount_objects_common_parse_sort( $sort )
 	{
-		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
-		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
-		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
-		$this->db->select( 'b.id bucket_id, b.slug bucket_slug' );
+		$_out = array( 'column' => NULL, 'order' => NULL );
 
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.created_by', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = o.created_by', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'b.id = o.bucket_id', 'LEFT' );
+		// --------------------------------------------------------------------------
 
-		$this->db->order_by( 'o.filename_display' );
+		if ( is_string( $sort ) ) :
 
-		$_objects = $this->db->get( NAILS_DB_PREFIX . 'cdn_object_trash o' )->result();
+			$_out['column'] = $sort;
+			return $_out;
 
-		foreach ( $_objects AS $obj ) :
+		elseif ( isset( $sort['column'] ) ) :
 
-			//	Format the object, make it pretty
-			$this->_format_object( $obj );
-
-		endforeach;
-
-		return $_objects;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns a single object object
-	 *
-	 * @access	public
-	 * @param	string
-	 * @return	boolean
-	 **/
-	public function get_object( $object, $bucket = NULL )
-	{
-		if ( is_numeric( $object ) ) :
-
-			//	Check the cache
-			$_cache_key	= 'object-' . $object;
-			$_cache		= $this->_get_cache( $_cache_key );
-
-			if ( $_cache ) :
-
-				return $_cache;
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			$this->db->where( 'o.id', $object );
+			$_out['column'] = $sort['column'];
 
 		else :
 
-			//	Check the cache
-			$_cache_key	 = 'object-' . $object;
-			$_cache_key .= $bucket ? '-' . $bucket : '';
-			$_cache		 = $this->_get_cache( $_cache_key );
-
-			if ( $_cache ) :
-
-				return $_cache;
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			$this->db->where( 'o.filename', $object );
-
-			if ( $bucket ) :
-
-				if ( is_numeric( $bucket ) ) :
-
-					$this->db->where( 'b.id', $bucket );
-
-				else :
-
-					$this->db->where( 'b.slug', $bucket );
-
-				endif;
-
-			endif;
+			//	Take the first element
+			$_out['column'] = reset( $sort );
+			$_out['column'] = is_string( $_out['column'] ) ? $_out['column'] : NULL;
 
 		endif;
 
-		$_objects = $this->get_objects();
+		if ( $_out['column'] ) :
 
-		if ( ! $_objects ) :
+			//	Determine order
+			if ( isset( $sort['order'] ) ) :
 
-			return FALSE;
+				$_out['order'] = $sort['order'];
+
+			elseif( count( $sort ) > 1 ) :
+
+				//	Take the last element
+				$_out['order'] = end( $sort );
+				$_out['order'] = is_string( $_out['order'] ) ? $_out['order'] : NULL;
+
+			endif;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Cache the object
-		$this->_set_cache( $_cache_key, $_objects[0] );
-
-		// --------------------------------------------------------------------------
-
-		return $_objects[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns a single object object
-	 *
-	 * @access	public
-	 * @param	string
-	 * @return	boolean
-	 **/
-	public function get_object_from_trash( $object, $bucket = NULL )
-	{
-		if ( is_numeric( $object ) ) :
-
-			$this->db->where( 'o.id', $object );
-
-		else :
-
-			$this->db->where( 'o.filename', $object );
-
-			if ( $bucket ) :
-
-				if ( is_numeric( $bucket ) ) :
-
-					$this->db->where( 'b.id', $bucket );
-
-				else :
-
-					$this->db->where( 'b.slug', $bucket );
-
-				endif;
-
-			endif;
-
-		endif;
-
-		$_objects = $this->get_objects_from_trash();
-
-		if ( ! $_objects )
-			return FALSE;
-
-		return $_objects[0];
+		return $_out;
 	}
 
 
@@ -776,10 +964,10 @@ class Cdn {
 	 * @param	string
 	 * @return	boolean
 	 **/
-	public function get_objects_for_user( $user_id )
+	public function get_objects_for_user( $user_id, $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS_FOR_USER' )
 	{
 		$this->db->where( 'o.created_by', $user_id );
-		return $this->get_objects();
+		return $this->get_objects( $page, $per_page, $data, $_caller );
 	}
 
 
@@ -3102,6 +3290,50 @@ class Cdn {
 
 		//	If we got here then the token is valid
 		return $_user;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function find_orphaned_objects()
+	{
+		$_out = array( 'orphans' => array(), 'elapsed_time' => 0 );
+
+		//	Time how long this takes
+		//	Start timer
+		$this->_ci->benchmark->mark( 'orphan_search_start' );
+
+		$this->db->select( 'o.id, o.filename, o.filename_display, o.mime, o.filesize, b.slug bucket_slug, b.label bucket' );
+		$this->db->join( NAILS_DB_PREFIX . 'cdn_bucket b', 'o.bucket_id = b.id' );
+		$this->db->order_by( 'b.label' );
+		$this->db->order_by( 'o.filename_display' );
+		$_orphans = $this->db->get( NAILS_DB_PREFIX . 'cdn_object o' );
+
+		while ( $row = $_orphans->_fetch_object() ) :
+
+			if ( ! $this->_cdn->object_exists( $row->filename, $row->bucket_slug ) ) :
+
+				$_out['orphans'][] = $row;
+
+			endif;
+
+		endwhile;
+
+		//	End timer
+		$this->_ci->benchmark->mark( 'orphan_search_end' );
+		$_out['elapsed_time'] = $this->_ci->benchmark->elapsed_time( 'orphan_search_start', 'orphan_search_end' );
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function find_orphaned_files()
+	{
+		return array();
 	}
 
 

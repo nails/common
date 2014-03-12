@@ -885,7 +885,7 @@ class CORE_NAILS_Model extends CI_Model
 	{
 		if ( ! $this->_table ) :
 
-			show_error( get_called_class() . '::count() Table variable not set' );
+			show_error( get_called_class() . '::count_all() Table variable not set' );
 
 		else :
 
