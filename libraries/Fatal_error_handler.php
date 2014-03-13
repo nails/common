@@ -219,19 +219,14 @@ class Fatal_error_handler
 		$_message	.= '' . "\n";
 		$_message	.= 'DEBUGGING DATA' . "\n";
 		$_message	.= '' . "\n";
-		$_message	.= 'URI: ' .		$_info['uri'] . "\n\n";
-		$_message	.= 'SESSION: ' .	$_info['session'] . "\n\n";
-		$_message	.= 'POST: ' .		$_info['post'] . "\n\n";
-		$_message	.= 'GET: ' .		$_info['get'] . "\n\n";
-		$_message	.= 'SERVER: ' .		$_info['server'] . "\n\n";
-		$_message	.= 'GLOBALS: ' .	$_info['globals'] . "\n\n";
-		$_message	.= 'BACKTRACE: ' .	$_info['debug_backtrace'] . "\n\n";
-
-		if ( defined( 'NAILS_DB_ENABLED' ) && NAILS_DB_ENABLED ) :
-
-			$_message	.= 'LAST KNOWN QUERY: ' . $_ci->db->last_query() . "\n\n";
-
-		endif;
+		$_message	.= 'URI: ' .				$_info['uri'] . "\n\n";
+		$_message	.= 'SESSION: ' .			$_info['session'] . "\n\n";
+		$_message	.= 'POST: ' .				$_info['post'] . "\n\n";
+		$_message	.= 'GET: ' .				$_info['get'] . "\n\n";
+		$_message	.= 'SERVER: ' .				$_info['server'] . "\n\n";
+		$_message	.= 'GLOBALS: ' .			$_info['globals'] . "\n\n";
+		$_message	.= 'BACKTRACE: ' .			$_info['debug_backtrace'] . "\n\n";
+		$_message	.= 'LAST KNOWN QUERY: ' .	$_ci->db->last_query() . "\n\n";
 
 		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
 	}

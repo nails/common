@@ -284,15 +284,15 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Database Debug
-		if ( ! defined( 'DB_DEBUG' ) ) :
+		if ( ! defined( 'DEPLOY_DB_DEBUG' ) ) :
 
 			if ( ENVIRONMENT == 'production' ) :
 
-				define( 'DB_DEBUG', FALSE );
+				define( 'DEPLOY_DB_DEBUG', FALSE );
 
 			else :
 
-				define( 'DB_DEBUG', TRUE );
+				define( 'DEPLOY_DB_DEBUG', TRUE );
 
 			endif;
 
@@ -468,18 +468,13 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_db()
 	{
-		if ( $this->uri->segment( 1 ) === 'deploy' ) :
+		if ( defined( 'DEPLOY_DB_USERNAME' ) && DEPLOY_DB_USERNAME && defined( 'DEPLOY_DB_DATABASE' ) && DEPLOY_DB_DATABASE ) :
 
-			define( 'NAILS_DB_ENABLED', FALSE );
-
-		elseif ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
-
-			define( 'NAILS_DB_ENABLED', TRUE );
 			$this->load->database();
 
 		else :
 
-			define( 'NAILS_DB_ENABLED', FALSE );
+			show_error( 'No database is configured.' );
 
 		endif;
 	}
@@ -536,11 +531,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Make sure the DB is thinking along the same lines
-		if ( NAILS_DB_ENABLED ) :
-
-			$this->db->query( 'SET time_zone = \'+0:00\'' );
-
-		endif;
+		$this->db->query( 'SET time_zone = \'+0:00\'' );
 	}
 
 	// --------------------------------------------------------------------------
@@ -581,8 +572,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
 
-	 		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 500 Bad Request' );
-			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
+			show_error( 'Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
 
 		endif;
 
@@ -797,12 +787,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_user()
 	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return FALSE;
-
-		endif;
-
 		//	Set a $user variable (for the views)
 		$this->data['user'] =& $this->user;
 

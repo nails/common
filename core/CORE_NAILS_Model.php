@@ -21,6 +21,8 @@ class CORE_NAILS_Model extends CI_Model
 	protected $_table_slug_column;
 	protected $_table_label_column;
 
+	protected $_table_auto_set_timestamps;
+
 	protected $_deleted_flag;
 
 	//	Preferences
@@ -71,13 +73,14 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Define defaults
-		$this->_errors				= $this->clear_errors();
-		$this->_destructive_delete	= TRUE;
-		$this->_table_id_column		= 'id';
-		$this->_table_slug_column	= 'slug';
-		$this->_table_label_column	= 'label';
-		$this->_deleted_flag		= 'is_deleted';
-		$this->_per_page			= 50;
+		$this->_errors						= $this->clear_errors();
+		$this->_destructive_delete			= TRUE;
+		$this->_table_id_column				= 'id';
+		$this->_table_slug_column			= 'slug';
+		$this->_table_label_column			= 'label';
+		$this->_table_auto_set_timestamps	= TRUE;
+		$this->_deleted_flag				= 'is_deleted';
+		$this->_per_page					= 50;
 	}
 
 
@@ -399,26 +402,33 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( $data ) :
+		if ( $this->_table_auto_set_timestamps ) :
 
-			$this->db->set( $data );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'modified', 'NOW()', FALSE );
+
+			if ( $this->user->is_logged_in() ) :
+
+				$this->db->set( 'created_by', active_user( 'id' ) );
+				$this->db->set( 'modified_by', active_user( 'id' ) );
+
+			else :
+
+				$this->db->set( 'created_by', NULL );
+				$this->db->set( 'modified_by', NULL );
+
+			endif;
+
+		elseif ( ! $data ) :
+
+			$this->_set_error( 'No data to insert.' );
+			return FALSE;
 
 		endif;
 
-		// --------------------------------------------------------------------------
+		if ( $data ) :
 
-		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->set( 'modified', 'NOW()', FALSE );
-
-		if ( $this->user->is_logged_in() ) :
-
-			$this->db->set( 'created_by', active_user( 'id' ) );
-			$this->db->set( 'modified_by', active_user( 'id' ) );
-
-		else :
-
-			$this->db->set( 'created_by', NULL );
-			$this->db->set( 'modified_by', NULL );
+			$this->db->set( $data );
 
 		endif;
 
@@ -426,7 +436,7 @@ class CORE_NAILS_Model extends CI_Model
 
 		if ( $this->db->affected_rows() ) :
 
-			$_id =  $this->db->insert_id();
+			$_id = $this->db->insert_id();
 
 			// --------------------------------------------------------------------------
 
@@ -474,26 +484,34 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $data ) :
+		if ( $this->_table_auto_set_timestamps ) :
 
+			$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
+
+			if ( $this->user->is_logged_in() ) :
+
+				$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
+
+			else :
+
+				$this->db->set( $_prefix . 'modified_by', NULL );
+
+			endif;
+
+		elseif ( ! $data ) :
+
+			$this->_set_error( 'No data to update.' );
 			return FALSE;
 
 		endif;
 
-		// --------------------------------------------------------------------------
+		if ( $data ) :
 
-		$this->db->set( $data );
-		$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
-
-		if ( $this->user->is_logged_in() ) :
-
-			$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
-
-		else :
-
-			$this->db->set( 'modified_by', NULL );
+			$this->db->set( $data );
 
 		endif;
+
+		// --------------------------------------------------------------------------
 
 		$this->db->where( $_prefix . 'id', $id );
 		$this->db->update( $_table );

@@ -21,6 +21,20 @@ class NAILS_Language_model extends NAILS_Model
 
 	// --------------------------------------------------------------------------
 
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$this->_table						= NAILS_DB_PREFIX . 'language';
+		$this->_table_prefix				= 'l';
+		$this->_table_label_column			= 'name';
+		$this->_table_auto_set_timestamps	= FALSE;
+	}
+
+	// --------------------------------------------------------------------------
+
 	public function set_usr_obj( &$usr )
 	{
 		$this->user =& $usr;
@@ -30,67 +44,10 @@ class NAILS_Language_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all()
-	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return array();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->select( 'l.id,l.name,l.slug,l.priority,l.supported' );
-		$this->db->order_by( 'l.name' );
-		$_result = $this->db->get( NAILS_DB_PREFIX . 'language l' );
-
-		if ( $_result ) :
-
-			return $_result->result();
-
-		else :
-
-			return array();
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	public function get_all_supported()
 	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return array();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->where( 'l.supported', TRUE );
+		$this->db->where( $this->_table_prefix . '.supported', TRUE );
 		return $this->get_all();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_all_flat()
-	{
-		$_out	= array();
-		$_langs	= $this->get_all();
-
-		for( $i=0; $i<count( $_langs ); $i++ ) :
-
-			$_out[$_langs[$i]->id] = $_langs[$i]->name;
-
-		endfor;
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
 	}
 
 
@@ -117,86 +74,32 @@ class NAILS_Language_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_by_id( $id )
-	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->where( 'l.id', $id );
-		$_result = $this->get_all();
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_by_slug( $slug )
-	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->where( 'l.slug', $slug );
-		$_result = $this->get_all();
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	public function get_default_id()
 	{
-		if ( ! NAILS_DB_ENABLED ) :
+		$_cache_key	= 'lang-default-' . APP_DEFAULT_LANG_SLUG;
+		$_cache		= $this->_get_cache( $_cache_key );
 
-			return NULL;
+		if ( $_cache ) :
+
+			return $_cache->id;
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->_default_lang )
-			return $this->_default_lang->id;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch and cache
 		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
 
-		if ( isset( $_default->id ) ) :
+		if ( $_default ) :
 
-			$this->_defaut_lang = $_default;
+			//	Save to cache
+			$this->_set_cache( $_cache_key, $_default );
+
 			return $_default->id;
 
 		else :
 
-			return NULL;
+			return FALSE;
 
 		endif;
 	}
@@ -207,30 +110,30 @@ class NAILS_Language_model extends NAILS_Model
 
 	public function get_default_name()
 	{
-		if ( ! NAILS_DB_ENABLED ) :
+		$_cache_key	= 'lang-default-' . APP_DEFAULT_LANG_SLUG;
+		$_cache		= $this->_get_cache( $_cache_key );
 
-			return NULL;
+		if ( $_cache ) :
+
+			return $_cache->name;
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->_default_lang )
-			return $this->_default_lang->name;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch and cache
 		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
 
-		if ( isset( $_default->id ) ) :
+		if ( $_default ) :
 
-			$this->_defaut_lang = $_default;
+			//	Save to cache
+			$this->_set_cache( $_cache_key, $_default );
+
 			return $_default->name;
 
 		else :
 
-			return NULL;
+			return FALSE;
 
 		endif;
 	}
@@ -255,25 +158,6 @@ class NAILS_Language_model extends NAILS_Model
 		$_data				= array();
 		$_data['supported']	= FALSE;
 		return $this->update( $id, $_data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function update( $id, $data )
-	{
-		if ( ! NAILS_DB_ENABLED ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->set( $data );
-		$this->db->where( 'id', $id );
-		return $this->db->update( NAILS_DB_PREFIX . 'language' );
 	}
 }
 

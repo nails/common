@@ -41,14 +41,14 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = DB_HOST;
-$db['default']['username'] = DB_USERNAME;
-$db['default']['password'] = DB_PASSWORD;
-$db['default']['database'] = DB_DATABASE;
+$db['default']['hostname'] = DEPLOY_DB_HOST;
+$db['default']['username'] = DEPLOY_DB_USERNAME;
+$db['default']['password'] = DEPLOY_DB_PASSWORD;
+$db['default']['database'] = DEPLOY_DB_DATABASE;
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
-$db['default']['db_debug'] = DB_DEBUG;
+$db['default']['db_debug'] = DEPLOY_DB_DEBUG;
 $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = DEPLOY_CACHE_DIR;
 $db['default']['char_set'] = 'utf8';

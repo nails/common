@@ -20,7 +20,7 @@
 			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
 			window.NAILS.LANG				= {};
 			window.NAILS.USER				= {};
-			window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
+			window.NAILS.USER.ID			= <?=active_user( 'id' ) ? active_user( 'id' ) : 'null'?>;
 			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
 			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
 			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';

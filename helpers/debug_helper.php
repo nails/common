@@ -130,15 +130,7 @@ if ( ! function_exists( 'lastquery' ) )
 {
 	function lastquery( $die = TRUE )
 	{
-		if ( defined( 'NAILS_DB_ENABLED' ) && NAILS_DB_ENABLED ) :
-
-			$_last_query = get_instance()->db->last_query();
-
-		else :
-
-			$_last_query = NULL;
-
-		endif;
+		$_last_query = get_instance()->db->last_query();
 
 		// --------------------------------------------------------------------------
 

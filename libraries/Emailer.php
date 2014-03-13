@@ -85,25 +85,6 @@ class Emailer
 			endif;
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Ensure there is a DB
-		if ( ! NAILS_DB_ENABLED ) :
-
-			$_error = 'EMAILER: Database not available';
-
-			if ( ! empty( $config['graceful_startup'] ) ) :
-
-				$this->_set_error( $_error );
-
-			else :
-
-				show_error( $_error );
-
-			endif;
-
-		endif;
 	}
 
 

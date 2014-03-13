@@ -38,15 +38,6 @@ class NAILS_Auth_Controller extends NAILS_Controller
 
 		//	Load config
 		$this->config->load( 'auth' );
-
-		// --------------------------------------------------------------------------
-
-		//	DB enabled?
-		if ( ! NAILS_DB_ENABLED ) :
-
-			show_error( lang( 'auth_no_db' ) );
-
-		endif;
 	}
 }
 
