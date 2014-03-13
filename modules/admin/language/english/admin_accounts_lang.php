@@ -90,6 +90,11 @@
 	$lang['accounts_edit_password_field_temp_pw_yes']				= '<strong>Yes</strong>, require user to update password on next log in.';
 	$lang['accounts_edit_password_field_temp_pw_no']				= '<strong>No</strong>, do not require user to update password on next log in.';
 
+	$lang['accounts_edit_security_questions_legend']			= 'Security Questions';
+	$lang['accounts_edit_security_questions_field_reset_label']	= 'Set new qustions on next log in';
+	$lang['accounts_edit_security_questions_field_reset_yes']	= '<strong>Yes</strong>, require user to set new security questions on next log in.';
+	$lang['accounts_edit_security_questions_field_reset_no']	= '<strong>No</strong>, do not require user to set new security questions on next log in.';
+
 	$lang['accounts_edit_basic_legend']							= 'Basic Information';
 	$lang['accounts_edit_basic_field_first_placeholder']		= 'The user\'s first name';
 	$lang['accounts_edit_basic_field_last_placeholder']			= 'The user\'s surname';

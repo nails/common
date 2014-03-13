@@ -15,6 +15,13 @@
 	$this->load->view( 'accounts/edit/inc-basic' );
 	$this->load->view( 'accounts/edit/inc-emails' );
 	$this->load->view( 'accounts/edit/inc-password' );
+
+	if ( APP_AUTH_TWO_FACTOR ) :
+
+		$this->load->view( 'accounts/edit/inc-security-questions' );
+
+	endif;
+
 	$this->load->view( 'accounts/edit/inc-meta' );
 	$this->load->view( 'accounts/edit/inc-profile-img' );
 	$this->load->view( 'accounts/edit/inc-social-media' );

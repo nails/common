@@ -499,24 +499,23 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Validate if we're saving, otherwise get the data and display the edit form
 		if ( $this->input->post() ) :
 
-			$_post = $this->input->post();
-
 			//	Load validation library
 			$this->load->library( 'form_validation' );
 
 			// --------------------------------------------------------------------------
 
 			//	Define user table rules
-			$this->form_validation->set_rules( 'username',				lang( 'accounts_edit_basic_field_username_label' ),		'xss_clean|alpha_dash|min_length[2]|unique_if_diff[' . NAILS_DB_PREFIX . 'user.username.' . $_post['username_orig'] . ']' );
-			$this->form_validation->set_rules( 'first_name',			lang( 'form_label_first_name' ),						'xss_clean|required' );
-			$this->form_validation->set_rules( 'last_name',				lang( 'form_label_last_name' ),							'xss_clean|required' );
-			$this->form_validation->set_rules( 'gender',				lang( 'accounts_edit_basic_field_gender_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'timezone',				lang( 'accounts_edit_basic_field_timezone_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'date_format_date_id',	lang( 'accounts_edit_basic_field_date_format_label' ),	'xss_clean|required' );
-			$this->form_validation->set_rules( 'date_format_time_id',	lang( 'accounts_edit_basic_field_time_format_label' ),	'xss_clean|required' );
-			$this->form_validation->set_rules( 'language_id',			lang( 'accounts_edit_basic_field_language_label' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'password',				lang( 'accounts_edit_basic_field_password_label' ),		'xss_clean' );
-			$this->form_validation->set_rules( 'temp_pw',				lang( 'accounts_edit_basic_field_temp+pw_label' ),		'xss_clean' );
+			$this->form_validation->set_rules( 'username',					'',	'xss_clean|alpha_dash|min_length[2]|unique_if_diff[' . NAILS_DB_PREFIX . 'user.username.' . $this->input->post( 'username_orig' ) . ']' );
+			$this->form_validation->set_rules( 'first_name',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',					'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'gender',					'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'timezone',					'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'date_format_date_id',		'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'date_format_time_id',		'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'language_id',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'password',					'',	'xss_clean' );
+			$this->form_validation->set_rules( 'temp_pw',					'',	'xss_clean' );
+			$this->form_validation->set_rules( 'reset_security_questions',	'',	'xss_clean' );
 
 			// --------------------------------------------------------------------------
 
@@ -608,19 +607,20 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				if ( ! isset( $this->data['upload_error'] ) ) :
 
 					//	Set basic data
-					$_data['temp_pw']				= string_to_boolean( $_post['temp_pw'] );
-					$_data['first_name']			= $_post['first_name'];
-					$_data['last_name']				= $_post['last_name'];
-					$_data['username']				= $_post['username'];
-					$_data['gender']				= $_post['gender'];
-					$_data['timezone']				= $_post['timezone'];
-					$_data['date_format_date_id']	= $_post['date_format_date_id'];
-					$_data['date_format_time_id']	= $_post['date_format_time_id'];
-					$_data['language_id']			= $_post['language_id'];
+					$_data['temp_pw']					= string_to_boolean( $this->input->post( 'temp_pw' ) );
+					$_data['reset_security_questions']	= string_to_boolean( $this->input->post( 'reset_security_questions' ) );
+					$_data['first_name']				= $this->input->post( 'first_name' );
+					$_data['last_name']					= $this->input->post( 'last_name' );
+					$_data['username']					= $this->input->post( 'username' );
+					$_data['gender']					= $this->input->post( 'gender' );
+					$_data['timezone']					= $this->input->post( 'timezone' );
+					$_data['date_format_date_id']		= $this->input->post( 'date_format_date_id' );
+					$_data['date_format_time_id']		= $this->input->post( 'date_format_time_id' );
+					$_data['language_id']				= $this->input->post( 'language_id' );
 
-					if ( $_post['password'] ) :
+					if ( $this->input->post( 'password' ) ) :
 
-						$_data['password']	= $_post['password'];
+						$_data['password']	= $this->input->post( 'password' );
 
 					endif;
 
@@ -633,7 +633,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 							case 'boolean' :
 
 								//	Convert all to boolean from string
-								$_data[$col] = string_to_boolean( $_post[$col] );
+								$_data[$col] = string_to_boolean( $this->input->post( $col ) );
 
 							break;
 
@@ -641,7 +641,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 							default :
 
-								$_data[$col] = $_post[$col];
+								$_data[$col] = $this->input->post( $col );
 
 							break;
 
@@ -652,14 +652,15 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					// --------------------------------------------------------------------------
 
 					//	Update account
-					if ( $this->user->update( $_post['id'], $_data ) ) :
+					if ( $this->user->update( $this->input->post( 'id' ), $_data ) ) :
 
-						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_post['first_name'] . ' ' . $_post['last_name'] ) ) );
+						$_name = $this->input->post(  'first_name' ) . ' ' . $this->input->post( 'last_anme' );
+						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_name ) ) );
 
 						// --------------------------------------------------------------------------
 
 						//	Set Admin changelogs
-						$_name = '#' . number_format( $_post['id'] );
+						$_name = '#' . number_format( $this->input->post( 'id' ) );
 
 						if ( $_data['first_name'] ) :
 
@@ -677,7 +678,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 							if ( isset( $_user->$field ) ) :
 
-								_ADMIN_CHANGE_ADD( 'updated', 'a', 'user', $_post['id'],  $_name, 'admin/accounts/edit/' . $_post['id'], $field, $_user->$field, $value, FALSE );
+								_ADMIN_CHANGE_ADD( 'updated', 'a', 'user', $this->input->post( 'id' ),  $_name, 'admin/accounts/edit/' . $this->input->post( 'id' ), $field, $_user->$field, $value, FALSE );
 
 							endif;
 
@@ -686,7 +687,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						// --------------------------------------------------------------------------
 
 						//	refresh the user object
-						$_user = $this->user->get_by_id( $_post['id'] );
+						$_user = $this->user->get_by_id( $this->input->post( 'id' ) );
 
 					//	The account failed to update, feedback to user
 					else:

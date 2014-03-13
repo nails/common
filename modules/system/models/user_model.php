@@ -1372,10 +1372,11 @@ class NAILS_User_model extends NAILS_Model
 			endif;
 
 			//	Set the data
-			$_data_user		= array();
-			$_data_meta		= array();
-			$_data_email	= '';
-			$_data_username	= '';
+			$_data_user						= array();
+			$_data_meta						= array();
+			$_data_email					= '';
+			$_data_username					= '';
+			$_data_reset_security_questions	= FALSE;
 
 			foreach ( $data AS $key => $val ) :
 
@@ -1406,6 +1407,10 @@ class NAILS_User_model extends NAILS_Model
 				elseif ( $key == 'username' ) :
 
 					$_data_username = trim( $val );
+
+				elseif ( $key == 'reset_security_questions' ) :
+
+					$_data_reset_security_questions = $val;
 
 				else :
 
@@ -1443,6 +1448,27 @@ class NAILS_User_model extends NAILS_Model
 			//	Begin transaction
 			$_rollback = FALSE;
 			$this->db->trans_begin();
+
+			// --------------------------------------------------------------------------
+
+			//	Resetting security questions?
+			if ( APP_AUTH_TWO_FACTOR && $_data_reset_security_questions ) :
+
+				$this->db->where( 'user_id', (int) $_uid );
+				if ( ! $this->db->delete( NAILS_DB_PREFIX . 'user_auth_two_factor_question' ) ) :
+
+					//	Rollback immediately in case there's email or password changes which
+					//	might send an email.
+
+					$this->db->trans_rollback();
+
+					$this->_set_error( 'could not reset user\'s security questions.' );
+
+					return FALSE;
+
+				endif;
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
