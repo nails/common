@@ -70,6 +70,37 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		$this->error_has_occurred	= FALSE;
 		$this->recent_errors		= array();
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function show_404( $page = '', $log_error = TRUE )
+	{
+		$heading = "404 Page Not Found";
+		$message = "The page you requested was not found.";
+
+		if ( empty( $page ) ) :
+
+			$page = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+
+		endif;
+
+		// By default we log this, but allow a dev to skip it
+		if ( $log_error )
+		{
+			log_message( 'error', '404 Page Not Found --> ' . $page );
+		}
+
+		if ( ! defined( 'NAILS_IS_404' ) ) :
+
+			define( 'NAILS_IS_404', TRUE );
+
+		endif;
+
+		echo $this->show_error( $heading, $message, 'error_404', 404 );
+		exit;
+	}
 }
 
 /* End of file CORE_NAILS_Exceptions.php */

@@ -60,7 +60,8 @@
 	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.print.css'?>" />
 
 </head>
-<body class="<?=!$loaded_modules ? 'no-modules' : ''?>">
+
+<body class="<?=empty( $loaded_modules ) ? 'no-modules' : ''?>">
 
 	<div class="header">
 
@@ -73,13 +74,13 @@
 				</a>
 			</li>
 			<li><?=anchor( 'admin', lang( 'admin_home' ) )?></li>
-			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
-			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
+			<?=! empty( $page->module->name ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
+			<?=! empty( $page->title ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
 		</ul>
 
 		<ul class="right shaded">
 			<li>
-				<?=anchor( '/', lang( 'admin_switch_frontend' ) )?>
+				<?=anchor( '', lang( 'admin_switch_frontend' ) )?>
 			</li>
 			<li style="color:#999;">
 				<?php
@@ -128,6 +129,7 @@
 			$_acl			= active_user( 'acl' );
 			$_mobile_menu	= array();
 			$_counter		= 0;
+			$loaded_modules	= ! empty( $loaded_modules ) ? $loaded_modules : array();
 
 			foreach ( $loaded_modules AS $module => $config ) :
 
@@ -179,7 +181,7 @@
 						$_temp->is_active = $this->uri->rsegment( 1 ) == $module && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
 
 						//	Notifications for this method?
-						if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
+						if ( ! empty( $_notifications[$method] ) ) :
 
 							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'neutral';
 							$_temp->notification->title		= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
@@ -370,7 +372,7 @@
 
 			?>
 
-			<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
+			<?php if ( ! empty( $error ) ) : ?>
 			<div class="system-alert error">
 				<div class="padder">
 					<p><?=$error?></p>
@@ -378,7 +380,7 @@
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $success ) && ! empty( $success ) ) : ?>
+			<?php if ( ! empty( $success ) ) : ?>
 			<div class="system-alert success">
 				<div class="padder">
 					<p><?=$success?></p>
@@ -386,7 +388,7 @@
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
+			<?php if ( ! empty( $message ) ) : ?>
 			<div class="system-alert message">
 				<div class="padder">
 					<p><?=$message?></p>
@@ -394,7 +396,7 @@
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
+			<?php if ( ! empty( $notice ) ) : ?>
 			<div class="system-alert notice">
 				<div class="padder">
 					<p><?=$notice?></p>

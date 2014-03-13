@@ -193,6 +193,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 		if ( ! defined( 'APP_NATIVE_LOGIN_USING' ) )		define( 'APP_NATIVE_LOGIN_USING',		'EMAIL' );	//	[EMAIL|USERNAME|BOTH]
 		if ( ! defined( 'APP_AUTH_TWO_FACTOR' ) )			define( 'APP_AUTH_TWO_FACTOR',			FALSE );
+		if ( ! defined( 'APP_ADMIN_IP_WHITELIST' ) )		define( 'APP_ADMIN_IP_WHITELIST',		json_encode( array() ) );
 
 
 		// --------------------------------------------------------------------------
@@ -739,16 +740,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		endforeach;
 
 		// --------------------------------------------------------------------------
-
-		$_nails_assets		= array();
-		$_nails_assets[]	= 'nails.default.css';
-		$_nails_assets[]	= 'nails.default.min.js';
-
-		foreach ( $_nails_assets AS $asset ) :
-
-			$this->asset->load( $asset, TRUE );
-
-		endforeach;
 
 		//	App assets
 		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
