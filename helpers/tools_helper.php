@@ -154,9 +154,9 @@ if ( ! function_exists( 'ip_in_range' ) )
 {
 	function ip_in_range( $ip, $range )
 	{
-		if ( ! array() ) :
+		if ( ! array( $range ) ) :
 
-			if ( strpos( $cidr_mask, ',' ) !== FALSE ) :
+			if ( strpos( $range, ',' ) !== FALSE ) :
 
 				$range = explode( ',', $range );
 
