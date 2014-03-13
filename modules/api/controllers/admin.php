@@ -49,13 +49,15 @@ class NAILS_Admin extends NAILS_API_Controller
 		//	IP whitelist?
 		$_ip_whitelist = json_decode( APP_ADMIN_IP_WHITELIST );
 
-		if ( is_array( $_ip_whitelist ) && $_ip_whitelist ) :
+		if ( $_ip_whitelist ) :
 
-			if ( array_search( $this->input->ip_address(), $_ip_whitelist ) === FALSE ) :
+			if ( ! ip_in_range( $this->input->ip_address(), $_ip_whitelist ) ) :
 
-				$this->_method_not_found( $this->uri->segment( 3 ) );
+				show_404();
 
 			endif;
+
+		endif;
 
 		//	Only logged in users
 		elseif ( ! $this->user->is_logged_in() ) :

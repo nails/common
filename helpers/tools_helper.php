@@ -117,67 +117,87 @@ if ( ! function_exists( 'return_bytes' ) )
 
 
 /**
- * Generates a random reference of characters
- *
- * @access	public
- * @param	string
- * @return	float
- */
-function generate_reference( $length = 10 )
-{
-	$characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-	$string = '';
-	for ( $p = 0; $p < $length; $p++ ) {
-		$string .= $characters[ mt_rand( 0, strlen( $characters ) - 1) ];
-	}
-	return $string;
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Converts an integer to a word
- *
- * @access	public
- * @param	string
- * @return	float
- */
-function int_to_word( $number )
-{
-
-	$words = array(
-
-		'zero', 'one', 'two', 'three', 'four',
-		'five', 'six', 'seven', 'eight', 'nine'
-	);
-
-	return ( (int) $number >= count( $words ) ) ?  $number : $words[ $number ];
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
  * Converts a string to a boolean
  *
  * @access	public
  * @param	string
  * @return	float
  */
-function string_to_boolean( $string )
+if ( ! function_exists( 'string_to_boolean' ) )
 {
-	if ( $string && strtoupper( $string ) !== "FALSE") :
+	function string_to_boolean( $string )
+	{
+		if ( $string && strtoupper( $string ) !== "FALSE") :
 
-		return TRUE;
+			return TRUE;
 
-	else:
+		else:
+
+			return FALSE;
+
+		endif;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Match an IP to a given CIDR range
+ *
+ * @access	public
+ * @param	string
+ * @return	float
+ */
+if ( ! function_exists( 'ip_in_range' ) )
+{
+	function ip_in_range( $ip, $range )
+	{
+		if ( ! array() ) :
+
+			if ( strpos( $cidr_mask, ',' ) !== FALSE ) :
+
+				$range = explode( ',', $range );
+
+			else :
+
+				$range = (array) $range;
+
+			endif;
+
+		endif;
+
+		foreach ( $range AS $cidr_mask ) :
+
+			if ( strpos( $cidr_mask, '/' ) !== FALSE ) :
+
+				//	Hat tip: http://stackoverflow.com/a/594134/789224
+				list ($subnet, $bits) = explode('/', $cidr_mask);
+				$ip = ip2long($ip);
+				$subnet = ip2long($subnet);
+				$mask = -1 << (32 - $bits);
+				$subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+				if ( ($ip & $mask) == $subnet ) :
+
+					return TRUE;
+
+				endif;
+
+			else :
+
+				if ( $ip == $cidr_mask ) :
+
+					return TRUE;
+
+				endif;
+
+			endif;
+
+		endforeach;
 
 		return FALSE;
-
-	endif;
+	}
 }
 
 
