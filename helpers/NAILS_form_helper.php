@@ -1161,16 +1161,35 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
 		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
-
 		foreach ( $options AS $value => $label ) :
 
-			//	Selected?
-			$_checked = $value == $_selected ? ' selected="selected"' : '';
+			if ( is_array( $label ) ) :
 
-			//	Disabled?
-			$_disabled = array_search( $value, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
+				$_out .= '<optgroup label="' . $value . '">';
+				foreach ( $label AS $k => $v ) :
 
-			$_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
+					//	Selected?
+					$_checked = $k == $_selected ? ' selected="selected"' : '';
+
+					//	Disabled?
+					$_disabled = array_search( $k, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
+
+					$_out .= '<option value="' . $k . '"' . $_checked . $_disabled . '>' . $v . '</option>';
+
+				endforeach;
+				$_out .= '</optgroup>';
+
+			else :
+
+				//	Selected?
+				$_checked = $value == $_selected ? ' selected="selected"' : '';
+
+				//	Disabled?
+				$_disabled = array_search( $value, $_field['disabled_options'] ) !== FALSE ? ' disabled="disabled"' : '';
+
+				$_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
+
+			endif;
 
 		endforeach;
 		$_out .= '</select>';
