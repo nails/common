@@ -3048,7 +3048,7 @@ class NAILS_User_model extends NAILS_Model
 	 * @param	string
 	 * @return	string or boolean FALSE
 	 **/
-	public function validate_password_token( $code )
+	public function validate_password_token( $code, $generate_new_pw = TRUE )
 	{
 		if ( empty( $code ) ) :
 
@@ -3084,25 +3084,31 @@ class NAILS_User_model extends NAILS_Model
 		else :
 
 			//	Valid hash and hasn't expired.
-			$this->load->helper( 'string' );
-			$_password	= random_string( 'alpha', 6 );
-			$_hash	 	= $this->hash_password( $_password );
+			$_out				= array();
+			$_out['user_id']	= $_user->id;
 
-			// --------------------------------------------------------------------------
+			//	Generate a new password?
+			if ( $generate_new_pw ) :
 
-			$_data['password']					= $_hash[0];
-			$_data['password_md5']				= md5( $_hash[0] );
-			$_data['salt']						= $_hash[1];
-			$_data['temp_pw']					= TRUE;
-			$_data['forgotten_password_code']	= NULL;
+				$this->load->helper( 'string' );
+				$_out['password']	= random_string( 'alpha', 6 );
+				$_hash	 			= $this->hash_password( $_out['password'] );
 
-			// --------------------------------------------------------------------------
+				// --------------------------------------------------------------------------
 
-			$this->db->where( 'forgotten_password_code', $_user->forgotten_password_code );
-			$this->db->set( $_data );
-			$this->db->update( NAILS_DB_PREFIX . 'user' );
+				$_data['password']					= $_hash[0];
+				$_data['password_md5']				= md5( $_hash[0] );
+				$_data['salt']						= $_hash[1];
+				$_data['temp_pw']					= TRUE;
+				$_data['forgotten_password_code']	= NULL;
 
-			return $_password;
+				$this->db->where( 'forgotten_password_code', $_user->forgotten_password_code );
+				$this->db->set( $_data );
+				$this->db->update( NAILS_DB_PREFIX . 'user' );
+
+			endif;
+
+			return $_out;
 
 		endif;
 	}

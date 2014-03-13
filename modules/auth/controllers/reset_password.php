@@ -122,7 +122,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 						break;
 
 					endswitch;
-dumpanddie($_login);
+
 					if ( $_login ) :
 
 						if ( APP_AUTH_TWO_FACTOR ) :

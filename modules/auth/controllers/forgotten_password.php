@@ -268,8 +268,11 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	 */
 	public function _validate( $code )
 	{
-		//	Attempt to verify code
-		$_new_pw = $this->user->validate_password_token( $code );
+		//	Attempt to verify code, if twof actor auth is enabled then don't  generate
+		//	a new password, we'll need the user to jump through some hoops first.
+
+		$_generate_new_pw = APP_AUTH_TWO_FACTOR ? FALSE : TRUE;
+		$_new_pw = $this->user->validate_password_token( $code, $_generate_new_pw );
 
 		// --------------------------------------------------------------------------
 
@@ -286,22 +289,93 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 		else :
 
-			//	Everything worked!
-			$this->data['new_password'] = $_new_pw;
+			if ( APP_AUTH_TWO_FACTOR ) :
 
-			// --------------------------------------------------------------------------
+				//	Show them a security question
+				$this->data['question'] = $this->user->get_security_question( $_new_pw['user_id'] );
 
-			//	Set some flashdata for the login page when they go to it; just a little reminder
-			$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw ) );
+				if ( $this->data['question'] ) :
 
-			// --------------------------------------------------------------------------
+					if ( $this->input->post( 'answer' ) ) :
 
-			//	Load the views; using the auth_model view loader as we need to check if
-			//	an overload file exists which should be used instead
+						$_valid = $this->user->validate_security_answer( $this->data['question']->id, $_new_pw['user_id'], $this->input->post( 'answer' ) );
 
-			$this->load->view( 'structure/header',				$this->data );
-			$this->load->view( 'auth/password/forgotten_reset',	$this->data );
-			$this->load->view( 'structure/footer',				$this->data );
+						if ( $_valid ) :
+
+							//	Correct answer, reset password and render views
+							$_new_pw = $this->user->validate_password_token( $code, TRUE );
+
+							$this->data['new_password'] = $_new_pw['password'];
+
+							// --------------------------------------------------------------------------
+
+							//	Set some flashdata for the login page when they go to it; just a little reminder
+							$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+
+							// --------------------------------------------------------------------------
+
+							//	Load the views
+							$this->load->view( 'structure/header',				$this->data );
+							$this->load->view( 'auth/password/forgotten_reset',	$this->data );
+							$this->load->view( 'structure/footer',				$this->data );
+
+							return;
+
+						else :
+
+							$this->data['error'] = lang( 'auth_twofactor_answer_incorrect' );
+
+						endif;
+
+					endif;
+
+					$this->data['page']->title = lang( 'auth_title_forgotten_password_security_question' );
+
+					$this->load->view( 'structure/header',							$this->data );
+					$this->load->view( 'auth/password/forgotten_security_question',	$this->data );
+					$this->load->view( 'structure/footer',							$this->data );
+
+				else :
+
+					//	No questions, reset and load views
+					$_new_pw = $this->user->validate_password_token( $code, TRUE );
+
+					$this->data['new_password'] = $_new_pw['password'];
+
+					// --------------------------------------------------------------------------
+
+					//	Set some flashdata for the login page when they go to it; just a little reminder
+					$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+
+					// --------------------------------------------------------------------------
+
+					//	Load the views
+					$this->load->view( 'structure/header',				$this->data );
+					$this->load->view( 'auth/password/forgotten_reset',	$this->data );
+					$this->load->view( 'structure/footer',				$this->data );
+
+
+				endif;
+
+			else :
+
+				//	Everything worked!
+				$this->data['new_password'] = $_new_pw['password'];
+
+				// --------------------------------------------------------------------------
+
+				//	Set some flashdata for the login page when they go to it; just a little reminder
+				$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+
+				// --------------------------------------------------------------------------
+
+				//	Load the views
+				$this->load->view( 'structure/header',				$this->data );
+				$this->load->view( 'auth/password/forgotten_reset',	$this->data );
+				$this->load->view( 'structure/footer',				$this->data );
+
+			endif;
+
 			return;
 
 		endif;

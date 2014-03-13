@@ -9,10 +9,11 @@
 
 
 	//	Page Titles
-	$lang['auth_title_login']							= 'Please Log In';
-	$lang['auth_title_register']						= 'Register';
-	$lang['auth_title_forgotten_password']				= 'Forgotten your password?';
-	$lang['auth_title_reset']							= 'Reset your Password';
+	$lang['auth_title_login']									= 'Please Log In';
+	$lang['auth_title_register']								= 'Register';
+	$lang['auth_title_forgotten_password']						= 'Forgotten your password?';
+	$lang['auth_title_forgotten_password_security_question']	= 'Please answer this security question';
+	$lang['auth_title_reset']									= 'Reset your Password';
 
 
 	// --------------------------------------------------------------------------
