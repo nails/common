@@ -3,7 +3,7 @@
 /**
  * Name:		Admin API
  *
- * Description:	This controller handles API emthods relating to admin
+ * Description:	This controller handles API methods relating to admin
  *
  **/
 
@@ -46,18 +46,25 @@ class NAILS_Admin extends NAILS_API_Controller
 
 		//	Constructor mabobs.
 
+		//	IP whitelist?
+		$_ip_whitelist = json_decode( APP_ADMIN_IP_WHITELIST );
+
+		if ( is_array( $_ip_whitelist ) && $_ip_whitelist ) :
+
+			if ( array_search( $this->input->ip_address(), $_ip_whitelist ) === FALSE ) :
+
+				$this->_method_not_found( $this->uri->segment( 3 ) );
+
+			endif;
+
 		//	Only logged in users
-		if ( ! $this->user->is_logged_in() ) :
+		elseif ( ! $this->user->is_logged_in() ) :
 
 			$this->_authorised	= FALSE;
 			$this->_error		= lang( 'auth_require_session' );
 
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Only admins
-		if ( ! $this->user->is_admin() ) :
+		elseif ( ! $this->user->is_admin() ) :
 
 			$this->_authorised	= FALSE;
 			$this->_error		= lang( 'auth_require_administrator' );
