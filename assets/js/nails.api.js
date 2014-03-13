@@ -3,8 +3,6 @@
  *
  * This class handles API requests
  *
- * Author: Pablo de la Peña (@hellopablo)
- *
  **/
 
 var NAILS_API;
