@@ -29,16 +29,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'auth' ) || ! module_is_enabled( 'admin' ) ) :
-
-			//	Cancel execution, module isn't enabled
-			show_404();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Admins only please
 		if ( ! $this->user->is_admin() ) :
 

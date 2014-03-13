@@ -576,7 +576,6 @@ class CORE_NAILS_Installer
 			$_app_str .= 'define( \'APP_PRIVATE_KEY\',	\'' . $_app_key . '\' );' . "\n";
 			$_app_str .= 'define( \'APP_DEVELOPER_EMAIL\',	\'' . $_app_developer_email . '\' );' . "\n";
 			$_app_str .= 'define( \'APP_DEFAULT_TIMEZONE\',	\'' . $_app_default_timezone . '\' );' . "\n";
-			$_app_str .= 'define( \'APP_NAILS_MODULES\',	\'*\' );' . "\n";
 
 			$_fh = @fopen( $this->_app_file, 'w' );
 

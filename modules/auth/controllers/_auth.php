@@ -16,16 +16,6 @@ class NAILS_Auth_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'auth' ) ) :
-
-			//	Cancel execution, module isn't enabled
-			show_404();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Load model
 		$this->load->model( 'auth_model' );
 
