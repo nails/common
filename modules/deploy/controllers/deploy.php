@@ -15,14 +15,44 @@
  *
  **/
 
-class NAILS_Deploy extends NAILS_Controller
+class NAILS_Deploy extends CORE_NAILS_Controller
 {
+	public function __construct()
+	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		if ( ENVIRONMENT == 'production' && ! $this->input->is_cli_request() ) :
+
+			show_404();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function pre()
 	{
-		//	Potential tasks
-		//	Run Tests
-		//	Note deployment start
+		$this->_start();
+
+		// --------------------------------------------------------------------------
+
+		//	NO NAILS TASKS TO BE RUN PRE DEPLOYMENT
+
+		// --------------------------------------------------------------------------
+
+		//	App hook
+		$this->_pre_app();
+
+		// --------------------------------------------------------------------------
+
+		$this->_end();
 	}
+
+	protected function _pre_app(){}
 
 
 	// --------------------------------------------------------------------------
@@ -30,12 +60,98 @@ class NAILS_Deploy extends NAILS_Controller
 
 	public function post()
 	{
-		//	Potential tasks
+		$this->_start();
+
+		// --------------------------------------------------------------------------
+
 		//	Migrate DB
-		//	Run Tests
-		//	Clear caches (?)
-		//	Module specific tasks - e.g rewrite routes file
-		//	Note deployment end
+		$this->load->library( 'migration' );
+
+		//	NAILS Migrations
+		_LOG( 'Migrating Nails DB...' );
+		$this->migration->set_nails();
+		$this->migration->latest();
+		_LOG( '... done' );
+
+		//	APP Migrations
+		_LOG( 'Migrating App DB...' );
+		$this->migration->set_app();
+		$this->migration->latest();
+		_LOG( '... done' );
+
+		// --------------------------------------------------------------------------
+
+		//	App hook
+		$this->_post_app();
+
+		// --------------------------------------------------------------------------
+
+		//	Rewrite Routes file
+		_LOG( 'Rewriting app routes...' );
+		$this->load->model( 'system/routes_model', 'routes_model', array( 'set_session' => FALSE ) );
+
+		if ( $this->routes_model->update() ) :
+
+			_LOG( '... done' );
+
+		else :
+
+			_LOG( '... failed: ' . $this->routes_model->last_error() );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->_end();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _post_app(){}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _start()
+	{
+		if ( ENVIRONMENT !== 'production' && ! $this->input->is_cli_request() ) :
+
+			echo $this->load->view( 'deploy/header', NULL, TRUE );
+			echo $this->load->view( 'deploy/' . $this->uri->segment( 2 ), NULL, TRUE );
+
+			echo '<hr />';
+			echo '<h2>Deployment Log &rsaquo; ' . ucfirst( $this->uri->segment( 2 ) ) . '</h2>';
+			echo '<pre>';
+
+		endif;
+
+		//	Note start
+		$this->benchmark->mark( 'deploy_start' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _end()
+	{
+		//	Note End
+		$this->benchmark->mark( 'deploy_end' );
+
+		_LOG( '-----------------------------------------' );
+		_LOG( ucfirst( $this->uri->segment( 2 ) ) . ' Deployment Tasks took ' . $this->benchmark->elapsed_time('deploy_start', 'deploy_end') . ' seconds' );
+
+		// --------------------------------------------------------------------------
+
+		if ( ENVIRONMENT !== 'production' && ! $this->input->is_cli_request() ) :
+
+			echo '</pre>';
+			echo $this->load->view( 'deploy/footer',	NULL,	TRUE );
+
+		endif;
 	}
 }
 

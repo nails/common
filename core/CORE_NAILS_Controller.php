@@ -177,7 +177,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Default app constants (if not already defined)
-		//	These should be specified in settings/app.php
+		//	These should be specified in config/app.php
 
 		if ( ! defined( 'NAILS_DB_PREFIX' ) )				define( 'NAILS_DB_PREFIX',				'nails_' );
 		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
@@ -198,7 +198,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Deployment specific constants (if not already defined)
-		//	These should be specified in settings/deploy.php
+		//	These should be specified in config/deploy.php
 
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
 
@@ -468,7 +468,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_db()
 	{
-		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
+		if ( $this->uri->segment( 1 ) === 'deploy' ) :
+
+			define( 'NAILS_DB_ENABLED', FALSE );
+
+		elseif ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
 
 			define( 'NAILS_DB_ENABLED', TRUE );
 			$this->load->database();
@@ -793,6 +797,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_user()
 	{
+		if ( ! NAILS_DB_ENABLED ) :
+
+			return FALSE;
+
+		endif;
+
 		//	Set a $user variable (for the views)
 		$this->data['user'] =& $this->user;
 

@@ -24,9 +24,13 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function __construct()
+	public function __construct( $config = array() )
 	{
 		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$_config_set_session = isset( $config['set_session'] ) ? (bool) $config['set_session'] : TRUE;
 
 		// --------------------------------------------------------------------------
 
@@ -55,7 +59,12 @@ class NAILS_Shop_model extends NAILS_Model
 
 			//	Use the currency defined in the user object
 			$_currency_id = active_user( 'shop_currency' );
-			$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+			if ( ! headers_sent() ) :
+
+				$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+			endif;
 
 		else :
 
@@ -89,7 +98,11 @@ class NAILS_Shop_model extends NAILS_Model
 			endif;
 
 			//	Save to session
-			$this->session->set_userdata( 'shop_currency', $_currency_id );
+			if ( ! headers_sent() ) :
+
+				$this->session->set_userdata( 'shop_currency', $_currency_id );
+
+			endif;
 
 		endif;
 
@@ -100,7 +113,12 @@ class NAILS_Shop_model extends NAILS_Model
 
 			//	Bad currency ID or not active, use base
 			$_user_currency = $_base;
-			$this->session->unset_userdata( 'shop_currency', $_currency_id );
+
+			if ( ! headers_sent() ) :
+
+				$this->session->unset_userdata( 'shop_currency', $_currency_id );
+
+			endif;
 
 			if ( $this->user->is_logged_in() ) :
 
