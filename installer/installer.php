@@ -31,10 +31,11 @@ class CORE_NAILS_Installer
 	public function __construct()
 	{
 		$this->_errors			= '';
-		$this->_app_file		= '';
+		$this->_app_file		= $this->_abpath . '/config/app.php';
 		$this->_has_app_file	= FALSE;
-		$this->_deploy_file		= '';
+		$this->_deploy_file		= $this->_abpath . '/config/deploy.php';
 		$this->_has_deploy_file	= FALSE;
+
 	}
 
 	// --------------------------------------------------------------------------
@@ -264,7 +265,7 @@ class CORE_NAILS_Installer
 
 					else :
 
-						echo '<select name="">';
+						echo '<select name="app_default_timezone">';
 
 							$_timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 
@@ -749,13 +750,9 @@ class CORE_NAILS_Installer
 			<p>
 				Please provide the installer password for this deployment.
 			</p>
-			<ul>
-				<li>
-					<label class="rounded">
-					<input type="password" class="rounded" name="password" value="" placeholder="Type your password">
-					</label>
-				</li>
-			</ul>
+			<p>
+				<input type="password" class="rounded" name="password" value="" placeholder="Type your password">
+			</p>
 			<p class="submit">
 				<input type="submit" name="submit" class="awesome rounded" value="Continue &rsaquo;" />
 			</p>
