@@ -121,6 +121,12 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			//	Run validation
 			if ( $this->form_validation->run() ) :
 
+				//	Some apps may want the forgotten password tool to always return
+				//	as successfull, even if it wasn't. Bad UX, if you ask me, but I'm
+				//	not the client.
+
+				$_always_succeed = $this->config->item( 'auth_forgotten_pass_always_succeed' );
+
 				//	Attempt to reset password
 				if ( $this->user->set_password_token( $_identifier ) ) :
 
@@ -188,11 +194,19 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 						$this->data['success'] = lang( 'auth_forgot_success' );
 
+					elseif ( $_always_succeed ) :
+
+						$this->data['success'] = lang( 'auth_forgot_success' );
+
 					else :
 
 						$this->data['error'] = lang( 'auth_forgot_email_fail' );
 
 					endif;
+
+				elseif ( $_always_succeed ) :
+
+					$this->data['success'] = lang( 'auth_forgot_success' );
 
 				else :
 

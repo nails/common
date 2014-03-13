@@ -12,6 +12,8 @@
 |
 */
 
+$config['auth_forgotten_pass_always_succeed']	= FALSE;
+
 $config['auth_show_nicetime_on_login']			= TRUE;
 $config['auth_show_last_ip_on_login']			= FALSE;
 
