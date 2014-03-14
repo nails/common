@@ -1,6 +1,6 @@
 <?php	if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Migration_Init extends CORE_NAILS_Migration
+class Migration_Nails_init extends CORE_NAILS_Migration
 {
 	public function up()
 	{
