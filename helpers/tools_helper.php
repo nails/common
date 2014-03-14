@@ -174,11 +174,11 @@ if ( ! function_exists( 'ip_in_range' ) )
 
 				//	Hat tip: http://stackoverflow.com/a/594134/789224
 				list ($subnet, $bits) = explode('/', $cidr_mask);
-				$ip = ip2long($ip);
+				$_ip = ip2long($ip);
 				$subnet = ip2long($subnet);
 				$mask = -1 << (32 - $bits);
 				$subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
-				if ( ($ip & $mask) == $subnet ) :
+				if ( ($_ip & $mask) == $subnet ) :
 
 					return TRUE;
 
