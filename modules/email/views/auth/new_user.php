@@ -9,7 +9,10 @@
 <?php endif; ?>
 <?php if ( ! empty( $password ) ) : ?>
 <p>
-	Your password is <strong><?=$password?></strong><?=! empty( $temp_pw ) ? ', you will be asked to set this to something more memorable when you log in' : ''?>.
+	Your password is shown below<?=! empty( $temp_pw ) ? ', you will be asked to set this to something more memorable when you log in' : ''?>.
+</p>
+<p class="heads-up" style="font-weight:bold;font-size:1.5em;text-align:center;">
+	<?=$password?>
 </p>
 <?php endif; ?>
 <p>

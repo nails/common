@@ -305,7 +305,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				if ( ! $_password ) :
 
 					//	Password isn't set, generate one
-					$_password = strtoupper( random_string( 'alpha' ) );
+					$_password = $this->user->generate_password();
 
 				endif;
 

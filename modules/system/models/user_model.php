@@ -1360,6 +1360,13 @@ class NAILS_User_model extends NAILS_Model
 
 				$_hash = $this->hash_password( $data['password'] );
 
+				if ( ! $_hash ) :
+
+					//	Error will be set by hash_password();
+					return FALSE;
+
+				endif;
+
 				$data['password']		= $_hash[0];
 				$data['password_md5']	= md5( $_hash[0] );
 				$data['salt']			= $_hash[1];
@@ -2030,7 +2037,8 @@ class NAILS_User_model extends NAILS_Model
 
 
 	/**
-	 * Create a password hash
+	 * Create a password hash, checks to ensure a password is strong enough according
+	 * to the password rules defined by the app.
 	 *
 	 * @access	public
 	 * @param	string
@@ -2041,11 +2049,86 @@ class NAILS_User_model extends NAILS_Model
 	{
 		if ( empty( $password ) ) :
 
+			$this->_set_error( 'No password to hash' );
 			return FALSE;
 
 		endif;
 
 		// --------------------------------------------------------------------------
+
+		//	Check password satisfies password rules
+		$_password_rules = $this->_get_password_rules();
+
+		//	Lgng enough?
+		if ( strlen( $password ) < $_password_rules['min_length'] ) :
+
+			$this->_set_error( 'Password is too short.' );
+			return FALSE;
+
+		endif;
+
+		//	Too long?
+		if ( $_password_rules['max_length'] ) :
+
+			if ( strlen( $password ) > $_password_rules['max_length'] ) :
+
+				$this->_set_error( 'Password is too long.' );
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		//	Contains at least 1 character from each of the charsets
+		foreach ( $_password_rules['charsets'] AS $slug => $charset ) :
+
+			$_chars		= str_split( $charset );
+			$_is_valid	= FALSE;
+
+			foreach ( $_chars AS $char ) :
+
+				if ( strstr( $password, $char ) ) :
+
+					$_is_valid = TRUE;
+					break;
+
+				endif;
+
+			endforeach;
+
+			if ( ! $_is_valid ) :
+
+				switch( $slug ) :
+
+					case 'symbol' :			$_item = 'a symbol';				break;
+					case 'lower_alpha' :	$_item = 'a lower case letter';		break;
+					case 'upper_alpha' :	$_item = 'an upper case letter';	break;
+					case 'number' :			$_item = 'a number';				break;
+
+				endswitch;
+
+				$this->_set_error( 'Password must contain ' . $_item . '.' );
+				return FALSE;
+
+			endif;
+
+		endforeach;
+
+		//	Not be a bad password?
+		foreach ( $_password_rules['is_not'] AS $str ) :
+
+			if ( strtolower( $password ) == strtolower( $str ) ) :
+
+				$this->_set_error( 'Password cannot be "' . $str . '"' );
+				return FALSE;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Password is valid.
 
 		if ( ! $salt ) :
 
@@ -2056,6 +2139,189 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		return array( sha1( sha1( $password ) . $salt ), $salt );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Generates a password which is sufficiently secure according to the apps
+	 * password rules
+	 *
+	 * @access	public
+	 * @param	none
+	 * @return	string
+	 **/
+	public function generate_password()
+	{
+		$_password_rules	= $this->_get_password_rules();
+		$_pw_str			= '';
+
+		// --------------------------------------------------------------------------
+
+		//	Work out the max length, if it's not beenset
+		if ( ! $_password_rules['min_length'] && ! $_password_rules['max_length'] ) :
+
+			$_password_rules['max_length'] = count( $_password_rules['charsets'] ) * 2;
+
+		elseif( $_password_rules['min_length'] && ! $_password_rules['max_length'] ) :
+
+			$_password_rules['max_length'] = $_password_rules['min_length'] + count( $_password_rules['charsets'] );
+
+		elseif ( $_password_rules['min_length'] > $_password_rules['max_length'] ) :
+
+			$_password_rules['max_length'] = $_password_rules['min_length'] + count( $_password_rules['charsets'] );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	We now have a max_length and all our chars, generate password!
+		$_password_valid = TRUE;
+		do
+		{
+			do
+			{
+				foreach ( $_password_rules['charsets'] AS $charset ) :
+
+					$_pw_str .= $charset[rand( 0, strlen( $charset ) - 1 )];
+
+				endforeach;
+
+			} while( strlen( $_pw_str ) < $_password_rules['max_length'] );
+
+			//	Check password isn't a prohibited string
+			foreach ( $_password_rules['is_not'] AS $str ) :
+
+				if ( strtolower( $_pw_str ) == strtolower( $str ) ) :
+
+					$_password_valid = FALSE;
+					break;
+
+				endif;
+
+			endforeach;
+
+		} while( ! $_password_valid );
+
+		// --------------------------------------------------------------------------
+
+		//	Shuffle the string
+		$_pw_str = str_shuffle( $_pw_str );
+
+		// --------------------------------------------------------------------------
+
+		return $_pw_str;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _get_password_rules()
+	{
+		$this->config->load( 'auth' );
+
+		$_pw_str		= '';
+		$_pw_rules		= $this->config->item( 'auth_password_rules' );
+		$_pw_rules		= ! is_array( $_pw_rules ) ? array() : $_pw_rules;
+		$_min_length	= 0;
+		$_max_length	= FALSE;
+		$_contains		= array();
+
+		foreach ( $_pw_rules AS $rule => $val ) :
+
+			switch( $rule ) :
+
+				case 'min_length' :
+
+					$_min_length = (int) $val;
+
+				break;
+
+				case 'max_length' :
+
+					$_max_length = (int) $val;
+
+				break;
+
+				case 'contains' :
+
+					foreach( $val AS $str ) :
+
+						$_contains[] = (string) $str;
+
+					endforeach;
+
+				break;
+
+				case 'is_not' :
+
+					foreach( $val AS $str ) :
+
+						$_is_not[] = (string) $str;
+
+					endforeach;
+
+				break;
+
+			endswitch;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Set decent defaults
+		if ( empty( $_contains ) ) :
+
+			$_contains		= array( 'symbol', 'lower_alpha', 'upper_alpha', 'number' );
+
+		endif;
+
+		if ( empty( $_is_not ) ) :
+
+			$_is_not	= array( 'password', '123456789' );
+
+		endif;
+
+		$_contains = array_filter( $_contains );
+		$_contains = array_unique( $_contains );
+
+		$_is_not = array_filter( $_is_not );
+		$_is_not = array_unique( $_is_not );
+
+		// --------------------------------------------------------------------------
+
+		//	Generate the lsit of characters to use
+		$_chars = array();
+		foreach ( $_contains AS $charset ) :
+
+			switch( $charset ) :
+
+				case 'symbol' :			$_chars[$charset] = '!@£$%^&*(){}":?<>~-=[];\'\/.,`';	break;
+				case 'lower_alpha' :	$_chars[$charset] = 'abcdefghijklmnopqrstuvwxyz';		break;
+				case 'upper_alpha' :	$_chars[$charset] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';		break;
+				case 'number' :			$_chars[$charset] = '0123456789';						break;
+
+			endswitch;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Make sure min_length is >= count( $_chars ), so we can satisfy the
+		//	requirements of the chars
+
+		$_min_length = $_min_length < count( $_chars ) ? count( $_chars ) : $_min_length;
+
+		$_out = array();
+		$_out['min_length']	= $_min_length;
+		$_out['max_length']	= $_max_length;
+		$_out['charsets']	= $_chars;
+		$_out['is_not']		= $_is_not;
+
+		return $_out;
 	}
 
 
@@ -2582,6 +2848,13 @@ class NAILS_User_model extends NAILS_Model
 
 			$_password = $this->hash_password( $password );
 
+			if ( ! $_password ) :
+
+				//	Error will be set by hash_password()
+				return FALSE;
+
+			endif;
+
 		endif;
 
 		//	Do we need to inform the user of their password? This might be set
@@ -2969,7 +3242,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Generate code
-		$_key = $this->hash_password( $this->salt() );
+		$_key = sha1( sha1( $this->salt() ) . $this->salt() . APP_PRIVATE_KEY );
 		$_ttl = time() + 86400; // 24 hours.
 
 		// --------------------------------------------------------------------------
@@ -3016,7 +3289,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$_data = array(
 
-				'forgotten_password_code' => $_ttl . ':' . $_key[0]
+				'forgotten_password_code' => $_ttl . ':' . $_key
 			);
 
 			return $this->update( $_user->id, $_data );
@@ -3091,8 +3364,15 @@ class NAILS_User_model extends NAILS_Model
 			if ( $generate_new_pw ) :
 
 				$this->load->helper( 'string' );
-				$_out['password']	= random_string( 'alpha', 6 );
+				$_out['password']	= $this->generate_password();
 				$_hash	 			= $this->hash_password( $_out['password'] );
+
+				if ( ! $_hash ) :
+
+					//	This should never happen, but just in case.
+					return FALSE;
+
+				endif;
 
 				// --------------------------------------------------------------------------
 

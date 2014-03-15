@@ -40,3 +40,14 @@ $config['auth_two_factor_questions'][]			= 'In what city or town was your first 
 $config['auth_two_factor_questions'][]			= 'What is the name of the place your wedding reception was held?';
 $config['auth_two_factor_questions'][]			= 'What is the name of a college or university you applied to but didn\'t attend?';
 $config['auth_two_factor_questions'][]			= 'Where were you when you first heard about 9/11?';
+
+$config['auth_password_rules']					= array();
+$config['auth_password_rules']['min_length']	= 6;
+$config['auth_password_rules']['contains']		= array();
+$config['auth_password_rules']['contains'][]	= 'symbol';
+$config['auth_password_rules']['contains'][]	= 'lower_alpha';
+$config['auth_password_rules']['contains'][]	= 'upper_alpha';
+$config['auth_password_rules']['contains'][]	= 'number';
+$config['auth_password_rules']['is_not']		= array();
+$config['auth_password_rules']['is_not'][]		= 'password';
+$config['auth_password_rules']['is_not'][]		= '123456789';

@@ -5,7 +5,10 @@ Thank you for registering at the <?=APP_NAME?> website.
 <?php endif; ?>
 
 <?php if ( ! empty( $password ) ) : ?>
-Your password is <?=$password?><?=! empty( $temp_pw ) ? ', you will be asked to set this to something more memorable when you log in' : ''?>.
+Your password is shown below<?=! empty( $temp_pw ) ? ', you will be asked to set this to something more memorable when you log in' : ''?>.
+
+<?=$password?>
+
 
 <?php endif; ?>
 You can log in using the link below:
