@@ -59,18 +59,22 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Check that admin is running on the SECURE_BASE_URL url
-		$_host1 = $this->input->server( 'HTTP_HOST' );
-		$_host2 = parse_url( SECURE_BASE_URL );
+		if ( APP_SSL_ROUTING ) :
 
-		if ( ! empty( $_host2['host'] ) && $_host2['host'] != $_host1 ) :
+			$_host1 = $this->input->server( 'HTTP_HOST' );
+			$_host2 = parse_url( SECURE_BASE_URL );
 
-			//	Not on the secure URL, redirect with message
-			$_redirect = $this->input->server( 'REQUEST_URI' );
+			if ( ! empty( $_host2['host'] ) && $_host2['host'] != $_host1 ) :
 
-			if ( $_redirect ) :
+				//	Not on the secure URL, redirect with message
+				$_redirect = $this->input->server( 'REQUEST_URI' );
 
-				$this->session->set_flashdata( 'message', lang( 'admin_not_secure' ) );
-				redirect( $_redirect );
+				if ( $_redirect ) :
+
+					$this->session->set_flashdata( 'message', lang( 'admin_not_secure' ) );
+					redirect( $_redirect );
+
+				endif;
 
 			endif;
 
