@@ -26,6 +26,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Test that the cache is writeable
+		$this->_test_cache();
+
+		// --------------------------------------------------------------------------
+
 		//	Set the default content-type
 		$this->output->set_content_type( 'text/html; charset=utf-8' );
 
@@ -113,6 +118,36 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Startup hooks
+		if ( defined( 'STARTUP_ADD_HOOK_GENERATE_APP_ROUTES' ) && STARTUP_ADD_HOOK_GENERATE_APP_ROUTES ) :
+
+			//	No routes_app.php was found, attempt to generate it
+			$this->load->model( 'system/routes_model' );
+
+			if ( ! $this->routes_model->update() ) :
+
+				//	Fall over, routes_app.php *must* be there
+				show_fatal_error( 'Failed To generate routes_app.php', 'routes_app.php was not found and could not be generated. ' . $this->routes_model->last_error() );
+
+			else :
+
+				//	Routes exist now, instruct the browser to try again
+				if ( $this->input->post() ) :
+
+					redirect( $this->input->server( 'REQUEST_URI' ), 'Location', 307 );
+
+				else :
+
+					redirect( $this->input->server( 'REQUEST_URI' ) );
+
+				endif;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Set alerts
 
 		//	These are hooks for code to add feedback messages to the user.
@@ -128,9 +163,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->data['page']->title			= '';
 		$this->data['page']->description	= '';
 		$this->data['page']->keywords		= '';
-
-		// dumpanddie(cdn_serve_zipped(array(316,315,321), 'my-files.zip'));
-		// dumpanddie(cdn_serve_zipped(array(342,343), 'my-files.zip'));
 	}
 
 
@@ -158,6 +190,40 @@ class CORE_NAILS_Controller extends MX_Controller {
 	 		break;
 
 	 	endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _test_cache()
+	{
+		if ( is_writable( DEPLOY_CACHE_DIR ) ) :
+
+			return TRUE;
+
+		elseif ( is_dir( DEPLOY_CACHE_DIR ) ) :
+
+			//	Attempt to chmod the dir
+			if ( @chmod( DEPLOY_CACHE_DIR, FILE_WRITE_MODE ) ) :
+
+				return TRUE;
+
+			else :
+
+				show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
+
+			endif;
+
+		elseif( mkdir( DEPLOY_CACHE_DIR ) ) :
+
+			return TRUE;
+
+		else :
+
+			show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
+
+		endif;
 	}
 
 

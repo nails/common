@@ -34,7 +34,7 @@ class NAILS_Routes_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set Defaults
-		$this->_routes_dir			= FCPATH . APPPATH . 'config/';
+		$this->_routes_dir			= DEPLOY_CACHE_DIR;
 		$this->_routes_file			= 'routes_app.php';
 		$this->_writers				= array();
 		$this->_can_write_routes	= $this->_can_write_routes();
