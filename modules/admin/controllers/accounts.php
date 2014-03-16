@@ -280,13 +280,64 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->load->library( 'form_validation' );
 
 			//	Set rules
-			$this->form_validation->set_rules( 'group_id',			'Group',				'xss_clean|required|is_natural_no_zero' );
-			$this->form_validation->set_rules( 'password',			'Password',				'xss_clean' );
-			$this->form_validation->set_rules( 'send_activation',	'Send Welcome Email',	'xss_clean' );
-			$this->form_validation->set_rules( 'temp_pw',			'Temp Password',		'xss_clean' );
-			$this->form_validation->set_rules( 'first_name',		'First Name',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'last_name',			'Last Name',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'email',				'Email',				'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+			$this->form_validation->set_rules( 'group_id',			'',	'xss_clean|required|is_natural_no_zero' );
+			$this->form_validation->set_rules( 'password',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'send_activation',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'temp_pw',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'first_name',		'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'last_name',			'',	'xss_clean|required' );
+
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
+
+				$this->form_validation->set_rules( 'email',			'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				if ( $this->input->post( 'username' ) ) :
+
+					$this->form_validation->set_rules( 'username',	'',	'xss_clean|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				else :
+
+					$this->form_validation->set_rules( 'username',		'',	'xss_clean' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'USERNAME' ) :
+
+				$this->form_validation->set_rules( 'username',		'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				if ( $this->input->post( 'email' ) ) :
+
+					$this->form_validation->set_rules( 'email',		'',	'xss_clean|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				else :
+
+					$this->form_validation->set_rules( 'email',		'',	'xss_clean' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				if ( $this->input->post( 'email' ) ) :
+
+					$this->form_validation->set_rules( 'email',		'',	'xss_clean|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				else :
+
+					$this->form_validation->set_rules( 'email',		'',	'xss_clean' );
+
+				endif;
+
+				if ( $this->input->post( 'username' ) ) :
+
+					$this->form_validation->set_rules( 'username',	'',	'xss_clean|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				else :
+
+					$this->form_validation->set_rules( 'username',		'',	'xss_clean' );
+
+				endif;
+
+			endif;
 
 			//	Set messages
 			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
@@ -309,13 +360,27 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				endif;
 
-				$_meta						= array();
-				$_meta['first_name']		= $this->input->post( 'first_name' );
-				$_meta['last_name']			= $this->input->post( 'last_name' );
-				$_meta['temp_pw']			= (bool) $this->input->post( 'temp_pw' );
-				$_meta['inform_user_pw']	= TRUE;
+				$_meta = array();
 
-				$_new_user = $this->user->create( $_email, $_password, $_group_id, $_meta, string_to_boolean( $this->input->post( 'send_activation' ) ) );
+				if ( $this->input->post( 'email' ) ) :
+
+					$_data['email']			= $this->input->post( 'email' );
+
+				endif;
+
+				if ( $this->input->post( 'username' ) ) :
+
+					$_data['username']		= $this->input->post( 'username' );
+
+				endif;
+
+				$_data['first_name']		= $this->input->post( 'first_name' );
+				$_data['first_name']		= $this->input->post( 'first_name' );
+				$_data['last_name']			= $this->input->post( 'last_name' );
+				$_data['temp_pw']			= (bool) $this->input->post( 'temp_pw' );
+				$_data['inform_user_pw']	= TRUE;
+
+				$_new_user = $this->user->create( $_data, string_to_boolean( $this->input->post( 'send_activation' ) ) );
 
 				if ( $_new_user ) :
 
@@ -332,36 +397,36 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					// --------------------------------------------------------------------------
 
 					//	Add item to admin changelog
-					$_name = '#' . number_format( $_new_user['id'] );
+					$_name = '#' . number_format( $_new_user->id );
 
-					if ( $_meta['first_name'] ) :
+					if ( $_new_user->first_name ) :
 
-						$_name .= ' ' . $_meta['first_name'];
-
-					endif;
-
-					if ( $_meta['last_name'] ) :
-
-						$_name .= ' ' . $_meta['last_name'];
+						$_name .= ' ' . $_new_user->first_name;
 
 					endif;
 
-					_ADMIN_CHANGE_ADD( 'created', 'a', 'user', $_new_user['id'],  $_name, 'admin/accounts/edit/' . $_new_user['id'] );
+					if ( $_new_user->last_name ) :
+
+						$_name .= ' ' . $_new_user->last_name;
+
+					endif;
+
+					_ADMIN_CHANGE_ADD( 'created', 'a', 'user', $_new_user->id,  $_name, 'admin/accounts/edit/' . $_new_user->id );
 
 					// --------------------------------------------------------------------------
 
-					$this->session->set_flashdata( 'success', '<strong>Success!</strong> A user account was created for <strong>' . $_meta['first_name'] . '</strong>, update their details now.' );
-					redirect( 'admin/accounts/edit/' . $_new_user['id'] );
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> A user account was created for <strong>' . $_new_user->first_name . '</strong>, update their details now.' );
+					redirect( 'admin/accounts/edit/' . $_new_user->id );
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo;' . implode( '<br />&rsaquo; ', $this->user->get_errors() );
+					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo; ' . implode( '<br />&rsaquo; ', $this->user->get_errors() );
 
 				endif;
 
 			else :
 
-				$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account';
+				$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account. ' . $this->user->last_error();
 
 			endif;
 
@@ -370,7 +435,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the groups
-		$this->data['groups']		= $this->user->get_groups();
+		$this->data['groups'] = $this->user->get_groups();
 
 		// --------------------------------------------------------------------------
 

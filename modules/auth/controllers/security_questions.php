@@ -21,7 +21,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 {
 	public function _remap()
 	{
-		if ( APP_AUTH_TWO_FACTOR ) :
+		if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 			$_return_to	= $this->input->get( 'return_to' );
 			$_remember	= $this->input->get( 'remember' );

@@ -26,6 +26,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Set the default content-type
+		$this->output->set_content_type( 'text/html; charset=utf-8' );
+
+		// --------------------------------------------------------------------------
+
 		//	Include the composer autoloader
 		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
@@ -192,7 +197,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
 		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
 		if ( ! defined( 'APP_NATIVE_LOGIN_USING' ) )		define( 'APP_NATIVE_LOGIN_USING',		'EMAIL' );	//	[EMAIL|USERNAME|BOTH]
-		if ( ! defined( 'APP_AUTH_TWO_FACTOR' ) )			define( 'APP_AUTH_TWO_FACTOR',			FALSE );
 		if ( ! defined( 'APP_ADMIN_IP_WHITELIST' ) )		define( 'APP_ADMIN_IP_WHITELIST',		json_encode( array() ) );
 
 

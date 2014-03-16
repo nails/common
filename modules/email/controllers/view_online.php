@@ -82,6 +82,15 @@ class NAILS_View_Online extends NAILS_Email_Controller
 		$_data['sent_to']->group_id		= $_email->user->group_id;
 		$_data['sent_to']->login_url	= $_email->user->id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user->id ) . '/' . md5( $_email->user->password ) ) : NULL;
 
+		//	Check login URLs are allowed
+		$this->config->load( 'auth' );
+
+		if ( ! $this->config->item( 'auth_enable_hashed_login' ) ) :
+
+			$_data['sent_to']->login_url = '';
+
+		endif;
+
 		// --------------------------------------------------------------------------
 
 		//	Load template

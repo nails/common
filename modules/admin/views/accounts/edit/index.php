@@ -16,7 +16,9 @@
 	$this->load->view( 'accounts/edit/inc-emails' );
 	$this->load->view( 'accounts/edit/inc-password' );
 
-	if ( APP_AUTH_TWO_FACTOR ) :
+	$this->config->load( 'auth' );
+
+	if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 		$this->load->view( 'accounts/edit/inc-security-questions' );
 

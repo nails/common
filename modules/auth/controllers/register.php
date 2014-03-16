@@ -79,16 +79,55 @@ class NAILS_Register extends NAILS_Auth_Controller
 			//	Validate input
 			$this->form_validation->set_rules( 'first_name',	'First Name',			'required|xss_clean' );
 			$this->form_validation->set_rules( 'last_name',		'Surname',				'required|xss_clean' );
-			$this->form_validation->set_rules( 'email',			'Email',				'required|xss_clean|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
 			$this->form_validation->set_rules( 'password',		'Password',				'required|xss_clean' );
 			$this->form_validation->set_rules( 'terms',			'Terms & Conditions',	'required|xss_clean' );
+
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
+
+				$this->form_validation->set_rules( 'email',	'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				if ( $this->input->post( 'username' ) ) :
+
+					$this->form_validation->set_rules( 'email',	'',	'xss_clean|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'USERNAME' ) :
+
+				$this->form_validation->set_rules( 'username',	'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				if ( $this->input->post( 'email' ) ) :
+
+					$this->form_validation->set_rules( 'email',	'',	'xss_clean|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$this->form_validation->set_rules( 'email',		'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+				$this->form_validation->set_rules( 'username',	'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
 			//	Change default messages
 			$this->form_validation->set_message( 'required',				lang( 'fv_required' ) );
 			$this->form_validation->set_message( 'valid_email',				lang( 'fv_valid_email' ) );
-			$this->form_validation->set_message( 'is_unique',				lang( 'auth_register_email_is_unique', site_url( 'auth/forgotten_password' ) ) );
+
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
+
+				$this->form_validation->set_message( 'is_unique',			lang( 'auth_register_email_is_unique', site_url( 'auth/forgotten_password' ) ) );
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'USERNAME' ) :
+
+				$this->form_validation->set_message( 'is_unique',			lang( 'auth_register_username_is_unique', site_url( 'auth/forgotten_password' ) ) );
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$this->form_validation->set_message( 'is_unique',			lang( 'auth_register_identity_is_unique', site_url( 'auth/forgotten_password' ) ) );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
@@ -96,57 +135,58 @@ class NAILS_Register extends NAILS_Auth_Controller
 			if ( $this->form_validation->run() ) :
 
 				//	Attempt the registration
-				$email		= $this->input->post( 'email' );
-				$password	= $this->input->post( 'password' );
-				$remember	= $this->input->post( 'remember' );
-
-				// --------------------------------------------------------------------------
-
-				//	Meta data
-				$data['first_name']	= $this->input->post( 'first_name' );
-				$data['last_name']	= $this->input->post( 'last_name' );
+				$_data					= array();
+				$_data['email']			= $this->input->post( 'email' );
+				$_data['username']		= $this->input->post( 'username' );
+				$_data['group_id']		= APP_USER_DEFAULT_GROUP;
+				$_data['password']		= $this->input->post( 'password' );
+				$_data['first_name']	= $this->input->post( 'first_name' );
+				$_data['last_name']		= $this->input->post( 'last_name' );
 
 				// --------------------------------------------------------------------------
 
 				//	Handle referrals
 				if ( $this->session->userdata( 'referred_by' ) ) :
 
-					$data['referred_by'] = $this->session->userdata( 'referred_by' );
+					$_data['referred_by'] = $this->session->userdata( 'referred_by' );
 
 				endif;
 
 				// --------------------------------------------------------------------------
 
 				//	Create new user
-				$_uid = $this->user->create( $email, $password, APP_USER_DEFAULT_GROUP, $data );
+				$_new_user = $this->user->create( $_data );
 
-				if ( $_uid ) :
+				if ( $_new_user ) :
 
 					//	Fetch user and group data
-					$_user	= $this->user->get_by_id( $_uid['id'] );
-					$_group	= $this->user->get_group( APP_USER_DEFAULT_GROUP );
+					$_group	= $this->user->get_group( $_data['group_id'] );
 
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_user->id );
+					$this->user->set_login_data( $_new_user->id );
 
 					// --------------------------------------------------------------------------
 
 					//	Create an event for this event
-					create_event( 'did_register', $_user->id, 0, NULL, array( 'method' => 'native' ) );
+					create_event( 'did_register', $_new_user->id, 0, NULL, array( 'method' => 'native' ) );
 
 					// --------------------------------------------------------------------------
 
 					//	Redirect to the group homepage
 					//	TODO: There should be the option to enable/disable forced activation
 
-					$this->session->set_flashdata( 'success', lang( 'auth_register_flashdata_welcome', $_user->first_name ) );
+					$this->session->set_flashdata( 'success', lang( 'auth_register_flashdata_welcome', $_new_user->first_name ) );
 
 					$_redirect = $_group->registration_redirect ? $_group->registration_redirect : $_group->default_homepage;
 
 					redirect( $_redirect );
 					return;
+
+				else :
+
+					$this->data['error'] = 'Could not create new user account. ' . $this->user->last_error();
 
 				endif;
 

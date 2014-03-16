@@ -210,9 +210,9 @@ class Emailer
 			//	Sending to an ID, fetch the user's email
 			$_user = get_userobject()->get_by_id( $input->to_id );
 
-			if ( $_user ) :
+			if ( ! empty( $_user->email ) ) :
 
-				$input->to_email	= $_user->email;
+				$input->to_email = $_user->email;
 
 			endif;
 
@@ -239,6 +239,26 @@ class Emailer
 
 		$input->ref = $this->_generate_reference();
 
+		// --------------------------------------------------------------------------
+
+		//	Double check we have an email address (a user may exist but not have an
+		//	email address set)
+
+		if ( empty( $input->to_email ) ) :
+
+			if ( ! $graceful ) :
+
+				show_error( 'EMAILER: No email address to send to.' );
+
+			else :
+
+				$this->_set_error( 'EMAILER: No email address to send to.' );
+				FALSE;
+
+			endif;
+
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -390,6 +410,15 @@ class Emailer
 		$_send->template_pt				= $_email->template_file . '_plaintext';
 		$_send->data					= $_email->email_vars;
 		$_send->data['ci']				=& get_instance();
+
+		//	Check login URLs are allowed
+		get_instance()->config->load( 'auth' );
+
+		if ( ! get_instance()->config->item( 'auth_enable_hashed_login' ) ) :
+
+			$_send->to->login_url = '';
+
+		endif;
 
 		if ( ! is_array( $_send->data ) ) :
 

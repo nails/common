@@ -513,7 +513,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Two factor auth enabled?
-		if ( APP_AUTH_TWO_FACTOR ) :
+		if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 			//	Generate a token
 			$this->load->model( 'auth_model' );
@@ -609,19 +609,63 @@ class NAILS_Fb extends NAILS_Auth_Controller
 	protected function _create_user( $me )
 	{
 		//	Attempt the registration
-		$email		= $me['email'];
-		$password	= NULL;
-		$remember	= TRUE;
-
-		//	Meta data
-		$_data						= array();
+		$_data						=  array();
+		$_data['email']				= $me['email'];
+		$_data['username']			= $me['username'];
+		$_data['password']			= NULL;
 		$_data['first_name']		= $me['first_name'];
 		$_data['last_name']			= $me['last_name'];
-		$_data['username']			= $me['username'];
 		$_data['fb_id']				= $me['id'];
 		$_data['fb_token']			= $this->fb->getAccessToken();
 		$_data['auth_method_id']	= 'facebook';
-		$_data['is_verified']		= TRUE;	//	Trust the email from Facebook
+		$_data['email_is_verified']	= TRUE;	//	Trust the email from Facebook
+
+		// --------------------------------------------------------------------------
+
+		//	Set username, ensure it's valid.
+		if ( ! empty( $_me[0]->screen_name ) ) :
+
+			//	Check if their Facebook username is available
+			$_data['username'] = $me['username'];
+
+			$_user = $this->user->get_by_username( $_data['username'] );
+
+			while ( $_user ) :
+
+				$_data['username'] = increment_string( $me['username'], '' );
+				$_user = $this->user->get_by_username( $_data['username'] );
+
+			endwhile;
+
+		elseif ( ! empty( $me['first_name'] ) && ! empty( $me['last_name'] ) ) :
+
+			//	No handle, odd, try their name, keep trying it till it works
+			$_data['username'] = url_title( $me['first_name'] . ' ' . $me['last_name'], '-', TRUE );
+
+			$_user = $this->user->get_by_username( $_data['username'] );
+
+			while ( $_user ) :
+
+				$_data['username']  = increment_string( url_title( $me['first_name'] . ' ' . $me['last_name'], '-', TRUE ), '' );
+				$_user = $this->user->get_by_username( $_data['username'] );
+
+			endwhile;
+
+		else :
+
+			//	Random string
+			$_data['username'] = 'user' . date( 'YmdHis' );
+
+			$_user = $this->user->get_by_username( $_data['username'] );
+
+			while ( $_user ) :
+
+				$_data['username']  = increment_string( $_data['username'], '' );
+				$_user = $this->user->get_by_username( $_data['username'] );
+
+			endwhile;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -654,45 +698,47 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		//	Which group?
 		//	If there's a register_token set, use that if not fall back to the default
 
-		if ( isset( $this->_register_token['group'] ) && $this->_register_token['group'] ) :
+		if ( ! empty( $this->_register_token['group'] ) ) :
 
-			$_group_id = $this->_register_token['group'];
+			$_data['group_id'] = $this->_register_token['group'];
 
 		else :
 
-			$_group_id = APP_USER_DEFAULT_GROUP;
+			$_data['group_id'] = APP_USER_DEFAULT_GROUP;
 
 		endif;
 
 		//	Create new user
-		$_uid = $this->user->create( $email, $password, $_group_id, $_data );
+		$_new_user = $this->user->create( $_data );
 
-		if ( $_uid ) :
+		if ( $_new_user ) :
 
-			//	Fetch user and group data
-			$_user	= $this->user->get_by_id( $_uid['id'] );
-			$_group	= $this->user->get_group( $_group_id );
+			//	Fetch group data
+			$_group	= $this->user->get_group( $_data['group_id'] );
 
 			// --------------------------------------------------------------------------
 
 			//	Send the user the welcome email (that is, if there is one)
-			$this->load->library( 'emailer' );
+			if ( $_new_user->email ) :
 
-			$_email					= new stdClass();
-			$_email->type			= 'new_user_' . $_group->id;
-			$_email->to_id			= $_user->id;
-			$_email->data			= array();
-			$_email->data['method']	= 'facebook';
+				$this->load->library( 'emailer' );
 
-
-			if ( ! $this->emailer->send( $_email, TRUE ) ) :
-
-				//	Failed to send using the group email, try using the generic email template
-				$_email->type = 'new_user';
+				$_email					= new stdClass();
+				$_email->type			= 'new_user_' . $_group->id;
+				$_email->to_id			= $_new_user->id;
+				$_email->data			= array();
+				$_email->data['method']	= 'facebook';
 
 				if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
-					//	Email failed to send, musn't exist, oh well.
+					//	Failed to send using the group email, try using the generic email template
+					$_email->type = 'new_user';
+
+					if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+						//	Email failed to send, musn't exist, oh well.
+
+					endif;
 
 				endif;
 
@@ -701,17 +747,17 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Log the user in
-			$this->user->set_login_data( $_user->id );
+			$this->user->set_login_data( $_new_user->id );
 
 			// --------------------------------------------------------------------------
 
 			//	Create an event for this event
-			create_event( 'did_register', $_user->id, 0, NULL, array( 'method' => 'facebook' ) );
+			create_event( 'did_register', $_new_user->id, 0, NULL, array( 'method' => 'facebook' ) );
 
 			// --------------------------------------------------------------------------
 
 			//	Redirect
-			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
+			$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_new_user->first_name ) );
 			$this->session->set_flashdata( 'from_facebook', TRUE );
 
 			//	Registrations will be forced to the registration redirect, regardless of

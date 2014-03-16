@@ -125,7 +125,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 
 					if ( $_login ) :
 
-						if ( APP_AUTH_TWO_FACTOR ) :
+						if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 							$_query	= array();
 

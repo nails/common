@@ -32,7 +32,7 @@ class NAILS_Unsubscribe extends NAILS_Email_Controller
 	{
 		if ( ! $this->user->is_logged_in() ) :
 
-			show_404();
+			unauthorised();
 
 		endif;
 

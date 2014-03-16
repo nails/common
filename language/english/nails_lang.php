@@ -66,6 +66,8 @@
 	$lang['fv_valid_email']					= 'This must be a valid email.';
 	$lang['fv_valid_email_field']			= 'The %s field is must be a valid email.';
 	$lang['fv_email_already_registered']	= 'This email is already registered.';
+	$lang['fv_username_already_registered']	= 'This username is already registered.';
+	$lang['fv_identity_already_registered']	= 'This is already registered.';
 	$lang['fv_matches']						= 'This field does not match the %2$s field.';
 	$lang['fv_matches_field']				= 'The %s field does not match the %s field.';
 	$lang['fv_is_unique']					= 'This field must be unique.';

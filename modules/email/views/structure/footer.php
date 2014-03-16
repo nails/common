@@ -18,28 +18,34 @@
 		// --------------------------------------------------------------------------
 
 		//	1-Click unsubscribe
+		$_login_url	= $sent_to->login_url . '?return_to=';
+		$_return	= '/email/unsubscribe?token=';
+
+		//	Bit of a hack; keep trying until there's no + symbol in the hash, try up to 20 times before giving up
+		//	TODO: make this less hacky
+
+		$_counter	= 0;
+		$_attemps	= 20;
+
+		do
+		{
+			$_token = $this->encrypt->encode( $email_type_id . '|' . $email_ref . '|' . $sent_to->email, $secret );
+			$_counter++;
+		}
+		while( $_counter <= $_attemps && strpos( $_token, '+') !== FALSE );
+
+		//	Link, autologin if possible
 		if ( ! empty( $sent_to->login_url ) ) :
 
-			$_login_url	= $sent_to->login_url . '?return_to=';
-			$_return	= '/email/unsubscribe?token=';
+			$_url = $_login_url . urlencode( $_return . $_token );
 
-			//	Bit of a hack; keep trying until there's no + symbol in the hash, try up to 20 times before giving up
-			//	TODO: make this less hacky
+		else :
 
-			$_counter	= 0;
-			$_attemps	= 20;
-
-			do
-			{
-				$_token = $this->encrypt->encode( $email_type_id . '|' . $email_ref . '|' . $sent_to->email, $secret );
-				$_counter++;
-			}
-			while( $_counter <= $_attemps && strpos( $_token, '+') !== FALSE );
-
-			//	Link
-			$_links[] = anchor( $_login_url . urlencode( $_return . $_token ), 'Unsubscribe' );
+			$_url = $_return . $_token;
 
 		endif;
+
+		$_links[] = anchor( $_url, 'Unsubscribe' );
 
 		// --------------------------------------------------------------------------
 

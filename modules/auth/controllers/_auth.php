@@ -16,8 +16,8 @@ class NAILS_Auth_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load model
-		$this->load->model( 'auth_model' );
+		//	Load config
+		$this->config->load( 'auth' );
 
 		// --------------------------------------------------------------------------
 
@@ -26,10 +26,10 @@ class NAILS_Auth_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load config
-		$this->config->load( 'auth' );
+		//	Load model
+		$this->load->model( 'auth_model' );
 	}
 }
 
 /* End of file _auth.php */
-/* Location: ./application/modules/api/controllers/_auth.php */
+/* Location: ./application/modules/auth/controllers/_auth.php */

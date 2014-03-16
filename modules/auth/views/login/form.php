@@ -127,20 +127,27 @@
 			<!--	REMEMBER ME CHECKBOX	-->
 			<?php
 
-				$_field	= 'remember';
-				$_name	= lang( 'auth_login_label_remember_me' );
-				$_error = form_error( $_field ) ? 'error' : NULL
+				if ( $this->config->item( 'auth_enable_remember_me' ) ) :
+
+					$_field	= 'remember';
+					$_name	= lang( 'auth_login_label_remember_me' );
+					$_error = form_error( $_field ) ? 'error' : NULL
+
+					?>
+					<div class="row">
+						<label class="two columns first">&nbsp;</label>
+						<div class="four columns last">
+							<label class="checkbox">
+								<?=form_checkbox( $_field, TRUE, TRUE )?>
+								<?=$_name?>
+							</label>
+						</div>
+					</div>
+					<?php
+
+			endif;
 
 			?>
-			<div class="row">
-				<label class="two columns first">&nbsp;</label>
-				<div class="four columns last">
-					<label class="checkbox">
-						<?=form_checkbox( $_field, TRUE, TRUE )?>
-						<?=$_name?>
-					</label>
-				</div>
-			</div>
 
 
 			<div class="row button-row">

@@ -29,11 +29,23 @@ if ( ! function_exists( 'show_401' ) )
 
 		$_ci->session->set_flashdata( 'message', $message );
 
-		$_return_to = ( $_ci->uri->uri_string() ) ? '?return_to=' . urlencode( $_ci->uri->uri_string() ) : NULL;
+		if ( $_ci->input->server( 'REQUEST_URI' ) ) :
 
-		redirect( 'auth/login' . $_return_to );
+			$_return = $_ci->input->server( 'REQUEST_URI' );
 
-		exit( 0 );
+		elseif( uri_string() ) :
+
+			$_return = uri_string();
+
+		else :
+
+			$_return = '';
+
+		endif;
+
+		$_return = $_return ? '?return_to=' . urlencode( $_return ) : '';
+
+		redirect( 'auth/login' . $_return );
 	}
 }
 

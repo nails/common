@@ -163,7 +163,7 @@ class NAILS_Auth_model extends NAILS_Model
 				//	If two factor auth is enabled then don't _actually_ set login data
 				//	the next process will confirm the login and set this.
 
-				if ( ! APP_AUTH_TWO_FACTOR ) :
+				if ( ! $this->config->item( 'auth_two_factor_enable' ) ) :
 
 					//	Set login data for this user
 					$this->user->set_login_data( $_user->id );
@@ -191,7 +191,7 @@ class NAILS_Auth_model extends NAILS_Model
 				);
 
 				//	Two factor auth?
-				if (  APP_AUTH_TWO_FACTOR ) :
+				if (  $this->config->item( 'auth_two_factor_enable' ) ) :
 
 					//	Generate token
 					$_return['two_factor_auth'] = $this->generate_two_factor_token( $_user->id );

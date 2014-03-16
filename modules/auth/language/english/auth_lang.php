@@ -118,11 +118,14 @@
 
 	//	Register lang strings
 	$lang['auth_register_email_is_unique']				= 'This email is already registered. Have you <a href="%s">forgotten your password</a>?';
+	$lang['auth_register_username_is_unique']			= 'This username is already registered. Have you <a href="%s">forgotten your password</a>?';
+	$lang['auth_register_identity_is_unique']			= 'This is already registered. Have you <a href="%s">forgotten your password</a>?';
 	$lang['auth_register_flashdata_welcome']			= '<strong>Welcome, %s!</strong>';
 	$lang['auth_register_message']						= 'To register with %s simply complete the following form.';
 	$lang['auth_register_first_name_placeholder']		= 'Your first name';
 	$lang['auth_register_last_name_placeholder']		= 'Your Surname';
 	$lang['auth_register_email_placeholder']			= 'A valid email address';
+	$lang['auth_register_username_placeholder']			= 'Your desired username';
 	$lang['auth_register_password_placeholder']			= 'Choose a password';
 	$lang['auth_register_label_accept_tc']				= 'I accept the <a href="%s">T&amp;C\'s</a>';
 
@@ -174,7 +177,7 @@
 	$lang['auth_forgot_invalid_code']					= '<strong>Sorry,</strong> Invalid or expired password reset token.';
 	$lang['auth_forgot_reset_badlogin']					= '<strong>Sorry,</strong> something when wrong and you were not logged in. Please try <a href="%s">logging in with your new password</a>.';
 	$lang['auth_forgot_reminder']						= '<strong>In case you forgot,</strong> your temporary password is <strong>%s</strong>. You won\'t be shown this message again.';
-	$lang['auth_forgot_reset_ok']						= 'Please log in using this temporary password: <strong>%s</strong>';
+	$lang['auth_forgot_reset_ok']						= 'Please log in using this temporary password:';
 	$lang['auth_forgot_action_proceed']					= 'Proceed to Log In';
 
 

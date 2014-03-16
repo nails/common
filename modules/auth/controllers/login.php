@@ -179,7 +179,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 						redirect( 'auth/reset_password/' . $_login['temp_pw']['id'] . '/' . $_login['temp_pw']['hash'] . $_query );
 						return;
 
-					elseif ( APP_AUTH_TWO_FACTOR ) :
+					elseif ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 						$_query	= array();
 
@@ -278,6 +278,14 @@ class NAILS_Login extends NAILS_Auth_Controller
 	 **/
 	public function with_hashes()
 	{
+		if ( ! $this->config->item( 'auth_enable_hashed_login' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_hash['id']	= $this->uri->segment( 4 );
 		$_hash['pw']	= $this->uri->segment( 5 );
 

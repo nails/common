@@ -59,21 +59,49 @@
 
 	<?php
 
-		$_field			= 'email';
-		$_name			= lang( 'form_label_email' );
-		$_placeholder	= lang( 'auth_register_email_placeholder' );
-		$_error			= form_error( $_field ) ? 'error' : NULL
+		if ( APP_NATIVE_LOGIN_USING == 'EMAIL' || APP_NATIVE_LOGIN_USING == 'BOTH' ) :
 
-	?>
-	<div class="row <?=$_error?>">
-		<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-		<div class="four columns">
-			<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-			<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-		</div>
-	</div>
+			$_field			= 'email';
+			$_name			= lang( 'form_label_email' );
+			$_placeholder	= lang( 'auth_register_email_placeholder' );
+			$_error			= form_error( $_field ) ? 'error' : NULL;
+			$_default		= ! empty( $email ) ? $email : '';
 
-	<?php
+			?>
+			<div class="row <?=$_error?>">
+				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
+				<div class="four columns">
+					<?=form_input( $_field, set_value( $_field, $_default ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
+					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+				</div>
+			</div>
+			<?php
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( APP_NATIVE_LOGIN_USING == 'USERNAME' || APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+			$_field			= 'username';
+			$_name			= lang( 'form_label_username' );
+			$_placeholder	= lang( 'auth_register_username_placeholder' );
+			$_error			= form_error( $_field ) ? 'error' : NULL;
+			$_default		= ! empty( $username ) ? $username : '';
+
+			?>
+			<div class="row <?=$_error?>">
+				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
+				<div class="four columns">
+					<?=form_input( $_field, set_value( $_field, $_default ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
+					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+				</div>
+			</div>
+			<?php
+
+		endif;
+
+		// --------------------------------------------------------------------------
 
 		if ( ! $first_name || ! $last_name ) :
 

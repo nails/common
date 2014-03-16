@@ -12,13 +12,31 @@
 |
 */
 
+//	Disable errors when submitting the forgotten password form
 $config['auth_forgotten_pass_always_succeed']	= FALSE;
 
+//	Toggle the "remember me" functionality
+$config['auth_enable_remember_me']				= FALSE;
+
+//	Toggle logins via hashes functionality
+$config['auth_enable_hashed_login']				= FALSE;
+
+//	On login show the last seen time as a human friendly string
 $config['auth_show_nicetime_on_login']			= TRUE;
+
+//	On login show the last known IP of the user
 $config['auth_show_last_ip_on_login']			= FALSE;
 
+//	Toggle two factor security
+$config['auth_two_factor_enable']				= TRUE;
+
+//	If enabled, define how many system questions a user must have
 $config['auth_two_factor_num_questions']		= 1;
+
+//	If enabled, define how many custom questons a user must have
 $config['auth_two_factor_num_custom_question']	= 0;
+
+//	Define system questions for two factor auth
 $config['auth_two_factor_questions']			= array();
 $config['auth_two_factor_questions'][]			= 'What was your childhood nickname? ';
 $config['auth_two_factor_questions'][]			= 'In what city did you meet your spouse/significant other?';
@@ -41,13 +59,27 @@ $config['auth_two_factor_questions'][]			= 'What is the name of the place your w
 $config['auth_two_factor_questions'][]			= 'What is the name of a college or university you applied to but didn\'t attend?';
 $config['auth_two_factor_questions'][]			= 'Where were you when you first heard about 9/11?';
 
+//	Define password strength rules
 $config['auth_password_rules']					= array();
+
+//	Minimum password length
 $config['auth_password_rules']['min_length']	= 6;
+
+//	Maximum password length, 0 means unlimited length
+$config['auth_password_rules']['max_length']	= 0;
+
+//	Define sets of characters which a password must contain
+//	symbol, lower_alpha, upper_alpha and number are special
+//	strings and will render the charset for you. Any other
+//	string will be treated as a charset itself.
+
 $config['auth_password_rules']['contains']		= array();
 $config['auth_password_rules']['contains'][]	= 'symbol';
 $config['auth_password_rules']['contains'][]	= 'lower_alpha';
 $config['auth_password_rules']['contains'][]	= 'upper_alpha';
 $config['auth_password_rules']['contains'][]	= 'number';
+
+//	Define strings which should not be used as a password
 $config['auth_password_rules']['is_not']		= array();
 $config['auth_password_rules']['is_not'][]		= 'password';
 $config['auth_password_rules']['is_not'][]		= '123456789';

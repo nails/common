@@ -271,7 +271,8 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 		//	Attempt to verify code, if twof actor auth is enabled then don't  generate
 		//	a new password, we'll need the user to jump through some hoops first.
 
-		$_generate_new_pw = APP_AUTH_TWO_FACTOR ? FALSE : TRUE;
+		$_generate_new_pw = ! $this->config->item( 'auth_two_factor_enable' );
+
 		$_new_pw = $this->user->validate_password_token( $code, $_generate_new_pw );
 
 		// --------------------------------------------------------------------------
@@ -289,7 +290,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 		else :
 
-			if ( APP_AUTH_TWO_FACTOR ) :
+			if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 				//	Show them a security question
 				$this->data['question'] = $this->user->get_security_question( $_new_pw['user_id'] );
@@ -310,7 +311,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 							// --------------------------------------------------------------------------
 
 							//	Set some flashdata for the login page when they go to it; just a little reminder
-							$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+							$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', htmlentities( $_new_pw['password'] ) ) );
 
 							// --------------------------------------------------------------------------
 
@@ -345,7 +346,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Set some flashdata for the login page when they go to it; just a little reminder
-					$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+					$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', htmlentities( $_new_pw['password'] ) ) );
 
 					// --------------------------------------------------------------------------
 
@@ -365,7 +366,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 
 				//	Set some flashdata for the login page when they go to it; just a little reminder
-				$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', $_new_pw['password'] ) );
+				$this->session->set_flashdata( 'notice', lang( 'auth_forgot_reminder', htmlentities( $_new_pw['password'] ) ) );
 
 				// --------------------------------------------------------------------------
 

@@ -472,7 +472,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Two factor auth enabled?
-		if ( APP_AUTH_TWO_FACTOR ) :
+		if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 			//	Generate a token
 			$this->load->model( 'auth_model' );
@@ -594,35 +594,120 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Set the user's username as their Twitter handle, check it's available, if
+		//	it's not, try their name. If that fails stick a random number on the end
+		//	of their handle
+
+		if ( ! empty( $_me[0]->screen_name ) ) :
+
+			//	Check if their Twitter handle is available
+			$this->data['username'] = url_title( $_me[0]->screen_name, '-', TRUE );
+
+			$_user = $this->user->get_by_username( $this->data['username'] );
+
+			while( $_user ) :
+
+				$this->data['username']  = increment_string( url_title( $_me[0]->screen_name, '-', TRUE ), '' );
+				$_user = $this->user->get_by_username( $this->data['username'] );
+
+			endwhile;
+
+		elseif ( ! empty( $_me[0]->name ) ) :
+
+			//	No handle, odd, try their name, keep trying it till it works
+			$this->data['username'] = url_title( $_me[0]->name, '-', TRUE );
+
+			$_user = $this->user->get_by_username( $this->data['username'] );
+
+			while( $_user ) :
+
+				$this->data['username']  = increment_string( url_title( $_me[0]->name, '-', TRUE ), '' );
+				$_user = $this->user->get_by_username( $this->data['username'] );
+
+			endwhile;
+
+		else :
+
+			//	Random string
+			$this->data['username'] = 'user' . date( 'YmdHis' );
+
+			$_user = $this->user->get_by_username( $this->data['username'] );
+
+			while ( $_user ) :
+
+				$this->data['username']  = increment_string( $this->data['username'], '' );
+				$_user = $this->user->get_by_username( $this->data['username'] );
+
+			endwhile;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		if ( $this->input->post() ) :
 
 			//	Validate the form and attempt the registration
 			$this->load->library( 'form_validation' );
 
 			//	Set rules
-			$this->form_validation->set_rules( 'email',	'Email',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
+
+				$this->form_validation->set_rules( 'email',	'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				if ( $this->input->post( 'username' ) ) :
+
+					$this->form_validation->set_rules( 'email',	'',	'xss_clean|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'USERNAME' ) :
+
+				$this->form_validation->set_rules( 'username',	'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+				if ( $this->input->post( 'email' ) ) :
+
+					$this->form_validation->set_rules( 'email',	'',	'xss_clean|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+
+				endif;
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$this->form_validation->set_rules( 'email',		'',	'xss_clean|required|valid_email|is_unique[' . NAILS_DB_PREFIX . 'user_email.email]' );
+				$this->form_validation->set_rules( 'username',	'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'user.username]' );
+
+			endif;
 
 			if ( ! $this->data['first_name'] || ! $this->data['last_name'] ) :
 
-				$this->form_validation->set_rules( 'first_name',	'First Name',	'xss_clean|required' );
-				$this->form_validation->set_rules( 'last_name',		'Surname',		'xss_clean|required' );
+				$this->form_validation->set_rules( 'first_name',	'',	'xss_clean|required' );
+				$this->form_validation->set_rules( 'last_name',		'',	'xss_clean|required' );
 
 			endif;
 
 			//	Set messages
-			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
-			$this->form_validation->set_message( 'is_unique',	lang( 'fv_email_already_registered' ) . ' ' . anchor( 'auth/forgotten_password', lang( 'auth_login_forgot' ) ) );
+			$this->form_validation->set_message( 'required',		lang( 'fv_required' ) );
+
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
+
+				$this->form_validation->set_message( 'is_unique',	lang( 'fv_email_already_registered', site_url( 'auth/forgotten_password' ) ) );
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'USERNAME' ) :
+
+				$this->form_validation->set_message( 'is_unique',	lang( 'fv_username_already_registered', site_url( 'auth/forgotten_password' ) ) );
+
+			elseif ( APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$this->form_validation->set_message( 'is_unique',	lang( 'fv_identity_already_registered', site_url( 'auth/forgotten_password' ) ) );
+
+			endif;
 
 			//	Execute
 			if ( $this->form_validation->run() ) :
 
-				$email		= $this->input->post( 'email' );
-				$password	= NULL;
-				$remember	= TRUE;
+				$_data				= array();
+				$_data['email']		= $this->input->post( 'email' );
+				$_data['username']	= $this->input->post( 'username' );
 
-				$_data = array();
-
-				//	Meta data
 				if ( ! $this->data['first_name'] || ! $this->data['last_name'] ) :
 
 					$_data['first_name']	= $this->input->post( 'first_name' );
@@ -635,7 +720,6 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 				endif;
 
-				$_data['username']			= $access_token->screen_name;
 				$_data['tw_id']				= $access_token->user_id;
 				$_data['tw_token']			= $access_token->oauth_token;
 				$_data['tw_secret']			= $access_token->oauth_token_secret;
@@ -657,22 +741,21 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 				if ( isset( $this->_register_token['group'] ) && $this->_register_token['group'] ) :
 
-					$_group_id = $this->_register_token['group'];
+					$_data['group_id'] = $this->_register_token['group'];
 
 				else :
 
-					$_group_id = APP_USER_DEFAULT_GROUP;
+					$_data['group_id'] = APP_USER_DEFAULT_GROUP;
 
 				endif;
 
 				//	Create new user
-				$_uid = $this->user->create( $email, $password, $_group_id, $_data );
+				$_new_user = $this->user->create( $_data );
 
-				if ( $_uid ) :
+				if ( $_new_user ) :
 
-					//	Fetch user and group data
-					$_user	= $this->user->get_by_id( $_uid['id'] );
-					$_group	= $this->user->get_group( $_group_id );
+					//	Fetch group data
+					$_group	= $this->user->get_group( $_data['group_id'] );
 
 					// --------------------------------------------------------------------------
 
@@ -681,7 +764,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 
 					$_email					= new stdClass();
 					$_email->type			= 'new_user_' . $_group->id;
-					$_email->to_id			= $_user->id;
+					$_email->to_id			= $_new_user->id;
 					$_email->data			= array();
 					$_email->data['method']	= 'twitter';
 
@@ -701,12 +784,12 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_user->id );
+					$this->user->set_login_data( $_new_user->id );
 
 					// --------------------------------------------------------------------------
 
 					//	Create an event for this event
-					create_event( 'did_register', $_user->id, 0, NULL, array( 'method' => 'twitter' ) );
+					create_event( 'did_register', $_new_user->id, 0, NULL, array( 'method' => 'twitter' ) );
 
 					// --------------------------------------------------------------------------
 
@@ -716,7 +799,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 					// --------------------------------------------------------------------------
 
 					//	Redirect
-					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_user->first_name ) );
+					$this->session->set_flashdata( 'success', lang( 'auth_social_register_ok', $_new_user->first_name ) );
 					$this->session->set_flashdata( 'from_twitter', TRUE );
 
 					//	Registrations will be forced to the registration redirect, regardless of

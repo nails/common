@@ -60,6 +60,7 @@
 	$lang['accounts_create_field_first_placeholder']	= 'The user\'s first name';
 	$lang['accounts_create_field_last_placeholder']		= 'The user\'s surname';
 	$lang['accounts_create_field_email_placeholder']	= 'The user\'s email address';
+	$lang['accounts_create_field_username_placeholder']	= 'The user\'s username';
 	$lang['accounts_create_submit']						= 'Create User';
 
 	// --------------------------------------------------------------------------
