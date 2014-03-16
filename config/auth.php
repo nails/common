@@ -19,7 +19,7 @@ $config['auth_forgotten_pass_always_succeed']	= FALSE;
 $config['auth_enable_remember_me']				= FALSE;
 
 //	Toggle logins via hashes functionality
-$config['auth_enable_hashed_login']				= FALSE;
+$config['auth_enable_hashed_login']				= TRUE;
 
 //	On login show the last seen time as a human friendly string
 $config['auth_show_nicetime_on_login']			= TRUE;
@@ -28,7 +28,7 @@ $config['auth_show_nicetime_on_login']			= TRUE;
 $config['auth_show_last_ip_on_login']			= FALSE;
 
 //	Toggle two factor security
-$config['auth_two_factor_enable']				= TRUE;
+$config['auth_two_factor_enable']				= FALSE;
 
 //	If enabled, define how many system questions a user must have
 $config['auth_two_factor_num_questions']		= 1;
