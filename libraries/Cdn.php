@@ -3399,8 +3399,35 @@ class Cdn {
 
 			// --------------------------------------------------------------------------
 
-			//	Can we write a small image to the bucket?
-			$_file = NAILS_PATH . 'assets/tests/cdn/pablo.jpg';
+			//	Can we write a small image to the bucket? Or a PDf, whatever the bucket
+			//	will accept. Do these in order of filesize, we want to be dealing with as
+			//	small a file as possible.
+
+			$_file			= array();
+			$_file['txt']	= NAILS_PATH . 'assets/tests/cdn/txt.txt';
+			$_file['jpg']	= NAILS_PATH . 'assets/tests/cdn/jpg.jpg';
+			$_file['pdf']	= NAILS_PATH . 'assets/tests/cdn/pdf.pdf';
+
+			if ( empty( $_bucket->allowed_types ) ) :
+
+				//	Not specified, use the txt as it's so tiny
+				$_file = $_file['txt'];
+
+			else :
+
+				//	find a file we can use
+				foreach( $_file AS $ext => $path ) :
+
+					if ( array_search( $ext, $_bucket->allowed_types ) !== FALSE ) :
+
+						$_file = $path;
+						break;
+
+					endif;
+
+				endforeach;
+
+			endif;
 
 			//	Copy this file temporarily to the cache
 			$_cachefile = DEPLOY_CACHE_DIR . 'test-' . $bucket->slug . '-' . $_test_id . '.jpg';

@@ -478,12 +478,8 @@ class NAILS_Test extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Is the app routes file writeable? Various modules might require access to it
-		if ( module_is_enabled( 'cms' ) || module_is_enabled( 'blog' ) || module_is_enabled( 'shop' ) ) :
-
-			$_dirs[] = FCPATH . APPPATH . 'config/routes_app.php';
-
-		endif;
+		//	the routes_app.php file should exist
+		$_dirs[] = DEPLOY_CACHE_DIR . 'routes_app.php';
 
 		// --------------------------------------------------------------------------
 
@@ -547,12 +543,12 @@ class NAILS_Test extends NAILS_System_Controller
 		else :
 
 			//	Send the email
-			$_email->to_email	= APP_DEVELOPER_EMAIL;
+			$_email->to_email = APP_DEVELOPER_EMAIL;
 
 			$_config = array( 'graceful_startup' => TRUE );
 			$this->load->library( 'emailer', $_config );
 
-			//	Any startup errorS?
+			//	Any startup errors?
 			if ( $this->emailer->get_errors() ) :
 
 				$this->_result->pass	= FALSE;
