@@ -180,4 +180,21 @@ class MX_Config extends CI_Config
 			return $this->item($file);
 		}
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Secure Base URL
+	 * Returns secure_base_url [. uri_string]
+	 *
+	 * @access public
+	 * @param string $uri
+	 * @return string
+	 */
+	function secure_base_url($uri = '')
+	{
+		return SECURE_BASE_URL.ltrim($this->_uri_string($uri), '/');
+	}
 }

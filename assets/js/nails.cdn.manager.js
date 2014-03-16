@@ -329,7 +329,15 @@ NAILS_CDN_Manager =  function() {
 
 	this._add_tag_fail = function( dropabble, draggable, data )
 	{
-		var _data = JSON.parse( data.responseText );
+		var _data;
+		try
+		{
+			_data = JSON.parse( data.responseText );
+		}
+		catch( err )
+		{
+			_data = { 'error' : 'An unknown error occurred' };
+		}
 		alert( _data.error );
 		dropabble.find( '.count' ).removeClass( 'saving' );
 	};
@@ -351,7 +359,15 @@ NAILS_CDN_Manager =  function() {
 
 	this._remove_tag_fail = function( dropabble, draggable, data )
 	{
-		var _data = JSON.parse( data.responseText );
+		var _data;
+		try
+		{
+			_data = JSON.parse( data.responseText );
+		}
+		catch( err )
+		{
+			_data = { 'error' : 'An unknown error occurred' };
+		}
 		alert( _data.error );
 		dropabble.removeClass( 'saving' );
 	};

@@ -38,7 +38,7 @@
 	//	will most likely contain a full URL, causing form_open() not to site_url() it (resulting in the
 	//	form posting to auth/login rather than /auth/login).
 
-	$_return_to = $return_to ? '?return_to=' . $return_to : '';
+	$_return_to = $return_to ? '?return_to=' . urlencode( $return_to ) : '';
 
 	echo form_open( site_url( 'auth/login' . $_return_to ), $attr );
 

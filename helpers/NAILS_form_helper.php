@@ -1,5 +1,69 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * form_field
+ *
+ * Generates a form field (of type text, password or textarea)
+ *
+ * @access	public
+ * @param	array
+ * @param	mixed
+ * @return	string
+ */
+if ( ! function_exists('form_open'))
+{
+	function form_open($action = '', $attributes = '', $hidden = array())
+	{
+		$CI =& get_instance();
+
+		if ($attributes == '')
+		{
+			$attributes = 'method="post"';
+		}
+
+		// If an action is not a full URL then turn it into one
+		if ($action && strpos($action, '://') === FALSE)
+		{
+			$action = $CI->config->site_url($action);
+		}
+
+		// If no action is provided then set to the current url
+		$action OR $action = $CI->config->site_url($CI->uri->uri_string());
+
+		$form = '<form action="'.$action.'"';
+
+		$form .= _attributes_to_string($attributes, TRUE);
+
+		$form .= '>';
+
+		// Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
+
+		$_base_url			= $CI->config->base_url();
+		$_secure_base_url	= $CI->config->secure_base_url();
+
+		if ($CI->config->item('csrf_protection') === TRUE AND ! (strpos($action, $_base_url) === FALSE OR strpos($form, 'method="get"')))
+		{
+			$hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
+		}
+
+		//	If the secure_base_url is different, then do a check for that domain/url too.
+		if ( $_base_url != $_secure_base_url ) :
+
+			if ($CI->config->item('csrf_protection') === TRUE AND ! (strpos($action, $_secure_base_url) === FALSE OR strpos($form, 'method="get"')))
+			{
+				$hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
+			}
+
+			if (is_array($hidden) AND count($hidden) > 0)
+			{
+				$form .= sprintf("<div style=\"display:none\">%s</div>", form_hidden($hidden));
+			}
+
+		endif;
+
+		return $form;
+	}
+}
 
 /**
  * form_field

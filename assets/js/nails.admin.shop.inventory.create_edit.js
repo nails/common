@@ -472,6 +472,9 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		var _this = this;
 
 		//	Init uploadify
+		//	TODO: replace uploadify, it's lack of session support is killing me.
+		//	Additionally, if CSRF is enabled, this won't work.
+
 		$('#file_upload').uploadify({
 			'debug': false,
 			'auto': true,
@@ -534,7 +537,15 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				$('#' + file.id + ' .progress').css('height', _percent + '%');
 			},
 			'onUploadSuccess': function(file, data) {
-				var _data = JSON.parse(data);
+				var _data;
+				try
+				{
+					_data = JSON.parse( data );
+				}
+				catch( err )
+				{
+					_data = {};
+				}
 
 				// --------------------------------------------------------------------------
 

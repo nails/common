@@ -346,8 +346,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			//	the server will respond with the page's ID, make sure this is set
 			//	in the page_data object
 
-			var _this = this;
-
 			var _publish_action;
 
 			if ( is_published === true )
@@ -359,79 +357,22 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				_publish_action = 'NONE';
 			}
 
-			$.ajax(
+			var _call =
 			{
-				type: 'POST',
-				url: window.SITE_URL + 'api/cms/pages/save',
-				async: this._async_save,
-				data:
+				'controller'	: 'cms/pages',
+				'method'		: 'save',
+				'action'		: 'POST',
+				'async'			: this._async_save,
+				'data'			:
 				{
-					page_data		: JSON.stringify( this.page_data ),
-					publish_action	: _publish_action
+					'page_data'			: JSON.stringify( this.page_data ),
+					'publish_action'	: _publish_action
 				},
-				success: function( data )
-				{
-					//	Use data, if we get 200 OK then save was a success and payload
-					//	will be the page's ID as the server thinks it is.
+				'success'		: $.proxy( function( data ) { this._save_ok( success_callback, data ); }, this ),
+				'error'			: $.proxy( function( data ) { this._save_fail( error_callback, data ); }, this ),
+			};
 
-					if ( data.status === 200 )
-					{
-						//	Set the page ID
-						_this.page_data.id = data.id;
-
-						//	Reset the hash
-						_this.page_data.hash = _this._generate_data_hash();
-
-						//	Feedback to the user
-						$( '#save-status' ).removeClass( 'saving' );
-
-						var _date	= new Date();
-						var _hours	= _date.getHours() < 10 ? '0' + _date.getHours() : _date.getHours();
-						var _mins	= _date.getMinutes() < 10 ? '0' + _date.getMinutes() : _date.getMinutes();
-						var _str	= _hours + ':' + _mins;
-
-
-						$( '#save-status .last-saved').text( _str );
-
-						console.log( 'Save completed successfully' );
-					}
-					else
-					{
-						$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
-						$( '#save-status .last-saved').text( 'ERROR: ' + data.error );
-						console.log( 'Save failed: ' + data.error );
-					}
-
-					_this._saving = false;
-
-					// --------------------------------------------------------------------------
-
-					//	Execute any custom callback
-					if ( typeof( success_callback ) === 'function' )
-					{
-						success_callback.call( undefined, data );
-					}
-				},
-				error: function( data )
-				{
-					var _data = JSON.parse( data.responseText );
-
-					$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
-					$( '#save-status .last-saved').text( 'ERROR: ' + _data.error );
-
-					console.log( 'Save failed: ' + _data.error );
-
-					_this._saving = false;
-
-					// --------------------------------------------------------------------------
-
-					//	Execute any custom callback
-					if ( typeof( error_callback ) === 'function' )
-					{
-						error_callback.call( undefined, _data );
-					}
-				}
-			});
+			window.NAILS.API.call( _call );
 
 			return true;
 		}
@@ -439,6 +380,87 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		{
 			console.log( 'Page data hasn\'t changed, ignoring call' );
 			return false;
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._save_ok = function( success_callback, data )
+	{
+		//	Use data, if we get 200 OK then save was a success and payload
+		//	will be the page's ID as the server thinks it is.
+
+		if ( data.status === 200 )
+		{
+			//	Set the page ID
+			this.page_data.id = data.id;
+
+			//	Reset the hash
+			this.page_data.hash = this._generate_data_hash();
+
+			//	Feedback to the user
+			$( '#save-status' ).removeClass( 'saving' );
+
+			var _date	= new Date();
+			var _hours	= _date.getHours() < 10 ? '0' + _date.getHours() : _date.getHours();
+			var _mins	= _date.getMinutes() < 10 ? '0' + _date.getMinutes() : _date.getMinutes();
+			var _str	= _hours + ':' + _mins;
+
+
+			$( '#save-status .last-saved').text( _str );
+
+			console.log( 'Save completed successfully' );
+		}
+		else
+		{
+			$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
+			$( '#save-status .last-saved').text( 'ERROR: ' + data.error );
+			console.log( 'Save failed: ' + data.error );
+		}
+
+		this._saving = false;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute any custom callback
+		if ( typeof( success_callback ) === 'function' )
+		{
+			success_callback.call( undefined, data );
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._save_fail = function( error_callback, data )
+	{
+		var _data;
+
+		try
+		{
+			_data = JSON.parse( data.responseText );
+		}
+		catch( err )
+		{
+			_data = {};
+		}
+
+		$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
+		$( '#save-status .last-saved').text( 'ERROR: ' + _data.error );
+
+		console.log( 'Save failed: ' + _data.error );
+
+		this._saving = false;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute any custom callback
+		if ( typeof( error_callback ) === 'function' )
+		{
+			error_callback.call( undefined, _data );
 		}
 	};
 

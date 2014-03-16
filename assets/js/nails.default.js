@@ -22,21 +22,6 @@ if ( typeof( console ) === "undefined" )
 
 // --------------------------------------------------------------------------
 
-//	Import libraries - no need to load them individually
-//@codekit-prepend 'jquery.js';
-//@codekit-prepend 'jquery.ui.js';
-//@codekit-prepend 'jquery.ui.datetimepicker.js';
-//@codekit-prepend 'jquery.tipsy.js';
-//@codekit-prepend 'jquery.fancybox.js';
-//@codekit-prepend 'jquery.fancybox.thumbs.js';
-//@codekit-prepend 'jquery.fancybox.media.js';
-//@codekit-prepend 'jquery.fancybox.buttons.js';
-//@codekit-prepend 'jquery.chosen.js';
-//@codekit-prepend 'jquery.scrollto.js';
-//@codekit-prepend 'jquery.easing.js';
-
-// --------------------------------------------------------------------------
-
 var NAILS_JS;
 NAILS_JS = function()
 {
