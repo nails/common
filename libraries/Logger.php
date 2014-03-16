@@ -39,7 +39,7 @@ class Logger
 		//	Define defaults
 		$this->_log			= new stdClass();
 		$this->_log->exists	= FALSE;
-		$this->_log->file	= FCPATH . APPPATH . 'logs/' .  date( 'Y-m-d' ) . '.php';
+		$this->_log->file	= DEPLOY_LOG_DIR .  date( 'Y-m-d' ) . '.php';
 		$this->mute_output	= FALSE;
 	}
 

@@ -272,6 +272,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	These should be specified in config/deploy.php
 
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
+		if ( ! defined( 'DEPLOY_LOG_DIR') )					define( 'DEPLOY_LOG_DIR',				FCPATH . 'application/logs/' );
 
 		// --------------------------------------------------------------------------
 
@@ -311,9 +312,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
+		// --------------------------------------------------------------------------
 
 		//	Set NAILS_URL here as it's dependent on knowing whether SSL is set or not
 		//	and if the current page is secure.
+
 		if ( ! defined( 'NAILS_URL') ) :
 
 			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
@@ -328,29 +331,19 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
 		//	Set the NAILS_ASSETS_URL
 		if ( ! defined( 'NAILS_ASSETS_URL') ) :
 
-			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
-
-				define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
-
-			else :
-
-				define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
-
-			endif;
+			define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
 
 		endif;
 
-
 		// --------------------------------------------------------------------------
 
-		//	Caching
-		if ( ! defined( 'DEPLOY_CACHE_DIR') ) define( 'DEPLOY_CACHE_DIR',				FCPATH . 'application/cache/' );
-
-		//	Update the system configs to use this cache dir
-		$this->config->set_item( 'cache_path', DEPLOY_CACHE_DIR );
+		//	Log path
+		$this->config->set_item( 'log_path', add_trailing_slash( DEPLOY_LOG_DIR ) );
 
 		// --------------------------------------------------------------------------
 

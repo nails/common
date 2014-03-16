@@ -13,6 +13,10 @@ function &get_controller_data()
 	return $NAILS_CONTROLLER_DATA;
 }
 
+
+// --------------------------------------------------------------------------
+
+
 /**
  * Attempts to fetch the real domain from a URL
  *
@@ -129,6 +133,22 @@ if ( ! function_exists( 'get_relative_path' ) ) :
 	}
 
 endif;
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Adds a trailing slash to the input string if there isn't already one there
+ *
+ * @access	public
+ * @param	string The string to add a trailing shash to.
+ * @return	string The input string with a trailing slash
+ **/
+function add_trailing_slash( $str )
+{
+	return rtrim( $str, '/' ) . '/';
+}
 
 /* End of file CORE_NAILS_Common.php */
 /* Location: ./core/CORE_NAILS_Common.php */
