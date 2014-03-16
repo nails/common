@@ -378,6 +378,34 @@ class CORE_NAILS_Installer
 				</fieldset>
 			</div>
 
+			<!-- CACHE DIR -->
+			<div class="config-item">
+				<p>
+					Provide the absolute path of a directory which the application can use for caching.
+				</p>
+				<p>
+				<?php
+
+					if ( isset( $_POST['deploy_cache_dir'] ) ) :
+
+						$_default = $_POST['deploy_cache_dir'];
+
+					elseif( defined( 'DEPLOY_CACHE_DIR' ) ) :
+
+						$_default = DEPLOY_CACHE_DIR;
+
+					else :
+
+						$_default = $this->_abpath . '/application/cache/';
+
+					endif;
+
+					echo '<input type="text" class="rounded" name="deploy_cache_dir" value="' . $_default . '" placeholder="http://www.example.com/">';
+
+				?>
+				</p>
+			</div>
+
 			<!-- ENVIRONMENT -->
 			<div class="config-item">
 				<p>
@@ -554,6 +582,51 @@ class CORE_NAILS_Installer
 
 		endif;
 
+		//	Test cachedir
+		$_deploy_cache_dir = ! empty( $_POST['deploy_cache_dir'] ) ? $_POST['deploy_cache_dir'] : '';
+
+		if ( empty( $_deploy_cache_dir ) ) :
+
+			$this->_errors = 'The application cache directory must be specified.';
+			$this->_request_config();
+			return FALSE;
+
+		endif;
+
+		if ( is_writable( $_deploy_cache_dir ) ) :
+
+			//	All good
+
+		elseif ( is_dir( $_deploy_cache_dir ) ) :
+
+			//	Attempt to chmod the dir
+			if ( @chmod( $_deploy_cache_dir, FILE_WRITE_MODE ) ) :
+
+				//	All good here.
+
+			else :
+
+				$this->_errors = 'The specified cache directory "' . $_deploy_cache_dir . '" exists but is not writeable.';
+				$this->_request_config();
+				return FALSE;
+
+			endif;
+
+		elseif( mkdir( $_deploy_cache_dir ) ) :
+
+			//	Yup, good arrows.
+
+		else :
+
+			$this->_errors = 'The specified cache directory "' . $_deploy_cache_dir . '" does not exist and could not be created.';
+			$this->_request_config();
+			return FALSE;
+
+		endif;
+
+		//	Santize cache dir
+		$_deploy_cache_dir .= substr( $_deploy_cache_dir, -1 ) != '/' ? '/' : '';
+
 		// --------------------------------------------------------------------------
 
 		//	Attempt to create the app.php and deploy.php file
@@ -630,6 +703,7 @@ class CORE_NAILS_Installer
 		$_deploy_str .= 'define( \'BASE_URL\',	\'' . $_base_url . '\' );' . "\n";
 		$_deploy_str .= 'define( \'DEPLOY_PRIVATE_KEY\',	\'' . $_deploy_key . '\' );' . "\n";
 		$_deploy_str .= 'define( \'DEPLOY_INSTALLER_PW\',	\'' . $_password . '\' );' . "\n";
+		$_deploy_str .= 'define( \'DEPLOY_CACHE_DIR\',	\'' . $_deploy_cache_dir . '\' );' . "\n";
 
 		$_deploy_str .= 'define( \'DEPLOY_DB_HOST\',		\'' . $_db_host . '\' );' . "\n";
 		$_deploy_str .= 'define( \'DEPLOY_DB_USERNAME\',	\'' . $_db_username . '\' );' . "\n";
