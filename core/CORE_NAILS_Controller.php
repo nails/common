@@ -26,11 +26,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Test that the cache is writeable
-		$this->_test_cache();
-
-		// --------------------------------------------------------------------------
-
 		//	Set the default content-type
 		$this->output->set_content_type( 'text/html; charset=utf-8' );
 
@@ -82,6 +77,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Load, instantiate and apply the fatal error handler
 		$this->_fatal_error_handler();
+
+		// --------------------------------------------------------------------------
+
+		//	Test that the cache is writeable
+		$this->_test_cache();
 
 		// --------------------------------------------------------------------------
 

@@ -226,7 +226,12 @@ class Fatal_error_handler
 		$_message	.= 'SERVER: ' .				$_info['server'] . "\n\n";
 		$_message	.= 'GLOBALS: ' .			$_info['globals'] . "\n\n";
 		$_message	.= 'BACKTRACE: ' .			$_info['debug_backtrace'] . "\n\n";
-		$_message	.= 'LAST KNOWN QUERY: ' .	$_ci->db->last_query() . "\n\n";
+
+		if ( isset( $_ci->db ) ) :
+
+			$_message	.= 'LAST KNOWN QUERY: ' .	$_ci->db->last_query() . "\n\n";
+
+		endif;
 
 		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
 	}

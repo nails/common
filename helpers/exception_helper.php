@@ -64,7 +64,7 @@ if ( ! function_exists( 'unauthorised' ) )
 
 
 /**
- * Alias of show_401()
+ * Shows a fatal error
  *
  */
 if ( ! function_exists( 'show_fatal_error' ) )
@@ -73,7 +73,7 @@ if ( ! function_exists( 'show_fatal_error' ) )
 	{
 		if ( $subject && $message ) :
 
-			send_developer_mail( $subject, $message );
+			get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
 
 		endif;
 
