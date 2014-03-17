@@ -209,6 +209,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 				return TRUE;
 
+			elseif ( ENVIRONMENT !== 'production' ) :
+
+				show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
+
 			else :
 
 				show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
@@ -218,6 +222,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 		elseif( mkdir( DEPLOY_CACHE_DIR ) ) :
 
 			return TRUE;
+
+		elseif ( ENVIRONMENT !== 'production' ) :
+
+			show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
 
 		else :
 

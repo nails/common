@@ -31,17 +31,7 @@ NAILS_API = function()
 
 		// --------------------------------------------------------------------------
 
-		//	If we're on a secure conenction then make our request secure as well
-		//	TODO: check the domain as well as the protocol
-
-		if ( document.location.protocol === 'https:' )
-		{
-			this._api_base = window.SITE_URL + 'api/';
-		}
-		else
-		{
-			this._api_base = window.SECURE_SITE_URL + 'api/';
-		}
+		this._api_base = window.SITE_URL + 'api/';
 	};
 
 

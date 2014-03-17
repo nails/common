@@ -147,14 +147,7 @@ class MX_Config extends CI_Config
 
 		if ($path === FALSE)
 		{
-
-			//	Pablo: Flip reverse the config array so that application overrides package
-			$this->_config_paths = array_reverse( $this->_config_paths );
-
 			parent::load($file, $use_sections, $fail_gracefully);
-
-			//	Pablo: Then flip it back again so it's back to normal.
-			$this->_config_paths = array_reverse( $this->_config_paths );
 
 			return $this->item($file);
 		}
