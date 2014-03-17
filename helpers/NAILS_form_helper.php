@@ -54,12 +54,13 @@ if ( ! function_exists('form_open'))
 				$hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
 			}
 
-			if (is_array($hidden) AND count($hidden) > 0)
-			{
-				$form .= sprintf("<div style=\"display:none\">%s</div>", form_hidden($hidden));
-			}
-
 		endif;
+
+		//	Render any hidden fields
+		if (is_array($hidden) AND count($hidden) > 0)
+		{
+			$form .= sprintf("<div style=\"display:none\">%s</div>", form_hidden($hidden));
+		}
 
 		return $form;
 	}
