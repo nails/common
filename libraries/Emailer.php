@@ -464,7 +464,7 @@ class Emailer
 		//	If we're not on a production server, never send out to any live addresses
 		$_send_to = $_send->to->email;
 
-		if ( ENVIRONMENT != 'production' ) :
+		if ( ENVIRONMENT != 'production' || defined( 'EMAIL_OVERRIDE' ) ) :
 
 			if ( defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ) :
 
