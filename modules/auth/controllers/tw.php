@@ -310,7 +310,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		if ( ! $_user ) :
 
 			//	OK, fine, this is a new user! Registerm buyt only if registration is allowed
-			if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+			if ( APP_USER_ALLOW_REGISTRATION ) :
 
 				$this->_create_user( $access_token );
 

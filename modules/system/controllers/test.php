@@ -466,19 +466,15 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Directories to test
 		$_dirs		= array();
 
-		//	Log folder
-		$_dirs[]	= FCPATH . APPPATH . 'logs/';
-
 		//	Cache directory
-		if ( defined( 'DEPLOY_CACHE_DIR' ) ) :
+		$_dirs[]	= DEPLOY_CACHE_DIR;
 
-			$_dirs[]	= DEPLOY_CACHE_DIR;
-
-		endif;
+		//	Log folder
+		$_dirs[]	= DEPLOY_LOG_DIR;
 
 		// --------------------------------------------------------------------------
 
-		//	the routes_app.php file should exist
+		//	Rhe routes_app.php file should exist
 		$_dirs[] = DEPLOY_CACHE_DIR . 'routes_app.php';
 
 		// --------------------------------------------------------------------------
@@ -494,7 +490,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 			endif;
 
-			if ( ! is_really_writable( $dir ) ) :
+			if ( ! is_writable( $dir ) ) :
 
 				$this->_result->pass		= FALSE;
 				$this->_result->errors[]	= '"' . $dir . '" is not writable.';
@@ -535,7 +531,7 @@ class NAILS_Test extends NAILS_System_Controller
 		$_email				= new stdClass();
 		$_email->type		= 'test_email';
 
-		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) || ! APP_DEVELOPER_EMAIL ) :
+		if ( ! APP_DEVELOPER_EMAIL ) :
 
 			$this->_result->pass		= FALSE;
 			$this->_result->errors[]	= 'APP_DEVELOPER_EMAIL is not defined.';
@@ -581,16 +577,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Only return if the test makes sense to run, i.e email is configured
-		if ( defined( 'SMTP_HOST' ) && SMTP_HOST ) :
-
-			return $this->_info;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return $this->_info;
 	}
 }
 

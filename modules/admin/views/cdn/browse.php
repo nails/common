@@ -75,7 +75,17 @@
 						echo '<td class="actions">';
 							echo anchor( 'admin/cdnadmin/edit/' . $object->id . $_return, 'Edit', 'class="awesome small"' );
 							echo anchor( 'admin/cdnadmin/delete/' . $object->id . $_return, 'Delete', 'data-title="Are you sure?" data-body="Deleting an item will attempt to disconnect it from resources which depend on it. The object wil be recoverable but dependencies won\'t." class="confirm awesome small red"' );
-							echo anchor( cdn_serve( $object->id ), 'View', 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+
+							if ( $object->is_img ) :
+
+								echo anchor( cdn_serve( $object->id ), 'View', 'class="awesome small fancybox"' );
+
+							else :
+
+								echo anchor( cdn_serve( $object->id ), 'View', 'class="awesome small fancybox" data-fancybox-type="iframe"' );
+
+							endif;
+
 						echo '</td>';
 					echo '</tr>';
 
@@ -84,7 +94,7 @@
 			else :
 
 				echo '<tr>';
-				echo '<td colspan="9" class="no-data">';
+				echo '<td colspan="10" class="no-data">';
 				echo 'No Items found';
 				echo '</td>';
 				echo '</tr>';

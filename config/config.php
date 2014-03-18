@@ -76,7 +76,8 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language']	= APP_DEFAULT_LANG_SLUG;
+
+$config['language']	= defined( 'APP_DEFAULT_LANG_SLUG' ) ? APP_DEFAULT_LANG_SLUG : 'english';
 
 /*
 |--------------------------------------------------------------------------
@@ -98,7 +99,7 @@ $config['charset'] = 'UTF-8';
 | setting this variable to TRUE (boolean).  See the user guide for details.
 |
 */
-$config['enable_hooks'] = FALSE;
+$config['enable_hooks'] = TRUE;
 
 
 /*
@@ -220,7 +221,8 @@ $config['log_date_format'] = 'Y-m-d H:i:s';
 | system/cache/ folder.  Use a full server path with trailing slash.
 |
 */
-$config['cache_path'] = DEPLOY_CACHE_DIR;
+
+$config['cache_path'] = defined( 'DEPLOY_CACHE_DIR' ) ? DEPLOY_CACHE_DIR : FCPATH . APPPATH . 'cache/';
 
 /*
 |--------------------------------------------------------------------------
@@ -231,7 +233,11 @@ $config['cache_path'] = DEPLOY_CACHE_DIR;
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-$config['encryption_key'] = md5( DEPLOY_PRIVATE_KEY . APP_PRIVATE_KEY );
+
+$_deploy_private_key	= defined( 'DEPLOY_PRIVATE_KEY' )	? DEPLOY_PRIVATE_KEY	: '';
+$_app_private_key		= defined( 'APP_PRIVATE_KEY' )		? APP_PRIVATE_KEY		: '';
+
+$config['encryption_key'] = md5( $_deploy_private_key . $_app_private_key );
 
 /*
 |--------------------------------------------------------------------------

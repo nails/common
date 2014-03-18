@@ -175,7 +175,7 @@ class Fatal_error_handler
 
 	public function send_developer_mail( $subject, $message )
 	{
-		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) || ! APP_DEVELOPER_EMAIL ) :
+		if ( ! APP_DEVELOPER_EMAIL ) :
 
 			//	Log the fact there's no email
 			log_message( 'error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.' );
@@ -186,10 +186,10 @@ class Fatal_error_handler
 		// --------------------------------------------------------------------------
 
 		$_from_email	= 'root@' . gethostname();
-		$_from_name		= defined( 'APP_EMAIL_FROM_NAME' ) ? APP_EMAIL_FROM_NAME : 'Fatal Error Reporter';
-		$_reply_to		= defined( 'APP_EMAIL_FROM_EMAIL' ) ? APP_EMAIL_FROM_EMAIL : $_from_email;
+		$_from_name		= APP_EMAIL_FROM_NAME;
+		$_reply_to		= APP_EMAIL_FROM_EMAIL;
 
-		$_to			= ENVIRONMENT != 'production' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+		$_to			= ENVIRONMENT != 'production' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 		$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
 						  'Reply-To: ' . $_reply_to . "\r\n" .
 						  'X-Mailer: PHP/' . phpversion()  . "\r\n" .

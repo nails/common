@@ -217,7 +217,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 							else :
 
-								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_login['last_ip'] ) ) );
+								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
 
 							endif;
 

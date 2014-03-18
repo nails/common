@@ -70,7 +70,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Check SMTP is configured
-		if ( ! SMTP_HOST || ! SMTP_PORT ) :
+		if ( ! DEPLOY_SMTP_HOST || ! DEPLOY_SMTP_PORT ) :
 
 			$_error = 'EMAILER: SMTP not configured';
 
@@ -464,13 +464,13 @@ class Emailer
 		//	If we're not on a production server, never send out to any live addresses
 		$_send_to = $_send->to->email;
 
-		if ( ENVIRONMENT != 'production' || defined( 'EMAIL_OVERRIDE' ) ) :
+		if ( ENVIRONMENT != 'production' || EMAIL_OVERRIDE ) :
 
-			if ( defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ) :
+			if ( EMAIL_OVERRIDE ) :
 
 				$_send_to = EMAIL_OVERRIDE;
 
-			elseif ( defined( 'APP_DEVELOPER_EMAIL' ) && APP_DEVELOPER_EMAIL ) :
+			elseif ( APP_DEVELOPER_EMAIL ) :
 
 				$_send_to = APP_DEVELOPER_EMAIL;
 
@@ -506,13 +506,7 @@ class Emailer
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 
-		if (
-				( defined( EMAIL_DEBUG ) && EMAIL_DEBUG )
-				&&
-				( defined( APP_DEVELOPER_EMAIL ) && APP_DEVELOPER_EMAIL )
-				&&
-				$_error->error_has_occurred()
-			) :
+		if ( EMAIL_DEBUG && APP_DEVELOPER_EMAIL && $_error->error_has_occurred() ) :
 
 			//	The templates error'd, abort the send and let dev know
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';
@@ -638,7 +632,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Debugging?
-		if ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) :
+		if ( EMAIL_DEBUG ) :
 
 			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;
@@ -1350,6 +1344,7 @@ class Emailer
 
 		//	If a subject is defined in the variables use that, if not check to see if one was
 		//	defined in the template; if not, fall back to a default subject
+
 		if ( isset( $email->email_vars['email_subject'] ) ) :
 
 			$email->subject = $email->email_vars['email_subject'];

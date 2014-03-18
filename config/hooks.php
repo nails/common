@@ -9,7 +9,12 @@
 | http://codeigniter.com/user_guide/general/hooks.html
 |
 */
-
+	$hook['pre_system'] =	array(
+								'class'		=> 'System_startup',
+								'function'	=> 'define_constants',
+								'filename'	=> 'System_startup.php',
+								'filepath'	=> is_file( FCPATH . APPPATH . 'modules/system/hooks/System_startup.php' ) ? FCPATH . APPPATH . 'modules/system/hooks/' : NAILS_PATH . 'modules/system/hooks/',
+							);
 
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */

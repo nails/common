@@ -150,5 +150,48 @@ function add_trailing_slash( $str )
 	return rtrim( $str, '/' ) . '/';
 }
 
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Detects whether the current page is secure or not
+ *
+ * @access	public
+ * @param	string
+ * @return	bool
+ */
+function page_is_secure()
+{
+	if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
+
+		//	Page is being served through HTTPS
+		return TRUE;
+
+	elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && defined( 'SECURE_BASE_URL' ) ) :
+
+		//	Not being served through HTTPS, but does the URL of the page begin
+		//	with SECURE_BASE_URL
+
+		$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+		if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Unknown, assume not
+	return FALSE;
+}
+
 /* End of file CORE_NAILS_Common.php */
 /* Location: ./core/CORE_NAILS_Common.php */

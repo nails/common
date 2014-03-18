@@ -56,14 +56,9 @@ $route['404_override']			= 'system/render_404';
 | Load the app's dynamic routes file.
 */
 
-if ( defined( 'DEPLOY_CACHE_DIR' ) && file_exists( DEPLOY_CACHE_DIR . 'routes_app.php' ) ) :
+if ( ! NAILS_STARTUP_GENERATE_APP_ROUTES ) :
 
 	include_once DEPLOY_CACHE_DIR . 'routes_app.php';
-
-else :
-
-	//	Not found, crude hook seeing as basically nothing has loaded yet
-	define( 'STARTUP_ADD_HOOK_GENERATE_APP_ROUTES', TRUE );
 
 endif;
 

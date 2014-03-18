@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Name:			Placeholder
@@ -71,7 +71,7 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 		//	cache directory to see if this image has been processed already; serve it up if
 		//	it has.
 
-		if ( defined( 'DEPLOY_CACHE_DIR' ) && file_exists( DEPLOY_CACHE_DIR . $this->_cache_file ) ) :
+		if ( file_exists( DEPLOY_CACHE_DIR . $this->_cache_file ) ) :
 
 			$this->_serve_from_cache( $this->_cache_file );
 
@@ -128,21 +128,7 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 
 			//	Save local version, make sure cache is writable
-			if ( defined( 'DEPLOY_CACHE_DIR' ) && is_really_writable( DEPLOY_CACHE_DIR ) ) :
-
-				imagepng( $_img, DEPLOY_CACHE_DIR . $this->_cache_file );
-
-			elseif ( defined( 'DEPLOY_CACHE_DIR' ) ) :
-
-				//	Inform developers
-				$_subject	= 'Cache (placeholder) dir not writeable';
-				$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
-				$_message	.= 'Dir: ' . DEPLOY_CACHE_DIR . $this->_cache_file . "\n\n";
-				$_message	.= 'URL: ' . $_SERVER['REQUEST_URI'];
-
-				send_developer_mail( $_subject, $_message );
-
-			endif;
+			imagepng( $_img, DEPLOY_CACHE_DIR . $this->_cache_file );
 
 			// --------------------------------------------------------------------------
 

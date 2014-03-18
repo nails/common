@@ -101,4 +101,123 @@ class CORE_NAILS_Hooks extends CI_Hooks
 		$this->my_in_progress = FALSE;
 		return TRUE;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Run Hook
+	 *
+	 * Runs a particular hook
+	 *
+	 * @access	private
+	 * @param	array	the hook details
+	 * @return	bool
+	 */
+	function _run_hook($data)
+	{
+		if ( ! is_array($data))
+		{
+			return FALSE;
+		}
+
+		// -----------------------------------
+		// Safety - Prevents run-away loops
+		// -----------------------------------
+
+		// If the script being called happens to have the same
+		// hook call within it a loop can happen
+
+		if ($this->in_progress == TRUE)
+		{
+			return;
+		}
+
+		// -----------------------------------
+		// Set file path
+		// -----------------------------------
+
+		if ( ! isset($data['filepath']) OR ! isset($data['filename']))
+		{
+			return FALSE;
+		}
+
+		//	Using absolute filepath?
+		if ( substr( $data['filepath'], 0, 1 ) == '/' ) :
+
+			$filepath = add_trailing_slash( $data['filepath'] ) . $data['filename'];
+
+		else :
+
+			$filepath = FCPATH . APPPATH . add_trailing_slash( $data['filepath'] ) . $data['filename'];
+
+		endif;
+
+		if ( ! file_exists($filepath))
+		{
+			return FALSE;
+		}
+
+		// -----------------------------------
+		// Set class/function name
+		// -----------------------------------
+
+		$class		= FALSE;
+		$function	= FALSE;
+		$params		= '';
+
+		if (isset($data['class']) AND $data['class'] != '')
+		{
+			$class = $data['class'];
+		}
+
+		if (isset($data['function']))
+		{
+			$function = $data['function'];
+		}
+
+		if (isset($data['params']))
+		{
+			$params = $data['params'];
+		}
+
+		if ($class === FALSE AND $function === FALSE)
+		{
+			return FALSE;
+		}
+
+		// -----------------------------------
+		// Set the in_progress flag
+		// -----------------------------------
+
+		$this->in_progress = TRUE;
+
+		// -----------------------------------
+		// Call the requested class and/or function
+		// -----------------------------------
+
+		if ($class !== FALSE)
+		{
+			if ( ! class_exists($class))
+			{
+				require($filepath);
+			}
+
+			$HOOK = new $class;
+			$HOOK->$function($params);
+		}
+		else
+		{
+			if ( ! function_exists($function))
+			{
+				require($filepath);
+			}
+
+			$function($params);
+		}
+
+		$this->in_progress = FALSE;
+		return TRUE;
+	}
 }

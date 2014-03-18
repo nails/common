@@ -34,14 +34,6 @@ class Local_CDN
 
 		//	Load langfile
 		get_instance()->lang->load( 'cdn/cdn_driver_local', RENDER_LANG_SLUG );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! defined( 'DEPLOY_CDN_PATH' ) ) :
-
-			show_error( lang( 'cdn_error_not_configured' ) );
-
-		endif;
 	}
 
 

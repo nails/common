@@ -53,11 +53,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Define constants (set defaults if not already set)
-		$this->_define_constants();
-
-		// --------------------------------------------------------------------------
-
 		//	Is Nails in maintenance mode?
 		$this->_maintenance_mode();
 
@@ -118,10 +113,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Startup hooks
-		if ( defined( 'STARTUP_ADD_HOOK_GENERATE_APP_ROUTES' ) && STARTUP_ADD_HOOK_GENERATE_APP_ROUTES ) :
+		//	Need to generate the routes_app.php file?
+		if ( NAILS_STARTUP_GENERATE_APP_ROUTES ) :
 
-			//	No routes_app.php was found, attempt to generate it
 			$this->load->model( 'system/routes_model' );
 
 			if ( ! $this->routes_model->update() ) :
@@ -219,7 +213,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			endif;
 
-		elseif( mkdir( DEPLOY_CACHE_DIR ) ) :
+		elseif( @mkdir( DEPLOY_CACHE_DIR ) ) :
 
 			return TRUE;
 
@@ -232,151 +226,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 			show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _define_constants()
-	{
-		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.1.0' );
-
-		// --------------------------------------------------------------------------
-
-		//	These settings can be specified wherever it makes most sense (e.g if
-		//	maintenance mode needs enabled app wide, then specify it in app.php, if
-		//	only a single server needs to be put in maintenance mode then define in
-		//	deploy.php
-
-		if ( ! defined( 'MAINTENANCE') )					define( 'MAINTENANCE',					FALSE );
-		if ( ! defined( 'MAINTENANCE_WHITELIST') )			define( 'MAINTENANCE_WHITELIST',		'127.0.0.1' );
-
-		// --------------------------------------------------------------------------
-
-		//	Default app constants (if not already defined)
-		//	These should be specified in config/app.php
-
-		if ( ! defined( 'NAILS_DB_PREFIX' ) )				define( 'NAILS_DB_PREFIX',				'nails_' );
-		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
-		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
-
-		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
-		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
-		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
-		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
-		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
-		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
-		if ( ! defined( 'APP_SSL_ROUTING' ) )				define( 'APP_SSL_ROUTING',				FALSE );
-		if ( ! defined( 'APP_DEFAULT_TIMEZONE' ) )			define( 'APP_DEFAULT_TIMEZONE',			'UTC' );
-		if ( ! defined( 'APP_NATIVE_LOGIN_USING' ) )		define( 'APP_NATIVE_LOGIN_USING',		'EMAIL' );	//	[EMAIL|USERNAME|BOTH]
-		if ( ! defined( 'APP_ADMIN_IP_WHITELIST' ) )		define( 'APP_ADMIN_IP_WHITELIST',		json_encode( array() ) );
-
-
-		// --------------------------------------------------------------------------
-
-		//	Deployment specific constants (if not already defined)
-		//	These should be specified in config/deploy.php
-
-		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
-
-		//	If this is changed, update CORE_NAILS_Log.php too
-		if ( ! defined( 'DEPLOY_LOG_DIR') )					define( 'DEPLOY_LOG_DIR',				FCPATH . APPPATH . 'logs/' );
-
-		// --------------------------------------------------------------------------
-
-		//	Email
-		if ( ! defined( 'APP_DEVELOPER_EMAIL' ) )			define( 'APP_DEVELOPER_EMAIL',			'' );
-		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
-		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
-		if ( ! defined( 'SMTP_HOST' ) )						define( 'SMTP_HOST',					'' );
-		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
-		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
-		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
-		if ( ! defined( 'EMAIL_DEBUG' ) )					define( 'EMAIL_DEBUG',					FALSE );
-
-		// --------------------------------------------------------------------------
-
-		//	CDN
-		if ( ! defined( 'APP_CDN_DRIVER' ) )				define( 'APP_CDN_DRIVER',				'local' );
-		if ( ! defined( 'DEPLOY_CDN_MAGIC') )				define( 'DEPLOY_CDN_MAGIC',				'' );
-		if ( ! defined( 'DEPLOY_CDN_PATH') )				define( 'DEPLOY_CDN_PATH',				FCPATH . 'assets/uploads/' );
-
-		//	Define how long CDN items should be cached for, this is a maximum age in seconds
-		//	According to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html this shouldn't be
-		//	more than 1 year.
-
-		if ( ! defined( 'APP_CDN_CACHE_MAX_AGE' ) )			define( 'APP_CDN_CACHE_MAX_AGE',		'31536000' ); // 1 year
-
-		// --------------------------------------------------------------------------
-
-		//	SSL
-		//	If a SECURE_BASE_URL is not defined then assume the secure URL is simply
-		//	https://BASE_URL
-
-		if ( ! defined( 'SECURE_BASE_URL' ) ) :
-
-			//	Not defined, play it safe and just copy the BASE_URL
-			define( 'SECURE_BASE_URL', BASE_URL );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Set NAILS_URL here as it's dependent on knowing whether SSL is set or not
-		//	and if the current page is secure.
-
-		if ( ! defined( 'NAILS_URL') ) :
-
-			if ( APP_SSL_ROUTING && $this->_page_is_secure() ) :
-
-				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/' );
-
-			else :
-
-				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/' );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Set the NAILS_ASSETS_URL
-		if ( ! defined( 'NAILS_ASSETS_URL') ) :
-
-			define( 'NAILS_ASSETS_URL', NAILS_URL . 'assets/' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Log path
-		$this->config->set_item( 'log_path', add_trailing_slash( DEPLOY_LOG_DIR ) );
-
-		// --------------------------------------------------------------------------
-
-		//	Database Debug
-		if ( ! defined( 'DEPLOY_DB_DEBUG' ) ) :
-
-			if ( ENVIRONMENT == 'production' ) :
-
-				define( 'DEPLOY_DB_DEBUG', FALSE );
-
-			else :
-
-				define( 'DEPLOY_DB_DEBUG', TRUE );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Default common API credentials
-		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
-
 	}
 
 
@@ -542,7 +391,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_db()
 	{
-		if ( defined( 'DEPLOY_DB_USERNAME' ) && DEPLOY_DB_USERNAME && defined( 'DEPLOY_DB_DATABASE' ) && DEPLOY_DB_DATABASE ) :
+		if ( DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE ) :
 
 			$this->load->database();
 
@@ -574,11 +423,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			$_timezone_user = active_user( 'timezone' );
 
-		elseif( defined( 'APP_DEFAULT_TIMEZONE' ) && APP_DEFAULT_TIMEZONE ) :
+		elseif( APP_DEFAULT_TIMEZONE ) :
 
 			$_timezone_user = APP_DEFAULT_TIMEZONE;
 
-		elseif( defined( 'DEPLOY_SYSTEM_TIMEZONE' ) && DEPLOY_SYSTEM_TIMEZONE ) :
+		elseif( DEPLOY_SYSTEM_TIMEZONE ) :
 
 			$_timezone_user = DEPLOY_SYSTEM_TIMEZONE;
 
@@ -613,7 +462,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_profiler()
 	{
-		if ( defined( 'PROFILING' ) && PROFILING ) :
+		if ( PROFILING ) :
 
 			/**
 			 * Enable profiler if not AJAX or CI request and there's no user_token. user_token
@@ -892,42 +741,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 			redirect( '/' );
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _page_is_secure()
-	{
-		if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) :
-
-			//	Page is being served through HTTPS
-			return TRUE;
-
-		elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && defined( 'SECURE_BASE_URL' ) ) :
-
-			//	Not being served through HTTPS, but does the URL of the page begin
-			//	with SECURE_BASE_URL
-
-			$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-
-			if (  preg_match( '#^' . SECURE_BASE_URL . '.*#', $_url ) ) :
-
-				return TRUE;
-
-			else :
-
-				return FALSE;
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Unknown, assume not
-		return FALSE;
 	}
 }
 

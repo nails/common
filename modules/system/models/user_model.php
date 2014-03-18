@@ -3113,11 +3113,11 @@ class NAILS_User_model extends NAILS_Model
 
 			$_data['timezone'] = $data['timezone'];
 
-		elseif ( defined( 'APP_DEFAULT_TIMEZONE' ) && APP_DEFAULT_TIMEZONE ) :
+		elseif ( APP_DEFAULT_TIMEZONE ) :
 
 			$_data['timezone'] = APP_DEFAULT_TIMEZONE;
 
-		elseif ( defined( 'DEPLOY_SYSTEM_TIMEZONE' ) && DEPLOY_SYSTEM_TIMEZONE ) :
+		elseif ( DEPLOY_SYSTEM_TIMEZONE ) :
 
 			$_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
 

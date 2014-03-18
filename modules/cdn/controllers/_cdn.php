@@ -29,6 +29,8 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	Which driver is being used?
 		$this->_driver = strtolower( APP_CDN_DRIVER );
 
+		// --------------------------------------------------------------------------
+
 		//	Sanity checks; driver specific
 		switch ( $this->_driver ) :
 
@@ -38,52 +40,15 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 			break;
 
-			// --------------------------------------------------------------------------
-
 			case 'local' :
 
-				//	DEPLOY_CDN_PATH must be defined, while it might not be used for all scenarios
-				//	it's lack of presence is a configuration issue and so execution should
-				//	be halted.
-
-				if ( ! defined( 'DEPLOY_CDN_PATH' ) ) :
-
-					log_message( 'error', 'CDN: DEPLOY_CDN_PATH not defined' );
-					show_error( 'CDN: DEPLOY_CDN_PATH not defined' );
-
-				endif;
+				//	TODO: Sanity checks, if any.
 
 			break;
 
 		endswitch;
 
-		//	Common
-
-		//	DEPLOY_CACHE_DIR must be defined; the CDN can be very process heavy so caching is a
-		//	requirement and if not defined it is considered a configuration error and
-		//	execution should be halted
-
-		if ( ! defined( 'DEPLOY_CACHE_DIR' ) ) :
-
-			log_message( 'error', 'CDN: DEPLOY_CACHE_DIR not defined' );
-			show_error( 'CDN: DEPLOY_CACHE_DIR not defined' );
-
-		endif;
-
-		//	Cache must be writeable
-		if ( ! is_really_writable( DEPLOY_CACHE_DIR ) ) :
-
-			//	Inform developers
-			$_subject	= 'Cache (CDN) dir not writeable';
-			$_message	= 'The CDN cannot write to the cache directory.'."\n\n";
-			$_message	.= 'Dir: ' . DEPLOY_CACHE_DIR . "\n\n";
-			$_message	.= 'URL: ' . $this->input->server( 'REQUEST_URI' );
-
-			send_developer_mail( $_subject, $_message );
-
-			show_error( 'CDN: DEPLOY_CACHE_DIR not writeable' );
-
-		endif;
+		//	Sanity checks: common
 
 		// --------------------------------------------------------------------------
 
@@ -287,58 +252,36 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	 **/
 	protected function _bad_src( $width = 100, $height = 100 )
 	{
-		if ( $this->_driver == 'local' && ! defined( 'DEPLOY_CDN_PATH' ) ) :
+		//	Create the icon
+		$_icon = @imagecreatefrompng( $this->_cdn_root . '_resources/img/fail.png' );
+		$_icon_w = imagesx( $_icon );
+		$_icon_h = imagesy( $_icon );
 
-			header( 'Cache-Control: no-cache, must-revalidate', TRUE );
-			header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
-			header( 'Content-type: application/json', TRUE );
-			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
+		// --------------------------------------------------------------------------
 
-			// --------------------------------------------------------------------------
+		//	Create the background
+		$_bg	= imagecreatetruecolor( $width, $height );
+		$_white	= imagecolorallocate( $_bg, 255, 255, 255);
+		imagefill( $_bg, 0, 0, $_white );
 
-			$_out = array(
+		// --------------------------------------------------------------------------
 
-				'status'	=> 400,
-				'message'	=> lang( 'cdn_not_configured' )
+		//	Merge the two
+		$_center_x = ( $width / 2 ) - ( $_icon_w / 2 );
+		$_center_y = ( $height / 2 ) - ( $_icon_h / 2 );
+		imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
 
-			);
+		// --------------------------------------------------------------------------
 
-			$this->output->set_output( json_encode( $_out ) );
+		//	Output to browser
+		header( 'Content-type: image/png', TRUE );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
+		imagepng( $_bg );
 
-		else :
+		// --------------------------------------------------------------------------
 
-			//	Create the icon
-			$_icon = @imagecreatefrompng( $this->_cdn_root . '_resources/img/fail.png' );
-			$_icon_w = imagesx( $_icon );
-			$_icon_h = imagesy( $_icon );
-
-			// --------------------------------------------------------------------------
-
-			//	Create the background
-			$_bg	= imagecreatetruecolor( $width, $height );
-			$_white	= imagecolorallocate( $_bg, 255, 255, 255);
-			imagefill( $_bg, 0, 0, $_white );
-
-			// --------------------------------------------------------------------------
-
-			//	Merge the two
-			$_center_x = ( $width / 2 ) - ( $_icon_w / 2 );
-			$_center_y = ( $height / 2 ) - ( $_icon_h / 2 );
-			imagecopymerge( $_bg, $_icon, $_center_x, $_center_y, 0, 0, $_icon_w, $_icon_h, 100 );
-
-			// --------------------------------------------------------------------------
-
-			//	Output to browser
-			header( 'Content-type: image/png', TRUE );
-			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
-			imagepng( $_bg );
-
-			// --------------------------------------------------------------------------
-
-			//	Destroy the images
-			imagedestroy( $_icon );
-			imagedestroy( $_bg );
-
-		endif;
+		//	Destroy the images
+		imagedestroy( $_icon );
+		imagedestroy( $_bg );
 	}
 }

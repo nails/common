@@ -7,7 +7,8 @@
 *
 */
 
-class Cdn {
+class Cdn
+{
 
 	private $_ci;
 	private $_cdn;
@@ -62,7 +63,7 @@ class Cdn {
 		// --------------------------------------------------------------------------
 
 		//	Define the mime.magic file
-		if ( ! defined( 'DEPLOY_CDN_MAGIC' ) || ! DEPLOY_CDN_MAGIC ) :
+		if ( ! DEPLOY_CDN_MAGIC ) :
 
 			$_found			= FALSE;
 			$_locations		= array();

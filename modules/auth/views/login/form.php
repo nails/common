@@ -55,7 +55,7 @@
 			<p>
 				<?php
 
-					if ( defined( 'APP_USER_ALLOW_REGISTRATION' ) && APP_USER_ALLOW_REGISTRATION ) :
+					if ( APP_USER_ALLOW_REGISTRATION ) :
 
 						echo lang( 'auth_login_message', array( APP_NAME, site_url( 'auth/register' ) ) );
 
