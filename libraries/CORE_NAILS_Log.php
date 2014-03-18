@@ -2,6 +2,33 @@
 
 class CORE_NAILS_Log extends CI_Log
 {
+	public function __construct()
+	{
+		parent::__construct();
+die(FCPATH . APPPATH . 'logs/');
+
+		// --------------------------------------------------------------------------
+
+		//	Set the Log Dir appropriately
+		if ( ! defined( 'DEPLOY_LOG_DIR' ) ) :
+
+			//	Not defined
+			//	If this is changed, udpate CORE_NAILS_Controller.php too
+
+			$this->_log_path = FCPATH . APPPATH . 'logs/';
+
+		elseif ( defined( 'DEPLOY_LOG_DIR' ) && $this->_log_path != DEPLOY_LOG_DIR ) :
+
+			//	Set incorrectly
+			$this->_log_path = DEPLOY_LOG_DIR;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function write_log($level = 'error', $msg, $php_error = FALSE)
 	{
 		//	Test Log folder, but only if the error level is to be captured

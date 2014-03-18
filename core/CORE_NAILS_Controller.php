@@ -280,7 +280,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	These should be specified in config/deploy.php
 
 		if ( ! defined( 'DEPLOY_SYSTEM_TIMEZONE') )			define( 'DEPLOY_SYSTEM_TIMEZONE',		'UTC' );
-		if ( ! defined( 'DEPLOY_LOG_DIR') )					define( 'DEPLOY_LOG_DIR',				FCPATH . 'application/logs/' );
+
+		//	If this is changed, update CORE_NAILS_Log.php too
+		if ( ! defined( 'DEPLOY_LOG_DIR') )					define( 'DEPLOY_LOG_DIR',				FCPATH . APPPATH . 'logs/' );
 
 		// --------------------------------------------------------------------------
 
