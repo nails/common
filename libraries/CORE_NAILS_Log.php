@@ -2,9 +2,26 @@
 
 class CORE_NAILS_Log extends CI_Log
 {
-
 	public function write_log($level = 'error', $msg, $php_error = FALSE)
 	{
+		//	Ensure this is set correctly. Would use the constructor, however
+		//	that is called before the pre_system hook (as the constructor of
+		//	the hook class calls log_message() which in turn constructs this class.
+		//	The docs LIE when theys ay only benchmark and hooks class are loaded)
+
+		if ( defined( 'DEPLOY_LOG_DIR' ) ) :
+
+			$this->_log_path = DEPLOY_LOG_DIR;
+
+		else :
+
+			//	Don't bother writing as we don't know where to write.
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Test Log folder, but only if the error level is to be captured
 		$level = strtoupper($level);
 
