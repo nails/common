@@ -2666,7 +2666,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Update user's `last_seen` and `last_ip` properties
 		$this->db->set( 'last_seen', 'NOW()', FALSE );
-		$this->db->set( 'last_seen', $this->input->ip_address(), FALSE );
+		$this->db->set( 'last_ip', $this->input->ip_address() );
 		$this->db->where( 'id', $_me->id );
 		$this->db->update( NAILS_DB_PREFIX . 'user' );
 	}

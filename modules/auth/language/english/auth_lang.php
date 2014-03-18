@@ -176,9 +176,8 @@
 	$lang['auth_forgot_expired_code']					= '<strong>Sorry,</strong> the reset token you are using has expired. You will need to resubmit a password reset request.';
 	$lang['auth_forgot_invalid_code']					= '<strong>Sorry,</strong> Invalid or expired password reset token.';
 	$lang['auth_forgot_reset_badlogin']					= '<strong>Sorry,</strong> something when wrong and you were not logged in. Please try <a href="%s">logging in with your new password</a>.';
+	$lang['auth_forgot_reset_badupdate']				= '<strong>Sorry,</strong> there were errors. %s';
 	$lang['auth_forgot_reminder']						= '<strong>In case you forgot,</strong> your temporary password is <strong>%s</strong>. You won\'t be shown this message again.';
 	$lang['auth_forgot_reset_ok']						= 'Please log in using this temporary password:';
 	$lang['auth_forgot_action_proceed']					= 'Proceed to Log In';
-
-
 

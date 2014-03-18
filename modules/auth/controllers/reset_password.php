@@ -93,107 +93,113 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					$_remember							= (bool) $this->input->get( 'remember' );
 
 					//	Reset the password
-					$this->user->update( $id, $_data );
+					if ( $this->user->update( $id, $_data ) ) :
 
-					//	Log the user in
-					switch( APP_NATIVE_LOGIN_USING ) :
+						//	Log the user in
+						switch( APP_NATIVE_LOGIN_USING ) :
 
-						case 'EMAIL' :
+							case 'EMAIL' :
 
-							$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
+								$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
 
-						break;
+							break;
 
-						// --------------------------------------------------------------------------
+							// --------------------------------------------------------------------------
 
-						case 'USERNAME' :
+							case 'USERNAME' :
 
-							$_login = $this->auth_model->login( $_user->username, $this->input->post( 'new_password' ), $_remember );
+								$_login = $this->auth_model->login( $_user->username, $this->input->post( 'new_password' ), $_remember );
 
-						break;
+							break;
 
-						// --------------------------------------------------------------------------
+							// --------------------------------------------------------------------------
 
-						case 'BOTH' :
-						default :
+							case 'BOTH' :
+							default :
 
-							$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
+								$_login = $this->auth_model->login( $_user->email, $this->input->post( 'new_password' ), $_remember );
 
-						break;
+							break;
 
-					endswitch;
+						endswitch;
 
-					if ( $_login ) :
+						if ( $_login ) :
 
-						if ( $this->config->item( 'auth_two_factor_enable' ) ) :
+							if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
-							$_query	= array();
+								$_query	= array();
 
-							if ( $this->input->get( 'return_to' ) ) :
+								if ( $this->input->get( 'return_to' ) ) :
 
-								$_query['return_to'] = $this->input->get( 'return_to' );
-
-							endif;
-
-							if ( $_remember ) :
-
-								$_query['remember'] = $_remember;
-
-							endif;
-
-							$_query = $_query ? '?' . http_build_query( $_query ) : '';
-
-							//	Login was successful, redirect to the security questions page
-							redirect( 'auth/security_questions/' . $_login['user_id'] . '/' . $_login['two_factor_auth']['salt'] . '/' . $_login['two_factor_auth']['token'] . $_query );
-
-						else :
-
-							//	Say hello
-							if ( $_login['last_login'] ) :
-
-								$this->load->helper( 'date' );
-
-								$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_login['last_login'] ) ) : user_datetime( $_login['last_login'] );
-
-								if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
-
-									$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_login['first_name'], $_last_login, $_login['last_ip'] ) ) );
-
-								else :
-
-									$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_login['first_name'], $_last_login ) ) );
+									$_query['return_to'] = $this->input->get( 'return_to' );
 
 								endif;
 
-							else :
+								if ( $_remember ) :
 
-								$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_login['first_name'] ) ) );
+									$_query['remember'] = $_remember;
 
-							endif;
+								endif;
 
-							//	Log user in and forward to wherever they need to go
-							if ( $this->input->get( 'return_to' ) ):
+								$_query = $_query ? '?' . http_build_query( $_query ) : '';
 
-								redirect( $this->input->get( 'return_to' ) );
-								return;
-
-							elseif ( $_user->group_homepage ) :
-
-								redirect( $_user->group_homepage );
-								return;
+								//	Login was successful, redirect to the security questions page
+								redirect( 'auth/security_questions/' . $_login['user_id'] . '/' . $_login['two_factor_auth']['salt'] . '/' . $_login['two_factor_auth']['token'] . $_query );
 
 							else :
 
-								redirect( '/' );
-								return;
+								//	Say hello
+								if ( $_login['last_login'] ) :
+
+									$this->load->helper( 'date' );
+
+									$_last_login = $this->config->item( 'auth_show_nicetime_on_login' ) ? nice_time( strtotime( $_login['last_login'] ) ) : user_datetime( $_login['last_login'] );
+
+									if ( $this->config->item( 'auth_show_last_ip_on_login' ) ) :
+
+										$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_with_ip', array( $_login['first_name'], $_last_login, $_login['last_ip'] ) ) );
+
+									else :
+
+										$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_login['first_name'], $_last_login ) ) );
+
+									endif;
+
+								else :
+
+									$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_login['first_name'] ) ) );
+
+								endif;
+
+								//	Log user in and forward to wherever they need to go
+								if ( $this->input->get( 'return_to' ) ):
+
+									redirect( $this->input->get( 'return_to' ) );
+									return;
+
+								elseif ( $_user->group_homepage ) :
+
+									redirect( $_user->group_homepage );
+									return;
+
+								else :
+
+									redirect( '/' );
+									return;
+
+								endif;
 
 							endif;
+
+						else :
+
+							$this->data['error'] = lang( 'auth_forgot_reset_badlogin', site_url( 'auth/login' ) );
 
 						endif;
 
 					else :
 
-						$this->data['error'] = lang( 'auth_forgot_reset_badlogin', site_url( 'auth/login' ) );
+						$this->data['error'] = lang( 'auth_forgot_reset_badupdate', $this->user->last_error() );
 
 					endif;
 
