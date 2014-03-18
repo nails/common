@@ -3526,7 +3526,7 @@ class NAILS_User_model extends NAILS_Model
 				$_data['password_md5']				= md5( $_hash[0] );
 				$_data['salt']						= $_hash[1];
 				$_data['temp_pw']					= TRUE;
-				//$_data['forgotten_password_code']	= NULL;
+				$_data['forgotten_password_code']	= NULL;
 
 				$this->db->where( 'forgotten_password_code', $_user->forgotten_password_code );
 				$this->db->set( $_data );
