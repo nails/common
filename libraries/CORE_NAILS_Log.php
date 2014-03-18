@@ -5,7 +5,6 @@ class CORE_NAILS_Log extends CI_Log
 	public function __construct()
 	{
 		parent::__construct();
-die(FCPATH . APPPATH . 'logs/');
 
 		// --------------------------------------------------------------------------
 
