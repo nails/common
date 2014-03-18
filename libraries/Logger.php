@@ -39,7 +39,7 @@ class Logger
 		//	Define defaults
 		$this->_log			= new stdClass();
 		$this->_log->exists	= FALSE;
-		$this->_log->file	= DEPLOY_LOG_DIR .  date( 'Y-m-d' ) . '.php';
+		$this->_log->file	= DEPLOY_LOG_DIR .  'log-' . date( 'Y-m-d' ) . '.php';
 		$this->mute_output	= FALSE;
 	}
 
@@ -101,7 +101,7 @@ class Logger
 
 			else :
 
-				write_file( $this->_log->file, date('Y-m-d H:i:s').' -- ' . trim( $line ) . "\n", 'a' );
+				write_file( $this->_log->file, 'INFO - ' . date( 'Y-m-d H:i:s' ) . ' --> ' . trim( $line ) . "\n", 'a' );
 
 			endif;
 
