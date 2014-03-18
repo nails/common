@@ -39,7 +39,7 @@ class CORE_NAILS_Log extends CI_Log
 
 		endif;
 
-		if ( ! is_writeable( FCPATH . $this->_log_path ) ) :
+		if ( ! is_writeable( $this->_log_path ) ) :
 
 			//	Kick up a fuss and tell Shed
 
@@ -79,7 +79,7 @@ class CORE_NAILS_Log extends CI_Log
 			$_message	.= '' . "\n";
 			$_message	.= 'The path was:' . "\n";
 			$_message	.= '' . "\n";
-			$_message	.= FCPATH . $this->_log_path . "\n";
+			$_message	.= $this->_log_path . "\n";
 			$_message	.= '' . "\n";
 			$_message	.= 'PHP SAPI Name:' . "\n";
 			$_message	.= '' . "\n";
