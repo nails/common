@@ -6,6 +6,7 @@ NAILS_CDN_Manager =  function() {
 	this.url_schemes		= {};
 	this.is_fancybox		= '';
 	this.reopen_fancybox	= '';
+	this._api				= null;
 
 	// --------------------------------------------------------------------------
 
@@ -16,6 +17,13 @@ NAILS_CDN_Manager =  function() {
 		this.url_schemes		= url_schemes;
 		this.is_fancybox		= is_fancybox;
 		this.reopen_fancybox	= reopen_fancybox;
+
+		// --------------------------------------------------------------------------
+
+		//	Set up the API interface
+		this._api = new window.NAILS_API();
+
+		// --------------------------------------------------------------------------
 
 		this._init_submit();
 		this._init_alerts();
@@ -265,7 +273,7 @@ NAILS_CDN_Manager =  function() {
 				var _droppable = $(this);
 				var _draggable = $(ui.draggable);
 
-				_api.call(
+				_this._api.call(
 				{
 					controller	: 'cdnapi',
 					method		: 'add_object_tag',
@@ -298,7 +306,7 @@ NAILS_CDN_Manager =  function() {
 				var _droppable = $(this);
 				var _draggable = $(ui.draggable);
 
-				_api.call(
+				_this._api.call(
 				{
 					controller	: 'cdnapi',
 					method		: 'delete_object_tag',

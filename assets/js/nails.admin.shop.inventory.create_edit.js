@@ -1,10 +1,11 @@
 var NAILS_Admin_Shop_Inventory_Create_Edit;
 NAILS_Admin_Shop_Inventory_Create_Edit = function()
 {
-	this.mode = null;
-	this.product_types = [];
-	this.upload_token = null;
-	this._variation_counter = 0;
+	this.mode				= null;
+	this.product_types		= [];
+	this.upload_token		= null;
+	this._api				= null;
+	this._variation_counter	= 0;
 
 
 	// --------------------------------------------------------------------------
@@ -16,6 +17,12 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		this.mode = mode;
 		this.product_types = product_types;
 		this.upload_token = upload_token;
+
+		// --------------------------------------------------------------------------
+
+		//	Set up the API interface
+		this._api = new window.NAILS_API();
+		console.log(this._api);
 
 		// --------------------------------------------------------------------------
 
@@ -478,9 +485,9 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$('#file_upload').uploadify({
 			'debug': false,
 			'auto': true,
-			'swf': SITE_URL + 'vendor/shed/nails/assets/swf/jquery.uploadify/uploadify.swf',
+			'swf': window.SITE_URL + 'vendor/shed/nails/assets/swf/jquery.uploadify/uploadify.swf',
 			'queueID': 'gallery-items',
-			'uploader': SITE_URL + 'api/cdnapi/object_create/script.php',
+			'uploader': window.SITE_URL + 'api/cdnapi/object_create/script.php',
 			'fileSizeLimit': 2048,
 			'fileObjName': 'upload',
 			'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',
@@ -747,7 +754,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		//	Deletes an uploaded image
 		$(document).on('click', '#gallery-items .gallery-item .delete', function()
 		{
-
 			var _object = this;
 
 			$('#dialog-confirm-delete').dialog(
@@ -772,7 +778,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 								'object_id': _object_id
 							}
 						};
-						window.NAILS.API.call(_call);
+						_this._api.call( _call );
 
 						// --------------------------------------------------------------------------
 
@@ -880,31 +886,31 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		var _url = {};
 
 		_target.types = '#tab-basics select.type_id';
-		_url.types = SITE_URL + 'admin/shop/manage/types?is_fancybox=1';
+		_url.types = window.SITE_URL + 'admin/shop/manage/types?is_fancybox=1';
 
 		_target.brands = '#tab-basics select.brands';
-		_url.brands = SITE_URL + 'admin/shop/manage/brands?is_fancybox=1';
+		_url.brands = window.SITE_URL + 'admin/shop/manage/brands?is_fancybox=1';
 
 		_target.categories = '#tab-basics select.categories';
-		_url.categories = SITE_URL + 'admin/shop/manage/categories?is_fancybox=1';
+		_url.categories = window.SITE_URL + 'admin/shop/manage/categories?is_fancybox=1';
 
 		_target.tags = '#tab-basics select.tags';
-		_url.tags = SITE_URL + 'admin/shop/manage/tags?is_fancybox=1';
+		_url.tags = window.SITE_URL + 'admin/shop/manage/tags?is_fancybox=1';
 
 		_target.tax_rates = '#tab-basics select.tax_rate_id';
-		_url.tax_rates = SITE_URL + 'admin/shop/manage/tax_rates?is_fancybox=1';
+		_url.tax_rates = window.SITE_URL + 'admin/shop/manage/tax_rates?is_fancybox=1';
 
 		_target.attributes = '#tab-attributes select.attributes';
-		_url.attributes = SITE_URL + 'admin/shop/manage/attributes?is_fancybox=1';
+		_url.attributes = window.SITE_URL + 'admin/shop/manage/attributes?is_fancybox=1';
 
 		_target.ranges = '#tab-ranges-collections select.ranges';
-		_url.ranges = SITE_URL + 'admin/shop/manage/ranges?is_fancybox=1';
+		_url.ranges = window.SITE_URL + 'admin/shop/manage/ranges?is_fancybox=1';
 
 		_target.collections = '#tab-ranges-collections select.collections';
-		_url.collections = SITE_URL + 'admin/shop/manage/collections?is_fancybox=1';
+		_url.collections = window.SITE_URL + 'admin/shop/manage/collections?is_fancybox=1';
 
 		_target.courier_method = '#tab-variations select.shipping_methods';
-		_url.courier_method = SITE_URL + 'admin/shop/manage/shipping_methods?is_fancybox=1';
+		_url.courier_method = window.SITE_URL + 'admin/shop/manage/shipping_methods?is_fancybox=1';
 
 		// --------------------------------------------------------------------------
 

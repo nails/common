@@ -8,11 +8,9 @@
 var NAILS_API;
 NAILS_API = function()
 {
-	this._api_base		= '';				//	The base of the API
-	this._hash			= '';				//	The hash to send along with each request
-	this._guid			= '';				//	The guid to send along with each request
-	this._csrf_cookie	= 'nailscsrftoken';	//	The name of the CSRF token to send, hard coded in config.php too
-	this._csrf_token	= 'nailscsrftest';	//	The name of the cooking containing the CSRF token, hard coded in config.php too
+	this._api_base		= window.SITE_URL + 'api/';	//	The base of the API
+	this._csrf_cookie	= 'nailscsrftoken';			//	The name of the CSRF token to send, hard coded in config.php too
+	this._csrf_token	= 'nailscsrftest';			//	The name of the cooking containing the CSRF token, hard coded in config.php too
 
 	// --------------------------------------------------------------------------
 
@@ -24,14 +22,9 @@ NAILS_API = function()
 	 * Sets everything up and binds all the listeners
 	 *
 	 **/
-	this.init = function( hash, guid )
+	this.set_base = function( base )
 	{
-		this._hash = hash;
-		this._guid = guid;
-
-		// --------------------------------------------------------------------------
-
-		this._api_base = window.SITE_URL + 'api/';
+		this._api_base = base;
 	};
 
 
@@ -118,17 +111,6 @@ NAILS_API = function()
 				_settings.data = $.extend({}, _settings.data, _csrf );
 			}
 		}
-
-		// --------------------------------------------------------------------------
-
-		//	Mix in some authentication variables
-		var _auth =
-		{
-			'api_token': this._hash,
-			'api_guid': this._guid
-		};
-
-		_settings.data = $.extend({}, _settings.data, _auth);
 
 		// --------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 var NAILS_Admin_CMS_pages_Create_Edit;
 NAILS_Admin_CMS_pages_Create_Edit = function()
 {
+	this._api				= null;
 	this.editor_id			= Math.floor( Math.random() * 10000000000000001 );
 	this._editor			= {};
 	this.search_placeholder	= 'Search widget library';
@@ -23,6 +24,13 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	{
 		this.templates	= templates;
 		this.widgets	= widgets;
+
+		// --------------------------------------------------------------------------
+
+		//	Set up the API interface
+		this._api = new window.NAILS_API();
+
+		// --------------------------------------------------------------------------
 
 		var _key, _key2;
 
@@ -372,7 +380,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				'error'			: $.proxy( function( data ) { this._save_fail( error_callback, data ); }, this ),
 			};
 
-			window.NAILS.API.call( _call );
+			this._api.call( _call );
 
 			return true;
 		}
@@ -1263,7 +1271,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			},
 		};
 
-		window.NAILS.API.call(_call);
+		this._api.call(_call);
 	};
 
 

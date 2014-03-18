@@ -1046,7 +1046,8 @@ $_out = <<<EOT
 								'object_id': _object_id
 							}
 						};
-						window.NAILS.API.call(_call);
+						var _api = new window.NAILS_API();
+						_api.call( _call );
 
 						// --------------------------------------------------------------------------
 

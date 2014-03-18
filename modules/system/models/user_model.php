@@ -2324,19 +2324,6 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Set decent defaults
-		if ( empty( $_contains ) ) :
-
-			$_contains		= array( 'symbol', 'lower_alpha', 'upper_alpha', 'number' );
-
-		endif;
-
-		if ( empty( $_is_not ) ) :
-
-			$_is_not	= array( 'password', '123456789' );
-
-		endif;
-
 		$_contains = array_filter( $_contains );
 		$_contains = array_unique( $_contains );
 

@@ -137,28 +137,6 @@ class Asset
 
 			break;
 
-			// --------------------------------------------------------------------------
-
-			case 'nails_api' :
-
-				//	Generate the api credentials
-
-				//	Load the assets
-				$this->load( 'nails.api.min.js', TRUE );
-
-				//	Inline assets
-				$_js  = '$(function(){';
-
-				$_js .= 'if ( typeof( NAILS_API ) === \'function\' ){';
-				$_js .= 'window.NAILS.API = new NAILS_API();';
-				$_js .= 'window.NAILS.API.init( \'\', \'\' );}';
-
-				$_js .= '});';
-
-				$this->inline( '<script>' . $_js . '</script>' );
-
-			break;
-
 		endswitch;
 	}
 

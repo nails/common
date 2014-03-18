@@ -16,7 +16,7 @@
 $config['auth_forgotten_pass_always_succeed']	= FALSE;
 
 //	Toggle the "remember me" functionality
-$config['auth_enable_remember_me']				= FALSE;
+$config['auth_enable_remember_me']				= TRUE;
 
 //	Toggle logins via hashes functionality
 $config['auth_enable_hashed_login']				= TRUE;

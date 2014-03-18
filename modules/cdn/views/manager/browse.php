@@ -368,19 +368,13 @@
 		<script type="text/javascript">
 		<!--//
 
-			var _nails,_api,_manager;
+			var _nails,_manager;
 
 			$(function(){
 
 				//	Initialise NAILS_JS
 				_nails = new NAILS_JS();
 				_nails.init();
-
-				// --------------------------------------------------------------------------
-
-				//	Initialise NAILS_API
-				_api = new NAILS_API();
-				_api.init( '', '' );
 
 				// --------------------------------------------------------------------------
 
