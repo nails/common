@@ -22,7 +22,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 		//	Set up the API interface
 		this._api = new window.NAILS_API();
-		console.log(this._api);
 
 		// --------------------------------------------------------------------------
 
