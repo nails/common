@@ -129,7 +129,13 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
-	private function _include_driver()
+	/**
+	 * Loads the appropriate driver
+	 *
+	 * @access	protected
+	 * @return	void
+	 **/
+	protected function _include_driver()
 	{
 		switch ( strtoupper( APP_CDN_DRIVER ) ) :
 
@@ -369,10 +375,10 @@ class Cdn
 	/**
 	 * Define the cache key prefix
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	string
 	 **/
-	private function _cache_prefix()
+	protected function _cache_prefix()
 	{
 		return 'CDN_';
 	}
@@ -387,6 +393,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Retrieves the error array
+	 *
+	 * @access	public
+	 * @return	array
+	 **/
 	public function get_errors()
 	{
 		return $this->_errors;
@@ -428,6 +440,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Catches shortcut calls
+	 *
+	 * @access	public
+	 * @return	mixed
+	 **/
 	public function __call( $method, $arguments )
 	{
 		//	Shortcut methods
@@ -461,6 +479,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Retrieves all objects form the database
+	 *
+	 * @access	public
+	 * @return	array
+	 **/
 	public function get_objects( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS' )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
@@ -513,6 +537,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Retrieves all trashed objects form the database
+	 *
+	 * @access	public
+	 * @return	array
+	 **/
 	public function get_objects_from_trash( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS_FROM_TRASH' )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
@@ -909,6 +939,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Parses the sort field which may be passed to the get_all methods
+	 *
+	 * @access	protected
+	 * @return	array
+	 **/
 	protected function _getcount_objects_common_parse_sort( $sort )
 	{
 		$_out = array( 'column' => NULL, 'order' => NULL );
@@ -1100,8 +1136,9 @@ class Cdn
 
 				$_bucket = $this->get_bucket( $bucket );
 
-				$_data->bucket_id	= $_bucket->id;
-				$_data->bucket_slug	= $_bucket->slug;
+				$_data->bucket			= new stdClass();
+				$_data->bucket->id		= $_bucket->id;
+				$_data->bucket->slug	= $_bucket->slug;
 
 			else :
 
@@ -1111,8 +1148,9 @@ class Cdn
 
 		else :
 
-			$_data->bucket_id	= $_bucket->id;
-			$_data->bucket_slug	= $_bucket->slug;
+			$_data->bucket			= new stdClass();
+			$_data->bucket->id		= $_bucket->id;
+			$_data->bucket->slug	= $_bucket->slug;
 
 		endif;
 
@@ -1342,7 +1380,7 @@ class Cdn
 
 		// --------------------------------------------------------------------------
 
-		$_upload = $this->_cdn->object_create( $_data->bucket_slug, $_data->filename, $_data->file, $_data->mime );
+		$_upload = $this->_cdn->object_create( $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -1386,6 +1424,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Deletes an object
+	 *
+	 * @access	public
+	 * @return	boolean
+	 **/
 	public function object_delete( $object )
 	{
 		if ( ! $object ) :
@@ -1470,6 +1514,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Restores an object from the trash
+	 *
+	 * @access	public
+	 * @return	boolean
+	 **/
 	public function object_restore( $object )
 	{
 		if ( ! $object ) :
@@ -1910,9 +1960,9 @@ class Cdn
 	 * @param	boolean
 	 * @return	string
 	 **/
-	private function _create_object( $data, $return_object = FALSE )
+	protected function _create_object( $data, $return_object = FALSE )
 	{
-		$this->db->set( 'bucket_id',		$data->bucket_id );
+		$this->db->set( 'bucket_id',		$data->bucket->id );
 		$this->db->set( 'filename',			$data->filename );
 		$this->db->set( 'filename_display',	$data->name );
 		$this->db->set( 'mime',				$data->mime );
@@ -2004,11 +2054,11 @@ class Cdn
 	/**
 	 * Formats an object object
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @param	object	$object	The object to format
 	 * @return	void
 	 **/
-	private function _format_object( &$object )
+	protected function _format_object( &$object )
 	{
 		$object->id				= (int) $object->id;
 		$object->filesize		= (int) $object->filesize;
@@ -2492,11 +2542,11 @@ class Cdn
 	/**
 	 * Formats a bucket object
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @param	object	$bucket	The bucket to format
 	 * @return	void
 	 **/
-	private function _format_bucket( &$bucket )
+	protected function _format_bucket( &$bucket )
 	{
 		$bucket->id				= (int) $bucket->id;
 		$bucket->object_count	= (int) $bucket->object_count;
@@ -2530,11 +2580,11 @@ class Cdn
 	 * Attempts to detect whether a gif is animated or not
 	 * Credit where credit's due: http://php.net/manual/en/function.imagecreatefromgif.php#59787
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @param	string $file the path to the file to check
 	 * @return	boolean
 	 **/
-	private function _detect_animated_gif( $file )
+	protected function _detect_animated_gif( $file )
 	{
 		$filecontents=file_get_contents($file);
 
@@ -2582,10 +2632,10 @@ class Cdn
 
 
 	/**
-	 * Returns the error array
+	 * Fetches the extension from the mime type
 	 *
 	 * @access	public
-	 * @return	array
+	 * @return	string
 	 **/
 	public function get_ext_from_mimetype( $mime_type )
 	{
@@ -2703,6 +2753,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Gets the mime type from the extension
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function get_mimetype_from_ext( $ext )
 	{
 		//	Prep $ext, make sure it has no dots
@@ -2756,6 +2812,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Gets the mime type of a file on disk
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function get_mime_type_from_file( $object )
 	{
 		$_fi = finfo_open( FILEINFO_MIME_TYPE );
@@ -2877,6 +2939,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Verifies a zip file's hash
+	 *
+	 * @access	public
+	 * @return	boolean
+	 **/
 	public function verify_url_serve_zipped_hash( $hash, $objects, $filename = 'download.zip' )
 	{
 		if ( ! is_array( $objects ) ) :
@@ -3131,6 +3199,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Generates an API upload token.
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function generate_api_upload_token( $user_id = NULL, $duration = 7200, $restrict_ip = TRUE )
 	{
 		if ( $user_id === NULL ) :
@@ -3178,6 +3252,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Verifies an aPI upload token
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function validate_api_upload_token( $token )
 	{
 		$_token = get_instance()->encrypt->decode( $token, APP_PRIVATE_KEY );
@@ -3297,6 +3377,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Finds objects which have no file coutnerparts
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function find_orphaned_objects()
 	{
 		$_out = array( 'orphans' => array(), 'elapsed_time' => 0 );
@@ -3332,6 +3418,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Finds fiels which have no object coutnerparts
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function find_orphaned_files()
 	{
 		return array();
@@ -3341,6 +3433,12 @@ class Cdn
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Runs the CDN tests
+	 *
+	 * @access	public
+	 * @return	string
+	 **/
 	public function run_tests()
 	{
 		//	If defined, run the pre_test method for the driver

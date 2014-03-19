@@ -53,16 +53,22 @@ class Local_CDN
 	 * @param	none
 	 * @return	void
 	 **/
-	public function object_create( $bucket, $filename, $sourcefile, $mime )
+	public function object_create( $data )
 	{
+		$_bucket	= ! empty( $data->bucket->slug )	? $data->bucket->slug	: '';
+		$_filename	= ! empty( $data->filename )		? $data->filename		: '';
+		$_source	= ! empty( $data->file )			? $data->file			: '';
+
+		// --------------------------------------------------------------------------
+
 		//	Check directory exists
-		if ( ! is_dir( DEPLOY_CDN_PATH . $bucket ) ) :
+		if ( ! is_dir( DEPLOY_CDN_PATH . $_bucket ) ) :
 
 			//	Hmm, not writeable, can we create it?
-			if ( ! @mkdir( DEPLOY_CDN_PATH . $bucket ) ) :
+			if ( ! @mkdir( DEPLOY_CDN_PATH . $_bucket ) ) :
 
 				//	Nope, failed to create the directory - we iz gonna have problems if we continue, innit.
-				$this->cdn->set_error( lang( 'cdn_error_target_write_fail_mkdir', DEPLOY_CDN_PATH . $bucket ) );
+				$this->cdn->set_error( lang( 'cdn_error_target_write_fail_mkdir', DEPLOY_CDN_PATH . $_bucket ) );
 				return FALSE;
 
 			endif;
@@ -72,9 +78,9 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Check bucket is writeable
-		if ( ! is_really_writable( DEPLOY_CDN_PATH . $bucket ) ) :
+		if ( ! is_really_writable( DEPLOY_CDN_PATH . $_bucket ) ) :
 
-			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', DEPLOY_CDN_PATH . $bucket ) );
+			$this->cdn->set_error( lang( 'cdn_error_target_write_fail', DEPLOY_CDN_PATH . $_bucket ) );
 			return FALSE;
 
 		endif;
@@ -82,14 +88,14 @@ class Local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Move the file
-		$_dest = DEPLOY_CDN_PATH . $bucket . '/' . $filename;
+		$_dest = DEPLOY_CDN_PATH . $_bucket . '/' . $_filename;
 
-		if ( @move_uploaded_file( $sourcefile, $_dest ) ) :
+		if ( @move_uploaded_file( $_source, $_dest ) ) :
 
 			return TRUE;
 
 		//	Hmm, failed to move, try copying it.
-		elseif( @copy( $sourcefile, $_dest ) ) :
+		elseif( @copy( $_source, $_dest ) ) :
 
 			return TRUE;
 

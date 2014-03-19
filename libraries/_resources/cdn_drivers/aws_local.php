@@ -106,15 +106,27 @@ class Aws_local_CDN
 	 * @param	none
 	 * @return	void
 	 **/
-	public function object_create( $bucket, $filename, $sourcefile, $mime )
+	public function object_create( $data )
 	{
+		$_bucket		= ! empty( $data->bucket->slug )	? $data->bucket->slug	: '';
+		$_filename_orig	= ! empty( $data->filename )		? $data->filename		: '';
+
+		$_filename	= strtolower( substr( $_filename_orig, 0, strrpos( $_filename_orig, '.' ) ) );
+		$_extension	= strtolower( substr( $_filename_orig, strrpos( $_filename_orig, '.' ) ) );
+
+		$_source	= ! empty( $data->file )			? $data->file			: '';
+		$_mime		= ! empty( $data->mime )			? $data->mime			: '';
+		$_name		= ! empty( $data->name )			? $data->name			: 'file' . $_extension;
+
+		// --------------------------------------------------------------------------
+
 		try
 		{
 			$_result = $this->_s3->putObject(array(
 				'Bucket'		=> $this->_bucket,
-				'Key'			=> $bucket . '/' . $filename,
-				'SourceFile'	=> $sourcefile,
-				'ContentType'	=> $mime,
+				'Key'			=> $_bucket . '/' . $_filename . $_extension,
+				'SourceFile'	=> $_source,
+				'ContentType'	=> $_mime,
 				'ACL'			=> 'public-read'
 			));
 
@@ -124,16 +136,14 @@ class Aws_local_CDN
 			try
 			{
 
-				$_filename	= strtolower( substr( $filename, 0, strrpos( $filename, '.' ) ) );
-				$_extension	= strtolower( substr( $filename, strrpos( $filename, '.' ) ) );
-
 				$_result = $this->_s3->copyObject(array(
-					'Bucket'			=> $this->_bucket,
-					'CopySource'		=> $this->_bucket . '/' . $bucket . '/' . $filename,
-					'Key'				=> $bucket . '/' . $_filename . '-download' . $_extension,
-					'ContentType'		=> 'application/octet-stream',
-					'MetadataDirective'	=> 'REPLACE',
-					'ACL'				=> 'public-read'
+					'Bucket'				=> $this->_bucket,
+					'CopySource'			=> $this->_bucket . '/' . $_bucket . '/' . $_filename . $_extension,
+					'Key'					=> $_bucket . '/' . $_filename . '-download' . $_extension,
+					'ContentType'			=> 'application/octet-stream',
+					'ContentDisposition'	=> 'attachment; filename="' . str_replace( '"', '', $_name ) . '" ',
+					'MetadataDirective'		=> 'REPLACE',
+					'ACL'					=> 'public-read'
 				));
 
 				return TRUE;
