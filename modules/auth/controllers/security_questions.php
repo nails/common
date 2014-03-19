@@ -23,8 +23,8 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 	{
 		if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
-			$_return_to	= $this->input->get( 'return_to' );
-			$_remember	= $this->input->get( 'remember' );
+			$_return_to	= $this->input->get( 'return_to', TRUE );
+			$_remember	= $this->input->get( 'remember', TRUE );
 			$_user_id	= $this->uri->segment( 3 );
 			$_user		= $this->user->get_by_id( $_user_id );
 
@@ -375,17 +375,23 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 				$this->session->set_flashdata( 'error', lang( 'auth_twofactor_token_unverified' ) );
 
-				if ( $this->input->get( 'return_to' ) ):
+				$_query					= array();
+				$_query['return_to']	= $_return_to;
+				$_query['remember']		= $_remember;
 
-					redirect( 'auth/login?return_to=' . $this->input->get( 'return_to' ) );
-					return;
+				$_query = array_filter( $_query );
+
+				if ( $_query ) :
+
+					$_query = '?' . http_build_query( $_query );
 
 				else :
 
-					redirect( 'auth/login' );
-					return;
+					$_query = '';
 
 				endif;
+
+				redircet( 'auth/login' . $_query );
 
 			endif;
 

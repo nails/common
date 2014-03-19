@@ -24,10 +24,9 @@
 
 	endif;
 
-	$_return_to		= $return_to ? '?return_to=' . $return_to : '';
 	echo form_open( site_url() . 'auth/security_questions/' . $user_id . '/' . $token['salt'] . '/' . $token['token'] . $_login_method . $_query );
 
-?>
+	?>
 	<p>
 		<?=form_password( 'answer', NULL, 'placeholder="Type your answer here"' )?>
 	</p>
