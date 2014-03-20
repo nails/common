@@ -77,10 +77,9 @@ class NAILS_Register extends NAILS_Auth_Controller
 		if ( $this->input->post() ) :
 
 			//	Validate input
-			$this->form_validation->set_rules( 'first_name',	'First Name',			'required|xss_clean' );
-			$this->form_validation->set_rules( 'last_name',		'Surname',				'required|xss_clean' );
-			$this->form_validation->set_rules( 'password',		'Password',				'required|xss_clean' );
-			$this->form_validation->set_rules( 'terms',			'Terms & Conditions',	'required|xss_clean' );
+			$this->form_validation->set_rules( 'first_name',	'',	'required|xss_clean' );
+			$this->form_validation->set_rules( 'last_name',		'',	'required|xss_clean' );
+			$this->form_validation->set_rules( 'password',		'',	'required|xss_clean' );
 
 			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' ) :
 

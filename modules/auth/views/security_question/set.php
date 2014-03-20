@@ -1,9 +1,4 @@
-<p>
-	<?=lang( 'auth_twofactor_question_set_body' )?>
-</p>
 <?php
-
-	$_login_method	= $login_method && $login_method != 'native' ? '/' . $login_method : '';
 
 	$_query					= array();
 	$_query['return_to']	= $return_to;
@@ -11,98 +6,128 @@
 
 	$_query = array_filter( $_query );
 
-	if ( $_query ) :
+?>
+<div class="row">
+	<div class="well well-lg col-sm-6 col-sm-offset-3">
+		<p>
+			Please set security questions for your account.
+		</p>
+		<?php
 
-		$_query = '?' . http_build_query( $_query );
+			$_query					= array();
+			$_query['return_to']	= $return_to;
+			$_query['remember']		= $remember;
 
-	else :
+			$_query = array_filter( $_query );
 
-		$_query = '';
+			if ( $_query ) :
 
-	endif;
+				$_query = '?' . http_build_query( $_query );
 
-	echo form_open( 'auth/security_questions/' . $user_id . '/' . $token['salt'] . '/' . $token['token'] . $_login_method . $_query );
+			else :
 
+				$_query = '';
 
-		if ( $num_questions ) :
+			endif;
 
-			echo '<p>';
-				echo lang( 'auth_twofactor_question_set_system_body' );
-			echo '</p>';
+			echo form_open( 'auth/security_questions/' . $user_id . '/' . $token['salt'] . '/' . $token['token'] . $_query );
 
-			echo '<fieldset>';
-				echo $num_custom_questions ? '<legend>' . lang( 'auth_twofactor_question_set_system_legend' ) . '</legend>' : '';
+				if ( $num_questions ) :
 
-			for ( $i = 0; $i < $num_questions; $i++ ) :
-
-				echo '<fieldset>';
-
-					$_field				= array();
-					$_field['key']		= 'question[' . $i . '][question]';
-					$_field['label']	= 'Question';
-					$_field['class']	= 'chosen';
-					$_field['required']	= TRUE;
-
-					$_options  = array_merge( array( 'Please Choose...' ), $questions );
-
-					echo form_field_dropdown( $_field, $_options );
-
-					$_field					= array();
-					$_field['key']			= 'question[' . $i . '][answer]';
-					$_field['label']		= 'Answer';
-					$_field['placeholder']	= 'Type your answer here';
-					$_field['required']		= TRUE;
-
-					echo form_field( $_field );
-
-				echo '</fieldset>';
-
-			endfor;
-
-			echo '</fieldset>';
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( $num_custom_questions ) :
-
-			echo '<p>';
-				echo lang( 'auth_twofactor_question_set_custom_body' );
-			echo '</p>';
-
-			echo '<fieldset>';
-				echo $num_questions ? '<legend>' . lang( 'auth_twofactor_question_set_custom_legend' ) . '</legend>' : '';
-
-				for ( $i = 0; $i < $num_custom_questions; $i++ ) :
+					echo '<p>';
+						echo lang( 'auth_twofactor_question_set_system_body' );
+					echo '</p>';
 
 					echo '<fieldset>';
+						echo $num_custom_questions ? '<legend style="padding-top:20px">' . lang( 'auth_twofactor_question_set_system_legend' ) . '</legend>' : '';
 
-						$_field					= array();
-						$_field['key']			= 'custom_question[' . $i . '][question]';
-						$_field['label']		= 'Question';
-						$_field['class']		= 'chosen';
-						$_field['placeholder']	= 'Type your security question here';
-						$_field['required']		= TRUE;
+					for ( $i = 0; $i < $num_questions; $i++ ) :
 
-						echo form_field( $_field );
+						$_field			= 'question[' . $i . '][question]';
+						$_name			= 'Question ' . ( $i + 1 );
+						$_error			= form_error( $_field ) ? 'has-error' : NULL;
+						$_options  		= array_merge( array( 'Please Choose...' ), $questions );
 
-						$_field					= array();
-						$_field['key']			= 'custom_question[' . $i . '][answer]';
-						$_field['label']		= 'Answer';
-						$_field['placeholder']	= 'Type your answer here';
-						$_field['required']		= TRUE;
+						echo '<br>';
+						echo '<div class="' . $_error . '">';
+							echo '<label for="password">' . $_name . '</label>';
+							echo form_dropdown( $_field, $_options, set_value( $_field ), 'class="form-control"' );
+							echo form_error( $_field, '<span class="help-block">', '</span>' );
+						echo '</div>';
 
-						echo form_field( $_field );
+						// --------------------------------------------------------------------------
+
+						$_field			= 'question[' . $i . '][answer]';
+						$_name			= 'Answer ' . ( $i + 1 );
+						$_error			= form_error( $_field ) ? 'has-error' : NULL;
+						$_placeholder	= 'Type your answer here';
+						$_options  		= array_merge( array( 'Please Choose...' ), $questions );
+
+						echo '<br>';
+						echo '<div class="' . $_error . '">';
+							echo '<label for="password">' . $_name . '</label>';
+							echo form_input( $_field, set_value( $_field ), 'autocomplete="off" class="form-control" placeholder="' . $_placeholder . '"' );
+							echo form_error( $_field, '<span class="help-block">', '</span>' );
+						echo '</div>';
+
+						echo '<hr />';
+
+					endfor;
 
 					echo '</fieldset>';
 
-				endfor;
+				endif;
 
-			echo '</fieldset>';
+				// --------------------------------------------------------------------------
 
-		endif;
+				if ( $num_custom_questions ) :
 
-	?>
-	<?=form_submit( 'submit', lang( 'action_continue') )?>
-<?=form_close()?>
+					echo '<p>';
+						echo lang( 'auth_twofactor_question_set_custom_body' );
+					echo '</p>';
+
+					echo '<fieldset>';
+						echo $num_questions ? '<legend style="padding-top:20px">' . lang( 'auth_twofactor_question_set_custom_legend' ) . '</legend>' : '';
+
+						for ( $i = 0; $i < $num_custom_questions; $i++ ) :
+
+							$_field			= 'custom_question[' . $i . '][answer]';
+							$_name			= 'Answer ' . ( $i + 1 );
+							$_error			= form_error( $_field ) ? 'has-error' : NULL;
+							$_placeholder	= 'Type your question here';
+
+							echo '<br>';
+							echo '<div class="' . $_error . '">';
+								echo '<label for="password">' . $_name . '</label>';
+								echo form_input( $_field, set_value( $_field ), 'autocomplete="off" class="form-control" placeholder="' . $_placeholder . '"' );
+								echo form_error( $_field, '<span class="help-block">', '</span>' );
+							echo '</div>';
+
+							// --------------------------------------------------------------------------
+
+							$_field			= 'custom_question[' . $i . '][answer]';
+							$_name			= 'Answer ' . ( $i + 1 );
+							$_error			= form_error( $_field ) ? 'has-error' : NULL;
+							$_placeholder	= 'Type your answer here';
+							$_options  		= array_merge( array( 'Please Choose...' ), $questions );
+
+							echo '<br>';
+							echo '<div class="' . $_error . '">';
+								echo '<label for="password">' . $_name . '</label>';
+								echo form_input( $_field, set_value( $_field ), 'autocomplete="off" class="form-control" placeholder="' . $_placeholder . '"' );
+								echo form_error( $_field, '<span class="help-block">', '</span>' );
+							echo '</div>';
+
+							echo '<hr />';
+
+						endfor;
+
+					echo '</fieldset>';
+
+				endif;
+
+			?>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Set Questions &amp; Sign In</button>
+		<?=form_close()?>
+	</div>
+</div>

@@ -86,7 +86,7 @@
 	$lang['auth_twofactor_question_unique']				= '<strong>Sorry,</strong> questions must be unique. Please don\'t specify the same question more than once.';
 
 	$lang['auth_twofactor_answer_title']				= 'Security Question';
-	$lang['auth_twofactor_answer_body']					= 'Please answer the following question.';
+	$lang['auth_twofactor_answer_body']					= 'Please answer the following security question.';
 	$lang['auth_twofactor_answer_incorrect']			= '<strong>Sorry,</strong> your answer was incorrect.';
 
 

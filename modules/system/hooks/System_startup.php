@@ -4,8 +4,10 @@ class System_startup
 {
 	public function define_constants()
 	{
-		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.1.0' );
+		//	Define some generic Nails constants
+		define( 'NAILS_VERSION',		'0.1.0' );
+		define( 'NAILS_PACKAGE_NAME',	'Nails' );
+		define( 'NAILS_PACKAGE_URL',	'http://nailsapp.co.uk' );
 
 		// --------------------------------------------------------------------------
 

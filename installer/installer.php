@@ -15,6 +15,7 @@
 
 class CORE_NAILS_Installer
 {
+	protected $_warnings;
 	protected $_errors;
 	protected $_app_file;
 	protected $_has_app_file;
@@ -28,11 +29,11 @@ class CORE_NAILS_Installer
 	public function __construct()
 	{
 		$this->_errors			= '';
-		$this->_app_file		= $this->_abpath . '/config/app.php';
-		$this->_has_app_file	= FALSE;
-		$this->_deploy_file		= $this->_abpath . '/config/deploy.php';
-		$this->_has_deploy_file	= FALSE;
-
+		$this->_config_dir		= '/config/';
+		$this->_app_file		= $this->_abpath . $this->_config_dir . 'app.php';
+		$this->_deploy_file		= $this->_abpath . $this->_config_dir . 'deploy.php';
+		$this->_has_app_file	= is_file( $this->_app_file );
+		$this->_has_deploy_file	= is_file( $this->_deploy_file );
 	}
 
 	// --------------------------------------------------------------------------
@@ -128,6 +129,13 @@ class CORE_NAILS_Installer
 
 	protected function _request_config()
 	{
+		//	Test config directpory is writeable
+		if ( ! is_writeable( $this->_abpath . $this->_config_dir ) ) :
+
+			$this->_warnings = '<strong>Hey!</strong>&nbsp; Just a heads-up that it seems that app\'s config folder is not writeable. Please ensure <code>config/</code> is writeable by the webserver.';
+
+		endif;
+
 		$this->_view_header();
 
 		?>
@@ -138,6 +146,11 @@ class CORE_NAILS_Installer
 			<?php if ( $this->_errors ) : ?>
 			<p class="error rounded">
 				<?=$this->_errors?>
+			</p>
+			<?php endif; ?>
+			<?php if ( $this->_warnings ) : ?>
+			<p class="warning rounded">
+				<?=$this->_warnings?>
 			</p>
 			<?php endif; ?>
 			<p>
@@ -284,7 +297,7 @@ class CORE_NAILS_Installer
 			<!-- DATABASE -->
 			<div class="config-item">
 				<p>
-					Specify the details for conencting to MySQL. You'll need to have an empty database already set up.
+					Specify the details for connecting to MySQL. You'll need to have an empty database already set up.
 				</p>
 				<fieldset>
 					<p>
@@ -576,7 +589,7 @@ class CORE_NAILS_Installer
 		$_db = new DB();
 		if ( ! $_db->connect( $_db_host, $_db_username, $_db_password, $_db_database ) ) :
 
-			$this->_errors = 'Could not connect to MySQL.';
+			$this->_errors = 'Could not connect to MySQL. ' . $_db->last_error();
 			$this->_request_config();
 			return FALSE;
 
@@ -781,19 +794,11 @@ class CORE_NAILS_Installer
 
 		else :
 
-			$this->_view_header();
-			?>
-			<div id="container">
-				<h1>Nails. Installer</h1>
-				<p>
-					Unfortunately I wasn't able to create the appropriate configuration files.
-				</p>
-				<p>
-					Please ensure that the <code>config/</code> directory is writeable by the webserver and run this installer again.
-				</p>
-			</div>
-			<?php
-			$this->_view_footer();
+			@unlink( $this->_app_file );
+			@unlink( $this->_deploy_file );
+
+			$this->_errors = 'I wasn\'t able to create the appropriate configuration files. Please ensure that the <code>config/</code> directory is writeable by the webserver.';
+			$this->_request_config();
 
 		endif;
 	}
@@ -924,6 +929,14 @@ class CORE_NAILS_Installer
 					color:#CC0010;
 				}
 
+				p.warning
+				{
+					background:#FFFFE0;
+					border:1px solid #E6DB55;
+					padding:10px;
+					color:#222;
+				}
+
 				p.submit
 				{
 					text-align:right;
@@ -1042,6 +1055,7 @@ class CORE_NAILS_Migration {}
 class DB
 {
 	private $_db;
+	private $_error;
 
 	// --------------------------------------------------------------------------
 
@@ -1051,6 +1065,7 @@ class DB
 
 		if ( $this->_db->connect_errno ) :
 
+			$this->_error = $this->_db->connect_error . ' (Error: ' . $this->_db->connect_errno . ')';
 			return FALSE;
 
 		endif;
@@ -1065,5 +1080,14 @@ class DB
 	public function query( $query )
 	{
 		$this->_db->query( $query );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function last_error()
+	{
+		return $this->_error;
 	}
 }

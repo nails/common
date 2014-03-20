@@ -1,87 +1,104 @@
 <?php
 
-	/**
-	 *	THE LOGIN FORM
-	 *
-	 *	This view contains only the basic form required for logging a user in. The controller
-	 *	will look for an app version of the file  first and load that up. It will fall back
-	 *	to the empty Nails view if not available (which includes some basic styling so
-	 *	as not to look totally rubbish).
-	 *
-	 *	You can completely overload this view by creating a view at:
-	 *
-	 *	application/views/auth/login/form
-	 *
-	 **/
-
-	// --------------------------------------------------------------------------
-
-	/**
-	 *	LOGIN ERRORS
-	 *
-	 *	Only individual field errors are shown, generic erros (such as too many attempted logins)
-	 *	should be handled by the containing header files.
-	 *
-	 **/
-
-
-	//	Form attributes
-	$attr = array(
-
-		'id'	=> 'login-form',
-		'class'	=> 'container nails-default-form'
-
-	);
-
-	//	If there's a 'return_to' variable set it as a GET variable in case there's a form
-	//	validation error. Otherwise don't show it - cleaner. Using site_url() as the return_to variable
-	//	will most likely contain a full URL, causing form_open() not to site_url() it (resulting in the
-	//	form posting to auth/login rather than /auth/login).
-
 	$_return_to = $return_to ? '?return_to=' . urlencode( $return_to ) : '';
 
-	echo form_open( site_url( 'auth/login' . $_return_to ), $attr );
-
-	// --------------------------------------------------------------------------
-
-	//	Write the HTML for the login form
 ?>
+<div class="row ">
+	<div class="well well-lg col-sm-6 col-sm-offset-3">
+		<!--	SOCIAL NETWORK BUTTONS	-->
+		<?php
 
-	<div class="row">
+			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
 
-		<!--	LOGIN FIELDS	-->
-		<div class="first seven columns">
+				echo '<p class="text-center" style="margin:1em 0 2em 0;">';
+					echo 'Sign in using your preferred social network.';
+				echo '</p>';
 
-			<p>
-				<?php
+				echo '<div class="row" style="margin-top:1em;">';
 
-					if ( APP_USER_ALLOW_REGISTRATION ) :
+					$_buttons = array();
 
-						echo lang( 'auth_login_message', array( APP_NAME, site_url( 'auth/register' ) ) );
+					//	FACEBOOK
+					if ( module_is_enabled( 'auth[facebook]' ) ) :
 
-					else :
-
-						echo lang( 'auth_login_message_no_register', array( APP_NAME ) );
+						$_buttons[] = array( 'auth/fb/connect' . $_return_to, 'Facebook' );
 
 					endif;
 
-				?>
-			</p>
+					//	TWITTER
+					if ( module_is_enabled( 'auth[twitter]' ) ) :
 
+						$_buttons[] = array( 'auth/tw/connect' . $_return_to, 'Twitter' );
+
+					endif;
+
+					//	LINKEDIN
+					if ( module_is_enabled( 'auth[linkedin]' ) ) :
+
+						$_buttons[] = array( 'auth/li/connect' . $_return_to, 'LinkedIn' );
+
+					endif;
+
+					// --------------------------------------------------------------------------
+
+					//	Render the buttons
+					$_cols_each = floor( 12 / count( $_buttons ) );
+
+					foreach ( $_buttons AS $btn ) :
+
+						echo '<div class="col-sm-' . $_cols_each. ' text-center">';
+							echo anchor( $btn[0], $btn[1], 'class="btn btn-primary btn-lg" style="display:block;"' );
+						echo '</div>';
+
+					endforeach;
+
+				echo '</div>';
+
+				echo '<hr />';
+
+				echo '<p class="text-center" style="margin:1em 0 2em 0;">';
+					switch ( APP_NATIVE_LOGIN_USING ) :
+
+						case 'EMAIL' :
+
+							echo 'Or sign in using your email address and password.';
+
+						break;
+
+						case 'USERNAME' :
+
+							echo 'Or sign in using your username and password.';
+
+						break;
+
+						case 'BOTH' :
+						default :
+
+							echo 'Or sign in using your email address or username and password.';
+
+						break;
+
+					endswitch;
+				echo '</p>';
+
+			endif;
+
+		?>
+		<?=form_open( site_url( 'auth/login' . $_return_to ), 'class="form form-horizontal"' )?>
 			<?php
 
 				switch ( APP_NATIVE_LOGIN_USING ) :
 
 					case 'EMAIL' :
 
-						$_name			= lang( 'form_label_email' );
+						$_label			= lang( 'form_label_email' );
 						$_placeholder	= lang( 'auth_login_email_placeholder' );
 
 					break;
 
 					case 'USERNAME' :
 
-						$_name			= lang( 'form_label_username' );
+						$_label			= lang( 'form_label_username' );
 						$_placeholder	= lang( 'auth_login_username_placeholder' );
 
 					break;
@@ -89,7 +106,7 @@
 					case 'BOTH' :
 					default :
 
-						$_name			= lang( 'auth_login_both' );
+						$_label			= lang( 'auth_login_both' );
 						$_placeholder	= lang( 'auth_login_both_placeholder' );
 
 					break;
@@ -100,109 +117,46 @@
 				$_error	= form_error( $_field ) ? 'error' : NULL
 
 			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+			<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+				<label class="col-sm-3 control-label" for="input-<?=$_field?>"><?=$_label?></label>
+				<div class="col-sm-9">
+					<?=form_input( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+					<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
-
 			<?php
 
 				$_field			= 'password';
-				$_name			= lang( 'form_label_password' );
-				$_placeholder	= lang( 'auth_login_pass_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
+				$_label			= lang( 'form_label_password' );
+				$_placeholder	= lang( 'auth_login_password_placeholder' );
 
 			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns">
-					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
+			<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+				<label class="col-sm-3 control-label" for="input-<?=$_field?>"><?=$_label?></label>
+				<div class="col-sm-9">
+					<?=form_password( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+					<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
-
-			<!--	REMEMBER ME CHECKBOX	-->
-			<?php
-
-				if ( $this->config->item( 'auth_enable_remember_me' ) ) :
-
-					$_field	= 'remember';
-					$_name	= lang( 'auth_login_label_remember_me' );
-					$_error = form_error( $_field ) ? 'error' : NULL
-
-					?>
-					<div class="row">
-						<label class="two columns first">&nbsp;</label>
-						<div class="four columns last">
-							<label class="checkbox">
-								<?=form_checkbox( $_field, TRUE, TRUE )?>
-								<?=$_name?>
-							</label>
-						</div>
+			<div class="form-group">
+				<div class="col-sm-offset-3 col-sm-9">
+					<div class="checkbox">
+						<label class="popover-hover" title="Keep your account secure" data-content="Uncheck this when using a shared computer.">
+							<input type="checkbox" name="rememberme" <?=set_checkbox( 'rememberme' )?>> Remember me
+						</label>
 					</div>
-					<?php
-
-			endif;
-
-			?>
-
-
-			<div class="row button-row">
-				<label class="two columns first">&nbsp;</label>
-				<div class="four columns last">
-					<?=form_submit( 'submit', 'Log In', 'class="awesome"' )?>
-					<small style="margin-left:15px;">
-						<?=anchor( 'auth/forgotten_password', lang ('auth_login_forgot' ) )?>
-					</small>
 				</div>
 			</div>
-
-		</div>
-
-		<!--	SOCIAL NETWORK BUTTONS	-->
-		<?php
-
-			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
-
-				echo '<div class="eight columns last offset-by-one">';
-				echo '<p style="text-align:center;">' . lang( 'auth_login_social_message' ) . '</p>';
-
-				// --------------------------------------------------------------------------
-
-				//	FACEBOOK
-				if ( module_is_enabled( 'auth[facebook]' ) ) :
-
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect' . $_return_to, lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
-
-				endif;
-
-				//	TWITTER
-				if ( module_is_enabled( 'auth[twitter]' ) ) :
-
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect' . $_return_to, lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
-
-				endif;
-
-				//	LINKEDIN
-				if ( module_is_enabled( 'auth[linkedin]' ) ) :
-
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect' . $_return_to, lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
-
-				endif;
-
-				echo '</div>';
-
-			endif;
-
-		?>
+			<div class="form-group">
+				<div class="col-sm-offset-3 col-sm-9">
+					<button type="submit" class="btn btn-primary">Sign in</button>
+					<?=anchor( 'auth/forgotten_password', 'Forgotten Your Password?', 'class="btn btn-default"' )?>
+				</div>
+			</div>
+		<?=form_close()?>
+		<hr />
+		<p class="text-center">
+			Not got an account? <?=anchor( 'auth/register', 'Register now' )?>.
+		</p>
 	</div>
-
-<?php
-
-	// --------------------------------------------------------------------------
-
-	//	Close the form
-	echo form_close();
+</div>

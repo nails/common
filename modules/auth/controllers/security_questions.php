@@ -135,8 +135,6 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 						endif;
 
-
-
 						// --------------------------------------------------------------------------
 
 						//	Delete the token we generated, its no needed, eh!

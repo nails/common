@@ -4,15 +4,17 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 	<head>
+		<title><?php
 
-		<!--	META	-->
-		<meta charset="utf-8">
-		<title><?=! empty( $page->title ) ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+			echo ! empty( $page->title ) ? $page->title . ' - ' : '';
+
+			echo APP_NAME;
+
+		?></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset='utf-8'>
 		<meta name="description" content="<?=! empty( $page->description ) ? $page->description : ''?>">
 		<meta name="keywords" content="<?=! empty( $page->keywords ) ? $page->keywords : ''?>">
-
-		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
 			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
 			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
@@ -25,86 +27,51 @@
 			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
 			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 		</script>
-
-		<noscript>
-			<style type="text/css">
-
-				.js-only
-				{
-					display:none;
-				}
-
-			</style>
-		</noscript>
-
-		<!--	STYLES	-->
 		<?php
 
-			$this->asset->output();
+			$this->asset->output( 'css' );
+			$this->asset->output( 'css-inline' );
 
 		?>
-
-		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 		<![endif]-->
-
 	</head>
 	<body>
+		<div class="container">
+			<div class="row text-center" style="margin-top:1em;">
+				<?php
 
-	<div class="container">
+					if ( $user->was_admin() ) :
 
-		<!--	HEADER	-->
-		<div class="row" id="nails-default-header">
-			<div class="sixteen columns">
-				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
-			</div>
-		</div>
+						echo '<div class="alert alert-info text-left">';
+						echo 'Logged in as <strong>' . active_user( 'first_name,last_name' ) . ' (' . active_user( 'email' ) . ')</strong>.';
+						echo anchor( $this->session->userdata( 'admin_recovery' )->back_to_admin_url, 'Back to Admin', 'class="pull-right btn btn-sm btn-default" style="margin-top:-0.5em;"' );
+						echo '</div>';
 
+					endif;
 
-		<!--	CONTENT	-->
-		<div class="row" id="nails-default-content">
-			<div class="sixteen columns">
+				?>
+				<h1>
+					<?=APP_NAME?>
+				</h1>
+				<p>
+					A webapp powered by <?=anchor( NAILS_PACKAGE_URL, NAILS_PACKAGE_NAME )?>, ooh la la
+				</p>
+			</div><!-- /.row -->
+			<hr />
+			<?php
 
-				<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+				if ( $success || $error || $message || $notice ) :
 
-				<!--	SYSTEM ALERTS	-->
-				<?php if ( isset( $error ) && $error ) : ?>
-					<div class="system-alert error">
-						<div class="padder">
-							<p>
-								<?=$error?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+					echo '<div class="container row">';
+						echo $success	? '<p class="alert alert-success">' . $success . '</p>' : '';
+						echo $error		? '<p class="alert alert-danger">' . $error . '</p>' : '';
+						echo $message	? '<p class="alert alert-warning">' . $message . '</p>' : '';
+						echo $notice	? '<p class="alert alert-info">' . $notice . '</p>' : '';
+					echo '</div>';
 
-				<?php if ( isset( $success ) && $success ) : ?>
-					<div class="system-alert success">
-						<div class="padder">
-							<p>
-								<?=$success?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<?php if ( isset( $message ) && $message ) : ?>
-					<div class="system-alert message">
-						<div class="padder">
-							<p>
-								<?=$message?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<?php if ( isset( $notice ) && $notice ) : ?>
-					<div class="system-alert notice">
-						<div class="padder">
-							<p>
-								<?=$notice?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+				endif;
