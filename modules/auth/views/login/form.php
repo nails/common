@@ -46,8 +46,10 @@
 
 					foreach ( $_buttons AS $btn ) :
 
-						echo '<div class="col-sm-' . $_cols_each. ' text-center">';
-							echo anchor( $btn[0], $btn[1], 'class="btn btn-primary btn-lg" style="display:block;"' );
+						$_class = $_cols_each == 4 ? 'md' : 'sm';
+
+						echo '<div class="col-' . $_class . '-' . $_cols_each. ' text-center" style="margin-bottom:1em;">';
+							echo anchor( $btn[0], $btn[1], 'class="btn btn-primary btn-lg btn-block"' );
 						echo '</div>';
 
 					endforeach;

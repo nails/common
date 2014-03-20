@@ -7,7 +7,7 @@
 *
 */
 	//	Default header/footer
-	$lang['nails_footer_powered_by']	= 'Powered by <a href="http://nailsapp.co.uk">Nails. v%s</a>';
+	$lang['nails_footer_powered_by']	= 'Powered by <a href="%s">%s</a>';
 
 	// --------------------------------------------------------------------------
 

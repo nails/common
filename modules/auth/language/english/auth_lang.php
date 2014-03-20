@@ -33,9 +33,9 @@
 	$lang['auth_login_message_no_register']				= 'Sign in to your %s account using your email address and password.';
 	$lang['auth_login_email_placeholder']				= 'Your registered email ';
 	$lang['auth_login_username_placeholder']			= 'Your registered username';
-	$lang['auth_login_both']							= 'Email or Username';
+	$lang['auth_login_both']							= 'Email/Username';
 	$lang['auth_login_both_placeholder']				= 'Your registered email or username';
-	$lang['auth_login_pass_placeholder']				= 'Your password';
+	$lang['auth_login_password_placeholder']			= 'Your password';
 	$lang['auth_login_label_remember_me']				= 'Remember Me';
 	$lang['auth_login_action_login']					= 'Log In';
 	$lang['auth_login_forgot']							= 'Forgotten your password?';
