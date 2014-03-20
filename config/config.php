@@ -234,10 +234,9 @@ $config['cache_path'] = defined( 'DEPLOY_CACHE_DIR' ) ? DEPLOY_CACHE_DIR : FCPAT
 |
 */
 
-$_deploy_private_key	= defined( 'DEPLOY_PRIVATE_KEY' )	? DEPLOY_PRIVATE_KEY	: '';
 $_app_private_key		= defined( 'APP_PRIVATE_KEY' )		? APP_PRIVATE_KEY		: '';
 
-$config['encryption_key'] = md5( $_deploy_private_key . $_app_private_key );
+$config['encryption_key'] = md5( $_app_private_key );
 
 /*
 |--------------------------------------------------------------------------

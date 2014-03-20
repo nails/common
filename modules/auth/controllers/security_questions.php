@@ -391,7 +391,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 				endif;
 
-				redircet( 'auth/login' . $_query );
+				redirect( 'auth/login' . $_query );
 
 			endif;
 

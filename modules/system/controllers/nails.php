@@ -76,8 +76,6 @@ class NAILS_Nails extends NAILS_System_Controller
 
 		endif;
 
-		$this->_validate_token();
-
 		// --------------------------------------------------------------------------
 
 		//	Define page data
