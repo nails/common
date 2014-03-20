@@ -660,15 +660,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 			endif;
 
 		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		//	App assets
-		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
-
-			$this->asset->load( 'styles.css' );
-
-		endif;
 	}
 
 
