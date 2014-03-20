@@ -27,6 +27,8 @@
 			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
 			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 		</script>
+		<?=link_tag( NAILS_ASSETS_URL . 'bower_components/bootstrap/dist/css/bootstrap.min.css' )?>
+		<?=link_tag( NAILS_ASSETS_URL . 'bower_components/ionicons/css/ionicons.min.css' )?>
 		<?php
 
 			$this->asset->output( 'css' );
@@ -36,8 +38,8 @@
 		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
-		  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-		  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/html5shiv/dist/html5shiv.js'?>"></script>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
 		<![endif]-->
 	</head>
 	<body>

@@ -669,20 +669,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 			$this->asset->load( 'styles.css' );
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Inline assets
-		$_js  = 'var _nails;';
-		$_js .= '$(function(){';
-
-		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';
-		$_js .= '_nails = new NAILS_JS();';
-		$_js .= '_nails.init();}';
-
-		$_js .= '});';
-
-		$this->asset->inline( '<script>' . $_js . '</script>' );
 	}
 
 

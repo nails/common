@@ -120,7 +120,7 @@
 			<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
 				<label class="col-sm-3 control-label" for="input-<?=$_field?>"><?=$_label?></label>
 				<div class="col-sm-9">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '" class="form-control "' )?>
 					<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
@@ -134,7 +134,7 @@
 			<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
 				<label class="col-sm-3 control-label" for="input-<?=$_field?>"><?=$_label?></label>
 				<div class="col-sm-9">
-					<?=form_password( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+					<?=form_password( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '" class="form-control "' )?>
 					<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
