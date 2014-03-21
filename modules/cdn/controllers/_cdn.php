@@ -16,16 +16,6 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'cdn' ) ) :
-
-			//	Cancel execution, module isn't enabled
-			show_404();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Which driver is being used?
 		$this->_driver = strtolower( APP_CDN_DRIVER );
 
