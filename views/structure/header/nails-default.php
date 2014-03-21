@@ -61,7 +61,7 @@
 					<?=APP_NAME?>
 				</h1>
 				<p>
-					A webapp powered by <?=anchor( NAILS_PACKAGE_URL, NAILS_PACKAGE_NAME )?>, ooh la la
+					<?=NAILS_APP_STRAPLINE?>
 				</p>
 			</div><!-- /.row -->
 			<hr />
