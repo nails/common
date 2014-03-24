@@ -543,6 +543,16 @@ class NAILS_Cms_page_model extends NAILS_Model
 			$this->load->model( 'system/routes_model' );
 			$this->routes_model->update( 'cms' );
 
+			// --------------------------------------------------------------------------
+
+			//	Regenerate sitemap
+			if ( module_is_enabled( 'sitemap' ) ) :
+
+				$this->load->model( 'sitemap/sitemap_model' );
+				$this->sitemap_model->generate();
+
+			endif;
+
 			$this->db->trans_commit();
 
 			//	TODO: Kill caches for this page and all children
@@ -1534,6 +1544,24 @@ class NAILS_Cms_page_model extends NAILS_Model
 				endif;
 
 			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Rewrite routes
+			$this->load->model( 'system/routes_model' );
+			$this->routes_model->update( 'cms' );
+
+			// --------------------------------------------------------------------------
+
+			//	Regenerate sitemap
+			if ( module_is_enabled( 'sitemap' ) ) :
+
+				$this->load->model( 'sitemap/sitemap_model' );
+				$this->sitemap_model->generate();
+
+			endif;
+
+			// --------------------------------------------------------------------------
 
 			$this->db->trans_commit();
 			return TRUE;
