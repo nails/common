@@ -613,7 +613,7 @@ class NAILS_User_model extends NAILS_Model
 	{
 		//	Write selects
 		$this->db->select( 'u.*' );
-		$this->db->select( 'ue.email, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on' );
+		$this->db->select( 'ue.email, ue.code email_verification_code, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on' );
 		$this->db->select( $this->_get_meta_columns() );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
@@ -794,7 +794,7 @@ class NAILS_User_model extends NAILS_Model
 	public function get_all_minimal( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		//	Write selects
-		$this->db->select( 'u.id, ue.email, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on, u.first_name, u.last_name, u.profile_img, u.gender' );
+		$this->db->select( 'u.id, ue.email, ue.code email_verification_code, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on, u.first_name, u.last_name, u.profile_img, u.gender' );
 
 		// --------------------------------------------------------------------------
 
@@ -3707,7 +3707,6 @@ class NAILS_User_model extends NAILS_Model
 			$user->temp_pw				= (bool) $user->temp_pw;
 			$user->is_suspended			= (bool) $user->is_suspended;
 			$user->email_is_verified	= (bool) $user->email_is_verified;
-			$user->email_is_verified_on	= $user->email_is_verified_on;
 
 			//	Dates (TODO)
 
