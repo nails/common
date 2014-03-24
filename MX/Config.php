@@ -89,7 +89,7 @@ class MX_Config extends CI_Config
 				$route = str_replace( ':num', '[0-9]*', $route );
 
 				//	See if any of the routes match, if they do halt the loop.
-				if ( preg_match( '#' . $route . '#', $_uri ) ) :
+				if ( preg_match( '#^' . preg_quote( $route, '#' ) . '#', $_uri ) ) :
 
 					$i++;
 					break;
