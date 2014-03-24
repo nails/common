@@ -24,6 +24,10 @@ class NAILS_User_model extends NAILS_Model
 	protected $_remember_cookie;
 	protected $_is_remembered;
 	protected $_is_logged_in;
+	protected $_pw_charset_symbol;
+	protected $_pw_charset_lower_alpha;
+	protected $_pw_charset_upper_alpha;
+	protected $_pw_charset_number;
 
 	// --------------------------------------------------------------------------
 
@@ -35,8 +39,12 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set defaults
-		$this->_remember_cookie	= 'nailsrememberme';
-		$this->_is_remembered	= NULL;
+		$this->_remember_cookie			= 'nailsrememberme';
+		$this->_is_remembered			= NULL;
+		$this->_pw_charset_symbol		= utf8_encode( '!@$^&*(){}":?<>~-=[];\'\\/.,' );
+		$this->_pw_charset_lower_alpha	= utf8_encode( 'abcdefghijklmnopqrstuvwxyz' );
+		$this->_pw_charset_upper_alpha	= utf8_encode( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+		$this->_pw_charset_number		= utf8_encode( '0123456789' );
 
 		// --------------------------------------------------------------------------
 
@@ -2211,7 +2219,28 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Work out the max length, if it's not beenset
+		//	We're generating a password, so ensure that we've got all the charsets;
+		//	also make sure we include any additional charsets which have been defined.
+
+		$_charsets					= array();
+		$_charsets['symbol']		= $this->_pw_charset_symbol;
+		$_charsets['lower_alpha']	= $this->_pw_charset_lower_alpha;
+		$_charsets['upper_alpha']	= $this->_pw_charset_upper_alpha;
+		$_charsets['number']		= $this->_pw_charset_number;
+
+		foreach ( $_charsets AS $set => $chars ) :
+
+			if ( ! isset( $_password_rules['charsets'][$set] ) ) :
+
+				$_password_rules['charsets'][$set] = $chars;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Work out the max length, if it's not been set
 		if ( ! $_password_rules['min_length'] && ! $_password_rules['max_length'] ) :
 
 			$_password_rules['max_length'] = count( $_password_rules['charsets'] ) * 2;
@@ -2339,13 +2368,13 @@ class NAILS_User_model extends NAILS_Model
 
 			switch( $charset ) :
 
-				case 'symbol' :			$_chars[$charset]	= utf8_encode( '!@$^&*(){}":?<>~-=[];\'\\/.,`' );	break;
-				case 'lower_alpha' :	$_chars[$charset]	= utf8_encode( 'abcdefghijklmnopqrstuvwxyz' );		break;
-				case 'upper_alpha' :	$_chars[$charset]	= utf8_encode( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' );		break;
-				case 'number' :			$_chars[$charset]	= utf8_encode( '0123456789' );						break;
+				case 'symbol' :			$_chars[$charset]	= $this->_pw_charset_symbol;		break;
+				case 'lower_alpha' :	$_chars[$charset]	= $this->_pw_charset_lower_alpha;	break;
+				case 'upper_alpha' :	$_chars[$charset]	= $this->_pw_charset_upper_alpha;	break;
+				case 'number' :			$_chars[$charset]	= $this->_pw_charset_number;		break;
 
 				//	Not a 'special' charset? Whatever this string is just set that as the chars to use
-				default :				$_chars[]			= utf8_encode( $charset );							break;
+				default :				$_chars[]			= utf8_encode( $charset );			break;
 
 			endswitch;
 
@@ -3492,6 +3521,7 @@ class NAILS_User_model extends NAILS_Model
 			if ( $generate_new_pw ) :
 
 				$_out['password']	= $this->generate_password();
+
 				if ( empty( $_out['password'] ) ) :
 
 					//	This should never happen, but just in case.
@@ -3499,7 +3529,7 @@ class NAILS_User_model extends NAILS_Model
 
 				endif;
 
-				$_hash	 			= $this->hash_password( $_out['password'] );
+				$_hash = $this->hash_password( $_out['password'] );
 
 				if ( ! $_hash ) :
 
@@ -3522,9 +3552,9 @@ class NAILS_User_model extends NAILS_Model
 
 			endif;
 
-			return $_out;
-
 		endif;
+
+		return $_out;
 	}
 
 
