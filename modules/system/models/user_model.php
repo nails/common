@@ -2281,6 +2281,7 @@ class NAILS_User_model extends NAILS_Model
 		$_min_length	= 0;
 		$_max_length	= FALSE;
 		$_contains		= array();
+		$_is_not		= array();
 
 		foreach ( $_pw_rules AS $rule => $val ) :
 

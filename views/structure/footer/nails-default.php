@@ -9,8 +9,8 @@
 				</p>
 			</div><!-- /.row -->
 		</div><!-- /.container -->
-		<script type="text/javascript" href="<?=NAILS_ASSETS_URL . 'bower_components/jquery/dist/jquery.min.js'?>"></script>
-		<script type="text/javascript" href="<?=NAILS_ASSETS_URL . 'bower_components/bootstrap/dist/js/bootstrap.min.js'?>"></script>
+		<script type="text/javascript" src="<?=NAILS_ASSETS_URL . 'bower_components/jquery/dist/jquery.min.js'?>"></script>
+		<script type="text/javascript" src="<?=NAILS_ASSETS_URL . 'bower_components/bootstrap/dist/js/bootstrap.min.js'?>"></script>
 		<?php
 
 			$this->asset->output( 'js' );

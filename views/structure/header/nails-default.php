@@ -67,7 +67,7 @@
 			<hr />
 			<?php
 
-				if ( $success || $error || $message || $notice ) :
+				if ( empty( $_NAILS_DEFAULT_HIDE_SYSTEM_ALERTS ) && ( $success || $error || $message || $notice ) ) :
 
 					echo '<div class="container row">';
 						echo $success	? '<p class="alert alert-success">' . $success . '</p>' : '';
