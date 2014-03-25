@@ -622,7 +622,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Write selects
 		$this->db->select( 'u.*' );
 		$this->db->select( 'ue.email, ue.code email_verification_code, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on' );
-		$this->db->select( $this->_get_meta_columns() );
+		$this->db->select( $this->_get_meta_columns( 'um' ) );
 		$this->db->select( 'uam.type AS `auth_type`' );
 		$this->db->select( 'ug.display_name AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
@@ -1077,23 +1077,38 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _get_meta_columns()
+	protected function _get_meta_columns( $prefix = '', $cols = array() )
 	{
-		$_cols = array();
-
-		// --------------------------------------------------------------------------
-
 		//	Module: shop
 		if ( module_is_enabled( 'shop' ) ) :
 
-			$_cols[] = 'um.shop_basket';
-			$_cols[] = 'um.shop_currency';
+			$cols[] = 'um.shop_basket';
+			$cols[] = 'um.shop_currency';
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		return $_cols;
+		//	Clean up
+		$cols = array_unique( $cols );
+		$cols = array_filter( $cols );
+
+		// --------------------------------------------------------------------------
+
+		//	Prefix all the values, if needed
+		if ( $prefix ) :
+
+			foreach( $cols AS $key => &$value ) :
+
+				$value = $prefix . '.' . $value;
+
+			endforeach;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $cols;
 	}
 
 
@@ -3169,7 +3184,7 @@ class NAILS_User_model extends NAILS_Model
 		$_meta_cols = $this->_get_meta_columns();
 		foreach( $data AS $key => $val ) :
 
-			if ( array_search( $key, $_meta_cols ) === FALSE && array_search( 'um' . $key, $_meta_cols ) === FALSE ) :
+			if ( array_search( $key, $_meta_cols ) === FALSE && array_search( $key, $_meta_cols ) === FALSE ) :
 
 				unset( $data[$key] );
 
