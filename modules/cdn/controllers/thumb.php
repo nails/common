@@ -184,18 +184,49 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 
 		//	Perform the resize
-		$PHPThumb = new PHPThumb\GD( $usefile, $_options );
-		$PHPThumb->{$PHPThumb_method}( $this->_width, $this->_height );
 
-		// --------------------------------------------------------------------------
+		//	Turn errors off, if something bad happens we want to
+		//	output the _bad_src image and log the issue.
 
-		//	Output the newly rendered file to the browser
-		$PHPThumb->show();
+		$_old_errors = error_reporting();
+		error_reporting(0);
 
-		// --------------------------------------------------------------------------
+		try
+		{
+			//	Catch any output, don't want anything going to the browser unless
+			//	we're sure it's ok
 
-		//	Save cache version
-		$PHPThumb->save( $this->_cachedir . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+			ob_start();
+
+			$PHPThumb = new PHPThumb\GD( $usefile, $_options );
+			$PHPThumb->{$PHPThumb_method}( $this->_width, $this->_height );
+
+			//	Output the newly rendered file to the browser
+			$PHPThumb->show();
+
+			//	Save cache version
+			$PHPThumb->save( $this->_cachedir . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+		}
+		catch( Exception $e )
+		{
+			//	Log the error
+			log_message( 'error', 'CDN: ' . $PHPThumb_method . ': ' . $e->getMessage() );
+
+			//	Switch error reporting back how it was
+			error_reporting( $_old_errors );
+
+			//	Flush the buffer
+			ob_end_clean();
+
+			//	Bad SRC
+			return $this->_bad_src( $this->_width, $this->_height );
+		}
+
+		//	Send any output tae the brooser, eh!
+		ob_end_flush();
+
+		//	Switch error reporting back how it was
+		error_reporting( $_old_errors );
 	}
 
 

@@ -2,7 +2,6 @@
 
 class NAILS_CDN_Controller extends NAILS_Controller
 {
-	protected $_driver;
 	protected $_cdn_root;
 	protected $_cachedir;
 
@@ -16,21 +15,16 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Which driver is being used?
-		$this->_driver = strtolower( APP_CDN_DRIVER );
-
-		// --------------------------------------------------------------------------
-
 		//	Sanity checks; driver specific
-		switch ( $this->_driver ) :
+		switch ( APP_CDN_DRIVER ) :
 
-			case 'aws_local' :
+			case 'AWS_LOCAL' :
 
 				//	TODO: Sanity checks, if any.
 
 			break;
 
-			case 'local' :
+			case 'LOCAL' :
 
 				//	TODO: Sanity checks, if any.
 
@@ -38,7 +32,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		endswitch;
 
-		//	Sanity checks: common
+		//	TODO: Sanity checks: common
 
 		// --------------------------------------------------------------------------
 
@@ -179,7 +173,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	if it doesn't then pull it down and save it. Cache maintenance scripts will
 		//	clear this out every now and then.
 
-		if ( $this->_driver == 'aws_local' ) :
+		if ( APP_CDN_DRIVER == 'AWS_LOCAL' ) :
 
 			//	Do we have the original sourcefile?
 			$_filename	= strtolower( substr( $object, 0, strrpos( $object, '.' ) ) );
@@ -216,7 +210,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	If we're using the local driver then we need to check the source file exists
 		//	in the DEPLOY_CDN_PATH.
 
-		elseif ( $this->_driver == 'local' && file_exists( DEPLOY_CDN_PATH . $bucket . '/' . $object ) ) :
+		elseif ( APP_CDN_DRIVER == 'LOCAL' && file_exists( DEPLOY_CDN_PATH . $bucket . '/' . $object ) ) :
 
 			//	Object exists, time for manipulation fun times :>
 			return DEPLOY_CDN_PATH . $bucket . '/' . $object;

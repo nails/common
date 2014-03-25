@@ -580,7 +580,10 @@ class Aws_local_CDN
 	 **/
 	public function url_expiring_scheme()
 	{
-		dumpanddie( 'TODO: If cloudfront is configured, then generate a secure url and pass pack, if not serve through the processing mechanism. Maybe.' );
+		//	TODO: Generate expiring CloudFront URLS
+		return FALSE;
+
+		// --------------------------------------------------------------------------
 
 		$_out = site_url( 'cdn/serve?token={{token}}' );
 
@@ -626,11 +629,27 @@ class Aws_local_CDN
 				'SaveAs'	=> $save_as
 			));
 
-			return TRUE;
+			if ( $_result->isOK() ) :
+
+				return TRUE;
+
+			else :
+
+				//	Note the error
+				$this->cdn->set_error( 'AWS-SDK ERROR: An error occurreed while fetching from S3.' );
+
+				return FALSE;
+
+			endif;
 		}
-		catch ( Exception $e )
+		catch ( \Aws\S3\Exception\S3Exception $e )
 		{
+			//	Clean up
+			@unlink( $save_as );
+
+			//	Note the error
 			$this->cdn->set_error( 'AWS-SDK EXCEPTION: ' . get_class( $e ) . ': ' . $e->getMessage() );
+
 			return FALSE;
 		}
 	}

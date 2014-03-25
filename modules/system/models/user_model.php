@@ -1082,8 +1082,8 @@ class NAILS_User_model extends NAILS_Model
 		//	Module: shop
 		if ( module_is_enabled( 'shop' ) ) :
 
-			$cols[] = 'um.shop_basket';
-			$cols[] = 'um.shop_currency';
+			$cols[] = 'shop_basket';
+			$cols[] = 'shop_currency';
 
 		endif;
 
