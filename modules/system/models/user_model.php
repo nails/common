@@ -3258,66 +3258,64 @@ class NAILS_User_model extends NAILS_Model
 
 			endif;
 
-		endif;
+			//	Send the user the welcome email
+			if ( $send_welcome ) :
 
-		// --------------------------------------------------------------------------
+				$this->load->library( 'emailer' );
 
-		//	Send the user the welcome email
-		if ( ! empty( $data['email'] ) && $send_welcome ) :
+				$_email					= new stdClass();
+				$_email->type			= 'new_user_' . $_group->id;
+				$_email->to_id			= $_id;
+				$_email->data			= array();
+				$_email->data['method']	= $_auth_method;
 
-			$this->load->library( 'emailer' );
+				//	If this user is created by an admin then take note of that.
+				if ( $this->is_admin() ) :
 
-			$_email					= new stdClass();
-			$_email->type			= 'new_user_' . $_group->id;
-			$_email->to_id			= $_id;
-			$_email->data			= array();
-			$_email->data['method']	= $_auth_method;
-
-			//	If this user is created by an admin then take note of that.
-			if ( $this->is_admin() ) :
-
-				$_email->data['admin']				= new stdClass();
-				$_email->data['admin']->id			= active_user( 'id' );
-				$_email->data['admin']->first_name	= active_user( 'first_name' );
-				$_email->data['admin']->last_name	= active_user( 'last_name' );
-				$_email->data['admin']->group		= new stdClass();
-				$_email->data['admin']->group->id	= $_group->id;
-				$_email->data['admin']->group->name	= $_group->display_name;
-
-			endif;
-
-			if ( ! empty( $data['password'] ) && ! empty( $_inform_user_pw ) ) :
-
-				$_email->data['password'] = $data['password'];
-
-				//	Is this a temp password? We should let them know that too
-				if ( $_data['temp_pw'] ) :
-
-					$_email->data['temp_pw'] = ! empty( $_data['temp_pw'] );
+					$_email->data['admin']				= new stdClass();
+					$_email->data['admin']->id			= active_user( 'id' );
+					$_email->data['admin']->first_name	= active_user( 'first_name' );
+					$_email->data['admin']->last_name	= active_user( 'last_name' );
+					$_email->data['admin']->group		= new stdClass();
+					$_email->data['admin']->group->id	= $_group->id;
+					$_email->data['admin']->group->name	= $_group->display_name;
 
 				endif;
 
-			endif;
+				if ( ! empty( $data['password'] ) && ! empty( $_inform_user_pw ) ) :
 
-			//	If the email isn't verified we'll want to include a note asking them to do so
-			if ( ! $_verified ) :
+					$_email->data['password'] = $data['password'];
 
-				$_email->data['verification_code']	= $_code;
+					//	Is this a temp password? We should let them know that too
+					if ( $_data['temp_pw'] ) :
 
-			endif;
+						$_email->data['temp_pw'] = ! empty( $_data['temp_pw'] );
 
-			if ( ! $this->emailer->send( $_email, TRUE ) ) :
+					endif;
 
-				//	Failed to send using the group email, try using the generic email template
-				$_email->type = 'new_user';
+				endif;
+
+				//	If the email isn't verified we'll want to include a note asking them to do so
+				if ( ! $_email_is_verified ) :
+
+					$_email->data['verification_code']	= $_code;
+
+				endif;
 
 				if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
-					//	Email failed to send, musn't exist, oh well.
-					$_error  = 'Failed to send welcome email.';
-					$_error .= ! empty( $_inform_user_pw ) ? ' Inform the user their password is <strong>' . $data['password'] . '</strong>' : '';
+					//	Failed to send using the group email, try using the generic email template
+					$_email->type = 'new_user';
 
-					$this->_set_error( $_error );
+					if ( ! $this->emailer->send( $_email, TRUE ) ) :
+
+						//	Email failed to send, musn't exist, oh well.
+						$_error  = 'Failed to send welcome email.';
+						$_error .= ! empty( $_inform_user_pw ) ? ' Inform the user their password is <strong>' . $data['password'] . '</strong>' : '';
+
+						$this->_set_error( $_error );
+
+					endif;
 
 				endif;
 
