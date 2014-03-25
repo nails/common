@@ -81,7 +81,7 @@ class MX_Config extends CI_Config
 			// --------------------------------------------------------------------------
 
 			//	Analyse target URL, if it matches a route then change it to be an https URL
-			$i = 0;
+			$_is_secure_route = FALSE;
 			foreach ( $this->routes_ssl AS $route ) :
 
 				//	Swap out the pseudo regex's
@@ -89,9 +89,21 @@ class MX_Config extends CI_Config
 				$route = str_replace( ':num', '[0-9]*', $route );
 
 				//	See if any of the routes match, if they do halt the loop.
-				if ( preg_match( '#^' . preg_quote( $route, '#' ) . '#', $_uri ) ) :
+				//	We need to do an optional prefix for the hosts
 
-					$i++;
+				if ( BASE_URL !== SECURE_BASE_URL ) :
+
+					$_pattern = '#^(' . preg_quote( BASE_URL, '#' ) .'|' . preg_quote( SECURE_BASE_URL, '#' ) . ')?' . $route . '#';
+
+				else :
+
+					$_pattern = '#^(' . preg_quote( BASE_URL, '#' ) . ')?' . $route . '#';
+
+				endif;
+
+				if ( preg_match( $_pattern, $_uri ) ) :
+
+					$_is_secure_route = TRUE;
 					break;
 
 				endif;
@@ -113,7 +125,7 @@ class MX_Config extends CI_Config
 				$_page_is_secure = page_is_secure();
 
 				if (
-					   ( $i )
+					   ( $_is_secure_route )
 					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
 					|| ( $_page_is_secure && preg_match( '#^' . NAILS_ASSETS_URL . '.*#', $_uri ) )
 					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
