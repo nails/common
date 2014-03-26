@@ -629,18 +629,7 @@ class Aws_local_CDN
 				'SaveAs'	=> $save_as
 			));
 
-			if ( $_result->isOK() ) :
-
-				return TRUE;
-
-			else :
-
-				//	Note the error
-				$this->cdn->set_error( 'AWS-SDK ERROR: An error occurreed while fetching from S3.' );
-
-				return FALSE;
-
-			endif;
+			return TRUE;
 		}
 		catch ( \Aws\S3\Exception\S3Exception $e )
 		{
