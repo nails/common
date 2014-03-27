@@ -2917,7 +2917,7 @@ class Cdn
 	public function url_serve_zipped( $objects, $filename = 'download.zip' )
 	{
 		$_data		= array( 'where_in' => array( array( 'o.id', $objects ) ) );
-		$_objects	= $this->get_objects( $_data );
+		$_objects	= $this->get_objects( NULL, NULL, $_data );
 
 		$_ids		= array();
 		$_ids_hash	= array();
@@ -2954,7 +2954,7 @@ class Cdn
 		endif;
 
 		$_data		= array( 'where_in' => array( array( 'o.id', $objects ) ) );
-		$_objects	= $this->get_objects( $_data );
+		$_objects	= $this->get_objects( NULL, NULL, $_data );
 
 		$_ids		= array();
 		$_ids_hash	= array();
