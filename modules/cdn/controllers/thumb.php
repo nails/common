@@ -125,7 +125,27 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 
 			if ( ! $_usefile ) :
 
+				log_message( 'error', 'CDN: ' . $_cropmethod . ': No sourcefile was returned.' );
 				return $this->_bad_src( $this->_width, $this->_height );
+
+			elseif( ! filesize( $_usefile ) ) :
+
+				//	Hmm, empty, delete it and try one mroe time
+				@unlink( $_usefile );
+
+				$_usefile = $this->_fetch_sourcefile( $this->_bucket, $this->_object );
+
+				if ( ! $_usefile ) :
+
+					log_message( 'error', 'CDN: ' . $_cropmethod . ': No sourcefile was returned, second attempt.' );
+					return $this->_bad_src( $this->_width, $this->_height );
+
+				elseif( ! filesize( $_usefile ) ) :
+
+					log_message( 'error', 'CDN: ' . $_cropmethod . ': sourcefile exists, but has a zero filesize.' );
+					return $this->_bad_src( $this->_width, $this->_height );
+
+				endif;
 
 			endif;
 
@@ -140,7 +160,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 
 			if ( ! $_object ) :
 
-				return $this->_bad_src( $this->_width, $this->_height );
+				//return $this->_bad_src( $this->_width, $this->_height );
 
 			endif;
 
@@ -152,7 +172,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 
 			//	Handle the actual resize
-			if ( $_object->is_animated ) :
+			if ( 1==0 && $_object->is_animated ) :
 
 				$this->_resize_animated( $_usefile, $_phpthumb_method );
 
@@ -165,7 +185,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			// --------------------------------------------------------------------------
 
 			//	Bump the counter
-			$this->cdn->object_increment_count( $_cropmethod, $_object->id );
+			//$this->cdn->object_increment_count( $_cropmethod, $_object->id );
 
 		endif;
 	}

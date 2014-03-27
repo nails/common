@@ -4,6 +4,12 @@ class NAILS_CDN_Controller extends NAILS_Controller
 {
 	protected $_cdn_root;
 	protected $_cachedir;
+	protected $_cache_headers_set;
+	protected $_cache_headers_max_age;
+	protected $_cache_headers_last_modified;
+	protected $_cache_headers_expires;
+	protected $_cache_headers_file;
+	protected $_cache_headers_hit;
 
 
 	// --------------------------------------------------------------------------
@@ -39,6 +45,13 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	Define variables
 		$this->_cdn_root	= NAILS_PATH . 'modules/cdn/';
 		$this->_cachedir	= DEPLOY_CACHE_DIR;
+
+		$this->_cache_headers_set			= FALSE;
+		$this->_cache_headers_max_age		= APP_CDN_CACHE_MAX_AGE;
+		$this->_cache_headers_last_modified	= '';
+		$this->_cache_headers_expires		= '';
+		$this->_cache_headers_file			= '';
+		$this->_cache_headers_hit			= 'MISS';
 
 		// --------------------------------------------------------------------------
 
@@ -82,15 +95,54 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 	protected function _set_cache_headers( $last_modified, $file, $hit )
 	{
-		$_hit = $hit ? 'HIT' : 'MISS';
+		//	Set some flags
+		$this->_cache_headers_set			= TRUE;
+		$this->_cache_headers_max_age		= APP_CDN_CACHE_MAX_AGE;
+		$this->_cache_headers_last_modified	= $last_modified;
+		$this->_cache_headers_expires		= time() + APP_CDN_CACHE_MAX_AGE;
+		$this->_cache_headers_file			= $file;
+		$this->_cache_headers_hit			= $hit ? 'HIT' : 'MISS';
 
 		// --------------------------------------------------------------------------
 
-		header( 'Cache-Control: max-age=' . APP_CDN_CACHE_MAX_AGE . ', must-revalidate', TRUE );
-		header( 'Last-Modified: ' . date( 'r', $last_modified ), TRUE );
-		header( 'Expires: ' . date( 'r', time() + APP_CDN_CACHE_MAX_AGE ), TRUE );
-		header( 'ETag: "' . md5( $file ) . '"', TRUE );
-		header( 'X-CDN-CACHE: ' . $_hit, TRUE );
+		header( 'Cache-Control: max-age=' . $this->_cache_headers_max_age . ', must-revalidate', TRUE );
+		header( 'Last-Modified: ' . date( 'r', $this->_cache_headers_last_modified ), TRUE );
+		header( 'Expires: ' . date( 'r', $this->_cache_headers_expires ), TRUE );
+		header( 'ETag: "' . md5( $this->_cache_headers_file ) . '"', TRUE );
+		header( 'X-CDN-CACHE: ' . $this->_cache_headers_hit, TRUE );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _unset_cache_headers()
+	{
+
+		if ( empty( $this->_cache_headers_set ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Remove previously set headers
+		header_remove( 'Cache-Control' );
+		header_remove( 'Last-Modified' );
+		header_remove( 'Expires' );
+		header_remove( 'ETag' );
+		header_remove( 'X-CDN-CACHE' );
+
+		// --------------------------------------------------------------------------
+
+		//	Set new "do not cache" headers
+		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT', TRUE );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate', TRUE );
+		header( 'Cache-Control: post-check=0, pre-check=0', FALSE );
+		header( 'Pragma: no-cache', TRUE );
+		header( 'X-CDN-CACHE: MISS', TRUE );
 	}
 
 
@@ -236,6 +288,11 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	 **/
 	protected function _bad_src( $width = 100, $height = 100 )
 	{
+		//	Make sure this doesn't get cached
+		$this->_unset_cache_headers();
+
+		// --------------------------------------------------------------------------
+
 		//	Create the icon
 		$_icon = @imagecreatefrompng( $this->_cdn_root . '_resources/img/fail.png' );
 		$_icon_w = imagesx( $_icon );
