@@ -305,9 +305,11 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _staging()
 	{
-		$_users		= @unserialize( APP_STAGING_USERPASS );
+		$_users = @json_decode( APP_STAGING_USERPASS );
 
 		if ( ENVIRONMENT == 'staging' && $_users ) :
+
+			$_users = (array) $_users;
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
@@ -318,16 +320,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
 
 				//	Determine the users
-				$_users			= array_filter( $_users );
-				$_user_check	= array();
+				$_users = array_filter( $_users );
 
-				foreach ( $_users AS $user ) :
-
-					$_user_check[$user[0]] = $user[1];
-
-				endforeach;
-
-				if ( ! isset( $_user_check[$_SERVER['PHP_AUTH_USER']] ) || $_user_check[$_SERVER['PHP_AUTH_USER']] != $_SERVER['PHP_AUTH_PW'] ) :
+				if ( ! isset( $_users[$_SERVER['PHP_AUTH_USER']] ) || $_users[$_SERVER['PHP_AUTH_USER']] != md5( trim( $_SERVER['PHP_AUTH_PW'] ) ) ) :
 
 					$this->_staging_request_credentials();
 
