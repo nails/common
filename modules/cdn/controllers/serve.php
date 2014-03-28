@@ -229,6 +229,14 @@ class NAILS_Serve extends NAILS_CDN_Controller
 			endif;
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -258,6 +266,14 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		endif;
 
 		echo json_encode( $_out );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 

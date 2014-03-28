@@ -134,6 +134,14 @@ class NAILS_Sitemap extends NAILS_Controller
 		header( 'Pragma: no-cache' );
 
 		readfile( DEPLOY_CACHE_DIR . $this->_filename_xml );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -159,6 +167,14 @@ class NAILS_Sitemap extends NAILS_Controller
 
 		//	Stream
 		readfile( DEPLOY_CACHE_DIR . $this->_filename_json );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 

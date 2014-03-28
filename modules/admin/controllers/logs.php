@@ -155,11 +155,11 @@ class NAILS_Logs extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Send header
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=stats-export-' . date( 'Y-m-d_h-i-s' ) . '.csv;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 
@@ -252,11 +252,11 @@ class NAILS_Logs extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Send header
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=admin-changelog-export-' . date( 'Y-m-d_h-i-s' ) . '.csv;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 

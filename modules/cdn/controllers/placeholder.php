@@ -137,6 +137,14 @@ class NAILS_Placeholder extends NAILS_CDN_Controller
 			imagedestroy( $_img );
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 

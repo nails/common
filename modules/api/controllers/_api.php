@@ -52,9 +52,9 @@ class NAILS_API_Controller extends NAILS_Controller
 	protected function _out( $out = array(), $format = 'JSON', $send_header = TRUE )
 	{
 		//	Set JSON headers
+		$this->output->set_content_type( 'application/octet-stream' );
 		$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		$this->output->set_header( 'Content-type: application/json' );
 		$this->output->set_header( 'Pragma: no-cache' );
 
 		// --------------------------------------------------------------------------

@@ -57,6 +57,14 @@ class NAILS_Tracker extends NAILS_Email_Controller
 		header( 'Pragma: no-cache' );
 
 		echo base64_decode('R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -100,9 +108,9 @@ class NAILS_Tracker extends NAILS_Email_Controller
 
 			case 'BAD_HASH' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_email' ) ) ) );
@@ -112,9 +120,9 @@ class NAILS_Tracker extends NAILS_Email_Controller
 
 			case 'BAD_LINK' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_link' ) ) ) );

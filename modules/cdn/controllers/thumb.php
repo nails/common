@@ -334,6 +334,14 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			@unlink( $frame );
 
 		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 

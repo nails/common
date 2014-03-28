@@ -157,9 +157,9 @@ class NAILS_Test extends NAILS_System_Controller
 
 			case 'json' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_output( json_encode( $this->_tests ) );
 

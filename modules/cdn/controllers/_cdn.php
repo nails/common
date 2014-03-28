@@ -87,6 +87,12 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		//	Send the contents of the file to the browser
 		echo file_get_contents( $this->_cachedir . $file );
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -323,5 +329,13 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		//	Destroy the images
 		imagedestroy( $_icon );
 		imagedestroy( $_bg );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 }
