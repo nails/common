@@ -349,32 +349,29 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			if ( $this->form_validation->run() ) :
 
 				//	Success
-				$_group_id	= (int) $this->input->post( 'group_id' );
-				$_email		= $this->input->post( 'email' );
-				$_password	= trim( $this->input->post( 'password' ) );
+				$_data				= array();
+				$_data['group_id']	= (int) $this->input->post( 'group_id' );
+				$_data['password']	= trim( $this->input->post( 'password' ) );
 
-				if ( ! $_password ) :
+				if ( ! $_data['password'] ) :
 
 					//	Password isn't set, generate one
-					$_password = $this->user->generate_password();
+					$_data['password'] = $this->user->generate_password();
 
 				endif;
 
-				$_meta = array();
-
 				if ( $this->input->post( 'email' ) ) :
 
-					$_data['email']			= $this->input->post( 'email' );
+					$_data['email'] = $this->input->post( 'email' );
 
 				endif;
 
 				if ( $this->input->post( 'username' ) ) :
 
-					$_data['username']		= $this->input->post( 'username' );
+					$_data['username'] = $this->input->post( 'username' );
 
 				endif;
 
-				$_data['first_name']		= $this->input->post( 'first_name' );
 				$_data['first_name']		= $this->input->post( 'first_name' );
 				$_data['last_name']			= $this->input->post( 'last_name' );
 				$_data['temp_pw']			= (bool) $this->input->post( 'temp_pw' );

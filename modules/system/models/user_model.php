@@ -2980,7 +2980,7 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	All should be ok, go ahead and create the account
-		$_data = array();
+		$_user_data = array();
 
 		// --------------------------------------------------------------------------
 
@@ -3009,22 +3009,21 @@ class NAILS_User_model extends NAILS_Model
 		//	if an admin created the account, or if the system generated a new password
 
 		$_inform_user_pw = ! empty( $data['inform_user_pw'] ) ? TRUE : FALSE;
-		unset( $data['inform_user_pw'] );
 
 		// --------------------------------------------------------------------------
 
 		//	Check that we're dealing with a valid group
 		if ( empty( $data['group_id'] ) ) :
 
-			$_data['group_id'] = APP_USER_DEFAULT_GROUP;
+			$_user_data['group_id'] = APP_USER_DEFAULT_GROUP;
 
 		else :
 
-			$_data['group_id'] = $data['group_id'];
+			$_user_data['group_id'] = $data['group_id'];
 
 		endif;
 
-		$_group = $this->get_group( $_data['group_id'] );
+		$_group = $this->get_group( $_user_data['group_id'] );
 
 		if ( ! $_group ) :
 
@@ -3033,7 +3032,7 @@ class NAILS_User_model extends NAILS_Model
 
 		else :
 
-			$_data['group_id'] = $_group->id;
+			$_user_data['group_id'] = $_group->id;
 
 		endif;
 
@@ -3087,13 +3086,13 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$_data['auth_method_id'] = $_auth_method->id;
+		$_user_data['auth_method_id'] = $_auth_method->id;
 
 		// --------------------------------------------------------------------------
 
 		if ( ! empty( $data['username'] ) ) :
 
-			$_data['username']		= $data['username'];
+			$_user_data['username'] = $data['username'];
 
 		endif;
 
@@ -3104,89 +3103,91 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$_data['password']			= $_password[0];
-		$_data['password_md5']		= md5( $_password[0] );
-		$_data['ip_address']		= $this->input->ip_address();
-		$_data['last_ip']			= $_data['ip_address'];
-		$_data['created']			= date( 'Y-m-d H:i:s' );
-		$_data['last_update']		= date( 'Y-m-d H:i:s' );
-		$_data['is_suspended']		= ! empty( $data['is_suspended'] );
-		$_data['salt']				= $_password[1];
-		$_data['temp_pw']			= ! empty( $data['temp_pw'] );
-		$_data['auth_method_id']	= $_auth_method->id;
+		$_user_data['password']			= $_password[0];
+		$_user_data['password_md5']		= md5( $_password[0] );
+		$_user_data['ip_address']		= $this->input->ip_address();
+		$_user_data['last_ip']			= $_user_data['ip_address'];
+		$_user_data['created']			= date( 'Y-m-d H:i:s' );
+		$_user_data['last_update']		= date( 'Y-m-d H:i:s' );
+		$_user_data['is_suspended']		= ! empty( $data['is_suspended'] );
+		$_user_data['salt']				= $_password[1];
+		$_user_data['temp_pw']			= ! empty( $data['temp_pw'] );
+		$_user_data['auth_method_id']	= $_auth_method->id;
 
 		//	Facebook oauth details
-		$_data['fb_token']			= ! empty( $data['fb_token'] )	? $data['fb_token']		: NULL ;
-		$_data['fb_id']				= ! empty( $data['fb_id'] )		? $data['fb_id']		: NULL ;
+		$_user_data['fb_token']			= ! empty( $data['fb_token'] )	? $data['fb_token']		: NULL ;
+		$_user_data['fb_id']			= ! empty( $data['fb_id'] )		? $data['fb_id']		: NULL ;
 
 		//	Twitter oauth details
-		$_data['tw_id']				= ! empty( $data['tw_id'] )		? $data['tw_id']		: NULL ;
-		$_data['tw_token']			= ! empty( $data['tw_token'] )	? $data['tw_token']		: NULL ;
-		$_data['tw_secret']			= ! empty( $data['tw_secret'] )	? $data['tw_secret']	: NULL ;
+		$_user_data['tw_id']			= ! empty( $data['tw_id'] )		? $data['tw_id']		: NULL ;
+		$_user_data['tw_token']			= ! empty( $data['tw_token'] )	? $data['tw_token']		: NULL ;
+		$_user_data['tw_secret']		= ! empty( $data['tw_secret'] )	? $data['tw_secret']	: NULL ;
 
 		//	Linkedin oauth details
-		$_data['li_id']				= ! empty( $data['li_id'] )		? $data['li_id']		: NULL ;
-		$_data['li_token']			= ! empty( $data['li_token'] )	? $data['li_token']		: NULL ;
+		$_user_data['li_id']			= ! empty( $data['li_id'] )		? $data['li_id']		: NULL ;
+		$_user_data['li_token']			= ! empty( $data['li_token'] )	? $data['li_token']		: NULL ;
 
 		//	Referral code
-		$_data['referral']			= $this->_generate_referral();
+		$_user_data['referral']			= $this->_generate_referral();
 
 		//	Other data
-		$_data['salutation']		= ! empty( $data['salutation'] )	? $data['salutation']	: NULL ;
-		$_data['first_name']		= ! empty( $data['first_name'] )	? $data['first_name']	: NULL ;
-		$_data['last_name']			= ! empty( $data['last_name'] )		? $data['last_name']	: NULL ;
+		$_user_data['salutation']		= ! empty( $data['salutation'] )	? $data['salutation']	: NULL ;
+		$_user_data['first_name']		= ! empty( $data['first_name'] )	? $data['first_name']	: NULL ;
+		$_user_data['last_name']		= ! empty( $data['last_name'] )		? $data['last_name']	: NULL ;
 
 		if ( isset( $data['gender'] ) ) :
 
-			$_data['gender'] = $data['gender'];
+			$_user_data['gender'] = $data['gender'];
 
 		endif;
 
 		if ( isset( $data['timezone'] ) ) :
 
-			$_data['timezone'] = $data['timezone'];
+			$_user_data['timezone'] = $data['timezone'];
 
 		elseif ( APP_DEFAULT_TIMEZONE ) :
 
-			$_data['timezone'] = APP_DEFAULT_TIMEZONE;
+			$_user_data['timezone'] = APP_DEFAULT_TIMEZONE;
 
 		elseif ( DEPLOY_SYSTEM_TIMEZONE ) :
 
-			$_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
+			$_user_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
 
 		else :
 
-			$_data['timezone'] = 'UTC';
+			$_user_data['timezone'] = 'UTC';
 
 		endif;
 
 		if ( isset( $data['date_format_date_id'] ) ) :
 
-			$_data['date_format_date_id'] = $data['date_format_date_id'];
+			$_user_data['date_format_date_id'] = $data['date_format_date_id'];
 
 		endif;
 
 		if ( isset( $data['date_format_time_id'] ) ) :
 
-			$_data['date_format_time_id'] = $data['date_format_time_id'];
+			$_user_data['date_format_time_id'] = $data['date_format_time_id'];
 
 		endif;
 
 		if ( isset( $data['language_id'] ) ) :
 
-			$_data['language_id'] = $data['language_id'];
+			$_user_data['language_id'] = $data['language_id'];
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Unset anything which isn't a meta column
+		//	Set Meta data
 		$_meta_cols = $this->_get_meta_columns();
+		$_meta_data	= array();
+
 		foreach( $data AS $key => $val ) :
 
-			if ( array_search( $key, $_meta_cols ) === FALSE && array_search( $key, $_meta_cols ) === FALSE ) :
+			if ( array_search( $key, $_meta_cols ) !== FALSE ) :
 
-				unset( $data[$key] );
+				$_meta_data[$key] = $val;
 
 			endif;
 
@@ -3196,7 +3197,7 @@ class NAILS_User_model extends NAILS_Model
 
 		$this->db->trans_begin();
 
-		$this->db->set( $_data );
+		$this->db->set( $_user_data );
 
 		if ( ! $this->db->insert( NAILS_DB_PREFIX . 'user' ) ) :
 
@@ -3229,9 +3230,9 @@ class NAILS_User_model extends NAILS_Model
 		//	Create the user_meta record, add any extra data if needed
 		$this->db->set( 'user_id', $_id );
 
-		if ( $data ) :
+		if ( $_meta_data ) :
 
-			$this->db->set( $data );
+			$this->db->set( $_meta_data );
 
 		endif;
 
@@ -3287,9 +3288,9 @@ class NAILS_User_model extends NAILS_Model
 					$_email->data['password'] = $data['password'];
 
 					//	Is this a temp password? We should let them know that too
-					if ( $_data['temp_pw'] ) :
+					if ( $_user_data['temp_pw'] ) :
 
-						$_email->data['temp_pw'] = ! empty( $_data['temp_pw'] );
+						$_email->data['temp_pw'] = ! empty( $_user_data['temp_pw'] );
 
 					endif;
 
