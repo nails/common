@@ -374,7 +374,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				$_data['first_name']		= $this->input->post( 'first_name' );
 				$_data['last_name']			= $this->input->post( 'last_name' );
-				$_data['temp_pw']			= (bool) $this->input->post( 'temp_pw' );
+				$_data['temp_pw']			= string_to_boolean( $this->input->post( 'temp_pw' ) );
 				$_data['inform_user_pw']	= TRUE;
 
 				$_new_user = $this->user->create( $_data, string_to_boolean( $this->input->post( 'send_activation' ) ) );
