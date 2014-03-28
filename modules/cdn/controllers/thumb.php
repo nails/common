@@ -221,11 +221,11 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			$PHPThumb = new PHPThumb\GD( $usefile, $_options );
 			$PHPThumb->{$PHPThumb_method}( $this->_width, $this->_height );
 
-			//	Output the newly rendered file to the browser
-			$PHPThumb->show();
-
 			//	Save cache version
 			$PHPThumb->save( $this->_cachedir . $this->_cache_file , strtoupper( substr( $this->_extension, 1 ) ) );
+
+			//	Flush the buffer
+			ob_end_clean();
 		}
 		catch( Exception $e )
 		{
@@ -242,8 +242,7 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			return $this->_bad_src( $this->_width, $this->_height );
 		}
 
-		//	Send any output tae the brooser, eh!
-		ob_end_flush();
+		$this->_serve_from_cache( $this->_cache_file, FALSE );
 
 		//	Switch error reporting back how it was
 		error_reporting( $_old_errors );
@@ -335,8 +334,6 @@ class NAILS_Thumb extends NAILS_CDN_Controller
 			@unlink( $frame );
 
 		endforeach;
-
-
 	}
 
 

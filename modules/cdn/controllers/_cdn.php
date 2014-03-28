@@ -68,7 +68,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _serve_from_cache( $file )
+	protected function _serve_from_cache( $file, $hit = TRUE )
 	{
 		//	Cache object exists, set the appropriate headers and return the
 		//	contents of the file.
@@ -76,12 +76,12 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		$_stats = stat( $this->_cachedir . $file );
 
 		//	Set cache headers
-		$this->_set_cache_headers( $_stats[9], $file, TRUE );
+		$this->_set_cache_headers( $_stats[9], $file, $hit );
 
 		//	Work out content type
 		$_mime = $this->cdn->get_mime_type_from_file( $this->_cachedir . $file );
 
-		header( 'Content-Type: ' . $_mime );
+		header( 'Content-Type: ' . $_mime, TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -118,7 +118,6 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 	protected function _unset_cache_headers()
 	{
-
 		if ( empty( $this->_cache_headers_set ) ) :
 
 			return FALSE;
@@ -203,7 +202,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 
 		endif;
 
-		if ( isset( $_headers['If-None-Match'] ) && ( $_headers['If-None-Match'] == '"' . md5( $file ) . '"' ) ) :
+		if ( isset( $_headers['If-None-Match'] ) && $_headers['If-None-Match'] == '"' . md5( $file ) . '"' ) :
 
 			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 304 Not Modified', TRUE, 304 );
 			return TRUE;
@@ -315,7 +314,7 @@ class NAILS_CDN_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Output to browser
-		header( 'Content-type: image/png', TRUE );
+		header( 'Content-Type: image/png', TRUE );
 		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
 		imagepng( $_bg );
 
