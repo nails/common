@@ -200,7 +200,7 @@ class Nails_CMS_Template
 							parse_str( $widget_data->data, $_data );
 
 							$WIDGET = new $_widget->iam();
-							$_widget_areas[$key] .= $WIDGET->render( $_data );
+							$_widget_areas[$key] .= $WIDGET->render( $_data, $_tpl_additional_fields );
 
 						endif;
 					}

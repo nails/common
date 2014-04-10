@@ -129,6 +129,13 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Add the page data as a reference to the additional_fields, so widgets can
+		//	have some contect about the page they're being rendered on.
+		
+		$_render->additional_fields->cmspage =& $_data;
+		
+		// --------------------------------------------------------------------------
+		
 		//	Actually render
 		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields );
 

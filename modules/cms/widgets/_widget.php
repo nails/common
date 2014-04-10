@@ -156,7 +156,7 @@ class NAILS_CMS_Widget
 	 * @return string
 	 *
 	 **/
-	public function render( $_wgt_data = array() )
+	public function render( $_wgt_data = array(), $_tpl_additional_data = array() )
 	{
 		if ( is_file( $this->_details->path . 'views/render.php' ) ) :
 
@@ -173,6 +173,12 @@ class NAILS_CMS_Widget
 			if ( $_wgt_data ) :
 
 				extract( $_wgt_data );
+
+			endif;
+			
+			if ( $_tpl_additional_data ) :
+
+				extract( $_tpl_additional_data );
 
 			endif;
 
