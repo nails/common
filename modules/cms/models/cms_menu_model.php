@@ -71,7 +71,25 @@ class NAILS_Cms_menu_model extends NAILS_Model
 
 	public function get_by_id( $id, $include_menu_items = FALSE, $nested = TRUE )
 	{
-		$this->db->where( $this->_table_prefix . '.id', $id );
+		$this->db->where( $this->_table_prefix . '.' . $this->_table_id_column, $id );
+		$_menu = $this->get_all( $include_menu_items, $nested );
+
+		if ( ! $_menu ) :
+
+			return FALSE;
+
+		endif;
+
+		return $_menu[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_by_slug( $id, $include_menu_items = FALSE, $nested = TRUE )
+	{
+		$this->db->where( $this->_table_prefix . '.' . $this->_table_slug_column, $id );
 		$_menu = $this->get_all( $include_menu_items, $nested );
 
 		if ( ! $_menu ) :
