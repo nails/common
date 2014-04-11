@@ -18,6 +18,26 @@ function &get_controller_data()
 
 
 /**
+ * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
+ * this function provides an easy interface to populate this array when it's not
+ * in scope.
+ *
+ * @access	public
+ * @param string $key The key to populate
+ * @param mixed $value The value to assign
+ * @return	void
+ **/
+function &set_controller_data( $key, $value )
+{
+	global $NAILS_CONTROLLER_DATA;
+	$NAILS_CONTROLLER_DATA[$key] = $value;
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * Attempts to fetch the real domain from a URL
  *
  * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
