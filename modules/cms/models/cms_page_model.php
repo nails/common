@@ -586,9 +586,9 @@ class NAILS_Cms_page_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_all_nested()
+	public function get_all_nested( $use_draft = TRUE )
 	{
-		return $this->_nest_pages( $this->get_all() );
+		return $this->_nest_pages( $this->get_all(), NULL, $use_draft );
 	}
 
 
@@ -598,15 +598,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 	/**
 	 *	Hat tip to Timur; http://stackoverflow.com/a/9224696/789224
 	 **/
-	protected function _nest_pages( &$list, $parent = NULL )
+	protected function _nest_pages( &$list, $parent_id = NULL, $use_draft = TRUE )
 	{
 		$result = array();
 
 		for ( $i = 0, $c = count( $list ); $i < $c; $i++ ) :
 
-			if ( $list[$i]->parent_id == $parent ) :
+			$_parent_id = $use_draft ? $list[$i]->draft->parent_id : $list[$i]->published->parent_id;
 
-				$list[$i]->children	= $this->_nest_pages( $list, $list[$i]->id );
+			if ( $_parent_id == $parent_id ) :
+
+				$list[$i]->children	= $this->_nest_pages( $list, $list[$i]->id, $use_draft );
 				$result[]			= $list[$i];
 
 			endif;
@@ -782,6 +784,25 @@ class NAILS_Cms_page_model extends NAILS_Model
 		endforeach;
 
 		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_top_level( $use_draft = TRUE )
+	{
+		if ( $use_draft ) :
+
+			$this->db->where( 'draft_parent_id', NULL );
+
+		else :
+
+			$this->db->where( 'published_parent_id', NULL );
+
+		endif;
+
+		return $this->get_all();
 	}
 
 
