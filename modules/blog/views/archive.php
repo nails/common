@@ -1,28 +1,7 @@
 <div class="blog archive container">
 <?php
-	
-	//	Sidebar enabled? If it's not we'll adjust columns accordingly
-	if ( blog_setting( 'sidebar_enabled' ) ) :
 
-		//	Left hand sidebar?
-		if ( blog_setting( 'sidebar_position' ) == 'left' ) :
-
-			$this->load->view( 'blog/sidebar' );
-
-			echo '<ul class="eleven columns offset-by-one last">';
-
-		else :
-
-			echo '<ul class="eleven columns first">';
-
-		endif;
-
-	else :
-
-		echo '<ul class="sixteen columns first last">';
-
-	endif;
-
+	echo '<ul class="posts col-md-9 col-md-push-3 list-unstyled">';
 
 	// --------------------------------------------------------------------------
 
@@ -72,14 +51,9 @@
 	// --------------------------------------------------------------------------
 
 	echo '</ul>';
-	
-	// --------------------------------------------------------------------------
-	
-	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
 
-		$this->load->view( 'blog/sidebar' );
-
-	endif;
+	//	Load Sidebar
+	$this->load->view( 'blog/sidebar' );
 
 ?>
 </div>

@@ -1,27 +1,7 @@
-<div class="blog browse container">
+<div class="container">
 <?php
 
-	//	Sidebar enabled? If it's not we'll adjust columns accordingly
-	if ( blog_setting( 'sidebar_enabled' ) ) :
-
-		//	Left hand sidebar?
-		if ( blog_setting( 'sidebar_position' ) == 'left' ) :
-
-			echo $this->load->view( 'blog/sidebar', NULL, TRUE );
-
-			echo '<ul class="posts eleven columns offset-by-one last">';
-
-		else :
-
-			echo '<ul class="posts eleven columns first">';
-
-		endif;
-
-	else :
-
-		echo '<ul class="posts sixteen columns first last">';
-
-	endif;
+	echo '<ul class="posts col-md-9 col-md-push-3 list-unstyled">';
 
 	// --------------------------------------------------------------------------
 
@@ -31,16 +11,16 @@
 		echo '<li class="post clearfix">';
 		if ( $post->image_id ) :
 
-			echo '<div class="img three columns first featured-image">';
-			echo anchor( $blog_url . $post->slug, img( array( 'src' => cdn_scale( $post->image_id, 200, 200 ), 'class' => 'scale-with-grid' ) ) );
+			echo '<div class="img featured-image col-md-3 text-center">';
+				echo anchor( $blog_url . $post->slug, img( array( 'src' => cdn_scale( $post->image_id, 300, 300 ), 'class' => 'thumbnail img-responsive center-block' ) ) );
 			echo '</div>';
-			echo '<div class="eight columns last">';
+			echo '<div class="col-md-9">';
 
 		endif;
 		echo '<h2 class="title">' . anchor( $blog_url . $post->slug, $post->title ) . '</h2>';
 		echo '<p class="date-author">';
-		echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
-		echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
+			echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
+			echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
 		echo '</p>';
 
 		//	Excerpts or not?
@@ -50,9 +30,11 @@
 
 		else :
 
-			echo '<p class="excerpt">' . $post->excerpt . '</p>';
+			echo '<p class="excerpt">';
+				echo $post->excerpt;
+			echo '</p>';
 			echo '<p class="meta">';
-			echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
+				echo anchor( $blog_url . $post->slug, 'Read More', 'class="read-more"' );
 			echo '</p>';
 
 		endif;
@@ -85,20 +67,14 @@
 
 	$this->pagination->initialize( $_config );
 
-	echo $this->pagination->create_links();
-
-	// --------------------------------------------------------------------------
+	echo '<li>' . $this->pagination->create_links() . '</li>';
 
 	echo '</ul>';
 
-	if ( blog_setting( 'sidebar_enabled' ) && blog_setting( 'sidebar_position' ) == 'right' ) :
+	// --------------------------------------------------------------------------
 
-		echo $this->load->view( 'blog/sidebar', NULL, TRUE );
-
-	endif;
+	//	Load Sidebar
+	$this->load->view( 'blog/sidebar');
 
 ?>
-
-	<div class="clearfix"></div>
-
 </div>

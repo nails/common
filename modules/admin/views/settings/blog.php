@@ -10,11 +10,6 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-general">General</a>
 			</li>
-
-			<?php $_active = $this->input->post( 'update' ) == 'sidebar' ? 'active' : ''?>
-			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-blog-sidebar">Sidebar</a>
-			</li>
 		</ul>
 
 		<section class="tabs pages">
@@ -71,6 +66,25 @@
 					?>
 				</fieldset>
 
+				<fieldset id="blog-settings-excerpts">
+					<legend>Post Excerpts</legend>
+					<p>
+						Excerpts are short post summaries of posts. If enabled these sumamries will be shown
+						beneath the title of the post on the main blog page (i.e to read the full post the
+						user will have to click through to the post itself).
+					</p>
+					<?php
+
+						//	Enable/disable post excerpts
+						$_field					= array();
+						$_field['key']			= 'use_excerpts';
+						$_field['label']		= 'Use excerpts';
+						$_field['default']		= $settings['use_excerpts'];
+
+						echo form_field_boolean( $_field );
+					?>
+				</fieldset>
+
 				<fieldset id="blog-settings-cattag">
 					<legend>Categories &amp; Tags</legend>
 					<?php
@@ -101,39 +115,5 @@
 				<?=form_close()?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'sidebar'  ? 'active' : ''?>
-			<div id="tab-blog-sidebar" class="tab page <?=$_display?> blog-sidebar">
-				<?=form_open()?>
-				<?=form_hidden( 'update', 'sidebar' )?>
-				<fieldset id="blog-settings-blog-sidebar">
-					<legend>Sidebar</legend>
-					<?php
-
-						//	Enable/disable categories
-						$_field					= array();
-						$_field['key']			= 'sidebar_enabled';
-						$_field['label']		= 'Enabled';
-						$_field['default']		= $settings['sidebar_enabled'];
-
-						echo form_field_boolean( $_field );
-
-						// --------------------------------------------------------------------------
-
-						//	Enable/disable categories
-						$_field					= array();
-						$_field['key']			= 'sidebar_position';
-						$_field['label']		= 'Position';
-						$_field['default']		= $settings['sidebar_position'];
-						$_field['class']		= 'chosen';
-
-						echo form_field_dropdown( $_field, array( 'left' => 'Left', 'right' => 'Right' ) );
-
-					?>
-				</fieldset>
-				<p style="margin-top:1em;margin-bottom:0;">
-					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
-				</p>
-				<?=form_close()?>
-			</div>
 		</section>
 </div>

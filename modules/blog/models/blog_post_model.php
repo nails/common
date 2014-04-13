@@ -31,7 +31,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_table				= NAILS_DB_PREFIX . 'blog_post';
-		$this->_table_prefix		= 'bp';	//	Hard-cded throughout model; take care when changing this
+		$this->_table_prefix		= 'bp';	//	Hard-coded throughout model; take care when changing this
 		$this->_table_label_column	= 'title';
 		$this->_destructive_delete	= FALSE;
 
@@ -70,13 +70,12 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set data
-		if ( array_key_exists( 'title', $data ) ) :				$this->db->set( 'title',			$data['title'] );			endif;
-		if ( array_key_exists( 'excerpt', $data ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
-		if ( array_key_exists( 'body', $data ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
-		if ( array_key_exists( 'seo_title', $data ) ) :			$this->db->set( 'seo_title',		$data['title'] );			endif;
-		if ( array_key_exists( 'seo_description', $data ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
-		if ( array_key_exists( 'seo_keywords', $data ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
-		if ( array_key_exists( 'is_published', $data ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
+		if ( isset( $data['title'] ) ) :			$this->db->set( 'title',			$data['title'] );			endif;
+		if ( isset( $data['body'] ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
+		if ( isset( $data['seo_title'] ) ) :		$this->db->set( 'seo_title',		$data['title'] );			endif;
+		if ( isset( $data['seo_description'] ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
+		if ( isset( $data['seo_keywords'] ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
+		if ( isset( $data['is_published'] ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
 
 		//	Safety first!
 		if ( array_key_exists( 'image_id', $data ) ) :
@@ -85,6 +84,17 @@ class NAILS_Blog_post_model extends NAILS_Model
 			$_image_id = ! $_image_id ? NULL : $_image_id;
 
 			$this->db->set( 'image_id', $_image_id );
+
+		endif;
+
+		//	Excerpt
+		if ( ! empty( $data['excerpt'] ) ) :
+
+			$this->db->set( 'excerpt', trim( strip_tags( $data['excerpt'] ) ) );
+
+		elseif ( ! empty( $data['body'] ) ) :
+
+			$this->db->set( 'excerpt', word_limiter( trim( strip_tags( $data['body'] ) ) ), 50 );
 
 		endif;
 
@@ -231,14 +241,14 @@ class NAILS_Blog_post_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set data
-		if ( array_key_exists( 'title', $data ) ) :				$this->db->set( 'title',			$data['title'] );			endif;
-		if ( array_key_exists( 'excerpt', $data ) ) :			$this->db->set( 'excerpt',			trim( strip_tags( $data['excerpt'] ) ) );	endif;
-		if ( array_key_exists( 'body', $data ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
-		if ( array_key_exists( 'seo_title', $data ) ) :			$this->db->set( 'seo_title',		$data['title'] );			endif;
-		if ( array_key_exists( 'seo_description', $data ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
-		if ( array_key_exists( 'seo_keywords', $data ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
-		if ( array_key_exists( 'is_published', $data ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
-		if ( array_key_exists( 'modified', $data ) ) :			$this->db->set( 'modified',			'NOW()', FALSE );			endif;
+		if ( isset( $data['title'] ) ) :			$this->db->set( 'title',			$data['title'] );			endif;
+		if ( isset( $data['body'] ) ) :				$this->db->set( 'body',				$data['body'] );			endif;
+		if ( isset( $data['seo_title'] ) ) :		$this->db->set( 'seo_title',		$data['title'] );			endif;
+		if ( isset( $data['seo_description'] ) ) :	$this->db->set( 'seo_description',	$data['seo_description'] );	endif;
+		if ( isset( $data['seo_keywords'] ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
+		if ( isset( $data['is_published'] ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
+		if ( isset( $data['is_deleted'] ) ) :		$this->db->set( 'is_deleted',		$data['is_deleted'] );		endif;
+		if ( isset( $data['modified'] ) ) :			$this->db->set( 'modified',			'NOW()', FALSE );			endif;
 
 		//	Safety first!
 		if ( array_key_exists( 'image_id', $data ) ) :
@@ -247,6 +257,17 @@ class NAILS_Blog_post_model extends NAILS_Model
 			$_image_id = ! $_image_id ? NULL : $_image_id;
 
 			$this->db->set( 'image_id', $_image_id );
+
+		endif;
+
+		//	Excerpt
+		if ( ! empty( $data['excerpt'] ) ) :
+
+			$this->db->set( 'excerpt', trim( strip_tags( $data['excerpt'] ) ) );
+
+		elseif ( ! empty( $data['body'] ) ) :
+
+			$this->db->set( 'excerpt', word_limiter( trim( strip_tags( $data['body'] ) ) ), 50 );
 
 		endif;
 
@@ -545,7 +566,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.gallery_type, bp.gallery_position, bp.excerpt, bp.seo_title' );
+		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.excerpt, bp.seo_title' );
 		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
 
 		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );

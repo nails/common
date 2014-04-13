@@ -175,7 +175,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
@@ -261,7 +261,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.min.js', TRUE );
+		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -310,7 +310,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
 			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean' );
 			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
 			$this->form_validation->set_rules( 'body',				'Body',				'required' );
 			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
@@ -370,18 +370,21 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 									endforeach;
 
+									if ( is_array( $value ) ) :
 
-									foreach( $value AS $v ) :
+										foreach( $value AS $v ) :
 
-										$_temp = $this->category->get_by_id( $v );
+											$_temp = $this->category->get_by_id( $v );
 
-										if ( $_temp ) :
+											if ( $_temp ) :
 
-											$_new_categories[] = $_temp->label;
+												$_new_categories[] = $_temp->label;
 
-										endif;
+											endif;
 
-									endforeach;
+										endforeach;
+
+									endif;
 
 									asort( $_old_categories );
 									asort( $_new_categories );
@@ -404,18 +407,21 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 									endforeach;
 
+									if ( is_array( $value ) ) :
 
-									foreach( $value AS $v ) :
+										foreach( $value AS $v ) :
 
-										$_temp = $this->tag->get_by_id( $v );
+											$_temp = $this->tag->get_by_id( $v );
 
-										if ( $_temp ) :
+											if ( $_temp ) :
 
-											$_new_tags[] = $_temp->label;
+												$_new_tags[] = $_temp->label;
 
-										endif;
+											endif;
 
-									endforeach;
+										endforeach;
+
+									endif;
 
 									asort( $_old_tags );
 									asort( $_new_tags );
@@ -484,7 +490,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.min.js', TRUE );
+		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -541,19 +547,11 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$_post = $this->post->get_by_id( $_post_id );
-
-		if ( ! $_post ) :
-
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could\'t find a post by that ID.' );
-			redirect( 'admin/blog' );
-			return;
-
-		endif;
-
 		// --------------------------------------------------------------------------
 
 		if ( $this->post->restore( $_post_id ) ) :
+
+			$_post = $this->post->get_by_id( $_post_id );
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was restored successfully. ' );
 

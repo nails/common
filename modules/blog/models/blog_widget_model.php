@@ -70,7 +70,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		//	Render HTML?
 		if ( $return_html ) :
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
+			$_out  = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
 			$_out .= '<ul>';
 
 			foreach ( $_posts AS $post ) :
@@ -156,7 +156,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		//	Render HTML?
 		if ( $return_html ) :
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
+			$_out  = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
 			$_out .= '<ul>';
 
 			foreach ( $_cats AS $cat ) :
@@ -164,7 +164,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 				$_out .= '<li class="' . $_config->li_class . '">';
 
 				$_count = $_config->show_count ? ' (' . $cat->post_count . ')' : '';
-				$_out .= '&rsaquo; ' . anchor( $this->data['blog_url'] . 'category/' . $cat->slug, $cat->label ) . $_count;
+				$_out .= anchor( $this->data['blog_url'] . 'category/' . $cat->slug, $cat->label ) . $_count;
 				$_out .= '</li>';
 
 			endforeach;
@@ -236,7 +236,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		//	Render HTML?
 		if ( $return_html ) :
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
+			$_out  = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
 			$_out .= '<ul>';
 
 			foreach ( $_tags AS $tag ) :
@@ -244,7 +244,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 				$_out .= '<li class="' . $_config->li_class . '">';
 
 				$_count = $_config->show_count ? ' (' . $tag->post_count . ')' : '';
-				$_out .= anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, '&rsaquo; ' . $tag->label . $_count );
+				$_out .= anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, $tag->label . $_count );
 				$_out .= '</li>';
 
 			endforeach;

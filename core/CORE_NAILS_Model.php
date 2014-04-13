@@ -556,6 +556,7 @@ class CORE_NAILS_Model extends CI_Model
 			$_data = array(
 				$this->_deleted_flag => TRUE
 			);
+
 			return $this->update( $id, $_data );
 
 		endif;

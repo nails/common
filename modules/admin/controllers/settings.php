@@ -206,12 +206,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 				break;
 
-				case 'sidebar' :
-
-					$this->_blog_update_sidebar();
-
-				break;
-
 				// --------------------------------------------------------------------------
 
 				default :
@@ -250,6 +244,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Prepare update
 		$_settings							= array();
 		$_settings['blog_url']				= $this->input->post( 'blog_url' );
+		$_settings['use_excerpts']			= (bool) $this->input->post( 'use_excerpts' );
 		$_settings['categories_enabled']	= (bool) $this->input->post( 'categories_enabled' );
 		$_settings['tags_enabled']			= (bool) $this->input->post( 'tags_enabled' );
 
@@ -271,31 +266,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				$this->data['warning'] = '<strong>Warning:</strong> while the blog settings were updated, the routes file could not be updated. The blog may not behave as expected,';
 
 			endif;
-
-		else :
-
-			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _blog_update_sidebar()
-	{
-		//	Prepare update
-		$_settings						= array();
-		$_settings['sidebar_enabled']	= (bool) $this->input->post( 'sidebar_enabled' );
-		$_settings['sidebar_position']	= $this->input->post( 'sidebar_position' );
-
-		// --------------------------------------------------------------------------
-
-		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
-
-			$this->data['success'] = '<strong>Success!</strong> Sidebar settings have been saved.';
 
 		else :
 

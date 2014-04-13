@@ -18,7 +18,8 @@ NAILS_Admin_Blog_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._init_chosens = function() {
+	this._init_chosens = function()
+	{
 		var _this = this;
 
 		// --------------------------------------------------------------------------
@@ -164,20 +165,20 @@ NAILS_Admin_Blog_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Reset everything
-		$( 'ul.tabs li a.error, div.field.error' ).removeClass( 'error' );
+		$( 'ul.tabs li a.error,div.field.error' ).removeClass( 'error' );
+		$( 'div.field.error span.error' ).remove();
 		$( '#body-error' ).hide();
 
 		// --------------------------------------------------------------------------
 
-		//	ERror messages
+		//	Error messages
 		var msg =
 		{
-			required: 'This field is required'
+			required: '<span class="error">This field is required</span>'
 		};
 
 		// --------------------------------------------------------------------------
 
-		//	Tab: Meta
 		//	Title
 		if ( ! $( 'input[name=title]', _form ).val().length )
 		{
@@ -185,50 +186,31 @@ NAILS_Admin_Blog_Create_Edit = function()
 
 			$( '#tabber-meta' ).addClass( 'error' );
 			$( 'input[name=title]', _form ).closest( 'div.field' ).addClass( 'error' );
-			$( 'input[name=title]', _form ).closest( 'div.field' ).find( 'span.error' ).text( msg.required );
-
-		}
-
-		//	Excerpt
-		if ( ! $( 'textarea[name=excerpt]', _form ).val().length )
-		{
-			_errors++;
-
-			$( '#tabber-meta' ).addClass( 'error' );
-			$( 'textarea[name=excerpt]', _form ).closest( 'div.field' ).addClass( 'error' );
-			$( 'textarea[name=excerpt]', _form ).closest( 'div.field' ).find( 'span.error' ).text( msg.required );
+			$( 'input[name=title]', _form ).closest( 'div.field' ).find( 'span.input' ).append( msg.required );
 
 		}
 
 		//	Body
-		if ( ! $( 'textarea[name=body]', _form ).val().length )
+		var _body_length;
+		if ( typeof(CKEDITOR) == 'object' )
+		{
+			//	CKEDITOR is available, use it's methods
+			_body_length = CKEDITOR.instances.post_body.getData().length;
+		}
+		else
+		{
+			//	CKEDITOR isn't available, check the value of the textarea
+			_body_length = $( 'textarea[name=body]', _form ).val().length
+
+		}
+
+		if ( ! _body_length )
 		{
 			_errors++;
 
 			$( '#tabber-body' ).addClass( 'error' );
 			$( 'textarea[name=body]', _form ).closest( 'div.field' ).addClass( 'error' );
-			$( 'textarea[name=body]', _form ).closest( 'div.field' ).find( 'span.error' ).text( msg.required );
-
-		}
-
-		//	SEO Description
-		if ( ! $( 'textarea[name=seo_description]', _form ).val().length )
-		{
-			_errors++;
-
-			$( '#tabber-seo' ).addClass( 'error' );
-			$( '#body-error' ).show().text( msg.required );
-
-		}
-
-		//	SEO Keywords
-		if ( ! $( 'input[name=seo_keywords]', _form ).val().length )
-		{
-			_errors++;
-
-			$( '#tabber-seo' ).addClass( 'error' );
-			$( 'input[name=seo_keywords]', _form ).closest( 'div.field' ).addClass( 'error' );
-			$( 'input[name=seo_keywords]', _form ).closest( 'div.field' ).find( 'span.error' ).text( msg.required );
+			$( 'textarea[name=body]', _form ).closest( 'div.field' ).find( 'span.input' ).append( msg.required );
 
 		}
 

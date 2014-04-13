@@ -66,15 +66,18 @@
 				// --------------------------------------------------------------------------
 
 				//	Excerpt
-				$_field					= array();
-				$_field['key']			= 'excerpt';
-				$_field['type']			= 'textarea';
-				$_field['label']		= 'Excerpt';
-				$_field['required']		= TRUE;
-				$_field['default']		= isset( $post->excerpt ) ? $post->excerpt : '';
-				$_field['placeholder']	= 'A short excerpt of the post, this will be shown in locations where a summary is required.';
+				if ( blog_setting( 'use_excerpts' ) ) :
 
-				echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'excerpt';
+					$_field['type']			= 'textarea';
+					$_field['label']		= 'Excerpt';
+					$_field['default']		= isset( $post->excerpt ) ? html_entity_decode( $post->excerpt ) : '';
+					$_field['placeholder']	= 'A short excerpt of the post, this will be shown in locations where a summary is required. If not specified the a truncated version of the main body will be used instead.';
+
+					echo form_field( $_field );
+
+				endif;
 
 				// --------------------------------------------------------------------------
 
@@ -98,7 +101,7 @@
 			?>
 			<div class="tab page" id="tab-body">
 				<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
-				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="ckeditor"' )?>
+				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="ckeditor" id="post_body"' )?>
 				<p class="system-alert notice no-close" style="margin-top:10px;">
 					<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 					due to application stylesheets on the front end which are not loaded here.
@@ -252,12 +255,22 @@
 				</p>
 				<?php
 
+				//	Keywords
+				$_field					= array();
+				$_field['key']			= 'seo_title';
+				$_field['label']		= 'Title';
+				$_field['default']		= isset( $post->seo_title ) ? $post->seo_title : '';
+				$_field['placeholder']	= 'The SEO optimised title of the post.';
+
+				echo form_field( $_field, 'Should you want or need to specify a different title for the page for SEO purposes do so here.' );
+
+				// --------------------------------------------------------------------------
+
 				//	Description
 				$_field					= array();
 				$_field['key']			= 'seo_description';
 				$_field['type']			= 'textarea';
 				$_field['label']		= 'Description';
-				$_field['required']		= TRUE;
 				$_field['default']		= isset( $post->seo_description ) ? $post->seo_description : '';
 				$_field['placeholder']	= 'The post\'s SEO description';
 
@@ -269,7 +282,6 @@
 				$_field					= array();
 				$_field['key']			= 'seo_keywords';
 				$_field['label']		= 'Keywords';
-				$_field['required']		= TRUE;
 				$_field['default']		= isset( $post->seo_keywords ) ? $post->seo_keywords : '';
 				$_field['placeholder']	= 'Comma separated keywords relating to the content of the post.';
 

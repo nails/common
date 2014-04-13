@@ -1,15 +1,5 @@
+<ul class="sidebar col-md-3 col-md-pull-9 list-unstyled">
 <?php
-
-	//	Left hand sidebar?
-	if ( blog_setting( 'sidebar_position' ) == 'left' ) :
-
-		echo '<ul class="sidebar four columns first">';
-
-	else :
-
-		echo '<ul class="sidebar four columns offset-by-one last">';
-
-	endif;
 
 	if ( $widget->latest_posts ) :
 

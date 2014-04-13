@@ -58,7 +58,11 @@
 						echo '<small>' . anchor( $post->url, $post->url, 'target="_blank"' ) . '</small>';
 
 						//	Exceprt
-						echo '<small>' . $post->excerpt . '</small>';
+						if ( blog_setting( 'use_excerpt' ) ) :
+
+							echo '<small>' . $post->excerpt . '</small>';
+
+						endif;
 
 					echo '</td>';
 

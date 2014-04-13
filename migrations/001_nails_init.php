@@ -66,8 +66,6 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`excerpt` text NOT NULL,
 			`body` longtext NOT NULL,
 			`image_id` int(11) unsigned DEFAULT NULL,
-			`gallery_type` enum(\'slider\',\'fancy\') NOT NULL DEFAULT \'fancy\',
-			`gallery_position` enum(\'top\',\'bottom\') NOT NULL DEFAULT \'top\',
 			`seo_title` varchar(200) DEFAULT NULL,
 			`seo_description` varchar(200) DEFAULT NULL,
 			`seo_keywords` varchar(200) DEFAULT NULL,
@@ -1429,7 +1427,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(3, 'categories_enabled', 'b:1;'),
 			(4, 'tags_enabled', 'b:1;'),
 			(5, 'sidebar_position', 's:5:\\\"right\\\";'),
-			(6, 'use_excerpts', 'b:0;'),
+			(6, 'use_excerpts', 'b:1;'),
 			(7, 'home_show_gallery', 'b:1;'),
 			(8, 'home_per_page', 'i:10;');" );
 
