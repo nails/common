@@ -16,6 +16,7 @@
 
 						$_label			= lang( 'form_label_email' );
 						$_placeholder	= lang( 'auth_forgot_email_placeholder' );
+						$_input_type	= 'form_email';
 
 					break;
 
@@ -23,6 +24,7 @@
 
 						$_label			= lang( 'form_label_username' );
 						$_placeholder	= lang( 'auth_forgot_username_placeholder' );
+						$_input_type	= 'form_input';
 
 					break;
 
@@ -31,6 +33,7 @@
 
 						$_label			= lang( 'auth_forgot_both' );
 						$_placeholder	= lang( 'auth_forgot_both_placeholder' );
+						$_input_type	= 'form_input';
 
 					break;
 
@@ -43,7 +46,7 @@
 			<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
 				<label class="col-sm-3 control-label" for="input-email"><?=$_label?>: </label>
 				<div class="col-sm-9">
-					<?=form_input( $_field, set_value( $_field, $this->input->get( 'email' ) ), 'id="input-email" placeholder="' . $_placeholder . '" class="form-control "' )?>
+					<?=$_input_type( $_field, set_value( $_field, $this->input->get( 'email' ) ), 'id="input-email" placeholder="' . $_placeholder . '" class="form-control "' )?>
 					<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
