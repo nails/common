@@ -661,6 +661,7 @@
 		_settings = new NAILS_Admin_Shop_Settings();
 		_settings.init();
 	});
+
 </script>
 
 <script type="text/template" id="template-new-shipping">

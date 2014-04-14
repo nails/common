@@ -46,3 +46,12 @@
 		$this->load->view( 'blog/_components/single_tags' );
 
 	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Post comments
+	if ( blog_setting( 'comments_enabled' ) ) :
+
+		$this->load->view( 'blog/_components/single_comments' );
+
+	endif;

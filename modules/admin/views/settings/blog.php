@@ -10,6 +10,10 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-general">General</a>
 			</li>
+			<?php $_active = $this->input->post( 'update' ) == 'commenting' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-commenting">Commenting</a>
+			</li>
 		</ul>
 
 		<section class="tabs pages">
@@ -115,5 +119,98 @@
 				<?=form_close()?>
 			</div>
 
+			<?php $_display = $this->input->post( 'update' ) == 'commenting' ? 'active' : ''?>
+			<div id="tab-commenting" class="tab page <?=$_display?> commenting">
+				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
+				<?=form_hidden( 'update', 'commenting' )?>
+				<p>
+					Customise how commenting works on your blog.
+				</p>
+				<hr />
+				<fieldset id="blog-settings-comments">
+					<legend>Post comments enabled</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'comments_enabled';
+						$_field['label']		= 'Comments Enabled';
+						$_field['default']		= ! empty( $settings['comments_enabled'] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+					?>
+				</fieldset>
+
+				<fieldset id="blog-settings-comments-engine">
+					<legend>Post comments powered by</legend>
+					<p>
+						Choose which engine to use for blog post commenting. Please note that
+						existing comments will not be carried through to another service should
+						this value be changed.
+					</p>
+					<?php
+
+						$_field				= array();
+						$_field['key']		= 'comments_engine';
+						$_field['label']	= 'Comment Engine';
+						$_field['default']	= empty( $settings[$_field['key']] ) ? 'NATIVE' : $settings[$_field['key']];
+						$_field['class']	= 'chosen';
+						$_field['id']		= 'comment-engine';
+
+						$_options			= array();
+						$_options['NATIVE']	= 'Native';
+						$_options['DISQUS']	= 'Disqus';
+
+						echo form_field_dropdown( $_field, $_options );
+					?>
+
+					<hr />
+
+					<div id="native-settings" style="display:<?=empty( $settings['comments_engine'] ) || $settings['comments_engine'] == 'NATIVE' ? 'block' : 'none'?>">
+						<p class="system-alert message no-close">
+							<strong>Coming Soon!</strong> Native commenting is in the works and will be available soon.
+							<?php
+
+								//	TODO: Need to be able to handle alot with native commenting, e.g
+								//	- anonymous comments/forced login etc
+								//	- pingbacks?
+								//	- anything else WordPress might do?
+
+							?>
+						</p>
+					</div>
+
+					<div id="disqus-settings" style="display:<?=! empty( $settings['comments_engine'] ) && $settings['comments_engine'] == 'DISQUS' ? 'block' : 'none'?>">
+					<?php
+
+						//	Blog URL
+						$_field					= array();
+						$_field['key']			= 'comments_disqus_shortname';
+						$_field['label']		= 'Disqus Shortname';
+						$_field['default']		= empty( $settings[$_field['key']] ) ? '' : $settings[$_field['key']];
+						$_field['placeholder']	= 'The Disqus shortname for this website.';
+
+						echo form_field( $_field, 'Create a shortname at disqus.com.' );
+
+					?>
+					</div>
+				</fieldset>
+				</fieldset>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
+			</div>
+
 		</section>
 </div>
+<script type="text/javascript">
+
+	var _settings;
+
+	$(function()
+	{
+		_settings = new NAILS_Admin_Blog_Settings();
+		_settings.init();
+	});
+
+</script>

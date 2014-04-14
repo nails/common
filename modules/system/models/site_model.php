@@ -59,8 +59,19 @@ class NAILS_Site_model extends NAILS_Model
 		foreach ( $key_values AS $key => $value ) :
 
 			$this->db->where( 'key', $key );
-			$this->db->set( 'value', serialize( $value ) );
-			$this->db->update( NAILS_DB_PREFIX . 'site_settings' );
+			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'site_settings' ) ) :
+
+				$this->db->where( 'key', $key );
+				$this->db->set( 'value', serialize( $value ) );
+				$this->db->update( NAILS_DB_PREFIX . 'site_settings' );
+
+			else :
+
+				$this->db->set( 'key', $key );
+				$this->db->set( 'value', serialize( $value ) );
+				$this->db->insert( NAILS_DB_PREFIX . 'site_settings' );
+
+			endif;
 
 		endforeach;
 

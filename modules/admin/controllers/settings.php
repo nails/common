@@ -208,6 +208,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 				// --------------------------------------------------------------------------
 
+				case 'commenting' :
+
+					$this->_blog_update_commenting();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
 				default :
 
 					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
@@ -227,6 +235,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->load( 'jquery.toggles.min.js', TRUE );
+		$this->asset->load( 'nails.admin.blog.settings.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -270,6 +279,32 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		else :
 
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _blog_update_commenting()
+	{
+		//	Prepare update
+		$_settings								= array();
+		$_settings['comments_enabled']			= $this->input->post( 'comments_enabled' );
+		$_settings['comments_engine']			= $this->input->post( 'comments_engine' );
+		$_settings['comments_disqus_shortname']	= $this->input->post( 'comments_disqus_shortname' );
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->blog->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Blog commenting settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving commenting settings.';
 
 		endif;
 	}
