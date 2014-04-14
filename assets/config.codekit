@@ -16797,7 +16797,7 @@
 	"javascriptOutputStyle": 1,
 	"javascriptOutputSuffix": ".min",
 	"javascriptSyntaxCheckerStyle": 1,
-	"jsCheckerReservedNamesString": "Mustache",
+	"jsCheckerReservedNamesString": "_nails,_nails_admin,Mustache,CKEDITOR",
 	"jsHintFlags2": {
 		"asi": {
 			"active": 0,

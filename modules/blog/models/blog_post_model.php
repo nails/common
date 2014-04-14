@@ -115,6 +115,23 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 			$_id = $this->db->insert_id();
 
+			//	Add Gallery items, if any
+			if ( isset( $data['gallery'] ) && $data['gallery'] ) :
+
+				$_data = array();
+
+				foreach ( $data['gallery'] AS $order => $image_id ) :
+
+					$_data[] = array( 'post_id' => $_id, 'image_id' => $image_id, 'order' => $order );
+
+				endforeach;
+
+				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
 			//	Add Categories and tags, if any
 			if ( isset( $data['categories'] ) && $data['categories'] ) :
 
@@ -248,7 +265,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 		if ( isset( $data['seo_keywords'] ) ) :		$this->db->set( 'seo_keywords',		$data['seo_keywords'] );	endif;
 		if ( isset( $data['is_published'] ) ) :		$this->db->set( 'is_published',		$data['is_published'] );	endif;
 		if ( isset( $data['is_deleted'] ) ) :		$this->db->set( 'is_deleted',		$data['is_deleted'] );		endif;
-		if ( isset( $data['modified'] ) ) :			$this->db->set( 'modified',			'NOW()', FALSE );			endif;
 
 		//	Safety first!
 		if ( array_key_exists( 'image_id', $data ) ) :
@@ -288,6 +304,32 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->where( 'id', $id );
 
 		$this->db->update( NAILS_DB_PREFIX . 'blog_post' );
+
+		// --------------------------------------------------------------------------
+
+		//	Update/reset the post gallery if it's been defined
+		if ( isset( $data['gallery'] ) ) :
+
+			//	Delete all categories
+			$this->db->where( 'post_id', $id );
+			$this->db->delete( NAILS_DB_PREFIX . 'blog_post_image' );
+
+			//	Recreate new ones
+			if ( $data['gallery'] ) :
+
+				$_data = array();
+
+				foreach ( $data['gallery'] AS $order => $image_id ) :
+
+					$_data[] = array( 'post_id' => $id, 'image_id' => $image_id, 'order' => $order );
+
+				endforeach;
+
+				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

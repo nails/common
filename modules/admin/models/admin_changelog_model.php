@@ -67,6 +67,18 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 		if ( NULL !== $field) :
 
+			if ( ! is_string( $new_value) ) :
+
+				$new_value = print_r( $new_value, TRUE );
+
+			endif;
+
+			if ( ! is_string( $old_value) ) :
+
+				$old_value = print_r( $old_value, TRUE );
+
+			endif;
+
 			$new_value = trim( $new_value );
 			$old_value = trim( $old_value );
 

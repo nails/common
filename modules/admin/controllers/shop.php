@@ -326,7 +326,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Process POST
-		//$_POST = unserialize( 'a:16:{s:7:"type_id";s:1:"1";s:5:"title";s:26:"This is my product\'s title";s:9:"is_active";s:1:"1";s:6:"brands";a:2:{i:0;s:1:"1";i:1;s:1:"2";}s:10:"categories";a:2:{i:0;s:1:"0";i:1;s:1:"4";}s:4:"tags";a:1:{i:0;s:1:"1";}s:11:"tax_rate_id";s:1:"1";s:11:"description";s:280:"<p>This is my product&#39;s description, isn&#39;t it <em><strong>freaking awesome?!</strong></em></p><p>And here&#39;s a hottie:</p><p><img alt="" src="http://dev.nails.web/cdn/serve/user-1/1380278000_081d7f848ff0722517aa042ea64d1ddd.jpg" style="height:667px; width:500px" /></p>";s:9:"variation";a:2:{i:0;a:7:{s:5:"label";s:21:"First variation title";s:3:"sku";s:14:"SKU-THING-1234";s:18:"quantity_available";s:3:"100";s:13:"quantity_sold";s:1:"0";s:4:"meta";a:7:{s:6:"length";s:3:"100";s:5:"width";s:3:"100";s:6:"height";s:3:"100";s:16:"measurement_unit";s:1:"m";s:6:"weight";s:3:"100";s:11:"weight_unit";s:2:"kg";s:11:"download_id";s:0:"";}s:7:"pricing";a:3:{i:0;a:3:{s:11:"currency_id";s:2:"52";s:5:"price";s:3:"100";s:10:"sale_price";s:2:"50";}i:1;a:3:{s:11:"currency_id";s:2:"47";s:5:"price";s:3:"100";s:10:"sale_price";s:2:"50";}i:2;a:3:{s:11:"currency_id";s:3:"144";s:5:"price";s:0:"";s:10:"sale_price";s:0:"";}}s:7:"gallery";a:1:{i:0;s:1:"8";}}i:1;a:8:{s:5:"label";s:41:"Variation 2, very special collection only";s:3:"sku";s:14:"SKU-THING-4567";s:18:"quantity_available";s:1:"1";s:13:"quantity_sold";s:1:"0";s:4:"meta";a:7:{s:6:"length";s:4:"1000";s:5:"width";s:4:"1000";s:6:"height";s:4:"1000";s:16:"measurement_unit";s:2:"mm";s:6:"weight";s:4:"1000";s:11:"weight_unit";s:1:"g";s:11:"download_id";s:0:"";}s:7:"pricing";a:3:{i:0;a:3:{s:11:"currency_id";s:2:"52";s:5:"price";s:4:"1000";s:10:"sale_price";s:3:"500";}i:1;a:3:{s:11:"currency_id";s:2:"47";s:5:"price";s:4:"1000";s:10:"sale_price";s:3:"500";}i:2;a:3:{s:11:"currency_id";s:3:"144";s:5:"price";s:0:"";s:10:"sale_price";s:0:"";}}s:7:"gallery";a:1:{i:0;s:1:"7";}s:8:"shipping";a:1:{s:15:"collection_only";s:1:"1";}}}s:7:"gallery";a:2:{i:0;s:1:"7";i:1;s:1:"8";}s:10:"attributes";a:2:{i:0;a:2:{s:12:"attribute_id";s:1:"2";s:5:"value";s:9:"the value";}i:1;a:2:{s:12:"attribute_id";s:1:"1";s:5:"value";s:13:"another value";}}s:6:"ranges";a:2:{i:0;s:1:"1";i:1;s:1:"2";}s:11:"collections";a:1:{i:0;s:1:"2";}s:15:"seo_description";s:30:"SEO Description; this is nice.";s:12:"seo_keywords";s:12:"seo,keywords";s:6:"submit";s:6:"Create";}' );
 		if ( $this->input->post() ) :
 
 			//	Form validation, this'll be fun...
@@ -560,9 +559,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/inventory/create',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 

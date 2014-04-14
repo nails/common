@@ -195,16 +195,17 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
 				$_data['associations']		= $this->input->post( 'associations' );
+				$_data['gallery']			= $this->input->post( 'gallery' );
 
 				if ( blog_setting( 'categories_enabled' ) ) :
 
-					$_data['categories']	= $this->input->post( 'categories' );
+					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
 				if ( blog_setting( 'tags_enabled' ) ) :
 
-					$_data['tags']			= $this->input->post( 'tags' );
+					$_data['tags'] = $this->input->post( 'tags' );
 
 				endif;
 
@@ -262,6 +263,8 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
 		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
+		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -330,17 +333,17 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
 				$_data['associations']		= $this->input->post( 'associations' );
+				$_data['gallery']			= $this->input->post( 'gallery' );
 
 				if ( blog_setting( 'categories_enabled' ) ) :
 
-					$_data['categories']	= $this->input->post( 'categories' );
-
+					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
 				if ( blog_setting( 'tags_enabled' ) ) :
 
-					$_data['tags']			= $this->input->post( 'tags' );
+					$_data['tags'] = $this->input->post( 'tags' );
 
 				endif;
 
@@ -491,6 +494,8 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
 		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
+		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
+		$this->asset->load( 'mustache.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 

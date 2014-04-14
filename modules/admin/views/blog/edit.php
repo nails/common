@@ -244,9 +244,73 @@
 			<?php endif; ?>
 
 			<div class="tab page" id="tab-gallery">
-				<p class="system-alert no-close message">
-					<strong>Coming soon!</strong> We're working on a simple way of attaching images to your blog posts which can be displayed in an attractive slideshow.
+				<p>
+					Upload images to the post gallery.
+					<small>
+					<?php
+
+						$_max_upload	= ini_get( 'upload_max_filesize' );
+						$_max_upload	= return_bytes( $_max_upload );
+
+						$_max_post		= ini_get( 'post_max_size' );
+						$_max_post		= return_bytes( $_max_post );
+
+						$_memory_limit	= ini_get( 'memory_limit' );
+						$_memory_limit	= return_bytes( $_memory_limit );
+
+						$_upload_mb		= min( $_max_upload, $_max_post, $_memory_limit );
+						$_upload_mb		= format_bytes( $_upload_mb );
+
+						echo 'Images only, max file size is ' . $_upload_mb . '.';
+
+					?>
+					</small>
 				</p>
+				<p>
+					<input type="file" id="file_upload" />
+				</p>
+				<p class="system-alert notice no-close" id="upload-message" style="display:none">
+					<strong>Please be patient while files upload.</strong>
+					<br />Tabs have been disabled until uploads are complete.
+				</p>
+				<?php
+
+					//	Determine gallery items to render
+					if ( $this->input->post( 'gallery' ) ) :
+
+						$_gallery_items = (array) $this->input->post( 'gallery' );
+
+					elseif ( ! empty( $post->gallery ) ) :
+
+						$_gallery_items = array();
+
+						foreach( $post->gallery AS $item ) :
+
+							$_gallery_items[] = $item->image_id;
+
+						endforeach;
+
+					else :
+
+						$_gallery_items = array();
+
+					endif;
+
+				?>
+				<ul id="gallery-items" class="<?=$_gallery_items ? '' : 'empty' ?>">
+					<li class="empty">
+						No images, why not upload some?
+					</li>
+					<?php
+
+						foreach( $_gallery_items AS $image ) :
+
+							$this->load->view( 'admin/blog/_utilities/template-mustache-gallery-item', array( 'object_id' => $image ) );
+
+						endforeach;
+
+					?>
+				</ul>
 			</div>
 
 			<div class="tab page fieldset" id="tab-seo">
@@ -300,10 +364,32 @@
 </div>
 <script type="text/javascript">
 	var _EDIT;
-	$(function(){
+	$(function()
+	{
 
-		_EDIT	= new NAILS_Admin_Blog_Create_Edit();
-		_EDIT.init( '_EDIT', '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
+		_EDIT = new NAILS_Admin_Blog_Create_Edit();
+		_EDIT.init( '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
 
 	});
 </script>
+<script type="text/template" id="template-gallery-item">
+<?php
+
+	$this->load->view( 'admin/blog/_utilities/template-mustache-gallery-item', array( 'object_id' => NULL ) );
+
+?>
+</script>
+<script type="text/template" id="template-uploadify">
+	<li class="gallery-item uploadify-queue-item" id="${fileID}" data-instance_id="${instanceID}" data-file_id="${fileID}">
+		<a href="#" data-instance_id="${instanceID}" data-file_id="${fileID}" class="remove"></a>
+		<div class="progress" style="height:0%"></div>
+		<div class="data data-cancel">CANCELLED</div>
+	</li>
+</script>
+<div id="dialog-confirm-delete" title="Confirm Delete" style="display:none;">
+	<p>
+		<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
+		This item will be removed from the interface and cannot be recovered.
+		<strong>Are you sure?</strong>
+	</p>
+</div>
