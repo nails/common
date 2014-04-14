@@ -88,10 +88,18 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	 * @access public
 	 * @return void
 	 **/
-	public function single()
+	public function single( $id = NULL )
 	{
 		//	Get the single post by its slug
-		$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ) );
+		if ( $id ) :
+
+			$this->data['post'] = $this->post->get_by_id( $id );
+
+		else :
+
+			$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ) );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -383,6 +391,22 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	// --------------------------------------------------------------------------
 
 
+	public function rss()
+	{
+		//	Get posts
+		$this->data['posts'] = $this->post->get_all( NULL, NULL, array( 'include_body' => TRUE ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Set Output
+		$this->output->set_content_type( 'text/xml; charset=UTF-8' );
+		$this->load->view( 'blog/feeds/rss', $this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Map slugs to the single() method
 	 *
@@ -393,7 +417,11 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	{
 		$method = $method ? $method : 'index';
 
-		if ( method_exists( $this, $method ) ) :
+		if ( method_exists( $this, $method ) && $this->input->get( 'id' ) ) :
+
+			$this->single( $this->input->get( 'id' ) );
+
+		elseif ( method_exists( $this, $method ) ) :
 
 			//	Method exists, execute it
 			$this->{$method}();
