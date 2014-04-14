@@ -122,11 +122,19 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				foreach ( $data['gallery'] AS $order => $image_id ) :
 
-					$_data[] = array( 'post_id' => $_id, 'image_id' => $image_id, 'order' => $order );
+					if ( (int) $image_id ) :
+
+						$_data[] = array( 'post_id' => $_id, 'image_id' => $image_id, 'order' => $order );
+
+					endif;
 
 				endforeach;
 
-				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+				if ( $_data ) :
+
+					$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+
+				endif;
 
 			endif;
 
@@ -321,11 +329,19 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				foreach ( $data['gallery'] AS $order => $image_id ) :
 
-					$_data[] = array( 'post_id' => $id, 'image_id' => $image_id, 'order' => $order );
+					if ( (int) $image_id ) :
+
+						$_data[] = array( 'post_id' => $id, 'image_id' => $image_id, 'order' => $order );
+
+					endif;
 
 				endforeach;
 
-				$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+				if ( $_data ) :
+
+					$this->db->insert_batch( NAILS_DB_PREFIX . 'blog_post_image', $_data );
+
+				endif;
 
 			endif;
 
