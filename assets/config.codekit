@@ -8072,78 +8072,6 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/css\/_jquery.chosen.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.chosen.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_jquery.fancybox.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.fancybox.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_jquery.tipsy.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.tipsy.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_jquery.toggles.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.toggles.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_jquery.ui.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.ui.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_jquery.ui.extra.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_jquery.ui.extra.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_normalize.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_normalize.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/css\/_reset.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/_reset.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
 	"\/css\/bootstrap.12.css": {
 		"fileType": 16,
 		"ignore": 1,
@@ -8162,11 +8090,56 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/css\/bootstrap.nails.admin.css": {
+	"\/css\/jquery.chosen.css": {
 		"fileType": 16,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/css\/bootstrap.nails.admin.css",
+		"inputAbbreviatedPath": "\/css\/jquery.chosen.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/jquery.fancybox.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/jquery.fancybox.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/jquery.tipsy.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/jquery.tipsy.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/jquery.toggles.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/jquery.toggles.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/jquery.ui.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/jquery.ui.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/jquery.ui.extra.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/jquery.ui.extra.css",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
@@ -8230,6 +8203,24 @@
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/css\/nails.shop.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/normalize.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/normalize.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/css\/reset.css": {
+		"fileType": 16,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/css\/reset.css",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
@@ -15661,26 +15652,6 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/less\/admin\/_variables.less": {
-		"allowInsecureImports": 0,
-		"createSourceMap": 0,
-		"disableJavascript": 0,
-		"fileType": 1,
-		"ieCompatibility": 1,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/admin\/_variables.less",
-		"outputAbbreviatedPath": "\/less\/css\/_variables.css",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 2,
-		"relativeURLS": 0,
-		"shouldRunAutoprefixer": 1,
-		"shouldRunBless": 1,
-		"strictImports": 0,
-		"strictMath": 0,
-		"strictUnits": 0
-		},
 	"\/less\/admin\/layout.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
@@ -16061,6 +16032,26 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
+	"\/less\/admin\/variables.less": {
+		"allowInsecureImports": 0,
+		"createSourceMap": 0,
+		"disableJavascript": 0,
+		"fileType": 1,
+		"ieCompatibility": 1,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/less\/admin\/variables.less",
+		"outputAbbreviatedPath": "\/less\/css\/variables.css",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 2,
+		"relativeURLS": 0,
+		"shouldRunAutoprefixer": 1,
+		"shouldRunBless": 1,
+		"strictImports": 0,
+		"strictMath": 0,
+		"strictUnits": 0
+		},
 	"\/less\/bootstrap.12.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
@@ -16101,47 +16092,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/bootstrap.nails.admin.less": {
-		"allowInsecureImports": 0,
-		"createSourceMap": 0,
-		"disableJavascript": 0,
-		"fileType": 1,
-		"ieCompatibility": 1,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/bootstrap.nails.admin.less",
-		"outputAbbreviatedPath": "\/css\/bootstrap.nails.admin.css",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 2,
-		"relativeURLS": 0,
-		"shouldRunAutoprefixer": 1,
-		"shouldRunBless": 1,
-		"strictImports": 0,
-		"strictMath": 0,
-		"strictUnits": 0
-		},
-	"\/less\/bootstrap.nails.default.less": {
-		"allowInsecureImports": 0,
-		"createSourceMap": 0,
-		"disableJavascript": 0,
-		"fileType": 1,
-		"ieCompatibility": 1,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/bootstrap.nails.default.less",
-		"outputAbbreviatedPath": "\/css\/bootstrap.nails.default.css",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 2,
-		"relativeURLS": 0,
-		"shouldRunAutoprefixer": 1,
-		"shouldRunBless": 1,
-		"strictImports": 0,
-		"strictMath": 0,
-		"strictUnits": 0
-		},
-	"\/less\/common\/_buttons.less": {
+	"\/less\/common\/buttons.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16149,8 +16100,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_buttons.less",
-		"outputAbbreviatedPath": "\/less\/css\/_buttons.css",
+		"inputAbbreviatedPath": "\/less\/common\/buttons.less",
+		"outputAbbreviatedPath": "\/less\/css\/buttons.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16161,7 +16112,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_cdn_manager.less": {
+	"\/less\/common\/cdn_manager.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16169,8 +16120,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_cdn_manager.less",
-		"outputAbbreviatedPath": "\/less\/css\/_cdn_manager.css",
+		"inputAbbreviatedPath": "\/less\/common\/cdn_manager.less",
+		"outputAbbreviatedPath": "\/less\/css\/cdn_manager.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16181,7 +16132,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_elements.less": {
+	"\/less\/common\/elements.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16189,8 +16140,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_elements.less",
-		"outputAbbreviatedPath": "\/less\/css\/_elements.css",
+		"inputAbbreviatedPath": "\/less\/common\/elements.less",
+		"outputAbbreviatedPath": "\/less\/css\/elements.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16201,7 +16152,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_forms.less": {
+	"\/less\/common\/forms.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16209,8 +16160,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_forms.less",
-		"outputAbbreviatedPath": "\/less\/css\/_forms.css",
+		"inputAbbreviatedPath": "\/less\/common\/forms.less",
+		"outputAbbreviatedPath": "\/less\/css\/forms.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16221,7 +16172,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.chosen.less": {
+	"\/less\/common\/jquery.chosen.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16229,8 +16180,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.chosen.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.chosen.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.chosen.less",
+		"outputAbbreviatedPath": "\/css\/jquery.chosen.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16241,7 +16192,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.fancybox.less": {
+	"\/less\/common\/jquery.fancybox.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16249,8 +16200,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.fancybox.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.fancybox.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.fancybox.less",
+		"outputAbbreviatedPath": "\/css\/jquery.fancybox.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16261,7 +16212,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.tipsy.less": {
+	"\/less\/common\/jquery.tipsy.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16269,8 +16220,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.tipsy.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.tipsy.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.tipsy.less",
+		"outputAbbreviatedPath": "\/css\/jquery.tipsy.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16281,7 +16232,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.toggles.less": {
+	"\/less\/common\/jquery.toggles.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16289,8 +16240,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.toggles.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.toggles.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.toggles.less",
+		"outputAbbreviatedPath": "\/css\/jquery.toggles.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16301,7 +16252,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.ui.extra.less": {
+	"\/less\/common\/jquery.ui.extra.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16309,8 +16260,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.ui.extra.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.ui.extra.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.ui.extra.less",
+		"outputAbbreviatedPath": "\/css\/jquery.ui.extra.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16321,7 +16272,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.ui.less": {
+	"\/less\/common\/jquery.ui.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16329,8 +16280,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.ui.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.ui.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.ui.less",
+		"outputAbbreviatedPath": "\/css\/jquery.ui.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16341,7 +16292,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_jquery.uploadify.less": {
+	"\/less\/common\/jquery.uploadify.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16349,8 +16300,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_jquery.uploadify.less",
-		"outputAbbreviatedPath": "\/css\/_jquery.uploadify.css",
+		"inputAbbreviatedPath": "\/less\/common\/jquery.uploadify.less",
+		"outputAbbreviatedPath": "\/css\/jquery.uploadify.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16361,7 +16312,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_nails_default.less": {
+	"\/less\/common\/nails_default.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16369,8 +16320,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_nails_default.less",
-		"outputAbbreviatedPath": "\/less\/css\/_nails_default.css",
+		"inputAbbreviatedPath": "\/less\/common\/nails_default.less",
+		"outputAbbreviatedPath": "\/less\/css\/nails_default.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16381,7 +16332,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_normalize.less": {
+	"\/less\/common\/normalize.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16389,8 +16340,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_normalize.less",
-		"outputAbbreviatedPath": "\/css\/_normalize.css",
+		"inputAbbreviatedPath": "\/less\/common\/normalize.less",
+		"outputAbbreviatedPath": "\/css\/normalize.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16401,7 +16352,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_reset.less": {
+	"\/less\/common\/reset.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16409,8 +16360,8 @@
 		"ieCompatibility": 1,
 		"ignore": 0,
 		"ignoreWasSetByUser": 1,
-		"inputAbbreviatedPath": "\/less\/common\/_reset.less",
-		"outputAbbreviatedPath": "\/css\/_reset.css",
+		"inputAbbreviatedPath": "\/less\/common\/reset.less",
+		"outputAbbreviatedPath": "\/css\/reset.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 1,
 		"outputStyle": 2,
@@ -16421,7 +16372,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_skeleton-base.less": {
+	"\/less\/common\/skeleton-base.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16429,8 +16380,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_skeleton-base.less",
-		"outputAbbreviatedPath": "\/less\/css\/_skeleton-base.css",
+		"inputAbbreviatedPath": "\/less\/common\/skeleton-base.less",
+		"outputAbbreviatedPath": "\/less\/css\/skeleton-base.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16441,7 +16392,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_skeleton-layout.less": {
+	"\/less\/common\/skeleton-layout.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16449,8 +16400,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_skeleton-layout.less",
-		"outputAbbreviatedPath": "\/less\/css\/_skeleton-layout.css",
+		"inputAbbreviatedPath": "\/less\/common\/skeleton-layout.less",
+		"outputAbbreviatedPath": "\/less\/css\/skeleton-layout.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16461,7 +16412,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_skeleton-skeleton.less": {
+	"\/less\/common\/skeleton-skeleton.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16469,8 +16420,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_skeleton-skeleton.less",
-		"outputAbbreviatedPath": "\/less\/css\/_skeleton-skeleton.css",
+		"inputAbbreviatedPath": "\/less\/common\/skeleton-skeleton.less",
+		"outputAbbreviatedPath": "\/less\/css\/skeleton-skeleton.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16481,7 +16432,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_system-alerts.less": {
+	"\/less\/common\/system-alerts.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16489,8 +16440,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_system-alerts.less",
-		"outputAbbreviatedPath": "\/less\/css\/_system-alerts.css",
+		"inputAbbreviatedPath": "\/less\/common\/system-alerts.less",
+		"outputAbbreviatedPath": "\/less\/css\/system-alerts.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16501,7 +16452,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_tabs.less": {
+	"\/less\/common\/tabs.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16509,8 +16460,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_tabs.less",
-		"outputAbbreviatedPath": "\/less\/css\/_tabs.css",
+		"inputAbbreviatedPath": "\/less\/common\/tabs.less",
+		"outputAbbreviatedPath": "\/less\/css\/tabs.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,
@@ -16521,7 +16472,7 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/less\/common\/_variables.less": {
+	"\/less\/common\/variables.less": {
 		"allowInsecureImports": 0,
 		"createSourceMap": 0,
 		"disableJavascript": 0,
@@ -16529,8 +16480,8 @@
 		"ieCompatibility": 1,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/less\/common\/_variables.less",
-		"outputAbbreviatedPath": "\/less\/css\/_variables.css",
+		"inputAbbreviatedPath": "\/less\/common\/variables.less",
+		"outputAbbreviatedPath": "\/less\/css\/variables.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 2,

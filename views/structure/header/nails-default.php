@@ -50,15 +50,15 @@
 					if ( $user->was_admin() ) :
 
 						echo '<div class="alert alert-info text-left">';
-						echo 'Logged in as <strong>' . active_user( 'first_name,last_name' ) . ' (' . active_user( 'email' ) . ')</strong>.';
-						echo anchor( $this->session->userdata( 'admin_recovery' )->back_to_admin_url, 'Back to Admin', 'class="pull-right btn btn-sm btn-default" style="margin-top:-0.5em;"' );
+							echo 'Logged in as <strong>' . active_user( 'first_name,last_name' ) . ' (' . active_user( 'email' ) . ')</strong>.';
+							echo anchor( $this->session->userdata( 'admin_recovery' )->back_to_admin_url, 'Back to Admin', 'class="pull-right btn btn-sm btn-default" style="margin-top:-0.5em;"' );
 						echo '</div>';
 
 					endif;
 
 				?>
 				<h1>
-					<?=APP_NAME?>
+					<?=anchor( '', APP_NAME, 'style="text-decoration:none;color:inherit;"' )?>
 				</h1>
 				<p>
 					<?=NAILS_APP_STRAPLINE?>

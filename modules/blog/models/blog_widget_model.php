@@ -80,6 +80,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 				if ( $_config->meta_show ) :
 
+					$_out .= '<br />';
 					$_out .= '<small class="' . $_config->meta_class . '">';
 					$_out .= 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) );
 					$_out .= '</small>';

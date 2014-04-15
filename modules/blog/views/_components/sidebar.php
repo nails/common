@@ -4,7 +4,7 @@
 	if ( $widget->latest_posts ) :
 
 		echo '<li class="widget latest-posts">';
-		echo $widget->latest_posts;
+			echo $widget->latest_posts;
 		echo '</li>';
 
 	endif;
@@ -14,7 +14,7 @@
 	if ( blog_setting( 'categories_enabled' ) &&  $widget->categories ) :
 
 		echo '<li class="widget categories">';
-		echo $widget->categories;
+			echo $widget->categories;
 		echo '</li>';
 
 	endif;
@@ -24,7 +24,7 @@
 	if ( blog_setting( 'tags_enabled' ) && $widget->tags ) :
 
 		echo '<li class="widget tags">';
-		echo $widget->tags;
+			echo $widget->tags;
 		echo '</li>';
 
 	endif;

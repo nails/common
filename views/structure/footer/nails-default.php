@@ -9,13 +9,13 @@
 				</p>
 			</div><!-- /.row -->
 		</div><!-- /.container -->
-		<script type="text/javascript" src="<?=NAILS_ASSETS_URL . 'bower_components/jquery/dist/jquery.min.js'?>"></script>
-		<script type="text/javascript" src="<?=NAILS_ASSETS_URL . 'bower_components/bootstrap/dist/js/bootstrap.min.js'?>"></script>
 		<?php
 
+			//	Load JS
 			$this->asset->output( 'js' );
 			$this->asset->output( 'js-inline' );
 
+			//	Analytics
 			if ( ENVIRONMENT == 'production' && site_setting( 'google_analytics_account' ) ) :
 
 				?>
