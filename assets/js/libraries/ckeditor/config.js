@@ -31,17 +31,17 @@ CKEDITOR.editorConfig = function( config ) {
 	config.format_small = { element : 'small', name : 'Small' };
 	config.format_tags = 'p;small;h1;h2;h3;h4;h5';
 
+	//	Allow the editor to define whatever classes the user wants on elements
+	config.extraAllowedContent = { '*' : { classes: '*' } };
+
 	// Considering that the basic setup doesn't provide pasting cleanup features,
 	// it's recommended to force everything to be plain text.
 	config.forcePasteAsPlainText = true;
 
-	//	KCFinder
-	//	Disabled for now until I can work out how to tell KCFinder to look at the current app's
-	//	uplaod directory and not it's own one.
-
-	config.filebrowserImageBrowseUrl	= SITE_URL + 'cdn/manager/browse/image';
-	config.filebrowserFlashBrowseUrl	= SITE_URL + 'cdn/manager/browse/flash';
-	config.filebrowserBrowseUrl			= SITE_URL + 'cdn/manager/browse/file';
+	//	CDN
+	config.filebrowserImageBrowseUrl	= window.SITE_URL + 'cdn/manager/browse/image';
+	config.filebrowserFlashBrowseUrl	= window.SITE_URL + 'cdn/manager/browse/flash';
+	config.filebrowserBrowseUrl			= window.SITE_URL + 'cdn/manager/browse/file';
 
 	//	Dialog colour; tie it in with the rest of admin
 	config.dialog_backgroundCoverColor		= 'rgb(0,0,0)';
