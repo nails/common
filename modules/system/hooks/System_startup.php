@@ -180,7 +180,7 @@ class System_startup
 		//	Firstly, which grid? Assume 12 unless specified otherwise
 		if ( ! defined( 'APP_BOOTSTRAP_GRID' ) ) :
 
-			define( 'APP_BOOTSTRAP_GRID', 24 );
+			define( 'APP_BOOTSTRAP_GRID', 12 );
 
 		endif;
 
