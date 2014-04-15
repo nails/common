@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="well well-lg col-sm-6 col-sm-offset-3">
+	<div class="well well-lg <?=BS_COL_SM_6?> <?=BS_COL_SM_OFFSET_3?>">
 		<?php
 
 			$_query = array();
@@ -27,8 +27,8 @@
 
 			?>
 			<div class="form-group <?=form_error( $field ) ? 'has-error' : ''?>">
-				<label class="col-sm-3 control-label" for="input-<?=$field?>"><?=$label?>: </label>
-				<div class="col-sm-9">
+				<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$field?>"><?=$label?>:</label>
+				<div class="<?=BS_COL_SM_9?>">
 					<?=form_password( $field, set_value( $field ), 'id="input-<?=$field?>" placeholder="' . $placeholder . '" class="form-control "' )?>
 					<?=form_error( $field, '<p class="help-block">', '</p>' )?>
 				</div>
@@ -42,16 +42,18 @@
 
 			?>
 			<div class="form-group <?=form_error( $field ) ? 'has-error' : ''?>">
-				<label class="col-sm-3 control-label" for="input-<?=$field?>"><?=$label?>: </label>
-				<div class="col-sm-9">
+				<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$field?>"><?=$label?>:</label>
+				<div class="<?=BS_COL_SM_9?>">
 					<?=form_password( $field, set_value( $field ), 'id="input-<?=$field?>" placeholder="' . $placeholder . '" class="form-control "' )?>
 					<?=form_error( $field, '<p class="help-block">', '</p>' )?>
 				</div>
 			</div>
 
 			<div class="form-group">
-				<div class="col-sm-offset-3 col-sm-9">
-					<button type="submit" class="btn btn-primary"><?=lang( 'auth_forgot_action_reset_continue' )?></button>
+				<div class="<?=BS_COL_SM_OFFSET_3?> <?=BS_COL_SM_9?>">
+					<button type="submit" class="btn btn-primary">
+						<?=lang( 'auth_forgot_action_reset_continue' )?>
+					</button>
 				</div>
 			</div>
 

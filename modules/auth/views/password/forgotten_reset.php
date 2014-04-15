@@ -1,10 +1,10 @@
 <div class="row">
-	<div class="well well-lg col-sm-6 col-sm-offset-3">
+	<div class="well well-lg <?=BS_COL_SM_6?> <?=BS_COL_SM_OFFSET_3?>">
 		<p>
 			<?=lang( 'auth_forgot_reset_ok' )?>
 		</p>
 		<div class="row">
-			<div class="col-md-offset-4 col-md-4">
+			<div class="<?=BS_COL_MD_OFFSET_4?> <?=BS_COL_MD_4?>">
 				<input type="text" value="<?=htmlentities( $new_password )?>" class="form-control" id="temp-password" style="font-size:1.5em;text-align:center;" />
 			</div>
 		</div>

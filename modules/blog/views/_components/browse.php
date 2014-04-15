@@ -3,11 +3,11 @@
 	//	Post Featured Image
 	if ( $post->image_id ) :
 
-		echo '<div class="img featured-image col-md-3 text-center">';
+		echo '<div class="img featured-image ' . BS_COL_MD_3 . ' text-center">';
 			$this->load->view( 'blog/_components/browse_featured_image' );
 		echo '</div>';
 
-		echo '<div class="col-md-9">';
+		echo '<div class="' . BS_COL_MD_9 . '">';
 
 	endif;
 

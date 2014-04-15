@@ -1,7 +1,7 @@
 <div class="blog archive container">
 <?php
 
-	echo '<ul class="posts col-md-9 col-md-push-3 list-unstyled">';
+	echo '<ul class="posts ' . BS_COL_MD_9 . ' ' . BS_COL_MD_PUSH_3 . ' list-unstyled">';
 
 	// --------------------------------------------------------------------------
 

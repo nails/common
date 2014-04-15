@@ -8,7 +8,7 @@
 
 ?>
 <div class="row">
-	<div class="well well-lg col-sm-6 col-sm-offset-3">
+	<div class="well well-lg <?=BS_COL_SM_6?> <?=BS_COL_SM_OFFSET_3?>">
 		<p>
 			Please set security questions for your account.
 		</p>

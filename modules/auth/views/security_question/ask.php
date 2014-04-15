@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="well well-lg col-sm-6 col-sm-offset-3 text-center">
+	<div class="well well-lg <?=BS_COL_SM_6?> <?=BS_COL_SM_OFFSET_3?> text-center">
 		<p>
 			<?=lang( 'auth_twofactor_answer_body' )?>
 		</p>

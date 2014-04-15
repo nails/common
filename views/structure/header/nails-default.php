@@ -27,12 +27,12 @@
 			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
 			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 		</script>
-		<?=link_tag( NAILS_ASSETS_URL . 'bower_components/bootstrap/dist/css/bootstrap.min.css' )?>
-		<?=link_tag( NAILS_ASSETS_URL . 'bower_components/ionicons/css/ionicons.min.css' )?>
 		<?php
 
 			$this->asset->output( 'css' );
 			$this->asset->output( 'css-inline' );
+
+			echo link_tag( NAILS_ASSETS_URL . 'bower_components/ionicons/css/ionicons.min.css' );
 
 		?>
 		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
