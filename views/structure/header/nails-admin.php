@@ -20,8 +20,7 @@
 
 	<!--	NAILS JS GLOBALS	-->
 	<script style="text/javascript">
-		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
-
+		window.ENVIRONMENT				= '<?=ENVIRONMENT?>';
 		window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
 		window.NAILS					= {};
 		window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';

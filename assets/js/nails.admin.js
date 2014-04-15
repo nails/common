@@ -397,7 +397,7 @@ NAILS_Admin = function()
 
 
 	this.error = function(output) {
-		if (window.console && ENVIRONMENT !== 'production') {
+		if (window.console && window.ENVIRONMENT !== 'production') {
 			console.error(output);
 		}
 	};

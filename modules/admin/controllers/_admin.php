@@ -182,6 +182,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		//	Load admin styles and JS
 		$this->asset->load( 'nails.admin.css', TRUE );
+		$this->asset->load( 'jquery.min.js', TRUE );
 		$this->asset->load( 'nails.default.min.js', TRUE );
 		$this->asset->load( 'nails.admin.min.js', TRUE );
 		$this->asset->load( 'nails.api.min.js', TRUE );
