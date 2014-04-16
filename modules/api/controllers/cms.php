@@ -145,7 +145,7 @@ class NAILS_Cms extends NAILS_API_Controller
 
 					else :
 
-						$_out['HTML'] = '<p class="no-config">This widget has no configurable options.</p>';
+						$_out['HTML'] = '<p class="static">This widget has no configurable options.</p>';
 
 					endif;
 
