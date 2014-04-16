@@ -159,9 +159,11 @@
 				</div>
 			</div>
 		<?=form_close()?>
+		<?php if ( APP_USER_ALLOW_REGISTRATION ) : ?>
 		<hr />
 		<p class="text-center">
 			Not got an account? <?=anchor( 'auth/register', 'Register now' )?>.
 		</p>
+		<?php endif; ?>
 	</div>
 </div>
