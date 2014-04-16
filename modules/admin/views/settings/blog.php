@@ -117,6 +117,19 @@
 
 					?>
 				</fieldset>
+
+				<fieldset id="blog-settings-rss">
+					<legend>RSS</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'rss_enabled';
+						$_field['label']		= 'RSS Enabled';
+						$_field['default']		= ! empty( $settings['rss_enabled'] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+					?>
+				</fieldset>
 				<p style="margin-top:1em;margin-bottom:0;">
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>

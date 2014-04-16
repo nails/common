@@ -430,6 +430,14 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 	public function rss()
 	{
+		if ( ! blog_setting( 'rss_enabled' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Get posts
 		$_data						= array();
 		$_data['include_body']		= ! blog_setting( 'use_excerpts' );

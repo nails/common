@@ -70,5 +70,17 @@
 
 	endif;
 
+	// --------------------------------------------------------------------------
+
+	//	RSS
+	if ( blog_setting( 'rss_enabled' ) ) :
+
+		echo '<li class="text-center">';
+			echo '<hr />';
+			echo anchor( blog_setting( 'blog_url' ) . 'rss', '<span class="ion-social-rss"></span>', 'title="Subscribe via RSS"' );
+		echo '<li>';
+
+	endif;
+
 ?>
 </ul>
