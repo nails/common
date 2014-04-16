@@ -201,6 +201,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery.ui.min.js',							TRUE );
 		$this->asset->load( 'jquery.ui.datetimepicker.min.js',			TRUE );
 		$this->asset->load( 'jquery.scrollto.min.js',					TRUE );
+		$this->asset->load( 'jquery.cookie.min.js',						TRUE );
 		$this->asset->load( 'jquery.uploadify.min.js',					TRUE );
 		$this->asset->load( 'nails.default.min.js',						TRUE );
 		$this->asset->load( 'nails.admin.min.js',						TRUE );

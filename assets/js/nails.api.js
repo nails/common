@@ -16,7 +16,13 @@ NAILS_API = function()
 
 
 	/* !INIT & SETUP */
-
+	this.__construct = function()
+	{
+		if ( ! $.cookie )
+		{
+			this.warn( 'NAILS_API: Cookie plugin not available. CSRF may fail (if enabled).' );
+		}
+	};
 
 	/**
 	 * Sets everything up and binds all the listeners
@@ -101,14 +107,17 @@ NAILS_API = function()
 
 		if ( _settings.action === 'POST' )
 		{
-			var _csrf_cookie = $.cookie( this._csrf_cookie );
-
-			if ( typeof( _csrf_cookie ) === 'string' && _csrf_cookie.length > 0 )
+			if ( $.cookie )
 			{
-				var _csrf = {};
-				_csrf[this._csrf_token] = _csrf_cookie;
+				var _csrf_cookie = $.cookie( this._csrf_cookie );
 
-				_settings.data = $.extend({}, _settings.data, _csrf );
+				if ( typeof( _csrf_cookie ) === 'string' && _csrf_cookie.length > 0 )
+				{
+					var _csrf = {};
+					_csrf[this._csrf_token] = _csrf_cookie;
+
+					_settings.data = $.extend({}, _settings.data, _csrf );
+				}
 			}
 		}
 
@@ -126,4 +135,32 @@ NAILS_API = function()
 			'async'		: _settings.async
 		});
 	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this.error = function(output)
+	{
+		if ( window.console && window.ENVIRONMENT !== 'production' )
+		{
+			console.error( output );
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this.warn = function(output)
+	{
+		if ( window.console && window.ENVIRONMENT !== 'production' )
+		{
+			console.warn( output );
+		}
+	};
+
+	// --------------------------------------------------------------------------
+
+	return this.__construct();
 };
