@@ -145,6 +145,38 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Assets
+		if ( blog_setting( 'social_enabled' ) ) :
+
+			$this->asset->load( 'social-likes/social-likes.min.js', 'BOWER' );
+
+			switch ( blog_setting( 'social_skin' ) )  :
+
+				case 'FLAT' :
+
+					$this->asset->load( 'social-likes/social-likes_flat.css', 'BOWER' );
+
+				break;
+
+				case 'BIRMAN' :
+
+					$this->asset->load( 'social-likes/social-likes_birman.css', 'BOWER' );
+
+				break;
+
+				case 'CLASSIC' :
+				default:
+
+					$this->asset->load( 'social-likes/social-likes_classic.css', 'BOWER' );
+
+				break;
+
+			endswitch;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Load views
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'blog/single',		$this->data );

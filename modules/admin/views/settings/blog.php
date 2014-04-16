@@ -14,6 +14,10 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-commenting">Commenting</a>
 			</li>
+			<?php $_active = $this->input->post( 'update' ) == 'social' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-social">Social Tools</a>
+			</li>
 		</ul>
 
 		<section class="tabs pages">
@@ -170,7 +174,7 @@
 							<strong>Coming Soon!</strong> Native commenting is in the works and will be available soon.
 							<?php
 
-								//	TODO: Need to be able to handle alot with native commenting, e.g
+								//	TODO: Need to be able to handle a lot with native commenting, e.g
 								//	- anonymous comments/forced login etc
 								//	- pingbacks?
 								//	- anything else WordPress might do?
@@ -194,11 +198,159 @@
 					?>
 					</div>
 				</fieldset>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
+			</div>
+
+			<?php $_display = $this->input->post( 'update' ) == 'social' ? 'active' : ''?>
+			<div id="tab-social" class="tab page <?=$_display?> social">
+				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
+				<?=form_hidden( 'update', 'social' )?>
+				<p>
+					Place social sharing tools on your blog post pages.
+				</p>
+				<hr />
+				<fieldset id="blog-settings-social">
+					<legend>Enable Services</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'social_facebook_enabled';
+						$_field['label']		= 'Facebook';
+						$_field['id']			= 'social-service-facebook';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'social_twitter_enabled';
+						$_field['label']		= 'Twitter';
+						$_field['id']			= 'social-service-twitter';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'social_googleplus_enabled';
+						$_field['label']		= 'Google+';
+						$_field['id']			= 'social-service-googleplus';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'social_pinterest_enabled';
+						$_field['label']		= 'Pinterest';
+						$_field['id']			= 'social-service-pinterest';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+					?>
+				</fieldset>
+				<fieldset id="blog-settings-social-twitter" style="display:<?=! empty( $settings['social_twitter_enabled'] ) ? 'block' : 'none' ?>">
+					<legend>Twitter Settings</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'social_twitter_via';
+						$_field['label']		= 'Via';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? $settings[$_field['key']] : '';
+						$_field['placeholder']	= 'Put your @username here to add it to the tweet';
+
+						echo form_field( $_field );
+					?>
+				</fieldset>
+				<fieldset id="blog-settings-social-config" style="display:<?=! empty( $settings['social_enabled'] ) ? 'block' : 'none' ?>">
+					<legend>Customisation</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'social_skin';
+						$_field['label']		= 'Skin';
+						$_field['class']		= 'chosen';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? $settings[$_field['key']] : 'CLASSIC';
+
+						$_options				= array();
+						$_options['CLASSIC']	= 'Classic';
+						$_options['FLAT']		= 'Flat';
+						$_options['BIRMAN']		= 'Birman';
+
+						echo form_field_dropdown( $_field, $_options );
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'social_layout';
+						$_field['label']		= 'Layout';
+						$_field['class']		= 'chosen';
+						$_field['id']			= 'blog-settings-social-layout';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? $settings[$_field['key']] : 'HORIZONTAL';
+
+						$_options				= array();
+						$_options['HORIZONTAL']	= 'Horizontal';
+						$_options['VERTICAL']	= 'Vertical';
+						$_options['SINGLE']		= 'Single Button';
+
+						echo form_field_dropdown( $_field, $_options );
+
+						// --------------------------------------------------------------------------
+
+						$_display = ! empty( $settings[$_field['key']] ) && $settings[$_field['key']] == 'SINGLE' ? 'block' : 'none';
+
+						echo '<div id="blog-settings-social-layout-single-text" style="display:' . $_display . '">';
+
+							$_field					= array();
+							$_field['key']			= 'social_layout_single_text';
+							$_field['label']		= 'Button Text';
+							$_field['default']		= ! empty( $settings[$_field['key']] ) ? $settings[$_field['key']] : 'Share';
+							$_field['placeholder']	= 'Specify what text should be rendered on the button';
+
+							echo form_field( $_field );
+
+						echo '</div>';
+
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'social_counters';
+						$_field['label']		= 'Show Counters';
+						$_field['id']			= 'social-counters';
+						$_field['default']		= ! empty( $settings[$_field['key']] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+					?>
 				</fieldset>
 				<p style="margin-top:1em;margin-bottom:0;">
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
+			</div>
+
+			<?php $_display = $this->input->post( 'update' ) == 'sidebar' ? 'active' : ''?>
+			<div id="tab-sidebar" class="tab page <?=$_display?> sidebar">
+
+				<p>
+					Configure the sidebar widgets.
+				</p>
+				<hr />
+				<p class="system-alert message no-close">
+					<strong>Coming Soon!</strong> We're working on an interface to make configuring the blog sidebar as easy as possible!
+				</p>
+				<?php
+
+					//	TODO: Maybe this uses the CMS areas thing
+
+				?>
+
 			</div>
 
 		</section>

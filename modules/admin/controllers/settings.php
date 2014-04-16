@@ -211,6 +211,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 				// --------------------------------------------------------------------------
 
+				case 'social' :
+
+					$this->_blog_update_social();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
 				default :
 
 					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
@@ -299,6 +307,41 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		else :
 
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving commenting settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _blog_update_social()
+	{
+		//	Prepare update
+		$_settings								= array();
+		$_settings['social_facebook_enabled']	= $this->input->post( 'social_facebook_enabled' ) ? TRUE : FALSE;
+		$_settings['social_twitter_enabled']	= $this->input->post( 'social_twitter_enabled' ) ? TRUE : FALSE;
+		$_settings['social_twitter_via']		= $this->input->post( 'social_twitter_via' );
+		$_settings['social_googleplus_enabled']	= $this->input->post( 'social_googleplus_enabled' ) ? TRUE : FALSE;
+		$_settings['social_pinterest_enabled']	= $this->input->post( 'social_pinterest_enabled' ) ? TRUE : FALSE;
+		$_settings['social_skin']				= $this->input->post( 'social_skin' );
+		$_settings['social_layout']				= $this->input->post( 'social_layout' );
+		$_settings['social_layout_single_text']	= $this->input->post( 'social_layout_single_text' );
+		$_settings['social_counters']			= $this->input->post( 'social_counters' ) ? TRUE : FALSE;
+
+		//	If any of the above are enabled, then social is enabled.
+		$_settings['social_enabled'] = $_settings['social_facebook_enabled'] || $_settings['social_twitter_enabled'] || $_settings['social_googleplus_enabled'] || $_settings['social_pinterest_enabled'];
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->blog->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Blog social settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving social settings.';
 
 		endif;
 	}

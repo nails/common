@@ -28,6 +28,15 @@
 
 	// --------------------------------------------------------------------------
 
+	//	Post Social Tools
+	if ( blog_setting( 'social_enabled' ) ) :
+
+		$this->load->view( 'blog/_components/single_social' );
+
+	endif;
+
+	// --------------------------------------------------------------------------
+
 	//	Categories & Tags
 	if ( ( blog_setting( 'categories_enabled' ) && $post->categories ) || ( blog_setting( 'tags_enabled' ) && $post->tags ) ) :
 
