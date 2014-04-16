@@ -4,17 +4,30 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 	<head>
-		<title><?php
+		<?php
 
-			echo ! empty( $page->title ) ? $page->title . ' - ' : '';
+			echo '<title>';
 
-			echo APP_NAME;
+				if ( ! empty( $page->seo->title ) ) :
 
-		?></title>
+					echo $page->seo->title . ' - ';
+
+				elseif ( ! empty( $page->title ) ) :
+
+					echo $page->title . ' - ';
+
+				endif;
+
+				echo APP_NAME;
+
+			echo '</title>';
+
+		?>
+
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta charset='utf-8'>
-		<meta name="description" content="<?=! empty( $page->description ) ? $page->description : ''?>">
-		<meta name="keywords" content="<?=! empty( $page->keywords ) ? $page->keywords : ''?>">
+		<meta name="description" content="<?=! empty( $page->seo->description ) ? $page->seo->description : ''?>">
+		<meta name="keywords" content="<?=! empty( $page->seo->keywords ) ? $page->seo->keywords : ''?>">
 		<script type="text/javascript">
 			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
 			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';

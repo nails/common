@@ -153,10 +153,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Other defaults
-		$this->data['page']					= new stdClass();
-		$this->data['page']->title			= '';
-		$this->data['page']->description	= '';
-		$this->data['page']->keywords		= '';
+		$this->data['page']						= new stdClass();
+		$this->data['page']->title				= '';
+		$this->data['page']->seo				= new stdClass();
+		$this->data['page']->seo->title			= '';
+		$this->data['page']->seo->description	= '';
+		$this->data['page']->seo->keywords		= '';
 	}
 
 

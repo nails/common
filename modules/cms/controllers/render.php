@@ -97,11 +97,13 @@ class NAILS_Render extends NAILS_CMS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Set some page level data
-		$this->data['page']->id				= $_page->id;
-		$this->data['page']->title			= $_data->title;
-		$this->data['page']->description	= $_data->seo_description;
-		$this->data['page']->keywords		= $_data->seo_keywords;
-		$this->data['page']->is_preview		= $this->_is_preview;
+		$this->data['page']->id					= $_page->id;
+		$this->data['page']->title				= $_data->title;
+		$this->data['page']->seo				= new stdClass();
+		$this->data['page']->seo->title			= $_data->seo_title;
+		$this->data['page']->seo->description	= $_data->seo_description;
+		$this->data['page']->seo->keywords		= $_data->seo_keywords;
+		$this->data['page']->is_preview			= $this->_is_preview;
 
 		//	Prepare data
 		$_render					= new stdClass();
@@ -131,11 +133,11 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		//	Add the page data as a reference to the additional_fields, so widgets can
 		//	have some contect about the page they're being rendered on.
-		
+
 		$_render->additional_fields->cmspage =& $_data;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Actually render
 		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields );
 

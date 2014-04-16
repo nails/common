@@ -515,6 +515,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			this.page_data.data.parent_id		= $( 'input[name=parent_id]' ).val();
 		}
 
+		this.page_data.data.seo_title			= $( 'input[name=seo_title]' ).val();
 		this.page_data.data.seo_description		= $( 'input[name=seo_description]' ).val();
 		this.page_data.data.seo_keywords		= $( 'input[name=seo_keywords]' ).val();
 		this.page_data.data.template			= $( 'input[name=template]:checked' ).val();

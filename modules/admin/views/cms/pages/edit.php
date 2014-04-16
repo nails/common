@@ -134,6 +134,17 @@
 
 			// --------------------------------------------------------------------------
 
+			//	SEO Title
+			$_field					= array();
+			$_field['key']			= 'seo_title';
+			$_field['label']		= 'SEO Title';
+			$_field['default']		= isset( $cmspage->draft->seo_title ) ? html_entity_decode( $cmspage->draft->seo_title, ENT_COMPAT | ENT_HTML5, 'UTF-8' ) : '';
+			$_field['placeholder']	= 'The page\'s SEO title, keep this short and concise. If not set, this will fallback to the page title.';
+
+			echo form_field( $_field );
+
+			// --------------------------------------------------------------------------
+
 			//	SEO Description
 			$_field					= array();
 			$_field['key']			= 'seo_description';

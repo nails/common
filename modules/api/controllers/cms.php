@@ -273,6 +273,7 @@ class NAILS_Cms extends NAILS_API_Controller
 		$_data->data					= new stdClass();
 		$_data->data->title				= ! empty( $_page_data->data->title )				? $_page_data->data->title				: '';
 		$_data->data->parent_id			= ! empty( $_page_data->data->parent_id )			? (int) $_page_data->data->parent_id	: '';
+		$_data->data->seo_title			= ! empty( $_page_data->data->seo_title )			? $_page_data->data->seo_title			: '';
 		$_data->data->seo_description	= ! empty( $_page_data->data->seo_description )		? $_page_data->data->seo_description	: '';
 		$_data->data->seo_keywords		= ! empty( $_page_data->data->seo_keywords )		? $_page_data->data->seo_keywords		: '';
 		$_data->data->template			= $_page_data->data->template;

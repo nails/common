@@ -147,6 +147,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 		$_data->draft_parent_id			= ! empty( $_clone->data->parent_id )		? (int) $_clone->data->parent_id			: NULL;
 		$_data->draft_title				= ! empty( $_clone->data->title )			? trim( $_clone->data->title )				: 'Untitled';
+		$_data->draft_seo_title			= ! empty( $_clone->data->seo_title )		? trim( $_clone->data->seo_title )			: '';
 		$_data->draft_seo_description	= ! empty( $_clone->data->seo_description )	? trim( $_clone->data->seo_description )	: '';
 		$_data->draft_seo_keywords		= ! empty( $_clone->data->seo_keywords )	? trim( $_clone->data->seo_keywords )		: '';
 
@@ -161,6 +162,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		//	in the title, so that it doesn't break our explode
 
 		$_data->draft_title				= htmlentities( str_replace( '|', '&#124;', $_data->draft_title ), ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
+		$_data->draft_seo_title			= htmlentities( $_data->draft_seo_title, ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
 		$_data->draft_seo_description	= htmlentities( $_data->draft_seo_description, ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
 		$_data->draft_seo_keywords		= htmlentities( $_data->draft_seo_keywords, ENT_COMPAT | ENT_HTML401, 'UTF-8', FALSE );
 
@@ -456,6 +458,7 @@ class NAILS_Cms_page_model extends NAILS_Model
 		$this->db->set( 'published_template_data',		'draft_template_data',		FALSE );
 		$this->db->set( 'published_title',				'draft_title',				FALSE );
 		$this->db->set( 'published_breadcrumbs',		'draft_breadcrumbs',		FALSE );
+		$this->db->set( 'published_seo_title',			'draft_seo_title',			FALSE );
 		$this->db->set( 'published_seo_description',	'draft_seo_description',	FALSE );
 		$this->db->set( 'published_seo_keywords',		'draft_seo_keywords',		FALSE );
 
@@ -917,6 +920,17 @@ class NAILS_Cms_page_model extends NAILS_Model
 		unset( $page->profile_img );
 		unset( $page->gender );
 		unset( $page->template_data );
+
+		// --------------------------------------------------------------------------
+
+		//	SEO Title
+		//	If not set then fallback to the page title
+
+		if ( empty( $page->seo_title ) && ! empty( $page->title ) ) :
+
+			$page->seo_title = $page->title;
+
+		endif;
 	}
 
 
