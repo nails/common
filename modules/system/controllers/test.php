@@ -53,8 +53,6 @@ class NAILS_Test extends NAILS_System_Controller
 
 		endif;
 
-		$this->_validate_token();
-
 		// --------------------------------------------------------------------------
 
 		//	Set defaults for $this->_info and $this->_result
