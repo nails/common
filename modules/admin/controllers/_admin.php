@@ -189,6 +189,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery.chosen.css',						TRUE );
 		$this->asset->load( 'jquery.ui.css',							TRUE );
 		$this->asset->load( 'jquery.ui.extra.css',						TRUE );
+		$this->asset->load( 'jquery.uploadify.css',							TRUE );
 		$this->asset->load( 'nails.admin.css',							TRUE );
 
 		//	JS
@@ -200,6 +201,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery.ui.min.js',							TRUE );
 		$this->asset->load( 'jquery.ui.datetimepicker.min.js',			TRUE );
 		$this->asset->load( 'jquery.scrollto.min.js',					TRUE );
+		$this->asset->load( 'jquery.uploadify.min.js',					TRUE );
 		$this->asset->load( 'nails.default.min.js',						TRUE );
 		$this->asset->load( 'nails.admin.min.js',						TRUE );
 		$this->asset->load( 'nails.api.min.js',							TRUE );
