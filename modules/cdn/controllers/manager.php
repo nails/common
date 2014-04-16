@@ -186,13 +186,17 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		if ( $this->data['enabled'] ) :
 
 			//	Load assets
-			$this->asset->load( 'jquery.min.js', TRUE );
-			$this->asset->load( 'jquery.ui.min.js', TRUE );
-			$this->asset->load( 'nails.default.min.js', TRUE );
-			$this->asset->load( 'nails.api.min.js', TRUE );
-			$this->asset->load( 'nails.cdn.manager.min.js', TRUE );
-			$this->asset->load( 'mustache.min.js', TRUE );
-			$this->asset->load( 'jquery.fancybox.min.js', TRUE );
+			$this->asset->load( 'jquery/dist/jquery.min.js',				'BOWER' );
+			$this->asset->load( 'fancybox/source/jquery.fancybox.pack.js',	'BOWER' );
+			$this->asset->load( 'fancybox/source/jquery.fancybox.css',		'BOWER' );
+			$this->asset->load( 'jquery.ui.min.js',							TRUE );
+			$this->asset->load( 'jquery.ui.css',							TRUE );
+			$this->asset->load( 'jquery.ui.extra.css',						TRUE );
+			$this->asset->load( 'nails.default.min.js',						TRUE );
+			$this->asset->load( 'nails.api.min.js',							TRUE );
+			$this->asset->load( 'nails.cdn.manager.min.js',					TRUE );
+			$this->asset->load( 'nails.cdn.manager.css',					TRUE );
+			$this->asset->load( 'mustache.min.js',							TRUE );
 
 			// --------------------------------------------------------------------------
 

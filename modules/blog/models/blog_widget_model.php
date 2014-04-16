@@ -51,6 +51,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		$this->db->select( 'id,slug,title,published' );
 		$this->db->where( 'is_published', TRUE );
+		$this->db->where( 'published <=', 'NOW()', FALSE );
 		$this->db->where( 'is_deleted', FALSE );
 		$this->db->limit( $_config->limit );
 		$this->db->order_by( 'published', 'DESC' );
@@ -130,7 +131,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		if ( $_config->show_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT bpc.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category bpc JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpc.post_id = bp.id WHERE bpc.category_id = c.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpc.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category bpc JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpc.post_id = bp.id WHERE bpc.category_id = c.id AND bp.is_published = 1 AND bp.is_deleted = 0 AND bp.published <= NOW()) post_count' );
 
 		endif;
 
@@ -210,7 +211,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		if ( $_config->show_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT bpt.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag bpt JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpt.post_id = bp.id WHERE tag_id = t.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpt.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag bpt JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpt.post_id = bp.id WHERE tag_id = t.id AND bp.is_published = 1 AND bp.is_deleted = 0 AND bp.published <= NOW()) post_count' );
 
 		endif;
 

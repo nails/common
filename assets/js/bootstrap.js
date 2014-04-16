@@ -1,1 +1,0 @@
-//	This file imports the Bootstrap JS from bower_components. Use CodeKit to Import.

@@ -52,6 +52,11 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
+		//	Only published items which are not schduled for the future
+		$_data['where']		= array();
+		$_data['where'][]	= array( 'column' => 'is_published',	'value' => TRUE );
+		$_data['where'][]	= array( 'column' => 'published <=',	'value' => 'NOW()', 'escape' => FALSE );
+
 		// --------------------------------------------------------------------------
 
 		//	Load posts and count
@@ -394,7 +399,17 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	public function rss()
 	{
 		//	Get posts
-		$this->data['posts'] = $this->post->get_all( NULL, NULL, array( 'include_body' => TRUE ) );
+		$_data						= array();
+		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
+		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['sort']				= array( 'bp.published', 'desc' );
+
+		//	Only published items which are not schduled for the future
+		$_data['where']		= array();
+		$_data['where'][]	= array( 'column' => 'is_published',	'value' => TRUE );
+		$_data['where'][]	= array( 'column' => 'published <=',	'value' => 'NOW()', 'escape' => FALSE );
+
+		$this->data['posts'] = $this->post->get_all( NULL, NULL, $_data );
 
 		// --------------------------------------------------------------------------
 

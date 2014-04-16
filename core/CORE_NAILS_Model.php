@@ -972,6 +972,7 @@ class CORE_NAILS_Model extends CI_Model
 
 							//	Work out column
 							$_column = ! empty( $where['column'] ) ? $where['column'] : NULL;
+
 							if ( $_column === NULL ) :
 
 								$_column = ! empty( $where[0] ) && is_string( $where[0] ) ? $where[0] : NULL;
@@ -980,12 +981,14 @@ class CORE_NAILS_Model extends CI_Model
 
 							//	Work out value
 							$_value = isset( $where['value'] ) ? $where['value'] : NULL;
+
 							if ( $_value === NULL ) :
 
 								$_value = ! empty( $where[1] ) ? $where[1] : NULL;
 
 							endif;
 
+							//	Escaped?
 							$_escape = isset( $where['escape'] ) ? (bool) $where['escape'] : TRUE;
 
 							if ( $_column ) :

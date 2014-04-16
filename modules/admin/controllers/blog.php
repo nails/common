@@ -140,11 +140,6 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load assets
-		$this->asset->load( 'nails.admin.blog.min.js', TRUE );
-
-		// --------------------------------------------------------------------------
-
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'admin/blog/index',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
@@ -173,13 +168,14 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->load->library( 'form_validation' );
 
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean' );
-			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
-			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
+			$this->form_validation->set_rules( 'is_published',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'published',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'body',				'',	'required' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -194,6 +190,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
+				$_data['published']			= $this->input->post( 'published' );
 				$_data['associations']		= $this->input->post( 'associations' );
 				$_data['gallery']			= $this->input->post( 'gallery' );
 
@@ -311,13 +308,14 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->load->library( 'form_validation' );
 
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean' );
-			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
-			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean' );
+			$this->form_validation->set_rules( 'is_published',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'published',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'body',				'',	'required' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -332,6 +330,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
+				$_data['published']			= $this->input->post( 'published' );
 				$_data['associations']		= $this->input->post( 'associations' );
 				$_data['gallery']			= $this->input->post( 'gallery' );
 

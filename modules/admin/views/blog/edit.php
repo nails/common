@@ -38,20 +38,7 @@
 		<section class="tabs pages">
 
 			<div class="tab page fieldset active" id="tab-meta">
-				<?php
-
-				//	Published
-				$_field					= array();
-				$_field['key']			= 'is_published';
-				$_field['label']		= 'Published';
-				$_field['text_on']		= 'YES';
-				$_field['text_off']		= 'NO';
-				$_field['default']		= isset( $post->is_published ) ? $post->is_published : TRUE;
-				$_field['required']		= TRUE;
-
-				echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
-
-				// --------------------------------------------------------------------------
+			<?php
 
 				//	Title
 				$_field					= array();
@@ -90,7 +77,36 @@
 
 				echo form_field_mm_image( $_field );
 
-				?>
+				// --------------------------------------------------------------------------
+
+				//	Published
+				$_field					= array();
+				$_field['key']			= 'is_published';
+				$_field['label']		= 'Published';
+				$_field['text_on']		= 'YES';
+				$_field['text_off']		= 'NO';
+				$_field['default']		= isset( $post->is_published ) ? $post->is_published : FALSE;
+				$_field['id']			= 'is-published';
+
+				echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
+
+				// --------------------------------------------------------------------------
+
+				//	Published Date
+				echo '<div id="publish-date">';
+
+					$_field					= array();
+					$_field['key']			= 'published';
+					$_field['label']		= 'Publish Date';
+					$_field['required']		= TRUE;
+					$_field['default']		= isset( $post->published ) ? user_mysql_datetime( $post->published ) : '';
+					$_field['placeholder']	= 'The publish date for this blog post';
+
+					echo form_field_datetime( $_field );
+
+				echo '</div>';
+
+			?>
 			</div>
 
 			<?php
@@ -366,10 +382,8 @@
 	var _EDIT;
 	$(function()
 	{
-
 		_EDIT = new NAILS_Admin_Blog_Create_Edit();
 		_EDIT.init( '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
-
 	});
 </script>
 <script type="text/template" id="template-gallery-item">

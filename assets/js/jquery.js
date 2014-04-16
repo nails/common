@@ -1,1 +1,0 @@
-//	This file imports the jQuery JS from bower_components. Use CodeKit to Import.

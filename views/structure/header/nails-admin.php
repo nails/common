@@ -52,9 +52,7 @@
 	<!--	ASSETS	-->
 	<?php
 
-		echo $this->asset->output( 'css' );
-		echo $this->asset->output( 'js' );
-		echo $this->asset->output( 'css-inline' );
+		echo $this->asset->output();
 
 	?>
 	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.print.css'?>" />

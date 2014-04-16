@@ -130,11 +130,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load assets
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
-
-		// --------------------------------------------------------------------------
-
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/settings/site',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
@@ -234,7 +229,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
 		$this->asset->load( 'nails.admin.blog.settings.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
@@ -415,12 +409,13 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Load assets
 		$this->asset->load( 'nails.admin.shop.settings.min.js', TRUE );
 		$this->asset->load( 'mustache.min.js', TRUE );
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
+		//	Load views
 		$this->load->view( 'structure/header',		$this->data );
 		$this->load->view( 'admin/settings/shop',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );

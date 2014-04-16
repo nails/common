@@ -98,16 +98,36 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 		endif;
 
+		//	Publish date
+		if ( ! empty( $data['is_published'] ) && isset( $data['published'] ) ) :
+
+			//	Published with date set
+			$_published = strtotime( $data['published'] );
+
+			if ( $_published ) :
+
+				$_published = user_rdatetime( $data['published'] );
+
+				$this->db->set( 'published', $_published );
+
+			else :
+
+				//	Failed, use NOW();
+				$this->db->set( 'published', 'NOW()', FALSE );
+
+			endif;
+
+		else :
+
+			//	No date set, use NOW()
+			$this->db->set( 'published', 'NOW()', FALSE );
+
+		endif;
+
 		$this->db->set( 'created',			'NOW()', FALSE );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 		$this->db->set( 'created_by',		active_user( 'id' ) );
 		$this->db->set( 'modified_by',		active_user( 'id' ) );
-
-		if ( $data['is_published'] ) :
-
-			$this->db->set( 'published',	'NOW()', FALSE );
-
-		endif;
 
 		$this->db->insert( NAILS_DB_PREFIX . 'blog_post' );
 
@@ -252,11 +272,6 @@ class NAILS_Blog_post_model extends NAILS_Model
 			$_prefix	= array_search( $data['title'], $this->_reserved ) !== FALSE ? 'post-' : '';
 			$_slug		= $this->_generate_slug( $data['title'], $_prefix );
 
-			// --------------------------------------------------------------------------
-
-			//	Also update the published datetime
-			$this->db->set( 'published',	'NOW()', FALSE );
-
 		else :
 
 			$_slug = FALSE;
@@ -292,6 +307,32 @@ class NAILS_Blog_post_model extends NAILS_Model
 		elseif ( ! empty( $data['body'] ) ) :
 
 			$this->db->set( 'excerpt', word_limiter( trim( strip_tags( $data['body'] ) ) ), 50 );
+
+		endif;
+
+		//	Publish date
+		if ( ! empty( $data['is_published'] ) && isset( $data['published'] ) ) :
+
+			//	Published with date set
+			$_published = strtotime( $data['published'] );
+
+			if ( $_published ) :
+
+				$_published = user_rdatetime( $data['published'] );
+
+				$this->db->set( 'published', $_published );
+
+			else :
+
+				//	Failed, use NOW();
+				$this->db->set( 'published', 'NOW()', FALSE );
+
+			endif;
+
+		else :
+
+			//	No date set, use NOW();
+			$this->db->set( 'published', 'NOW()', FALSE );
 
 		endif;
 

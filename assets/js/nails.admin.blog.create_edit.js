@@ -20,9 +20,93 @@ NAILS_Admin_Blog_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Init everything!
+		this._init_publish_date();
 		this._init_chosens();
 		this._init_gallery();
 		this._init_submit();
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_publish_date = function()
+	{
+		var _this = this;
+
+		$( '#is-published' ).on( 'change', function()
+		{
+			_this._publish_change();
+		});
+
+		$( '#is-published' ).closest( 'div.field' ).on( 'toggle', function()
+		{
+			_this._publish_change();
+		});
+
+		this._publish_change();
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._publish_change = function()
+	{
+		var _published = $( '#is-published' ).is( ':checked' );
+
+		if ( _published )
+		{
+			$( '#publish-date' ).show();
+
+			//	If it's empty set it to now
+			var _publish_date = $.trim( $( '#publish-date input.datetime' ).val() );
+
+			if ( _publish_date.length <= 0 )
+			{
+				var _date	= new Date();
+				var _year	= _date.getFullYear();
+				var _month	= _date.getMonth()+1;
+				var _day	= _date.getDate();
+				var _hour	= _date.getHours();
+				var _minute	= _date.getMinutes();
+				var _second	= _date.getSeconds();
+
+				//	Pad strings
+				if ( _month.toString().length === 1 )
+				{
+					_month = '0' + _month;
+				}
+
+				if ( _day.toString().length === 1 )
+				{
+					_day = '0' + _day;
+				}
+
+				if ( _hour.toString().length === 1 )
+				{
+					_hour = '0' + _hour;
+				}
+
+				if ( _minute.toString().length === 1 )
+				{
+					_minute = '0' + _minute;
+				}
+
+				if ( _second.toString().length === 1 )
+				{
+					_second = '0' + _second;
+				}
+
+				var _compiled = _year + '-' + _month + '-' + _day + ' ' + _hour + ':' + _minute + ':' + _second;
+
+				$( '#publish-date input.datetime' ).val( _compiled );
+			}
+		}
+		else
+		{
+			$( '#publish-date' ).hide();
+		}
 	};
 
 

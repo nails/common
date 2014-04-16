@@ -180,13 +180,29 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		//	Unload any previously loaded assets, admin handles it's own assets
 		$this->asset->clear_all();
 
-		//	Load admin styles and JS
-		$this->asset->load( 'nails.admin.css', TRUE );
-		$this->asset->load( 'jquery.min.js', TRUE );
-		$this->asset->load( 'nails.default.min.js', TRUE );
-		$this->asset->load( 'nails.admin.min.js', TRUE );
-		$this->asset->load( 'nails.api.min.js', TRUE );
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
+		//	CSS
+		$this->asset->load( 'fancybox/source/jquery.fancybox.css',		'BOWER' );
+		$this->asset->load( 'jquery-toggles/toggles.css',				'BOWER' );
+		$this->asset->load( 'jquery-toggles/themes/toggles-modern.css',	'BOWER' );
+		$this->asset->load( 'tipsy/src/stylesheets/tipsy.css',			'BOWER' );
+		$this->asset->load( 'ionicons/css/ionicons.min.css',			'BOWER' );
+		$this->asset->load( 'jquery.chosen.css',						TRUE );
+		$this->asset->load( 'jquery.ui.css',							TRUE );
+		$this->asset->load( 'jquery.ui.extra.css',						TRUE );
+		$this->asset->load( 'nails.admin.css',							TRUE );
+
+		//	JS
+		$this->asset->load( 'jquery/dist/jquery.min.js',				'BOWER' );
+		$this->asset->load( 'fancybox/source/jquery.fancybox.pack.js',	'BOWER' );
+		$this->asset->load( 'jquery-toggles/toggles.min.js',			'BOWER' );
+		$this->asset->load( 'tipsy/src/javascripts/jquery.tipsy.js',	'BOWER' );
+		$this->asset->load( 'jquery.chosen.min.js',						TRUE );
+		$this->asset->load( 'jquery.ui.min.js',							TRUE );
+		$this->asset->load( 'jquery.ui.datetimepicker.min.js',			TRUE );
+		$this->asset->load( 'jquery.scrollto.min.js',					TRUE );
+		$this->asset->load( 'nails.default.min.js',						TRUE );
+		$this->asset->load( 'nails.admin.min.js',						TRUE );
+		$this->asset->load( 'nails.api.min.js',							TRUE );
 
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :

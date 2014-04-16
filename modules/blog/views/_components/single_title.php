@@ -5,7 +5,7 @@
 
 	if ( $post->is_published ) :
 
-		echo 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) ) . ', ';
+		echo 'Published ' . date( 'jS F Y, H:i', strtotime( user_mysql_datetime( $post->published ) ) ) . ', ';
 		echo 'by ' . $post->author->first_name . ' ' . $post->author->last_name;
 
 	else :

@@ -323,7 +323,8 @@ NAILS_Admin = function()
 	// --------------------------------------------------------------------------
 
 
-	this._fieldset_toggle = function(obj) {
+	this._fieldset_toggle = function(obj)
+	{
 		var _fieldset = obj.closest('fieldset');
 
 		if (_fieldset.hasClass('closed')) {
@@ -345,8 +346,9 @@ NAILS_Admin = function()
 	// --------------------------------------------------------------------------
 
 
-	this.init_toggles = function() {
-		if ($.fn.toggles)
+	this.init_toggles = function()
+	{
+		if ( $.fn.toggles )
 		{
 			$('.field.boolean:not(.toggled)').each(function()
 			{

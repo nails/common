@@ -1,0 +1,15 @@
+{
+  "name": "jquery-toggles",
+  "homepage": "https://github.com/simontabor/jquery-toggles",
+  "version": "2.0.5",
+  "_release": "2.0.5",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.0.5",
+    "commit": "ec9059e8dc2dfcc6399c1f31d354e2e7f5845605"
+  },
+  "_source": "git://github.com/simontabor/jquery-toggles.git",
+  "_target": "~2.0.5",
+  "_originalSource": "jquery-toggles",
+  "_direct": true
+}
