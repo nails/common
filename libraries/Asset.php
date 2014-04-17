@@ -538,6 +538,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->css = array_filter( $this->css );
+		$this->css = array_unique( $this->css );
+
 		foreach ( $this->css AS $asset ) :
 
 			$_url  = preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ? $asset : 'assets/css/' . $asset ;
@@ -563,6 +566,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->css_nails = array_filter( $this->css_nails );
+		$this->css_nails = array_unique( $this->css_nails );
+
 		foreach ( $this->css_nails AS $asset ) :
 
 			$_out .= link_tag( NAILS_ASSETS_URL . 'css/' . $asset ) . "\n";
@@ -587,6 +593,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->css_nails_bower = array_filter( $this->css_nails_bower );
+		$this->css_nails_bower = array_unique( $this->css_nails_bower );
+
 		foreach ( $this->css_nails_bower AS $asset ) :
 
 			$_out .= link_tag( NAILS_ASSETS_URL . 'bower_components/' . $asset ) . "\n";
@@ -610,6 +619,9 @@ class Asset
 	private function _print_css_inline()
 	{
 		$_out = '';
+
+		$this->css_inline = array_filter( $this->css_inline );
+		$this->css_inline = array_unique( $this->css_inline );
 
 		foreach ( $this->css_inline AS $asset ) :
 
@@ -637,6 +649,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->js = array_filter( $this->js );
+		$this->js = array_unique( $this->js );
+
 		foreach ( $this->js AS $asset ) :
 
 			$_url  = preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ? $asset : site_url( 'assets/js/' . $asset ) ;
@@ -662,6 +677,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->js_nails = array_filter( $this->js_nails );
+		$this->js_nails = array_unique( $this->js_nails );
+
 		foreach ( $this->js_nails AS $asset ) :
 
 			$_out .= '<script type="text/javascript" src="' . NAILS_ASSETS_URL . 'js/' . $asset . '"></script>' . "\n";
@@ -686,6 +704,9 @@ class Asset
 	{
 		$_out = '';
 
+		$this->js_nails_bower = array_filter( $this->js_nails_bower );
+		$this->js_nails_bower = array_unique( $this->js_nails_bower );
+
 		foreach ( $this->js_nails_bower AS $asset ) :
 
 			$_out .= '<script type="text/javascript" src="' . NAILS_ASSETS_URL . 'bower_components/' . $asset . '"></script>' . "\n";
@@ -709,6 +730,9 @@ class Asset
 	private function _print_js_inline()
 	{
 		$_out = '';
+
+		$this->js_inline = array_filter( $this->js_inline );
+		$this->js_inline = array_unique( $this->js_inline );
 
 		foreach ( $this->js_inline AS $asset ) :
 

@@ -764,7 +764,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		});
 
 		//	Bind tipsys
-		$( 'li.widget', this._editor.widgets ).tipsy({gravity:'w'});
+		$( 'li.widget[title!=""]', this._editor.widgets ).tipsy({gravity:'w'});
 	};
 
 
@@ -1167,6 +1167,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		_item = $( '<li>' );
 		_item.addClass( 'processed dropzone-widget ' + _data.slug );
+		if ( _data.description.length === 0 )
+		{
+			_item.addClass( 'mask-no-description' );
+		}
 		_item.attr( 'id', _data.id );
 		_item.data( 'slug', _data.slug );
 		_item.html( _html );
