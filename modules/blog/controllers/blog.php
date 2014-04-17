@@ -440,7 +440,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Get posts
 		$_data						= array();
-		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
+		$_data['include_body']		= TRUE;
 		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
