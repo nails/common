@@ -48,6 +48,7 @@
 	// --------------------------------------------------------------------------
 
 	//	Misc
-	$lang['admin_login_as']			= 'Login As';
-	$lang['admin_confirm_delete']	= 'Are you sure you want to delete this item? This action is not undoable.';
-	$lang['admin_not_secure']		= '<strong>Oops!</strong> You attempted to access admin via an incorrect or unsecure URL. You have been redirected. If you were performing an action (such as saving) then you may need to perform it again. If you are consistently seeing this error and believe there is a problem, then please contact the developer.';
+	$lang['admin_login_as']				= 'Login As';
+	$lang['admin_confirm_delete_title']	= 'Are you sure?';
+	$lang['admin_confirm_delete_body']	= 'Are you sure you want to delete this item? This action is not undoable.';
+	$lang['admin_not_secure']			= '<strong>Oops!</strong> You attempted to access admin via an incorrect or unsecure URL. You have been redirected. If you were performing an action (such as saving) then you may need to perform it again. If you are consistently seeing this error and believe there is a problem, then please contact the developer.';

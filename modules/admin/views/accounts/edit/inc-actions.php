@@ -17,7 +17,7 @@
 	//	Edit
 	if ( $user_edit->id != active_user( 'id' ) && user_has_permission( 'admin.accounts.delete' ) ) :
 
-		$_buttons[] = anchor( 'admin/accounts/delete/' . $user_edit->id . '?return_to=' . urlencode( 'admin/accounts' ), lang( 'action_delete' ), 'class="awesome red confirm" data-confirm="' . lang( 'admin_confirm_delete' ) . '"' );
+		$_buttons[] = anchor( 'admin/accounts/delete/' . $user_edit->id . '?return_to=' . urlencode( 'admin/accounts' ), lang( 'action_delete' ), 'class="awesome red confirm" data-title="' . lang( 'admin_confirm_delete_title' ) . '" data-body="' . lang( 'admin_confirm_delete_body' ) . '"' );
 
 	endif;
 

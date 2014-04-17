@@ -48,8 +48,8 @@
 							<td>Auth</td>
 							<td>Yes</td>
 							<td>
-								<?=anchor( $_SERVER['REQUEST_URI'], 'Reinstall', 'class="awesome small confirm" data-confirm="Are you sure?\n\nReinstalling will destroy any existing content"' )?>
-								<?=anchor( $_SERVER['REQUEST_URI'], 'Uninstall', 'class="awesome small confirm red" data-confirm="Are you sure?\n\nDatabase data will be left (so the module can be re-enabled if nessecary)."' )?>
+								<?=anchor( $_SERVER['REQUEST_URI'], 'Reinstall', 'class="awesome small confirm" data-title="Are you sure?" data-body="Reinstalling will destroy any existing content"' )?>
+								<?=anchor( $_SERVER['REQUEST_URI'], 'Uninstall', 'class="awesome small confirm red" data-title="Are you sure?" data-body="Database data will be left (so the module can be re-enabled if nessecary)."' )?>
 							</td>
 						</tr>
 					</tbody>

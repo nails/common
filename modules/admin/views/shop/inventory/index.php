@@ -85,7 +85,7 @@
 
 									if ( user_has_permission( 'admin.shop.delete' ) ) :
 
-										$_buttons[] = anchor( 'admin/shop/inventory/delete/' . $item->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-confirm="Are you sure?"' );
+										$_buttons[] = anchor( 'admin/shop/inventory/delete/' . $item->id, lang( 'action_delete' ), 'class="awesome small red confirm" data-title="Are you sure?" data-body="You cannot undo this action"' );
 
 									endif;
 

@@ -151,7 +151,7 @@
 											$_uri_delete = site_url( 'cdn/manager/delete_tag/' . $tag->id . $_query_string, page_is_secure() );
 
 											echo '<li class="tag droppable ' . $_selected . '" data-id="' . $tag->id . '">';
-												echo '<a href="' . $_uri_delete .'" class="confirm delete-tag" data-confirm="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
+												echo '<a href="' . $_uri_delete .'" class="confirm delete-tag" data-title="Are you sure?" data-body="If you continue this tag will be deleted. No files will be removed.\n\nContinue?"></a>';
 												echo '<a href="' . $_uri . '" class="tag">';
 													echo $tag->label;
 													echo '<span class="count">' . $tag->total . '</span>';
