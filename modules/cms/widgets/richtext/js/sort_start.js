@@ -4,4 +4,4 @@ CKEDITOR.instances[_id].destroy();
 
 //	Show the mask
 ui.addClass( 'sorting' );
-ui.find( '.editor-sorting' ).animate({opacity:1},150);
+ui.find( '.mask' ).animate({opacity:1},150);

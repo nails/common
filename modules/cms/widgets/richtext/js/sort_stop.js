@@ -14,7 +14,7 @@ _textarea.ckeditor(function()
 	ui.stop().animate({height:_height}, 250);
 
 	//	Unhide the editor
-	ui.find( '.editor-sorting' ).animate({opacity:0},150, function()
+	ui.find( '.mask' ).animate({opacity:0},150, function()
 	{
 		ui.removeClass('sorting');
 	});

@@ -899,33 +899,30 @@
 			}
 		}
 
-		&.richtext
+		.mask
 		{
-			.editor-sorting
-			{
-				position:absolute;
-				top:@header_height+7px;
-				left:0px;
-				bottom:-2px;
-				right:0px;
-				text-align:center;
-				font-weight:bold;
-				font-size:2em;
-				background: #878787 url(../img/admin/modules/cms/pages/stripes.png);
-				z-index: 1;
-				padding-top: 50px;
-				text-shadow: 1px 1px 0px #333;
-				color: #FFF;
-				.opacity(0);
-				display:none;
-			}
+			position:absolute;
+			top:@header_height+7px;
+			left:0px;
+			bottom:-2px;
+			right:0px;
+			text-align:center;
+			font-weight:bold;
+			font-size:2em;
+			background: #878787 url(../img/admin/modules/cms/pages/stripes.png);
+			z-index: 1;
+			padding-top: 50px;
+			text-shadow: 1px 1px 0px #333;
+			color: #FFF;
+			.opacity(0);
+			display:none;
+		}
 
-			&.sorting
+		&.sorting
+		{
+			.mask
 			{
-				.editor-sorting
-				{
-					display:block;
-				}
+				display:block;
 			}
 		}
 	}
