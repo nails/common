@@ -100,6 +100,12 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 			$this->data['post'] = $this->post->get_by_id( $id );
 
+			if ( $this->data['post']->url != $this->input->server( 'REQUEST_URI' ) ) :
+
+				redirect( $this->data['post']->url, 'location', 301 );
+
+			endif;
+
 		else :
 
 			$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ) );

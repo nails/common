@@ -9,10 +9,10 @@
 	>
 
 	<channel>
-		<title><?=APP_NAME?></title>
+		<title><?=htmlentities( APP_NAME )?></title>
 		<atom:link href="<?=site_url( blog_setting( 'blog_url' ) . 'rss' )?>" rel="self" type="application/rss+xml" />
 		<link><?=site_url()?></link>
-		<description><?=strip_tags( NAILS_APP_STRAPLINE )?></description>
+		<description><?=htmlentities( strip_tags( NAILS_APP_STRAPLINE ) )?></description>
 		<lastBuildDate>Sun, 13 Apr 2014 19:49:30 +0000</lastBuildDate>
 		<language>en-UK</language>
 			<sy:updatePeriod>hourly</sy:updatePeriod>
@@ -22,7 +22,7 @@
 		<?php foreach( $posts AS $post ) : ?>
 
 			<item>
-				<title><?=$post->title?></title>
+				<title><?=htmlentities( $post->title )?></title>
 				<link><?=$post->url?></link>
 				<guid isPermaLink="false"><?=site_url( blog_setting( 'blog_url' ) . '?id=' . $post->id )?></guid>
 				<?=blog_setting( 'comments_enabled' ) ? '<comments>' . $post->url . '#comments</comments>' : ''?>
