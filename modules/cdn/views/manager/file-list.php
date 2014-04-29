@@ -14,6 +14,16 @@
 			$_action			= 'View';
 
 
+		elseif ( $object->mime == 'audio/mpeg' ) :
+
+			//	PDF
+			echo '<div class="icon"><span class="ion-music-note" style="font-size:2.2em"></span></div>';
+			$_fancybox_class	= 'cdn-fancybox';
+			$_fancybox_type		= 'iframe';
+			$_url				= cdn_serve( $object->id );
+			$_action			= 'Play';
+
+
 		elseif ( $object->mime == 'application/pdf' ) :
 
 			//	PDF
