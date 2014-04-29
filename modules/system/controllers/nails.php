@@ -84,9 +84,9 @@ class NAILS_Nails extends NAILS_System_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->load( 'nails.configure.css', TRUE );
-		$this->asset->load( 'nails.configure.min.js', TRUE );
-		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'nails.configure.css',		TRUE );
+		$this->asset->load( 'nails.configure.min.js',	TRUE );
 
 		// --------------------------------------------------------------------------
 

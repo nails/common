@@ -9,8 +9,8 @@ class NAILS_CMS_Widget_richtext extends NAILS_CMS_Widget
 		$_d->description	= 'Build beautiful pages using the rich text editor; embed images, links and more.';
 		$_d->keywords		= 'rich text,formatted text,formatted,wysiwyg,embed';
 
-		$_d->assets_editor[]	= array( 'libraries/ckeditor/ckeditor.js', TRUE );
-		$_d->assets_editor[]	= array( 'libraries/ckeditor/adapters/jquery.js', TRUE );
+		$_d->assets_editor[]	= array( 'ckeditor/ckeditor.js', 		'BOWER' );
+		$_d->assets_editor[]	= array( 'ckeditor/adapters/jquery.js', 'BOWER' );
 
 		return $_d;
 	}

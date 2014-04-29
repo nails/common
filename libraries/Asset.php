@@ -172,8 +172,8 @@ class Asset
 			case 'ckeditor' :
 
 				//	Load assets for CKEditor
-				$this->load( 'libraries/ckeditor/ckeditor.js', TRUE );
-				$this->load( 'libraries/ckeditor/adapters/jquery.js', TRUE );
+				$this->load( 'ckeditor/ckeditor.js',		'BOWER' );
+				$this->load( 'ckeditor/adapters/jquery.js',	'BOWER' );
 
 			break;
 
@@ -181,8 +181,14 @@ class Asset
 
 			case 'jqueryui' :
 
-				$this->load( 'jquery.ui.min.js', TRUE );
-				$this->load( 'jquery.ui.datetimepicker.min.js', TRUE );
+				//	JS
+				$this->load( 'jquery-ui/ui/minified/jquery-ui.min.js',								'BOWER' );
+				$this->load( 'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js',	'BOWER' );
+
+				//	CSS
+				$this->load( 'jquery-ui/themes/base/minified/jquery-ui.min.css',					'BOWER' );
+				$this->load( 'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css',		'BOWER' );
+				$this->load( 'jquery.ui.extra.css',													TRUE );
 
 			break;
 
@@ -198,7 +204,8 @@ class Asset
 
 			case 'uploadify' :
 
-				$this->load( 'jquery.uploadify.min.js', TRUE );
+				$this->load( 'jquery.uploadify.css',	TRUE );
+				$this->load( 'jquery.uploadify.min.js',	TRUE );
 
 			break;
 

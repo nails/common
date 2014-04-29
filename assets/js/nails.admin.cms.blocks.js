@@ -87,7 +87,7 @@ NAILS_Admin_CMS_Blocks = function()
 				//	Instanciate a CKEditor instance and show the WYSIWYG warning
 				$( '#default-value' ).show();
 				$( '#ckeditor-warn' ).show();
-				CKEDITOR.replace( 'default_value' );
+				CKEDITOR.replace( 'default_value', { 'customConfig' : window.NAILS.URL + 'js/libraries/ckeditor/ckeditor.config.min.js' } );
 
 			break;
 
@@ -176,7 +176,7 @@ NAILS_Admin_CMS_Blocks = function()
 		//	If editing a richtext field we need to instantiate the new editor
 		if ( this.block_type === 'richtext' )
 		{
-			CKEDITOR.replace( 'translation_' + this.new_counter );
+			CKEDITOR.replace( 'translation_' + this.new_counter, { 'customConfig' : window.NAILS.URL + 'js/libraries/ckeditor/ckeditor.config.min.js' } );
 		}
 
 		// --------------------------------------------------------------------------

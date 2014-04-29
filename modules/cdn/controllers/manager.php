@@ -185,18 +185,27 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		//	Fetch files
 		if ( $this->data['enabled'] ) :
 
-			//	Load assets
+			//	Load Bower assets
 			$this->asset->load( 'jquery/dist/jquery.min.js',				'BOWER' );
 			$this->asset->load( 'fancybox/source/jquery.fancybox.pack.js',	'BOWER' );
 			$this->asset->load( 'fancybox/source/jquery.fancybox.css',		'BOWER' );
-			$this->asset->load( 'jquery.ui.min.js',							TRUE );
-			$this->asset->load( 'jquery.ui.css',							TRUE );
-			$this->asset->load( 'jquery.ui.extra.css',						TRUE );
+			$this->asset->load( 'jquery.scrollTo/jquery.scrollTo.min.js',	'BOWER' );
+			$this->asset->load( 'tipsy/src/javascripts/jquery.tipsy.js',	'BOWER' );
+			$this->asset->load( 'tipsy/src/stylesheets/tipsy.css',			'BOWER' );
+			$this->asset->load( 'mustache/mustache.js',						'BOWER' );
+			$this->asset->load( 'jquery-cookie/jquery.cookie.js',			'BOWER' );
+
+			//	Load other assets
+			$this->asset->load( 'jquery.chosen.min.js',						TRUE );
+			$this->asset->load( 'jquery.chosen.css',						TRUE );
 			$this->asset->load( 'nails.default.min.js',						TRUE );
 			$this->asset->load( 'nails.api.min.js',							TRUE );
 			$this->asset->load( 'nails.cdn.manager.min.js',					TRUE );
 			$this->asset->load( 'nails.cdn.manager.css',					TRUE );
-			$this->asset->load( 'mustache.min.js',							TRUE );
+
+			//	Load libraries
+			$this->asset->library( 'jqueryui' );
+			//$this->asset->library( 'uploadify' );	//	One day...
 
 			// --------------------------------------------------------------------------
 

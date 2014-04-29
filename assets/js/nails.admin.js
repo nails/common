@@ -31,6 +31,7 @@ NAILS_Admin = function()
 		this.init_mobile_menu();
 		this.init_fieldsets();
 		this.init_toggles();
+		this.init_ckeditor();
 	};
 
 
@@ -384,6 +385,24 @@ NAILS_Admin = function()
 		}
 	};
 
+
+	// --------------------------------------------------------------------------
+
+
+	this.init_ckeditor = function()
+	{
+		if ( $.fn.ckeditor )
+		{
+			$( '.wysiwyg' ).ckeditor(
+			{
+				customConfig: window.NAILS.URL + 'js/libraries/ckeditor/ckeditor.config.min.js'
+			});
+		}
+		else
+		{
+			this.error('NAILS_ADMIN_JS: CKEditor not available.');
+		}
+	};
 
 	// --------------------------------------------------------------------------
 

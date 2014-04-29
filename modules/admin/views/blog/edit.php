@@ -117,7 +117,7 @@
 			?>
 			<div class="tab page" id="tab-body">
 				<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
-				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="ckeditor" id="post_body"' )?>
+				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="wysiwyg" id="post_body"' )?>
 				<p class="system-alert notice no-close" style="margin-top:10px;">
 					<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 					due to application stylesheets on the front end which are not loaded here.

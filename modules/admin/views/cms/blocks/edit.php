@@ -58,7 +58,7 @@
 
 					case 'richtext' :
 
-						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="ckeditor"' );
+						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="wysiwyg"' );
 
 						echo '<p class="system-alert notice no-close">';
 						echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
@@ -133,7 +133,7 @@
 
 							case 'richtext' :
 
-								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="ckeditor"' );
+								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="wysiwyg"' );
 
 								if ( $block->type == 'richtext' ) :
 

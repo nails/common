@@ -4,7 +4,11 @@ var _id			= ui.attr( 'id' ) + '-ckeditor';
 _textarea.attr( 'id', _id );
 
 //	Instantiate the editor
-_textarea.ckeditor(function()
+_textarea.ckeditor(
+{
+	customConfig: window.NAILS.URL + 'js/libraries/ckeditor/ckeditor.config.min.js'
+},
+function()
 {
 	// Increase the height of the container
 	var _header_height	= ui.find('.header-bar').outerHeight();

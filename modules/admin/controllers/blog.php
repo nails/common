@@ -258,10 +258,11 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
-		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
-		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
-		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->library( 'uploadify' );
+		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
+		$this->asset->load( 'mustache/mustache.js',										'BOWER' );
+		$this->asset->load( 'nails.admin.blog.create_edit.js',							TRUE );
+
 
 		// --------------------------------------------------------------------------
 
@@ -491,10 +492,10 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->library( 'ckeditor' );
-		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.js', TRUE );
-		$this->asset->load( 'jquery.uploadify.min.js', TRUE );
-		$this->asset->load( 'mustache.min.js', TRUE );
+		$this->asset->library( 'uploadify' );
+		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
+		$this->asset->load( 'mustache/mustache.js',										'BOWER' );
+		$this->asset->load( 'nails.admin.blog.create_edit.js',							TRUE );
 
 		// --------------------------------------------------------------------------
 

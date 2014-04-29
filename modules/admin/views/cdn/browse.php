@@ -56,6 +56,12 @@
 
 								break;
 
+								case 'audio/mpeg' :
+
+									echo '<span class="ion-music-note"></span>';
+
+								break;
+
 								default :
 
 									echo '<span class="ion-document"></span>';

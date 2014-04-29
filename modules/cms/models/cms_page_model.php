@@ -1512,7 +1512,16 @@ class NAILS_Cms_page_model extends NAILS_Model
 
 			if ( is_array( $asset ) ) :
 
-				$_is_nails = empty( $asset[1] ) ? FALSE : TRUE;
+				if ( ! empty( $asset[1] ) ) :
+
+					$_is_nails = $asset[1];
+
+				else:
+
+					$_is_nails = FALSE;
+
+				endif;
+
 				$this->asset->load( $asset[0], $_is_nails );
 
 			elseif ( is_string( $asset ) ) :

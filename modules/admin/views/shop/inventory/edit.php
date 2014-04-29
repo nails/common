@@ -123,7 +123,7 @@
 
 		<div class="tab page description" id="tab-description">
 			<?=form_error( 'description', '<p class="system-alert error no-close">', '</p>' )?>
-			<textarea class="ckeditor" name="description"><?=set_value( 'description' )?></textarea>
+			<textarea class="wysiwyg" name="description"><?=set_value( 'description' )?></textarea>
 			<p class="system-alert notice no-close" style="margin-top:10px;">
 				<strong>Note:</strong> The editor's display might not be a true representation of the final layout
 				due to application stylesheets on the front end which are not loaded here.
