@@ -293,7 +293,7 @@
 		"disableJavascript": 0,
 		"fileType": 1,
 		"ieCompatibility": 1,
-		"ignore": 1,
+		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/bower_components\/bootstrap\/less\/bootstrap.less",
 		"outputAbbreviatedPath": "\/bower_components\/bootstrap\/css\/bootstrap.css",
