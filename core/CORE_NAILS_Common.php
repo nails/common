@@ -27,7 +27,7 @@ function &get_controller_data()
  * @param mixed $value The value to assign
  * @return	void
  **/
-function &set_controller_data( $key, $value )
+function set_controller_data( $key, $value )
 {
 	global $NAILS_CONTROLLER_DATA;
 	$NAILS_CONTROLLER_DATA[$key] = $value;
