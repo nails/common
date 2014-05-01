@@ -45,7 +45,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Construct the model
 	 *
 	 * @access	public
-	 * @return	void
+	 * @return void
 	 **/
 	public function __construct( )
 	{
@@ -91,7 +91,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Destruct the model
 	 *
 	 * @access	public
-	 * @return	void
+	 * @return void
 	 **/
 	public function __destruct()
 	{
@@ -126,7 +126,7 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access	protected
 	 * @param	string	$error	The error message
-	 * @return	void
+	 * @return void
 	 **/
 	protected function _set_error( $error )
 	{
@@ -141,7 +141,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Get any errors
 	 *
 	 * @access	public
-	 * @return	array
+	 * @return array
 	 **/
 	public function get_errors()
 	{
@@ -156,7 +156,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Get last error
 	 *
 	 * @access	public
-	 * @return	mixed
+	 * @return mixed
 	 **/
 	public function last_error()
 	{
@@ -171,7 +171,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Clear the last error
 	 *
 	 * @access	public
-	 * @return	mixed
+	 * @return mixed
 	 **/
 	public function clear_last_error()
 	{
@@ -186,7 +186,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Clears all errors
 	 *
 	 * @access	public
-	 * @return	mixed
+	 * @return mixed
 	 **/
 	public function clear_errors()
 	{
@@ -212,7 +212,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @access	protected
 	 * @param string $key The key for the cached item
 	 * @param mixed $value The data to be cached
-	 * @return	array
+	 * @return array
 	 **/
 	protected function _set_cache( $key, $value )
 	{
@@ -259,7 +259,7 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
-	 * @return	mixed
+	 * @return mixed
 	 **/
 	protected function _get_cache( $key )
 	{
@@ -309,7 +309,7 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * @access	protected
 	 * @param	string	$key	The key to fetch
-	 * @return	boolean
+	 * @return boolean
 	 **/
 	protected function _unset_cache( $key )
 	{
@@ -362,7 +362,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * Define the cache key prefix
 	 *
 	 * @access	private
-	 * @return	string
+	 * @return string
 	 **/
 	protected function _cache_prefix()
 	{
@@ -785,7 +785,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @access public
 	 * @param int $id The ID of the object to fetch
 	 * @param mixed $data Any data to pass to _getcount_common()
-	 * @return	stdClass
+	 * @return stdClass
 	 **/
 	public function get_by_id( $id, $data = NULL )
 	{
@@ -822,12 +822,46 @@ class CORE_NAILS_Model extends CI_Model
 
 
 	/**
+	 * Fetch objects by their IDs
+	 *
+	 * @access public
+	 * @param array $id An array of IDs to fetch
+	 * @param mixed $data Any data to pass to _getcount_common()
+	 * @return array
+	 **/
+	public function get_by_ids( $ids, $data = NULL )
+	{
+		if ( ! $this->_table ) :
+
+			show_error( get_called_class() . '::get_by_ids() Table variable not set' );
+
+		else :
+
+			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->where_in( $_prefix . $this->_table_id_column, $ids );
+		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_IDS' );
+
+		// --------------------------------------------------------------------------
+
+		return $_result;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Fetch an object by it's slug
 	 *
 	 * @access public
 	 * @param int $slug The slug of the object to fetch
 	 * @param mixed $data Any data to pass to _getcount_common()
-	 * @return	stdClass
+	 * @return stdClass
 	 **/
 	public function get_by_slug( $slug, $data = NULL )
 	{
@@ -857,6 +891,40 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		return $_result[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetch objects by their slugs
+	 *
+	 * @access public
+	 * @param array $slug An array of slugs to fetch
+	 * @param mixed $data Any data to pass to _getcount_common()
+	 * @return array
+	 **/
+	public function get_by_slugs( $slugs, $data = NULL )
+	{
+		if ( ! $this->_table ) :
+
+			show_error( get_called_class() . '::get_by_slug() Table variable not set' );
+
+		else :
+
+			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->where_in( $_prefix . $this->_table_slug_column, $slugs );
+		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_SLUGS' );
+
+		// --------------------------------------------------------------------------
+
+		return $_result;
 	}
 
 
