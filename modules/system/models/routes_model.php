@@ -20,8 +20,7 @@ class NAILS_Routes_model extends NAILS_Model
 	protected $_can_write_routes;
 	protected $_routes_file;
 	protected $_writers;
-
-	private $_routes;
+	protected $_routes;
 
 	public $cant_write_reason;
 
