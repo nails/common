@@ -114,7 +114,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		//	Need to generate the routes_app.php file?
-		if ( NAILS_STARTUP_GENERATE_APP_ROUTES ) :
+		if ( defined( 'NAILS_STARTUP_GENERATE_APP_ROUTES' ) && NAILS_STARTUP_GENERATE_APP_ROUTES ) :
 
 			$this->load->model( 'system/routes_model' );
 

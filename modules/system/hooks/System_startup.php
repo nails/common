@@ -1,6 +1,15 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class System_startup
+
+/**
+ * OVERLOADING NAILS' HOOKS
+ *
+ * Note the name of this class; done like this to allow apps to extend this class.
+ * Read full explanation at the bottom of this file.
+ *
+ **/
+
+class NAILS_System_startup
 {
 	public function define_constants()
 	{
@@ -9,7 +18,6 @@ class System_startup
 		if ( ! defined( 'NAILS_PACKAGE_NAME' ) )			define( 'NAILS_PACKAGE_NAME',			'Nails' );
 		if ( ! defined( 'NAILS_PACKAGE_URL' ) )				define( 'NAILS_PACKAGE_URL',			'http://nailsapp.co.uk/' );
 		if ( ! defined( 'NAILS_APP_STRAPLINE' ) )			define( 'NAILS_APP_STRAPLINE',			'A webapp powered by <a href="' . NAILS_PACKAGE_URL . '">' . NAILS_PACKAGE_NAME . '</a>, ooh la la!' );
-
 
 		// --------------------------------------------------------------------------
 
@@ -24,14 +32,18 @@ class System_startup
 		// --------------------------------------------------------------------------
 
 		//	Check routes_app.php exists
-		if ( is_file( DEPLOY_CACHE_DIR . 'routes_app.php' ) ) :
+		if ( ! defined( 'NAILS_STARTUP_GENERATE_APP_ROUTES' ) ) :
 
-			define( 'NAILS_STARTUP_GENERATE_APP_ROUTES', FALSE );
+			if ( is_file( DEPLOY_CACHE_DIR . 'routes_app.php' ) ) :
 
-		else :
+				define( 'NAILS_STARTUP_GENERATE_APP_ROUTES', FALSE );
 
-			//	Not found, crude hook seeing as basically nothing has loaded yet
-			define( 'NAILS_STARTUP_GENERATE_APP_ROUTES', TRUE );
+			else :
+
+				//	Not found, crude hook seeing as basically nothing has loaded yet
+				define( 'NAILS_STARTUP_GENERATE_APP_ROUTES', TRUE );
+
+			endif;
 
 		endif;
 
@@ -672,7 +684,41 @@ class System_startup
 			break;
 
 		endswitch;
-
-
 	}
 }
+
+
+/**
+ * OVERLOADING NAILS' ADMIN MODULES
+ *
+ * The following block of code makes it simple to extend one of the core admin
+ * controllers. Some might argue it's a little hacky but it's a simple 'fix'
+ * which negates the need to massively extend the CodeIgniter Loader class
+ * even further (in all honesty I just can't face understanding the whole
+ * Loader class well enough to change it 'properly').
+ *
+ * Here's how it works:
+ *
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
+ *
+ * We solve this by prefixing the main class with NAILS_ and then conditionally
+ * declaring this helper class below; the helper gets instantiated et voila.
+ *
+ * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
+ * before including this PHP file and extend as normal (i.e in the same way as below);
+ * the helper won't be declared so we can declare our own one, app specific.
+ *
+ **/
+
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SYSTEM_STARTUP' ) ) :
+
+	class System_startup extends NAILS_System_startup
+	{
+	}
+
+endif;
+
+/* End of file System_startup.php */
+/* Location: ./modules/system/hooks/System_startup.php */
