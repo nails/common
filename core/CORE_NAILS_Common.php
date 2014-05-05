@@ -44,6 +44,9 @@ function set_controller_data( $key, $value )
  *
  * Hat tip: http://uk1.php.net/parse_url#104874
  *
+ * BUG: 2 character TLD's break this
+ * TODO: Try and fix this bug
+ *
  * @access	public
  * @param	string
  * @return	string	The real domain, or FALSE on error
@@ -74,17 +77,30 @@ if ( ! function_exists('get_domain_from_url')) :
 
 			$_url = FALSE;
 
-		elseif ( strlen( $_bits[($_idz+2)] ) == 2 ) :
+		elseif ( strlen( $_bits[($_idz+2)] ) == 2 && isset( $_bits[($_idz+2)] ) ) :
 
-			$_url = $_bits[$_idz] . '.' . $_bits[($_idz+1)] . '.' . $_bits[($_idz+2)];
+			$_url	= array();
+			$_url[] = ! empty( $_bits[$_idz] )		? $_bits[$_idz]		: FALSE;
+			$_url[] = ! empty( $_bits[$_idz+1] )	? $_bits[$_idz+1]	: FALSE;
+			$_url[] = ! empty( $_bits[$_idz+2] )	? $_bits[$_idz+2]	: FALSE;
+
+			$_url = implode( '.', array_filter( $_url ) );
 
 		elseif ( strlen( $_bits[($_idz+2)] ) == 0 ) :
 
-			$_url = $_bits[($_idz)] . '.' . $_bits[($_idz+1)];
+			$_url	= array();
+			$_url[] = ! empty( $_bits[$_idz] )		? $_bits[$_idz]		: FALSE;
+			$_url[] = ! empty( $_bits[$_idz+1] )	? $_bits[$_idz+1]	: FALSE;
+
+			$_url = implode( '.', array_filter( $_url ) );
 
 		elseif ( isset( $_bits[($_idz+1)] ) ) :
 
-			$_url = $_bits[($_idz+1)] . '.' . $_bits[($_idz+2)];
+			$_url	= array();
+			$_url[] = ! empty( $_bits[$_idz+1] )	? $_bits[$_idz+1]	: FALSE;
+			$_url[] = ! empty( $_bits[$_idz+2] )	? $_bits[$_idz+2]	: FALSE;
+
+			$_url = implode( '.', array_filter( $_url ) );
 
 		else :
 

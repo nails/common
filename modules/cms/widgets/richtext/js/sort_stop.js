@@ -15,13 +15,8 @@ function()
 	var _header_height	= ui.find('.header-bar').outerHeight();
 	var _editor_height	= ui.find('.editor').outerHeight();
 	var _height			= _header_height + _editor_height;
-	ui.stop().animate({height:_height}, 250);
 
-	//	Unhide the editor
-	ui.find( '.mask' ).animate({opacity:0},150, function()
-	{
-		ui.removeClass('sorting');
-	});
+	ui.stop().animate({height:_height}, 250);
 });
 
 //	Bind event listener
@@ -34,4 +29,10 @@ CKEDITOR.instances[_id].on( 'autoGrow', function(e)
 	var _height			= _header_height + _editor_height + _difference;
 
 	ui.css({height:_height});
+});
+
+//	Unhide the editor
+ui.find( '.mask' ).animate({opacity:0},150, function()
+{
+	ui.removeClass('sorting');
 });
