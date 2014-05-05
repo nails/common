@@ -87,7 +87,11 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 		//	Set the data hash
 		this.page_data.hash = this._generate_data_hash();
-		console.log( 'Initial page_data:', this.page_data );
+
+		if ( typeof( console.log ) === 'function' )
+		{
+			console.log( 'CMS PAGES: Initial page_data:', this.page_data );
+		}
 
 		// --------------------------------------------------------------------------
 
@@ -132,7 +136,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				case 'preview':		_this._main_action_launch_preview();	break;
 				default :
 
-					console.warn( 'Uncaught main-action.' );
+					if ( typeof( console.warn ) === 'function' )
+					{
+						console.warn( 'CMS PAGES: Uncaught main-action.' );
+					}
 					_this._enable_main_actions();
 
 				break;
@@ -313,14 +320,20 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		//	If we're already saving ignore any more calls
 		if ( this._saving )
 		{
-			console.log( 'Save in progress, ignoring repeated call.' );
+			if ( typeof( console.log ) === 'function' )
+			{
+				console.log( 'CMS PAGES: Save in progress, ignoring repeated call.' );
+			}
 			return false;
 		}
 
 		//	If we're refreshing, then ignore those calls too
 		if ( this._refreshing )
 		{
-			console.log( 'Refresh in progress, ignoring repeated call.' );
+			if ( typeof( console.log ) === 'function' )
+			{
+				console.log( 'CMS PAGES: Refresh in progress, ignoring repeated call.' );
+			}
 			return false;
 		}
 
@@ -333,11 +346,17 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		{
 			if ( force_save !== true )
 			{
-				console.log( 'Data has changed, old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+				if ( typeof( console.log ) === 'function' )
+				{
+					console.log( 'CMS PAGES: Data has changed, old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+				}
 			}
 			else
 			{
-				console.log( 'Forced save requested. Saving... old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+				if ( typeof( console.log ) === 'function' )
+				{
+					console.log( 'CMS PAGES: Forced save requested. Saving... old hash: ' + this.page_data.hash + ', new hash: ' + _hash + ' - Saving...' );
+				}
 			}
 
 			if ( _hash !== false )
@@ -386,7 +405,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		}
 		else
 		{
-			console.log( 'Page data hasn\'t changed, ignoring call' );
+			if ( typeof( console.log ) === 'function' )
+			{
+				console.log( 'CMS PAGES: Page data hasn\'t changed, ignoring call' );
+			}
 			return false;
 		}
 	};
@@ -419,13 +441,20 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 			$( '#save-status .last-saved').text( _str );
 
-			console.log( 'Save completed successfully' );
+			if ( typeof( console.log ) === 'function' )
+			{
+				console.log( 'CMS PAGES: Save completed successfully' );
+			}
 		}
 		else
 		{
 			$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
 			$( '#save-status .last-saved').text( 'ERROR: ' + data.error );
-			console.log( 'Save failed: ' + data.error );
+
+			if ( typeof( console.log ) === 'function' )
+			{
+				console.log( 'CMS PAGES: Save failed: ' + data.error );
+			}
 		}
 
 		this._saving = false;
@@ -459,7 +488,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		$( '#save-status' ).removeClass( 'saving notice' ).addClass( 'message' );
 		$( '#save-status .last-saved').text( 'ERROR: ' + _data.error );
 
-		console.log( 'Save failed: ' + _data.error );
+		if ( typeof( console.log ) === 'function' )
+		{
+			console.log( 'CMS PAGES: Save failed: ' + _data.error );
+		}
 
 		this._saving = false;
 
@@ -846,7 +878,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					}
 					catch( error )
 					{
-						console.log( 'sort_start callback is not defined', error );
+						if ( typeof( console.log ) === 'function' )
+						{
+							console.log( 'CMS PAGES: `sort_start` callback is not defined', error );
+						}
 					}
 				}
 			},
@@ -899,7 +934,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					}
 					catch( error )
 					{
-						console.log( 'sort_stop callback is not defined', error );
+						if ( typeof( console.log ) === 'function' )
+						{
+							console.log( 'CMS PAGES: `sort_stop` callback is not defined', error );
+						}
 					}
 				}
 			}
@@ -1156,127 +1194,159 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		_slug	= $(ui).data( 'slug' );
 		_widget	= this._get_widget( _slug );
 
-		_data = {
-			id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
-			slug		: _slug,
-			label		: _widget.label,
-			description	: _widget.description
-		};
-
-		_html = Mustache.render( this.mustache_tpl.dropzone_widget, _data );
-
-		_item = $( '<li>' );
-		_item.addClass( 'processed dropzone-widget ' + _data.slug );
-		if ( _data.description.length === 0 )
+		if ( _widget !== false )
 		{
-			_item.addClass( 'mask-no-description' );
+			_data = {
+				id			: 'widget-editor-' + Math.floor( Math.random() * 10000000000000001 ),
+				slug		: _slug,
+				label		: _widget.label,
+				description	: _widget.description
+			};
+
+			_html = Mustache.render( this.mustache_tpl.dropzone_widget, _data );
+
+			_item = $( '<li>' );
+			_item.addClass( 'processed dropzone-widget ' + _data.slug );
+			if ( _data.description.length === 0 )
+			{
+				_item.addClass( 'mask-no-description' );
+			}
+			_item.attr( 'id', _data.id );
+			_item.data( 'slug', _data.slug );
+			_item.html( _html );
+
+			// --------------------------------------------------------------------------
+
+			//	Bind onto the closer button
+			var _this = this;
+			$( '.header-bar .closer', _item ).on( 'click', function(e)
+			{
+
+				var _id = $(this).closest( 'li.dropzone-widget' ).attr( 'id' );
+
+				_this._remove_widget( _id );
+
+				e.stopPropagation();
+				return false;
+			});
+
+			// --------------------------------------------------------------------------
+
+			//	Place it into the DOM
+			ui.replaceWith( _item );
+
+			// --------------------------------------------------------------------------
+
+			this._editor.dropzone.removeClass( 'empty' );
+			this._editor.dropzone.find( 'li.empty' ).remove();
+
+			//	Call the server asking for the widget's editor view, use POST in case
+			//	there's a lot of data
+
+			var _call =
+			{
+				'action'		: 'POST',
+				'controller'	: 'cms/pages',
+				'method'		: 'widget/get_editor',
+				'data'			:
+				{
+					widget: _widget.slug,
+					template: template,
+					id: _data.id,
+					data: widget_data
+				},
+				'success' : function( data )
+				{
+					$( _item ).find( '.editor' ).html( data.HTML );
+
+					// --------------------------------------------------------------------------
+
+					//	Add stripes
+					/* jshint ignore:start */
+					if ( typeof( _nails.add_stripes ) === 'function' )
+					{
+						_nails.add_stripes();
+					}
+					/* jshint ignore:end */
+
+					// --------------------------------------------------------------------------
+
+					//	Chosen
+					/* jshint ignore:start */
+					if ( typeof( $.fn.chosen ) === 'function' )
+					{
+						//$( 'select.chosen' ).chosen();
+
+						//	TODO: get this working with the overflow'd parents
+					}
+					/* jshint ignore:end */
+
+					// --------------------------------------------------------------------------
+
+					//	Execute this widget's dropped callback
+					try
+					{
+						window['_WIDGET_' + _widget.slug].dropped( _item );
+					}
+					catch( error )
+					{
+						if ( typeof( console.log ) === 'function' )
+						{
+							console.log( 'CMS PAGES: `dropped` callback is not defined', error );
+						}
+					}
+
+					// --------------------------------------------------------------------------
+
+					//	Resize the container to the size of the content
+					var _header_height	= _item.find( '.header-bar' ).outerHeight();
+					var _editor_height	= _item.find( '.editor' ).outerHeight();
+					var _height			= _header_height + _editor_height;
+					_item.animate({height:_height},250);
+
+					// --------------------------------------------------------------------------
+
+					//	Finally, update the page_data
+					_this._refresh_page_data();
+
+				},
+				'error' : function( data )
+				{
+					var _data = JSON.parse( data.responseText );
+
+					$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
+
+				},
+			};
+
+			this._api.call(_call);
 		}
-		_item.attr( 'id', _data.id );
-		_item.data( 'slug', _data.slug );
-		_item.html( _html );
-
-		// --------------------------------------------------------------------------
-
-		//	Bind onto the closer button
-		var _this = this;
-		$( '.header-bar .closer', _item ).on( 'click', function(e)
+		else
 		{
-
-			var _id = $(this).closest( 'li.dropzone-widget' ).attr( 'id' );
-
-			_this._remove_widget( _id );
-
-			e.stopPropagation();
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		//	Place it into the DOM
-		ui.replaceWith( _item );
-
-		// --------------------------------------------------------------------------
-
-		this._editor.dropzone.removeClass( 'empty' );
-		this._editor.dropzone.find( 'li.empty' ).remove();
-
-		//	Call the server asking for the widget's editor view, use PSOT in case
-		//	there's a lot of data
-
-		var _call =
-		{
-			'action'		: 'POST',
-			'controller'	: 'cms/pages',
-			'method'		: 'widget/get_editor',
-			'data'			:
+			if ( typeof( console.warn ) === 'function' )
 			{
-				widget: _widget.slug,
-				template: template,
-				id: _data.id,
-				data: widget_data
-			},
-			'success' : function( data )
-			{
-				$( _item ).find( '.editor' ).html( data.HTML );
+				console.warn( 'CMS PAGES: Could not find widget "' + _slug + '"; ignored.' );
+			}
 
-				// --------------------------------------------------------------------------
-
-				//	Add stripes
-				/* jshint ignore:start */
-				if ( typeof( _nails.add_stripes ) === 'function' )
+			//	Feedback
+			var _message = '';
+			_message += '<p>I just attempted, and failed, to load a widget whose slug was "' + _slug + '"</p>';
+			_message += '<p>This likely happened due to an out-of-date database or a 3rd party edited the database with bad data.</p>';
+			_message += '<p>While nothing dangerous has happened, you should know that this widget was not loaded. You should check that your page is as expected.</p>';
+			$('<div>').html(_message).dialog({
+				title: 'A widget could not be loaded',
+				resizable: false,
+				draggable: false,
+				modal: true,
+				buttons:
 				{
-					_nails.add_stripes();
+					OK: function()
+					{
+						$(this).dialog('close');
+					}
 				}
-				/* jshint ignore:end */
-
-				// --------------------------------------------------------------------------
-
-				//	Chosen
-				/* jshint ignore:start */
-				if ( typeof( $.fn.chosen ) === 'function' )
-				{
-					//$( 'select.chosen' ).chosen();
-
-					//	TODO: get this working with the overflow'd parents
-				}
-				/* jshint ignore:end */
-
-				// --------------------------------------------------------------------------
-
-				//	Execute this widget's dropped callback
-				try
-				{
-					window['_WIDGET_' + _widget.slug].dropped( _item );
-				}
-				catch( error )
-				{
-					console.log( 'dropped callback is not defined', error );
-				}
-
-				// --------------------------------------------------------------------------
-
-				//	Resize the container to the size of the content
-				var _header_height	= _item.find( '.header-bar' ).outerHeight();
-				var _editor_height	= _item.find( '.editor' ).outerHeight();
-				var _height			= _header_height + _editor_height;
-				_item.animate({height:_height},250);
-
-				// --------------------------------------------------------------------------
-
-				//	Finally, update the page_data
-				_this._refresh_page_data();
-
-			},
-			'error' : function( data )
-			{
-				var _data = JSON.parse( data.responseText );
-
-				$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
-
-			},
-		};
-
-		this._api.call(_call);
+			});
+		}
 	};
 
 
@@ -1306,7 +1376,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					}
 					catch( error )
 					{
-						console.log( 'remove_start callback is not defined', error );
+						if ( typeof( console.log ) === 'function' )
+						{
+							console.log( 'NAILS CMS PAGES: `remove_start` callback is not defined', error );
+						}
 					}
 
 					//	Close dialog
@@ -1337,7 +1410,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						}
 						catch( error )
 						{
-							console.log( 'remove_stop callback is not defined', error );
+							if ( typeof( console.log ) === 'function' )
+							{
+								console.log( 'CMS PAGES: `remove_stop` callback is not defined', error );
+							}
 						}
 					});
 				},
