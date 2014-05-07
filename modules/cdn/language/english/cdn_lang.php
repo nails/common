@@ -36,6 +36,7 @@
 	$lang['cdn_error_delete']				= 'File failed to delete, it may be in use.';
 	$lang['cdn_error_delete_nofile']		= 'No file to delete.';
 	$lang['cdn_error_couldnotmove']			= 'Failed to move uploaded file into the bucket.';
+	$lang['cdn_error_bad_extension_mime']	= '%s is not a valid extension for this file type.';
 
 	//	Tag Errors
 	$lang['cdn_error_tag_exists']			= 'Tag already exists';

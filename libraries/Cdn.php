@@ -1037,22 +1037,29 @@ class Cdn
 			if ( ! isset( $_FILES[ $object ] ) || $_FILES[ $object ]['size'] == 0 ) :
 
 				//	If it's not in $_FILES does that file exist on the file system?
-				if ( ! file_exists( $object ) ) :
+				if ( ! is_file( $object ) ) :
 
 					$this->set_error( lang( 'cdn_error_no_file' ) );
 					return FALSE;
 
 				else :
 
-					$_file	= $object;
-					$_name	= empty( $options['filename_display'] ) ? basename( $object ) : $options['filename_display'];
+					$_data->file	= $object;
+					$_data->name	= empty( $options['filename_display'] ) ? basename( $object ) : $options['filename_display'];
+
+					//	Determine the extension
+					$_data->ext = substr( strrchr( $_data->file, '.' ), 1 );
 
 				endif;
 
 			else :
 
-				$_file	= $_FILES[ $object ]['tmp_name'];
-				$_name	= empty( $options['filename_display'] ) ? $_FILES[ $object ]['name'] : $options['filename_display'];
+				//	It's in $_FILES
+				$_data->file	= $_FILES[ $object ]['tmp_name'];
+				$_data->name	= empty( $options['filename_display'] ) ? $_FILES[ $object ]['name'] : $options['filename_display'];
+
+				//	Determine the supplied extension
+				$_data->ext	= substr( strrchr( $_FILES[ $object ]['name'], '.' ), 1 );
 
 			endif;
 
@@ -1071,12 +1078,18 @@ class Cdn
 
 			else :
 
-				$_data->mime = $this->get_mime_type_from_file( $_file );
+				$_data->mime = $this->get_mime_type_from_file( $_data->file );
 
 			endif;
 
-			//	Now set the actual file data
-			$_data->file = $_file;
+			// --------------------------------------------------------------------------
+
+			//	If no extension, then guess it
+			if ( empty( $_data->ext ) ) :
+
+				$_data->ext = $this->get_ext_from_mimetype( $_data->mime );
+
+			endif;
 
 		else :
 
@@ -1101,10 +1114,22 @@ class Cdn
 					// --------------------------------------------------------------------------
 
 					//	Specify the file specifics
-					$_file			= DEPLOY_CACHE_DIR . $_cache_file;
-					$_name			= empty( $options['filename_display'] ) ? $_cache_file : $options['filename_display'];
+					$_data->name	= empty( $options['filename_display'] ) ? $_cache_file : $options['filename_display'];
 					$_data->file	= DEPLOY_CACHE_DIR . $_cache_file;
 					$_data->mime	= $options['content-type'];
+
+					// --------------------------------------------------------------------------
+
+					//	If an extension has been supplied use that, if not detect from mime type
+					if ( ! empty( $options['extension'] ) ) :
+
+						$_data->ext = $options['extension'];
+
+					else :
+
+						$_data->ext = $this->get_ext_from_mimetype( $_data->mime );
+
+					endif;
 
 				else :
 
@@ -1114,6 +1139,16 @@ class Cdn
 				endif;
 
 			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Valid extension for mime type?
+		if ( ! $this->valid_ext_for_mime( $_data->ext, $_data->mime ) ) :
+
+			$this->set_error( lang( 'cdn_error_bad_extension_mime', $_data->ext ) );
+			return FALSE;
 
 		endif;
 
@@ -1157,58 +1192,9 @@ class Cdn
 		// --------------------------------------------------------------------------
 
 		//	Is this an acceptable file? Check against the allowed_types array (if present)
-
-		$_ext = $this->get_ext_from_mimetype( $_data->mime );	//	So other parts of this method can access $_ext;
 		if ( $_bucket->allowed_types ) :
 
-			//	Handle stupid bloody MS Office 'x' documents
-			//	If the returned extension is doc, xls or ppt compare it to the uploaded
-			//	extension but append an x, if they match then force the x version.
-			//	Also override the mime type
-
-			//	Makka sense? Hate M$.
-			$_user_ext = substr( $_name, strrpos( $_name, '.' ) + 1 );
-
-			switch ( $_ext ) :
-
-				case 'doc' :
-
-					if ( $_user_ext == 'docx' ) :
-
-						$_ext			= 'docx';
-						$_data->mime	= 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-
-					endif;
-
-				break;
-
-				case 'ppt' :
-
-					if ( $_user_ext == 'pptx' ) :
-
-						$_ext			= 'pptx';
-						$_data->mime	= 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-
-					endif;
-
-				break;
-
-				case 'xls' :
-
-					if ( $_user_ext == 'xlsx' ) :
-
-						$_ext			= 'xlsx';
-						$_data->mime	= 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-					endif;
-
-				break;
-
-			endswitch;
-
-			// --------------------------------------------------------------------------
-
-			if ( array_search( $_ext, $_bucket->allowed_types ) === FALSE ) :
+			if ( array_search( $_data->ext, $_bucket->allowed_types ) === FALSE ) :
 
 				if ( count( $_bucket->allowed_types ) > 1 ) :
 
@@ -1371,12 +1357,9 @@ class Cdn
 		else :
 
 			//	Generate a filename
-			$_data->filename = time() . '_' . md5( active_user( 'id' ) . microtime( TRUE ) . rand( 0, 999 ) ) . '.' . $_ext;
+			$_data->filename = time() . '_' . md5( active_user( 'id' ) . microtime( TRUE ) . rand( 0, 999 ) ) . '.' . $_data->ext;
 
 		endif;
-
-		//	And set the display name
-		$_data->name	= $_name;
 
 		// --------------------------------------------------------------------------
 
@@ -2656,7 +2639,7 @@ class Cdn
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $this->_magic ) :
+		if ( $this->_magic ) :
 
 			$_file	= fopen( $this->_magic, 'r' );
 			$_ext	= NULL;
@@ -2761,6 +2744,10 @@ class Cdn
 	 **/
 	public function get_mimetype_from_ext( $ext )
 	{
+		//	TODO: Handle no magic database
+
+		// --------------------------------------------------------------------------
+
 		//	Prep $ext, make sure it has no dots
 		$ext = substr( $ext, (int) strrpos( $ext, '.' ) + 1 );
 
@@ -2820,6 +2807,10 @@ class Cdn
 	 **/
 	public function get_mime_type_from_file( $object )
 	{
+		//	TODO: Handle no magic database
+
+		// --------------------------------------------------------------------------
+
 		$_fi = finfo_open( FILEINFO_MIME_TYPE );
 
 		//	Use normal magic
@@ -2850,6 +2841,135 @@ class Cdn
 		endif;
 
 		return $_result;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Determins whether an extension is valid for a specific mime typ
+	 * @param  string $ext  The extension to test, no leading period
+	 * @param  string $mime The mime type to test agains
+	 * @return bool
+	 */
+	public function valid_ext_for_mime( $ext, $mime )
+	{
+		$_assocs = array();
+
+		if ( $this->_magic ) :
+
+			$_file = fopen( $this->_magic, 'r' );
+
+			while ( ( $line = fgets( $_file ) ) !== FALSE ) :
+
+				$line = trim( preg_replace( '/#.*/', '', $line ) );
+
+				if ( ! $line ) :
+
+					continue;
+
+				endif;
+
+				$_parts = preg_split( '/\s+/', $line );
+
+				if ( count( $_parts ) == 1 ) :
+
+					continue;
+
+				endif;
+
+				$_mime = strtolower( array_shift( $_parts ) );
+
+				if ( ! isset( $_stuffs[$_mime] ) ) :
+
+					$_assocs[$_mime] = array();
+
+				endif;
+
+				foreach ( $_parts as $part ) :
+
+					$_assocs[$_mime][] = $part;
+
+				endforeach;
+
+			endwhile;
+
+			fclose( $_file );
+
+		else :
+
+			//	We don't have a magic database, eep. Try to work it out using CodeIgniter's mapping
+			require FCPATH . APPPATH . 'config/mimes.php';
+
+			$_ext = FALSE;
+
+			foreach ( $mimes AS $_ext => $_mime ) :
+
+				if ( is_array( $_mime ) ) :
+
+					foreach( $_mime AS $_subext => $_submime ) :
+
+						if ( ! isset( $_assocs[strtolower( $_submime )] ) ) :
+
+							$_assocs[strtolower( $_submime )] = array();
+
+						endif;
+
+					endforeach;
+
+				else :
+
+					if ( ! isset( $_assocs[strtolower( $_mime )] ) ) :
+
+						$_assocs[strtolower( $_mime )] = array();
+
+					endif;
+
+				endif;
+
+			endforeach;
+
+			//	Now put extensions into the appropriate slots
+			foreach ( $mimes AS $_ext => $_mime ) :
+
+				if ( is_array( $_mime ) ) :
+
+					foreach( $_mime AS $_submime ) :
+
+						$_assocs[strtolower( $_submime )][] = $_ext;
+
+					endforeach;
+
+				else :
+
+					$_assocs[strtolower( $_mime )][] = $_ext;
+
+				endif;
+
+			endforeach;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( isset( $_assocs[strtolower( $mime )] ) ) :
+
+			if ( array_search( $ext, $_assocs[strtolower( $mime )]) !== FALSE ) :
+
+				return TRUE;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		else :
+
+			return FALSE;
+
+		endif;
 	}
 
 
