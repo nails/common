@@ -204,10 +204,10 @@ function page_is_secure()
 		//	Page is being served through HTTPS
 		return TRUE;
 
-	elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && defined( 'SECURE_BASE_URL' ) ) :
+	elseif ( isset( $_SERVER['SERVER_NAME'] ) && isset( $_SERVER['REQUEST_URI'] ) && SECURE_BASE_URL != BASE_URL ) :
 
 		//	Not being served through HTTPS, but does the URL of the page begin
-		//	with SECURE_BASE_URL
+		//	with SECURE_BASE_URL (when BASE_URL is different)
 
 		$_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 
