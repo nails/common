@@ -243,7 +243,7 @@ class NAILS_Admin_changelog_model extends NAILS_Model
 
 		endif;
 
-		$obj->changes = unserialize( $obj->changes );
+		$obj->changes = @unserialize( $obj->changes );
 
 		$obj->user				= new stdClass();
 		$obj->user->id			= $obj->user_id;
