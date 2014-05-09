@@ -636,7 +636,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 		var _this = this;
 
 		//	Get Mustache templates
-
 		this.mustache_tpl.loader			= $( '#template-loader' ).html();
 		this.mustache_tpl.widget_search		= $( '#template-widget-search' ).html();
 		this.mustache_tpl.dropzone_empty	= $( '#template-dropzone-empty' ).html();
@@ -698,57 +697,181 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				// --------------------------------------------------------------------------
 
 				//	Build the callback functions for this widget
-
 				_script = 'var _WIDGET_CALLBACKS_' + this.widgets[_key].widgets[_key2].slug + ' = function(){';
 
 				// --------------------------------------------------------------------------
 
 					//	Dropped
 					_script += 'this.dropped = function( ui ){';
-					if ( this.widgets[_key].widgets[_key2].callbacks.dropped.length > 0 )
-					{
-						_script += this.widgets[_key].widgets[_key2].callbacks.dropped;
-					}
+
+						if ( this.widgets[_key].widgets[_key2].callbacks.dropped.length > 0 )
+						{
+							_script += this.widgets[_key].widgets[_key2].callbacks.dropped;
+						}
+
+						//	Automatically interpret any textareas with the class `wysiwyg` as CKEditors
+						//	NOTE: Ensure any changes here are reflected below in the sort_stop callback
+
+						_script += 'var _textarea	= ui.find( \'textarea.wysiwyg\' );';
+						_script += '$.each( _textarea, function( index )';
+						_script += '{';
+						_script += '	var _id = ui.attr( \'id\' ) + \'-wysiwyg-\' + index;';
+						_script += '	$(this).attr( \'id\', _id );';
+
+						//	Instantiate the editor
+						_script += '	$(this).ckeditor(';
+						_script += '	{';
+						_script += '		customConfig: window.NAILS.URL + \'js/libraries/ckeditor/ckeditor.config.min.js\'';
+						_script += '	},';
+						_script += '	function()';
+						_script += '	{';
+
+						// Increase the height of the container
+						_script += '		var _header_height	= ui.find( \'.header-bar\' ).outerHeight();';
+						_script += '		var _editor_height	= ui.find( \'.editor\' ).outerHeight();';
+						_script += '		var _height			= _header_height + _editor_height;';
+
+						//	Take into account the border if there is one
+						_script += '		if ( ui.css( \'box-sizing\' ) === \'border-box\' )';
+						_script += '		{';
+						_script += '			_height = _height + ( 2 * parseInt( ui.css( \'border-width\' ), 10 ) );';
+						_script += '		}';
+
+						_script += '		ui.stop().animate( { height: _height }, 250 );';
+						_script += '	});';
+						_script += '});';
+
+						// --------------------------------------------------------------------------
+
+						//	Automatically interpret any selects with the class `chosen` as Chosens
+						_script += 'ui.find( \'select.chosen\' ).chosen({width:\'100%\'});';
+
 					_script += '};';
 
 					// --------------------------------------------------------------------------
 
 					//	Sort Start
 					_script += 'this.sort_start = function( ui ){';
-					if ( this.widgets[_key].widgets[_key2].callbacks.sort_start.length > 0 )
-					{
-						_script += this.widgets[_key].widgets[_key2].callbacks.sort_start;
-					}
+
+						if ( this.widgets[_key].widgets[_key2].callbacks.sort_start.length > 0 )
+						{
+							_script += this.widgets[_key].widgets[_key2].callbacks.sort_start;
+						}
+
+						// --------------------------------------------------------------------------
+
+						//	Automatically handle any textareas with the class `wysiwyg`
+						_script += 'var _textarea = ui.find( \'textarea.wysiwyg\' );';
+						_script += 'if ( _textarea.length > 0 )';
+						_script += '{';
+						_script += '	$.each( _textarea, function( index )';
+						_script += '	{';
+
+						//	Destroy the instance
+						_script += '		var _id = ui.attr( \'id\' ) + \'-wysiwyg-\' + index;console.log(_id);';
+						_script += '		CKEDITOR.instances[_id].destroy();';
+						_script += '	});';
+
+						//	Show the mask (add one if there isn't a rpedefined one by the widget)
+						_script += '	var _mask = ui.find( \'.mask\' );';
+						_script += '	if ( _mask.length === 0 )';
+						_script += '	{';
+						_script += '		_mask = $( \'<div>\' ).addClass( \'mask\' ).text( \'' + this.widgets[_key].widgets[_key2].label + ' widget disabled while sorting.\' );';
+						_script += '		ui.prepend( _mask );';
+						_script += '	}';
+						_script += '	ui.addClass( \'sorting\' );';
+						_script += '	_mask.animate( { opacity: 1 }, 150 );';
+						_script += '}';
+
 					_script += '};';
 
 					// --------------------------------------------------------------------------
 
 					//	Sort Stop
 					_script += 'this.sort_stop = function( ui ){';
-					if ( this.widgets[_key].widgets[_key2].callbacks.sort_stop.length > 0 )
-					{
-						_script += this.widgets[_key].widgets[_key2].callbacks.sort_stop;
-					}
+
+						if ( this.widgets[_key].widgets[_key2].callbacks.sort_stop.length > 0 )
+						{
+							_script += this.widgets[_key].widgets[_key2].callbacks.sort_stop;
+						}
+
+						// --------------------------------------------------------------------------
+
+						//	Automatically interpret any textareas with the class `wysiwyg` as CKEditors
+						//	NOTE: Ensure any changes here are reflected below in the dropped callback
+
+						_script += 'var _textarea	= ui.find( \'textarea.wysiwyg\' );';
+						_script += '$.each( _textarea, function( index )';
+						_script += '{';
+						_script += '	var _id = ui.attr( \'id\' ) + \'-wysiwyg-\' + index;';
+						_script += '	$(this).attr( \'id\', _id );';
+
+						//	Instantiate the editor
+						_script += '	$(this).ckeditor(';
+						_script += '	{';
+						_script += '		customConfig: window.NAILS.URL + \'js/libraries/ckeditor/ckeditor.config.min.js\'';
+						_script += '	},';
+						_script += '	function()';
+						_script += '	{';
+
+						// Increase the height of the container
+						_script += '		var _header_height	= ui.find( \'.header-bar\' ).outerHeight();';
+						_script += '		var _editor_height	= ui.find( \'.editor\' ).outerHeight();';
+						_script += '		var _height			= _header_height + _editor_height;';
+
+						//	Take into account the border if there is one
+						_script += '		if ( ui.css( \'box-sizing\' ) === \'border-box\' )';
+						_script += '		{';
+						_script += '			_height = _height + ( 2 * parseInt( ui.css( \'border-width\' ), 10 ) );';
+						_script += '		}';
+
+						_script += '		ui.stop().animate( { height: _height }, 250 );';
+						_script += '	});';
+						_script += '});';
+
+						//	Unhide the mask
+						_script += 'ui.find( \'.mask\' ).animate( { opacity: 0 }, 150, function()';
+						_script += '{';
+						_script += '	ui.removeClass( \'sorting\' );';
+						_script += '});';
+
 					_script += '};';
 
 					// --------------------------------------------------------------------------
 
 					//	Remove start
 					_script += 'this.remove_start = function( ui ){';
-					if ( this.widgets[_key].widgets[_key2].callbacks.remove_start.length > 0 )
-					{
-						_script += this.widgets[_key].widgets[_key2].callbacks.remove_start;
-					}
+
+						if ( this.widgets[_key].widgets[_key2].callbacks.remove_start.length > 0 )
+						{
+							_script += this.widgets[_key].widgets[_key2].callbacks.remove_start;
+						}
+
+						// --------------------------------------------------------------------------
+
+						//	Automatically handle any textareas with the class `wysiwyg`
+						_script += 'var _textarea = ui.find( \'textarea.wysiwyg\' );';
+						_script += '$.each( _textarea, function( index )';
+						_script += '{';
+
+						//	Destroy the instance
+						_script += '	var _id = ui.attr( \'id\' ) + \'-wysiwyg-\' + index;';
+						_script += '	CKEDITOR.instances[_id].destroy();';
+
+						_script += '});';
+
 					_script += '};';
 
 					// --------------------------------------------------------------------------
 
 					//	Remove Stop
 					_script += 'this.remove_stop = function( ui ){';
-					if ( this.widgets[_key].widgets[_key2].callbacks.remove_stop.length > 0 )
-					{
-						_script += this.widgets[_key].widgets[_key2].callbacks.remove_stop;
-					}
+
+						if ( this.widgets[_key].widgets[_key2].callbacks.remove_stop.length > 0 )
+						{
+							_script += this.widgets[_key].widgets[_key2].callbacks.remove_stop;
+						}
+
 					_script += '};';
 
 				// --------------------------------------------------------------------------
@@ -758,6 +881,10 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				_script += 'var _header_height	= ui.find( \'.header-bar\' ).outerHeight();';
 				_script += 'var _editor_height	= ui.find( \'.editor\' ).outerHeight();';
 				_script += 'var _height			= _header_height + _editor_height;';
+				_script += 'if ( ui.css( \'box-sizing\' ) === \'border-box\' )';
+				_script += '{';
+				_script += '_height = _height + ( 2 * parseInt( ui.css( \'border-width\' ), 10 ) );';
+				_script += '}';
 				_script += 'ui.animate({height:_height},250);';
 				_script += '};';
 
@@ -880,7 +1007,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						if ( typeof( console.log ) === 'function' )
 						{
-							console.log( 'CMS PAGES: `sort_start` callback is not defined', error );
+							console.log( 'CMS PAGES: `sort_start` callback is not defined for widget "' + _slug + '"', error );
 						}
 					}
 				}
@@ -936,7 +1063,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						if ( typeof( console.log ) === 'function' )
 						{
-							console.log( 'CMS PAGES: `sort_stop` callback is not defined', error );
+							console.log( 'CMS PAGES: `sort_stop` callback is not defined for widget "' + _slug + '"', error );
 						}
 					}
 				}
@@ -1292,17 +1419,24 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						if ( typeof( console.log ) === 'function' )
 						{
-							console.log( 'CMS PAGES: `dropped` callback is not defined', error );
+							console.log( 'CMS PAGES: `dropped` callback is not defined for widget "' + _widget.slug + '"', error );
 						}
 					}
 
 					// --------------------------------------------------------------------------
 
 					//	Resize the container to the size of the content
-					var _header_height	= _item.find( '.header-bar' ).outerHeight();
-					var _editor_height	= _item.find( '.editor' ).outerHeight();
-					var _height			= _header_height + _editor_height;
-					_item.animate({height:_height},250);
+					try
+					{
+						window['_WIDGET_' + _widget.slug].resize_widget( _item );
+					}
+					catch( error )
+					{
+						if ( typeof( console.log ) === 'function' )
+						{
+							console.log( 'CMS PAGES: `resize_widget` callback is not defined for widget "' + _widget.slug + '"', error );
+						}
+					}
 
 					// --------------------------------------------------------------------------
 
@@ -1378,7 +1512,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 					{
 						if ( typeof( console.log ) === 'function' )
 						{
-							console.log( 'NAILS CMS PAGES: `remove_start` callback is not defined', error );
+							console.log( 'NAILS CMS PAGES: `remove_start` callback is not defined for widget "' + _slug + '"', error );
 						}
 					}
 
@@ -1412,7 +1546,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						{
 							if ( typeof( console.log ) === 'function' )
 							{
-								console.log( 'CMS PAGES: `remove_stop` callback is not defined', error );
+								console.log( 'CMS PAGES: `remove_stop` callback is not defined for widget "' + _slug + '"', error );
 							}
 						}
 					});
