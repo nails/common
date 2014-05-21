@@ -23,7 +23,8 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_table = NAILS_DB_PREFIX . 'blog_tag';
+		$this->_table			= NAILS_DB_PREFIX . 'blog_tag';
+		$this->_table_prefix	= 'bt';
 	}
 
 
@@ -32,15 +33,21 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function get_all( $include_count = FALSE )
 	{
-		$this->db->select( 'id,slug,label' );
+		$_select	= array();
+		$_select[]	= $this->_table_prefix . '.id';
+		$_select[]	= $this->_table_prefix . '.slug';
+		$_select[]	= $this->_table_prefix . '.label';
+
+		$this->db->select( $_select );
 
 		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag WHERE tag_id = id) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag WHERE tag_id = ' . $this->_table_prefix . '.id) post_count' );
 
 		endif;
 
-		$_tags = $this->db->get( $this->_table )->result();
+		$this->db->order_by( $this->_table_prefix . '.label' );
+		$_tags = $this->db->get( $this->_table . ' ' . $this->_table_prefix )->result();
 
 		foreach ( $_tags AS $tag ) :
 
