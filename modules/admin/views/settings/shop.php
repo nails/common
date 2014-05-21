@@ -50,7 +50,7 @@
 						$_field					= array();
 						$_field['key']			= 'notify_order';
 						$_field['label']		= 'Order Notifications';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'Who should be notified of new orders';
 
 						echo form_field( $_field, 'Specify multiple addresses with a comma.' );
@@ -73,7 +73,7 @@
 						$_field					= array();
 						$_field['key']			= 'free_shipping_threshold';
 						$_field['label']		= 'Threshold';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 
 						echo form_field( $_field );
 
@@ -91,7 +91,7 @@
 						$_field					= array();
 						$_field['key']			= 'warehouse_collection_enabled';
 						$_field['label']		= 'Enabled';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['id']			= 'warehouse_collection_enabled';
 
 						echo form_field_boolean( $_field );
@@ -104,7 +104,7 @@
 
 						else :
 
-							$_display = $settings[$_field['key']] ? 'block' : 'none';
+							$_display = shop_setting( $_field['key'] ) ? 'block' : 'none';
 
 						endif;
 
@@ -113,7 +113,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_addressee';
 							$_field['label']		= 'Addressee';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -122,7 +122,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_line1';
 							$_field['label']		= 'Address Line 1';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -131,7 +131,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_line2';
 							$_field['label']		= 'Address Line 2';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -140,7 +140,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_town';
 							$_field['label']		= 'Town';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -149,7 +149,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_postcode';
 							$_field['label']		= 'Postcode';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -158,7 +158,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_state';
 							$_field['label']		= 'State/County';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -167,7 +167,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_country';
 							$_field['label']		= 'Country';
-							$_field['default']		= $settings[$_field['key']];
+							$_field['default']		= shop_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -183,10 +183,10 @@
 					</p>
 					<?php
 
-						if ( $settings['shop_url'] != 'shop/' ) :
+						if ( shop_setting( 'shop_url' ) != 'shop/' ) :
 
 							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
-							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', substr( $settings['shop_url'], 0, -1 ) ) . '\(\/\(\:any\)\?\/\?\)\?\'\]\s*?=\s*?\'shop\/\$2\'\;#';
+							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', substr( shop_setting( 'shop_url' ), 0, -1 ) ) . '\(\/\(\:any\)\?\/\?\)\?\'\]\s*?=\s*?\'shop\/\$2\'\;#';
 
 							if ( ! preg_match( $_pattern, $_routes_file ) ) :
 
@@ -197,7 +197,7 @@
 
 									echo '<p class="system-alert message no-close">';
 									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the shop may not work as expected.';
-									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( $settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?\'] = \'shop/$2\';</code>';
+									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( shop_setting( 'shop_url' ), 0, -1 ) . '(/(:any)?/?)?\'] = \'shop/$2\';</code>';
 									echo '</p>';
 
 								endif;
@@ -212,7 +212,7 @@
 						$_field					= array();
 						$_field['key']			= 'shop_url';
 						$_field['label']		= 'Shop URL';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'Customise the Shop\'s URL (include trialing slash)';
 
 						echo form_field( $_field );
@@ -231,7 +231,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_company';
 						$_field['label']		= 'Company Name';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'The registered company name.';
 
 						echo form_field( $_field );
@@ -243,7 +243,7 @@
 						$_field['key']			= 'invoice_address';
 						$_field['label']		= 'Company Address';
 						$_field['type']			= 'textarea';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'The address to show on the invoice.';
 
 						echo form_field( $_field );
@@ -254,7 +254,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_vat_no';
 						$_field['label']		= 'VAT Number';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'Your VAT number, if any.';
 
 						echo form_field( $_field );
@@ -265,7 +265,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_company_no';
 						$_field['label']		= 'Company Number';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 						$_field['placeholder']	= 'Your company number.';
 
 						echo form_field( $_field );
@@ -430,7 +430,7 @@
 						$_field					= array();
 						$_field['key']			= 'base_currency';
 						$_field['label']		= 'Base Currency';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= shop_setting( $_field['key'] );
 
 						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="chosen-base"' );
 

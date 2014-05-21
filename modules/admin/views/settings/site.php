@@ -30,7 +30,7 @@
 						$_field					= array();
 						$_field['key']			= 'google_analytics_account';
 						$_field['label']		= 'Profile ID';
-						$_field['default']		= $settings[$_field['key']];
+						$_field['default']		= site_setting( $_field['key'] );
 						$_field['placeholder']	= 'UA-XXXXX-YY';
 
 						echo form_field( $_field );
