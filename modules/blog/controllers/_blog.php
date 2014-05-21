@@ -59,7 +59,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the styles
-		//$this->asset->load( 'nails.blog.css', TRUE );
+		$this->asset->load( 'nails.blog.css', TRUE );
 
 		if ( file_exists( FCPATH . 'assets/css/blog.css' ) ) :
 

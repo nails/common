@@ -5,19 +5,19 @@
 
 	// --------------------------------------------------------------------------
 
-	//	Post Gallery
-	if ( $post->gallery ) :
+	//	Post Featured Image
+	if ( $post->image_id ) :
 
-		$this->load->view( 'blog/_components/single_gallery' );
+		$this->load->view( 'blog/_components/single_featured_image' );
 
 	endif;
 
 	// --------------------------------------------------------------------------
 
-	//	Post Featured Image
-	if ( $post->image_id ) :
+	//	Post Gallery
+	if ( $post->gallery ) :
 
-		$this->load->view( 'blog/_components/single_featured_image' );
+		$this->load->view( 'blog/_components/single_gallery' );
 
 	endif;
 

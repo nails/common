@@ -3,7 +3,7 @@
 
 	if ( $widget->latest_posts ) :
 
-		echo '<li class="widget latest-posts">';
+		echo '<li class="widget latest-posts clearfix">';
 			echo $widget->latest_posts;
 		echo '</li>';
 
@@ -13,7 +13,7 @@
 
 	if ( blog_setting( 'categories_enabled' ) &&  $widget->categories ) :
 
-		echo '<li class="widget categories">';
+		echo '<li class="widget categories clearfix">';
 			echo $widget->categories;
 		echo '</li>';
 
@@ -23,7 +23,7 @@
 
 	if ( blog_setting( 'tags_enabled' ) && $widget->tags ) :
 
-		echo '<li class="widget tags">';
+		echo '<li class="widget tags clearfix">';
 			echo $widget->tags;
 		echo '</li>';
 
@@ -38,7 +38,7 @@
 
 			if ( $assoc->current ) :
 
-				echo '<li class="widget associations association-' . $index . '">';
+				echo '<li class="widget associations association-' . $index . ' clearfix">';
 				echo '<h5>' . $assoc->widget->title . '</h5>';
 
 				echo '<ul>';
