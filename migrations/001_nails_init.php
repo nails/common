@@ -113,6 +113,20 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			CONSTRAINT `' . $_NAILS_PREFIX . 'blog_post_image_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `' . $_NAILS_PREFIX . 'cdn_object` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
+		$this->db->query( 'CREATE TABLE `' . $_NAILS_PREFIX . 'blog_post_hit` (
+			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+			`post_id` int(11) unsigned NOT NULL,
+			`user_id` int(11) unsigned DEFAULT NULL,
+			`ip_address` varchar(39) DEFAULT NULL,
+			`created` datetime NOT NULL,
+			`referrer` varchar(300) DEFAULT NULL,
+			PRIMARY KEY (`id`),
+			KEY `post_id` (`post_id`),
+			KEY `user_id` (`user_id`),
+			CONSTRAINT `nails_blog_post_hit_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `nails_user` (`id`) ON DELETE SET NULL,
+			CONSTRAINT `nails_blog_post_hit_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `nails_blog_post` (`id`) ON DELETE CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;' );
+
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'blog_post_tag` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`post_id` int(11) unsigned NOT NULL,
