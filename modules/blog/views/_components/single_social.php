@@ -17,11 +17,23 @@
 
 	endswitch;
 
-?>
-<hr />
-<div class="social-likes <?=$_layout?>" <?=$_counters?> data-url="<?=$post->url?>" data-single-title="<?=$_single_title?>" data-title="<?=$post->title?>">
-	<?=blog_setting( 'social_facebook_enabled' ) ? '<div class="facebook" title="Share link on Facebook">Facebook</div>' : '';?>
-	<?=blog_setting( 'social_twitter_enabled' ) ? '<div class="twitter" data-via="' . $_twitter_via . '" title="Share link on Twitter">Twitter</div>' : '';?>
-	<?=blog_setting( 'social_googleplus_enabled' ) ? '<div class="plusone" title="Share link on Google+">Google+</div>' : '';?>
-	<?=blog_setting( 'social_pinterest_enabled' ) && $post->image_id ? '<div class="pinterest" data-media="' . cdn_serve( $post->image_id ) . '" title="Share image on Pinterest">Pinterest</div>' : '';?>
-</div>
+	$_enabled = array();
+	$_enabled[]	= blog_setting( 'social_facebook_enabled' ) ? '<div class="facebook" title="Share link on Facebook">Facebook</div>' : '';
+	$_enabled[] = blog_setting( 'social_twitter_enabled' ) ? '<div class="twitter" data-via="' . $_twitter_via . '" title="Share link on Twitter">Twitter</div>' : '';
+	$_enabled[] = blog_setting( 'social_googleplus_enabled' ) ? '<div class="plusone" title="Share link on Google+">Google+</div>' : '';
+	$_enabled[] = blog_setting( 'social_pinterest_enabled' ) && $post->image_id ? '<div class="pinterest" data-media="' . cdn_serve( $post->image_id ) . '" title="Share image on Pinterest">Pinterest</div>' : '';
+
+	$_enabled = array_filter( $_enabled );
+
+	if ( $_enabled ) :
+
+		echo '<hr />';
+		echo '<div class="social-likes ' . $_layout . '" ' . $_counters . ' data-url="' . $post->url . '" data-single-title="' . $_single_title . '" data-title="' . $post->title . '">';
+		foreach ( $_enabled AS $enabled ) :
+
+			echo $enabled;
+
+		endforeach;
+		echo '</div>';
+
+	endif;

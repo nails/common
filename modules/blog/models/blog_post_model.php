@@ -810,116 +810,65 @@ class NAILS_Blog_post_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	//get_all( $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE, $_caller = 'GET_ALL' )
+	public function get_with_category( $id_slug, $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE )
 	{
-		dumpanddie('<srong>TODO</strong>: blog_post_model::get_with_category(); use the get_all() method to run this (query logic will need changed)');
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
+		//	Join the blog_post_category table so we can WHERE on it.
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post_category bpc',	'bpc.post_id = bp.id' );
+		$this->db->join( NAILS_DB_PREFIX . 'blog_category bc',			'bc.id = bpc.category_id' );
 
-		if ( $include_body ) :
+		//	Set the where
+		if ( NULL === $data ) :
 
-			$this->db->select( 'bp.body' );
-
-		endif;
-
-		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );
-
-		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bc.post_id' );
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
-
-		if ( $only_published ) :
-
-			$this->db->where( 'bp.is_published', TRUE );
+			$data = array( 'where' => array() );
 
 		endif;
-
-		if ( $exclude_deleted ) :
-
-			$this->db->where( 'bp.is_deleted', FALSE );
-
-		endif;
-
-		$this->db->order_by( 'published', 'DESC' );
 
 		if ( is_numeric( $id_slug ) ) :
 
-			$this->db->where( 'bc.category_id = ', $id_slug );
+			$data['where'][] = array( 'column' => 'bc.id', 'value' => (int) $id_slug );
 
 		else :
 
-			$this->db->where( 'c.slug = ', $id_slug );
-			$this->db->join( NAILS_DB_PREFIX . 'blog_category c', 'c.id = bc.category_id' );
+			$data['where'][] = array( 'column' => 'bc.slug', 'value' => $id_slug );
 
 		endif;
 
-		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_category bc' )->result();
+		$this->db->group_by( $this->_table_prefix . '.id' );
 
-		foreach ( $_posts AS $post ) :
-
-			$this->_format_post_object( $post );
-
-		endforeach;
-
-		return $_posts;
+		return $this->get_all( $page, $per_page, $data, $include_deleted );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
+	public function get_with_tag( $id_slug, $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE )
 	{
-		dumpanddie('<srong>TODO</strong>: blog_post_model::get_with_tag(); use the get_all() method to run this (query logic will need changed)');
-		$this->db->select( 'bp.id, bp.slug, bp.title, bp.image_id, bp.excerpt, bp.seo_title' );
-		$this->db->select( 'bp.seo_description, bp.seo_keywords, bp.is_published, bp.is_deleted, bp.created, bp.created_by, bp.modified, bp.modified_by, bp.published' );
+		//	Join the blog_post_tag table so we can WHERE on it.
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post_tag bpt',	'bpt.post_id = bp.id' );
+		$this->db->join( NAILS_DB_PREFIX . 'blog_tag bt',		'bt.id = bpt.tag_id' );
 
-		if ( $include_body ) :
+		//	Set the where
+		if ( NULL === $data ) :
 
-			$this->db->select( 'bp.body' );
-
-		endif;
-
-		$this->db->select( 'u.first_name, u.last_name, ue.email, u.profile_img, u.gender' );
-
-		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bt.post_id' );
-		$this->db->join( NAILS_DB_PREFIX . 'user u', 'bp.modified_by = u.id', 'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
-
-		if ( $only_published ) :
-
-			$this->db->where( 'bp.is_published', TRUE );
+			$data = array( 'where' => array() );
 
 		endif;
-
-		if ( $exclude_deleted ) :
-
-			$this->db->where( 'bp.is_deleted', FALSE );
-
-		endif;
-
-		$this->db->order_by( 'published', 'DESC' );
 
 		if ( is_numeric( $id_slug ) ) :
 
-			$this->db->where( 'bt.tag_id = ', $id_slug );
+			$data['where'][] = array( 'column' => 'bt.id', 'value' => (int) $id_slug );
 
 		else :
 
-			$this->db->where( 't.slug = ', $id_slug );
-			$this->db->join( NAILS_DB_PREFIX . 'blog_tag t', 't.id = bt.tag_id' );
+			$data['where'][] = array( 'column' => 'bt.slug', 'value' => $id_slug );
 
 		endif;
 
-		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_tag bt' )->result();
+		$this->db->group_by( $this->_table_prefix . '.id' );
 
-		foreach ( $_posts AS $post ) :
-
-			$this->_format_post_object( $post );
-
-		endforeach;
-
-		return $_posts;
+		return $this->get_all( $page, $per_page, $data, $include_deleted );
 	}
 
 
@@ -930,7 +879,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 	{
 		$this->config->load( 'blog', FALSE, TRUE );
 
-		$_associations	= $this->config->item( 'blog_post_associations' );
+		$_associations = $this->config->item( 'blog_post_associations' );
 
 		if ( ! isset( $_associations[$association_index] ) ) :
 
@@ -952,6 +901,68 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$this->db->where_in( $this->_table_prefix . '.id', $_ids );
 		return $this->get_all();
 
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function add_hit( $id, $data = array() )
+	{
+		if ( ! $id ) :
+
+			$this->_set_error( 'Post ID is required.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_data					= array();
+		$_data['post_id']		= $id;
+		$_data['user_id']		= empty( $data['user_id'] ) ? NULL : $data['user_id'];
+		$_data['ip_address']	= $this->input->ip_address();
+		$_data['created']		= date( 'Y-m-d H:i:s' );
+		$_data['referrer']		= empty( $data['referrer'] ) ? NULL : prep_url( trim( $data['referrer'] ) );
+
+		if ( $_data['user_id'] && $this->user->is_admin( $_data['user_id'] ) ) :
+
+			$this->_set_error( 'Administrators cannot affect the post\'s popularity.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Registered a hit on this post in the past 5 minutes? Try to prevent abuse
+		//	of the popularity system.
+
+		$this->db->where( 'post_id', $_data['post_id'] );
+		$this->db->where( 'user_id', $_data['user_id'] );
+		$this->db->where( 'ip_address', $_data['ip_address'] );
+		$this->db->where( 'created > "' . date( 'Y-m-d H:i:s', strtotime( '-5 MINS' ) ) . '"' );
+
+		if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'blog_post_hit' ) ) :
+
+			$this->_set_error( 'Hit timeout in effect.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->set( $_data );
+
+		if ( $this->db->insert( NAILS_DB_PREFIX . 'blog_post_hit' ) ) :
+
+			return TRUE;
+
+		else :
+
+			$this->_set_error( 'Failed to add hit.' );
+			return FALSE;
+
+		endif;
 	}
 
 

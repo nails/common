@@ -18,6 +18,10 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-social">Social Tools</a>
 			</li>
+			<?php $_active = $this->input->post( 'update' ) == 'blog_sidebar' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-blog-sidebar">Sidebar</a>
+			</li>
 		</ul>
 
 		<section class="tabs pages">
@@ -125,7 +129,7 @@
 						$_field					= array();
 						$_field['key']			= 'rss_enabled';
 						$_field['label']		= 'RSS Enabled';
-						$_field['default']		= ! blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
@@ -151,7 +155,7 @@
 						$_field					= array();
 						$_field['key']			= 'comments_enabled';
 						$_field['label']		= 'Comments Enabled';
-						$_field['default']		= ! blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
@@ -348,22 +352,83 @@
 				<?=form_close()?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'sidebar' ? 'active' : ''?>
-			<div id="tab-sidebar" class="tab page <?=$_display?> sidebar">
-
+			<?php $_display = $this->input->post( 'update' ) == 'blog_sidebar' ? 'active' : ''?>
+			<div id="tab-blog-sidebar" class="tab page <?=$_display?> blog-sidebar">
+				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
+				<?=form_hidden( 'update', 'blog_sidebar' )?>
 				<p>
 					Configure the sidebar widgets.
 				</p>
 				<hr />
-				<p class="system-alert message no-close">
-					<strong>Coming Soon!</strong> We're working on an interface to make configuring the blog sidebar as easy as possible!
+				<fieldset id="blog-settings-blog-sidebar">
+					<legend>Enable Widgets</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'sidebar_latest_posts';
+						$_field['label']		= 'Latest Posts';
+						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+
+						// --------------------------------------------------------------------------
+
+						if ( blog_setting( 'categories_enabled' ) ) :
+
+							$_field					= array();
+							$_field['key']			= 'sidebar_categories';
+							$_field['label']		= 'Categories';
+							$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+
+							echo form_field_boolean( $_field );
+
+						endif;
+
+						// --------------------------------------------------------------------------
+
+						if ( blog_setting( 'tags_enabled' ) ) :
+
+							$_field					= array();
+							$_field['key']			= 'sidebar_tags';
+							$_field['label']		= 'Tags';
+							$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+
+							echo form_field_boolean( $_field );
+
+						endif;
+
+						// --------------------------------------------------------------------------
+
+						$_field					= array();
+						$_field['key']			= 'sidebar_popular_posts';
+						$_field['label']		= 'Popular Posts';
+						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field );
+
+						$_associations = $this->config->item( 'blog_post_associations' );
+
+						if ( is_array( $_associations ) ) :
+
+							foreach( $_associations AS $assoc ) :
+
+								$_field					= array();
+								$_field['key']			= 'sidebar_association_' . $assoc->slug;
+								$_field['label']		= $assoc->sidebar_title;
+								$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+
+								echo form_field_boolean( $_field );
+
+							endforeach;
+
+						endif;
+
+					?>
+				</fieldset>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
-				<?php
-
-					//	TODO: Maybe this uses the CMS areas thing
-
-				?>
-
+				<?=form_close()?>
 			</div>
 
 		</section>

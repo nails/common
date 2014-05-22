@@ -30,7 +30,8 @@
 
 		$config['blog_post_associations']					= array();
 		$config['blog_post_associations'][0]				= new stdClass();
-		$config['blog_post_associations'][0]->widget_title	= 'The title of the widget in the front end ';
+		$config['blog_post_associations'][0]->slug			= 'a-unique-slug';
+		$config['blog_post_associations'][0]->sidebar_title	= 'The title of the widget in the front end sidebar';
 		$config['blog_post_associations'][0]->legend		= 'The <fieldset>\'s legend';
 		$config['blog_post_associations'][0]->description	= 'The <fieldset>\'s description';
 		$config['blog_post_associations'][0]->multiple		= TRUE;
@@ -47,7 +48,7 @@
 
 	- The name of the table
 	- The name of the column which is the ID (usually ID if you're following any kind of sensible norm)
-	- The name of the lable column, i.e what will be shown in the list. specify an array of column
+	- The name of the label column, i.e what will be shown in the list. specify an array of column
 	  and they'll be merged into one joined with a space.
 	- The `WHERE` field, if any.
 
@@ -55,7 +56,7 @@
 		$config['blog_post_associations'][0]->source->table		= 'hills';
 		$config['blog_post_associations'][0]->source->id		= 'id';
 		$config['blog_post_associations'][0]->source->label		= 'name';
-		$config['blog_post_associations'][0]->source->label		= '';
+		$config['blog_post_associations'][0]->source->where		= '';
 
 	If you need to run a complex query to get this information you can specify a `sql` property
 	so long as it returns a field called `id` and another called `label`. If you use this approach
@@ -102,6 +103,6 @@
 
 		$config['blog_post_associations'][0]->widget->callback_batch = function( $ids ) { return 'formatted string' };
 
-	This will be passed an array ob objects, each with two properties: `id` and `label`; you are responsible for rendering *all* the HTML.
+	This will be passed an array of objects, each with two properties: `id` and `label`; you are responsible for rendering *all* the HTML.
 
 */

@@ -22,7 +22,7 @@
 	else :
 
 		echo '<li class="no-posts">';
-		echo 'No Posts Found';
+			echo 'No Posts Found';
 		echo '</li>';
 
 	endif;

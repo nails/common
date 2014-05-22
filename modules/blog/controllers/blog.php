@@ -66,14 +66,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Widgets
-		if ( blog_setting( 'sidebar_enabled' ) ) :
-
-			$this->data['widget'] = new stdClass();
-			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-			$this->data['widget']->categories	= $this->widget->categories();
-			$this->data['widget']->tags			= $this->widget->tags();
-
-		endif;
+		$this->_fetch_sidebar_widgets();
 
 		// --------------------------------------------------------------------------
 
@@ -133,14 +126,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Widgets
-		if ( blog_setting( 'sidebar_enabled' ) ) :
-
-			$this->data['widget']				= new stdClass();
-			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-			$this->data['widget']->categories	= $this->widget->categories();
-			$this->data['widget']->tags			= $this->widget->tags();
-
-		endif;
+		$this->_fetch_sidebar_widgets();
 
 		// --------------------------------------------------------------------------
 
@@ -187,127 +173,15 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		$this->load->view( 'structure/header',	$this->data );
 		$this->load->view( 'blog/single',		$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function archive()
-	{
-		//	Widgets
-		if ( blog_setting( 'sidebar_enabled' ) ) :
-
-			$this->data['widget'] = new stdClass();
-			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-			$this->data['widget']->categories	= $this->widget->categories();
-			$this->data['widget']->tags			= $this->widget->tags();
-
-		endif;
 
 		// --------------------------------------------------------------------------
 
-		$_year	= $this->uri->rsegment( 3 );
-		$_month	= $this->uri->rsegment( 4 );
+		//	Register a hit
+		$_data				= array();
+		$_data['user_id']	= active_user( 'id' );
+		$_data['referrer']	= $this->input->server( 'HTTP_REFERER' );
 
-		if ( $_year && $_month ) :
-
-			$this->_archive_month( $_year, $_month );
-
-		elseif ( $_year ) :
-
-			$this->_archive_year( $_year );
-
-		else :
-
-			$this->_archive();
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _archive()
-	{
-		//	Meta
-		$this->data['page']->title 				= 'Archive';
-		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME;
-		$this->data['page']->keywords 			= '';
-
-		// --------------------------------------------------------------------------
-
-		$this->data['posts'] = $this->post->get_archive();
-
-		// --------------------------------------------------------------------------
-
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/archive',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _archive_year( $year )
-	{
-		//	Meta
-		$this->data['page']->title 				= 'Archive (' . $year . ')';
-		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted during ' . $year;
-		$this->data['page']->keywords 			= '';
-
-		// --------------------------------------------------------------------------
-
-		$this->data['posts'] = $this->post->get_archive( $year );
-
-		// --------------------------------------------------------------------------
-
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/archive',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _archive_month( $year, $month )
-	{
-		switch ( (int) $month ) :
-
-			case 1 :	$_month = lang( 'month_jan' ); break;
-			case 2 :	$_month = lang( 'month_feb' ); break;
-			case 3 :	$_month = lang( 'month_mar' ); break;
-			case 4 :	$_month = lang( 'month_apr' ); break;
-			case 5 :	$_month = lang( 'month_may' ); break;
-			case 6 :	$_month = lang( 'month_jun' ); break;
-			case 7 :	$_month = lang( 'month_jul' ); break;
-			case 8 :	$_month = lang( 'month_aug' ); break;
-			case 8 :	$_month = lang( 'month_sep' ); break;
-			case 10 :	$_month = lang( 'month_oct' ); break;
-			case 11 :	$_month = lang( 'month_nov' ); break;
-			case 12 :	$_month = lang( 'month_dec' ); break;
-
-		endswitch;
-
-		// --------------------------------------------------------------------------
-
-		//	Meta
-		$this->data['page']->title 				= 'Archive (' . $_month . ', ' . $year . ')';
-		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted during ' . $_month . ', ' . $year;
-		$this->data['page']->keywords 			= '';
-
-		// --------------------------------------------------------------------------
-
-		$this->data['posts'] = $this->post->get_archive( $year, $month );
-
-		// --------------------------------------------------------------------------
-
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/archive',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->post->add_hit( $this->data['post']->id, $_data );
 	}
 
 
@@ -343,30 +217,55 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( blog_setting( 'sidebar_enabled' ) ) :
-
-			$this->data['widget'] = new stdClass();
-			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-			$this->data['widget']->categories	= $this->widget->categories();
-			$this->data['widget']->tags			= $this->widget->tags();
-
-		endif;
+		//	Widgets
+		$this->_fetch_sidebar_widgets();
 
 		// --------------------------------------------------------------------------
 
 		//	Meta
 		$this->data['page']->title 				= 'Posts in category "' . $this->data['category']->label . '"';
-		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' posted in the  ' . $this->data['category']->label . ' category ';
+		$this->data['page']->description 		= 'All posts on ' . APP_NAME . ' posted in the  ' . $this->data['category']->label . ' category ';
 		$this->data['page']->keywords 			= '';
 
 		// --------------------------------------------------------------------------
 
-		$this->data['posts'] = $this->post->get_with_category( $this->data['category']->id );
+		//	Handle pagination
+		$_page		= $this->uri->rsegment( 2 );
+		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= $_per_page ? $_per_page : 10;
+
+		$this->data['pagination']			= new stdClass();
+		$this->data['pagination']->page		= $_page;
+		$this->data['pagination']->per_page	= $_per_page;
+
+		// --------------------------------------------------------------------------
+
+		//	Send any additional data
+		$_data						= array();
+		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
+		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['sort']				= array( 'bp.published', 'desc' );
+
+		//	Only published items which are not schduled for the future
+		$_data['where']		= array();
+		$_data['where'][]	= array( 'column' => 'is_published',	'value' => TRUE );
+		$_data['where'][]	= array( 'column' => 'published <=',	'value' => 'NOW()', 'escape' => FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load posts and count
+		$this->data['posts'] = $this->post->get_with_category( $this->data['category']->id, $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->post->count_all( $_data );
+
+		// --------------------------------------------------------------------------
+
+		//	Finally, let the views know this is an 'archive' type page
+		$this->data['archive_title'] = $this->data['page']->title;
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'blog/browse',		$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 
@@ -403,30 +302,55 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( blog_setting( 'sidebar_enabled' ) ) :
-
-			$this->data['widget'] = new stdClass();
-			$this->data['widget']->latest_posts	= $this->widget->latest_posts();
-			$this->data['widget']->categories	= $this->widget->categories();
-			$this->data['widget']->tags			= $this->widget->tags();
-
-		endif;
+		//	Widgets
+		$this->_fetch_sidebar_widgets();
 
 		// --------------------------------------------------------------------------
 
 		//	Meta
 		$this->data['page']->title 				= 'Posts tagged with "' . $this->data['tag']->label . '"';
-		$this->data['page']->description 		= 'Archive of all posts on ' . APP_NAME . ' tagged with  ' . $this->data['tag']->label . ' ';
+		$this->data['page']->description 		= 'All posts on ' . APP_NAME . ' tagged with  ' . $this->data['tag']->label . ' ';
 		$this->data['page']->keywords 			= '';
 
 		// --------------------------------------------------------------------------
 
-		$this->data['posts'] = $this->post->get_with_tag( $this->data['tag']->id );
+		//	Handle pagination
+		$_page		= $this->uri->rsegment( 2 );
+		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= $_per_page ? $_per_page : 10;
+
+		$this->data['pagination']			= new stdClass();
+		$this->data['pagination']->page		= $_page;
+		$this->data['pagination']->per_page	= $_per_page;
+
+		// --------------------------------------------------------------------------
+
+		//	Send any additional data
+		$_data						= array();
+		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
+		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['sort']				= array( 'bp.published', 'desc' );
+
+		//	Only published items which are not schduled for the future
+		$_data['where']		= array();
+		$_data['where'][]	= array( 'column' => 'is_published',	'value' => TRUE );
+		$_data['where'][]	= array( 'column' => 'published <=',	'value' => 'NOW()', 'escape' => FALSE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load posts and count
+		$this->data['posts'] = $this->post->get_with_tag( $this->data['tag']->id, $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->post->count_all( $_data );
+
+		// --------------------------------------------------------------------------
+
+		//	Finally, let the views know this is an 'archive' type page
+		$this->data['archive_title'] = $this->data['page']->title;
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/archive',		$this->data );
+		$this->load->view( 'blog/browse',		$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 
@@ -462,6 +386,47 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		//	Set Output
 		$this->output->set_content_type( 'text/xml; charset=UTF-8' );
 		$this->load->view( 'blog/feeds/rss', $this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	/**
+	 * Loads all the enabled sidebar widgets
+	 * @return void
+	 */
+	protected function _fetch_sidebar_widgets()
+	{
+		//	Widgets
+		if ( blog_setting( 'sidebar_enabled' ) ) :
+
+			$this->data['widget'] = new stdClass();
+
+			if ( blog_setting( 'sidebar_latest_posts' ) ) :
+
+				$this->data['widget']->latest_posts = $this->widget->latest_posts();
+
+			endif;
+
+			if ( blog_setting( 'sidebar_categories' ) ) :
+
+				$this->data['widget']->categories = $this->widget->categories();
+
+			endif;
+
+			if ( blog_setting( 'sidebar_tags' ) ) :
+
+				$this->data['widget']->tags = $this->widget->tags();
+
+			endif;
+
+			if ( blog_setting( 'sidebar_popular_posts' ) ) :
+
+				$this->data['widget']->popular_posts = $this->widget->popular_posts();
+
+			endif;
+
+		endif;
 	}
 
 

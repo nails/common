@@ -107,6 +107,92 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 
 	/**
+	 * Fetches the latest blog posts
+	 *
+	 * @access public
+	 * @param array $config Changes to the default configs
+	 * @param boolean $return_html Whether to return HTML or just the data
+	 * @return mixed``
+	 **/
+	public function popular_posts( $config = array(), $return_html = TRUE )
+	{
+		//	Define defaults
+		$_config				= new stdClass();
+		$_config->limit			= isset( $config['limit'] ) ? (int) $config['limit'] : 5;
+		$_config->h_tag			= isset( $config['h_tag'] ) ? $config['h_tag'] : '5';
+		$_config->h_class		= isset( $config['h_class'] ) ? $config['h_class'] : '';
+		$_config->li_class		= isset( $config['li_class'] ) ? $config['li_class'] : '';
+		$_config->title			= isset( $config['title'] ) ? $config['title'] : 'Popular Posts';
+		$_config->meta_show		= isset( $config['meta_show'] ) ? $config['meta_show'] : TRUE;
+		$_config->meta_class	= isset( $config['meta_class'] ) ? $config['meta_class'] : '';
+
+		// --------------------------------------------------------------------------
+
+		$this->db->select( 'bp.id,bp.slug,bp.title,bp.published,COUNT(bph.id) hits' );
+
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bph.post_id' );
+
+		$this->db->where( 'bp.is_published', TRUE );
+		$this->db->where( 'bp.published <=', 'NOW()', FALSE );
+		$this->db->where( 'bp.is_deleted', FALSE );
+
+		$this->db->group_by( 'bp.id' );
+		$this->db->order_by( 'hits', 'DESC' );
+		$this->db->order_by( 'bp.published', 'DESC' );
+		$this->db->limit( $_config->limit );
+
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_hit bph' )->result();
+
+		// --------------------------------------------------------------------------
+
+		//	Any data?
+		if ( ! $_posts ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Render HTML?
+		if ( $return_html ) :
+
+			$_out  = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
+			$_out .= '<ul>';
+
+			foreach ( $_posts AS $post ) :
+
+				$_out .= '<li class="' . $_config->li_class . '">';
+				$_out .= anchor( $this->data['blog_url'] . $post->slug, $post->title );
+
+				if ( $_config->meta_show ) :
+
+					$_out .= '<br />';
+					$_out .= '<small class="' . $_config->meta_class . '">';
+					$_out .= 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) );
+					$_out .= '</small>';
+
+				endif;
+				$_out .= '</li>';
+
+			endforeach;
+
+			$_out .= '</ul>';
+
+			return $_out;
+
+		else :
+
+			return $_posts;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Fetches the blog categories
 	 *
 	 * @access public

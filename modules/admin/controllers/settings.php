@@ -219,6 +219,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 				// --------------------------------------------------------------------------
 
+				case 'blog_sidebar' :
+
+					$this->_blog_update_sidebar();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
 				default :
 
 					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
@@ -343,6 +351,35 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		else :
 
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving social settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _blog_update_sidebar()
+	{
+		//	Prepare update
+		$_settings								= array();
+		$_settings['sidebar_latest_posts']		= (bool) $this->input->post( 'sidebar_latest_posts' );
+		$_settings['sidebar_categories']		= (bool) $this->input->post( 'sidebar_categories' );
+		$_settings['sidebar_tags']				= (bool) $this->input->post( 'sidebar_tags' );
+		$_settings['sidebar_popular_posts']		= (bool) $this->input->post( 'sidebar_popular_posts' );
+
+		//	TODO: Associations
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->blog->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Blog sidebar settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving sidebar settings.';
 
 		endif;
 	}

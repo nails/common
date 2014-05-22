@@ -1,3 +1,4 @@
+<hr />
 <?php
 
 	$_shortname = blog_setting( 'comments_disqus_shortname' );

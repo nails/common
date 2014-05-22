@@ -1,4 +1,3 @@
-<hr />
 <?php
 
 	switch( blog_setting( 'comments_engine' ) ) :

@@ -5,14 +5,35 @@
 
 	// --------------------------------------------------------------------------
 
-	//	Render Posts
-	foreach ( $posts AS $post ) :
+	//	Are we on an 'archive' page? i.e Categories, tags or associations
+	if ( ! empty( $archive_title ) ) :
 
-		echo '<li class="post clearfix">';
-			$this->load->view( 'blog/_components/browse', array( 'post' => &$post ) );
+		echo '<li class="archive-title">';
+			$this->load->view( 'blog/_components/browse_archive_title' );
 		echo '</li>';
 
-	endforeach;
+	endif;
+
+	// --------------------------------------------------------------------------
+
+	//	Render Posts
+	if ( $posts ) :
+
+		foreach ( $posts AS $post ) :
+
+			echo '<li class="post clearfix">';
+				$this->load->view( 'blog/_components/browse', array( 'post' => &$post ) );
+			echo '</li>';
+
+		endforeach;
+
+	else :
+
+		echo '<li class="no-posts">';
+			echo 'No Posts Found';
+		echo '</li>';
+
+	endif;
 
 	// --------------------------------------------------------------------------
 
