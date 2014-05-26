@@ -209,6 +209,24 @@ class Asset
 
 			break;
 
+			// --------------------------------------------------------------------------
+
+			case 'chosen' :
+
+				$this->load( 'jquery.chosen.css',	TRUE );
+				$this->load( 'jquery.chosen.min.js',	TRUE );
+
+			break;
+
+			// --------------------------------------------------------------------------
+
+			case 'select2' :
+
+				$this->load( 'select2/select2.css',		'BOWER' );
+				$this->load( 'select2/select2.min.js',	'BOWER' );
+
+			break;
+
 		endswitch;
 	}
 

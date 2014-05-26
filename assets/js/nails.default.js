@@ -201,9 +201,11 @@ NAILS_JS = function()
 		{
 			$( 'select.chosen' ).each(function()
 			{
+				var _width = $(this).css( 'width' ) ? $(this).css( 'width' ) : '100%';
+
 				$(this).chosen(
 				{
-					width: $(this).css( 'width' )
+					width: _width
 				});
 			});
 		}

@@ -110,7 +110,7 @@
 				$_field				= array();
 				$_field['key']		= 'parent_id';
 				$_field['label']	= 'Parent';
-				$_field['class']	= 'chosen';
+				$_field['class']	= 'select2';
 
 				$_options = array();
 
@@ -189,7 +189,7 @@
 		$_field				= array();
 		$_field['key']		= $category->id . '[parent_id]';
 		$_field['label']	= 'Parent';
-		$_field['class']	= 'chosen';
+		$_field['class']	= 'select2';
 		$_field['default']	= $category->parent_id;
 
 		echo form_field_dropdown( $_field, $_options );

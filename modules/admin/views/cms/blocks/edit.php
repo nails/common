@@ -60,11 +60,6 @@
 
 						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="wysiwyg"' );
 
-						echo '<p class="system-alert notice no-close">';
-						echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
-						echo 'due to application stylesheets on the front end which are not loaded here.';
-						echo '</p>';
-
 					break;
 
 				endswitch;
@@ -135,15 +130,6 @@
 
 								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="wysiwyg"' );
 
-								if ( $block->type == 'richtext' ) :
-
-									echo '<p class="system-alert notice no-close">';
-									echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
-									echo 'due to application stylesheets on the front end which are not loaded here.';
-									echo '</p>';
-
-								endif;
-
 							break;
 
 						endswitch;
@@ -199,12 +185,6 @@
 		<strong>Oops!</strong> Please ensure a language and value is set.
 	</div>
 	<textarea name="new_translation[{{new_count}}][value]" id="translation_{{new_count}}"></textarea>
-	<?php if ( $block->type == 'richtext' ) : ?>
-	<p class="system-alert notice no-close">
-		<strong>Note:</strong> The editor's display might not be a true representation of the final layout
-		due to application stylesheets on the front end which are not loaded here.
-	</p>
-	<?php endif; ?>
 </script>
 
 <script type="text/javascript">

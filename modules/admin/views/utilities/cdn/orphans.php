@@ -24,7 +24,7 @@
 				$_field				= array();
 				$_field['key']		= 'type';
 				$_field['label']	= 'Search For';
-				$_field['class']	= 'chosen';
+				$_field['class']	= 'select2';
 
 				$_options = array(
 					'db'	=>	'Database objects for which the file does not exist.',
@@ -38,7 +38,7 @@
 				$_field				= array();
 				$_field['key']		= 'parser';
 				$_field['label']	= 'With the results';
-				$_field['class']	= 'chosen';
+				$_field['class']	= 'select2';
 
 				$_options = array(
 					'list'		=> 'Show list of results',

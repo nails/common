@@ -284,6 +284,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	SEO
+		$_data->seo_title		= isset( $data['seo_title'] )		? $data['seo_title']		: NULL;
 		$_data->seo_description	= isset( $data['seo_description'] )	? $data['seo_description']	: NULL;
 		$_data->seo_keywords	= isset( $data['seo_keywords'] )	? $data['seo_keywords']		: NULL;
 
@@ -301,6 +302,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->set( 'type_id',			$_data->type_id );
 		$this->db->set( 'title',			$_data->title );
 		$this->db->set( 'description',		$_data->description );
+		$this->db->set( 'seo_title',		$_data->seo_title );
 		$this->db->set( 'seo_description',	$_data->seo_description );
 		$this->db->set( 'seo_keywords',		$_data->seo_keywords );
 		$this->db->set( 'tax_rate_id',		$_data->tax_rate_id );
@@ -1295,7 +1297,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	{
 		//	Type casting
 		$obj->id				= (int) $obj->id;
-		$obj->max_per_order		= is_numeric( $obj->max_per_order ) ? (int) $obj->max_per_order : $obj->max_per_order;
+		$obj->max_per_order		= (int) $obj->max_per_order;
 		$obj->max_variations	= (int) $obj->max_variations;
 		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
 		$obj->is_physical		= (bool) $obj->is_physical;

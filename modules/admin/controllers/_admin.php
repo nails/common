@@ -186,7 +186,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery-toggles/themes/toggles-modern.css',	'BOWER' );
 		$this->asset->load( 'tipsy/src/stylesheets/tipsy.css',			'BOWER' );
 		$this->asset->load( 'ionicons/css/ionicons.min.css',			'BOWER' );
-		$this->asset->load( 'jquery.chosen.css',						TRUE );
 		$this->asset->load( 'nails.admin.css',							TRUE );
 
 		//	JS
@@ -196,13 +195,13 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'tipsy/src/javascripts/jquery.tipsy.js',	'BOWER' );
 		$this->asset->load( 'jquery.scrollTo/jquery.scrollTo.min.js',	'BOWER' );
 		$this->asset->load( 'jquery-cookie/jquery.cookie.js',			'BOWER' );
-		$this->asset->load( 'jquery.chosen.min.js',						TRUE );
 		$this->asset->load( 'nails.default.min.js',						TRUE );
 		$this->asset->load( 'nails.admin.min.js',						TRUE );
 		$this->asset->load( 'nails.api.min.js',							TRUE );
 
 		//	Libraries
 		$this->asset->library( 'jqueryui' );
+		$this->asset->library( 'select2' );
 
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :

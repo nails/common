@@ -90,7 +90,7 @@
 			$_field['key']				= 'parent_id';
 			$_field['label']			= 'Parent Page';
 			$_field['placeholder']		= 'The Page\'s parent.';
-			$_field['class']			= 'chosen';
+			$_field['class']			= 'select2';
 			$_field['default']			= isset( $cmspage->draft->parent_id ) ? $cmspage->draft->parent_id : '';
 			$_field['disabled_options']	= isset( $page_children ) ? $page_children : array();
 

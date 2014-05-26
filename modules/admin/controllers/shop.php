@@ -197,9 +197,10 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		switch( $this->uri->segment( '4' ) ) :
 
 			case 'create' :		$this->_inventory_create();		break;
+			case 'import' :		$this->_inventory_import();		break;
 			case 'edit' :		$this->_inventory_edit();		break;
 			case 'delete' :		$this->_inventory_delete();		break;
-			case 'restore' :	$this->_inventory_restore();		break;
+			case 'restore' :	$this->_inventory_restore();	break;
 			case 'index' :
 			default :			$this->_inventory_index();		break;
 
@@ -302,7 +303,16 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data, this data is used in both the view and the form submission
-		$this->data['product_types']	= $this->product->get_product_types();
+		$this->data['product_types'] = $this->product->get_product_types();
+
+		if ( ! $this->data['product_types'] ) :
+
+			//	No Product types, some need added, yo!
+			$this->session->set_flashdata( 'message', '<strong>Hey!</strong> No product types have been defined. You must set some before you can add inventory items.' );
+			redirect( 'admin/shop/manage/types?create=true' );
+
+		endif;
+
 		$this->data['currencies']		= $this->currency->get_all();
 
 		//	Fetch product meta fields
@@ -480,6 +490,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	SEO
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
@@ -562,6 +573,21 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _inventory_import()
+	{
+		$this->data['page']->title = 'Import Inventory Items';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/inventory/import',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
@@ -2719,7 +2745,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					$this->load->library( 'form_validation' );
 
-					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'shop_product_type.label]' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'is_physical',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'ipn_method',		'',	'xss_clean' );
@@ -2727,6 +2753,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( 'max_variations',	'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+					$this->form_validation->set_message( 'is_unique', lang( 'fv_is_unique' ) );
 
 					if ( $this->form_validation->run() ) :
 
@@ -2735,8 +2762,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->description		= $this->input->post( 'description' );
 						$_data->is_physical		= $this->input->post( 'is_physical' );
 						$_data->ipn_method		= $this->input->post( 'ipn_method' );
-						$_data->max_per_order	= $this->input->post( 'max_per_order' );
-						$_data->max_variations	= $this->input->post( 'max_variations' );
+						$_data->max_per_order	= (int) $this->input->post( 'max_per_order' );
+						$_data->max_variations	= (int) $this->input->post( 'max_variations' );
 
 						if ( $this->product->create_product_type( $_data ) ) :
 
@@ -2766,24 +2793,23 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->load->library( 'form_validation' );
 
 					$_id = $this->input->post( 'id' );
-					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
-					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[is_physical]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[ipn_method]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[max_per_order]',	'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[max_variations]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'type[label]',			'',	'xss_clean|required' );
+					$this->form_validation->set_rules( 'type[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'type[is_physical]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'type[ipn_method]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'type[max_per_order]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'type[max_variations]',	'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
 					if ( $this->form_validation->run() ) :
 
 						$_data					= new stdClass();
-						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
-						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
-						$_data->is_physical		= isset( $_POST[$_id]['is_physical'] )		? $_POST[$_id]['is_physical']		: NULL;
-						$_data->ipn_method		= isset( $_POST[$_id]['ipn_method'] )		? $_POST[$_id]['ipn_method']		: NULL;
-						$_data->max_per_order	= isset( $_POST[$_id]['max_per_order'] )	? $_POST[$_id]['max_per_order']		: NULL;
-						$_data->max_variations	= isset( $_POST[$_id]['max_variations'] )	? $_POST[$_id]['max_variations']	: NULL;
+						$_data->label			= isset( $_POST['type']['label'] )			? $_POST['type']['label'] : '';
+						$_data->description		= isset( $_POST['type']['description'] )	? $_POST['type']['description'] : '';
+						$_data->is_physical		= isset( $_POST['type']['is_physical'] )	? TRUE: FALSE;
+						$_data->max_per_order	= isset( $_POST['type']['max_per_order'] )	? (int) $_POST['type']['max_per_order'] : 0;
+						$_data->max_variations	= isset( $_POST['type']['max_variations'] )	? (int) $_POST['type']['max_variations'] : 0;
 
 						if ( $this->product->update_product_type( $_id, $_data ) ) :
 

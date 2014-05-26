@@ -66,7 +66,7 @@
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][stock_status]';
 				$_field['label']		= 'Stock Status';
-				$_field['class']		= 'chosen stock-status';
+				$_field['class']		= 'select2 stock-status';
 				$_field['required']		= TRUE;
 				$_field['default']		= 'IN_STOCK';
 
@@ -424,7 +424,7 @@
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][shipping][measurement_unit]';
 				$_field['label']		= 'L/W/H Unit of measurement';
-				$_field['class']		= 'chosen';
+				$_field['class']		= 'select2';
 				$_field['required']		= TRUE;
 
 				$_options				= array();
@@ -469,7 +469,7 @@
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][shipping][weight_unit]';
 				$_field['label']		= 'Weight unit of measurement';
-				$_field['class']		= 'chosen';
+				$_field['class']		= 'select2';
 				$_field['required']		= TRUE;
 
 				$_options				= array();

@@ -46,7 +46,7 @@
 		$_field['key']			= 'gender';
 		$_field['label']		= lang( 'accounts_edit_basic_field_gender_label' );
 		$_field['default']		= $user_edit->gender;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 		$_field['required']		= FALSE;
 
 		$_options = array();
@@ -66,7 +66,7 @@
 		$_field['label']		= lang( 'accounts_edit_basic_field_timezone_label' );
 		$_field['default']		= $user_edit->timezone;
 		$_field['required']		= FALSE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $timezones, lang( 'accounts_edit_basic_field_timezone_tip' ) );
 
@@ -78,7 +78,7 @@
 		$_field['label']		= lang( 'accounts_edit_basic_field_date_format_label' );
 		$_field['default']		= $user_edit->date_setting->format->date->id;
 		$_field['required']		= FALSE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $date_formats, lang( 'accounts_edit_basic_field_date_format_tip' ) );
 
@@ -91,7 +91,7 @@
 		$_field['label']		= lang( 'accounts_edit_basic_field_time_format_label' );
 		$_field['default']		= $user_edit->date_setting->format->time->id;
 		$_field['required']		= FALSE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $time_formats, lang( 'accounts_edit_basic_field_time_format_tip' ) );
 
@@ -103,7 +103,7 @@
 		$_field['label']		= lang( 'accounts_edit_basic_field_language_label' );
 		$_field['default']		= $user_edit->language_setting->id;
 		$_field['required']		= FALSE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_language_tip' ) );
 

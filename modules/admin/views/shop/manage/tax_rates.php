@@ -143,6 +143,15 @@
 	// --------------------------------------------------------------------------
 
 	//	Set JS
+
+	//	Add a dummy "no tax" option
+	$_no_rate			= new stdClass();
+	$_no_rate->id		= '';
+	$_no_rate->label	= 'No Tax';
+	$_no_rate->rates	= 0;
+
+	array_unshift( $rates, $_no_rate );
+
 	echo '<script type="text/javascript">';
 	if ( validation_errors() && $this->input->post( 'action' ) == 'edit' ) :
 

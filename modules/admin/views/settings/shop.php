@@ -432,7 +432,7 @@
 						$_field['label']		= 'Base Currency';
 						$_field['default']		= shop_setting( $_field['key'] );
 
-						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="chosen-base"' );
+						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
 
 					?>
 				</fieldset>
@@ -443,7 +443,7 @@
 					</p>
 					<?php
 
-						echo '<select name="active_currencies[]" multiple="multiple" class="chosen-active">';
+						echo '<select name="active_currencies[]" multiple="multiple" class="select2">';
 						foreach ( $currencies_all_flat AS $currency ) :
 
 							$_selected = $currency->is_active ? 'selected="selected"' : '';
@@ -469,7 +469,7 @@
 					Configure supported shipping methods.
 				</p>
 				<hr />
-				<table id="existing-shipping-methods">
+				<table id="existing-shipping-methods" class="settings-table">
 					<thead>
 						<tr>
 							<th class="order-handle">&nbsp;</th>
@@ -532,7 +532,7 @@
 							// --------------------------------------------------------------------------
 
 							echo '<td class="tax_rate">';
-							echo form_dropdown( 'methods[' . $_counter_ship . '][tax_rate_id]', $tax_rates_flat, set_value( 'methods[' . $_counter_ship . '][tax_rate_id]', $method->tax_rate->id ) );
+							echo form_dropdown( 'methods[' . $_counter_ship . '][tax_rate_id]', $tax_rates_flat, set_value( 'methods[' . $_counter_ship . '][tax_rate_id]', $method->tax_rate->id ), 'class="select2"' );
 							echo '</td>';
 
 							// --------------------------------------------------------------------------
@@ -593,10 +593,10 @@
 				<?=form_open( NULL, 'id="form-tax-rates" style="margin-bottom:0;"' )?>
 				<?=form_hidden( 'update', 'tax_rates' )?>
 				<p>
-					Configure supported Tax Rates
+					Configure supported Tax Rates. Specify a customer facing label and a rate; the rate must be a decimal between 0 and 1. For example, to specify a tax rate of 17.5% the rate would be noted as 0.175.
 				</p>
 				<hr />
-				<table id="existing-tax-rates">
+				<table id="existing-tax-rates" class="settings-table">
 					<thead>
 						<tr>
 							<th class="label">Label</th>
@@ -615,8 +615,8 @@
 							$_field = 'label';
 
 							echo '<td class="' . $_field . '">';
-							echo '<input type="hidden" name="rates[' . $_counter_tax . '][id]" value="' . $rate->id . '" />';
-							echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'class="table-cell"' );
+								echo '<input type="hidden" name="rates[' . $_counter_tax . '][id]" value="' . $rate->id . '" />';
+								echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'placeholder="Specify the tax rate label, e.g VAT" class="table-cell"' );
 							echo '</td>';
 
 							// --------------------------------------------------------------------------
@@ -624,13 +624,13 @@
 							$_field = 'rate';
 
 							echo '<td class="' . $_field . '">';
-							echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'class="table-cell"' );
+								echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'placeholder="Specify the rate for this tax band, decimal between 0 and 1, e.g for 20% you\'d enter 0.2" class="table-cell"' );
 							echo '</td>';
 
 							// --------------------------------------------------------------------------
 
 							echo '<td class="delete">';
-							echo '<a href="#" class="delete-row awesome small red">Delete</a>';
+								echo '<a href="#" class="delete-row awesome small red">Delete</a>';
 							echo '</td>';
 
 
@@ -682,7 +682,7 @@
 		<?=form_input( 'methods[{{counter}}][default_price_additional]', NULL, 'class="table-cell"' )?>
 	</td>
 	<td class="tax_rate">
-		<?=form_dropdown( 'methods[{{counter}}][tax_rate_id]', $tax_rates_flat, NULL )?>
+		<?=form_dropdown( 'methods[{{counter}}][tax_rate_id]', $tax_rates_flat, NULL, 'class="select2"' )?>
 	</td>
 	<td class="notes">
 		<?=form_input( 'methods[{{counter}}][notes]', NULL, 'class="table-cell"' )?>
@@ -701,10 +701,10 @@
 <script type="text/template" id="template-new-tax-rate">
 <tr>
 	<td class="label">
-		<?=form_input( 'rates[{{counter}}][label]', NULL, 'class="table-cell"' )?>
+		<?=form_input( 'rates[{{counter}}][label]', NULL, 'placeholder="Specify the tax rate label, e.g VAT" class="table-cell"' )?>
 	</td>
 	<td class="rate">
-		<?=form_input( 'rates[{{counter}}][rate]', NULL, 'class="table-cell"' )?>
+		<?=form_input( 'rates[{{counter}}][rate]', NULL, 'placeholder="Specify the rate for this tax band, decimal between 0 and 1, e.g for 20% you\'d enter 0.2" class="table-cell"' )?>
 	</td>
 	<td class="delete">
 		<a href="#" class="delete-row awesome small red">Delete</a>

@@ -689,24 +689,45 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$_rates	= $this->input->post( 'rates' );
 		$_ids	= array();
 
-		foreach( $_rates AS $counter => &$rate ) :
+		if ( is_array( $_rates ) ) :
 
-			//	If there's an ID we'll be updating (remove for safety)
-			$_id = isset( $rate['id'] ) ? $rate['id'] : NULL;
-			unset( $rate['id'] );
+			foreach( $_rates AS $counter => &$rate ) :
 
-			if ( $_id ) :
+				//	If there's an ID we'll be updating (remove for safety)
+				$_id = isset( $rate['id'] ) ? $rate['id'] : NULL;
+				unset( $rate['id'] );
 
-				$this->tax->update( $_id, $rate );
-				$_ids[] = $_id;
+				if ( $_id ) :
 
-			else :
+					$_data			= new stdClass();
+					$_data->label	= $rate['label'];
+					$_data->rate	= $rate['rate'];
 
-				$_ids[] = $this->tax->create( $rate );
+					if ( $this->tax->update( $_id, $_data ) ) :
 
-			endif;
+						$_ids[] = $_id;
 
-		endforeach;
+					endif;
+
+				else :
+
+					$_data			= new stdClass();
+					$_data->label	= $rate['label'];
+					$_data->rate	= $rate['rate'];
+
+					$_result = $this->tax->create( $_data );
+
+					if ( $_result ) :
+
+						$_ids[] = $_result;
+
+					endif;
+
+				endif;
+
+			endforeach;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

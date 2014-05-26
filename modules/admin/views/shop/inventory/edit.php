@@ -40,8 +40,9 @@
 				$_field['key']			= 'type_id';
 				$_field['label']		= 'Type';
 				$_field['required']		= TRUE;
-				$_field['class']		= 'type_id';
+				$_field['class']		= 'type_id select2';
 				$_field['id']			= 'type_id';
+				$_field['info']			= '<a href="#" class="manage-types awesome orange small">Manage Product Types</a>';
 
 				if ( count( $product_types_flat ) == 1 ) :
 
@@ -80,41 +81,45 @@
 
 				// --------------------------------------------------------------------------
 
-				$_field					= array();
-				$_field['key']			= 'brands[]';
-				$_field['label']		= 'Brands';
-				$_field['class']		= 'brands';
-				$_tip					= 'If this product contains multiple brands (e.g a hamper) specify them all here.';
+				$_field				= array();
+				$_field['key']		= 'brands[]';
+				$_field['label']	= 'Brands';
+				$_field['class']	= 'brands select2';
+				$_field['info']		= '<a href="#" class="manage-brands awesome orange small">Manage Brands</a>';
+				$_tip				= 'If this product contains multiple brands (e.g a hamper) specify them all here.';
 
 				echo form_field_dropdown_multiple( $_field, $brands, $_tip );
 
 				// --------------------------------------------------------------------------
 
-				$_field					= array();
-				$_field['key']			= 'categories[]';
-				$_field['label']		= 'Categories';
-				$_field['class']		= 'categories';
-				$_tip					= 'Specify which categories this product falls into.';
+				$_field				= array();
+				$_field['key']		= 'categories[]';
+				$_field['label']	= 'Categories';
+				$_field['class']	= 'categories select2';
+				$_field['info']		= '<a href="#" class="manage-categories awesome orange small">Manage Categories</a>';
+				$_tip				= 'Specify which categories this product falls into.';
 
 				echo form_field_dropdown_multiple( $_field, $categories, $_tip );
 
 				// --------------------------------------------------------------------------
 
-				$_field					= array();
-				$_field['key']			= 'tags[]';
-				$_field['label']		= 'Tags';
-				$_field['class']		= 'tags';
-				$_tip					= 'Use tags to associate products together, e.g. events.';
+				$_field				= array();
+				$_field['key']		= 'tags[]';
+				$_field['label']	= 'Tags';
+				$_field['class']	= 'tags select2';
+				$_field['info']		= '<a href="#" class="manage-tags awesome orange small">Manage Tags</a>';
+				$_tip				= 'Use tags to associate products together, e.g. events.';
 
 				echo form_field_dropdown_multiple( $_field, $tags, $_tip );
 
 				// --------------------------------------------------------------------------
 
-				$_field					= array();
-				$_field['key']			= 'tax_rate_id';
-				$_field['label']		= 'Tax Rate';
-				$_field['class']		= 'tax_rate_id';
-				$_field['required']		= TRUE;
+				$_field				= array();
+				$_field['key']		= 'tax_rate_id';
+				$_field['label']	= 'Tax Rate';
+				$_field['class']	= 'tax_rate_id select2';
+				$_field['required']	= TRUE;
+				$_field['info']		= '<a href="#" class="manage-tax-rates awesome orange small">Manage Tax Rates</a>';
 
 				echo form_field_dropdown( $_field, $tax_rates );
 
@@ -124,10 +129,6 @@
 		<div class="tab page description" id="tab-description">
 			<?=form_error( 'description', '<p class="system-alert error no-close">', '</p>' )?>
 			<textarea class="wysiwyg" name="description"><?=set_value( 'description' )?></textarea>
-			<p class="system-alert notice no-close" style="margin-top:10px;">
-				<strong>Note:</strong> The editor's display might not be a true representation of the final layout
-				due to application stylesheets on the front end which are not loaded here.
-			</p>
 		</div>
 
 		<div class="tab page variations" id="tab-variations">
@@ -267,6 +268,7 @@
 			</table>
 			<p>
 				<a href="#" id="product-attribute-add" class="awesome small green">Add Attribute</a>
+				<a href="#" class="awesome small orange manage-attributes">Manage Attributes</a>
 			</p>
 		</div>
 
@@ -286,56 +288,68 @@
 			<p>
 				<strong>Ranges</strong>
 			</p>
-			<select name="ranges[]" class="ranges" multiple="multiple" style="width:100%">
-			<?php
+			<p>
+				<select name="ranges[]" class="ranges select2" multiple="multiple" style="width:100%">
+				<?php
 
-				$_selected = $this->input->post( 'ranges' ) ? : array();
+					$_selected = $this->input->post( 'ranges' ) ? : array();
 
-				foreach ( $ranges AS $range ) :
+					foreach ( $ranges AS $range ) :
 
-					$_checked = array_search( $range->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
+						$_checked = array_search( $range->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
-					echo '<option value="' . $range->id . '" ' . $_checked . '>';
-					if ( ! $range->is_active ) :
+						echo '<option value="' . $range->id . '" ' . $_checked . '>';
+						if ( ! $range->is_active ) :
 
-						echo '[INACTIVE] ';
+							echo '[INACTIVE] ';
 
-					endif;
-					echo $range->label . ' - ' . word_limiter( $range->description, 25 );
-					echo '</option>';
+						endif;
+						echo $range->label;
+						echo $range->description ? ' - ' . word_limiter( $range->description, 25 ) : '';
+						echo '</option>';
 
-				endforeach;
+					endforeach;
 
-			?>
-			</select>
+				?>
+				</select>
+			</p>
+			<p>
+				<a href="#" class="awesome small orange manage-ranges">Manage Ranges</a>
+			</p>
 
 			<hr />
 
 			<p>
 				<strong>Collections</strong>
 			</p>
-			<select name="collections[]" class="collections" multiple="multiple" style="width:100%">
-			<?php
+			<p>
+				<select name="collections[]" class="collections select2" multiple="multiple" style="width:100%">
+				<?php
 
-				$_selected = $this->input->post( 'collections' ) ? : array();
+					$_selected = $this->input->post( 'collections' ) ? : array();
 
-				foreach ( $collections AS $collection ) :
+					foreach ( $collections AS $collection ) :
 
-					$_checked = array_search( $collection->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
+						$_checked = array_search( $collection->id, $_selected ) !== FALSE ? 'selected="selected"' : '';
 
-					echo '<option value="' . $collection->id . '" ' . $_checked . '>';
-					if ( ! $collection->is_active ) :
+						echo '<option value="' . $collection->id . '" ' . $_checked . '>';
+						if ( ! $collection->is_active ) :
 
-						echo '[INACTIVE] ';
+							echo '[INACTIVE] ';
 
-					endif;
-					echo $collection->label . ' - ' . word_limiter( $collection->description, 25 );
-					echo '</option>';
+						endif;
+						echo $collection->label;
+						echo $collection->description ? ' - ' . word_limiter( $collection->description, 25 ) : '';
+						echo '</option>';
 
-				endforeach;
+					endforeach;
 
-			?>
-			</select>
+				?>
+				</select>
+			</p>
+			<p>
+				<a href="#" class="awesome small orange manage-collections">Manage Collections</a>
+			</p>
 		</div>
 
 		<div class="tab page seo" id="tab-seo">
@@ -348,13 +362,21 @@
 				<?php
 
 					$_field					= array();
+					$_field['key']			= 'seo_title';
+					$_field['label']		= 'Title';
+					$_field['placeholder']	= 'Search Engine Optimised title';
+
+					echo form_field( $_field, 'Keep this below 100 characters' );
+
+					// --------------------------------------------------------------------------
+
+					$_field					= array();
 					$_field['key']			= 'seo_description';
 					$_field['label']		= 'Description';
 					$_field['placeholder']	= 'Search Engine Optimised description';
 					$_field['type']			= 'textarea';
 
 					echo form_field( $_field, 'Keep this relevant and below 140 characters' );
-
 
 					// --------------------------------------------------------------------------
 

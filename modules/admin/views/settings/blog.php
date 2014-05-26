@@ -174,7 +174,7 @@
 						$_field['key']		= 'comments_engine';
 						$_field['label']	= 'Comment Engine';
 						$_field['default']	= ! blog_setting( $_field['key'] ) ? 'NATIVE' : blog_setting( $_field['key'] );
-						$_field['class']	= 'chosen';
+						$_field['class']	= 'select2';
 						$_field['id']		= 'comment-engine';
 
 						$_options			= array();
@@ -292,7 +292,7 @@
 						$_field					= array();
 						$_field['key']			= 'social_skin';
 						$_field['label']		= 'Skin';
-						$_field['class']		= 'chosen';
+						$_field['class']		= 'select2';
 						$_field['default']		= blog_setting( $_field['key'] ) ? blog_setting( $_field['key'] ) : 'CLASSIC';
 
 						$_options				= array();
@@ -307,7 +307,7 @@
 						$_field					= array();
 						$_field['key']			= 'social_layout';
 						$_field['label']		= 'Layout';
-						$_field['class']		= 'chosen';
+						$_field['class']		= 'select2';
 						$_field['id']			= 'blog-settings-social-layout';
 						$_field['default']		= blog_setting( $_field['key'] ) ? blog_setting( $_field['key'] ) : 'HORIZONTAL';
 

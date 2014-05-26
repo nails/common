@@ -12,7 +12,7 @@
 		//	User
 		echo '<span class="label">';
 			echo '<span class="text">Show only events created by the following user(s):</span>';
-			echo '<select multiple="multiple" name="user_id[]" class="chosen user" data-placeholder="Choose some users. Leave blank to include all users.">';
+			echo '<select multiple="multiple" name="user_id[]" class="select2 user" data-placeholder="Choose some users. Leave blank to include all users.">';
 
 			foreach ( $users AS $user ) :
 
@@ -34,7 +34,7 @@
 		//	Event type(s)
 		echo '<span class="label">';
 			echo '<span class="text">Show only events of type(s):</span>';
-			echo '<select multiple="multiple" name="event_type[]" class="chosen type" data-placeholder="Choose some event types. Leave blank to include all event types.">';
+			echo '<select multiple="multiple" name="event_type[]" class="select2 type" data-placeholder="Choose some event types. Leave blank to include all event types.">';
 
 			foreach ( $types AS $id => $label ) :
 
@@ -68,7 +68,7 @@
 			$_options['u.last_name']	= 'Surname';
 			$_options['et.label']		= 'Event Type';
 
-			echo form_dropdown( 'sort', $_options, $this->input->get( 'sort' ), 'class="chosen"' );
+			echo form_dropdown( 'sort', $_options, $this->input->get( 'sort' ), 'class="select2" style="width:100px;"' );
 
 			//	Order by
 			echo '<span class="text and">order by </span>';
@@ -76,7 +76,7 @@
 			$_options['desc']	= 'Descending';
 			$_options['asc']	= 'Ascending';
 
-			echo form_dropdown( 'order', $_options, $this->input->get( 'order' ), 'class="chosen"' );
+			echo form_dropdown( 'order', $_options, $this->input->get( 'order' ), 'class="select2" style="width:125px;"' );
 
 			//	Per Page
 			echo '<span class="text and">show</span>';
@@ -87,7 +87,7 @@
 			$_options[75]	= 75;
 			$_options[100]	= 100;
 
-			echo form_dropdown( 'per_page', $_options, $this->input->get( 'per_page' ), 'class="chosen"' );
+			echo form_dropdown( 'per_page', $_options, $this->input->get( 'per_page' ), 'class="select2" style="width:100px;"' );
 
 			echo '<span class="text and">per page</span>';
 

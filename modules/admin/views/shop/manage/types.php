@@ -20,15 +20,15 @@
 		you may create your own for the sake of organisation in admin.
 	</p>
 	<ul class="tabs">
-		<li class="tab <?=empty( $show_tab ) || $show_tab == 'overview' || $show_tab == 'edit' ? 'active' : ''?>">
+		<li class="tab <?=! $this->input->get( 'create' ) && ( empty( $show_tab ) || $show_tab == 'overview' || $show_tab == 'edit' ) ? 'active' : ''?>">
 			<a href="#" data-tab="overview">Overview</a>
 		</li>
-		<li class="tab <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>">
+		<li class="tab <?=$this->input->get( 'create' ) || ( ! empty( $show_tab ) && $show_tab == 'create' ) ? 'active' : ''?>">
 			<a href="#" data-tab="create">Create Product Type</a>
 		</li>
 	</ul>
 	<section class="tabs pages">
-		<div class="tab page <?=empty( $show_tab ) || $show_tab == 'overview' || $show_tab == 'edit' ? 'active' : ''?>" id="overview">
+		<div class="tab page <?=! $this->input->get( 'create' ) && ( empty( $show_tab ) || $show_tab == 'overview' || $show_tab == 'edit' ) ? 'active' : ''?>" id="overview">
 			<table>
 				<thead>
 					<tr>
@@ -85,27 +85,29 @@
 			</table>
 		</div>
 
-		<div class="tab page fieldset <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>" id="create">
+		<div class="tab page fieldset <?=$this->input->get( 'create' ) || ( ! empty( $show_tab ) && $show_tab == 'create' ) ? 'active' : ''?>" id="create">
 			<?php
 
 				echo form_open( 'admin/shop/manage/types' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The name of this type of product, e.g. Books.';
 
-				echo form_field( $_field );
+				echo form_field( $_field, 'Should be unique.' );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'A description of this product type.';
 
-				echo form_field( $_field );
+				echo form_field( $_field, 'This is more for internal use.' );
 
 				// --------------------------------------------------------------------------
 
@@ -120,27 +122,30 @@
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'ipn_method';
-				$_field['label']	= 'IPN Method';
+				$_field					= array();
+				$_field['key']			= 'max_per_order';
+				$_field['label']		= 'Max Per Order';
+				$_field['placeholder']	= 'The maximum number of times this particular product can be added to the basket. Specify 0 for unlimited.';
 
-				echo form_field( $_field );
-
-				// --------------------------------------------------------------------------
-
-				$_field				= array();
-				$_field['key']		= 'max_per_order';
-				$_field['label']	= 'Max Per Order';
-
-				echo form_field( $_field );
+				echo form_field( $_field, 'Limit the number of times an individual product can be added to an order. This only applies to a single product, i.e. an item with a limit of 1 can only be added once, but multiple (different) products of the same type can be added, but only once each. Specify 0 for unlimited.' );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'max_variations';
-				$_field['label']	= 'Max Variations';
+				$_field					= array();
+				$_field['key']			= 'max_variations';
+				$_field['label']		= 'Max Variations';
+				$_field['placeholder']	= 'The maximum number of variations this type of product can have. Specify 0 for unlimited variations.';
 
-				echo form_field( $_field );
+				echo form_field( $_field, 'Define the number of variations this product can have. Specify 0 for unlimited variations.' );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'ipn_method';
+				$_field['label']		= 'Advanced: IPN Method';
+				$_field['placeholder']	= 'Advanced: The IPN method to call upon notification of successfull payment.';
+
+				echo form_field( $_field, 'This method should be callable within the scope of `shop_order_model`. Do not include the `_process` method name prefix here.' );
 
 				// --------------------------------------------------------------------------
 
@@ -159,73 +164,79 @@
 	foreach( $types AS $type ) :
 
 		echo '<div id="edit-' . $type->id . '" style="display:none">';
-		echo '<div class="fieldset">';
-		echo form_open( 'admin/shop/manage/types' . $_is_fancybox );
-		echo form_hidden( 'action', 'edit' );
-		echo form_hidden( 'id', $type->id );
+			echo '<div class="fieldset">';
+				echo form_open( 'admin/shop/manage/types' . $_is_fancybox );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $type->label;
-		$_field['required']	= TRUE;
+					echo form_hidden( 'action', 'edit' );
+					echo form_hidden( 'id', $type->id );
 
-		echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'type[label]';
+					$_field['label']		= 'Label';
+					$_field['default']		= $type->label;
+					$_field['placeholder']	= '';
+					$_field['required']		= TRUE;
 
-		// --------------------------------------------------------------------------
+					echo form_field( $_field );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $type->description;
+					// --------------------------------------------------------------------------
 
-		echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'type[description]';
+					$_field['label']		= 'Description';
+					$_field['type']			= 'textarea';
+					$_field['default']		= $type->description;
+					$_field['placeholder']	= '';
 
-		// --------------------------------------------------------------------------
+					echo form_field( $_field );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[is_physical]';
-		$_field['label']	= 'Is Physical';
-		$_field['text_on']	= strtoupper( lang( 'yes' ) );
-		$_field['text_off']	= strtoupper( lang( 'no' ) );
-		$_field['default']	= $type->is_physical;
+					// --------------------------------------------------------------------------
 
-		echo form_field_boolean( $_field );
+					$_field				= array();
+					$_field['key']		= 'type[is_physical]';
+					$_field['label']	= 'Is Physical';
+					$_field['text_on']	= strtoupper( lang( 'yes' ) );
+					$_field['text_off']	= strtoupper( lang( 'no' ) );
+					$_field['default']	= $type->is_physical;
 
-		// --------------------------------------------------------------------------
+					echo form_field_boolean( $_field );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[ipn_method]';
-		$_field['label']	= 'IPN Method';
-		$_field['default']	= $type->ipn_method;
+					// --------------------------------------------------------------------------
 
-		echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'type[ipn_method]';
+					$_field['label']		= 'IPN Method';
+					$_field['default']		= $type->ipn_method;
+					$_field['placeholder']	= '';
 
-		// --------------------------------------------------------------------------
+					echo form_field( $_field );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[max_per_order]';
-		$_field['label']	= 'Max Per Order';
-		$_field['default']	= $type->max_per_order;
+					// --------------------------------------------------------------------------
 
-		echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'type[max_per_order]';
+					$_field['label']		= 'Max Per Order';
+					$_field['default']		= $type->max_per_order;
+					$_field['placeholder']	= '';
 
-		// --------------------------------------------------------------------------
+					echo form_field( $_field );
 
-		$_field				= array();
-		$_field['key']		= $type->id . '[max_variations]';
-		$_field['label']	= 'Max Variations';
-		$_field['default']	= $type->max_variations;
+					// --------------------------------------------------------------------------
 
-		echo form_field( $_field );
+					$_field					= array();
+					$_field['key']			= 'type[max_variations]';
+					$_field['label']		= 'Max Variations';
+					$_field['default']		= $type->max_variations;
+					$_field['placeholder']	= '';
 
-		// --------------------------------------------------------------------------
+					echo form_field( $_field );
 
-		echo form_field_submit( lang( 'action_save_changes' ), 'submit', 'class="awesome"' );
+					// --------------------------------------------------------------------------
 
-		echo form_close();
-		echo '</div>';
+					echo form_field_submit( lang( 'action_save_changes' ), 'submit', 'class="awesome"' );
+
+				echo form_close();
+			echo '</div>';
 		echo '</div>';
 
 	endforeach;

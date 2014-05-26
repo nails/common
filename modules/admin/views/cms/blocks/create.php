@@ -64,7 +64,7 @@
 		$_field['key']			= 'type';
 		$_field['label']		= 'Block Type';
 		$_field['required']		= TRUE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $block_types );
 
@@ -89,10 +89,6 @@
 
 			//	Value
 			echo form_textarea( 'value', set_value( 'value' ), 'placeholder="Define the default value" id="default_value"' );
-
-			echo '<p id="ckeditor-warn" class="system-alert notice no-close" style="margin-top:10px;">';
-			echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout due to application stylesheets on the front end which are not loaded here.';
-			echo '</p>';
 
 		?>
 	</fieldset>

@@ -27,7 +27,7 @@
 			$_options[75]	= 75;
 			$_options[100]	= 100;
 
-			echo form_dropdown( 'per_page', $_options, $pagination->per_page, 'class="chosen"' );
+			echo form_dropdown( 'per_page', $_options, $pagination->per_page, 'class="select2" style="width:75px;"' );
 
 			echo '<span class="text and">per page</span>';
 

@@ -12,9 +12,7 @@ NAILS_Admin_Shop_Settings = function()
 		// --------------------------------------------------------------------------
 
 		//	Chosens
-		$( 'td.tax_rate select' ).chosen( { width : '100%' });
-		$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
-		$( 'select.chosen-active' ).chosen( { width : '100%' });
+		$( 'select.select2-base' ).select2({ formatNoMatches: 'Ensure currency is active. No currencies match' });
 	};
 
 
@@ -96,7 +94,7 @@ NAILS_Admin_Shop_Settings = function()
 
 			$( '#existing-shipping-methods tbody' ).append( _template );
 			$( '#existing-shipping-methods tbody' ).sortable('refresh');
-			$( 'td.tax_rate select' ).chosen( { width : '100%' });
+			$( 'td.tax_rate select.select2' ).select2();
 			_this._set_order_ship();
 
 			return false;
@@ -259,7 +257,7 @@ NAILS_Admin_Shop_Settings = function()
 
 				//	Rate
 				_value = parseInt( $(this).find( 'td.rate input' ).val(), 10 );
-				if ( _value > 1 || _value < 0 )
+				if ( isNaN( _value ) || _value > 1 || _value < 0 )
 				{
 					$(this).find( 'td.rate' ).addClass( 'error' );
 					_errors++;
@@ -272,7 +270,7 @@ NAILS_Admin_Shop_Settings = function()
 
 			if ( _errors )
 			{
-				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n-Rate must be a numeric in the range 0-1' );
+				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n- Rate must be a numeric in the range 0-1' );
 				return false;
 			}
 

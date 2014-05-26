@@ -32,6 +32,7 @@ NAILS_Admin = function()
 		this.init_fieldsets();
 		this.init_toggles();
 		this.init_ckeditor();
+		this.init_select2();
 	};
 
 
@@ -401,6 +402,27 @@ NAILS_Admin = function()
 		else
 		{
 			this.error('NAILS_ADMIN_JS: CKEditor not available.');
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 *
+	 * Initialise any select2 elements on the page
+	 *
+	 **/
+	this.init_select2 = function()
+	{
+		if ( $.fn.select2 )
+		{
+			$( 'select.select2' ).select2();
+		}
+		else
+		{
+			this.error( 'NAILS_JS: Select2 not available.' );
 		}
 	};
 

@@ -119,6 +119,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field_bucket		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
 		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
 		$_field_data		= isset( $field['data'] )			? $field['data'] 		: array();
+		$_field_info		= isset( $field['info'] )			? $field['info'] 		: FALSE;
 
 		$_help				= array();
 		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_ASSETS_URL . 'img/form/help.png';
@@ -238,6 +239,11 @@ if ( ! function_exists( 'form_field' ) )
 
 		// --------------------------------------------------------------------------
 
+		//	info block
+		$info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+
+		// --------------------------------------------------------------------------
+
 $_out = <<<EOT
 
 	<div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type">
@@ -250,6 +256,7 @@ $_out = <<<EOT
 				$_field_html
 				$_tip
 				$_error
+				$info_block
 			<span>
 		</label>
 	</div>
@@ -1198,10 +1205,12 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['required']			= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']		= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']			= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['style']			= isset( $field['style'] ) ? $field['style'] : FALSE;
 		$_field['readonly']			= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
 		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
 		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
+		$_field['help_block']		= isset( $field['help_block'] )		? $field['help_block'] 	: FALSE;
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
@@ -1248,7 +1257,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 
 		//	Build the select
 		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
-		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
+		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :
 
@@ -1341,6 +1350,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_field['required']			= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']		= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']			= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['style']			= isset( $field['style'] ) ? $field['style'] : FALSE;
 		$_field['readonly']			= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
 		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
 		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
@@ -1404,7 +1414,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 
 		//	Build the select
 		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
-		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
+		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :
 

@@ -5,6 +5,7 @@
 
 			if ( user_has_permission( 'admin.shop.inventory_create' ) ) :
 
+				echo anchor( 'admin/shop/inventory/import', 'Import Items', 'class="awesome small orange right"' );
 				echo anchor( 'admin/shop/inventory/create', 'Add New Item', 'class="awesome small green right"' );
 
 			endif;

@@ -13,7 +13,7 @@
 		<?php
 
 			$_selected = isset( $attribute['attribute_id'] ) ? $attribute['attribute_id'] : NULL;
-			echo form_dropdown( 'attributes[' . $_counter . '][attribute_id]', $attributes, $_selected	, 'class="attributes"' );
+			echo form_dropdown( 'attributes[' . $_counter . '][attribute_id]', $attributes, $_selected	, 'class="attributes select2"' );
 
 		?>
 	</td>
