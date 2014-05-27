@@ -14,7 +14,7 @@
 		$_field				= array();
 		$_field['key']		= 'scaling';
 		$_field['label']	= 'Scaling';
-		$_field['class']	= 'chosen';
+		$_field['class']	= 'select2';
 		$_field['default']	= isset( ${$_field['key']} ) ? ${$_field['key']} : '';
 
 		$_options = array(
@@ -50,7 +50,7 @@
 		$_field				= array();
 		$_field['key']		= 'linking';
 		$_field['label']	= 'Linking';
-		$_field['class']	= 'chosen';
+		$_field['class']	= 'select2';
 		$_field['default']	= isset( ${$_field['key']} ) ? ${$_field['key']} : '';
 
 		$_options = array(
@@ -76,7 +76,7 @@
 		$_field				= array();
 		$_field['key']		= 'target';
 		$_field['label']	= 'Target';
-		$_field['class']	= 'chosen';
+		$_field['class']	= 'select2';
 		$_field['default']	= isset( ${$_field['key']} ) ? ${$_field['key']} : '';
 
 		$_options = array(

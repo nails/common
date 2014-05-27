@@ -41,14 +41,14 @@ var _linking_change = function( value )
 		case 'FULLSIZE' :
 
 			_url.hide();
-			_target.show().trigger( 'chosen:updated' );
+			_target.show().trigger( 'change' );
 			_a_attr.show();
 
 		break;
 		case 'CUSTOM' :
 
 			_url.show();
-			_target.show().trigger( 'chosen:updated' );
+			_target.show().trigger( 'change' );
 			_a_attr.show();
 
 		break;

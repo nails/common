@@ -93,7 +93,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: scrollTo not available.' );
+			this.log( 'NAILS_JS: scrollTo not available.' );
 		}
 	};
 
@@ -119,7 +119,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: Tipsy not available.' );
+			this.log( 'NAILS_JS: Tipsy not available.' );
 		}
 	};
 
@@ -182,7 +182,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: Fancybox not available.' );
+			this.log( 'NAILS_JS: Fancybox not available.' );
 		}
 	};
 
@@ -211,7 +211,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: Chosen not available.' );
+			this.log( 'NAILS_JS: Chosen not available.' );
 		}
 	};
 
@@ -581,7 +581,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: datetimepicker not available.' );
+			this.log( 'NAILS_JS: datetimepicker not available.' );
 		}
 	};
 
@@ -626,7 +626,7 @@ NAILS_JS = function()
 	{
 		if ( window.console && window.ENVIRONMENT !== 'production' )
 		{
-			console.log( output);
+			console.log( output );
 		}
 	};
 
@@ -638,7 +638,19 @@ NAILS_JS = function()
 	{
 		if ( window.console && window.ENVIRONMENT !== 'production' )
 		{
-			console.error( output);
+			console.error( output );
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this.warn = function( output )
+	{
+		if ( window.console && window.ENVIRONMENT !== 'production' )
+		{
+			console.warn( output );
 		}
 	};
 };

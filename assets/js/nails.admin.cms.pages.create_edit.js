@@ -743,8 +743,8 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 						// --------------------------------------------------------------------------
 
-						//	Automatically interpret any selects with the class `chosen` as Chosens
-						_script += 'ui.find( \'select.chosen\' ).chosen({width:\'100%\'});';
+						//	Automatically interpret any selects with the class `select2` as select2's
+						_script += 'ui.find( \'select.select2\' ).select2();';
 
 					_script += '};';
 
@@ -1398,11 +1398,11 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 					// --------------------------------------------------------------------------
 
-					//	Chosen
+					//	Select2
 					/* jshint ignore:start */
-					if ( typeof( $.fn.chosen ) === 'function' )
+					if ( typeof( $.fn.select2 ) === 'function' )
 					{
-						//$( 'select.chosen' ).chosen();
+						//$( 'select.select2' ).select2();
 
 						//	TODO: get this working with the overflow'd parents
 					}
