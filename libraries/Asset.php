@@ -14,11 +14,13 @@ class Asset
 	private $unload_assets;
 
 	private $css				= array();
+	private $css_bower			= array();
 	private $css_nails			= array();
 	private $css_nails_bower	= array();
 	private $css_inline			= array();
 
 	private $js					= array();
+	private $js_bower			= array();
 	private $js_nails			= array();
 	private $js_nails_bower		= array();
 	private $js_inline			= array();
@@ -66,6 +68,10 @@ class Asset
 
 			$this->_load_nails_bower( $assets );
 
+		elseif ( strtoupper( $nails_asset ) === 'APP-BOWER' ) :
+
+			$this->_load_app_bower( $assets );
+
 		else :
 
 			$this->_load_app( $assets );
@@ -94,6 +100,33 @@ class Asset
 
 				case 'CSS' :	$this->css[$asset]	= $asset;	break;
 				case 'JS' :		$this->js[$asset]	= $asset;	break;
+
+			endswitch;
+
+		endforeach;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Load an App bower asset
+	 *
+	 * @access	private
+	 * @param array $assets An array of assets to load
+	 * @return void
+	 **/
+	private function _load_app_bower( $assets )
+	{
+		foreach ( $assets AS $asset ) :
+
+			$_type = $this->_determine_type( $asset );
+
+			switch ( $_type ) :
+
+				case 'CSS' :	$this->css_bower[$asset]	= $asset;	break;
+				case 'JS' :		$this->js_bower[$asset]		= $asset;	break;
 
 			endswitch;
 
@@ -384,11 +417,13 @@ class Asset
 	{
 		$_loaded					= new stdClass();
 		$_loaded->css				= $this->css;
+		$_loaded->css_bower			= $this->css_bower;
 		$_loaded->css_nails			= $this->css_nails;
 		$_loaded->css_nails_bower	= $this->css_nails_bower;
 		$_loaded->css_inline		= $this->css_inline;
 
 		$_loaded->js				= $this->js;
+		$_loaded->js_bower			= $this->js_bower;
 		$_loaded->js_nails			= $this->js_nails;
 		$_loaded->js_nails_bower	= $this->js_nails_bower;
 		$_loaded->js_inline			= $this->js_inline;
@@ -417,11 +452,13 @@ class Asset
 
 				//	CSS
 				unset( $this->css[$asset] );
+				unset( $this->css_bower[$asset] );
 				unset( $this->css_nails[$asset] );
 				unset( $this->css_nails_bower[$asset] );
 
 				//	JS
 				unset( $this->js[$asset] );
+				unset( $this->js_bower[$asset] );
 				unset( $this->js_nails[$asset] );
 				unset( $this->js_nails_bower[$asset] );
 
@@ -439,6 +476,7 @@ class Asset
 
 				$_out .= $this->_print_css_nails_bower();
 				$_out .= $this->_print_css_nails();
+				$_out .= $this->_print_css_bower();
 				$_out .= $this->_print_css();
 
 			break;
@@ -453,6 +491,7 @@ class Asset
 
 				$_out .= $this->_print_js_nails_bower();
 				$_out .= $this->_print_js_nails();
+				$_out .= $this->_print_js_bower();
 				$_out .= $this->_print_js();
 
 			break;
@@ -467,9 +506,11 @@ class Asset
 
 				$_out .= $this->_print_css_nails_bower();
 				$_out .= $this->_print_css_nails();
+				$_out .= $this->_print_css_bower();
 				$_out .= $this->_print_css();
 				$_out .= $this->_print_js_nails_bower();
 				$_out .= $this->_print_js_nails();
+				$_out .= $this->_print_js_bower();
 				$_out .= $this->_print_js();
 
 			break;
@@ -581,6 +622,33 @@ class Asset
 
 
 	/**
+	 * Output the referenced App bower CSS files
+	 *
+	 * @access	private
+	 * @param	none
+	 * @return	string
+	 **/
+	private function _print_css_bower()
+	{
+		$_out = '';
+
+		$this->css_bower = array_filter( $this->css_bower );
+		$this->css_bower = array_unique( $this->css_bower );
+
+		foreach ( $this->css_bower AS $asset ) :
+
+			$_out .= link_tag( 'assets/bower_components/' . $asset ) . "\n";
+
+		endforeach;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
 	 * Output the referenced Nails CSS files
 	 *
 	 * @access	private
@@ -607,7 +675,7 @@ class Asset
 	// --------------------------------------------------------------------------
 
 
-		/**
+	/**
 	 * Output the referenced Nails bower CSS files
 	 *
 	 * @access	private
@@ -681,6 +749,33 @@ class Asset
 
 			$_url  = preg_match( '/[http|https|ftp]:\/\/.*/si', $asset ) ? $asset : site_url( 'assets/js/' . $asset ) ;
 			$_out .= '<script type="text/javascript" src="' . $_url . '"></script>' . "\n";
+
+		endforeach;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Output the referenced App Bower JS files
+	 *
+	 * @access	private
+	 * @param	none
+	 * @return	string
+	 **/
+	private function _print_js_bower()
+	{
+		$_out = '';
+
+		$this->js_bower = array_filter( $this->js_bower );
+		$this->js_bower = array_unique( $this->js_bower );
+
+		foreach ( $this->js_bower AS $asset ) :
+
+			$_out .= '<script type="text/javascript" src="' . site_url( 'assets/bower_components/' . $asset ) . '"></script>' . "\n";
 
 		endforeach;
 
