@@ -1571,7 +1571,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	{
 		$( '#' + this.editor_id ).hide();
 		this._editor_destruct();
-
 	};
 
 
