@@ -1600,7 +1600,7 @@ class NAILS_User_model extends NAILS_Model
 						//	Doesn't appear to be in use, add as a new email address and
 						//	make it the primary one
 
-						$this->email_add( (int) $_uid, $_data_email, TRUE );
+						$this->email_add( $_data_email, (int) $_uid, TRUE );
 
 					endif;
 
@@ -1698,10 +1698,20 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function email_add( $user_id, $email, $is_primary = FALSE, $is_verified = FALSE, $send_email = TRUE )
+	/**
+	 * Adds a new email to the user_email table. Will optionally send the verification email, too.
+	 * @param  string  $email       The email address to add
+	 * @param  int     $user_id     The ID of the user to add for, defaults to active_user( 'id' )
+	 * @param  boolean $is_primary  Whether or not the email address should be the primary email address for the user
+	 * @param  boolean $is_verified Whether ot not the email should be marked as verified
+	 * @param  boolean $send_email  If unverified, whether or not the verification email should be sent
+	 * @return mixed                String containing verification code on success, FALSE on failure
+	 */
+	public function email_add( $email, $user_id = NULL, $is_primary = FALSE, $is_verified = FALSE, $send_email = TRUE )
 	{
-		$_email	= trim( strtolower( $email ) );
-		$_u		= $this->get_by_id( $user_id );
+		$_user_id	= empty( $user_id ) ? active_user( 'id' ) : $user_id;
+		$_email		= trim( strtolower( $email ) );
+		$_u			= $this->get_by_id( $_user_id );
 
 		if ( ! $_u ) :
 
@@ -1733,9 +1743,9 @@ class NAILS_User_model extends NAILS_Model
 				endif;
 
 				//	Resend verification email?
-				if ( ! $_test->is_verified ) :
+				if ( $send_email && ! $_test->is_verified ) :
 
-					$this->_email_add_send_verify( $_u->id, $_u->group_id, $_test->code );
+					$this->email_add_send_verify( $_test->id );
 
 				endif;
 
@@ -1755,6 +1765,7 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Make sure the email is valid
 		$this->load->helper( 'email' );
+
 		if ( ! valid_email( $_email ) ) :
 
 			$this->set_error( '"' . $_email . '" is not a valid email address' );
@@ -1776,17 +1787,20 @@ class NAILS_User_model extends NAILS_Model
 
 		if ( $this->db->affected_rows() ) :
 
+			//	Email ID
+			$_email_id = $this->db->insert_id();
+
 			//	Make it the primary email address?
 			if ( $is_primary ) :
 
-				$this->email_make_primary( $this->db->insert_id() );
+				$this->email_make_primary( $_email_id );
 
 			endif;
 
 			//	Send off the verification email
 			if ( $send_email && ! $is_verified ) :
 
-				$this->_email_add_send_verify( $_u->id, $_u->group_id, $_code );
+				$this->email_add_send_verify( $_email_id );
 
 			endif;
 
@@ -1803,16 +1817,55 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _email_add_send_verify( $user_id, $user_group, $code )
+	public function email_add_send_verify( $email_id, $user_id = NULL )
 	{
+		//	Fetch the email and the suer's group
+		$this->db->select( 'ue.id,ue.code,ue.is_verified,ue.user_id,u.group_id' );
+
+		if ( is_numeric( $email_id ) ) :
+
+			$this->db->where( 'ue.id', $email_id );
+
+		else :
+
+			$this->db->where( 'ue.email', $email_id );
+
+		endif;
+
+		if ( ! empty( $user_id ) ) :
+
+			$this->db->where( 'ue.user_id', $user_id );
+
+		endif;
+
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ue.user_id' );
+
+		$_e = $this->db->get( NAILS_DB_PREFIX . 'user_email ue' )->row();
+
+		if ( ! $_e ) :
+
+			$this->_set_error( 'Invalid Email.' );
+			return FALSE;
+
+		endif;
+
+		if ( $_e->is_verified ) :
+
+			$this->_set_error( 'Email is already verified.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$this->load->library( 'emailer' );
 
 		$_email						= new stdClass();
-		$_email->type				= 'verify_email_' . $user_group;
-		$_email->to_id				= $user_id;
+		$_email->type				= 'verify_email_' . $_e->group_id;
+		$_email->to_id				= $_e->user_id;
 		$_email->data				= array();
-		$_email->data['user_id']	= $user_id;
-		$_email->data['code']		= $code;
+		$_email->data['user_id']	= $_e->user_id;
+		$_email->data['code']		= $_e->code;
 
 		if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
@@ -1822,20 +1875,46 @@ class NAILS_User_model extends NAILS_Model
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 				//	Email failed to send, for now, do nothing.
+				$this->_set_error( 'The verification email failed to send.' );
+				return FALSE;
 
 			endif;
 
 		endif;
+
+		return TRUE;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function email_delete( $email )
+	/**
+	 * Deletes a non-primary email from the user_email table, optionally filtering
+	 * by $user_id
+	 * @param  mixed $email_id The email address, or the Id of the email address to remove
+	 * @param  int $user_id    The ID of the user ot restrict to
+	 * @return bool            TRUE on success, FALSE on failure
+	 */
+	public function email_delete( $email_id, $user_id = NULL )
 	{
+		if ( is_numeric( $email_id ) ) :
+
+			$this->db->where( 'id', $email_id );
+
+		else :
+
+			$this->db->where( 'email', $email_id );
+
+		endif;
+
+		if ( ! empty( $user_id ) ) :
+
+			$this->db->where( 'user_id', $user_id );
+
+		endif;
+
 		$this->db->where( 'is_primary', FALSE );
-		$this->db->where( 'email', $email );
 		$this->db->delete( NAILS_DB_PREFIX . 'user_email' );
 
 		return (bool) $this->db->affected_rows();
@@ -1845,6 +1924,13 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Verifies whether the supplied $code is valid for the requested user ID or email
+	 * address. If it is then the email is marked as verified.
+	 * @param  mixed  $id_email The numeric ID of the user, or the email address
+	 * @param  string $code     The verification code as generated by email_add()
+	 * @return bool             TRUE on successful verification, FALSE on failure
+	 */
 	public function email_verify( $id_email, $code )
 	{
 		//	Check user exists
@@ -1897,18 +1983,23 @@ class NAILS_User_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function email_make_primary( $email )
+	/**
+	 * Sets an email address as the primary email address for that user.
+	 * @param  mixed $id_email The numeric  ID of the email address, or the email address itself
+	 * @return bool            TRUE on success, FALSE on failure
+	 */
+	public function email_make_primary( $id_email )
 	{
-		//	Fetch other emails
+		//	Fetch email
 		$this->db->select( 'id,user_id,email' );
 
-		if ( is_numeric( $email ) ) :
+		if ( is_numeric( $id_email ) ) :
 
-			$this->db->where( 'id', $email );
+			$this->db->where( 'id', $id_email );
 
 		else :
 
-			$this->db->where( 'email', $email );
+			$this->db->where( 'email', $id_email );
 
 		endif;
 
@@ -3249,7 +3340,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Finally add the email address to the user_email table
 		if ( ! empty( $_email ) ) :
 
-			$_code = $this->email_add( $_id, $_email, TRUE, $_email_is_verified, FALSE );
+			$_code = $this->email_add( $_email, $_id, TRUE, $_email_is_verified, FALSE );
 
 			if ( ! $_code ) :
 
