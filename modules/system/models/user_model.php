@@ -1986,9 +1986,10 @@ class NAILS_User_model extends NAILS_Model
 	/**
 	 * Sets an email address as the primary email address for that user.
 	 * @param  mixed $id_email The numeric  ID of the email address, or the email address itself
+	 * @param  int   $user_id  Specify the user ID which this should apply to
 	 * @return bool            TRUE on success, FALSE on failure
 	 */
-	public function email_make_primary( $id_email )
+	public function email_make_primary( $id_email, $user_id = NULL )
 	{
 		//	Fetch email
 		$this->db->select( 'id,user_id,email' );
@@ -2000,6 +2001,12 @@ class NAILS_User_model extends NAILS_Model
 		else :
 
 			$this->db->where( 'email', $id_email );
+
+		endif;
+
+		if ( ! is_null( $user_id ) ) :
+
+			$this->db->where( 'user_id', $user_id );
 
 		endif;
 
