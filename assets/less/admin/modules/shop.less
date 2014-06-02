@@ -50,6 +50,10 @@
 		{
 			th.id,
 			td.id,
+			th.image,
+			td.image,
+			th.status,
+			td.status,
 			th.tax-rate,
 			td.tax-rate,
 			th.price,
@@ -76,6 +80,21 @@
 				min-width:100px;
 			}
 
+			th.image,
+			td.image
+			{
+				width:75px;
+
+				img
+				{
+					border:1px solid #EFEFEF;
+					padding:3px;
+					background:#FFF;
+					.rounded(3px);
+					.nifty-drop-shadow();
+				}
+			}
+
 			td.sold-available
 			{
 				.infinity
@@ -83,6 +102,14 @@
 					font-size:1.5em;
 					top:2px;
 					position:relative;
+				}
+			}
+
+			td.status
+			{
+				span
+				{
+					font-size: 1.5em;
 				}
 			}
 		}

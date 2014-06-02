@@ -375,7 +375,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				$this->form_validation->set_rules( 'variation[' . $index . '][stock_status]',		'',	'xss_clean|callback__callback_inventory_valid_stock_status|required' );
 
-				switch( $this->input->post( 'variation[' . $index . '][stock_status]' ) ) :
+				$_stock_status = isset( $_POST['variation'][$index]['stock_status'] ) ? $_POST['variation'][$index]['stock_status'] : '';
+
+				switch( $_stock_status ) :
 
 					case 'IN_STOCK' :
 

@@ -1,3 +1,6 @@
+<p class="system-alert message no-close">
+	<strong>TODO:</strong> Allow inventory items to be completed on a spreadsheet and imported.
+</p>
 <div class="group-shop inventory import">
 	<p>
 		This facility allows multiple shop items to be imported at once. You must use the <?=anchor( '', APP_NAME . ' Shop Import Template' )?>.

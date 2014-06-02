@@ -45,9 +45,9 @@
 							<td class="image">
 								<?php
 
-									if ( isset( $item->gallery[0] ) ) :
+									if ( ! empty( $item->gallery[0] ) ) :
 
-										echo img( cdn_scale( $item->gallery[0], 64, 64 ) );
+										echo anchor( cdn_serve( $item->gallery[0] ), img( cdn_scale( $item->gallery[0], 75, 75 ) ), 'class="fancybox"' );
 
 									else :
 
@@ -57,9 +57,25 @@
 
 								?>
 							</td>
-							<td class="id">
-								<?=$item->is_active ? '&#10004;' : '&#10006;' ?>
-							</td>
+
+							<?php
+
+							if ( $item->is_active ) :
+
+								echo '<td class="status success">';
+									echo '<span class="ion-checkmark-circled"></span>';
+								echo '</td>';
+
+							else :
+
+								echo '<td class="status error">';
+									echo '<span class="ion-close-circled"></span>';
+								echo '</td>';
+
+							endif;
+
+							?>
+
 							<td class="title">
 								<?=$item->title?>
 								<small><?=word_limiter( strip_tags( $item->description ), 30 )?></small>
