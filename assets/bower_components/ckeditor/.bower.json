@@ -14,15 +14,15 @@
   "authors": "CKSource - Frederico Knabben (http://cksource.com)",
   "license": "http://ckeditor.com/about/license",
   "homepage": "http://ckeditor.com",
-  "version": "4.4.0",
-  "_release": "4.4.0",
+  "version": "4.4.1",
+  "_release": "4.4.1",
   "_resolution": {
     "type": "version",
-    "tag": "4.4.0",
-    "commit": "7d88a6ab0efe61890edb131420a53dc8c7568a74"
+    "tag": "4.4.1",
+    "commit": "86ddb21e08c748eabe69ab00ede0d7a65b1298c7"
   },
   "_source": "git://github.com/ckeditor/ckeditor-releases.git",
-  "_target": "~4.4.0",
+  "_target": "~4.4.1",
   "_originalSource": "ckeditor",
   "_direct": true
 }
