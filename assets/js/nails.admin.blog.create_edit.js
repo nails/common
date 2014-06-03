@@ -10,7 +10,7 @@ NAILS_Admin_Blog_Create_Edit = function()
 	this.init = function( upload_token )
 	{
 		//	Set vars
-		this.upload_token	= upload_token;
+		this.upload_token = upload_token;
 
 		// --------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ NAILS_Admin_Blog_Create_Edit = function()
 
 		//	Init everything!
 		this._init_publish_date();
-		this._init_chosens();
+		this._init_select2();
 		this._init_gallery();
 		this._init_submit();
 	};
@@ -113,7 +113,7 @@ NAILS_Admin_Blog_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._init_chosens = function()
+	this._init_select2 = function()
 	{
 		var _this = this;
 
@@ -129,34 +129,28 @@ NAILS_Admin_Blog_Create_Edit = function()
 		_target.tags	= '#tab-tags select.tags';
 		_url.tags		= window.SITE_URL + 'admin/blog/manage/tags?is_fancybox=1';
 
-		_target.associations = '#tab-associations select';
+		// --------------------------------------------------------------------------
 
+		//	Init select2s
+		// $(_target.categories).select2({
+		// 	//footer_html: '<a href="#" class="manage-categories">Manage Categories</a>',
+		// });
+
+		// $(_target.tags).select2({
+		// 	//footer_html: '<a href="#" class="manage-tags">Manage Tags</a>',
+		// });
 
 		// --------------------------------------------------------------------------
 
-		//	Init chosens
-		$(_target.categories).chosen({
-			footer_html: '<a href="#" class="manage-categories">Manage Categories</a>',
-			width: '100%'
-		});
-
-		$(_target.tags).chosen({
-			footer_html: '<a href="#" class="manage-tags">Manage Tags</a>',
-			width: '100%'
-		});
-
-		$(_target.associations).chosen({
-			width: '100%'
-		});
-
-		// --------------------------------------------------------------------------
-
-		//	Bind fancybox to chosens
-		$(document).on('click', 'a.manage-categories', function() {
+		//	Bind fancybox to select2s
+		$(document).on('click', 'a.manage-categories', function()
+		{
 			$.fancybox.open(_url.categories, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.categories);
+					_this._rebuild_select2(_target.categories);
 				}
 			});
 			return false;
@@ -165,8 +159,10 @@ NAILS_Admin_Blog_Create_Edit = function()
 		$(document).on('click', 'a.manage-tags', function() {
 			$.fancybox.open(_url.tags, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.tags);
+					_this._rebuild_select2(_target.tags);
 				}
 			});
 			return false;
@@ -174,14 +170,13 @@ NAILS_Admin_Blog_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Ensure all chosens are updated when their tab is shown
+		//	Ensure all select2s are updated when their tab is shown
 		$( 'ul.tabs a:not(.disabled)' ).on( 'click', function()
 		{
 			setTimeout(function()
 			{
-				$(_target.categories).trigger( 'chosen:updated' );
-				$(_target.tags).trigger( 'chosen:updated' );
-				$(_target.associations).trigger( 'chosen:updated' );
+				$(_target.categories).trigger( 'change' );
+				$(_target.tags).trigger( 'change' );
 			}, 1);
 		});
 	};
@@ -190,10 +185,12 @@ NAILS_Admin_Blog_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._rebuild_chosen = function(target) {
+	this._rebuild_select2 = function(target)
+	{
 		var _DATA = $('.fancybox-iframe').get(0).contentWindow._DATA;
 
-		if (typeof(_DATA) === 'undefined') {
+		if (typeof(_DATA) === 'undefined')
+		{
 			//	Do nothing, nothing to work with
 			return false;
 		}
@@ -201,13 +198,15 @@ NAILS_Admin_Blog_Create_Edit = function()
 		//	Fetch the target(s)
 		var _targets = $(target);
 
-		if (!_targets.length) {
+		if (!_targets.length)
+		{
 			//	Target doesn't exist, ignore
 			return false;
 		}
 
 		//	Rebuild the target(s)
-		_targets.each(function() {
+		_targets.each(function()
+		{
 			//	Save a referene to the target
 			var _target = this;
 
@@ -215,27 +214,30 @@ NAILS_Admin_Blog_Create_Edit = function()
 			//	and store as an array of ID's
 
 			var _selected = [];
-			$('option:selected', this).each(function() {
+			$('option:selected', this).each(function()
+			{
 				_selected.push(parseInt($(this).val(), 10));
 			});
 
 			//	Rebuild, marking as selected where appropriate
 			$(this).empty();
-			$.each(_DATA, function() {
+			$.each(_DATA, function()
+			{
 				var _option = $('<option>');
 
 				_option.val(this.id);
 				_option.html(this.label);
 
-				if ($.inArray(this.id, _selected) > -1) {
+				if ($.inArray(this.id, _selected) > -1)
+				{
 					_option.prop('selected', true);
 				}
 
 				$(_target).append(_option);
 			});
 
-			//	Trigger the chosen
-			$(this).trigger('chosen:updated');
+			//	Trigger the select2
+			$(this).trigger('change');
 		});
 	};
 

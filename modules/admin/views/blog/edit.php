@@ -125,39 +125,43 @@
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Categories allow for a broad grouping of post topics and should be considered top-level 'containers' for posts of similar content.">categories</u>.
 					</p>
+					<p>
+						<select name="categories[]" multiple="multiple" class="select2 categories">
+						<?php
 
-					<select name="categories[]" multiple="multiple" class="categories">
-					<?php
+							$_post_cats = array();
+							if ( isset( $post->categories ) ) :
 
-						$_post_cats = array();
-						if ( isset( $post->categories ) ) :
+								foreach ( $post->categories AS $cat ) :
 
-							foreach ( $post->categories AS $cat ) :
+									$_post_cats[] = $cat->id;
 
-								$_post_cats[] = $cat->id;
+								endforeach;
+
+							endif;
+
+							$_post_raw	= $this->input->post( 'categories' ) ? $this->input->post( 'categories' ) : $_post_cats;
+							$_post		= array();
+
+							foreach ( $_post_raw AS $key => $value ) :
+
+								$_post[$value] = TRUE;
 
 							endforeach;
 
-						endif;
+							foreach ( $categories AS $category ) :
 
-						$_post_raw	= $this->input->post( 'categories' ) ? $this->input->post( 'categories' ) : $_post_cats;
-						$_post		= array();
+								$_selected = isset( $_post[$category->id] ) ? 'selected="selected"' : '';
+								echo '<option value="' . $category->id . '" ' . $_selected . '>' . $category->label . '</option>';
 
-						foreach ( $_post_raw AS $key => $value ) :
+							endforeach;
 
-							$_post[$value] = TRUE;
-
-						endforeach;
-
-						foreach ( $categories AS $category ) :
-
-							$_selected = isset( $_post[$category->id] ) ? 'selected="selected"' : '';
-							echo '<option value="' . $category->id . '" ' . $_selected . '>' . $category->label . '</option>';
-
-						endforeach;
-
-					?>
-					</select>
+						?>
+						</select>
+					</p>
+					<p>
+						<a href="#" class="manage-categories awesome orange small">Manage Categories</a>
+					</p>
 				</div>
 			<?php endif; ?>
 
@@ -166,39 +170,43 @@
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Tags are generally used to describe your post in more detail.">tags</u>.
 					</p>
+					<p>
+						<select name="tags[]" multiple="multiple" class="tags select2">
+						<?php
 
-					<select name="tags[]" multiple="multiple" class="tags">
-					<?php
+							$_post_tags = array();
+							if ( isset( $post->tags ) ) :
 
-						$_post_tags = array();
-						if ( isset( $post->tags ) ) :
+								foreach ( $post->tags AS $tag ) :
 
-							foreach ( $post->tags AS $tag ) :
+									$_post_tags[] = $tag->id;
 
-								$_post_tags[] = $tag->id;
+								endforeach;
+
+							endif;
+
+							$_post_raw	= $this->input->post( 'tags' ) ? $this->input->post( 'tags' ) : $_post_tags;
+							$_post		= array();
+
+							foreach ( $_post_raw AS $key => $value ) :
+
+								$_post[$value] = TRUE;
 
 							endforeach;
 
-						endif;
+							foreach ( $tags AS $tag ) :
 
-						$_post_raw	= $this->input->post( 'tags' ) ? $this->input->post( 'tags' ) : $_post_tags;
-						$_post		= array();
+								$_selected = isset( $_post[$tag->id] ) ? 'selected="selected"' : '';
+								echo '<option value="' . $tag->id . '" ' . $_selected . '>' . $tag->label . '</option>';
 
-						foreach ( $_post_raw AS $key => $value ) :
+							endforeach;
 
-							$_post[$value] = TRUE;
-
-						endforeach;
-
-						foreach ( $tags AS $tag ) :
-
-							$_selected = isset( $_post[$tag->id] ) ? 'selected="selected"' : '';
-							echo '<option value="' . $tag->id . '" ' . $_selected . '>' . $tag->label . '</option>';
-
-						endforeach;
-
-					?>
-					</select>
+						?>
+						</select>
+					</p>
+					<p>
+						<a href="#" class="manage-tags awesome orange small">Manage Tags</a>
+					</p>
 				</div>
 			<?php endif; ?>
 
@@ -236,7 +244,7 @@
 
 						endif;
 
-						echo '<select name="associations[' . $index . '][]" ' . $_multiple . '>';
+						echo '<select name="associations[' . $index . '][]" ' . $_multiple . ' class="select2">';
 
 							foreach( $assoc->data AS $data ) :
 

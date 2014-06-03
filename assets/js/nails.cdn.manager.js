@@ -47,13 +47,13 @@ NAILS_CDN_Manager =  function() {
 		{
 			if ( this.is_fancybox )
 			{
-				_callable = typeof( parent[this.callback] ) === 'function' ? true : false;
+				_callable = typeof( window.parent._nails_forms[this.callback] ) === 'function' ? true : false;
 			}
 			else
 			{
 				if ( window.opener )
 				{
-					_callable = typeof( window.opener[this.callback] ) === 'function' ? true : false;
+					_callable = typeof( window.opener._nails_forms[this.callback] ) === 'function' ? true : false;
 				}
 				else
 				{
@@ -174,17 +174,17 @@ NAILS_CDN_Manager =  function() {
 
 		$( 'a.insert' ).on( 'click', function()
 		{
-			var _bucket	= $(this).attr( 'data-bucket' );
-			var _file	= $(this).attr( 'data-file' );
-			var _id		= $(this).attr( 'data-id' );
+			var _file		= $(this).attr( 'data-file' );
+			var _id			= $(this).attr( 'data-id' );
+			var _fieldid	= $(this).attr( 'data-fieldid' );
 
 			if ( _this.handler === 'ckeditor' )
 			{
-				_this._insert_ckeditor( _bucket, _file, _id );
+				_this._insert_ckeditor( _file, _id, _fieldid );
 			}
 			else
 			{
-				_this._insert_native( _bucket, _file, _id );
+				_this._insert_native( _file, _id, _fieldid );
 			}
 
 			//	Close window
@@ -240,15 +240,15 @@ NAILS_CDN_Manager =  function() {
 	// --------------------------------------------------------------------------
 
 
-	this._insert_native = function( bucket, file, id )
+	this._insert_native = function( file, id, fieldid )
 	{
 		if ( this.is_fancybox )
 		{
-			parent[this.callback].call( bucket, file, id, this.reopen_fancybox );
+			window.parent._nails_forms[this.callback].call( null, file, id, this.reopen_fancybox, fieldid );
 		}
 		else
 		{
-			window.opener[this.callback].call( bucket, file, id, this.reopen_fancybox );
+			window.opener._nails_forms[this.callback].call( null, file, id, this.reopen_fancybox, fieldid );
 		}
 	};
 
