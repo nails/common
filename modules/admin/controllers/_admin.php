@@ -197,6 +197,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$this->asset->load( 'jquery-cookie/jquery.cookie.js',			'BOWER' );
 		$this->asset->load( 'nails.default.min.js',						TRUE );
 		$this->asset->load( 'nails.admin.min.js',						TRUE );
+		$this->asset->load( 'nails.forms.min.js',						TRUE );
 		$this->asset->load( 'nails.api.min.js',							TRUE );
 
 		//	Libraries
@@ -222,6 +223,10 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$_js .= 'if ( typeof( NAILS_Admin ) === \'function\' ){';
 		$_js .= '_nails_admin = new NAILS_Admin();';
 		$_js .= '_nails_admin.init();';
+		$_js .= '}';
+
+		$_js .= 'if ( typeof( NAILS_Forms ) === \'function\' ){';
+		$_js .= '_nails_forms = new NAILS_Forms();';
 		$_js .= '}';
 
 		$_js .= '});';

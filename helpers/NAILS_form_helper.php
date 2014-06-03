@@ -312,7 +312,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
 		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
 
-		$_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_field_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
 		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
 		$_readonly_cls			= $_field['readonly'] ? 'readonly' : '';
 
@@ -323,20 +323,18 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		// --------------------------------------------------------------------------
 
-		$_out  = '<div class="field mm-file ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
-		$_out .= '<label>';
+		//	Container data
+		$_field_oddeven	= $_field['oddeven'];
+		$_field_type	= $_field['type'];
+
+		// --------------------------------------------------------------------------
 
 		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
+		$_field_label = $_field['label'];
+		$_field_label .= $_field['required'] ? '*' : '';
+		$_field_label .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 
-		//	Does the field have an id?
-		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
-
-		//	Field
+		// --------------------------------------------------------------------------
 
 		//	Choose image button
 		$_force_secure = page_is_secure();
@@ -347,7 +345,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 
-			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=_callback_form_field_mm&bucket=' . $_bucket . '&hash=' . $_hash . '&fieldid=' . $_id;
 
 		else :
 
@@ -362,48 +360,41 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		endif;
 
-		$_out .= '<div class="mm-file-container">';
-
-		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="fancybox awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
+		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_field_tip = $_help['title'] ? img( $_help ) : '';
+
+		// --------------------------------------------------------------------------
 
 		//	If there's post data, use that value instead
 		$_field['default'] = set_value( $_field['key'], $_field['default'] );
 
-		//	Remove button
-		$_display = $_field['default'] ? 'inline-block' : 'none';
+		//	The actual field which is submitted
+		$_field_field = '<input type="hidden" name="' . $_field['key'] . '"  class="mm-file-value" value="' . $_field['default'] . '" />';
 
-		$_out .= '<br /><a href="#" class="awesome small red mm-file-remove" id="' . $_id . '-remove" style="display:' . $_display . '" onclick="return remove_' . $_id . '();">' . lang( 'action_remove' ) . '</a>';
+		// --------------------------------------------------------------------------
+
+		//	Remove button
+		$_remove_display = $_field['default'] ? 'inline-block' : 'none';
+
+		// --------------------------------------------------------------------------
 
 		//	If a default has been specified then show a download link
-		$_out .= '<span id="' . $_id . '-preview" class="mm-file-download">';
-		if ( $_field['default'] ) :
+		$_field_download = $_field['default'] ? anchor( cdn_serve( $_field['default'], TRUE ), 'Download File' ) : '';
 
-			$_out .= anchor( cdn_serve( $_field['default'], TRUE ), 'Download File' );
-
-		endif;
-		$_out .= '</span>';
-
-		//	The actual field which is submitted
-		$_out .= '<input type="hidden" name="' . $_field['key'] . '" id="' . $_id . '-field" value="' . $_field['default'] . '" />';
+		// --------------------------------------------------------------------------
 
 		//	Error
-		if ( $_error && $_field['error'] ) :
+		if ( $_field_error && $_field['error'] ) :
 
-			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			$_field_error = '<span class="error">' . $_field['error'] . '</span>';
 
-		elseif( $_error ) :
+		elseif ( $_field_error ) :
 
-			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+			$_field_error = form_error( $_field['key'], '<span class="error">', '</span>' );
 
 		endif;
-
-		$_out .= '</div>';
-
-		$_out .= '</label>';
-		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
 
@@ -419,91 +410,29 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_scheme = str_replace( '{{filename}}', '{[filename]}', $_scheme );
 		$_scheme = str_replace( '{{extension}}', '{[extension]}', $_scheme );
 
-$_out .= <<<EOT
-
-	<script type="text/javascript">
-
-		$( '#$_id-choose' ).on( 'click', function()
-		{
-			var _href = $(this).attr( 'href' );
-			_href += _href.indexOf( '?' ) >= 0 ? '&is_fancybox=1' : '?is_fancybox=1';
-
-			if ( $.fancybox.isOpen && $.fancybox.opts.type != 'iframe' )
-			{
-				_href += '&reopen_fancybox=' + encodeURIComponent( $.fancybox.opts.href );
-				$.fancybox.close();
-			}
-
-			var _w = $(this).data( 'width' ) ? $(this).data( 'width' ) : null;
-			var _h = $(this).data( 'height' ) ? $(this).data( 'height' ) : null;
-
-			$.fancybox.open({
-				href: _href,
-				type: 'iframe',
-				width: _w,
-				height: _h,
-				iframe: {
-					preload: false // fixes issue with iframe and IE
-				}
-			});
-
-			return false;
-		});
-
-		function callback_$_id( file, id, reopen )
-		{
-			if ( file.length == 0 )
-			{
-				remove_$_id();
-
-				// --------------------------------------------------------------------------
-
-				//	Reopen facybox?
-				if ( reopen.length )
-				{
-					$.fancybox.open({
-						href:reopen
-					});
-				}
-
-				return;
-			}
-
-			// --------------------------------------------------------------------------
-
-			var _scheme = '$_scheme';
-			var _file	= file.split( '.' );
-
-			_scheme = _scheme.replace( '{[filename]}', _file[0] );
-			_scheme = _scheme.replace( '{[extension]}', '.' + _file[1] );
-
-			$( '#$_id-preview' ).html( '<a href="' + _scheme + '">Download</a>' );
-			$( '#$_id-field' ).val( id );
-			$( '#$_id-remove' ).css( 'display', 'inline-block' );
-
-			// --------------------------------------------------------------------------
-
-			//	Reopen facybox?
-			if ( reopen.length )
-			{
-				$.fancybox.open({
-					href:reopen
-				});
-			}
-		}
-
-		function remove_$_id()
-		{
-			$( '#$_id-preview' ).html( '' );
-			$( '#$_id-field' ).val( '' );
-			$( '#$_id-remove' ).css( 'display', 'none' );
-
-			return false;
-		}
-
-	</script>
-
-EOT;
+		$_out  = '<div class="field mm-file ' . $_field_error . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
+		$_out .= '<label>';
+		$_out .= '	<span class="label">';
+		$_out .= '		' . $_field_label;
+		$_out .= '	</span>';
+		$_out .= '	<span class="mm-file-container">';
+		$_out .= '		<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-file-choose">';
+		$_out .= '			Choose';
+		$_out .= '		</a>';
+		$_out .= '		' . $_field_tip;
+		$_out .= '		<br />';
+		$_out .= '		<a href="#" class="awesome small red mm-file-remove" style="display:' . $_remove_display . '">';
+		$_out .= '			Remove';
+		$_out .= '		</a>';
+		$_out .= '		<span class="mm-file-preview">';
+		$_out .= '			' . $_field_download;
+		$_out .= '		</span>';
+		$_out .= '		' . $_field_error;
+		$_out .= '	</span>';
+		$_out .= '</label>';
+		$_out .= '<br /><br />';
+		$_out .= $_field_field;
+		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
 
@@ -531,30 +460,31 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 	{
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['type']			= isset( $field['type'] ) ? $field['type'] : 'text';
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
-		$_field['error']		= isset( $field['error'] ) ? $field['error'] : FALSE;
-		$_field['bucket']		= isset( $field['bucket'] ) ? $field['bucket'] : FALSE;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['id']			= isset( $field['id'] )				? $field['id']			: NULL;
+		$_field['type']			= isset( $field['type'] )			? $field['type']		: 'text';
+		$_field['oddeven']		= isset( $field['oddeven'] )		? $field['oddeven']		: NULL;
+		$_field['key']			= isset( $field['key'] )			? $field['key']			: NULL;
+		$_field['label']		= isset( $field['label'] )			? $field['label']		: NULL;
+		$_field['default']		= isset( $field['default'] )		? $field['default']		: NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] )		? $field['sub_label']	: NULL;
+		$_field['required']		= isset( $field['required'] )		? $field['required']	: FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] )	? $field['placeholder']	: NULL;
+		$_field['readonly']		= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
+		$_field['error']		= isset( $field['error'] )			? $field['error']		: FALSE;
+		$_field['bucket']		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
+		$_field['class']		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field['data']			= isset( $field['data'] )			? $field['data'] 		: array();
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_help					= array();
+		$_help['src']			= is_array( $help ) && isset( $help['src'] )	? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
+		$_help['class']			= is_array( $help ) && isset( $help['class'] )	? $help['class'] : 'help';
+		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy-left';
+		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
+		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
 
-		$_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
-		$_readonly		= $_field['readonly'] ? 'readonly="readonly"' : '';
-		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		$_field_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
+		$_readonly_cls			= $_field['readonly'] ? 'readonly' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -563,32 +493,18 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 		// --------------------------------------------------------------------------
 
-		$_out  = '<div class="field mm-image ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . ' ' . $_field['type'] . '" id="' . $_id . '">';
-		$_out .= '<label>';
+		//	Container data
+		$_field_oddeven	= $_field['oddeven'];
+		$_field_type	= $_field['type'];
+
+		// --------------------------------------------------------------------------
 
 		//	Label
-		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-		$_out .= '</span>';
+		$_field_label = $_field['label'];
+		$_field_label .= $_field['required'] ? '*' : '';
+		$_field_label .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 
-		//	Does the field have an id?
-		$_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
-
-		//	Field
-
-		//	If there's post data, sue that value instead
-		$_field['default'] = set_value( $_field['key'], $_field['default'] );
-
-		//	If a default has been specified then show a preview
-		$_out .= '<span id="' . $_id . '-preview" class="mm-image-preview">';
-		if ( $_field['default'] ) :
-
-			$_out .= img( cdn_scale( $_field['default'], 100, 100 ) );
-
-		endif;
-		$_out .= '</span>';
+		// --------------------------------------------------------------------------
 
 		//	Choose image button
 		$_force_secure = page_is_secure();
@@ -599,7 +515,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 			$_bucket	= urlencode( get_instance()->encrypt->encode( $_field['bucket'] . '|' . $_nonce , APP_PRIVATE_KEY ) );
 			$_hash		= md5( $_field['bucket'] . '|' . $_nonce . '|' . APP_PRIVATE_KEY );
 
-			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=callback_' . $_id . '&bucket=' . $_bucket . '&hash=' . $_hash;
+			$_url		= site_url( 'cdn/manager/browse', $_force_secure ) . '?callback=_callback_form_field_mm_image&bucket=' . $_bucket . '&hash=' . $_hash . '&fieldid=' . $_id;
 
 		else :
 
@@ -614,32 +530,41 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 		endif;
 
-		$_out .= '<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome" id="' . $_id . '-choose">' . lang( 'action_choose' ) . '</a>';
-
-		//	Remove button
-		$_display = $_field['default'] ? 'inline-block' : 'none';
-
-		$_out .= '<br /><a href="#" class="awesome small red mm-image-remove" id="' . $_id . '-remove" style="display:' . $_display . '" onclick="return remove_' . $_id . '();">' . lang( 'action_remove' ) . '</a>';
-
-		//	The actual field which is submitted
-		$_out .= '<input type="hidden" name="' . $_field['key'] . '" id="' . $_id . '-field" value="' . $_field['default'] . '" />';
+		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_field_tip = $_help['title'] ? img( $_help ) : '';
+
+		// --------------------------------------------------------------------------
+
+		//	If there's post data, use that value instead
+		$_field['default'] = set_value( $_field['key'], $_field['default'] );
+
+		//	The actual field which is submitted
+		$_field_field = '<input type="hidden" name="' . $_field['key'] . '"  class="mm-image-value" value="' . $_field['default'] . '" />';
+
+		// --------------------------------------------------------------------------
+
+		//	Remove button
+		$_remove_display = $_field['default'] ? 'inline-block' : 'none';
+
+		// --------------------------------------------------------------------------
+
+		//	If a default has been specified then show a download link
+		$_field_preview = $_field['default'] ? img( cdn_scale( $_field['default'], 100, 100 ) ) : '';
+
+		// --------------------------------------------------------------------------
 
 		//	Error
-		if ( $_error && $_field['error'] ) :
+		if ( $_field_error && $_field['error'] ) :
 
-			$_out .= '<span class="error">' . $_field['error'] . '</span>';
+			$_field_error = '<span class="error">' . $_field['error'] . '</span>';
 
-		elseif( $_error ) :
+		elseif ( $_field_error ) :
 
-			$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+			$_field_error = form_error( $_field['key'], '<span class="error">', '</span>' );
 
 		endif;
-
-		$_out .= '</label>';
-		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
 
@@ -651,91 +576,35 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_scheme = str_replace( '{{height}}', 100, $_scheme );
 		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
 
-$_out .= <<<EOT
+		//	Replace the Mustache style syntax; this could/does get used in mustache templates
+		//	so these fields get stripped out
 
-	<script type="text/javascript">
+		$_scheme = str_replace( '{{filename}}', '{[filename]}', $_scheme );
+		$_scheme = str_replace( '{{extension}}', '{[extension]}', $_scheme );
 
-		$( '#$_id-choose' ).on( 'click', function()
-		{
-			var _href = $(this).attr( 'href' );
-			_href += _href.indexOf( '?' ) >= 0 ? '&is_fancybox=1' : '?is_fancybox=1';
-
-			if ( $.fancybox.isOpen && $.fancybox.opts.type != 'iframe' )
-			{
-				_href += '&reopen_fancybox=' + encodeURIComponent( $.fancybox.opts.href );
-				$.fancybox.close();
-			}
-
-			var _w = $(this).data( 'width' ) ? $(this).data( 'width' ) : null;
-			var _h = $(this).data( 'height' ) ? $(this).data( 'height' ) : null;
-
-			$.fancybox.open({
-				href: _href,
-				type: 'iframe',
-				width: _w,
-				height: _h,
-				iframe: {
-					preload: false // fixes issue with iframe and IE
-				}
-			});
-
-			return false;
-		});
-
-		function callback_$_id( file, id, reopen )
-		{
-			if ( file.length == 0 )
-			{
-				remove_$_id();
-
-				// --------------------------------------------------------------------------
-
-				//	Reopen facybox?
-				if ( reopen.length )
-				{
-					$.fancybox.open({
-						href:reopen
-					});
-				}
-
-				return;
-			}
-
-			// --------------------------------------------------------------------------
-
-			var _scheme	= '$_scheme';
-			var _file	= file.split( '.' );
-
-			_scheme = _scheme.replace( '{{filename}}', _file[0] );
-			_scheme = _scheme.replace( '{{extension}}', '.' + _file[1] );
-
-			$( '#$_id-preview' ).html( '<img src="' + _scheme + '" / >' );
-			$( '#$_id-field' ).val( id );
-			$( '#$_id-remove' ).css( 'display', 'inline-block' );
-
-			// --------------------------------------------------------------------------
-
-			//	Reopen facybox?
-			if ( reopen.length )
-			{
-				$.fancybox.open({
-					href:reopen
-				});
-			}
-		}
-
-		function remove_$_id()
-		{
-			$( '#$_id-preview' ).html( '' );
-			$( '#$_id-field' ).val( '' );
-			$( '#$_id-remove' ).css( 'display', 'none' );
-
-			return false;
-		}
-
-	</script>
-
-EOT;
+		$_out  = '<div class="field mm-image ' . $_field_error . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
+		$_out .= '<label>';
+		$_out .= '	<span class="label">';
+		$_out .= '		' . $_field_label;
+		$_out .= '	</span>';
+		$_out .= '	<span class="mm-image-preview">';
+		$_out .= '		' . $_field_preview;
+		$_out .= '	</span>';
+		$_out .= '	<span class="mm-image-container">';
+		$_out .= '		<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-image-choose">';
+		$_out .= '			Choose';
+		$_out .= '		</a>';
+		$_out .= '		' . $_field_tip;
+		$_out .= '		<br />';
+		$_out .= '		<a href="#" class="awesome small red mm-image-remove" style="display:' . $_remove_display . '">';
+		$_out .= '			Remove';
+		$_out .= '		</a>';
+		$_out .= '		' . $_field_error;
+		$_out .= '	</span>';
+		$_out .= '</label>';
+		$_out .= '<br /><br />';
+		$_out .= $_field_field;
+		$_out .= '</div>';
 
 		// --------------------------------------------------------------------------
 
@@ -857,13 +726,13 @@ $_out = <<<EOT
 				<p class="system-alert error no-close" id="$_id-uploadify-not-available">
 					<strong>Configuration Error.</strong> Uploadify is not available.
 				</p>
-				<div id="$_id-uploadify-available" style="display:none;">
-					<ul id="$_id-filelist" class="filelist ">
+				<span id="$_id-uploadify-available" style="display:none;">
+					<ul id="$_id-filelist" class="filelist empty">
 						$_default_html
 						<li class="empty">No Images, add some now.</li>
 					</ul>
 					<button id="$_id-uploadify">Choose Images</button>
-				</div>
+				</span>
 				$_error
 			<span>
 		</label>
@@ -904,6 +773,7 @@ $_out = <<<EOT
 			'debug': false,
 			'auto': true,
 			'swf': '$_movie_url',
+			'buttonText':'Add Images',
 			'uploader': '$_upload_url',
 			'fileObjName': 'upload',
 			'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',

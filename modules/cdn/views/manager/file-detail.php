@@ -59,7 +59,7 @@
 
 		echo '<div class="actions">';
 
-			echo '<a href="#" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
+			echo '<a href="#" data-fieldid="' . $this->input->get( 'fieldid' ) . '" data-id="' . $object->id . '" data-bucket="' . $bucket->slug .'" data-file="' . $object->filename .'" class="awesome green small insert">Insert</a>';
 			echo anchor( site_url( 'cdn/manager/delete/' . $object->id . '?' . $_SERVER['QUERY_STRING'], page_is_secure() ), 'Delete', 'class="awesome red small delete"' );
 			echo anchor( $_url, $_action, 'data-fancybox-title="' . $object->filename_display . '" data-fancybox-type="' . $_fancybox_type . '" class="' . $_fancybox_class . ' awesome small"' );
 
