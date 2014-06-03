@@ -43,6 +43,7 @@
 				$_field['class']		= 'type_id select2';
 				$_field['id']			= 'type_id';
 				$_field['info']			= '<a href="#" class="manage-types awesome orange small">Manage Product Types</a>';
+				$_field['default']		= ! empty( $item->type->id ) ? $item->type->id : NULL;
 
 				if ( count( $product_types_flat ) == 1 ) :
 
@@ -65,6 +66,7 @@
 				$_field['label']		= 'Title';
 				$_field['required']		= TRUE;
 				$_field['placeholder']	= 'Give this product a title';
+				$_field['default']		= ! empty( $item->title ) ? $item->title : '';
 
 				echo form_field( $_field );
 
@@ -76,6 +78,7 @@
 				$_field['default']		= TRUE;
 				$_field['text_on']		= strtoupper( lang( 'yes' ) );
 				$_field['text_off']		= strtoupper( lang( 'no' ) );
+				$_field['default']		= ! empty( $item->is_active ) ? $item->is_active : TRUE;
 
 				echo form_field_boolean( $_field );
 
@@ -88,6 +91,24 @@
 				$_field['info']		= '<a href="#" class="manage-brands awesome orange small">Manage Brands</a>';
 				$_tip				= 'If this product contains multiple brands (e.g a hamper) specify them all here.';
 
+				//	Defaults
+				if ( $this->input->post( 'brands' ) ) :
+
+					$_field['default'] = $this->input->post( 'brands' );
+
+				elseif( ! empty( $item->brands ) ) :
+
+					$_field['default'] = array();
+
+					//	Build an array which matches the potential $_POST array
+					foreach( $item->brands AS $brand ) :
+
+						$_field['default'][] = $brand->id;
+
+					endforeach;
+
+				endif;
+
 				echo form_field_dropdown_multiple( $_field, $brands, $_tip );
 
 				// --------------------------------------------------------------------------
@@ -98,6 +119,24 @@
 				$_field['class']	= 'categories select2';
 				$_field['info']		= '<a href="#" class="manage-categories awesome orange small">Manage Categories</a>';
 				$_tip				= 'Specify which categories this product falls into.';
+
+				//	Defaults
+				if ( $this->input->post( 'categories' ) ) :
+
+					$_field['default'] = $this->input->post( 'categories' );
+
+				elseif( ! empty( $item->categories ) ) :
+
+					$_field['default'] = array();
+
+					//	Build an array which matches the potential $_POST array
+					foreach( $item->categories AS $category ) :
+
+						$_field['default'][] = $category->id;
+
+					endforeach;
+
+				endif;
 
 				echo form_field_dropdown_multiple( $_field, $categories, $_tip );
 
@@ -110,6 +149,24 @@
 				$_field['info']		= '<a href="#" class="manage-tags awesome orange small">Manage Tags</a>';
 				$_tip				= 'Use tags to associate products together, e.g. events.';
 
+				//	Defaults
+				if ( $this->input->post( 'tags' ) ) :
+
+					$_field['default'] = $this->input->post( 'tags' );
+
+				elseif( ! empty( $item->tags ) ) :
+
+					$_field['default'] = array();
+
+					//	Build an array which matches the potential $_POST array
+					foreach( $item->tags AS $tag ) :
+
+						$_field['default'][] = $tag->id;
+
+					endforeach;
+
+				endif;
+
 				echo form_field_dropdown_multiple( $_field, $tags, $_tip );
 
 				// --------------------------------------------------------------------------
@@ -120,6 +177,7 @@
 				$_field['class']	= 'tax_rate_id select2';
 				$_field['required']	= TRUE;
 				$_field['info']		= '<a href="#" class="manage-tax-rates awesome orange small">Manage Tax Rates</a>';
+				$_field['default']	= ! empty( $item->tax_rate->id ) ? $item->tax_rate->id : NULL;
 
 				echo form_field_dropdown( $_field, $tax_rates );
 
@@ -127,8 +185,17 @@
 		</div>
 
 		<div class="tab page description" id="tab-description">
-			<?=form_error( 'description', '<p class="system-alert error no-close">', '</p>' )?>
-			<textarea class="wysiwyg" name="description"><?=set_value( 'description' )?></textarea>
+		<?php
+
+			$_field				= array();
+			$_field['key']		= 'description';
+			$_field['default']	= ! empty( $item->description ) ? $item->description : '';
+
+
+			echo form_error( $_field['key'], '<p class="system-alert error no-close">', '</p>' );
+			echo form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), 'class="wysiwyg"' );
+
+		?>
 		</div>
 
 		<div class="tab page variations" id="tab-variations">
@@ -147,10 +214,33 @@
 					$_data['counter']	= 0;
 
 					//	Render, if there's POST then make sure we render it enough times
+					//	Otherwise check to see if there's $item data
 
 					if ( $this->input->post( 'variation' ) ) :
 
-						foreach ( $this->input->post( 'variation' ) AS $variation ) :
+						$_variations = $this->input->post( 'variation' );
+
+					elseif( ! empty( $item->variations ) ) :
+
+						$_variations = array();
+
+						//	Build an array which matches the potential $_POST array
+						foreach( $item->variations AS $variation ) :
+
+							$_variations[] = $variation;
+
+						endforeach;
+
+					else :
+
+						$_variations = array();
+
+					endif;
+
+
+					if ( ! empty( $_variations ) ) :
+
+						foreach ( $_variations AS $variation ) :
 
 							$_data['variation'] = $variation;
 
@@ -214,15 +304,35 @@
 				<strong>Please be patient while files upload.</strong>
 				<br />Tabs have been disabled until uploads are complete.
 			</p>
-			<ul id="gallery-items" class="<?=$this->input->post( 'gallery' ) ? '' : 'empty' ?>">
+			<?php
+
+				//	Render, if there's POST then make sure we render it enough times
+				//	Otherwise check to see if there's $item data
+
+				if ( $this->input->post( 'gallery' ) ) :
+
+					$_gallery = $this->input->post( 'gallery' );
+
+				elseif( ! empty( $item->gallery ) ) :
+
+					$_gallery = $item->gallery;
+
+				else :
+
+					$_gallery = array();
+
+				endif;
+
+			?>
+			<ul id="gallery-items" class="<?=! empty( $_gallery ) ? '' : 'empty' ?>">
 				<li class="empty">
 					No images, why not upload some?
 				</li>
 				<?php
 
-					if ( $this->input->post( 'gallery' ) ) :
+					if ( ! empty( $_gallery ) ) :
 
-						foreach( $this->input->post( 'gallery' ) AS $image ) :
+						foreach( $_gallery AS $image ) :
 
 							$this->load->view( 'admin/shop/inventory/utilities/template-mustache-gallery-item', array( 'object_id' => $image ) );
 
@@ -249,10 +359,34 @@
 				<tbody id="product-attributes">
 					<?php
 
+						//	Render, if there's POST then make sure we render it enough times
+						//	Otherwise check to see if there's $item data
+
 						if ( $this->input->post( 'attributes' ) ) :
 
+							$_attributes = $this->input->post( 'attributes' );
+
+						elseif( ! empty( $item->attributes ) ) :
+
+							$_attributes = array();
+
+							//	Build an array which matches the potential $_POST array
+							foreach( $item->attributes AS $attribute ) :
+
+								$_attributes[] = (array) $attribute;
+
+							endforeach;
+
+						else :
+
+							$_attributes = array();
+
+						endif;
+
+						if ( ! empty( $_attributes ) ) :
+
 							$_counter = 0;
-							foreach ( $this->input->post( 'attributes' ) AS $attribute ) :
+							foreach ( $_attributes AS $attribute ) :
 
 								$_data = array( 'attribute' => $attribute, 'counter' => $_counter );
 								$this->load->view( 'admin/shop/inventory/utilities/template-mustache-attribute', $_data );
@@ -278,7 +412,7 @@
 			</p>
 			<p>
 				A range is an actual line of stock, or a range of products from one of your
-				suppliers. For example this might be the 'Larsson' range from 'Neptune'.
+				suppliers. For example this might be the 'Jimi Hendrix' range from 'Vintage Rock Tees'.
 			</p>
 			<p>
 				Collections offer you a unique way to combine stock into 'smart' categories,
@@ -292,7 +426,29 @@
 				<select name="ranges[]" class="ranges select2" multiple="multiple" style="width:100%">
 				<?php
 
-					$_selected = $this->input->post( 'ranges' ) ? : array();
+					//	Render, if there's POST then make sure we render it enough times
+					//	Otherwise check to see if there's $item data
+
+					if ( $this->input->post( 'ranges' ) ) :
+
+						$_selected = $this->input->post( 'ranges' );
+
+					elseif( ! empty( $item->ranges ) ) :
+
+						$_selected = array();
+
+						//	Build an array which matches the potential $_POST array
+						foreach( $item->ranges AS $range ) :
+
+							$_selected[] = $range->id;
+
+						endforeach;
+
+					else :
+
+						$_selected = array();
+
+					endif;
 
 					foreach ( $ranges AS $range ) :
 
@@ -326,7 +482,29 @@
 				<select name="collections[]" class="collections select2" multiple="multiple" style="width:100%">
 				<?php
 
-					$_selected = $this->input->post( 'collections' ) ? : array();
+					//	Render, if there's POST then make sure we render it enough times
+					//	Otherwise check to see if there's $item data
+
+					if ( $this->input->post( 'collections' ) ) :
+
+						$_selected = $this->input->post( 'collections' );
+
+					elseif( ! empty( $item->collections ) ) :
+
+						$_selected = array();
+
+						//	Build an array which matches the potential $_POST array
+						foreach( $item->collections AS $collection ) :
+
+							$_selected[] = $collection->id;
+
+						endforeach;
+
+					else :
+
+						$_selected = array();
+
+					endif;
 
 					foreach ( $collections AS $collection ) :
 
@@ -365,6 +543,7 @@
 					$_field['key']			= 'seo_title';
 					$_field['label']		= 'Title';
 					$_field['placeholder']	= 'Search Engine Optimised title';
+					$_field['default']		= ! empty( $item->seo_title ) ? $item->seo_title : '';
 
 					echo form_field( $_field, 'Keep this below 100 characters' );
 
@@ -375,6 +554,7 @@
 					$_field['label']		= 'Description';
 					$_field['placeholder']	= 'Search Engine Optimised description';
 					$_field['type']			= 'textarea';
+					$_field['default']		= ! empty( $item->seo_description ) ? $item->seo_description : '';
 
 					echo form_field( $_field, 'Keep this relevant and below 140 characters' );
 
@@ -384,6 +564,7 @@
 					$_field['key']			= 'seo_keywords';
 					$_field['label']		= 'Keywords';
 					$_field['placeholder']	= 'Comma separated keywords';
+					$_field['default']		= ! empty( $item->seo_keywords ) ? $item->seo_keywords : '';
 
 					echo form_field( $_field, 'Comma seperated keywords. Try to keep to 10 or fewer.' );
 
@@ -393,17 +574,22 @@
 
 	</section>
 	<p>
-		<?=form_submit( 'submit', lang( 'action_create' ) )?>
+	<?php
+
+		$_action = empty( $item->id ) ? lang( 'action_create' ) : lang( 'action_save_changes' );
+		echo form_submit( 'submit', $_action );
+
+	?>
 	</p>
 	<?=form_close()?>
 </div>
 
 <script type="text/javascript">
-	var _CREATE;
+	var _CREATE_EDIT;
 	$(function(){
 
-		_CREATE	= new NAILS_Admin_Shop_Inventory_Create_Edit();
-		_CREATE.init( '_CREATE', <?=json_encode( $product_types )?>, '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
+		_CREATE_EDIT	= new NAILS_Admin_Shop_Inventory_Create_Edit();
+		_CREATE_EDIT.init(  <?=json_encode( $product_types )?>, '<?=$this->cdn->generate_api_upload_token( active_user( 'id' ) ) ?>' );
 
 	});
 </script>

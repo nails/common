@@ -1,7 +1,6 @@
 var NAILS_Admin_Shop_Inventory_Create_Edit;
 NAILS_Admin_Shop_Inventory_Create_Edit = function()
 {
-	this.mode				= null;
 	this.product_types		= [];
 	this.upload_token		= null;
 	this._api				= null;
@@ -11,10 +10,9 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this.init = function( mode, product_types, upload_token )
+	this.init = function( product_types, upload_token )
 	{
 		//	Set vars
-		this.mode			= mode;
 		this.product_types	= product_types;
 		this.upload_token	= upload_token;
 

@@ -341,168 +341,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			//	Form validation, this'll be fun...
 			$this->load->library( 'form_validation' );
 
-
-			//	Product Info
-			//	============
-			$this->form_validation->set_rules( 'type_id',			'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'brands',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'categories',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'tags',				'',	'xss_clean' );
-			$this->form_validation->set_rules( 'tax_rate_id',		'',	'xss_clean|required' );
-
-			// --------------------------------------------------------------------------
-
-			//	Description
-			//	===========
-			$this->form_validation->set_rules( 'description',		'',	'required' );
-
-			// --------------------------------------------------------------------------
-
-			//	Variants - Loop variants
-			//	========================
-			foreach ( $this->input->post( 'variation' ) AS $index => $v ) :
-
-				//	Details
-				//	-------
-
-				$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
-				$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
-
-				//	Stock
-				//	-----
-
-				$this->form_validation->set_rules( 'variation[' . $index . '][stock_status]',		'',	'xss_clean|callback__callback_inventory_valid_stock_status|required' );
-
-				$_stock_status = isset( $_POST['variation'][$index]['stock_status'] ) ? $_POST['variation'][$index]['stock_status'] : '';
-
-				switch( $_stock_status ) :
-
-					case 'IN_STOCK' :
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|callback__callback_inventory_valid_quantity' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean' );
-
-					break;
-
-					case 'TO_ORDER' :
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean|is_natural_no_zero' );
-
-					break;
-
-					case 'OUT_OF_STOCK' :
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean' );
-						$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean' );
-
-					break;
-
-				endswitch;
-
-				//	Meta
-				//	----
-
-				//	Any custom checks for the extra meta fields
-				if ( isset( $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) && $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) :
-
-					//	Process each rule
-					foreach( $this->data['product_types_meta'][$this->input->post( 'type_id' )] AS $field ) :
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][meta][' . $field->key . ']',	$field->label,	$field->validation );
-
-					endforeach;
-
-				endif;
-
-				//	Pricing
-				//	-------
-				if ( isset( $v['pricing'] ) ) :
-
-					foreach( $v['pricing'] AS $price_index => $price ) :
-
-						$_required	= $price['currency_id'] == SHOP_BASE_CURRENCY_ID ? '|required' : '';
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][price]',		'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
-						$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][sale_price]',	'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
-
-					endforeach;
-
-				endif;
-
-				//	Gallery Associations
-				//	--------------------
-				if ( isset( $v['gallery'] ) ) :
-
-					foreach( $v['gallery'] AS $gallery_index => $image ) :
-
-						$this->form_validation->set_rules( 'variation[' . $index . '][gallery][' . $gallery_index . ']',	'',	'xss_clean' );
-
-					endforeach;
-
-				endif;
-
-				//	Shipping
-				//	--------
-
-				//	If this product type is_physical then ensure that the dimensions are specified
-				$_rules			= 'xss_clean';
-				$_rules_unit	= 'xss_clean';
-
-				foreach( $this->data['product_types'] AS $type ) :
-
-					if ( $type->id == $this->input->post( 'type_id' ) && $type->is_physical ) :
-
-						$_rules			.= '|required|numeric';
-						$_rules_unit	.= '|required';
-						break;
-
-					endif;
-
-				endforeach;
-
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][length]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][width]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][height]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][measurement_unit]',	'',	$_rules_unit );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight]',			'',	$_rules );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight_unit]',		'',	$_rules_unit );
-				$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',	'',	'xss_clean' );
-
-			endforeach;
-
-			// --------------------------------------------------------------------------
-
-			//	Gallery
-			$this->form_validation->set_rules( 'gallery',			'',	'xss_clean' );
-
-			// --------------------------------------------------------------------------
-
-			//	Attributes
-			$this->form_validation->set_rules( 'attributes',		'',	'xss_clean' );
-
-			// --------------------------------------------------------------------------
-
-			//	Ranges & Collections
-			$this->form_validation->set_rules( 'ranges',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'collections',		'',	'xss_clean' );
-
-			// --------------------------------------------------------------------------
-
-			//	SEO
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
-
-			// --------------------------------------------------------------------------
-
-			//	Set messages
-			$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
-			$this->form_validation->set_message( 'numeric',				lang( 'fv_numeric' ) );
-			$this->form_validation->set_message( 'is_natural',			lang( 'fv_is_natural' ) );
-			$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_is_natural_no_zero' ) );
+			//	Define all the rules
+			$this->__inventory_form_validation_rules();
 
 			// --------------------------------------------------------------------------
 
@@ -581,6 +421,175 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
+	protected function __inventory_form_validation_rules()
+	{
+		//	Product Info
+		//	============
+		$this->form_validation->set_rules( 'type_id',			'',	'xss_clean|required' );
+		$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+		$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+		$this->form_validation->set_rules( 'brands',			'',	'xss_clean' );
+		$this->form_validation->set_rules( 'categories',		'',	'xss_clean' );
+		$this->form_validation->set_rules( 'tags',				'',	'xss_clean' );
+		$this->form_validation->set_rules( 'tax_rate_id',		'',	'xss_clean|required' );
+
+		// --------------------------------------------------------------------------
+
+		//	Description
+		//	===========
+		$this->form_validation->set_rules( 'description',		'',	'required' );
+
+		// --------------------------------------------------------------------------
+
+		//	Variants - Loop variants
+		//	========================
+		foreach ( $this->input->post( 'variation' ) AS $index => $v ) :
+
+			//	Details
+			//	-------
+
+			$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
+
+			//	Stock
+			//	-----
+
+			$this->form_validation->set_rules( 'variation[' . $index . '][stock_status]',		'',	'xss_clean|callback__callback_inventory_valid_stock_status|required' );
+
+			$_stock_status = isset( $_POST['variation'][$index]['stock_status'] ) ? $_POST['variation'][$index]['stock_status'] : '';
+
+			switch( $_stock_status ) :
+
+				case 'IN_STOCK' :
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean|callback__callback_inventory_valid_quantity' );
+					$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean' );
+
+				break;
+
+				case 'TO_ORDER' :
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean|is_natural_no_zero' );
+
+				break;
+
+				case 'OUT_OF_STOCK' :
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][quantity_available]',	'',	'xss_clean' );
+					$this->form_validation->set_rules( 'variation[' . $index . '][lead_time]',			'',	'xss_clean' );
+
+				break;
+
+			endswitch;
+
+			//	Meta
+			//	----
+
+			//	Any custom checks for the extra meta fields
+			if ( isset( $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) && $this->data['product_types_meta'][$this->input->post( 'type_id' )] ) :
+
+				//	Process each rule
+				foreach( $this->data['product_types_meta'][$this->input->post( 'type_id' )] AS $field ) :
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][meta][' . $field->key . ']',	$field->label,	$field->validation );
+
+				endforeach;
+
+			endif;
+
+			//	Pricing
+			//	-------
+			if ( isset( $v['pricing'] ) ) :
+
+				foreach( $v['pricing'] AS $price_index => $price ) :
+
+					$_required	= $price['currency_id'] == SHOP_BASE_CURRENCY_ID ? '|required' : '';
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][price]',		'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
+					$this->form_validation->set_rules( 'variation[' . $index . '][pricing][' . $price_index . '][sale_price]',	'',	'xss_clean|callback__callback_inventory_valid_price' . $_required );
+
+				endforeach;
+
+			endif;
+
+			//	Gallery Associations
+			//	--------------------
+			if ( isset( $v['gallery'] ) ) :
+
+				foreach( $v['gallery'] AS $gallery_index => $image ) :
+
+					$this->form_validation->set_rules( 'variation[' . $index . '][gallery][' . $gallery_index . ']',	'',	'xss_clean' );
+
+				endforeach;
+
+			endif;
+
+			//	Shipping
+			//	--------
+
+			//	If this product type is_physical then ensure that the dimensions are specified
+			$_rules			= 'xss_clean';
+			$_rules_unit	= 'xss_clean';
+
+			foreach( $this->data['product_types'] AS $type ) :
+
+				if ( $type->id == $this->input->post( 'type_id' ) && $type->is_physical ) :
+
+					$_rules			.= '|required|numeric';
+					$_rules_unit	.= '|required';
+					break;
+
+				endif;
+
+			endforeach;
+
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][length]',			'',	$_rules );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][width]',			'',	$_rules );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][height]',			'',	$_rules );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][measurement_unit]',	'',	$_rules_unit );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight]',			'',	$_rules );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][weight_unit]',		'',	$_rules_unit );
+			$this->form_validation->set_rules( 'variation[' . $index . '][shipping][collection_only]',	'',	'xss_clean' );
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Gallery
+		$this->form_validation->set_rules( 'gallery',			'',	'xss_clean' );
+
+		// --------------------------------------------------------------------------
+
+		//	Attributes
+		$this->form_validation->set_rules( 'attributes',		'',	'xss_clean' );
+
+		// --------------------------------------------------------------------------
+
+		//	Ranges & Collections
+		$this->form_validation->set_rules( 'ranges',			'',	'xss_clean' );
+		$this->form_validation->set_rules( 'collections',		'',	'xss_clean' );
+
+		// --------------------------------------------------------------------------
+
+		//	SEO
+		$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
+		$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+		$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+
+		// --------------------------------------------------------------------------
+
+		//	Set messages
+		$this->form_validation->set_message( 'required',			lang( 'fv_required' ) );
+		$this->form_validation->set_message( 'numeric',				lang( 'fv_numeric' ) );
+		$this->form_validation->set_message( 'is_natural',			lang( 'fv_is_natural' ) );
+		$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_is_natural_no_zero' ) );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _inventory_import()
 	{
 		$this->data['page']->title = 'Import Inventory Items';
@@ -643,7 +652,135 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_edit()
 	{
-		dump( 'edit inventory' );
+		//	Fetch item
+		$this->data['item'] = $this->product->get_by_id( $this->uri->segment( 5 ) );
+
+		if ( ! $this->data['item'] ) :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could not find a product by that ID.' );
+			redirect( 'admin/shop/inventory' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['page']->title = 'Edit Inventory Item "' . $this->data['item']->title . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch data, this data is used in both the view and the form submission
+		$this->data['product_types'] = $this->product->get_product_types();
+
+		if ( ! $this->data['product_types'] ) :
+
+			//	No Product types, some need added, yo!
+			$this->session->set_flashdata( 'message', '<strong>Hey!</strong> No product types have been defined. You must set some before you can add inventory items.' );
+			redirect( 'admin/shop/manage/types?create=true' );
+
+		endif;
+
+		$this->data['currencies'] = $this->currency->get_all();
+
+		//	Fetch product meta fields
+		$_product_types						= $this->product->get_product_types();
+		$this->data['product_types_meta']	= array();
+
+		foreach ( $_product_types AS $type ) :
+
+			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
+
+				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
+
+			else :
+
+				$this->data['product_types_meta'][$type->id] = array();
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Process POST
+		if ( $this->input->post() ) :
+
+			//	Form validation, this'll be fun...
+			$this->load->library( 'form_validation' );
+
+			//	Define all the rules
+			$this->__inventory_form_validation_rules();
+
+			// --------------------------------------------------------------------------
+
+			if ( $this->form_validation->run( $this ) ) :
+
+				//	Validated! Create the product
+				$_product = $this->product->update( $this->data['item']->id, $this->input->post() );
+
+				if ( $_product ) :
+
+					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product was updated successfully.' );
+					redirect( 'admin/shop/inventory' );
+					return;
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem updating the Product. ' . $this->product->last_error();
+
+				endif;
+
+			else :
+
+				$this->data['error'] = '<strong>Whoops!</strong> There are some problems with the form.';
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Load additional models
+		$this->load->model( 'shop/shop_attribute_model',	'attribute' );
+		$this->load->model( 'shop/shop_brand_model',		'brand' );
+		$this->load->model( 'shop/shop_category_model',		'category' );
+		$this->load->model( 'shop/shop_collection_model',	'collection' );
+		$this->load->model( 'shop/shop_range_model',		'range' );
+		$this->load->model( 'shop/shop_tag_model',			'tag' );
+
+		// --------------------------------------------------------------------------
+
+		//	Fetch additional data
+		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
+		$this->data['tax_rates']			= $this->tax->get_all_flat();
+		$this->data['attributes']			= $this->attribute->get_all_flat();
+		$this->data['brands']				= $this->brand->get_all_flat();
+		$this->data['categories']			= $this->category->get_all_nested_flat();
+		$this->data['collections']			= $this->collection->get_all();
+		$this->data['ranges']				= $this->range->get_all();
+		$this->data['tags']					= $this->tag->get_all_flat();
+
+		$this->data['tax_rates'] = array( 'No Tax' ) + $this->data['tax_rates'];
+
+		// --------------------------------------------------------------------------
+
+		//	Assets
+		$this->asset->library( 'ckeditor' );
+		$this->asset->library( 'uploadify' );
+		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
+		$this->asset->load( 'mustache/mustache.js',										'BOWER' );
+		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js',			TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Libraries
+		$this->load->library( 'mustache' );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'admin/shop/inventory/edit',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 

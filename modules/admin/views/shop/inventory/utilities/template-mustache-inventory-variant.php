@@ -6,9 +6,17 @@
 	//	automatically because of the Mustache ' . $_counter . ' variable.
 
 	//	Additionally, make sure it's not === FALSE as the value can persist when
-//	this view is loaded multiple times.
+	//	this view is loaded multiple times.
 
 	$_counter = isset( $variation ) && $counter !== FALSE ? $counter : '{{counter}}';
+
+
+	//	Pass the vraiation ID along for the ride too
+	if ( ! empty( $variation->id ) ) :
+
+		echo form_hidden( 'variation[' . $_counter . '][id]', $variation->id );
+
+	endif;
 
 ?>
 <div id="variation-<?=$_counter?>" class="variation" data-counter="<?=$_counter?>">
@@ -49,6 +57,7 @@
 				$_field['label']		= 'Label';
 				$_field['required']		= TRUE;
 				$_field['placeholder']	= 'Give this variation a title';
+				$_field['default']		= ! empty( $variation->label ) ? $variation->label : '';
 
 				echo form_field( $_field );
 
@@ -58,6 +67,7 @@
 				$_field['key']			= 'variation[' . $_counter . '][sku]';
 				$_field['label']		= 'SKU';
 				$_field['placeholder']	= 'This variation\'s Stock Keeping Unit; a unique offline identifier (e.g for POS or warehouses)';
+				$_field['default']		= ! empty( $variation->sku ) ? $variation->sku : '';
 
 				echo form_field( $_field );
 
@@ -68,7 +78,7 @@
 				$_field['label']		= 'Stock Status';
 				$_field['class']		= 'select2 stock-status';
 				$_field['required']		= TRUE;
-				$_field['default']		= 'IN_STOCK';
+				$_field['default']		= ! empty( $variation->stock_status ) ? $variation->stock_status : 'IN_STOCK';
 
 				$_options					= array();
 				$_options['IN_STOCK']		= 'In Stock';
@@ -79,9 +89,9 @@
 
 				// --------------------------------------------------------------------------
 
-				$_status = set_value( 'variation[' . $_counter . '][stock_status]', 'IN_STOCK' );
+				$_status	= set_value( 'variation[' . $_counter . '][stock_status]', $_field['default'] );
+				$_display	= $_status == 'IN_STOCK' ? 'block' : 'none';
 
-				$_display = $_status == 'IN_STOCK' ? 'block' : 'none';
 				echo '<div class="stock-status-field IN_STOCK" style="display:' . $_display . '">';
 
 					$_field					= array();
@@ -89,6 +99,7 @@
 					$_field['label']		= 'Quantity Available';
 					$_field['required']		= TRUE;
 					$_field['placeholder']	= 'How many units of this variation are available? Leave blank for unlimited';
+					$_field['default']		= ! empty( $variation->quantity_available ) ? $variation->quantity_available : '';
 
 					echo form_field( $_field );
 
@@ -104,6 +115,7 @@
 					$_field['label']		= 'Lead Time (days)';
 					$_field['required']		= TRUE;
 					$_field['placeholder']	= 'How long is the lead time on orders for this product?';
+					$_field['default']		= ! empty( $variation->lead_time ) ? $variation->lead_time : '';
 
 					echo form_field( $_field );
 
@@ -129,6 +141,7 @@
 							$_field['label']		= ! empty( $field->label )			? $field->label : '';
 							$_field['placeholder']	= ! empty( $field->placeholder )	? $field->placeholder : '';
 							$_field['required']		= array_search( 'required', explode( '|', $field->validation ) ) ? TRUE : FALSE;
+							$_field['default']		= ! empty( $variation->meta->{$field->key} ) ? $variation->meta->{$field->key} : '';
 
 							switch( $field->type ) :
 
@@ -207,6 +220,23 @@
 
 						endif;
 
+						// --------------------------------------------------------------------------
+
+						//	Prep the prices into an easy to access array
+						$_price			= array();
+						$_sale_price	= array();
+
+						if ( ! empty( $variation->price ) ) :
+
+							foreach( $variation->price AS $price ) :
+
+								$_price[$price->id]			= $price->price;
+								$_sale_price[$price->id]	= $price->sale_price;
+
+							endforeach;
+
+						endif;
+
 					?>
 					<tr>
 						<td class="currency">
@@ -222,9 +252,10 @@
 						<td class="price">
 							<?php
 
-								$_key	= 'variation[' . $_counter . '][pricing][0][price]';
-								$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
-								$_class = $_class_price;
+								$_key		= 'variation[' . $_counter . '][pricing][0][price]';
+								$_error		= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+								$_class		= $_class_price;
+								$_default	= ! empty( $_price[SHOP_BASE_CURRENCY_ID] ) ? $_price[SHOP_BASE_CURRENCY_ID] : '';
 
 								if ( $_error ) :
 
@@ -234,7 +265,7 @@
 
 								$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
 
-								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price . $_class . ' placeholder="Price"' );
+								echo form_input( $_key, set_value( $_key, $_default ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price . $_class . ' placeholder="Price"' );
 								echo $_error;
 
 							?>
@@ -242,9 +273,10 @@
 						<td class="price-sale">
 							<?php
 
-								$_key = 'variation[' . $_counter . '][pricing][0][sale_price]';
-								$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
-								$_class = $_class_price_sale;
+								$_key		= 'variation[' . $_counter . '][pricing][0][sale_price]';
+								$_error		= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+								$_class		= $_class_price_sale;
+								$_default	= ! empty( $_sale_price[SHOP_BASE_CURRENCY_ID] ) ? $_sale_price[SHOP_BASE_CURRENCY_ID] : '';
 
 								if ( $_error ) :
 
@@ -254,7 +286,7 @@
 
 								$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
 
-								echo form_input( $_key, set_value( $_key ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price_sale . $_class . ' placeholder="Sale Price"' );
+								echo form_input( $_key, set_value( $_key, $_default ), 'data-prefix="' . SHOP_BASE_CURRENCY_SYMBOL . '" ' . $_attr_price_sale . $_class . ' placeholder="Sale Price"' );
 								echo $_error;
 
 							?>
@@ -302,9 +334,10 @@
 									<td class="price">
 										<?php
 
-											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][price]';
-											$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
-											$_class = $_class_price;
+											$_key		= 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][price]';
+											$_error		= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+											$_class		= $_class_price;
+											$_default	= ! empty( $_price[$currency->id] ) ? $_price[$currency->id] : '';
 
 											if ( $_error ) :
 
@@ -314,7 +347,7 @@
 
 											$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
 
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											echo form_input( $_key, set_value( $_key, $_default ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
 											echo $_error;
 
 										?>
@@ -322,9 +355,10 @@
 									<td class="price-sale">
 										<?php
 
-											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][sale_price]';
-											$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
-											$_class = $_class_price_sale;
+											$_key		= 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][sale_price]';
+											$_error		= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
+											$_class		= $_class_price_sale;
+											$_default	= ! empty( $_sale_price[$currency->id] ) ? $_sale_price[$currency->id] : '';
 
 											if ( $_error ) :
 
@@ -333,7 +367,7 @@
 											endif;
 
 											$_class = $_class ? ' class="' . implode( ' ', $_class ) . '"' : '';
-											echo form_input( $_key, set_value( $_key ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
+											echo form_input( $_key, set_value( $_key, $_default ), 'data-prefix="' . $currency->symbol . '" ' . $_attr_price_sale . $_class . ' placeholder="Calculate automatically from ' . SHOP_BASE_CURRENCY_CODE . '"' );
 											echo $_error;
 
 										?>
@@ -368,22 +402,43 @@
 			<p>
 				Specify which, if any, of the uploaded gallery images feature this product variation.
 			</p>
-			<ul class="gallery-associations <?=$this->input->post( 'gallery' ) ? '' : 'empty' ?>">
+			<?php
+
+				//	Render, if there's POST then make sure we render it enough times
+				//	Otherwise check to see if there's $item data
+
+				if ( $this->input->post( 'gallery' ) ) :
+
+					$_gallery	= $this->input->post( 'gallery' );
+					$_selected	= isset( $_POST['variation'][$_counter]['gallery'] ) ? $_POST['variation'][$_counter]['gallery'] : array();
+
+				elseif( ! empty( $item->gallery ) ) :
+
+					$_gallery	= $item->gallery;
+					$_selected	= ! empty( $variation->gallery ) ? $variation->gallery : array();
+
+				else :
+
+					$_gallery	= array();
+					$_selected	= array();
+
+				endif;
+
+			?>
+			<ul class="gallery-associations <?=! empty( $_gallery ) ? '' : 'empty' ?>">
 				<li class="empty">No images have been uploaded; upload some using the <a href="#">Gallery tab</a></li>
 				<?php
 
-					if ( $this->input->post( 'gallery' ) ) :
+					if ( ! empty( $_gallery ) ) :
 
-						$_selected = isset( $_POST['variation'][$_counter]['gallery'] ) ? $_POST['variation'][$_counter]['gallery'] : array();
-
-						foreach( $this->input->post( 'gallery' ) AS $image ) :
+						foreach( $_gallery AS $image ) :
 
 							//	Is this item selected for this variation?
 							$_checked = array_search( $image, $_selected ) !== FALSE ? 'selected' : FALSE;
 
 							echo '<li class="image object-id-' . $image . ' ' . $_checked . '">';
-							echo form_checkbox( 'variation[' . $_counter . '][gallery][]', $image, (bool) $_checked );
-							echo img( cdn_thumb( $image, 34, 34 ) );
+								echo form_checkbox( 'variation[' . $_counter . '][gallery][]', $image, (bool) $_checked );
+								echo img( cdn_thumb( $image, 34, 34 ) );
 							echo '</li>';
 
 						endforeach;
@@ -414,11 +469,12 @@
 				$_field['label']		= 'L/W/H Unit of measurement';
 				$_field['class']		= 'select2 measurement-unit';
 				$_field['required']		= TRUE;
+				$_field['default']		= ! empty( $variation->shipping->measurement_unit ) ? $variation->shipping->measurement_unit : 'MM';
 
 				$_options				= array();
-				$_options['mm']			= 'Millimeter';
-				$_options['cm']			= 'Centimetre';
-				$_options['m']			= 'Metre';
+				$_options['MM']			= 'Millimeter';
+				$_options['CM']			= 'Centimetre';
+				$_options['M']			= 'Metre';
 
 				echo form_field_dropdown( $_field, $_options );
 
@@ -430,6 +486,7 @@
 				$_field['placeholder']	= 'The length of the item';
 				$_field['class']		= 'length';
 				$_field['required']		= TRUE;
+				$_field['default']		= isset( $variation->shipping->length ) ? $variation->shipping->length : '';
 
 				echo form_field( $_field );
 
@@ -441,6 +498,7 @@
 				$_field['placeholder']	= 'The width of the item';
 				$_field['class']		= 'width';
 				$_field['required']		= TRUE;
+				$_field['default']		= isset( $variation->shipping->width ) ? $variation->shipping->width : '';
 
 				echo form_field( $_field );
 
@@ -452,6 +510,7 @@
 				$_field['placeholder']	= 'The height of the item';
 				$_field['class']		= 'height';
 				$_field['required']		= TRUE;
+				$_field['default']		= isset( $variation->shipping->height ) ? $variation->shipping->height : '';
 
 				echo form_field( $_field );
 
@@ -462,10 +521,11 @@
 				$_field['label']		= 'Weight unit of measurement';
 				$_field['class']		= 'select2 weight-unit';
 				$_field['required']		= TRUE;
+				$_field['default']		= ! empty( $variation->shipping->weight_unit ) ? $variation->shipping->weight_unit : 'G';
 
 				$_options				= array();
-				$_options['g']			= 'Gram';
-				$_options['kg']			= 'Kilogram';
+				$_options['G']			= 'Gram';
+				$_options['KG']			= 'Kilogram';
 
 				echo form_field_dropdown( $_field, $_options );
 
@@ -477,6 +537,7 @@
 				$_field['placeholder']	= 'The weight of the item';
 				$_field['class']		= 'weight';
 				$_field['required']		= TRUE;
+				$_field['default']		= isset( $variation->shipping->weight ) ? $variation->shipping->weight : '';
 
 				echo form_field( $_field, 'cock and balls' );
 
@@ -487,6 +548,7 @@
 				$_field['label']		= 'Collection Only';
 				$_field['readonly']		= ! shop_setting( 'warehouse_collection_enabled' );
 				$_field['class']		= 'collection-only';
+				$_field['default']		= isset( $variation->shipping->collection_only ) ? (bool) $variation->shipping->collection_only : FALSE;
 				$_tip					= 'Items marked as collection only will be handled differently in checkout and reporting. They also dont contribute to the overall dimensions and weight of the order when calculating shipping costs.';
 
 				echo form_field_boolean( $_field, $_tip );

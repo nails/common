@@ -582,7 +582,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		dumpanddie( 'TODO' );
+		dumpanddie( 'TODO: Update Product' );
 	}
 
 
