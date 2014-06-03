@@ -228,6 +228,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		endif;
 
 		$this->db->order_by( 'c.label' );
+		$this->db->having( 'post_count > ', 0 );
 		$_cats = $this->db->get( NAILS_DB_PREFIX . 'blog_category c' )->result();
 
 		// --------------------------------------------------------------------------
@@ -308,6 +309,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		endif;
 
 		$this->db->order_by( 't.label' );
+		$this->db->having( 'post_count > ', 0 );
 		$_tags = $this->db->get( NAILS_DB_PREFIX . 'blog_tag t' )->result();
 
 		// --------------------------------------------------------------------------
