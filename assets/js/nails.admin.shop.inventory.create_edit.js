@@ -91,7 +91,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			//	If the shipping tab is active, make it non active
 			$( 'li.tab a.tabber-variation-shipping' ).each(function()
 			{
-				var _shipping_tab	= $(this);
+				var _shipping_tab = $(this);
 
 				if ( _shipping_tab.parent().hasClass( 'active' ) )
 				{
@@ -102,8 +102,8 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 					_details_tab.parent().addClass( 'active' );
 
 					//	Swap bodies
-					$( '#' + _shipping_tab.data( 'tab' ) ).hide();
-					$( '#' + _details_tab.data( 'tab' ) ).show();
+					$( '#' + _shipping_tab.data( 'tab' ) ).removeClass( 'active' );
+					$( '#' + _details_tab.data( 'tab' ) ).addClass( 'active' );
 				}
 			});
 
@@ -137,23 +137,25 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		//	Add a variation
 		$('#product-variation-add').on('click', function()
 		{
-			var _template = $('#template-variation').html().replace('<!--script type="text/javascript"-->', '<script type="text/javascript">').replace('<!--/script-->', '</script>');
-			var _counter = $('#product-variations .variation').length;
+			var _template	= $('#template-variation').html();
+			var _counter	= $('#product-variations .variation').length;
 
 			_template = Mustache.render(_template, {
 				counter: _counter
 			});
 
-			$('#product-variations').append(_template);
+			$('#product-variations').append( _template );
 
 			_nails.add_stripes();
+			_nails._init_tipsy();
 			_nails.process_prefixed_inputs();
 			_nails_admin.init_toggles();
+			_nails_admin.init_select2();
 			_this._variations_checkmax();
 
 			//	Show the price syncher
 			$( '#variation-sync-prices' ).show();
-			$( '#sync-shipping-options' ).show();
+			$( '#variation-sync-shipping' ).show();
 
 			return false;
 		});
@@ -184,7 +186,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 						if ( $( 'product-variations .variation' ).length <= 1 )
 						{
 							$( '#variation-sync-prices' ).hide();
-							$( '#sync-shipping-options' ).hide();
+							$( '#variation-sync-shipping' ).hide();
 						}
 
 						//	Close dialog
@@ -365,14 +367,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 					OK: function()
 					{
 						//	Get base prices
-						$( '#variation-0 .base-price' ).each(function()
+						$( '#tab-variation-0-pricing .base-price' ).each(function()
 						{
 							var _code = $(this).data( 'code' );
 
 							$( '#product-variations .variation-price.' + _code ).val( $(this).val() );
 						});
 
-						$( '#variation-0 .base-price-sale' ).each(function()
+						$( '#tab-variation-0-pricing .base-price-sale' ).each(function()
 						{
 							var _code = $(this).data( 'code' );
 
@@ -392,10 +394,11 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			return false;
 		});
 
+
 		// --------------------------------------------------------------------------
 
 		//	Sync shipping options
-		$( '#sync-shipping-options' ).on( 'click', function()
+		$( '#variation-sync-shipping a' ).on( 'click', function()
 		{
 			$('<div>').html( 'This action will take the values form the first variation and <strong>overwrite</strong> the corresponding values in each other variation.' ).dialog(
 			{
@@ -408,7 +411,23 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				{
 					OK: function()
 					{
-						alert( 'TODO' );
+						//	Measurement unit
+						var _measurement_unit = $( '#tab-variation-0-shipping select.measurement-unit' ).val();
+						$( '#product-variations .measurement-unit' ).val( _measurement_unit ).trigger( 'change' );
+
+						//	Length
+
+						//	Width
+
+						//	Height
+
+						//	Weight unit
+						var _weight_unit = $( '#tab-variation-0-shipping select.weight-unit' ).val();
+						$( '#product-variations .weight-unit' ).val( _weight_unit ).trigger( 'change' );
+
+						//	Weight
+
+						//	Collection
 
 						//	Close dialog
 						$(this).dialog("close");

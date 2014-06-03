@@ -1375,7 +1375,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
+		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] . ' help' : 'help';
 		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
 		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
 		$_help['title']	= is_string( $help ) ? $help : $_help['title'];

@@ -20,19 +20,19 @@
 	</div>
 	<ul class="tabs" data-tabgroup="variation-<?=$_counter?>">
 		<li class="tab active">
-			<a href="#" class="tabber-variation-details" data-tab="tab-varitation-<?=$_counter?>-details">Details</a>
+			<a href="#" class="tabber-variation-details" data-tab="tab-variation-<?=$_counter?>-details">Details</a>
 		</li>
 		<li class="tab">
-			<a href="#" data-tab="tab-varitation-<?=$_counter?>-meta">Meta</a>
+			<a href="#" data-tab="tab-variation-<?=$_counter?>-meta">Meta</a>
 		</li>
 		<li class="tab">
-			<a href="#" data-tab="tab-varitation-<?=$_counter?>-pricing">Pricing</a>
+			<a href="#" data-tab="tab-variation-<?=$_counter?>-pricing">Pricing</a>
 		</li>
 		<li class="tab">
-			<a href="#" data-tab="tab-varitation-<?=$_counter?>-gallery">Gallery</a>
+			<a href="#" data-tab="tab-variation-<?=$_counter?>-gallery">Gallery</a>
 		</li>
 		<li class="tab">
-			<a href="#" class="tabber-variation-shipping" data-tab="tab-varitation-<?=$_counter?>-shipping">Shipping</a>
+			<a href="#" class="tabber-variation-shipping" data-tab="tab-variation-<?=$_counter?>-shipping">Shipping</a>
 		</li>
 		{{^is_first}}
 		<li class="action">
@@ -41,7 +41,7 @@
 		{{/is_first}}
 	</ul>
 	<section class="tabs pages variation-<?=$_counter?>">
-		<div class="tab page active fieldset" id="tab-varitation-<?=$_counter?>-details">
+		<div class="tab page active fieldset" id="tab-variation-<?=$_counter?>-details">
 			<?php
 
 				$_field					= array();
@@ -112,7 +112,7 @@
 			?>
 		</div>
 
-		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-meta">
+		<div class="tab page fieldset" id="tab-variation-<?=$_counter?>-meta">
 			<?php
 
 				foreach ( $product_types_meta AS $id => $fields ) :
@@ -151,18 +151,6 @@
 
 							endswitch;
 
-
-							//	Don't do this for the first iteration as it's being done in PHP.
-							if ( ( ! isset( $is_first ) || ! $is_first ) && ( ! isset( $is_php ) || ! $is_php ) ) :
-
-								//	Replace any reference to </script> with <!--/script--> which will be parsed by the JS
-								//	Otherwise it prematurely closes the template.
-
-								$_field_out = str_replace( '<script type="text/javascript">', '<!--script type="text/javascript"-->', $_field_out );
-								$_field_out = str_replace( '</script>', '<!--/script-->', $_field_out );
-
-							endif;
-
 							echo $_field_out;
 
 						endforeach;
@@ -180,7 +168,7 @@
 			?>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-pricing">
+		<div class="tab page" id="tab-variation-<?=$_counter?>-pricing">
 			<?php if ( count( $currencies ) > 1 ) : ?>
 			<p>
 				Define the price points for this variation. If you'd like to set a specific price for a certain
@@ -214,8 +202,8 @@
 							$_attr_price		= '';
 							$_attr_price_sale	= '';
 
-							$_class_price		= array( 'base-price', SHOP_BASE_CURRENCY_CODE );
-							$_class_price_sale	= array( 'base-price-sale', SHOP_BASE_CURRENCY_CODE );
+							$_class_price		= array( 'variation-price', SHOP_BASE_CURRENCY_CODE );
+							$_class_price_sale	= array( 'variation-price-sale', SHOP_BASE_CURRENCY_CODE );
 
 						endif;
 
@@ -316,7 +304,7 @@
 
 											$_key = 'variation[' . $_counter . '][pricing][' . $_counter_inside . '][price]';
 											$_error	= form_error( $_key, '<span class="error show-in-tabs">', '</span>' );
-											$_class = $_class_price_sale;
+											$_class = $_class_price;
 
 											if ( $_error ) :
 
@@ -376,7 +364,7 @@
 			?>
 		</div>
 
-		<div class="tab page" id="tab-varitation-<?=$_counter?>-gallery">
+		<div class="tab page" id="tab-variation-<?=$_counter?>-gallery">
 			<p>
 				Specify which, if any, of the uploaded gallery images feature this product variation.
 			</p>
@@ -411,7 +399,7 @@
 			</ul>
 		</div>
 
-		<div class="tab page fieldset" id="tab-varitation-<?=$_counter?>-shipping">
+		<div class="tab page fieldset" id="tab-variation-<?=$_counter?>-shipping">
 			<p>
 				Define the following information for shipping. The system will use this information to
 				calculate a shipping quote for the user, where appropriate.
@@ -424,7 +412,7 @@
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][shipping][measurement_unit]';
 				$_field['label']		= 'L/W/H Unit of measurement';
-				$_field['class']		= 'select2';
+				$_field['class']		= 'select2 measurement-unit';
 				$_field['required']		= TRUE;
 
 				$_options				= array();
@@ -440,6 +428,7 @@
 				$_field['key']			= 'variation[' . $_counter . '][shipping][length]';
 				$_field['label']		= 'Boxed Length';
 				$_field['placeholder']	= 'The length of the item';
+				$_field['class']		= 'length';
 				$_field['required']		= TRUE;
 
 				echo form_field( $_field );
@@ -450,6 +439,7 @@
 				$_field['key']			= 'variation[' . $_counter . '][shipping][width]';
 				$_field['label']		= 'Boxed Width';
 				$_field['placeholder']	= 'The width of the item';
+				$_field['class']		= 'width';
 				$_field['required']		= TRUE;
 
 				echo form_field( $_field );
@@ -460,6 +450,7 @@
 				$_field['key']			= 'variation[' . $_counter . '][shipping][height]';
 				$_field['label']		= 'Boxed Height';
 				$_field['placeholder']	= 'The height of the item';
+				$_field['class']		= 'height';
 				$_field['required']		= TRUE;
 
 				echo form_field( $_field );
@@ -469,7 +460,7 @@
 				$_field					= array();
 				$_field['key']			= 'variation[' . $_counter . '][shipping][weight_unit]';
 				$_field['label']		= 'Weight unit of measurement';
-				$_field['class']		= 'select2';
+				$_field['class']		= 'select2 weight-unit';
 				$_field['required']		= TRUE;
 
 				$_options				= array();
@@ -484,9 +475,10 @@
 				$_field['key']			= 'variation[' . $_counter . '][shipping][weight]';
 				$_field['label']		= 'Boxed Weight';
 				$_field['placeholder']	= 'The weight of the item';
+				$_field['class']		= 'weight';
 				$_field['required']		= TRUE;
 
-				echo form_field( $_field );
+				echo form_field( $_field, 'cock and balls' );
 
 				// --------------------------------------------------------------------------
 
@@ -494,9 +486,20 @@
 				$_field['key']			= 'variation[' . $_counter . '][shipping][collection_only]';
 				$_field['label']		= 'Collection Only';
 				$_field['readonly']		= ! shop_setting( 'warehouse_collection_enabled' );
+				$_field['class']		= 'collection-only';
 				$_tip					= 'Items marked as collection only will be handled differently in checkout and reporting. They also dont contribute to the overall dimensions and weight of the order when calculating shipping costs.';
 
 				echo form_field_boolean( $_field, $_tip );
+
+				// --------------------------------------------------------------------------
+
+				if ( $is_first ) :
+
+					echo '<p id="variation-sync-shipping" style="margin-top:1em;display:none">';
+					echo '<a href="#" class="awesome small orange">Sync Shipping Details</a>';
+					echo '</p>';
+
+				endif;
 
 			?>
 		</div>

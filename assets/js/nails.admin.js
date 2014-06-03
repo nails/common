@@ -355,7 +355,7 @@ NAILS_Admin = function()
 			$('.field.boolean:not(.toggled)').each(function()
 			{
 				var _checkbox	= $(this).find('input[type=checkbox]');
-				var _readonly	= _checkbox.prop( 'disabled' );
+				var _readonly	= $(this).hasClass('readonly');
 				var _on			= $(this).data('text-on')	? $(this).data('text-on')	: 'ON';
 				var _off		= $(this).data('text-off')	? $(this).data('text-off')	: 'OFF';
 
@@ -365,6 +365,7 @@ NAILS_Admin = function()
 				}).toggles({
 					checkbox:	_checkbox,
 					click:		!_readonly,
+					drag:		!_readonly,
 					clicker:	_checkbox,
 					on:			_checkbox.is(':checked'),
 					text:
@@ -418,7 +419,7 @@ NAILS_Admin = function()
 	{
 		if ( $.fn.select2 )
 		{
-			$( 'select.select2' ).select2();
+			$( 'select.select2:not(.select2-offscreen)' ).select2();
 		}
 		else
 		{

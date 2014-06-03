@@ -88,7 +88,7 @@
 				$_field['default']		= isset( $post->is_published ) ? $post->is_published : FALSE;
 				$_field['id']			= 'is-published';
 
-				echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
+				echo form_field_boolean( $_field );
 
 				// --------------------------------------------------------------------------
 

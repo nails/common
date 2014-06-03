@@ -313,7 +313,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->data['currencies']		= $this->currency->get_all();
+		$this->data['currencies'] = $this->currency->get_all();
 
 		//	Fetch product meta fields
 		$_product_types						= $this->product->get_product_types();

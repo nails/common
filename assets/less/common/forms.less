@@ -418,6 +418,16 @@ div.field.boolean
 	{
 		//	width and height set via JS, so that if plugin isnt loaded
 		//	or otherwise unavailable, it falls back to a normal checkbox
+
+		text-align:center;
+		display:inline-block;
+	}
+
+	img.help
+	{
+		top: -0.4em;
+		left: 0.5em;
+		position: relative;
 	}
 }
 div.field.readonly
@@ -436,6 +446,11 @@ div.field.readonly
 	.toggle
 	{
 		.opacity(0.5);
+
+		*
+		{
+			cursor:not-allowed;
+		}
 	}
 }
 div.field.radio,

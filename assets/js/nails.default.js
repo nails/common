@@ -110,12 +110,15 @@ NAILS_JS = function()
 	{
 		if ( $.fn.tipsy )
 		{
-			$( '*[rel=tipsy]' ).tipsy({ opacity : 0.85 });
-			$( '*[rel=tipsy-html]' ).tipsy({ opacity : 0.85, html: true });
-			$( '*[rel=tipsy-right]' ).tipsy({ opacity : 0.85, gravity: 'w' });
-			$( '*[rel=tipsy-left]' ).tipsy({ opacity : 0.85, gravity: 'e' });
-			$( '*[rel=tipsy-top]' ).tipsy({ opacity : 0.85, gravity: 's' });
-			$( '*[rel=tipsy-bottom]' ).tipsy({ opacity : 0.85, gravity: 'n' });
+			//	Once tipsy'd, add drunk class - so it's not called twice should this method be called again
+			//	Tipsy... drunk... geddit?
+
+			$( '*[rel=tipsy]:not(.drunk)' ).tipsy({ opacity : 0.85 }).addClass( 'drunk' );
+			$( '*[rel=tipsy-html]:not(.drunk)' ).tipsy({ opacity : 0.85, html: true }).addClass( 'drunk' );
+			$( '*[rel=tipsy-right]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'w' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-left]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'e' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-top]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 's' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-bottom]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'n' }).addClass( 'drunk' );
 		}
 		else
 		{
