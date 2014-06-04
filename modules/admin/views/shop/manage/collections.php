@@ -111,6 +111,7 @@
 				$_field				= array();
 				$_field['key']		= 'is_active';
 				$_field['label']	= 'Active On Site';
+				$_field['default']	= TRUE;
 
 				echo form_field_boolean( $_field );
 
@@ -209,7 +210,8 @@
 	//	Set _DATA
 	foreach ( $collections AS &$collection ) :
 
-		$collection->label = $collection->label . ' - ' . word_limiter( $collection->description, 25 );
+		$collection->label  = $collection->label;
+		$collection->label .= trim( $collection->description ) ? ' - ' . word_limiter( trim( $collection->description ), 25 ) : '';
 
 		if ( ! $collection->is_active ) :
 

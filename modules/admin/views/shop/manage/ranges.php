@@ -111,6 +111,7 @@
 				$_field				= array();
 				$_field['key']		= 'is_active';
 				$_field['label']	= 'Active On Site';
+				$_field['default']	= TRUE;
 
 				echo form_field_boolean( $_field );
 
@@ -209,7 +210,8 @@
 	//	Set _DATA
 	foreach ( $ranges AS &$range ) :
 
-		$range->label = $range->label . ' - ' . word_limiter( $range->description, 25 );
+		$range->label  = $range->label;
+		$range->label .= trim( $range->description ) ? ' - ' . word_limiter( trim( $range->description ), 25 ) : '';
 
 		if ( ! $range->is_active ) :
 

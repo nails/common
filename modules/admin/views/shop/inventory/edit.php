@@ -208,10 +208,11 @@
 				<?php
 
 					//	Data which will be passed to template
-					$_data				= array();
-					$_data['is_first']	= TRUE;
-					$_data['is_php']	= TRUE;
-					$_data['counter']	= 0;
+					$_data					= array();
+					$_data['is_first']		= TRUE;
+					$_data['is_php']		= TRUE;
+					$_data['counter']		= 0;
+					$_data['num_variants']	= 0;
 
 					//	Render, if there's POST then make sure we render it enough times
 					//	Otherwise check to see if there's $item data
@@ -242,7 +243,8 @@
 
 						foreach ( $_variations AS $variation ) :
 
-							$_data['variation'] = $variation;
+							$_data['variation']		= $variation;
+							$_data['num_variants']	= count( $_variations );
 
 							$_template	= $this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data, TRUE );
 
@@ -373,7 +375,11 @@
 							//	Build an array which matches the potential $_POST array
 							foreach( $item->attributes AS $attribute ) :
 
-								$_attributes[] = (array) $attribute;
+								$_temp					= array();
+								$_temp['attribute_id']	= $attribute->id;
+								$_temp['value']			= $attribute->value;
+
+								$_attributes[] = $_temp;
 
 							endforeach;
 
@@ -389,6 +395,7 @@
 							foreach ( $_attributes AS $attribute ) :
 
 								$_data = array( 'attribute' => $attribute, 'counter' => $_counter );
+
 								$this->load->view( 'admin/shop/inventory/utilities/template-mustache-attribute', $_data );
 
 								$_counter++;
@@ -461,7 +468,7 @@
 
 						endif;
 						echo $range->label;
-						echo $range->description ? ' - ' . word_limiter( $range->description, 25 ) : '';
+						echo trim( $range->description ) ? ' - ' . word_limiter( trim( $range->description ), 25 ) : '';
 						echo '</option>';
 
 					endforeach;
@@ -597,7 +604,12 @@
 <script type="text/template" id="template-variation">
 <?php
 
-	$_data = array( 'is_first' => FALSE, 'is_php' => FALSE, 'counter' => FALSE );
+	$_data					= array();
+	$_data['is_first']		= FALSE;
+	$_data['is_php']		= FALSE;
+	$_data['counter']		= FALSE;
+	$_data['variation']		= NULL;
+	$_data['num_variants']	= NULL;
 
 	$this->load->view( 'admin/shop/inventory/utilities/template-mustache-inventory-variant', $_data );
 

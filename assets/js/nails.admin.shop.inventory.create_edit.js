@@ -274,66 +274,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			return false;
 		});
 
-		// --------------------------------------------------------------------------
-
-		//	Add a shipping option
-		$(document).on('click', '#add-shipping-option', function()
-		{
-			var _template	= $( '#template-shipping-option' ).html();
-			var _variation	= $( '#variation-' + $(this).data( 'variation-counter' ) );
-			var _counter	= $( 'tr.shipping-option', _variation ).length;
-
-			_template = Mustache.render(_template, {
-				counter: _counter+1
-			});
-
-			$( 'table.shipping-options tbody', _variation ).append(_template);
-			$( 'table.shipping-options', _variation ).removeClass( 'empty' );
-
-			_nails.add_stripes();
-			_nails.process_prefixed_inputs();
-			_this._init_select2();
-
-			return false;
-		});
-
-		// --------------------------------------------------------------------------
-
-		$('#product-variations').on('click', 'a.delete-shipping', function()
-		{
-			var _option = this;
-
-			$('#dialog-confirm-delete').dialog({
-				resizable: false,
-				draggable: false,
-				modal: true,
-				dialogClass: "no-close",
-				buttons:
-				{
-					"Delete Option": function()
-				{
-						//	Last one?
-						if ( $(_option).closest('table.shipping-options').find( 'tr.shipping-option' ).length === 1 )
-						{
-							$(_option).closest('table.shipping-options').addClass( 'empty' );
-						}
-
-						//	Remove the variation
-						$(_option).closest('tr.shipping-option').remove();
-
-						//	Close dialog
-						$(this).dialog("close");
-					},
-					Cancel: function()
-					{
-						$(this).dialog("close");
-					}
-				}
-			});
-
-			return false;
-		});
-
 
 		// --------------------------------------------------------------------------
 
@@ -439,7 +379,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 			return false;
 		});
-
 	};
 
 

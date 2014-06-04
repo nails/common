@@ -1359,19 +1359,20 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		//	Set var defaults
 		$_field					= array();
-		$_field['id']			= isset( $field['id'] ) ? $field['id'] : NULL;
-		$_field['oddeven']		= isset( $field['oddeven'] ) ? $field['oddeven'] : NULL;
-		$_field['key']			= isset( $field['key'] ) ? $field['key'] : NULL;
-		$_field['label']		= isset( $field['label'] ) ? $field['label'] : NULL;
-		$_field['default']		= isset( $field['default'] ) ? $field['default'] : NULL;
-		$_field['sub_label']	= isset( $field['sub_label'] ) ? $field['sub_label'] : NULL;
-		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
-		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
-		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
-		$_field['text_on']		= isset( $field['text_on'] ) ? $field['text_on'] : 'ON';
-		$_field['text_off']		= isset( $field['text_off'] ) ? $field['text_off'] : 'OFF';
-		$_field['data']			= isset( $field['data'] ) ? $field['data'] : array();
-		$_field['readonly']		= isset( $field['readonly'] ) ? $field['readonly'] : FALSE;
+		$_field['id']			= isset( $field['id'] )				? $field['id']			: NULL;
+		$_field['oddeven']		= isset( $field['oddeven'] )		? $field['oddeven']		: NULL;
+		$_field['key']			= isset( $field['key'] )			? $field['key']			: NULL;
+		$_field['label']		= isset( $field['label'] )			? $field['label']		: NULL;
+		$_field['default']		= isset( $field['default'] )		? $field['default']		: NULL;
+		$_field['sub_label']	= isset( $field['sub_label'] )		? $field['sub_label']	: NULL;
+		$_field['required']		= isset( $field['required'] )		? $field['required']	: FALSE;
+		$_field['placeholder']	= isset( $field['placeholder'] )	? $field['placeholder']	: NULL;
+		$_field['class']		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field['text_on']		= isset( $field['text_on'] )		? $field['text_on']		: 'ON';
+		$_field['text_off']		= isset( $field['text_off'] )		? $field['text_off']	: 'OFF';
+		$_field['data']			= isset( $field['data'] )			? $field['data']		: array();
+		$_field['readonly']		= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
+		$_field['info']			= isset( $field['info'] )			? $field['info'] 		: FALSE;
 
 		$_help			= array();
 		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
@@ -1418,6 +1419,9 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
+
+		//	Info block
+		$_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
 
 		$_out .= '</span>';
 		$_out .= '</div>';
