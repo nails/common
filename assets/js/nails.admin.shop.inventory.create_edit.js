@@ -351,21 +351,30 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 					{
 						//	Measurement unit
 						var _measurement_unit = $( '#tab-variation-0-shipping select.measurement-unit' ).val();
-						$( '#product-variations .measurement-unit' ).val( _measurement_unit ).trigger( 'change' );
+						$( '#product-variations select.measurement-unit' ).val( _measurement_unit ).trigger( 'change' );
 
 						//	Length
+						var _length = $( '#tab-variation-0-shipping input.length' ).val();
+						$( '#product-variations input.length' ).val( _length );
 
 						//	Width
+						var _width = $( '#tab-variation-0-shipping input.width' ).val();
+						$( '#product-variations input.width' ).val( _width );
 
 						//	Height
+						var _height = $( '#tab-variation-0-shipping input.height' ).val();
+						$( '#product-variations input.height' ).val( _height );
 
 						//	Weight unit
 						var _weight_unit = $( '#tab-variation-0-shipping select.weight-unit' ).val();
 						$( '#product-variations .weight-unit' ).val( _weight_unit ).trigger( 'change' );
 
 						//	Weight
+						var _weight = $( '#tab-variation-0-shipping input.weight' ).val();
+						$( '#product-variations input.weight' ).val( _weight );
 
 						//	Collection
+						//	TODO
 
 						//	Close dialog
 						$(this).dialog("close");

@@ -36,7 +36,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_table_product			= NAILS_DB_PREFIX . 'shop_product';
+		$this->_table					= NAILS_DB_PREFIX . 'shop_product';
+		$this->_table_prefix			= 'p';
+
 		$this->_table_attribute			= NAILS_DB_PREFIX . 'shop_product_attribute';
 		$this->_table_brand				= NAILS_DB_PREFIX . 'shop_product_brand';
 		$this->_table_category			= NAILS_DB_PREFIX . 'shop_product_category';
@@ -66,6 +68,95 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 **/
 	public function create( $data = array(), $return_obj = FALSE )
 	{
+		//	Do all we need to do with the incoming data
+		$data = $this->_create_update_prep_data( $data );
+
+		if ( ! $data ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute
+		$_id = $this->_create_update_execute( $data );
+
+		//	Wrap it all up
+		if ( $_id ) :
+
+			if ( $return_obj ) :
+
+				return $this->get_by_id( $_id );
+
+			else :
+
+				return $_id;
+
+			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Updates an existing object
+	 *
+	 * @access public
+	 * @param int $id The ID of the object to update
+	 * @param array $data The data to update the object with
+	 * @return bool
+	 **/
+	public function update( $id, $data = array() )
+	{
+		$_current = $this->get_by_id( $id );
+
+		if ( ! $_current ) :
+
+			$this->_set_error( 'Invalid product ID' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Do all we need to do with the incoming data
+		$_data = $this->_create_update_prep_data( $data );
+
+		if ( ! $_data ) :
+
+			return FALSE;
+
+		endif;
+
+		$_data->id = $id;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute
+		$_id = $this->_create_update_execute( $_data );
+
+		//	Wrap it all up
+		if ( $_id ) :
+
+			return TRUE;
+
+		else :
+
+			return FALSE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _create_update_prep_data( $data )
+	{
 		//	Quick check of incoming data
 		$_data = new stdClass();
 
@@ -81,11 +172,12 @@ class NAILS_Shop_product_model extends NAILS_Model
 		//	Slug
 		//	====
 
-		$_data->slug	= $this->_generate_slug( $data['title'], '', '', $this->_table_product );
+		$_data->slug = $this->_generate_slug( $data['title'], '', '', $this->_table );
 
 		//	Product Info
 		//	============
-		$_data->type_id		= isset( $data['type_id'] )			? (int) $data['type_id']	: NULL;
+
+		$_data->type_id = isset( $data['type_id'] ) ? (int) $data['type_id']	: NULL;
 
 		if ( ! $_data->type_id ) :
 
@@ -94,11 +186,12 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		endif;
 
-		$_data->title		= isset( $data['title'] )			? trim( $data['title'] )	: NULL;
-		$_data->is_active	= isset( $data['is_active'] )		? (bool) $data['is_active']	: FALSE;
-		$_data->brands		= isset( $data['brands'] )			? $data['brands']			: array();
-		$_data->categories	= isset( $data['categories'] )		? $data['categories']		: array();
-		$_data->tags		= isset( $data['tags'] )			? $data['tags']				: array();
+		$_data->title		= isset( $data['title'] )		? trim( $data['title'] )		: NULL;
+		$_data->is_active	= isset( $data['is_active'] )	? (bool) $data['is_active']		: FALSE;
+		$_data->is_deleted	= isset( $data['is_deleted'] )	? (bool) $data['is_deleted']	: FALSE;
+		$_data->brands		= isset( $data['brands'] )		? $data['brands']				: array();
+		$_data->categories	= isset( $data['categories'] )	? $data['categories']			: array();
+		$_data->tags		= isset( $data['tags'] )		? $data['tags']					: array();
 
 		$_data->tax_rate_id	= isset( $data['tax_rate_id'] ) &&	(int) $data['tax_rate_id']	? (int) $data['tax_rate_id']	: NULL;
 
@@ -121,12 +214,16 @@ class NAILS_Shop_product_model extends NAILS_Model
 		endif;
 
 		$_data->variation	= array();
-		$_product_type		= $this->get_product_type_by_id( $_data->type_id );
+		$_product_type		= $this->product_type->get_by_id( $_data->type_id );
 
 		if ( ! $_product_type ) :
 
 			$this->_set_error( 'Invalid Product Type' );
 			return FALSE;
+
+		else :
+
+			$_data->is_physical = $_product_type->is_physical;
 
 		endif;
 
@@ -143,13 +240,21 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	Details
 			//	-------
 
-			$_data->variation[$index]						= new stdClass();
-			$_data->variation[$index]->label				= isset( $v['label'] )				? $v['label']				: NULL;
-			$_data->variation[$index]->sku					= isset( $v['sku'] )				? $v['sku']					: NULL;
+			$_data->variation[$index] = new stdClass();
+
+			//	If there's an ID note it down, we'll be using it later as a switch between INSERT and UPDATE
+			if ( ! empty( $v['id'] ) ) :
+
+				$_data->variation[$index]->id = $v['id'];
+
+			endif;
+
+			$_data->variation[$index]->label	= isset( $v['label'] )	? $v['label']	: NULL;
+			$_data->variation[$index]->sku		= isset( $v['sku'] )	? $v['sku']		: NULL;
 
 			//	Stock
 			//	-----
-			$_data->variation[$index]->stock_status	= isset( $v['stock_status'] )	? $v['stock_status']	: 'OUT_OF_STOCK';
+			$_data->variation[$index]->stock_status = isset( $v['stock_status'] ) ? $v['stock_status'] : 'OUT_OF_STOCK';
 
 
 			switch ( $_data->variation[$index]->stock_status ) :
@@ -190,7 +295,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	Process each field
 			foreach( $_product_type_meta AS $field ) :
 
-				$_data->variation[$index]->meta->{$field->key}	= isset( $v['meta'][$field->key] )	? $v['meta'][$field->key]	: NULL;
+				$_data->variation[$index]->meta->{$field->key} = isset( $v['meta'][$field->key] ) ? $v['meta'][$field->key] : NULL;
 
 			endforeach;
 
@@ -249,7 +354,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	Shipping
 			//	--------
 
-			$_data->variation[$index]->shipping							= new stdClass();
+			$_data->variation[$index]->shipping = new stdClass();
 
 			if ( $_product_type->is_physical ) :
 
@@ -289,244 +394,341 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$_data->seo_keywords	= isset( $data['seo_keywords'] )	? $data['seo_keywords']		: NULL;
 
 		// --------------------------------------------------------------------------
-		// ==========================================================================
-		// --------------------------------------------------------------------------
 
-		//	Now we shove all this lovely data into the database. Yummy!
+		return $_data;
+	}
 
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _create_update_execute( $data )
+	{
 		//	Start the transaction, safety first!
 		$this->db->trans_begin();
 		$_rollback = FALSE;
 
 		//	Add the product
-		$this->db->set( 'type_id',			$_data->type_id );
-		$this->db->set( 'title',			$_data->title );
-		$this->db->set( 'description',		$_data->description );
-		$this->db->set( 'seo_title',		$_data->seo_title );
-		$this->db->set( 'seo_description',	$_data->seo_description );
-		$this->db->set( 'seo_keywords',		$_data->seo_keywords );
-		$this->db->set( 'tax_rate_id',		$_data->tax_rate_id );
-		$this->db->set( 'is_active',		$_data->is_active );
-		$this->db->set( 'is_deleted',		FALSE);
-		$this->db->set( 'created',			'NOW()', FALSE );
+		$this->db->set( 'type_id',			$data->type_id );
+		$this->db->set( 'title',			$data->title );
+		$this->db->set( 'description',		$data->description );
+		$this->db->set( 'seo_title',		$data->seo_title );
+		$this->db->set( 'seo_description',	$data->seo_description );
+		$this->db->set( 'seo_keywords',		$data->seo_keywords );
+		$this->db->set( 'tax_rate_id',		$data->tax_rate_id );
+		$this->db->set( 'is_active',		$data->is_active );
+		$this->db->set( 'is_deleted',		$data->is_deleted );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 
 		if ( $this->user->is_logged_in() ) :
 
-			$this->db->set( 'created_by',		active_user( 'id' ) );
-			$this->db->set( 'modified_by',		active_user( 'id' ) );
+			$this->db->set( 'modified_by',	active_user( 'id' ) );
 
 		endif;
 
-		if ( $this->db->insert( $this->_table_product ) ) :
+		if ( ! empty( $data->id ) ) :
 
-			$_id = $this->db->insert_id();
+			$this->db->where( 'id', $data->id );
+			$_result = $this->db->update( $this->_table );
+			$_action = 'update';
 
-			//	Product Attributes
-			//	==================
-			foreach( $_data->attributes AS &$attr ) :
+		else :
 
-				$attr['product_id'] = $_id;
+			$_result = $this->db->insert( $this->_table );
+			$_action = 'create';
+			$data->id = $this->db->insert_id();
 
-			endforeach;
+		endif;
 
-			if ( $_data->attributes ) :
+		if ( $_result ) :
 
-				$this->db->insert_batch( $this->_table_attribute, $_data->attributes );
+			//	The following items are all handled, and error, in the [mostly] same way
+			//	loopy loop for clarity and consistency.
 
-			endif;
+			$_types = array();
 
-			//	Product Brands
-			//	==============
-			$_temp = array();
-			foreach( $_data->brands AS $id ) :
+			//					//Items to loop			//Field name		//Plural human		//Table name
+			$_types[]	= array( $data->attributes,		'attribute_id',		'attributes',		$this->_table_attribute );
+			$_types[]	= array( $data->brands,			'brand_id',			'brands',			$this->_table_brand );
+			$_types[]	= array( $data->categories,		'category_id',		'categories',		$this->_table_category );
+			$_types[]	= array( $data->collections,	'collection_id',	'collections',		$this->_table_collection );
+			$_types[]	= array( $data->gallery,		'object_id',		'gallery items',	$this->_table_gallery );
+			$_types[]	= array( $data->ranges,			'range_id',			'ranges',			$this->_table_range );
+			$_types[]	= array( $data->tags,			'tag_id',			'tags',				$this->_table_tag );
 
-				$_temp[] = array( 'product_id' => $_id, 'brand_id' => $id );
+			foreach ( $_types AS $type ) :
 
-			endforeach;
+				list( $_items, $_field, $_type, $_table ) = $type;
 
-			if ( $_temp ) :
+				//	Clear old items
+				$this->db->where( 'product_id', $data->id );
+				if ( ! $this->db->delete( $_table ) ) :
 
-				$this->db->insert_batch( $this->_table_brand, $_temp );
-
-			endif;
-
-			//	Product Categories
-			//	==================
-			$_temp = array();
-			foreach( $_data->categories AS $id ) :
-
-				$_temp[] = array( 'product_id' => $_id, 'category_id' => $id );
-
-			endforeach;
-
-			if ( $_temp ) :
-
-				$this->db->insert_batch( $this->_table_category, $_temp );
-
-			endif;
-
-			//	Product Collections
-			//	===================
-			$_temp = array();
-			foreach( $_data->collections AS $id ) :
-
-				$_temp[] = array( 'product_id' => $_id, 'collection_id' => $id );
-
-			endforeach;
-
-			if ( $_temp ) :
-
-				$this->db->insert_batch( $this->_table_collection, $_temp );
-
-			endif;
-
-			//	Product Gallery
-			//	===============
-			$_temp		= array();
-			$_counter	= 0;
-			foreach( $_data->gallery AS $id ) :
-
-				$_temp[] = array( 'product_id' => $_id, 'object_id' => $id, 'order' => $_counter );
-				$_counter++;
-
-			endforeach;
-
-			if ( $_temp ) :
-
-				$this->db->insert_batch( $this->_table_gallery, $_temp );
-
-			endif;
-
-			//	Product Ranges
-			//	==============
-			$_temp = array();
-			foreach( $_data->ranges AS $id ) :
-
-				$_temp[] = array( 'product_id' => $_id, 'range_id' => $id );
-
-			endforeach;
-
-			if ( $_temp ) :
-
-				$this->db->insert_batch( $this->_table_range, $_temp );
-
-			endif;
-
-			//	Product Tags
-			//	============
-			$_temp = array();
-			foreach( $_data->tags AS $id ) :
-
-				$_temp[] = array( 'product_id' => $_id, 'tag_id' => $id );
-
-			endforeach;
-
-			if ( $_temp ) :
-
-				$this->db->insert_batch( $this->_table_tag, $_temp );
-
-			endif;
-
-			//	Product Variations
-			//	==================
-			$_counter = 0;
-			foreach( $_data->variation AS $index => $v ) :
-
-				//	Product Variation: Details
-				//	==========================
-
-				$this->db->set( 'product_id',			$_id );
-				$this->db->set( 'label',				$v->label );
-				$this->db->set( 'sku',					$v->sku );
-				$this->db->set( 'order',				$_counter );
-
-				//	Product Variation: Stock Status
-				//	===============================
-
-				$this->db->set( 'stock_status',			$v->stock_status );
-				$this->db->set( 'quantity_available',	$v->quantity_available );
-				$this->db->set( 'lead_time',			$v->lead_time );
-
-				//	Product Variation: Shipping
-				//	===========================
-
-				$this->db->set( 'ship_collection_only',			$v->shipping->collection_only );
-
-				if ( $_product_type->is_physical ) :
-
-					$this->db->set( 'ship_length',				$v->shipping->length );
-					$this->db->set( 'ship_width',				$v->shipping->width );
-					$this->db->set( 'ship_height',				$v->shipping->height );
-					$this->db->set( 'ship_measurement_unit',	$v->shipping->measurement_unit );
-					$this->db->set( 'ship_weight',				$v->shipping->weight );
-					$this->db->set( 'ship_weight_unit',			$v->shipping->weight_unit );
-
-				endif;
-
-				if ( $this->db->insert( $this->_table_variation ) ) :
-
-					$_variation_id = $this->db->insert_id();
-
-					//	Product Variation: Gallery
-					//	==========================
-					$_temp = array();
-					foreach( $v->gallery AS $id ) :
-
-						$_temp[] = array(
-							'product_id' => $_id,
-							'variation_id' => $_variation_id,
-							'object_id' => $id
-							);
-
-					endforeach;
-
-					if ( $_temp ) :
-
-						$this->db->insert_batch( $this->_table_variation_gallery, $_temp );
-
-					endif;
-
-					//	Product Variation: Meta
-					//	=======================
-
-					$this->db->set( 'variation_id',	$_variation_id );
-					$this->db->set( (array) $v->meta );
-					$this->db->insert( $this->_table_variation_meta );
-
-					//	Product Variation: Price
-					//	========================
-
-					foreach( $v->pricing AS &$price ) :
-
-						$price->product_id		= $_id;
-						$price->variation_id	= $_variation_id;
-
-						$price = (array) $price;
-
-					endforeach;
-
-					if ( $v->pricing ) :
-
-						$this->db->insert_batch( $this->_table_variation_price, $v->pricing );
-
-					endif;
-
-				else :
-
-					$this->_set_error( 'Unable to create variation with label "' . $v->label . '".' );
+					$this->_set_error( 'Failed to clear old product ' . $_type . '.' );
 					$_rollback = TRUE;
 					break;
 
 				endif;
 
-				$_counter++;
+				$_temp = array();
+				switch( $_field ) :
+
+					case 'attribute_id' :
+
+						foreach( $_items AS $item ) :
+
+							$_temp[] = array( 'product_id' => $data->id, 'attribute_id' => $item['attribute_id'], 'value' => $item['value'] );
+
+						endforeach;
+
+					break;
+
+					case 'object_id' :
+
+						$_counter = 0;
+						foreach( $_items AS $item_id ) :
+
+							$_temp[] = array( 'product_id' => $data->id, $_field => $item_id, 'order' => $_counter );
+							$_counter++;
+
+						endforeach;
+
+					break;
+
+					default :
+
+						foreach( $_items AS $item_id ) :
+
+							$_temp[] = array( 'product_id' => $data->id, $_field => $item_id );
+
+						endforeach;
+
+					break;
+
+				endswitch;
+
+				if ( $_temp ) :
+
+					if ( ! $this->db->insert_batch( $_table, $_temp ) ) :
+
+						$this->_set_error( 'Failed to add product ' . $_type . '.' );
+						$_rollback = TRUE;
+
+					endif;
+
+				endif;
 
 			endforeach;
 
+
+			//	Product Variations
+			//	==================
+
+			if ( ! $_rollback ) :
+
+				$_counter = 0;
+
+				//	Keep a note of the variants we deal with, we'll
+				//	want to mark any we don't deal with as deleted
+
+				$_variant_id_tracker = array();
+
+				foreach( $data->variation AS $index => $v ) :
+
+					//	Product Variation: Details
+					//	==========================
+
+					$this->db->set( 'label',	$v->label );
+					$this->db->set( 'sku',		$v->sku );
+					$this->db->set( 'order',	$_counter );
+
+
+					//	Product Variation: Stock Status
+					//	===============================
+
+					$this->db->set( 'stock_status',			$v->stock_status );
+					$this->db->set( 'quantity_available',	$v->quantity_available );
+					$this->db->set( 'lead_time',			$v->lead_time );
+
+
+					//	Product Variation: Shipping
+					//	===========================
+
+					$this->db->set( 'ship_collection_only', $v->shipping->collection_only );
+
+					if ( $data->is_physical ) :
+
+						$this->db->set( 'ship_length',				$v->shipping->length );
+						$this->db->set( 'ship_width',				$v->shipping->width );
+						$this->db->set( 'ship_height',				$v->shipping->height );
+						$this->db->set( 'ship_measurement_unit',	$v->shipping->measurement_unit );
+						$this->db->set( 'ship_weight',				$v->shipping->weight );
+						$this->db->set( 'ship_weight_unit',			$v->shipping->weight_unit );
+
+					endif;
+
+					if ( ! empty( $v->id ) ) :
+
+						//	Existing variation, update what's there
+						$this->db->where( 'id', $v->id );
+						$_result = $this->db->update( $this->_table_variation );
+						$_action = 'update';
+
+						$_variant_id_tracker[] = $v->id;
+
+					else :
+
+						//	New variation, add it.
+						$this->db->set( 'product_id', $data->id );
+						$_result = $this->db->insert( $this->_table_variation );
+						$_action = 'create';
+
+						$_variant_id_tracker[] = $this->db->insert_id();
+
+						$v->id = $this->db->insert_id();
+
+					endif;
+
+					if ( $_result ) :
+
+						//	Product Variation: Gallery
+						//	==========================
+
+						$this->db->where( 'variation_id', $v->id );
+						if ( ! $this->db->delete( $this->_table_variation_gallery ) ) :
+
+							$this->_set_error( 'Failed to clear gallery items for variant with label "' . $v->label . '"' );
+							$_rollback = TRUE;
+
+						endif;
+
+						if  (! $_rollback ) :
+
+							$_temp = array();
+							foreach( $v->gallery AS $object_id ) :
+
+								$_temp[] = array(
+									'variation_id'	=> $v->id,
+									'object_id'		=> $object_id
+								);
+
+							endforeach;
+
+							if ( $_temp ) :
+
+								if ( ! $this->db->insert_batch( $this->_table_variation_gallery, $_temp ) ) :
+
+									$this->_set_error( 'Failed to update gallery items variant with label "' . $v->label . '"' );
+									$_rollback = TRUE;
+
+								endif;
+
+							endif;
+
+						endif;
+
+
+						//	Product Variation: Meta
+						//	=======================
+
+						if ( ! $_rollback ) :
+
+							$this->db->where( 'variation_id', $v->id );
+							if ( ! $this->db->delete( $this->_table_variation_meta ) ) :
+
+								$this->_set_error( 'Failed to clear meta data for variant with label "' . $v->label . '"' );
+								$_rollback = TRUE;
+
+							endif;
+
+							if ( ! $_rollback ) :
+
+								$this->db->set( 'variation_id',	$v->id );
+								$this->db->set( (array) $v->meta );
+
+								if ( ! $this->db->insert( $this->_table_variation_meta ) ) :
+
+									$this->_set_error( 'Failed to update meta data for variant with label "' . $v->label . '"' );
+									$_rollback = TRUE;
+
+								endif;
+
+							endif;
+
+						endif;
+
+
+						//	Product Variation: Price
+						//	========================
+
+						if ( ! $_rollback ) :
+
+							$this->db->where( 'variation_id', $v->id );
+							if ( ! $this->db->delete( $this->_table_variation_price ) ) :
+
+								$this->_set_error( 'Failed to clear price data for variant with label "' . $v->label . '"' );
+								$_rollback = TRUE;
+
+							endif;
+
+							if ( ! $_rollback ) :
+
+								foreach( $v->pricing AS &$price ) :
+
+									$price->variation_id = $v->id;
+
+									$price = (array) $price;
+
+								endforeach;
+
+								if ( $v->pricing ) :
+
+									if ( ! $this->db->insert_batch( $this->_table_variation_price, $v->pricing ) ) :
+
+										$this->_set_error( 'Failed to update price data for variant with label "' . $v->label . '"' );
+										$_rollback = TRUE;
+
+									endif;
+
+								endif;
+
+							endif;
+
+						endif;
+
+					else :
+
+						$this->_set_error( 'Unable to ' . $_action . ' variation with label "' . $v->label . '".' );
+						$_rollback = TRUE;
+						break;
+
+					endif;
+
+					$_counter++;
+
+				endforeach;
+
+				//	Mark all untouched variants as deleted
+				if ( ! $_rollback ) :
+
+					$this->db->set( 'is_deleted', TRUE );
+					$this->db->where( 'product_id', $data->id );
+					$this->db->where_not_in( 'id', $_variant_id_tracker );
+
+					if ( ! $this->db->update( $this->_table_variation ) ) :
+
+						$this->_set_error( 'Unable to delete old variations.' );
+						$_rollback = TRUE;
+
+					endif;
+
+				endif;
+
+			endif;
+
 		else :
 
-			$this->_set_error( 'Unable to create base product.' );
+			$this->_set_error( 'Failed to ' . $_action . ' base product.' );
 			$_rollback = TRUE;
 
 		endif;
@@ -543,46 +745,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 		else :
 
 			$this->db->trans_commit();
-
-			if ( $return_obj ) :
-
-				return $this->get_by_id( $_id );
-
-			else :
-
-				return $_id;
-
-			endif;
+			return $data->id;
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Updates an existing object
-	 *
-	 * @access public
-	 * @param int $id The ID of the object to update
-	 * @param array $data The data to update the object with
-	 * @return bool
-	 **/
-	public function update( $id, $data = array() )
-	{
-		$_current = $this->get_by_id( $id );
-
-		if ( ! $_current ) :
-
-			$this->_set_error( 'Invalid product ID' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		dumpanddie( 'TODO: Update Product' );
 	}
 
 
@@ -598,7 +763,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 **/
 	public function delete( $id )
 	{
-		return $this->update( $id, array( 'is_deleted' => TRUE ) );
+		return parent::update( $id, array( 'is_deleted' => TRUE ) );
 	}
 
 
@@ -614,34 +779,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 **/
 	public function restore( $id )
 	{
-		return $this->update( $id, array( 'is_deleted' => FALSE ) );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Permenantly deletes an existing object
-	 *
-	 * @access public
-	 * @param int $id The ID of the object to delete
-	 * @return bool
-	 **/
-	public function destroy( $id )
-	{
-		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table );
-
-		if ( $this->db->affected_rows() ) :
-
-			return TRUE;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return parent::update( $id, array( 'is_deleted' => FALSE ) );
 	}
 
 
@@ -655,10 +793,10 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 * @param none
 	 * @return array
 	 **/
-	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL )
+	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $include_deleted = FALSE, $include_deleted_variants = FALSE )
 	{
 		//	TODO: Caching
-		//	Maybe use CI database caching?
+		//	TODO: Adopt the generic Nails Model format
 
 		// --------------------------------------------------------------------------
 
@@ -692,7 +830,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->join( $this->_table_tax_rate . ' tr', 'p.tax_rate_id = tr.id', 'LEFT' );
 
 		//	GrumpyCat says no
-		$this->db->where( 'p.is_deleted', FALSE );
+		if ( ! $include_deleted ) :
+
+			$this->db->where( 'p.is_deleted', FALSE );
+
+		endif;
 
 		if ( $only_active ) :
 
@@ -702,7 +844,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_products = $this->db->get( $this->_table_product . ' p' )->result();
+		$_products = $this->db->get( $this->_table . ' p' )->result();
 
 		// --------------------------------------------------------------------------
 
@@ -774,6 +916,11 @@ class NAILS_Shop_product_model extends NAILS_Model
 			//	==========
 			$this->db->select( 'pv.*' );
 			$this->db->where( 'pv.product_id', $product->id );
+			if ( ! $include_deleted_variants ) :
+
+				$this->db->where( 'pv.is_deleted', FALSE );
+
+			endif;
 			$this->db->order_by( 'pv.order' );
 			$product->variations = $this->db->get( $this->_table_variation . ' pv' )->result();
 
@@ -809,41 +956,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			endforeach;
 
-			// --------------------------------------------------------------------------
-
-			//	Do prices need converted?
-			// if ( SHOP_BASE_CURRENCY_ID != SHOP_USER_CURRENCY_ID ) :
-
-			// 	//	Has a set price been defined for this currency?
-			// 	if ( NULL !== $product->render_price ) :
-
-			// 		$product->price_render = $product->render_price;
-
-			// 	else :
-
-			// 		$product->price_render = shop_convert_to_user( $product->price );
-
-			// 	endif;
-
-			// 	//	What about a set sale price?
-			// 	if ( NULL !== $product->render_sale_price ) :
-
-			// 		$product->sale_price_render = $product->render_sale_price;
-
-			// 	else :
-
-			// 		$product->sale_price_render = shop_convert_to_user( $product->sale_price );
-
-			// 	endif;
-
-			// else :
-
-			// 	$product->price_render		= $product->price;
-			// 	$product->sale_price_render	= $product->price;
-
-			// endif;
-
-
 		endforeach;
 
 		// --------------------------------------------------------------------------
@@ -854,10 +966,23 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 	// --------------------------------------------------------------------------
 
-
-	protected function search( $only_active = TRUE, $order = NULL, $limit = NULL )
+	/**
+	 * Fetch a product by it's ID
+	 * @param  int $id The ID of the product
+	 * @return mixed     FALSE on failure, stdClass on success
+	 */
+	public function get_by_id( $id )
 	{
-		dumpanddie( 'TODO: Search products' );
+		$this->db->where( $this->_table_prefix . '.id', $id );
+		$_item = $this->get_all( TRUE, NULL, NULL, TRUE, FALSE );
+
+		if ( ! $_item ) :
+
+			return FALSE;
+
+		endif;
+
+		return $_item[0];
 	}
 
 
@@ -865,311 +990,66 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 
 	/**
-	 * Counts the total amount of products for a partricular query/search key. Essentially performs
-	 * the same query as $this->get_all() but without limiting.
-	 *
-	 * @access	public
-	 * @param	string	$where	An array of where conditions
-	 * @param	mixed	$search	A string containing the search terms
-	 * @return	int
-	 *
-	 **/
-	public function count_all( $only_active = FALSE, $where = NULL, $search = NULL )
+	 * Fetch a product by it's slug
+	 * @param  string $slug The slug of the product
+	 * @return mixed     FALSE on failure, stdClass on success
+	 */
+	public function get_by_slug( $slug )
 	{
-		//$this->_getcount_common( $only_active, $where, $search );
+		$this->db->where( $this->_table_prefix . '.slug', $slug );
+		$_item = $this->get_all( TRUE, NULL, NULL, TRUE, FALSE );
 
-		// --------------------------------------------------------------------------
+		if ( ! $_item ) :
 
-		//	Execute Query
+			return FALSE;
+
+		endif;
+
+		return $_item[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Count all the total number of products
+	 * @param  boolean $only_active     Include active items only
+	 * @param  array  $where            TODO
+	 * @param  string  $search          TODO
+	 * @param  boolean $include_deleted Include deleted items
+	 * @return int                   The number of products
+	 */
+	public function count_all( $only_active = FALSE, $where = NULL, $search = NULL, $include_deleted = FALSE )
+	{
+		if ( ! $include_deleted ) :
+
+			$this->db->where( 'p.is_deleted', FALSE );
+
+		endif;
+
+		if ( $only_active ) :
+
+			$this->db->where( 'p.is_active', TRUE );
+
+		endif;
+
 		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_product p' );
 	}
 
-
 	// --------------------------------------------------------------------------
 
 
 	/**
-	 * Fetch an object by it's ID
-	 *
-	 * @access public
-	 * @param int $id The ID of the object to fetch
-	 * @return	stdClass
-	 **/
-	public function get_by_id( $id )
-	{
-		$this->db->where( 'p.id', $id );
-		$_result = $this->get_all( FALSE );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_product_types( $include_count = FALSE )
-	{
-		$this->db->select( 'pt.id,pt.slug,pt.label,pt.description,pt.is_physical,pt.ipn_method,pt.max_per_order,pt.max_variations,pt.created,pt.modified' );
-
-		if ( $include_count ) :
-
-			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product WHERE type_id = pt.id) product_count' );
-
-		endif;
-
-		$this->db->order_by( 'label' );
-		$_result = $this->db->get( $this->_table_type . ' pt' )->result();
-
-		foreach( $_result AS &$r ) :
-
-			$this->_format_product_type_object( $r );
-
-		endforeach;
-
-		return $_result;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_product_types_flat( $include_count = FALSE )
-	{
-		$_types	= $this->get_product_types( $include_count );
-		$_out	= array();
-
-		foreach ( $_types AS $type ) :
-
-			$_out[$type->id] = $type->label;
-
-			if ( $include_count ) :
-
-				$_out[$type->id] .= ' (' . $type->product_count . ')';
-
-			endif;
-
-		endforeach;
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_product_type_by_id( $id, $include_count = FALSE  )
-	{
-		$this->db->where( 'id', $id );
-		$_types = $this->get_product_types( $include_count );
-
-		if ( ! $_types ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $_types[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function create_product_type( $data )
-	{
-		$_data = new stdClass();
-
-		if ( isset( $data->label ) ) :
-
-			$_data->label = strip_tags( $data->label );
-
-		else :
-
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
-
-		endif;
-
-		if ( isset( $data->description ) ) :
-
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->is_physical ) ) :
-
-			$_data->is_physical = $data->is_physical;
-
-		endif;
-
-		if ( isset( $data->ipn_method ) ) :
-
-			$_data->ipn_method = $data->ipn_method;
-
-		endif;
-
-		if ( isset( $data->max_per_order ) ) :
-
-			$_data->max_per_order = $data->max_per_order;
-
-		endif;
-
-		if ( isset( $data->max_variations ) ) :
-
-			$_data->max_variations =  $data->max_variations;
-
-		endif;
-
-		if ( ! empty( $_data ) ) :
-
-			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label, '', '', $this->_table_type );
-			$this->db->set( $_data );
-			$this->db->set( 'created', 'NOW()', FALSE );
-			$this->db->set( 'modified', 'NOW()', FALSE );
-
-			if ( active_user( 'id' ) ) :
-
-				$this->db->set( 'created_by', active_user( 'id' ) );
-				$this->db->set( 'modified_by', active_user( 'id' ) );
-
-			endif;
-
-			$this->db->insert( $this->_table_type );
-
-			if ( $this->db->affected_rows() ) :
-
-				return $this->db->insert_id();
-
-			else :
-
-				return FALSE;
-
-			endif;
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function delete_product_type( $id )
-	{
-		//	Turn off DB Errors
-		$_previous = $this->db->db_debug;
-		$this->db->db_debug = FALSE;
-
-		$this->db->trans_begin();
-		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table_type );
-		$_affected_rows = $this->db->affected_rows();
-
-		if ($this->db->trans_status() === FALSE) :
-
-		    $this->db->trans_rollback();
-
-			$_return = FALSE;
-
-		else :
-
-		    $this->db->trans_commit();
-			$_return = (bool) $_affected_rows;
-
-		endif;
-
-		//	Put DB errors back as they were
-		$this->db->db_debug = $_previous;
-
-		return $_return;
-	}
-
-
-	public function update_product_type( $id, $data )
-	{
-		$_data = new stdClass();
-
-		if ( isset( $data->label ) ) :
-
-			$_data->label = strip_tags( $data->label );
-
-		else :
-
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
-
-		endif;
-
-		if ( isset( $data->description ) ) :
-
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->is_physical ) ) :
-
-			$_data->is_physical = $data->is_physical;
-
-		endif;
-
-		if ( isset( $data->ipn_method ) ) :
-
-			$_data->ipn_method = $data->ipn_method;
-
-		endif;
-
-		if ( isset( $data->max_per_order ) ) :
-
-			$_data->max_per_order = $data->max_per_order;
-
-		endif;
-
-		if ( isset( $data->max_variations ) ) :
-
-			$_data->max_variations =  $data->max_variations;
-
-		endif;
-
-		if ( ! empty( $_data ) ) :
-
-			$this->db->set( $_data );
-			$this->db->set( 'modified', 'NOW()', FALSE );
-			$this->db->where( 'id', $id );
-
-			if ( $this->db->update( $this->_table_type ) ) :
-
-				return TRUE;
-
-			else :
-
-				return FALSE;
-
-			endif;
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_for_category( $category, $only_active = TRUE, $order = NULL, $limit = NULL )
+	 * Fetch products from a particular category
+	 * @param  mixed  $category        The ID or slug of the category
+	 * @param  boolean $only_active     Include active items only
+	 * @param  [type]  $order           [description]
+	 * @param  [type]  $limit           [description]
+	 * @param  boolean $include_deleted Include deleted items
+	 * @return array                   An array of products
+	 */
+	public function get_for_category( $category, $only_active = TRUE, $order = NULL, $limit = NULL, $include_deleted = FALSE )
 	{
 		$this->load->model( 'shop/shop_category_model', 'category' );
 
@@ -1192,45 +1072,24 @@ class NAILS_Shop_product_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Fetch all the ID's we want to search across
-		$_ids 		= array( $_category->id );
-		$_ids		= array_merge( $_ids, $this->category->get_ids_of_all_children( $_category->id ) );
+		$_ids = array( $_category->id );
+		$_ids = array_merge( $_ids, $this->category->get_ids_of_all_children( $_category->id ) );
 
 		$this->db->where_in( 'pc.category_id', $_ids );
 		$this->db->join( $this->_table_category . ' pc', 'pc.product_id = p.id' );
 		$this->db->group_by( 'p.id' );
-		return $this->get_all();
+		return $this->get_all( $only_active, $order, $limit, $include_deleted );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function product_type_meta_fields_download()
-	{
-		$_out = array();
-
-		// --------------------------------------------------------------------------
-
-		//	TODO: This array should be a form builder config array - when that library is complete.
-
-		//	Download ID
-		$_out[0]				= new stdClass();
-		$_out[0]->type			= 'cdn_object';
-		$_out[0]->key			= 'download_id';
-		$_out[0]->label			= 'Download';
-		$_out[0]->bucket		= 'shop-download';
-		$_out[0]->tip			= '';
-		$_out[0]->validation	= 'xss_clean|required';
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
+	/**
+	 * Formats a product object
+	 * @param  stdClass $product The product object to format
+	 * @return void
+	 */
 	protected function _format_product_object( &$product )
 	{
 		//	Type casting
@@ -1265,18 +1124,53 @@ class NAILS_Shop_product_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Formats a variation object
+	 * @param  stdClass $variation The variation object to format
+	 * @return void
+	 */
 	protected function _format_variation_object( &$variation )
 	{
 		//	Type casting
-		$variation->id							= (int) $variation->id;
+		$variation->id					= (int) $variation->id;
+		$variation->product_id			= (int) $variation->product_id;
+		$variation->quantity_sold		= (int) $variation->quantity_sold;
+		$variation->order				= (int) $variation->order;
+		$variation->is_deleted			= (bool) $variation->is_deleted;
+		$variation->quantity_available	= is_numeric( $variation->quantity_available ) ? (int) $variation->quantity_available : $variation->quantity_available;
+
+		//	Gallery
+		if ( ! empty( $variation->gallery ) && is_array( $variation->gallery ) ) :
+
+			foreach ( $variation->gallery AS &$object_id ) :
+
+				$object_id	= (int) $object_id;
+
+			endforeach;
+
+		endif;
+
+		//	Price
+		if ( ! empty( $variation->price ) && is_array( $variation->price ) ) :
+
+			foreach ( $variation->price AS $price ) :
+
+				$price->id					= (int) $price->id;
+				$price->decimal_precision	= (int) $price->decimal_precision;
+				$price->price				= (float) $price->price;
+				$price->sale_price			= (float) $price->sale_price;
+
+			endforeach;
+
+		endif;
 
 		//	Shipping data
 		$variation->shipping					= new stdClass();
-		$variation->shipping->length			= $variation->ship_length;
-		$variation->shipping->width				= $variation->ship_width;
-		$variation->shipping->height			= $variation->ship_height;
+		$variation->shipping->length			= (float) $variation->ship_length;
+		$variation->shipping->width				= (float) $variation->ship_width;
+		$variation->shipping->height			= (float) $variation->ship_height;
 		$variation->shipping->measurement_unit	= $variation->ship_measurement_unit;
-		$variation->shipping->weight			= $variation->ship_weight;
+		$variation->shipping->weight			= (float) $variation->ship_weight;
 		$variation->shipping->weight_unit		= $variation->ship_weight_unit;
 		$variation->shipping->collection_only	= (bool) $variation->ship_collection_only;
 
@@ -1287,20 +1181,6 @@ class NAILS_Shop_product_model extends NAILS_Model
 		unset( $variation->ship_weight );
 		unset( $variation->ship_weight_unit );
 		unset( $variation->ship_collection_only );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _format_product_type_object( &$obj )
-	{
-		//	Type casting
-		$obj->id				= (int) $obj->id;
-		$obj->max_per_order		= (int) $obj->max_per_order;
-		$obj->max_variations	= (int) $obj->max_variations;
-		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
-		$obj->is_physical		= (bool) $obj->is_physical;
 	}
 }
 

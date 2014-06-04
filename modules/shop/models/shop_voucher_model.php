@@ -307,7 +307,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 					else :
 
 						//	Doesn't exist, fetch and save
-						$voucher->product = $this->product->get_product_type_by_id( $voucher->product_type_id );
+						$voucher->product = $this->product_type->get_by_id( $voucher->product_type_id );
 						$this->_set_cache( 'voucher-product-type-' . $voucher->product_type_id, $voucher->product );
 
 					endif;

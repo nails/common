@@ -174,11 +174,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load models which this model depends on
-		$this->load->model( 'shop/shop_model', 'shop' );
-		$this->load->model( 'shop/shop_currency_model', 'currency' );
-		$this->load->model( 'shop/shop_product_model', 'product' );
-		$this->load->model( 'shop/shop_tax_model', 'tax' );
+		//	Load models which this controller depends on
+		$this->load->model( 'shop/shop_model',				'shop' );
+		$this->load->model( 'shop/shop_currency_model',		'currency' );
+		$this->load->model( 'shop/shop_product_model',		'product' );
+		$this->load->model( 'shop/shop_product_type_model',	'product_type' );
+		$this->load->model( 'shop/shop_tax_model',			'tax' );
 	}
 
 
@@ -303,7 +304,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data, this data is used in both the view and the form submission
-		$this->data['product_types'] = $this->product->get_product_types();
+		$this->data['product_types'] = $this->product_type->get_all();
 
 		if ( ! $this->data['product_types'] ) :
 
@@ -316,7 +317,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['currencies'] = $this->currency->get_all();
 
 		//	Fetch product meta fields
-		$_product_types						= $this->product->get_product_types();
+		$_product_types						= $this->product_type->get_all();
 		$this->data['product_types_meta']	= array();
 
 		foreach ( $_product_types AS $type ) :
@@ -365,7 +366,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			else :
 
-				$this->data['error'] = '<strong>Whoops!</strong> There are some problems with the form.';
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 
 			endif;
 
@@ -384,7 +385,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch additional data
-		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
+		$this->data['product_types_flat']	= $this->product_type->get_all_flat();
 		$this->data['tax_rates']			= $this->tax->get_all_flat();
 		$this->data['attributes']			= $this->attribute->get_all_flat();
 		$this->data['brands']				= $this->brand->get_all_flat();
@@ -669,7 +670,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data, this data is used in both the view and the form submission
-		$this->data['product_types'] = $this->product->get_product_types();
+		$this->data['product_types'] = $this->product_type->get_all();
 
 		if ( ! $this->data['product_types'] ) :
 
@@ -682,7 +683,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['currencies'] = $this->currency->get_all();
 
 		//	Fetch product meta fields
-		$_product_types						= $this->product->get_product_types();
+		$_product_types						= $this->product_type->get_all();
 		$this->data['product_types_meta']	= array();
 
 		foreach ( $_product_types AS $type ) :
@@ -731,7 +732,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			else :
 
-				$this->data['error'] = '<strong>Whoops!</strong> There are some problems with the form.';
+				$this->data['error'] = lang( 'fv_there_were_errors' );
 
 			endif;
 
@@ -750,7 +751,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch additional data
-		$this->data['product_types_flat']	= $this->product->get_product_types_flat();
+		$this->data['product_types_flat']	= $this->product_type->get_all_flat();
 		$this->data['tax_rates']			= $this->tax->get_all_flat();
 		$this->data['attributes']			= $this->attribute->get_all_flat();
 		$this->data['brands']				= $this->brand->get_all_flat();
@@ -1538,7 +1539,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['product_types'] = $this->product->get_product_types_flat();
+		$this->data['product_types'] = $this->product_type->get_all_flat();
 
 		// --------------------------------------------------------------------------
 
@@ -1591,7 +1592,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	public function _callback_voucher_valid_product_type( $str )
 	{
 		$this->form_validation->set_message( '_callback_voucher_valid_product_type', 'Invalid product type.' );
-		return (bool) $this->product->get_product_type_by_id( $str );
+		return (bool) $this->product_type->get_by_id( $str );
 	}
 
 	public function _callback_voucher_valid_from( &$str )
@@ -2904,7 +2905,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->max_per_order	= (int) $this->input->post( 'max_per_order' );
 						$_data->max_variations	= (int) $this->input->post( 'max_variations' );
 
-						if ( $this->product->create_product_type( $_data ) ) :
+						if ( $this->product_type->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
@@ -2950,7 +2951,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->max_per_order	= isset( $_POST['type']['max_per_order'] )	? (int) $_POST['type']['max_per_order'] : 0;
 						$_data->max_variations	= isset( $_POST['type']['max_variations'] )	? (int) $_POST['type']['max_variations'] : 0;
 
-						if ( $this->product->update_product_type( $_id, $_data ) ) :
+						if ( $this->product_type->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Product Type saved successfully.';
 
@@ -2973,7 +2974,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->product->delete_product_type( $_id ) ) :
+					if ( $this->product_type->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Product Type was deleted successfully.';
 
@@ -2992,7 +2993,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['types'] = $this->product->get_product_types( TRUE );
+		$this->data['types'] = $this->product_type->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 

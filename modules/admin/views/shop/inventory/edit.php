@@ -238,7 +238,6 @@
 
 					endif;
 
-
 					if ( ! empty( $_variations ) ) :
 
 						foreach ( $_variations AS $variation ) :
