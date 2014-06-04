@@ -624,7 +624,7 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->select( 'ue.email, ue.code email_verification_code, ue.is_verified email_is_verified, ue.date_verified email_is_verified_on' );
 		$this->db->select( $this->_get_meta_columns( 'um' ) );
 		$this->db->select( 'uam.type AS `auth_type`' );
-		$this->db->select( 'ug.display_name AS `group_name`' );
+		$this->db->select( 'ug.label AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
 		$this->db->select( 'dfd.label date_format_date_label, dfd.format date_format_date_format' );
@@ -3121,7 +3121,7 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$_group = $this->get_group( $_user_data['group_id'] );
+		$_group = $this->user_group->get_by_id( $_user_data['group_id'] );
 
 		if ( ! $_group ) :
 
@@ -3377,7 +3377,7 @@ class NAILS_User_model extends NAILS_Model
 					$_email->data['admin']->last_name	= active_user( 'last_name' );
 					$_email->data['admin']->group		= new stdClass();
 					$_email->data['admin']->group->id	= $_group->id;
-					$_email->data['admin']->group->name	= $_group->display_name;
+					$_email->data['admin']->group->name	= $_group->label;
 
 				endif;
 
@@ -3700,122 +3700,6 @@ class NAILS_User_model extends NAILS_Model
 	 {
 	 	return $this->update( $id, array( 'is_suspended' => FALSE ) );
 	 }
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns an array of user groups
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	string
-	 * @param	array
-	 * @param	string
-	 * @return	array
-	 **/
-	public function get_groups()
-	{
-		$_groups = $this->db->get( NAILS_DB_PREFIX . 'user_group' )->result();
-
-		// --------------------------------------------------------------------------
-
-		//	Loop through results and unserialise the acl
-		foreach( $_groups AS $group ) :
-
-			$group->acl = unserialize( $group->acl );
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_groups;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns an array of user groups
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	string
-	 * @param	array
-	 * @param	string
-	 * @return	array
-	 **/
-	public function get_groups_flat()
-	{
-		$_groups	= $this->get_groups();
-		$_out		= array();
-
-		// --------------------------------------------------------------------------
-
-		//	Loop through results and unserialise the ACL
-		foreach( $_groups AS $group ) :
-
-			$_out[$group->id] = $group->display_name;
-			//	TODO: unserialize the ACL (check it's not being unserialized twice elsewhere)
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Get a group's information
-	 *
-	 * @access	public
-	 * @param	int		$group_id	The ID of the group to fetch
-	 * @return	object
-	 **/
-	public function get_group( $group_id )
-	{
-		if ( is_numeric( $group_id ) ) :
-
-			$this->db->where( 'id', (int) $group_id );
-
-		else :
-
-			//	TODO: change this column to `slug`
-			$this->db->where( 'name', $group_id );
-
-		endif;
-
-		$_group = $this->get_groups();
-
-		// --------------------------------------------------------------------------
-
-		return ( isset( $_group[0] ) ) ? $_group[0] : FALSE;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Update a group's information
-	 *
-	 * @access	public
-	 * @param	int		$id		The ID of the group to update
-	 * @param	array	$data	The data to use in the update
-	 * @return	void
-	 **/
-	public function update_group( $id, $data )
-	{
-		$this->db->set( $data );
-		$this->db->where( 'id', $id );
-		$this->db->update( NAILS_DB_PREFIX . 'user_group' );
-	}
 
 
 	// --------------------------------------------------------------------------

@@ -1402,14 +1402,20 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'user_group` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			`name` varchar(150) NOT NULL DEFAULT \'\',
-			`display_name` varchar(150) NOT NULL DEFAULT \'\',
+			`slug` varchar(150) NOT NULL DEFAULT \'\',
+			`label` varchar(150) NOT NULL DEFAULT \'\',
 			`description` varchar(500) NOT NULL,
 			`default_homepage` varchar(255) NOT NULL,
 			`registration_redirect` varchar(255) DEFAULT NULL,
 			`acl` text,
+			`created` datetime NOT NULL,
+			`created_by` int(10) unsigned DEFAULT NULL,
+			`modified` datetime NOT NULL,
+			`modified_by` int(11) unsigned DEFAULT NULL,
 			PRIMARY KEY (`id`),
-			UNIQUE KEY `name` (`name`)
+			UNIQUE KEY `name` (`name`),
+			CONSTRAINT `' . $_NAILS_PREFIX . 'admin_user_group_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `' . $_NAILS_PREFIX . 'user` (`id`) ON DELETE SET NULL,
+			CONSTRAINT `' . $_NAILS_PREFIX . 'admin_user_group_ibfk_2` FOREIGN KEY (`modified_by`) REFERENCES `' . $_NAILS_PREFIX . 'user` (`id`) ON DELETE SET NULL
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'user_meta` (

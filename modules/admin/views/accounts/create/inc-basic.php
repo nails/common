@@ -23,7 +23,7 @@
 
 			endif;
 
-			$_groups_by_id[$group->id] = $group->display_name;
+			$_groups_by_id[$group->id] = $group->label;
 
 		endforeach;
 
@@ -44,7 +44,7 @@
 
 			$_display = !$_counter ? 'block' : 'none';
 			echo '<li class="system-alert notice no-close" id="user-group-' . $groups[$i]->id . '" style="display:' . $_display . ';">';
-			echo  '<strong>' . $groups[$i]->display_name . ':</strong> ' . $groups[$i]->description;
+			echo  '<strong>' . $groups[$i]->label . ':</strong> ' . $groups[$i]->description;
 			echo '</li>';
 
 			$_counter++;

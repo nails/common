@@ -55,10 +55,10 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Navigation options
-		$d->funcs				= array();
-		$d->funcs['index']		= lang( 'accounts_nav_index' );
-		$d->funcs['create']		= lang( 'accounts_nav_create' );
-
+		$d->funcs			= array();
+		$d->funcs['index']	= lang( 'accounts_nav_index' );
+		$d->funcs['create']	= lang( 'accounts_nav_create' );
+		$d->funcs['groups']	= 'Manage User Groups';
 
 		// --------------------------------------------------------------------------
 
@@ -112,6 +112,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Define some basic extra permissions
 		$_permissions['can_login_as']		= 'Can log in as another user';
 		$_permissions['can_edit_others']	= 'Can edit other users';
+		$_permissions['can_create_group']		= 'Can create user groups';
+		$_permissions['can_edit_group']			= 'Can edit user groups';
+		$_permissions['can_delete_group']		= 'Can delete user groups';
 
 		// --------------------------------------------------------------------------
 
@@ -180,7 +183,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$_default_order		= $this->session->userdata( $_hash . 'order' ) ? 	$this->session->userdata( $_hash . 'order' ) : 'ASC';
 
 		//	Define vars
-		$_search						= array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
+		$_search			= array( 'keywords' => $this->input->get( 'search' ), 'columns' => array() );
 
 		foreach ( $this->accounts_sortfields AS $field ) :
 
@@ -432,7 +435,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the groups
-		$this->data['groups'] = $this->user->get_groups();
+		$this->data['groups'] = $this->user_group->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -799,7 +802,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$this->data['page']->title = lang( 'accounts_edit_title', title_case( $_user->first_name . ' ' . $_user->last_name ) );
 
 		//	Get the groups, timezones and languages
-		$this->data['groups']		= $this->user->get_groups();
+		$this->data['groups']		= $this->user_group->get_all();
 		$this->data['timezones']	= $this->datetime->get_all_timezone_flat();
 		$this->data['date_formats']	= $this->datetime->get_all_date_format_flat();
 		$this->data['time_formats']	= $this->datetime->get_all_time_format_flat();
@@ -1105,6 +1108,181 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			redirect( $_return_to );
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function groups()
+	{
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
+
+		if ( method_exists( $this, '_groups_' . $_method ) ) :
+
+			$this->{'_groups_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _groups_index()
+	{
+		$this->data['page']->title = 'Manage User Groups';
+
+		// --------------------------------------------------------------------------
+
+
+		$this->data['groups'] = $this->user_group->get_all();
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/accounts/groups/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _groups_create()
+	{
+		if ( ! user_has_permission( 'admin.accounts.can_create_group' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->session->set_flashdata( 'message', '<strong>Coming soon!</strong> The ability to dynamically create groups is on the roadmap.' );
+		redirect( 'admin/accounts/groups' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _groups_edit()
+	{
+		if ( ! user_has_permission( 'admin.accounts.can_edit_group' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_gid = $this->uri->segment( 5, NULL );
+
+		$this->data['group'] = $this->user_group->get_by_id( $_gid );
+
+		if ( ! $this->data['group'] ) :
+
+			$this->session->set_flashdata( 'error', 'Group does not exist.' );
+			redirect( 'admin/accounts/groups' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->post() ) :
+
+			//	Load library
+			$this->load->library( 'form_validation' );
+
+			//	Define rules
+			$this->form_validation->set_rules( 'slug',					'', 'xss_clean|unique_if_diff[' . NAILS_DB_PREFIX . 'user_group.slug.' . $this->data['group']->slug . ']' );
+			$this->form_validation->set_rules( 'label',					'', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'description',			'', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'default_homepage',		'', 'xss_clean|required' );
+			$this->form_validation->set_rules( 'registration_redirect',	'', 'xss_clean' );
+			$this->form_validation->set_rules( 'acl[]',					'', 'xss_clean' );
+			$this->form_validation->set_rules( 'acl[superuser]',		'', 'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin]',			'', 'xss_clean' );
+			$this->form_validation->set_rules( 'acl[admin][]',			'', 'xss_clean' );
+
+			//	Set messages
+			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required', lang( 'fv_unique_if_diff' ) );
+
+			if ( $this->form_validation->run() ) :
+
+				$_data							= array();
+				$_data['slug']					= $this->input->post( 'slug' );
+				$_data['label']					= $this->input->post( 'label' );
+				$_data['description']			= $this->input->post( 'description' );
+				$_data['default_homepage']		= $this->input->post( 'default_homepage' );
+				$_data['registration_redirect']	= $this->input->post( 'registration_redirect' );
+
+				//	Parse ACL's
+				$_acl = $this->input->post( 'acl' );
+
+				if ( isset( $_acl['admin'] ) ) :
+
+					//	Remove ACLs which have no enabled methods - pointless
+					$_acl['admin'] = array_filter( $_acl['admin'] );
+
+				endif;
+
+				$_data['acl'] = serialize( $_acl );
+
+				if ( $this->user_group->update( $_gid, $_data ) ) :
+
+					$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
+					redirect( 'admin/accounts/groups' );
+
+				else :
+
+					$this->data['error'] = '<strong>Sorry,</strong> I was unable to update the group. ' . $this->user_group->last_error();
+
+				endif;
+
+			else :
+
+				$this->data['error'] = lang( 'fv_there_were_errors' );
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		$this->data['page']->title = lang( 'accounts_groups_edit_title', $this->data['group']->label );
+
+		// --------------------------------------------------------------------------
+
+		//	Load views
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/accounts/groups/edit',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _groups_delete()
+	{
+		if ( ! user_has_permission( 'admin.accounts.can_delete_group' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->session->set_flashdata( 'message', '<strong>Coming soon!</strong> The ability to delete groups is on the roadmap.' );
+		redirect( 'admin/accounts/groups' );
 	}
 }
 

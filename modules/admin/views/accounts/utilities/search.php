@@ -48,11 +48,11 @@
 
 		// --------------------------------------------------------------------------
 
-		$_user_groups_obj = $user->get_groups();
+		$_user_groups_obj = $user_group->get_all();
 		$_groups = array( '' => 'All Groups' );
 		foreach ( $_user_groups_obj AS $g ) :
 
-			$_groups[$g->id] = $g->display_name;
+			$_groups[$g->id] = $g->label;
 
 		endforeach;
 

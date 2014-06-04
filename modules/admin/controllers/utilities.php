@@ -52,7 +52,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Navigation options
 		$d->funcs					= array();
 		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
-		$d->funcs['user_access']	= lang( 'utilities_nav_user_access' );
 		$d->funcs['languages']		= lang( 'utilities_nav_languages' );
 		$d->funcs['export']			= lang( 'utilities_nav_export' );
 
@@ -171,129 +170,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/utilities/send_test',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Manage user groups ACL's
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 **/
-	public function user_access()
-	{
-		//	Page Title
-		$this->data['page']->title = lang ( 'utilities_user_access_title' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['groups'] = $this->user->get_groups();
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/utilities/user_access',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Edit a group
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 **/
-	public function edit_group()
-	{
-		$_gid = $this->uri->segment( 4, NULL );
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->input->post() ) :
-
-			//	Load library
-			$this->load->library( 'form_validation' );
-
-			//	Define rules
-			$this->form_validation->set_rules( 'display_name',			lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'name',					lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
-			$this->form_validation->set_rules( 'description',			lang( 'utilities_edit_group_basic_field_label_description' ),	'xss_clean|required' );
-			$this->form_validation->set_rules( 'default_homepage',		lang( 'utilities_edit_group_basic_field_label_homepage' ), 		'xss_clean|required' );
-			$this->form_validation->set_rules( 'registration_redirect',	lang( 'utilities_edit_group_basic_field_label_registration' ), 	'xss_clean' );
-			$this->form_validation->set_rules( 'acl[]',					lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[superuser]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin][]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-
-			//	Set messages
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
-
-			if ( $this->form_validation->run() ) :
-
-				$_data = array();
-				$_data['display_name']			= $this->input->post( 'display_name' );
-				$_data['name']					= url_title( $this->input->post( 'name' ), 'dash', TRUE );
-				$_data['description']			= $this->input->post( 'description' );
-				$_data['default_homepage']		= $this->input->post( 'default_homepage' );
-				$_data['registration_redirect']	= $this->input->post( 'registration_redirect' );
-
-				//	Parse ACL's
-				$_acl = $this->input->post( 'acl' );
-
-				if ( isset( $_acl['admin'] ) ) :
-
-					//	Remove ACLs which have no enabled methods - pointless
-					$_acl['admin'] = array_filter( $_acl['admin'] );
-
-				endif;
-
-				$_data['acl']				= serialize( $_acl );
-
-				$this->user->update_group( $_gid, $_data );
-
-				$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
-				redirect( 'admin/utilities/user_access' );
-				return;
-
-			else :
-
-				$this->data['error'] = validation_errors();
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->data['group'] = $this->user->get_group( $_gid );
-
-		if ( ! $this->data['group'] ) :
-
-			$this->session->set_flashdata( 'error', 'Group does not exist.' );
-			redirect( 'admin/utilities/user_access' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Page title
-		$this->data['page']->title = lang( 'utilities_edit_group_title', $this->data['group']->display_name );
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/utilities/edit_group',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 

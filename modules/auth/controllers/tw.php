@@ -755,7 +755,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 				if ( $_new_user ) :
 
 					//	Fetch group data
-					$_group	= $this->user->get_group( $_data['group_id'] );
+					$_group	= $this->user_group->get_get_by_idgroup( $_data['group_id'] );
 
 					// --------------------------------------------------------------------------
 

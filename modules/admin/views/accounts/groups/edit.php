@@ -1,8 +1,8 @@
-<div class="group-utilities user-access edit">
+<div class="group-accounts groups edit">
 	<div class="system-alert message">
 		<div class="padder">
 			<p>
-				<?=lang( 'utilities_edit_group_warning' )?>
+				<?=lang( 'accounts_groups_edit_warning' )?>
 			</p>
 		</div>
 	</div>
@@ -14,16 +14,16 @@
 		<!--	BASICS	-->
 		<fieldset>
 
-			<legend><?=lang( 'utilities_edit_group_basic_legend' )?></legend>
+			<legend><?=lang( 'accounts_groups_edit_basic_legend' )?></legend>
 			<?php
 
 				//	Display Name
 				$_field					= array();
-				$_field['key']			= 'display_name';
-				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_display' );
-				$_field['default']		= $group->display_name;
+				$_field['key']			= 'label';
+				$_field['label']		= lang( 'accounts_groups_edit_basic_field_label_label' );
+				$_field['default']		= $group->label;
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_display' );
+				$_field['placeholder']	= lang( 'accounts_groups_edit_basic_field_placeholder_label' );
 
 				echo form_field( $_field );
 
@@ -31,11 +31,11 @@
 
 				//	Name
 				$_field					= array();
-				$_field['key']			= 'name';
-				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_name' );
-				$_field['default']		= $group->name;
+				$_field['key']			= 'slug';
+				$_field['label']		= lang( 'accounts_groups_edit_basic_field_label_slug' );
+				$_field['default']		= $group->slug;
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_name' );
+				$_field['placeholder']	= lang( 'accounts_groups_edit_basic_field_placeholder_slug' );
 
 				echo form_field( $_field );
 
@@ -45,10 +45,10 @@
 				$_field					= array();
 				$_field['key']			= 'description';
 				$_field['type']			= 'textarea';
-				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_description' );
+				$_field['label']		= lang( 'accounts_groups_edit_basic_field_label_description' );
 				$_field['default']		= $group->description;
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_description' );
+				$_field['placeholder']	= lang( 'accounts_groups_edit_basic_field_placeholder_description' );
 
 				echo form_field( $_field );
 
@@ -57,10 +57,10 @@
 				//	Default Homepage
 				$_field					= array();
 				$_field['key']			= 'default_homepage';
-				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_homepage' );
+				$_field['label']		= lang( 'accounts_groups_edit_basic_field_label_homepage' );
 				$_field['default']		= $group->default_homepage;
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_homepage' );
+				$_field['placeholder']	= lang( 'accounts_groups_edit_basic_field_placeholder_homepage' );
 
 				echo form_field( $_field );
 
@@ -69,12 +69,12 @@
 				//	Registration Redirect
 				$_field					= array();
 				$_field['key']			= 'registration_redirect';
-				$_field['label']		= lang( 'utilities_edit_group_basic_field_label_registration' );
+				$_field['label']		= lang( 'accounts_groups_edit_basic_field_label_registration' );
 				$_field['default']		= $group->registration_redirect;
 				$_field['required']		= FALSE;
-				$_field['placeholder']	= lang( 'utilities_edit_group_basic_field_placeholder_registration' );
+				$_field['placeholder']	= lang( 'accounts_groups_edit_basic_field_placeholder_registration' );
 
-				echo form_field( $_field, lang( 'utilities_edit_group_basic_field_tip_registration' ) );
+				echo form_field( $_field, lang( 'accounts_groups_edit_basic_field_tip_registration' ) );
 
 			?>
 
@@ -83,13 +83,13 @@
 		<!--	PERMISSIONS	-->
 		<fieldset id="permissions">
 
-			<legend><?=lang( 'utilities_edit_group_permission_legend' )?></legend>
+			<legend><?=lang( 'accounts_groups_edit_permission_legend' )?></legend>
 
 			<p class="system-alert message no-close">
-				<?=lang( 'utilities_edit_group_permission_warn' )?>
+				<?=lang( 'accounts_groups_edit_permission_warn' )?>
 			</p>
 			<p>
-				<?=lang( 'utilities_edit_group_permission_intro' )?>
+				<?=lang( 'accounts_groups_edit_permission_intro' )?>
 			</p>
 
 			<hr />
@@ -99,7 +99,7 @@
 				//	Require password update on log in
 				$_field					= array();
 				$_field['key']			= 'acl[superuser]';
-				$_field['label']		= lang( 'utilities_edit_group_permissions_field_label_superuser' );
+				$_field['label']		= lang( 'accounts_groups_edit_permissions_field_label_superuser' );
 				$_field['default']		= isset( $group->acl['superuser'] ) && $group->acl['superuser'] ? TRUE : FALSE;
 				$_field['required']		= FALSE;
 				$_field['id']			= 'super-user';
@@ -149,14 +149,14 @@
 
 							echo '<span class="label">';
 							echo $_field['label'];
-							echo '<small><a href="#" class="check-all" data-module="' . $_module_hash . '">' . lang( 'utilities_edit_group_permissions_toggle_all' ) . '</a></small>';
+							echo '<small><a href="#" class="check-all" data-module="' . $_module_hash . '">' . lang( 'accounts_groups_edit_permissions_toggle_all' ) . '</a></small>';
 							echo '</span>';
 
 						endif;
 
 						echo '<span class="input">';
 
-						$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>' . lang( 'utilities_edit_group_permissions_dashboard_warn' ) . '</small>' : '';
+						$_sub_label = $module == 'dashboard' && $method == 'index' ? '<br /><small>' . lang( 'accounts_groups_edit_permissions_dashboard_warn' ) . '</small>' : '';
 
 						$_options = array(
 							'key'		=> 'acl[admin][' . $module . '][' . $method . ']',

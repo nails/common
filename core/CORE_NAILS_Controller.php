@@ -641,6 +641,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_models	= array();
 		$_models[]	= array( 'system/site_model', 'site' );
 		$_models[]	= array( 'system/user_model', 'user' );
+		$_models[]	= array( 'system/user_group_model', 'user_group' );
+		$_models[]	= array( 'system/user_password_model', 'user_password' );
 		$_models[]	= array( 'system/datetime_model', 'datetime' );
 		$_models[]	= array( 'system/language_model', 'language' );
 
@@ -675,7 +677,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instantiate_user()
 	{
 		//	Set a $user variable (for the views)
-		$this->data['user'] =& $this->user;
+		$this->data['user']				=& $this->user;
+		$this->data['user_group']		=& $this->user_group;
+		$this->data['user_password']	=& $this->user_password;
 
 		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
 		//	reference the user model
@@ -689,6 +693,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$this->user->find_remembered_user();
 		$this->user->init();
+
+		// --------------------------------------------------------------------------
+
+		//	Inject the user object into the user_group and user_password models
+		$this->user_group->_set_user_object( $this->user );
+		$this->user_password->_set_user_object( $this->user );
 	}
 
 

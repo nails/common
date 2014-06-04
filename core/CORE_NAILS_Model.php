@@ -110,6 +110,23 @@ class CORE_NAILS_Model extends CI_Model
 	}
 
 
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Inject the user object, private by convention - only really used by a few
+	 * core NAils classes
+	 *
+	 * @access	public
+	 * @param object $user The user object
+	 * @return void
+	 **/
+	public function _set_user_object( &$user )
+	{
+		$this->user = $user;
+	}
+
+
 	/**
 	 * --------------------------------------------------------------------------
 	 *

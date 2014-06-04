@@ -159,7 +159,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 				if ( $_new_user ) :
 
 					//	Fetch user and group data
-					$_group	= $this->user->get_group( $_data['group_id'] );
+					$_group	= $this->user_group->get_by_id( $_data['group_id'] );
 
 					// --------------------------------------------------------------------------
 
