@@ -113,7 +113,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			CONSTRAINT `' . $_NAILS_PREFIX . 'blog_post_image_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `' . $_NAILS_PREFIX . 'cdn_object` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-		$this->db->query( 'CREATE TABLE `' . $_NAILS_PREFIX . 'blog_post_hit` (
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'blog_post_hit` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`post_id` int(11) unsigned NOT NULL,
 			`user_id` int(11) unsigned DEFAULT NULL,
@@ -761,7 +761,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`label` varchar(50) NOT NULL DEFAULT \'\',
 			`decimal_precision` tinyint(1) unsigned NOT NULL DEFAULT \'2\',
 			`decimal_symbol` char(1) NOT NULL DEFAULT \'.\',
-			`thousands_seperator` char(1) NOT NULL DEFAULT \',\',
+			`thousands_seperator` char(1) NOT NULL DEFAULT ',',
 			`base_exchange` float(20,6) NOT NULL,
 			`is_active` tinyint(1) unsigned NOT NULL,
 			`created` datetime NOT NULL,
@@ -802,7 +802,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`voucher_id` int(11) unsigned DEFAULT NULL,
 			`status` enum(\'UNPAID\',\'PAID\',\'ABANDONED\',\'CANCELLED\',\'FAILED\',\'PENDING\') NOT NULL DEFAULT \'UNPAID\',
 			`requires_shipping` tinyint(1) unsigned NOT NULL,
-			`fulfilment_status` enum(\'UNFULFILLED\',\'FULFILLED\') NOT NULL DEFAULT \'UNFULFILLED\',
+			`fulfilment_status` enum(\'UNFULFILLED\',\'FULFILLED\) NOT NULL DEFAULT \'UNFULFILLED\',
 			`created` datetime NOT NULL,
 			`modified` datetime NOT NULL,
 			`fulfilled` datetime DEFAULT NULL,
@@ -852,6 +852,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`order_id` int(11) unsigned NOT NULL,
 			`product_id` int(11) unsigned NOT NULL,
+			`variant_id` int(11) unsigned NOT NULL,
 			`quantity` tinyint(1) unsigned NOT NULL DEFAULT \'1\',
 			`title` varchar(150) DEFAULT \'\',
 			`price` float(10,2) unsigned NOT NULL,
@@ -875,6 +876,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			PRIMARY KEY (`id`),
 			KEY `order_id` (`order_id`),
 			KEY `product_id` (`product_id`),
+			KEY `variant_id` (`variant_id`),
+			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_order_product_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product_variation` (`id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_order_product_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_order` (`id`) ON DELETE CASCADE,
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_order_product_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
@@ -925,11 +928,9 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_attribute` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`attribute_id` int(11) unsigned NOT NULL,
 			`value` varchar(255) DEFAULT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `attribute_id` (`attribute_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_attribute_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -937,10 +938,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_brand` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`brand_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `brand_id` (`brand_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_brand_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -948,10 +947,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_category` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`category_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `category_id` (`category_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_category_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -959,10 +956,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_collection` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`collection_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `collection_id` (`collection_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_collection_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -970,11 +965,9 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_gallery` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`object_id` int(11) unsigned DEFAULT NULL,
 			`order` tinyint(1) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `image_id` (`object_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_gallery_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -982,10 +975,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_range` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`range_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `range_id` (`range_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_range_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -993,10 +984,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_tag` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`product_id` int(11) unsigned NOT NULL,
 			`tag_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			KEY `tag_id` (`tag_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_tag_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
@@ -1040,21 +1029,17 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`ship_weight` decimal(10,5) unsigned DEFAULT NULL,
 			`ship_weight_unit` enum(\'G\',\'KG\') NOT NULL DEFAULT \'G\',
 			`ship_collection_only` tinyint(1) unsigned NOT NULL,
+			`is_deleted` tinyint(1) unsigned NOT NULL,
 			PRIMARY KEY (`id`),
 			KEY `product_id` (`product_id`),
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_variation_gallery` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			`product_id` int(11) unsigned NOT NULL,
 			`variation_id` int(11) unsigned NOT NULL,
 			`object_id` int(11) unsigned NOT NULL,
-			PRIMARY KEY (`id`),
-			KEY `product_id` (`product_id`),
 			KEY `variation_id` (`variation_id`),
 			KEY `object_id` (`object_id`),
-			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_gallery_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_gallery_ibfk_2` FOREIGN KEY (`variation_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product_variation` (`id`) ON DELETE CASCADE,
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_gallery_ibfk_3` FOREIGN KEY (`object_id`) REFERENCES `' . $_NAILS_PREFIX . 'cdn_object` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
@@ -1072,17 +1057,12 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_product_variation_price` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			`product_id` int(11) unsigned NOT NULL,
 			`variation_id` int(11) unsigned NOT NULL,
 			`currency_id` int(11) unsigned NOT NULL,
 			`price` float(10,2) DEFAULT NULL,
 			`sale_price` float(10,2) DEFAULT NULL,
-			PRIMARY KEY (`id`),
-			KEY `product_id` (`product_id`),
 			KEY `currency_id` (`currency_id`),
 			KEY `variation_id` (`variation_id`),
-			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_price_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product` (`id`) ON DELETE CASCADE,
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_price_ibfk_2` FOREIGN KEY (`currency_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_currency` (`id`) ON DELETE CASCADE,
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_product_variation_price_ibfk_3` FOREIGN KEY (`variation_id`) REFERENCES `' . $_NAILS_PREFIX . 'shop_product_variation` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
