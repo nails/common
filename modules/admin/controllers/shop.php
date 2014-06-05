@@ -52,6 +52,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
 		$d->funcs['sales']		= 'Manage Sales';				//	Sub-nav function.
+		$d->funcs['front']		= 'Manage Front of House';				//	Sub-nav function.
 		$d->funcs['manage']		= 'Other Managers';				//	Sub-nav function.
 		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
 
@@ -195,17 +196,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 **/
 	public function inventory()
 	{
-		switch( $this->uri->segment( '4' ) ) :
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
 
-			case 'create' :		$this->_inventory_create();		break;
-			case 'import' :		$this->_inventory_import();		break;
-			case 'edit' :		$this->_inventory_edit();		break;
-			case 'delete' :		$this->_inventory_delete();		break;
-			case 'restore' :	$this->_inventory_restore();	break;
-			case 'index' :
-			default :			$this->_inventory_index();		break;
+		if ( method_exists( $this, '_inventory_' . $_method ) ) :
 
-		endswitch;
+			$this->{'_inventory_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 
 
@@ -892,15 +893,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	public function orders()
 	{
-		switch( $this->uri->segment( '4' ) ) :
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
 
-			case 'view' :		$this->_orders_view();		break;
-			case 'reprocess' :	$this->_orders_reprocess();	break;
-			case 'process' :	$this->_orders_process();	break;
-			case 'index' :
-			default :			$this->_orders_index();		break;
+		if ( method_exists( $this, '_orders_' . $_method ) ) :
 
-		endswitch;
+			$this->{'_orders_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 
 
@@ -1270,15 +1273,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		switch( $this->uri->segment( '4' ) ) :
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
 
-			case 'create' :		$this->_vouchers_create();		break;
-			case 'activate' :	$this->_vouchers_activate();	break;
-			case 'deactivate' :	$this->_vouchers_deactivate();	break;
-			case 'index' :
-			default :			$this->_vouchers_index();		break;
+		if ( method_exists( $this, '_vouchers_' . $_method ) ) :
 
-		endswitch;
+			$this->{'_vouchers_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 
 
@@ -1782,15 +1787,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 **/
 	public function sales()
 	{
-		switch( $this->uri->segment( '4' ) ) :
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
 
-			case 'add' :		$this->_sales_add();	break;
-			case 'edit' :		$this->_sales_edit();	break;
-			case 'delete' :		$this->_sales_delete();	break;
-			case 'index' :
-			default :			$this->_sales_index();	break;
+		if ( method_exists( $this, '_sales_' . $_method ) ) :
 
-		endswitch;
+			$this->{'_sales_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 
 
@@ -1848,29 +1855,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	 **/
 	public function manage()
 	{
-		//	Load voucher model
-		$this->load->model( 'shop/shop_voucher_model', 'voucher' );
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
 
-		// --------------------------------------------------------------------------
+		if ( method_exists( $this, '_manage_' . $_method ) ) :
 
-		switch( $this->uri->segment( '4' ) ) :
+			$this->{'_manage_' . $_method}();
 
-			case 'attributes' :			$this->_manage_attributes();			break;
-			case 'brands' :				$this->_manage_brands();				break;
-			case 'categories' :			$this->_manage_categories();			break;
-			case 'collections' :		$this->_manage_collections();			break;
-			case 'ranges' :				$this->_manage_ranges();				break;
-			case 'shipping_methods' :	$this->_manage_shipping_methods();		break;
-			case 'tags' :				$this->_manage_tags();					break;
-			case 'tax_rates' :			$this->_manage_tax_rates();				break;
-			case 'types' :				$this->_manage_types();					break;
+		else :
 
-			// --------------------------------------------------------------------------
+			show_404();
 
-			case 'index' :
-			default :					$this->_manage_index();					break;
-
-		endswitch;
+		endif;
 	}
 
 
@@ -3054,12 +3049,38 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Other managers
+	 *
+	 * @access public
+	 * @param none
+	 * @return void
+	 **/
 	public function reports()
+	{
+		$_method = $this->uri->segment( 4 ) ? $this->uri->segment( 4 ) : 'index';
+
+		if ( method_exists( $this, '_reports_' . $_method ) ) :
+
+			$this->{'_reports_' . $_method}();
+
+		else :
+
+			show_404();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _reports_index()
 	{
 		if ( ! user_has_permission( 'admin.shop.reports' ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to generate reports.' );
-			redirect( 'admin/shop/vouchers' );
+			redirect( 'admin/shop' );
 			return;
 
 		endif;
