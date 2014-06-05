@@ -229,11 +229,13 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		$_product_type_meta	= array();
 
-		if ( is_callable( array( $this, 'product_type_meta_fields_' . $_product_type->slug ) ) ) :
+		if ( is_callable( array( $this->product_type, 'meta_fields_' . $_product_type->slug ) ) ) :
 
-			$_product_type_meta = $this->{'product_type_meta_fields_' . $_product_type->slug}();
+			$_product_type_meta = $this->product_type->{'meta_fields_' . $_product_type->slug}();
 
 		endif;
+
+		$_sku_tracker = array();
 
 		foreach ( $data['variation'] AS $index => $v ) :
 
@@ -251,6 +253,8 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			$_data->variation[$index]->label	= isset( $v['label'] )	? $v['label']	: NULL;
 			$_data->variation[$index]->sku		= isset( $v['sku'] )	? $v['sku']		: NULL;
+
+			$_sku_tracker[] = $_data->variation[$index]->sku;
 
 			//	Stock
 			//	-----
@@ -366,9 +370,33 @@ class NAILS_Shop_product_model extends NAILS_Model
 				$_data->variation[$index]->shipping->weight_unit		= isset( $v['shipping']['weight_unit'] )		? $v['shipping']['weight_unit']				: 'G';
 				$_data->variation[$index]->shipping->collection_only	= isset( $v['shipping']['collection_only'] )	? (bool) $v['shipping']['collection_only']	: FALSE;
 
+			else :
+
+				$_data->variation[$index]->shipping->length				= NULL;
+				$_data->variation[$index]->shipping->width				= NULL;
+				$_data->variation[$index]->shipping->height				= NULL;
+				$_data->variation[$index]->shipping->measurement_unit	= NULL;
+				$_data->variation[$index]->shipping->weight				= NULL;
+				$_data->variation[$index]->shipping->weight_unit		= NULL;
+				$_data->variation[$index]->shipping->collection_only	= FALSE;
+
 			endif;
 
 		endforeach;
+
+		//	Duplicate SKUs?
+		$_sku_tracker	= array_filter( $_sku_tracker );
+		$_count			= array_count_values( $_sku_tracker );
+
+		if ( count( $_count ) != count( $_sku_tracker ) ) :
+
+			//	If only one occurance of everything then the count on both
+			//	should be the same, if not then it'll vary.
+
+			$this->_set_error( 'All variations which have defined SKUs must be unique.' );
+			return FALSE;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -554,18 +582,13 @@ class NAILS_Shop_product_model extends NAILS_Model
 					//	Product Variation: Shipping
 					//	===========================
 
-					$this->db->set( 'ship_collection_only', $v->shipping->collection_only );
-
-					if ( $data->is_physical ) :
-
-						$this->db->set( 'ship_length',				$v->shipping->length );
-						$this->db->set( 'ship_width',				$v->shipping->width );
-						$this->db->set( 'ship_height',				$v->shipping->height );
-						$this->db->set( 'ship_measurement_unit',	$v->shipping->measurement_unit );
-						$this->db->set( 'ship_weight',				$v->shipping->weight );
-						$this->db->set( 'ship_weight_unit',			$v->shipping->weight_unit );
-
-					endif;
+					$this->db->set( 'ship_collection_only',		$v->shipping->collection_only );
+					$this->db->set( 'ship_length',				$v->shipping->length );
+					$this->db->set( 'ship_width',				$v->shipping->width );
+					$this->db->set( 'ship_height',				$v->shipping->height );
+					$this->db->set( 'ship_measurement_unit',	$v->shipping->measurement_unit );
+					$this->db->set( 'ship_weight',				$v->shipping->weight );
+					$this->db->set( 'ship_weight_unit',			$v->shipping->weight_unit );
 
 					if ( ! empty( $v->id ) ) :
 

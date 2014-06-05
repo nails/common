@@ -393,7 +393,7 @@
 
 				if ( $is_first ) :
 
-					$_display = empty( $num_variants ) ? 'none' : 'block';
+					$_display = empty( $num_variants ) || $num_variants == 1 ? 'none' : 'block';
 					echo '<p id="variation-sync-prices" style="display:' . $_display . '">';
 					echo '<a href="#" class="awesome small orange">Sync Prices</a>';
 					echo '</p>';
@@ -564,7 +564,7 @@
 
 				if ( $is_first ) :
 
-					$_display = empty( $num_variants ) ? 'none' : 'block';
+					$_display = empty( $num_variants ) || $num_variants == 1 ? 'none' : 'block';
 					echo '<p id="variation-sync-shipping" style="margin-top:1em;display:' . $_display . '">';
 					echo '<a href="#" class="awesome small orange">Sync Shipping Details</a>';
 					echo '</p>';

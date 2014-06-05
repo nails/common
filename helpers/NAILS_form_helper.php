@@ -312,7 +312,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
 		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
 
-		$_field_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_field_error_cls		= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
 		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
 		$_readonly_cls			= $_field['readonly'] ? 'readonly' : '';
 
@@ -386,13 +386,17 @@ if ( ! function_exists( 'form_field_mm' ) )
 		// --------------------------------------------------------------------------
 
 		//	Error
-		if ( $_field_error && $_field['error'] ) :
+		if ( $_field_error_cls && $_field['error'] ) :
 
 			$_field_error = '<span class="error">' . $_field['error'] . '</span>';
 
-		elseif ( $_field_error ) :
+		elseif ( $_field_error_cls ) :
 
 			$_field_error = form_error( $_field['key'], '<span class="error">', '</span>' );
+
+		else :
+
+			$_field_error = '';
 
 		endif;
 
@@ -410,7 +414,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_scheme = str_replace( '{{filename}}', '{[filename]}', $_scheme );
 		$_scheme = str_replace( '{{extension}}', '{[extension]}', $_scheme );
 
-		$_out  = '<div class="field mm-file ' . $_field_error . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
+		$_out  = '<div class="field mm-file ' . $_field_error_cls . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
 		$_out .= '<label>';
 		$_out .= '	<span class="label">';
 		$_out .= '		' . $_field_label;

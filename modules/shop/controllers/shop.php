@@ -199,7 +199,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 	public function _remap( $method )
 	{
-		//	using rsegment in case the route has been re-written to something funky
+		//	Using rsegment in case the route has been re-written to something funky
 		$this->_action	= $this->uri->rsegment( 2 );
 
 		//	Quick bit of shifting to get the slug

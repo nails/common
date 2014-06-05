@@ -48,7 +48,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Navigation options
 		$d->funcs				= array();
-		$d->funcs['inventory']		= 'Manage Inventory';				//	Sub-nav function.
+		$d->funcs['inventory']	= 'Manage Inventory';				//	Sub-nav function.
 		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
 		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
 		$d->funcs['sales']		= 'Manage Sales';				//	Sub-nav function.
@@ -317,14 +317,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['currencies'] = $this->currency->get_all();
 
 		//	Fetch product meta fields
-		$_product_types						= $this->product_type->get_all();
-		$this->data['product_types_meta']	= array();
+		$this->data['product_types_meta'] = array();
 
-		foreach ( $_product_types AS $type ) :
+		foreach ( $this->data['product_types'] AS $type ) :
 
-			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
+			if ( is_callable( array( $this->product_type, 'meta_fields_' . $type->slug ) ) ) :
 
-				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
+				$this->data['product_types_meta'][$type->id] = $this->product_type->{'meta_fields_' . $type->slug}();
 
 			else :
 
@@ -343,7 +342,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->load->library( 'form_validation' );
 
 			//	Define all the rules
-			$this->__inventory_form_validation_rules();
+			$this->__inventory_create_edit_validation_rules();
 
 			// --------------------------------------------------------------------------
 
@@ -422,7 +421,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function __inventory_form_validation_rules()
+	protected function __inventory_create_edit_validation_rules()
 	{
 		//	Product Info
 		//	============
@@ -449,8 +448,10 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			//	Details
 			//	-------
 
-			$this->form_validation->set_rules( 'variation[' . $index . '][label]',				'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'variation[' . $index . '][sku]',				'',	'xss_clean' );
+			$this->form_validation->set_rules( 'variation[' . $index . '][label]', '', 'xss_clean|required' );
+
+			$_v_id = ! empty( $v['id'] ) ? $v['id'] : '';
+			$this->form_validation->set_rules( 'variation[' . $index . '][sku]', '', 'xss_clean|callback__callback_inventory_valid_sku[' . $_v_id . ']' );
 
 			//	Stock
 			//	-----
@@ -651,6 +652,42 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
+	public function _callback_inventory_valid_sku( $str, $variation_id )
+	{
+		$str = trim( $str );
+
+		if ( empty( $str ) ) :
+
+			return TRUE;
+
+		endif;
+
+		if ( $variation_id ) :
+
+			$this->db->where( 'id !=', $variation_id );
+
+		endif;
+
+		$this->db->where( 'is_deleted', FALSE );
+		$this->db->where( 'sku', $str );
+		$_result = $this->db->get( NAILS_DB_PREFIX . 'shop_product_variation' )->row();
+
+		if ( $_result ) :
+
+			$this->form_validation->set_message( '_callback_inventory_valid_sku', 'This SKU is already in use.' );
+			return FALSE;
+
+		else :
+
+			return TRUE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _inventory_edit()
 	{
 		//	Fetch item
@@ -683,14 +720,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->data['currencies'] = $this->currency->get_all();
 
 		//	Fetch product meta fields
-		$_product_types						= $this->product_type->get_all();
-		$this->data['product_types_meta']	= array();
+		$this->data['product_types_meta'] = array();
 
-		foreach ( $_product_types AS $type ) :
+		foreach ( $this->data['product_types'] AS $type ) :
 
-			if ( is_callable( array( $this->product, 'product_type_meta_fields_' . $type->slug ) ) ) :
+			if ( is_callable( array( $this->product_type, 'meta_fields_' . $type->slug ) ) ) :
 
-				$this->data['product_types_meta'][$type->id] = $this->product->{'product_type_meta_fields_' . $type->slug}();
+				$this->data['product_types_meta'][$type->id] = $this->product_type->{'meta_fields_' . $type->slug}();
 
 			else :
 
@@ -709,7 +745,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->load->library( 'form_validation' );
 
 			//	Define all the rules
-			$this->__inventory_form_validation_rules();
+			$this->__inventory_create_edit_validation_rules();
 
 			// --------------------------------------------------------------------------
 
