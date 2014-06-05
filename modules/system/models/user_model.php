@@ -1768,7 +1768,7 @@ class NAILS_User_model extends NAILS_Model
 
 		if ( ! valid_email( $_email ) ) :
 
-			$this->set_error( '"' . $_email . '" is not a valid email address' );
+			$this->_set_error( '"' . $_email . '" is not a valid email address' );
 			return FALSE;
 
 		endif;
