@@ -48,13 +48,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Navigation options
 		$d->funcs				= array();
-		$d->funcs['inventory']	= 'Manage Inventory';				//	Sub-nav function.
-		$d->funcs['orders']		= 'Manage Orders';					//	Sub-nav function.
-		$d->funcs['vouchers']	= 'Manage Vouchers';				//	Sub-nav function.
-		$d->funcs['sales']		= 'Manage Sales';				//	Sub-nav function.
-		$d->funcs['front']		= 'Manage Front of House';				//	Sub-nav function.
-		$d->funcs['manage']		= 'Other Managers';				//	Sub-nav function.
-		$d->funcs['reports']	= 'Generate Reports';				//	Sub-nav function.
+		$d->funcs['inventory']	= 'Manage Inventory';		//	Sub-nav function.
+		$d->funcs['orders']		= 'Manage Orders';			//	Sub-nav function.
+		$d->funcs['vouchers']	= 'Manage Vouchers';		//	Sub-nav function.
+		$d->funcs['sales']		= 'Manage Sales';			//	Sub-nav function.
+		$d->funcs['manage']		= 'Other Managers';			//	Sub-nav function.
+		$d->funcs['reports']	= 'Generate Reports';		//	Sub-nav function.
 
 		// --------------------------------------------------------------------------
 
@@ -1819,9 +1818,15 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _sales_add()
+	protected function _sales_create()
 	{
-		dump( 'Add Sale' );
+		$this->data['page']->title = 'Create Sale';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/shop/sales/edit',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 
 
@@ -1830,7 +1835,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _sales_edit()
 	{
-		dump( 'Edit Sale' );
+		$this->data['page']->title = 'Edit Sale "xxx"';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'admin/shop/sales/edit',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
 	}
 
 
@@ -1839,7 +1850,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _sales_delete()
 	{
-		dump( 'Delete Sale' );
+		$this->session->set_flashdata( 'message', '<strong>TODO:</strong> Delete a sale.' );
 	}
 
 
