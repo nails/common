@@ -41,31 +41,6 @@
 					</p>
 					<?php
 
-						if ( blog_setting( 'blog_url' ) != 'blog/' ) :
-
-							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
-							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', substr( blog_setting( 'blog_url' ), 0, -1 ) ) . '\(\/\(\:any\)\?\/\?\)\?\'\]\s*?=\s*?\'blog\/\$2\'\;#';
-
-							if ( ! preg_match( $_pattern, $_routes_file) ) :
-
-								//	Check the routes_app file
-								$_routes_file = @file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
-
-								if ( ! $_routes_file || ! preg_match( $_pattern, $_routes_file ) ) :
-
-									echo '<p class="system-alert message no-close">';
-									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the blog may not work as expected.';
-									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( blog_setting( 'blog_url' ), 0, -1 ) . '(/(:any)?/?)?\' ) = \'blog/$2\';</code>';
-									echo '</p>';
-
-								endif;
-
-							endif;
-
-						endif;
-
-						// --------------------------------------------------------------------------
-
 						//	Blog URL
 						$_field					= array();
 						$_field['key']			= 'blog_url';

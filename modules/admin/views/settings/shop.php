@@ -183,31 +183,6 @@
 					</p>
 					<?php
 
-						if ( shop_setting( 'shop_url' ) != 'shop/' ) :
-
-							$_routes_file = file_get_contents( FCPATH . APPPATH . '/config/routes.php' );
-							$_pattern = '#\$route\[\'' . str_replace( '/', '\/', substr( shop_setting( 'shop_url' ), 0, -1 ) ) . '\(\/\(\:any\)\?\/\?\)\?\'\]\s*?=\s*?\'shop\/\$2\'\;#';
-
-							if ( ! preg_match( $_pattern, $_routes_file ) ) :
-
-								//	Check the routes_app file
-								$_routes_file = @file_get_contents( FCPATH . APPPATH . '/config/routes_app.php' );
-
-								if ( ! $_routes_file || ! preg_match( $_pattern, $_routes_file ) ) :
-
-									echo '<p class="system-alert message no-close">';
-									echo '<strong>Please Note:</strong> Ensure that the following route is in the app\'s <code>routes.php</code> or <code>routes_app.php</code> file or the shop may not work as expected.';
-									echo '<code style="display:block;margin-top:10px;border:1px solid #CCC;background:#EFEFEF;padding:10px;">$route[\'' . substr( shop_setting( 'shop_url' ), 0, -1 ) . '(/(:any)?/?)?\'] = \'shop/$2\';</code>';
-									echo '</p>';
-
-								endif;
-
-							endif;
-
-						endif;
-
-						// --------------------------------------------------------------------------
-
 						//	Blog URL
 						$_field					= array();
 						$_field['key']			= 'shop_url';
@@ -269,6 +244,70 @@
 						$_field['placeholder']	= 'Your company number.';
 
 						echo form_field( $_field );
+
+					?>
+				</fieldset>
+				<fieldset id="shop-settings-misc">
+					<legend>Miscellaneous</legend>
+					<?php
+
+						//	Brand Listing
+						$_field					= array();
+						$_field['key']			= 'page_brand_listing';
+						$_field['label']		= 'Brand Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the brand URL is used, but no slug is specified. Renders all the populated brands and their SEO data.' );
+
+						// --------------------------------------------------------------------------
+
+						//	Category Listing
+						$_field					= array();
+						$_field['key']			= 'page_category_listing';
+						$_field['label']		= 'Category Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the category URL is used, but no slug is specified. Renders all the populated categories and their SEO data.' );
+
+						// --------------------------------------------------------------------------
+
+						//	Collection Listing
+						$_field					= array();
+						$_field['key']			= 'page_collection_listing';
+						$_field['label']		= 'Collection Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the collection URL is used, but no slug is specified. Renders all the active collections and their SEO data.' );
+
+						// --------------------------------------------------------------------------
+
+						//	Range Listing
+						$_field					= array();
+						$_field['key']			= 'page_range_listing';
+						$_field['label']		= 'Range Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the range URL is used, but no slug is specified. Renders all the active ranges and their SEO data.' );
+
+						// --------------------------------------------------------------------------
+
+						//	Sale Listing
+						$_field					= array();
+						$_field['key']			= 'page_sale_listing';
+						$_field['label']		= 'Sale Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the sale URL is used, but no slug is specified. Renders all the active sales and their SEO data.' );
+
+						// --------------------------------------------------------------------------
+
+						//	Tag Listing
+						$_field					= array();
+						$_field['key']			= 'page_tag_listing';
+						$_field['label']		= 'Tag Listing Page';
+						$_field['default']		= shop_setting( $_field['key'] );
+
+						echo form_field_boolean( $_field, 'The page shown when the tag URL is used, but no slug is specified. Renders all the populated tags and their SEO data.' );
 
 					?>
 				</fieldset>

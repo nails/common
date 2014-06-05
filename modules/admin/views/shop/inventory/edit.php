@@ -62,11 +62,11 @@
 				// --------------------------------------------------------------------------
 
 				$_field					= array();
-				$_field['key']			= 'title';
-				$_field['label']		= 'Title';
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= 'Give this product a title';
-				$_field['default']		= ! empty( $item->title ) ? $item->title : '';
+				$_field['placeholder']	= 'Give this product a label';
+				$_field['default']		= ! empty( $item->label ) ? $item->label : '';
 
 				echo form_field( $_field );
 

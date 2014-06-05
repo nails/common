@@ -160,9 +160,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 		//	Quick check of incoming data
 		$_data = new stdClass();
 
-		if ( empty( $data['title'] ) ) :
+		if ( empty( $data['label'] ) ) :
 
-			$this->_set_error( 'Title is a required field.' );
+			$this->_set_error( 'Label is a required field.' );
 			return FALSE;
 
 		endif;
@@ -172,7 +172,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		//	Slug
 		//	====
 
-		$_data->slug = $this->_generate_slug( $data['title'], '', '', $this->_table );
+		$_data->slug = $this->_generate_slug( $data['label'], '', '', $this->_table );
 
 		//	Product Info
 		//	============
@@ -186,7 +186,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		endif;
 
-		$_data->title		= isset( $data['title'] )		? trim( $data['title'] )		: NULL;
+		$_data->label		= isset( $data['label'] )		? trim( $data['label'] )		: NULL;
 		$_data->is_active	= isset( $data['is_active'] )	? (bool) $data['is_active']		: FALSE;
 		$_data->is_deleted	= isset( $data['is_deleted'] )	? (bool) $data['is_deleted']	: FALSE;
 		$_data->brands		= isset( $data['brands'] )		? $data['brands']				: array();
@@ -438,7 +438,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		//	Add the product
 		$this->db->set( 'type_id',			$data->type_id );
-		$this->db->set( 'title',			$data->title );
+		$this->db->set( 'label',			$data->label );
 		$this->db->set( 'description',		$data->description );
 		$this->db->set( 'seo_title',		$data->seo_title );
 		$this->db->set( 'seo_description',	$data->seo_description );

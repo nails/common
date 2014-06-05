@@ -20,53 +20,36 @@ require_once '_shop.php';
 
 class NAILS_Shop extends NAILS_Shop_Controller
 {
-	protected $_action;
-	protected $_slug;
-
-	// --------------------------------------------------------------------------
-
-
-	public function __construct()
-	{
-		parent::__construct();
-
-		// --------------------------------------------------------------------------
-
-		//	Load models
-		$this->load->model( 'shop/shop_model',			'shop' );
-		$this->load->model( 'shop/shop_category_model',	'category' );
-		$this->load->model( 'shop/shop_product_model',	'product' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Renders the shop's homepage
-	 *
-	 * @access	public
-	 * @return	void
-	 *
-	 **/
-	public function _home()
+	public function index()
 	{
 		//	Page title
-		$this->data['page']->title = 'Shop/home';
+		//	==========
+
+		$this->data['page']->title = 'Shop/index';
 
 		// --------------------------------------------------------------------------
 
 		//	Categories
 		//	==========
 
+		$this->data['categories'] = array( 'categories' );
 
-		//	Products
-		//	========
+
+		//	Tags
+		//	====
+
+		$this->data['tags'] = array( 'tags' );
+
+
+		//	Featured Products
+		//	=================
+
+		$this->data['products_featured'] = array( 'featured products' );
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/front/home',	$this->data );
+		$this->load->view( 'shop/front/index',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 
@@ -75,57 +58,528 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 
 	/**
-	 * Renders the category listings
-	 *
-	 * @access	public
-	 * @return	void
-	 *
-	 **/
-	public function _category()
+	 * Detects the brand slug and loads the appropriate method
+	 * @return void
+	 */
+	public function brand()
 	{
-		//	Categories
-		//	==========
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'brand/?#', '', uri_string() );
 
-		if ( $this->_slug ) :
+		if ( $_slug ) :
 
-			//	Find a specific category; placing into an array for consistency with the top level
-			$this->data['categories']	= array( $this->category->get_by_slug( $this->_slug, TRUE, TRUE ) );
-			$this->data['category']		= $this->category->get_by_slug( $this->_slug );
-
-			$this->data['page']->title		= $this->data['category']->label;
-			$this->data['page']->subtitle	= implode( ' &rsaquo; ', explode( '|', $this->data['category']->label_nested ) );
+			$this->_brand_single( $_slug );
 
 		else :
 
-			//	Fetch top level categories
-			$this->data['categories']	= $this->category->get_top_level( TRUE, TRUE );
+			$this->_brand_index();
 
-			$this->data['page']->title		= '';
-			$this->data['page']->subtitle	= '';
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _brand_index()
+	{
+		if ( ! shop_setting( 'page_brand_listing' ) ) :
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Products
-		//	========
+		//	Page title
+		//	==========
 
-		if ( $this->_slug ) :
+		$this->data['page']->title = 'Brand: List';
 
-			//	Find products for a specific category
-			$this->data['products']	= $this->product->get_for_category( $this->_slug );
+
+		// --------------------------------------------------------------------------
+
+		//	Brands
+		//	======
+
+		$this->data['brands'] = $this->brand->get_all();
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/brand/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders a single brand
+	 * @return void
+	 */
+	protected function _brand_single( $slug )
+	{
+		$this->data['brand'] = $this->brand->get_by_slug( $slug );
+
+		if ( ! $this->data['brand' ] ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Brand: "' . $this->data['brand']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Brand's Products
+		//	================
+
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/brand/single',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Detects the category slug and loads the appropriate method
+	 * @return void
+	 */
+	public function category()
+	{
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'category/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_category_single( $_slug );
 
 		else :
 
-			//	Fetch top level categories
-			$this->data['products']	= $this->product->get_all();
+			$this->_category_index();
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _category_index()
+	{
+		if ( ! shop_setting( 'page_category_listing' ) ) :
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Category: List';
+
+		// --------------------------------------------------------------------------
+
+		//	Categories
+		//	==========
+
+		$this->data['categories'] = $this->category->get_all();
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/category/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders a single category
+	 * @return void
+	 */
+	protected function _category_single( $slug )
+	{
+		$this->data['category'] = $this->category->get_by_slug( $slug );
+
+		if ( ! $this->data['category' ] ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Category: "' . $this->data['category']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Category's Products
+		//	===================
+
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'shop/front/category/single',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Detects the collection slug and loads the appropriate method
+	 * @return void
+	 */
+	public function collection()
+	{
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'collection/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_collection_single( $_slug );
+
+		else :
+
+			$this->_collection_index();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _collection_index()
+	{
+		if ( ! shop_setting( 'page_collection_listing' ) ) :
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Collection: List';
+
+		// --------------------------------------------------------------------------
+
+		//	Collections
+		//	===========
+
+		$this->data['collections'] = $this->collection->get_all();
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'shop/front/collection/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders a single collection
+	 * @return void
+	 */
+	protected function _collection_single( $slug )
+	{
+		$this->data['collection'] = $this->collection->get_by_slug( $slug );
+
+		if ( ! $this->data['collection' ] ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Collection: "' . $this->data['collection']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Collection's Products
+		//	=====================
+
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'shop/front/collection/single',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Detects the product slug and loads the appropriate method
+	 * @return void
+	 */
+	protected function product()
+	{
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'product/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_product_single( $_slug );
+
+		else :
+
+			show_404();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders a single product
+	 * @return void
+	 */
+	protected function _product_single( $slug )
+	{
+		$this->data['product'] = $this->product->get_by_slug( $slug );
+
+		if ( ! $this->data['product' ] ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Product: "' . $this->data['product']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/product/single',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Detects the range slug and loads the appropriate method
+	 * @return void
+	 */
+	public function range()
+	{
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'range/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_range_single( $_slug );
+
+		else :
+
+			$this->_range_index();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _range_index()
+	{
+		if ( ! shop_setting( 'page_range_listing' ) ) :
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Range: List';
+
+		// --------------------------------------------------------------------------
+
+		//	Ranges
+		//	======
+
+		$this->data['ranges'] = $this->range->get_all();
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/range/index',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders a single range
+	 * @return void
+	 */
+	protected function _range_single( $slug )
+	{
+		$this->data['range'] = $this->range->get_by_slug( $slug );
+
+		if ( ! $this->data['range' ] ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Range: "' . $this->data['range']->label . '"';
+
+		// --------------------------------------------------------------------------
+
+		//	Range's Products
+		//	================
+
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/range/single',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Detects the sale slug and loads the appropriate method
+	 * @return void
+	 */
+	public function sale()
+	{
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'sale/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_sale_single( $_slug );
+
+		else :
+
+			$this->_sale_index();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _sale_index()
+	{
+		if ( ! shop_setting( 'page_sale_listing' ) ) :
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Page title
+		//	==========
+
+		$this->data['page']->title = 'Sale: List';
+
+		// --------------------------------------------------------------------------
+
+		//	Sales
+		//	=====
+
+		$this->data['sales'] = $this->sale->get_all();
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/front/category',	$this->data );
+		$this->load->view( 'shop/front/sale/index',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
 	}
 
@@ -134,31 +588,45 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 
 	/**
-	 * Renders the tag page
-	 *
-	 * @access	public
-	 * @return	void
-	 *
-	 **/
-	public function _tag()
+	 * Renders a single sale
+	 * @return void
+	 */
+	protected function _sale_single( $slug )
 	{
-		//	Page title
-		$this->data['page']->title = 'Shop/tag';
+		$this->data['sale'] = $this->sale->get_by_slug( $slug );
+
+		if ( ! $this->data['sale' ] ) :
+
+			show_404();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Categories
+		//	Page title
 		//	==========
 
-
-		//	Products
-		//	========
+		$this->data['page']->title = 'Sale: "' . $this->data['sale']->label . '"';
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/front/tag',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		//	Sale's Products
+		//	===============
+
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',			$this->data );
+		$this->load->view( 'shop/front/sale/single',	$this->data );
+		$this->load->view( 'structure/footer',			$this->data );
 	}
 
 
@@ -166,30 +634,56 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 
 	/**
-	 * Renders the product page
-	 *
-	 * @access	public
-	 * @return	void
-	 *
-	 **/
-	public function _product()
+	 * Detects the tag slug and loads the appropriate method
+	 * @return void
+	 */
+	public function tag()
 	{
-		//	Page title
-		$this->data['page']->title = 'Shop/product';
+		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'tag/?#', '', uri_string() );
+
+		if ( $_slug ) :
+
+			$this->_tag_single( $_slug );
+
+		else :
+
+			$this->_tag_index();
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the list of categories
+	 * @return void
+	 */
+	protected function _tag_index()
+	{
+		if ( ! shop_setting( 'page_tag_listing' ) ) :
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Categories
+		//	Page title
 		//	==========
 
+		$this->data['page']->title = 'Tag: List';
 
-		//	Products
-		//	========
+		// --------------------------------------------------------------------------
+
+		//	Tags
+		//	====
+
+		$this->data['tags'] = $this->tag->get_all();
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/front/product',	$this->data );
+		$this->load->view( 'shop/front/tag/index',	$this->data );
 		$this->load->view( 'structure/footer',		$this->data );
 	}
 
@@ -197,34 +691,72 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	// --------------------------------------------------------------------------
 
 
-	public function _remap( $method )
+	/**
+	 * Renders a single tag
+	 * @return void
+	 */
+	protected function _tag_single( $slug )
 	{
-		//	Using rsegment in case the route has been re-written to something funky
-		$this->_action	= $this->uri->rsegment( 2 );
+		$this->data['tag'] = $this->tag->get_by_slug( $slug );
 
-		//	Quick bit of shifting to get the slug
-		$this->_slug = $this->uri->rsegment_array();
-		array_shift( $this->_slug );
-		array_shift( $this->_slug );
-		$this->_slug = implode( '/',  $this->_slug );
+		if ( ! $this->data['tag' ] ) :
+
+			show_404();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Switcheroo
-		switch( $this->_action ) :
+		//	Page title
+		//	==========
 
-			case '' :
-			case 'index' :		$this->_home();		break;
-			case 'category' :	$this->_category();	break;
-			case 'tag' :		$this->_tag();		break;
-			case 'product' :	$this->_product();	break;
+		$this->data['page']->title = 'Tag: "' . $this->data['tag']->label . '"';
 
-			// --------------------------------------------------------------------------
+		// --------------------------------------------------------------------------
 
-			//	Boo.
-			default :	show_404();	break;
+		//	Tag's Products
+		//	==============
 
-		endswitch;
+		//	TODO: Adopt the generic Nails Model approach and use a where conditional
+		$this->data['products'] = $this->product->get_all();
+
+		if ( empty( $this->data['products'] ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',		$this->data );
+		$this->load->view( 'shop/front/tag/single',	$this->data );
+		$this->load->view( 'structure/footer',		$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Manually remap the URL as CI's router has some issues resolving the index()
+	 * route, especially when using a non-standard shop base URL
+	 * @return void
+	 */
+	public function _remap()
+	{
+		$_method = $this->uri->rsegment( 2 ) ? $this->uri->rsegment( 2 ) : 'index';
+
+		// --------------------------------------------------------------------------
+
+		if ( method_exists( $this, $_method ) ) :
+
+			$this->{$_method}();
+
+		else :
+
+			show_404();
+
+		endif;
 	}
 }
 

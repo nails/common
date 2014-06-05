@@ -33,13 +33,19 @@ class NAILS_Shop_Controller extends NAILS_Controller
 
 		//	Load the models
 		$this->load->model( 'shop_model',				'shop' );
-		$this->load->model( 'shop_voucher_model',		'voucher' );
 		$this->load->model( 'shop_basket_model',		'basket' );
+		$this->load->model( 'shop_brand_model',			'brand' );
+		$this->load->model( 'shop_category_model',		'category' );
+		$this->load->model( 'shop_collection_model',	'collection' );
 		$this->load->model( 'shop_currency_model',		'currency' );
 		$this->load->model( 'shop_order_model',			'order' );
 		$this->load->model( 'shop_product_model',		'product' );
 		$this->load->model( 'shop_product_type_model',	'product_type' );
+		$this->load->model( 'shop_range_model',			'range' );
 		$this->load->model( 'shop_shipping_model',		'shipping' );
+		$this->load->model( 'shop_sale_model',			'sale' );
+		$this->load->model( 'shop_tag_model',			'tag' );
+		$this->load->model( 'shop_voucher_model',		'voucher' );
 
 		// --------------------------------------------------------------------------
 

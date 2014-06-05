@@ -26,7 +26,7 @@
 				<th class="id">ID</th>
 				<th class="image">Image</th>
 				<th class="active">Active</th>
-				<th class="title">Title &amp; Description</th>
+				<th class="label">Label &amp; Description</th>
 				<th class="type">Type</th>
 				<th class="datetime">Modified</th>
 				<th class="actions">Actions</th>
@@ -76,8 +76,8 @@
 
 							?>
 
-							<td class="title">
-								<?=$item->title?>
+							<td class="label">
+								<?=$item->label?>
 								<small><?=word_limiter( strip_tags( $item->description ), 30 )?></small>
 							</td>
 							<td class="type"><?=$item->type->label?></td>

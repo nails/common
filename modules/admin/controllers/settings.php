@@ -525,6 +525,13 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$_settings['invoice_address']				= $this->input->post( 'invoice_address' );
 		$_settings['invoice_vat_no']				= $this->input->post( 'invoice_vat_no' );
 		$_settings['invoice_company_no']			= $this->input->post( 'invoice_company_no' );
+		$_settings['page_brand_listing']			= $this->input->post( 'page_brand_listing' );
+		$_settings['page_category_listing']			= $this->input->post( 'page_category_listing' );
+		$_settings['page_collection_listing']		= $this->input->post( 'page_collection_listing' );
+		$_settings['page_range_listing']			= $this->input->post( 'page_range_listing' );
+		$_settings['page_sale_listing']				= $this->input->post( 'page_sale_listing' );
+		$_settings['page_tag_listing']				= $this->input->post( 'page_tag_listing' );
+
 
 		// --------------------------------------------------------------------------
 
