@@ -30,9 +30,33 @@ class Twitter_Connect
 
 		// --------------------------------------------------------------------------
 
+		$this->_ci->load->helper( 'site' );
+
 		//	Fetch our config variables
-		$this->_ci->config->load( 'twitter' );
-		$this->_settings = $this->_ci->config->item( 'twitter' );
+		$this->_settings			= array();
+		$this->_settings['consumer_key']	= site_setting( 'social_signin_fb_app_id' );
+		$this->_settings['consumer_secret']	= site_setting( 'social_signin_fb_app_secret' );
+
+		if ( $this->_settings['consumer_secret'] ) :
+
+			$this->_settings['consumer_secret'] = $this->_ci->encrypt->decode( $this->_settings['consumer_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		//	Sanity check
+		if ( ! $this->_settings['consumer_key'] || ! $this->_settings['consumer_secret'] ) :
+
+			if ( ENVIRONMENT === 'production' ) :
+
+				show_fatal_error( 'Twitter has not been configured correctly', 'The Twitter App ID and secret must be specified in Admin under Site Settings.' );
+
+			else :
+
+				show_error( 'The Twitter App ID and secret must be specified in Admin under Site Settings.' );
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

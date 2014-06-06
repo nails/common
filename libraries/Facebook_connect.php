@@ -26,14 +26,49 @@ class Facebook_Connect
 	 **/
 	public function __construct()
 	{
-		$this->_ci =& get_instance();
+		$this->_ci = get_instance();
 
 		// --------------------------------------------------------------------------
 
+		$this->_ci->load->helper( 'site' );
+
 		//	Fetch our config variables
-		$this->_ci->config->load( 'facebook' );
-		$this->_settings = $this->_ci->config->item( 'facebook' );
+		$this->_settings			= array();
+		$this->_settings['appId']	= site_setting( 'social_signin_fb_app_id' );
+		$this->_settings['secret']	= site_setting( 'social_signin_fb_app_secret' );
+		$this->_settings['scope']	= site_setting( 'social_signin_fb_app_scope' );
+
+		if ( ! is_array( $this->_settings['scope'] ) ) :
+
+			$this->_settings['scope'] = (array) $this->_settings['scope'];
+
+		endif;
+
+		if ( $this->_settings['secret'] ) :
+
+			$this->_settings['secret'] = $this->_ci->encrypt->decode( $this->_settings['secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		//	Add the email scope
 		array_unshift( $this->_settings['scope'], 'email' );
+		$this->_settings['scope'] = array_filter( $this->_settings['scope'] );
+		$this->_settings['scope'] = array_unique( $this->_settings['scope'] );
+
+		//	Sanity check
+		if ( ! $this->_settings['appId'] || ! $this->_settings['secret'] ) :
+
+			if ( ENVIRONMENT === 'production' ) :
+
+				show_fatal_error( 'Facebook has not been configured correctly', 'The Facebook App ID and secret must be specified in Admin under Site Settings.' );
+
+			else :
+
+				show_error( 'The Facebook App ID and secret must be specified in Admin under Site Settings.' );
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

@@ -71,7 +71,7 @@
 						// --------------------------------------------------------------------------
 
 						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
-						echo '<div id="socialsignin-fb-settings" style="display:' . $_display . '">';
+						echo '<div id="socialsignin-fb-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_fb_app_id';
@@ -87,14 +87,21 @@
 							$_field['label']		= 'Facebook App Secret';
 							$_field['default']		= site_setting( $_field['key'] );
 
+							if ( $_field['default'] ) :
+
+								$_field['default'] = $this->encrypt->decode( $_field['default'], APP_PRIVATE_KEY );
+
+							endif;
+
 							echo form_field( $_field );
 
 							// --------------------------------------------------------------------------
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_fb_app_scope';
-							$_field['label']		= 'Facebook App ID';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['label']		= 'Facebook App Scope';
+							$_field['info']			= 'Comma seperated list of scopes. The \'email\' scope will be automatically added.';
+							$_field['default']		= site_setting( $_field['key'] ) ? implode( ',', site_setting( $_field['key'] ) ) : '';
 
 							echo form_field( $_field );
 
@@ -123,7 +130,7 @@
 						// --------------------------------------------------------------------------
 
 						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
-						echo '<div id="socialsignin-tw-settings" style="display:' . $_display . '">';
+						echo '<div id="socialsignin-tw-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_tw_app_key';
@@ -138,6 +145,12 @@
 							$_field['key']			= 'social_signin_tw_app_secret';
 							$_field['label']		= 'Twitter App Secret';
 							$_field['default']		= site_setting( $_field['key'] );
+
+							if ( $_field['default'] ) :
+
+								$_field['default'] = $this->encrypt->decode( $_field['default'], APP_PRIVATE_KEY );
+
+							endif;
 
 							echo form_field( $_field );
 
@@ -166,7 +179,7 @@
 						// --------------------------------------------------------------------------
 
 						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
-						echo '<div id="socialsignin-li-settings" style="display:' . $_display . '">';
+						echo '<div id="socialsignin-li-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_li_app_key';
@@ -181,6 +194,12 @@
 							$_field['key']			= 'social_signin_li_app_secret';
 							$_field['label']		= 'LinkedIn App Secret';
 							$_field['default']		= site_setting( $_field['key'] );
+
+							if ( $_field['default'] ) :
+
+								$_field['default'] = $this->encrypt->decode( $_field['default'], APP_PRIVATE_KEY );
+
+							endif;
 
 							echo form_field( $_field );
 

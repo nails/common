@@ -31,13 +31,42 @@ class Linkedin_connect
 		// --------------------------------------------------------------------------
 
 		//	Default vars
-		$this->_access_token = '';
+		$this->_access_token	= '';
+		$this->api_endpoint		= 'https://api.linkedin.com/';
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch our config variables
 		$this->_ci->config->load( 'linkedin' );
 		$this->_settings = $this->_ci->config->item( 'linkedin' );
+
+		$this->_ci->load->helper( 'site' );
+
+		//	Fetch our config variables
+		$this->_settings				= array();
+		$this->_settings['api_key']		= site_setting( 'social_signin_li_app_key' );
+		$this->_settings['api_secret']	= site_setting( 'social_signin_li_app_secret' );
+
+		if ( $this->_settings['api_secret'] ) :
+
+			$this->_settings['api_secret'] = $this->_ci->encrypt->decode( $this->_settings['api_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		//	Sanity check
+		if ( ! $this->_settings['api_key'] || ! $this->_settings['api_secret'] ) :
+
+			if ( ENVIRONMENT === 'production' ) :
+
+				show_fatal_error( 'LinkedIn has not been configured correctly', 'The LinkedIn App ID and secret must be specified in Admin under Site Settings.' );
+
+			else :
+
+				show_error( 'The LinkedIn App ID and secret must be specified in Admin under Site Settings.' );
+
+			endif;
+
+		endif;
 	}
 
 
@@ -165,7 +194,7 @@ class Linkedin_connect
 	{
 		//	Prep the API URL
 		$_params	= array_merge( $params, array( 'oauth2_access_token' => $this->_access_token ) );
-		$_url		= $this->_settings['api_endpoint'] . 'v1/' . $api_method;
+		$_url		= $this->api_endpoint . 'v1/' . $api_method;
 
 		// --------------------------------------------------------------------------
 

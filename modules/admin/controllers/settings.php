@@ -183,7 +183,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$_settings['social_signin_fb_enabled']			= $this->input->post( 'social_signin_fb_enabled' );
 		$_settings['social_signin_fb_app_id']			= $this->input->post( 'social_signin_fb_app_id' );
 		$_settings['social_signin_fb_app_secret']		= $this->input->post( 'social_signin_fb_app_secret' );
-		$_settings['social_signin_fb_app_scope']		= $this->input->post( 'social_signin_fb_app_scope' );
+		$_settings['social_signin_fb_app_scope']		= array_filter( explode( ',', $this->input->post( 'social_signin_fb_app_scope' ) ) );
 		$_settings['social_signin_fb_settings_page']	= $this->input->post( 'social_signin_fb_settings_page' );
 		$_settings['social_signin_tw_enabled']			= $this->input->post( 'social_signin_tw_enabled' );
 		$_settings['social_signin_tw_app_key']			= $this->input->post( 'social_signin_tw_app_key' );
@@ -201,6 +201,27 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		else :
 
 			$_settings['social_signin_enabled'] = FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Encryptsecrets
+		if ( $_settings['social_signin_fb_app_secret'] ) :
+
+			$_settings['social_signin_fb_app_secret'] = $this->encrypt->encode( $_settings['social_signin_fb_app_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		if ( $_settings['social_signin_tw_app_secret'] ) :
+
+			$_settings['social_signin_tw_app_secret'] = $this->encrypt->encode( $_settings['social_signin_tw_app_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		if ( $_settings['social_signin_li_app_secret'] ) :
+
+			$_settings['social_signin_li_app_secret'] = $this->encrypt->encode( $_settings['social_signin_li_app_secret'], APP_PRIVATE_KEY );
 
 		endif;
 
