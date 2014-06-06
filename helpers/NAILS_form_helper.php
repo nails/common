@@ -1388,6 +1388,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_error			= form_error( $_field['key'] ) ? 'error' : '';
 		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
 		$_readonly_cls	= $_field['readonly'] ? 'readonly' : '';
+		$_class			= $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -1416,7 +1417,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_selected = set_value( $_field['key'], (bool) $_field['default'] );
 
 		$_out .= '<div class="toggle toggle-modern"></div>';
-		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly );
+		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class );
 
 		//	Tip
 		$_out .= $_help['title'] ? img( $_help ) : '';

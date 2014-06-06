@@ -113,6 +113,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 				// --------------------------------------------------------------------------
 
+				case 'auth' :
+
+					$this->_site_update_auth();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
 				default :
 
 					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
@@ -127,6 +135,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Get data
 		$this->data['settings'] = $this->site->get_settings( NULL, TRUE );
+
+		// --------------------------------------------------------------------------
+
+		//	Load assets
+		$this->asset->load( 'nails.admin.site.settings.min.js', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -155,6 +168,52 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		else :
 
 			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _site_update_auth()
+	{
+		//	Prepare update
+		$_settings										= array();
+		$_settings['social_signin_fb_enabled']			= $this->input->post( 'social_signin_fb_enabled' );
+		$_settings['social_signin_fb_app_id']			= $this->input->post( 'social_signin_fb_app_id' );
+		$_settings['social_signin_fb_app_secret']		= $this->input->post( 'social_signin_fb_app_secret' );
+		$_settings['social_signin_fb_app_scope']		= $this->input->post( 'social_signin_fb_app_scope' );
+		$_settings['social_signin_fb_settings_page']	= $this->input->post( 'social_signin_fb_settings_page' );
+		$_settings['social_signin_tw_enabled']			= $this->input->post( 'social_signin_tw_enabled' );
+		$_settings['social_signin_tw_app_key']			= $this->input->post( 'social_signin_tw_app_key' );
+		$_settings['social_signin_tw_app_secret']		= $this->input->post( 'social_signin_tw_app_secret' );
+		$_settings['social_signin_tw_settings_page']	= $this->input->post( 'social_signin_tw_settings_page' );
+		$_settings['social_signin_li_enabled']			= $this->input->post( 'social_signin_li_enabled' );
+		$_settings['social_signin_li_app_key']			= $this->input->post( 'social_signin_li_app_key' );
+		$_settings['social_signin_li_app_secret']		= $this->input->post( 'social_signin_li_app_secret' );
+		$_settings['social_signin_li_settings_page']	= $this->input->post( 'social_signin_li_settings_page' );
+
+		if ( $_settings['social_signin_fb_enabled'] || $_settings['social_signin_tw_enabled'] || $_settings['social_signin_li_enabled'] ) :
+
+			$_settings['social_signin_enabled'] = TRUE;
+
+		else :
+
+			$_settings['social_signin_enabled'] = FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Save
+		if ( $this->site->set_settings( $_settings ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Site authentication settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving authentication settings.';
 
 		endif;
 	}
