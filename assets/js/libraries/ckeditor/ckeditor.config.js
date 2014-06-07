@@ -3,7 +3,6 @@
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  */
 
-CKEDITOR.plugins.addExternal( 'autogrow',	window.NAILS.URL + 'js/libraries/ckeditor/plugins/autogrow/' );
 CKEDITOR.plugins.addExternal( 'codemirror',	window.NAILS.URL + 'js/libraries/ckeditor/plugins/codemirror/' );
 CKEDITOR.plugins.addExternal( 'mediaembed',	window.NAILS.URL + 'js/libraries/ckeditor/plugins/mediaembed/' );
 
@@ -12,7 +11,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// For the complete reference:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
-	config.extraPlugins = 'justify,mediaembed,autogrow,codemirror';
+	config.extraPlugins = 'justify,autogrow,mediaembed,codemirror';
 	config.removePlugins = 'resize,elementspath';
 
 	// The toolbar groups arrangement, optimized for a single toolbar row.
