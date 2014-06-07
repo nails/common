@@ -5,14 +5,22 @@ class Pdf
 
 	private $_ci;
 	private $_dompdf;
+	private $_default_filename;
 
 
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Construct the PDF library
+	 */
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
+
+		// --------------------------------------------------------------------------
+
+		$this->_default_filename = 'document.pdf';
 
 		// --------------------------------------------------------------------------
 
@@ -76,9 +84,24 @@ class Pdf
 	// --------------------------------------------------------------------------
 
 
-	public function load_view( $view, $data = array() )
+	/**
+	 * Loads CI views and passes it as HTML to DOMPDF
+	 * @param  mixed $views An array of views, or a single view as a string
+	 * @param  array  $data  View variables to pass to the view
+	 * @return void
+	 */
+	public function load_view( $views, $data = array() )
 	{
-		$_html = $this->_ci->load->view( $view, $data, TRUE );
+		$_html	= '';
+		$views	= (array) $views;
+		$views	= array_filter( $_views );
+
+		foreach( $views AS $view ) :
+
+			$_html .= $this->_ci->load->view( $view, $data, TRUE );
+
+		endforeach;
+
 		$this->_dompdf->load_html( $_html );
 	}
 
@@ -86,6 +109,66 @@ class Pdf
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Renders the PDF and sends it to the browser as a download.
+	 * @param  string $filename The filename to give the PDF
+	 * @param  array $options  An array of options to pass to DOMPDF's stream() method
+	 * @return void
+	 */
+	public function download( $filename = '', $options = NULL )
+	{
+		$filename = $filename ? $filename : $this->_default_filename;
+
+		//	Set the content attachment, by default send to the browser
+		if ( is_null( $options ) ) :
+
+			$options = array();
+
+		endif;
+
+		$options['Attachment'] = 1;
+
+		$this->_dompdf->stream( $filename, $options );
+		exit();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Renders the PDF and sends it to the browser as an inline PDF.
+	 * @param  string $filename The filename to give the PDF
+	 * @param  array $options  An array of options to pass to DOMPDF's stream() method
+	 * @return void
+	 */
+	public function stream( $filename = '', $options = NULL )
+	{
+		$filename = $filename ? $filename : $this->_default_filename;
+
+		//	Set the content attachment, by default send to the browser
+		if ( is_null( $options ) ) :
+
+			$options = array();
+
+		endif;
+
+		$options['Attachment'] = 0;
+
+		$this->_dompdf->stream( $filename, $options );
+		exit();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * MagicMethod routes any method calls to this class to DOMPDF if it exists
+	 * @param  string $method    The method called
+	 * @param  array  $arguments Any arguments passed
+	 * @return mixed
+	 */
 	public function __call( $method, $arguments = array() )
 	{
 		if ( method_exists( $this->_dompdf, $method ) ) :
