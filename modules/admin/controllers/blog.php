@@ -53,13 +53,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		get_instance()->load->helper( 'blog_helper' );
 
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 			$d->funcs['manage/categories']	= 'Manage Categories';	//	Sub-nav function.
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 			$d->funcs['manage/tags']		= 'Manage Tags';		//	Sub-nav function.
 
@@ -194,13 +194,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['associations']		= $this->input->post( 'associations' );
 				$_data['gallery']			= $this->input->post( 'gallery' );
 
-				if ( blog_setting( 'categories_enabled' ) ) :
+				if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
-				if ( blog_setting( 'tags_enabled' ) ) :
+				if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 					$_data['tags'] = $this->input->post( 'tags' );
 
@@ -237,13 +237,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Categories and Tags
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 			$this->data['categories']	= $this->category->get_all();
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 			$this->data['tags']			= $this->tag->get_all();
 
@@ -335,13 +335,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['associations']		= $this->input->post( 'associations' );
 				$_data['gallery']			= $this->input->post( 'gallery' );
 
-				if ( blog_setting( 'categories_enabled' ) ) :
+				if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
-				if ( blog_setting( 'tags_enabled' ) ) :
+				if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 					$_data['tags'] = $this->input->post( 'tags' );
 
@@ -471,13 +471,13 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Categories and Tags
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 			$this->data['categories']	= $this->category->get_all();
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 			$this->data['tags']			= $this->tag->get_all();
 

@@ -252,7 +252,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 			$this->load->model( 'blog/blog_post_model' );
 
 			$_posts		= $this->blog_post_model->get_all();
-			$_blog_url	= blog_setting( 'blog_url' );
+			$_url	= app_setting( 'url', 'blog' );
 			$_counter	= 0;
 
 			// --------------------------------------------------------------------------
@@ -260,7 +260,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 			//	Blog front page route
 			$_map[$_counter]				= new stdClass();
 			$_map[$_counter]->title			= htmlentities( 'Blog' );	//	TODO: this is silly, should blog "name" be configurable?
-			$_map[$_counter]->location		= site_url( $_blog_url );
+			$_map[$_counter]->location		= site_url( $_url );
 			$_map[$_counter]->changefreq	= 'daily';
 			$_map[$_counter]->priority		= 0.5;
 
@@ -274,7 +274,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 					$_map[$_counter]				= new stdClass();
 					$_map[$_counter]->title			= htmlentities( $post->title );
-					$_map[$_counter]->location		= site_url( $_blog_url . $post->slug );
+					$_map[$_counter]->location		= site_url( $_url . $post->slug );
 					$_map[$_counter]->lastmod		= date( DATE_ATOM, strtotime( $post->modified ) );
 					$_map[$_counter]->changefreq	= 'monthly';
 					$_map[$_counter]->priority		= 0.5;

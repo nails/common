@@ -63,7 +63,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function brand()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'brand/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'brand/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -86,7 +86,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _brand_index()
 	{
-		if ( ! shop_setting( 'page_brand_listing' ) ) :
+		if ( ! app_setting( 'page_brand_listing', 'shop' ) ) :
 
 		endif;
 
@@ -168,7 +168,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function category()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'category/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'category/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -191,7 +191,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _category_index()
 	{
-		if ( ! shop_setting( 'page_category_listing' ) ) :
+		if ( ! app_setting( 'page_category_listing', 'shop' ) ) :
 
 		endif;
 
@@ -272,7 +272,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function collection()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'collection/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'collection/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -295,7 +295,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _collection_index()
 	{
-		if ( ! shop_setting( 'page_collection_listing' ) ) :
+		if ( ! app_setting( 'page_collection_listing', 'shop' ) ) :
 
 		endif;
 
@@ -376,7 +376,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function product()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'product/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'product/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -431,7 +431,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function range()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'range/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'range/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -454,7 +454,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _range_index()
 	{
-		if ( ! shop_setting( 'page_range_listing' ) ) :
+		if ( ! app_setting( 'page_range_listing', 'shop' ) ) :
 
 		endif;
 
@@ -535,7 +535,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function sale()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'sale/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'sale/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -558,7 +558,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _sale_index()
 	{
-		if ( ! shop_setting( 'page_sale_listing' ) ) :
+		if ( ! app_setting( 'page_sale_listing', 'shop' ) ) :
 
 		endif;
 
@@ -639,7 +639,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	public function tag()
 	{
-		$_slug = preg_replace( '#' . shop_setting( 'shop_url' ) . 'tag/?#', '', uri_string() );
+		$_slug = preg_replace( '#' . app_setting( 'url', 'shop' ) . 'tag/?#', '', uri_string() );
 
 		if ( $_slug ) :
 
@@ -662,7 +662,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _tag_index()
 	{
-		if ( ! shop_setting( 'page_tag_listing' ) ) :
+		if ( ! app_setting( 'page_tag_listing', 'shop' ) ) :
 
 		endif;
 

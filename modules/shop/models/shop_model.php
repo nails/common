@@ -147,74 +147,6 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_settings( $key = NULL, $force_refresh = FALSE )
-	{
-		if ( ! $this->_settings || $force_refresh ) :
-
-			$_settings = $this->db->get( NAILS_DB_PREFIX . 'shop_settings' )->result();
-
-			foreach ( $_settings AS $setting ) :
-
-				$this->_settings[ $setting->key ] = unserialize( $setting->value );
-
-			endforeach;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $key ) :
-
-			return $this->_settings;
-
-		else :
-
-			return isset( $this->_settings[$key] ) ? $this->_settings[$key] : NULL;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function set_settings( $key_values )
-	{
-		foreach ( $key_values AS $key => $value ) :
-
-			$this->db->where( 'key', $key );
-			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_settings' ) ) :
-
-				$this->db->where( 'key', $key );
-				$this->db->set( 'value', serialize( $value ) );
-				$this->db->update( NAILS_DB_PREFIX . 'shop_settings' );
-
-			else :
-
-				$this->db->set( 'key', $key );
-				$this->db->set( 'value', serialize( $value ) );
-				$this->db->insert( NAILS_DB_PREFIX . 'shop_settings' );
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			//	Unset the cache if the base_currency is being updated
-			if ( $key == 'base_currency' ) :
-
-				$this->_unset_cache( 'base_currency' );
-
-			endif;
-
-		endforeach;
-
-		return TRUE;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	public function get_base_currency()
 	{
 		$_cache = $this->_get_cache( 'base_currency' );
@@ -237,7 +169,7 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Fetch base currency
-		$_base = $this->currency->get_by_id( $this->get_settings( 'base_currency' ) );
+		$_base = $this->currency->get_by_id( app_setting( 'base_currency', 'shop' ) );
 
 		//	Cache
 		$this->_set_cache( 'base_currency', $_base );

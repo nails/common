@@ -136,10 +136,10 @@
 
 		endif;
 
-		$_uri_back = shop_setting( 'shop_url' ) . 'checkout';
+		$_uri_back = app_setting( 'url', 'shop' ) . 'checkout';
 		$_uri_back .= $guest ? '?guest=true' : '';
 
-		$_uri_pay = shop_setting( 'shop_url' ) . 'checkout/payment';
+		$_uri_pay = app_setting( 'url', 'shop' ) . 'checkout/payment';
 		$_uri_pay .= $guest ? '?guest=true' : '';
 
 		echo '<div class="row sixteen columns first last">';

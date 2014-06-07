@@ -196,7 +196,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		if ( $order->requires_shipping ) :
 
-			if ( shop_setting( 'free_shipping_threshold' ) <= $order->totals->sub ) :
+			if ( app_setting( 'free_shipping_threshold', 'shop' ) <= $order->totals->sub ) :
 
 				//	The order qualifies for free shipping, ignore the discount
 				//	given in discount->shipping
@@ -615,9 +615,9 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		//	and the threshold has been reached then prevent it being added as it
 		//	doesn't make sense.
 
-		if ( NULL !== $basket && shop_setting( 'free_shipping_threshold' ) && $_voucher->discount_application == 'SHIPPING' ) :
+		if ( NULL !== $basket && app_setting( 'free_shipping_threshold', 'shop' ) && $_voucher->discount_application == 'SHIPPING' ) :
 
-			if ( $basket->totals->sub >= shop_setting( 'free_shipping_threshold' ) ) :
+			if ( $basket->totals->sub >= app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 				$this->_set_error( 'Your order qualifies for free shipping, voucher not needed!' );
 				return FALSE;

@@ -9,7 +9,7 @@
 			</p>
 			<?php
 
-				if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
+				if ( app_setting( 'social_signin_enabled' ) ) :
 
 					//	This is technically not needed for the default group, but left here by
 					//	way of an example
@@ -24,21 +24,21 @@
 					echo '<p style="text-align:center;">';
 
 					//	FACEBOOK
-					if ( module_is_enabled( 'auth[facebook]' ) ) :
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 						echo anchor( 'auth/fb/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'Facebook' ), 'class="social-signin fb"' );
 
 					endif;
 
 					//	TWITTER
-					if ( module_is_enabled( 'auth[twitter]' ) ) :
+					if ( app_setting( 'social_signin_tw_enabled' ) ) :
 
 						echo anchor( 'auth/tw/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'Twitter' ), 'class="social-signin tw"' );
 
 					endif;
 
 					//	LINKEDIN
-					if ( module_is_enabled( 'auth[linkedin]' ) ) :
+					if ( app_setting( 'social_signin_li_enabled' ) ) :
 
 						echo anchor( 'auth/li/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_login_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
 
@@ -101,7 +101,7 @@
 			</p>
 			<?php
 
-				if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
+				if ( app_setting( 'social_signin_enabled' ) ) :
 
 					//	This is technically not needed for the default group, but left here by
 					//	way of an example
@@ -116,21 +116,21 @@
 					echo '<p style="text-align:center;">';
 
 					//	FACEBOOK
-					if ( module_is_enabled( 'auth[facebook]' ) ) :
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 						echo anchor( 'auth/fb/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'Facebook' ), 'class="social-signin fb"' );
 
 					endif;
 
 					//	TWITTER
-					if ( module_is_enabled( 'auth[twitter]' ) ) :
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 						echo anchor( 'auth/tw/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'Twitter' ), 'class="social-signin tw"' );
 
 					endif;
 
 					//	LINKEDIN
-					if ( module_is_enabled( 'auth[linkedin]' ) ) :
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 						echo anchor( 'auth/li/connect?token=' . $_token . '&return_to=' . urlencode( 'shop/checkout' ), lang( 'auth_register_social_signin', 'LinkedIn' ), 'class="social-signin li"' );
 
@@ -207,7 +207,7 @@
 
 	<div class="sixteen columns first last guest-checkout">
 		<p>
-			Prefer not to register? <?=anchor( shop_setting( 'shop_url' ) . 'checkout?guest=true', 'Checkout as a guest' )?>.
+			Prefer not to register? <?=anchor( app_setting( 'url', 'shop' ) . 'checkout?guest=true', 'Checkout as a guest' )?>.
 		</p>
 	</div>
 

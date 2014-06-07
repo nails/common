@@ -7,7 +7,7 @@
 		foreach ( $post->categories AS $cat ) :
 
 			echo '<li class="category">';
-			echo anchor( $blog_url . 'category/' . $cat->slug, $cat->label );
+			echo anchor( $cat->url, $cat->label );
 			echo '</li>';
 
 		endforeach;

@@ -1,7 +1,7 @@
 <hr />
 <?php
 
-	$_shortname = blog_setting( 'comments_disqus_shortname' );
+	$_shortname = app_setting( 'comments_disqus_shortname', 'blog' );
 
 	if ( $_shortname ) :
 

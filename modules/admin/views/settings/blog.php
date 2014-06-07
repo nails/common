@@ -43,9 +43,9 @@
 
 						//	Blog URL
 						$_field					= array();
-						$_field['key']			= 'blog_url';
+						$_field['key']			= 'blog';
 						$_field['label']		= 'Blog URL';
-						$_field['default']		= blog_setting( 'blog_url' );
+						$_field['default']		= app_setting( 'url', 'blog' );
 						$_field['placeholder']	= 'Customise the Blog\'s URL (include trialing slash)';
 
 						echo form_field( $_field );
@@ -66,7 +66,7 @@
 						$_field					= array();
 						$_field['key']			= 'use_excerpts';
 						$_field['label']		= 'Use excerpts';
-						$_field['default']		= blog_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'blog' );
 
 						echo form_field_boolean( $_field );
 					?>
@@ -80,7 +80,7 @@
 						$_field					= array();
 						$_field['key']			= 'categories_enabled';
 						$_field['label']		= 'Categories';
-						$_field['default']		= blog_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'blog' );
 
 						echo form_field_boolean( $_field );
 
@@ -90,7 +90,7 @@
 						$_field					= array();
 						$_field['key']			= 'tags_enabled';
 						$_field['label']		= 'Tags';
-						$_field['default']		= blog_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'blog' );
 
 						echo form_field_boolean( $_field );
 
@@ -104,7 +104,7 @@
 						$_field					= array();
 						$_field['key']			= 'rss_enabled';
 						$_field['label']		= 'RSS Enabled';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
@@ -130,7 +130,7 @@
 						$_field					= array();
 						$_field['key']			= 'comments_enabled';
 						$_field['label']		= 'Comments Enabled';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
@@ -148,7 +148,7 @@
 						$_field				= array();
 						$_field['key']		= 'comments_engine';
 						$_field['label']	= 'Comment Engine';
-						$_field['default']	= ! blog_setting( $_field['key'] ) ? 'NATIVE' : blog_setting( $_field['key'] );
+						$_field['default']	= ! app_setting( $_field['key'], 'blog' ) ? 'NATIVE' : app_setting( $_field['key'], 'blog' );
 						$_field['class']	= 'select2';
 						$_field['id']		= 'comment-engine';
 
@@ -161,7 +161,7 @@
 
 					<hr />
 
-					<div id="native-settings" style="display:<?=! blog_setting( $_field['key'] ) || blog_setting( $_field['key'] ) == 'NATIVE' ? 'block' : 'none'?>">
+					<div id="native-settings" style="display:<?=! app_setting( $_field['key'], 'blog' ) || app_setting( $_field['key'], 'blog' ) == 'NATIVE' ? 'block' : 'none'?>">
 						<p class="system-alert message no-close">
 							<strong>Coming Soon!</strong> Native commenting is in the works and will be available soon.
 							<?php
@@ -175,14 +175,14 @@
 						</p>
 					</div>
 
-					<div id="disqus-settings" style="display:<?=blog_setting( $_field['key'] ) && blog_setting( $_field['key'] ) == 'DISQUS' ? 'block' : 'none'?>">
+					<div id="disqus-settings" style="display:<?=app_setting( $_field['key'], 'blog' ) && app_setting( $_field['key'], 'blog' ) == 'DISQUS' ? 'block' : 'none'?>">
 					<?php
 
 						//	Blog URL
 						$_field					= array();
 						$_field['key']			= 'comments_disqus_shortname';
 						$_field['label']		= 'Disqus Shortname';
-						$_field['default']		= blog_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'blog' );
 						$_field['placeholder']	= 'The Disqus shortname for this website.';
 
 						echo form_field( $_field, 'Create a shortname at disqus.com.' );
@@ -212,7 +212,7 @@
 						$_field['key']			= 'social_facebook_enabled';
 						$_field['label']		= 'Facebook';
 						$_field['id']			= 'social-service-facebook';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
@@ -222,7 +222,7 @@
 						$_field['key']			= 'social_twitter_enabled';
 						$_field['label']		= 'Twitter';
 						$_field['id']			= 'social-service-twitter';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
@@ -232,7 +232,7 @@
 						$_field['key']			= 'social_googleplus_enabled';
 						$_field['label']		= 'Google+';
 						$_field['id']			= 'social-service-googleplus';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
@@ -242,25 +242,25 @@
 						$_field['key']			= 'social_pinterest_enabled';
 						$_field['label']		= 'Pinterest';
 						$_field['id']			= 'social-service-pinterest';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
 				</fieldset>
-				<fieldset id="blog-settings-social-twitter" style="display:<?=blog_setting( 'social_twitter_enabled' ) ? 'block' : 'none' ?>">
+				<fieldset id="blog-settings-social-twitter" style="display:<?=app_setting( 'social_twitter_enabled', 'blog' ) ? 'block' : 'none' ?>">
 					<legend>Twitter Settings</legend>
 					<?php
 
 						$_field					= array();
 						$_field['key']			= 'social_twitter_via';
 						$_field['label']		= 'Via';
-						$_field['default']		= blog_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'blog' );
 						$_field['placeholder']	= 'Put your @username here to add it to the tweet';
 
 						echo form_field( $_field );
 					?>
 				</fieldset>
-				<fieldset id="blog-settings-social-config" style="display:<?=blog_setting( 'social_enabled' ) ? 'block' : 'none' ?>">
+				<fieldset id="blog-settings-social-config" style="display:<?=app_setting( 'social_enabled', 'blog' ) ? 'block' : 'none' ?>">
 					<legend>Customisation</legend>
 					<?php
 
@@ -268,7 +268,7 @@
 						$_field['key']			= 'social_skin';
 						$_field['label']		= 'Skin';
 						$_field['class']		= 'select2';
-						$_field['default']		= blog_setting( $_field['key'] ) ? blog_setting( $_field['key'] ) : 'CLASSIC';
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? app_setting( $_field['key'], 'blog' ) : 'CLASSIC';
 
 						$_options				= array();
 						$_options['CLASSIC']	= 'Classic';
@@ -284,7 +284,7 @@
 						$_field['label']		= 'Layout';
 						$_field['class']		= 'select2';
 						$_field['id']			= 'blog-settings-social-layout';
-						$_field['default']		= blog_setting( $_field['key'] ) ? blog_setting( $_field['key'] ) : 'HORIZONTAL';
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? app_setting( $_field['key'], 'blog' ) : 'HORIZONTAL';
 
 						$_options				= array();
 						$_options['HORIZONTAL']	= 'Horizontal';
@@ -295,14 +295,14 @@
 
 						// --------------------------------------------------------------------------
 
-						$_display = blog_setting( $_field['key'] ) && blog_setting( $_field['key'] ) == 'SINGLE' ? 'block' : 'none';
+						$_display = app_setting( $_field['key'], 'blog' ) && app_setting( $_field['key'], 'blog' ) == 'SINGLE' ? 'block' : 'none';
 
 						echo '<div id="blog-settings-social-layout-single-text" style="display:' . $_display . '">';
 
 							$_field					= array();
 							$_field['key']			= 'social_layout_single_text';
 							$_field['label']		= 'Button Text';
-							$_field['default']		= blog_setting( $_field['key'] ) ? blog_setting( $_field['key'] ) : 'Share';
+							$_field['default']		= app_setting( $_field['key'], 'blog' ) ? app_setting( $_field['key'], 'blog' ) : 'Share';
 							$_field['placeholder']	= 'Specify what text should be rendered on the button';
 
 							echo form_field( $_field );
@@ -316,7 +316,7 @@
 						$_field['key']			= 'social_counters';
 						$_field['label']		= 'Show Counters';
 						$_field['id']			= 'social-counters';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 					?>
@@ -342,18 +342,18 @@
 						$_field					= array();
 						$_field['key']			= 'sidebar_latest_posts';
 						$_field['label']		= 'Latest Posts';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
-						if ( blog_setting( 'categories_enabled' ) ) :
+						if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 							$_field					= array();
 							$_field['key']			= 'sidebar_categories';
 							$_field['label']		= 'Categories';
-							$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+							$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 							echo form_field_boolean( $_field );
 
@@ -361,12 +361,12 @@
 
 						// --------------------------------------------------------------------------
 
-						if ( blog_setting( 'tags_enabled' ) ) :
+						if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 							$_field					= array();
 							$_field['key']			= 'sidebar_tags';
 							$_field['label']		= 'Tags';
-							$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+							$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 							echo form_field_boolean( $_field );
 
@@ -377,7 +377,7 @@
 						$_field					= array();
 						$_field['key']			= 'sidebar_popular_posts';
 						$_field['label']		= 'Popular Posts';
-						$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
@@ -390,7 +390,7 @@
 								$_field					= array();
 								$_field['key']			= 'sidebar_association_' . $assoc->slug;
 								$_field['label']		= $assoc->sidebar_title;
-								$_field['default']		= blog_setting( $_field['key'] ) ? TRUE : FALSE;
+								$_field['default']		= app_setting( $_field['key'], 'blog' ) ? TRUE : FALSE;
 
 								echo form_field_boolean( $_field );
 

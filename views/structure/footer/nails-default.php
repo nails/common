@@ -16,14 +16,14 @@
 			$this->asset->output( 'js-inline' );
 
 			//	Analytics
-			if ( ENVIRONMENT == 'production' && site_setting( 'google_analytics_account' ) ) :
+			if ( ENVIRONMENT == 'production' && app_setting( 'google_analytics_account' ) ) :
 
 				?>
 				<script type="text/javascript">
 				<!--//
 
 					var _gaq = _gaq || [];
-					_gaq.push(['_setAccount', '<?=site_setting( 'google_analytics_account' )?>]);
+					_gaq.push(['_setAccount', '<?=app_setting( 'google_analytics_account' )?>]);
 					_gaq.push(['_trackPageview']);
 
 					(function() {

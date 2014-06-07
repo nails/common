@@ -38,23 +38,18 @@ class NAILS_Blog_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 			$this->load->model( 'blog_category_model',	'category' );
 
 		endif;
 
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 			$this->load->model( 'blog_tag_model',	'tag' );
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Fetch the Blog URL
-		$this->data['blog_url'] = blog_setting( 'blog_url' );
 
 		// --------------------------------------------------------------------------
 

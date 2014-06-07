@@ -95,11 +95,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load models
-		$this->load->model( 'system/site_model', 'site' );
-
-		// --------------------------------------------------------------------------
-
 		//	Process POST
 		if ( $this->input->post() ) :
 
@@ -134,7 +129,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->site->get_settings( NULL, TRUE );
+		$this->data['settings'] = app_setting( NULL, 'app', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -161,7 +156,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->site->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site settings have been saved.';
 
@@ -228,7 +223,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->site->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site authentication settings have been saved.';
 
@@ -262,11 +257,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Set method info
 		$this->data['page']->title = lang( 'settings_blog_title' );
-
-		// --------------------------------------------------------------------------
-
-		//	Load models
-		$this->load->model( 'blog/blog_model', 'blog' );
 
 		// --------------------------------------------------------------------------
 
@@ -320,7 +310,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->blog->get_settings( NULL, TRUE );
+		$this->data['settings'] = app_setting( NULL, 'blog', TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -342,7 +332,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings							= array();
-		$_settings['blog_url']				= $this->input->post( 'blog_url' );
+		$_settings['blog']				= $this->input->post( 'blog' );
 		$_settings['use_excerpts']			= (bool) $this->input->post( 'use_excerpts' );
 		$_settings['categories_enabled']	= (bool) $this->input->post( 'categories_enabled' );
 		$_settings['tags_enabled']			= (bool) $this->input->post( 'tags_enabled' );
@@ -351,12 +341,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Sanitize blog url
-		$_settings['blog_url'] .= substr( $_settings['blog_url'], -1 ) != '/' ? '/' : '';
+		$_settings['blog'] .= substr( $_settings['blog'], -1 ) != '/' ? '/' : '';
 
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
 
@@ -389,7 +379,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog commenting settings have been saved.';
 
@@ -424,7 +414,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog social settings have been saved.';
 
@@ -453,7 +443,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->blog->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog sidebar settings have been saved.';
 
@@ -549,7 +539,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = $this->shop->get_settings( NULL, TRUE );
+		$this->data['settings'] = app_setting( NULL, 'shop', TRUE );
 
 		if ( $this->user->is_superuser() ) :
 
@@ -591,7 +581,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Prepare update
 		$_settings									= array();
 		$_settings['notify_order']					= $this->input->post( 'notify_order' );
-		$_settings['shop_url']						= $this->input->post( 'shop_url' );
+		$_settings['url']						= $this->input->post( 'url' );
 		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );
 		$_settings['warehouse_collection_enabled']	= (bool) $this->input->post( 'warehouse_collection_enabled' );
 		$_settings['warehouse_addr_addressee']		= $this->input->post( 'warehouse_addr_addressee' );
@@ -616,11 +606,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Sanitize shop url
-		$_settings['shop_url'] .= substr( $_settings['shop_url'], -1 ) != '/' ? '/' : '';
+		$_settings['url'] .= substr( $_settings['url'], -1 ) != '/' ? '/' : '';
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->shop->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
 
@@ -682,7 +672,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->shop->set_settings( $_settings ) ) :
+		if ( $this->settings->set_settings( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
 

@@ -694,6 +694,15 @@ class NAILS_Shop_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function format_url( $slug )
+	{
+		return  app_setting( 'url', 'shop' ) . 'category/' . $slug;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_object( &$object )
 	{
 		//	Type casting
@@ -705,6 +714,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 		$object->children		= array();
 
 		$object->depth			= count( explode( '/', $object->slug ) ) - 1;
+		$object->url			= $this->format_url( $object->slug );
 	}
 }
 

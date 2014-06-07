@@ -37,7 +37,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Handle pagination
 		$_page		= $this->uri->rsegment( 2 );
-		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= app_setting( 'home_per_page', 'blog' );
 		$_per_page	= $_per_page ? $_per_page : 10;
 
 		$this->data['pagination']			= new stdClass();
@@ -48,8 +48,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Send any additional data
 		$_data						= array();
-		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
-		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['include_body']		= ! app_setting( 'use_excerpts', 'blog' );
+		$_data['include_gallery']	= app_setting( 'home_show_gallery', 'blog' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
 		//	Only published items which are not schduled for the future
@@ -138,11 +138,11 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Assets
-		if ( blog_setting( 'social_enabled' ) ) :
+		if ( app_setting( 'social_enabled', 'blog' ) ) :
 
 			$this->asset->load( 'social-likes/social-likes.min.js', 'BOWER' );
 
-			switch ( blog_setting( 'social_skin' ) )  :
+			switch ( app_setting( 'social_skin', 'blog' ) )  :
 
 				case 'FLAT' :
 
@@ -190,7 +190,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 	public function category()
 	{
-		if ( ! blog_setting( 'categories_enabled' ) ) :
+		if ( ! app_setting( 'categories_enabled', 'blog' ) ) :
 
 			show_404();
 
@@ -231,7 +231,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Handle pagination
 		$_page		= $this->uri->rsegment( 2 );
-		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= app_setting( 'home_per_page', 'blog' );
 		$_per_page	= $_per_page ? $_per_page : 10;
 
 		$this->data['pagination']			= new stdClass();
@@ -242,8 +242,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Send any additional data
 		$_data						= array();
-		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
-		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['include_body']		= ! app_setting( 'use_excerpts', 'blog' );
+		$_data['include_gallery']	= app_setting( 'home_show_gallery', 'blog' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
 		//	Only published items which are not schduled for the future
@@ -275,7 +275,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 	public function tag()
 	{
-		if ( ! blog_setting( 'tags_enabled' ) ) :
+		if ( ! app_setting( 'tags_enabled', 'blog' ) ) :
 
 			show_404();
 
@@ -316,7 +316,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Handle pagination
 		$_page		= $this->uri->rsegment( 2 );
-		$_per_page	= blog_setting( 'home_per_page' );
+		$_per_page	= app_setting( 'home_per_page', 'blog' );
 		$_per_page	= $_per_page ? $_per_page : 10;
 
 		$this->data['pagination']			= new stdClass();
@@ -327,8 +327,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Send any additional data
 		$_data						= array();
-		$_data['include_body']		= ! blog_setting( 'use_excerpts' );
-		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['include_body']		= ! app_setting( 'use_excerpts', 'blog' );
+		$_data['include_gallery']	= app_setting( 'home_show_gallery', 'blog' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
 		//	Only published items which are not schduled for the future
@@ -360,7 +360,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 	public function rss()
 	{
-		if ( ! blog_setting( 'rss_enabled' ) ) :
+		if ( ! app_setting( 'rss_enabled', 'blog' ) ) :
 
 			show_404();
 
@@ -371,7 +371,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		//	Get posts
 		$_data						= array();
 		$_data['include_body']		= TRUE;
-		$_data['include_gallery']	= blog_setting( 'home_show_gallery' );
+		$_data['include_gallery']	= app_setting( 'home_show_gallery', 'blog' );
 		$_data['sort']				= array( 'bp.published', 'desc' );
 
 		//	Only published items which are not schduled for the future
@@ -398,29 +398,29 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	protected function _fetch_sidebar_widgets()
 	{
 		//	Widgets
-		if ( blog_setting( 'sidebar_enabled' ) ) :
+		if ( app_setting( 'sidebar_enabled', 'blog' ) ) :
 
 			$this->data['widget'] = new stdClass();
 
-			if ( blog_setting( 'sidebar_latest_posts' ) ) :
+			if ( app_setting( 'sidebar_latest_posts', 'blog' ) ) :
 
 				$this->data['widget']->latest_posts = $this->widget->latest_posts();
 
 			endif;
 
-			if ( blog_setting( 'sidebar_categories' ) ) :
+			if ( app_setting( 'sidebar_categories', 'blog' ) ) :
 
 				$this->data['widget']->categories = $this->widget->categories();
 
 			endif;
 
-			if ( blog_setting( 'sidebar_tags' ) ) :
+			if ( app_setting( 'sidebar_tags', 'blog' ) ) :
 
 				$this->data['widget']->tags = $this->widget->tags();
 
 			endif;
 
-			if ( blog_setting( 'sidebar_popular_posts' ) ) :
+			if ( app_setting( 'sidebar_popular_posts', 'blog' ) ) :
 
 				$this->data['widget']->popular_posts = $this->widget->popular_posts();
 

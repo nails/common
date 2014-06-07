@@ -169,9 +169,9 @@
 						<strong>
 						<?php
 
-							if ( shop_setting( 'invoice_company' ) ) :
+							if ( app_setting( 'invoice_company', 'shop' ) ) :
 
-								echo shop_setting( 'invoice_company' );
+								echo app_setting( 'invoice_company', 'shop' );
 
 							elseif ( APP_NAME ) :
 
@@ -185,9 +185,9 @@
 
 						?>
 						</strong>
-						<?=shop_setting( 'invoice_address' ) ? '<br />' . nl2br( shop_setting( 'invoice_address' ) ) : ''?>
-						<?=shop_setting( 'invoice_vat_no' ) ? '<small>VAT No.: ' . nl2br( shop_setting( 'invoice_vat_no' ) ) . '</small>' : ''?>
-						<?=shop_setting( 'invoice_company_no' ) ? '<small>Company No.: ' . nl2br( shop_setting( 'invoice_company_no' ) ) . '</small>' : ''?>
+						<?=app_setting( 'invoice_address', 'shop' ) ? '<br />' . nl2br( app_setting( 'invoice_address', 'shop' ) ) : ''?>
+						<?=app_setting( 'invoice_vat_no', 'shop' ) ? '<small>VAT No.: ' . nl2br( app_setting( 'invoice_vat_no', 'shop' ) ) . '</small>' : ''?>
+						<?=app_setting( 'invoice_company_no', 'shop' ) ? '<small>Company No.: ' . nl2br( app_setting( 'invoice_company_no', 'shop' ) ) . '</small>' : ''?>
 
 					</td>
 				</tr>

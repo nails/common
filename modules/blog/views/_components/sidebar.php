@@ -1,7 +1,7 @@
 <ul class="sidebar <?=BS_COL_MD_3?> <?=BS_COL_MD_PULL_9?> list-unstyled">
 <?php
 
-	if ( blog_setting( 'sidebar_latest_posts' ) && $widget->latest_posts ) :
+	if ( app_setting( 'sidebar_latest_posts', 'blog' ) && $widget->latest_posts ) :
 
 		echo '<li class="widget latest-posts clearfix">';
 			echo $widget->latest_posts;
@@ -12,7 +12,7 @@
 
 	// --------------------------------------------------------------------------
 
-	if ( blog_setting( 'categories_enabled' ) && blog_setting( 'sidebar_categories' ) &&$widget->categories ) :
+	if ( app_setting( 'categories_enabled', 'blog' ) && app_setting( 'sidebar_categories', 'blog' ) && $widget->categories ) :
 
 		echo '<li class="widget categories clearfix">';
 			echo $widget->categories;
@@ -23,7 +23,7 @@
 
 	// --------------------------------------------------------------------------
 
-	if ( blog_setting( 'tags_enabled' ) && blog_setting( 'sidebar_tags' ) &&$widget->tags ) :
+	if ( app_setting( 'tags_enabled', 'blog' ) && app_setting( 'sidebar_tags', 'blog' ) && $widget->tags ) :
 
 		echo '<li class="widget tags clearfix">';
 			echo $widget->tags;
@@ -39,7 +39,7 @@
 
 		foreach ( $post->associations AS $assoc ) :
 
-			if ( blog_setting( 'sidebar_association_' . $assoc->slug ) && $assoc->current ) :
+			if ( app_setting( 'sidebar_association_' . $assoc->slug, 'blog' ) && $assoc->current ) :
 
 				echo '<li class="widget associations association-' . $assoc->slug . ' clearfix">';
 				echo '<h5>' . $assoc->widget->title . '</h5>';
@@ -74,7 +74,7 @@
 
 	endif;
 
-	if ( blog_setting( 'sidebar_popular_posts' ) && $widget->popular_posts ) :
+	if ( app_setting( 'sidebar_popular_posts', 'blog' ) && $widget->popular_posts ) :
 
 		echo '<li class="widget popular-posts clearfix">';
 			echo $widget->popular_posts;
@@ -86,10 +86,10 @@
 	// --------------------------------------------------------------------------
 
 	//	RSS
-	if ( blog_setting( 'rss_enabled' ) ) :
+	if ( app_setting( 'rss_enabled', 'blog' ) ) :
 
 		echo '<li class="text-center">';
-			echo anchor( blog_setting( 'blog_url' ) . 'rss', '<span class="ion-social-rss"></span>', 'title="Subscribe via RSS"' );
+			echo anchor( app_setting( 'url', 'blog' ) . 'rss', '<span class="ion-social-rss"></span>', 'title="Subscribe via RSS"' );
 		echo '<li>';
 
 	endif;

@@ -16,7 +16,7 @@
 		Use tags to group specific post topics together. For example, a tag might be 'New Year <?=date( 'Y')?>', or 'Coursework'.
 		<?php
 
-			if ( blog_setting( 'categories_enabled' ) ) :
+			if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
 				echo 'For broader subjects (e.g "Music" or "Travel") consider using a ' . anchor( 'admin/blog/manage/categories' . $_is_fancybox, 'category' ) . '.';
 

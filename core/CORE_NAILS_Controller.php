@@ -585,7 +585,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_helpers		= array();
-		$_helpers[]		= 'site';
+		$_helpers[]		= 'settings';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
 		$_helpers[]		= 'form';
@@ -639,12 +639,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_models	= array();
-		$_models[]	= array( 'system/site_model', 'site' );
-		$_models[]	= array( 'system/user_model', 'user' );
-		$_models[]	= array( 'system/user_group_model', 'user_group' );
-		$_models[]	= array( 'system/user_password_model', 'user_password' );
-		$_models[]	= array( 'system/datetime_model', 'datetime' );
-		$_models[]	= array( 'system/language_model', 'language' );
+		$_models[]	= array( 'system/settings_model',		'settings' );
+		$_models[]	= array( 'system/user_model',			'user' );
+		$_models[]	= array( 'system/user_group_model',		'user_group' );
+		$_models[]	= array( 'system/user_password_model',	'user_password' );
+		$_models[]	= array( 'system/datetime_model',		'datetime' );
+		$_models[]	= array( 'system/language_model',		'language' );
 
 		foreach ( $_models AS $model ) :
 

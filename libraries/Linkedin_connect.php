@@ -40,12 +40,10 @@ class Linkedin_connect
 		$this->_ci->config->load( 'linkedin' );
 		$this->_settings = $this->_ci->config->item( 'linkedin' );
 
-		$this->_ci->load->helper( 'site' );
-
 		//	Fetch our config variables
 		$this->_settings				= array();
-		$this->_settings['api_key']		= site_setting( 'social_signin_li_app_key' );
-		$this->_settings['api_secret']	= site_setting( 'social_signin_li_app_secret' );
+		$this->_settings['api_key']		= app_setting( 'social_signin_li_app_key' );
+		$this->_settings['api_secret']	= app_setting( 'social_signin_li_app_secret' );
 
 		if ( $this->_settings['api_secret'] ) :
 

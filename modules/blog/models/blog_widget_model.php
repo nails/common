@@ -19,8 +19,12 @@ class NAILS_Blog_widget_model extends NAILS_Model
 {
 	public function __construct()
 	{
+		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
 		//	Fetch the Blog URL
-		$this->data['blog_url'] = blog_setting( 'blog_url' );
+		$this->data['blog_url'] = app_setting( 'url', 'blog' );
 	}
 
 
@@ -253,7 +257,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 				$_out .= '<li class="' . $_config->li_class . '">';
 
 				$_count = $_config->show_count ? ' (' . $cat->post_count . ')' : '';
-				$_out .= anchor( $this->data['blog_url'] . 'category/' . $cat->slug, $cat->label ) . $_count;
+				$_out .= anchor( $this->category->format_url( $cat->slug ), $cat->label ) . $_count;
 				$_out .= '</li>';
 
 			endforeach;
@@ -334,7 +338,7 @@ class NAILS_Blog_widget_model extends NAILS_Model
 				$_out .= '<li class="' . $_config->li_class . '">';
 
 				$_count = $_config->show_count ? ' (' . $tag->post_count . ')' : '';
-				$_out .= anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, $tag->label . $_count );
+				$_out .= anchor( $this->tag->format_url( $tag->slug ), $tag->label . $_count );
 				$_out .= '</li>';
 
 			endforeach;

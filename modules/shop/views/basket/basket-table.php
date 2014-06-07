@@ -42,7 +42,7 @@
 							//	Decrement
 							if ( ! isset( $no_changes ) || ! $no_changes ) :
 
-								echo anchor( shop_setting( 'shop_url' ) . 'basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
+								echo anchor( app_setting( 'url', 'shop' ) . 'basket/decrement/' . $item->id, 'Decrement', 'class="decrement"' );
 
 							endif;
 
@@ -54,7 +54,7 @@
 
 								if ( empty( $item->type->max_per_order ) || $item->quantity < $item->type->max_per_order ) :
 
-									echo anchor( shop_setting( 'shop_url' ) . 'basket/increment/' . $item->id, 'Increment', 'class="increment"' );
+									echo anchor( app_setting( 'url', 'shop' ) . 'basket/increment/' . $item->id, 'Increment', 'class="increment"' );
 
 								endif;
 
@@ -134,7 +134,7 @@
 					echo '<td colspan="' . $_colspan . '">';
 
 
-						echo form_open( shop_setting( 'shop_url' ) . 'basket/set_currency' );
+						echo form_open( app_setting( 'url', 'shop' ) . 'basket/set_currency' );
 
 						echo 'Currency:';
 
@@ -187,7 +187,7 @@
 					echo '<tr class="shipping-chooser">';
 					echo '<td colspan="6">';
 
-						echo form_open( shop_setting( 'shop_url' ) . 'basket/set_shipping_method' );
+						echo form_open( app_setting( 'url', 'shop' ) . 'basket/set_shipping_method' );
 						echo 'Shipping method: ';
 						echo '<select name="shipping_method" class="chosen" id="shipping-chooser">';
 

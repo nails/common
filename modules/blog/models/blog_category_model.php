@@ -181,9 +181,19 @@ class NAILS_Blog_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function format_url( $slug )
+	{
+		return app_setting( 'url', 'blog' ) . 'category/' . $slug;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_category( &$category )
 	{
-		$category->id = (int) $category->id;
+		$category->id	= (int) $category->id;
+		$category->url	= $this->format_url( $category->slug );
 
 		if ( isset( $category->post_count ) ) :
 

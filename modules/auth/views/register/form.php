@@ -3,7 +3,7 @@
 		<!--	SOCIAL NETWORK BUTTONS	-->
 		<?php
 
-			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
+			if ( app_setting( 'social_signin_enabled' ) ) :
 
 				echo '<p class="text-center" style="margin:1em 0 2em 0;">';
 					echo 'Register using your preferred social network.';
@@ -24,21 +24,21 @@
 					$_buttons = array();
 
 					//	FACEBOOK
-					if ( module_is_enabled( 'auth[facebook]' ) ) :
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 						$_buttons[] = array( 'auth/fb/connect?token=' . $_token, 'Facebook' );
 
 					endif;
 
 					//	TWITTER
-					if ( module_is_enabled( 'auth[twitter]' ) ) :
+					if ( app_setting( 'social_signin_tw_enabled' ) ) :
 
 						$_buttons[] = array( 'auth/tw/connect?token=' . $_token, 'Twitter' );
 
 					endif;
 
 					//	LINKEDIN
-					if ( module_is_enabled( 'auth[linkedin]' ) ) :
+					if ( app_setting( 'social_signin_li_enabled' ) ) :
 
 						$_buttons[] = array( 'auth/li/connect?token=' . $_token, 'LinkedIn' );
 

@@ -212,7 +212,7 @@
 
 		// --------------------------------------------------------------------------
 
-		$_uri = shop_setting( 'shop_url' ) . 'basket';
+		$_uri = app_setting( 'url', 'shop' ) . 'basket';
 		$_uri .= $guest ? '?guest=true' : '';
 
 		echo '<div class="row sixteen columns first last">';

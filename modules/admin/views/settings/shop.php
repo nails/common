@@ -50,7 +50,7 @@
 						$_field					= array();
 						$_field['key']			= 'notify_order';
 						$_field['label']		= 'Order Notifications';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'Who should be notified of new orders';
 
 						echo form_field( $_field, 'Specify multiple addresses with a comma.' );
@@ -73,7 +73,7 @@
 						$_field					= array();
 						$_field['key']			= 'free_shipping_threshold';
 						$_field['label']		= 'Threshold';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field( $_field );
 
@@ -91,7 +91,7 @@
 						$_field					= array();
 						$_field['key']			= 'warehouse_collection_enabled';
 						$_field['label']		= 'Enabled';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['id']			= 'warehouse_collection_enabled';
 
 						echo form_field_boolean( $_field );
@@ -104,7 +104,7 @@
 
 						else :
 
-							$_display = shop_setting( $_field['key'] ) ? 'block' : 'none';
+							$_display = app_setting( $_field['key'], 'shop' ) ? 'block' : 'none';
 
 						endif;
 
@@ -113,7 +113,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_addressee';
 							$_field['label']		= 'Addressee';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -122,7 +122,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_line1';
 							$_field['label']		= 'Address Line 1';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -131,7 +131,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_line2';
 							$_field['label']		= 'Address Line 2';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -140,7 +140,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_town';
 							$_field['label']		= 'Town';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -149,7 +149,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_postcode';
 							$_field['label']		= 'Postcode';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -158,7 +158,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_state';
 							$_field['label']		= 'State/County';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -167,7 +167,7 @@
 							$_field					= array();
 							$_field['key']			= 'warehouse_addr_country';
 							$_field['label']		= 'Country';
-							$_field['default']		= shop_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 							echo form_field( $_field );
 
@@ -185,9 +185,9 @@
 
 						//	Blog URL
 						$_field					= array();
-						$_field['key']			= 'shop_url';
+						$_field['key']			= 'url';
 						$_field['label']		= 'Shop URL';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'Customise the Shop\'s URL (include trialing slash)';
 
 						echo form_field( $_field );
@@ -206,7 +206,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_company';
 						$_field['label']		= 'Company Name';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'The registered company name.';
 
 						echo form_field( $_field );
@@ -218,7 +218,7 @@
 						$_field['key']			= 'invoice_address';
 						$_field['label']		= 'Company Address';
 						$_field['type']			= 'textarea';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'The address to show on the invoice.';
 
 						echo form_field( $_field );
@@ -229,7 +229,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_vat_no';
 						$_field['label']		= 'VAT Number';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'Your VAT number, if any.';
 
 						echo form_field( $_field );
@@ -240,7 +240,7 @@
 						$_field					= array();
 						$_field['key']			= 'invoice_company_no';
 						$_field['label']		= 'Company Number';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 						$_field['placeholder']	= 'Your company number.';
 
 						echo form_field( $_field );
@@ -255,7 +255,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_brand_listing';
 						$_field['label']		= 'Brand Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the brand URL is used, but no slug is specified. Renders all the populated brands and their SEO data.' );
 
@@ -265,7 +265,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_category_listing';
 						$_field['label']		= 'Category Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the category URL is used, but no slug is specified. Renders all the populated categories and their SEO data.' );
 
@@ -275,7 +275,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_collection_listing';
 						$_field['label']		= 'Collection Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the collection URL is used, but no slug is specified. Renders all the active collections and their SEO data.' );
 
@@ -285,7 +285,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_range_listing';
 						$_field['label']		= 'Range Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the range URL is used, but no slug is specified. Renders all the active ranges and their SEO data.' );
 
@@ -295,7 +295,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_sale_listing';
 						$_field['label']		= 'Sale Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the sale URL is used, but no slug is specified. Renders all the active sales and their SEO data.' );
 
@@ -305,7 +305,7 @@
 						$_field					= array();
 						$_field['key']			= 'page_tag_listing';
 						$_field['label']		= 'Tag Listing Page';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_field_boolean( $_field, 'The page shown when the tag URL is used, but no slug is specified. Renders all the populated tags and their SEO data.' );
 
@@ -469,7 +469,7 @@
 						$_field					= array();
 						$_field['key']			= 'base_currency';
 						$_field['label']		= 'Base Currency';
-						$_field['default']		= shop_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
 						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
 

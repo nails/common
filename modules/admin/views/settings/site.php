@@ -34,7 +34,7 @@
 						$_field					= array();
 						$_field['key']			= 'google_analytics_account';
 						$_field['label']		= 'Profile ID';
-						$_field['default']		= site_setting( $_field['key'] );
+						$_field['default']		= app_setting( $_field['key'] );
 						$_field['placeholder']	= 'UA-XXXXX-YY';
 
 						echo form_field( $_field );
@@ -64,19 +64,19 @@
 						$_field['label']		= 'Facebook';
 						$_field['class']		= 'social-signin';
 						$_field['data']			= array( 'fields' => 'socialsignin-fb-settings' );
-						$_field['default']		= site_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'] ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
-						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
+						$_display = app_setting( $_field['key'] ) ? 'block' : 'none';
 						echo '<div id="socialsignin-fb-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_fb_app_id';
 							$_field['label']		= 'Facebook App ID';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -85,7 +85,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_fb_app_secret';
 							$_field['label']		= 'Facebook App Secret';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							if ( $_field['default'] ) :
 
@@ -101,7 +101,7 @@
 							$_field['key']			= 'social_signin_fb_app_scope';
 							$_field['label']		= 'Facebook App Scope';
 							$_field['info']			= 'Comma seperated list of scopes. The \'email\' scope will be automatically added.';
-							$_field['default']		= site_setting( $_field['key'] ) ? implode( ',', site_setting( $_field['key'] ) ) : '';
+							$_field['default']		= app_setting( $_field['key'] ) ? implode( ',', app_setting( $_field['key'] ) ) : '';
 
 							echo form_field( $_field );
 
@@ -110,7 +110,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_fb_settings_page';
 							$_field['label']		= 'Facebook Settings Page';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -123,19 +123,19 @@
 						$_field['label']		= 'Twitter';
 						$_field['class']		= 'social-signin';
 						$_field['data']			= array( 'fields' => 'socialsignin-tw-settings' );
-						$_field['default']		= site_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'] ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
-						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
+						$_display = app_setting( $_field['key'] ) ? 'block' : 'none';
 						echo '<div id="socialsignin-tw-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_tw_app_key';
 							$_field['label']		= 'Twitter App ID';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -144,7 +144,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_tw_app_secret';
 							$_field['label']		= 'Twitter App Secret';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							if ( $_field['default'] ) :
 
@@ -159,7 +159,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_tw_settings_page';
 							$_field['label']		= 'Twitter Settings Page';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -172,19 +172,19 @@
 						$_field['label']		= 'LinkedIn';
 						$_field['class']		= 'social-signin';
 						$_field['data']			= array( 'fields' => 'socialsignin-li-settings' );
-						$_field['default']		= site_setting( $_field['key'] ) ? TRUE : FALSE;
+						$_field['default']		= app_setting( $_field['key'] ) ? TRUE : FALSE;
 
 						echo form_field_boolean( $_field );
 
 						// --------------------------------------------------------------------------
 
-						$_display = site_setting( $_field['key'] ) ? 'block' : 'none';
+						$_display = app_setting( $_field['key'] ) ? 'block' : 'none';
 						echo '<div id="socialsignin-li-settings" style="display:' . $_display . ';border-bottom:1px solid #CCC;">';
 
 							$_field					= array();
 							$_field['key']			= 'social_signin_li_app_key';
 							$_field['label']		= 'LinkedIn App ID';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 
@@ -193,7 +193,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_li_app_secret';
 							$_field['label']		= 'LinkedIn App Secret';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							if ( $_field['default'] ) :
 
@@ -208,7 +208,7 @@
 							$_field					= array();
 							$_field['key']			= 'social_signin_li_settings_page';
 							$_field['label']		= 'LinkedIn Settings Page';
-							$_field['default']		= site_setting( $_field['key'] );
+							$_field['default']		= app_setting( $_field['key'] );
 
 							echo form_field( $_field );
 

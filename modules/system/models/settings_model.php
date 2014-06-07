@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		NAILS_Site_model
+ * Name:		NAILS_Settings_model
  *
- * Description:	This model contains all methods for handling system settings
+ * Description:	This model contains all methods for handling app settings
  *
  **/
 
@@ -15,7 +15,7 @@
  *
  **/
 
-class NAILS_Site_model extends NAILS_Model
+class NAILS_Settings_model extends NAILS_Model
 {
 	protected $_settings;
 
@@ -23,15 +23,31 @@ class NAILS_Site_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_settings( $key = NULL, $force_refresh = FALSE )
+	public function __construct()
 	{
-		if ( ! $this->_settings || $force_refresh ) :
+		parent::__construct();
 
-			$_settings = $this->db->get( NAILS_DB_PREFIX . 'site_settings' )->result();
+		// --------------------------------------------------------------------------
+
+		$this->_table		= NAILS_DB_PREFIX . 'app_settings';
+		$this->_settings	= array();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_settings( $key = NULL, $grouping = 'app', $force_refresh = FALSE )
+	{
+		if ( empty( $this->_settings[$grouping] ) || $force_refresh ) :
+
+			$this->db->where( 'grouping', $grouping );
+			$_settings = $this->db->get( $this->_table )->result();
+			$this->_settings[$grouping] = array();
 
 			foreach ( $_settings AS $setting ) :
 
-				$this->_settings[ $setting->key ] = unserialize( $setting->value );
+				$this->_settings[$grouping][ $setting->key ] = unserialize( $setting->value );
 
 			endforeach;
 
@@ -41,11 +57,11 @@ class NAILS_Site_model extends NAILS_Model
 
 		if ( ! $key ) :
 
-			return $this->_settings;
+			return $this->_settings[$grouping];
 
 		else :
 
-			return isset( $this->_settings[$key] ) ? $this->_settings[$key] : NULL;
+			return isset( $this->_settings[$grouping][$key] ) ? $this->_settings[$grouping][$key] : NULL;
 
 		endif;
 	}
@@ -54,22 +70,24 @@ class NAILS_Site_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function set_settings( $key_values )
+	public function set_settings( $key_values, $grouping = 'app' )
 	{
 		foreach ( $key_values AS $key => $value ) :
 
 			$this->db->where( 'key', $key );
-			if ( $this->db->count_all_results( NAILS_DB_PREFIX . 'site_settings' ) ) :
+			if ( $this->db->count_all_results( $this->_table ) ) :
 
+				$this->db->where( 'grouping', $grouping );
 				$this->db->where( 'key', $key );
 				$this->db->set( 'value', serialize( $value ) );
-				$this->db->update( NAILS_DB_PREFIX . 'site_settings' );
+				$this->db->update( $this->_table);
 
 			else :
 
+				$this->db->where( 'grouping', $grouping );
 				$this->db->set( 'key', $key );
 				$this->db->set( 'value', serialize( $value ) );
-				$this->db->insert( NAILS_DB_PREFIX . 'site_settings' );
+				$this->db->insert( $this->_table );
 
 			endif;
 
@@ -107,14 +125,14 @@ class NAILS_Site_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SITE_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SETTINGS_MODEL' ) ) :
 
-	class Site_model extends NAILS_Site_model
+	class Settings_model extends NAILS_Settings_model
 	{
 	}
 
 endif;
 
 
-/* End of file site_model.php */
-/* Location: ./system/models/site_model.php */
+/* End of file settings_model.php */
+/* Location: ./system/models/settings_model.php */

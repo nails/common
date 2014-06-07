@@ -174,7 +174,7 @@
 
 			echo '<p>';
 			echo 'They will be shipped using <strong>' . $order->shipping_method->courier . ' - ' . $order->shipping_method->method . '</strong>; you can also ';
-			echo anchor( shop_setting( 'shop_url' ) . 'order/track?token=' . $_track_token , 'track the status of your order' ) . '.';
+			echo anchor( app_setting( 'url', 'shop' ) . 'order/track?token=' . $_track_token , 'track the status of your order' ) . '.';
 			echo '</p>';
 
 		elseif ( $type == 'notification' ) :

@@ -380,9 +380,9 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If there's a free-shipping threshold, and it's been reached, apply a discount to the shipping
-		if ( shop_setting( 'free_shipping_threshold' ) && $_basket->requires_shipping ) :
+		if ( app_setting( 'free_shipping_threshold', 'shop' ) && $_basket->requires_shipping ) :
 
-			if ( $_basket->totals->sub >= shop_setting( 'free_shipping_threshold' ) ) :
+			if ( $_basket->totals->sub >= app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 				$_basket->discount->shipping	= $_basket->totals->shipping + $_basket->totals->tax_shipping;
 				$_basket->totals->grand			-=$_basket->discount->shipping;
@@ -397,7 +397,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Apply any vouchers which apply to just shipping
-		if ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && ( ! shop_setting( 'free_shipping_threshold' ) || shop_setting( 'free_shipping_threshold' ) > $_basket->totals->sub ) ) :
+		if ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && ( ! app_setting( 'free_shipping_threshold', 'shop' ) || app_setting( 'free_shipping_threshold', 'shop' ) > $_basket->totals->sub ) ) :
 
 			if ( $_basket->voucher->discount_type == 'PERCENTAGE' ) :
 
@@ -444,7 +444,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 			$_basket->totals->grand			= $_basket->totals->sub + $_basket->totals->shipping + $_basket->totals->tax_shipping + $_basket->totals->tax_items - $_basket->discount->shipping;
 			$_basket->totals->grand_render	= $_basket->totals->sub_render + $_basket->totals->shipping_render + $_basket->totals->tax_shipping_render + $_basket->totals->tax_items_render - $_basket->discount->shipping_render;
 
-		elseif ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && shop_setting( 'free_shipping_threshold' ) && shop_setting( 'free_shipping_threshold' ) < $_basket->totals->sub ) :
+		elseif ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && app_setting( 'free_shipping_threshold', 'shop' ) && app_setting( 'free_shipping_threshold', 'shop' ) < $_basket->totals->sub ) :
 
 			//	Voucher no longer makes sense. Remove it.
 			$this->_voucher_code		= FALSE;
@@ -531,7 +531,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				//	Simple percentage, just knock that off the product and shipping totals
 
 				//	Check free shipping threshold
-				if ( ! shop_setting( 'free_shipping_threshold' ) || $_basket->totals->sub < shop_setting( 'free_shipping_threshold' ) ) :
+				if ( ! app_setting( 'free_shipping_threshold', 'shop' ) || $_basket->totals->sub < app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 					$_sdiscount			= ( $_basket->totals->shipping + $_basket->totals->tax_shipping ) * ( $_basket->voucher->discount_value / 100 );
 					$_sdiscount_render	= ( $_basket->totals->shipping_render + $_basket->totals->tax_shipping_render ) * ( $_basket->voucher->discount_value / 100 );

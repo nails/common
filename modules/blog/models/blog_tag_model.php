@@ -175,9 +175,19 @@ class NAILS_Blog_tag_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function format_url( $slug )
+	{
+		return app_setting( 'url', 'blog' ) . 'tag/' . $slug;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_tag( &$tag )
 	{
-		$tag->id = (int) $tag->id;
+		$tag->id	= (int) $tag->id;
+		$tag->url	= $this->format_url( $tag->slug );
 
 		if ( isset( $tag->post_count ) ) :
 

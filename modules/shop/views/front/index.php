@@ -61,12 +61,12 @@
 			<?php
 
 				if (
-					shop_setting( 'page_brand_listing') ||
-					shop_setting( 'page_category_listing') ||
-					shop_setting( 'page_collection_listing') ||
-					shop_setting( 'page_range_listing') ||
-					shop_setting( 'page_sale_listing') ||
-					shop_setting( 'page_tag_listing')
+					app_setting( 'page_brand_listing', 'shop' ) ||
+					app_setting( 'page_category_listing', 'shop' ) ||
+					app_setting( 'page_collection_listing', 'shop' ) ||
+					app_setting( 'page_range_listing', 'shop' ) ||
+					app_setting( 'page_sale_listing', 'shop' ) ||
+					app_setting( 'page_tag_listing', 'shop' )
 				) :
 
 					echo '<h5>Other Pages</h5>';
@@ -74,12 +74,12 @@
 
 					echo '<ul class="list-unstyled">';
 
-						echo shop_setting( 'page_brand_listing' )		? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'brand',		'Brand listing page' ) . '</li>'		: '';
-						echo shop_setting( 'page_category_listing' )	? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'category',	'Category listing page' ) . '</li>'		: '';
-						echo shop_setting( 'page_collection_listing' )	? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'collection',	'Collection listing page' ) . '</li>'	: '';
-						echo shop_setting( 'page_range_listing' )		? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'range',		'Range listing page' ) . '</li>'		: '';
-						echo shop_setting( 'page_sale_listing' )		? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'sale',		'Sale listing page' ) . '</li>'			: '';
-						echo shop_setting( 'page_tag_listing' )			? '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'tag',			'Tag listing page' ) . '</li>'			: '';
+						echo app_setting( 'page_brand_listing', 'shop' )		? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'brand',		'Brand listing page' ) . '</li>'		: '';
+						echo app_setting( 'page_category_listing', 'shop' )	? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'category',	'Category listing page' ) . '</li>'		: '';
+						echo app_setting( 'page_collection_listing', 'shop' )	? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'collection',	'Collection listing page' ) . '</li>'	: '';
+						echo app_setting( 'page_range_listing', 'shop' )		? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'range',		'Range listing page' ) . '</li>'		: '';
+						echo app_setting( 'page_sale_listing', 'shop' )		? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'sale',		'Sale listing page' ) . '</li>'			: '';
+						echo app_setting( 'page_tag_listing', 'shop' )			? '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'tag',			'Tag listing page' ) . '</li>'			: '';
 
 					echo '</ul>';
 

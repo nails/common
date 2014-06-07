@@ -513,6 +513,12 @@ class NAILS_Blog_post_model extends NAILS_Model
 				$this->db->order_by( 'c.label' );
 				$post->categories = $this->db->get( NAILS_DB_PREFIX . 'blog_post_category pc' )->result();
 
+				foreach( $post->categories AS $c ) :
+
+					$c->url = $this->category->format_url( $c->slug );
+
+				endforeach;
+
 			else :
 
 				$post->categories = array();
@@ -531,6 +537,12 @@ class NAILS_Blog_post_model extends NAILS_Model
 				$this->db->group_by( 't.id' );
 				$this->db->order_by( 't.label' );
 				$post->tags = $this->db->get( NAILS_DB_PREFIX . 'blog_post_tag pt' )->result();
+
+				foreach( $post->tags AS $t ) :
+
+					$t->url = $this->tag->format_url( $t->slug );
+
+				endforeach;
 
 			else :
 
@@ -980,7 +992,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$post->is_deleted			= (bool) $post->is_deleted;
 
 		//	Generate URL
-		$post->url					= site_url( blog_setting( 'blog_url' ) . $post->slug );
+		$post->url					= site_url( app_setting( 'url', 'blog' ) . $post->slug );
 
 		//	Author
 		$post->author				= new stdClass();

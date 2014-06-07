@@ -32,7 +32,7 @@ class NAILS_Tw extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Ensure the sub-module is enabled
-		if ( ! module_is_enabled( 'auth' ) && site_setting( 'social_signin_tw_enabled' ) ) :
+		if ( ! module_is_enabled( 'auth' ) && app_setting( 'social_signin_tw_enabled' ) ) :
 
 			show_404();
 

@@ -136,7 +136,7 @@
 			case 'paypal' :
 
 				echo '<p>';
-				echo anchor( shop_setting( 'shop_url' ) . 'checkout/notify/' . $order->payment_gateway->slug . '?testing=true&ref='. $order->ref, 'Testing: Simulate Successful Payment', 'class="awesome small"' );
+				echo anchor( app_setting( 'url', 'shop' ) . 'checkout/notify/' . $order->payment_gateway->slug . '?testing=true&ref='. $order->ref, 'Testing: Simulate Successful Payment', 'class="awesome small"' );
 				echo '<br /><small>Auto advance disabled on non-production servers</small>';
 				echo '</p>';
 

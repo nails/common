@@ -1232,11 +1232,14 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_voucher_ibfk_3` FOREIGN KEY (`modified_by`) REFERENCES `' . $_NAILS_PREFIX . 'user` (`id`) ON DELETE SET NULL
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'site_settings` (
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'app_settings` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+			`grouping` varchar(100) NOT NULL,
 			`key` varchar(50) DEFAULT NULL,
 			`value` text,
-			PRIMARY KEY (`id`)
+			PRIMARY KEY (`id`),
+			KEY `grouping` (`grouping`),
+			KEY `grouping_2` (`grouping`,`key`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'testimonial` (
@@ -1423,17 +1426,6 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		// --------------------------------------------------------------------------
 
 		//	Insert Data
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'blog_settings` (`id`, `key`, `value`)
-		VALUES
-			(1, 'blog_url', 's:5:\\\"blog/\\\";'),
-			(2, 'sidebar_enabled', 'b:1;'),
-			(3, 'categories_enabled', 'b:1;'),
-			(4, 'tags_enabled', 'b:1;'),
-			(5, 'sidebar_position', 's:5:\\\"right\\\";'),
-			(6, 'use_excerpts', 'b:1;'),
-			(7, 'home_show_gallery', 'b:1;'),
-			(8, 'home_per_page', 'i:10;');" );
-
 		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'country` (`id`, `iso_code`, `iso_code_3`, `iso_name`, `iso_number`, `language_id`)
 		VALUES
 			(1, 'AD', 'AND', 'Andorra', '020', NULL),
@@ -3017,28 +3009,33 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(255, 52, 77),
 			(256, 144, 233);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'shop_settings` (`id`, `key`, `value`)
+		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'app_settings` (`grouping`, `key`, `value`)
 		VALUES
-			(1, 'base_currency', 'i:52;'),
-			(2, 'notify_order', 's:0:\\\"\\\";'),
-			(3, 'shop_url', 's:5:\\\"shop/\\\";'),
-			(4, 'free_shipping_threshold', 'd:0;'),
-			(5, 'invoice_company', 's:0:\\\"\\\";'),
-			(6, 'invoice_company_no', 's:0:\\\"\\\";'),
-			(7, 'invoice_address', 's:0:\\\"\\\";'),
-			(8, 'invoice_vat_no', 's:0:\\\"\\\";'),
-			(9, 'warehouse_collection_enabled', 'b:0;'),
-			(10, 'warehouse_addr_addressee', 's:0:\\\"\\\";'),
-			(11, 'warehouse_addr_line1', 's:0:\\\"\\\";'),
-			(12, 'warehouse_addr_line2', 's:0:\\\"\\\";'),
-			(13, 'warehouse_addr_town', 's:0:\\\"\\\";'),
-			(14, 'warehouse_addr_postcode', 's:0:\\\"\\\";'),
-			(15, 'warehouse_addr_state', 's:0:\\\"\\\";'),
-			(16, 'warehouse_addr_country', 's:0:\\\"\\\";');" );
-
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'site_settings` (`id`, `key`, `value`)
-		VALUES
-			(1, 'google_analytics_account', NULL);" );
+			('app', 'google_analytics_account', NULL),
+			('blog', 'blog', 's:5:\\\"blog/\\\";'),
+			('blog', 'sidebar_enabled', 'b:1;'),
+			('blog', 'categories_enabled', 'b:1;'),
+			('blog', 'tags_enabled', 'b:1;'),
+			('blog', 'sidebar_position', 's:5:\\\"right\\\";'),
+			('blog', 'use_excerpts', 'b:1;'),
+			('blog', 'home_show_gallery', 'b:1;'),
+			('blog', 'home_per_page', 'i:10;'),
+			('shop', 'base_currency', 'i:52;'),
+			('shop', 'notify_order', 's:0:\\\"\\\";'),
+			('shop', 'url', 's:5:\\\"shop/\\\";'),
+			('shop', 'free_shipping_threshold', 'd:0;'),
+			('shop', 'invoice_company', 's:0:\\\"\\\";'),
+			('shop', 'invoice_company_no', 's:0:\\\"\\\";'),
+			('shop', 'invoice_address', 's:0:\\\"\\\";'),
+			('shop', 'invoice_vat_no', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_collection_enabled', 'b:0;'),
+			('shop', 'warehouse_addr_addressee', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_line1', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_line2', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_town', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_postcode', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_state', 's:0:\\\"\\\";'),
+			('shop', 'warehouse_addr_country', 's:0:\\\"\\\";');" );
 
 		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'user_auth_method` (`id`, `type`)
 		VALUES

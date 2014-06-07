@@ -30,13 +30,11 @@ class Facebook_Connect
 
 		// --------------------------------------------------------------------------
 
-		$this->_ci->load->helper( 'site' );
-
 		//	Fetch our config variables
 		$this->_settings			= array();
-		$this->_settings['appId']	= site_setting( 'social_signin_fb_app_id' );
-		$this->_settings['secret']	= site_setting( 'social_signin_fb_app_secret' );
-		$this->_settings['scope']	= site_setting( 'social_signin_fb_app_scope' );
+		$this->_settings['appId']	= app_setting( 'social_signin_fb_app_id' );
+		$this->_settings['secret']	= app_setting( 'social_signin_fb_app_secret' );
+		$this->_settings['scope']	= app_setting( 'social_signin_fb_app_scope' );
 
 		if ( ! is_array( $this->_settings['scope'] ) ) :
 

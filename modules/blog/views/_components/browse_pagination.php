@@ -3,7 +3,7 @@
 	$this->load->library('pagination');
 
 	$_config						= array();
-	$_config['base_url']			= site_url( blog_setting( 'blog_url' ) );
+	$_config['base_url']			= site_url( app_setting( 'url', 'blog' ) );
 	$_config['total_rows']			= $pagination->total;
 	$_config['per_page']			= $pagination->per_page;
 	$_config['use_page_numbers']	= TRUE;

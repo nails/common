@@ -65,7 +65,7 @@
 
 					endswitch;
 
-					echo anchor( shop_setting( 'shop_url' ) . 'basket/remove_voucher', 'Remove' );
+					echo anchor( app_setting( 'url', 'shop' ) . 'basket/remove_voucher', 'Remove' );
 					echo '</span>';
 					echo '</div>';
 
@@ -76,7 +76,7 @@
 					//	Add voucher
 					echo '<div class="voucher-add row">';
 
-					echo form_open( shop_setting( 'shop_url' ) . 'basket/add_voucher' );
+					echo form_open( app_setting( 'url', 'shop' ) . 'basket/add_voucher' );
 					echo form_input( 'voucher', NULL, 'class="working" placeholder="Got a discount voucher or giftcard code? Enter it here..."' );
 					echo form_submit( 'submit', 'Validate', 'class="awesome"' );
 					echo form_close();
@@ -92,11 +92,11 @@
 			// --------------------------------------------------------------------------
 
 			//	Free shipping?
-			if ( shop_setting( 'free_shipping_threshold' ) && $basket->requires_shipping ) :
+			if ( app_setting( 'free_shipping_threshold', 'shop' ) && $basket->requires_shipping ) :
 
-				if ( $basket->totals->sub  < shop_setting( 'free_shipping_threshold' ) ) :
+				if ( $basket->totals->sub  < app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
-					$_amount_left = shop_setting( 'free_shipping_threshold' ) - $basket->totals->sub;
+					$_amount_left = app_setting( 'free_shipping_threshold', 'shop' ) - $basket->totals->sub;
 					$_amount_left = shop_format_price( $_amount_left, TRUE );
 
 					echo '<div class="free-shipping-threshold row">';
@@ -108,7 +108,7 @@
 					echo '<div class="free-shipping-threshold row">';
 					echo '<p>';
 					echo 'Your order qualifies for free shipping!';
-					echo '<small>Your order qualifies because you\'ve spent more than ' . shop_format_price( shop_setting( 'free_shipping_threshold' ), TRUE ) . '</small>';
+					echo '<small>Your order qualifies because you\'ve spent more than ' . shop_format_price( app_setting( 'free_shipping_threshold', 'shop' ), TRUE ) . '</small>';
 					echo '</p>';
 					echo '</div>';
 
@@ -121,7 +121,7 @@
 			if ( $payment_gateways ) :
 
 				echo '<p class="checkout">';
-				echo anchor( shop_setting( 'shop_url' ) . 'checkout', 'Checkout', 'class="awesome huge"' );
+				echo anchor( app_setting( 'url', 'shop' ) . 'checkout', 'Checkout', 'class="awesome huge"' );
 
 				echo '<small>';
 

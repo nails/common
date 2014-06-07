@@ -8,31 +8,31 @@ Order reference <?=$order->ref?>, placed on the <?=date( 'jS F Y, \a\t H:i:s', s
 
 	$this->load->view( 'email/shop/utilities/order_table_plaintext', array( 'type' => 'receipt' ) );
 
-	if ( shop_setting( 'invoice_company' ) || shop_setting( 'invoice_vat_no' ) || shop_setting( 'vat_address' ) || shop_setting( 'invoice_company_no' ) ) :
+	if ( app_setting( 'invoice_company', 'shop' ) || app_setting( 'invoice_vat_no', 'shop' ) || app_setting( 'vat_address', 'blog' ) || app_setting( 'invoice_company_no', 'shop' ) ) :
 
 		echo '---------------' . "\n\n";
 
-		if ( shop_setting( 'invoice_company' ) ) :
+		if ( app_setting( 'invoice_company', 'shop' ) ) :
 
-			echo 'Company: ' . shop_setting( 'invoice_company' ) . "\n";
-
-		endif;
-
-		if ( shop_setting( 'invoice_vat_no' ) ) :
-
-			echo 'VAT: ' . shop_setting( 'invoice_vat_no' ) . "\n";
+			echo 'Company: ' . app_setting( 'invoice_company', 'shop' ) . "\n";
 
 		endif;
 
-		if ( shop_setting( 'invoice_address' ) ) :
+		if ( app_setting( 'invoice_vat_no', 'shop' ) ) :
 
-			echo 'Address: ' . shop_setting( 'invoice_address' ) . "\n";
+			echo 'VAT: ' . app_setting( 'invoice_vat_no', 'shop' ) . "\n";
 
 		endif;
 
-		if ( shop_setting( 'invoice_company_no' ) ) :
+		if ( app_setting( 'invoice_address', 'shop' ) ) :
 
-			echo 'Company No.: ' . shop_setting( 'invoice_company_no' ) . "\n";
+			echo 'Address: ' . app_setting( 'invoice_address', 'shop' ) . "\n";
+
+		endif;
+
+		if ( app_setting( 'invoice_company_no', 'shop' ) ) :
+
+			echo 'Company No.: ' . app_setting( 'invoice_company_no', 'shop' ) . "\n";
 
 		endif;
 

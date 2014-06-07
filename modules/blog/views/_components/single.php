@@ -29,7 +29,7 @@
 	// --------------------------------------------------------------------------
 
 	//	Post Social Tools
-	if ( blog_setting( 'social_enabled' ) ) :
+	if ( app_setting( 'social_enabled', 'blog' ) ) :
 
 		$this->load->view( 'blog/_components/single_social' );
 
@@ -38,19 +38,19 @@
 	// --------------------------------------------------------------------------
 
 	//	Categories & Tags
-	if ( ( blog_setting( 'categories_enabled' ) && $post->categories ) || ( blog_setting( 'tags_enabled' ) && $post->tags ) ) :
+	if ( ( app_setting( 'categories_enabled', 'blog' ) && $post->categories ) || ( app_setting( 'tags_enabled', 'blog' ) && $post->tags ) ) :
 
 		echo '<hr />';
 
 	endif;
 
-	if ( blog_setting( 'categories_enabled' ) && $post->categories ) :
+	if ( app_setting( 'categories_enabled', 'blog' ) && $post->categories ) :
 
 		$this->load->view( 'blog/_components/single_categories' );
 
 	endif;
 
-	if ( blog_setting( 'tags_enabled' ) && $post->tags ) :
+	if ( app_setting( 'tags_enabled', 'blog' ) && $post->tags ) :
 
 		$this->load->view( 'blog/_components/single_tags' );
 
@@ -59,7 +59,7 @@
 	// --------------------------------------------------------------------------
 
 	//	Post comments
-	if ( blog_setting( 'comments_enabled' ) ) :
+	if ( app_setting( 'comments_enabled', 'blog' ) ) :
 
 		$this->load->view( 'blog/_components/single_comments' );
 

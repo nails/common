@@ -202,13 +202,12 @@ class NAILS_Routes_model extends NAILS_Model
 
 		if ( module_is_enabled( 'shop' ) ) :
 
-			$this->load->model( 'shop/shop_model' );
-			$_settings = $this->shop_model->get_settings();
+			$_settings = app_setting( NULL, 'shop' );
 
 			$_routes['//BEGIN SHOP'] = '';
 
 			//	Shop front page route
-			$_routes[substr( $_settings['shop_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'shop/$2';
+			$_routes[substr( $_settings['url'], 0, -1 ) . '(/(:any)?/?)?'] = 'shop/$2';
 
 			//	TODO: all shop product/category/tag/sale routes etc
 
@@ -229,13 +228,12 @@ class NAILS_Routes_model extends NAILS_Model
 
 		if ( module_is_enabled( 'blog' ) ) :
 
-			$this->load->model( 'blog/blog_model' );
-			$_settings = $this->blog_model->get_settings();
+			$_settings = app_setting( NULL, 'blog' );
 
 			$_routes['//BEGIN BLOG'] = '';
 
 			//	Blog front page route
-			$_routes[substr( $_settings['blog_url'], 0, -1 ) . '(/(:any)?/?)?'] = 'blog/$2';
+			$_routes[substr( $_settings['url'], 0, -1 ) . '(/(:any)?/?)?'] = 'blog/$2';
 
 			$_routes['//END BLOG'] = '';
 

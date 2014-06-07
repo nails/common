@@ -138,7 +138,7 @@
 			$_track_token = urlencode( $this->encrypt->encode( $order->ref . '|' . $order->id . '|' . time(), APP_PRIVATE_KEY ) );
 
 			echo "\n" . 'They will be shipped using ' . $order->shipping_method->courier . ' - ' . $order->shipping_method->method . '; you can also track the status of your order at the following URL:' . "\n";
-			echo '{unwrap}' . site_url( shop_setting( 'shop_url' ) . 'order/track?token=' . $_track_token ) . '{unwrap}';
+			echo '{unwrap}' . site_url( app_setting( 'url', 'shop' ) . 'order/track?token=' . $_track_token ) . '{unwrap}';
 
 		elseif ( $type == 'notification' ) :
 

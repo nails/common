@@ -10,13 +10,13 @@
 				<a href="#" data-tab="tab-body" id="tabber-body">Body</a>
 			</li>
 
-			<?php if ( blog_setting( 'categories_enabled' ) ) : ?>
+			<?php if ( app_setting( 'categories_enabled', 'blog' ) ) : ?>
 			<li class="tab">
 				<a href="#" data-tab="tab-categories" id="tabber-categories">Categories</a>
 			</li>
 			<?php endif; ?>
 
-			<?php if ( blog_setting( 'tags_enabled' ) ) : ?>
+			<?php if ( app_setting( 'tags_enabled', 'blog' ) ) : ?>
 			<li class="tab">
 				<a href="#" data-tab="tab-tags" id="tabber-tags">Tags</a>
 			</li>
@@ -53,7 +53,7 @@
 				// --------------------------------------------------------------------------
 
 				//	Excerpt
-				if ( blog_setting( 'use_excerpts' ) ) :
+				if ( app_setting( 'use_excerpts', 'blog' ) ) :
 
 					$_field					= array();
 					$_field['key']			= 'excerpt';
@@ -120,7 +120,7 @@
 				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="wysiwyg" id="post_body"' )?>
 			</div>
 
-			<?php if ( blog_setting( 'categories_enabled' ) ) : ?>
+			<?php if ( app_setting( 'categories_enabled', 'blog' ) ) : ?>
 				<div class="tab page" id="tab-categories">
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Categories allow for a broad grouping of post topics and should be considered top-level 'containers' for posts of similar content.">categories</u>.
@@ -165,7 +165,7 @@
 				</div>
 			<?php endif; ?>
 
-			<?php if ( blog_setting( 'tags_enabled' ) ) : ?>
+			<?php if ( app_setting( 'tags_enabled', 'blog' ) ) : ?>
 				<div class="tab page" id="tab-tags">
 					<p>
 						Organise your posts and help user's find them by assigning <u rel="tipsy" title="Tags are generally used to describe your post in more detail.">tags</u>.

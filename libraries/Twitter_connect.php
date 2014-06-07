@@ -30,12 +30,10 @@ class Twitter_Connect
 
 		// --------------------------------------------------------------------------
 
-		$this->_ci->load->helper( 'site' );
-
 		//	Fetch our config variables
 		$this->_settings			= array();
-		$this->_settings['consumer_key']	= site_setting( 'social_signin_fb_app_id' );
-		$this->_settings['consumer_secret']	= site_setting( 'social_signin_fb_app_secret' );
+		$this->_settings['consumer_key']	= app_setting( 'social_signin_fb_app_id' );
+		$this->_settings['consumer_secret']	= app_setting( 'social_signin_fb_app_secret' );
 
 		if ( $this->_settings['consumer_secret'] ) :
 

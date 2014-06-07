@@ -56,7 +56,7 @@
 
 					echo '<ul class="list-unstyled">';
 
-						echo '<li>&rsaquo; ' . anchor( shop_setting( 'shop_url' ) . 'collection/' . ${$_data_available[0]->variable}[0]->slug, 'Single Collection page' ) . '</li>';
+						echo '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'collection/' . ${$_data_available[0]->variable}[0]->slug, 'Single Collection page' ) . '</li>';
 
 					echo '</ul>';
 
