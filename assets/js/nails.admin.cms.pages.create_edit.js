@@ -739,6 +739,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 
 						_script += '		ui.stop().animate( { height: _height }, 250 );';
 						_script += '	});';
+						_script += '	CKEDITOR.instances[_id].on( \'autoGrow\', function( e )';
+						_script += '	{';
+						_script += '		var _difference		= e.data.newHeight - e.data.currentHeight;';
+						_script += '		var _header_height	= ui.find(\'.header-bar\').outerHeight();';
+						_script += '		var _editor_height	= ui.find(\'.editor\').outerHeight();';
+						_script += '		var _height			= _header_height + _editor_height + _difference;';
+						_script += '		ui.css({height:_height});';
+						_script += '	});';
 						_script += '});';
 
 						// --------------------------------------------------------------------------
@@ -826,6 +834,14 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 						_script += '		}';
 
 						_script += '		ui.stop().animate( { height: _height }, 250 );';
+						_script += '	});';
+						_script += '	CKEDITOR.instances[_id].on( \'autoGrow\', function( e )';
+						_script += '	{';
+						_script += '		var _difference		= e.data.newHeight - e.data.currentHeight;';
+						_script += '		var _header_height	= ui.find(\'.header-bar\').outerHeight();';
+						_script += '		var _editor_height	= ui.find(\'.editor\').outerHeight();';
+						_script += '		var _height			= _header_height + _editor_height + _difference;';
+						_script += '		ui.css({height:_height});';
 						_script += '	});';
 						_script += '});';
 
