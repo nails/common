@@ -669,6 +669,16 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'sessions` (
+			`session_id` varchar(40) NOT NULL DEFAULT \'0\',
+			`ip_address` varchar(45) NOT NULL DEFAULT \'0\',
+			`user_agent` varchar(120) NOT NULL,
+			`last_activity` int(10) unsigned NOT NULL DEFAULT \'0\',
+			`user_data` text NOT NULL,
+			PRIMARY KEY (`session_id`),
+			KEY `last_activity_idx` (`last_activity`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'shop_attribute` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`slug` varchar(100) NOT NULL DEFAULT \'\',
