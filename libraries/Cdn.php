@@ -488,7 +488,7 @@ class Cdn
 	public function get_objects( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS' )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
-		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.img_orientation, o.is_animated' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.label bucket_label, b.slug bucket_slug' );
 
@@ -546,7 +546,7 @@ class Cdn
 	public function get_objects_from_trash( $page = NULL, $per_page = NULL, $data = array(), $_caller = 'GET_OBJECTS_FROM_TRASH' )
 	{
 		$this->db->select( 'o.id, o.filename, o.filename_display, o.created, o.created_by, o.modified, o.modified_by, o.serves, o.downloads, o.thumbs, o.scales' );
-		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.is_animated' );
+		$this->db->select( 'o.mime, o.filesize, o.img_width, o.img_height, o.img_orientation, o.is_animated' );
 		$this->db->select( 'ue.email, u.first_name, u.last_name, u.profile_img, u.gender' );
 		$this->db->select( 'b.id bucket_id, b.label bucket_label, b.slug bucket_slug' );
 
@@ -1253,6 +1253,22 @@ class Cdn
 
 			// --------------------------------------------------------------------------
 
+			if ( $_data->img->width > $_data->img->height ) :
+
+				$_data->img->orientation = 'LANDSCAPE';
+
+			elseif( $_data->img->width < $_data->img->height ) :
+
+				$_data->img->orientation = 'PORTRAIT';
+
+			elseif( $_data->img->width == $_data->img->height ) :
+
+				$_data->img->orientation = 'SQUARE';
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
 			if ( $_data->mime == 'image/gif' ) :
 
 				//	Detect animated gif
@@ -1444,6 +1460,7 @@ class Cdn
 		$_data['filesize']			= $_object->filesize;
 		$_data['img_width']			= $_object->img_width;
 		$_data['img_height']		= $_object->img_height;
+		$_data['img_orientation']	= $_object->img_orientation;
 		$_data['is_animated']		= $_object->is_animated;
 		$_data['created']			= $_object->created;
 		$_data['created_by']		= $_object->creator->id;
@@ -1534,6 +1551,7 @@ class Cdn
 		$_data['filesize']			= $_object->filesize;
 		$_data['img_width']			= $_object->img_width;
 		$_data['img_height']		= $_object->img_height;
+		$_data['img_orientation']	= $_object->img_orientation;
 		$_data['is_animated']		= $_object->is_animated;
 		$_data['created']			= $_object->created;
 		$_data['created_by']		= $_object->creator->id;
@@ -1962,10 +1980,11 @@ class Cdn
 
 		// --------------------------------------------------------------------------
 
-		if ( isset( $data->img->width ) && isset( $data->img->height ) ) :
+		if ( isset( $data->img->width ) && isset( $data->img->height ) && isset( $data->img->orientation ) ) :
 
-			$this->db->set( 'img_width',	$data->img->height );
-			$this->db->set( 'img_height',	$data->img->width );
+			$this->db->set( 'img_width',		$data->img->width );
+			$this->db->set( 'img_height',		$data->img->height );
+			$this->db->set( 'img_orientation',	$data->img->orientation );
 
 		endif;
 
