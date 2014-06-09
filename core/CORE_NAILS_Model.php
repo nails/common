@@ -115,7 +115,7 @@ class CORE_NAILS_Model extends CI_Model
 
 	/**
 	 * Inject the user object, private by convention - only really used by a few
-	 * core NAils classes
+	 * core Nails classes
 	 *
 	 * @access	public
 	 * @param object $user The user object

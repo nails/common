@@ -669,7 +669,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'sessions` (
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'session` (
 			`session_id` varchar(40) NOT NULL DEFAULT \'0\',
 			`ip_address` varchar(45) NOT NULL DEFAULT \'0\',
 			`user_agent` varchar(120) NOT NULL,
@@ -1285,6 +1285,8 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			`username` varchar(30) DEFAULT NULL,
 			`password` varchar(40) DEFAULT \'\',
 			`password_md5` char(32) DEFAULT NULL,
+			`password_engine` varchar(10) DEFAULT \'NAILS_1\',
+			`password_changed` datetime DEFAULT NULL,
 			`salt` varchar(40) DEFAULT NULL,
 			`forgotten_password_code` varchar(40) DEFAULT NULL,
 			`remember_code` varchar(255) DEFAULT NULL,

@@ -128,7 +128,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 				$_always_succeed = $this->config->item( 'auth_forgotten_pass_always_succeed' );
 
 				//	Attempt to reset password
-				if ( $this->user->set_password_token( $_identifier ) ) :
+				if ( $this->user_password->set_token( $_identifier ) ) :
 
 					//	Send email to user; load library
 					$this->load->library( 'emailer' );
@@ -273,7 +273,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 		$_generate_new_pw = ! $this->config->item( 'auth_two_factor_enable' );
 
-		$_new_pw = $this->user->validate_password_token( $code, $_generate_new_pw );
+		$_new_pw = $this->user_password->validate_token( $code, $_generate_new_pw );
 
 		// --------------------------------------------------------------------------
 
@@ -304,7 +304,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 						if ( $_valid ) :
 
 							//	Correct answer, reset password and render views
-							$_new_pw = $this->user->validate_password_token( $code, TRUE );
+							$_new_pw = $this->user_password->validate_token( $code, TRUE );
 
 							$this->data['new_password'] = $_new_pw['password'];
 
@@ -339,7 +339,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 				else :
 
 					//	No questions, reset and load views
-					$_new_pw = $this->user->validate_password_token( $code, TRUE );
+					$_new_pw = $this->user_password->validate_token( $code, TRUE );
 
 					$this->data['new_password'] = $_new_pw['password'];
 

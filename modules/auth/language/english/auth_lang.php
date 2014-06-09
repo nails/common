@@ -62,6 +62,7 @@
 	//	Auth_model lang strings
 	$lang['auth_login_fail_missing_field']				= '<strong>Sorry,</strong> a required field was missing.';
 	$lang['auth_login_fail_general']					= '<strong>Sorry,</strong> your log in has not been successful, please try again.';
+	$lang['auth_login_fail_general_recent']				= '<strong>Sorry,</strong> your log in has not been successful, please try again. You changed your password %s.';
 	$lang['auth_login_fail_suspended']					= '<strong>This account has been suspended;</strong> if you feel you have received this message in error then please contact us.';
 	$lang['auth_login_fail_blocked']					= '<strong>This account has been temporarily blocked due to repeated failed logins.</strong><br />Please wait %s minutes before trying again (each failed login resets the block). ';
 	$lang['auth_login_fail_social']						= '<strong>This account was created using a social network</strong><br />Either login via the appropriate button or <a href="%s">click here to set a password</a> using the Forgotten Password tool.';

@@ -558,6 +558,23 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
+		// --------------------------------------------------------------------------
+
+		//	STOP! Before we load the session library, we need to check if we're using
+		//	the database. If we are then check if `sess_table_name` is "nails_session".
+		//	If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
+
+		$_sess_table_name = $this->config->item( 'sess_table_name' );
+
+		if ( $_sess_table_name === 'nails_session' && NAILS_DB_PREFIX !== 'nails_' ) :
+
+			$_sess_table_name = str_replace( 'nails_', NAILS_DB_PREFIX, $_sess_table_name );
+			$this->config->set_item( 'sess_table_name', $_sess_table_name );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_libraries[]	= 'encrypt';
 		$_libraries[]	= 'asset';
 		$_libraries[]	= 'logger';

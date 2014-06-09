@@ -132,10 +132,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 			//	User was recognised; validate credentials
 
-			//	Generate the hashed password to check against
-			$password = $this->user->hash_password_db( $_user->id, $password );
-
-			if ( $_user->password === $password ) :
+			if ( $this->user_password->is_correct( $_user->id, $password ) ) :
 
 				//	Password accepted! Final checks...
 
@@ -289,12 +286,35 @@ class NAILS_Auth_model extends NAILS_Model
 
 				endif;
 
+				//	Check if the password was changed recently
+				if ( $_user->password_changed ) :
+
+					$_changed	= strtotime( $_user->password_changed );
+					$_recent	= strtotime( '-2 WEEKS' );
+
+					if ( $_changed > $_recent ) :
+
+						$_changed_recently = nice_time( $_changed );
+
+					endif;
+
+				endif;
+
 			endif;
 
 		endif;
 
 		//	Login failed
-		$this->_set_error( 'auth_login_fail_general' );
+		if ( empty( $_changed_recently ) ) :
+
+			$this->_set_error( 'auth_login_fail_general' );
+
+		else :
+
+			$this->_set_error( 'auth_login_fail_general_recent', $_changed_recently );
+
+		endif;
+
 		return FALSE;
 	}
 
@@ -351,7 +371,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 	public function generate_two_factor_token( $user_id )
 	{
-		$_salt		= $this->user->salt();
+		$_salt		= $this->user_password->salt();
 		$_ip		= $this->input->ip_address();
 		$_created	= date( 'Y-m-d H:i:s' );
 		$_expires	= date( 'Y-m-d H:i:s', strtotime( '+10 MINS' ) );
