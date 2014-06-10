@@ -979,6 +979,53 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			endforeach;
 
+			//	Work out price/price_from
+			//	=========================
+
+			$product->price = array();
+
+			foreach( $product->variations AS &$v ) :
+
+				foreach( $v->price AS $price ) :
+
+					if ( empty( $product->price[$price->code] ) ) :
+
+						$product->price[$price->code]					= new stdClass();
+						$product->price[$price->code]->max_price		= NULL;
+						$product->price[$price->code]->min_price		= NULL;
+						$product->price[$price->code]->max_sale_price	= NULL;
+						$product->price[$price->code]->min_sale_price	= NULL;
+
+					endif;
+
+					if ( is_null( $product->price[$price->code]->max_price ) || $price->price > $product->price[$price->code]->max_price ) :
+
+						$product->price[$price->code]->max_price = $price->price;
+
+					endif;
+
+					if ( is_null( $product->price[$price->code]->min_price ) || $price->price < $product->price[$price->code]->min_price ) :
+
+						$product->price[$price->code]->min_price = $price->price;
+
+					endif;
+
+					if ( is_null( $product->price[$price->code]->max_sale_price ) || $price->sale_price > $product->price[$price->code]->max_sale_price ) :
+
+						$product->price[$price->code]->max_sale_price = $price->sale_price;
+
+					endif;
+
+					if ( is_null( $product->price[$price->code]->min_sale_price ) || $price->sale_price < $product->price[$price->code]->min_sale_price ) :
+
+						$product->price[$price->code]->min_sale_price = $price->sale_price;
+
+					endif;
+
+				endforeach;
+
+			endforeach;
+
 		endforeach;
 
 		// --------------------------------------------------------------------------
