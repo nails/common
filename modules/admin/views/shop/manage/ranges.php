@@ -46,7 +46,21 @@
 						echo $range->description ? '<small>' . $range->description . '</small>' : '';
 						echo '</td>';
 						echo '<td class="count">' . $range->product_count . '</td>';
-						echo $range->is_active ? '<td class="active yes">' . lang( 'yes' ) . '</td>' : '<td class="active no">' . lang( 'no' ) . '</td>';
+
+						if ( $range->is_active ) :
+
+							echo '<td class="active success">';
+								echo '<span class="ion-checkmark-circled"></span>';
+							echo '</td>';
+
+						else :
+
+							echo '<td class="active error">';
+								echo '<span class="ion-close-circled"></span>';
+							echo '</td>';
+
+						endif;
+
 						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $range->modified ), TRUE );
 						echo '<td class="actions">';
 						echo '<a href="#edit-' . $range->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
@@ -73,36 +87,49 @@
 				echo form_open( 'admin/shop/manage/ranges' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The range\'s label';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'The range\'s description';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'seo_title';
+				$_field['label']		= 'SEO Title';
+				$_field['placeholder']	= 'An alternative, SEO specific title for the range.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
+				$_field					= array();
+				$_field['key']			= 'seo_description';
+				$_field['label']		= 'SEO Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'seo_keywords';
+				$_field['label']		= 'SEO Keywords';
+				$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 				echo form_field( $_field );
 
@@ -138,40 +165,54 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $range->id );
 
-		$_field				= array();
-		$_field['key']		= $range->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $range->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $range->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $range->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The range\'s label';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $range->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $range->description;
+		$_field					= array();
+		$_field['key']			= $range->id . '[description]';
+		$_field['label']		= 'Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $range->description;
+		$_field['placeholder']	= 'The range\'s description';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $range->id . '[seo_description]';
-		$_field['label']	= 'SEO Description';
-		$_field['default']	= $range->seo_description;
-		$_field['type']		= 'textarea';
+		$_field					= array();
+		$_field['key']			= $range->id . '[seo_title]';
+		$_field['label']		= 'SEO Title';
+		$_field['default']		= $range->seo_title;
+		$_field['placeholder']	= 'An alternative, SEO specific title for the range.';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $range->id . '[seo_keywords]';
-		$_field['label']	= 'SEO Keywords';
-		$_field['default']	= $range->seo_keywords;
+		$_field					= array();
+		$_field['key']			= $range->id . '[seo_description]';
+		$_field['label']		= 'SEO Description';
+		$_field['default']		= $range->seo_description;
+		$_field['type']			= 'textarea';
+		$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $range->id . '[seo_keywords]';
+		$_field['label']		= 'SEO Keywords';
+		$_field['default']		= $range->seo_keywords;
+		$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 		echo form_field( $_field );
 
@@ -193,7 +234,6 @@
 		echo '</div>';
 
 	endforeach;
-
 
 	// --------------------------------------------------------------------------
 

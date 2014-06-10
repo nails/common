@@ -13,7 +13,7 @@
 
 	?>
 	<p class="system-alert no-close">
-		Manage the which attributes are available for your products. Tags help the shop determine related products.
+		Manage the which attributes are available for your products.
 	</p>
 	<ul class="tabs">
 		<li class="tab <?=empty( $show_tab ) || $show_tab == 'overview' || $show_tab == 'edit' ? 'active' : ''?>">
@@ -71,36 +71,21 @@
 				echo form_open( 'admin/shop/manage/attributes' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The attribute\'s label';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
-
-				echo form_field( $_field );
-
-				// --------------------------------------------------------------------------
-
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-				$_field['type']		= 'textarea';
-
-				echo form_field( $_field );
-
-				// --------------------------------------------------------------------------
-
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'The attribute\'s description';
 
 				echo form_field( $_field );
 
@@ -127,40 +112,23 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $attribute->id );
 
-		$_field				= array();
-		$_field['key']		= $attribute->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $attribute->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $attribute->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $attribute->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The attribute\'s label';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $attribute->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $attribute->description;
-
-		echo form_field( $_field );
-
-		// --------------------------------------------------------------------------
-
-		$_field				= array();
-		$_field['key']		= $attribute->id . '[seo_description]';
-		$_field['label']	= 'SEO Description';
-		$_field['default']	= $attribute->seo_description;
-		$_field['type']		= 'textarea';
-
-		echo form_field( $_field );
-
-		// --------------------------------------------------------------------------
-
-		$_field				= array();
-		$_field['key']		= $attribute->id . '[seo_keywords]';
-		$_field['label']	= 'SEO Keywords';
-		$_field['default']	= $attribute->seo_keywords;
+		$_field					= array();
+		$_field['key']			= $attribute->id . '[description]';
+		$_field['label']		= 'Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $attribute->description;
+		$_field['placeholder']	= 'The attribute\'s description';
 
 		echo form_field( $_field );
 

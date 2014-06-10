@@ -461,6 +461,12 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 		endif;
 
+		if ( isset( $data->seo_title ) ) :
+
+			$_data->seo_title = strip_tags( $data->seo_title );
+
+		endif;
+
 		if ( isset( $data->seo_description ) ) :
 
 			$_data->seo_description = strip_tags( $data->seo_description );
@@ -566,6 +572,12 @@ class NAILS_Shop_category_model extends NAILS_Model
 		if ( isset( $data->description ) ) :
 
 			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_title ) ) :
+
+			$_data->seo_title = strip_tags( $data->seo_title );
 
 		endif;
 

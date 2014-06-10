@@ -1921,20 +1921,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
-					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
 					if ( $this->form_validation->run() ) :
 
-						$_data					= new stdClass();
-						$_data->label			= $this->input->post( 'label' );
-						$_data->description		= $this->input->post( 'description' );
-						$_data->seo_description	= $this->input->post( 'seo_description' );
-						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
-						$_data->is_active		= $this->input->post( 'is_active' );
+						$_data				= new stdClass();
+						$_data->label		= $this->input->post( 'label' );
+						$_data->description	= $this->input->post( 'description' );
 
 						if ( $this->attribute->create( $_data ) ) :
 
@@ -1966,9 +1960,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$_id = $this->input->post( 'id' );
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
 
 					$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -1977,9 +1968,6 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
-						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
-						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
-						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: NULL;
 
 						if ( $this->attribute->update( $_id, $_data ) ) :
 
@@ -2067,6 +2055,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( 'logo_id',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'is_hidden',			'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',				'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
@@ -2079,6 +2068,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->logo_id			= $this->input->post( 'logo_id' );
 						$_data->description		= $this->input->post( 'description' );
 						$_data->is_hidden		= $this->input->post( 'is_hidden' );
+						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
@@ -2114,6 +2104,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( $_id . '[logo_id]',			'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[is_hidden]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
 
@@ -2125,6 +2116,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->logo_id			= isset( $_POST[$_id]['logo_id'] )			? $_POST[$_id]['logo_id']			: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_title		= isset( $_POST[$_id]['seo_title'] )		? $_POST[$_id]['seo_title']			: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 
@@ -2214,6 +2206,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'parent_id',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
@@ -2225,6 +2218,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label			= $this->input->post( 'label' );
 						$_data->parent_id		= $this->input->post( 'parent_id' );
 						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
@@ -2259,6 +2253,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[parent_id]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
 
@@ -2270,6 +2265,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->parent_id		= isset( $_POST[$_id]['parent_id'] )		? $_POST[$_id]['parent_id']			: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_title		= isset( $_POST[$_id]['seo_title'] )		? $_POST[$_id]['seo_title']			: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 
@@ -2372,6 +2368,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
@@ -2383,6 +2380,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= $this->input->post( 'label' );
 						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 						$_data->is_active		= $this->input->post( 'is_active' );
@@ -2417,6 +2415,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$_id = $this->input->post( 'id' );
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
@@ -2428,6 +2427,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_title		= isset( $_POST[$_id]['seo_title'] )		? $_POST[$_id]['seo_title']			: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
@@ -2516,6 +2516,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
@@ -2527,6 +2528,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= $this->input->post( 'label' );
 						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 						$_data->is_active		= (bool) $this->input->post( 'is_active' );
@@ -2561,6 +2563,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$_id = $this->input->post( 'id' );
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
@@ -2572,6 +2575,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_title		= isset( $_POST[$_id]['seo_title'] )		? $_POST[$_id]['seo_title']			: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
@@ -2660,6 +2664,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
@@ -2670,6 +2675,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= $this->input->post( 'label' );
 						$_data->description		= $this->input->post( 'description' );
+						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
@@ -2703,6 +2709,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$_id = $this->input->post( 'id' );
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
 
@@ -2713,6 +2720,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data					= new stdClass();
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
+						$_data->seo_title		= isset( $_POST[$_id]['seo_title'] )		? $_POST[$_id]['seo_title']			: NULL;
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 

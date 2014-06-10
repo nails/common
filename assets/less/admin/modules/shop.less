@@ -925,6 +925,12 @@
 	{
 		table
 		{
+			th,
+			td
+			{
+				vertical-align: middle;
+			}
+
 			th.label,
 			td.label
 			{
@@ -963,14 +969,9 @@
 
 			td.active
 			{
-				&.yes
+				span
 				{
-					background:#E0F2CB !important;
-				}
-
-				&.no
-				{
-					background:#FFEBE8 !important;
+					font-size:1.5em;
 				}
 			}
 
@@ -990,6 +991,11 @@
 					display:inline;
 					width:auto;
 					margin:0;
+
+					.awesome
+					{
+						margin-bottom:0;
+					}
 				}
 			}
 		}

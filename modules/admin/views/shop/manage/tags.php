@@ -88,7 +88,7 @@
 				$_field['key']			= 'label';
 				$_field['label']		= 'Label';
 				$_field['required']		= TRUE;
-				$_field['placeholder']	= 'The label to give your tag';
+				$_field['placeholder']	= 'The label to give your tag.';
 
 				echo form_field( $_field );
 
@@ -99,6 +99,15 @@
 				$_field['label']		= 'Description';
 				$_field['type']			= 'textarea';
 				$_field['placeholder']	= 'This text may be used on the tag\'s overview page.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'seo_title';
+				$_field['label']		= 'SEO Title';
+				$_field['placeholder']	= 'An alternative, SEO specific title for the tag.';
 
 				echo form_field( $_field );
 
@@ -144,40 +153,54 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $tag->id );
 
-		$_field				= array();
-		$_field['key']		= $tag->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $tag->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $tag->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $tag->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The label to give your tag.';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $tag->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $tag->description;
+		$_field					= array();
+		$_field['key']			= $tag->id . '[description]';
+		$_field['label']		= 'Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $tag->description;
+		$_field['placeholder']	= 'This text may be used on the tag\'s overview page.';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $tag->id . '[seo_description]';
-		$_field['label']	= 'SEO Description';
-		$_field['default']	= $tag->seo_description;
-		$_field['type']		= 'textarea';
+		$_field					= array();
+		$_field['key']			= $tag->id . '[seo_title]';
+		$_field['label']		= 'SEO Title';
+		$_field['default']		= $tag->seo_title;
+		$_field['placeholder']	= 'An alternative, SEO specific title for the tag.';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $tag->id . '[seo_keywords]';
-		$_field['label']	= 'SEO Keywords';
-		$_field['default']	= $tag->seo_keywords;
+		$_field					= array();
+		$_field['key']			= $tag->id . '[seo_description]';
+		$_field['label']		= 'SEO Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $tag->seo_description;
+		$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $tag->id . '[seo_keywords]';
+		$_field['label']		= 'SEO Keywords';
+		$_field['default']		= $tag->seo_keywords;
+		$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 		echo form_field( $_field );
 

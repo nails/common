@@ -72,10 +72,11 @@
 				echo form_open( 'admin/shop/manage/tax_rates' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The label to give this tax rate';
 
 				echo form_field( $_field );
 
@@ -84,7 +85,8 @@
 				$_field					= array();
 				$_field['key']			= 'rate';
 				$_field['label']		= 'Rate';
-				$_field['sub_label']	= 'Expressed as decimal';
+				$_field['info']			= 'This should be expressed as decimal between 0 and 1. For example, to add 20% tax this value would be 0.2. You can use up to 4 decimal places.';
+				$_field['placeholder']	= 'The tax rate, expressed as a decimal between 0 and 1';
 
 				echo form_field( $_field );
 
@@ -111,11 +113,12 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $rate->id );
 
-		$_field				= array();
-		$_field['key']		= $rate->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $rate->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $rate->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $rate->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The label to give this tax rate';
 
 		echo form_field( $_field );
 
@@ -124,8 +127,9 @@
 		$_field					= array();
 		$_field['key']			= $rate->id . '[rate]';
 		$_field['label']		= 'Rate';
-		$_field['sub_label']	= 'Expressed as decimal';
+		$_field['info']			= 'This should be expressed as decimal between 0 and 1. For example, to add 20% tax this value would be 0.2. You can use up to 4 decimal places.';
 		$_field['default']		= $rate->rate;
+		$_field['placeholder']	= 'The tax rate, expressed as a decimal between 0 and 1';
 
 		echo form_field( $_field );
 

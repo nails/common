@@ -32,6 +32,7 @@
 						<th class="label">Label &amp; Description</th>
 						<th class="count">Products</th>
 						<th class="modified">Modified</th>
+						<th class="active">Active</th>
 						<th class="actions">Actions</th>
 					</tr>
 				</thead>
@@ -48,6 +49,19 @@
 						echo '</td>';
 						echo '<td class="count">' . $brand->product_count . '</td>';
 						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $brand->modified ), TRUE );
+						if ( $brand->is_active ) :
+
+							echo '<td class="active success">';
+								echo '<span class="ion-checkmark-circled"></span>';
+							echo '</td>';
+
+						else :
+
+							echo '<td class="active error">';
+								echo '<span class="ion-close-circled"></span>';
+							echo '</td>';
+
+						endif;
 						echo '<td class="actions">';
 						echo '<a href="#edit-' . $brand->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
 
@@ -73,10 +87,11 @@
 				echo form_open( 'admin/shop/manage/brands' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The brand\'s label';
 
 				echo form_field( $_field );
 
@@ -91,40 +106,53 @@
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'The brand\'s description';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				//	Hidden?
 				$_field					= array();
-				$_field['key']			= 'is_hidden';
-				$_field['label']		= 'Hide this Brand?';
+				$_field['key']			= 'seo_title';
+				$_field['label']		= 'SEO Title';
+				$_field['placeholder']	= 'An alternative, SEO specific title for the brand.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'seo_description';
+				$_field['label']		= 'SEO Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'seo_keywords';
+				$_field['label']		= 'SEO Keywords';
+				$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'is_active';
+				$_field['label']		= 'Show on site?';
 				$_field['text_on']		= 'YES';
 				$_field['text_off']		= 'NO';
 				$_field['required']		= TRUE;
+				$_field['default']		= TRUE;
 
 				echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
-
-				// --------------------------------------------------------------------------
-
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-
-				echo form_field( $_field );
-
-				// --------------------------------------------------------------------------
-
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
-
-				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
@@ -149,11 +177,12 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $brand->id );
 
-		$_field				= array();
-		$_field['key']		= $brand->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $brand->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $brand->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $brand->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The brand\'s label';
 
 		echo form_field( $_field );
 
@@ -169,44 +198,57 @@
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $brand->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $brand->description;
-
-		echo form_field( $_field );
-
-		// --------------------------------------------------------------------------
-
-		$_field				= array();
-		$_field['key']		= $brand->id . '[seo_description]';
-		$_field['label']	= 'SEO Description';
-		$_field['default']	= $brand->seo_description;
-
-		echo form_field( $_field );
-
-		// --------------------------------------------------------------------------
-
-		//	Hidden?
 		$_field					= array();
-		$_field['key']			= $brand->id . '[is_hidden]';
-		$_field['label']		= 'Hide this Brand?';
+		$_field['key']			= $brand->id . '[description]';
+		$_field['label']		= 'Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $brand->description;
+		$_field['placeholder']	= 'The brand\'s description';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $brand->id . '[seo_title]';
+		$_field['label']		= 'SEO Title';
+		$_field['default']		= $brand->seo_title;
+		$_field['placeholder']	= 'An alternative, SEO specific title for the brand.';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $brand->id . '[seo_description]';
+		$_field['label']		= 'SEO Description';
+		$_field['default']		= $brand->seo_description;
+		$_field['type']			= 'textarea';
+		$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $brand->id . '[seo_keywords]';
+		$_field['label']		= 'SEO Keywords';
+		$_field['default']		= $brand->seo_keywords;
+		$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $brand->id . '[is_active]';
+		$_field['label']		= 'Show on site?';
 		$_field['text_on']		= 'YES';
 		$_field['text_off']		= 'NO';
-		$_field['default']		= $brand->is_hidden;
+		$_field['default']		= $brand->is_active;
 		$_field['required']		= TRUE;
 
 		echo form_field_boolean( $_field, array( 'No', 'Yes' ) );
-
-		// --------------------------------------------------------------------------
-
-		$_field				= array();
-		$_field['key']		= $brand->id . '[seo_keywords]';
-		$_field['label']	= 'SEO Keywords';
-		$_field['default']	= $brand->seo_keywords;
-
-		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 

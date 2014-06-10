@@ -20,7 +20,7 @@
 			<a href="#" data-tab="overview">Overview</a>
 		</li>
 		<li class="tab <?=! empty( $show_tab ) && $show_tab == 'create' ? 'active' : ''?>">
-			<a href="#" data-tab="create">Create Collection</a>
+			<a href="#" data-tab="create">Create collection</a>
 		</li>
 	</ul>
 	<section class="tabs pages">
@@ -46,7 +46,21 @@
 						echo $collection->description ? '<small>' . $collection->description . '</small>' : '';
 						echo '</td>';
 						echo '<td class="count">' . $collection->product_count . '</td>';
-						echo $collection->is_active ? '<td class="active yes">' . lang( 'yes' ) . '</td>' : '<td class="active no">' . lang( 'no' ) . '</td>';
+
+						if ( $collection->is_active ) :
+
+							echo '<td class="active success">';
+								echo '<span class="ion-checkmark-circled"></span>';
+							echo '</td>';
+
+						else :
+
+							echo '<td class="active error">';
+								echo '<span class="ion-close-circled"></span>';
+							echo '</td>';
+
+						endif;
+
 						echo $this->load->view( '_utilities/table-cell-datetime', array( 'datetime' => $collection->modified ), TRUE );
 						echo '<td class="actions">';
 						echo '<a href="#edit-' . $collection->id . '" class="edit-open awesome small">' . lang( 'action_edit' ) . '</a>';
@@ -73,36 +87,49 @@
 				echo form_open( 'admin/shop/manage/collections' . $_is_fancybox );
 				echo form_hidden( 'action', 'create' );
 
-				$_field				= array();
-				$_field['key']		= 'label';
-				$_field['label']	= 'Label';
-				$_field['required']	= TRUE;
+				$_field					= array();
+				$_field['key']			= 'label';
+				$_field['label']		= 'Label';
+				$_field['required']		= TRUE;
+				$_field['placeholder']	= 'The collection\'s label';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'description';
-				$_field['label']	= 'Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'description';
+				$_field['label']		= 'Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'The collection\'s description';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_description';
-				$_field['label']	= 'SEO Description';
-				$_field['type']		= 'textarea';
+				$_field					= array();
+				$_field['key']			= 'seo_title';
+				$_field['label']		= 'SEO Title';
+				$_field['placeholder']	= 'An alternative, SEO specific title for the collection.';
 
 				echo form_field( $_field );
 
 				// --------------------------------------------------------------------------
 
-				$_field				= array();
-				$_field['key']		= 'seo_keywords';
-				$_field['label']	= 'SEO Keywords';
+				$_field					= array();
+				$_field['key']			= 'seo_description';
+				$_field['label']		= 'SEO Description';
+				$_field['type']			= 'textarea';
+				$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
+
+				echo form_field( $_field );
+
+				// --------------------------------------------------------------------------
+
+				$_field					= array();
+				$_field['key']			= 'seo_keywords';
+				$_field['label']		= 'SEO Keywords';
+				$_field['placeholder']	= 'These comma separated keywords help search engines understand the context of the page; stick to 5-10 words.';
 
 				echo form_field( $_field );
 
@@ -138,40 +165,54 @@
 		echo form_hidden( 'action', 'edit' );
 		echo form_hidden( 'id', $collection->id );
 
-		$_field				= array();
-		$_field['key']		= $collection->id . '[label]';
-		$_field['label']	= 'Label';
-		$_field['default']	= $collection->label;
-		$_field['required']	= TRUE;
+		$_field					= array();
+		$_field['key']			= $collection->id . '[label]';
+		$_field['label']		= 'Label';
+		$_field['default']		= $collection->label;
+		$_field['required']		= TRUE;
+		$_field['placeholder']	= 'The collection\'s label';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $collection->id . '[description]';
-		$_field['label']	= 'Description';
-		$_field['type']		= 'textarea';
-		$_field['default']	= $collection->description;
+		$_field					= array();
+		$_field['key']			= $collection->id . '[description]';
+		$_field['label']		= 'Description';
+		$_field['type']			= 'textarea';
+		$_field['default']		= $collection->description;
+		$_field['placeholder']	= 'The collection\'s description';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $collection->id . '[seo_description]';
-		$_field['label']	= 'SEO Description';
-		$_field['default']	= $collection->seo_description;
-		$_field['type']		= 'textarea';
+		$_field					= array();
+		$_field['key']			= $collection->id . '[seo_title]';
+		$_field['label']		= 'SEO Title';
+		$_field['default']		= $collection->seo_title;
+		$_field['placeholder']	= 'An alternative, SEO specific title for the collection.';
 
 		echo form_field( $_field );
 
 		// --------------------------------------------------------------------------
 
-		$_field				= array();
-		$_field['key']		= $collection->id . '[seo_keywords]';
-		$_field['label']	= 'SEO Keywords';
-		$_field['default']	= $collection->seo_keywords;
+		$_field					= array();
+		$_field['key']			= $collection->id . '[seo_description]';
+		$_field['label']		= 'SEO Description';
+		$_field['default']		= $collection->seo_description;
+		$_field['type']			= 'textarea';
+		$_field['placeholder']	= 'An SEO optimised description, optional';
+
+		echo form_field( $_field );
+
+		// --------------------------------------------------------------------------
+
+		$_field					= array();
+		$_field['key']			= $collection->id . '[seo_keywords]';
+		$_field['label']		= 'SEO Keywords';
+		$_field['default']		= $collection->seo_keywords;
+		$_field['placeholder']	= 'This text will be read by search engines when they\'re indexing the page. Keep this short and concise.';
 
 		echo form_field( $_field );
 
@@ -193,7 +234,6 @@
 		echo '</div>';
 
 	endforeach;
-
 
 	// --------------------------------------------------------------------------
 

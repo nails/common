@@ -30,7 +30,7 @@ class NAILS_Shop_range_model extends NAILS_Model
 
 	public function get_all( $include_count  = FALSE)
 	{
-		$this->db->select( 'r.id,r.slug,r.label,r.description,r.seo_description,r.seo_keywords,r.is_active,r.created,r.modified' );
+		$this->db->select( 'r.*' );
 
 		if ( $include_count ) :
 
@@ -84,6 +84,12 @@ class NAILS_Shop_range_model extends NAILS_Model
 		if ( isset( $data->description ) ) :
 
 			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_title ) ) :
+
+			$_data->seo_title = strip_tags( $data->seo_title );
 
 		endif;
 
@@ -161,6 +167,12 @@ class NAILS_Shop_range_model extends NAILS_Model
 		if ( isset( $data->description ) ) :
 
 			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
+
+		endif;
+
+		if ( isset( $data->seo_title ) ) :
+
+			$_data->seo_title = strip_tags( $data->seo_title );
 
 		endif;
 
