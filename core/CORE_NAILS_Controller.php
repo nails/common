@@ -615,6 +615,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'typography';
 		$_helpers[]		= 'event';
 		$_helpers[]		= 'log';
+		$_helpers[]		= 'notification';
 
 		//	Module specific helpers
 		//	CDN

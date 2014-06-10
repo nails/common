@@ -1,7 +1,7 @@
 <?php
 
 	//	Manager? Or managers?
-	$_managers	= explode( ',', app_setting( 'notify_order', 'shop' ) );
+	$_managers	= explode( ',', notification( 'notify_order', 'shop' ) );
 	$_count		= count( $_managers );
 	$_manager	= $_count > 1 ? 'managers' : 'manager';
 
@@ -9,7 +9,7 @@
 
 		foreach ( $_managers AS &$manager ) :
 
-			$manager = mailto( trim( $manager ) );
+			$manager = mailto( $manager );
 
 		endforeach;
 

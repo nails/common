@@ -42,22 +42,6 @@
 					Generic store settings. Use these to control some store behaviours.
 				</p>
 				<hr />
-				<fieldset id="shop-settings-notifications">
-					<legend>Notifications</legend>
-					<?php
-
-						//	Order Notifications
-						$_field					= array();
-						$_field['key']			= 'notify_order';
-						$_field['label']		= 'Order Notifications';
-						$_field['default']		= app_setting( $_field['key'], 'shop' );
-						$_field['placeholder']	= 'Who should be notified of new orders';
-
-						echo form_field( $_field, 'Specify multiple addresses with a comma.' );
-
-					?>
-				</fieldset>
-
 				<fieldset id="shop-settings-free-shipping">
 					<legend>Free Shipping</legend>
 					<p>

@@ -581,8 +581,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings									= array();
-		$_settings['notify_order']					= $this->input->post( 'notify_order' );
-		$_settings['url']						= $this->input->post( 'url' );
+		$_settings['url']							= $this->input->post( 'url' );
 		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );
 		$_settings['warehouse_collection_enabled']	= (bool) $this->input->post( 'warehouse_collection_enabled' );
 		$_settings['warehouse_addr_addressee']		= $this->input->post( 'warehouse_addr_addressee' );

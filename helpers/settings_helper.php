@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Helper for quickly accessing blog settings
+ * Helper for quickly accessing app settings
  *
  * @access	public
  * @param	none
  * @return	void
  */
-if ( ! function_exists( 'site_setting' ) )
+if ( ! function_exists( 'app_setting' ) )
 {
 	function app_setting( $key = NULL, $grouping = 'app', $force_refresh = FALSE )
 	{

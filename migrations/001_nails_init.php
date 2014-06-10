@@ -1252,6 +1252,16 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			KEY `grouping_2` (`grouping`,`key`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `nails_app_notification` (
+			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+			`grouping` varchar(100) NOT NULL,
+			`key` varchar(50) DEFAULT NULL,
+			`value` text,
+			PRIMARY KEY (`id`),
+			KEY `grouping` (`grouping`),
+			KEY `grouping_2` (`grouping`,`key`)
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8;');
+
 		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'testimonial` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`quote` text,
@@ -3033,7 +3043,6 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			('blog', 'home_show_gallery', 'b:1;'),
 			('blog', 'home_per_page', 'i:10;'),
 			('shop', 'base_currency', 'i:52;'),
-			('shop', 'notify_order', 's:0:\\\"\\\";'),
 			('shop', 'url', 's:5:\\\"shop/\\\";'),
 			('shop', 'free_shipping_threshold', 'd:0;'),
 			('shop', 'invoice_company', 's:0:\\\"\\\";'),

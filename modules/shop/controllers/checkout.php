@@ -1125,7 +1125,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	Send a notification to the store owner(s)
-			_LOG( 'Sending notification to store owner(s): ' . app_setting( 'notify_order', 'shop' ) );
+			_LOG( 'Sending notification to store owner(s): ' . notification( 'notify_order', 'shop' ) );
 			$this->order->send_order_notification( $_order );
 
 			// --------------------------------------------------------------------------

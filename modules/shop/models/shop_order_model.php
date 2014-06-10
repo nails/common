@@ -1030,17 +1030,11 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$_email->data					= array();
 		$_email->data['order']			= $order;
 
-		$_recipients = explode( ',', app_setting( 'notify_order', 'shop' ) );
+		$_recipients = explode( ',', notification( 'notify_order', 'shop' ) );
 
 		foreach ( $_recipients AS $recipient ) :
 
-			$_email->to_email = trim( $recipient );
-
-			if ( ! valid_email( app_setting( 'notify_order', 'shop' ) ) ) :
-
-				continue;
-
-			endif;
+			$_email->to_email = $recipient;
 
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
