@@ -888,7 +888,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			//	Brands
 			//	======
-			$this->db->select( 'b.id, b.slug, b.label, b.logo_id, b.is_hidden' );
+			$this->db->select( 'b.id, b.slug, b.label, b.logo_id, b.is_active' );
 			$this->db->where( 'pb.product_id', $product->id );
 			$this->db->join( NAILS_DB_PREFIX . 'shop_brand b', 'b.id = pb.brand_id' );
 			$product->brands = $this->db->get( $this->_table_brand . ' pb' )->result();

@@ -2054,8 +2054,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 					$this->form_validation->set_rules( 'logo_id',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-					$this->form_validation->set_rules( 'is_hidden',			'',	'xss_clean' );
-					$this->form_validation->set_rules( 'seo_title',				'',	'xss_clean' );
+					$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+					$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
 					$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
@@ -2067,7 +2067,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label			= $this->input->post( 'label' );
 						$_data->logo_id			= $this->input->post( 'logo_id' );
 						$_data->description		= $this->input->post( 'description' );
-						$_data->is_hidden		= $this->input->post( 'is_hidden' );
+						$_data->is_active		= $this->input->post( 'is_active' );
 						$_data->seo_title		= $this->input->post( 'seo_title' );
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
@@ -2103,7 +2103,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 					$this->form_validation->set_rules( $_id . '[label]',			'',	'xss_clean|required' );
 					$this->form_validation->set_rules( $_id . '[logo_id]',			'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[description]',		'',	'xss_clean' );
-					$this->form_validation->set_rules( $_id . '[is_hidden]',		'',	'xss_clean' );
+					$this->form_validation->set_rules( $_id . '[is_active]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_title]',		'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_description]',	'',	'xss_clean' );
 					$this->form_validation->set_rules( $_id . '[seo_keywords]',		'',	'xss_clean' );
