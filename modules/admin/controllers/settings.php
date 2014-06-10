@@ -175,6 +175,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings										= array();
+		$_settings['user_registration_enabled']			= $this->input->post( 'user_registration_enabled' );
 		$_settings['social_signin_fb_enabled']			= $this->input->post( 'social_signin_fb_enabled' );
 		$_settings['social_signin_fb_app_id']			= $this->input->post( 'social_signin_fb_app_id' );
 		$_settings['social_signin_fb_app_secret']		= $this->input->post( 'social_signin_fb_app_secret' );

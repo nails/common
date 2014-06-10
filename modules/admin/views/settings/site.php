@@ -12,8 +12,9 @@
 			</li>
 			<?php $_active = $this->input->post( 'update' ) == 'auth' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-auth">Authentication</a>
+				<a href="#" data-tab="tab-auth">Registration &amp; Authentication</a>
 			</li>
+
 		</ul>
 
 		<section class="tabs pages">
@@ -52,9 +53,22 @@
 				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
 				<?=form_hidden( 'update', 'auth' )?>
 				<p>
-				Configure the site's authentication settings and defaults.
+				Configure the site's registration and authentication settings &amp; defaults.
 				</p>
 				<hr />
+				<fieldset>
+					<legend>User Registration</legend>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'user_registration_enabled';
+						$_field['label']		= 'Registration Enabled';
+						$_field['default']		= app_setting( $_field['key'] ) ? TRUE : FALSE;
+
+						echo form_field_boolean( $_field, 'Admin will always be able to create users.' );
+
+					?>
+				</fieldset>
 				<fieldset id="site-settings-socialsignin">
 					<legend>Social Sign In</legend>
 					<?php

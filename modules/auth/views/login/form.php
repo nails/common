@@ -159,7 +159,7 @@
 				</div>
 			</div>
 		<?=form_close()?>
-		<?php if ( APP_USER_ALLOW_REGISTRATION ) : ?>
+		<?php if ( app_setting( 'user_registration_enabled', 'app' ) ) : ?>
 		<hr />
 		<p class="text-center">
 			Not got an account? <?=anchor( 'auth/register', 'Register now' )?>.

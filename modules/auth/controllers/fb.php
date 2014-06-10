@@ -298,7 +298,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 			if ( ! $_user ) :
 
 				//	OK, fine, this is a new user! Register but only if registration is allowed
-				if ( APP_USER_ALLOW_REGISTRATION ) :
+				if ( app_setting( 'user_registration_enabled', 'app' ) ) :
 
 					$this->_create_user( $_me );
 
