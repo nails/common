@@ -17,6 +17,12 @@
 
 class NAILS_User_group_model extends NAILS_Model
 {
+	public $default_group;
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -25,6 +31,89 @@ class NAILS_User_group_model extends NAILS_Model
 
 		$this->_table			= NAILS_DB_PREFIX . 'user_group';
 		$this->_table_prefix	= 'ug';
+
+		// --------------------------------------------------------------------------
+
+		$this->default_group = $this->get_default_group();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Set's a group as the default group
+	 * @param mixed $group_id_slug The group's ID or slug
+	 */
+	public function set_as_default( $group_id_slug )
+	{
+		$_group = $this->get_by_id_or_slug( $group_id_slug );
+
+		if ( ! $_group ) :
+
+			$this->_set_error( 'Invalid Group' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->trans_begin();
+
+		//	Unset old default
+		$this->db->set( 'is_default', FALSE );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		if ( $this->user->is_logged_in() ) :
+
+			$this->db->set( 'modified_by', active_user( 'id' ) );
+
+		endif;
+		$this->db->where( 'is_default', TRUE );
+		$this->db->update( $this->_table );
+
+		//	Set new default
+		$this->db->set( 'is_default', TRUE );
+		$this->db->set( 'modified', 'NOW()', FALSE );
+		if ( $this->user->is_logged_in() ) :
+
+			$this->db->set( 'modified_by', active_user( 'id' ) );
+
+		endif;
+		$this->db->where( 'id', $_group->id );
+		$this->db->update( $this->_table );
+
+		if ( $this->db->trans_status() === FALSE ) :
+
+			$this->db->trans_rollback();
+			return FALSE;
+
+		else :
+
+			$this->db->trans_commit();
+			return TRUE;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_default_group()
+	{
+		$_data['where']		= array();
+		$_data['where'][]	= array( 'column' => 'is_default', 'value' => TRUE );
+
+		$_group = $this->get_all( NULL, NULL, $_data );
+
+		if ( ! $_group ) :
+
+			show_fatal_error( 'No Defaul Group Set', 'A default user group must be set.' );
+
+		endif;
+
+		$this->default_group = $_group[0];
+
+		return $this->default_group;
 	}
 
 

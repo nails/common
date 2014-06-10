@@ -10,6 +10,8 @@
 		$_field['key']			= 'group_id';
 		$_field['label']		= lang( 'accounts_create_field_group_label' );
 		$_field['required']		= TRUE;
+		$_field['default']		= $this->user_group->default_group->id;
+		$_field['class']		= 'select2';
 
 		//	Prepare ID's
 		$_groups_by_id = array();
@@ -31,10 +33,9 @@
 
 		//	Render the group descriptions
 		echo '<ul id="user-group-descriptions">';
-		$_counter = 0;
-		for( $i=0; $i<count( $groups ); $i++ ) :
+		foreach ( $groups AS $group ) :
 
-			if ( isset( $groups[$i]->acl['superuser'] ) && $groups[$i]->acl['superuser'] && ! $user->is_superuser() ) :
+			if ( isset( $group->acl['superuser'] ) && $group->acl['superuser'] && ! $user->is_superuser() ) :
 
 				continue;
 
@@ -42,14 +43,12 @@
 
 			// --------------------------------------------------------------------------
 
-			$_display = !$_counter ? 'block' : 'none';
-			echo '<li class="system-alert notice no-close" id="user-group-' . $groups[$i]->id . '" style="display:' . $_display . ';">';
-			echo  '<strong>' . $groups[$i]->label . ':</strong> ' . $groups[$i]->description;
+			$_display = $group->id == $this->user_group->default_group->id ? 'block' : 'none';
+			echo '<li class="system-alert notice no-close" id="user-group-' . $group->id . '" style="display:' . $_display . ';">';
+			echo  '<strong>' . $group->label . ':</strong> ' . $group->description;
 			echo '</li>';
 
-			$_counter++;
-
-		endfor;
+		endforeach;
 		echo '</ul>';
 
 		// --------------------------------------------------------------------------

@@ -465,7 +465,7 @@ class NAILS_User_password_model extends CI_Model
 
 	/**
 	 * Set's a forgotten password token for a user
-	 * @param string $identifier The identifier to use for setting the token (set by APP_NATIVE_LOGIN_METHOD)
+	 * @param string $identifier The identifier to use for setting the token (set by APP_NATIVE_LOGIN_USING)
 	 * @return boolean
 	 */
 	public function set_token( $identifier )

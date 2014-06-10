@@ -174,11 +174,13 @@
 	// --------------------------------------------------------------------------
 
 	//	Manage User Groups
-	$lang['accounts_groups_index_title']			= 'Manage User Access';
-	$lang['accounts_groups_index_intro']			= 'Manage how groups of user\'s can interface with the site, e.g: grant a specific group access to admin and specify which parts of admin they can view.';
-	$lang['accounts_groups_index_th_name']			= 'Name and Description';
-	$lang['accounts_groups_index_th_homepage']		= 'Default Homepage';
-	$lang['accounts_groups_index_th_actions']		= 'Actions';
+	$lang['accounts_groups_index_title']				= 'Manage User Access';
+	$lang['accounts_groups_index_intro']				= 'Manage how groups of user\'s can interact with the site.';
+	$lang['accounts_groups_index_th_name']				= 'Name and Description';
+	$lang['accounts_groups_index_th_homepage']			= 'Homepage';
+	$lang['accounts_groups_index_th_default']			= 'Default';
+	$lang['accounts_groups_index_th_actions']			= 'Actions';
+	$lang['accounts_groups_index_action_set_default']	= 'Set As Default Group';
 
 	//	Edit group
 	$lang['accounts_groups_edit_title']				= 'Edit Group (%s)';

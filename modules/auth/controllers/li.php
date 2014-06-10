@@ -731,7 +731,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 		else :
 
-			$_data['group_id'] = APP_USER_DEFAULT_GROUP;
+			$_data['group_id'] = $this->user_group->default_group->id;
 
 		endif;
 

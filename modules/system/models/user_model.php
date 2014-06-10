@@ -2692,7 +2692,6 @@ class NAILS_User_model extends NAILS_Model
 
 			endif;
 
-
 			if ( ! empty( $data['username'] ) ) :
 
 				//	Check username against DB
@@ -2746,7 +2745,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Check that we're dealing with a valid group
 		if ( empty( $data['group_id'] ) ) :
 
-			$_user_data['group_id'] = APP_USER_DEFAULT_GROUP;
+			$_user_data['group_id'] = $this->user_group->default_group->id;
 
 		else :
 

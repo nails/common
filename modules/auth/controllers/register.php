@@ -137,7 +137,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 				$_data					= array();
 				$_data['email']			= $this->input->post( 'email' );
 				$_data['username']		= $this->input->post( 'username' );
-				$_data['group_id']		= APP_USER_DEFAULT_GROUP;
+				$_data['group_id']		= $this->user_group->default_group->id;
 				$_data['password']		= $this->input->post( 'password' );
 				$_data['first_name']	= $this->input->post( 'first_name' );
 				$_data['last_name']		= $this->input->post( 'last_name' );

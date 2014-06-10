@@ -1284,6 +1284,32 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$this->session->set_flashdata( 'message', '<strong>Coming soon!</strong> The ability to delete groups is on the roadmap.' );
 		redirect( 'admin/accounts/groups' );
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _groups_set_default()
+	{
+		if ( ! user_has_permission( 'admin.accounts.can_set_default_group' ) ) :
+
+			show_404();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->user_group->set_as_default( $this->uri->segment( 5 ) ) ) :
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Group set as default successfully.' );
+
+		else :
+
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could not set that group as the default user group. ' . $this->user_group->last_error() );
+
+		endif;
+		redirect( 'admin/accounts/groups' );
+	}
 }
 
 

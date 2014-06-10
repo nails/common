@@ -84,7 +84,7 @@ class NAILS_Settings_model extends NAILS_Model
 
 			else :
 
-				$this->db->where( 'grouping', $grouping );
+				$this->db->set( 'grouping', $grouping );
 				$this->db->set( 'key', $key );
 				$this->db->set( 'value', serialize( $value ) );
 				$this->db->insert( $this->_table );
