@@ -25,21 +25,9 @@
 		?>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta charset='utf-8'>
+		<meta charset="utf-8">
 		<meta name="description" content="<?=! empty( $page->seo->description ) ? $page->seo->description : ''?>">
 		<meta name="keywords" content="<?=! empty( $page->seo->keywords ) ? $page->seo->keywords : ''?>">
-		<script type="text/javascript">
-			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
-			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
-			window.NAILS					= {};
-			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
-			window.NAILS.LANG				= {};
-			window.NAILS.USER				= {};
-			window.NAILS.USER.ID			= <?=active_user( 'id' ) ? active_user( 'id' ) : 'null'?>;
-			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
-			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
-			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
-		</script>
 		<?php
 
 			$this->asset->output( 'css' );

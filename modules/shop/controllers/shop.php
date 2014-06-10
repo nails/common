@@ -407,12 +407,17 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		endif;
 
+		//	Generate missing SEO content
+		$this->product->generate_seo_content( $this->data['product'] );
+
 		// --------------------------------------------------------------------------
 
-		//	Page title
-		//	==========
+		//	SEO
+		//	===
 
-		$this->data['page']->title = 'Product: "' . $this->data['product']->label . '"';
+		$this->data['page']->title				= $this->data['product']->seo_title ? $this->data['product']->seo_title : $this->data['product']->label;
+		$this->data['page']->seo->description	= $this->data['product']->seo_description;
+		$this->data['page']->seo->keywords		= $this->data['product']->seo_keywords;
 
 		// --------------------------------------------------------------------------
 
