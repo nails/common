@@ -156,7 +156,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'app' ) ) :
+		if ( $this->app_setting->set( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site settings have been saved.';
 
@@ -224,7 +224,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'app' ) ) :
+		if ( $this->app_setting->set( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site authentication settings have been saved.';
 
@@ -347,7 +347,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
+		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
 
@@ -380,7 +380,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
+		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog commenting settings have been saved.';
 
@@ -415,7 +415,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
+		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog social settings have been saved.';
 
@@ -444,7 +444,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->settings->set_settings( $_settings, 'blog' ) ) :
+		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog sidebar settings have been saved.';
 
@@ -610,7 +610,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->settings->set_settings( $_settings, 'shop' ) ) :
+		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
 
@@ -672,7 +672,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->settings->set_settings( $_settings, 'shop' ) ) :
+		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
 

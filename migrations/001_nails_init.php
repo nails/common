@@ -8,7 +8,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		//	TODO: allow this to be configurable, depending on how this script is executed
 		//	the NAILS_DB_PREFIX constant may be available; check and complete.
 
-		$_NAILS_PREFIX = 'nails';
+		$_NAILS_PREFIX = 'nails_';
 
 		// --------------------------------------------------------------------------
 
@@ -1242,7 +1242,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			CONSTRAINT `' . $_NAILS_PREFIX . 'shop_voucher_ibfk_3` FOREIGN KEY (`modified_by`) REFERENCES `' . $_NAILS_PREFIX . 'user` (`id`) ON DELETE SET NULL
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'app_settings` (
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'app_setting` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`grouping` varchar(100) NOT NULL,
 			`key` varchar(50) DEFAULT NULL,
@@ -1252,7 +1252,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			KEY `grouping_2` (`grouping`,`key`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-		$this->db->query( 'CREATE TABLE IF NOT EXISTS `nails_app_notification` (
+		$this->db->query( 'CREATE TABLE IF NOT EXISTS `' . $_NAILS_PREFIX . 'app_notification` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			`grouping` varchar(100) NOT NULL,
 			`key` varchar(50) DEFAULT NULL,
@@ -1448,7 +1448,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 		// --------------------------------------------------------------------------
 
 		//	Insert Data
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'country` (`id`, `iso_code`, `iso_code_3`, `iso_name`, `iso_number`, `language_id`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "country` (`id`, `iso_code`, `iso_code_3`, `iso_name`, `iso_number`, `language_id`)
 		VALUES
 			(1, 'AD', 'AND', 'Andorra', '020', NULL),
 			(2, 'AE', 'ARE', 'United Arab Emirates', '784', NULL),
@@ -1700,7 +1700,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(248, 'ZM', 'ZMB', 'Zambia', '894', NULL),
 			(249, 'ZW', 'ZWE', 'Zimbabwe', '716', NULL);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'date_format_date` (`id`, `label`, `format`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "date_format_date` (`id`, `label`, `format`)
 		VALUES
 			(1, 'DD/MM/YYYY', 'd/m/Y'),
 			(2, 'DD/MM/YY', 'd/m/y'),
@@ -1711,12 +1711,12 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(7, 'MM-DD-YYYY', 'm-d-Y'),
 			(8, 'MM-DD-YY', 'm-d-y');" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'date_format_time` (`id`, `label`, `format`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "date_format_time` (`id`, `label`, `format`)
 		VALUES
 			(1, '24 Hour', 'H:i:s'),
 			(2, '12 Hour', 'g:i:s A');" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'email_type` (`id`, `slug`, `name`, `description`, `template_file`, `default_subject`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "email_type` (`id`, `slug`, `name`, `description`, `template_file`, `default_subject`)
 		VALUES
 			(1, 'test_email', 'Test Email', 'Test email template, normally used in admin to test if recipients can receive email sent by the system', 'utilities/test_email', 'Test Email'),
 			(2, 'verify_email', 'Verify Email, generic', 'Email sent with a verification code', 'verify/verify_email', 'Please verify your email'),
@@ -1724,7 +1724,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(4, 'new_user', 'Welcome Email, generic', 'Email sent to new users when they regsiter on site, or when an administrator creates a new user account.', 'auth/new_user', 'Welcome'),
 			(5, 'password_updated', 'Password Updated', 'Email sent to users when their password is updated, regardless of who updated it.', 'auth/password_updated', 'Your Password Has Been Updated');" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'event_type` (`id`, `slug`, `label`, `description`, `ref_join_table`, `ref_join_column`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "event_type` (`id`, `slug`, `label`, `description`, `ref_join_table`, `ref_join_column`)
 		VALUES
 			(1, 'did_register', 'User Registered', 'Fired when a user registers', '', NULL),
 			(2, 'did_log_in', 'User logged in', 'Fired when a user logs in', '', NULL),
@@ -1736,7 +1736,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(8, 'did_link_li', 'User linked LinkedIn to their account', 'Fired when a user links their LinkedIn account', '', NULL),
 			(9, 'did_unlink_li', 'User unlinked LinkedIn from their account', 'Fired when a user unlinks LinkedIn  from their account', '', NULL);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'language` (`id`, `slug`, `name`, `priority`, `supported`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "language` (`id`, `slug`, `name`, `priority`, `supported`)
 		VALUES
 			(1, 'areare', '\'Are\'are', NULL, 0),
 			(2, 'auhelawa', '\'Auhelawa', NULL, 0),
@@ -2611,7 +2611,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(871, 'kung', 'ǃKung', NULL, 0),
 			(872, 'xoo', 'ǃXóõ', NULL, 0);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'shop_currency` (`id`, `code`, `symbol`, `symbol_position`, `label`, `decimal_precision`, `decimal_symbol`, `thousands_seperator`, `base_exchange`, `is_active`, `created`, `created_by`, `modified`, `modified_by`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "shop_currency` (`id`, `code`, `symbol`, `symbol_position`, `label`, `decimal_precision`, `decimal_symbol`, `thousands_seperator`, `base_exchange`, `is_active`, `created`, `created_by`, `modified`, `modified_by`)
 		VALUES
 			(2, 'AED', '&curren;', 'BEFORE', 'United Arab Emirates Dirham', 2, '.', ',', 5.579284, 0, '0000-00-00 00:00:00', NULL, '2013-07-17 14:55:15', NULL),
 			(3, 'AFN', '&curren;', 'BEFORE', 'Afghan Afghani', 2, '.', ',', 85.140991, 0, '0000-00-00 00:00:00', NULL, '2013-07-17 14:55:15', NULL),
@@ -2779,7 +2779,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(191, 'UZS', '&curren;', 'BEFORE', 'Uzbekistan Som', 2, '.', ',', 3195.041260, 0, '2013-07-17 15:50:57', NULL, '2013-07-17 14:55:15', NULL),
 			(192, 'ZMW', '&curren;', 'BEFORE', 'Zambian Kwacha', 2, '.', ',', 8.318298, 0, '2013-07-17 15:50:57', NULL, '2013-07-17 14:55:15', NULL);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'shop_currency_country` (`id`, `currency_id`, `country_id`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "shop_currency_country` (`id`, `currency_id`, `country_id`)
 		VALUES
 			(8, 47, 1),
 			(9, 2, 2),
@@ -3031,7 +3031,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(255, 52, 77),
 			(256, 144, 233);" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'app_settings` (`grouping`, `key`, `value`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "app_setting` (`grouping`, `key`, `value`)
 		VALUES
 			('app', 'google_analytics_account', NULL),
 			('blog', 'blog', 's:5:\\\"blog/\\\";'),
@@ -3058,7 +3058,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			('shop', 'warehouse_addr_state', 's:0:\\\"\\\";'),
 			('shop', 'warehouse_addr_country', 's:0:\\\"\\\";');" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'user_auth_method` (`id`, `type`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "user_auth_method` (`id`, `type`)
 		VALUES
 			(1, 'native'),
 			(2, 'facebook'),
@@ -3066,7 +3066,7 @@ class Migration_Nails_init extends CORE_NAILS_Migration
 			(4, 'open_id'),
 			(5, 'linkedin');" );
 
-		$this->db->query( "INSERT IGNORE INTO `' . $_NAILS_PREFIX . 'user_group` (`id`, `name`, `display_name`, `description`, `default_homepage`, `registration_redirect`, `acl`)
+		$this->db->query( "INSERT IGNORE INTO `" . $_NAILS_PREFIX . "user_group` (`id`, `name`, `display_name`, `description`, `default_homepage`, `registration_redirect`, `acl`)
 		VALUES
 			(1, 'superuser', 'Superuser', 'Superuser accounts', '/admin', NULL, 'a:1:{s:9:\\\"superuser\\\";b:1;}'),
 			(2, 'admin', 'Admin', 'Admin accounts', '/', '', NULL),

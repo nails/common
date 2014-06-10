@@ -8,7 +8,7 @@
  *
  **/
 
-class NAILS_Notification_model extends NAILS_Model
+class NAILS_App_notification_model extends NAILS_Model
 {
 	protected $_notifications;
 
@@ -16,6 +16,9 @@ class NAILS_Notification_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Construct the notification model, set defaults
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -31,6 +34,13 @@ class NAILS_Notification_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Get's emails associated with a particular group/key
+	 * @param  string  $key           The key to retrieve
+	 * @param  string  $grouping      The group the key belongs to
+	 * @param  boolean $force_refresh Whether to force a group refresh
+	 * @return array
+	 */
 	public function get( $key = NULL, $grouping = 'app', $force_refresh = FALSE )
 	{
 		if ( empty( $this->_notifications[$grouping] ) || $force_refresh ) :
@@ -49,13 +59,13 @@ class NAILS_Notification_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $key ) :
+		if ( empty( $key ) ) :
 
 			return $this->_notifications[$grouping];
 
 		else :
 
-			return isset( $this->_notifications[$grouping][$key] ) ? $this->_notifications[$grouping][$key] : NULL;
+			return isset( $this->_notifications[$grouping][$key] ) ? $this->_notifications[$grouping][$key] : array();
 
 		endif;
 	}
@@ -64,36 +74,87 @@ class NAILS_Notification_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function set( $key_values, $grouping = 'app' )
+	/**
+	 * Set a group/key either by passing an array of key=>value pairs as the $key
+	 * or by passing a string to $key and setting $value
+	 * @param mixed  $key      The key to set, or an array of key => value pairs
+	 * @param string $grouping The grouping to store the keys under
+	 * @param mixed  $value    The data to store, only used if $key is a string
+	 * @return boolean
+	 */
+	public function set( $key, $grouping = 'app', $value = NULL )
 	{
-		foreach ( $key_values AS $key => $value ) :
+		$this->db->trans_begin();
 
-			$this->db->where( 'key', $key );
-			if ( $this->db->count_all_results( $this->_table ) ) :
+		if ( is_array( $key ) ) :
 
-				$this->db->where( 'grouping', $grouping );
-				$this->db->where( 'key', $key );
-				$this->db->set( 'value', serialize( $value ) );
-				$this->db->update( $this->_table);
+			foreach ( $key AS $key => $value ) :
 
-			else :
+				$this->_set( $key, $grouping, $value );
 
-				$this->db->set( 'grouping', $grouping );
-				$this->db->set( 'key', $key );
-				$this->db->set( 'value', serialize( $value ) );
-				$this->db->insert( $this->_table );
+			endforeach;
 
-			endif;
+		else :
 
-		endforeach;
+			$this->_set( $key, $grouping, $value );
 
-		return TRUE;
+		endif;
+
+		if ( $this->db->trans_status() === FALSE ) :
+
+			$this->db->trans_rollback();
+			return FALSE;
+
+		else :
+
+			$this->db->trans_commit();
+			return TRUE;
+
+		endif;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Inserts/Updates a group/key value
+	 * @param string $key      The key to set
+	 * @param string $grouping The key's grouping
+	 * @param mixed  $value    The value of the group/key
+	 * @return void
+	 */
+	protected function _set( $key, $grouping, $value )
+	{
+		$this->db->where( 'key', $key );
+		if ( $this->db->count_all_results( $this->_table ) ) :
+
+			$this->db->where( 'grouping', $grouping );
+			$this->db->where( 'key', $key );
+			$this->db->set( 'value', serialize( $value ) );
+			$this->db->update( $this->_table);
+
+		else :
+
+			$this->db->set( 'grouping', $grouping );
+			$this->db->set( 'key', $key );
+			$this->db->set( 'value', serialize( $value ) );
+			$this->db->insert( $this->_table );
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Trigger a notification
+	 * @param  string $key      The key to trigger
+	 * @param  string $grouping The group to trigger
+	 * @param  array  $data     Data to pass to the email
+	 * @return boolean
+	 */
 	public function trigger( $key, $grouping, $data = array() )
 	{
 		//	TODO: need to be able to handle rich email templates
@@ -128,13 +189,13 @@ class NAILS_Notification_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_NOTIfICATION_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_APP_NOTIFICATION_MODEL' ) ) :
 
-	class Notification_model extends NAILS_Notification_model
+	class App_notification_model extends NAILS_App_notification_model
 	{
 	}
 
 endif;
 
-/* End of file notification_model.php */
-/* Location: ./modules/shop/models/notification_model.php */
+/* End of file app_notification_model.php */
+/* Location: ./modules/system/models/app_notification_model.php */

@@ -28,7 +28,7 @@
 
 						foreach( $noti->options AS $key => $label ) :
 
-							$_default = implode( ', ', $this->notification_model->get( $key, $grouping ) );
+							$_default = implode( ', ', $this->app_notification_model->get( $key, $grouping ) );
 
 							echo '<tr>';
 								echo '<td class="event-label">';

@@ -70,7 +70,7 @@ class NAILS_Notification extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'notification/notification_model' );
+		$this->load->model( 'system/app_notification_model' );
 	}
 
 
@@ -134,9 +134,11 @@ class NAILS_Notification extends NAILS_Admin_Controller
 
 					foreach( $_set AS $grouping => $options ) :
 
-						$this->notification_model->set( $options, $grouping );
+						$this->app_notification_model->set( $options, $grouping );
 
 					endforeach;
+
+					$this->data['success'] = '<strong>Success!</strong> Notifications were updated successfully.';
 
 				else :
 

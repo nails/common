@@ -602,7 +602,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_helpers		= array();
-		$_helpers[]		= 'settings';
+		$_helpers[]		= 'app_setting';
+		$_helpers[]		= 'app_notification';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
 		$_helpers[]		= 'form';
@@ -615,7 +616,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'typography';
 		$_helpers[]		= 'event';
 		$_helpers[]		= 'log';
-		$_helpers[]		= 'notification';
 
 		//	Module specific helpers
 		//	CDN
@@ -657,7 +657,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_models	= array();
-		$_models[]	= array( 'system/settings_model',		'settings' );
+		$_models[]	= array( 'system/app_setting_model',	'app_setting' );
 		$_models[]	= array( 'system/user_model',			'user' );
 		$_models[]	= array( 'system/user_group_model',		'user_group' );
 		$_models[]	= array( 'system/user_password_model',	'user_password' );
