@@ -768,6 +768,42 @@ class NAILS_Shop_product_model extends NAILS_Model
 		else :
 
 			$this->db->trans_commit();
+
+			// --------------------------------------------------------------------------
+
+			//	Inform any persons who may have subscribed to a 'keep me informed' notification
+			$_variants_available = array();
+
+			$this->db->select( 'id' );
+			$this->db->where( 'product_id', $data->id );
+			$this->db->where( 'is_deleted', FALSE );
+			$this->db->where( 'stock_status', 'IN_STOCK' );
+			$this->db->where( '(quantity_available = 0 OR quantity_available - quantity_sold > 0)' );
+			$_variants_available_raw = $this->db->get( $this->_table_variation	 )->result();
+			$_variants_available = array();
+
+			foreach( $_variants_available_raw AS $v ) :
+
+				$_variants_available[] = $v->id;
+
+			endforeach;
+
+			if ( $_variants_available ) :
+
+				if ( ! $this->load->model_is_loaded( 'shop_inform_product_available_model' ) ) :
+
+					$this->load->model( 'shop/shop_inform_product_available_model' );
+
+				endif;
+
+				$this->shop_inform_product_available_model->inform( $data->id, $_variants_available );
+
+			endif;
+
+
+
+			// --------------------------------------------------------------------------
+
 			return $data->id;
 
 		endif;
@@ -920,6 +956,18 @@ class NAILS_Shop_product_model extends NAILS_Model
 				$product->gallery[] = (int) $image->object_id;
 
 			endforeach;
+
+			//	Featured image
+			//	==============
+			if ( ! empty( $product->gallery[0] ) ) :
+
+				$product->featured_img = $product->gallery[0];
+
+			else :
+
+				$product->featured_img = NULL;
+
+			endif;
 
 			//	Range
 			//	=====
@@ -1188,6 +1236,9 @@ class NAILS_Shop_product_model extends NAILS_Model
 		unset( $product->tax_rate_id );
 		unset( $product->tax_rate_label );
 		unset( $product->tax_rate_rate );
+
+		//	URL
+		$product->url = site_url( app_setting( 'url', 'shop' ) . 'product/' . $product->slug );
 	}
 
 

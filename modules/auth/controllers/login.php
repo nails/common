@@ -364,13 +364,13 @@ class NAILS_Login extends NAILS_Auth_Controller
 
 				else :
 
-					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_first_name, $_last_login ) ) );
+					$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome', array( $_user->first_name, $_user->last_login ) ) );
 
 				endif;
 
 			else :
 
-				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_first_name ) ) );
+				$this->session->set_flashdata( 'message', lang( 'auth_login_ok_welcome_notime', array( $_user->first_name ) ) );
 
 			endif;
 

@@ -53,6 +53,11 @@
 			{
 				margin-bottom:1em;
 			}
+
+			.text-center
+			{
+				text-align: center;
+			}
 			
 			small
 			{
@@ -144,6 +149,20 @@
 				display:block;
 			}
 			
+			img.thumbnail
+			{
+				padding:6px;
+				border:1px solid #CCC;
+				background:#F9F9F9;
+				-moz-border-radius: 2px;
+				-webkit-border-radius: 2px;
+				border-radius: 2px;
+
+				-moz-box-shadow: 0px 1px 1px #888;
+				-webkit-box-shadow: 0px 1px 1px #888;
+				box-shadow: 0px 1px 1px #888;
+			}
+
 			.heads-up
 			{
 				padding:10px;
@@ -154,9 +173,9 @@
 				-o-border-radius:3px;
 				border-radius:3px;
 				
-				-moz-box-shadow: 0px 1px 1px #888;
-				-webkit-box-shadow: 0px 1px 1px #888;
-				box-shadow: 0px 1px 1px #888;
+				-moz-box-shadow: 0px 1px 1px #CCC;
+				-webkit-box-shadow: 0px 1px 1px #CCC;
+				box-shadow: 0px 1px 1px #CCC;
 			}
 
 			a.button
