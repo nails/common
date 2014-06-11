@@ -15,9 +15,10 @@
  *
  **/
 
-class NAILS_Shop_skin_model extends CI_Model
+class NAILS_Shop_skin_model extends NAILS_Model
 {
 	protected $_available;
+	protected $_skins;
 
 	// --------------------------------------------------------------------------
 
@@ -28,7 +29,9 @@ class NAILS_Shop_skin_model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_available = NULL;
+		$this->_available	= NULL;
+		$this->_skins		= array();
+
 	}
 
 	// --------------------------------------------------------------------------
@@ -43,21 +46,29 @@ class NAILS_Shop_skin_model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Have a look in the Nails and App directories, app skins trum nails skins
-		$this->_available = array();
-		$this->_available = array_merge( $this->_available, $this->_find_skins( TRUE ) );
-		$this->_available = array_merge( $this->_available, $this->_find_skins( FALSE ) );
+		//	Have a look in the Nails and App directories, app skins trump nails skins
+		$this->load->helper( 'directory' );
+
+		$_available = array();
+		$_available = array_merge( $_available, (array) directory_map( NAILS_PATH . 'modules/shop/views/', 1 ) );
+		$_available = array_merge( $_available, (array) directory_map( FCPATH . APPPATH . 'modules/shop/views/', 1 ) );
+		$_available = array_filter( $_available );
+		$_available = array_unique( $_available );
 
 		// --------------------------------------------------------------------------
 
-		//	Tidy up
-		foreach( $this->_available AS $dir => $skin ) :
+		foreach( $_available AS $skin ) :
 
-			$skin->dir = $dir;
+			$_skin = $this->get( $skin, $refresh );
+			if ( $_skin ) :
+
+				$this->_available[] = $_skin;
+
+			endif;
 
 		endforeach;
 
-		return array_values( $this->_available );
+		return $this->_available;
 	}
 
 
@@ -118,6 +129,158 @@ class NAILS_Shop_skin_model extends CI_Model
 		endif;
 
 		return $_found;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get( $skin, $refresh = FALSE )
+	{
+		if ( ! empty( $this->_skins[$skin] ) && ! $refresh ) :
+
+			return $this->_skins[$skin];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_app_path		= FCPATH . APPPATH . 'modules/shop/views/';
+		$_nails_path	= NAILS_PATH . 'modules/shop/views/';
+
+		//	Load the skin's configs
+		if ( file_exists( $_app_path . $skin . '/' . $skin . '.json' ) ) :
+
+			$_skin		= @json_decode( file_get_contents( $_app_path . $skin . '/' . $skin . '.json' ) );
+			$_is_nails	= FALSE;
+
+		elseif ( file_exists( $_nails_path . $skin . '/' . $skin . '.json' ) ) :
+
+			$_skin		= @json_decode( file_get_contents( $_nails_path . $skin . '/' . $skin . '.json' ) );
+			$_is_nails	= TRUE;
+
+		else :
+
+			$this->_set_error( 'Could not find valid configuration file.' );
+			return FALSE;
+
+		endif;
+
+		//	Check skin config is sane
+		if ( empty( $_skin ) ) :
+
+			$this->_set_error( 'Could not find valid configuration file.' );
+			return FALSE;
+
+		elseif ( ! is_object( $_skin ) ) :
+
+			$this->_set_error( 'Corrupt configuration file.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Check skin is compatible with this version of Nails
+		if ( ! empty( $_skin->require->nails ) ) :
+
+			preg_match( '/^(.*)?(\d.\d.\d)$/', $_skin->require->nails, $_matches );
+
+			$_modifier	= $_matches[1];
+			$_version	= $_matches[2];
+			$_error		= '"' . $_skin . '" requires Nails ' . $_modifier . $_version . ', version ' . NAILS_VERSION . ' is installed.';
+
+			if ( ! empty( $_version ) ) :
+
+				$_version_compare = version_compare( NAILS_VERSION, $_version );
+
+				if ( $_matches[1] == '>' ) :
+
+					if ( $_version_compare <= 0 ) :
+
+						$this->_set_error( $_error );
+						return FALSE;
+
+					endif;
+
+				elseif ( $_matches[1] == '<' ) :
+
+					if ( $_version_compare >= 0 ) :
+
+						$this->_set_error( $_error );
+						return FALSE;
+
+					endif;
+
+				elseif ( $_matches[1] == '>=' ) :
+
+					if ( $_version_compare < 0 ) :
+
+						$this->_set_error( $_error );
+						return FALSE;
+
+					endif;
+
+				elseif ( $_matches[1] == '<=' ) :
+
+					if ( $_version_compare >= 0 ) :
+
+						$this->_set_error( $_error );
+						return FALSE;
+
+					endif;
+
+				else :
+
+					//	This skin is only compatible with a specific version of Nails
+					if ( $_version_compare != 0 ) :
+
+						$this->_set_error( $_error );
+						return FALSE;
+
+					endif;
+
+				endif;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Set the dir, URL and Path
+
+		//	Dir
+		$_skin->dir = $skin;
+
+
+		//	URL & Path
+		if ( $_is_nails ) :
+
+			$_skin->url		= NAILS_URL . 'modules/shop/views/' . $skin . '/';
+			$_skin->path	= $_nails_path . $skin . '/';
+
+		else :
+
+			$_skin->url		= site_url( 'modules/shop/views/' . $skin . '/' );
+			$_skin->path	= $_app_path . $skin . '/';
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->_skins[$skin] = $_skin;
+
+		return $this->_skins[$skin];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function is_compatible( $skin )
+	{
+
 	}
 
 }
