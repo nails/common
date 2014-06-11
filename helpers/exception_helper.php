@@ -71,14 +71,27 @@ if ( ! function_exists( 'show_fatal_error' ) )
 {
 	function show_fatal_error( $subject = NULL, $message = NULL )
 	{
-		if ( $subject && $message ) :
+		if ( isset( get_instance()->fatal_error_handler ) && is_callable( array( get_instance()->fatal_error_handler, 'send_developer_mail' ) ) ) :
 
-			get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
+			if ( $subject && $message ) :
+
+				get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
+
+			endif;
+
+			get_instance()->fatal_error_handler->show();
+
+		elseif( function_exists( '_NAILS_ERROR' ) ) :
+
+			_NAILS_ERROR( $message, $subject );
+
+		else :
+
+			echo '<h1>ERROR: ' . $subject . '</h1>';
+			echo '<h2>' . $message . '</h2>';
+			exit(0);
 
 		endif;
-
-		get_instance()->fatal_error_handler->show();
-		exit(0);
 	}
 }
 

@@ -107,7 +107,7 @@ class NAILS_User_group_model extends NAILS_Model
 
 		if ( ! $_group ) :
 
-			show_fatal_error( 'No Defaul Group Set', 'A default user group must be set.' );
+			show_fatal_error( 'No Default Group Set', 'A default user group must be set.' );
 
 		endif;
 
