@@ -1123,4 +1123,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_BASKET_MODEL' ) ) :
 endif;
 
 /* End of file shop_basket_model.php */
-/* Location: ./application/models/shop_basket_model.php */
+/* Location: ./modules/shop/models/shop_basket_model.php */

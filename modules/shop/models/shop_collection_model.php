@@ -296,4 +296,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_COLLECTION_MODEL' ) ) :
 endif;
 
 /* End of file shop_collection_model.php */
-/* Location: ./application/models/shop_collection_model.php */
+/* Location: ./modules/shop/models/shop_collection_model.php */

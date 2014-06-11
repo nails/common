@@ -398,5 +398,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_CURRENCY_MODEL' ) ) :
 
 endif;
 
-/* End of file  */
-/* Location: ./application/models/ */
+/* End of file shop_currency_model.php */
+/* Location: ./modules/shop/models/shop_currency_model.php */

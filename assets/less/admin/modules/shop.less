@@ -1122,6 +1122,55 @@
 				width:100%;
 			}
 		}
+
+		ul.skins
+		{
+			li.skin
+			{
+				.opacity(0.5);
+				border:1px solid #CCC;
+				display:block;
+				float:left;
+				box-sizing:border-box;
+				margin-right:1em;
+				margin-bottom:1em;
+				padding:10px;
+				background:#FFF;
+				width:250px;
+				height:200px;
+				.rounded(3px);
+				.nifty-drop-shadow();
+				cursor:pointer;
+
+				.icon
+				{
+					img
+					{
+						width: 230px;
+						height: 150px;
+						border-bottom:1px solid #CCC;
+						margin-bottom:5px;
+					}
+				}
+
+				.name
+				{
+					font-weight:bold;
+					text-align:center;
+				}
+
+				input
+				{
+					display:none;
+				}
+
+				&:hover,
+				&.selected
+				{
+					.opacity(1)
+				}
+			}
+		}
 	}
 }
 

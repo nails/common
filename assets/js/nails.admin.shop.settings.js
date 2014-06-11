@@ -8,6 +8,7 @@ NAILS_Admin_Shop_Settings = function()
 		this._init_adds();
 		this._init_submits();
 		this._init_warehouse_collection();
+		this._init_skins();
 
 		// --------------------------------------------------------------------------
 
@@ -275,6 +276,18 @@ NAILS_Admin_Shop_Settings = function()
 			}
 
 			return true;
+		});
+	};
+
+	// --------------------------------------------------------------------------
+
+	this._init_skins = function()
+	{
+		$( 'ul.skins li.skin' ).on( 'click', function()
+		{
+			$( 'ul.skins li.skin' ).removeClass( 'selected' );
+			$(this).addClass( 'selected' );
+			$(this).find( 'input[type=radio]' ).prop( 'checked', true );
 		});
 	};
 };

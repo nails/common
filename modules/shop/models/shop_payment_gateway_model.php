@@ -232,4 +232,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_PAYMENT_GATEWAY_MODEL' ) ) :
 endif;
 
 /* End of file shop_payment_gateway_model.php */
-/* Location: ./application/models/shop_payment_gateway_model.php */
+/* Location: ./modules/shop/models/shop_payment_gateway_model.php */

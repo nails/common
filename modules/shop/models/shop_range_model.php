@@ -296,4 +296,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_RANGE_MODEL' ) ) :
 endif;
 
 /* End of file shop_range_model.php */
-/* Location: ./application/models/shop_range_model.php */
+/* Location: ./modules/shop/models/shop_range_model.php */

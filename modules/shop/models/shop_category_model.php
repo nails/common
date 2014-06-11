@@ -767,4 +767,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_CATEGORY_MODEL' ) ) :
 endif;
 
 /* End of file shop_category_model.php */
-/* Location: ./application/models/shop_category_model.php */
+/* Location: ./modules/shop/models/shop_category_model.php */

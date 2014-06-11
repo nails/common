@@ -240,4 +240,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_TAG_MODEL' ) ) :
 endif;
 
 /* End of file shop_tag_model.php */
-/* Location: ./application/models/shop_tag_model.php */
+/* Location: ./modules/shop/models/shop_tag_model.php */

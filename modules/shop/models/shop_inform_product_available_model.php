@@ -122,4 +122,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_INFORM_PRODUCT_AVAILABLE_MODEL' ) ) 
 endif;
 
 /* End of file shop_inform_product_available_model.php */
-/* Location: ./application/models/shop_inform_product_available_model.php */
+/* Location: ./modules/shop/models/shop_inform_product_available_model.php */

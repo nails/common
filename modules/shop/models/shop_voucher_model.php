@@ -810,4 +810,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_VOUCHER_MODEL' ) ) :
 endif;
 
 /* End of file shop_voucher_model.php */
-/* Location: ./application/models/shop_voucher_model.php */
+/* Location: ./modules/shop/models/shop_voucher_model.php */

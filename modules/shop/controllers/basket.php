@@ -98,9 +98,9 @@ class NAILS_Basket extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/basket/index',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',								$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/basket/index',	$this->data );
+		$this->load->view( 'structure/footer',								$this->data );
 	}
 
 

@@ -240,4 +240,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_SALE_MODEL' ) ) :
 endif;
 
 /* End of file shop_sale_model.php */
-/* Location: ./application/models/shop_sale_model.php */
+/* Location: ./modules/shop/models/shop_sale_model.php */

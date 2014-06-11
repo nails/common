@@ -48,9 +48,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/front/index',	$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',								$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/index',	$this->data );
+		$this->load->view( 'structure/footer',								$this->data );
 	}
 
 
@@ -107,9 +107,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/brand/index',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/brand/index',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -153,9 +153,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/brand/single',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/brand/single',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -211,9 +211,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/category/index',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',										$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/category/index',	$this->data );
+		$this->load->view( 'structure/footer',										$this->data );
 	}
 
 
@@ -257,9 +257,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'shop/front/category/single',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',										$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/category/single',	$this->data );
+		$this->load->view( 'structure/footer',										$this->data );
 	}
 
 
@@ -315,9 +315,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'shop/front/collection/index',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',										$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/collection/index',	$this->data );
+		$this->load->view( 'structure/footer',										$this->data );
 	}
 
 
@@ -361,9 +361,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'shop/front/collection/single',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',											$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/collection/single',	$this->data );
+		$this->load->view( 'structure/footer',											$this->data );
 	}
 
 
@@ -421,9 +421,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/product/single',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',										$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/product/single',	$this->data );
+		$this->load->view( 'structure/footer',										$this->data );
 	}
 
 
@@ -479,9 +479,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/range/index',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/range/index',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -525,9 +525,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/range/single',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/range/single',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -583,9 +583,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/front/sale/index',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/sale/index',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -629,9 +629,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',			$this->data );
-		$this->load->view( 'shop/front/sale/single',	$this->data );
-		$this->load->view( 'structure/footer',			$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/sale/single',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -687,9 +687,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/front/tag/index',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/tag/index',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 
@@ -733,9 +733,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',		$this->data );
-		$this->load->view( 'shop/front/tag/single',	$this->data );
-		$this->load->view( 'structure/footer',		$this->data );
+		$this->load->view( 'structure/header',									$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/front/tag/single',	$this->data );
+		$this->load->view( 'structure/footer',									$this->data );
 	}
 
 

@@ -11,6 +11,11 @@
 				<a href="#" data-tab="tab-general">General</a>
 			</li>
 
+			<?php $_active = $this->input->post( 'update' ) == 'skin' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-skin">Skin</a>
+			</li>
+
 			<?php $_active = $this->input->post( 'update' ) == 'paymentgateways' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-paymentgateway">Payment Gateways</a>
@@ -299,6 +304,75 @@
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
+			</div>
+
+			<?php $_display = $this->input->post( 'update' ) == 'skin' ? 'active' : ''?>
+			<div id="tab-skin" class="tab page <?=$_display?> skin">
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
+				<?=form_hidden( 'update', 'skin' )?>
+				<p>
+					The following Shop skins are available to use.
+				</p>
+				<hr />
+				<?php
+
+					if ( $skins ) :
+
+						$_selected_skin = app_setting( 'skin', 'shop' ) ? app_setting( 'skin', 'shop' ) : 'getting-started';
+
+						echo '<ul class="skins">';
+						foreach( $skins AS $skin ) :
+
+							$_name			= ! empty( $skin->name ) ? $skin->name : 'Untitled';
+							$_description	= ! empty( $skin->description ) ? $skin->description : '';
+
+							if ( file_exists( $skin->path . 'icon.png' ) ) :
+
+								$_icon = $skin->url . 'icon.png';
+
+							elseif ( file_exists( $skin->path . 'icon.jpg' ) ) :
+
+								$_icon = $skin->url . 'icon.jpg';
+
+							elseif ( file_exists( $skin->path . 'icon.gif' ) ) :
+
+								$_icon = $skin->url . 'icon.gif';
+
+							else :
+
+								$_icon = NAILS_ASSETS_URL . 'img/admin/modules/settings/shop-skin-no-icon.png';
+
+							endif;
+
+							$_selected	= $skin->dir == $_selected_skin ? TRUE : FALSE;
+							$_class		= $_selected ? 'selected' : '';
+
+							echo '<li class="skin ' . $_class . '" rel="tipsy" title="' . $_description . '">';
+								echo '<div class="icon">' . img( $_icon ) . '</div>';
+								echo '<div class="name">' . $_name . '</div>';
+								echo form_radio( 'skin', $skin->dir, $_selected );
+							echo '</li>';
+
+						endforeach;
+						echo '</ul>';
+
+						echo '<hr class="clearfix" />';
+
+					else :
+
+						echo '<p class="system-alert error no-close">';
+							echo '<strong>Error:</strong> ';
+							echo 'I\'m sorry, but I couldn\'t find any skins to use. This is a configuration error and should be raised with the developer.';
+						echo '</p>';
+
+					endif;
+
+				?>
+				<p>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
+
 			</div>
 
 			<?php $_display = $this->input->post( 'update' ) == 'paymentgateways' ? 'active' : ''?>

@@ -487,6 +487,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->load->model( 'shop/shop_currency_model',			'currency' );
 		$this->load->model( 'shop/shop_shipping_model',			'shipping' );
 		$this->load->model( 'shop/shop_tax_model',				'tax' );
+		$this->load->model( 'shop/shop_skin_model',				'skin' );
 
 		// --------------------------------------------------------------------------
 
@@ -498,6 +499,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				case 'settings' :
 
 					$this->_shop_update_settings();
+
+				break;
+
+				case 'skin' :
+
+					$this->_shop_update_skin();
 
 				break;
 
@@ -552,6 +559,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		endif;
 
+		$this->data['skins']					= $this->skin->get_available();
 		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
 		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
 		$this->data['shipping_methods']			= $this->shipping->get_all( FALSE );
@@ -623,6 +631,29 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				$this->data['warning'] = '<strong>Warning:</strong> while the shop settings were updated, the routes file could not be updated. The shop may not behave as expected,';
 
 			endif;
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _shop_update_skin()
+	{
+		//	Prepare update
+		$_settings			= array();
+		$_settings['skin']	= $this->input->post( 'skin' );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Skin settings have been saved.';
 
 		else :
 

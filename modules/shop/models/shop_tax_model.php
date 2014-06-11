@@ -238,5 +238,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_TAX_MODEL' ) ) :
 
 endif;
 
-/* End of file  */
-/* Location: ./application/models/ */
+/* End of file shop_tax_model.php */
+/* Location: ./modules/shop/models/shop_tax_model.php */

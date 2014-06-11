@@ -319,9 +319,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	Load veiws
-			$this->load->view( 'structure/header',			$this->data );
-			$this->load->view( 'shop/checkout/checkout',	$this->data );
-			$this->load->view( 'structure/footer',			$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/checkout',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		else :
 
@@ -333,9 +333,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
-			$this->load->view( 'structure/header',		$this->data );
-			$this->load->view( 'shop/checkout/signin',	$this->data );
-			$this->load->view( 'structure/footer',		$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/signin',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		endif;
 	}
@@ -401,9 +401,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
-			$this->load->view( 'structure/header',		$this->data );
-			$this->load->view( 'shop/checkout/confirm',	$this->data );
-			$this->load->view( 'structure/footer',		$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/confirm',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		else :
 
@@ -582,7 +582,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the views
-		$this->load->view( 'shop/checkout/payment/paypal/index',	$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/paypal/index',	$this->data );
 	}
 
 
@@ -707,7 +707,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _processing_unpaid()
 	{
-		$this->load->view( 'shop/checkout/payment/processing/unpaid', $this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/unpaid', $this->data );
 	}
 
 
@@ -716,9 +716,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _processing_pending()
 	{
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/pending', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',														$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/pending',	$this->data );
+		$this->load->view( 'structure/footer',														$this->data );
 	}
 
 
@@ -732,9 +732,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',													$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/paid',	$this->data );
+		$this->load->view( 'structure/footer',													$this->data );
 	}
 
 
@@ -784,9 +784,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/error', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',													$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/error',	$this->data );
+		$this->load->view( 'structure/footer',													$this->data );
 	}
 
 

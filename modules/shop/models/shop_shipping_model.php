@@ -228,4 +228,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_SHIPPING_MODEL' ) ) :
 endif;
 
 /* End of file shop_shipping_model.php */
-/* Location: ./application/models/shop_shipping_model.php */
+/* Location: ./modules/shop/models/shop_shipping_model.php */

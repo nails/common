@@ -10,6 +10,12 @@
 
 class NAILS_Shop_Controller extends NAILS_Controller
 {
+	protected $_skin;
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -49,14 +55,108 @@ class NAILS_Shop_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the styles
-		$this->asset->load( 'nails.shop.css', TRUE );
+		//	Load up the shop's skin
+		$_skin			= app_setting( 'skin', 'shop' ) ? app_setting( 'skin', 'shop' ) : 'getting-started';
+		$_app_path		= FCPATH . APPPATH . 'modules/shop/views/' . $_skin . '/' . $_skin . '.json';
+		$_nails_path	= NAILS_PATH . 'modules/shop/views/' . $_skin . '/' . $_skin . '.json';
 
-		if ( file_exists( FCPATH . 'assets/css/shop.css' ) ) :
+		//	Load the skin's configs
+		if ( file_exists( $_app_path ) ) :
 
-			$this->asset->load( 'shop.css' );
+			$this->_skin	= @json_decode( file_get_contents( $_app_path ) );
+			$_using			= $_app_path;
+
+		elseif ( file_exists( $_nails_path ) ) :
+
+			$this->_skin	= @json_decode( file_get_contents( $_nails_path ) );
+			$_using			= $_app_path;
+
+		else :
+
+			show_fatal_error( 'Shop skin "' . $_skin . '" is not configured correctly.', 'I was unable to load a valid skin configuration file for skin "' . $_skin . '"' );
 
 		endif;
+
+		//	Check skin config is sane
+		if ( empty( $this->_skin ) ) :
+
+			show_fatal_error( 'Shop skin "' . $_skin . '" is not configured correctly.', 'I was unable to load a valid skin configuration file. I looked for ' . $_using );
+
+		elseif ( ! is_object( $this->_skin ) ) :
+
+			show_fatal_error( 'Shop skin "' . $_skin . '" is not configured correctly.', 'The configuration file was found (at ' . $_using . ') but it did not contain a valid config object.' );
+
+		else :
+
+			$this->_skin->dir = $_skin;
+
+		endif;
+
+		//	Check skin is compatible with this version of Nails
+		if ( ! empty( $this->_skin->require->nails ) ) :
+
+			preg_match( '/^(.*)?(\d.\d.\d)$/', $this->_skin->require->nails, $_matches );
+
+			$_modifier		= $_matches[1];
+			$_version		= $_matches[2];
+			$_error_title	= 'Shop skin "' . $_skin . ' is not compatible with the version of Nails running on ' . APP_NAME;
+			$_error_message	= '"' . $_skin . '" requires Nails ' . $_modifier . $_version . ', version ' . NAILS_VERSION . ' is installed.';
+
+			if ( ! empty( $_version ) ) :
+
+				$_version_compare = version_compare( NAILS_VERSION, $_version );
+
+				if ( $_matches[1] == '>' ) :
+
+					if ( $_version_compare <= 0 ) :
+
+						show_fatal_error( $_error_title, $_error_message );
+
+					endif;
+
+				elseif ( $_matches[1] == '<' ) :
+
+					if ( $_version_compare >= 0 ) :
+
+						show_fatal_error( $_error_title, $_error_message );
+
+					endif;
+
+				elseif ( $_matches[1] == '>=' ) :
+
+					if ( $_version_compare < 0 ) :
+
+						show_fatal_error( $_error_title, $_error_message );
+
+					endif;
+
+				elseif ( $_matches[1] == '<=' ) :
+
+					if ( $_version_compare >= 0 ) :
+
+						show_fatal_error( $_error_title, $_error_message );
+
+					endif;
+
+				else :
+
+					//	This skin is only compatible with a specific version of Nails
+					if ( $_version_compare != 0 ) :
+
+						show_fatal_error( $_error_title, $_error_message );
+
+					endif;
+
+				endif;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Pass to $this->data, for the views
+		$this->data['skin'] = $this->_skin;
 	}
 }
 
