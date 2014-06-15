@@ -981,6 +981,15 @@ class NAILS_Blog_post_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function format_url( $slug )
+	{
+		return site_url( app_setting( 'url', 'blog' ) . $slug );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _format_object( &$post )
 	{
 		parent::_format_object( $post );
@@ -992,7 +1001,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$post->is_deleted			= (bool) $post->is_deleted;
 
 		//	Generate URL
-		$post->url					= site_url( app_setting( 'url', 'blog' ) . $post->slug );
+		$post->url					= $this->format_url( $post->slug );
 
 		//	Author
 		$post->author				= new stdClass();

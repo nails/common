@@ -41,6 +41,28 @@
 		<p>
 			An error occurred which we couldn't recover from. The technical team have been informed, we apologise for the inconvenience.
 		</p>
+		<?php
+
+			if ( ENVIRONMENT != 'production' ) :
+
+				if ( ! empty( $subject ) ) :
+
+					echo '<h2>' . $subject . '</h2>';
+
+				endif;
+
+				if ( ! empty( $message ) ) :
+
+					echo '<p>' . $message . '</p>';
+
+				endif;
+
+			endif;
+
+		?>
+		<p>
+
+		</p>
 		<p>
 			<small>Powered by <a href="http://nailsapp.co.uk">Nails</a></small>
 		</p>

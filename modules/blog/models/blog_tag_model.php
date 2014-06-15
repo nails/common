@@ -177,7 +177,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 
 	public function format_url( $slug )
 	{
-		return app_setting( 'url', 'blog' ) . 'tag/' . $slug;
+		return site_url( app_setting( 'url', 'blog' ) . 'tag/' . $slug );
 	}
 
 

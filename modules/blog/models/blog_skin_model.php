@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:			shop_skin_model.php
+ * Name:			blog_skin_model.php
  *
- * Description:		This model finds and loads shop skins
+ * Description:		This model finds and loads blog skins
  *
  **/
 
@@ -15,7 +15,7 @@
  *
  **/
 
-class NAILS_Shop_skin_model extends NAILS_Model
+class NAILS_Blog_skin_model extends NAILS_Model
 {
 	protected $_available;
 	protected $_skins;
@@ -30,7 +30,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_available			= NULL;
-		$this->_skin_extension		= '-shopskin';
+		$this->_skin_extension		= '-blogskin';
 
 		//	Skin locations
 		//	This must be an array with 2 indexes:
@@ -41,8 +41,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		//	Nails skins
 		$this->_skin_locations[]	= array(
-										'path'	=> NAILS_PATH . 'modules/shop/views',
-										'url'	=> NAILS_URL . 'modules/shop/views'
+										'path'	=> NAILS_PATH . 'modules/blog/views',
+										'url'	=> NAILS_URL . 'modules/blog/views'
 									);
 
 		//	'Official' skins
@@ -53,8 +53,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		//	App Skins
 		$this->_skin_locations[]	= array(
-										'path' => FCPATH . APPPATH . 'modules/shop/views',
-										'url' => site_url( APPPATH . 'modules/shop/views' )
+										'path' => FCPATH . APPPATH . 'modules/blog/views',
+										'url' => site_url( APPPATH . 'modules/blog/views' )
 									);
 	}
 
@@ -125,7 +125,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 					if ( ! preg_match( $_pattern, $skin ) ) :
 
-						log_message( 'debug', '"' . $skin . '" is not a shop skin.' );
+						log_message( 'debug', '"' . $skin . '" is not a blog skin.' );
 						continue;
 
 					endif;
@@ -278,7 +278,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 /**
  * OVERLOADING NAILS' MODELS
  *
- * The following block of code makes it simple to extend one of the core shop
+ * The following block of code makes it simple to extend one of the core blog
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -299,13 +299,13 @@ class NAILS_Shop_skin_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_SKIN_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_BLOG_SKIN_MODEL' ) ) :
 
-	class Shop_skin_model extends NAILS_Shop_skin_model
+	class Blog_skin_model extends NAILS_Blog_skin_model
 	{
 	}
 
 endif;
 
-/* End of file shop_skin_model.php */
-/* Location: ./modules/shop/models/shop_skin_model.php */
+/* End of file blog_skin_model.php */
+/* Location: ./modules/blog/models/blog_skin_model.php */

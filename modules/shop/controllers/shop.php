@@ -25,7 +25,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Shop/index';
+		$this->data['page']->title = $this->_shop_name;
 
 		// --------------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',								$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/index',	$this->data );
-		$this->load->view( 'structure/footer',								$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( $this->_skin->path . 'front/index',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
@@ -88,6 +88,8 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	{
 		if ( ! app_setting( 'page_brand_listing', 'shop' ) ) :
 
+			show_404();
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -95,7 +97,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Brand: List';
+		$this->data['page']->title = $this->_shop_name . ': Brands';
 
 
 		// --------------------------------------------------------------------------
@@ -107,9 +109,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/brand/index',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/brand/index',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -135,7 +137,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Brand: "' . $this->data['brand']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Brand: "' . $this->data['brand']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -153,9 +155,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/brand/single',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/brand/single',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -193,6 +195,8 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	{
 		if ( ! app_setting( 'page_category_listing', 'shop' ) ) :
 
+			show_404();
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -200,7 +204,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Category: List';
+		$this->data['page']->title = $this->_shop_name . ': Categories';
 
 		// --------------------------------------------------------------------------
 
@@ -211,9 +215,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',										$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/category/index',	$this->data );
-		$this->load->view( 'structure/footer',										$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/category/index',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -239,7 +243,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Category: "' . $this->data['category']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Category: "' . $this->data['category']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -257,9 +261,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',										$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/category/single',	$this->data );
-		$this->load->view( 'structure/footer',										$this->data );
+		$this->load->view( 'structure/header',								$this->data );
+		$this->load->view( $this->_skin->path . 'front/category/single',	$this->data );
+		$this->load->view( 'structure/footer',								$this->data );
 	}
 
 
@@ -297,6 +301,8 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	{
 		if ( ! app_setting( 'page_collection_listing', 'shop' ) ) :
 
+			show_404();
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -304,7 +310,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Collection: List';
+		$this->data['page']->title = $this->_shop_name . ': Collections';
 
 		// --------------------------------------------------------------------------
 
@@ -315,9 +321,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',										$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/collection/index',	$this->data );
-		$this->load->view( 'structure/footer',										$this->data );
+		$this->load->view( 'structure/header',								$this->data );
+		$this->load->view( $this->_skin->path . 'front/collection/index',	$this->data );
+		$this->load->view( 'structure/footer',								$this->data );
 	}
 
 
@@ -343,7 +349,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Collection: "' . $this->data['collection']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Collection: "' . $this->data['collection']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -361,9 +367,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',											$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/collection/single',	$this->data );
-		$this->load->view( 'structure/footer',											$this->data );
+		$this->load->view( 'structure/header',								$this->data );
+		$this->load->view( $this->_skin->path . 'front/collection/single',	$this->data );
+		$this->load->view( 'structure/footer',								$this->data );
 	}
 
 
@@ -415,15 +421,16 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	SEO
 		//	===
 
-		$this->data['page']->title				= $this->data['product']->seo_title ? $this->data['product']->seo_title : $this->data['product']->label;
+		$this->data['page']->title				= $this->_shop_name . ': ';
+		$this->data['page']->title				.= $this->data['product']->seo_title ? $this->data['product']->seo_title : $this->data['product']->label;
 		$this->data['page']->seo->description	= $this->data['product']->seo_description;
 		$this->data['page']->seo->keywords		= $this->data['product']->seo_keywords;
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',										$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/product/single',	$this->data );
-		$this->load->view( 'structure/footer',										$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/product/single',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -461,6 +468,8 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	{
 		if ( ! app_setting( 'page_range_listing', 'shop' ) ) :
 
+			show_404();
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -468,7 +477,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Range: List';
+		$this->data['page']->title = $this->_shop_name . ': Ranges';
 
 		// --------------------------------------------------------------------------
 
@@ -479,9 +488,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/range/index',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/range/index',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -507,7 +516,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Range: "' . $this->data['range']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Range: "' . $this->data['range']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -525,9 +534,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/range/single',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/range/single',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -565,6 +574,8 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	{
 		if ( ! app_setting( 'page_sale_listing', 'shop' ) ) :
 
+			show_404();
+
 		endif;
 
 		// --------------------------------------------------------------------------
@@ -572,7 +583,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Sale: List';
+		$this->data['page']->title = $this->_shop_name . ': Sales';
 
 		// --------------------------------------------------------------------------
 
@@ -583,9 +594,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/sale/index',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( $this->_skin->path . 'front/sale/index',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 
@@ -611,7 +622,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Sale: "' . $this->data['sale']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Sale: "' . $this->data['sale']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -629,9 +640,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/sale/single',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',							$this->data );
+		$this->load->view( $this->_skin->path . 'front/sale/single',	$this->data );
+		$this->load->view( 'structure/footer',							$this->data );
 	}
 
 
@@ -676,7 +687,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Tag: List';
+		$this->data['page']->title = $this->_shop_name . ': Tags';
 
 		// --------------------------------------------------------------------------
 
@@ -687,9 +698,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/tag/index',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( $this->_skin->path . 'front/tag/index',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 
@@ -715,7 +726,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Page title
 		//	==========
 
-		$this->data['page']->title = 'Tag: "' . $this->data['tag']->label . '"';
+		$this->data['page']->title = $this->_shop_name . ': Tag: "' . $this->data['tag']->label . '"';
 
 		// --------------------------------------------------------------------------
 
@@ -733,9 +744,9 @@ class NAILS_Shop extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',									$this->data );
-		$this->load->view( 'shop/' . $this->_skin->dir . '/front/tag/single',	$this->data );
-		$this->load->view( 'structure/footer',									$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( $this->_skin->path . 'front/tag/single',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 

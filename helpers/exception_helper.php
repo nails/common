@@ -69,7 +69,7 @@ if ( ! function_exists( 'unauthorised' ) )
  */
 if ( ! function_exists( 'show_fatal_error' ) )
 {
-	function show_fatal_error( $subject = NULL, $message = NULL )
+	function show_fatal_error( $subject = '', $message = '' )
 	{
 		if ( isset( get_instance()->fatal_error_handler ) && is_callable( array( get_instance()->fatal_error_handler, 'send_developer_mail' ) ) ) :
 
@@ -79,7 +79,7 @@ if ( ! function_exists( 'show_fatal_error' ) )
 
 			endif;
 
-			get_instance()->fatal_error_handler->show();
+			get_instance()->fatal_error_handler->show( $subject, $message );
 
 		elseif( function_exists( '_NAILS_ERROR' ) ) :
 

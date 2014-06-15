@@ -19,7 +19,7 @@ class Fatal_error_handler
 	 */
 	public function handleShutdown()
 	{
-		//	On non production systems don't bother reporting
+		//	On non-production systems don't bother reporting
 		if ( ENVIRONMENT != 'production' ) :
 
 			return FALSE;
@@ -123,7 +123,7 @@ class Fatal_error_handler
 	// --------------------------------------------------------------------------
 
 
-	public function show()
+	public function show( $subject = '', $message = '' )
 	{
 		if ( is_file( FCPATH . APPPATH . 'errors/error_fatal.php' ) ) :
 

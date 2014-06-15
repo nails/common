@@ -708,7 +708,7 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 	public function format_url( $slug )
 	{
-		return  app_setting( 'url', 'shop' ) . 'category/' . $slug;
+		return site_url( app_setting( 'url', 'shop' ) . 'category/' . $slug );
 	}
 
 

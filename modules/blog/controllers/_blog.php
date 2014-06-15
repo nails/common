@@ -35,6 +35,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		$this->load->model( 'blog_model',			'blog' );
 		$this->load->model( 'blog_post_model',		'post' );
 		$this->load->model( 'blog_widget_model',	'widget' );
+		$this->load->model( 'blog_skin_model',		'skin' );
 
 		// --------------------------------------------------------------------------
 
@@ -53,12 +54,26 @@ class NAILS_Blog_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the styles
-		if ( file_exists( FCPATH . 'assets/css/blog.css' ) ) :
+		//	Load up the blog's skin
+		$_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'getting-started';
 
-			$this->asset->load( 'blog.css' );
+		$this->_skin = $this->skin->get( $_skin );
+
+		if ( ! $this->_skin ) :
+
+			show_fatal_error( 'Failed to load blog skin "' . $_skin . '"', 'Blog skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->skin->last_error() );
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Pass to $this->data, for the views
+		$this->data['skin'] = $this->_skin;
+
+		// --------------------------------------------------------------------------
+
+		//	Blog name
+		$this->_blog_name = app_setting( 'name', 'blog' ) ? app_setting( 'name', 'blog' ) : 'Blog';
 	}
 }
 

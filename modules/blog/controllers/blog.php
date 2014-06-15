@@ -30,8 +30,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 	{
 		//	Meta & Breadcrumbs
 		$this->data['page']->title 				= APP_NAME . ' Blog';
-		$this->data['page']->description 		= '';
-		$this->data['page']->keywords 			= '';
+		$this->data['page']->seo->description 		= '';
+		$this->data['page']->seo->keywords 			= '';
 
 		// --------------------------------------------------------------------------
 
@@ -71,9 +71,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/browse',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( $this->_skin->path . '/browse',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
@@ -131,9 +131,10 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Meta
-		$this->data['page']->title 				= $this->data['post']->title;
-		$this->data['page']->description 		= $this->data['post']->seo_description;
-		$this->data['page']->keywords 			= $this->data['post']->seo_keywords;
+		$this->data['page']->title				= $this->_blog_name . ': ';
+		$this->data['page']->title				.= $this->data['post']->seo_title ? $this->data['post']->seo_title : $this->data['post']->title;
+		$this->data['page']->seo->description	= $this->data['post']->seo_description;
+		$this->data['page']->seo->keywords		= $this->data['post']->seo_keywords;
 
 		// --------------------------------------------------------------------------
 
@@ -170,9 +171,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/single',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( $this->_skin->path . 'single',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 
 		// --------------------------------------------------------------------------
 
@@ -223,9 +224,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Meta
-		$this->data['page']->title 				= 'Posts in category "' . $this->data['category']->label . '"';
-		$this->data['page']->description 		= 'All posts on ' . APP_NAME . ' posted in the  ' . $this->data['category']->label . ' category ';
-		$this->data['page']->keywords 			= '';
+		$this->data['page']->title 				= $this->_blog_name . ': Posts in category "' . $this->data['category']->label . '"';
+		$this->data['page']->seo->description 	= 'All posts on ' . APP_NAME . ' posted in the  ' . $this->data['category']->label . ' category ';
+		$this->data['page']->seo->keywords 		= '';
 
 		// --------------------------------------------------------------------------
 
@@ -260,13 +261,13 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Finally, let the views know this is an 'archive' type page
-		$this->data['archive_title'] = $this->data['page']->title;
+		$this->data['archive_title'] = 'Posts in category "' . $this->data['category']->label . '"';
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/browse',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( $this->_skin->path . 'browse',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
@@ -308,9 +309,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Meta
-		$this->data['page']->title 				= 'Posts tagged with "' . $this->data['tag']->label . '"';
-		$this->data['page']->description 		= 'All posts on ' . APP_NAME . ' tagged with  ' . $this->data['tag']->label . ' ';
-		$this->data['page']->keywords 			= '';
+		$this->data['page']->title 				= $this->_blog_name . ': Posts tagged with "' . $this->data['tag']->label . '"';
+		$this->data['page']->seo->description	= 'All posts on ' . APP_NAME . ' tagged with  ' . $this->data['tag']->label . ' ';
+		$this->data['page']->seo->keywords 		= '';
 
 		// --------------------------------------------------------------------------
 
@@ -345,13 +346,13 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Finally, let the views know this is an 'archive' type page
-		$this->data['archive_title'] = $this->data['page']->title;
+		$this->data['archive_title'] = 'Posts in tag "' . $this->data['tag']->label . '"';
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'blog/browse',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( $this->_skin->path . 'browse',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
@@ -385,7 +386,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Set Output
 		$this->output->set_content_type( 'text/xml; charset=UTF-8' );
-		$this->load->view( 'blog/feeds/rss', $this->data );
+		$this->load->view( $this->_skin->path . 'rss', $this->data );
 	}
 
 

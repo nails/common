@@ -183,7 +183,7 @@ class NAILS_Blog_category_model extends NAILS_Model
 
 	public function format_url( $slug )
 	{
-		return app_setting( 'url', 'blog' ) . 'category/' . $slug;
+		return sitE_url( app_setting( 'url', 'blog' ) . 'category/' . $slug );
 	}
 
 

@@ -63,7 +63,7 @@ class NAILS_Shop_Controller extends NAILS_Controller
 
 		if ( ! $this->_skin ) :
 
-			show_fatal_error( 'Failed to shop skin "' . $_skin . '"', 'Shop skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->skin->last_error() );
+			show_fatal_error( 'Failed to load shop skin "' . $_skin . '"', 'Shop skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->skin->last_error() );
 
 		endif;
 
@@ -71,6 +71,11 @@ class NAILS_Shop_Controller extends NAILS_Controller
 
 		//	Pass to $this->data, for the views
 		$this->data['skin'] = $this->_skin;
+
+		// --------------------------------------------------------------------------
+
+		//	Shop's name
+		$this->_shop_name = app_setting( 'name', 'shop' ) ? app_setting( 'name', 'shop' ) : 'Shop';
 	}
 }
 

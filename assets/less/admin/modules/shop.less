@@ -1157,6 +1157,11 @@
 				{
 					font-weight:bold;
 					text-align:center;
+
+					span
+					{
+						display:none;
+					}
 				}
 
 				input
@@ -1168,6 +1173,19 @@
 				&.selected
 				{
 					.opacity(1)
+				}
+
+				&.selected
+				{
+					.name
+					{
+						span
+						{
+							color:@green;
+							margin-left: 0.5em;
+							display:inline-block;
+						}
+					}
 				}
 			}
 		}

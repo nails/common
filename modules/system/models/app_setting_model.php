@@ -65,7 +65,7 @@ class NAILS_App_setting_model extends NAILS_Model
 
 		else :
 
-			return isset( $this->_settings[$grouping][$key] ) ? $this->_settings[$grouping][$key] : array();
+			return isset( $this->_settings[$grouping][$key] ) ? $this->_settings[$grouping][$key] : NULL;
 
 		endif;
 	}
@@ -127,6 +127,7 @@ class NAILS_App_setting_model extends NAILS_Model
 	protected function _set( $key, $grouping, $value )
 	{
 		$this->db->where( 'key', $key );
+		$this->db->where( 'grouping', $grouping );
 		if ( $this->db->count_all_results( $this->_table ) ) :
 
 			$this->db->where( 'grouping', $grouping );

@@ -10,14 +10,22 @@
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-general">General</a>
 			</li>
+
+			<?php $_active = $this->input->post( 'update' ) == 'skin' ? 'active' : ''?>
+			<li class="tab <?=$_active?>">
+				<a href="#" data-tab="tab-skin">Skin</a>
+			</li>
+
 			<?php $_active = $this->input->post( 'update' ) == 'commenting' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-commenting">Commenting</a>
 			</li>
+
 			<?php $_active = $this->input->post( 'update' ) == 'social' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-social">Social Tools</a>
 			</li>
+
 			<?php $_active = $this->input->post( 'update' ) == 'blog_sidebar' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
 				<a href="#" data-tab="tab-blog-sidebar">Sidebar</a>
@@ -34,6 +42,25 @@
 					Generic blog settings. Use these to control some blog behaviours.
 				</p>
 				<hr />
+				<fieldset id="blog-settings-name">
+					<legend>Name</legend>
+					<p>
+						Is this a blog? Or is it news? Or something else altogether...
+					</p>
+					<?php
+
+						//	Blog Name
+						$_field					= array();
+						$_field['key']			= 'name';
+						$_field['label']		= 'Blog Name';
+						$_field['default']		= app_setting( 'name', 'blog' ) ? app_setting( 'name', 'blog' ) : 'Blog';
+						$_field['placeholder']	= 'Customise the Blog\'s Name';
+
+						echo form_field( $_field );
+
+					?>
+				</fieldset>
+
 				<fieldset id="blog-settings-url">
 					<legend>URL</legend>
 					<p>
@@ -43,9 +70,9 @@
 
 						//	Blog URL
 						$_field					= array();
-						$_field['key']			= 'blog';
+						$_field['key']			= 'url';
 						$_field['label']		= 'Blog URL';
-						$_field['default']		= app_setting( 'url', 'blog' );
+						$_field['default']		= app_setting( 'url', 'blog' ) ? app_setting( 'url', 'blog' ) : 'blog/';
 						$_field['placeholder']	= 'Customise the Blog\'s URL (include trialing slash)';
 
 						echo form_field( $_field );
@@ -113,6 +140,78 @@
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
+			</div>
+
+			<?php $_display = $this->input->post( 'update' ) == 'skin' ? 'active' : ''?>
+			<div id="tab-skin" class="tab page <?=$_display?> skin">
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
+				<?=form_hidden( 'update', 'skin' )?>
+				<p>
+					The following Blog skins are available to use.
+				</p>
+				<hr />
+				<?php
+
+					if ( $skins ) :
+
+						$_selected_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'getting-started';
+
+						echo '<ul class="skins">';
+						foreach( $skins AS $skin ) :
+
+							$_name			= ! empty( $skin->name ) ? $skin->name : 'Untitled';
+							$_description	= ! empty( $skin->description ) ? $skin->description : '';
+
+							if ( file_exists( $skin->path . 'icon.png' ) ) :
+
+								$_icon = $skin->url . 'icon.png';
+
+							elseif ( file_exists( $skin->path . 'icon.jpg' ) ) :
+
+								$_icon = $skin->url . 'icon.jpg';
+
+							elseif ( file_exists( $skin->path . 'icon.gif' ) ) :
+
+								$_icon = $skin->url . 'icon.gif';
+
+							else :
+
+								$_icon = NAILS_ASSETS_URL . 'img/admin/modules/settings/blog-skin-no-icon.png';
+
+							endif;
+
+							$_selected	= $skin->slug == $_selected_skin ? TRUE : FALSE;
+							$_class		= $_selected ? 'selected' : '';
+
+							echo '<li class="skin ' . $_class . '" rel="tipsy" title="' . $_description . '">';
+								echo '<div class="icon">' . img( $_icon ) . '</div>';
+								echo '<div class="name">';
+									echo $_name;
+									echo '<span class="ion-checkmark-circled"></span>';
+								echo '</div>';
+								echo form_radio( 'skin', $skin->slug, $_selected );
+							echo '</li>';
+
+						endforeach;
+						echo '</ul>';
+
+						echo '<hr class="clearfix" />';
+
+					else :
+
+						echo '<p class="system-alert error no-close">';
+							echo '<strong>Error:</strong> ';
+							echo 'I\'m sorry, but I couldn\'t find any skins to use. This is a configuration error and should be raised with the developer.';
+						echo '</p>';
+
+					endif;
+
+				?>
+				<p>
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
+
 			</div>
 
 			<?php $_display = $this->input->post( 'update' ) == 'commenting' ? 'active' : ''?>

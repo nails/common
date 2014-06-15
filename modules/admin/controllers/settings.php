@@ -261,6 +261,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
+		//	Load models
+		$this->load->model( 'blog/blog_skin_model', 'skin' );
+
+		// --------------------------------------------------------------------------
+
 		//	Process POST
 		if ( $this->input->post() ) :
 
@@ -269,6 +274,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				case 'settings' :
 
 					$this->_blog_update_settings();
+
+				break;
+
+				// --------------------------------------------------------------------------
+
+				case 'skin' :
+
+					$this->_blog_update_skin();
 
 				break;
 
@@ -312,6 +325,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Get data
 		$this->data['settings'] = app_setting( NULL, 'blog', TRUE );
+		$this->data['skins']	= $this->skin->get_available();
 
 		// --------------------------------------------------------------------------
 
@@ -333,7 +347,8 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings							= array();
-		$_settings['blog']				= $this->input->post( 'blog' );
+		$_settings['name']					= $this->input->post( 'name' );
+		$_settings['url']					= $this->input->post( 'url' );
 		$_settings['use_excerpts']			= (bool) $this->input->post( 'use_excerpts' );
 		$_settings['categories_enabled']	= (bool) $this->input->post( 'categories_enabled' );
 		$_settings['tags_enabled']			= (bool) $this->input->post( 'tags_enabled' );
@@ -342,7 +357,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Sanitize blog url
-		$_settings['blog'] .= substr( $_settings['blog'], -1 ) != '/' ? '/' : '';
+		$_settings['url'] .= substr( $_settings['url'], -1 ) != '/' ? '/' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -357,6 +372,29 @@ class NAILS_Settings extends NAILS_Admin_Controller
 				$this->data['warning'] = '<strong>Warning:</strong> while the blog settings were updated, the routes file could not be updated. The blog may not behave as expected,';
 
 			endif;
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _blog_update_skin()
+	{
+		//	Prepare update
+		$_settings			= array();
+		$_settings['skin']	= $this->input->post( 'skin' );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Skin settings have been saved.';
 
 		else :
 
@@ -589,6 +627,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings									= array();
+		$_settings['name']							= $this->input->post( 'name' );
 		$_settings['url']							= $this->input->post( 'url' );
 		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );
 		$_settings['warehouse_collection_enabled']	= (bool) $this->input->post( 'warehouse_collection_enabled' );
@@ -661,6 +700,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		endif;
 	}
+
 
 	// --------------------------------------------------------------------------
 

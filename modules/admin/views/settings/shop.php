@@ -47,6 +47,24 @@
 					Generic store settings. Use these to control some store behaviours.
 				</p>
 				<hr />
+				<fieldset id="shop-settings-name">
+					<legend>Name</legend>
+					<p>
+						Is this a shop? Or is it store? Maybe a boutique...?
+					</p>
+					<?php
+
+						//	Blog Name
+						$_field					= array();
+						$_field['key']			= 'name';
+						$_field['label']		= 'Shop Name';
+						$_field['default']		= app_setting( 'name', 'shop' ) ? app_setting( 'name', 'shop' ) : 'Shop';
+						$_field['placeholder']	= 'Customise the Shop\'s Name';
+
+						echo form_field( $_field );
+
+					?>
+				</fieldset>
 				<fieldset id="shop-settings-free-shipping">
 					<legend>Free Shipping</legend>
 					<p>
@@ -344,13 +362,16 @@
 
 							endif;
 
-							$_selected	= $skin->dir == $_selected_skin ? TRUE : FALSE;
+							$_selected	= $skin->slug == $_selected_skin ? TRUE : FALSE;
 							$_class		= $_selected ? 'selected' : '';
 
 							echo '<li class="skin ' . $_class . '" rel="tipsy" title="' . $_description . '">';
 								echo '<div class="icon">' . img( $_icon ) . '</div>';
-								echo '<div class="name">' . $_name . '</div>';
-								echo form_radio( 'skin', $skin->dir, $_selected );
+								echo '<div class="name">';
+									echo $_name;
+									echo '<span class="ion-checkmark-circled"></span>';
+								echo '</div>';
+								echo form_radio( 'skin', $skin->slug, $_selected );
 							echo '</li>';
 
 						endforeach;

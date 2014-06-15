@@ -1203,6 +1203,15 @@ class NAILS_Shop_product_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
+	public function format_url( $slug )
+	{
+		return site_url( app_setting( 'url', 'shop' ) . 'product/' . $slug );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Formats a product object
 	 * @param  stdClass $product The product object to format
@@ -1238,7 +1247,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		unset( $product->tax_rate_rate );
 
 		//	URL
-		$product->url = site_url( app_setting( 'url', 'shop' ) . 'product/' . $product->slug );
+		$product->url = $this->format_url( $product->slug );
 	}
 
 

@@ -5,6 +5,7 @@ NAILS_Admin_Blog_Settings = function()
 	{
 		this._init_comments();
 		this._init_social();
+		this._init_skins();
 
 		// --------------------------------------------------------------------------
 
@@ -191,5 +192,19 @@ NAILS_Admin_Blog_Settings = function()
 		// --------------------------------------------------------------------------
 
 		_nails.add_stripes();
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_skins = function()
+	{
+		$( 'ul.skins li.skin' ).on( 'click', function()
+		{
+			$( 'ul.skins li.skin' ).removeClass( 'selected' );
+			$(this).addClass( 'selected' );
+			$(this).find( 'input[type=radio]' ).prop( 'checked', true );
+		});
 	};
 };
