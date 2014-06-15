@@ -30,7 +30,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_available			= NULL;
-		$this->_skin_extension		= '-shopskin';
+		$this->_skin_extension		= '-shop-skin';
 
 		//	Skin locations
 		//	This must be an array with 2 indexes:

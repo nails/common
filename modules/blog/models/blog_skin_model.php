@@ -30,7 +30,7 @@ class NAILS_Blog_skin_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		$this->_available			= NULL;
-		$this->_skin_extension		= '-blogskin';
+		$this->_skin_extension		= '-blog-skin';
 
 		//	Skin locations
 		//	This must be an array with 2 indexes:
