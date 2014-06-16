@@ -142,6 +142,9 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 							$this->data['reset_user'] = $this->user_model->get_by_email( $_identifier );
 
+							//	User provided an email, send to that email
+							$_send_to_email = $_identifier;
+
 						break;
 
 						// --------------------------------------------------------------------------
@@ -149,6 +152,11 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 						case 'USERNAME' :
 
 							$this->data['reset_user'] = $this->user_model->get_by_username( $_identifier );
+
+							//	Can't email a username, send to their ID and let the email
+							//	library handle the routing
+
+							$_send_to_id = $this->data['reset_user']->id;
 
 						break;
 
@@ -163,9 +171,17 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 								$this->data['reset_user'] = $this->user_model->get_by_email( $_identifier );
 
+								//	User provided an email, send to that email
+								$_send_to_email = $_identifier;
+
 							else :
 
 								$this->data['reset_user'] = $this->user_model->get_by_username( $_identifier );
+
+								//	Can't email a username, send to their ID and let the email
+								//	library handle the routing
+
+								$_send_to_id = $this->data['reset_user']->id;
 
 							endif;
 
@@ -173,34 +189,65 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 					endswitch;
 
-					$_data			= new stdClass();
-					$_data->to_id	= $this->data['reset_user']->id;
-					$_data->type	= 'forgotten_password';
-
 					// --------------------------------------------------------------------------
 
-					//	Add data for the email view
-					$_code = explode( ':', $this->data['reset_user']->forgotten_password_code );
+					if ( ! $_always_succeed && isset( $_send_to_email ) && ! $_send_to_email ) :
 
-					$_data->data							= array();
-					$_data->data['first_name']				= title_case( $this->data['reset_user']->first_name );
-					$_data->data['forgotten_password_code']	= $_code[1];
-					$_data->data['identifier']				= $_identifier;
+						//	If we're expecting an email, and none is available then we're kinda stuck
+						$this->data['error'] = lang( 'auth_forgot_email_fail_no_email' );
 
-					// --------------------------------------------------------------------------
+					elseif ( ! $_always_succeed && isset( $_send_to_id ) && ! $_send_to_id ) :
 
-					//	Send user the password reset email
-					if ( $this->emailer->send( $_data ) ) :
-
-						$this->data['success'] = lang( 'auth_forgot_success' );
+						//	If we're expecting an ID and it's empty then we're stuck again
+						$this->data['error'] = lang( 'auth_forgot_email_fail_no_id' );
 
 					elseif ( $_always_succeed ) :
 
+						//	Failed, but we always succeed so, yeah, succeed
 						$this->data['success'] = lang( 'auth_forgot_success' );
 
 					else :
 
-						$this->data['error'] = lang( 'auth_forgot_email_fail' );
+						//	We've got something, go go go
+						$_data			= new stdClass();
+						$_data->type	= 'forgotten_password';
+
+						if ( isset( $_send_to_email ) && $_send_to_email ) :
+
+							$_data->to_email = $_send_to_email;
+
+						elseif ( isset( $_send_to_id ) && $_send_to_id ) :
+
+							$_data->to_id = $_send_to_id;
+
+						endif;
+
+						// --------------------------------------------------------------------------
+
+						//	Add data for the email view
+						$_code = explode( ':', $this->data['reset_user']->forgotten_password_code );
+
+						$_data->data							= array();
+						$_data->data['first_name']				= title_case( $this->data['reset_user']->first_name );
+						$_data->data['forgotten_password_code']	= $_code[1];
+						$_data->data['identifier']				= $_identifier;
+
+						// --------------------------------------------------------------------------
+
+						//	Send user the password reset email
+						if ( $this->emailer->send( $_data ) ) :
+
+							$this->data['success'] = lang( 'auth_forgot_success' );
+
+						elseif ( $_always_succeed ) :
+
+							$this->data['success'] = lang( 'auth_forgot_success' );
+
+						else :
+
+							$this->data['error'] = lang( 'auth_forgot_email_fail' );
+
+						endif;
 
 					endif;
 

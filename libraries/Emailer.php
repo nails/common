@@ -200,7 +200,6 @@ class Emailer
 
 			if ( $_user ) :
 
-				$input->to_email	= $_user->email;
 				$input->to_id		= $_user->id;
 
 			endif;
@@ -422,24 +421,24 @@ class Emailer
 
 		if ( ! is_array( $_send->data ) ) :
 
-			$_send->data			= array();
+			$_send->data = array();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	From user
-		$_send->from				= new stdClass();
+		$_send->from = new stdClass();
 
 		if ( ! empty( $_send->data['email_from_email'] ) ) :
 
-			$_send->from->email			= $_send->data['email_from_email'];
-			$_send->from->name			= ! empty( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
+			$_send->from->email	= $_send->data['email_from_email'];
+			$_send->from->name	= ! empty( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
 
 		else :
 
-			$_send->from->email			= $this->from->email;
-			$_send->from->name			= $this->from->name;
+			$_send->from->email	= $this->from->email;
+			$_send->from->name	= $this->from->name;
 
 		endif;
 

@@ -170,7 +170,9 @@
 	$lang['auth_forgot_action_reset']					= 'Reset Password';
 	$lang['auth_forgot_action_reset_continue']			= 'Change Password & Log In';
 	$lang['auth_forgot_success']						= '<strong>Reset token sent!</strong> Please check your email remembering to look in junk and spam folders.';
-	$lang['auth_forgot_email_fail']						= '<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
+	$lang['auth_forgot_email_fail']						= '1<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
+	$lang['auth_forgot_email_fail_no_email']			= '2<strong>Sorry,</strong> there was a problem sending the email with your reset link. Your account has no email address associated with it, please contact us for assistance.';
+	$lang['auth_forgot_email_fail_no_id']				= '3<strong>Sorry,</strong> there was a problem sending the email with your reset link. Please try again.';
 	$lang['auth_forgot_code_not_set_email']				= '<strong>Sorry,</strong> we were unable to generate a token for the email address <strong>%s</strong>.';
 	$lang['auth_forgot_code_not_set_username']			= '<strong>Sorry,</strong> we were unable to generate a token for the username <strong>%s</strong>.';
 	$lang['auth_forgot_code_not_set']					= '<strong>Sorry,</strong> we were unable to generate a token for that account.';
