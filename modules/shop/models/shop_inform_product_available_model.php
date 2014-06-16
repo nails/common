@@ -3,7 +3,7 @@
 /**
  * Name:			shop_inform_product_available_model.php
  *
- * Description:		This model handles interfacing with shop sales
+ * Description:		This model handles informing customers when products are back in stock
  *
  **/
 
@@ -47,7 +47,7 @@ class NAILS_Shop_inform_product_available_model extends NAILS_Model
 
 			$_product = $this->shop_product_model->get_by_id( $product_id );
 
-			if ( $_product ) :
+			if ( $_product && $_product->is_active && ! $_product->is_deleted ) :
 
 				foreach ( $variation_ids AS $variation_id ) :
 
