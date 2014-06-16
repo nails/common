@@ -199,7 +199,7 @@
 
 					else :
 
-						echo '<p class="system-alert error no-close">';
+						echo '<p class="system-alert error">';
 							echo '<strong>Error:</strong> ';
 							echo 'I\'m sorry, but I couldn\'t find any skins to use. This is a configuration error and should be raised with the developer.';
 						echo '</p>';
@@ -261,7 +261,7 @@
 					<hr />
 
 					<div id="native-settings" style="display:<?=! app_setting( $_field['key'], 'blog' ) || app_setting( $_field['key'], 'blog' ) == 'NATIVE' ? 'block' : 'none'?>">
-						<p class="system-alert message no-close">
+						<p class="system-alert message">
 							<strong>Coming Soon!</strong> Native commenting is in the works and will be available soon.
 							<?php
 

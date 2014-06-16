@@ -727,7 +727,7 @@ $_out = <<<EOT
 				$_field_sub_label
 			</span>
 			<span class="input">
-				<p class="system-alert error no-close" id="$_id-uploadify-not-available">
+				<p class="system-alert error" id="$_id-uploadify-not-available">
 					<strong>Configuration Error.</strong> Uploadify is not available.
 				</p>
 				<span id="$_id-uploadify-available" style="display:none;">

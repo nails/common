@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage the which attributes are available for your products.
 	</p>
 	<ul class="tabs">

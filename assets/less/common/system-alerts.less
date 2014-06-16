@@ -5,6 +5,7 @@
 .system-alert
 {
 	margin:10px 0;
+	padding:10px;
 	border-radius:4px;
 	margin-top:0px;
 	margin-bottom:1.5em;
@@ -50,47 +51,6 @@
 		}
 	}
 }
-.system-alert.no-close
-{
-	padding:10px;
-}
-.system-alert.close-enabled
-{
-	p
-	{
-		margin-right:15px;
-	}
-	p.close
-	{
-		position:absolute;
-		right:5px;
-		top:5px;
-		margin-right:0;
-
-		a
-		{
-			display:block;
-			width:16px;
-			height:16px;
-			overflow: hidden;
-			text-indent:-999em;
-			background-image:url(../img/system-alerts/close.png);
-			background-repeat:no-repeat;
-			background-position-x: 0px;
-			background-position-y: 0px;
-			border:none;
-		}
-		a:hover
-		{
-			background-position-x: -16px;
-		}
-		a:active
-		{
-			background-position-x: -32px;
-			background-position-y: 0px !important;
-		}
-	}
-}
 
 
 /* --------------------------------------------------------------
@@ -102,65 +62,33 @@
 	border:1px solid @neutral_border;
 	background:@neutral;
 	color:@neutral_colour;
-}
 
-.system-alert.error
-{
-	border:1px solid @error_border;
-	background:@error;
-	color:@error_colour;
-
-	p.close
+	&.error
 	{
-		a
-		{
-			background-position-y: -16px;
-		}
+		border:1px solid @error_border;
+		background:@error;
+		color:@error_colour;
 	}
-}
 
-.system-alert.success
-{
-	border:1px solid @success_border;
-	background:@success;
-	color:@success_colour;
-
-	p.close
+	&.success
 	{
-		a
-		{
-			background-position-y: -32px;
-		}
+		border:1px solid @success_border;
+		background:@success;
+		color:@success_colour;
 	}
-}
 
-.system-alert.message
-{
-	border:1px solid @message_border;
-	background:@message;
-	color:@message_colour;
-
-	p.close
+	&.message
 	{
-		a
-		{
-			background-position-y: -48px;
-		}
+		border:1px solid @message_border;
+		background:@message;
+		color:@message_colour;
 	}
-}
 
-.system-alert.notice
-{
-	border:1px solid @notice_border;
-	background:@notice;
-	color:@notice_colour;
-
-	p.close
+	&.notice
 	{
-		a
-		{
-			background-position-y: -64px;
-		}
+		border:1px solid @notice_border;
+		background:@notice;
+		color:@notice_colour;
 	}
 }
 
@@ -181,10 +109,5 @@
 	.title
 	{
 		font-weight:bold;
-	}
-
-	.message
-	{
-
 	}
 }

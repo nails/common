@@ -46,7 +46,7 @@
 
 							if ( isset( $bad_bucket ) ) :
 
-								echo '<p class="system-alert error no-close">';
+								echo '<p class="system-alert error">';
 								echo $bad_bucket;
 								echo '</p>';
 

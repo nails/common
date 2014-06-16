@@ -464,7 +464,7 @@
 				Define the following information for shipping. The system will use this information to
 				calculate a shipping quote for the user, where appropriate.
 			</p>
-			<p class="system-alert message no-close">
+			<p class="system-alert message">
 				<strong>Please note:</strong> specify dimensions of the item as it'll be shipped, not assembled.
 			</p>
 			<?php

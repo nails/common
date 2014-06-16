@@ -1,5 +1,5 @@
 <div class="group-shop manage index">
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Choose which Manager you'd like to utilise.
 	</p>
 	<ul>

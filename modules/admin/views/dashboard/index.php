@@ -16,7 +16,7 @@
 
 	<hr />
 
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		<strong>TODO:</strong> Widgetise the dashboard area so that individual users can pick and
 		choose which widgets appear here. Widgets should be customiseable at the app level and also
 		be orderable per user and persists across sessions.
@@ -117,7 +117,7 @@
 	else :
 
 		//	No modules
-		echo '<p class="system-alert message no-close">';
+		echo '<p class="system-alert message">';
 			echo '<strong>' . lang( 'dashboard_nomodules_title' ) . '</strong>';
 			echo '<br />';
 			echo lang( 'dashboard_nomodules_message', APP_DEVELOPER_EMAIL );

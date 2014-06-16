@@ -116,7 +116,7 @@
 
 			?>
 			<div class="tab page" id="tab-body">
-				<?=form_error( 'body', '<p class="system-alert error no-close">', '</p>' )?>
+				<?=form_error( 'body', '<p class="system-alert error">', '</p>' )?>
 				<?=form_textarea( $_key, set_value( $_key, $_default), 'class="wysiwyg" id="post_body"' )?>
 			</div>
 
@@ -289,7 +289,7 @@
 				<p>
 					<input type="file" id="file_upload" />
 				</p>
-				<p class="system-alert notice no-close" id="upload-message" style="display:none">
+				<p class="system-alert notice" id="upload-message" style="display:none">
 					<strong>Please be patient while files upload.</strong>
 					<br />Tabs have been disabled until uploads are complete.
 				</p>

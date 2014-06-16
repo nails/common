@@ -2,7 +2,7 @@
 	<?=form_open()?>
 	<fieldset>
 		<legend>Menu Details</legend>
-		<p class="system-alert no-close">
+		<p class="system-alert">
 			The following details help you identify the purpose and location of this menu in admin. They are not used in the front-end.
 		</p>
 		<?php
@@ -29,7 +29,7 @@
 		?>
 	</fieldset>
 	<hr />
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		All menu items are sown below. Drag the menu item to nest beneath another item or to change the order. A label and a URL is required for each menu item.
 	</p>
 

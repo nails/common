@@ -121,7 +121,7 @@
 	<fieldset id="create-voucher-meta">
 		<legend>Extended Data</legend>
 		<div id="no-extended-data" style="display:block;">
-			<p class="system-alert message no-close">
+			<p class="system-alert message">
 				<strong>Note:</strong> More options may become available depending on your choices above.
 			</p>
 		</div>

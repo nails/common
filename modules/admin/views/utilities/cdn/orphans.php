@@ -8,7 +8,7 @@
 		You can choose to specify wether to look for database items which are missing files, or the opposite,
 		files which aren't in the database.
 	</p>
-	<p class="system-alert message no-close">
+	<p class="system-alert message">
 		<strong>Please note:</strong> This process can take some time to execute on large CDNs and may time out. If
 		you are experiencing timeouts consider increasing the timeout limit for PHP temporarily or executing
 		<u rel="tipsy" title="Use command: `php index.php admin utilities cms orphans`">via the command line</u>.

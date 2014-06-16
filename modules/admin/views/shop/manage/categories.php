@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage the shop's categories. Categories are like departments and should be used to organise
 		similar products. Additionally, categories can be nested to more granularly organise items.
 	</p>

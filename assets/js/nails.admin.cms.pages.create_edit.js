@@ -1464,7 +1464,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 				{
 					var _data = JSON.parse( data.responseText );
 
-					$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error no-close"><strong>Error:</strong> ' + _data.error + '</p>' );
+					$( _item ).addClass( 'error' ).find( '.editor' ).html( '<p class="system-alert error"><strong>Error:</strong> ' + _data.error + '</p>' );
 
 				},
 			};

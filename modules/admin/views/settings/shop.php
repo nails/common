@@ -263,7 +263,7 @@
 
 					else :
 
-						echo '<p class="system-alert error no-close">';
+						echo '<p class="system-alert error">';
 							echo '<strong>Error:</strong> ';
 							echo 'I\'m sorry, but I couldn\'t find any skins to use. This is a configuration error and should be raised with the developer.';
 						echo '</p>';
@@ -308,7 +308,7 @@
 
 					else :
 
-						echo '<p class="system-alert error no-close">';
+						echo '<p class="system-alert error">';
 							echo '<strong>No payment gateway modules are available.</strong>';
 							echo '<br />I could not find any payment gateway modules. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
 						echo '</p>';
@@ -374,7 +374,7 @@
 				<p>
 					Which countries would you like to ship to? If no countries are selected, it's assumed you're happy to ship worldwide.
 				</p>
-				<p class="system-alert message no-close">
+				<p class="system-alert message">
 					<strong>TODO:</strong> Render a list of countries.
 				</p>
 				<hr />
@@ -435,7 +435,7 @@
 
 					else :
 
-						echo '<p class="system-alert error no-close">';
+						echo '<p class="system-alert error">';
 							echo '<strong>No shipping modules are available.</strong>';
 							echo '<br />I could not find any shipping modules. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
 						echo '</p>';

@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage which collections are available for your products. Products grouped together into a collection are deemed related and can have their own customised landing page.
 	</p>
 	<ul class="tabs">

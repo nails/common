@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage brands recognised by the system. Assigning brands to products allows shoppers
 		to more easily find items they might be interested in.
 	</p>

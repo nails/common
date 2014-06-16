@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage the which tags are available for your products. Tags help the shop determine related products.
 	</p>
 	<ul class="tabs">

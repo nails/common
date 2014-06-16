@@ -46,28 +46,8 @@ NAILS_JS = function()
 	 * Add a close button to any system-alerts which are on the page
 	 *
 	 **/
-	this._init_system_alerts = function(){
-
-		//	Add close buttons to messages
-		var _close = $( '<p>' ).addClass( 'close' ).attr( 'rel', 'tipsy' ).attr( 'title', 'Dismiss' );
-		_close.html( $( '<a>' ).attr( 'href', '#' ) );
-
-		$( '.system-alert:not(.no-close)' ).addClass( 'close-enabled' ).find( '.padder' ).prepend( _close );
-
-		// --------------------------------------------------------------------------
-
-		//	Add handler to close button
-		$( '.system-alert p.close a' ).on( 'click', function(){
-
-			$(this).closest( '.padder' ).fadeOut();
-			$(this).closest( '.system-alert' ).slideUp();
-
-			return false;
-
-		});
-
-		// --------------------------------------------------------------------------
-
+	this._init_system_alerts = function()
+	{
 		//	Scroll to first error, if scrollTo is available
 		if ( $.fn.scrollTo )
 		{

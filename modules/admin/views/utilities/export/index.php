@@ -3,7 +3,7 @@
 	<p>
 		<?=lang( 'utilities_export_intro' )?>
 	</p>
-	<p class="system-alert message no-close">
+	<p class="system-alert message">
 		<?=lang( 'utilities_export_warn' )?>
 	</p>
 

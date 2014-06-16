@@ -77,7 +77,7 @@
 			if ( APP_MULTI_LANG && count( $languages ) > 1 ) :
 
 				echo '<legend>' . APP_DEFAULT_LANG_NAME . ' Value</legend>';
-				echo '<p class="system-alert message no-close">';
+				echo '<p class="system-alert message">';
 				echo '<strong>Note:</strong> All blocks must have an <?=APP_DEFAULT_LANG_NAME?> value, define the initial ' . APP_DEFAULT_LANG_NAME . ' value now.';
 				echo '</p>';
 

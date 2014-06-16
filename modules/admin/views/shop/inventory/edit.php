@@ -192,7 +192,7 @@
 			$_field['default']	= ! empty( $item->description ) ? $item->description : '';
 
 
-			echo form_error( $_field['key'], '<p class="system-alert error no-close">', '</p>' );
+			echo form_error( $_field['key'], '<p class="system-alert error">', '</p>' );
 			echo form_textarea( $_field['key'], set_value( $_field['key'], $_field['default'] ), 'class="wysiwyg"' );
 
 		?>
@@ -301,7 +301,7 @@
 			<p>
 				<input type="file" id="file_upload" />
 			</p>
-			<p class="system-alert notice no-close" id="upload-message" style="display:none">
+			<p class="system-alert notice" id="upload-message" style="display:none">
 				<strong>Please be patient while files upload.</strong>
 				<br />Tabs have been disabled until uploads are complete.
 			</p>

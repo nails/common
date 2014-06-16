@@ -30,7 +30,7 @@
 		please quote this reference in any correspondence regarding this order.
 	</p>
 
-	<p class="system-alert message no-close">
+	<p class="system-alert message">
 		<strong>Please note:</strong> The payment system has placed your payment under review. We'll finish processing the order when we receive notification of completed payment at which point you'll receive your receipt.
 	</p>
 	<p>

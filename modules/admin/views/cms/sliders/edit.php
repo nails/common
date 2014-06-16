@@ -1,4 +1,4 @@
-<p class="system-alert no-close">
+<p class="system-alert">
 	<strong>TODO:</strong> The slider edit page inc. list items.
 </p>
 

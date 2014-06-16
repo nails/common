@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage which ranges are available for your products. Products grouped together into a range are deemed related and can have their own customised landing page.
 	</p>
 	<ul class="tabs">

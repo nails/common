@@ -54,7 +54,7 @@
 
 		else :
 
-			echo '<p class="system-alert message no-close">';
+			echo '<p class="system-alert message">';
 			echo '<strong>No Categories!</strong> Create a category using the form above.';
 			echo '</p>';
 

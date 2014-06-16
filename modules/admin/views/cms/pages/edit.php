@@ -31,7 +31,7 @@
 
 			case 'saved' :
 
-				echo '<p class="system-alert success no-close">';
+				echo '<p class="system-alert success">';
 					echo '<strong>Success!</strong> Your page was saved successfully. ' . anchor( 'cms/render/preview/' . $cmspage->id, 'Preview it here', 'class="main-action" data-action="preview" target="_blank"' );
 				echo '</p>';
 
@@ -41,7 +41,7 @@
 
 			case 'published' :
 
-				echo '<p class="system-alert success no-close">';
+				echo '<p class="system-alert success">';
 					echo '<strong>Success!</strong> Your page was published successfully. ' . anchor( $cmspage->published->url, 'View it here', 'target="_blank"' );
 				echo '</p>';
 
@@ -51,7 +51,7 @@
 
 			case 'unpublished' :
 
-				echo '<p class="system-alert success no-close">';
+				echo '<p class="system-alert success">';
 					echo '<strong>Success!</strong> Your page was unpublished successfully.';
 				echo '</p>';
 
@@ -61,7 +61,7 @@
 
 	?>
 
-	<div class="system-alert notice no-close" id="save-status">
+	<div class="system-alert notice" id="save-status">
 		<p>
 			<small>
 				Last Saved: <span class="last-saved">Not Saved</span>
@@ -330,7 +330,7 @@
 
 		if ( isset( $cmspage ) && $cmspage->is_published && $cmspage->published->hash !== $cmspage->draft->hash ) :
 
-			echo '<p class="system-alert message no-close">';
+			echo '<p class="system-alert message">';
 				echo '<strong>You have unpublished changes.</strong><br />This version of the page is more recent than the version currently published on site. When you\'re done make sure you click "Publish Changes" below.';
 			echo '</p>';
 

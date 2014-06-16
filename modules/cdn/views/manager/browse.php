@@ -56,7 +56,7 @@
 
 				if ( $success ) :
 
-					echo '<p class="system-alert success no-close">';
+					echo '<p class="system-alert success">';
 					echo $success;
 					echo '<br /><a href="#" class="awesome small ok">OK</a>';
 					echo '</p>';
@@ -65,7 +65,7 @@
 
 				if ( $error ) :
 
-					echo '<p class="system-alert error no-close">';
+					echo '<p class="system-alert error">';
 					echo $error;
 					echo '<br /><a href="#" class="awesome small ok">OK</a>';
 					echo '<a href="#" class="awesome small cancel">Cancel</a>';
@@ -76,7 +76,7 @@
 
 				if ( $notice ) :
 
-					echo '<p class="system-alert notice no-close">';
+					echo '<p class="system-alert notice">';
 					echo $notice;
 					echo '<br /><a href="#" class="awesome small ok">OK</a>';
 					echo '</p>';
@@ -85,7 +85,7 @@
 
 				if ( $message ) :
 
-					echo '<p class="system-alert message no-close">';
+					echo '<p class="system-alert message">';
 					echo $message;
 					echo '<br /><a href="#" class="awesome small ok">OK</a>';
 					echo '</p>';

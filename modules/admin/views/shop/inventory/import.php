@@ -1,4 +1,4 @@
-<p class="system-alert message no-close">
+<p class="system-alert message">
 	<strong>TODO:</strong> Allow inventory items to be completed on a spreadsheet and imported.
 </p>
 <div class="group-shop inventory import">

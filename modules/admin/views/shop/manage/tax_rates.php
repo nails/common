@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Manage which tax rates the shop supports.
 	</p>
 	<ul class="tabs">

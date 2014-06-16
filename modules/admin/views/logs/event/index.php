@@ -46,7 +46,7 @@
 						echo '<td class="actions">';
 						echo '<a href="#data-' . $event->id . '" class="awesome small fancybox">View Data</a>';
 						echo '<div id="data-' . $event->id . '" style="display:none;">';
-						echo '<p class="system-alert message no-close"><strong>Note:</strong> This is raw, unformatted data associated with the event.<br />The system uses this information to specify specific items relating to this particular event.</p>';
+						echo '<p class="system-alert message"><strong>Note:</strong> This is raw, unformatted data associated with the event.<br />The system uses this information to specify specific items relating to this particular event.</p>';
 						echo '<div style="white-space:pre; margin-top:1em;padding:1em;border:1px dashed #CCC;background:#EFEFEF;">';
 						echo print_r( $event->data, TRUE );
 						echo '</div>';

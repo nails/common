@@ -22,7 +22,7 @@
 	<fieldset>
 	<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
 		<legend>Translations</legend>
-		<p class="system-alert message no-close">
+		<p class="system-alert message">
 			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_NAME?> version, however more translations can be
 			added if needed. Translations will only be used when viewing the site in a particular language (if supported).
 			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_NAME?>.
@@ -40,7 +40,7 @@
 	<?php endif; ?>
 
 			<?=form_hidden( 'translation[0][lang_id]', $default_id )?>
-			<div class="system-alert error no-close">
+			<div class="system-alert error">
 				<strong>Oops!</strong> Please ensure a value is set.
 			</div>
 			<?php
@@ -110,7 +110,7 @@
 						<a href="#" class="remove-translation">Remove Translation</a>
 					</legend>
 					<?=form_hidden( 'translation[' . $_counter . '][lang_id]', $translation->lang->id )?>
-					<div class="system-alert error no-close">
+					<div class="system-alert error">
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>
 					<?php
@@ -181,7 +181,7 @@
 		<?=form_dropdown( 'new_translation[{{new_count}}][lang_id]', $languages )?>
 		<a href="#" class="remove-translation">Remove Translation</a>
 	</legend>
-	<div class="system-alert error no-close">
+	<div class="system-alert error">
 		<strong>Oops!</strong> Please ensure a language and value is set.
 	</div>
 	<textarea name="new_translation[{{new_count}}][value]" id="translation_{{new_count}}"></textarea>

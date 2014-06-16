@@ -12,7 +12,7 @@
 		<?=anchor( 'admin/cdnadmin/purge' . $_return, 'Empty Trash', 'style="float:right" data-title="Are you sure?" data-body="Purging the trash will <strong>permanently</strong> delete items." class="confirm awesome small red"' )?>
 	</p>
 	<hr />
-	<p class="system-alert no-close">
+	<p class="system-alert message">
 		<strong>TODO:</strong> facility for browsing trashed CDN objects, plus empty trash facility.
 	</p>
 </div>

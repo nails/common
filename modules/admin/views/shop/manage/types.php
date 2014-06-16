@@ -12,7 +12,7 @@
 		endif;
 
 	?>
-	<p class="system-alert no-close">
+	<p class="system-alert">
 		Product types control how the order is processed when a user completes checkout and payment
 		is authorised. Most products can simply be considered a generic product, however, there are
 		some cases when a product should be processed differently (e.g a download requires links to

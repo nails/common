@@ -1,7 +1,7 @@
 <div class="container">
 	<div id="nails-configure">
 		<h1>Nails. Configuration Manager</h1>
-		<p class="system-alert notice no-close testing">
+		<p class="system-alert notice testing">
 			<?=img( NAILS_ASSETS_URL . 'img/loader/20px-TRANS.gif' )?>
 			<strong>Hey!</strong> Please exscuse me while I run some tests...
 		</p>

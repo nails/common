@@ -85,7 +85,7 @@
 
 			<legend><?=lang( 'accounts_groups_edit_permission_legend' )?></legend>
 
-			<p class="system-alert message no-close">
+			<p class="system-alert message">
 				<?=lang( 'accounts_groups_edit_permission_warn' )?>
 			</p>
 			<p>

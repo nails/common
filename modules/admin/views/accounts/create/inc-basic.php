@@ -44,7 +44,7 @@
 			// --------------------------------------------------------------------------
 
 			$_display = $group->id == $this->user_group_model->get_default_group_id() ? 'block' : 'none';
-			echo '<li class="system-alert notice no-close" id="user-group-' . $group->id . '" style="display:' . $_display . ';">';
+			echo '<li class="system-alert notice" id="user-group-' . $group->id . '" style="display:' . $_display . ';">';
 			echo  '<strong>' . $group->label . ':</strong> ' . $group->description;
 			echo '</li>';
 
