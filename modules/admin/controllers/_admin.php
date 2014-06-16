@@ -212,7 +212,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		endif;
 
 		//	Inline assets
-		$_js  = 'var _nails,_nails_admin;';
+		$_js  = 'var _nails,_nails_admin,_nails_forms;';
 		$_js .= '$(function(){';
 
 		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';

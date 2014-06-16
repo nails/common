@@ -1,7 +1,7 @@
 var NAILS_Admin_Site_Settings;
 NAILS_Admin_Site_Settings = function()
 {
-	this.init = function()
+	this.__construct() = function()
 	{
 		this._init_auth();
 	};
@@ -28,4 +28,10 @@ NAILS_Admin_Site_Settings = function()
 			_nails.add_stripes();
 		});
 	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	return this.__construct();
 };

@@ -1,7 +1,7 @@
 var NAILS_Admin_Shop_Settings;
 NAILS_Admin_Shop_Settings = function()
 {
-	this.init = function()
+	this.__construct = function()
 	{
 		this._init_sortable();
 		this._init_delete();
@@ -12,7 +12,7 @@ NAILS_Admin_Shop_Settings = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Chosens
+		//	Select2's
 		$( 'select.select2-base' ).select2({ formatNoMatches: 'Ensure currency is active. No currencies match' });
 	};
 
@@ -290,4 +290,10 @@ NAILS_Admin_Shop_Settings = function()
 			$(this).find( 'input[type=radio]' ).prop( 'checked', true );
 		});
 	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	return this.__construct();
 };

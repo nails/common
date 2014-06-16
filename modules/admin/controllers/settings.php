@@ -98,31 +98,17 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Process POST
 		if ( $this->input->post() ) :
 
-			switch ( $this->input->post( 'update' ) ) :
+			$_method =  $this->input->post( 'update' );
 
-				case 'analytics' :
+			if ( method_exists( $this, '_site_update_' . $_method ) ) :
 
-					$this->_site_update_analytics();
+				$this->{'_site_update_' . $_method}();
 
-				break;
+			else :
 
-				// --------------------------------------------------------------------------
+				$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
 
-				case 'auth' :
-
-					$this->_site_update_auth();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				default :
-
-					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
-
-				break;
-
-			endswitch;
+			endif;
 
 		endif;
 
@@ -135,6 +121,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->load( 'nails.admin.site.settings.min.js', TRUE );
+		$this->asset->inline( '<script>_nails_settings = new NAILS_Admin_Site_Settings();</script>' );
 
 		// --------------------------------------------------------------------------
 
@@ -269,55 +256,17 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Process POST
 		if ( $this->input->post() ) :
 
-			switch ( $this->input->post( 'update' ) ) :
+			$_method =  $this->input->post( 'update' );
 
-				case 'settings' :
+			if ( method_exists( $this, '_blog_update_' . $_method ) ) :
 
-					$this->_blog_update_settings();
+				$this->{'_blog_update_' . $_method}();
 
-				break;
+			else :
 
-				// --------------------------------------------------------------------------
+				$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
 
-				case 'skin' :
-
-					$this->_blog_update_skin();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'commenting' :
-
-					$this->_blog_update_commenting();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'social' :
-
-					$this->_blog_update_social();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				case 'blog_sidebar' :
-
-					$this->_blog_update_sidebar();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				default :
-
-					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
-
-				break;
-
-			endswitch;
+			endif;
 
 		endif;
 
@@ -331,6 +280,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load assets
 		$this->asset->load( 'nails.admin.blog.settings.min.js', TRUE );
+		$this->asset->inline( '<script>_nails_settings = new NAILS_Admin_Blog_Settings();</script>' );
 
 		// --------------------------------------------------------------------------
 
@@ -521,7 +471,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Load models
 		$this->load->model( 'shop/shop_model',					'shop' );
-		$this->load->model( 'shop/shop_payment_gateway_model',	'payment_gateway' );
 		$this->load->model( 'shop/shop_currency_model',			'currency' );
 		$this->load->model( 'shop/shop_shipping_model',			'shipping' );
 		$this->load->model( 'shop/shop_tax_model',				'tax' );
@@ -532,71 +481,26 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Process POST
 		if ( $this->input->post() ) :
 
-			switch ( $this->input->post( 'update' ) ) :
+			$_method =  $this->input->post( 'update' );
 
-				case 'settings' :
+			if ( method_exists( $this, '_shop_update_' . $_method ) ) :
 
-					$this->_shop_update_settings();
+				$this->{'_shop_update_' . $_method}();
 
-				break;
+			else :
 
-				case 'skin' :
+				$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
 
-					$this->_shop_update_skin();
-
-				break;
-
-				case 'paymentgateways' :
-
-					$this->_shop_update_paymentgateways();
-
-				break;
-
-				case 'currencies' :
-
-					$this->_shop_update_currencies();
-
-				break;
-
-				case 'shipping_methods' :
-
-					$this->_shop_shipping_methods();
-
-				break;
-
-				case 'tax_rates' :
-
-					$this->_shop_tax_rates();
-
-				break;
-
-				// --------------------------------------------------------------------------
-
-				default :
-
-					$this->data['error'] = '<strong>Sorry,</strong> I can\'t determine what type of update you are trying to perform.';
-
-				break;
-
-			endswitch;
+			endif;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['settings'] = app_setting( NULL, 'shop', TRUE );
-
-		if ( $this->user->is_superuser() ) :
-
-			$this->data['payment_gateways'] = $this->payment_gateway->get_all();
-
-		else :
-
-			$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
-
-		endif;
-
+		$this->data['settings']					= app_setting( NULL, 'shop', TRUE );
+		$this->data['payment_gateways']			= array();
+		$this->data['shipping_modules']			= array();
 		$this->data['skins']					= $this->skin->get_available();
 		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
 		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
@@ -610,6 +514,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Load assets
 		$this->asset->load( 'nails.admin.shop.settings.min.js',	TRUE );
 		$this->asset->load( 'mustache/mustache.js',				'BOWER' );
+		$this->asset->inline( '<script>_nails_settings = new NAILS_Admin_Shop_Settings();</script>' );
 
 		// --------------------------------------------------------------------------
 
@@ -705,30 +610,9 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _shop_update_paymentgateways()
+	protected function _shop_update_payment_gateway()
 	{
-		//	Prepare update
-		foreach( $this->input->post( 'paymentgateway' ) AS $id => $values ) :
-
-			$_data						= new stdClass();
-
-			if ( $this->user->is_superuser() ) :
-
-				$_data->enabled				= isset( $values['enabled'] ) ? (bool) $values['enabled'] : FALSE;
-				$_data->sandbox_account_id	= isset( $values['sandbox_account_id'] ) ? $values['sandbox_account_id'] : NULL;
-				$_data->sandbox_api_key		= isset( $values['sandbox_api_key'] ) ? $values['sandbox_api_key'] : NULL;
-				$_data->sandbox_api_secret	= isset( $values['sandbox_api_secret'] ) ? $values['sandbox_api_secret'] : NULL;
-
-			endif;
-			$_data->account_id			= isset( $values['account_id'] ) ? $values['account_id'] : NULL;
-			$_data->api_key				= isset( $values['api_key'] ) ? $values['api_key'] : NULL;
-			$_data->api_secret			= isset( $values['api_secret'] ) ? $values['api_secret'] : NULL;
-
-			$this->payment_gateway->update( $id, $_data );
-
-		endforeach;
-
-		$this->data['success'] = '<strong>Success!</strong> Payment Gateway settings have been saved.';
+		$this->data['message'] = '<strong>TODO</strong> Handling payment gateways is in the works.';
 	}
 
 
@@ -777,122 +661,9 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _shop_shipping_methods()
+	protected function _shop_update_shipping()
 	{
-		$_methods	= $this->input->post( 'methods' );
-		$_ids		= array();
-
-		foreach( $_methods AS $counter => &$method ) :
-
-			//	If there's an ID we'll be updating (remove for safety)
-			$_id = isset( $method['id'] ) ? $method['id'] : NULL;
-			unset( $method['id'] );
-
-			//	Correctly define the Tax Rate ID
-			$method['tax_rate_id']	= $method['tax_rate_id'] ? $method['tax_rate_id'] : NULL;
-
-			//	And is this itemthe default?
-			$method['is_default']	= $counter == $this->input->post( 'default' ) ? TRUE : FALSE;
-
-			//	Active?
-			$method['is_active']	= isset( $method['is_active'] ) ? TRUE : FALSE;
-
-			if ( $_id ) :
-
-				$this->shipping->update( $_id, $method );
-				$_ids[] = $_id;
-
-			else :
-
-				$_ids[] = $this->shipping->create( $method );
-
-			endif;
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		//	Mark any items not in the $_ids array as is_deleted
-		$this->db->set( 'is_deleted', TRUE );
-
-		if ( $_ids ) :
-
-			$this->db->where_not_in( 'id', $_ids );
-
-		endif;
-
-		$this->db->update( NAILS_DB_PREFIX . 'shop_shipping_method' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['success'] = '<strong>Success!</strong> Shipping Methods have been updated.';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _shop_tax_rates()
-	{
-		$_rates	= $this->input->post( 'rates' );
-		$_ids	= array();
-
-		if ( is_array( $_rates ) ) :
-
-			foreach( $_rates AS $counter => &$rate ) :
-
-				//	If there's an ID we'll be updating (remove for safety)
-				$_id = isset( $rate['id'] ) ? $rate['id'] : NULL;
-				unset( $rate['id'] );
-
-				if ( $_id ) :
-
-					$_data			= new stdClass();
-					$_data->label	= $rate['label'];
-					$_data->rate	= $rate['rate'];
-
-					if ( $this->tax->update( $_id, $_data ) ) :
-
-						$_ids[] = $_id;
-
-					endif;
-
-				else :
-
-					$_data			= new stdClass();
-					$_data->label	= $rate['label'];
-					$_data->rate	= $rate['rate'];
-
-					$_result = $this->tax->create( $_data );
-
-					if ( $_result ) :
-
-						$_ids[] = $_result;
-
-					endif;
-
-				endif;
-
-			endforeach;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Mark any items not in the $_ids array as is_deleted
-		$this->db->set( 'is_deleted', TRUE );
-
-		if ( $_ids ) :
-
-			$this->db->where_not_in( 'id', $_ids );
-
-		endif;
-
-		$this->db->update( NAILS_DB_PREFIX . 'shop_tax_rate' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['success'] = '<strong>Success!</strong> Tax Rates have been updated.';
+		$this->data['message'] = '<strong>TODO</strong> Handling shipping modules in the works.';
 	}
 }
 

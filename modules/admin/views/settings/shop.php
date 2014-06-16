@@ -16,9 +16,9 @@
 				<a href="#" data-tab="tab-skin">Skin</a>
 			</li>
 
-			<?php $_active = $this->input->post( 'update' ) == 'paymentgateways' ? 'active' : ''?>
+			<?php $_active = $this->input->post( 'update' ) == 'payment_gateway' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-paymentgateway">Payment Gateways</a>
+				<a href="#" data-tab="tab-payment-gateway">Payment Gateways</a>
 			</li>
 
 			<?php $_active = $this->input->post( 'update' ) == 'currencies' ? 'active' : ''?>
@@ -26,14 +26,9 @@
 				<a href="#" data-tab="tab-currencies">Currencies</a>
 			</li>
 
-			<?php $_active = $this->input->post( 'update' ) == 'shipping_methods' ? 'active' : ''?>
+			<?php $_active = $this->input->post( 'update' ) == 'shipping' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-shipping-methods">Shipping Methods</a>
-			</li>
-
-			<?php $_active = $this->input->post( 'update' ) == 'tax_rates' ? 'active' : ''?>
-			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-tax-rates">Tax Rates</a>
+				<a href="#" data-tab="tab-shipping">Shipping</a>
 			</li>
 		</ul>
 
@@ -65,28 +60,6 @@
 
 					?>
 				</fieldset>
-				<fieldset id="shop-settings-free-shipping">
-					<legend>Free Shipping</legend>
-					<p>
-						If you wish to offer your customers an incentive to spend more you can offer free shipping when they spend a certain amount. Define what that figure should be here.
-						If you don't want to offer this service set the threshold to 0.
-					</p>
-					<p class="system-alert message no-close">
-						<strong>Please note:</strong> This is calculated on the cost of items <em>before</em> any tax is applied.
-					</p>
-					<?php
-
-						//	Order Notifications
-						$_field					= array();
-						$_field['key']			= 'free_shipping_threshold';
-						$_field['label']		= 'Threshold';
-						$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-						echo form_field( $_field );
-
-					?>
-				</fieldset>
-
 				<fieldset id="shop-settings-warehouse-collection">
 					<legend>Warehouse Collection</legend>
 					<p>
@@ -393,136 +366,45 @@
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
 				</p>
 				<?=form_close()?>
-
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'paymentgateways' ? 'active' : ''?>
-			<div id="tab-paymentgateway" class="tab page <?=$_display?> paymentgateway">
+			<?php $_display = $this->input->post( 'update' ) == 'payment_gateway' ? 'active' : ''?>
+			<div id="tab-payment-gateway" class="tab page <?=$_display?> payment-gateway">
 				<p>
 					Set Payment Gateway credentials.
 				</p>
 				<hr />
 				<?php
 
-				if ( $payment_gateways ) :
+					if ( $payment_gateways ) :
 
-					echo form_open( NULL, 'style="margin-bottom:0;"' );
-					echo form_hidden( 'update', 'paymentgateways' );
+						echo form_open( NULL, 'style="margin-bottom:0;"' );
+						echo form_hidden( 'update', 'payment_gateway' );
 
-					foreach ( $payment_gateways AS $pg ) :
+						foreach ( $payment_gateways AS $pg ) :
 
-						echo '<fieldset id="shop-settings-pg-' . $pg->slug . '">';
-						echo '<legend>';
-						if ( $pg->logo ) :
+							echo '<fieldset id="shop-settings-pg-' . $pg->slug . '">';
+								echo '<legend>';
+									echo $pg->label;
+								echo '</legend>';
+								echo '<p>TODO: Request the settings config from the module.</p>';
+							echo '</fieldset>';
 
-							echo img( array( 'src' => NAILS_ASSETS_URL . 'img/modules/shop/payment-gateway/' . $pg->logo, 'style' => 'margin-top:-10px;' ) );
+						endforeach;
 
-						else :
+						echo '<p style="margin-top:1em;margin-bottom:0;">';
+							echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
+						echo '</p>';
+						echo form_close();
 
-							echo $pg->label;
+					else :
 
-						endif;
-						echo '</legend>';
+						echo '<p class="system-alert error no-close">';
+							echo '<strong>No payment gateway modules are available.</strong>';
+							echo '<br />I could not find any payment gateway modules. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
+						echo '</p>';
 
-						//	Only superusers can change the 'enabled' status of a payment gateway
-						if ( $user->is_superuser() ) :
-
-							//	Enabled
-							$_field					= array();
-							$_field['key']			= 'paymentgateway[' . $pg->id . '][enabled]';
-							$_field['label']		= 'Supported';
-							$_field['default']		= $pg->enabled;
-
-							echo form_field_boolean( $_field );
-
-						endif;
-
-						// --------------------------------------------------------------------------
-
-						//	Account ID
-						$_field					= array();
-						$_field['key']			= 'paymentgateway[' . $pg->id . '][account_id]';
-						$_field['label']		= 'Account ID';
-						$_field['default']		= $pg->account_id;
-						$_field['placeholder']	= 'The unique account identifier';
-
-						echo form_field( $_field );
-
-						// --------------------------------------------------------------------------
-
-						//	API KEY
-						$_field					= array();
-						$_field['key']			= 'paymentgateway[' . $pg->id . '][api_key]';
-						$_field['label']		= 'API Key';
-						$_field['default']		= $pg->api_key;
-						$_field['placeholder']	= 'The key for accessing this payment gateway\'s API';
-
-						echo form_field( $_field );
-
-						// --------------------------------------------------------------------------
-
-						//	API Secret
-						$_field					= array();
-						$_field['key']			= 'paymentgateway[' . $pg->id . '][api_secret]';
-						$_field['label']		= 'API Secret';
-						$_field['default']		= $pg->api_secret;
-						$_field['placeholder']	= 'The secret or password for accessing this payment gateway\'s API';
-
-						echo form_field( $_field );
-
-						// --------------------------------------------------------------------------
-
-						if ( $user->is_superuser() ) :
-
-							//	Sandbox Account ID
-							$_field					= array();
-							$_field['key']			= 'paymentgateway[' . $pg->id . '][sandbox_account_id]';
-							$_field['label']		= 'Sandbox Account ID';
-							$_field['default']		= $pg->sandbox_account_id;
-							$_field['placeholder']	= 'The unique account identifier';
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							//	Sandbox API KEY
-							$_field					= array();
-							$_field['key']			= 'paymentgateway[' . $pg->id . '][sandbox_api_key]';
-							$_field['label']		= 'Sandbox API Key';
-							$_field['default']		= $pg->sandbox_api_key;
-							$_field['placeholder']	= 'The key for accessing this payment gateway\'s API';
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							//	Sandbox API Secret
-							$_field					= array();
-							$_field['key']			= 'paymentgateway[' . $pg->id . '][sandbox_api_secret]';
-							$_field['label']		= 'Sandbox API Secret';
-							$_field['default']		= $pg->sandbox_api_secret;
-							$_field['placeholder']	= 'The secret or password for accessing this payment gateway\'s API';
-
-							echo form_field( $_field );
-
-						endif;
-
-						echo '</fieldset>';
-
-					endforeach;
-					echo '<p style="margin-top:1em;margin-bottom:0;">';
-					echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
-					echo '</p>';
-					echo form_close();
-
-				else :
-
-					echo '<p class="system-alert message no-close">';
-					echo '<strong>No Payment gateways have been enabled.</strong>';
-					echo '<br />No payment gateways have been enabled for this site. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
-					echo '</p>';
-
-				endif;
+					endif;
 
 				?>
 			</div>
@@ -578,210 +460,48 @@
 				<?=form_close()?>
 			</div>
 
-
-			<?php $_display = $this->input->post( 'update' ) == 'shipping_methods' ? 'active' : ''?>
-			<div id="tab-shipping-methods" class="tab page <?=$_display?> shipping-methods">
-				<?=form_open( NULL, 'id="form-shipping-methods" style="margin-bottom:0;"' )?>
-				<?=form_hidden( 'update', 'shipping_methods' )?>
+			<?php $_display = $this->input->post( 'update' ) == 'shipping' ? 'active' : ''?>
+			<div id="tab-shipping" class="tab page <?=$_display?> shipping">
 				<p>
-					Configure supported shipping methods.
+					Configure shipping modules.
 				</p>
 				<hr />
-				<table id="existing-shipping-methods" class="settings-table">
-					<thead>
-						<tr>
-							<th class="order-handle">&nbsp;</th>
-							<th class="courier">Courier</th>
-							<th class="method">Method</th>
-							<th class="default_price">Price</th>
-							<th class="default_price_additional">1+ Price</th>
-							<th class="tax_rate">Tax Rate</th>
-							<th class="notes">Notes</th>
-							<th class="active">Active</th>
-							<th class="default">Default</th>
-							<th class="delete">&nbsp;</th>
-						</tr>
-					</thead>
-					<tbody>
-					<?php
+				<?php
 
-						$_counter_ship = 0;
-						foreach ( $shipping_methods AS $method ) :
+					if ( ! empty( $shipping_modules ) ) :
 
-							echo '<tr>';
+						echo form_open( NULL, 'style="margin-bottom:0;"' );
+						echo form_hidden( 'update', 'shipping' );
 
-							echo '<td class="order-handle">';
-							echo '<input type="hidden" name="methods[' . $_counter_ship . '][id]" value="' . $method->id . '" />';
-							echo '<input type="hidden" name="methods[' . $_counter_ship . '][order]" value="' . $method->order . '" class="order" />';
-							echo '</td>';
+						foreach ( $shipping_modules AS $sm ) :
 
-							// --------------------------------------------------------------------------
+							echo '<fieldset id="shop-settings-pg-' . $sm->slug . '">';
+							echo '<legend>';
+								echo $sm->label;
+							echo '</legend>';
+								echo '<p>TODO: Request the settings config from the module.</p>';
+							echo '</fieldset>';
 
-							$_field = 'courier';
-
-							echo '<td class="' . $_field . '">';
-							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							$_field = 'method';
-
-							echo '<td class="' . $_field . '">';
-							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							$_field = 'default_price';
-
-							echo '<td class="' . $_field . '">';
-							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							$_field = 'default_price_additional';
-
-							echo '<td class="' . $_field . '">';
-							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							echo '<td class="tax_rate">';
-							echo form_dropdown( 'methods[' . $_counter_ship . '][tax_rate_id]', $tax_rates_flat, set_value( 'methods[' . $_counter_ship . '][tax_rate_id]', $method->tax_rate->id ), 'class="select2"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							$_field = 'notes';
-
-							echo '<td class="' . $_field . '">';
-							echo form_input( 'methods[' . $_counter_ship . '][' . $_field . ']', set_value( 'methods[' . $_counter_ship . '][' . $_field . ']', $method->{$_field} ), 'class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							echo '<td class="active">';
-							if ( $_POST ) :
-
-								$_checked = isset( $_POST['methods'][$_counter_ship]['is_active'] ) ? TRUE : FALSE;
-
-							else :
-
-								$_checked = $method->is_active;
-
-							endif;
-							echo form_checkbox( 'methods[' . $_counter_ship . '][is_active]', TRUE, $_checked );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							echo '<td class="default">';
-							echo form_radio( 'default', $_counter_ship, set_radio( 'default', $_counter_ship, $method->is_default ) );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							echo '<td class="delete">';
-							echo '<a href="#" class="delete-row awesome small red">Delete</a>';
-							echo '</td>';
-
-
-							echo '</tr>';
-
-
-						$_counter_ship++;
 						endforeach;
 
-					?>
-					</tbody>
-				</table>
-				<p style="margin-bottom:0;">
-					<a href="#" id="add-new-shipping" style="float:right" class="awesome green small">Add Shipping Method</a>
-					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
-				</p>
-				<?=form_close()?>
-			</div>
+						echo '<p style="margin-top:1em;margin-bottom:0;">';
+							echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
+						echo '</p>';
+						echo form_close();
 
+					else :
 
-			<?php $_display = $this->input->post( 'update' ) == 'tax_rates' ? 'active' : ''?>
-			<div id="tab-tax-rates" class="tab page <?=$_display?> tax-rates">
-				<?=form_open( NULL, 'id="form-tax-rates" style="margin-bottom:0;"' )?>
-				<?=form_hidden( 'update', 'tax_rates' )?>
-				<p>
-					Configure supported Tax Rates. Specify a customer facing label and a rate; the rate must be a decimal between 0 and 1. For example, to specify a tax rate of 17.5% the rate would be noted as 0.175.
-				</p>
-				<hr />
-				<table id="existing-tax-rates" class="settings-table">
-					<thead>
-						<tr>
-							<th class="label">Label</th>
-							<th class="rate">Rate</th>
-							<th class="delete">&nbsp;</th>
-						</tr>
-					</thead>
-					<tbody>
-					<?php
+						echo '<p class="system-alert error no-close">';
+							echo '<strong>No shipping modules are available.</strong>';
+							echo '<br />I could not find any shipping modules. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
+						echo '</p>';
 
-						$_counter_tax = 0;
-						foreach ( $tax_rates AS $rate ) :
+					endif;
 
-							echo '<tr>';
-
-							$_field = 'label';
-
-							echo '<td class="' . $_field . '">';
-								echo '<input type="hidden" name="rates[' . $_counter_tax . '][id]" value="' . $rate->id . '" />';
-								echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'placeholder="Specify the tax rate label, e.g VAT" class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							$_field = 'rate';
-
-							echo '<td class="' . $_field . '">';
-								echo form_input( 'rates[' . $_counter_tax . '][' . $_field . ']', set_value( 'rates[' . $_counter_tax . '][' . $_field . ']', $rate->{$_field} ), 'placeholder="Specify the rate for this tax band, decimal between 0 and 1, e.g for 20% you\'d enter 0.2" class="table-cell"' );
-							echo '</td>';
-
-							// --------------------------------------------------------------------------
-
-							echo '<td class="delete">';
-								echo '<a href="#" class="delete-row awesome small red">Delete</a>';
-							echo '</td>';
-
-
-							echo '</tr>';
-
-
-						$_counter_tax++;
-						endforeach;
-
-					?>
-					</tbody>
-				</table>
-				<p style="margin-bottom:0;">
-					<a href="#" id="add-new-tax-rate" style="float:right" class="awesome green small">Add Tax Rate</a>
-					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
-				</p>
-				<?=form_close()?>
+				?>
 			</div>
 		</section>
 </div>
-
-<script type="text/javascript">
-
-	var _settings;
-
-	$(function()
-	{
-		_settings = new NAILS_Admin_Shop_Settings();
-		_settings.init();
-	});
-
-</script>
-
 <script type="text/template" id="template-new-shipping">
 <tr>
 	<td class="order-handle">

@@ -237,14 +237,3 @@
 
 		</section>
 </div>
-<script type="text/javascript">
-
-	var _settings;
-
-	$(function()
-	{
-		_settings = new NAILS_Admin_Site_Settings();
-		_settings.init();
-	});
-
-</script>

@@ -1,7 +1,7 @@
 var NAILS_Admin_Blog_Settings;
 NAILS_Admin_Blog_Settings = function()
 {
-	this.init = function()
+	this.__construct = function()
 	{
 		this._init_comments();
 		this._init_social();
@@ -207,4 +207,10 @@ NAILS_Admin_Blog_Settings = function()
 			$(this).find( 'input[type=radio]' ).prop( 'checked', true );
 		});
 	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	return this.__construct();
 };

@@ -67,20 +67,6 @@ class NAILS_Basket extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the payment gateway model
-		$this->load->model( 'shop_payment_gateway_model', 'payment_gateway' );
-
-		//	Fetch the supported payment gateways
-		$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
-
-		if ( ! $this->data['payment_gateways'] ) :
-
-			$this->data['message'] = '<strong>Sorry,</strong> there\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment, you won\'t be able to checkout.';
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Load assets
 		$this->asset->load( 'nails.shop.basket.min.js', TRUE );
 

@@ -26,9 +26,9 @@
 				<a href="#" data-tab="tab-social">Social Tools</a>
 			</li>
 
-			<?php $_active = $this->input->post( 'update' ) == 'blog_sidebar' ? 'active' : ''?>
+			<?php $_active = $this->input->post( 'update' ) == 'sidebar' ? 'active' : ''?>
 			<li class="tab <?=$_active?>">
-				<a href="#" data-tab="tab-blog-sidebar">Sidebar</a>
+				<a href="#" data-tab="tab-sidebar">Sidebar</a>
 			</li>
 		</ul>
 
@@ -426,10 +426,10 @@
 				<?=form_close()?>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'blog_sidebar' ? 'active' : ''?>
-			<div id="tab-blog-sidebar" class="tab page <?=$_display?> blog-sidebar">
+			<?php $_display = $this->input->post( 'update' ) == 'sidebar' ? 'active' : ''?>
+			<div id="tab-sidebar" class="tab page <?=$_display?> sidebar">
 				<?=form_open( NULL, 'style="margin-bottom:0;"')?>
-				<?=form_hidden( 'update', 'blog_sidebar' )?>
+				<?=form_hidden( 'update', 'sidebar' )?>
 				<p>
 					Configure the sidebar widgets.
 				</p>
@@ -507,14 +507,3 @@
 
 		</section>
 </div>
-<script type="text/javascript">
-
-	var _settings;
-
-	$(function()
-	{
-		_settings = new NAILS_Admin_Blog_Settings();
-		_settings.init();
-	});
-
-</script>

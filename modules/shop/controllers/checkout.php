@@ -648,22 +648,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Load the payment gateway model
-		$this->load->model( 'shop_payment_gateway_model', 'payment_gateway' );
-
-		//	Fetch the supported payment gateways
-		$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
-
-		if ( ! $this->data['payment_gateways'] ) :
-
-			//	Uh-oh, no supported payment gateways. Bad times but feedback to the user.
-			$this->data['error'] = 'There\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment. Please try again later.';
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		return TRUE;
 	}
 
