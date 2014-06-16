@@ -64,7 +64,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 	public function index()
 	{
 		//	If you're logged in you shouldn't be accessing this method
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
@@ -137,7 +137,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 				$_data					= array();
 				$_data['email']			= $this->input->post( 'email' );
 				$_data['username']		= $this->input->post( 'username' );
-				$_data['group_id']		= $this->user_group->default_group->id;
+				$_data['group_id']		= $this->user_group_model->get_default_group_id();
 				$_data['password']		= $this->input->post( 'password' );
 				$_data['first_name']	= $this->input->post( 'first_name' );
 				$_data['last_name']		= $this->input->post( 'last_name' );
@@ -154,17 +154,17 @@ class NAILS_Register extends NAILS_Auth_Controller
 				// --------------------------------------------------------------------------
 
 				//	Create new user
-				$_new_user = $this->user->create( $_data );
+				$_new_user = $this->user_model->create( $_data );
 
 				if ( $_new_user ) :
 
 					//	Fetch user and group data
-					$_group	= $this->user_group->get_by_id( $_data['group_id'] );
+					$_group	= $this->user_group_model->get_by_id( $_data['group_id'] );
 
 					// --------------------------------------------------------------------------
 
 					//	Log the user in
-					$this->user->set_login_data( $_new_user->id );
+					$this->user_model->set_login_data( $_new_user->id );
 
 					// --------------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 
 				else :
 
-					$this->data['error'] = 'Could not create new user account. ' . $this->user->last_error();
+					$this->data['error'] = 'Could not create new user account. ' . $this->user_model->last_error();
 
 				endif;
 
@@ -235,7 +235,7 @@ class NAILS_Register extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Valid user?
-		$_u = $this->user->get_by_id( $_id );
+		$_u = $this->user_model->get_by_id( $_id );
 
 		if ( $_u === FALSE ) :
 

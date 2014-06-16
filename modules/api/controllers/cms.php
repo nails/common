@@ -54,7 +54,7 @@ class NAILS_Cms extends NAILS_API_Controller
 		// --------------------------------------------------------------------------
 
 		//	Only logged in users
-		if ( ! $this->user->is_logged_in() ) :
+		if ( ! $this->user_model->is_logged_in() ) :
 
 
 			$this->_authorised	= FALSE;
@@ -65,7 +65,7 @@ class NAILS_Cms extends NAILS_API_Controller
 		// --------------------------------------------------------------------------
 
 		//	Only admins
-		if ( ! $this->user->is_admin() ) :
+		if ( ! $this->user_model->is_admin() ) :
 
 			$this->_authorised	= FALSE;
 			$this->_error		= lang( 'auth_require_administrator' );

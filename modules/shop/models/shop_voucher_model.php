@@ -35,7 +35,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'created_by', active_user( 'id' ) );
 			$this->db->set( 'modified_by', active_user( 'id' ) );
@@ -86,7 +86,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 

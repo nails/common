@@ -93,7 +93,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 			case 'EMAIL' :
 
-				$_user = $this->user->get_by_email( $identifier );
+				$_user = $this->user_model->get_by_email( $identifier );
 
 			break;
 
@@ -101,7 +101,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 			case 'USERNAME' :
 
-				$_user = $this->user->get_by_username( $identifier );
+				$_user = $this->user_model->get_by_username( $identifier );
 
 			break;
 
@@ -114,11 +114,11 @@ class NAILS_Auth_model extends NAILS_Model
 
 				if ( valid_email( $identifier ) ) :
 
-					$_user = $this->user->get_by_email( $identifier );
+					$_user = $this->user_model->get_by_email( $identifier );
 
 				else :
 
-					$_user = $this->user->get_by_username( $identifier );
+					$_user = $this->user_model->get_by_username( $identifier );
 
 				endif;
 
@@ -132,7 +132,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 			//	User was recognised; validate credentials
 
-			if ( $this->user_password->is_correct( $_user->id, $password ) ) :
+			if ( $this->user_password_model->is_correct( $_user->id, $password ) ) :
 
 				//	Password accepted! Final checks...
 
@@ -159,7 +159,7 @@ class NAILS_Auth_model extends NAILS_Model
 				endif;
 
 				//	Reset user's failed login counter and allow login
-				$this->user->reset_failed_login( $_user->id );
+				$this->user_model->reset_failed_login( $_user->id );
 
 				//	If two factor auth is enabled then don't _actually_ set login data
 				//	the next process will confirm the login and set this.
@@ -167,17 +167,17 @@ class NAILS_Auth_model extends NAILS_Model
 				if ( ! $this->config->item( 'auth_two_factor_enable' ) ) :
 
 					//	Set login data for this user
-					$this->user->set_login_data( $_user->id );
+					$this->user_model->set_login_data( $_user->id );
 
 					//	If we're remembering this user set a cookie
 					if ( $remember ) :
 
-						$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
+						$this->user_model->set_remember_cookie( $_user->id, $_user->password, $_user->email );
 
 					endif;
 
 					//	Update their last login and increment their login count
-					$this->user->update_last_login( $_user->id );
+					$this->user_model->update_last_login( $_user->id );
 
 				endif;
 
@@ -267,7 +267,7 @@ class NAILS_Auth_model extends NAILS_Model
 				//	User was recognised but the password was wrong
 
 				//	Increment the user's failed login count
-				$this->user->increment_failed_login( $_user->id, $this->brute_force_protection['expire'] );
+				$this->user_model->increment_failed_login( $_user->id, $this->brute_force_protection['expire'] );
 
 				//	Are we already blocked? Let them know...
 				if ( $_user->failed_login_count >= $this->brute_force_protection['limit'] ) :
@@ -282,7 +282,7 @@ class NAILS_Auth_model extends NAILS_Model
 					endif;
 
 					//	Block has expired, reset the counter
-					$this->user->reset_failed_login( $user->id );
+					$this->user_model->reset_failed_login( $user->id );
 
 				endif;
 
@@ -332,7 +332,7 @@ class NAILS_Auth_model extends NAILS_Model
 	public function logout()
 	{
 		// Delete the remember me cookies if they exist
-		$this->user->clear_remember_cookie();
+		$this->user_model->clear_remember_cookie();
 
 		// --------------------------------------------------------------------------
 
@@ -344,7 +344,7 @@ class NAILS_Auth_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Destroy key parts of the session (enough for user_model to report user as logged out)
-		$this->user->clear_login_data();
+		$this->user_model->clear_login_data();
 
 		// --------------------------------------------------------------------------
 
@@ -371,7 +371,7 @@ class NAILS_Auth_model extends NAILS_Model
 
 	public function generate_two_factor_token( $user_id )
 	{
-		$_salt		= $this->user_password->salt();
+		$_salt		= $this->user_password_model->salt();
 		$_ip		= $this->input->ip_address();
 		$_created	= date( 'Y-m-d H:i:s' );
 		$_expires	= date( 'Y-m-d H:i:s', strtotime( '+10 MINS' ) );

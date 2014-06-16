@@ -300,7 +300,7 @@ class NAILS_User_model extends NAILS_Model
 		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
 		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
 
-		$this->datetime->set_formats( $_format_date, $_format_time );
+		$this->datetime_model->set_formats( $_format_date, $_format_time );
 	}
 
 
@@ -1413,11 +1413,11 @@ class NAILS_User_model extends NAILS_Model
 			//	If we're updating the user's password we should generate a new hash
 			if (  array_key_exists( 'password', $data ) ) :
 
-				$_hash = $this->user_password->generate_hash( $data['password'] );
+				$_hash = $this->user_password_model->generate_hash( $data['password'] );
 
 				if ( ! $_hash ) :
 
-					$this->_set_error( $this->user_password->last_error() );
+					$this->_set_error( $this->user_password_model->last_error() );
 					return FALSE;
 
 				endif;
@@ -1772,7 +1772,7 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_code = $this->user_password->salt();
+		$_code = $this->user_password_model->salt();
 
 		$this->db->set( 'user_id',		$_u->id );
 		$this->db->set( 'email',		$_email );
@@ -2317,7 +2317,7 @@ class NAILS_User_model extends NAILS_Model
 
 			$_data[$_counter]	= array();
 			$_data[$_counter]['user_id']	= $user_id;
-			$_data[$_counter]['salt']		= $this->user_password->salt();
+			$_data[$_counter]['salt']		= $this->user_password_model->salt();
 			$_data[$_counter]['question']	= $this->encrypt->encode( $d->question, APP_PRIVATE_KEY . $_data[$_counter]['salt'] );
 			$_data[$_counter]['answer']		= sha1( sha1( strtolower( $d->answer ) ) . APP_PRIVATE_KEY . $_data[$_counter]['salt'] );
 			$_data[$_counter]['created']	= date( 'Y-m-d H:i:s' );
@@ -2720,15 +2720,15 @@ class NAILS_User_model extends NAILS_Model
 		if ( empty( $data['password'] ) ) :
 
 			$_password[] = NULL;
-			$_password[] = $this->user_password->salt();
+			$_password[] = $this->user_password_model->salt();
 
 		else :
 
-			$_password = $this->user_password->generate_hash( $data['password'] );
+			$_password = $this->user_password_model->generate_hash( $data['password'] );
 
 			if ( ! $_password ) :
 
-				$this->_set_error( $this->user_password->last_error() );
+				$this->_set_error( $this->user_password_model->last_error() );
 				return FALSE;
 
 			endif;
@@ -2745,7 +2745,7 @@ class NAILS_User_model extends NAILS_Model
 		//	Check that we're dealing with a valid group
 		if ( empty( $data['group_id'] ) ) :
 
-			$_user_data['group_id'] = $this->user_group->default_group->id;
+			$_user_data['group_id'] = $this->user_group_model->get_default_group_id();
 
 		else :
 
@@ -2753,7 +2753,7 @@ class NAILS_User_model extends NAILS_Model
 
 		endif;
 
-		$_group = $this->user_group->get_by_id( $_user_data['group_id'] );
+		$_group = $this->user_group_model->get_by_id( $_user_data['group_id'] );
 
 		if ( ! $_group ) :
 

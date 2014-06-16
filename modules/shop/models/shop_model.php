@@ -120,9 +120,9 @@ class NAILS_Shop_model extends NAILS_Model
 
 			endif;
 
-			if ( $this->user->is_logged_in() ) :
+			if ( $this->user_model->is_logged_in() ) :
 
-				$this->user->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
+				$this->user_model->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
 
 			endif;
 

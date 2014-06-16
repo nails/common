@@ -102,7 +102,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			$_order->user_last_name		= $basket->personal_details->last_name;
 
 			//	Double check to make sure this isn't a user we can associate with instead
-			$_user = $this->user->get_by_email( $_order->user_email );
+			$_user = $this->user_model->get_by_email( $_order->user_email );
 
 			if ( $_user ) :
 
@@ -112,7 +112,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 			unset( $_user );
 
-		elseif ( $this->user->is_logged_in() ) :
+		elseif ( $this->user_model->is_logged_in() ) :
 
 			$_order->user_id			= active_user( 'id' );
 			$_order->user_email			= active_user( 'email' );

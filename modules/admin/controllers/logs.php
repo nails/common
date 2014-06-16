@@ -183,7 +183,7 @@ class NAILS_Logs extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Fetch users
-			$this->data['users'] = $this->user->get_all_minimal();
+			$this->data['users'] = $this->user_model->get_all_minimal();
 			$this->data['types'] = $this->event->get_types_flat();
 
 			// --------------------------------------------------------------------------
@@ -285,7 +285,7 @@ class NAILS_Logs extends NAILS_Admin_Controller
 			// --------------------------------------------------------------------------
 
 			//	Fetch users
-			$this->data['users'] = $this->user->get_all_minimal();
+			$this->data['users'] = $this->user_model->get_all_minimal();
 
 			// --------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	If you're not a admin then you shouldn't be accessing this class
-		if ( ! $this->user->was_admin() && ! $this->user->is_admin() ) :
+		if ( ! $this->user_model->was_admin() && ! $this->user_model->is_admin() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access' ) );
 			redirect( '/' );
@@ -58,7 +58,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		$_hashid = $this->uri->segment( 4 );
 		$_hashpw = $this->uri->segment( 5 );
 
-		$_u = $this->user->get_by_hashes( $_hashid, $_hashpw, TRUE );
+		$_u = $this->user_model->get_by_hashes( $_hashid, $_hashpw, TRUE );
 
 		if ( ! $_u ) :
 
@@ -116,7 +116,7 @@ class NAILS_Override extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Replace current user's session data
-		$this->user->set_login_data( $_u->id );
+		$this->user_model->set_login_data( $_u->id );
 
 		// --------------------------------------------------------------------------
 

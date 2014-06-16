@@ -15,7 +15,7 @@ if ( ! function_exists( 'nice_time' ) )
 {
 	function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
-		return get_instance()->datetime->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
+		return get_instance()->datetime_model->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
 	}
 }
 

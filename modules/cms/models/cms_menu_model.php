@@ -129,7 +129,7 @@ class NAILS_Cms_menu_model extends NAILS_Model
 		$this->db->trans_begin();
 
 		$this->db->set( 'created', 'NOW()', FALSE );
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'created_by', active_user( 'id') );
 
@@ -211,7 +211,7 @@ class NAILS_Cms_menu_model extends NAILS_Model
 		$this->db->set( 'description', $data['description'] );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 
@@ -233,7 +233,7 @@ class NAILS_Cms_menu_model extends NAILS_Model
 					$_data->url			= ! empty( $item['url'] )		? $item['url']			: NULL;
 					$_data->label		= ! empty( $item['label'] )		? $item['label']		: NULL;
 					$_data->modified	= date( 'Y-m-d H:i:s' );
-					$_data->modified_by	= $this->user->is_logged_in() ? active_user( 'id' ) : NULL;
+					$_data->modified_by	= $this->user_model->is_logged_in() ? active_user( 'id' ) : NULL;
 
 					//	Work out the parent ID
 					if ( ! empty( $item['parent_id'] ) && isset( $_id_map[$item['parent_id']] ) ) :

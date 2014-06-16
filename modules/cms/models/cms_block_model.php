@@ -63,7 +63,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			$_id = $this->db->insert_id();
 
 			$this->db->set( 'block_id', $_id );
-			$this->db->set( 'lang_id', $this->language->get_default_id() );
+			$this->db->set( 'lang_id', $this->language_model->get_default_id() );
 			$this->db->set( 'value', $default_value );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );

@@ -35,17 +35,17 @@ class NAILS_Verify extends NAILS_Email_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch the user
-		$_u = $this->user->get_by_id( $_id );
+		$_u = $this->user_model->get_by_id( $_id );
 
 		if ( $_u && $_code ) :
 
 			//	User found, attempt to verify
-			if ( $this->user->email_verify( $_u->id, $_code ) ) :
+			if ( $this->user_model->email_verify( $_u->id, $_code ) ) :
 
 				//	Reward referrer (if any
 				if ( ! empty( $_u->referred_by ) ) :
 
-					$this->user->reward_referral( $_u->id, $_u->referred_by );
+					$this->user_model->reward_referral( $_u->id, $_u->referred_by );
 
 				endif;
 
@@ -61,7 +61,7 @@ class NAILS_Verify extends NAILS_Email_Controller
 
 					redirect( $this->input->get( 'return_to' ) );
 
-				elseif ( ! $this->user->is_logged_in() ) :
+				elseif ( ! $this->user_model->is_logged_in() ) :
 
 					//	Set success message
 					$this->session->set_flashdata( 'success', lang( 'email_verify_ok' ) );
@@ -78,7 +78,7 @@ class NAILS_Verify extends NAILS_Email_Controller
 					else :
 
 						//	Nope, log in as normal
-						$this->user->set_login_data( $_u->id );
+						$this->user_model->set_login_data( $_u->id );
 
 						// --------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ class NAILS_Verify extends NAILS_Email_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->session->set_flashdata( 'error', lang( 'email_verify_fail_error' ) . ' ' . $this->user->last_error() );
+		$this->session->set_flashdata( 'error', lang( 'email_verify_fail_error' ) . ' ' . $this->user_model->last_error() );
 		redirect( '/' );
 	}
 

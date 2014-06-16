@@ -14,7 +14,7 @@ if ( ! function_exists( 'show_401' ) )
 {
 	function show_401( $message = '<strong>Sorry,</strong> you need to be logged in to see that page.' )
 	{
-		$_usr =& get_userobject();
+		$_usr = get_userobject();
 
 		//	Logged in users can't be redirected to log in, they
 		//	simply get an unauthorised page

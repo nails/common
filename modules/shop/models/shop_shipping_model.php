@@ -3,7 +3,7 @@
 /**
  * Name:			shop_shipping_model.php
  *
- * Description:		This model handles shipping methods
+ * Description:		This model finds and loads blog modules
  *
  **/
 
@@ -17,177 +17,257 @@
 
 class NAILS_Shop_shipping_model extends NAILS_Model
 {
+	protected $_available;
+	protected $_modules;
+
+	// --------------------------------------------------------------------------
+
+
 	public function __construct()
 	{
 		parent::__construct();
 
 		// --------------------------------------------------------------------------
 
-		$this->_table			= NAILS_DB_PREFIX . 'shop_shipping_method';
-		$this->_table_prefix	= 'sm';
-	}
+		$this->_available			= NULL;
+		$this->_module_extension	= '-shop-shipping';
 
+		//	Module locations
+		//	This must be an array with 2 indexes:
+		//	`path`		=> The absolute path to the directory containing the modules (required)
+		//	`url`		=> The URL to access the modules (required)
+
+		$this->_module_locations = array();
+
+		//	Nails modules
+		$this->_module_locations[]	= array(
+										'path'	=> NAILS_PATH . 'modules/shop/shipping',
+										'url'	=> NAILS_URL . 'modules/shop/shipping'
+									);
+
+		//	'Official' modules
+		$this->_module_locations[]	= array(
+										'path' => FCPATH . 'vendor/shed',
+										'url' => site_url( 'vendor/shed', page_is_secure() )
+									);
+
+		//	App Modules
+		$this->_module_locations[]	= array(
+										'path' => FCPATH . APPPATH . 'modules/shop/shipping',
+										'url' => site_url( APPPATH . 'modules/shop/shipping', page_is_secure() )
+									);
+	}
 
 	// --------------------------------------------------------------------------
 
-
-	public function get_all( $only_active = TRUE, $include_deleted = FALSE )
+	public function get_available( $refresh = FALSE )
 	{
-		$this->db->select( 'sm.*, tr.id tr_id, tr.label tr_label, tr.rate tr_rate' );
+		if ( ! is_null( $this->_available ) && ! $refresh ) :
 
-		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = sm.tax_rate_id', 'LEFT' );
-
-		if ( $only_active ) :
-
-			$this->db->where( 'sm.is_active', TRUE );
+			return $this->_available;
 
 		endif;
 
-		if ( ! $include_deleted ) :
+		//	Reset
+		$this->_available = array();
 
-			$this->db->where( 'sm.is_deleted', FALSE );
+		// --------------------------------------------------------------------------
 
-		endif;
+		//	Look for modules, where a module has the same name, the last one found is the
+		//	one which is used
 
-		$this->db->order_by( 'sm.order' );
+		$this->load->helper( 'directory' );
 
-		$_methods = $this->db->get( NAILS_DB_PREFIX . 'shop_shipping_method sm' )->result();
+		//	Take a fresh copy
+		$_module_locations = $this->_module_locations;
 
-		foreach ( $_methods AS $method ) :
+		//	Sanitise
+		for ( $i = 0; $i < count( $_module_locations ); $i++ ) :
 
-			$this->_format_method( $method );
+			//	Ensure path is present and has a trailing slash
+			if ( isset( $_module_locations[$i]['path'] ) ) :
+
+				$_module_locations[$i]['path'] = substr( $_module_locations[$i]['path'], -1, 1 ) == '/' ? $_module_locations[$i]['path'] : $_module_locations[$i]['path'] . '/';
+
+			else :
+
+				unset( $_module_locations[$i] );
+
+			endif;
+
+			//	Ensure URL is present and has a trailing slash
+			if ( isset( $_module_locations[$i]['url'] ) ) :
+
+				$_module_locations[$i]['url'] = substr( $_module_locations[$i]['url'], -1, 1 ) == '/' ? $_module_locations[$i]['url'] : $_module_locations[$i]['url'] . '/';
+
+			else :
+
+				unset( $_module_locations[$i] );
+
+			endif;
+
+		endfor;
+
+		//	Reset array keys, possible that some may have been removed
+		$_module_locations = array_values( $_module_locations );
+
+		foreach( $_module_locations AS $module_location ) :
+
+			$_path	= $module_location['path'];
+			$_modules	= directory_map( $_path, 1 );
+
+			if ( is_array( $_modules ) ) :
+
+				foreach( $_modules AS $module ) :
+
+					//	Filter out non-modules
+					$_pattern = '/^(.*)' . preg_quote( $this->_module_extension, '/' ) . '$/';
+
+					if ( ! preg_match( $_pattern, $module ) ) :
+
+						log_message( 'debug', '"' . $module . '" is not a blog module.' );
+						continue;
+
+					endif;
+
+					// --------------------------------------------------------------------------
+
+					//	Exists?
+					if ( file_exists( $_path . $module . '/config.json' ) ) :
+
+						$_config = @json_decode( file_get_contents( $_path . $module . '/config.json' ) );
+
+					else :
+
+						log_message( 'error', 'Could not find configuration file for module "' . $_path . $module. '".' );
+						continue;
+
+					endif;
+
+					//	Valid?
+					if ( empty( $_config ) ) :
+
+						log_message( 'error', 'Configuration file for module "' . $_path . $module. '" contains invalid JSON.' );
+						continue;
+
+					elseif ( ! is_object( $_config ) ) :
+
+						log_message( 'error', 'Configuration file for module "' . $_path . $module. '" contains invalid data.' );
+						continue;
+
+					endif;
+
+					//	Version OK?
+					if ( ! empty( $_config->require->nails ) ) :
+
+						preg_match( '/^(.*)?(\d.\d.\d)$/', $_config->require->nails, $_matches );
+
+						$_modifier	= $_matches[1];
+						$_version	= $_matches[2];
+						$_error		= '"' . $_path . $module . '" requires Nails ' . $_modifier . $_version . ', version ' . NAILS_VERSION . ' is installed.';
+
+						if ( ! empty( $_version ) ) :
+
+							$_version_compare = version_compare( NAILS_VERSION, $_version );
+
+							if ( $_matches[1] == '>' ) :
+
+								if ( $_version_compare <= 0 ) :
+
+									log_message( 'error', $_error );
+									continue;
+
+								endif;
+
+							elseif ( $_matches[1] == '<' ) :
+
+								if ( $_version_compare >= 0 ) :
+
+									log_message( 'error', $_error );
+									continue;
+
+								endif;
+
+							elseif ( $_matches[1] == '>=' ) :
+
+								if ( $_version_compare < 0 ) :
+
+									log_message( 'error', $_error );
+									continue;
+
+								endif;
+
+							elseif ( $_matches[1] == '<=' ) :
+
+								if ( $_version_compare >= 0 ) :
+
+									log_message( 'error', $_error );
+									continue;
+
+								endif;
+
+							else :
+
+								//	This module is only compatible with a specific version of Nails
+								if ( $_version_compare != 0 ) :
+
+									log_message( 'error', $_error );
+									continue;
+
+								endif;
+
+							endif;
+
+						endif;
+
+					endif;
+
+					// --------------------------------------------------------------------------
+
+					//	All good!
+
+					//	Set the slug
+					$_config->slug	= preg_replace( '/^(.*?)' . preg_quote( $this->_module_extension ) . '$/', '$1', $module );
+
+					//	Set the path
+					$_config->path	= $_path . $module . '/';
+
+					//	Set the URL
+					$_config->url	= $module_location['url'] . $module . '/';
+
+					$this->_available[$module] = $_config;
+
+				endforeach;
+
+			endif;
 
 		endforeach;
 
-		return $_methods;
+		$this->_available = array_values( $this->_available );
+
+		return $this->_available;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_by_id( $id )
+	public function get( $slug, $refresh = FALSE )
 	{
-		$this->db->where( 'sm.id', $id );
-		$_method = $this->get_all( FALSE );
+		$_modules = $this->get_available( $refresh );
 
-		if ( ! $_method ) :
+		foreach( $_modules AS $module ) :
 
-			return FALSE;
+			if ( $module->slug == $slug ) :
 
-		endif;
+				return $module;
 
-		return $_method[0];
-	}
+			endif;
 
+		endforeach;
 
-	// --------------------------------------------------------------------------
-
-
-	public function get_default_id()
-	{
-		$this->db->where( 'sm.is_default', TRUE );
-		$_method = $this->get_all();
-
-		if ( ! $_method ) :
-
-			return FALSE;
-
-		endif;
-
-		return $_method[0]->id;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_price_for_product( $product_id, $method_id )
-	{
-		//	Look-up the shipping emthod
-		$_method = $this->validate( $method_id );
-
-		if ( ! $_method ) :
-
-			return FALSE;
-
-		endif;
-
-		//	Look in the product_shipping_method table for a price override
-		$this->db->where( 'product_id', $product_id );
-		$this->db->where( 'shipping_method_id', $_method->id );
-		$_override = $this->db->get( NAILS_DB_PREFIX . 'shop_product_shipping_method' )->row();
-
-		if ( $_override ) :
-
-			$_out					= new stdClass();
-			$_out->price			= $_override->price;
-			$_out->price_additional	= $_override->price_additional;
-			$_out->tax_rate			= $_method->tax_rate->rate;
-
-		else :
-
-			$_out					= new stdClass();
-			$_out->price			= $_method->default_price;
-			$_out->price_additional	= $_method->default_price_additional;
-			$_out->tax_rate			= $_method->tax_rate->rate;
-
-		endif;
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function validate( $shipping_method )
-	{
-		$_method = $this->get_by_id( $shipping_method );
-
-		if ( ! $_method ) :
-
-			$this->_set_error( 'Invalid Shipping Method.' );
-			return FALSE;
-
-		endif;
-
-		if ( ! $_method->is_active ) :
-
-			$this->_set_error( 'Invalid Shipping Method.' );
-			return FALSE;
-
-		endif;
-
-		return $_method;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _format_method( &$object )
-	{
-		$object->id							= (int) $object->id;
-		$object->order						= (int) $object->order;
-
-		$object->default_price				= (float) $object->default_price;
-		$object->default_price_additional	= (float) $object->default_price_additional;
-
-		$object->is_active					= (bool) $object->is_active;
-		$object->is_deleted					= (bool) $object->is_deleted;
-		$object->is_default					= (bool) $object->is_default;
-
-		$object->tax_rate					= new stdClass();
-		$object->tax_rate->id				= (int) $object->tr_id;
-		$object->tax_rate->label			= $object->tr_label;
-		$object->tax_rate->rate				= $object->tr_rate;
-
-		unset( $object->tr_id );
-		unset( $object->tax_rate_id );
-		unset( $object->tr_label );
-		unset( $object->tr_rate );
-
+		$this->_set_error( '"' . $slug . '" was not found.' );
+		return FALSE;
 	}
 }
 
@@ -198,7 +278,7 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 /**
  * OVERLOADING NAILS' MODELS
  *
- * The following block of code makes it simple to extend one of the core shop
+ * The following block of code makes it simple to extend one of the core blog
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole

@@ -112,7 +112,7 @@ class NAILS_Blog_tag_model extends NAILS_Model
 		$this->db->set( 'label', $_slug );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 

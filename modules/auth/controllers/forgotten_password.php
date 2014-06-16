@@ -55,7 +55,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	public function index()
 	{
 		//	If user is logged in they shouldn't be accessing this method
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
@@ -128,7 +128,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 				$_always_succeed = $this->config->item( 'auth_forgotten_pass_always_succeed' );
 
 				//	Attempt to reset password
-				if ( $this->user_password->set_token( $_identifier ) ) :
+				if ( $this->user_password_model->set_token( $_identifier ) ) :
 
 					//	Send email to user; load library
 					$this->load->library( 'emailer' );
@@ -140,7 +140,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 						case 'EMAIL' :
 
-							$this->data['reset_user'] = $this->user->get_by_email( $_identifier );
+							$this->data['reset_user'] = $this->user_model->get_by_email( $_identifier );
 
 						break;
 
@@ -148,7 +148,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 						case 'USERNAME' :
 
-							$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+							$this->data['reset_user'] = $this->user_model->get_by_username( $_identifier );
 
 						break;
 
@@ -161,11 +161,11 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 							if ( valid_email( $_identifier ) ) :
 
-								$this->data['reset_user'] = $this->user->get_by_email( $_identifier );
+								$this->data['reset_user'] = $this->user_model->get_by_email( $_identifier );
 
 							else :
 
-								$this->data['reset_user'] = $this->user->get_by_username( $_identifier );
+								$this->data['reset_user'] = $this->user_model->get_by_username( $_identifier );
 
 							endif;
 
@@ -273,7 +273,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 
 		$_generate_new_pw = ! $this->config->item( 'auth_two_factor_enable' );
 
-		$_new_pw = $this->user_password->validate_token( $code, $_generate_new_pw );
+		$_new_pw = $this->user_password_model->validate_token( $code, $_generate_new_pw );
 
 		// --------------------------------------------------------------------------
 
@@ -293,18 +293,18 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 			if ( $this->config->item( 'auth_two_factor_enable' ) ) :
 
 				//	Show them a security question
-				$this->data['question'] = $this->user->get_security_question( $_new_pw['user_id'] );
+				$this->data['question'] = $this->user_model->get_security_question( $_new_pw['user_id'] );
 
 				if ( $this->data['question'] ) :
 
 					if ( $this->input->post( 'answer' ) ) :
 
-						$_valid = $this->user->validate_security_answer( $this->data['question']->id, $_new_pw['user_id'], $this->input->post( 'answer' ) );
+						$_valid = $this->user_model->validate_security_answer( $this->data['question']->id, $_new_pw['user_id'], $this->input->post( 'answer' ) );
 
 						if ( $_valid ) :
 
 							//	Correct answer, reset password and render views
-							$_new_pw = $this->user_password->validate_token( $code, TRUE );
+							$_new_pw = $this->user_password_model->validate_token( $code, TRUE );
 
 							$this->data['new_password'] = $_new_pw['password'];
 
@@ -339,7 +339,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 				else :
 
 					//	No questions, reset and load views
-					$_new_pw = $this->user_password->validate_token( $code, TRUE );
+					$_new_pw = $this->user_password_model->validate_token( $code, TRUE );
 
 					$this->data['new_password'] = $_new_pw['password'];
 
@@ -403,7 +403,7 @@ class NAILS_Forgotten_Password extends NAILS_Auth_Controller
 	public function _remap( $method )
 	{
 		//	If you're logged in you shouldn't be accessing this method
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );

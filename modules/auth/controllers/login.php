@@ -77,7 +77,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 	public function index()
 	{
 		//	If you're logged in you shouldn't be accessing this method
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( $this->data['return_to'] );
@@ -303,7 +303,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 		 * again using the hashes.
 		 *
 		 **/
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			if ( md5( active_user( 'id' ) ) == $_hash['id'] ) :
 
@@ -340,14 +340,14 @@ class NAILS_Login extends NAILS_Auth_Controller
 		 *
 		 **/
 
-		$_user = $this->user->get_by_hashes( $_hash['id'], $_hash['pw'] );
+		$_user = $this->user_model->get_by_hashes( $_hash['id'], $_hash['pw'] );
 
 		// --------------------------------------------------------------------------
 
 		if ( $_user ) :
 
 			//	User was verified, log the user in
-			$this->user->set_login_data( $_user->id );
+			$this->user_model->set_login_data( $_user->id );
 
 			// --------------------------------------------------------------------------
 
@@ -377,7 +377,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Update their last login
-			$this->user->update_last_login( $_user->id );
+			$this->user_model->update_last_login( $_user->id );
 
 			// --------------------------------------------------------------------------
 

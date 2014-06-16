@@ -161,7 +161,7 @@ class NAILS_Auth extends NAILS_API_Controller
 	public function logout()
 	{
 		//	Only create the event if the user is logged in
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			//	Generate an event for this log in
 			create_event( 'did_log_out', active_user( 'id' ) );

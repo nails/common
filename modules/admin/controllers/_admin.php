@@ -45,7 +45,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Admins only please
-		if ( ! $this->user->is_admin() ) :
+		if ( ! $this->user_model->is_admin() ) :
 
 			unauthorised();
 
@@ -109,7 +109,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$_active_method	= $this->uri->segment( 3, 'index' );
 		$_acl			= active_user( 'acl' );
 
-		if ( ! $this->user->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
 
 			//	If this is the dashboard, we should see if the user has permission to
 			//	access any other modules before we 404 their ass.
@@ -143,7 +143,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 			endif;
 
-		elseif ( ! $this->user->is_superuser() ) :
+		elseif ( ! $this->user_model->is_superuser() ) :
 
 			//	Module is OK, check to make sure they can access this method
 			if ( ! isset( $_acl['admin'][$_active_module][$_active_method] ) ) :

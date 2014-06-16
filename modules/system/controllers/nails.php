@@ -30,7 +30,7 @@ class NAILS_Nails extends NAILS_System_Controller
 	public function info()
 	{
 		//	Command line or super user only
-		if ( ! $this->input->is_cli_request() && ! $this->user->is_superuser() ) :
+		if ( ! $this->input->is_cli_request() && ! $this->user_model->is_superuser() ) :
 
 			show_404();
 
@@ -62,7 +62,7 @@ class NAILS_Nails extends NAILS_System_Controller
 
 	public function configure()
 	{
-		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+		if ( ! $this->user_model->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
 
 			if ( module_is_enabled( 'auth' ) ) :
 

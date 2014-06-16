@@ -26,7 +26,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 			$_return_to	= $this->input->get( 'return_to', TRUE );
 			$_remember	= $this->input->get( 'remember', TRUE );
 			$_user_id	= $this->uri->segment( 3 );
-			$_user		= $this->user->get_by_id( $_user_id );
+			$_user		= $this->user_model->get_by_id( $_user_id );
 
 			if ( ! $_user ) :
 
@@ -87,23 +87,23 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 					//	Validate the answer, if correct then log user in and forward, if not
 					//	then generate a new token and show errors
 
-					$this->data['question'] = $this->user->get_security_question( $_user->id );
-					$_valid					= $this->user->validate_security_answer( $this->data['question']->id, $_user->id, $this->input->post( 'answer' ) );
+					$this->data['question'] = $this->user_model->get_security_question( $_user->id );
+					$_valid					= $this->user_model->validate_security_answer( $this->data['question']->id, $_user->id, $this->input->post( 'answer' ) );
 
 					if ( $_valid ) :
 
 						//	Set login data for this user
-						$this->user->set_login_data( $_user->id );
+						$this->user_model->set_login_data( $_user->id );
 
 						//	If we're remembering this user set a cookie
 						if ( $_remember ) :
 
-							$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
+							$this->user_model->set_remember_cookie( $_user->id, $_user->password, $_user->email );
 
 						endif;
 
 						//	Update their last login and increment their login count
-						$this->user->update_last_login( $_user->id );
+						$this->user_model->update_last_login( $_user->id );
 
 						// --------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 				else :
 
 					//	Determine whether the user has any security questions set
-					$this->data['question'] = $this->user->get_security_question( $_user->id );
+					$this->data['question'] = $this->user_model->get_security_question( $_user->id );
 
 					if ( $this->data['question'] ) :
 
@@ -282,20 +282,20 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 									endif;
 
-									if ( $this->user->set_security_questions( $_user->id, $_data ) ) :
+									if ( $this->user_model->set_security_questions( $_user->id, $_data ) ) :
 
 										//	Set login data for this user
-										$this->user->set_login_data( $_user->id );
+										$this->user_model->set_login_data( $_user->id );
 
 										//	If we're remembering this user set a cookie
 										if ( $_remember ) :
 
-											$this->user->set_remember_cookie( $_user->id, $_user->password, $_user->email );
+											$this->user_model->set_remember_cookie( $_user->id, $_user->password, $_user->email );
 
 										endif;
 
 										//	Update their last login and increment their login count
-										$this->user->update_last_login( $_user->id );
+										$this->user_model->update_last_login( $_user->id );
 
 										// --------------------------------------------------------------------------
 
@@ -340,7 +340,7 @@ class NAILS_Security_questions extends NAILS_Auth_Controller
 
 									else :
 
-										$this->data['error'] = lang( 'auth_twofactor_question_set_fail' ) . ' ' . $this->user->last_error();
+										$this->data['error'] = lang( 'auth_twofactor_question_set_fail' ) . ' ' . $this->user_model->last_error();
 
 									endif;
 

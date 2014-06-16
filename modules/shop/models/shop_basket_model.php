@@ -1041,10 +1041,10 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	{
 		$this->session->set_userdata( $this->sess_var, $this->_items );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$_data = array( 'shop_basket' => serialize( $this->_items ) );
-			$this->user->update( active_user( 'id' ), $_data );
+			$this->user_model->update( active_user( 'id' ), $_data );
 
 		endif;
 	}
@@ -1077,10 +1077,10 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	public function __destruct()
 	{
 		//	If logged in, save the basket to the user's meta data for safe keeping.
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$_data = array( 'shop_basket' => serialize( $this->_items ) );
-			$this->user->update( active_user( 'id' ), $_data );
+			$this->user_model->update( active_user( 'id' ), $_data );
 
 		endif;
 	}

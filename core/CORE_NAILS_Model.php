@@ -6,6 +6,7 @@ class CORE_NAILS_Model extends CI_Model
 	//	Common data
 	protected $data;
 	protected $user;
+	protected $user_model;
 	protected $_cache_values;
 	protected $_cache_keys;
 	protected $_cache_method;
@@ -53,10 +54,11 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Ensure models all have access to the NAILS_USR_OBJ if it's defined
+		//	Ensure models all have access to the global user_model
 		if ( function_exists( 'get_userobject' ) ) :
 
-			$this->user = get_userobject();
+			$this->user_model	= get_userobject();
+			$this->user			= get_userobject();
 
 		endif;
 
@@ -424,7 +426,7 @@ class CORE_NAILS_Model extends CI_Model
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
 
-			if ( $this->user->is_logged_in() ) :
+			if ( $this->user_model->is_logged_in() ) :
 
 				$this->db->set( 'created_by', active_user( 'id' ) );
 				$this->db->set( 'modified_by', active_user( 'id' ) );
@@ -505,7 +507,7 @@ class CORE_NAILS_Model extends CI_Model
 
 			$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
 
-			if ( $this->user->is_logged_in() ) :
+			if ( $this->user_model->is_logged_in() ) :
 
 				$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
 

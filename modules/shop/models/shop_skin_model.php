@@ -54,7 +54,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 		//	App Skins
 		$this->_skin_locations[]	= array(
 										'path' => FCPATH . APPPATH . 'modules/shop/views',
-										'url' => site_url( APPPATH . 'modules/shop/views' )
+										'url' => site_url( APPPATH . 'modules/shop/views', page_is_secure() )
 									);
 	}
 

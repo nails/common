@@ -48,7 +48,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :
@@ -363,7 +363,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :
@@ -428,7 +428,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :

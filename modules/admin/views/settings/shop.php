@@ -42,6 +42,10 @@
 					Generic store settings. Use these to control some store behaviours.
 				</p>
 				<hr />
+				<fieldset id="shop-settings-domicile">
+					<legend>Domicile</legend>
+
+				</fieldset>
 				<fieldset id="shop-settings-name">
 					<legend>Name</legend>
 					<p>
@@ -57,101 +61,6 @@
 						$_field['placeholder']	= 'Customise the Shop\'s Name';
 
 						echo form_field( $_field );
-
-					?>
-				</fieldset>
-				<fieldset id="shop-settings-warehouse-collection">
-					<legend>Warehouse Collection</legend>
-					<p>
-						If you wish to give your customers the option of collecting from your warehouse or store then turn this feature on here. Also provide the address of the warehouse or store so we can let the customer know where to go.
-					</p>
-					<?php
-
-						//	Order Notifications
-						$_field					= array();
-						$_field['key']			= 'warehouse_collection_enabled';
-						$_field['label']		= 'Enabled';
-						$_field['default']		= app_setting( $_field['key'], 'shop' );
-						$_field['id']			= 'warehouse_collection_enabled';
-
-						echo form_field_boolean( $_field );
-
-						// --------------------------------------------------------------------------
-
-						if ( $this->input->post( $_field['key'] ) ) :
-
-							$_display = $this->input->post( $_field['key'] ) ? 'block' : 'none';
-
-						else :
-
-							$_display = app_setting( $_field['key'], 'shop' ) ? 'block' : 'none';
-
-						endif;
-
-						echo '<div id="warehouse-collection-address" style="display:' . $_display . '">';
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_addressee';
-							$_field['label']		= 'Addressee';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_line1';
-							$_field['label']		= 'Address Line 1';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_line2';
-							$_field['label']		= 'Address Line 2';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_town';
-							$_field['label']		= 'Town';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_postcode';
-							$_field['label']		= 'Postcode';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_state';
-							$_field['label']		= 'State/County';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-							// --------------------------------------------------------------------------
-
-							$_field					= array();
-							$_field['key']			= 'warehouse_addr_country';
-							$_field['label']		= 'Country';
-							$_field['default']		= app_setting( $_field['key'], 'shop' );
-
-							echo form_field( $_field );
-
-						echo '</div>';
 
 					?>
 				</fieldset>
@@ -444,7 +353,7 @@
 					<?php
 
 						echo '<select name="active_currencies[]" multiple="multiple" class="select2">';
-						foreach ( $currencies_all_flat AS $currency ) :
+						foreach ( $currencies AS $currency ) :
 
 							$_selected = $currency->is_active ? 'selected="selected"' : '';
 							echo '<option value="'. $currency->id . '" ' . $_selected . '>' . $currency->code . ' - ' . $currency->label . '</option>';
@@ -463,9 +372,19 @@
 			<?php $_display = $this->input->post( 'update' ) == 'shipping' ? 'active' : ''?>
 			<div id="tab-shipping" class="tab page <?=$_display?> shipping">
 				<p>
-					Configure shipping modules.
+					Which countries would you like to ship to? If no countries are selected, it's assumed you're happy to ship worldwide.
+				</p>
+				<p class="system-alert message no-close">
+					<strong>TODO:</strong> Render a list of countries.
 				</p>
 				<hr />
+
+				<hr />
+				<p>
+					Enable the shipping modules you wish to use here. A shipping module defines a set of rules as
+					to how to calculate the shipping cost for a basket. The system will work down the list, top
+					to bottom, until an enabled module is able to give a price.
+				</p>
 				<?php
 
 					if ( ! empty( $shipping_modules ) ) :
@@ -473,16 +392,41 @@
 						echo form_open( NULL, 'style="margin-bottom:0;"' );
 						echo form_hidden( 'update', 'shipping' );
 
-						foreach ( $shipping_modules AS $sm ) :
+						echo '<table>';
+							echo '<thead class="shipping-modules">';
+								echo '<tr>';
+									echo '<th class="order">Order</th>';
+									echo '<th class="enabled">Enabled</th>';
+									echo '<th class="label">Label</th>';
+									echo '<th class="configure">Configure</th>';
+								echo '</tr>';
+							echo '</thead>';
+							echo '<tbody>';
+							foreach( $shipping_modules AS $sm ) :
 
-							echo '<fieldset id="shop-settings-pg-' . $sm->slug . '">';
-							echo '<legend>';
-								echo $sm->label;
-							echo '</legend>';
-								echo '<p>TODO: Request the settings config from the module.</p>';
-							echo '</fieldset>';
+								$_name			= ! empty( $sm->name ) ? $sm->name : 'Untitled';
+								$_description	= ! empty( $sm->description ) ? $sm->description : '';
 
-						endforeach;
+								echo '<tr>';
+									echo '<td class="order">';
+										echo '-';
+									echo '</td>';
+									echo '<td class="enabled">';
+										echo '-';
+									echo '</td>';
+									echo '<td class="label">';
+										echo $_name;
+										echo $_description ? '<small>' . $_description . '</small>' : '';
+									echo '</td>';
+									echo '<td class="configure">';
+										echo '-';
+									echo '</td>';
+								echo '</tr>';
+
+							endforeach;
+							echo '<tbody>';
+						echo '</table>';
+						echo '<hr />';
 
 						echo '<p style="margin-top:1em;margin-bottom:0;">';
 							echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );

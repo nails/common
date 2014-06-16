@@ -10,17 +10,20 @@
  */
 if ( ! function_exists( 'get_userobject' ) )
 {
-	function get_userobject()
+	function &get_userobject()
 	{
-		if ( ! defined( 'NAILS_USR_OBJ' ) )
-			return FALSE;
+		//	So we can return a reference
+		$_fail = FALSE;
 
 		$_ci =& get_instance();
 
-		if ( ! isset( $_ci->{NAILS_USR_OBJ} ) )
-			return FALSE;
+		if ( ! isset( $_ci->user_model ) ) :
 
-		return $_ci->{NAILS_USR_OBJ};
+			return $_fail;
+
+		endif;
+
+		return $_ci->user_model;
 	}
 }
 
@@ -41,7 +44,7 @@ if ( ! function_exists( 'active_user' ) )
 {
 	function active_user( $keys = FALSE, $delimiter = ' ' )
 	{
-		$_usr_obj =& get_userobject();
+		$_usr_obj = get_userobject();
 
 		if ( $_usr_obj ) :
 
@@ -73,7 +76,7 @@ if ( ! function_exists( 'user_has_permission' ) )
 {
 	function user_has_permission( $permission, $user = NULL )
 	{
-		$_usr_obj =& get_userobject();
+		$_usr_obj = get_userobject();
 
 		if ( $_usr_obj ) :
 

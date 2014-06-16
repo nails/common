@@ -448,7 +448,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		$this->db->set( 'is_deleted',		$data->is_deleted );
 		$this->db->set( 'modified',			'NOW()', FALSE );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by',	active_user( 'id' ) );
 

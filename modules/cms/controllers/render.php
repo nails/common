@@ -123,7 +123,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		//	the user is someone with edit permissions) then highlight this fact using
 		//	a system alert (which the templates *should* handle).
 
-		if ( ! $this->data['message'] && ! $this->_is_preview && $_page->has_unpublished_changes && $this->user->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
+		if ( ! $this->data['message'] && ! $this->_is_preview && $_page->has_unpublished_changes && $this->user_model->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
 
 			$this->data['message'] = lang( 'cms_notice_unpublished_changes', array( site_url( 'cms/render/preview/' . $_page->id ), site_url( 'admin/cms/pages/edit/' . $_page->id ) ) );
 
@@ -150,7 +150,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 	public function preview()
 	{
-		if ( $this->user->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
+		if ( $this->user_model->is_admin() && user_has_permission( 'admin.cms.can_edit_page' ) ) :
 
 			$this->_is_preview = TRUE;
 			return $this->page();

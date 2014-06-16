@@ -81,18 +81,18 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$_acl						= active_user( 'acl' );
 		$this->_export_sources		= array();
 
-		if ( $this->user->is_superuser() || isset( $_acl['admin']['accounts']['index'] ) )
+		if ( $this->user_model->is_superuser() || isset( $_acl['admin']['accounts']['index'] ) )
 		$this->_export_sources[]	= array( 'Members: All', 'Export a list of all the site\'s registered users and their meta data.', 'users_all' );
 
 		if ( module_is_enabled( 'shop' ) ) :
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['inventory'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['inventory'] ) )
 			$this->_export_sources[]	= array( 'Shop: Inventory', 'Export a list of the shop\'s inventory.', 'shop_inventory' );
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['orders'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['orders'] ) )
 			$this->_export_sources[]	= array( 'Shop: Orders', 'Export a list of all shop orders and their products.', 'shop_orders' );
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['vouchers'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['vouchers'] ) )
 			$this->_export_sources[]	= array( 'Shop: Vouchers', 'Export a list of all shop vouchers.', 'shop_vouchers' );
 
 		endif;
@@ -183,7 +183,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['languages'] = $this->language->get_all();
+		$this->data['languages'] = $this->language_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -201,7 +201,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language->mark_supported( $_id ) ) :
+		if ( $this->language_model->mark_supported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_ok' ) );
 
@@ -222,7 +222,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	{
 		$_id = $this->uri->segment( 4 );
 
-		if ( $this->language->mark_unsupported( $_id ) ) :
+		if ( $this->language_model->mark_unsupported( $_id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_ok' ) );
 
@@ -338,7 +338,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_users_all( $out = array() )
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -459,7 +459,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_inventory()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['inventory'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['inventory'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -486,7 +486,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_orders()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['orders'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['orders'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -567,7 +567,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_vouchers()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['vouchers'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['vouchers'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );

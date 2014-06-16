@@ -30,7 +30,7 @@ class NAILS_Unsubscribe extends NAILS_Email_Controller
 	 **/
 	public function index()
 	{
-		if ( ! $this->user->is_logged_in() ) :
+		if ( ! $this->user_model->is_logged_in() ) :
 
 			unauthorised();
 
@@ -53,7 +53,7 @@ class NAILS_Unsubscribe extends NAILS_Email_Controller
 
 		endif;
 
-		$_user = $this->user->get_by_email( $_token[2] );
+		$_user = $this->user_model->get_by_email( $_token[2] );
 
 		if ( ! $_user || $_user->id != active_user( 'id ' ) ) :
 

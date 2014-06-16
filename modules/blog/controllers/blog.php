@@ -117,7 +117,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	If this post's status is not published then 404, unless logged in as an admin
-		if ( ! $this->data['post']->is_published && ! $this->user->is_admin() ) :
+		if ( ! $this->data['post']->is_published && ! $this->user_model->is_admin() ) :
 
 			show_404();
 

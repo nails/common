@@ -39,7 +39,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+		if ( ! $this->user_model->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
 
 			if ( module_is_enabled( 'auth' ) ) :
 

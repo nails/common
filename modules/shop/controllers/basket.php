@@ -318,10 +318,10 @@ class NAILS_Basket extends NAILS_Shop_Controller
 			//	Valid currency
 			$this->session->set_userdata( 'shop_currency', $_currency->id );
 
-			if ( $this->user->is_logged_in() ) :
+			if ( $this->user_model->is_logged_in() ) :
 
 				//	Save to the user object
-				$this->user->update( active_user( 'id' ), array( 'shop_currency' => $_currency->id ) );
+				$this->user_model->update( active_user( 'id' ), array( 'shop_currency' => $_currency->id ) );
 
 			endif;
 

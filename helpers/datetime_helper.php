@@ -12,7 +12,7 @@ if ( ! function_exists( 'user_date' ) )
 {
 	function user_date( $timestamp = NULL, $format_date = NULL )
 	{
-		return get_instance()->datetime->user_date( $timestamp, $format_date );
+		return get_instance()->datetime_model->user_date( $timestamp, $format_date );
 	}
 }
 
@@ -31,7 +31,7 @@ if ( ! function_exists( 'user_mysql_date' ) )
 {
 	function user_mysql_date( $timestamp = NULL )
 	{
-		return get_instance()->datetime->user_date( $timestamp, 'Y-m-d' );
+		return get_instance()->datetime_model->user_date( $timestamp, 'Y-m-d' );
 	}
 }
 
@@ -50,7 +50,7 @@ if ( ! function_exists( 'user_rdate' ) )
 {
 	function user_rdate( $timestamp = NULL )
 	{
-		return get_instance()->datetime->user_rdate( $timestamp, 'date' );
+		return get_instance()->datetime_model->user_rdate( $timestamp, 'date' );
 	}
 }
 
@@ -71,7 +71,7 @@ if ( ! function_exists( 'user_datetime' ) )
 {
 	function user_datetime( $timestamp = NULL, $format_date = NULL, $format_time = NULL )
 	{
-		return get_instance()->datetime->user_datetime( $timestamp, $format_date, $format_time );
+		return get_instance()->datetime_model->user_datetime( $timestamp, $format_date, $format_time );
 	}
 }
 
@@ -90,7 +90,7 @@ if ( ! function_exists( 'user_mysql_datetime' ) )
 {
 	function user_mysql_datetime( $timestamp = NULL )
 	{
-		return get_instance()->datetime->user_datetime( $timestamp, 'Y-m-d', 'H:i:s' );
+		return get_instance()->datetime_model->user_datetime( $timestamp, 'Y-m-d', 'H:i:s' );
 	}
 }
 
@@ -109,7 +109,7 @@ if ( ! function_exists( 'user_rdatetime' ) )
 {
 	function user_rdatetime( $timestamp = NULL )
 	{
-		return get_instance()->datetime->user_rdate( $timestamp, 'datetime' );
+		return get_instance()->datetime_model->user_rdate( $timestamp, 'datetime' );
 	}
 }
 

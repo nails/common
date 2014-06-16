@@ -33,7 +33,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	If user is logged in they shouldn't be accessing this method
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->session->set_flashdata( 'error', lang( 'auth_no_access_already_logged_in', active_user( 'email' ) ) );
 			redirect( '/' );
@@ -56,7 +56,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 	private function _validate( $id, $hash )
 	{
 		//	Check auth credentials
-		$_user = $this->user->get_by_id( $id );
+		$_user = $this->user_model->get_by_id( $id );
 
 		// --------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 					$_remember							= (bool) $this->input->get( 'remember' );
 
 					//	Reset the password
-					if ( $this->user->update( $id, $_data ) ) :
+					if ( $this->user_model->update( $id, $_data ) ) :
 
 						//	Log the user in
 						switch( APP_NATIVE_LOGIN_USING ) :
@@ -199,7 +199,7 @@ class NAILS_Reset_Password extends NAILS_Auth_Controller
 
 					else :
 
-						$this->data['error'] = lang( 'auth_forgot_reset_badupdate', $this->user->last_error() );
+						$this->data['error'] = lang( 'auth_forgot_reset_badupdate', $this->user_model->last_error() );
 
 					endif;
 

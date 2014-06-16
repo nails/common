@@ -17,7 +17,7 @@
 
 class NAILS_User_group_model extends NAILS_Model
 {
-	public $default_group;
+	protected $default_group;
 
 
 	// --------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class NAILS_User_group_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->default_group = $this->get_default_group();
+		$this->_default_group = $this->get_default_group();
 	}
 
 
@@ -62,7 +62,7 @@ class NAILS_User_group_model extends NAILS_Model
 		//	Unset old default
 		$this->db->set( 'is_default', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 
@@ -73,7 +73,7 @@ class NAILS_User_group_model extends NAILS_Model
 		//	Set new default
 		$this->db->set( 'is_default', TRUE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->db->set( 'modified_by', active_user( 'id' ) );
 
@@ -89,6 +89,10 @@ class NAILS_User_group_model extends NAILS_Model
 		else :
 
 			$this->db->trans_commit();
+
+			//	Refresh the default group variable
+			$this->get_default_group();
+
 			return TRUE;
 
 		endif;
@@ -111,9 +115,18 @@ class NAILS_User_group_model extends NAILS_Model
 
 		endif;
 
-		$this->default_group = $_group[0];
+		$this->_default_group = $_group[0];
 
-		return $this->default_group;
+		return $this->_default_group;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_default_group_id()
+	{
+		return $this->_default_group->id;
 	}
 
 

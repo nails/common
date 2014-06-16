@@ -937,7 +937,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 		$_data['created']		= date( 'Y-m-d H:i:s' );
 		$_data['referrer']		= empty( $data['referrer'] ) ? NULL : prep_url( trim( $data['referrer'] ) );
 
-		if ( $_data['user_id'] && $this->user->is_admin( $_data['user_id'] ) ) :
+		if ( $_data['user_id'] && $this->user_model->is_admin( $_data['user_id'] ) ) :
 
 			$this->_set_error( 'Administrators cannot affect the post\'s popularity.' );
 			return FALSE;

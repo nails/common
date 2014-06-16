@@ -29,7 +29,7 @@ class NAILS_Logout extends NAILS_Auth_Controller
 	public function index()
 	{
 		//	If already logged out just send them silently on their way
-		if ( ! $this->user->is_logged_in() ) :
+		if ( ! $this->user_model->is_logged_in() ) :
 
 			redirect( '/' );
 

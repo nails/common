@@ -273,9 +273,9 @@ class NAILS_Li extends NAILS_Auth_Controller
 		//	Check if the user has previously connected this LinkedIn account
 		//	to another registered account
 
-		$_user = $this->user->get_by_liid( $access_token->user_id );
+		$_user = $this->user_model->get_by_liid( $access_token->user_id );
 
-		if ( $this->user->is_logged_in() && $_user ) :
+		if ( $this->user_model->is_logged_in() && $_user ) :
 
 			//	This LinkedIn ID is already in use, tell the user so and prevent anything else from happening.
 			$this->session->set_flashdata( 'error', lang( 'auth_social_account_in_use', array( 'LinkedIn', APP_NAME ) ) );
@@ -330,7 +330,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		//	If the user is already logged in then skip the email check and link the
 		//	two accounts together.
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$this->_link_user( $access_token );
 
@@ -343,7 +343,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		if ( ! $_user ) :
 
 			//	Not recognised via LinkedIn ID, what about via their email?
-			$_user = $this->user->get_by_email( $access_token->email );
+			$_user = $this->user_model->get_by_email( $access_token->email );
 
 			if ( ! $_user ) :
 
@@ -449,7 +449,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 	public function disconnect()
 	{
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			if ( $this->li->user_is_linked() ) :
 
@@ -506,7 +506,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Update the user
-		$this->user->update( active_user( 'id' ), $_data );
+		$this->user_model->update( active_user( 'id' ), $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -556,7 +556,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 		//	Update token
 		$_data['li_token']	= $access_token->access_token;
-		$this->user->update( $user->id, $_data );
+		$this->user_model->update( $user->id, $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -593,7 +593,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		else :
 
 			//	Set login details
-			$this->user->set_login_data( $user->id );
+			$this->user_model->set_login_data( $user->id );
 
 			// --------------------------------------------------------------------------
 
@@ -623,7 +623,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Update the last login
-			$this->user->update_last_login( $user->id );
+			$this->user_model->update_last_login( $user->id );
 
 			// --------------------------------------------------------------------------
 
@@ -686,12 +686,12 @@ class NAILS_Li extends NAILS_Auth_Controller
 			//	No handle, odd, try their name, keep trying it till it works
 			$_data['username'] = url_title( $access_token->first_name . ' ' . $access_token->last_name, '-', TRUE );
 
-			$_user = $this->user->get_by_username( $_data['username'] );
+			$_user = $this->user_model->get_by_username( $_data['username'] );
 
 			while( $_user ) :
 
 				$_data['username']  = increment_string( url_title( $access_token->first_name . ' ' . $access_token->last_name, '-', TRUE ), '' );
-				$_user = $this->user->get_by_username( $_data['username'] );
+				$_user = $this->user_model->get_by_username( $_data['username'] );
 
 			endwhile;
 
@@ -700,12 +700,12 @@ class NAILS_Li extends NAILS_Auth_Controller
 			//	Random string
 			$_data['username'] = 'user' . date( 'YmdHis' );
 
-			$_user = $this->user->get_by_username( $_data['username'] );
+			$_user = $this->user_model->get_by_username( $_data['username'] );
 
 			while ( $_user ) :
 
 				$_data['username']  = increment_string( $_data['username'], '' );
-				$_user = $this->user->get_by_username( $_data['username'] );
+				$_user = $this->user_model->get_by_username( $_data['username'] );
 
 			endwhile;
 
@@ -731,17 +731,17 @@ class NAILS_Li extends NAILS_Auth_Controller
 
 		else :
 
-			$_data['group_id'] = $this->user_group->default_group->id;
+			$_data['group_id'] = $this->user_group_model->get_default_group_id();
 
 		endif;
 
 		//	Create new user
-		$_new_user = $this->user->create( $_data );
+		$_new_user = $this->user_model->create( $_data );
 
 		if ( $_new_user ) :
 
 			//	Fetch group data
-			$_group	= $this->user_group->get_by_id( $_data['group_id'] );
+			$_group	= $this->user_group_model->get_by_id( $_data['group_id'] );
 
 			// --------------------------------------------------------------------------
 
@@ -774,7 +774,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 			// --------------------------------------------------------------------------
 
 			//	Log the user in
-			$this->user->set_login_data( $_new_user->id );
+			$this->user_model->set_login_data( $_new_user->id );
 
 			// --------------------------------------------------------------------------
 

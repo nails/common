@@ -500,11 +500,10 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		//	Get data
 		$this->data['settings']					= app_setting( NULL, 'shop', TRUE );
 		$this->data['payment_gateways']			= array();
-		$this->data['shipping_modules']			= array();
+		$this->data['shipping_modules']			= $this->shop_shipping_model->get_available();
 		$this->data['skins']					= $this->shop_skin_model->get_available();
-		$this->data['currencies_all_flat']		= $this->shop_currency_model->get_all( FALSE );
+		$this->data['currencies']				= $this->shop_currency_model->get_all( FALSE );
 		$this->data['currencies_active_flat']	= $this->shop_currency_model->get_all_flat();
-		$this->data['shipping_methods']			= $this->shop_shipping_model->get_all( FALSE );
 		$this->data['tax_rates']				= $this->shop_tax_model->get_all();
 		$this->data['tax_rates_flat']			= $this->shop_tax_model->get_all_flat();
 		array_unshift( $this->data['tax_rates_flat'], 'No Tax');
@@ -532,6 +531,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings									= array();
+		$_settings['domicile']						= $this->input->post( 'domicile' );
 		$_settings['name']							= $this->input->post( 'name' );
 		$_settings['url']							= $this->input->post( 'url' );
 		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );

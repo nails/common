@@ -43,7 +43,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 		// --------------------------------------------------------------------------
 
 		//	Determine if browsing/uploading is permitted
-		$this->data['enabled'] = $this->user->is_logged_in() ? TRUE : FALSE;
+		$this->data['enabled'] = $this->user_model->is_logged_in() ? TRUE : FALSE;
 		$this->data['enabled'] = TRUE;
 
 		// --------------------------------------------------------------------------

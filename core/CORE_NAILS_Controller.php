@@ -406,7 +406,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instantiate_datetime()
 	{
 		//	Pass the user object to the datetime model
-		$this->datetime->set_usr_obj( $this->user );
+		$this->datetime_model->set_usr_obj( $this->user_model );
 
 		// --------------------------------------------------------------------------
 
@@ -434,14 +434,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
-		$this->datetime->set_timezones( 'UTC', $_timezone_user );
+		$this->datetime_model->set_timezones( 'UTC', $_timezone_user );
 
 		// --------------------------------------------------------------------------
 
 		//	Set the default date/time formats
 		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
 		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
-		$this->datetime->set_formats( $_format_date, $_format_time );
+		$this->datetime_model->set_formats( $_format_date, $_format_time );
 
 		// --------------------------------------------------------------------------
 
@@ -484,7 +484,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instantiate_languages()
 	{
 		//	Pass the user object to the language model
-		$this->language->set_usr_obj( $this->user );
+		$this->language_model->set_usr_obj( $this->user_model );
 
 		//	Check default lang is supported by nails
 		$this->_supported	= array();
@@ -496,8 +496,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
-		define( 'APP_DEFAULT_LANG_ID',		$this->language->get_default_id() );
-		define( 'APP_DEFAULT_LANG_NAME',	$this->language->get_default_name() );
+		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
+		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
 
 		// --------------------------------------------------------------------------
 
@@ -658,23 +658,15 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$_models	= array();
 		$_models[]	= 'system/app_setting_model';
-		$_models[]	= array( 'system/user_model',			'user' );
-		$_models[]	= array( 'system/user_group_model',		'user_group' );
-		$_models[]	= array( 'system/user_password_model',	'user_password' );
-		$_models[]	= array( 'system/datetime_model',		'datetime' );
-		$_models[]	= array( 'system/language_model',		'language' );
+		$_models[]	= 'system/user_model';
+		$_models[]	= 'system/user_group_model';
+		$_models[]	= 'system/user_password_model';
+		$_models[]	= 'system/datetime_model';
+		$_models[]	= 'system/language_model';
 
 		foreach ( $_models AS $model ) :
 
-			if ( is_array( $model ) ) :
-
-				$this->load->model( $model[0], $model[1] );
-
-			else :
-
-				$this->load->model( $model );
-
-			endif;
+			$this->load->model( $model );
 
 		endforeach;
 	}
@@ -694,29 +686,27 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_user()
 	{
-		//	Set a $user variable (for the views)
-		$this->data['user']				=& $this->user;
-		$this->data['user_group']		=& $this->user_group;
-		$this->data['user_password']	=& $this->user_password;
-
-		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
-		//	reference the user model
-
-		define( 'NAILS_USR_OBJ', 'user' );
-
-		// --------------------------------------------------------------------------
-
 		//	Find a remembered user and initialise the user model; this routine checks
 		//	the user's cookies and set's up the session for an existing or new user.
 
-		$this->user->find_remembered_user();
-		$this->user->init();
+		$this->user_model->find_remembered_user();
+		$this->user_model->init();
 
 		// --------------------------------------------------------------------------
 
 		//	Inject the user object into the user_group and user_password models
-		$this->user_group->_set_user_object( $this->user );
-		$this->user_password->_set_user_object( $this->user );
+		$this->user_group_model->_set_user_object( $this->user_model );
+		$this->user_password_model->_set_user_object( $this->user_model );
+
+		// --------------------------------------------------------------------------
+
+		//	Shortcut/backwards compatibility
+		$this->user = $this->user_model;
+
+		//	Set a $user variable (for the views)
+		$this->data['user']				= $this->user_model;
+		$this->data['user_group']		= $this->user_group_model;
+		$this->data['user_password']	= $this->user_password_model;
 	}
 
 
@@ -726,7 +716,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _is_user_suspended()
 	{
 		//	Check if this user is suspended
-		if ( $this->user->is_logged_in() && active_user( 'is_suspended' ) ) :
+		if ( $this->user_model->is_logged_in() && active_user( 'is_suspended' ) ) :
 
 			//	Load models and langs
 			$this->load->model( 'auth/auth_model' );

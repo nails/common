@@ -230,11 +230,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		//	Get the accounts
 		$this->data['users']		= new stdClass();
-		$this->data['users']->data	= $this->user->get_all( FALSE, $_order, $_limit, $this->accounts_where, $_search );
+		$this->data['users']->data	= $this->user_model->get_all( FALSE, $_order, $_limit, $this->accounts_where, $_search );
 
 		//	Work out pagination
 		$this->data['users']->pagination				= new stdClass();
-		$this->data['users']->pagination->total_results	= $this->user->count_all( $this->accounts_where, $_search );
+		$this->data['users']->pagination->total_results	= $this->user_model->count_all( $this->accounts_where, $_search );
 
 		// --------------------------------------------------------------------------
 
@@ -359,7 +359,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				if ( ! $_data['password'] ) :
 
 					//	Password isn't set, generate one
-					$_data['password'] = $this->user_password->generate_password();
+					$_data['password'] = $this->user_password_model->generate_password();
 
 				endif;
 
@@ -380,15 +380,15 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 				$_data['temp_pw']			= string_to_boolean( $this->input->post( 'temp_pw' ) );
 				$_data['inform_user_pw']	= TRUE;
 
-				$_new_user = $this->user->create( $_data, string_to_boolean( $this->input->post( 'send_activation' ) ) );
+				$_new_user = $this->user_model->create( $_data, string_to_boolean( $this->input->post( 'send_activation' ) ) );
 
 				if ( $_new_user ) :
 
 					//	Any errors happen? While the user can be created successfully other problems might happen along the way
-					if ( $this->user->get_errors() ) :
+					if ( $this->user_model->get_errors() ) :
 
 						$_message  = '<strong>Please Note,</strong> while the user was created successfully, the following issues were encountered:';
-						$_message .= '<ul><li>' . implode( '</li><li>', $this->user->get_errors() ) . '</li></ul>';
+						$_message .= '<ul><li>' . implode( '</li><li>', $this->user_model->get_errors() ) . '</li></ul>';
 
 						$this->session->set_flashdata( 'message', $_message );
 
@@ -420,13 +420,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo; ' . implode( '<br />&rsaquo; ', $this->user->get_errors() );
+					$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account:<br />&rsaquo; ' . implode( '<br />&rsaquo; ', $this->user_model->get_errors() );
 
 				endif;
 
 			else :
 
-				$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account. ' . $this->user->last_error();
+				$this->data['error'] = '<strong>Sorry,</strong> there was an error when creating the user account. ' . $this->user_model->last_error();
 
 			endif;
 
@@ -435,7 +435,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the groups
-		$this->data['groups'] = $this->user_group->get_all();
+		$this->data['groups'] = $this->user_group_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -461,7 +461,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the user's data; loaded early because it's required for the user_meta_cols
 		//	(we need to know the group of the user so we can pull up the correct cols/rules)
 
-		$_user = $this->user->get_by_id( $this->uri->segment( 4 ) );
+		$_user = $this->user_model->get_by_id( $this->uri->segment( 4 ) );
 
 		if ( ! $_user ) :
 
@@ -472,7 +472,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		endif;
 
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
+		if ( ! $this->user_model->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
 
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			$_return_to = $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/dashboard';
@@ -717,9 +717,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					// --------------------------------------------------------------------------
 
 					//	Update account
-					if ( $this->user->update( $this->input->post( 'id' ), $_data ) ) :
+					if ( $this->user_model->update( $this->input->post( 'id' ), $_data ) ) :
 
-						$_name = $this->input->post(  'first_name' ) . ' ' . $this->input->post( 'last_anme' );
+						$_name = $this->input->post(  'first_name' ) . ' ' . $this->input->post( 'last_name' );
 						$this->data['success'] = lang( 'accounts_edit_ok', array( title_case( $_name ) ) );
 
 						// --------------------------------------------------------------------------
@@ -752,12 +752,12 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 						// --------------------------------------------------------------------------
 
 						//	refresh the user object
-						$_user = $this->user->get_by_id( $this->input->post( 'id' ) );
+						$_user = $this->user_model->get_by_id( $this->input->post( 'id' ) );
 
 					//	The account failed to update, feedback to user
 					else:
 
-						$this->data['error'] = lang( 'accounts_edit_fail', implode( ', ', $this->user->get_errors() ) );
+						$this->data['error'] = lang( 'accounts_edit_fail', implode( ', ', $this->user_model->get_errors() ) );
 
 					endif;
 
@@ -791,7 +791,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get the user's email addresses
-		$this->data['user_emails'] = $this->user->get_emails_for_user( $_user->id );
+		$this->data['user_emails'] = $this->user_model->get_emails_for_user( $_user->id );
 
 		// --------------------------------------------------------------------------
 
@@ -802,11 +802,11 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		$this->data['page']->title = lang( 'accounts_edit_title', title_case( $_user->first_name . ' ' . $_user->last_name ) );
 
 		//	Get the groups, timezones and languages
-		$this->data['groups']		= $this->user_group->get_all();
-		$this->data['timezones']	= $this->datetime->get_all_timezone_flat();
-		$this->data['date_formats']	= $this->datetime->get_all_date_format_flat();
-		$this->data['time_formats']	= $this->datetime->get_all_time_format_flat();
-		$this->data['languages']	= $this->language->get_all_flat();
+		$this->data['groups']		= $this->user_group_model->get_all();
+		$this->data['timezones']	= $this->datetime_model->get_all_timezone_flat();
+		$this->data['date_formats']	= $this->datetime_model->get_all_date_format_flat();
+		$this->data['time_formats']	= $this->datetime_model->get_all_time_format_flat();
+		$this->data['languages']	= $this->language_model->get_all_flat();
 
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :
@@ -873,13 +873,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid		= $this->uri->segment( 4 );
-		$_user		= $this->user->get_by_id( $_uid );
+		$_user		= $this->user_model->get_by_id( $_uid );
 		$_old_value = $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
 
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
+		if ( ! $this->user_model->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
 
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -890,12 +890,12 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Suspend user
-		$this->user->suspend( $_uid );
+		$this->user_model->suspend( $_uid );
 
 		// --------------------------------------------------------------------------
 
 		//	Get the user's details, again
-		$_user		= $this->user->get_by_id( $_uid );
+		$_user		= $this->user_model->get_by_id( $_uid );
 		$_new_value	= $_user->is_suspended;
 
 
@@ -937,13 +937,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid		= $this->uri->segment( 4 );
-		$_user		= $this->user->get_by_id( $_uid );
+		$_user		= $this->user_model->get_by_id( $_uid );
 		$_old_value	= $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
 
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
+		if ( ! $this->user_model->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
 
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -954,12 +954,12 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Unsuspend user
-		$this->user->unsuspend( $_uid );
+		$this->user_model->unsuspend( $_uid );
 
 		// --------------------------------------------------------------------------
 
 		//	Get the user's details, again
-		$_user		= $this->user->get_by_id( $_uid );
+		$_user		= $this->user_model->get_by_id( $_uid );
 		$_new_value	= $_user->is_suspended;
 
 		// --------------------------------------------------------------------------
@@ -1000,12 +1000,12 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	{
 		//	Get the user's details
 		$_uid	= $this->uri->segment( 4 );
-		$_user	= $this->user->get_by_id( $_uid );
+		$_user	= $this->user_model->get_by_id( $_uid );
 
 		// --------------------------------------------------------------------------
 
 		//	Non-superusers editing superusers is not cool
-		if ( ! $this->user->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
+		if ( ! $this->user_model->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
 
 			$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 			redirect( $this->input->get( 'return_to' ) );
@@ -1016,7 +1016,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Delete user
-		$_user = $this->user->get_by_id( $_uid );
+		$_user = $this->user_model->get_by_id( $_uid );
 
 		if ( ! $_user ) :
 
@@ -1029,7 +1029,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Define messages
-		if ( $this->user->destroy( $_uid ) ) :
+		if ( $this->user_model->destroy( $_uid ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'accounts_delete_success', title_case( $_user->first_name . ' ' . $_user->last_name ) ) );
 
@@ -1054,7 +1054,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 	public function delete_profile_img()
 	{
 		$_uid		= $this->uri->segment( 4 );
-		$_user		= $this->user->get_by_id( $_uid );
+		$_user		= $this->user_model->get_by_id( $_uid );
 		$_return_to	= $this->input->get( 'return_to' ) ? $this->input->get( 'return_to' ) : 'admin/accounts/edit/' . $_uid;
 
 		// --------------------------------------------------------------------------
@@ -1067,7 +1067,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		else :
 
 			//	Non-superusers editing superusers is not cool
-			if ( ! $this->user->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
+			if ( ! $this->user_model->is_superuser() && user_has_permission( 'superuser', $_user ) ) :
 
 				$this->session->set_flashdata( 'error', lang( 'accounts_edit_error_noteditable' ) );
 				redirect( $_return_to );
@@ -1085,7 +1085,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					$_data = array();
 					$_data['profile_img'] = NULL;
 
-					$this->user->update( $_uid, $_data );
+					$this->user_model->update( $_uid, $_data );
 
 					// --------------------------------------------------------------------------
 
@@ -1140,7 +1140,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 
-		$this->data['groups'] = $this->user_group->get_all();
+		$this->data['groups'] = $this->user_group_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -1183,7 +1183,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		$_gid = $this->uri->segment( 5, NULL );
 
-		$this->data['group'] = $this->user_group->get_by_id( $_gid );
+		$this->data['group'] = $this->user_group_model->get_by_id( $_gid );
 
 		if ( ! $this->data['group'] ) :
 
@@ -1235,14 +1235,14 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 				$_data['acl'] = serialize( $_acl );
 
-				if ( $this->user_group->update( $_gid, $_data ) ) :
+				if ( $this->user_group_model->update( $_gid, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
 					redirect( 'admin/accounts/groups' );
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> I was unable to update the group. ' . $this->user_group->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> I was unable to update the group. ' . $this->user_group_model->last_error();
 
 				endif;
 
@@ -1299,13 +1299,13 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user_group->set_as_default( $this->uri->segment( 5 ) ) ) :
+		if ( $this->user_group_model->set_as_default( $this->uri->segment( 5 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Group set as default successfully.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could not set that group as the default user group. ' . $this->user_group->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could not set that group as the default user group. ' . $this->user_group_model->last_error() );
 
 		endif;
 		redirect( 'admin/accounts/groups' );
