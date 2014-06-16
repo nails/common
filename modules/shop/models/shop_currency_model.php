@@ -258,7 +258,7 @@ class NAILS_Shop_currency_model extends NAILS_Model
 			//	Make sure we know what the base currency is
 			if ( defined( 'SHOP_BASE_CURRENCY_CODE' ) ) :
 
-				$this->load->model( 'shop/shop_model', 'shop' );
+				$this->load->model( 'shop/shop_model' );
 
 			endif;
 

@@ -47,11 +47,11 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	public function index()
 	{
 		//	Abandon any previous order
-		if ( $this->basket->get_order_id() ) :
+		if ( $this->shop_basket_model->get_order_id() ) :
 
 			//	Abandon this order and remove from basket
-			$this->order->abandon( $this->basket->get_order_id() );
-			$this->basket->remove_order_id();
+			$this->shop_order_model->abandon( $this->shop_basket_model->get_order_id() );
+			$this->shop_basket_model->remove_order_id();
 
 		endif;
 
@@ -61,9 +61,9 @@ class NAILS_Basket extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['basket']			= $this->basket->get_basket();
-		$this->data['shipping_methods'] = $this->shipping->get_all();
-		$this->data['currencies']		= $this->currency->get_all();
+		$this->data['basket']			= $this->shop_basket_model->get_basket();
+		$this->data['shipping_methods'] = $this->shop_shipping_model->get_all();
+		$this->data['currencies']		= $this->shop_currency_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -108,13 +108,13 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function add()
 	{
-		if ( $this->basket->add( $this->uri->rsegment( 3 ), $this->uri->rsegment( 4 ) ) ) :
+		if ( $this->shop_basket_model->add( $this->uri->rsegment( 3 ), $this->uri->rsegment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Item was added to your basket. <a href="javascript: history.go(-1)">Continue Shopping</a>' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem adding to your basket: ' . $this->basket->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem adding to your basket: ' . $this->shop_basket_model->last_error() );
 
 		endif;
 
@@ -136,13 +136,13 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function remove()
 	{
-		if ( $this->basket->remove( $this->uri->rsegment( 3 ), $this->uri->rsegment( 4 ) ) ) :
+		if ( $this->shop_basket_model->remove( $this->uri->rsegment( 3 ), $this->uri->rsegment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Item was removed from your basket.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem removing the item from your basket: ' . $this->basket->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem removing the item from your basket: ' . $this->shop_basket_model->last_error() );
 
 		endif;
 
@@ -164,7 +164,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function destroy()
 	{
-		$this->basket->destroy();
+		$this->shop_basket_model->destroy();
 
 		// --------------------------------------------------------------------------
 
@@ -184,7 +184,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function increment()
 	{
-		$this->basket->increment( $this->uri->rsegment( 3 ) );
+		$this->shop_basket_model->increment( $this->uri->rsegment( 3 ) );
 
 		// --------------------------------------------------------------------------
 
@@ -204,7 +204,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function decrement()
 	{
-		$this->basket->decrement( $this->uri->rsegment( 3 ) );
+		$this->shop_basket_model->decrement( $this->uri->rsegment( 3 ) );
 
 		// --------------------------------------------------------------------------
 
@@ -224,18 +224,18 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function add_voucher()
 	{
-		$_voucher = $this->voucher->validate( $this->input->post( 'voucher' ), get_basket() );
+		$_voucher = $this->shop_voucher_model->validate( $this->input->post( 'voucher' ), get_basket() );
 
 		if ( $_voucher ) :
 
 			//	Validated, add to basket
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Voucher has been applied to your basket.' );
-			$this->basket->add_voucher( $_voucher->code );
+			$this->shop_basket_model->add_voucher( $_voucher->code );
 
 		else :
 
 			//	Failed to validate, feedback
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that voucher is not valid:<br />&rsaquo; ' . implode( '<br />&rsaquo;', $this->voucher->get_errors() ) );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> that voucher is not valid:<br />&rsaquo; ' . implode( '<br />&rsaquo;', $this->shop_voucher_model->get_errors() ) );
 
 		endif;
 
@@ -257,7 +257,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function remove_voucher()
 	{
-		$this->basket->remove_voucher();
+		$this->shop_basket_model->remove_voucher();
 		$this->session->set_flashdata( 'success', '<strong>Success!</strong> Your voucher was removed.' );
 
 		// --------------------------------------------------------------------------
@@ -278,13 +278,13 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function set_shipping_method()
 	{
-		$_method = $this->shipping->validate( $this->input->post( 'shipping_method' ) );
+		$_method = $this->shop_shipping_model->validate( $this->input->post( 'shipping_method' ) );
 
 		if ( $_method ) :
 
 			//	Validated, add to basket
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Your shipping method has been updated.' );
-			$this->basket->add_shipping_method( $_method->id );
+			$this->shop_basket_model->add_shipping_method( $_method->id );
 
 		else :
 
@@ -311,7 +311,7 @@ class NAILS_Basket extends NAILS_Shop_Controller
 	 **/
 	public function set_currency()
 	{
-		$_currency = $this->currency->get_by_id( $this->input->post( 'currency' ) );
+		$_currency = $this->shop_currency_model->get_by_id( $this->input->post( 'currency' ) );
 
 		if ( $_currency && $_currency->is_active ) :
 

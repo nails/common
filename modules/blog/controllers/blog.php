@@ -60,8 +60,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load posts and count
-		$this->data['posts'] = $this->post->get_all( $_page, $_per_page, $_data );
-		$this->data['pagination']->total = $this->post->count_all( $_data );
+		$this->data['posts'] = $this->blog_post_model->get_all( $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->blog_post_model->count_all( $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		//	Get the single post by its slug
 		if ( $id ) :
 
-			$this->data['post'] = $this->post->get_by_id( $id );
+			$this->data['post'] = $this->blog_post_model->get_by_id( $id );
 
 			if ( $this->data['post']->url != $this->input->server( 'REQUEST_URI' ) ) :
 
@@ -101,7 +101,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		else :
 
-			$this->data['post'] = $this->post->get_by_slug( $this->uri->rsegment( 2 ) );
+			$this->data['post'] = $this->blog_post_model->get_by_slug( $this->uri->rsegment( 2 ) );
 
 		endif;
 
@@ -182,7 +182,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		$_data['user_id']	= active_user( 'id' );
 		$_data['referrer']	= $this->input->server( 'HTTP_REFERER' );
 
-		$this->post->add_hit( $this->data['post']->id, $_data );
+		$this->blog_post_model->add_hit( $this->data['post']->id, $_data );
 	}
 
 
@@ -208,7 +208,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get category
-		$this->data['category'] = $this->category->get_by_slug( $this->uri->rsegment( 3 ) );
+		$this->data['category'] = $this->blog_category_model->get_by_slug( $this->uri->rsegment( 3 ) );
 
 		if ( ! $this->data['category'] ) :
 
@@ -255,8 +255,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load posts and count
-		$this->data['posts'] = $this->post->get_with_category( $this->data['category']->id, $_page, $_per_page, $_data );
-		$this->data['pagination']->total = $this->post->count_all( $_data );
+		$this->data['posts'] = $this->blog_post_model->get_with_category( $this->data['category']->id, $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->blog_post_model->count_all( $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -293,7 +293,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get category
-		$this->data['tag'] = $this->tag->get_by_slug( $this->uri->rsegment( 3 ) );
+		$this->data['tag'] = $this->blog_tag_model->get_by_slug( $this->uri->rsegment( 3 ) );
 
 		if ( ! $this->data['tag'] ) :
 
@@ -340,8 +340,8 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load posts and count
-		$this->data['posts'] = $this->post->get_with_tag( $this->data['tag']->id, $_page, $_per_page, $_data );
-		$this->data['pagination']->total = $this->post->count_all( $_data );
+		$this->data['posts'] = $this->blog_post_model->get_with_tag( $this->data['tag']->id, $_page, $_per_page, $_data );
+		$this->data['pagination']->total = $this->blog_post_model->count_all( $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -380,7 +380,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		$_data['where'][]	= array( 'column' => 'is_published',	'value' => TRUE );
 		$_data['where'][]	= array( 'column' => 'published <=',	'value' => 'NOW()', 'escape' => FALSE );
 
-		$this->data['posts'] = $this->post->get_all( NULL, NULL, $_data );
+		$this->data['posts'] = $this->blog_post_model->get_all( NULL, NULL, $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -405,25 +405,25 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 			if ( app_setting( 'sidebar_latest_posts', 'blog' ) ) :
 
-				$this->data['widget']->latest_posts = $this->widget->latest_posts();
+				$this->data['widget']->latest_posts = $this->blog_widget_model->latest_posts();
 
 			endif;
 
 			if ( app_setting( 'sidebar_categories', 'blog' ) ) :
 
-				$this->data['widget']->categories = $this->widget->categories();
+				$this->data['widget']->categories = $this->blog_widget_model->categories();
 
 			endif;
 
 			if ( app_setting( 'sidebar_tags', 'blog' ) ) :
 
-				$this->data['widget']->tags = $this->widget->tags();
+				$this->data['widget']->tags = $this->blog_widget_model->tags();
 
 			endif;
 
 			if ( app_setting( 'sidebar_popular_posts', 'blog' ) ) :
 
-				$this->data['widget']->popular_posts = $this->widget->popular_posts();
+				$this->data['widget']->popular_posts = $this->blog_widget_model->popular_posts();
 
 			endif;
 

@@ -143,7 +143,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'app' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site settings have been saved.';
 
@@ -211,7 +211,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'app' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'app' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Site authentication settings have been saved.';
 
@@ -249,7 +249,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load models
-		$this->load->model( 'blog/blog_skin_model', 'skin' );
+		$this->load->model( 'blog/blog_skin_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -274,7 +274,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Get data
 		$this->data['settings'] = app_setting( NULL, 'blog', TRUE );
-		$this->data['skins']	= $this->skin->get_available();
+		$this->data['skins']	= $this->blog_skin_model->get_available();
 
 		// --------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog settings have been saved.';
 
@@ -342,7 +342,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Skin settings have been saved.';
 
@@ -368,7 +368,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog commenting settings have been saved.';
 
@@ -403,7 +403,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog social settings have been saved.';
 
@@ -432,7 +432,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Save
-		if ( $this->app_setting->set( $_settings, 'blog' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'blog' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Blog sidebar settings have been saved.';
 
@@ -470,11 +470,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load models
-		$this->load->model( 'shop/shop_model',					'shop' );
-		$this->load->model( 'shop/shop_currency_model',			'currency' );
-		$this->load->model( 'shop/shop_shipping_model',			'shipping' );
-		$this->load->model( 'shop/shop_tax_model',				'tax' );
-		$this->load->model( 'shop/shop_skin_model',				'skin' );
+		$this->load->model( 'shop/shop_model' );
+		$this->load->model( 'shop/shop_currency_model' );
+		$this->load->model( 'shop/shop_shipping_model' );
+		$this->load->model( 'shop/shop_tax_model' );
+		$this->load->model( 'shop/shop_skin_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -501,12 +501,12 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->data['settings']					= app_setting( NULL, 'shop', TRUE );
 		$this->data['payment_gateways']			= array();
 		$this->data['shipping_modules']			= array();
-		$this->data['skins']					= $this->skin->get_available();
-		$this->data['currencies_all_flat']		= $this->currency->get_all( FALSE );
-		$this->data['currencies_active_flat']	= $this->currency->get_all_flat();
-		$this->data['shipping_methods']			= $this->shipping->get_all( FALSE );
-		$this->data['tax_rates']				= $this->tax->get_all();
-		$this->data['tax_rates_flat']			= $this->tax->get_all_flat();
+		$this->data['skins']					= $this->shop_skin_model->get_available();
+		$this->data['currencies_all_flat']		= $this->shop_currency_model->get_all( FALSE );
+		$this->data['currencies_active_flat']	= $this->shop_currency_model->get_all_flat();
+		$this->data['shipping_methods']			= $this->shop_shipping_model->get_all( FALSE );
+		$this->data['tax_rates']				= $this->shop_tax_model->get_all();
+		$this->data['tax_rates_flat']			= $this->shop_tax_model->get_all_flat();
 		array_unshift( $this->data['tax_rates_flat'], 'No Tax');
 
 		// --------------------------------------------------------------------------
@@ -562,7 +562,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Store settings have been saved.';
 
@@ -595,7 +595,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Skin settings have been saved.';
 
@@ -627,7 +627,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->app_setting->set( $_settings, 'shop' ) ) :
+		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
 
 			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
 
@@ -640,7 +640,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 			endforeach;
 
-			if ( $this->currency->set_active_currencies( $_where_in ) ) :
+			if ( $this->shop_currency_model->set_active_currencies( $_where_in ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
 

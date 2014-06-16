@@ -105,7 +105,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Brands
 		//	======
 
-		$this->data['brands'] = $this->brand->get_all();
+		$this->data['brands'] = $this->shop_brand_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -124,7 +124,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _brand_single( $slug )
 	{
-		$this->data['brand'] = $this->brand->get_by_slug( $slug );
+		$this->data['brand'] = $this->shop_brand_model->get_by_slug( $slug );
 
 		if ( ! $this->data['brand' ] ) :
 
@@ -145,7 +145,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	================
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 
@@ -211,7 +211,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Categories
 		//	==========
 
-		$this->data['categories'] = $this->category->get_all();
+		$this->data['categories'] = $this->shop_category_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _category_single( $slug )
 	{
-		$this->data['category'] = $this->category->get_by_slug( $slug );
+		$this->data['category'] = $this->shop_category_model->get_by_slug( $slug );
 
 		if ( ! $this->data['category' ] ) :
 
@@ -251,7 +251,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	===================
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 
@@ -317,7 +317,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Collections
 		//	===========
 
-		$this->data['collections'] = $this->collection->get_all();
+		$this->data['collections'] = $this->shop_collection_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -336,7 +336,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _collection_single( $slug )
 	{
-		$this->data['collection'] = $this->collection->get_by_slug( $slug );
+		$this->data['collection'] = $this->shop_collection_model->get_by_slug( $slug );
 
 		if ( ! $this->data['collection' ] ) :
 
@@ -357,7 +357,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	=====================
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 
@@ -405,7 +405,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _product_single( $slug )
 	{
-		$this->data['product'] = $this->product->get_by_slug( $slug );
+		$this->data['product'] = $this->shop_product_model->get_by_slug( $slug );
 
 		if ( ! $this->data['product' ] ) :
 
@@ -414,7 +414,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		endif;
 
 		//	Generate missing SEO content
-		$this->product->generate_seo_content( $this->data['product'] );
+		$this->shop_product_model->generate_seo_content( $this->data['product'] );
 
 		// --------------------------------------------------------------------------
 
@@ -484,7 +484,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Ranges
 		//	======
 
-		$this->data['ranges'] = $this->range->get_all();
+		$this->data['ranges'] = $this->shop_range_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -503,7 +503,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _range_single( $slug )
 	{
-		$this->data['range'] = $this->range->get_by_slug( $slug );
+		$this->data['range'] = $this->shop_range_model->get_by_slug( $slug );
 
 		if ( ! $this->data['range' ] ) :
 
@@ -524,7 +524,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	================
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 
@@ -590,7 +590,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Sales
 		//	=====
 
-		$this->data['sales'] = $this->sale->get_all();
+		$this->data['sales'] = $this->shop_sale_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -609,7 +609,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _sale_single( $slug )
 	{
-		$this->data['sale'] = $this->sale->get_by_slug( $slug );
+		$this->data['sale'] = $this->shop_sale_model->get_by_slug( $slug );
 
 		if ( ! $this->data['sale' ] ) :
 
@@ -630,7 +630,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	===============
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 
@@ -694,7 +694,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Tags
 		//	====
 
-		$this->data['tags'] = $this->tag->get_all();
+		$this->data['tags'] = $this->shop_tag_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -713,7 +713,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 	 */
 	protected function _tag_single( $slug )
 	{
-		$this->data['tag'] = $this->tag->get_by_slug( $slug );
+		$this->data['tag'] = $this->shop_tag_model->get_by_slug( $slug );
 
 		if ( ! $this->data['tag' ] ) :
 
@@ -734,7 +734,7 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	==============
 
 		//	TODO: Adopt the generic Nails Model approach and use a where conditional
-		$this->data['products'] = $this->product->get_all();
+		$this->data['products'] = $this->shop_product_model->get_all();
 
 		if ( empty( $this->data['products'] ) ) :
 

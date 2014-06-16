@@ -484,7 +484,7 @@ class Event {
 	public function get_types()
 	{
 		$this->db->order_by( 'label,slug' );
-		return $this->db->get( NAILS_DB_PREFIX . 'event_type' )->result();;
+		return $this->db->get( NAILS_DB_PREFIX . 'event_type' )->result();
 	}
 
 

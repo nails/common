@@ -59,7 +59,7 @@
 
 						default:
 
-							echo $basket->voucher->label;;
+							echo $basket->voucher->label;
 
 						break;
 

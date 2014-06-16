@@ -50,7 +50,7 @@
 
 					echo '<ul class="list-unstyled">';
 
-						echo '<li>&rsaquo; ' . anchor( $this->category->format_url( ${$_data_available[1]->variable}[0]->slug ), 'Single Category page' ) . '</li>';
+						echo '<li>&rsaquo; ' . anchor( $this->shop_category_model->format_url( ${$_data_available[1]->variable}[0]->slug ), 'Single Category page' ) . '</li>';
 
 					echo '</ul>';
 

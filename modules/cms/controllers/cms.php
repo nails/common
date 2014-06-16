@@ -32,7 +32,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'cms/cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 
 	public function index()
 	{
-		$_page = $this->cms_page->get_by_slug( $this->_slug, TRUE );
+		$_page = $this->cms_page_model->get_by_slug( $this->_slug, TRUE );
 
 		if ( ! $_page ) :
 
@@ -60,7 +60,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 		$this->data['page']->slug			= $_page->slug;
 		$this->data['page']->layout			= $_page->layout;
 		$this->data['page']->sidebar_width	= $_page->sidebar_width;
-		$this->data['rendered_page']		= $this->cms_page->render( $_page );
+		$this->data['rendered_page']		= $this->cms_page_model->render( $_page );
 
 		// --------------------------------------------------------------------------
 

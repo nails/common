@@ -88,10 +88,10 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'blog/blog_model',			'blog' );
-		$this->load->model( 'blog/blog_post_model',		'post' );
-		$this->load->model( 'blog/blog_category_model',	'category' );
-		$this->load->model( 'blog/blog_tag_model',		'tag' );
+		$this->load->model( 'blog/blog_model' );
+		$this->load->model( 'blog/blog_post_model' );
+		$this->load->model( 'blog/blog_category_model' );
+		$this->load->model( 'blog/blog_tag_model' );
 	}
 
 
@@ -133,10 +133,10 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		$this->data['pagination']				= new stdClass();
 		$this->data['pagination']->page			= $_page;
 		$this->data['pagination']->per_page		= $_per_page;
-		$this->data['pagination']->total_rows	= $this->post->count_all( $_data );
+		$this->data['pagination']->total_rows	= $this->blog_post_model->count_all( $_data );
 
 		//	Fetch all the items for this page
-		$this->data['posts'] = $this->post->get_all( $_page, $_per_page, $_data );
+		$this->data['posts'] = $this->blog_post_model->get_all( $_page, $_per_page, $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -206,7 +206,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 				endif;
 
-				$_post_id = $this->post->create( $_data );
+				$_post_id = $this->blog_post_model->create( $_data );
 
 				if ( $_post_id ) :
 
@@ -239,20 +239,20 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Load Categories and Tags
 		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->data['categories']	= $this->category->get_all();
+			$this->data['categories'] = $this->blog_category_model->get_all();
 
 		endif;
 
 		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->data['tags']			= $this->tag->get_all();
+			$this->data['tags'] = $this->blog_tag_model->get_all();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Load associations
-		$this->data['associations'] = $this->blog->get_associations();
+		$this->data['associations'] = $this->blog_model->get_associations();
 
 		// --------------------------------------------------------------------------
 
@@ -287,7 +287,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$this->data['post'] = $this->post->get_by_id( $_post_id );
+		$this->data['post'] = $this->blog_post_model->get_by_id( $_post_id );
 
 		if ( ! $this->data['post'] ) :
 
@@ -347,7 +347,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 				endif;
 
-				if ( $this->post->update( $_post_id, $_data ) ) :
+				if ( $this->blog_post_model->update( $_post_id, $_data ) ) :
 
 					//	Update admin change log
 					foreach ( $_data AS $field => $value ) :
@@ -377,7 +377,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 										foreach( $value AS $v ) :
 
-											$_temp = $this->category->get_by_id( $v );
+											$_temp = $this->blog_category_model->get_by_id( $v );
 
 											if ( $_temp ) :
 
@@ -414,7 +414,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 										foreach( $value AS $v ) :
 
-											$_temp = $this->tag->get_by_id( $v );
+											$_temp = $this->blog_tag_model->get_by_id( $v );
 
 											if ( $_temp ) :
 
@@ -473,20 +473,20 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Load Categories and Tags
 		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->data['categories']	= $this->category->get_all();
+			$this->data['categories'] = $this->blog_category_model->get_all();
 
 		endif;
 
 		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->data['tags']			= $this->tag->get_all();
+			$this->data['tags'] = $this->blog_tag_model->get_all();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Load associations
-		$this->data['associations'] = $this->blog->get_associations( $this->data['post']->id );
+		$this->data['associations'] = $this->blog_model->get_associations( $this->data['post']->id );
 
 		// --------------------------------------------------------------------------
 
@@ -513,7 +513,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$_post = $this->post->get_by_id( $_post_id );
+		$_post = $this->blog_post_model->get_by_id( $_post_id );
 
 		if ( ! $_post ) :
 
@@ -525,7 +525,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->post->delete( $_post_id ) ) :
+		if ( $this->blog_post_model->delete( $_post_id ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/restore/' . $_post_id, 'Undo?' ) );
 
@@ -554,9 +554,9 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->post->restore( $_post_id ) ) :
+		if ( $this->blog_post_model->restore( $_post_id ) ) :
 
-			$_post = $this->post->get_by_id( $_post_id );
+			$_post = $this->blog_post_model->get_by_id( $_post_id );
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was restored successfully. ' );
 
@@ -611,7 +611,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Handle POST
 		if ( $this->input->post() ) :
 
-			if ( $this->category->create( $this->input->post( 'category' ) ) ) :
+			if ( $this->blog_category_model->create( $this->input->post( 'category' ) ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Category created.';
 
@@ -625,7 +625,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['categories']	= $this->category->get_all( TRUE );
+		$this->data['categories']	= $this->blog_category_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -640,7 +640,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 	public function delete_category()
 	{
-		if ( $this->category->delete( $this->uri->segment( 4 ) ) ) :
+		if ( $this->blog_category_model->delete( $this->uri->segment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category Deleted.' );
 
@@ -679,7 +679,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Handle POST
 		if ( $this->input->post() ) :
 
-			if ( $this->tag->create( $this->input->post( 'tag' ) ) ) :
+			if ( $this->blog_tag_model->create( $this->input->post( 'tag' ) ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Tag created.';
 
@@ -694,7 +694,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Tags
-		$this->data['tags']	= $this->tag->get_all( TRUE );
+		$this->data['tags']	= $this->blog_tag_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -709,7 +709,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 	public function delete_tag()
 	{
-		if ( $this->tag->delete( $this->uri->segment( 4 ) ) ) :
+		if ( $this->blog_tag_model->delete( $this->uri->segment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag Deleted.' );
 

@@ -169,7 +169,7 @@
 	</fieldset>
 
 	<p>
-		<?=form_submit( 'submit', lang( 'action_save_changes' ), 'class="awesome"' )?>
+		<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 	</p>
 
 	<?=form_close()?>

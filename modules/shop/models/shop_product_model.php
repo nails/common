@@ -214,7 +214,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		endif;
 
 		$_data->variation	= array();
-		$_product_type		= $this->product_type->get_by_id( $_data->type_id );
+		$_product_type		= $this->shop_product_type_model->get_by_id( $_data->type_id );
 
 		if ( ! $_product_type ) :
 
@@ -231,7 +231,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		if ( is_callable( array( $this->product_type, 'meta_fields_' . $_product_type->slug ) ) ) :
 
-			$_product_type_meta = $this->product_type->{'meta_fields_' . $_product_type->slug}();
+			$_product_type_meta = $this->shop_product_type_model->{'meta_fields_' . $_product_type->slug}();
 
 		endif;
 
@@ -1169,15 +1169,15 @@ class NAILS_Shop_product_model extends NAILS_Model
 	 */
 	public function get_for_category( $category, $only_active = TRUE, $order = NULL, $limit = NULL, $include_deleted = FALSE )
 	{
-		$this->load->model( 'shop/shop_category_model', 'category' );
+		$this->load->model( 'shop/shop_category_model' );
 
 		if ( is_numeric( $category ) ) :
 
-			$_category = $this->category->get_by_id( $category );
+			$_category = $this->shop_category_model->get_by_id( $category );
 
 		else :
 
-			$_category = $this->category->get_by_slug( $category );
+			$_category = $this->shop_category_model->get_by_slug( $category );
 
 		endif;
 
@@ -1191,7 +1191,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 		//	Fetch all the ID's we want to search across
 		$_ids = array( $_category->id );
-		$_ids = array_merge( $_ids, $this->category->get_ids_of_all_children( $_category->id ) );
+		$_ids = array_merge( $_ids, $this->shop_category_model->get_ids_of_all_children( $_category->id ) );
 
 		$this->db->where_in( 'pc.category_id', $_ids );
 		$this->db->join( $this->_table_category . ' pc', 'pc.product_id = p.id' );

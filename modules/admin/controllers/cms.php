@@ -167,7 +167,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function pages()
 	{
 		//	Load common blocks items
-		$this->load->model( 'cms/cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model' );
 		$this->load->model( 'system/routes_model' );
 
 		// --------------------------------------------------------------------------
@@ -213,7 +213,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch all the pages in the DB
-		$this->data['pages'] = $this->cms_page->get_all();
+		$this->data['pages'] = $this->cms_page_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -243,14 +243,14 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
+		$this->data['pages_nested_flat'] = $this->cms_page_model->get_all_nested_flat( ' &rsaquo; ', FALSE );
 
 		//	Set method info
 		$this->data['page']->title	= 'Create New Page';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates( 'EDITOR' );
-		$this->data['widgets']		= $this->cms_page->get_available_widgets( 'EDITOR' );
+		$this->data['templates']	= $this->cms_page_model->get_available_templates( 'EDITOR' );
+		$this->data['widgets']		= $this->cms_page_model->get_available_widgets( 'EDITOR' );
 
 		// --------------------------------------------------------------------------
 
@@ -287,7 +287,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['cmspage'] = $this->cms_page->get_by_id( $this->uri->segment( 5 ), TRUE );
+		$this->data['cmspage'] = $this->cms_page_model->get_by_id( $this->uri->segment( 5 ), TRUE );
 
 		if ( ! $this->data['cmspage'] ) :
 
@@ -300,17 +300,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Get data
-		$this->data['pages_nested_flat'] = $this->cms_page->get_all_nested_flat( ' &rsaquo; ', FALSE );
+		$this->data['pages_nested_flat'] = $this->cms_page_model->get_all_nested_flat( ' &rsaquo; ', FALSE );
 
 		//	Set method info
 		$this->data['page']->title	= 'Edit Page "' . $this->data['cmspage']->draft->title . '"';
 
 		//	Get available templates & widgets
-		$this->data['templates']	= $this->cms_page->get_available_templates( 'EDITOR' );
-		$this->data['widgets']		= $this->cms_page->get_available_widgets( 'EDITOR' );
+		$this->data['templates']	= $this->cms_page_model->get_available_templates( 'EDITOR' );
+		$this->data['widgets']		= $this->cms_page_model->get_available_widgets( 'EDITOR' );
 
 		//	Get children of this page
-		$this->data['page_children'] = $this->cms_page->get_ids_of_children( $this->data['cmspage']->id );
+		$this->data['page_children'] = $this->cms_page_model->get_ids_of_children( $this->data['cmspage']->id );
 
 		// --------------------------------------------------------------------------
 
@@ -341,17 +341,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_id	= $this->uri->segment( 5 );
-		$_page	= $this->cms_page->get_by_id( $_id );
+		$_page	= $this->cms_page_model->get_by_id( $_id );
 
 		if ( $_page && ! $_page->is_deleted ) :
 
-			if ( $this->cms_page->publish( $_id ) ) :
+			if ( $this->cms_page_model->publish( $_id ) ) :
 
 				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was published successfully.' );
 
 			else :
 
-				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not publish page. ' . $this->cms_page->last_error() );
+				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not publish page. ' . $this->cms_page_model->last_error() );
 
 			endif;
 
@@ -379,17 +379,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_id	= $this->uri->segment( 5 );
-		$_page	= $this->cms_page->get_by_id( $_id );
+		$_page	= $this->cms_page_model->get_by_id( $_id );
 
 		if ( $_page && ! $_page->is_deleted ) :
 
-			if ( $this->cms_page->delete( $_id ) ) :
+			if ( $this->cms_page_model->delete( $_id ) ) :
 
 				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was deleted successfully.' );
 
 			else :
 
-				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not delete page. ' . $this->cms_page->last_error() );
+				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not delete page. ' . $this->cms_page_model->last_error() );
 
 			endif;
 
@@ -417,17 +417,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_id	= $this->uri->segment( 5 );
-		$_page	= $this->cms_page->get_by_id( $_id );
+		$_page	= $this->cms_page_model->get_by_id( $_id );
 
 		if ( $_page && $_page->is_deleted ) :
 
-			if ( $this->cms_page->restore( $_id ) ) :
+			if ( $this->cms_page_model->restore( $_id ) ) :
 
 				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was restored successfully. ' );
 
 			else :
 
-				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not restore page. ' . $this->cms_page->last_error() );
+				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not restore page. ' . $this->cms_page_model->last_error() );
 
 			endif;
 
@@ -455,17 +455,17 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_id	= $this->uri->segment( 5 );
-		$_page	= $this->cms_page->get_by_id( $_id );
+		$_page	= $this->cms_page_model->get_by_id( $_id );
 
 		if ( $_page ) :
 
-			if ( $this->cms_page->destroy( $_id ) ) :
+			if ( $this->cms_page_model->destroy( $_id ) ) :
 
 				$this->session->set_flashdata( 'success', '<strong>Success!</strong> Page was destroyed successfully. ' );
 
 			else :
 
-				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not destroy page. ' . $this->cms_page->last_error() );
+				$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> Could not destroy page. ' . $this->cms_page_model->last_error() );
 
 			endif;
 
@@ -563,7 +563,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function blocks()
 	{
 		//	Load common blocks items
-		$this->load->model( 'cms/cms_block_model', 'cms_block' );
+		$this->load->model( 'cms/cms_block_model' );
 		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'mustache/mustache.js',				'BOWER' );
 		$this->asset->load( 'nails.admin.cms.blocks.min.js',	TRUE );
@@ -605,7 +605,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['blocks']		= $this->cms_block->get_all();
+		$this->data['blocks']		= $this->cms_block_model->get_all();
 		$this->data['languages']	= $this->language->get_all_supported_flat();
 
 		// --------------------------------------------------------------------------
@@ -621,7 +621,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _blocks_edit()
 	{
-		$this->data['block'] = $this->cms_block->get_by_id( $this->uri->segment( 5 ), TRUE );
+		$this->data['block'] = $this->cms_block_model->get_by_id( $this->uri->segment( 5 ), TRUE );
 
 		if ( ! $this->data['block'] ) :
 
@@ -640,7 +640,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				foreach ( $this->input->post( 'translation' ) AS $translation ) :
 
-					$this->cms_block->update_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+					$this->cms_block_model->update_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
 					$_updated[] = $translation['lang_id'];
 
 				endforeach;
@@ -661,7 +661,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				foreach ( $this->input->post( 'new_translation' ) AS $translation ) :
 
-					$this->cms_block->create_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+					$this->cms_block_model->create_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
 
 				endforeach;
 
@@ -732,7 +732,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 				$_loc	= $this->input->post( 'located' );
 				$_val	= $this->input->post( 'value' );
 
-				if ( $this->cms_block->create_block( $_type, $_slug, $_title, $_desc, $_loc, $_val ) ) :
+				if ( $this->cms_block_model->create_block( $_type, $_slug, $_title, $_desc, $_loc, $_val ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Block created successfully.' );
 					redirect( 'admin/cms/blocks' );
@@ -774,7 +774,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		//	Check slug's characters are ok
 		if ( ! preg_match( '/[^a-zA-Z0-9\-\_]/', $slug ) ) :
 
-			$_block = $this->cms_block->get_by_slug( $slug );
+			$_block = $this->cms_block_model->get_by_slug( $slug );
 
 			if ( ! $_block ) :
 
@@ -832,7 +832,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function sliders()
 	{
 		//	Load common slider items
-		$this->load->model( 'cms/cms_slider_model', 'cms_slider' );
+		$this->load->model( 'cms/cms_slider_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -860,7 +860,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch all the menus in the DB
-		$this->data['sliders'] = $this->cms_slider->get_all();
+		$this->data['sliders'] = $this->cms_slider_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -900,7 +900,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _sliders_edit()
 	{
-		$this->data['slider'] = $this->cms_slider->get_by_id( $this->uri->segment( 5 ), TRUE );
+		$this->data['slider'] = $this->cms_slider_model->get_by_id( $this->uri->segment( 5 ), TRUE );
 
 		if ( ! $this->data['slider'] ) :
 
@@ -940,7 +940,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	public function menus()
 	{
 		//	Load common menu items
-		$this->load->model( 'cms/cms_menu_model', 'cms_menu' );
+		$this->load->model( 'cms/cms_menu_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -968,7 +968,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch all the menus in the DB
-		$this->data['menus'] = $this->cms_menu->get_all();
+		$this->data['menus'] = $this->cms_menu_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -1018,14 +1018,14 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			//	Execute
 			if ( $this->form_validation->run() && ! $_errors ) :
 
-				if ( $this->cms_menu->create( $_post ) ) :
+				if ( $this->cms_menu_model->create( $_post ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was created successfully.' );
 					redirect( 'admin/cms/menus' );
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu_model->last_error();
 
 				endif;
 
@@ -1058,7 +1058,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _menus_edit()
 	{
-		$this->data['menu'] = $this->cms_menu->get_by_id( $this->uri->segment( 5 ), TRUE, FALSE );
+		$this->data['menu'] = $this->cms_menu_model->get_by_id( $this->uri->segment( 5 ), TRUE, FALSE );
 
 		if ( ! $this->data['menu'] ) :
 
@@ -1095,14 +1095,14 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			//	Execute
 			if ( $this->form_validation->run() && ! $_errors ) :
 
-				if ( $this->cms_menu->update( $this->data['menu']->id, $_post ) ) :
+				if ( $this->cms_menu_model->update( $this->data['menu']->id, $_post ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was updated successfully.' );
 					redirect( 'admin/cms/menus' );
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there were errors. ' . $this->cms_menu_model->last_error();
 
 				endif;
 
@@ -1135,7 +1135,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 	protected function _menus_delete()
 	{
-		$_menu = $this->cms_menu->get_by_id( $this->uri->segment( 5 ) );
+		$_menu = $this->cms_menu_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $_menu ) :
 
@@ -1146,13 +1146,13 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->cms_menu->delete( $_menu->id ) ) :
+		if ( $this->cms_menu_model->delete( $_menu->id ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Menu was deleted successfully.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> failed to delete menu. ' . $this->cms_menu->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> failed to delete menu. ' . $this->cms_menu_model->last_error() );
 
 		endif;
 

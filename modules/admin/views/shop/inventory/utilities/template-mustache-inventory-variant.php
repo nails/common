@@ -307,7 +307,7 @@
 
 								if ( $is_first ) :
 
-									$_attr_price		= 'data-code="' . $currency->code . '"';;
+									$_attr_price		= 'data-code="' . $currency->code . '"';
 									$_attr_price_sale	= 'data-code="' . $currency->code . '"';
 
 									$_class_price		= array( 'base-price' );

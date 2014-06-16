@@ -44,7 +44,7 @@
 
 					default:
 
-						echo $basket->voucher->label;;
+						echo $basket->voucher->label;
 
 					break;
 
@@ -71,7 +71,7 @@
 			echo '<h2>Shipping Details</h2>';
 			echo '<table class="shipping-details">';
 
-				$_method = $this->shipping->get_by_id( $basket->shipping_method );
+				$_method = $this->shop_shipping_model->get_by_id( $basket->shipping_method );
 
 				echo '<tr>';
 				echo '<td class="label">Courier:</td>';

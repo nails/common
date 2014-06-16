@@ -245,7 +245,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			if ( $this->db->affected_rows() ) :
 
 				//	Associate the basket with this order
-				$this->basket->add_order_id( $_order->id );
+				$this->shop_basket_model->add_order_id( $_order->id );
 
 				// --------------------------------------------------------------------------
 

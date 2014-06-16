@@ -80,11 +80,11 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		$this->_shipping_method	= $this->session->userdata( $this->sess_var . '_sm' );
 
-		$this->load->model( 'shop/shop_shipping_model', 'shipping' );
+		$this->load->model( 'shop/shop_shipping_model' );
 
 		if ( ! $this->_shipping_method ) :
 
-			$this->_shipping_method = $this->shipping->get_default_id();
+			$this->_shipping_method = $this->shop_shipping_model->get_default_id();
 
 		endif;
 
@@ -107,18 +107,18 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_order_id			= (int) $this->session->userdata( $this->sess_var . '_oi' );
+		$this->_order_id = (int) $this->session->userdata( $this->sess_var . '_oi' );
 
 		// --------------------------------------------------------------------------
 
 		//	Handle voucher
-		$this->_voucher_code		= $this->session->userdata( $this->sess_var . '_vc' );
+		$this->_voucher_code = $this->session->userdata( $this->sess_var . '_vc' );
 
 		//	Check voucher is still valid
 		if ( $this->_voucher_code ) :
 
-			$this->load->model( 'shop/shop_voucher_model', 'voucher' );
-			$_voucher = $this->voucher->validate( $this->_voucher_code );
+			$this->load->model( 'shop/shop_voucher_model' );
+			$_voucher = $this->shop_voucher_model->validate( $this->_voucher_code );
 
 			if ( ! $_voucher ) :
 
@@ -141,7 +141,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 	public function get_basket()
 	{
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -183,12 +183,12 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		foreach ( $this->_items AS $basket_key => $item ) :
 
 			//	Fetch details about product and check availability
-			$_product = $this->product->get_by_id( $item->product_id );
+			$_product = $this->shop_product_model->get_by_id( $item->product_id );
 
 			//	Fetch shipping costs for this product
 			if ( $_product->type->requires_shipping ) :
 
-				$_product->shipping = $this->shipping->get_price_for_product( $_product->id, $_basket->shipping_method );
+				$_product->shipping = $this->shop_shipping_model->get_price_for_product( $_product->id, $_basket->shipping_method );
 
 			else :
 
@@ -679,7 +679,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_model' );
 
 		//	Check item isn't already in the basket
 		$_key = $this->_get_basket_key_by_product_id( $product_id );
@@ -696,7 +696,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Check the product ID is valid
-		$_product = $this->product->get_by_id( $product_id );
+		$_product = $this->shop_product_model->get_by_id( $product_id );
 
 		if ( ! $_product ) :
 

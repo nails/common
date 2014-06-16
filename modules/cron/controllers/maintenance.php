@@ -63,16 +63,16 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 			// --------------------------------------------------------------------------
 
 			//	Load models
-			$this->load->model( 'shop/shop_model', 'shop' );
-			$this->load->model( 'shop/shop_currency_model', 'currency' );
+			$this->load->model( 'shop/shop_model' );
+			$this->load->model( 'shop/shop_currency_model' );
 
 			// --------------------------------------------------------------------------
 
 			//	Sync Currencies
 			_LOG( '... Synching Currencies' );
-			if ( ! $this->currency->sync() ) :
+			if ( ! $this->shop_currency_model->sync() ) :
 
-				_LOG( '... ... FAILED: ' . $this->currency->last_error() );
+				_LOG( '... ... FAILED: ' . $this->shop_currency_model->last_error() );
 
 			endif;
 

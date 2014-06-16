@@ -20,7 +20,7 @@ class NAILS_CMS_Template_redirect extends Nails_CMS_Template
 		$_d->additional_fields[0]['key']		= 'redirect_page_id';
 		$_d->additional_fields[0]['label']		= 'Redirect To Page';
 		$_d->additional_fields[0]['class']		= 'chosen';
-		$_d->additional_fields[0]['options']	= array( 'None' ) + get_instance()->cms_page->get_all_nested_flat();
+		$_d->additional_fields[0]['options']	= array( 'None' ) + get_instance()->cms_page_model->get_all_nested_flat();
 
 		$_d->additional_fields[1]					= array();
 		$_d->additional_fields[1]['type']			= 'text';
@@ -60,7 +60,7 @@ class NAILS_CMS_Template_redirect extends Nails_CMS_Template
 
 		elseif(  ! empty( $_tpl_additional_fields['redirect_page_id'] ) ) :
 
-			$_page = get_instance()->cms_page->get_by_id( $_tpl_additional_fields['redirect_page_id'] );
+			$_page = get_instance()->cms_page_model->get_by_id( $_tpl_additional_fields['redirect_page_id'] );
 
 			if ( $_page && ! $_page->is_deleted && $_page->is_published ) :
 

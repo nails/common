@@ -38,32 +38,32 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the models
-		$this->load->model( 'shop_model',				'shop' );
-		$this->load->model( 'shop_basket_model',		'basket' );
-		$this->load->model( 'shop_brand_model',			'brand' );
-		$this->load->model( 'shop_category_model',		'category' );
-		$this->load->model( 'shop_collection_model',	'collection' );
-		$this->load->model( 'shop_currency_model',		'currency' );
-		$this->load->model( 'shop_order_model',			'order' );
-		$this->load->model( 'shop_product_model',		'product' );
-		$this->load->model( 'shop_product_type_model',	'product_type' );
-		$this->load->model( 'shop_range_model',			'range' );
-		$this->load->model( 'shop_shipping_model',		'shipping' );
-		$this->load->model( 'shop_sale_model',			'sale' );
-		$this->load->model( 'shop_tag_model',			'tag' );
-		$this->load->model( 'shop_voucher_model',		'voucher' );
-		$this->load->model( 'shop_skin_model',			'skin' );
+		$this->load->model( 'shop/shop_model' );
+		$this->load->model( 'shop/shop_basket_model' );
+		$this->load->model( 'shop/shop_brand_model' );
+		$this->load->model( 'shop/shop_category_model' );
+		$this->load->model( 'shop/shop_collection_model' );
+		$this->load->model( 'shop/shop_currency_model' );
+		$this->load->model( 'shop/shop_order_model' );
+		$this->load->model( 'shop/shop_product_model' );
+		$this->load->model( 'shop/shop_product_type_model' );
+		$this->load->model( 'shop/shop_range_model' );
+		$this->load->model( 'shop/shop_shipping_model' );
+		$this->load->model( 'shop/shop_sale_model' );
+		$this->load->model( 'shop/shop_tag_model' );
+		$this->load->model( 'shop/shop_voucher_model' );
+		$this->load->model( 'shop/shop_skin_model' );
 
 		// --------------------------------------------------------------------------
 
 		//	Load up the shop's skin
 		$_skin = app_setting( 'skin', 'shop' ) ? app_setting( 'skin', 'shop' ) : 'getting-started';
 
-		$this->_skin = $this->skin->get( $_skin );
+		$this->_skin = $this->shop_skin_model->get( $_skin );
 
 		if ( ! $this->_skin ) :
 
-			show_fatal_error( 'Failed to load shop skin "' . $_skin . '"', 'Shop skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->skin->last_error() );
+			show_fatal_error( 'Failed to load shop skin "' . $_skin . '"', 'Shop skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->shop_skin_model->last_error() );
 
 		endif;
 

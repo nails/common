@@ -912,7 +912,7 @@ class CORE_NAILS_Installer
 				p
 				{
 					margin:0;
-					margin-bottom:1em;;
+					margin-bottom:1em;
 				}
 
 				p small

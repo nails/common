@@ -6,15 +6,15 @@ if ( ! function_exists( 'cms_render_block' ) )
 	function cms_render_block( $slug, $lang = NULL )
 	{
 		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'cms_block' ) ) :
+		if ( ! get_instance()->load->model_is_loaded( 'cms_block_model' ) ) :
 
-			get_instance()->load->model( 'cms/cms_block_model', 'cms_block' );
+			get_instance()->load->model( 'cms/cms_block_model' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$_block = get_instance()->cms_block->get_by_slug( $slug );
+		$_block = get_instance()->cms_block_model->get_by_slug( $slug );
 
 		if ( ! $_block ) :
 

@@ -32,15 +32,15 @@ class NAILS_Blog_widget_model extends NAILS_Model
 		$this->db->order_by( 'published', 'DESC' );
 		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post' )->result();
 
-		if ( ! $this->load->model_is_loaded( 'post' ) ) :
+		if ( ! $this->load->model_is_loaded( 'blog_post_model' ) ) :
 
-			$this->load->model( 'blog/blog_post_model', 'post' );
+			$this->load->model( 'blog/blog_post_model' );
 
 		endif;
 
 		foreach ( $_posts AS $post ) :
 
-			$post->url = $this->post->format_url( $post->slug );
+			$post->url = $this->blog_post_model->format_url( $post->slug );
 
 		endforeach;
 
@@ -72,15 +72,15 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_hit bph' )->result();
 
-		if ( ! $this->load->model_is_loaded( 'post' ) ) :
+		if ( ! $this->load->model_is_loaded( 'blog_post_model' ) ) :
 
-			$this->load->model( 'blog/blog_post_model', 'post' );
+			$this->load->model( 'blog/blog_post_model' );
 
 		endif;
 
 		foreach ( $_posts AS $post ) :
 
-			$post->url = $this->post->format_url( $post->slug );
+			$post->url = $this->blog_post_model->format_url( $post->slug );
 
 		endforeach;
 
@@ -119,15 +119,15 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		$_categories = $this->db->get( NAILS_DB_PREFIX . 'blog_category c' )->result();
 
-		if ( ! $this->load->model_is_loaded( 'category' ) ) :
+		if ( ! $this->load->model_is_loaded( 'blog_category_model' ) ) :
 
-			$this->load->model( 'blog/blog_category_model', 'category' );
+			$this->load->model( 'blog/blog_category_model' );
 
 		endif;
 
 		foreach ( $_categories AS $cat ) :
 
-			$cat->url = $this->category->format_url( $cat->slug );
+			$cat->url = $this->blog_category_model->format_url( $cat->slug );
 
 		endforeach;
 
@@ -166,15 +166,15 @@ class NAILS_Blog_widget_model extends NAILS_Model
 
 		$_tags = $this->db->get( NAILS_DB_PREFIX . 'blog_tag t' )->result();
 
-		if ( ! $this->load->model_is_loaded( 'tag' ) ) :
+		if ( ! $this->load->model_is_loaded( 'blog_tag_model' ) ) :
 
-			$this->load->model( 'blog/blog_tag_model', 'tag' );
+			$this->load->model( 'blog/blog_tag_model' );
 
 		endif;
 
 		foreach ( $_tags AS $tag ) :
 
-			$tag->url = $this->tag->format_url( $tag->slug );
+			$tag->url = $this->blog_tag_model->format_url( $tag->slug );
 
 		endforeach;
 

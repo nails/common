@@ -71,7 +71,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'testimonials/testimonial_model', 'testimonial' );
+		$this->load->model( 'testimonials/testimonial_model' );
 	}
 
 
@@ -92,7 +92,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['testimonials'] = $this->testimonial->get_all();
+		$this->data['testimonials'] = $this->testimonial_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 	public function create()
 	{
 		//	Page Title
-		$this->data['page']->title = lang( 'testimonials_create_title' );;
+		$this->data['page']->title = lang( 'testimonials_create_title' );
 
 		// --------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 				$_data['quote_by']	= $this->input->post( 'quote_by' );
 				$_data['order']		= (int) $this->input->post( 'order' );
 
-				if ( $this->testimonial->create( $_data ) ) :
+				if ( $this->testimonial_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', lang( 'testimonials_create_ok' ) );
 					redirect( 'admin/testimonials' );
@@ -164,7 +164,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 	public function edit()
 	{
-		$this->data['testimonial'] = $this->testimonial->get_by_id( $this->uri->segment( 4 ) );
+		$this->data['testimonial'] = $this->testimonial_model->get_by_id( $this->uri->segment( 4 ) );
 
 		if ( ! $this->data['testimonial'] ) :
 
@@ -177,7 +177,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page Title
-		$this->data['page']->title = lang( 'testimonials_edit_title' );;
+		$this->data['page']->title = lang( 'testimonials_edit_title' );
 
 		// --------------------------------------------------------------------------
 
@@ -198,7 +198,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 				$_data['quote_by']	= $this->input->post( 'quote_by' );
 				$_data['order']		= (int) $this->input->post( 'order' );
 
-				if ( $this->testimonial->update( $this->data['testimonial']->id, $_data ) ) :
+				if ( $this->testimonial_model->update( $this->data['testimonial']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', lang( 'testimonials_edit_ok' ) );
 					redirect( 'admin/testimonials' );
@@ -232,7 +232,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 	public function delete()
 	{
-		$_testimonial = $this->testimonial->get_by_id( $this->uri->segment( 4 ) );
+		$_testimonial = $this->testimonial_model->get_by_id( $this->uri->segment( 4 ) );
 
 		if ( ! $_testimonial ) :
 
@@ -244,7 +244,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->testimonial->delete( $_testimonial->id ) ) :
+		if ( $this->testimonial_model->delete( $_testimonial->id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'testimonials_delete_ok' ) );
 

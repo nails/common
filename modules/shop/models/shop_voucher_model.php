@@ -163,8 +163,8 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		if ( is_numeric( $order ) ) :
 
-			$this->load->model( 'shop/shop_order_model', 'order' );
-			$order = $this->order->get_by_id( $order );
+			$this->load->model( 'shop/shop_order_model' );
+			$order = $this->shop_order_model->get_by_id( $order );
 
 		endif;
 
@@ -289,7 +289,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_type_model' );
 
 		foreach ( $_vouchers AS $voucher ) :
 
@@ -307,7 +307,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 					else :
 
 						//	Doesn't exist, fetch and save
-						$voucher->product = $this->product_type->get_by_id( $voucher->product_type_id );
+						$voucher->product = $this->shop_product_type_model->get_by_id( $voucher->product_type_id );
 						$this->_set_cache( 'voucher-product-type-' . $voucher->product_type_id, $voucher->product );
 
 					endif;

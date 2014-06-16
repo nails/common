@@ -252,7 +252,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 			$this->load->model( 'blog/blog_post_model' );
 
 			$_posts		= $this->blog_post_model->get_all();
-			$_url	= app_setting( 'url', 'blog' );
+			$_url		= app_setting( 'url', 'blog' );
 			$_counter	= 0;
 
 			// --------------------------------------------------------------------------

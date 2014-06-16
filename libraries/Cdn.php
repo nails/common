@@ -85,7 +85,7 @@ class Cdn
 			if ( $_found ) :
 
 				//	Whoop! We totes did.
-				$this->_magic = $_found;;
+				$this->_magic = $_found;
 
 			else :
 
@@ -3108,7 +3108,7 @@ class Cdn
 		$_ids		= implode( '-', $_ids );
 		$_ids_hash	= implode( '-', $_ids_hash );
 
-		return md5( APP_PRIVATE_KEY . $_ids . $_ids_hash . $filename ) === $hash ? $_objects : FALSE;;
+		return md5( APP_PRIVATE_KEY . $_ids . $_ids_hash . $filename ) === $hash ? $_objects : FALSE;
 	}
 
 

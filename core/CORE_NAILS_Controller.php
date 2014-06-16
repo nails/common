@@ -657,7 +657,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		// --------------------------------------------------------------------------
 
 		$_models	= array();
-		$_models[]	= array( 'system/app_setting_model',	'app_setting' );
+		$_models[]	= 'system/app_setting_model';
 		$_models[]	= array( 'system/user_model',			'user' );
 		$_models[]	= array( 'system/user_group_model',		'user_group' );
 		$_models[]	= array( 'system/user_password_model',	'user_password' );

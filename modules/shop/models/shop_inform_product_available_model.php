@@ -39,13 +39,13 @@ class NAILS_Shop_inform_product_available_model extends NAILS_Model
 
 		if ( $variation_ids ) :
 
-			if ( ! $this->load->model_is_loaded( 'product' ) ) :
+			if ( ! $this->load->model_is_loaded( 'shop_product_model' ) ) :
 
-				$this->load->model( 'shop/shop_product_model', 'product' );
+				$this->load->model( 'shop/shop_product_model' );
 
 			endif;
 
-			$_product = $this->product->get_by_id( $product_id );
+			$_product = $this->shop_product_model->get_by_id( $product_id );
 
 			if ( $_product ) :
 

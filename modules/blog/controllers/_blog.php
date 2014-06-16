@@ -27,28 +27,28 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'blog', RENDER_LANG_SLUG );
+		$this->lang->load( 'blog/blog', RENDER_LANG_SLUG );
 
 		// --------------------------------------------------------------------------
 
 		//	Load the models
-		$this->load->model( 'blog_model',			'blog' );
-		$this->load->model( 'blog_post_model',		'post' );
-		$this->load->model( 'blog_widget_model',	'widget' );
-		$this->load->model( 'blog_skin_model',		'skin' );
+		$this->load->model( 'blog/blog_model' );
+		$this->load->model( 'blog/blog_post_model' );
+		$this->load->model( 'blog/blog_widget_model' );
+		$this->load->model( 'blog/blog_skin_model' );
 
 		// --------------------------------------------------------------------------
 
 		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->load->model( 'blog_category_model',	'category' );
+			$this->load->model( 'blog/blog_category_model' );
 
 		endif;
 
 
 		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->load->model( 'blog_tag_model',	'tag' );
+			$this->load->model( 'blog/blog_tag_model' );
 
 		endif;
 
@@ -57,7 +57,7 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		//	Load up the blog's skin
 		$_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'getting-started';
 
-		$this->_skin = $this->skin->get( $_skin );
+		$this->_skin = $this->blog_skin_model->get( $_skin );
 
 		if ( ! $this->_skin ) :
 

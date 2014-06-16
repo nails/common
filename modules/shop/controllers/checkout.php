@@ -87,11 +87,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				//	Save payment gateway info to the session
 				if ( $this->data['basket']->totals->grand != 0 ) :
 
-					$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+					$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
 				else :
 
-					$this->basket->remove_payment_gateway();
+					$this->shop_basket_model->remove_payment_gateway();
 
 				endif;
 
@@ -183,12 +183,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						$_details->last_name	= $this->input->post( 'last_name' );
 						$_details->email		= $this->input->post( 'email' );
 
-						$this->basket->add_personal_details( $_details );
+						$this->shop_basket_model->add_personal_details( $_details );
 
 					else :
 
 						//	In case it's already there for some reason
-						$this->basket->remove_personal_details();
+						$this->shop_basket_model->remove_personal_details();
 
 					endif;
 
@@ -219,12 +219,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 						endif;
 
-						$this->basket->add_shipping_details( $_details );
+						$this->shop_basket_model->add_shipping_details( $_details );
 
 					else :
 
 						//	In case it's already there for some reason
-						$this->basket->remove_shipping_details();
+						$this->shop_basket_model->remove_shipping_details();
 
 					endif;
 
@@ -236,7 +236,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					if ( $this->data['basket']->totals->grand > 0 && count( $this->data['payment_gateways'] ) == 1 ) :
 
 						//	Save payment gateway info to the session
-						$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+						$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
 						//	... and confirm
 						$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
@@ -251,7 +251,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 							if ( $pg->id == $this->input->post( 'payment_gateway' ) ) :
 
 								//	Save payment gateway info to the session
-								$this->basket->add_payment_gateway( $pg->id );
+								$this->shop_basket_model->add_payment_gateway( $pg->id );
 
 								//	... and confirm
 								$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
@@ -267,7 +267,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					elseif ( $this->data['basket']->totals->grand == 0 ) :
 
 						//	Incase it's already there for some reason
-						$this->basket->remove_payment_gateway();
+						$this->shop_basket_model->remove_payment_gateway();
 
 						// --------------------------------------------------------------------------
 
@@ -384,7 +384,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			if ( ! $this->data['basket']->requires_shipping && count( $this->data['payment_gateways'] ) == 1 ) :
 
-				$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+				$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
 				$_uri  = app_setting( 'url', 'shop' ) . 'checkout/payment';
 				$_uri .= $this->data['guest'] ? '?guest=true' : '';
@@ -397,7 +397,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			$this->data['page']->title	= 'Checkout &rsaquo; Confirm Your Order';
-			$this->data['currencies']	= $this->currency->get_all();
+			$this->data['currencies']	= $this->shop_currency_model->get_all();
 
 			// --------------------------------------------------------------------------
 
@@ -454,7 +454,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			if ( $this->data['basket']->totals->grand == 0 ) :
 
 				//	Create order, then set as paid and redirect to processing page
-				$_order = $this->order->create( $this->data['basket'], TRUE );
+				$_order = $this->shop_order_model->create( $this->data['basket'], TRUE );
 
 				if ( ! $_order ) :
 
@@ -465,23 +465,23 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				endif;
 
 				//	Set as paid
-				$this->order->paid( $_order->id );
+				$this->shop_order_model->paid( $_order->id );
 
 				//	Process the order, send receipt and send order notification
-				$this->order->process( $_order );
-				$this->order->send_receipt( $_order );
-				$this->order->send_order_notification( $_order );
+				$this->shop_order_model->process( $_order );
+				$this->shop_order_model->send_receipt( $_order );
+				$this->shop_order_model->send_order_notification( $_order );
 
 				if ( $_order->voucher ) :
 
-					$this->voucher->redeem( $_order->voucher->id, $_order );
+					$this->shop_voucher_model->redeem( $_order->voucher->id, $_order );
 
 				endif;
 
 				// --------------------------------------------------------------------------
 
 				//	Destory the basket
-				$this->basket->destroy();
+				$this->shop_basket_model->destroy();
 
 				// --------------------------------------------------------------------------
 
@@ -528,7 +528,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _payment_paypal()
 	{
 		//	Create the order
-		$this->data['order'] = $this->order->create( $this->data['basket'], TRUE );
+		$this->data['order'] = $this->shop_order_model->create( $this->data['basket'], TRUE );
 
 		if ( ! $this->data['order'] ) :
 
@@ -637,7 +637,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _can_checkout()
 	{
 		//	Check basket isn't empty
-		$this->data['basket'] = $this->basket->get_basket();
+		$this->data['basket'] = $this->shop_basket_model->get_basket();
 
 		if ( ! $this->data['basket']->items ) :
 
@@ -657,7 +657,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	public function processing()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 		if ( ! $this->data['order'] ) :
 
@@ -668,7 +668,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 
 		//	Empty the basket
-		$this->basket->destroy();
+		$this->shop_basket_model->destroy();
 
 		// --------------------------------------------------------------------------
 
@@ -779,7 +779,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	public function cancel()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 		if ( ! $this->data['order'] ) :
 
@@ -789,7 +789,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->order->cancel( $this->data['order']->id );
+		$this->shop_order_model->cancel( $this->data['order']->id );
 
 		$this->session->set_flashdata( 'message', '<strong>Checkout was cancelled.</strong><br />At your request, we cancelled checkout - you have not been charged.' );
 
@@ -863,7 +863,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			_LOG();
 
 			//	Check order exists
-			$_order = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+			$_order = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 			if ( ! $_order ) :
 
@@ -895,7 +895,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			$_ipn		= $this->paypal->validate_ipn();
 			$_paypal	= $this->input->post();
 
-			$_order = $this->order->get_by_ref( $this->input->post( 'invoice' ) );
+			$_order = $this->shop_order_model->get_by_ref( $this->input->post( 'invoice' ) );
 
 			if ( ! $_order ) :
 
@@ -930,7 +930,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				$_data = array(
 					'pp_txn_id'	=> $_paypal['txn_id']
 				);
-				$this->order->fail( $_order->id, $_data );
+				$this->shop_order_model->fail( $_order->id, $_data );
 
 				_LOG( 'Order failed secondary verification, aborting.' );
 				_LOG( '- - - - - - - - - - - - - - - - - - -' );
@@ -1010,7 +1010,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
 					);
-					$this->order->fail( $_order->id, $_data );
+					$this->shop_order_model->fail( $_order->id, $_data );
 
 				break;
 
@@ -1027,7 +1027,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 						//	The transaction is pending review, gracefully stop proicessing, but don't cancel the order
 						_LOG( 'Payment is pending review by PayPal, gracefully aborting just now.' );
-						$this->order->pending( $_order->id );
+						$this->shop_order_model->pending( $_order->id );
 						return;
 
 					else :
@@ -1039,7 +1039,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						$_data = array(
 							'pp_txn_id'	=> $_paypal['txn_id']
 						);
-						$this->order->fail( $_order->id, $_data );
+						$this->shop_order_model->fail( $_order->id, $_data );
 
 						// --------------------------------------------------------------------------
 
@@ -1066,7 +1066,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
 					);
-					$this->order->fail( $_order->id, $_data );
+					$this->shop_order_model->fail( $_order->id, $_data );
 
 					// --------------------------------------------------------------------------
 
@@ -1091,26 +1091,26 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				'pp_txn_id'		=> $_paypal['txn_id'],
 				'fees_deducted'	=> $_paypal['mc_fee']
 			);
-			$this->order->paid( $_order->id, $_data );
+			$this->shop_order_model->paid( $_order->id, $_data );
 
 			// --------------------------------------------------------------------------
 
 			//	PROCESSSSSS...
-			$this->order->process( $_order );
+			$this->shop_order_model->process( $_order );
 			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a receipt to the customer
 			_LOG( 'Sending receipt to customer: ' . $_order->user->email );
-			$this->order->send_receipt( $_order );
+			$this->shop_order_model->send_receipt( $_order );
 			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a notification to the store owner(s)
 			_LOG( 'Sending notification to store owner(s): ' . notification( 'notify_order', 'shop' ) );
-			$this->order->send_order_notification( $_order );
+			$this->shop_order_model->send_order_notification( $_order );
 
 			// --------------------------------------------------------------------------
 
@@ -1118,7 +1118,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 				//	Redeem the voucher, if it's there
 				_LOG( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
-				$this->voucher->redeem( $_order->voucher->id, $_order );
+				$this->shop_voucher_model->redeem( $_order->voucher->id, $_order );
 
 			endif;
 

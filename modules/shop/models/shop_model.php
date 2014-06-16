@@ -78,7 +78,7 @@ class NAILS_Shop_model extends NAILS_Model
 			if ( ! empty( $_lookup->status ) && $_lookup->status == 200 ) :
 
 				//	We know the code, does it have a known currency?
-				$_country_currency = $this->currency->get_by_country( $_lookup->country->iso );
+				$_country_currency = $this->shop_currency_model->get_by_country( $_lookup->country->iso );
 
 				if ( $_country_currency ) :
 
@@ -107,7 +107,7 @@ class NAILS_Shop_model extends NAILS_Model
 		endif;
 
 		//	Fetch the user's render currency
-		$_user_currency = $this->currency->get_by_id( $_currency_id );
+		$_user_currency = $this->shop_currency_model->get_by_id( $_currency_id );
 
 		if ( ! $_user_currency || ! $_user_currency->is_active ) :
 
@@ -160,16 +160,16 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Load the currency model, if not already loaded
-		if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+		if ( ! $this->load->model_is_loaded( 'shop_currency_model' ) ) :
 
-			$this->load->model( 'shop/shop_currency_model', 'currency' );
+			$this->load->model( 'shop/shop_currency_model' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch base currency
-		$_base = $this->currency->get_by_id( app_setting( 'base_currency', 'shop' ) );
+		$_base = $this->shop_currency_model->get_by_id( app_setting( 'base_currency', 'shop' ) );
 
 		//	Cache
 		$this->_set_cache( 'base_currency', $_base );
@@ -212,19 +212,19 @@ class NAILS_Shop_model extends NAILS_Model
 				//	Fetch currency
 
 				//	Load the currency model, if not already loaded
-				if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+				if ( ! $this->load->model_is_loaded( 'shop_currency_model' ) ) :
 
-					$this->load->model( 'shop/shop_currency_model', 'currency' );
+					$this->load->model( 'shop/shop_currency_model' );
 
 				endif;
 
 				if ( is_numeric( $for_currency ) ) :
 
-					$_currency = $this->currency->get_by_id( $for_currency );
+					$_currency = $this->shop_currency_model->get_by_id( $for_currency );
 
 				else :
 
-					$_currency = $this->currency->get_by_code( $for_currency );
+					$_currency = $this->shop_currency_model->get_by_code( $for_currency );
 
 				endif;
 

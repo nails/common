@@ -33,7 +33,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'cms/cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 	public function page( $preview = FALSE )
 	{
-		$_page = $this->cms_page->get_by_id( $this->_page_id, TRUE );
+		$_page = $this->cms_page_model->get_by_id( $this->_page_id, TRUE );
 
 		if ( ! $_page || $_page->is_deleted ) :
 
@@ -139,7 +139,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Actually render
-		$_html	= $this->cms_page->render_template( $_data->template, $_render->widgets, $_render->additional_fields );
+		$_html	= $this->cms_page_model->render_template( $_data->template, $_render->widgets, $_render->additional_fields );
 
 		$this->output->set_output( $_html );
 	}
@@ -169,7 +169,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 	public function homepage()
 	{
 		//	Attempt to get the site's homepage
-		$_homepage = $this->cms_page->get_homepage();
+		$_homepage = $this->cms_page_model->get_homepage();
 
 		if ( $_homepage ) :
 
@@ -195,7 +195,7 @@ class NAILS_Render extends NAILS_CMS_Controller
 
 		if ( $_id ) :
 
-			$_page = $this->cms_page->get_by_id( $_id );
+			$_page = $this->cms_page_model->get_by_id( $_id );
 
 			if ( $_page && $_page->is_published ) :
 

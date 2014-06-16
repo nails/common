@@ -515,7 +515,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				foreach( $post->categories AS $c ) :
 
-					$c->url = $this->category->format_url( $c->slug );
+					$c->url = $this->blog_category_model->format_url( $c->slug );
 
 				endforeach;
 
@@ -540,7 +540,7 @@ class NAILS_Blog_post_model extends NAILS_Model
 
 				foreach( $post->tags AS $t ) :
 
-					$t->url = $this->tag->format_url( $t->slug );
+					$t->url = $this->blog_tag_model->format_url( $t->slug );
 
 				endforeach;
 

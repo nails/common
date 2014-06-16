@@ -22,7 +22,7 @@ class NAILS_Orders extends NAILS_Shop_Controller
 {
 	public function invoice()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->uri->segment( 4 ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->uri->segment( 4 ) );
 
 		//	Order exist?
 		if ( ! $this->data['order'] ) :

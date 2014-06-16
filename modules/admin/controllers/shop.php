@@ -79,12 +79,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		get_instance()->load->model( 'shop/shop_order_model', 'order' );
+		get_instance()->load->model( 'shop/shop_order_model' );
 
 		$_notifications['orders']			= array();
 		$_notifications['orders']['type']	= 'alert';
 		$_notifications['orders']['title']	= 'Unfulfilled orders';
-		$_notifications['orders']['value']	= get_instance()->order->count_unfulfilled_orders();
+		$_notifications['orders']['value']	= get_instance()->shop_order_model->count_unfulfilled_orders();
 
 		// --------------------------------------------------------------------------
 
@@ -175,11 +175,11 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load models which this controller depends on
-		$this->load->model( 'shop/shop_model',				'shop' );
-		$this->load->model( 'shop/shop_currency_model',		'currency' );
-		$this->load->model( 'shop/shop_product_model',		'product' );
-		$this->load->model( 'shop/shop_product_type_model',	'product_type' );
-		$this->load->model( 'shop/shop_tax_model',			'tax' );
+		$this->load->model( 'shop/shop_model' );
+		$this->load->model( 'shop/shop_currency_model' );
+		$this->load->model( 'shop/shop_product_model' );
+		$this->load->model( 'shop/shop_product_type_model' );
+		$this->load->model( 'shop/shop_tax_model' );
 	}
 
 
@@ -277,14 +277,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch orders
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_model' );
 
 		$this->data['items']		= new stdClass();
-		$this->data['items']->data	= $this->product->get_all( FALSE, $_order, $_limit, $_where, $_search );
+		$this->data['items']->data	= $this->shop_product_model->get_all( FALSE, $_order, $_limit, $_where, $_search );
 
 		//	Work out pagination
 		$this->data['items']->pagination				= new stdClass();
-		$this->data['items']->pagination->total_results	= $this->product->count_all( FALSE, $_where, $_search );
+		$this->data['items']->pagination->total_results	= $this->shop_product_model->count_all( FALSE, $_where, $_search );
 
 		// --------------------------------------------------------------------------
 
@@ -304,7 +304,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data, this data is used in both the view and the form submission
-		$this->data['product_types'] = $this->product_type->get_all();
+		$this->data['product_types'] = $this->shop_product_type_model->get_all();
 
 		if ( ! $this->data['product_types'] ) :
 
@@ -314,7 +314,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->data['currencies'] = $this->currency->get_all();
+		$this->data['currencies'] = $this->shop_currency_model->get_all();
 
 		//	Fetch product meta fields
 		$this->data['product_types_meta'] = array();
@@ -323,7 +323,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			if ( is_callable( array( $this->product_type, 'meta_fields_' . $type->slug ) ) ) :
 
-				$this->data['product_types_meta'][$type->id] = $this->product_type->{'meta_fields_' . $type->slug}();
+				$this->data['product_types_meta'][$type->id] = $this->shop_product_type_model->{'meta_fields_' . $type->slug}();
 
 			else :
 
@@ -349,7 +349,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			if ( $this->form_validation->run( $this ) ) :
 
 				//	Validated! Create the product
-				$_product = $this->product->create( $this->input->post() );
+				$_product = $this->shop_product_model->create( $this->input->post() );
 
 				if ( $_product ) :
 
@@ -359,7 +359,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the Product. ' . $this->product->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the Product. ' . $this->shop_product_model->last_error();
 
 				endif;
 
@@ -374,24 +374,24 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load additional models
-		$this->load->model( 'shop/shop_attribute_model',	'attribute' );
-		$this->load->model( 'shop/shop_brand_model',		'brand' );
-		$this->load->model( 'shop/shop_category_model',		'category' );
-		$this->load->model( 'shop/shop_collection_model',	'collection' );
-		$this->load->model( 'shop/shop_range_model',		'range' );
-		$this->load->model( 'shop/shop_tag_model',			'tag' );
+		$this->load->model( 'shop/shop_attribute_model' );
+		$this->load->model( 'shop/shop_brand_model' );
+		$this->load->model( 'shop/shop_category_model' );
+		$this->load->model( 'shop/shop_collection_model' );
+		$this->load->model( 'shop/shop_range_model' );
+		$this->load->model( 'shop/shop_tag_model' );
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch additional data
-		$this->data['product_types_flat']	= $this->product_type->get_all_flat();
-		$this->data['tax_rates']			= $this->tax->get_all_flat();
-		$this->data['attributes']			= $this->attribute->get_all_flat();
-		$this->data['brands']				= $this->brand->get_all_flat();
-		$this->data['categories']			= $this->category->get_all_nested_flat();
-		$this->data['collections']			= $this->collection->get_all();
-		$this->data['ranges']				= $this->range->get_all();
-		$this->data['tags']					= $this->tag->get_all_flat();
+		$this->data['product_types_flat']	= $this->shop_product_type_model->get_all_flat();
+		$this->data['tax_rates']			= $this->shop_tax_model->get_all_flat();
+		$this->data['attributes']			= $this->shop_attribute_model->get_all_flat();
+		$this->data['brands']				= $this->shop_brand_model->get_all_flat();
+		$this->data['categories']			= $this->shop_category_model->get_all_nested_flat();
+		$this->data['collections']			= $this->shop_collection_model->get_all();
+		$this->data['ranges']				= $this->shop_range_model->get_all();
+		$this->data['tags']					= $this->shop_tag_model->get_all_flat();
 
 		$this->data['tax_rates'] = array( 'No Tax' ) + $this->data['tax_rates'];
 
@@ -691,7 +691,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _inventory_edit()
 	{
 		//	Fetch item
-		$this->data['item'] = $this->product->get_by_id( $this->uri->segment( 5 ) );
+		$this->data['item'] = $this->shop_product_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $this->data['item'] ) :
 
@@ -707,7 +707,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data, this data is used in both the view and the form submission
-		$this->data['product_types'] = $this->product_type->get_all();
+		$this->data['product_types'] = $this->shop_product_type_model->get_all();
 
 		if ( ! $this->data['product_types'] ) :
 
@@ -717,7 +717,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		$this->data['currencies'] = $this->currency->get_all();
+		$this->data['currencies'] = $this->shop_currency_model->get_all();
 
 		//	Fetch product meta fields
 		$this->data['product_types_meta'] = array();
@@ -726,7 +726,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			if ( is_callable( array( $this->product_type, 'meta_fields_' . $type->slug ) ) ) :
 
-				$this->data['product_types_meta'][$type->id] = $this->product_type->{'meta_fields_' . $type->slug}();
+				$this->data['product_types_meta'][$type->id] = $this->shop_product_type_model->{'meta_fields_' . $type->slug}();
 
 			else :
 
@@ -752,7 +752,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			if ( $this->form_validation->run( $this ) ) :
 
 				//	Validated! Create the product
-				$_product = $this->product->update( $this->data['item']->id, $this->input->post() );
+				$_product = $this->shop_product_model->update( $this->data['item']->id, $this->input->post() );
 
 				if ( $_product ) :
 
@@ -762,7 +762,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem updating the Product. ' . $this->product->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem updating the Product. ' . $this->shop_product_model->last_error();
 
 				endif;
 
@@ -777,24 +777,24 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load additional models
-		$this->load->model( 'shop/shop_attribute_model',	'attribute' );
-		$this->load->model( 'shop/shop_brand_model',		'brand' );
-		$this->load->model( 'shop/shop_category_model',		'category' );
-		$this->load->model( 'shop/shop_collection_model',	'collection' );
-		$this->load->model( 'shop/shop_range_model',		'range' );
-		$this->load->model( 'shop/shop_tag_model',			'tag' );
+		$this->load->model( 'shop/shop_attribute_model' );
+		$this->load->model( 'shop/shop_brand_model' );
+		$this->load->model( 'shop/shop_category_model' );
+		$this->load->model( 'shop/shop_collection_model' );
+		$this->load->model( 'shop/shop_range_model' );
+		$this->load->model( 'shop/shop_tag_model' );
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch additional data
-		$this->data['product_types_flat']	= $this->product_type->get_all_flat();
-		$this->data['tax_rates']			= $this->tax->get_all_flat();
-		$this->data['attributes']			= $this->attribute->get_all_flat();
-		$this->data['brands']				= $this->brand->get_all_flat();
-		$this->data['categories']			= $this->category->get_all_nested_flat();
-		$this->data['collections']			= $this->collection->get_all();
-		$this->data['ranges']				= $this->range->get_all();
-		$this->data['tags']					= $this->tag->get_all_flat();
+		$this->data['product_types_flat']	= $this->shop_product_type_model->get_all_flat();
+		$this->data['tax_rates']			= $this->shop_tax_model->get_all_flat();
+		$this->data['attributes']			= $this->shop_attribute_model->get_all_flat();
+		$this->data['brands']				= $this->shop_brand_model->get_all_flat();
+		$this->data['categories']			= $this->shop_category_model->get_all_nested_flat();
+		$this->data['collections']			= $this->shop_collection_model->get_all();
+		$this->data['ranges']				= $this->shop_range_model->get_all();
+		$this->data['tags']					= $this->shop_tag_model->get_all_flat();
 
 		$this->data['tax_rates'] = array( 'No Tax' ) + $this->data['tax_rates'];
 
@@ -826,7 +826,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_delete()
 	{
-		$_product = $this->product->get_by_id( $this->uri->segment( 5 ) );
+		$_product = $this->shop_product_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $_product ) :
 
@@ -838,7 +838,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->product->delete( $_product->id ) ) :
+		if ( $this->shop_product_model->delete( $_product->id ) ) :
 
 			$this->session->set_flashdata( 'success', 'Product successfully deleted! You can restore this product by ' . anchor( '/admin/shop/inventory/restore/' . $_product->id, 'clicking here' ) );
 
@@ -859,7 +859,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 	protected function _inventory_restore()
 	{
-		$_product = $this->product->get_by_id( $this->uri->segment( 5 ) );
+		$_product = $this->shop_product_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $_product ) :
 
@@ -871,7 +871,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->product->restore( $_product->id ) ) :
+		if ( $this->shop_product_model->restore( $_product->id ) ) :
 
 			$this->session->set_flashdata( 'success', 'Product successfully restored' );
 
@@ -1035,14 +1035,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch orders
-		$this->load->model( 'shop/shop_order_model', 'order' );
+		$this->load->model( 'shop/shop_order_model' );
 
 		$this->data['orders']		= new stdClass();
-		$this->data['orders']->data = $this->order->get_all( $_order, $_limit, $_where, $_search );
+		$this->data['orders']->data = $this->shop_order_model->get_all( $_order, $_limit, $_where, $_search );
 
 		//	Work out pagination
 		$this->data['orders']->pagination					= new stdClass();
-		$this->data['orders']->pagination->total_results	= $this->order->count_orders( $_where, $_search );
+		$this->data['orders']->pagination->total_results	= $this->shop_order_model->count_orders( $_where, $_search );
 
 		// --------------------------------------------------------------------------
 
@@ -1075,9 +1075,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch and check order
-		$this->load->model( 'shop/shop_order_model', 'order' );
+		$this->load->model( 'shop/shop_order_model' );
 
-		$this->data['order'] = $this->order->get_by_id( $this->uri->segment( 5 ) );
+		$this->data['order'] = $this->shop_order_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $this->data['order'] ) :
 
@@ -1141,8 +1141,8 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Check order exists
-		$this->load->model( 'shop/shop_order_model', 'order' );
-		$_order = $this->order->get_by_id( $this->uri->segment( 5 ) );
+		$this->load->model( 'shop/shop_order_model' );
+		$_order = $this->shop_order_model->get_by_id( $this->uri->segment( 5 ) );
 
 		if ( ! $_order ) :
 
@@ -1155,25 +1155,25 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	PROCESSSSSS...
-		$this->order->process( $_order );
+		$this->shop_order_model->process( $_order );
 
 		// --------------------------------------------------------------------------
 
 		//	Send a receipt to the customer
-		$this->order->send_receipt( $_order );
+		$this->shop_order_model->send_receipt( $_order );
 
 		// --------------------------------------------------------------------------
 
 		//	Send a notification to the store owner(s)
-		$this->order->send_order_notification( $_order );
+		$this->shop_order_model->send_order_notification( $_order );
 
 		// --------------------------------------------------------------------------
 
 		if ( $_order->voucher ) :
 
 			//	Redeem the voucher, if it's there
-			$this->load->model( 'shop/shop_voucher_model', 'voucher' );
-			$this->voucher->redeem( $_order->voucher->id, $_order );
+			$this->load->model( 'shop/shop_voucher_model' );
+			$this->shop_voucher_model->redeem( $_order->voucher->id, $_order );
 
 		endif;
 
@@ -1230,14 +1230,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			if ( ! $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order_product' ) ) :
 
 				//	No unprocessed items, consider order FULFILLED
-				$this->load->model( 'shop/shop_order_model', 'order' );
-				$this->order->fulfil( $_order_id );
+				$this->load->model( 'shop/shop_order_model' );
+				$this->shop_order_model->fulfil( $_order_id );
 
 			else :
 
 				//	Still some unprocessed items, mark as unfulfilled (in case it was already fulfilled)
-				$this->load->model( 'shop/shop_order_model', 'order' );
-				$this->order->unfulfil( $_order_id );
+				$this->load->model( 'shop/shop_order_model' );
+				$this->shop_order_model->unfulfil( $_order_id );
 
 			endif;
 
@@ -1268,7 +1268,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	public function vouchers()
 	{
 		//	Load voucher model
-		$this->load->model( 'shop/shop_voucher_model', 'voucher' );
+		$this->load->model( 'shop/shop_voucher_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -1382,11 +1382,11 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Fetch vouchers
 		$this->data['vouchers']		= new stdClass();
-		$this->data['vouchers']->data = $this->voucher->get_all( FALSE, $_order, $_limit, $_where, $_search );
+		$this->data['vouchers']->data = $this->shop_voucher_model->get_all( FALSE, $_order, $_limit, $_where, $_search );
 
 		//	Work out pagination
 		$this->data['vouchers']->pagination					= new stdClass();
-		$this->data['vouchers']->pagination->total_results	= $this->voucher->count_vouchers( FALSE, $_where, $_search );
+		$this->data['vouchers']->pagination->total_results	= $this->shop_voucher_model->count_vouchers( FALSE, $_where, $_search );
 
 		// --------------------------------------------------------------------------
 
@@ -1553,14 +1553,14 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				// --------------------------------------------------------------------------
 
 				//	Attempt to create
-				if ( $this->voucher->create( $_data ) ) :
+				if ( $this->shop_voucher_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Voucher "' . $_data['code'] . '" was created successfully.' );
 					redirect( 'admin/shop/vouchers' );
 
 				else :
 
-					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the voucher. '  . $this->voucher->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem creating the voucher. '  . $this->shop_voucher_model->last_error();
 
 				endif;
 
@@ -1579,7 +1579,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['product_types'] = $this->product_type->get_all_flat();
+		$this->data['product_types'] = $this->shop_product_type_model->get_all_flat();
 
 		// --------------------------------------------------------------------------
 
@@ -1632,7 +1632,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	public function _callback_voucher_valid_product_type( $str )
 	{
 		$this->form_validation->set_message( '_callback_voucher_valid_product_type', 'Invalid product type.' );
-		return (bool) $this->product_type->get_by_id( $str );
+		return (bool) $this->shop_product_type_model->get_by_id( $str );
 	}
 
 	public function _callback_voucher_valid_from( &$str )
@@ -1729,13 +1729,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		$_id = $this->uri->segment( 5 );
 
-		if ( $this->voucher->update( $_id, array( 'is_active' => TRUE ) ) ) :
+		if ( $this->shop_voucher_model->update( $_id, array( 'is_active' => TRUE ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Voucher was activated successfully.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem activating the voucher. ' . $this->voucher->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem activating the voucher. ' . $this->shop_voucher_model->last_error() );
 
 		endif;
 
@@ -1760,13 +1760,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		$_id = $this->uri->segment( 5 );
 
-		if ( $this->voucher->update( $_id, array( 'is_active' => FALSE ) ) ) :
+		if ( $this->shop_voucher_model->update( $_id, array( 'is_active' => FALSE ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Voucher was suspended successfully.' );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem suspending the voucher. ' . $this->voucher->last_error() );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> There was a problem suspending the voucher. ' . $this->shop_voucher_model->last_error() );
 
 		endif;
 
@@ -1907,7 +1907,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_attributes()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_attribute_model', 'attribute' );
+		$this->load->model( 'shop/shop_attribute_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -1930,7 +1930,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label		= $this->input->post( 'label' );
 						$_data->description	= $this->input->post( 'description' );
 
-						if ( $this->attribute->create( $_data ) ) :
+						if ( $this->shop_attribute_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Attribute created successfully.' );
@@ -1939,7 +1939,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Attribute. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Attribute. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -1969,13 +1969,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label			= isset( $_POST[$_id]['label'] )			? $_POST[$_id]['label']				: NULL;
 						$_data->description		= isset( $_POST[$_id]['description'] )		? $_POST[$_id]['description']		: NULL;
 
-						if ( $this->attribute->update( $_id, $_data ) ) :
+						if ( $this->shop_attribute_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Attribute saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Attribute. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Attribute. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -1992,7 +1992,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->attribute->delete( $_id ) ) :
+					if ( $this->shop_attribute_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Attribute was deleted successfully.';
 
@@ -2011,7 +2011,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['attributes'] = $this->attribute->get_all( TRUE );
+		$this->data['attributes'] = $this->shop_attribute_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2039,7 +2039,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_brands()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_brand_model', 'brand' );
+		$this->load->model( 'shop/shop_brand_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2072,7 +2072,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
-						if ( $this->brand->create( $_data ) ) :
+						if ( $this->shop_brand_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Brand created successfully.' );
@@ -2081,7 +2081,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Brand. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2120,13 +2120,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 
-						if ( $this->brand->update( $_id, $_data ) ) :
+						if ( $this->shop_brand_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Brand saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2143,7 +2143,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->brand->delete( $_id ) ) :
+					if ( $this->shop_brand_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Brand was deleted successfully.';
 
@@ -2162,7 +2162,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['brands'] = $this->brand->get_all( TRUE );
+		$this->data['brands'] = $this->shop_brand_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2191,7 +2191,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_categories()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_category_model', 'category' );
+		$this->load->model( 'shop/shop_category_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2222,7 +2222,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
-						if ( $this->category->create( $_data ) ) :
+						if ( $this->shop_category_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category created successfully.' );
@@ -2231,7 +2231,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Category. ' . $this->category->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Category. ' . $this->shop_category_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2269,13 +2269,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 
-						if ( $this->category->update( $_id, $_data ) ) :
+						if ( $this->shop_category_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Category saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Category. ' . $this->category->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Category. ' . $this->shop_category_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2292,7 +2292,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->category->delete( $_id ) ) :
+					if ( $this->shop_category_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Category was deleted successfully.';
 
@@ -2311,9 +2311,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['categories']			= $this->category->get_all( FALSE, TRUE, 'NESTED' );
+		$this->data['categories']			= $this->shop_category_model->get_all( FALSE, TRUE, 'NESTED' );
 		$this->data['categories_nested']	= array();
-		$_categories_nested					= $this->category->get_all_nested_flat();
+		$_categories_nested					= $this->shop_category_model->get_all_nested_flat();
 
 		//	Prep the nested categories so it's DATA suitable.
 		foreach( $_categories_nested AS $id => $label ) :
@@ -2354,7 +2354,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_collections()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_collection_model', 'collection' );
+		$this->load->model( 'shop/shop_collection_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2385,7 +2385,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 						$_data->is_active		= $this->input->post( 'is_active' );
 
-						if ( $this->collection->create( $_data ) ) :
+						if ( $this->shop_collection_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Collection created successfully.' );
@@ -2394,7 +2394,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Collection. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Collection. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2432,13 +2432,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
 
-						if ( $this->collection->update( $_id, $_data ) ) :
+						if ( $this->shop_collection_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Collection saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Collection. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Collection. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2455,7 +2455,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->collection->delete( $_id ) ) :
+					if ( $this->shop_collection_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Collection was deleted successfully.';
 
@@ -2474,7 +2474,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['collections'] = $this->collection->get_all( TRUE );
+		$this->data['collections'] = $this->shop_collection_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2502,7 +2502,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_ranges()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_range_model', 'range' );
+		$this->load->model( 'shop/shop_range_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2533,7 +2533,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 						$_data->is_active		= (bool) $this->input->post( 'is_active' );
 
-						if ( $this->range->create( $_data ) ) :
+						if ( $this->shop_range_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Range created successfully.' );
@@ -2542,7 +2542,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Range. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Range. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2580,13 +2580,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 						$_data->is_active		= isset( $_POST[$_id]['is_active'] )		? $_POST[$_id]['is_active']			: FALSE;
 
-						if ( $this->range->update( $_id, $_data ) ) :
+						if ( $this->shop_range_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Range saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Range. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Range. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2603,7 +2603,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->range->delete( $_id ) ) :
+					if ( $this->shop_range_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Range was deleted successfully.';
 
@@ -2622,7 +2622,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['ranges'] = $this->range->get_all( TRUE );
+		$this->data['ranges'] = $this->shop_range_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2650,7 +2650,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_tags()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_tag_model', 'tag' );
+		$this->load->model( 'shop/shop_tag_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2679,7 +2679,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= $this->input->post( 'seo_description' );
 						$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 
-						if ( $this->tag->create( $_data ) ) :
+						if ( $this->shop_tag_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag created successfully.' );
@@ -2688,7 +2688,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tag. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tag. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2724,13 +2724,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->seo_description	= isset( $_POST[$_id]['seo_description'] )	? $_POST[$_id]['seo_description']	: NULL;
 						$_data->seo_keywords	= isset( $_POST[$_id]['seo_keywords'] )		? $_POST[$_id]['seo_keywords']		: NULL;
 
-						if ( $this->tag->update( $_id, $_data ) ) :
+						if ( $this->shop_tag_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Tag saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tag. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tag. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2747,7 +2747,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->tag->delete( $_id ) ) :
+					if ( $this->shop_tag_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Tag was deleted successfully.';
 
@@ -2766,7 +2766,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['tags'] = $this->tag->get_all( TRUE );
+		$this->data['tags'] = $this->shop_tag_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -2794,7 +2794,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	protected function _manage_tax_rates()
 	{
 		//	Load model
-		$this->load->model( 'shop/shop_tax_model', 'tax' );
+		$this->load->model( 'shop/shop_tax_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -2818,7 +2818,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label	= $this->input->post( 'label' );
 						$_data->rate	= $this->input->post( 'rate' );
 
-						if ( $this->tax->create( $_data ) ) :
+						if ( $this->shop_tax_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tax Rate created successfully.' );
@@ -2827,7 +2827,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tax Rate. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Tax Rate. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -2858,13 +2858,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->label	= isset( $_POST[$_id]['label'] )	? $_POST[$_id]['label']		: NULL;
 						$_data->rate	= isset( $_POST[$_id]['rate'] )		? $_POST[$_id]['rate']		: NULL;
 
-						if ( $this->tax->update( $_id, $_data ) ) :
+						if ( $this->shop_tax_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Tax Rate saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tax Rate. ' . $this->brand->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Tax Rate. ' . $this->shop_brand_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -2881,7 +2881,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->tax->delete( $_id ) ) :
+					if ( $this->shop_tax_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Tax Rate was deleted successfully.';
 
@@ -2900,7 +2900,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['rates'] = $this->tax->get_all();
+		$this->data['rates'] = $this->shop_tax_model->get_all();
 
 		// --------------------------------------------------------------------------
 
@@ -2955,7 +2955,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->max_per_order	= (int) $this->input->post( 'max_per_order' );
 						$_data->max_variations	= (int) $this->input->post( 'max_variations' );
 
-						if ( $this->product_type->create( $_data ) ) :
+						if ( $this->shop_product_type_model->create( $_data ) ) :
 
 							//	Redirect to clear form
 							$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
@@ -2964,7 +2964,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type. ' . $this->product->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem creating the Product Type. ' . $this->shop_product_model->last_error();
 							$this->data['show_tab']	= 'create';
 
 						endif;
@@ -3001,13 +3001,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 						$_data->max_per_order	= isset( $_POST['type']['max_per_order'] )	? (int) $_POST['type']['max_per_order'] : 0;
 						$_data->max_variations	= isset( $_POST['type']['max_variations'] )	? (int) $_POST['type']['max_variations'] : 0;
 
-						if ( $this->product_type->update( $_id, $_data ) ) :
+						if ( $this->shop_product_type_model->update( $_id, $_data ) ) :
 
 							$this->data['success']	= '<strong>Success!</strong> Product Type saved successfully.';
 
 						else :
 
-							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type. ' . $this->product->last_error();
+							$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Product Type. ' . $this->shop_product_model->last_error();
 							$this->data['show_tab']	= 'edit';
 
 						endif;
@@ -3024,7 +3024,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				case 'delete' :
 
 					$_id = $this->input->post( 'id' );
-					if ( $this->product_type->delete( $_id ) ) :
+					if ( $this->shop_product_type_model->delete( $_id ) ) :
 
 						$this->data['success'] = '<strong>Success!</strong> Product Type was deleted successfully.';
 
@@ -3043,7 +3043,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['types'] = $this->product_type->get_all( TRUE );
+		$this->data['types'] = $this->shop_product_type_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
