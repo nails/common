@@ -475,6 +475,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->load->model( 'shop/shop_shipping_model' );
 		$this->load->model( 'shop/shop_tax_model' );
 		$this->load->model( 'shop/shop_skin_model' );
+		$this->load->model( 'system/country_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -506,6 +507,8 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->data['currencies_active_flat']	= $this->shop_currency_model->get_all_flat();
 		$this->data['tax_rates']				= $this->shop_tax_model->get_all();
 		$this->data['tax_rates_flat']			= $this->shop_tax_model->get_all_flat();
+		$this->data['countries']				= $this->country_model->get_all();
+		$this->data['countries_flat']			= $this->country_model->get_all_flat();
 		array_unshift( $this->data['tax_rates_flat'], 'No Tax');
 
 		// --------------------------------------------------------------------------

@@ -1052,77 +1052,39 @@
 	{
 		table
 		{
-			margin-bottom:2em;
-
-			td
+			th.order,
+			td.order
 			{
-				padding:0px;
-				position:relative;
-				height:30px;
+				width:25px;
 			}
 
-			th.active,
-			td.active,
-			th.default,
-			td.default,
-			th.tax_rate,
-			td.tax_rate,
-			th.delete,
-			td.delete
+			th.enabled,
+			td.enabled
 			{
+				width:150px;
 				text-align:center;
 			}
 
-			td.order-handle
+			th.configure,
+			td.configure
 			{
-				background-image:url(../img/icons/list-icon3.png) !important;
-				background-repeat:no-repeat !important;
-				background-position:center !important;
-				cursor:row-resize;
-				width:30px;
-				height:30px;
-			}
-			th.active,
-			td.active,
-			th.default,
-			td.default,
-			th.delete,
-			td.delete
-			{
-				width:40px;
+				width:125px;
 			}
 
-			&.settings-table
+			td.enabled
 			{
-				td
+				.toggle
 				{
-					padding:2px;
+					text-align:center;
+					display:inline-block;
 				}
-			}
 
-			input.table-cell,
-			{
-				box-sizing:border-box;
-				width:100%;
-				height:auto;
-			}
-
-			td.error
-			{
-				background:rgb(250, 218, 218) !important;
-
-				input
+				input[type=checkbox]
 				{
-					border:1px solid red;
+					display:none;
 				}
-			}
-
-			select
-			{
-				width:100%;
 			}
 		}
-
 		ul.skins
 		{
 			li.skin

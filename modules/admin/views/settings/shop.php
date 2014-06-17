@@ -42,10 +42,6 @@
 					Generic store settings. Use these to control some store behaviours.
 				</p>
 				<hr />
-				<fieldset id="shop-settings-domicile">
-					<legend>Domicile</legend>
-
-				</fieldset>
 				<fieldset id="shop-settings-name">
 					<legend>Name</legend>
 					<p>
@@ -371,19 +367,96 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'shipping' ? 'active' : ''?>
 			<div id="tab-shipping" class="tab page <?=$_display?> shipping">
-				<p>
-					Which countries would you like to ship to? If no countries are selected, it's assumed you're happy to ship worldwide.
-				</p>
-				<p class="system-alert message">
-					<strong>TODO:</strong> Render a list of countries.
-				</p>
-				<hr />
+				<fieldset id="shop-settings-shipping-domicile">
+					<legend>Domicile</legend>
+					<p>
+						Where is your shop based? The domicile will be used to determine when to
+						use international postage rates.
+					</p>
+					<?php
+
+						$_field					= array();
+						$_field['key']			= 'domicile';
+						$_field['default']		= app_setting( $_field['key'], 'shop' );
+
+						echo form_dropdown( $_field['key'], $countries_flat, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
+
+					?>
+				</fieldset>
+				<fieldset id="shop-settings-shipping-countries">
+					<legend>Ship To</legend>
+					<p>
+						Where you're willing to ship to. You can be as granular as individual countries,
+						or you can choose entire continents.
+					</p>
+					<p>
+						<strong>Continents</strong>
+					</p>
+					<p>
+					<?php
+
+						$_continents		= array();
+						$_continents['AF']	= 'Africa';
+						$_continents['AN']	= 'Antarctica';
+						$_continents['AS']	= 'Asia';
+						$_continents['OC']	= 'Australia (Oceania)';
+						$_continents['EU']	= 'Europe';
+						$_continents['NA']	= 'North America';
+						$_continents['SA']	= 'South America';
+
+						echo '<select name="ship_to_continents[]" multiple="multiple" class="select2">';
+							foreach ( $_continents AS $key => $label ) :
+
+								echo '<option value="'. $key . '" >' . $label . '</option>';
+
+							endforeach;
+						echo '</select>';
+
+					?>
+					</p>
+					<p>
+						<strong>Countries</strong>
+					</p>
+					<p>
+					<?php
+
+						echo '<select name="ship_to_countries[]" multiple="multiple" class="select2">';
+							foreach ( $countries AS $country ) :
+
+								echo '<option value="'. $country->id . '" >' . $country->iso_name . '</option>';
+
+							endforeach;
+						echo '</select>';
+
+					?>
+					</p>
+					<p>
+						<strong>Exclude</strong> - Exclude certain countries, regardless if they fall under any of the options above.
+					</p>
+					<p>
+					<?php
+
+						echo '<select name="ship_to_countries[]" multiple="multiple" class="select2">';
+							foreach ( $countries AS $country ) :
+
+								echo '<option value="'. $country->id . '" >' . $country->iso_name . '</option>';
+
+							endforeach;
+						echo '</select>';
+
+					?>
+					</p>
+				</fieldset>
 
 				<hr />
 				<p>
-					Enable the shipping modules you wish to use here. A shipping module defines a set of rules as
+					Enable the shipping modules you wish to use. A shipping module defines a set of rules as
 					to how to calculate the shipping cost for a basket. The system will work down the list, top
 					to bottom, until an enabled module is able to give a price.
+				</p>
+				<p>
+					If no price can be determined then the user will receive an error indicating to them that
+					they should get in touch to complete the order.
 				</p>
 				<?php
 
@@ -392,7 +465,7 @@
 						echo form_open( NULL, 'style="margin-bottom:0;"' );
 						echo form_hidden( 'update', 'shipping' );
 
-						echo '<table>';
+						echo '<table id="shipping-modules">';
 							echo '<thead class="shipping-modules">';
 								echo '<tr>';
 									echo '<th class="order">Order</th>';
@@ -412,7 +485,8 @@
 										echo '-';
 									echo '</td>';
 									echo '<td class="enabled">';
-										echo '-';
+										echo '<div class="toggle toggle-modern"></div>';
+										echo form_checkbox( '', TRUE );
 									echo '</td>';
 									echo '<td class="label">';
 										echo $_name;
