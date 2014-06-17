@@ -401,7 +401,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->asset->library( 'ckeditor' );
 		$this->asset->library( 'uploadify' );
 		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
-		$this->asset->load( 'mustache/mustache.js',										'BOWER' );
+		$this->asset->load( 'mustache.js/mustache.js',										'BOWER' );
 		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js',			TRUE );
 
 		// --------------------------------------------------------------------------
@@ -804,7 +804,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->asset->library( 'ckeditor' );
 		$this->asset->library( 'uploadify' );
 		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
-		$this->asset->load( 'mustache/mustache.js',										'BOWER' );
+		$this->asset->load( 'mustache.js/mustache.js',										'BOWER' );
 		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js',			TRUE );
 
 		// --------------------------------------------------------------------------

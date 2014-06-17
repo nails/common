@@ -192,7 +192,7 @@ class NAILS_Manager extends NAILS_CDN_Controller
 			$this->asset->load( 'jquery.scrollTo/jquery.scrollTo.min.js',	'BOWER' );
 			$this->asset->load( 'tipsy/src/javascripts/jquery.tipsy.js',	'BOWER' );
 			$this->asset->load( 'tipsy/src/stylesheets/tipsy.css',			'BOWER' );
-			$this->asset->load( 'mustache/mustache.js',						'BOWER' );
+			$this->asset->load( 'mustache.js/mustache.js',						'BOWER' );
 			$this->asset->load( 'jquery-cookie/jquery.cookie.js',			'BOWER' );
 
 			//	Load other assets
