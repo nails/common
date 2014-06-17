@@ -71,7 +71,7 @@
 
 				foreach( $_data_available AS $index => $item ) :
 
-					$this->load->view( $skin->path . '_utilities/variable', array( 'index' => $index, 'item' => $item ) );
+					$this->load->view( $skin->path . 'views/_components/variable', array( 'index' => $index, 'item' => $item ) );
 
 				endforeach;
 
@@ -82,4 +82,4 @@
 </div>
 <?php
 
-	$this->load->view( $skin->path . '_utilities/css_js' );
+	$this->load->view( $skin->path . 'views/_components/css_js' );

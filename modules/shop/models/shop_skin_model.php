@@ -41,8 +41,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		//	Nails skins
 		$this->_skin_locations[]	= array(
-										'path'	=> NAILS_PATH . 'modules/shop/views',
-										'url'	=> NAILS_URL . 'modules/shop/views'
+										'path'	=> NAILS_PATH . 'modules/shop/skins',
+										'url'	=> NAILS_URL . 'modules/shop/skins'
 									);
 
 		//	'Official' skins
@@ -53,8 +53,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		//	App Skins
 		$this->_skin_locations[]	= array(
-										'path' => FCPATH . APPPATH . 'modules/shop/views',
-										'url' => site_url( APPPATH . 'modules/shop/views', page_is_secure() )
+										'path' => FCPATH . APPPATH . 'modules/shop/skins',
+										'url' => site_url( APPPATH . 'modules/shop/skins', page_is_secure() )
 									);
 	}
 

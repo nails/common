@@ -2,15 +2,15 @@
 	<div class="row">
 		<div class="jumbotron <?=BS_COL_LG_10?> <?=BS_COL_LG_OFFSET_1?>">
 			<h3 class="text-center">
-				Collections
+				Brands
 			</h3>
 			<h4 class="text-center">
-				The "Developer Chic" collection, now available
+				All the brands, from Apple to Orange.
 			</h4>
 			<hr />
 			<p>
-				This page is shown when no particular collection is requested. It should probably
-				list all the collections available in your store; good for SEO, maybe.
+				This page is shown when no particular brand is requested. It should probably
+				list all the brands available in your store; good for SEO, maybe.
 			</p>
 			<p>
 				This page can be enabled/disabled in Shop Settings.
@@ -28,14 +28,14 @@
 				$_data_available[0]->description	= 'The skin\'s config.';
 
 				$_data_available[1]					= new stdClass();
-				$_data_available[1]->variable		= 'collections';
-				$_data_available[1]->description	= 'An array of the collections containing active items, including count.';
+				$_data_available[1]->variable		= 'brands';
+				$_data_available[1]->description	= 'An array of the brands containing active items, including count.';
 
 				// --------------------------------------------------------------------------
 
 				foreach( $_data_available AS $index => $item ) :
 
-					$this->load->view( $skin->path . 'front/_utilities/variable', array( 'index' => $index, 'item' => $item ) );
+					$this->load->view( $skin->path . 'front/_components/variable', array( 'index' => $index, 'item' => $item ) );
 
 				endforeach;
 
@@ -50,7 +50,7 @@
 
 					echo '<ul class="list-unstyled">';
 
-						echo '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'collection/' . ${$_data_available[1]->variable}[0]->slug, 'Single Collection page' ) . '</li>';
+						echo '<li>&rsaquo; ' . anchor( app_setting( 'url', 'shop' ) . 'brand/' . ${$_data_available[1]->variable}[0]->slug, 'Single Brand page' ) . '</li>';
 
 					echo '</ul>';
 
@@ -62,4 +62,4 @@
 </div>
 <?php
 
-	$this->load->view( $skin->path . 'front/_utilities/css_js' );
+	$this->load->view( $skin->path . 'front/_components/css_js' );

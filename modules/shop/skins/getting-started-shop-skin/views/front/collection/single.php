@@ -2,14 +2,15 @@
 	<div class="row">
 		<div class="jumbotron <?=BS_COL_LG_10?> <?=BS_COL_LG_OFFSET_1?>">
 			<h3 class="text-center">
-				Something on your mind?
+				A single Collection
 			</h3>
 			<h4 class="text-center">
-				You've come to the right place, but it's a little empty round here.
+				Just one: <?=$collection->label?>
 			</h4>
 			<hr />
 			<p>
-				This view renders a single blog post.
+				This is the collection's homepage, it should list all the products which feature this collection.
+			</p>
 			<hr />
 			<h5>
 				Available Data
@@ -23,14 +24,18 @@
 				$_data_available[0]->description	= 'The skin\'s config.';
 
 				$_data_available[1]					= new stdClass();
-				$_data_available[1]->variable		= 'post';
-				$_data_available[1]->description	= 'An array of the posts.';
+				$_data_available[1]->variable		= 'collection';
+				$_data_available[1]->description	= 'The collection object';
+
+				$_data_available[2]					= new stdClass();
+				$_data_available[2]->variable		= 'products';
+				$_data_available[2]->description	= 'An array of products which feature this collection.';
 
 				// --------------------------------------------------------------------------
 
 				foreach( $_data_available AS $index => $item ) :
 
-					$this->load->view( $skin->path . '_utilities/variable', array( 'index' => $index, 'item' => $item ) );
+					$this->load->view( $skin->path . 'front/_components/variable', array( 'index' => $index, 'item' => $item ) );
 
 				endforeach;
 
@@ -41,4 +46,4 @@
 </div>
 <?php
 
-	$this->load->view( $skin->path . '_utilities/css_js' );
+	$this->load->view( $skin->path . 'front/_components/css_js' );
