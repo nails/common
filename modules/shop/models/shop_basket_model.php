@@ -45,7 +45,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		if ( ! $this->_items ) :
 
 			//	Check the active_user data in case it exists there
-			$_saved_basket = unserialize( active_user( 'shop_basket' ) );
+			$_saved_basket = @unserialize( active_user( 'shop_basket' ) );
 
 			if ( $_saved_basket ) :
 
@@ -61,7 +61,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_personal_details	= $this->session->userdata( $this->sess_var . '_pd' );
+		$this->_personal_details = $this->session->userdata( $this->sess_var . '_pd' );
 
 		if ( ! $this->_personal_details ) :
 
@@ -74,21 +74,15 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_payment_gateway		= (int) $this->session->userdata( $this->sess_var . '_pg' );
+		$this->_payment_gateway	 = (int) $this->session->userdata( $this->sess_var . '_pg' );
 
 		// --------------------------------------------------------------------------
 
 		$this->_shipping_method	= $this->session->userdata( $this->sess_var . '_sm' );
 
-		$this->load->model( 'shop/shop_shipping_model' );
+		// --------------------------------------------------------------------------
 
-		if ( ! $this->_shipping_method ) :
-
-			$this->_shipping_method = $this->shop_shipping_model->get_default_id();
-
-		endif;
-
-		$this->_shipping_details	= $this->session->userdata( $this->sess_var . '_sd' );
+		$this->_shipping_details = $this->session->userdata( $this->sess_var . '_sd' );
 
 		if ( ! $this->_shipping_details ) :
 
@@ -197,9 +191,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				$_product->shipping->price_additional	= 0;
 				$_product->shipping->tax_rate			= 0;
 
-
 			endif;
-
 
 			if ( $_product && $_product->is_active && ( NULL === $_product->quantity_available || $_product->quantity_available ) ) :
 
