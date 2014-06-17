@@ -372,33 +372,25 @@
 
 			<?php if ( ! empty( $error ) ) : ?>
 			<div class="system-alert error">
-				<div class="padder">
-					<p><?=$error?></p>
-				</div>
+				<p><?=$error?></p>
 			</div>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $success ) ) : ?>
 			<div class="system-alert success">
-				<div class="padder">
-					<p><?=$success?></p>
-				</div>
+				<p><?=$success?></p>
 			</div>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $message ) ) : ?>
 			<div class="system-alert message">
-				<div class="padder">
-					<p><?=$message?></p>
-				</div>
+				<p><?=$message?></p>
 			</div>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $notice ) ) : ?>
 			<div class="system-alert notice">
-				<div class="padder">
-					<p><?=$notice?></p>
-				</div>
+				<p><?=$notice?></p>
 			</div>
 			<?php endif; ?>
 
