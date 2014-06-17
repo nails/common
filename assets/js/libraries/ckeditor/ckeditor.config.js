@@ -11,7 +11,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// For the complete reference:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
-	config.extraPlugins = 'justify,autogrow,mediaembed,codemirror';
+	config.extraPlugins = 'justify,autogrow,mediaembed,codemirror,colorbutton,colordialog';
 	config.removePlugins = 'resize,elementspath';
 
 	// The toolbar groups arrangement, optimized for a single toolbar row.
@@ -19,6 +19,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'document',    groups: [ 'mode' ] },
 		{ name: 'styles' },
 		{ name: 'basicstyles', groups: [ 'basicstyles' ] },
+		{ name: 'colors' },
 		{ name: 'paragraph',   groups: [ 'align', 'list', 'indent', 'blocks' ] },
 		{ name: 'links' },
 		{ name: 'insert',      groups: [ 'mediaembed' ] },
