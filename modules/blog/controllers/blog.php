@@ -71,9 +71,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( $this->_skin->path . '/browse',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( $this->_skin->path . 'views/browse',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
@@ -171,9 +171,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( $this->_skin->path . 'single',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( $this->_skin->path . 'views/single',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 
 		// --------------------------------------------------------------------------
 
@@ -265,9 +265,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( $this->_skin->path . 'browse',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( $this->_skin->path . 'views/browse',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
@@ -350,9 +350,9 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( $this->_skin->path . 'browse',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( $this->_skin->path . 'views/browse',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
@@ -386,7 +386,7 @@ class NAILS_Blog extends NAILS_Blog_Controller
 
 		//	Set Output
 		$this->output->set_content_type( 'text/xml; charset=UTF-8' );
-		$this->load->view( $this->_skin->path . 'rss', $this->data );
+		$this->load->view( $this->_skin->path . 'views/rss', $this->data );
 	}
 
 
