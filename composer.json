@@ -32,6 +32,7 @@
 		"masterexploder/phpthumb": "v2.0",
 		"sybio/gif-creator": "~1.0.0",
 		"sybio/gif-frame-extractor": "~1.0.0",
-		"stripe/stripe-php": "v1.11.0"
+		"stripe/stripe-php": "v1.11.0",
+		"omnipay/omnipay": "~2.0"
 	}
 }
