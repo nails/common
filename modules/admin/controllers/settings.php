@@ -473,6 +473,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->load->model( 'shop/shop_model' );
 		$this->load->model( 'shop/shop_currency_model' );
 		$this->load->model( 'shop/shop_shipping_model' );
+		$this->load->model( 'shop/shop_payment_gateway_model' );
 		$this->load->model( 'shop/shop_tax_model' );
 		$this->load->model( 'shop/shop_skin_model' );
 		$this->load->model( 'system/country_model' );
@@ -500,7 +501,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 		//	Get data
 		$this->data['settings']					= app_setting( NULL, 'shop', TRUE );
-		$this->data['payment_gateways']			= array();
+		$this->data['payment_gateways']			= $this->shop_payment_gateway_model->get_available();
 		$this->data['shipping_modules']			= $this->shop_shipping_model->get_available();
 		$this->data['skins']					= $this->shop_skin_model->get_available();
 		$this->data['currencies']				= $this->shop_currency_model->get_all( );
@@ -613,7 +614,21 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 	protected function _shop_update_payment_gateway()
 	{
-		$this->data['message'] = '<strong>TODO</strong> Handling payment gateways is in the works.';
+		//	Prepare update
+		$_settings								= array();
+		$_settings['enabled_payment_gateways']	= array_filter( (array) $this->input->post( 'enabled_payment_gateways' ) );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Payment Gateway settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
 	}
 
 

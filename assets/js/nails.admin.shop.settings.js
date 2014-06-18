@@ -9,6 +9,7 @@ NAILS_Admin_Shop_Settings = function()
 		this._init_submits();
 		this._init_warehouse_collection();
 		this._init_skins();
+		this._init_payment_gateways();
 		this._init_shipping();
 
 		// --------------------------------------------------------------------------
@@ -299,6 +300,30 @@ NAILS_Admin_Shop_Settings = function()
 	this._init_shipping = function()
 	{
 		$( '#shipping-modules .enabled' ).each(function()
+		{
+			var _toggle		= $(this).find( '.toggle' );
+			var _checkbox	= $(this).find( 'input[type=checkbox]' );
+
+			_toggle.css({
+				width:	'100px',
+				height:	'30px'
+			});
+
+			_toggle.toggles({
+				checkbox : _checkbox,
+				on : _checkbox.is(':checked'),
+			});
+
+		});
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_payment_gateways = function()
+	{
+		$( '#payment-gateways .enabled' ).each(function()
 		{
 			var _toggle		= $(this).find( '.toggle' );
 			var _checkbox	= $(this).find( 'input[type=checkbox]' );

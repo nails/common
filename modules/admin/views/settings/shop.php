@@ -275,43 +275,66 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'payment_gateway' ? 'active' : ''?>
 			<div id="tab-payment-gateway" class="tab page <?=$_display?> payment-gateway">
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
+				<?=form_hidden( 'update', 'payment_gateway' )?>
 				<p>
 					Set Payment Gateway credentials.
 				</p>
 				<hr />
 				<?php
 
-					if ( $payment_gateways ) :
+					if ( ! empty( $payment_gateways ) ) :
 
-						echo form_open( NULL, 'style="margin-bottom:0;"' );
-						echo form_hidden( 'update', 'payment_gateway' );
+						echo '<table id="payment-gateways">';
+							echo '<thead class="payment-gateways">';
+								echo '<tr>';
+									echo '<th class="enabled">Enabled</th>';
+									echo '<th class="label">Label</th>';
+									echo '<th class="configure">Configure</th>';
+								echo '</tr>';
+							echo '</thead>';
+							echo '<tbody>';
 
-						foreach ( $payment_gateways AS $pg ) :
+							$_enabled_payment_gateways = set_value( 'enabled_payment_gateways', app_setting( 'enabled_payment_gateways', 'shop' ) );
+							$_enabled_payment_gateways = array_filter( (array) $_enabled_payment_gateways );
 
-							echo '<fieldset id="shop-settings-pg-' . $pg->slug . '">';
-								echo '<legend>';
-									echo $pg->label;
-								echo '</legend>';
-								echo '<p>TODO: Request the settings config from the module.</p>';
-							echo '</fieldset>';
+							foreach( $payment_gateways AS $slug ) :
 
-						endforeach;
+								$_enabled = array_search( $slug, $_enabled_payment_gateways ) !== FALSE ? TRUE : FALSE;
 
-						echo '<p style="margin-top:1em;margin-bottom:0;">';
-							echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
-						echo '</p>';
-						echo form_close();
+								echo '<tr>';
+									echo '<td class="enabled">';
+										echo '<div class="toggle toggle-modern"></div>';
+										echo form_checkbox( 'enabled_payment_gateways[]', $slug, $_enabled );
+									echo '</td>';
+									echo '<td class="label">';
+										echo $slug;
+									echo '</td>';
+									echo '<td class="configure">';
+										echo anchor( 'admin/shop/configure/payment_gateway?module=' . urlencode( $slug ), 'Configure', 'data-fancybox-type="iframe" class="fancybox awesome small"' );
+									echo '</td>';
+								echo '</tr>';
+
+							endforeach;
+
+							echo '<tbody>';
+						echo '</table>';
+						echo '<hr />';
 
 					else :
 
 						echo '<p class="system-alert error">';
-							echo '<strong>No payment gateway modules are available.</strong>';
-							echo '<br />I could not find any payment gateway modules. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
+							echo '<strong>No payment gateways are available.</strong>';
+							echo '<br />I could not find any payment gateways. Please contact the developers on ' . mailto( APP_DEVELOPER_EMAIL ) . ' for assistance.';
 						echo '</p>';
 
 					endif;
 
 				?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
 			</div>
 
 			<?php $_display = $this->input->post( 'update' ) == 'currencies' ? 'active' : ''?>
@@ -524,8 +547,6 @@
 
 							endforeach;
 
-
-							$i = 0;
 							foreach( $_modules AS $slug ) :
 
 								$_module = ! empty( $shipping_modules[$slug] ) ? $shipping_modules[$slug] : FALSE;
@@ -548,18 +569,16 @@
 									echo '</td>';
 									echo '<td class="enabled">';
 										echo '<div class="toggle toggle-modern"></div>';
-										echo form_checkbox( 'enabled_shipping_modules', $slug, $_enabled );
+										echo form_checkbox( 'enabled_shipping_modules[]', $slug, $_enabled );
 									echo '</td>';
 									echo '<td class="label">';
 										echo $_name;
 										echo $_description ? '<small>' . $_description . '</small>' : '';
 									echo '</td>';
 									echo '<td class="configure">';
-										echo $_enabled ? anchor( 'admin/shop/configure/shipping?module=' . urlencode( $slug ), 'Configure', 'data-fancybox-type="iframe" class="fancybox awesome small"' ) : '&mdash;';
+										echo anchor( 'admin/shop/configure/shipping?module=' . urlencode( $slug ), 'Configure', 'data-fancybox-type="iframe" class="fancybox awesome small"' );
 									echo '</td>';
 								echo '</tr>';
-
-								$i++;
 
 							endforeach;
 
