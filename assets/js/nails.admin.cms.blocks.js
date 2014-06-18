@@ -220,7 +220,7 @@ NAILS_Admin_CMS_Blocks = function()
 
 	this._lang_change = function( obj )
 	{
-		obj.closest( 'fieldset' ).attr( 'data-lang_id', obj.val() );
+		obj.closest( 'fieldset' ).attr( 'data-language', obj.val() );
 		this._lang_disable();
 	};
 
@@ -237,10 +237,10 @@ NAILS_Admin_CMS_Blocks = function()
 
 		//	Disable options which have been used
 		$( '.translation' ).each( function() {
-			$( '.translation option[value=' + $(this).attr( 'data-lang_id' ) + ']' ).attr( 'disabled', 'disabled' );
+			$( '.translation option[value=' + $(this).attr( 'data-language' ) + ']' ).attr( 'disabled', 'disabled' );
 
 			//	Re-enable for the selected item in this <select>
-			$( 'option[value=' + $(this).attr( 'data-lang_id' ) + ']', this ).removeAttr( 'disabled' );
+			$( 'option[value=' + $(this).attr( 'data-language' ) + ']', this ).removeAttr( 'disabled' );
 		});
 
 		// --------------------------------------------------------------------------

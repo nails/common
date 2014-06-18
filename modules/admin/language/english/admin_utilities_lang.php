@@ -31,27 +31,6 @@
 
 	// --------------------------------------------------------------------------
 
-	//	Manage Languages
-	$lang['utilities_languages_title']				= 'Manage Site Languages';
-	$lang['utilities_languages_intro']				= 'Manage which languages are supported by the site.';
-	$lang['utilities_languages_multilang_on']		= 'This site supports multiple languages, where appropriate you will be able to specify content in langauges which are marked here as \'supported\'.';
-	$lang['utilities_languages_multilang_off']		= 'This site does not support multiple languages, changes made here will affect non-language specific items (e.g dropdowns where the user can choose a language).';
-
-	$lang['utilities_languages_th_lang']			= 'Language';
-	$lang['utilities_languages_th_actions']			= 'Actions';
-
-	$lang['utilities_languages_action_mark_supported']		= 'Mark As Supported';
-	$lang['utilities_languages_action_mark_unsupported']	= 'Mark As Unsupported';
-
-	$lang['utilities_languages_mark_supported_ok']		= '<strong>Success!</strong> Language marked as supported.';
-	$lang['utilities_languages_mark_supported_fail']	= '<strong>Sorry,</strong> there was a problem marking this language as supported.';
-
-	$lang['utilities_languages_mark_unsupported_ok']	= '<strong>Success!</strong> Language marked as unsupported.';
-	$lang['utilities_languages_mark_unsupported_fail']	= '<strong>Sorry,</strong> there was a problem marking this language as unsupported.';
-
-
-	// --------------------------------------------------------------------------
-
 	//	Export data
 	$lang['utilities_export_title']				= 'Export Data';
 	$lang['utilities_export_intro']				= 'Export data stored in the site\'s database in a variety of formats.';

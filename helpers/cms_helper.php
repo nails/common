@@ -24,7 +24,7 @@ if ( ! function_exists( 'cms_render_block' ) )
 
 		// --------------------------------------------------------------------------
 
-		if ( NULL === $lang || $lang == APP_DEFAULT_LANG_SLUG ) :
+		if ( NULL === $lang || $lang == APP_DEFAULT_LANG_CODE ) :
 
 			return $_block->default_value;
 

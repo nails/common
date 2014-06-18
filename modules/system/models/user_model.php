@@ -297,8 +297,8 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Set the user's date/time formats
-		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
-		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
+		$_format_date = active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : $this->datetime_model->get_date_format_default_slug();
+		$_format_time = active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : $this->datetime_model->get_time_format_default_slug();
 
 		$this->datetime_model->set_formats( $_format_date, $_format_time );
 	}
@@ -619,9 +619,6 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->select( 'ug.label AS `group_name`' );
 		$this->db->select( 'ug.default_homepage AS `group_homepage`' );
 		$this->db->select( 'ug.acl AS `group_acl`' );
-		$this->db->select( 'dfd.label date_format_date_label, dfd.format date_format_date_format' );
-		$this->db->select( 'dft.label date_format_time_label, dft.format date_format_time_format' );
-		$this->db->select( 'ul.name language_name, ul.slug language_slug' );
 
 		// --------------------------------------------------------------------------
 
@@ -884,9 +881,6 @@ class NAILS_User_model extends NAILS_Model
 		$this->db->join( NAILS_DB_PREFIX . 'user_meta um',			'u.id = um.user_id',						'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_auth_method uam',	'u.auth_method_id = uam.id',				'LEFT' );
 		$this->db->join( NAILS_DB_PREFIX . 'user_group ug',			'u.group_id = ug.id',						'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'date_format_date dfd',	'u.date_format_date_id = dfd.id',			'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'date_format_time dft',	'u.date_format_time_id = dft.id',			'LEFT' );
-		$this->db->join( NAILS_DB_PREFIX . 'language ul',				'u.language_id = ul.id',				'LEFT' );
 
 		// --------------------------------------------------------------------------
 
@@ -1058,9 +1052,9 @@ class NAILS_User_model extends NAILS_Model
 		$_cols[]	= 'gender';
 		$_cols[]	= 'profile_img';
 		$_cols[]	= 'timezone';
-		$_cols[]	= 'date_format_date_id';
-		$_cols[]	= 'date_format_time_id';
-		$_cols[]	= 'language_id';
+		$_cols[]	= 'datetime_format_date';
+		$_cols[]	= 'datetime_format_time';
+		$_cols[]	= 'language';
 
 		// --------------------------------------------------------------------------
 
@@ -1670,6 +1664,27 @@ class NAILS_User_model extends NAILS_Model
 					$this->_active_user->{$key} = $val;
 
 				endforeach;
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			//	Do we need to update any timezone/date/time preferences?
+			if ( isset( $data['timezone'] ) ) :
+
+				$this->datetime_model->set_user_timezone( $data['timezone'] );
+
+			endif;
+
+			if ( isset( $data['datetime_format_date'] ) ) :
+
+				$this->datetime_model->set_date_format( $data['datetime_format_date'] );
+
+			endif;
+
+			if ( isset( $data['datetime_format_time'] ) ) :
+
+				$this->datetime_model->set_time_format( $data['datetime_format_time'] );
 
 			endif;
 
@@ -2876,35 +2891,23 @@ class NAILS_User_model extends NAILS_Model
 
 			$_user_data['timezone'] = $data['timezone'];
 
-		elseif ( APP_DEFAULT_TIMEZONE ) :
+		endif;
 
-			$_user_data['timezone'] = APP_DEFAULT_TIMEZONE;
+		if ( isset( $data['datetime_format_date'] ) ) :
 
-		elseif ( DEPLOY_SYSTEM_TIMEZONE ) :
-
-			$_user_data['timezone'] = DEPLOY_SYSTEM_TIMEZONE;
-
-		else :
-
-			$_user_data['timezone'] = 'UTC';
+			$_user_data['datetime_format_date'] = $data['datetime_format_date'];
 
 		endif;
 
-		if ( isset( $data['date_format_date_id'] ) ) :
+		if ( isset( $data['datetime_format_time'] ) ) :
 
-			$_user_data['date_format_date_id'] = $data['date_format_date_id'];
-
-		endif;
-
-		if ( isset( $data['date_format_time_id'] ) ) :
-
-			$_user_data['date_format_time_id'] = $data['date_format_time_id'];
+			$_user_data['datetime_format_time'] = $data['datetime_format_time'];
 
 		endif;
 
-		if ( isset( $data['language_id'] ) ) :
+		if ( isset( $data['language'] ) ) :
 
-			$_user_data['language_id'] = $data['language_id'];
+			$_user_data['language'] = $data['language'];
 
 		endif;
 
@@ -3195,52 +3198,6 @@ class NAILS_User_model extends NAILS_Model
 			$user->temp_pw				= (bool) $user->temp_pw;
 			$user->is_suspended			= (bool) $user->is_suspended;
 			$user->email_is_verified	= (bool) $user->email_is_verified;
-
-			//	Dates (TODO)
-
-			// --------------------------------------------------------------------------
-
-			//	Social Networks (TODO)
-
-			// --------------------------------------------------------------------------
-
-			//	Tidy up date/time/timezone field
-			$user->date_setting					= new stdClass();
-			$user->date_setting->format			= new stdClass();
-			$user->date_setting->format->date	= new stdClass();
-			$user->date_setting->format->time	= new stdClass();
-
-			$user->date_setting->format->date->id		= (int) $user->date_format_date_id;
-			$user->date_setting->format->date->label	= $user->date_format_date_label;
-			$user->date_setting->format->date->format	= $user->date_format_date_format;
-
-			$user->date_setting->format->time->id		= (int) $user->date_format_time_id;
-			$user->date_setting->format->time->label	= $user->date_format_time_label;
-			$user->date_setting->format->time->format	= $user->date_format_time_format;
-
-			//	Set an easy access pref
-			$user->pref_date_format						= $user->date_format_date_format;
-			$user->pref_time_format						= $user->date_format_time_format;
-
-			unset( $user->date_format_date_id );
-			unset( $user->date_format_date_label );
-			unset( $user->date_format_date_format );
-
-			unset( $user->date_format_time_id );
-			unset( $user->date_format_time_label );
-			unset( $user->date_format_time_format );
-
-			// --------------------------------------------------------------------------
-
-			//	Tidy up language field
-			$user->language_setting			= new stdClass();
-			$user->language_setting->id		= (int) $user->language_id;
-			$user->language_setting->name	= $user->language_name;
-			$user->language_setting->slug	= $user->language_slug;
-
-			unset( $user->language_id );
-			unset( $user->language_name );
-			unset( $user->language_slug );
 
 			// --------------------------------------------------------------------------
 

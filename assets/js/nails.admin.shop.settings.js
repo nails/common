@@ -309,7 +309,8 @@ NAILS_Admin_Shop_Settings = function()
 			});
 
 			_toggle.toggles({
-				checkbox : _checkbox
+				checkbox : _checkbox,
+				on : _checkbox.is(':checked'),
 			});
 
 		});

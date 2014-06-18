@@ -17,39 +17,256 @@
 
 class NAILS_Datetime_model extends NAILS_Model
 {
-	public $timezone_nails;
-	public $timezone_user;
+	public $_timezone_nails;
+	public $_timezone_user;
 	protected $_format_date;
 	protected $_format_time;
 
+
 	// --------------------------------------------------------------------------
 
-	public function set_usr_obj( &$usr )
+
+	public function __construct()
 	{
-		$this->user =& $usr;
+		parent::__construct();
+		$this->config->load( 'datetime' );
+	}
+
+
+	// --------------------------------------------------------------------------
+	//	DATE FORMAT
+	// --------------------------------------------------------------------------
+
+
+	public function get_date_format_default()
+	{
+		$_default		= $this->config->item( 'datetime_format_date_default' );
+		$_date_format	= $this->get_date_format_by_slug( $_default );
+
+		return ! empty( $_date_format ) ? $_date_format : FALSE;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function set_timezones( $tz_nails, $tz_user )
+	public function get_date_format_default_slug()
 	{
-		$this->_timezone_nails	= $tz_nails;
-		$this->_timezone_user	= $tz_user;
+		$_default = $this->get_date_format_default();
+		return empty( $_default->slug ) ? FALSE : $_default->slug;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function set_formats( $date, $time )
+	public function get_date_format_default_label()
 	{
-		$this->_format_date = $date;
-		$this->_format_time = $time;
+		$_default = $this->get_date_format_default();
+		return empty( $_default->label ) ? FALSE : $_default->label;
 	}
 
 
+	// --------------------------------------------------------------------------
+
+
+	public function get_date_format_default_format()
+	{
+		$_default = $this->get_date_format_default();
+		return empty( $_default->format ) ? FALSE : $_default->format;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_date_format()
+	{
+		$_formats = $this->config->item( 'datetime_format_date' );
+
+		foreach ( $_formats AS $format ) :
+
+			$format->example = date( $format->format );
+
+		endforeach;
+
+		return $_formats;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_date_format_flat()
+	{
+		$_out		= array();
+		$_formats	= $this->get_all_date_format();
+
+		foreach ( $_formats AS $format ) :
+
+			$_out[$format->slug] = $format->label;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_date_format_by_slug( $slug )
+	{
+		$_formats = $this->get_all_date_format();
+
+		return ! empty( $_formats[$slug] ) ? $_formats[$slug] : FALSE;
+	}
+
+
+	// --------------------------------------------------------------------------
+	//	TIME FORMAT
+	// --------------------------------------------------------------------------
+
+
+	public function get_time_format_default()
+	{
+		$_default		= $this->config->item( 'datetime_format_time_default' );
+		$_time_format	= $this->get_time_format_by_slug( $_default );
+
+		return ! empty( $_time_format ) ? $_time_format : FALSE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_time_format_default_slug()
+	{
+		$_default = $this->get_time_format_default();
+		return empty( $_default->slug ) ? FALSE : $_default->slug;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_time_format_default_label()
+	{
+		$_default = $this->get_time_format_default();
+		return empty( $_default->label ) ? FALSE : $_default->label;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_time_format_default_format()
+	{
+		$_default = $this->get_time_format_default();
+		return empty( $_default->format ) ? FALSE : $_default->format;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_time_format()
+	{
+		$_formats = $this->config->item( 'datetime_format_time' );
+
+		if ( $this->_timezone_user ) :
+
+			foreach ( $_formats AS $format ) :
+
+				$format->example = date( $format->format, strtotime( $this->convert_datetime( time(), $this->_timezone_user ) ) );
+
+			endforeach;
+
+		endif;
+
+		return $_formats;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+	public function get_all_time_format_flat()
+	{
+		$_out		= array();
+		$_formats	= $this->get_all_time_format();
+
+		foreach ( $_formats AS $format ) :
+
+			$_out[$format->slug] = $format->label;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_time_format_by_slug( $slug )
+	{
+		$_formats = $this->get_all_time_format();
+
+		return ! empty( $_formats[$slug] ) ? $_formats[$slug] : FALSE;
+	}
+
+
+	// --------------------------------------------------------------------------
+	//	GENERIC FORMAT METHODS
+	// --------------------------------------------------------------------------
+
+
+	public function set_formats( $date_slug, $time_slug )
+	{
+		$this->set_date_format( $date_slug );
+		$this->set_time_format( $time_slug );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function set_date_format( $slug )
+	{
+		$_date_format = $this->get_date_format_by_slug( $slug );
+
+		if ( empty( $_date_format ) ) :
+
+			$_date_format = $this->get_date_format_default();
+
+		endif;
+
+		$this->_format_date = $_date_format->format;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function set_time_format( $slug )
+	{
+		$_time_format = $this->get_time_format_by_slug( $slug );
+
+		if ( empty( $_time_format ) ) :
+
+			$_time_format = $this->get_time_format_default();
+
+		endif;
+
+		$this->_format_time = $_time_format->format;
+	}
+
+
+	// --------------------------------------------------------------------------
+	//	USER METHODS
 	// --------------------------------------------------------------------------
 
 
@@ -153,8 +370,8 @@ class NAILS_Datetime_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Has a date/time format been supplied? If so overwrite the defaults
-		$_format_date	= NULL === $format_date ? $this->_format_date : $format_date;
-		$_format_time	= NULL === $format_time ? $this->_format_time : $format_time;
+		$_format_date	= is_null( $format_date ) ? $this->_format_date : $format_date;
+		$_format_time	= is_null( $format_time ) ? $this->_format_time : $format_time;
 
 		// --------------------------------------------------------------------------
 
@@ -226,71 +443,47 @@ class NAILS_Datetime_model extends NAILS_Model
 
 
 	// --------------------------------------------------------------------------
-
-	//	DATE FORMAT METHODS
-
-	// --------------------------------------------------------------------------
-
-	public function get_all_date_format()
-	{
-		return $this->db->get( NAILS_DB_PREFIX . 'date_format_date dfd' )->result();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	public function get_all_date_format_flat()
-	{
-		$_out		= array();
-		$_formats	= $this->get_all_date_format();
-
-		for ( $i=0; $i<count( $_formats ); $i++ ) :
-
-			$_out[$_formats[$i]->id] = $_formats[$i]->label;
-
-		endfor;
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	//	TIME FORMAT METHODS
-
-	// --------------------------------------------------------------------------
-
-	public function get_all_time_format()
-	{
-		return $this->db->get( NAILS_DB_PREFIX . 'date_format_time dft' )->result();
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	public function get_all_time_format_flat()
-	{
-		$_out		= array();
-		$_formats	= $this->get_all_time_format();
-
-		for ( $i=0; $i<count( $_formats ); $i++ ) :
-
-			$_out[$_formats[$i]->id] = $_formats[$i]->label;
-
-		endfor;
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-	// --------------------------------------------------------------------------
-
 	//	TIMEZONE METHODS
+	// --------------------------------------------------------------------------
+
+
+	public function get_timezone_default()
+	{
+		$_default = $this->config->item( 'datetime_timezone_default' );
+
+		if ( $_default ) :
+
+			return $_default;
+
+		else :
+
+			return date_default_timezone_get();
+
+		endif;
+	}
+
 
 	// --------------------------------------------------------------------------
+
+
+	public function set_timezones( $tz_nails, $tz_user )
+	{
+		$this->_timezone_nails	= $tz_nails;
+		$this->set_user_timezone( $tz_user );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function set_user_timezone( $tz )
+	{
+		$this->_timezone_user = $tz;
+	}
+
+
+	// --------------------------------------------------------------------------
+
 
 	public function get_all_timezone()
 	{
@@ -366,10 +559,9 @@ class NAILS_Datetime_model extends NAILS_Model
 
 
 	// --------------------------------------------------------------------------
-
 	//	OTHER METHODS
-
 	// --------------------------------------------------------------------------
+
 
 	static function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
@@ -520,11 +712,11 @@ class NAILS_Datetime_model extends NAILS_Model
 		endforeach;
 	}
 
-	// --------------------------------------------------------------------------
 
+	// --------------------------------------------------------------------------
 	//	CONVERSION METHODS
-
 	// --------------------------------------------------------------------------
+
 
 	static function convert_datetime( $timestamp, $to_tz, $from_tz = 'UTC' )
 	{

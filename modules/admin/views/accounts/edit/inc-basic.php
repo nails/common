@@ -64,7 +64,7 @@
 		$_field					= array();
 		$_field['key']			= 'timezone';
 		$_field['label']		= lang( 'accounts_edit_basic_field_timezone_label' );
-		$_field['default']		= $user_edit->timezone;
+		$_field['default']		= $user_edit->timezone ? $user_edit->timezone : $this->datetime_model->get_timezone_default();
 		$_field['required']		= FALSE;
 		$_field['class']		= 'select2';
 
@@ -74,38 +74,78 @@
 
 		//	Date format
 		$_field					= array();
-		$_field['key']			= 'date_format_date_id';
+		$_field['key']			= 'datetime_format_date';
 		$_field['label']		= lang( 'accounts_edit_basic_field_date_format_label' );
-		$_field['default']		= $user_edit->date_setting->format->date->id;
+		$_field['default']		= $user_edit->datetime_format_date ? $user_edit->datetime_format_date : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
 		$_field['required']		= FALSE;
 		$_field['class']		= 'select2';
 
-		echo form_field_dropdown( $_field, $date_formats, lang( 'accounts_edit_basic_field_date_format_tip' ) );
+		if ( count( $date_formats ) > 1 ) :
+
+			$_options = array();
+
+			foreach( $date_formats AS $format ) :
+
+				$_options[$format->slug] = $format->label . ' (' . $format->example . ')';
+
+			endforeach;
+
+			echo form_field_dropdown( $_field, $_options, lang( 'accounts_edit_basic_field_date_format_tip' ) );
+
+		else :
+
+			echo form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
 
 
 		// --------------------------------------------------------------------------
 
 		//	Time Format
 		$_field					= array();
-		$_field['key']			= 'date_format_time_id';
+		$_field['key']			= 'datetime_format_time';
 		$_field['label']		= lang( 'accounts_edit_basic_field_time_format_label' );
-		$_field['default']		= $user_edit->date_setting->format->time->id;
+		$_field['default']		= $user_edit->datetime_format_time ? $user_edit->datetime_format_time : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 		$_field['required']		= FALSE;
 		$_field['class']		= 'select2';
 
-		echo form_field_dropdown( $_field, $time_formats, lang( 'accounts_edit_basic_field_time_format_tip' ) );
+		if ( count( $time_formats ) > 1 ) :
+
+			$_options = array();
+
+			foreach( $time_formats AS $format ) :
+
+				$_options[$format->slug] = $format->label . ' (' . $format->example . ')';
+
+			endforeach;
+
+			echo form_field_dropdown( $_field, $_options, lang( 'accounts_edit_basic_field_time_format_tip' ) );
+
+		else :
+
+			echo form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Preferred Language
 		$_field					= array();
-		$_field['key']			= 'language_id';
+		$_field['key']			= 'language';
 		$_field['label']		= lang( 'accounts_edit_basic_field_language_label' );
-		$_field['default']		= $user_edit->language_setting->id;
+		$_field['default']		= $user_edit->language ? $user_edit->language : APP_DEFAULT_LANG_CODE;
 		$_field['required']		= FALSE;
 		$_field['class']		= 'select2';
 
-		echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_language_tip' ) );
+		if ( count( $languages ) > 1 ) :
+
+			echo form_field_dropdown( $_field, $languages, lang( 'accounts_edit_basic_field_language_tip' ) );
+
+		else :
+
+			echo form_hidden( $_field['key'], $_field['default'] );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 

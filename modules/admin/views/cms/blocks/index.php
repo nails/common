@@ -14,7 +14,7 @@
 	</p>
 	<p>
 		Blocks allow you to update a single block of content. Blocks might appear in more than one place so any updates will be reflected across
-		all instances. Blocks must have an <?=APP_DEFAULT_LANG_NAME?> value defined, but translations can also be created, when viewing the site in another language (if
+		all instances. Blocks must have an <?=APP_DEFAULT_LANG_LABEL?> value defined, but translations can also be created, when viewing the site in another language (if
 		supported for this site) the appropriate language will be used.
 	</p>
 
@@ -32,8 +32,8 @@
 		<thead>
 			<tr>
 				<th class="title">Block Title &amp; Description</th>
-				<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
-				<th class="default"><?=APP_DEFAULT_LANG_NAME?> Value</th>
+				<?php if ( count( $languages ) > 1 ) : ?>
+				<th class="default"><?=APP_DEFAULT_LANG_LABEL?> Value</th>
 				<th class="translations">Translations</th>
 				<?php else : ?>
 				<th class="default">Value</th>
@@ -68,13 +68,13 @@
 
 					// --------------------------------------------------------------------------
 
-					if ( APP_MULTI_LANG && count( $languages ) > 1 ) :
+					if ( count( $languages ) > 1 ) :
 
 						echo '<td class="translations">';
 						echo '<ul>';
 						foreach ( $block->translations AS $variation ) :
 
-							if ( $variation->lang->slug == APP_DEFAULT_LANG_SLUG )
+							if ( $variation->lang->slug == APP_DEFAULT_LANG_CODE )
 								continue;
 
 							// --------------------------------------------------------------------------

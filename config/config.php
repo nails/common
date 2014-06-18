@@ -77,7 +77,7 @@ $config['url_suffix'] = '';
 |
 */
 
-$config['language']	= defined( 'APP_DEFAULT_LANG_SLUG' ) ? APP_DEFAULT_LANG_SLUG : 'english';
+$config['language']	= 'english';
 
 /*
 |--------------------------------------------------------------------------

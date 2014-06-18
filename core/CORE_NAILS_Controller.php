@@ -34,13 +34,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Include the composer autoloader
 		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
-			echo '<style type="text/css">';
-			echo 'p {font-family:monospace;margin:20px 10px;}';
-			echo 'strong { color:red;}';
-			echo 'code { padding:5px;border:1px solid #CCC;background:#EEE }';
-			echo '</style>';
-			echo '<p><strong>ERROR:</strong> Composer autoloader not found; run <code>composer install</code> to install dependencies.</p>';
-			exit( 0 );
+			$_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies.';
+			include NAILS_PATH . 'errors/startup_error.php';
 
 		endif;
 
@@ -406,31 +401,50 @@ class CORE_NAILS_Controller extends MX_Controller {
 	protected function _instantiate_datetime()
 	{
 		//	Pass the user object to the datetime model
-		$this->datetime_model->set_usr_obj( $this->user_model );
+		$this->datetime_model->_set_user_object( $this->user_model );
+
+		// --------------------------------------------------------------------------
+
+		//	Define default date format
+		$_default = $this->datetime_model->get_date_format_default();
+
+		if ( empty( $_default ) ) :
+
+			show_fatal_error( 'No default date format has been set, or it\'s been set incorrectly.' );
+
+		endif;
+
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG',	$_default->slug );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL',	$_default->label );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT',	$_default->format );
+
+		//	Define default time format
+		$_default = $this->datetime_model->get_time_format_default();
+
+		if ( empty( $_default ) ) :
+
+			show_fatal_error( 'No default time format has been set, or it\'s been set incorrectly.' );
+
+		endif;
+
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG',	$_default->slug );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL',	$_default->label );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT',	$_default->format );
 
 		// --------------------------------------------------------------------------
 
 		//	Set the timezones.
 
-		//	Choose the user's timezone - starting with their rpeference, followed by
-		//	the app's default, followed by the system and if all that fails (how?!)
-		//	then default to UTC
+		//	Choose the user's timezone - starting with their preference, followed by
+		//	the app's default.
 
 		if ( active_user( 'timezone' ) ) :
 
 			$_timezone_user = active_user( 'timezone' );
 
-		elseif( APP_DEFAULT_TIMEZONE ) :
-
-			$_timezone_user = APP_DEFAULT_TIMEZONE;
-
-		elseif( DEPLOY_SYSTEM_TIMEZONE ) :
-
-			$_timezone_user = DEPLOY_SYSTEM_TIMEZONE;
-
 		else :
 
-			$_timezone_user = 'UTC';
+			$_timezone_user = $this->datetime_model->get_timezone_default();
 
 		endif;
 
@@ -438,9 +452,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Set the default date/time formats
-		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
-		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
+		//	Set the user date/time formats
+		$_format_date	= active_user( 'datetime_format_date' ) ? active_user( 'datetime_format_date' ) : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
+		$_format_time	= active_user( 'datetime_format_time' ) ? active_user( 'datetime_format_time' ) : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+
 		$this->datetime_model->set_formats( $_format_date, $_format_time );
 
 		// --------------------------------------------------------------------------
@@ -483,45 +498,40 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_languages()
 	{
-		//	Pass the user object to the language model
-		$this->language_model->set_usr_obj( $this->user_model );
+		//	Define default language
+		$_default = $this->language_model->get_default();
 
-		//	Check default lang is supported by nails
-		$this->_supported	= array();
-		$this->_supported[]	= 'english';
+		if ( empty( $_default ) ) :
 
-		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
-
-			show_error( 'Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
+			show_fatal_error( 'No default language has been set, or it\'s been set incorrectly.' );
 
 		endif;
 
-		define( 'APP_DEFAULT_LANG_ID',		$this->language_model->get_default_id() );
-		define( 'APP_DEFAULT_LANG_NAME',	$this->language_model->get_default_name() );
-
-		// --------------------------------------------------------------------------
-
-		//	Load the Nails. generic lang file
-		$this->lang->load( 'nails' );
+		define( 'APP_DEFAULT_LANG_CODE',	$_default->code );
+		define( 'APP_DEFAULT_LANG_LABEL',	$_default->label );
 
 		// --------------------------------------------------------------------------
 
 		//	Set any global preferences for this user, e.g languages, fall back to
 		//	the app's default language (defined in config.php).
 
-		$_user_pref = active_user( 'language_setting' );
+		$_user_lang = active_user( 'language' );
 
-		if ( isset( $_user_pref->slug ) && $_user_pref->slug ) :
+		if ( ! empty( $_user_lang ) ) :
 
-			define( 'RENDER_LANG_SLUG',	$_user_pref->slug );
-			define( 'RENDER_LANG_ID',	$_user_pref->id );
+			define( 'RENDER_LANG_CODE',	$_user_lang );
 
 		else :
 
-			define( 'RENDER_LANG_SLUG',	APP_DEFAULT_LANG_SLUG );
-			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
+			define( 'RENDER_LANG_CODE',	APP_DEFAULT_LANG_CODE );
 
 		endif;
+
+		//	Set the language config item which codeigniter will use.
+		$this->config->set_item( 'language', RENDER_LANG_CODE );
+
+		//	Load the Nails. generic lang file
+		$this->lang->load( 'nails' );
 	}
 
 
@@ -720,7 +730,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			//	Load models and langs
 			$this->load->model( 'auth/auth_model' );
-			$this->lang->load( 'auth/auth', RENDER_LANG_SLUG );
+			$this->lang->load( 'auth/auth' );
 
 			//	Log the user out
 			$this->auth_model->logout();

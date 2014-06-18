@@ -21,50 +21,30 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	{
 		parent::__construct();
 
-		$this->_table			= NAILS_DB_PREFIX . 'shop_currency';
-		$this->_table_prefix	= 'c';
+		$this->config->load( 'currency' );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Fetches all objects
-	 *
-	 * @access public
-	 * @param none
-	 * @return array
-	 **/
-	public function get_all( $only_active = TRUE )
+	public function get_all()
 	{
-		if ( $only_active ) :
-
-			$this->db->where( $this->_table_prefix . '.is_active', TRUE );
-
-		endif;
-
-		$this->db->order_by( $this->_table_prefix . '.code' );
-
-		return parent::get_all();
+		return $this->config->item( 'currency' );
 	}
 
 
-	/**
-	 * Fetches all objects
-	 *
-	 * @access public
-	 * @param none
-	 * @return array
-	 **/
-	public function get_all_flat( $only_active = TRUE )
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_flat()
 	{
-		$_currencies = $this->get_all( $only_active );
-		$_out = array();
+		$_out		= array();
+		$_currency	= $this->get_all();
 
-		foreach ( $_currencies AS $currency ) :
+		foreach( $_currency AS $c ) :
 
-			$_out[$currency->id] = $currency->code . ' - ' . $currency->label;
+			$_out[$c->code] = $c->label;
 
 		endforeach;
 
@@ -75,178 +55,12 @@ class NAILS_Shop_currency_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Fetch an object by it's ID
-	 *
-	 * @access public
-	 * @param int $id The ID of the object to fetch
-	 * @return	stdClass
-	 **/
-	public function get_by_id( $id )
-	{
-		$this->db->where( $this->_table_prefix . '.id', $id );
-		$_result = $this->get_all( FALSE );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Fetch an object by it's code
-	 *
-	 * @access public
-	 * @param string $code The code of the object to fetch
-	 * @return	stdClass
-	 **/
 	public function get_by_code( $code )
 	{
-		$this->db->where( $this->_table_prefix . '.code', $code );
-		$_result = $this->get_all( FALSE );
+		$_currency = $this->get_all();
 
-		// --------------------------------------------------------------------------
-
-		if ( ! $_result )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_result[0];
+		return ! empty( $_currency[$code] ) ? $_currency[$code] : FALSE;
 	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_by_country( $country )
-	{
-		//	What are we dealing with?
-		if ( is_numeric( $country ) ) :
-
-			//	An ID
-			$this->db->where( 'scc.country_id', $country );
-
-		elseif( is_string( $country ) ) :
-
-			if ( strlen( $country ) == 2 ) :
-
-				$this->db->where( 'c.iso_code', $country );
-				$this->db->join( NAILS_DB_PREFIX . 'country c', 'c.id = scc.country_id' );
-
-			elseif ( strlen( $country ) == 3 ) :
-
-				$this->db->where( 'c.iso_code_3', $country );
-				$this->db->join( NAILS_DB_PREFIX . 'country c', 'c.id = scc.country_id' );
-
-			else :
-
-				//	Unknown
-				return NULL;
-
-			endif;
-
-		else :
-
-			//	Unknown
-			return NULL;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->db->select( 'sc.*' );
-		$this->db->join( NAILS_DB_PREFIX . 'shop_currency sc', 'sc.id = scc.currency_id' );
-		$_result = $this->db->get( NAILS_DB_PREFIX . 'shop_currency_country scc' );
-
-		if ( $_result && $_result->row() ) :
-
-			$_result = $_result->row();
-
-			//	Format
-			$this->_format_object( $_result );
-
-			return $_result;
-
-		else :
-
-			return NULL;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function set_active_currencies( $ids )
-	{
-		if ( ! is_array( $ids ) || ! $ids ) :
-
-			$this->_set_error( 'At least one currency is required to be active.' );
-			return FALSE;
-
-		endif;
-
-		$this->db->set( 'is_active', FALSE );
-		$this->db->update( NAILS_DB_PREFIX . 'shop_currency' );
-
-		if ( $this->db->affected_rows() ) :
-
-			$this->db->set( 'is_active', TRUE );
-			$this->db->where_in( 'id', $ids );
-			$this->db->update( NAILS_DB_PREFIX . 'shop_currency' );
-
-			if ( $this->db->affected_rows() ) :
-
-				return TRUE;
-
-			else :
-
-				$this->_set_error( 'Unable to enable currencies' );
-				return FALSE;
-
-			endif;
-
-		else :
-
-			$this->_set_error( 'Unable to disabled all currencies' );
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _format_object( &$object )
-	{
-		$object->id				= (int) $object->id;
-		$object->created_by		= NULL === $object->created_by	? NULL : (int) $object->created_by;
-		$object->modified_by	= NULL === $object->modified_by	? NULL : (int) $object->modified_by;
-		$object->is_active		= (bool) $object->is_active;
-		$object->base_exchange	= (float) $object->base_exchange;
-
-		// --------------------------------------------------------------------------
-
-		//	If this currency lacks a symbol, use it's CODE as a symbol
-		if ( ! $object->symbol ) :
-
-			$object->symbol				= $object->code . ' ';
-			$object->symbol_position	= 'BEFORE';
-
-		endif;
-	}
-
 
 	// --------------------------------------------------------------------------
 

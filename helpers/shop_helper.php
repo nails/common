@@ -146,7 +146,7 @@ if ( ! function_exists( 'add_to_basket_button' ) )
 
 		if ( ! $button_text ) :
 
-			get_instance()->lang->load( 'shop/shop', RENDER_LANG_SLUG );
+			get_instance()->lang->load( 'shop/shop' );
 
 			if ( $_in_basket ) :
 
@@ -274,7 +274,7 @@ if ( ! function_exists( 'shop_convert_to_user' ) )
 
 		// --------------------------------------------------------------------------
 
-		return get_instance()->shop_currency_model->convert_to_user( $price);
+		return get_instance()->shop_currency_model->convert_to_user( $price );
 	}
 }
 

@@ -30,7 +30,6 @@ NAILS_JS = function()
 		this._init_system_alerts();
 		this._init_tipsy();
 		this._init_fancybox();
-		this._init_chosen();
 		this._init_confirm();
 		this._init_nicetime();
 		this._init_tabs();
@@ -166,35 +165,6 @@ NAILS_JS = function()
 		else
 		{
 			this.log( 'NAILS_JS: Fancybox not available.' );
-		}
-	};
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 *
-	 * Initialise any chosen elements on the page
-	 *
-	 **/
-	this._init_chosen = function()
-	{
-		if ( $.fn.chosen )
-		{
-			$( 'select.chosen' ).each(function()
-			{
-				var _width = $(this).css( 'width' ) ? $(this).css( 'width' ) : '100%';
-
-				$(this).chosen(
-				{
-					width: _width
-				});
-			});
-		}
-		else
-		{
-			this.log( 'NAILS_JS: Chosen not available.' );
 		}
 	};
 

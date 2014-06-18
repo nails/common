@@ -235,15 +235,13 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 					//	Set the URL
 					$_config->url	= $module_location['url'] . $module . '/';
 
-					$this->_available[$module] = $_config;
+					$this->_available[$_config->slug] = $_config;
 
 				endforeach;
 
 			endif;
 
 		endforeach;
-
-		$this->_available = array_values( $this->_available );
 
 		return $this->_available;
 	}

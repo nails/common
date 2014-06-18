@@ -17,55 +17,67 @@
 
 class NAILS_Language_model extends NAILS_Model
 {
-	protected $_default_lang;
-
-	// --------------------------------------------------------------------------
-
 	public function __construct()
 	{
 		parent::__construct();
-
-		// --------------------------------------------------------------------------
-
-		$this->_table						= NAILS_DB_PREFIX . 'language';
-		$this->_table_prefix				= 'l';
-		$this->_table_label_column			= 'name';
-		$this->_table_auto_set_timestamps	= FALSE;
-	}
-
-	// --------------------------------------------------------------------------
-
-	public function set_usr_obj( &$usr )
-	{
-		$this->user =& $usr;
+		$this->config->load( 'languages' );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_all_supported()
+	public function get_default()
 	{
-		$this->db->where( $this->_table_prefix . '.supported', TRUE );
-		return $this->get_all();
+		$_default	= $this->config->item( 'languages_default' );
+		$_language	= $this->get_by_code( $_default );
+
+		return ! empty( $_language ) ? $_language : FALSE;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_all_supported_flat()
+	public function get_default_code()
 	{
-		$_out	= array();
-		$_langs	= $this->get_all_supported();
+		$_default = $this->get_default();
+		return empty( $_default->code ) ? FALSE : $_default->code;
+	}
 
-		for( $i=0; $i<count( $_langs ); $i++ ) :
 
-			$_out[$_langs[$i]->id] = $_langs[$i]->name;
+	// --------------------------------------------------------------------------
 
-		endfor;
 
-		// --------------------------------------------------------------------------
+	public function get_default_label()
+	{
+		$_default = $this->get_default();
+		return empty( $_default->label ) ? FALSE : $_default->label;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all()
+	{
+		return $this->config->item( 'languages' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_flat()
+	{
+		$_out		= array();
+		$_languages	= $this->get_all();
+
+		foreach( $_languages AS $l ) :
+
+			$_out[$l->code] = $l->label;
+
+		endforeach;
 
 		return $_out;
 	}
@@ -74,90 +86,47 @@ class NAILS_Language_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_default_id()
+	public function get_all_enabled()
 	{
-		$_cache_key	= 'lang-default-' . APP_DEFAULT_LANG_SLUG;
-		$_cache		= $this->_get_cache( $_cache_key );
+		$_enabled	= $this->config->item( 'languages_enabled' );
+		$_out		= array();
 
-		if ( $_cache ) :
+		foreach( $_enabled AS $e ) :
 
-			return $_cache->id;
+			$_out[] = $this->get_by_code( $e );
 
-		endif;
+		endforeach;
 
-		// --------------------------------------------------------------------------
-
-		//	Fetch and cache
-		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
-
-		if ( $_default ) :
-
-			//	Save to cache
-			$this->_set_cache( $_cache_key, $_default );
-
-			return $_default->id;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return array_filter( $_out );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_default_name()
+	public function get_all_enabled_flat()
 	{
-		$_cache_key	= 'lang-default-' . APP_DEFAULT_LANG_SLUG;
-		$_cache		= $this->_get_cache( $_cache_key );
+		$_out		= array();
+		$_languages	= $this->get_all_enabled();
 
-		if ( $_cache ) :
+		foreach( $_languages AS $l ) :
 
-			return $_cache->name;
+			$_out[$l->code] = $l->label;
 
-		endif;
+		endforeach;
 
-		// --------------------------------------------------------------------------
-
-		//	Fetch and cache
-		$_default = $this->get_by_slug( APP_DEFAULT_LANG_SLUG );
-
-		if ( $_default ) :
-
-			//	Save to cache
-			$this->_set_cache( $_cache_key, $_default );
-
-			return $_default->name;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return $_out;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function mark_supported( $id )
+	public function get_by_code( $code )
 	{
-		$_data				= array();
-		$_data['supported']	= TRUE;
-		return $this->update( $id, $_data );
-	}
+		$_languages = $this->get_all();
 
-
-	// --------------------------------------------------------------------------
-
-
-	public function mark_unsupported( $id )
-	{
-		$_data				= array();
-		$_data['supported']	= FALSE;
-		return $this->update( $id, $_data );
+		return ! empty( $_languages[$code] ) ? $_languages[$code] : FALSE;
 	}
 }
 

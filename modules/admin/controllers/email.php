@@ -34,7 +34,7 @@ class NAILS_Email extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_email', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_email' );
 
 		// --------------------------------------------------------------------------
 

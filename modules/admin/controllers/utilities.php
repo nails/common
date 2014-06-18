@@ -40,7 +40,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_utilities', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_utilities' );
 
 		// --------------------------------------------------------------------------
 
@@ -52,7 +52,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Navigation options
 		$d->funcs					= array();
 		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
-		$d->funcs['languages']		= lang( 'utilities_nav_languages' );
 		$d->funcs['export']			= lang( 'utilities_nav_export' );
 
 		if ( module_is_enabled( 'cdn' ) ) :
@@ -170,69 +169,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/utilities/send_test',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function languages()
-	{
-		//	Page Title
-		$this->data['page']->title = lang ( 'utilities_languages_title' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['languages'] = $this->language_model->get_all();
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/utilities/languages/index',	$this->data );
-		$this->load->view( 'structure/footer',					$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function mark_lang_supported()
-	{
-		$_id = $this->uri->segment( 4 );
-
-		if ( $this->language_model->mark_supported( $_id ) ) :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_ok' ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_fail' ) );
-
-		endif;
-
-		redirect( 'admin/utilities/languages' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function mark_lang_unsupported()
-	{
-		$_id = $this->uri->segment( 4 );
-
-		if ( $this->language_model->mark_unsupported( $_id ) ) :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_ok' ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_fail' ) );
-
-		endif;
-
-		redirect( 'admin/utilities/languages' );
 	}
 
 
@@ -376,27 +312,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	user_meta
 		$_out[$_counter]			= new stdClass();
 		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_meta';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
-
-		//	date_format_date
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'date_format_date';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
-
-		//	date_format_time
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'date_format_time';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
-
-		//	langauge
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'language';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;

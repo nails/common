@@ -329,6 +329,7 @@
 						price, you are doing so in the base currency. You are free to change this but it will be reflected
 						across the entire store, <em>change with <strong>extreme</strong> caution</em>.
 					</p>
+					<p>
 					<?php
 
 						//	Base Currency
@@ -337,27 +338,46 @@
 						$_field['label']		= 'Base Currency';
 						$_field['default']		= app_setting( $_field['key'], 'shop' );
 
-						echo form_dropdown( $_field['key'], $currencies_active_flat, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
+						$_currencies = array();
+
+						foreach( $currencies AS $c ) :
+
+							$_currencies[$c->code] = $c->code . ' - ' . $c->label;
+
+						endforeach;
+
+						echo form_dropdown( $_field['key'], $_currencies, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
 
 					?>
+					</p>
 				</fieldset>
 				<fieldset id="shop-currencies-base">
-					<legend>Supported Currencies</legend>
+					<legend>Additional Supported Currencies</legend>
 					<p>
-						Define which currencies you wish to support in your store, the base currency must always be supported.
+						Define which currencies you wish to support in your store in addition to the base currency.
 					</p>
+					<p class="system-alert message">
+						<strong>Important:</strong> Not all payment gateways support all currencies and some must be configured to
+						support a particular currency. Additional costs may apply, please choose additional currencies carefully.
+					</p>
+					<p>
 					<?php
 
-						echo '<select name="active_currencies[]" multiple="multiple" class="select2">';
+						$_default = set_value( 'additional_currencies', app_setting( 'additional_currencies', 'shop' ) );
+						$_default = array_filter( (array) $_default );
+
+						echo '<select name="additional_currencies[]" multiple="multiple" class="select2">';
 						foreach ( $currencies AS $currency ) :
 
-							$_selected = $currency->is_active ? 'selected="selected"' : '';
-							echo '<option value="'. $currency->id . '" ' . $_selected . '>' . $currency->code . ' - ' . $currency->label . '</option>';
+							$_selected = array_search( $currency->code, $_default ) !== FALSE ? 'selected="selected"' : '';
+
+							echo '<option value="'. $currency->code . '" ' . $_selected . '>' . $currency->code . ' - ' . $currency->label . '</option>';
 
 						endforeach;
 						echo '</select>';
 
 					?>
+					</p>
 				</fieldset>
 				<p style="margin-top:1em;margin-bottom:0;">
 					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
@@ -367,6 +387,8 @@
 
 			<?php $_display = $this->input->post( 'update' ) == 'shipping' ? 'active' : ''?>
 			<div id="tab-shipping" class="tab page <?=$_display?> shipping">
+				<?=form_open( NULL, 'style="margin-bottom:0;"' )?>
+				<?=form_hidden( 'update', 'shipping' )?>
 				<fieldset id="shop-settings-shipping-domicile">
 					<legend>Domicile</legend>
 					<p>
@@ -377,7 +399,7 @@
 
 						$_field					= array();
 						$_field['key']			= 'domicile';
-						$_field['default']		= app_setting( $_field['key'], 'shop' );
+						$_field['default']		= app_setting( $_field['key'], 'shop' ) ? app_setting( $_field['key'], 'shop' ) : 'GB';
 
 						echo form_dropdown( $_field['key'], $countries_flat, set_value( $_field['key'], $_field['default'] ), 'class="select2"' );
 
@@ -387,7 +409,7 @@
 					<legend>Ship To</legend>
 					<p>
 						Where you're willing to ship to. You can be as granular as individual countries,
-						or you can choose entire continents.
+						or you can choose entire continents. Your domicile will always be a shippable location.
 					</p>
 					<p>
 						<strong>Continents</strong>
@@ -395,19 +417,15 @@
 					<p>
 					<?php
 
-						$_continents		= array();
-						$_continents['AF']	= 'Africa';
-						$_continents['AN']	= 'Antarctica';
-						$_continents['AS']	= 'Asia';
-						$_continents['OC']	= 'Australia (Oceania)';
-						$_continents['EU']	= 'Europe';
-						$_continents['NA']	= 'North America';
-						$_continents['SA']	= 'South America';
+						$_default = set_value( 'ship_to_continents', app_setting( 'ship_to_continents', 'shop' ) );
+						$_default = array_filter( (array) $_default );
 
 						echo '<select name="ship_to_continents[]" multiple="multiple" class="select2">';
-							foreach ( $_continents AS $key => $label ) :
+							foreach ( $continents_flat AS $key => $label ) :
 
-								echo '<option value="'. $key . '" >' . $label . '</option>';
+								$_selected = array_search( $key, $_default ) !== FALSE ? ' selected="selected"' : '';
+
+								echo '<option value="'. $key . '"' . $_selected . '>' . $label . '</option>';
 
 							endforeach;
 						echo '</select>';
@@ -420,10 +438,15 @@
 					<p>
 					<?php
 
-						echo '<select name="ship_to_countries[]" multiple="multiple" class="select2">';
-							foreach ( $countries AS $country ) :
+						$_default = set_value( 'ship_to_countries', app_setting( 'ship_to_countries', 'shop' ) );
+						$_default = array_filter( (array) $_default );
 
-								echo '<option value="'. $country->id . '" >' . $country->iso_name . '</option>';
+						echo '<select name="ship_to_countries[]" multiple="multiple" class="select2">';
+							foreach ( $countries_flat AS $key => $label ) :
+
+								$_selected = array_search( $key, $_default ) !== FALSE ? ' selected="selected"' : '';
+
+								echo '<option value="'. $key . '"' . $_selected . '>' . $label . '</option>';
 
 							endforeach;
 						echo '</select>';
@@ -436,10 +459,15 @@
 					<p>
 					<?php
 
-						echo '<select name="ship_to_countries[]" multiple="multiple" class="select2">';
-							foreach ( $countries AS $country ) :
+						$_default = set_value( 'ship_to_exclude', app_setting( 'ship_to_exclude', 'shop' ) );
+						$_default = array_filter( (array) $_default );
 
-								echo '<option value="'. $country->id . '" >' . $country->iso_name . '</option>';
+						echo '<select name="ship_to_exclude[]" multiple="multiple" class="select2">';
+							foreach ( $countries_flat AS $key => $label ) :
+
+								$_selected = array_search( $key, $_default ) !== FALSE ? ' selected="selected"' : '';
+
+								echo '<option value="'. $key . '"' . $_selected . '>' . $label . '</option>';
 
 							endforeach;
 						echo '</select>';
@@ -462,50 +490,82 @@
 
 					if ( ! empty( $shipping_modules ) ) :
 
-						echo form_open( NULL, 'style="margin-bottom:0;"' );
-						echo form_hidden( 'update', 'shipping' );
-
 						echo '<table id="shipping-modules">';
 							echo '<thead class="shipping-modules">';
 								echo '<tr>';
-									echo '<th class="order">Order</th>';
+									echo '<th class="order">&nbsp;</th>';
 									echo '<th class="enabled">Enabled</th>';
 									echo '<th class="label">Label</th>';
 									echo '<th class="configure">Configure</th>';
 								echo '</tr>';
 							echo '</thead>';
 							echo '<tbody>';
+
+							$_enabled_shipping_modules = set_value( 'enabled_shipping_modules', app_setting( 'enabled_shipping_modules', 'shop' ) );
+							$_enabled_shipping_modules = array_filter( (array) $_enabled_shipping_modules );
+
+							$_modules = array();
+
+							//	Enabled ones first, in order
+							foreach( $_enabled_shipping_modules AS $sm ) :
+
+								$_modules[] = $sm;
+
+							endforeach;
+
+							//	Followed by the others
 							foreach( $shipping_modules AS $sm ) :
 
-								$_name			= ! empty( $sm->name ) ? $sm->name : 'Untitled';
-								$_description	= ! empty( $sm->description ) ? $sm->description : '';
+								if ( array_search( $sm->slug, $_modules ) === FALSE ) :
+
+									$_modules[] = $sm->slug;
+
+								endif;
+
+							endforeach;
+
+
+							$i = 0;
+							foreach( $_modules AS $slug ) :
+
+								$_module = ! empty( $shipping_modules[$slug] ) ? $shipping_modules[$slug] : FALSE;
+
+								if ( ! $_module ) :
+
+									continue;
+
+								endif;
+
+								// --------------------------------------------------------------------------
+
+								$_name			= ! empty( $_module->name ) ? $_module->name : 'Untitled';
+								$_description	= ! empty( $_module->description ) ? $_module->description : '';
+								$_enabled		= array_search( $slug, $_enabled_shipping_modules ) !== FALSE ? TRUE : FALSE;
 
 								echo '<tr>';
 									echo '<td class="order">';
-										echo '-';
+										echo '<span class="ion-drag"></span>';
 									echo '</td>';
 									echo '<td class="enabled">';
 										echo '<div class="toggle toggle-modern"></div>';
-										echo form_checkbox( '', TRUE );
+										echo form_checkbox( 'enabled_shipping_modules', $slug, $_enabled );
 									echo '</td>';
 									echo '<td class="label">';
 										echo $_name;
 										echo $_description ? '<small>' . $_description . '</small>' : '';
 									echo '</td>';
 									echo '<td class="configure">';
-										echo '-';
+										echo $_enabled ? anchor( 'admin/shop/configure/shipping?module=' . urlencode( $slug ), 'Configure', 'data-fancybox-type="iframe" class="fancybox awesome small"' ) : '&mdash;';
 									echo '</td>';
 								echo '</tr>';
 
+								$i++;
+
 							endforeach;
+
 							echo '<tbody>';
 						echo '</table>';
 						echo '<hr />';
-
-						echo '<p style="margin-top:1em;margin-bottom:0;">';
-							echo form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' );
-						echo '</p>';
-						echo form_close();
 
 					else :
 
@@ -517,6 +577,10 @@
 					endif;
 
 				?>
+				<p style="margin-top:1em;margin-bottom:0;">
+					<?=form_submit( 'submit', lang( 'action_save_changes' ), 'style="margin-bottom:0;"' )?>
+				</p>
+				<?=form_close()?>
 			</div>
 		</section>
 </div>

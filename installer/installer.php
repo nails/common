@@ -246,54 +246,6 @@ class CORE_NAILS_Installer
 				</p>
 			</div>
 
-			<!-- DEFAULT TIMEZONE -->
-			<div class="config-item">
-				<p>
-					What's the default timezone for this app?
-				</p>
-				<p>
-				<?php
-
-					if ( isset( $_POST['app_default_timezone'] ) ) :
-
-						$_default = $_POST['app_default_timezone'];
-
-					elseif( defined( 'APP_DEFAULT_TIMEZONE' ) ) :
-
-						$_default = APP_DEFAULT_TIMEZONE;
-
-					else :
-
-						$_default = date_default_timezone_get();
-
-					endif;
-
-					if ( $this->_has_app_file ) :
-
-						echo '<input type="text" class="rounded" name="app_default_timezone" readonly="readonly" value="' . $_default . '">';
-						echo $_readonly ? '<small class="readonly">To change this value, please update config/app.php manually.</small>' : '';
-
-					else :
-
-						echo '<select name="app_default_timezone">';
-
-							$_timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
-
-							foreach ( $_timezones AS $tz ) :
-
-								$_selected = $tz == $_default ? 'selected="selected"' : '';
-								echo '<option value="' . $tz. '" ' . $_selected . '>' . $tz . '</option>';
-
-							endforeach;
-
-						echo '</select>';
-
-					endif;
-
-				?>
-				</p>
-			</div>
-
 			<!-- DATABASE -->
 			<div class="config-item">
 				<p>
@@ -651,14 +603,11 @@ class CORE_NAILS_Installer
 			$_app_lang				= 'english';
 			$_app_key				= md5( uniqid() );
 			$_app_developer_email	= isset( $_POST['app_developer_email'] ) ? $_POST['app_developer_email'] : '';
-			$_app_default_timezone	= isset( $_POST['app_default_timezone'] ) ? $_POST['app_default_timezone'] : '';
 
 			$_app_str  = '<?php' . "\n";
 			$_app_str .= 'define( \'APP_NAME\',	\'' . str_replace( "'", "\'", $_app_name ) . '\' );' . "\n";
-			$_app_str .= 'define( \'APP_DEFAULT_LANG_SLUG\',	\'' . str_replace( "'", "\'", $_app_lang ) . '\' );' . "\n";
 			$_app_str .= 'define( \'APP_PRIVATE_KEY\',	\'' . $_app_key . '\' );' . "\n";
 			$_app_str .= 'define( \'APP_DEVELOPER_EMAIL\',	\'' . $_app_developer_email . '\' );' . "\n";
-			$_app_str .= 'define( \'APP_DEFAULT_TIMEZONE\',	\'' . $_app_default_timezone . '\' );' . "\n";
 
 			$_fh = @fopen( $this->_app_file, 'w' );
 

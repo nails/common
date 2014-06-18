@@ -34,7 +34,7 @@ class NAILS_Events extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_events', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_events' );
 
 		// --------------------------------------------------------------------------
 

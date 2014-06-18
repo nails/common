@@ -33,7 +33,7 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'shop', RENDER_LANG_SLUG );
+		$this->lang->load( 'shop' );
 
 		// --------------------------------------------------------------------------
 

@@ -45,7 +45,7 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_accounts', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_accounts' );
 
 		// --------------------------------------------------------------------------
 
@@ -575,9 +575,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'last_name',					'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'gender',					'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'timezone',					'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'date_format_date_id',		'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'date_format_time_id',		'',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'language_id',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'datetime_format_date',		'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'datetime_format_time',		'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'language',						'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'password',					'',	'xss_clean' );
 			$this->form_validation->set_rules( 'temp_pw',					'',	'xss_clean' );
 			$this->form_validation->set_rules( 'reset_security_questions',	'',	'xss_clean' );
@@ -679,9 +679,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 					$_data['username']					= $this->input->post( 'username' );
 					$_data['gender']					= $this->input->post( 'gender' );
 					$_data['timezone']					= $this->input->post( 'timezone' );
-					$_data['date_format_date_id']		= $this->input->post( 'date_format_date_id' );
-					$_data['date_format_time_id']		= $this->input->post( 'date_format_time_id' );
-					$_data['language_id']				= $this->input->post( 'language_id' );
+					$_data['datetime_format_date']		= $this->input->post( 'datetime_format_date' );
+					$_data['datetime_format_time']		= $this->input->post( 'datetime_format_time' );
+					$_data['language']					= $this->input->post( 'language' );
 
 					if ( $this->input->post( 'password' ) ) :
 
@@ -804,9 +804,9 @@ class NAILS_Accounts extends NAILS_Admin_Controller
 		//	Get the groups, timezones and languages
 		$this->data['groups']		= $this->user_group_model->get_all();
 		$this->data['timezones']	= $this->datetime_model->get_all_timezone_flat();
-		$this->data['date_formats']	= $this->datetime_model->get_all_date_format_flat();
-		$this->data['time_formats']	= $this->datetime_model->get_all_time_format_flat();
-		$this->data['languages']	= $this->language_model->get_all_flat();
+		$this->data['date_formats']	= $this->datetime_model->get_all_date_format();
+		$this->data['time_formats']	= $this->datetime_model->get_all_time_format();
+		$this->data['languages']	= $this->language_model->get_all_enabled_flat();
 
 		//	Fetch any user uploads
 		if ( module_is_enabled( 'cdn' ) ) :

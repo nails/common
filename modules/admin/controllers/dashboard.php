@@ -34,7 +34,7 @@ class NAILS_Dashboard extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_dashboard', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_dashboard' );
 
 		// --------------------------------------------------------------------------
 

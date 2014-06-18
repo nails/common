@@ -35,7 +35,7 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_settings', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_settings' );
 
 		// --------------------------------------------------------------------------
 
@@ -503,12 +503,11 @@ class NAILS_Settings extends NAILS_Admin_Controller
 		$this->data['payment_gateways']			= array();
 		$this->data['shipping_modules']			= $this->shop_shipping_model->get_available();
 		$this->data['skins']					= $this->shop_skin_model->get_available();
-		$this->data['currencies']				= $this->shop_currency_model->get_all( FALSE );
-		$this->data['currencies_active_flat']	= $this->shop_currency_model->get_all_flat();
+		$this->data['currencies']				= $this->shop_currency_model->get_all( );
 		$this->data['tax_rates']				= $this->shop_tax_model->get_all();
 		$this->data['tax_rates_flat']			= $this->shop_tax_model->get_all_flat();
-		$this->data['countries']				= $this->country_model->get_all();
 		$this->data['countries_flat']			= $this->country_model->get_all_flat();
+		$this->data['continents_flat']			= $this->country_model->get_all_continents_flat();
 		array_unshift( $this->data['tax_rates_flat'], 'No Tax');
 
 		// --------------------------------------------------------------------------
@@ -534,7 +533,6 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings									= array();
-		$_settings['domicile']						= $this->input->post( 'domicile' );
 		$_settings['name']							= $this->input->post( 'name' );
 		$_settings['url']							= $this->input->post( 'url' );
 		$_settings['free_shipping_threshold']		= (float) $this->input->post( 'free_shipping_threshold' );
@@ -626,32 +624,14 @@ class NAILS_Settings extends NAILS_Admin_Controller
 	{
 		//	Prepare update
 		$_settings								= array();
-		$_settings['base_currency']				= (int) $this->input->post( 'base_currency' );
+		$_settings['base_currency']				= $this->input->post( 'base_currency' );
+		$_settings['additional_currencies']		= $this->input->post( 'additional_currencies' );
 
 		// --------------------------------------------------------------------------
 
 		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
 
-			$this->data['success'] = '<strong>Success!</strong> Base currency has been saved.';
-
-			//	Save the active currencies
-			$_where_in = array( $_settings['base_currency'] );
-
-			foreach ( $this->input->post( 'active_currencies' ) AS $id ) :
-
-				$_where_in[] = $id;
-
-			endforeach;
-
-			if ( $this->shop_currency_model->set_active_currencies( $_where_in ) ) :
-
-				$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
-
-			else :
-
-				$this->data['error'] = '<strong>Sorry,</strong> an error occurred while setting supported currencies.';
-
-			endif;
+			$this->data['success'] = '<strong>Success!</strong> Currency settings have been updated.';
 
 		else :
 
@@ -666,7 +646,25 @@ class NAILS_Settings extends NAILS_Admin_Controller
 
 	protected function _shop_update_shipping()
 	{
-		$this->data['message'] = '<strong>TODO</strong> Handling shipping modules in the works.';
+		//	Prepare update
+		$_settings								= array();
+		$_settings['domicile']					= $this->input->post( 'domicile' );
+		$_settings['ship_to_continents']		= array_filter( (array) $this->input->post( 'ship_to_continents' ) );
+		$_settings['ship_to_countries']			= array_filter( (array) $this->input->post( 'ship_to_countries' ) );
+		$_settings['ship_to_exclude']			= array_filter( (array) $this->input->post( 'ship_to_exclude' ) );
+		$_settings['enabled_shipping_modules']	= array_filter( (array) $this->input->post( 'enabled_shipping_modules' ) );
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->app_setting_model->set( $_settings, 'shop' ) ) :
+
+			$this->data['success'] = '<strong>Success!</strong> Shipping settings have been saved.';
+
+		else :
+
+			$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving settings.';
+
+		endif;
 	}
 }
 

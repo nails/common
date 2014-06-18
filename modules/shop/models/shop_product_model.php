@@ -1285,7 +1285,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 		if ( empty( $product->seo_keywords ) ) :
 
 			//	Extract common keywords
-			$this->lang->load( 'shop/shop', RENDER_LANG_SLUG );
+			$this->lang->load( 'shop/shop' );
 			$_common = explode( ',', lang( 'shop_common_words' ) );
 			$_common = array_unique( $_common );
 			$_common = array_filter( $_common );

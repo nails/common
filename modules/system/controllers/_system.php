@@ -23,7 +23,7 @@ class NAILS_System_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'system', RENDER_LANG_SLUG );
+		$this->lang->load( 'system' );
 	}
 }
 

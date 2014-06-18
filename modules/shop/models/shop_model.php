@@ -43,7 +43,6 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_BASE_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',		$_base->decimal_precision );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',			$_base->code );
-		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',			$_base->id );
 
 		//	Formatting constants
 		if ( ! defined( 'SHOP_BASE_CURRENCY_THOUSANDS' ) )	define( 'SHOP_BASE_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
@@ -53,16 +52,16 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( $this->session->userdata( 'shop_currency' ) ) :
 
 			//	Use the currency defined in the session
-			$_currency_id = $this->session->userdata( 'shop_currency' );
+			$_currency_code = $this->session->userdata( 'shop_currency' );
 
 		elseif( active_user( 'shop_currency' ) ) :
 
 			//	Use the currency defined in the user object
-			$_currency_id = active_user( 'shop_currency' );
+			$_currency_code = active_user( 'shop_currency' );
 
 			if ( ! headers_sent() ) :
 
-				$this->session->set_userdata( 'shop_currency', $_currency_id );
+				$this->session->set_userdata( 'shop_currency', $_currency_code );
 
 			endif;
 
@@ -82,41 +81,41 @@ class NAILS_Shop_model extends NAILS_Model
 
 				if ( $_country_currency ) :
 
-					$_currency_id = $_country_currency->id;
+					$_currency_code = $_country_currency->code;
 
 				else :
 
 					//	Fall back to default
-					$_currency_id = $_base->id;
+					$_currency_code = $_base->code;
 
 				endif;
 
 			else :
 
-				$_currency_id = $_base->id;
+				$_currency_code = $_base->code;
 
 			endif;
 
 			//	Save to session
 			if ( ! headers_sent() ) :
 
-				$this->session->set_userdata( 'shop_currency', $_currency_id );
+				$this->session->set_userdata( 'shop_currency', $_currency_code );
 
 			endif;
 
 		endif;
 
 		//	Fetch the user's render currency
-		$_user_currency = $this->shop_currency_model->get_by_id( $_currency_id );
+		$_user_currency = $this->shop_currency_model->get_by_code( $_currency_code );
 
-		if ( ! $_user_currency || ! $_user_currency->is_active ) :
+		if ( ! $_user_currency  ) :
 
-			//	Bad currency ID or not active, use base
+			//	Bad currency code
 			$_user_currency = $_base;
 
 			if ( ! headers_sent() ) :
 
-				$this->session->unset_userdata( 'shop_currency', $_currency_id );
+				$this->session->unset_userdata( 'shop_currency', $_currency_code );
 
 			endif;
 
@@ -133,14 +132,10 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL_POS' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL_POS',	$_user_currency->symbol_position );
 		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )		define( 'SHOP_USER_CURRENCY_PRECISION',		$_user_currency->decimal_precision );
 		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )			define( 'SHOP_USER_CURRENCY_CODE',			$_user_currency->code );
-		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )				define( 'SHOP_USER_CURRENCY_ID',			$_user_currency->id );
 
 		//	Formatting constants
 		if ( ! defined( 'SHOP_USER_CURRENCY_THOUSANDS' ) )		define( 'SHOP_USER_CURRENCY_THOUSANDS',		$_user_currency->thousands_seperator );
 		if ( ! defined( 'SHOP_USER_CURRENCY_DECIMALS' ) )		define( 'SHOP_USER_CURRENCY_DECIMALS',		$_user_currency->decimal_symbol );
-
-		//	Exchange rate betweent the two currencies
-		if ( ! defined( 'SHOP_USER_CURRENCY_BASE_EXCHANGE' ) )	define( 'SHOP_USER_CURRENCY_BASE_EXCHANGE',	$_user_currency->base_exchange );
 	}
 
 
@@ -169,7 +164,7 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Fetch base currency
-		$_base = $this->shop_currency_model->get_by_id( app_setting( 'base_currency', 'shop' ) );
+		$_base = $this->shop_currency_model->get_by_code( app_setting( 'base_currency', 'shop' ) );
 
 		//	Cache
 		$this->_set_cache( 'base_currency', $_base );

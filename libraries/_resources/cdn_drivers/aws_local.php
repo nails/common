@@ -40,7 +40,7 @@ class Aws_local_CDN
 		// --------------------------------------------------------------------------
 
 		//	Load langfile
-		get_instance()->lang->load( 'cdn/cdn_driver_aws_local', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'cdn/cdn_driver_aws_local' );
 
 		// --------------------------------------------------------------------------
 

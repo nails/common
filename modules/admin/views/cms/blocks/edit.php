@@ -20,26 +20,26 @@
 
 	<?=form_open()?>
 	<fieldset>
-	<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
+	<?php if ( count( $languages ) > 1 ) : ?>
 		<legend>Translations</legend>
 		<p class="system-alert message">
-			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_NAME?> version, however more translations can be
+			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_LABEL?> version, however more translations can be
 			added if needed. Translations will only be used when viewing the site in a particular language (if supported).
-			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_NAME?>.
+			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_LABEL?>.
 		</p>
 
 
 		<!--	DEFAULT LANG	-->
-		<fieldset class="translation" data-lang_id="<?=$default_id?>">
-			<legend><?=APP_DEFAULT_LANG_NAME?></legend>
+		<fieldset class="translation" data-language="<?=$default_id?>">
+			<legend><?=APP_DEFAULT_LANG_LABEL?></legend>
 
 	<?php else : ?>
 		<legend>Value</legend>
-		<div class="translation" data-lang_id="<?=$default_id?>">
+		<div class="translation" data-language="<?=$default_id?>">
 
 	<?php endif; ?>
 
-			<?=form_hidden( 'translation[0][lang_id]', $default_id )?>
+			<?=form_hidden( 'translation[0][language]', $default_id )?>
 			<div class="system-alert error">
 				<strong>Oops!</strong> Please ensure a value is set.
 			</div>
@@ -88,7 +88,7 @@
 				endif;
 
 			?>
-		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
+		<?php if ( count( $languages ) > 1 ) : ?>
 		</fieldset>
 		<?php else : ?>
 		</div>
@@ -100,16 +100,16 @@
 			$_counter = 1;
 			foreach ( $block->translations AS $translation ) :
 
-				if ( $translation->lang->slug == APP_DEFAULT_LANG_SLUG )
+				if ( $translation->lang->slug == APP_DEFAULT_LANG_CODE )
 					continue;
 
 				?>
-				<fieldset class="translation" data-lang_id="<?=$translation->lang->id?>">
+				<fieldset class="translation" data-language="<?=$translation->language?>">
 					<legend>
 						<?=$translation->lang->name?>
 						<a href="#" class="remove-translation">Remove Translation</a>
 					</legend>
-					<?=form_hidden( 'translation[' . $_counter . '][lang_id]', $translation->lang->id )?>
+					<?=form_hidden( 'translation[' . $_counter . '][language]', $translation->lang->id )?>
 					<div class="system-alert error">
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>
@@ -159,7 +159,7 @@
 		?>
 
 
-		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
+		<?php if ( count( $languages ) > 1 ) : ?>
 		<!--	ACTIONS	-->
 		<p class="add-translation">
 			<a href="#" class="awesome small right" id="new-translation">Add Translation</a>
@@ -178,7 +178,7 @@
 
 <script type="text/template" id="template-translation">
 	<legend>
-		<?=form_dropdown( 'new_translation[{{new_count}}][lang_id]', $languages )?>
+		<?=form_dropdown( 'new_translation[{{new_count}}][language]', $languages )?>
 		<a href="#" class="remove-translation">Remove Translation</a>
 	</legend>
 	<div class="system-alert error">

@@ -23,7 +23,7 @@ class NAILS_Email_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'email', RENDER_LANG_SLUG );
+		$this->lang->load( 'email' );
 	}
 }
 

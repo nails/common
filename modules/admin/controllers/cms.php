@@ -606,7 +606,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$this->data['blocks']		= $this->cms_block_model->get_all();
-		$this->data['languages']	= $this->language_model->get_all_supported_flat();
+		$this->data['languages']	= $this->language_model->get_all_enabled_flat();
 
 		// --------------------------------------------------------------------------
 
@@ -640,8 +640,8 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				foreach ( $this->input->post( 'translation' ) AS $translation ) :
 
-					$this->cms_block_model->update_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
-					$_updated[] = $translation['lang_id'];
+					$this->cms_block_model->update_translation( $this->data['block']->id, $translation['language'], $translation['value'] );
+					$_updated[] = $translation['language'];
 
 				endforeach;
 
@@ -651,7 +651,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 			if ( $_updated ) :
 
 				$this->db->where( 'block_id', $this->data['block']->id );
-				$this->db->where_not_in( 'lang_id', $_updated );
+				$this->db->where_not_in( 'language', $_updated );
 				$this->db->delete( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 			endif;
@@ -661,7 +661,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 				foreach ( $this->input->post( 'new_translation' ) AS $translation ) :
 
-					$this->cms_block_model->create_translation( $this->data['block']->id, $translation['lang_id'], $translation['value'] );
+					$this->cms_block_model->create_translation( $this->data['block']->id, $translation['language'], $translation['value'] );
 
 				endforeach;
 
@@ -684,7 +684,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Fetch data
-		$this->data['languages']	= $this->language_model->get_all_supported_flat();
+		$this->data['languages']	= $this->language_model->get_all_enabled_flat();
 		$this->data['default_id']	= $this->language_model->get_default_id();
 
 		// --------------------------------------------------------------------------
@@ -754,7 +754,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['languages'] = $this->language_model->get_all_supported_flat();
+		$this->data['languages'] = $this->language_model->get_all_enabled_flat();
 
 		// --------------------------------------------------------------------------
 
