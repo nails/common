@@ -416,7 +416,7 @@ NAILS_JS = function()
 	this._init_tabs = function()
 	{
 		var _this = this;	/*	Ugly Scope Hack	*/
-		$( document ).on( 'click', 'ul.tabs li.tab a', function()
+		$( document ).on( 'click', 'ul.tabs:not(.disabled) li.tab a', function()
 		{
 			if ( ! $(this).hasClass( 'disabled' ) )
 			{

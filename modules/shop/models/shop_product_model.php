@@ -932,7 +932,7 @@ class NAILS_Shop_product_model extends NAILS_Model
 
 			//	Categories
 			//	==========
-			$this->db->select( 'c.id, c.slug, c.label, c.label_nested' );
+			$this->db->select( 'c.id, c.slug, c.label, c.breadcrumbs' );
 			$this->db->where( 'pc.product_id', $product->id );
 			$this->db->join( NAILS_DB_PREFIX . 'shop_category c', 'c.id = pc.category_id' );
 			$product->categories = $this->db->get( $this->_table_category . ' pc' )->result();

@@ -21,185 +21,45 @@ class NAILS_Shop_sale_model extends NAILS_Model
 	{
 		parent::__construct();
 
-		$this->_table = NAILS_DB_PREFIX . 'shop_sale';
+		$this->_table			= NAILS_DB_PREFIX . 'shop_attribute';
+		$this->_table_prefix	= 'sa';
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_all( $include_count  = FALSE)
+	protected function _getcount_common( $data = array(), $_caller = NULL )
 	{
-		$this->db->select( 's.*' );
+		if ( empty( $data['sort'] ) ) :
 
-		if ( $include_count ) :
-
-			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_sale spt LEFT JOIN ' . NAILS_DB_PREFIX . 'shop_product p ON p.id = sps.product_id  WHERE sps.sale_id = s.id AND p.is_active = 1) product_count' );
-
-		endif;
-
-		$this->db->order_by( 's.label' );
-		$_result = $this->db->get( $this->_table . ' s' )->result();
-
-		foreach( $_result AS &$r ) :
-
-			$this->_format_object( $r );
-
-		endforeach;
-
-		return $_result;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _format_object( &$obj )
-	{
-		$obj->id				= (int) $obj->id;
-		$obj->product_count		= isset( $obj->product_count ) ? (int) $obj->product_count : NULL;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function create( $data, $return_obj = FALSE )
-	{
-		$_data = new stdClass();
-
-		if ( isset( $data->label ) ) :
-
-			$_data->label = strip_tags( $data->label );
+			$data['sort'] = 'label';
 
 		else :
 
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
-
-		endif;
-
-		if ( isset( $data->description ) ) :
-
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->seo_title ) ) :
-
-			$_data->seo_title = strip_tags( $data->seo_title );
-
-		endif;
-
-		if ( isset( $data->seo_description ) ) :
-
-			$_data->seo_description = strip_tags( $data->seo_description );
-
-		endif;
-
-		if ( isset( $data->seo_keywords ) ) :
-
-			$_data->seo_keywords = strip_tags( $data->seo_keywords );
-
-		endif;
-
-		if ( ! empty( $_data ) ) :
-
-			//	Generate a slug
-			$_data->slug = $this->_generate_slug( $data->label );
+			$data = array( 'sort' => 'label' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		return parent::create( $_data, $return_obj );
-	}
+		if ( ! empty( $data['include_count'] ) ) :
 
+			if ( empty( $this->db->ar_select ) ) :
 
-	// --------------------------------------------------------------------------
+				//	No selects have been called, call this so that we don't *just* get the product count
+				$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+				$this->db->select( $_prefix . '*' );
 
+			endif;
 
-	public function update( $id, $data )
-	{
-		$_data = new stdClass();
-
-		if ( isset( $data->label ) ) :
-
-			$_data->label = strip_tags( $data->label );
-
-		else :
-
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_sale spt LEFT JOIN ' . NAILS_DB_PREFIX . 'shop_product p ON p.id = sps.product_id  WHERE sps.sale_id = s.id AND p.is_active = 1) product_count' );
 
 		endif;
 
-		if ( isset( $data->description ) ) :
+		// --------------------------------------------------------------------------
 
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->seo_title ) ) :
-
-			$_data->seo_title = strip_tags( $data->seo_title );
-
-		endif;
-
-		if ( isset( $data->seo_description ) ) :
-
-			$_data->seo_description = strip_tags( $data->seo_description );
-
-		endif;
-
-		if ( isset( $data->seo_keywords ) ) :
-
-			$_data->seo_keywords = strip_tags( $data->seo_keywords );
-
-		endif;
-
-		if ( ! empty( $_data ) ) :
-
-			return parent::update( $id, $_data );
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function delete( $id )
-	{
-		//	Turn off DB Errors
-		$_previous = $this->db->db_debug;
-		$this->db->db_debug = FALSE;
-
-		$this->db->trans_begin();
-		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table );
-		$_affected_rows = $this->db->affected_rows();
-
-		if ( $this->db->trans_status() === FALSE ) :
-
-			$this->db->trans_rollback();
-			$_return = FALSE;
-
-		else :
-
-			$this->db->trans_commit();
-			$_return = (bool) $_affected_rows;
-
-		endif;
-
-		//	Put DB errors back as they were
-		$this->db->db_debug = $_previous;
-
-		return $_return;
+		return parent::_getcount_common( $data, $_caller );
 	}
 }
 

@@ -533,9 +533,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		$this->db->where( $_prefix . 'id', $id );
-		$this->db->update( $_table );
-
-		return (bool) $this->db->affected_rows();
+		return $this->db->update( $_table );
 	}
 
 
@@ -1031,7 +1029,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param string $_caller The name of the calling method
 	 * @return void
 	 **/
-	protected function _getcount_common( $data = NULL, $_caller = NULL )
+	protected function _getcount_common( $data = array(), $_caller = NULL )
 	{
 		//	NOTE: The CDN library follows this principle too. Fixes/changes in here? Update there too!
 

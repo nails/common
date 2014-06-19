@@ -203,6 +203,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		//	Libraries
 		$this->asset->library( 'jqueryui' );
 		$this->asset->library( 'select2' );
+		$this->asset->library( 'ckeditor' );
 
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :

@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Shop_product_type_model
+ * Name:			shop_tax_rate_model.php
  *
- * Description:	The user group model handles user's passwords
+ * Description:		This model handles everything to do with tax rates
  *
  **/
 
@@ -15,14 +15,14 @@
  *
  **/
 
-class NAILS_Shop_product_type_model extends NAILS_Model
+class NAILS_Shop_tax_rate_model extends NAILS_Model
 {
 	public function __construct()
 	{
 		parent::__construct();
 
-		$this->_table			= NAILS_DB_PREFIX . 'shop_product_type';
-		$this->_table_prefix	= 'spt';
+		$this->_table			= NAILS_DB_PREFIX . 'shop_tax_rate';
+		$this->_table_prefix	= 'str';
 	}
 
 
@@ -53,42 +53,13 @@ class NAILS_Shop_product_type_model extends NAILS_Model
 
 			endif;
 
-			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product WHERE type_id = ' . $this->_table_prefix . '.id) product_count' );
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product WHERE tax_rate_id = ' . $this->_table_prefix . '.id) product_count' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		return parent::_getcount_common( $data, $_caller );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-	//	Meta fields for various product types
-
-	// --------------------------------------------------------------------------
-
-	public function meta_fields_download()
-	{
-		$_out = array();
-
-		// --------------------------------------------------------------------------
-
-		//	TODO: This array should be a form builder config array - when that library is complete.
-
-		//	Download ID
-		$_out[0]				= new stdClass();
-		$_out[0]->type			= 'cdn_object';
-		$_out[0]->key			= 'download_id';
-		$_out[0]->label			= 'Download';
-		$_out[0]->bucket		= 'shop-download';
-		$_out[0]->tip			= '';
-		$_out[0]->validation	= 'xss_clean|required';
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
 	}
 }
 
@@ -99,7 +70,7 @@ class NAILS_Shop_product_type_model extends NAILS_Model
 /**
  * OVERLOADING NAILS' MODELS
  *
- * The following block of code makes it simple to extend one of the core
+ * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -120,13 +91,13 @@ class NAILS_Shop_product_type_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_PRODUCT_TYPE_MODEL' ) ) :
+if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_TAX_RATE_MODEL' ) ) :
 
-	class Shop_product_type_model extends NAILS_Shop_product_type_model
+	class Shop_tax_rate_model extends NAILS_Shop_tax_rate_model
 	{
 	}
 
 endif;
 
-/* End of file shop_product_type_model.php */
-/* Location: ./modules/shop/models/shop_product_type_model.php */
+/* End of file shop_tax_rate_model.php */
+/* Location: ./modules/shop/models/shop_tax_rate_model.php */

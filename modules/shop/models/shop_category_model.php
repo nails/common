@@ -21,314 +21,56 @@ class NAILS_Shop_category_model extends NAILS_Model
 	{
 		parent::__construct();
 
-		$this->_table = NAILS_DB_PREFIX . 'shop_category';
-	}
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_all( $include_children = FALSE, $include_product_count = FALSE, $order_style = 'NORMAL' )
-	{
-		switch( $order_style ) :
-
-			case 'NORMAL' :
-
-				$this->db->order_by( 'order,label' );
-
-			break;
-
-			case 'NESTED' :
-
-				$this->db->order_by( 'slug' );
-
-			break;
-
-		endswitch;
-
-
-		$_all = parent::get_all();
-
-		if ( $include_children ) :
-
-			foreach( $_all AS $cat ) :
-
-				$this->db->where( 'parent_id', $cat->id );
-				$cat->children = parent::get_all();
-
-				if ( $include_product_count ) :
-
-					foreach( $cat->children AS $child ) :
-
-						$_ids = array_merge( array( $child->id ), $this->get_ids_of_all_children( $child->id ) );
-
-						$this->db->select( 'COUNT( DISTINCT( `spc`.`product_id` ) ) total' );
-						$this->db->where_in( 'spc.category_id', $_ids );
-						$this->db->where( 'p.is_active', TRUE );
-						$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = spc.product_id' );
-						$child->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category spc' )->row()->total;
-
-					endforeach;
-
-				endif;
-
-			endforeach;
-
-		endif;
-
-		if ( $include_product_count ) :
-
-			foreach( $_all AS $cat ) :
-
-				$_ids = array_merge( array( $cat->id ), $this->get_ids_of_all_children( $cat->id ) );
-				$this->db->select( 'COUNT( DISTINCT( `spc`.`product_id` ) ) total' );
-				$this->db->where_in( 'category_id', $_ids );
-				$this->db->where( 'p.is_active', TRUE );
-				$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = spc.product_id' );
-				$cat->product_count = $this->db->get( NAILS_DB_PREFIX . 'shop_product_category spc' )->row()->total;
-
-			endforeach;
-
-		endif;
-
-		return $_all;
+		$this->_table			= NAILS_DB_PREFIX . 'shop_category';
+		$this->_table_prefix	= 'sc';
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	public function get_all_nested()
+	public function create( $data, $return_object = FALSE )
 	{
-		return $this->_nest_categories( $this->get_all() );
-	}
+		//	Some basic sanity testing
+		if ( empty( $data->label ) ) :
 
-
-	// --------------------------------------------------------------------------
-
-	/**
-	 *	Hat tip to Timur; http://stackoverflow.com/a/9224696/789224
-	 **/
-	protected function _nest_categories( &$list, $parent = NULL )
-	{
-		$result = array();
-
-		for ( $i = 0, $c = count( $list ); $i < $c; $i++ ) :
-
-			if ( $list[$i]->parent_id == $parent ) :
-
-				$list[$i]->children	= $this->_nest_categories( $list, $list[$i]->id );
-				$result[]			= $list[$i];
-
-			endif;
-
-		endfor;
-
-		return $result;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_all_nested_flat( $separator = ' &rsaquo; ', $murder_parents_of_children = TRUE )
-	{
-		$_out			= array();
-		$_categories	= $this->get_all();
-
-		foreach ( $_categories AS $cat ) :
-
-			$_out[$cat->id] = $this->_find_parents( $cat->parent_id, $_categories, $separator ) . $cat->label;
-
-		endforeach;
-
-		asort( $_out );
-
-		// --------------------------------------------------------------------------
-
-		//	Remove parents from the array if they have any children
-		if ( $murder_parents_of_children ) :
-
-			foreach( $_out AS $key => &$cat ) :
-
-				$_found		= FALSE;
-				$_needle	= $cat . $separator;
-
-				//	Hat tip - http://uk3.php.net/manual/en/function.array-search.php#90711
-				foreach ( $_out as $item ) :
-
-					if ( strpos( $item, $_needle ) !== FALSE ) :
-
-						$_found = TRUE;
-						break;
-
-					endif;
-
-				endforeach;
-
-				if ( $_found ) :
-
-					unset( $_out[$key] );
-
-				endif;
-
-			endforeach;
-
-		endif;
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _find_parents( $parent_id, &$source, $separator )
-	{
-		if ( ! $parent_id ) :
-
-			//	No parent ID, end of the line señor!
-			return '';
-
-		else :
-
-			//	There is a parent, look for it
-			foreach ( $source AS $src ) :
-
-				if ( $src->id == $parent_id ) :
-
-					$_parent = $src;
-
-				endif;
-
-			endforeach;
-
-			if ( isset( $_parent ) && $_parent ) :
-
-				//	Parent was found, does it have any parents?
-				if ( $_parent->parent_id ) :
-
-					//	Yes it does, repeat!
-					$_return = $this->_find_parents( $_parent->parent_id, $source, $separator );
-
-					return $_return ? $_return . $_parent->label . $separator : $_parent->label;
-
-				else :
-
-					//	Nope, end of the line mademoiselle
-					return $_parent->label . $separator;
-
-				endif;
-
-
-			else :
-
-				//	Did not find parent, give up.
-				return '';
-
-			endif;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_by_id( $id, $include_children = FALSE, $include_product_count = FALSE, $nest = FALSE )
-	{
-		//	Fetch
-		$this->db->where( 'id', $id );
-		$_categories = $this->get_all( $include_children, $include_product_count );
-
-		if ( ! $_categories ) :
-
+			$this->_set_error( '"label" is a required field.' );
 			return FALSE;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Process
-		return $this->_get_by_idslug( $_categories, $nest );
-	}
+		$this->db->trans_begin();
 
+		//	Create a new blank object to work with
+		$_data	= array( 'label' => $data->label );
+		$_id	= parent::create( $_data );
 
-	// --------------------------------------------------------------------------
+		if ( ! $_id ) :
 
-
-	public function get_by_slug( $slug, $include_children = FALSE, $include_product_count = FALSE, $nest = FALSE )
-	{
-		//	Fetch
-		$this->db->where( 'slug', $slug );
-		$_categories = $this->get_all( $include_children, $include_product_count );
-
-		if ( ! $_categories ) :
-
+			$this->_set_error( 'Unable to create base category object.' );
+			$this->db->trans_rollback();
 			return FALSE;
 
-		endif;
+		elseif ( $this->update( $_id, $data ) ) :
 
-		// --------------------------------------------------------------------------
+			$this->db->trans_commit();
 
-		//	Process
-		return $this->_get_by_idslug( $_categories, $nest );
-	}
+			if ( $return_object ) :
 
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _get_by_idslug( $categories, $nest )
-	{
-		//	Are we nesting this category amongst it's parents?
-		if ( $nest ) :
-
-			$_family_tree	= array();
-			$_family_tree[]	= $categories[0];
-			$_current		= $categories[0];
-
-			while( $_current && $_current->parent_id ) :
-
-				$_current = $this->get_by_id( $_current->parent_id );
-
-				if ( $_current ) :
-
-					$_family_tree[] = $_current;
-
-				endif;
-
-			endwhile;
-
-			//	Now stitch them together in reverse
-			$_family_tree	= array_reverse( $_family_tree );
-
-			if ( count( $_family_tree ) > 1 ) :
-
-				$_out			= $_family_tree[0];
-				$_pointer		=& $_out;
-				foreach ( $_family_tree AS $category ) :
-
-					//	Place the category
-					$_pointer->children = array( $category );
-
-					//	Update the pointer
-					$_pointer =& $_pointer->children[0];
-
-
-				endforeach;
+				return $this->get_by_id( $_id );
 
 			else :
 
-				$_out = $_family_tree[0];
+				return $_id;
 
 			endif;
 
-			return $_out;
-
 		else :
 
-			//	Nope, just return
-			return $categories[0];
+			$this->db->trans_rollback();
+			return FALSE;
 
 		endif;
 	}
@@ -337,334 +79,159 @@ class NAILS_Shop_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function get_top_level( $include_children = FALSE, $include_product_count = FALSE )
-	{
-		$this->db->where( 'parent_id', NULL );
-		return $this->get_all( $include_children, $include_product_count );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_ids_of_all_children( $category_id )
-	{
-		//	Check the cache
-		$_cache_key = 'get_ids_of_all_children-' . $category_id;
-		$_cache = $this->_get_cache( $_cache_key );
-
-		if ( $_cache ) :
-
-			return $_cache;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Not in cache? Bugger
-		$_out = array();
-
-		$this->db->select( 'id' );
-		$this->db->where( 'parent_id', $category_id );
-		$_result = $this->db->get( $this->_table )->result();
-
-		if ( $_result ) :
-
-			foreach( $_result AS $result ) :
-
-				$_out[] = (int) $result->id;
-
-				//	Look for children of this dude
-				$_children = $this->get_ids_of_all_children( $result->id );
-
-				if ( $_children ) :
-
-					$_out = array_merge( $_out, $_children );
-
-				endif;
-
-			endforeach;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Cache this
-		$this->_set_cache( $_cache_key, $_out );
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function create( $data, $return_obj = FALSE )
+	public function update( $id, $data = array() )
 	{
 		$_data = new stdClass();
 
-		if ( isset( $data->label ) ) :
+		// --------------------------------------------------------------------------
 
-			$_data->label = strip_tags( $data->label );
+		//	Prep the data
+		if ( empty( $data->label ) ) :
+
+			$this->_set_error( '"label" is a required field.' );
+			return FALSE;
 
 		else :
 
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
+			$_data->label = trim( $data->label );
 
 		endif;
 
 		if ( isset( $data->parent_id ) ) :
 
-			$_data->parent_id = ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
+			$_data->parent_id = (int) $data->parent_id;
 
-			//	Work out the slug, prefix it with nested parents
-			$_parent = $this->get_by_id( $_data->parent_id );
+			if ( empty( $_data->parent_id ) ) :
 
-			if ( $_data->parent_id && ! $_parent ) :
+				$_data->parent_id = NULL;
 
-				$this->_set_error( 'Invalid Parent ID.' );
+			endif;
+
+		endif;
+
+		if ( isset( $data->description ) ) :
+
+			$_data->description = $data->description;
+
+		endif;
+
+		if ( isset( $data->seo_title ) ) :
+
+			$_data->seo_title = strip_tags( $data->seo_title );
+
+		endif;
+
+		if ( isset( $data->seo_description ) ) :
+
+			$_data->seo_description = strip_tags( $data->seo_description );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Generate the slug
+		//	If there's a parent then prefix the slug with the parent's slug
+
+		if ( ! empty( $_data->parent_id ) ) :
+
+			$this->db->select( 'slug' );
+			$this->db->where( 'id', $_data->parent_id );
+			$_parent = $this->db->get( $this->_table )->row();
+
+			if ( empty( $_parent ) ) :
+
+				$_prefix = '';
+
+				//	Also, invalid aprent, so NULL out parent_id
+				$_data->parent_id = NULL;
+
+			else :
+
+				$_prefix = $_parent->slug . '/';
+
+			endif;
+
+		else :
+
+			//	No parent == no prefix
+			$_prefix = '';
+
+		endif;
+
+		$_data->slug		= $this->_generate_slug( $_data->label, $_prefix, '', NULL, NULL, $id );
+		$_data->slug_end	= array_pop( explode( '/', $_data->slug ) );
+
+		// --------------------------------------------------------------------------
+
+		//	Attempt the update
+		$this->db->trans_begin();
+
+		if ( parent::update( $id, $_data ) ) :
+
+			//	Success! Generate this category's breadcrumbs
+			$_data				= new stdClass();
+			$_data->breadcrumbs	= json_encode( $this->_generate_breadcrumbs( $id ) );
+
+			if ( ! parent::update( $id, $_data ) ) :
+
+				$this->db->trans_rollback();
+				$this->_set_error( 'Failed to update category breadcrumbs.' );
 				return FALSE;
 
 			endif;
 
-			if ( $_data->parent_id ) :
+			// --------------------------------------------------------------------------
 
-				$_data->slug			= $this->_generate_slug( $data->label, $_parent->slug . '/' );
+			//	Also regenerate breadcrumbs and slugs for all children
+			$_children = $this->_get_children( $id );
 
-				//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
-				$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent->slug ) . '/#', '', $_data->slug );
-				$_data->label_nested	= $_parent->label_nested . '|' . $_data->label;
+			if ( $_children ) :
 
-			else :
+				foreach ( $_children AS $child_id ) :
 
-				//	No parent, slug is just the label
-				$_data->slug			= $this->_generate_slug( $data->label );
-				$_data->slug_end		= $_data->slug;
-				$_data->label_nested	= $_data->label;
+					$_child_data = new stdClass();
 
-			endif;
+					//	Breadcrumbs is easy
+					$_child_data->breadcrumbs = json_encode( $this->_generate_breadcrumbs( $child_id ) );
 
-		else :
+					//	Slugs are slightly harder, we need to get the child's parent's slug
+					//	and use it as a prefix
 
-			//	No parent, slug is just the label
-			$_data->slug			= $this->_generate_slug( $data->label );
-			$_data->label_nested	= $_data->label;
+					$this->db->select( 'parent_id, label' );
+					$this->db->where( 'id', $child_id );
+					$_child = $this->db->get( $this->_table )->row();
 
-		endif;
+					if ( ! empty( $_child ) ) :
 
-		if ( isset( $data->description ) ) :
+						$this->db->select( 'slug' );
+						$this->db->where( 'id', $_child->parent_id );
+						$_parent = $this->db->get( $this->_table )->row();
+						$_prefix = empty( $_parent ) ? '' : $_parent->slug . '/';
 
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->seo_title ) ) :
-
-			$_data->seo_title = strip_tags( $data->seo_title );
-
-		endif;
-
-		if ( isset( $data->seo_description ) ) :
-
-			$_data->seo_description = strip_tags( $data->seo_description );
-
-		endif;
-
-		if ( isset( $data->seo_keywords ) ) :
-
-			$_data->seo_keywords = strip_tags( $data->seo_keywords );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return parent::create( $_data, $return_obj );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function update( $id, $data )
-	{
-		//	Fetch the current category, incldue the children - we may need to
-		//	update them if the label changes
-
-		$_current = $this->get_by_id( $id );
-		$_children = $this->get_ids_of_all_children( $_current->id );
-
-		if ( ! $_current ) :
-
-			$this->_set_error( 'Invalid Category ID.' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_data			= new stdClass();
-		$_regenerate	= FALSE;
-
-		if ( isset( $data->label ) ) :
-
-			if ( $_current->label !== $data->label ) :
-
-				$_data->label	= strip_tags( $data->label );
-				$_regenerate	= TRUE;
-
-			endif;
-
-		else :
-
-			$this->_set_error( 'Label is required.' );
-			return FALSE;
-
-		endif;
-
-		if ( isset( $data->parent_id ) ) :
-
-			if ( $_current->parent_id != $data->parent_id ) :
-
-				$_data->parent_id	= ! empty( $data->parent_id ) ? (int) $data->parent_id : NULL;
-				$_regenerate		= TRUE;
-
-			endif;
-
-		endif;
-
-		//	If we need to regenerate the slug then do so here
-		if ( $_regenerate ) :
-
-			//	Get the new slug prefix
-			if ( ! empty( $_data->parent_id ) ) :
-
-				$_parent = $this->get_by_id( $_data->parent_id );
-				if ( ! $_parent ) :
-
-					$this->_set_error( 'Invalid Parent ID.' );
-					return FALSE;
-
-				endif;
-
-				$_parent_slug			= $_parent->slug . '/';
-				$_parent_label_nested	= $_parent->label_nested . '|';
-
-			else :
-
-				$_parent_slug			= '';
-				$_parent_label_nested	= '';
-
-			endif;
-
-			//	Get new slug details
-			$_label					= isset( $_data->label ) ? $_data->label : $_current->label;
-			$_data->slug			= $this->_generate_slug( $_label, $this->_table, 'slug', $_parent_slug );
-
-			//	Do it like this as _generate_slug() may have added some numbers or something after (i.e. can't use url_title())
-			$_data->slug_end		= preg_replace( '#^' . str_replace( '-', '\-', $_parent_slug ) . '#', '', $_data->slug );
-			$_data->label_nested	= $_parent_label_nested . $_label;
-
-		endif;
-
-		if ( isset( $data->description ) ) :
-
-			$_data->description = strip_tags( $data->description, '<a><strong><em><img>' );
-
-		endif;
-
-		if ( isset( $data->seo_title ) ) :
-
-			$_data->seo_title = strip_tags( $data->seo_title );
-
-		endif;
-
-		if ( isset( $data->seo_description ) ) :
-
-			$_data->seo_description = strip_tags( $data->seo_description );
-
-		endif;
-
-		if ( isset( $data->seo_keywords ) ) :
-
-			$_data->seo_keywords = strip_tags( $data->seo_keywords );
-
-		endif;
-
-		if ( ! empty( $_data ) ) :
-
-			//	Start the transaction
-			$this->db->trans_begin();
-
-			$this->db->set( $_data );
-			$this->db->set( 'modified', 'NOW()', FALSE );
-			$this->db->where( 'id', $id );
-
-			if ( active_user( 'id' ) ) :
-
-				$this->db->set( 'modified_by', active_user( 'id' ) );
-
-			endif;
-
-			if ( $this->db->update( $this->_table ) ) :
-
-				//	Regenerate anything? This may seem like magic, future Pabs, but we're just
-				//	gluing stuff together from the other stuffs we made up there^^
-
-				if ( $_regenerate ) :
-
-					//	Update children's slugs and nested labels
-					$_children = $this->get_ids_of_all_children( $id );
-
-					if ( $_children ) :
-
-						$this->db->set( 'label_nested', 'CONCAT( "' . $_data->label_nested . '|", label )', FALSE );
-						$this->db->set( 'slug', 'CONCAT( "' . $_data->slug . '/", slug_end )', FALSE );
-						$this->db->where_in( 'id', $_children );
-						$this->db->update( $this->_table );
-
-						if ( $this->db->trans_status() !== FALSE ) :
-
-							$this->db->trans_commit();
-							return TRUE;
-
-						else :
-
-							$this->db->trans_rollback();
-							return FALSE;
-
-						endif;
-
-					else :
-
-						$this->db->trans_commit();
-						return TRUE;
+						$_child_data->slug		= $this->_generate_slug( $_child->label, $_prefix, '', NULL, NULL, $child_id );
+						$_child_data->slug_end	= array_pop( explode( '/', $_child_data->slug ) );
 
 					endif;
 
-				else :
+					if ( ! parent::update( $child_id, $_child_data ) ) :
 
-					//	Complete, commit transaction
-					$this->db->trans_commit();
+						$this->db->trans_rollback();
+						$this->_set_error( 'Failed to update child category.' );
+						return FALSE;
 
-				endif;
+					endif;
 
-				return TRUE;
-
-			else :
-
-				//	Failed, roll back
-				$this->db->trans_rollback();
-
-				return FALSE;
+				endforeach;
 
 			endif;
 
+			$this->db->trans_commit();
+			return TRUE;
+
 		else :
 
-			return TRUE;
+			$this->db->trans_rollback();
+			return FALSE;
 
 		endif;
 	}
@@ -673,33 +240,143 @@ class NAILS_Shop_category_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function delete( $id )
+	protected function _generate_breadcrumbs( $id )
 	{
-		//	Turn off DB Errors
-		$_previous = $this->db->db_debug;
-		$this->db->db_debug = FALSE;
-
-		$this->db->trans_begin();
+		//	Fetch current
+		$this->db->select( 'id,slug,label' );
 		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table );
-		$_affected_rows = $this->db->affected_rows();
+		$_current = $this->db->get( $this->_table )->result();
 
-		if ( $this->db->trans_status() === FALSE ) :
+		if ( empty( $_current ) ) :
 
-		    $this->db->trans_rollback();
-			$_return = FALSE;
-
-		else :
-
-		    $this->db->trans_commit();
-			$_return = (bool) $_affected_rows;
+			return FALSE;
 
 		endif;
 
-		//	Put DB errors back as they were
-		$this->db->db_debug = $_previous;
+		//	Fetch parents
+		$_parents = $this->_get_parents( $id );
 
-		return $_return;
+		if ( ! empty( $_parents ) ) :
+
+			$this->db->select( 'id,slug,label' );
+			$this->db->where_in( 'id', $_parents );
+			$_parents = $this->db->get( $this->_table )->result();
+
+		endif;
+
+		//	Finally, build breadcrumbs
+		return array_merge( $_parents, $_current );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _get_parents( $id )
+	{
+		$_return = array();
+
+		$this->db->select( 'parent_id' );
+		$this->db->where( 'id', $id );
+		$_parent = $this->db->get( $this->_table )->row();
+
+		if ( ! empty( $_parent->parent_id ) ) :
+
+			$_temp		= array( $_parent->parent_id );
+			$_return	= array_merge( $_return, $_temp, $this->_get_parents( $_parent->parent_id ) );
+
+		endif;
+
+		return array_unique( array_filter( $_return ) );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _get_children( $id )
+	{
+		$_return = array();
+
+		$this->db->select( 'id' );
+		$this->db->where( 'parent_id', $id );
+		$_children = $this->db->get( $this->_table )->result();
+
+		if ( ! empty( $_children ) ) :
+
+			foreach( $_children AS $child ) :
+
+				$_temp		= array( $child->id );
+				$_return	= array_merge( $_return, $_temp, $this->_get_children( $child->id ) );
+
+			endforeach;
+
+		endif;
+
+		return array_unique( array_filter( $_return ) );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_nested_flat( $separator = ' &rsaquo; ' )
+	{
+		$_categories	= $this->get_all();
+		$_out			= array();
+
+		foreach( $_categories AS $cat ) :
+
+			$_out[$cat->id] = array();
+
+			foreach ( $cat->breadcrumbs AS $crumb ) :
+
+				$_out[$cat->id][] = $crumb->label;
+
+			endforeach;
+
+			$_out[$cat->id] = implode( $separator, $_out[$cat->id] );
+
+		endforeach;
+
+		return $_out;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _getcount_common( $data = array(), $_caller = NULL )
+	{
+		if ( empty( $data['sort'] ) ) :
+
+			$data['sort'] = 'slug';
+
+		else :
+
+			$data = array( 'sort' => 'slug' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( ! empty( $data['include_count'] ) ) :
+
+			if ( empty( $this->db->ar_select ) ) :
+
+				//	No selects have been called, call this so that we don't *just* get the product count
+				$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+				$this->db->select( $_prefix . '*' );
+
+			endif;
+
+			$this->db->select( '(SELECT COUNT(*) FROM ' . NAILS_DB_PREFIX .  'shop_product_category WHERE category_id = ' . $this->_table_prefix . '.id) product_count' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return parent::_getcount_common( $data, $_caller );
 	}
 
 
@@ -720,10 +397,11 @@ class NAILS_Shop_category_model extends NAILS_Model
 		//	Type casting
 		$object->id				= (int) $object->id;
 		$object->parent_id		= $object->parent_id ? (int) $object->parent_id : NULL;
-		$object->order			= (int) $object->order;
 		$object->created_by		= $object->created_by ? (int) $object->created_by : NULL;
 		$object->modified_by	= $object->modified_by ? (int) $object->modified_by : NULL;
 		$object->children		= array();
+
+		$object->breadcrumbs	= (array) @json_decode( $object->breadcrumbs );
 
 		$object->depth			= count( explode( '/', $object->slug ) ) - 1;
 		$object->url			= $this->format_url( $object->slug );

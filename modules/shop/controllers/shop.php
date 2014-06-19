@@ -32,7 +32,10 @@ class NAILS_Shop extends NAILS_Shop_Controller
 		//	Categories
 		//	==========
 
-		$this->data['categories'] = array( 'categories' );
+
+		$this->data['categories'] = $this->shop_category_model->get_all_nested();
+
+		dumpanddie($this->data['categories']);
 
 
 		//	Tags

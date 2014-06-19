@@ -257,7 +257,6 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->library( 'ckeditor' );
 		$this->asset->library( 'uploadify' );
 		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
 		$this->asset->load( 'mustache.js/mustache.js',									'BOWER' );
@@ -491,7 +490,6 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->library( 'ckeditor' );
 		$this->asset->library( 'uploadify' );
 		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
 		$this->asset->load( 'mustache.js/mustache.js',										'BOWER' );

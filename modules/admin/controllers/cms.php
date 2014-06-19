@@ -564,7 +564,6 @@ class NAILS_Cms extends NAILS_Admin_Controller
 	{
 		//	Load common blocks items
 		$this->load->model( 'cms/cms_block_model' );
-		$this->asset->library( 'ckeditor' );
 		$this->asset->load( 'mustache.js/mustache.js',				'BOWER' );
 		$this->asset->load( 'nails.admin.cms.blocks.min.js',	TRUE );
 
