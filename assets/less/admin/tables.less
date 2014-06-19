@@ -17,6 +17,7 @@
 	max-width:100%;
 	overflow-x:auto;
 }
+
 table
 {
 	width: 100%;
@@ -45,36 +46,41 @@ table
 					vertical-align:baseline;
 				}
 
-				a:link,
-				a:vsited
+				a
 				{
-					text-decoration:none;
-					color:inherit;
+					&:link,
+					&:vsited
+					{
+						text-decoration:none;
+						color:inherit;
+					}
 				}
-			}
-			th:first-of-type
-			{
-				border-top-left-radius: 4px;
-				-moz-border-radius-topleft: 4px;
-				-webkit-border-top-left-radius: 4px;
-			}
-			th:last-of-type
-			{
-				border-top-right-radius: 4px;
-				-moz-border-radius-topright: 4px;
-				-webkit-border-top-right-radius: 4px;
-			}
 
-			th.user
-			{
-				text-align:center;
-				width:200px;
-			}
+				&:first-of-type
+				{
+					border-top-left-radius: 4px;
+					-moz-border-radius-topleft: 4px;
+					-webkit-border-top-left-radius: 4px;
+				}
 
-			th.datetime
-			{
-				text-align:center;
-				width:150px;
+				&:last-of-type
+				{
+					border-top-right-radius: 4px;
+					-moz-border-radius-topright: 4px;
+					-webkit-border-top-right-radius: 4px;
+				}
+
+				&.user
+				{
+					text-align:center;
+					width:200px;
+				}
+
+				&.datetime
+				{
+					text-align:center;
+					width:150px;
+				}
 			}
 		}
 	}
@@ -85,27 +91,35 @@ table
 		{
 			td
 			{
-				background: #FFF;
+				background: #FFFFFF;
 				border-bottom: 1px solid #EFEFEF;
-				border-right:1px solid #efefef;
+				border-right:1px solid #EFEFEF;
 				vertical-align:middle;
 				padding: @table_td_padding_top @table_td_padding_right @table_td_padding_bottom @table_td_padding_left;
+
+				&:last-of-type
+				{
+					border-right:0px;
+				}
 
 				small
 				{
 					display:block;
 				}
 
-				a:link,
-				a:visited
+				a
 				{
-					color: #000;
-					text-decoration: none;
-				}
+					&:link,
+					&:visited
+					{
+						color: #000;
+						text-decoration: none;
+					}
 
-				a:hover
-				{
-					color: #999;
+					&:hover
+					{
+						color: #999;
+					}
 				}
 
 				ul
@@ -120,6 +134,7 @@ table
 				}
 
 				input[type=text],
+				input[type=email],
 				input[type=password]
 				{
 					margin-bottom:0px;
@@ -130,163 +145,192 @@ table
 				{
 					color:#ccc;
 				}
-			}
-			td.error
-			{
-				background:@error !important;
-				color:@error_colour !important;
-			}
-			td.success
-			{
-				background:@success !important;
-				color:@success_colour !important;
-			}
-			td.notice
-			{
-				background:@notice !important;
-				color:@notice_colour !important;
-			}
-			td.message
-			{
-				background:@message !important;
-				color:@message_colour !important;
-			}
-			td:last-of-type
-			{
-				border-right:0px;
-			}
-			td#no_records
-			{
-				height: 75px;
-				text-align: center;
-				color: #AAA;
-				text-transform: uppercase;
-			}
-			td.no-data
-			{
-				color:#ccc;
-				height: 75px;
-				text-align: center;
-				color: #AAA;
-				text-transform: uppercase;
-			}
-			td.user-cell
-			{
-				position:relative;
-				width:200px;
-				min-height:35px;
 
-				img
+				&.error
 				{
-					position:absolute;
-					left:@table_td_padding_left;
-					padding:3px;
-					border:1px solid #EEE;
-					background: #FFF url(../img/loader/10px-FFFFFF.gif) center no-repeat;
-					width:35px;
-					height:35px;
-					.rounded(3px);
-					margin-top:-3px;
+					background:@error !important;
+					color:@error_colour !important;
 				}
 
-				span.user-data
+				&.success
 				{
-					margin-left:35px+@table_td_padding_left+5px;
-					display:block;
+					background:@success !important;
+					color:@success_colour !important;
+				}
+
+				&.notice
+				{
+					background:@notice !important;
+					color:@notice_colour !important;
+				}
+
+				&.message
+				{
+					background:@message !important;
+					color:@message_colour !important;
+				}
+
+				&.no-data
+				{
+					height: 75px;
+					text-align: center;
+					color: #AAA;
+					text-transform: uppercase;
+				}
+
+				&.user-cell
+				{
+					position:relative;
+					width:200px;
+					min-height:35px;
+
+					img
+					{
+						position:absolute;
+						left:@table_td_padding_left;
+						padding:3px;
+						border:1px solid #EEE;
+						background: #FFF url(../img/loader/10px-FFFFFF.gif) center no-repeat;
+						width:35px;
+						height:35px;
+						.rounded(3px);
+						margin-top:-3px;
+					}
+
+					span
+					{
+						&.user-data
+						{
+							margin-left:35px+@table_td_padding_left+5px;
+							display:block;
+						}
+					}
+				}
+
+				&.datetime
+				{
+					width:150px;
+				}
+
+
+				&.user-cell,
+				&.datetime
+				{
+					&.no-data
+					{
+						height:auto;
+						text-transform: none;
+						text-align:left;
+					}
+				}
+
+				&.indentosaurus
+				{
+					position:relative;
+
+					.indentor
+					{
+						display:inline-block;
+						float:left;
+						left:0px;
+						margin-top:2px;
+						height:15px;
+						width:15px;
+						margin-right:3px;
+						.rounded(10px);
+						background:#CCC;
+						border-right:1px solid #FFF;
+					}
+
+					&.indent-1 .indentor-content { margin-left:20*1px; }
+					&.indent-2 .indentor-content { margin-left:20*2px; }
+					&.indent-3 .indentor-content { margin-left:20*3px; }
+					&.indent-4 .indentor-content { margin-left:20*4px; }
+					&.indent-5 .indentor-content { margin-left:20*5px; }
+					&.indent-6 .indentor-content { margin-left:20*6px; }
+					&.indent-7 .indentor-content { margin-left:20*7px; }
+					&.indent-8 .indentor-content { margin-left:20*8px; }
 				}
 			}
 
-			td.datetime
+			&.error
 			{
-				width:150px;
-			}
-
-			td.user-cell.no-data,
-			td.datetime.no-data
-			{
-				height:auto;
-				text-transform: none;
-				text-align:left;
-			}
-			td.indentosaurus
-			{
-				position:relative;
-
-				.indentor
+				td
 				{
-					display:inline-block;
-					float:left;
-					left:0px;
-					margin-top:2px;
-					height:15px;
-					width:15px;
-					margin-right:3px;
-					.rounded(10px);
-					background:#CCC;
-					border-right:1px solid #FFF;
+					background:@error !important;
+					color:@error_colour !important;
 				}
 			}
 
-			td.indentosaurus.indent-1	.indentor-content {	margin-left:20*1px; }
-			td.indentosaurus.indent-2	.indentor-content {	margin-left:20*2px; }
-			td.indentosaurus.indent-3	.indentor-content {	margin-left:20*3px; }
-			td.indentosaurus.indent-4	.indentor-content {	margin-left:20*4px; }
-			td.indentosaurus.indent-5	.indentor-content {	margin-left:20*5px; }
-			td.indentosaurus.indent-6	.indentor-content {	margin-left:20*6px; }
-			td.indentosaurus.indent-7	.indentor-content {	margin-left:20*7px; }
-			td.indentosaurus.indent-8	.indentor-content {	margin-left:20*8px; }
-		}
-		tr.error
-		{
-			td
+			&.success
 			{
-				background:@error !important;
-				color:@error_colour !important;
+				td
+				{
+					background:@success !important;
+					color:@success_colour !important;
+				}
 			}
-		}
-		tr.success
-		{
-			td
+
+			&.notice
 			{
-				background:@success !important;
-				color:@success_colour !important;
+				td
+				{
+					background:@notice !important;
+					color:@notice_colour !important;
+				}
 			}
-		}
-		tr.notice
-		{
-			td
+
+			&.message
 			{
-				background:@notice !important;
-				color:@notice_colour !important;
+				td
+				{
+					background:@message !important;
+					color:@message_colour !important;
+				}
 			}
-		}
-		tr.message
-		{
-			td
+
+			&:hover
 			{
-				background:@message !important;
-				color:@message_colour !important;
+				td
+				{
+					background:#F6F6F6 !important;
+
+					&.error
+					{
+						background:@error !important;
+					}
+
+					&.success
+					{
+						background:@success !important;
+					}
+
+					&.notice
+					{
+						background:@notice !important;
+					}
+
+					&.message
+					{
+						background:@message !important;
+					}
+				}
 			}
-		}
-		tr:hover
-		{
-			td
+
+			&:last-child
 			{
-				background:#F6F6F6 !important;
+				td
+				{
+					border-bottom: 0 !important;
+				}
 			}
-		}
-		tr:last-child
-		{
-			td
+
+			&:nth-child(even)
 			{
-				border-bottom: 0 !important;
-			}
-		}
-		tr:nth-child(even)
-		{
-			td
-			{
-				background: #F9F9F9;
+				td
+				{
+					background: #F9F9F9;
+				}
 			}
 		}
 	}
