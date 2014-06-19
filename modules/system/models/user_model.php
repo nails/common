@@ -58,60 +58,21 @@ class NAILS_User_model extends NAILS_Model
 	public function init()
 	{
 		//	Do we need to pull up the data of a remembered user?
-		$this->_login_remembered_user();
+		//$this->_login_remembered_user();
 
 		// --------------------------------------------------------------------------
 
 		//	Refresh user's session
 		$this->_refresh_session();
-	}
 
+		// --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+		//	if no user is logged in, see if there's a remembered user to be logged in
+		if ( ! $this->is_logged_in() ) :
 
-
-	/**
-	 * Checks for the rememebred user cookies, if found we need to tell the
-	 * user_model class to set the data when it instantiates.
-	 *
-	 * @access	public
-	 * @return	void
-	 *
-	 **/
-	public function find_remembered_user()
-	{
-		//	Is rememebr me functionality enabled?
-		$this->config->load( 'auth' );
-
-		if ( ! $this->config->item( 'auth_enable_remember_me' ) ) :
-
-			return FALSE;
+			$this->_login_remembered_user();
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Look for a cookie
-		$this->load->helper( 'cookie' );
-		$_remember_me = get_cookie( $this->_remember_cookie );
-
-		// --------------------------------------------------------------------------
-
-		//	If we're missing anything then there's nothing to do
-		if ( ! $_remember_me ) :
-
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	User cookie's were found
-		define( 'LOGIN_REMEMBERED_USER', $_remember_me );
-
-		// --------------------------------------------------------------------------
-
-		return;
 	}
 
 
@@ -138,32 +99,27 @@ class NAILS_User_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		//	Only attempt to log in a user if they are remembered.
-		//	This constant is set in User_Model::find_remembered_user();
+		//	Get the credentials from the cookie set earlier
+		$_remember	= get_cookie( $this->_remember_cookie );
 
-		if ( ! defined( 'LOGIN_REMEMBERED_USER' ) || ! LOGIN_REMEMBERED_USER ) :
+		if ( $_remember ) :
 
-			return;
+			$_remember	= explode( '|', $_remember );
+			$_email		= isset( $_remember[0] ) ? $_remember[0] : NULL;
+			$_code		= isset( $_remember[1] ) ? $_remember[1] : NULL;
 
-		endif;
+			if ( $_email && $_code ) :
 
-		// --------------------------------------------------------------------------
+				//	Look up the user so we can cross-check the codes
+				$_u = $this->get_by_email( $_email, TRUE );
 
-		//	Get the credentials from the constant set earlier
-		$_remember	= explode( '|', LOGIN_REMEMBERED_USER );
-		$_email		= isset( $_remember[0] ) ? $_remember[0] : NULL;
-		$_code		= isset( $_remember[1] ) ? $_remember[1] : NULL;
+				if ( $_u && $_code === $_u->remember_code ) :
 
-		if ( $_email && $_code ) :
+					//	User was validated, log them in!
+					$this->set_login_data( $_u->id );
+					$this->_me = $_u->id;
 
-			//	Look up the user so we can cross-check the codes
-			$_u = $this->get_by_email( $_email, TRUE );
-
-			if ( $_u && $_code === $_u->remember_code ) :
-
-				//	User was validated, log them in!
-				$this->set_login_data( $_u->id );
-				$this->_me = $_u->id;
+				endif;
 
 			endif;
 

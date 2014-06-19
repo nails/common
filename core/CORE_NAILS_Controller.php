@@ -90,7 +90,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Is the suer suspended?
+		//	Is the user suspended?
 		//	Executed here so that both the user and language systems are initialised
 		//	(so that any errors can be shown in the correct language).
 
@@ -400,11 +400,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _instantiate_datetime()
 	{
-		//	Pass the user object to the datetime model
-		$this->datetime_model->_set_user_object( $this->user_model );
-
-		// --------------------------------------------------------------------------
-
 		//	Define default date format
 		$_default = $this->datetime_model->get_date_format_default();
 
@@ -616,6 +611,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$_helpers[]		= 'app_notification';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
+		$_helpers[]		= 'cookie';
 		$_helpers[]		= 'form';
 		$_helpers[]		= 'html';
 		$_helpers[]		= 'tools';
@@ -699,14 +695,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 		//	Find a remembered user and initialise the user model; this routine checks
 		//	the user's cookies and set's up the session for an existing or new user.
 
-		$this->user_model->find_remembered_user();
 		$this->user_model->init();
 
 		// --------------------------------------------------------------------------
 
-		//	Inject the user object into the user_group and user_password models
+		//	Inject the user object into the user_group, user_password & datetime models
 		$this->user_group_model->_set_user_object( $this->user_model );
 		$this->user_password_model->_set_user_object( $this->user_model );
+		$this->datetime_model->_set_user_object( $this->user_model );
 
 		// --------------------------------------------------------------------------
 
