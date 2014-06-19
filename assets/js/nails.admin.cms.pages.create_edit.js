@@ -1153,7 +1153,6 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 			}
 		});
 
-
 		// --------------------------------------------------------------------------
 
 		//	Bind keyUp event for the escape key, don't close if dragging or previewing
@@ -1249,7 +1248,7 @@ NAILS_Admin_CMS_pages_Create_Edit = function()
 	this._editor_destruct = function()
 	{
 		//	Save widget data/state
-		this._save();
+		this._refresh_page_data();
 
 		// --------------------------------------------------------------------------
 
