@@ -16,6 +16,5 @@
   },
   "_source": "git://github.com/simontabor/jquery-toggles.git",
   "_target": "~3.0.1",
-  "_originalSource": "jquery-toggles",
-  "_direct": true
+  "_originalSource": "jquery-toggles"
 }

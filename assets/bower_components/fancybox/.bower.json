@@ -10,6 +10,5 @@
   },
   "_source": "git://github.com/fancyapps/fancyBox.git",
   "_target": "~2.1.5",
-  "_originalSource": "fancybox",
-  "_direct": true
+  "_originalSource": "fancybox"
 }

@@ -10,6 +10,5 @@
   },
   "_source": "git://github.com/jaz303/tipsy.git",
   "_target": "~0.1.7",
-  "_originalSource": "tipsy",
-  "_direct": true
+  "_originalSource": "tipsy"
 }

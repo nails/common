@@ -23,6 +23,5 @@
   },
   "_source": "git://github.com/ckeditor/ckeditor-releases.git",
   "_target": "~4.4.1",
-  "_originalSource": "ckeditor",
-  "_direct": true
+  "_originalSource": "ckeditor"
 }
