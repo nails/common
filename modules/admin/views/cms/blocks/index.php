@@ -1,7 +1,6 @@
 <div class="group-cms blocks overview">
 
 	<p>
-		Browse editable blocks.
 		<?php
 
 			if ( user_has_permission( 'admin.cms.can_create_block' ) ) :
@@ -14,8 +13,7 @@
 	</p>
 	<p>
 		Blocks allow you to update a single block of content. Blocks might appear in more than one place so any updates will be reflected across
-		all instances. Blocks must have an <?=APP_DEFAULT_LANG_LABEL?> value defined, but translations can also be created, when viewing the site in another language (if
-		supported for this site) the appropriate language will be used.
+		all instances.
 	</p>
 
 	<hr />
@@ -32,12 +30,7 @@
 		<thead>
 			<tr>
 				<th class="title">Block Title &amp; Description</th>
-				<?php if ( count( $languages ) > 1 ) : ?>
-				<th class="default"><?=APP_DEFAULT_LANG_LABEL?> Value</th>
-				<th class="translations">Translations</th>
-				<?php else : ?>
 				<th class="default">Value</th>
-				<?php endif; ?>
 				<th class="actions">Actions</th>
 			</tr>
 		</thead>
@@ -62,26 +55,23 @@
 
 					// --------------------------------------------------------------------------
 
-					echo '<td class="default">';
-					echo character_limiter( strip_tags( $block->default_value ), 100 );
-					echo '</td>';
+					if ( count( $languages ) == 1 ) :
 
-					// --------------------------------------------------------------------------
+						echo '<td class="default">';
+						echo character_limiter( strip_tags( $block->default_value ), 100 );
+						echo '</td>';
 
-					if ( count( $languages ) > 1 ) :
+					else :
 
-						echo '<td class="translations">';
+						echo '<td class="default">';
 						echo '<ul>';
 						foreach ( $block->translations AS $variation ) :
 
-							if ( $variation->lang->slug == APP_DEFAULT_LANG_CODE )
-								continue;
-
-							// --------------------------------------------------------------------------
+							$_label = ! empty( $languages[$variation->language] ) ? $languages[$variation->language] : $variation->language;
 
 							echo '<li>';
-							echo '<span class="lang" title="' . $variation->lang->name . '">' . $variation->lang->name . '</span>';
-							echo '<span class="value">' . character_limiter( strip_tags( $variation->value, 100 ) ) . '</span>';
+								echo '<strong>' . $_label . ':</strong> ';
+								echo character_limiter( strip_tags( $variation->value ), 100 );
 							echo '</li>';
 
 						endforeach;

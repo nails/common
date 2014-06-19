@@ -20,79 +20,92 @@
 
 	<?=form_open()?>
 	<fieldset>
-	<?php if ( count( $languages ) > 1 ) : ?>
-		<legend>Translations</legend>
-		<p class="system-alert message">
-			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_LABEL?> version, however more translations can be
-			added if needed. Translations will only be used when viewing the site in a particular language (if supported).
-			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_LABEL?>.
-		</p>
+		<?php
+
+			if ( count( $languages ) > 1 ) :
+
+				?>
+				<legend>Translations</legend>
+				<p class="system-alert message">
+					<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_LABEL?> version, however more translations can be
+					added if needed. Translations will only be used when viewing the site in a particular language (if supported).
+					If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_LABEL?>.
+				</p>
 
 
-		<!--	DEFAULT LANG	-->
-		<fieldset class="translation" data-language="<?=$default_id?>">
-			<legend><?=APP_DEFAULT_LANG_LABEL?></legend>
+				<!--	DEFAULT LANG	-->
+				<fieldset class="translation" data-language="<?=$default_code?>">
+					<legend><?=APP_DEFAULT_LANG_LABEL?></legend>
+				<?php
 
-	<?php else : ?>
-		<legend>Value</legend>
-		<div class="translation" data-language="<?=$default_id?>">
+			else :
 
-	<?php endif; ?>
+				?>
+				<legend>Value</legend>
+				<div class="translation" data-language="<?=$default_code?>">
+				<?php
 
-			<?=form_hidden( 'translation[0][language]', $default_id )?>
-			<div class="system-alert error">
-				<strong>Oops!</strong> Please ensure a value is set.
-			</div>
-			<?php
+			endif;
 
-				//	Render the correct display
-				switch ( $block->type ) :
+			echo form_hidden( 'translation[0][language]', $default_code );
 
-					case 'plaintext' :
+			echo '<div class="system-alert error">';
+				echo '<strong>Oops!</strong> Please ensure a value is set.';
+			echo '</div>';
 
-						echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
+			//	Render the correct display
+			switch ( $block->type ) :
 
-					break;
+				case 'plaintext' :
 
-					// --------------------------------------------------------------------------
+					echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
 
-					case 'richtext' :
-
-						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="wysiwyg"' );
-
-					break;
-
-				endswitch;
+				break;
 
 				// --------------------------------------------------------------------------
 
-				//	Revisions
-				if ( $block->default_value_revisions ) :
+				case 'richtext' :
 
-					?>
-					<ul class="revisions">
-						<li class="summary">
-							<?=count( $block->default_value_revisions )?> Revisions
-							<a href="#" class="toggle-revisions right">Show/Hide</a>
+					echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="wysiwyg"' );
+
+				break;
+
+			endswitch;
+
+			// --------------------------------------------------------------------------
+
+			//	Revisions
+			if ( $block->default_value_revisions ) :
+
+				?>
+				<ul class="revisions">
+					<li class="summary">
+						<?=count( $block->default_value_revisions )?> Revisions
+						<a href="#" class="toggle-revisions right">Show/Hide</a>
+					</li>
+					<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
+						<li class="revision">
+							<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
+								<?=$revision->value ? $revision->value : '<span class="no-data">No Value</span>'?>
+							</span>
 						</li>
-						<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
-							<li class="revision">
-								<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
-									<?=$revision->value ? $revision->value : '<span class="no-data">No Value</span>'?>
-								</span>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-					<?php
+					<?php endforeach; ?>
+				</ul>
+				<?php
 
-				endif;
+			endif;
 
-			?>
-		<?php if ( count( $languages ) > 1 ) : ?>
-		</fieldset>
-		<?php else : ?>
-		</div>
-		<?php endif; ?>
+			if ( count( $languages ) > 1 ) :
+
+				echo '</fieldset>';
+
+			else :
+
+				echo '</div>';
+
+			endif;
+
+		?>
 
 		<!--	OTHER LANGUAGES	-->
 		<?php
@@ -100,16 +113,16 @@
 			$_counter = 1;
 			foreach ( $block->translations AS $translation ) :
 
-				if ( $translation->lang->slug == APP_DEFAULT_LANG_CODE )
+				if ( $translation->language == APP_DEFAULT_LANG_CODE )
 					continue;
 
 				?>
 				<fieldset class="translation" data-language="<?=$translation->language?>">
 					<legend>
-						<?=$translation->lang->name?>
+						<?=! empty( $languages[$translation->language] ) ? $languages[$translation->language] : $translation->language?>
 						<a href="#" class="remove-translation">Remove Translation</a>
 					</legend>
-					<?=form_hidden( 'translation[' . $_counter . '][language]', $translation->lang->id )?>
+					<?=form_hidden( 'translation[' . $_counter . '][language]', $translation->language )?>
 					<div class="system-alert error">
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>

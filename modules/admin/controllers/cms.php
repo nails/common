@@ -685,7 +685,7 @@ class NAILS_Cms extends NAILS_Admin_Controller
 
 		//	Fetch data
 		$this->data['languages']	= $this->language_model->get_all_enabled_flat();
-		$this->data['default_id']	= $this->language_model->get_default_id();
+		$this->data['default_code']	= $this->language_model->get_default_code();
 
 		// --------------------------------------------------------------------------
 

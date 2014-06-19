@@ -19,63 +19,27 @@
 		th.title,
 		td.title
 		{
-
+			width:200px;
 		}
 
 		th.default,
 		td.default
 		{
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow:ellipsis;
 			max-width:225px;
-		}
 
-		th.translations,
-		td.translations
-		{
-			max-width:305px;
-		}
-
-		td.translations
-		{
 			ul
 			{
 				list-style-type: none;
 				padding:0;
 				margin:0;
-				max-width:350px;
 
 				li
 				{
 					border:1px solid #CCC;
-					margin-bottom:3px;
+					margin-bottom:5px;
 					.rounded(4px);
 					background:#FFF;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow:ellipsis;
-					max-width:100%;
-
-					.lang,
-					.value
-					{
-
-					}
-
-					.lang
-					{
-						display:inline-block;
-						white-space: nowrap;
-						overflow: hidden;
-						text-overflow:ellipsis;
-
-						width:75px;
-						background:#EEE;
-						padding:3px 10px 5px 10px;
-						border-right:1px solid #DDD;
-						margin-right:7px;
-					}
+					padding:5px;
 				}
 
 				li:last-of-type
@@ -89,6 +53,7 @@
 		td.actions
 		{
 			text-align:center;
+			width:100px;
 		}
 	}
 

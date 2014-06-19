@@ -372,6 +372,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			$_temp						= new stdClass();
 			$_temp->id					= (int) $_blocks[$i]->id;
 			$_temp->value				= $_blocks[$i]->value;
+			$_temp->language			= $_blocks[$i]->language;
 			$_temp->created				= $_blocks[$i]->created;
 			$_temp->modified			= $_blocks[$i]->modified;
 			$_temp->user				= new stdClass();
