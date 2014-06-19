@@ -50,11 +50,11 @@
 		$_field['required']		= FALSE;
 
 		$_options = array();
-		$_options['undisclosed']	= 'Undisclosed';
-		$_options['male']			= 'Male';
-		$_options['female']			= 'Female';
-		$_options['transgender']	= 'Transgender';
-		$_options['other']			= 'Other';
+		$_options['UNDISCLOSED']	= 'Undisclosed';
+		$_options['MALE']			= 'Male';
+		$_options['FEMALE']			= 'Female';
+		$_options['TRANSGENDER']	= 'Transgender';
+		$_options['OTHER']			= 'Other';
 
 		echo form_field_dropdown( $_field, $_options );
 
