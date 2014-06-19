@@ -929,6 +929,17 @@
 			td
 			{
 				vertical-align: middle;
+
+				.thumbnail
+				{
+					float:left;
+					width:40px;
+				}
+
+				.content
+				{
+					margin-left:55px;
+				}
 			}
 
 			th.label,
@@ -940,7 +951,6 @@
 					width:32px;
 					height:32px;
 					padding:3px;
-					margin-right:7px;
 					.rounded(3px);
 					border:1px solid #DDD;
 					background:#FFF url(../img/loader/10px-TRANS.gif) center no-repeat;
@@ -950,6 +960,7 @@
 			td.ipn
 			{
 				width:100px;
+				text-align:center;
 			}
 
 			th.physical,
@@ -985,18 +996,7 @@
 			td.actions
 			{
 				width:95px;
-
-				form
-				{
-					display:inline;
-					width:auto;
-					margin:0;
-
-					.awesome
-					{
-						margin-bottom:0;
-					}
-				}
+				text-align:center;
 			}
 		}
 
@@ -1022,25 +1022,6 @@
 						padding:25px 25px;
 					}
 				}
-			}
-		}
-
-		&.categories,
-		&.tags
-		{
-			.product-count
-			{
-				display:inline-block;
-				margin-left:10px;
-				font-weight: bold;
-				background:#ECECEC;
-				padding:3px 5px;
-				top:-1px;
-				position:relative;
-				line-height:1em;
-				.rounded(3px);
-				font-size:0.85em;
-				border:1px solid #CCC;
 			}
 		}
 	}

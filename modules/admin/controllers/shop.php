@@ -118,49 +118,44 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$_permissions['vouchers_deactivate']	= 'Vouchers: Deactivate';
 
 		//	Attributes
-		$_permissions['attributes_create']		= 'Attributes: Create';
-		$_permissions['attributes_edit']		= 'Attributes: Edit';
-		$_permissions['attributes_delete']		= 'Attributes: Delete';
+		$_permissions['attribute_create']		= 'Attribute: Create';
+		$_permissions['attribute_edit']			= 'Attribute: Edit';
+		$_permissions['attribute_delete']		= 'Attribute: Delete';
 
 		//	Brands
-		$_permissions['brands_create']			= 'Brands: Create';
-		$_permissions['brands_edit']			= 'Brands: Edit';
-		$_permissions['brands_delete']			= 'Brands: Delete';
+		$_permissions['brand_create']			= 'Brand: Create';
+		$_permissions['brand_edit']				= 'Brand: Edit';
+		$_permissions['brand_delete']			= 'Brand: Delete';
 
 		//	Categories
-		$_permissions['categories_create']		= 'Categories: Create';
-		$_permissions['categories_edit']		= 'Categories: Edit';
-		$_permissions['categories_delete']		= 'Categories: Delete';
+		$_permissions['category_create']		= 'Category: Create';
+		$_permissions['category_edit']			= 'Category: Edit';
+		$_permissions['category_delete']		= 'Category: Delete';
 
 		//	Collections
-		$_permissions['collections_create']		= 'Collections: Create';
-		$_permissions['collections_edit']		= 'Collections: Edit';
-		$_permissions['collections_delete']		= 'Collections: Delete';
+		$_permissions['collection_create']		= 'Collection: Create';
+		$_permissions['collection_edit']		= 'Collection: Edit';
+		$_permissions['collection_delete']		= 'Collection: Delete';
 
 		//	Ranges
-		$_permissions['ranges_create']			= 'Ranges: Create';
-		$_permissions['ranges_edit']			= 'Ranges: Edit';
-		$_permissions['ranges_delete']			= 'Ranges: Delete';
+		$_permissions['range_create']			= 'Range: Create';
+		$_permissions['range_edit']				= 'Range: Edit';
+		$_permissions['range_delete']			= 'Range: Delete';
 
-		//	Attributes
-		$_permissions['tags_create']			= 'Tags: Create';
-		$_permissions['tags_edit']				= 'Tags: Edit';
-		$_permissions['tags_delete']			= 'Tags: Delete';
-
-		//	Attributes
-		$_permissions['attributes_create']		= 'Attributes: Create';
-		$_permissions['attributes_edit']		= 'Attributes: Edit';
-		$_permissions['attributes_delete']		= 'Attributes: Delete';
+		//	Tags
+		$_permissions['tag_create']				= 'Tag: Create';
+		$_permissions['tag_edit']				= 'Tag: Edit';
+		$_permissions['tag_delete']				= 'Tag: Delete';
 
 		//	Tax Rates
-		$_permissions['tax_rates_create']		= 'Tax Rates: Create';
-		$_permissions['tax_rates_edit']			= 'Tax Rates: Edit';
-		$_permissions['tax_rates_delete']		= 'Tax Rates: Delete';
+		$_permissions['tax_rate_create']		= 'Tax Rate: Create';
+		$_permissions['tax_rate_edit']			= 'Tax Rate: Edit';
+		$_permissions['tax_rate_delete']		= 'Tax Rate: Delete';
 
 		//	Product Types
-		$_permissions['product_types_create']	= 'Product Types: Create';
-		$_permissions['product_types_edit']		= 'Product Types: Edit';
-		$_permissions['product_types_delete']	= 'Product Types: Delete';
+		$_permissions['product_type_create']	= 'Product Type: Create';
+		$_permissions['product_type_edit']		= 'Product Type: Edit';
+		$_permissions['product_type_delete']	= 'Product Type: Delete';
 
 		// --------------------------------------------------------------------------
 
@@ -355,7 +350,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			//	No Product types, some need added, yo!
 			$this->session->set_flashdata( 'message', '<strong>Hey!</strong> No product types have been defined. You must set some before you can add inventory items.' );
-			redirect( 'admin/shop/manage/types?create=true' );
+			redirect( 'admin/shop/manage/product_type/create' );
 
 		endif;
 
@@ -445,7 +440,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		//	Assets
 		$this->asset->library( 'uploadify' );
 		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
-		$this->asset->load( 'mustache.js/mustache.js',										'BOWER' );
+		$this->asset->load( 'mustache.js/mustache.js',									'BOWER' );
 		$this->asset->load( 'nails.admin.shop.inventory.create_edit.min.js',			TRUE );
 
 		// --------------------------------------------------------------------------
@@ -619,9 +614,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	SEO
-		$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-		$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-		$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+		$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+		$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+		$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
 		// --------------------------------------------------------------------------
 
@@ -630,6 +625,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		$this->form_validation->set_message( 'numeric',				lang( 'fv_numeric' ) );
 		$this->form_validation->set_message( 'is_natural',			lang( 'fv_is_natural' ) );
 		$this->form_validation->set_message( 'is_natural_no_zero',	lang( 'fv_is_natural_no_zero' ) );
+		$this->form_validation->set_message( 'max_length',			lang( 'fv_max_length' ) );
 	}
 
 
@@ -757,7 +753,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			//	No Product types, some need added, yo!
 			$this->session->set_flashdata( 'message', '<strong>Hey!</strong> No product types have been defined. You must set some before you can add inventory items.' );
-			redirect( 'admin/shop/manage/types?create=true' );
+			redirect( 'admin/shop/manage/product_type/create' );
 
 		endif;
 
@@ -1952,19 +1948,19 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_attributes()
+	protected function _manage_attribute()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_attribute_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_attributes_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_attribute_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Attributes ';
 
-			$this->{'_manage_attributes_' . $_method}();
+			$this->{'_manage_attribute_' . $_method}();
 
 		else :
 
@@ -1977,7 +1973,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_attributes_index()
+	protected function _manage_attribute_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -1986,18 +1982,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/attributes/index',	$this->data );
-		$this->load->view( 'structure/footer',						$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( 'admin/shop/manage/attribute/index',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_attributes_create()
+	protected function _manage_attribute_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.attributes_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.attribute_create' ) ) :
 
 			unauthorised();
 
@@ -2023,7 +2019,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_attribute_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Attribute created successfully.' );
-					redirect( 'admin/shop/manage/attributes' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/attribute' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2053,7 +2049,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/attributes/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/attribute/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -2061,9 +2057,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_attributes_edit()
+	protected function _manage_attribute_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.attributes_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.attribute_edit' ) ) :
 
 			unauthorised();
 
@@ -2099,7 +2095,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_attribute_model->update( $this->data['attribute']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Attribute saved successfully.' );
-					redirect( 'admin/shop/manage/attributes' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/attribute' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2118,7 +2114,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['attribute']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['attribute']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -2129,7 +2125,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/attributes/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/attribute/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -2137,9 +2133,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_attributes_delete()
+	protected function _manage_attribute_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.attributes_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.attribute_delete' ) ) :
 
 			unauthorised();
 
@@ -2159,26 +2155,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/attributes' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/attribute' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_brands()
+	protected function _manage_brand()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_brand_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_brands_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_brand_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Brands ';
 
-			$this->{'_manage_brands_' . $_method}();
+			$this->{'_manage_brand_' . $_method}();
 
 		else :
 
@@ -2191,7 +2187,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_brands_index()
+	protected function _manage_brand_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -2200,18 +2196,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/brands/index',	$this->data );
-		$this->load->view( 'structure/footer',					$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/brand/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_brands_create()
+	protected function _manage_brand_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.brands_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.brand_create' ) ) :
 
 			unauthorised();
 
@@ -2227,11 +2223,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'logo_id',			'',	'xss_clean' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -2248,7 +2245,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					//	Redirect to clear form
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Brand created successfully.' );
-					redirect( 'admin/shop/manage/brands' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/brand' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2278,7 +2275,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/brands/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/brand/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -2286,9 +2283,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_brands_edit()
+	protected function _manage_brand_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.brands_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.brand_edit' ) ) :
 
 			unauthorised();
 
@@ -2314,18 +2311,20 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'logo_id',			'',	'xss_clean' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
 				$_data					= new stdClass();
 				$_data->label			= $this->input->post( 'label' );
-				$_data->logo_id			= $this->input->post( 'logo_id' ) ? $this->input->post( 'logo_id' ) : NULL;
+				$_data->logo_id			= (int) $this->input->post( 'logo_id' ) ? (int) $this->input->post( 'logo_id' ) : NULL;
 				$_data->description		= $this->input->post( 'description' );
+				$_data->is_active		= (bool) $this->input->post( 'is_active' );
 				$_data->seo_title		= $this->input->post( 'seo_title' );
 				$_data->seo_description	= $this->input->post( 'seo_description' );
 				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
@@ -2333,17 +2332,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_brand_model->update( $this->data['brand']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Brand saved successfully.' );
-					redirect( 'admin/shop/manage/brands' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/brand' . $this->data['is_fancybox'] );
 
 				else :
 
-					$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand. ' . $this->shop_brand_model->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the Brand. ' . $this->shop_brand_model->last_error();
 
 				endif;
 
 			else :
 
-				$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Brand.';
+				$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the Brand.';
 
 			endif;
 
@@ -2352,7 +2351,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['brand']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['brand']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -2363,7 +2362,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/brands/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/brand/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -2371,9 +2370,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_brands_delete()
+	protected function _manage_brand_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.brands_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.brand_delete' ) ) :
 
 			unauthorised();
 
@@ -2393,7 +2392,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/brands' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/brand' . $this->data['is_fancybox'] );
 	}
 
 
@@ -2401,19 +2400,19 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_categories()
+	protected function _manage_category()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_category_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_categories_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_category_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Categories ';
 
-			$this->{'_manage_categories_' . $_method}();
+			$this->{'_manage_category_' . $_method}();
 
 		else :
 
@@ -2426,7 +2425,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_categories_index()
+	protected function _manage_category_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -2434,34 +2433,19 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Page data
-		$this->data['page']->title = 'Manage &rsaquo; Categories';
-
-		// --------------------------------------------------------------------------
-
-		//	Override header?
-		if ( $this->data['is_fancybox'] ) :
-
-			$this->data['header_override'] = 'structure/header/blank';
-			$this->data['footer_override'] = 'structure/footer/blank';
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Load views
-		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/categories/index',	$this->data );
-		$this->load->view( 'structure/footer',						$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( 'admin/shop/manage/category/index',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_categories_create()
+	protected function _manage_category_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.categories_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.category_create' ) ) :
 
 			unauthorised();
 
@@ -2476,11 +2460,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'parent_id',			'',	'xss_clean' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -2495,7 +2480,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_category_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category created successfully.' );
-					redirect( 'admin/shop/manage/categories' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/category' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2514,7 +2499,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title = 'Manage &rsaquo; Categories &rsaquo; Create';
+		$this->data['page']->title = '&rsaquo; Create';
 
 		// --------------------------------------------------------------------------
 
@@ -2525,7 +2510,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/categories/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/category/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -2533,9 +2518,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_categories_edit()
+	protected function _manage_category_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.categories_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.category_edit' ) ) :
 
 			unauthorised();
 
@@ -2580,7 +2565,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_category_model->update( $this->data['category']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category saved successfully.' );
-					redirect( 'admin/shop/manage/categories' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/category' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2599,7 +2584,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title = 'Manage &rsaquo; Categories &rsaquo; ' . $this->data['category']->label;
+		$this->data['page']->title = 'Edit &rsaquo; ' . $this->data['category']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -2610,7 +2595,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/categories/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/category/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -2618,9 +2603,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_categories_delete()
+	protected function _manage_category_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.categories_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.category_delete' ) ) :
 
 			unauthorised();
 
@@ -2640,26 +2625,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/categories' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/category' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_collections()
+	protected function _manage_collection()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_collection_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_collections_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_collection_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Collections ';
 
-			$this->{'_manage_collections_' . $_method}();
+			$this->{'_manage_collection_' . $_method}();
 
 		else :
 
@@ -2672,7 +2657,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_collections_index()
+	protected function _manage_collection_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -2682,7 +2667,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/collections/index',	$this->data );
+		$this->load->view( 'admin/shop/manage/collection/index',	$this->data );
 		$this->load->view( 'structure/footer',						$this->data );
 	}
 
@@ -2690,9 +2675,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_collections_create()
+	protected function _manage_collection_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.collections_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.collection_create' ) ) :
 
 			unauthorised();
 
@@ -2706,12 +2691,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -2726,7 +2712,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_collection_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Collection created successfully.' );
-					redirect( 'admin/shop/manage/collections' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/collection' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2755,18 +2741,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/collections/edit',	$this->data );
-		$this->load->view( 'structure/footer',						$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( 'admin/shop/manage/collection/edit',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_collections_edit()
+	protected function _manage_collection_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.collections_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.collection_edit' ) ) :
 
 			unauthorised();
 
@@ -2790,12 +2776,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -2807,10 +2794,10 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				$_data->seo_keywords	= $this->input->post( 'seo_keywords' );
 				$_data->is_active		= (bool) $this->input->post( 'is_active' );
 
-				if ( $this->shop_collection_model->update( $_this->data['collection']->id, $_data ) ) :
+				if ( $this->shop_collection_model->update( $this->data['collection']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'succes', '<strong>Success!</strong> Collection saved successfully.' );
-					redirect( 'admin/shop/manage/collections' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/collection' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2829,7 +2816,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['collection']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['collection']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -2839,18 +2826,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',						$this->data );
-		$this->load->view( 'admin/shop/manage/collections/edit',	$this->data );
-		$this->load->view( 'structure/footer',						$this->data );
+		$this->load->view( 'structure/header',					$this->data );
+		$this->load->view( 'admin/shop/manage/collection/edit',	$this->data );
+		$this->load->view( 'structure/footer',					$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_collections_delete()
+	protected function _manage_collection_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.collections_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.collection_delete' ) ) :
 
 			unauthorised();
 
@@ -2870,26 +2857,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/collections' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/collection' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges()
+	protected function _manage_range()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_range_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_ranges_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_range_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Ranges ';
 
-			$this->{'_manage_ranges_' . $_method}();
+			$this->{'_manage_range_' . $_method}();
 
 		else :
 
@@ -2902,7 +2889,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges_index()
+	protected function _manage_range_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -2911,18 +2898,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/ranges/index',	$this->data );
-		$this->load->view( 'structure/footer',					$this->data );
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/shop/manage/range/index',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges_create()
+	protected function _manage_range_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.ranges_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.range_create' ) ) :
 
 			unauthorised();
 
@@ -2936,12 +2923,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -2956,7 +2944,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_range_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Range created successfully.' );
-					redirect( 'admin/shop/manage/ranges' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/range' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -2986,7 +2974,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/ranges/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/range/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -2994,9 +2982,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges_edit()
+	protected function _manage_range_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.ranges_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.range_edit' ) ) :
 
 			unauthorised();
 
@@ -3020,12 +3008,13 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_active',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -3040,11 +3029,11 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_range_model->update( $this->data['range']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Range saved successfully.' );
-					redirect( 'admin/shop/manage/ranges' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/range' . $this->data['is_fancybox'] );
 
 				else :
 
-					$this->data['error']	= '<strong>Sorry,</strong> there was a problem saving the Range. ' . $this->shop_range_model->last_error();
+					$this->data['error'] = '<strong>Sorry,</strong> there was a problem saving the Range. ' . $this->shop_range_model->last_error();
 
 				endif;
 
@@ -3059,7 +3048,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['range']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['range']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -3070,7 +3059,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/ranges/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/range/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -3078,9 +3067,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_ranges_delete()
+	protected function _manage_range_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.ranges_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.range_delete' ) ) :
 
 			unauthorised();
 
@@ -3100,26 +3089,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/ranges' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/range' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tags()
+	protected function _manage_tag()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_tag_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_tags_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_tag_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Tags ';
 
-			$this->{'_manage_tags_' . $_method}();
+			$this->{'_manage_tag_' . $_method}();
 
 		else :
 
@@ -3132,7 +3121,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tags_index()
+	protected function _manage_tag_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
@@ -3142,7 +3131,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/tags/index',	$this->data );
+		$this->load->view( 'admin/shop/manage/tag/index',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -3150,9 +3139,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tags_create()
+	protected function _manage_tag_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.tags_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tag_create' ) ) :
 
 			unauthorised();
 
@@ -3166,11 +3155,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -3184,7 +3174,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_tag_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag created successfully.' );
-					redirect( 'admin/shop/manage/tags' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/tag' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3214,7 +3204,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/tags/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/tag/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -3222,9 +3212,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tags_edit()
+	protected function _manage_tag_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.tags_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tag_edit' ) ) :
 
 			unauthorised();
 
@@ -3248,11 +3238,12 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
-			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_title',			'',	'xss_clean|max_length[150]' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean|max_length[300]' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean|max_length[150]' );
 
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'required',	lang( 'fv_required' ) );
+			$this->form_validation->set_message( 'max_length',	lang( 'fv_max_length' ) );
 
 			if ( $this->form_validation->run() ) :
 
@@ -3266,7 +3257,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_tag_model->update( $this->data['tag']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag saved successfully.' );
-					redirect( 'admin/shop/manage/tags' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/tag' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3285,7 +3276,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['tag']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['tag']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -3296,7 +3287,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/tags/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/tag/edit',	$this->data );
 		$this->load->view( 'structure/footer',				$this->data );
 	}
 
@@ -3304,9 +3295,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tags_delete()
+	protected function _manage_tag_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.tags_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tag_delete' ) ) :
 
 			unauthorised();
 
@@ -3326,26 +3317,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/tags' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/tag' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tax_rates()
+	protected function _manage_tax_rate()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_tax_rate_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_tax_rates_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_tax_rate_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Tax Rates ';
 
-			$this->{'_manage_tax_rates_' . $_method}();
+			$this->{'_manage_tax_rate_' . $_method}();
 
 		else :
 
@@ -3358,17 +3349,17 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tax_rates_index()
+	protected function _manage_tax_rate_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
-		$this->data['rates'] = $this->shop_tax_rate_model->get_all( NULL, NULL, $_data );
+		$this->data['tax_rates'] = $this->shop_tax_rate_model->get_all( NULL, NULL, $_data );
 
 		// --------------------------------------------------------------------------
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/tax_rates/index',	$this->data );
+		$this->load->view( 'admin/shop/manage/tax_rate/index',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -3376,9 +3367,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tax_rates_create()
+	protected function _manage_tax_rate_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.tax_rates_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tax_rate_create' ) ) :
 
 			unauthorised();
 
@@ -3405,7 +3396,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_tax_rate_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tax Rate created successfully.' );
-					redirect( 'admin/shop/manage/tax_rates' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/tax_rate' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3435,7 +3426,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/tax_rates/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/tax_rate/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -3443,9 +3434,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tax_rates_edit()
+	protected function _manage_tax_rate_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.tax_rates_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tax_rate_edit' ) ) :
 
 			unauthorised();
 
@@ -3482,7 +3473,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_tax_rate_model->update( $this->data['tax_rate']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tax Rate saved successfully.' );
-					redirect( 'admin/shop/manage/tax_rates' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/tax_rate' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3501,7 +3492,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['tax_rate']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['tax_rate']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -3512,7 +3503,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		//	Load views
 		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/shop/manage/tax_rates/edit',	$this->data );
+		$this->load->view( 'admin/shop/manage/tax_rate/edit',	$this->data );
 		$this->load->view( 'structure/footer',					$this->data );
 	}
 
@@ -3520,9 +3511,9 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_tax_rates_delete()
+	protected function _manage_tax_rate_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.tax_rates_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.tax_rate_delete' ) ) :
 
 			unauthorised();
 
@@ -3542,26 +3533,26 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/tax_rates' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/tax_rate' . $this->data['is_fancybox'] );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_types()
+	protected function _manage_product_type()
 	{
 		//	Load model
 		$this->load->model( 'shop/shop_product_type_model' );
 
 		$_method = $this->uri->segment( 5 ) ? $this->uri->segment( 5 ) : 'index';
 
-		if ( method_exists( $this, '_manage_types_' . $_method ) ) :
+		if ( method_exists( $this, '_manage_product_type_' . $_method ) ) :
 
 			//	Extend the title
 			$this->data['page']->title .= 'Product Types ';
 
-			$this->{'_manage_types_' . $_method}();
+			$this->{'_manage_product_type_' . $_method}();
 
 		else :
 
@@ -3574,27 +3565,27 @@ class NAILS_Shop extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_types_index()
+	protected function _manage_product_type_index()
 	{
 		//	Fetch data
 		$_data = array( 'include_count' => TRUE );
-		$this->data['types'] = $this->shop_product_type_model->get_all( NULL, NULL, $_data );
+		$this->data['product_types'] = $this->shop_product_type_model->get_all( NULL, NULL, $_data );
 
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/types/index',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( 'admin/shop/manage/product_type/index',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_types_create()
+	protected function _manage_product_type_create()
 	{
-		if ( ! user_has_permission( 'admin.shop.product_types_create' ) ) :
+		if ( ! user_has_permission( 'admin.shop.product_type_create' ) ) :
 
 			unauthorised();
 
@@ -3606,7 +3597,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 			$this->load->library( 'form_validation' );
 
-			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . '.label]' );
+			$this->form_validation->set_rules( 'label',				'',	'xss_clean|required|is_unique[' . NAILS_DB_PREFIX . 'shop_product_type.label]' );
 			$this->form_validation->set_rules( 'description',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'is_physical',		'',	'xss_clean' );
 			$this->form_validation->set_rules( 'ipn_method',		'',	'xss_clean' );
@@ -3630,7 +3621,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 					//	Redirect to clear form
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product Type created successfully.' );
-					redirect( 'admin/shop/manage/types' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/manage/product_type' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3659,18 +3650,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/types/edit',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( 'admin/shop/manage/product_type/edit',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_types_edit()
+	protected function _manage_product_type_edit()
 	{
-		if ( ! user_has_permission( 'admin.shop.product_types_edit' ) ) :
+		if ( ! user_has_permission( 'admin.shop.product_type_edit' ) ) :
 
 			unauthorised();
 
@@ -3714,7 +3705,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 				if ( $this->shop_product_type_model->update( $this->data['product_type']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Product Type saved successfully.' );
-					redirect( 'admin/shop/types' . $this->data['is_fancybox'] );
+					redirect( 'admin/shop/product_type' . $this->data['is_fancybox'] );
 
 				else :
 
@@ -3733,7 +3724,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page data
-		$this->data['page']->title .= '&rsaquo; ' . $this->data['product_type']->label;
+		$this->data['page']->title .= 'Edit &rsaquo; ' . $this->data['product_type']->label;
 
 		// --------------------------------------------------------------------------
 
@@ -3743,18 +3734,18 @@ class NAILS_Shop extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/shop/manage/types/edit',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
+		$this->load->view( 'structure/header',						$this->data );
+		$this->load->view( 'admin/shop/manage/product_type/edit',	$this->data );
+		$this->load->view( 'structure/footer',						$this->data );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _manage_types_delete()
+	protected function _manage_product_type_delete()
 	{
-		if ( ! user_has_permission( 'admin.shop.product_types_delete' ) ) :
+		if ( ! user_has_permission( 'admin.shop.product_type_delete' ) ) :
 
 			unauthorised();
 
@@ -3774,7 +3765,7 @@ class NAILS_Shop extends NAILS_Admin_Controller
 
 		endif;
 
-		redirect( 'admin/shop/manage/types' . $this->data['is_fancybox'] );
+		redirect( 'admin/shop/manage/product_type' . $this->data['is_fancybox'] );
 	}
 
 

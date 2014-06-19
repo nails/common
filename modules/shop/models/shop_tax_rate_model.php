@@ -21,8 +21,9 @@ class NAILS_Shop_tax_rate_model extends NAILS_Model
 	{
 		parent::__construct();
 
-		$this->_table			= NAILS_DB_PREFIX . 'shop_tax_rate';
-		$this->_table_prefix	= 'str';
+		$this->_table				= NAILS_DB_PREFIX . 'shop_tax_rate';
+		$this->_table_prefix		= 'str';
+		$this->_destructive_delete	= FALSE;
 	}
 
 

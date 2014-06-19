@@ -845,31 +845,28 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		var _url	= {};
 
 		_target.types			= '#tab-basics select.type_id';
-		_url.types				= window.SITE_URL + 'admin/shop/manage/types?is_fancybox=1';
+		_url.types				= window.SITE_URL + 'admin/shop/manage/product_type?is_fancybox=1';
 
 		_target.brands			= '#tab-basics select.brands';
-		_url.brands				= window.SITE_URL + 'admin/shop/manage/brands?is_fancybox=1';
+		_url.brands				= window.SITE_URL + 'admin/shop/manage/brand?is_fancybox=1';
 
 		_target.categories		= '#tab-basics select.categories';
-		_url.categories			= window.SITE_URL + 'admin/shop/manage/categories?is_fancybox=1';
+		_url.categories			= window.SITE_URL + 'admin/shop/manage/category?is_fancybox=1';
 
 		_target.tags			= '#tab-basics select.tags';
-		_url.tags				= window.SITE_URL + 'admin/shop/manage/tags?is_fancybox=1';
+		_url.tags				= window.SITE_URL + 'admin/shop/manage/tag?is_fancybox=1';
 
 		_target.tax_rates		= '#tab-basics select.tax_rate_id';
-		_url.tax_rates			= window.SITE_URL + 'admin/shop/manage/tax_rates?is_fancybox=1';
+		_url.tax_rates			= window.SITE_URL + 'admin/shop/manage/tax_rate?is_fancybox=1';
 
 		_target.attributes		= '#tab-attributes select.attributes';
-		_url.attributes			= window.SITE_URL + 'admin/shop/manage/attributes?is_fancybox=1';
+		_url.attributes			= window.SITE_URL + 'admin/shop/manage/attribute?is_fancybox=1';
 
 		_target.ranges			= '#tab-ranges-collections select.ranges';
-		_url.ranges				= window.SITE_URL + 'admin/shop/manage/ranges?is_fancybox=1';
+		_url.ranges				= window.SITE_URL + 'admin/shop/manage/range?is_fancybox=1';
 
 		_target.collections		= '#tab-ranges-collections select.collections';
-		_url.collections		= window.SITE_URL + 'admin/shop/manage/collections?is_fancybox=1';
-
-		_target.courier_method	= '#tab-variations select.shipping_methods';
-		_url.courier_method		= window.SITE_URL + 'admin/shop/manage/shipping_methods?is_fancybox=1';
+		_url.collections		= window.SITE_URL + 'admin/shop/manage/collection?is_fancybox=1';
 
 		// --------------------------------------------------------------------------
 

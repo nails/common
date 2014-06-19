@@ -107,6 +107,13 @@ class NAILS_Shop_category_model extends NAILS_Model
 
 			endif;
 
+			if ( $_data->parent_id == $id ) :
+
+				$this->_set_error( '"parent_id" cannot be the same as the category\'s ID.' );
+				return FALSE;
+
+			endif;
+
 		endif;
 
 		if ( isset( $data->description ) ) :

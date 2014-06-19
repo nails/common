@@ -21,8 +21,9 @@ class NAILS_Shop_product_type_model extends NAILS_Model
 	{
 		parent::__construct();
 
-		$this->_table			= NAILS_DB_PREFIX . 'shop_product_type';
-		$this->_table_prefix	= 'spt';
+		$this->_table				= NAILS_DB_PREFIX . 'shop_product_type';
+		$this->_table_prefix		= 'spt';
+		$this->_destructive_delete	= FALSE;
 	}
 
 
