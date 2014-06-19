@@ -174,7 +174,7 @@ class NAILS_Logs extends NAILS_Admin_Controller
 			//	=======================================
 			$this->data['pagination']				= new stdClass();
 			$this->data['pagination']->page			= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
-			$this->data['pagination']->per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 5;
+			$this->data['pagination']->per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 50;
 			$this->data['pagination']->total_rows	= $this->event->count_all( $_where );
 
 			//	Fetch all the items for this page
