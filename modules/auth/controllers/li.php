@@ -26,7 +26,7 @@ class NAILS_Li extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Ensure the sub-module is enabled
-		if ( ! module_is_enabled( 'auth' ) && app_setting( 'social_signin_li_enabled' ) ) :
+		if ( app_setting( 'social_signin_li_enabled' ) ) :
 
 			show_404();
 

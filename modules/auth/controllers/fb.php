@@ -41,7 +41,7 @@ class NAILS_Fb extends NAILS_Auth_Controller
 		// --------------------------------------------------------------------------
 
 		//	Ensure the sub-module is enabled
-		if ( ! module_is_enabled( 'auth' ) && app_setting( 'social_signin_fb_enabled' ) ) :
+		if ( app_setting( 'social_signin_fb_enabled' ) ) :
 
 			show_404();
 

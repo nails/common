@@ -130,7 +130,7 @@ class NAILS_Login extends NAILS_Auth_Controller
 				//	Attempt the log in
 				$_identifier	= $this->input->post( 'identifier' );
 				$_password		= $this->input->post( 'password' );
-				$_remember		= $this->input->post( 'remember' );
+				$_remember		= (bool) $this->input->post( 'remember' );
 
 				$_login = $this->auth_model->login( $_identifier, $_password, $_remember );
 

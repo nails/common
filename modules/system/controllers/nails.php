@@ -64,15 +64,7 @@ class NAILS_Nails extends NAILS_System_Controller
 	{
 		if ( ! $this->user_model->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
 
-			if ( module_is_enabled( 'auth' ) ) :
-
-				unauthorised();
-
-			else :
-
-				show_404();
-
-			endif;
+			show_404();
 
 		endif;
 

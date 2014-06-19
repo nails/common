@@ -39,16 +39,6 @@ class NAILS_Auth extends NAILS_API_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'auth' ) ) :
-
-			//	Cancel execution, module isn't enabled
-			$this->_method_not_found( $ths->uri->segment( 2 ) );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Where are we returning user to?
 		$this->data['return_to'] = $this->input->get( 'return_to' );
 	}

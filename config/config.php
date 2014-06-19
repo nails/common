@@ -257,8 +257,8 @@ $config['encryption_key'] = md5( $_app_private_key );
 |
 */
 $config['sess_cookie_name']		= 'nailssession';
-$config['sess_expiration']		= 7200;
-$config['sess_expire_on_close']	= FALSE;
+$config['sess_expiration']		= 0;
+$config['sess_expire_on_close']	= TRUE;
 $config['sess_encrypt_cookie']	= TRUE;
 $config['sess_use_database']	= TRUE;
 $config['sess_table_name']		= 'nails_session';

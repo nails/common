@@ -229,6 +229,10 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$_js .= '_nails_forms = new NAILS_Forms();';
 		$_js .= '}';
 
+		$_js .= 'if ( typeof( NAILS_API ) === \'function\' ){';
+		$_js .= '_nails_api = new NAILS_API();';
+		$_js .= '}';
+
 		$_js .= '});';
 
 		$this->asset->inline( '<script>' . $_js . '</script>' );

@@ -147,7 +147,7 @@
 				<div class="<?=BS_COL_SM_OFFSET_3?> <?=BS_COL_SM_9?>">
 					<div class="checkbox">
 						<label class="popover-hover" title="Keep your account secure" data-content="Uncheck this when using a shared computer.">
-							<input type="checkbox" name="rememberme" <?=set_checkbox( 'rememberme' )?>> Remember me
+							<input type="checkbox" name="remember" <?=set_checkbox( 'remember' )?>> Remember me
 						</label>
 					</div>
 				</div>

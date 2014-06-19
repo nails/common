@@ -127,7 +127,7 @@ class NAILS_User_model extends NAILS_Model
 	 **/
 	protected function _login_remembered_user()
 	{
-		//	Is rememebr me functionality enabled?
+		//	Is remember me functionality enabled?
 		$this->config->load( 'auth' );
 
 		if ( ! $this->config->item( 'auth_enable_remember_me' ) ) :
@@ -418,6 +418,9 @@ class NAILS_User_model extends NAILS_Model
 
 		//	Reset the active_user
 		$this->clear_active_user();
+
+		//	Remove any rememebr me cookie
+		$this->clear_remember_cookie();
 	}
 
 
@@ -2153,7 +2156,6 @@ class NAILS_User_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Generate a code to remember the user by and save it to the DB
-
 		$_salt = $this->encrypt->encode( sha1( $id . $password . $email . APP_PRIVATE_KEY. time() ), APP_PRIVATE_KEY );
 
 		$this->db->set( 'remember_code', $_salt );
