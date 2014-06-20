@@ -256,7 +256,7 @@ NAILS_Admin_Blog_Create_Edit = function()
 		$('#file_upload').uploadify({
 			'debug': false,
 			'auto': true,
-			'swf': window.SITE_URL + 'vendor/shed/nails/assets/swf/jquery.uploadify/uploadify.swf',
+			'swf': window.SITE_URL + 'vendor/nailsapp/common/assets/swf/jquery.uploadify/uploadify.swf',
 			'queueID': 'gallery-items',
 			'uploader': window.SITE_URL + 'api/cdnapi/object_create/script.php',
 			'fileSizeLimit': 2048,

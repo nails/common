@@ -1,6 +1,6 @@
 {
-	"name": "shed/nails",
-	"version": "0.1.0",
+	"name": "nailsapp/common",
+	"version": "0.2.1",
 	"authors": [
 		"Pablo de la Pena <p@shedcollective.org>"
 	],

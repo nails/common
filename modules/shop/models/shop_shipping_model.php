@@ -47,8 +47,8 @@ class NAILS_Shop_shipping_model extends NAILS_Model
 
 		//	'Official' modules
 		$this->_module_locations[]	= array(
-										'path' => FCPATH . 'vendor/shed',
-										'url' => site_url( 'vendor/shed', page_is_secure() )
+										'path' => FCPATH . 'vendor/nailsapp',
+										'url' => site_url( 'vendor/nailsapp', page_is_secure() )
 									);
 
 		//	App Modules

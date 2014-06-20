@@ -14,7 +14,7 @@ class NAILS_System_startup
 	public function define_constants()
 	{
 		//	Define some generic Nails constants, allow dev to override these - just in case
-		if ( ! defined( 'NAILS_VERSION' ) )					define( 'NAILS_VERSION',				'0.2.0' );
+		if ( ! defined( 'NAILS_VERSION' ) )					define( 'NAILS_VERSION',				'0.2.1' );
 		if ( ! defined( 'NAILS_PACKAGE_NAME' ) )			define( 'NAILS_PACKAGE_NAME',			'Nails' );
 		if ( ! defined( 'NAILS_PACKAGE_URL' ) )				define( 'NAILS_PACKAGE_URL',			'http://nailsapp.co.uk/' );
 		if ( ! defined( 'NAILS_APP_STRAPLINE' ) )			define( 'NAILS_APP_STRAPLINE',			'A webapp powered by <a href="' . NAILS_PACKAGE_URL . '">' . NAILS_PACKAGE_NAME . '</a>, ooh la la!' );
@@ -140,11 +140,11 @@ class NAILS_System_startup
 
 			if ( APP_SSL_ROUTING && page_is_secure() ) :
 
-				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/' );
+				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/common/' );
 
 			else :
 
-				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/' );
+				define( 'NAILS_URL', BASE_URL . 'vendor/nailsapp/common/' );
 
 			endif;
 

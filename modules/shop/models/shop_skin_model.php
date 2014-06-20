@@ -29,8 +29,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_available			= NULL;
-		$this->_skin_extension		= '-shop-skin';
+		$this->_available	= NULL;
+		$this->_skin_prefix	= 'skin-shop-';
 
 		//	Skin locations
 		//	This must be an array with 2 indexes:
@@ -47,8 +47,8 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 		//	'Official' skins
 		$this->_skin_locations[]	= array(
-										'path' => FCPATH . 'vendor/shed',
-										'url' => site_url( 'vendor/shed', page_is_secure() )
+										'path' => FCPATH . 'vendor/nailsapp',
+										'url' => site_url( 'vendor/nailsapp', page_is_secure() )
 									);
 
 		//	App Skins
@@ -121,7 +121,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 				foreach( $_skins AS $skin ) :
 
 					//	Filter out non-skins
-					$_pattern = '/^(.*)' . preg_quote( $this->_skin_extension, '/' ) . '$/';
+					$_pattern = '/^' . preg_quote( $this->_skin_prefix, '/' ) . '(.*)$/';
 
 					if ( ! preg_match( $_pattern, $skin ) ) :
 
@@ -227,7 +227,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 					//	All good!
 
 					//	Set the slug
-					$_config->slug	= preg_replace( '/^(.*?)' . preg_quote( $this->_skin_extension ) . '$/', '$1', $skin );
+					$_config->slug	= preg_replace( '/^' . preg_quote( $this->_skin_prefix, '/' ) . '(.*?)$/', '$1', $skin );
 
 					//	Set the path
 					$_config->path	= $_path . $skin . '/';
