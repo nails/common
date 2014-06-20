@@ -2,6 +2,12 @@
 
 ---
 
+## Version 0.2.1
+
+Release date: 20th June 2014
+
+- Bug fix; looking for old package name
+
 ## Version 0.2.0
 
 Release date: 20th June 2014
