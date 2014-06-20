@@ -41,27 +41,27 @@ class MX_Config extends CI_Config
 	// --------------------------------------------------------------------------
 
 
-	public function site_url( $uri = '' )
+	public function site_url( $uri = '', $force_secure = FALSE )
 	{
 		//	Prepare the URI as normal
 		$_uri = parent::site_url( $uri );
 
 		// --------------------------------------------------------------------------
 
+		//	If forcing secure just return now
+		if ( $force_secure ) :
+
+			return preg_replace( '#^' . BASE_URL . '#', SECURE_BASE_URL, $_uri );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	If SSL routing is enabled then parse the URL
-		if ( SSL_ROUTING ) :
+		if ( APP_SSL_ROUTING ) :
 
-			//	Only swap onto 'real' SSL on the live box.
-			if ( ENVIRONMENT == 'production' ) :
-
-				$_prefix = 'https://';
-				$this->load( 'routes_ssl' );
-
-			else :
-
-				$_prefix = 'http://';
-
-			endif;
+			$_prefix = 'https://';
+			$this->load( 'routes_ssl' );
 
 			// --------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ class MX_Config extends CI_Config
 			// --------------------------------------------------------------------------
 
 			//	Analyse target URL, if it matches a route then change it to be an https URL
-			$i = 0;
+			$_is_secure_route = FALSE;
 			foreach ( $this->routes_ssl AS $route ) :
 
 				//	Swap out the pseudo regex's
@@ -89,9 +89,21 @@ class MX_Config extends CI_Config
 				$route = str_replace( ':num', '[0-9]*', $route );
 
 				//	See if any of the routes match, if they do halt the loop.
-				if ( preg_match( '#' . $route . '#', $_uri ) ) :
+				//	We need to do an optional prefix for the hosts
 
-					$i++;
+				if ( BASE_URL !== SECURE_BASE_URL ) :
+
+					$_pattern = '#^(' . preg_quote( BASE_URL, '#' ) .'|' . preg_quote( SECURE_BASE_URL, '#' ) . ')?' . $route . '#';
+
+				else :
+
+					$_pattern = '#^(' . preg_quote( BASE_URL, '#' ) . ')?' . $route . '#';
+
+				endif;
+
+				if ( preg_match( $_pattern, $_uri ) ) :
+
+					$_is_secure_route = TRUE;
 					break;
 
 				endif;
@@ -105,14 +117,24 @@ class MX_Config extends CI_Config
 			//	calls for anything to the assets folder or the favicon (so secure content
 			//	is shown).
 
-			if (
-				   ( $i )
-				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'assets.*#', $_uri ) )
-				|| ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' && preg_match( '#' . $this->config['base_url'] . 'favicon\.ico#', $_uri ) )
-			) :
+			//	HTTPS is considered on if the domain matches that given in SECURE_BASE_URL
+			//	or if the page is being served through HTTPS
 
-				//	SSL is off and there was a match, turn SSL on
-				$_uri = preg_replace( '/^http:\/\//', $_prefix, $_uri );
+			if ( isset( $_SERVER ) ) :
+
+				$_page_is_secure = page_is_secure();
+
+				if (
+					   ( $_is_secure_route )
+					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'assets.*#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . NAILS_ASSETS_URL . '.*#', $_uri ) )
+					|| ( $_page_is_secure && preg_match( '#^' . BASE_URL . 'favicon\.ico#', $_uri ) )
+				) :
+
+					//	SSL is off and there was a match, turn SSL on
+					$_uri = preg_replace( '#^' . BASE_URL . '#', SECURE_BASE_URL, $_uri );
+
+				endif;
 
 			endif;
 
@@ -137,14 +159,7 @@ class MX_Config extends CI_Config
 
 		if ($path === FALSE)
 		{
-
-			//	Pablo: Flip reverse the config array so that application overrides package
-			$this->_config_paths = array_reverse( $this->_config_paths );
-
 			parent::load($file, $use_sections, $fail_gracefully);
-
-			//	Pablo: Then flip it back again so it's back to normal.
-			$this->_config_paths = array_reverse( $this->_config_paths );
 
 			return $this->item($file);
 		}
@@ -169,5 +184,22 @@ class MX_Config extends CI_Config
 			unset($config);
 			return $this->item($file);
 		}
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Secure Base URL
+	 * Returns secure_base_url [. uri_string]
+	 *
+	 * @access public
+	 * @param string $uri
+	 * @return string
+	 */
+	function secure_base_url($uri = '')
+	{
+		return SECURE_BASE_URL.ltrim($this->_uri_string($uri), '/');
 	}
 }

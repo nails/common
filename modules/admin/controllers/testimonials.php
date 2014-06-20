@@ -1,10 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Testimonials Admin
+ * Name:		Admin: Testimonials
+ * Description:	Manage testimonials
  *
- * Description:	Manage events
- * 
  **/
 
 //	Include Admin_Controller; executes common admin functionality.
@@ -12,12 +11,12 @@ require_once '_admin.php';
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
- 
+
 class NAILS_Testimonials extends NAILS_Admin_Controller
 {
 
@@ -27,31 +26,30 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
 		$d = new stdClass();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_testimonials', RENDER_LANG_SLUG );
-		
+		get_instance()->lang->load( 'admin_testimonials' );
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Configurations
 		$d->name = lang( 'testimonials_module_name' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Navigation options
 		$d->funcs				= array();
 		$d->funcs['index']		= lang( 'testimonials_nav_index' );
 		$d->funcs['create']		= lang( 'testimonials_nav_create' );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Only announce the controller if the user has permisison to know about it
 		return self::_can_access( $d, __FILE__ );
 	}
@@ -66,7 +64,6 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -74,7 +71,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'testimonials/testimonial_model', 'testimonial' );
+		$this->load->model( 'testimonials/testimonial_model' );
 	}
 
 
@@ -87,19 +84,18 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function index()
 	{
 		//	Page Title
 		$this->data['page']->title = lang( 'testimonials_index_title' );
-		
-		// --------------------------------------------------------------------------
-
-		$this->data['testimonials'] = $this->testimonial->get_all();
 
 		// --------------------------------------------------------------------------
-		
+
+		$this->data['testimonials'] = $this->testimonial_model->get_all();
+
+		// --------------------------------------------------------------------------
+
 		//	Load views
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/testimonials/index',	$this->data );
@@ -113,8 +109,8 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 	public function create()
 	{
 		//	Page Title
-		$this->data['page']->title = lang( 'testimonials_create_title' );;
-		
+		$this->data['page']->title = lang( 'testimonials_create_title' );
+
 		// --------------------------------------------------------------------------
 
 		if ( $this->input->post() ) :
@@ -134,7 +130,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 				$_data['quote_by']	= $this->input->post( 'quote_by' );
 				$_data['order']		= (int) $this->input->post( 'order' );
 
-				if ( $this->testimonial->create( $_data ) ) :
+				if ( $this->testimonial_model->create( $_data ) ) :
 
 					$this->session->set_flashdata( 'success', lang( 'testimonials_create_ok' ) );
 					redirect( 'admin/testimonials' );
@@ -168,7 +164,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 	public function edit()
 	{
-		$this->data['testimonial'] = $this->testimonial->get_by_id( $this->uri->segment( 4 ) );
+		$this->data['testimonial'] = $this->testimonial_model->get_by_id( $this->uri->segment( 4 ) );
 
 		if ( ! $this->data['testimonial'] ) :
 
@@ -181,8 +177,8 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Page Title
-		$this->data['page']->title = lang( 'testimonials_edit_title' );;
-		
+		$this->data['page']->title = lang( 'testimonials_edit_title' );
+
 		// --------------------------------------------------------------------------
 
 		if ( $this->input->post() ) :
@@ -202,7 +198,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 				$_data['quote_by']	= $this->input->post( 'quote_by' );
 				$_data['order']		= (int) $this->input->post( 'order' );
 
-				if ( $this->testimonial->update( $this->data['testimonial']->id, $_data ) ) :
+				if ( $this->testimonial_model->update( $this->data['testimonial']->id, $_data ) ) :
 
 					$this->session->set_flashdata( 'success', lang( 'testimonials_edit_ok' ) );
 					redirect( 'admin/testimonials' );
@@ -223,7 +219,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Load views
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/testimonials/edit',	$this->data );
@@ -236,7 +232,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 	public function delete()
 	{
-		$_testimonial = $this->testimonial->get_by_id( $this->uri->segment( 4 ) );
+		$_testimonial = $this->testimonial_model->get_by_id( $this->uri->segment( 4 ) );
 
 		if ( ! $_testimonial ) :
 
@@ -248,7 +244,7 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->testimonial->delete( $_testimonial->id ) ) :
+		if ( $this->testimonial_model->delete( $_testimonial->id ) ) :
 
 			$this->session->set_flashdata( 'success', lang( 'testimonials_delete_ok' ) );
 
@@ -270,28 +266,28 @@ class NAILS_Testimonials extends NAILS_Admin_Controller
 
 /**
  * OVERLOADING NAILS' ADMIN MODULES
- * 
+ *
  * The following block of code makes it simple to extend one of the core admin
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ * declaring this helper class below; the helper gets instantiated et voila.
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_DASHBOARD' ) ) :
 
 	class Testimonials extends NAILS_Testimonials
@@ -302,4 +298,4 @@ endif;
 
 
 /* End of file testimonials.php */
-/* Location: ./application/modules/admin/controllers/testimonials.php */
+/* Location: ./modules/admin/controllers/testimonials.php */

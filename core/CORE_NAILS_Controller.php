@@ -9,11 +9,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	/**
 	 * Build the main framework. All autoloaded items have been loaded and
-	 * instanciated by this point and are safe to use.
+	 * instantiated by this point and are safe to use.
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -22,52 +21,30 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Error styles
-		$_styles = <<<EOT
+		//	Set the level of error reporting
+		$this->_set_error_reporting();
 
-			<style type="text/css">
+		// --------------------------------------------------------------------------
 
-				p {font-family:monospace;margin:20px 10px;}
-				strong { color:red;}
-				code { padding:5px;border:1px solid #CCC;background:#EEE }
-
-			</style>
-
-EOT;
-
-		//	Include the environment Nails config
-		if ( ! file_exists( NAILS_PATH . '/config/_nails.php' ) ) :
-
-			echo $_styles;
-			echo '<p><strong>ERROR:</strong> Nails. environment not correctly configured; config file not found.</p>';
-			exit( 0 );
-
-		endif;
-
-		require_once( NAILS_PATH . '/config/_nails.php' );
+		//	Set the default content-type
+		$this->output->set_content_type( 'text/html; charset=utf-8' );
 
 		// --------------------------------------------------------------------------
 
 		//	Include the composer autoloader
-		if ( ! file_exists( NAILS_PATH . '/vendor/autoload.php' ) ) :
+		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
-			echo $_styles;
-			echo '<p><strong>ERROR:</strong> Composer autoloader not found; run <code>composer install</code> to install dependencies.</p>';
-			exit( 0 );
+			$_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies.';
+			include NAILS_PATH . 'errors/startup_error.php';
 
 		endif;
 
-		require_once( NAILS_PATH . '/vendor/autoload.php' );
+		require_once( FCPATH . 'vendor/autoload.php' );
 
 		// --------------------------------------------------------------------------
 
 		//	Define data array (used extensively in views)
-		$this->data	= array();
-
-		// --------------------------------------------------------------------------
-
-		//	Define constants (set defaults if not already set)
-		$this->_define_constants();
+		$this->data	=& get_controller_data();
 
 		// --------------------------------------------------------------------------
 
@@ -88,22 +65,32 @@ EOT;
 
 		// --------------------------------------------------------------------------
 
-		//	Do we need to instanciate the database?
-		$this->_instanciate_db();
+		//	Load, instantiate and apply the fatal error handler
+		$this->_fatal_error_handler();
+
+		// --------------------------------------------------------------------------
+
+		//	Test that the cache is writeable
+		$this->_test_cache();
+
+		// --------------------------------------------------------------------------
+
+		//	Do we need to instantiate the database?
+		$this->_instantiate_db();
 
 		// --------------------------------------------------------------------------
 
 		//	Instanciate the user model
-		$this->_instanciate_user();
+		$this->_instantiate_user();
 
 		// --------------------------------------------------------------------------
 
 		//	Instanciate languages
-		$this->_instanciate_languages();
+		$this->_instantiate_languages();
 
 		// --------------------------------------------------------------------------
 
-		//	Is the suer suspended?
+		//	Is the user suspended?
 		//	Executed here so that both the user and language systems are initialised
 		//	(so that any errors can be shown in the correct language).
 
@@ -112,12 +99,41 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		//	Instanciate DateTime
-		$this->_instanciate_datetime();
+		$this->_instantiate_datetime();
 
 		// --------------------------------------------------------------------------
 
 		//	Profiling
-		$this->_instanciate_profiler();
+		$this->_instantiate_profiler();
+
+		// --------------------------------------------------------------------------
+
+		//	Need to generate the routes_app.php file?
+		if ( defined( 'NAILS_STARTUP_GENERATE_APP_ROUTES' ) && NAILS_STARTUP_GENERATE_APP_ROUTES ) :
+
+			$this->load->model( 'system/routes_model' );
+
+			if ( ! $this->routes_model->update() ) :
+
+				//	Fall over, routes_app.php *must* be there
+				show_fatal_error( 'Failed To generate routes_app.php', 'routes_app.php was not found and could not be generated. ' . $this->routes_model->last_error() );
+
+			else :
+
+				//	Routes exist now, instruct the browser to try again
+				if ( $this->input->post() ) :
+
+					redirect( $this->input->server( 'REQUEST_URI' ), 'Location', 307 );
+
+				else :
+
+					redirect( $this->input->server( 'REQUEST_URI' ) );
+
+				endif;
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -132,81 +148,81 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		//	Other defaults
-		$this->data['page']					= new stdClass();
-		$this->data['page']->title			= '';
-		$this->data['page']->description	= '';
-		$this->data['page']->keywords		= '';
+		$this->data['page']						= new stdClass();
+		$this->data['page']->title				= '';
+		$this->data['page']->seo				= new stdClass();
+		$this->data['page']->seo->title			= '';
+		$this->data['page']->seo->description	= '';
+		$this->data['page']->seo->keywords		= '';
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _define_constants()
+	protected function _set_error_reporting()
 	{
-		//	Define the Nails version constant
-		define( 'NAILS_VERSION',	'0.1.0' );
+	 	switch( ENVIRONMENT ) :
 
-		// --------------------------------------------------------------------------
+	 		case 'production' :
 
-		//	Default Nails. constants
-		//	These should be defined in config/_nails.php
+	 			//	Suppress all errors on production
+	 			error_reporting( 0 );
 
-		if ( ! defined( 'NAILS_ENVIRONMENT') )				define( 'NAILS_ENVIRONMENT',			'development' );
-		if ( ! defined( 'NAILS_MAINTENANCE') )				define( 'NAILS_MAINTENANCE',			FALSE );
-		if ( ! defined( 'NAILS_MAINTENANCE_WHITELIST') )	define( 'NAILS_MAINTENANCE_WHITELIST',	'127.0.0.1' );
-		if ( ! defined( 'NAILS_DEFAULT_TIMEZONE') )			define( 'NAILS_DEFAULT_TIMEZONE',		'UTC' );
-		if ( ! defined( 'NAILS_URL') )						define( 'NAILS_URL',					site_url( 'vendor/shed/nails/assets/' ) );
-		if ( ! defined( 'NAILS_STAGING_USERPASS') )			define( 'NAILS_STAGING_USERPASS',		serialize( array() ) );
-		if ( ! defined( 'NAILS_EMAIL_DEVELOPER') )			define( 'NAILS_EMAIL_DEVELOPER',		'' );
+	 		break;
 
-		// --------------------------------------------------------------------------
+	 		// --------------------------------------------------------------------------
 
-		//	Default app constants (if not already defined)
-		if ( ! defined( 'APP_PRIVATE_KEY' ) )				define( 'APP_PRIVATE_KEY',				'' );
-		if ( ! defined( 'APP_NAME' ) )						define( 'APP_NAME',						'Untitled' );
-		if ( ! defined( 'APP_EMAIL_FROM_NAME' ) )			define( 'APP_EMAIL_FROM_NAME',			APP_NAME );
-		if ( ! defined( 'APP_EMAIL_FROM_EMAIL' ) )			define( 'APP_EMAIL_FROM_EMAIL',			'' );
-		if ( ! defined( 'APP_EMAIL_DEVELOPER' ) )			define( 'APP_EMAIL_DEVELOPER',			'' );
-		if ( ! defined( 'APP_USER_ALLOW_REGISTRATION' ) )	define( 'APP_USER_ALLOW_REGISTRATION',	FALSE );
-		if ( ! defined( 'APP_USER_DEFAULT_GROUP' ) )		define( 'APP_USER_DEFAULT_GROUP',		3 );
-		if ( ! defined( 'APP_MULTI_LANG' ) )				define( 'APP_MULTI_LANG',				FALSE );
-		if ( ! defined( 'APP_DEFAULT_LANG_SLUG' ) )			define( 'APP_DEFAULT_LANG_SLUG',		'english' );
-		if ( ! defined( 'APP_NAILS_MODULES' ) )				define( 'APP_NAILS_MODULES',			'' );
-		if ( ! defined( 'SSL_ROUTING' ) )					define( 'SSL_ROUTING',					FALSE );
-		if ( ! defined( 'APP_STAGING_USERPASS' ) )			define( 'APP_STAGING_USERPASS',			serialize( array() ) );
+	 		default :
 
-		// --------------------------------------------------------------------------
+	 			//	Show errors everywhere else
+	 			error_reporting( E_ALL|E_STRICT );
 
-		//	Email
-		if ( ! defined( 'SMTP_HOST' ) )						define( 'SMTP_HOST',					'' );
-		if ( ! defined( 'SMTP_USERNAME' ) )					define( 'SMTP_USERNAME',				'' );
-		if ( ! defined( 'SMTP_PASSWORD' ) )					define( 'SMTP_PASSWORD',				'' );
-		if ( ! defined( 'SMTP_PORT' ) )						define( 'SMTP_PORT',					'' );
+	 		break;
+
+	 	endswitch;
+	}
 
 
-		// --------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 
-		//	Database Debug
-		if ( ! defined( 'DB_DEBUG' ) ) :
 
-			if ( ENVIRONMENT == 'production' ) :
+	protected function _test_cache()
+	{
+		if ( is_writable( DEPLOY_CACHE_DIR ) ) :
 
-				define( 'DB_DEBUG', FALSE );
+			return TRUE;
+
+		elseif ( is_dir( DEPLOY_CACHE_DIR ) ) :
+
+			//	Attempt to chmod the dir
+			if ( @chmod( DEPLOY_CACHE_DIR, FILE_WRITE_MODE ) ) :
+
+				return TRUE;
+
+			elseif ( ENVIRONMENT !== 'production' ) :
+
+				show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
 
 			else :
 
-				define( 'DB_DEBUG', TRUE );
+				show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
 
 			endif;
 
+		elseif( @mkdir( DEPLOY_CACHE_DIR ) ) :
+
+			return TRUE;
+
+		elseif ( ENVIRONMENT !== 'production' ) :
+
+			show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
+
+		else :
+
+			show_fatal_error( 'Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
+
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Default common API credentials
-		if ( ! defined( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID') )	define( 'NAILS_SHOP_OPENEXCHANGERATES_APP_ID',	'' );
-
 	}
 
 
@@ -215,36 +231,62 @@ EOT;
 
 	protected function _maintenance_mode()
 	{
-		if ( NAILS_MAINTENANCE ) :
+		if ( MAINTENANCE || file_exists( FCPATH . '.MAINTENANCE' ) ) :
 
-			$whitelist_ip = explode(',', NAILS_MAINTENANCE_WHITELIST );
+			$whitelist_ip = explode(',', MAINTENANCE_WHITELIST );
 
-			if ( array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
+			if ( ! $this->input->is_cli_request() && array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
 
-				header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
+				header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
 				header( 'Status: 503 Service Temporarily Unavailable' );
 				header( 'Retry-After: 7200' );
 
 				// --------------------------------------------------------------------------
 
-		 		//	Look for an app override
-		 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
+				//	If the request is an AJAX request, or the URL is on the API then spit back JSON
+				if ( $this->input->is_ajax_request() || $this->uri->segment( 1 ) == 'api' ) :
 
-		 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+					header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+					header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+					header( 'Content-type: application/json' );
+					header( 'Pragma: no-cache' );
 
-		 		//	Fall back to the Nails maintenance page
-		 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+					$_out = array( 'status' => 503, 'error' => 'Down for Maintenance' );
 
-		 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+					echo json_encode( $_out );
 
-		 		//	Fall back, back to plain text
-		 		else :
+				//	Otherwise, render some HTML
+				else :
 
-		 			echo '<h1>Down for maintenance</h1>';
+			 		//	Look for an app override
+			 		if ( file_exists( FCPATH . APPPATH . 'views/maintenance/maintenance.php' ) ) :
+
+			 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+
+			 		//	Fall back to the Nails maintenance page
+			 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+
+			 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+
+			 		//	Fall back, back to plain text
+			 		else :
+
+			 			echo '<h1>Down for maintenance</h1>';
+
+			 		endif;
 
 		 		endif;
 
-		 		// --------------------------------------------------------------------------
+				// --------------------------------------------------------------------------
+
+		 		//	Halt script execution
+	 			exit(0);
+
+	 		elseif ( $this->input->is_cli_request() ) :
+
+	 			echo 'Down for Maintenance' . "\n";
+
+				// --------------------------------------------------------------------------
 
 		 		//	Halt script execution
 	 			exit(0);
@@ -260,10 +302,11 @@ EOT;
 
 	protected function _staging()
 	{
-		$_users_nails	= @unserialize( NAILS_STAGING_USERPASS );
-		$_users_app		= @unserialize( APP_STAGING_USERPASS );
+		$_users = @json_decode( APP_STAGING_USERPASS );
 
-		if ( ENVIRONMENT == 'staging' && ( $_users_nails || $_users_app ) ) :
+		if ( ENVIRONMENT == 'staging' && $_users ) :
+
+			$_users = (array) $_users;
 
 			if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) :
 
@@ -274,16 +317,9 @@ EOT;
 			if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) :
 
 				//	Determine the users
-				$_users			= array_filter( array_merge( (array) $_users_nails, (array) $_users_app ) );
-				$_user_check	= array();
+				$_users = array_filter( $_users );
 
-				foreach ( $_users AS $user ) :
-
-					$_user_check[$user[0]] = $user[1];
-
-				endforeach;
-
-				if ( ! isset( $_user_check[$_SERVER['PHP_AUTH_USER']] ) || $_user_check[$_SERVER['PHP_AUTH_USER']] != $_SERVER['PHP_AUTH_PW'] ) :
+				if ( ! isset( $_users[$_SERVER['PHP_AUTH_USER']] ) || $_users[$_SERVER['PHP_AUTH_USER']] != md5( trim( $_SERVER['PHP_AUTH_PW'] ) ) ) :
 
 					$this->_staging_request_credentials();
 
@@ -305,7 +341,7 @@ EOT;
 	protected function _staging_request_credentials()
 	{
 		header( 'WWW-Authenticate: Basic realm="' . APP_NAME . ' Staging Area"' );
-		header( 'HTTP/1.0 401 Unauthorized' );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 401 Unauthorized' );
 		?>
 		<!DOCTYPE html>
 		<html>
@@ -314,7 +350,7 @@ EOT;
 				<meta charset="utf-8">
 
 				<!--	STYLES	-->
-				<link href="<?=NAILS_URL?>css/nails.default.css" rel="stylesheet">
+				<link href="<?=NAILS_ASSETS_URL?>css/nails.default.css" rel="stylesheet">
 
 				<style type="text/css">
 
@@ -345,16 +381,15 @@ EOT;
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_db()
+	protected function _instantiate_db()
 	{
-		if ( defined( 'DB_USERNAME' ) && DB_USERNAME && defined( 'DB_DATABASE' ) && DB_DATABASE ) :
+		if ( DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE ) :
 
-			define( 'NAILS_DB_ENABLED', TRUE );
 			$this->load->database();
 
 		else :
 
-			define( 'NAILS_DB_ENABLED', FALSE );
+			show_error( 'No database is configured.' );
 
 		endif;
 	}
@@ -363,23 +398,60 @@ EOT;
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_datetime()
+	protected function _instantiate_datetime()
 	{
-		//	Pass the user object to the datetime model
-		$this->datetime->set_usr_obj( $this->user );
+		//	Define default date format
+		$_default = $this->datetime_model->get_date_format_default();
+
+		if ( empty( $_default ) ) :
+
+			show_fatal_error( 'No default date format has been set, or it\'s been set incorrectly.' );
+
+		endif;
+
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG',	$_default->slug );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL',	$_default->label );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT',	$_default->format );
+
+		//	Define default time format
+		$_default = $this->datetime_model->get_time_format_default();
+
+		if ( empty( $_default ) ) :
+
+			show_fatal_error( 'No default time format has been set, or it\'s been set incorrectly.' );
+
+		endif;
+
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG',	$_default->slug );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL',	$_default->label );
+		define( 'APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT',	$_default->format );
 
 		// --------------------------------------------------------------------------
 
-		//	Set the timezones
-		$_timezone_user = active_user( 'timezone' ) ? active_user( 'timezone' ) : NAILS_DEFAULT_TIMEZONE;
-		$this->datetime->set_timezones( 'UTC', $_timezone_user );
+		//	Set the timezones.
+
+		//	Choose the user's timezone - starting with their preference, followed by
+		//	the app's default.
+
+		if ( active_user( 'timezone' ) ) :
+
+			$_timezone_user = active_user( 'timezone' );
+
+		else :
+
+			$_timezone_user = $this->datetime_model->get_timezone_default();
+
+		endif;
+
+		$this->datetime_model->set_timezones( 'UTC', $_timezone_user );
 
 		// --------------------------------------------------------------------------
 
-		//	Set the default date/time formats
-		$_format_date	= active_user( 'pref_date_format' ) ? active_user( 'pref_date_format' ) : 'Y-m-d';
-		$_format_time	= active_user( 'pref_time_format' ) ? active_user( 'pref_time_format' ) : 'H:i:s';
-		$this->datetime->set_formats( $_format_date, $_format_time );
+		//	Set the user date/time formats
+		$_format_date	= active_user( 'datetime_format_date' ) ? active_user( 'datetime_format_date' ) : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
+		$_format_time	= active_user( 'datetime_format_time' ) ? active_user( 'datetime_format_time' ) : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+
+		$this->datetime_model->set_formats( $_format_date, $_format_time );
 
 		// --------------------------------------------------------------------------
 
@@ -389,19 +461,15 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		//	Make sure the DB is thinking along the same lines
-		if ( NAILS_DB_ENABLED ) :
-
-			$this->db->query( 'SET time_zone = \'+0:00\'' );
-
-		endif;
+		$this->db->query( 'SET time_zone = \'+0:00\'' );
 	}
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_profiler()
+	protected function _instantiate_profiler()
 	{
-		if ( defined( 'PROFILING' ) && PROFILING ) :
+		if ( PROFILING ) :
 
 			/**
 			 * Enable profiler if not AJAX or CI request and there's no user_token. user_token
@@ -423,48 +491,42 @@ EOT;
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_languages()
+	protected function _instantiate_languages()
 	{
-		//	Pass the user object to the language model
-		$this->language->set_usr_obj( $this->user );
+		//	Define default language
+		$_default = $this->language_model->get_default();
 
-		//	Check default lang is supported by nails
-		$this->_supported	= array();
-		$this->_supported[]	= 'english';
+		if ( empty( $_default ) ) :
 
-		if ( array_search( APP_DEFAULT_LANG_SLUG, $this->_supported ) === FALSE ) :
-
-	 		header( 'HTTP/1.1 500 Bad Request' );
-			die( 'ERROR: Default language "' . APP_DEFAULT_LANG_SLUG . '" is not a supported language.' );
+			show_fatal_error( 'No default language has been set, or it\'s been set incorrectly.' );
 
 		endif;
 
-		define( 'APP_DEFAULT_LANG_ID',		$this->language->get_default_id() );
-		define( 'APP_DEFAULT_LANG_NAME',	$this->language->get_default_name() );
-
-		// --------------------------------------------------------------------------
-
-		//	Load the Nails. generic lang file
-		$this->lang->load( 'nails' );
+		define( 'APP_DEFAULT_LANG_CODE',	$_default->code );
+		define( 'APP_DEFAULT_LANG_LABEL',	$_default->label );
 
 		// --------------------------------------------------------------------------
 
 		//	Set any global preferences for this user, e.g languages, fall back to
 		//	the app's default language (defined in config.php).
 
-		$_user_pref = active_user( 'language_setting' );
+		$_user_lang = active_user( 'language' );
 
-		if ( isset( $_user_pref->slug ) && $_user_pref->slug ) :
+		if ( ! empty( $_user_lang ) ) :
 
-			define( 'RENDER_LANG_SLUG',	$_user_pref->slug );
-			define( 'RENDER_LANG_ID',	$_user_pref->id );
+			define( 'RENDER_LANG_CODE',	$_user_lang );
 
 		else :
 
-			define( 'RENDER_LANG_SLUG',	APP_DEFAULT_LANG_SLUG );
-			define( 'RENDER_LANG_ID',	APP_DEFAULT_LANG_ID );
+			define( 'RENDER_LANG_CODE',	APP_DEFAULT_LANG_CODE );
 
 		endif;
+
+		//	Set the language config item which codeigniter will use.
+		$this->config->set_item( 'language', RENDER_LANG_CODE );
+
+		//	Load the Nails. generic lang file
+		$this->lang->load( 'nails' );
 	}
 
 
@@ -485,15 +547,48 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		$_libraries		= array();
-		$_libraries[]	= 'session';
+
+		//	Test that $_SERVER is available, the session library needs this
+		//	Generally not available when running on the command line. If it's
+		//	not available then load up the faux session which has the same methods
+		//	as the session library, but behave as if logged out - comprende?
+
+		if ( $this->input->server( 'REMOTE_ADDR' ) ) :
+
+			$_libraries[]	= 'session';
+
+		else :
+
+			$_libraries[]	= array( 'faux_session', 'session' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	STOP! Before we load the session library, we need to check if we're using
+		//	the database. If we are then check if `sess_table_name` is "nails_session".
+		//	If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
+
+		$_sess_table_name = $this->config->item( 'sess_table_name' );
+
+		if ( $_sess_table_name === 'nails_session' && NAILS_DB_PREFIX !== 'nails_' ) :
+
+			$_sess_table_name = str_replace( 'nails_', NAILS_DB_PREFIX, $_sess_table_name );
+			$this->config->set_item( 'sess_table_name', $_sess_table_name );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		$_libraries[]	= 'encrypt';
 		$_libraries[]	= 'asset';
+		$_libraries[]	= 'logger';
 
 		foreach ( $_libraries AS $library ) :
 
 			if ( is_array( $library ) ) :
 
-				$this->load->library( $library[0], $library[1] );
+				$this->load->library( $library[0], array(), $library[1] );
 
 			else :
 
@@ -505,15 +600,18 @@ EOT;
 
 		// --------------------------------------------------------------------------
 
-		//	Load the system helper
+		//	Load the system & user helper
 		$this->load->helper( 'system' );
+		$this->load->helper( 'user' );
 
 		// --------------------------------------------------------------------------
 
 		$_helpers		= array();
-		$_helpers[]		= 'site';
+		$_helpers[]		= 'app_setting';
+		$_helpers[]		= 'app_notification';
 		$_helpers[]		= 'datetime';
 		$_helpers[]		= 'url';
+		$_helpers[]		= 'cookie';
 		$_helpers[]		= 'form';
 		$_helpers[]		= 'html';
 		$_helpers[]		= 'tools';
@@ -523,6 +621,7 @@ EOT;
 		$_helpers[]		= 'exception';
 		$_helpers[]		= 'typography';
 		$_helpers[]		= 'event';
+		$_helpers[]		= 'log';
 
 		//	Module specific helpers
 		//	CDN
@@ -564,79 +663,56 @@ EOT;
 		// --------------------------------------------------------------------------
 
 		$_models	= array();
-		$_models[]	= array( 'system/site_model', 'site' );
-		$_models[]	= array( 'system/user_model', 'user' );
-		$_models[]	= array( 'system/datetime_model', 'datetime' );
-		$_models[]	= array( 'system/language_model', 'language' );
+		$_models[]	= 'system/app_setting_model';
+		$_models[]	= 'system/user_model';
+		$_models[]	= 'system/user_group_model';
+		$_models[]	= 'system/user_password_model';
+		$_models[]	= 'system/datetime_model';
+		$_models[]	= 'system/language_model';
 
 		foreach ( $_models AS $model ) :
 
-			if ( is_array( $model ) ) :
-
-				$this->load->model( $model[0], $model[1] );
-
-			else :
-
-				$this->load->model( $model );
-
-			endif;
+			$this->load->model( $model );
 
 		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		$_nails_assets		= array();
-		$_nails_assets[]	= 'nails.default.css';
-		$_nails_assets[]	= 'nails.default.min.js';
-
-		foreach ( $_nails_assets AS $asset ) :
-
-			$this->asset->load( $asset, TRUE );
-
-		endforeach;
-
-		//	App assets
-		if ( file_exists( FCPATH . 'assets/css/styles.css' ) ) :
-
-			$this->asset->load( 'styles.css' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Inline assets
-		$_js  = 'var _nails;';
-		$_js .= '$(function(){';
-
-		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';
-		$_js .= '_nails = new NAILS_JS();';
-		$_js .= '_nails.init();}';
-
-		$_js .= '});';
-
-		$this->asset->inline( '<script>' . $_js . '</script>' );
 	}
+
 
 	// --------------------------------------------------------------------------
 
 
-	protected function _instanciate_user()
+	protected function _fatal_error_handler()
 	{
-		//	Set a $user variable (for the views)
-		$this->data['user'] =& $this->user;
+		$this->load->library( 'Fatal_error_handler' );
+	}
 
-		//	Define the NAILS_USR_OBJ constant; this is used in get_userobject() to
-		//	reference the user model
 
-		define( 'NAILS_USR_OBJ', 'user' );
+	// --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
 
+	protected function _instantiate_user()
+	{
 		//	Find a remembered user and initialise the user model; this routine checks
 		//	the user's cookies and set's up the session for an existing or new user.
 
-		$this->user->find_remembered_user();
-		$this->user->init();
+		$this->user_model->init();
+
+		// --------------------------------------------------------------------------
+
+		//	Inject the user object into the user_group, user_password & datetime models
+		$this->user_group_model->_set_user_object( $this->user_model );
+		$this->user_password_model->_set_user_object( $this->user_model );
+		$this->datetime_model->_set_user_object( $this->user_model );
+
+		// --------------------------------------------------------------------------
+
+		//	Shortcut/backwards compatibility
+		$this->user = $this->user_model;
+
+		//	Set a $user variable (for the views)
+		$this->data['user']				= $this->user_model;
+		$this->data['user_group']		= $this->user_group_model;
+		$this->data['user_password']	= $this->user_password_model;
 	}
 
 
@@ -646,11 +722,11 @@ EOT;
 	protected function _is_user_suspended()
 	{
 		//	Check if this user is suspended
-		if ( $this->user->is_logged_in() && active_user( 'is_suspended' ) ) :
+		if ( $this->user_model->is_logged_in() && active_user( 'is_suspended' ) ) :
 
 			//	Load models and langs
 			$this->load->model( 'auth/auth_model' );
-			$this->lang->load( 'auth/auth', RENDER_LANG_SLUG );
+			$this->lang->load( 'auth/auth' );
 
 			//	Log the user out
 			$this->auth_model->logout();

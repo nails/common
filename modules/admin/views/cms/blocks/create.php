@@ -40,7 +40,7 @@
 		$_field['key']			= 'description';
 		$_field['label']		= 'Description';
 		$_field['default']		= '';
-		$_field['required']		= TRUE;
+		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'A description of what this block\'s value should be';
 
 		echo form_field( $_field );
@@ -52,7 +52,7 @@
 		$_field['key']			= 'located';
 		$_field['label']		= 'Located';
 		$_field['default']		= '';
-		$_field['required']		= TRUE;
+		$_field['required']		= FALSE;
 		$_field['placeholder']	= 'A brief outline of where this block might be used';
 
 		echo form_field( $_field );
@@ -64,7 +64,7 @@
 		$_field['key']			= 'type';
 		$_field['label']		= 'Block Type';
 		$_field['required']		= TRUE;
-		$_field['class']		= 'chosen';
+		$_field['class']		= 'select2';
 
 		echo form_field_dropdown( $_field, $block_types );
 
@@ -72,26 +72,25 @@
 	</fieldset>
 
 	<fieldset id="default-value">
-
-		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
-		<legend><?=APP_DEFAULT_LANG_NAME?> Value</legend>
-		<p class="system-alert message no-close">
-			<strong>Note:</strong> All blocks must have an <?=APP_DEFAULT_LANG_NAME?> value, define the
-			initial <?=APP_DEFAULT_LANG_NAME?> value now.
-		</p>
-		<?php else : ?>
-		<legend>Value</legend>
-		<?php endif; ?>
 		<?php
+
+			if ( count( $languages ) > 1 ) :
+
+				echo '<legend>' . APP_DEFAULT_LANG_LABEL . ' Value</legend>';
+				echo '<p class="system-alert message">';
+				echo '<strong>Note:</strong> All blocks must have an <?=APP_DEFAULT_LANG_LABEL?> value, define the initial ' . APP_DEFAULT_LANG_LABEL . ' value now.';
+				echo '</p>';
+
+			else :
+
+				echo '<legend>Value</legend>';
+
+			endif;
 
 			//	Value
 			echo form_textarea( 'value', set_value( 'value' ), 'placeholder="Define the default value" id="default_value"' );
 
 		?>
-		<p id="ckeditor-warn" class="system-alert notice no-close" style="margin-top:10px;">
-			<strong>Note:</strong> The editor's display might not be a true representation of the final layout
-			due to application stylesheets on the front end which are not loaded here.
-		</p>
 	</fieldset>
 
 	<p>

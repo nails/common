@@ -10,6 +10,12 @@
 
 class NAILS_Shop_Controller extends NAILS_Controller
 {
+	protected $_skin;
+
+
+	// --------------------------------------------------------------------------
+
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -27,31 +33,51 @@ class NAILS_Shop_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'shop', RENDER_LANG_SLUG );
+		$this->lang->load( 'shop' );
 
 		// --------------------------------------------------------------------------
 
 		//	Load the models
-		$this->load->model( 'shop_model',			'shop' );
-		$this->load->model( 'shop_voucher_model',	'voucher' );
-		$this->load->model( 'shop_basket_model',	'basket' );
-		$this->load->model( 'shop_currency_model',	'currency' );
-		$this->load->model( 'shop_order_model',		'order' );
-		$this->load->model( 'shop_product_model',	'product' );
-		$this->load->model( 'shop_shipping_model',	'shipping' );
+		$this->load->model( 'shop/shop_model' );
+		$this->load->model( 'shop/shop_basket_model' );
+		$this->load->model( 'shop/shop_brand_model' );
+		$this->load->model( 'shop/shop_category_model' );
+		$this->load->model( 'shop/shop_collection_model' );
+		$this->load->model( 'shop/shop_currency_model' );
+		$this->load->model( 'shop/shop_order_model' );
+		$this->load->model( 'shop/shop_product_model' );
+		$this->load->model( 'shop/shop_product_type_model' );
+		$this->load->model( 'shop/shop_range_model' );
+		$this->load->model( 'shop/shop_shipping_model' );
+		$this->load->model( 'shop/shop_sale_model' );
+		$this->load->model( 'shop/shop_tag_model' );
+		$this->load->model( 'shop/shop_voucher_model' );
+		$this->load->model( 'shop/shop_skin_model' );
 
 		// --------------------------------------------------------------------------
 
-		//	Load the styles
-		$this->asset->load( 'nails.shop.css', TRUE );
+		//	Load up the shop's skin
+		$_skin = app_setting( 'skin', 'shop' ) ? app_setting( 'skin', 'shop' ) : 'getting-started';
 
-		if ( file_exists( FCPATH . 'assets/css/shop.css' ) ) :
+		$this->_skin = $this->shop_skin_model->get( $_skin );
 
-			$this->asset->load( 'shop.css' );
+		if ( ! $this->_skin ) :
+
+			show_fatal_error( 'Failed to load shop skin "' . $_skin . '"', 'Shop skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->shop_skin_model->last_error() );
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Pass to $this->data, for the views
+		$this->data['skin'] = $this->_skin;
+
+		// --------------------------------------------------------------------------
+
+		//	Shop's name
+		$this->_shop_name = app_setting( 'name', 'shop' ) ? app_setting( 'name', 'shop' ) : 'Shop';
 	}
 }
 
 /* End of file _shop.php */
-/* Location: ./application/modules/shop/controllers/_shop.php */
+/* Location: ./modules/shop/controllers/_shop.php */

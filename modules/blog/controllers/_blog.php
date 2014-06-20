@@ -27,45 +27,53 @@ class NAILS_Blog_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'blog', RENDER_LANG_SLUG );
+		$this->lang->load( 'blog/blog' );
 
 		// --------------------------------------------------------------------------
 
 		//	Load the models
-		$this->load->model( 'blog_model',			'blog' );
-		$this->load->model( 'blog_post_model',		'post' );
-		$this->load->model( 'blog_widget_model',	'widget' );
+		$this->load->model( 'blog/blog_model' );
+		$this->load->model( 'blog/blog_post_model' );
+		$this->load->model( 'blog/blog_widget_model' );
+		$this->load->model( 'blog/blog_skin_model' );
 
 		// --------------------------------------------------------------------------
 
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->load->model( 'blog_category_model',	'category' );
+			$this->load->model( 'blog/blog_category_model' );
 
 		endif;
 
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->load->model( 'blog_tag_model',	'tag' );
+			$this->load->model( 'blog/blog_tag_model' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch the Blog URL
-		$this->data['blog_url'] = blog_setting( 'blog_url' );
+		//	Load up the blog's skin
+		$_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'getting-started';
+
+		$this->_skin = $this->blog_skin_model->get( $_skin );
+
+		if ( ! $this->_skin ) :
+
+			show_fatal_error( 'Failed to load blog skin "' . $_skin . '"', 'Blog skin "' . $_skin . '" failed to load at ' . APP_NAME . ', the following reason was given: ' . $this->skin->last_error() );
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Load the styles
-		$this->asset->load( 'nails.blog.css', TRUE );
+		//	Pass to $this->data, for the views
+		$this->data['skin'] = $this->_skin;
 
-		if ( file_exists( FCPATH . 'assets/css/blog.css' ) ) :
+		// --------------------------------------------------------------------------
 
-			$this->asset->load( 'blog.css' );
-
-		endif;
+		//	Blog name
+		$this->_blog_name = app_setting( 'name', 'blog' ) ? app_setting( 'name', 'blog' ) : 'Blog';
 	}
 }
 

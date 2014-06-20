@@ -22,7 +22,6 @@ class NAILS_Cron_Controller extends NAILS_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
@@ -31,21 +30,17 @@ class NAILS_Cron_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load language file
-		$this->lang->load( 'cron', RENDER_LANG_SLUG );
+		$this->lang->load( 'cron' );
 
 		// --------------------------------------------------------------------------
 
 		//	Command line only
 		if ( ENVIRONMENT == 'production' && ! $this->input->is_cli_request() ) :
 
-			header( 'HTTP/1.1 401 Unauthorized' );
+			header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 401 Unauthorized' );
 			die( '<h1>' . lang( 'unauthorised' ) . '</h1>' );
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->load->library( 'logger' );
 
 		// --------------------------------------------------------------------------
 
@@ -65,11 +60,10 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Set logger details
-		$this->logger->log_dir( 'cron/' . $log_dir . '/' );
-		$this->logger->log_file( $log_file . '-' . date( 'Y-m-d' ) . '.php' );
-		$this->logger->line( 'Starting job [' . $this->task . ']...' );
-		$this->logger->line();
+		//	Set log details
+		_LOG_FILE( 'cron/' . $log_dir . '/' . $log_file . '-' . date( 'Y-m-d' ) . '.php' );
+		_LOG( 'Starting job [' . $this->task . ']...' );
+		_LOG();
 	}
 
 
@@ -84,12 +78,12 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->logger->line();
-		$this->logger->line( 'Finished job [' . $this->task . ']' );
-		$this->logger->line( 'Job took ' . number_format( $_duration, 5 ) . ' seconds' );
-		$this->logger->line();
-		$this->logger->line( '----------------------------------------' );
-		$this->logger->line();
+		_LOG();
+		_LOG( 'Finished job [' . $this->task . ']' );
+		_LOG( 'Job took ' . number_format( $_duration, 5 ) . ' seconds' );
+		_LOG();
+		_LOG( '----------------------------------------' );
+		_LOG();
 
 		// --------------------------------------------------------------------------
 
@@ -101,7 +95,7 @@ class NAILS_Cron_Controller extends NAILS_Controller
 
 		$this->db->set( $_data );
 		$this->db->set( 'created', 'NOW()', FALSE );
-		$this->db->insert( 'log_cron' );
+		$this->db->insert( NAILS_DB_PREFIX . 'log_cron' );
 	}
 }
 

@@ -1,20 +1,21 @@
 var NAILS_Admin_Shop_Settings;
 NAILS_Admin_Shop_Settings = function()
 {
-	this.init = function()
+	this.__construct = function()
 	{
 		this._init_sortable();
 		this._init_delete();
 		this._init_adds();
 		this._init_submits();
 		this._init_warehouse_collection();
+		this._init_skins();
+		this._init_payment_gateways();
+		this._init_shipping();
 
 		// --------------------------------------------------------------------------
 
-		//	Chosens
-		$( 'td.tax_rate select' ).chosen( { width : '100%' });
-		$( 'select.chosen-base' ).chosen( { no_results_text: 'Ensure currency is active. No currencies match', width : '100%' });
-		$( 'select.chosen-active' ).chosen( { width : '100%' });
+		//	Select2's
+		$( 'select.select2-base' ).select2({ formatNoMatches: 'Ensure currency is active. No currencies match' });
 	};
 
 
@@ -96,7 +97,7 @@ NAILS_Admin_Shop_Settings = function()
 
 			$( '#existing-shipping-methods tbody' ).append( _template );
 			$( '#existing-shipping-methods tbody' ).sortable('refresh');
-			$( 'td.tax_rate select' ).chosen( { width : '100%' });
+			$( 'td.tax_rate select.select2' ).select2();
 			_this._set_order_ship();
 
 			return false;
@@ -259,7 +260,7 @@ NAILS_Admin_Shop_Settings = function()
 
 				//	Rate
 				_value = parseInt( $(this).find( 'td.rate input' ).val(), 10 );
-				if ( _value > 1 || _value < 0 )
+				if ( isNaN( _value ) || _value > 1 || _value < 0 )
 				{
 					$(this).find( 'td.rate' ).addClass( 'error' );
 					_errors++;
@@ -272,11 +273,77 @@ NAILS_Admin_Shop_Settings = function()
 
 			if ( _errors )
 			{
-				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n-Rate must be a numeric in the range 0-1' );
+				alert( 'Please check highlighted fields for errors:\n\n- A label must be provided\n- Rate must be a numeric in the range 0-1' );
 				return false;
 			}
 
 			return true;
 		});
 	};
+
+	// --------------------------------------------------------------------------
+
+	this._init_skins = function()
+	{
+		$( 'ul.skins li.skin' ).on( 'click', function()
+		{
+			$( 'ul.skins li.skin' ).removeClass( 'selected' );
+			$(this).addClass( 'selected' );
+			$(this).find( 'input[type=radio]' ).prop( 'checked', true );
+		});
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_shipping = function()
+	{
+		$( '#shipping-modules .enabled' ).each(function()
+		{
+			var _toggle		= $(this).find( '.toggle' );
+			var _checkbox	= $(this).find( 'input[type=checkbox]' );
+
+			_toggle.css({
+				width:	'100px',
+				height:	'30px'
+			});
+
+			_toggle.toggles({
+				checkbox : _checkbox,
+				on : _checkbox.is(':checked'),
+			});
+
+		});
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._init_payment_gateways = function()
+	{
+		$( '#payment-gateways .enabled' ).each(function()
+		{
+			var _toggle		= $(this).find( '.toggle' );
+			var _checkbox	= $(this).find( 'input[type=checkbox]' );
+
+			_toggle.css({
+				width:	'100px',
+				height:	'30px'
+			});
+
+			_toggle.toggles({
+				checkbox : _checkbox,
+				on : _checkbox.is(':checked'),
+			});
+
+		});
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	return this.__construct();
 };

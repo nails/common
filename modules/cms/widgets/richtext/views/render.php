@@ -1,0 +1,1 @@
+<?=isset( $body ) ? $body : '' ?>

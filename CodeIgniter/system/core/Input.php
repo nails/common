@@ -6,7 +6,7 @@
  *
  * @package		CodeIgniter
  * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -348,10 +348,7 @@ class CI_Input {
 		}
 		else
 		{
-			//	Hack by Shed, don't assume this exists - fixed in the CI master branch so happy to implement this
-			//	change in the knowledge it'll be overwritten when CI is upgraded next.
-
-			$this->ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+			$this->ip_address = $_SERVER['REMOTE_ADDR'];
 		}
 
 		if ( ! $this->valid_ip($this->ip_address))

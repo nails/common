@@ -8,7 +8,7 @@
 | Control aspects of admin at the app level with this config file.
 |
 | Full details of configurable options are available at
-| http://docs.nailsapp.co.uk/modules/admin/config
+| TODO: Link to docs
 |
 */
 
@@ -26,7 +26,7 @@
 	$config['user_meta_cols'][GROUP_ID]	= array();
 
 	$config['user_meta_cols'][GROUP_ID]['COL_NAME'] = array(
-		'datatype'		=> 'string|bool|join|date',
+		'datatype'		=> 'string|bool|id|date',
 		'label'			=> 'Label to render',
 		'required'		=> TRUE|FALSE,
 		'validation'	=> 'form_validation|rules|',

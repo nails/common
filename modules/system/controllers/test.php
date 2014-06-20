@@ -31,7 +31,6 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -40,21 +39,11 @@ class NAILS_Test extends NAILS_System_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+		if ( ! $this->user_model->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
 
-			if ( module_is_enabled( 'auth' ) ) :
-
-				unauthorised();
-
-			else :
-
-				show_404();
-
-			endif;
+			show_404();
 
 		endif;
-
-		$this->_validate_token();
 
 		// --------------------------------------------------------------------------
 
@@ -77,10 +66,60 @@ class NAILS_Test extends NAILS_System_Controller
 		//	Each test listed here should be a valid callback, if a callback is not found the test will be silently discarded
 
 		$this->_tests = array();
-		$this->_tests[] = 'canwritedirs';
-		$this->_tests[] = 'cansendemail';
+
+		if ( $this->input->post( 'test' ) ) :
+
+			$this->_tests	= $this->input->post( 'test' );
+
+		else :
+
+			$this->_tests[] = module_is_enabled( 'shop' ) ? 'shop' : NULL;
+			$this->_tests[] = module_is_enabled( 'cdn' ) ? 'cdn' : NULL;
+			$this->_tests[] = 'canwritedirs';
+			$this->_tests[] = 'cansendemail';
+
+		endif;
+
+		$this->_tests = array_filter( $this->_tests );
+		$this->_tests = array_values( $this->_tests );
 
 		$this->data['tests'] =& $this->_tests;
+
+		// --------------------------------------------------------------------------
+
+		//	Clear assets
+		$this->asset->clear_all();
+
+		// --------------------------------------------------------------------------
+
+		//	Prepare tests
+		for ( $i=0; $i < count( $this->_tests ); $i++ ) :
+
+			if ( method_exists( $this, '_info_' . $this->_tests[$i] ) ) :
+
+				$_test	= $this->_tests[$i];
+				$_info	= $this->{'_info_' . $this->_tests[$i] }();
+
+				if ( $_info ) :
+
+					$this->_tests[$i] = clone( $_info );
+					$this->_tests[$i]->test = $_test;
+
+				else :
+
+					$this->_tests[$i] = FALSE;
+
+				endif;
+
+			else :
+
+				$this->_tests[$i] = FALSE;
+
+			endif;
+
+		endfor;
+
+		$this->_tests = array_values( array_filter( $this->_tests ) );
 	}
 
 
@@ -92,31 +131,10 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function view()
 	{
-		for ( $i=0; $i < count( $this->_tests ); $i++ ) :
-
-			if ( method_exists( $this, '_info_' . $this->_tests[$i] ) ) :
-
-				$_test = $this->_tests[$i];
-				$this->_tests[$i] = clone( $this->{'_info_' . $this->_tests[$i] }() );
-				$this->_tests[$i]->test = $_test;
-
-			else :
-
-				$this->_tests[$i] = FALSE;
-
-			endif;
-
-		endfor;
-
-		$this->_tests = array_values( array_filter( $this->_tests ) );
-
-		// --------------------------------------------------------------------------
-
 		//	Overrides & page data
 		$this->data['header_override']	= 'structure/header/blank';
 		$this->data['footer_override']	= 'structure/footer/blank';
@@ -129,9 +147,9 @@ class NAILS_Test extends NAILS_System_Controller
 
 			case 'json' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
 				$this->output->set_output( json_encode( $this->_tests ) );
 
@@ -186,23 +204,13 @@ class NAILS_Test extends NAILS_System_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function run()
 	{
-		//	which tests are we running?
-		if ( $this->input->post( 'test' ) ) :
+		//	Which tests are we running?
+		$_tests =& $this->_tests;
 
-			//	The posted tests!
-			$_tests =& $this->input->post( 'test' );
-
-		else :
-
-			//	All the tests!
-			$_tests =& $this->_tests;
-
-		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -211,7 +219,7 @@ class NAILS_Test extends NAILS_System_Controller
 
 		for ( $i=0; $i < count( $_tests ); $i++ ) :
 
-			if ( method_exists( $this, '_test_' . $_tests[$i] ) ) :
+			if ( method_exists( $this, '_test_' . $_tests[$i]->test ) ) :
 
 				//	Reset defaults
 				$this->_result->pass	= TRUE;
@@ -219,8 +227,8 @@ class NAILS_Test extends NAILS_System_Controller
 
 				// --------------------------------------------------------------------------
 
-				$_result		= clone( $this->{'_test_' . $_tests[$i] }() );
-				$_result->info	= clone( $this->{'_info_' . $_tests[$i] }() );
+				$_result		= clone( $this->{'_test_' . $_tests[$i]->test }() );
+				$_result->info	= clone( $this->{'_info_' . $_tests[$i]->test }() );
 				$_results[]		= $_result;
 
 			endif;
@@ -327,6 +335,116 @@ class NAILS_Test extends NAILS_System_Controller
 	// --------------------------------------------------------------------------
 
 
+	protected function _test_shop()
+	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+
+		// --------------------------------------------------------------------------
+
+		$_buckets	= array();
+		$_buckets[]	= 'shop-product-images';
+		$_buckets[]	= 'shop-brand-logos';
+		$_buckets[]	= 'shop-download';
+
+		// --------------------------------------------------------------------------
+
+		//	CDN Enabled?
+		if ( ! module_is_enabled( 'cdn' ) ) :
+
+			$this->_result->pass		= FALSE;
+			$this->_result->errors[]	= 'CDN is not enabled.';
+			return $this->_result;
+
+		else :
+
+			$this->load->library( 'cdn' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Execute test
+		foreach ( $_buckets AS $bucket ) :
+
+			$this->db->where( 'slug', $bucket );
+			$_bucket = $this->db->get( NAILS_DB_PREFIX . 'cdn_bucket' );
+
+			if ( ! $_bucket ) :
+
+				//	Attempt to create
+				if ( ! $this->cdn->bucket_create( $bucket ) ) :
+
+					$this->_result->pass		= FALSE;
+					$this->_result->errors[]	= '"' . $bucket . '" does not exist and is required, could not crete bucket (' . $this->cdn->last_error() . ').';
+					continue;
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		return $this->_result;
+	}
+
+	protected function _info_shop()
+	{
+		$this->_info->label			= 'Shop is configured correctly';
+		$this->_info->description	= 'This test will check that the shop is configured correctly.';
+		$this->_info->testing		= 'Tests that the databse is correctly formed and that the appropriate CDN bucket exists.';
+		$this->_info->expecting		= 'Normal databases and presence of CDN buckets (if they don\'t exist, the test will attempt to create them).';
+
+		// --------------------------------------------------------------------------
+
+		return $this->_info;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _test_cdn()
+	{
+		//	Reset result
+		$this->_result->pass	= TRUE;
+		$this->_result->errors	= array();
+
+		// --------------------------------------------------------------------------
+
+		//	Execute tests
+		$this->load->library( 'cdn' );
+		if ( ! $this->cdn->run_tests() ) :
+
+			$this->_result->pass	= FALSE;
+			$this->_result->errors	= $this->cdn->get_errors();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $this->_result;
+	}
+
+	protected function _info_cdn()
+	{
+		$this->_info->label			= 'CDN is functioning correctly';
+		$this->_info->description	= 'This test will check that the CDN is configured correctly and functioning.';
+		$this->_info->testing		= 'Tests that each bucket is configured correcty and that a small file can be written, moved, copied, deleted then destroyed.';
+		$this->_info->expecting		= 'All buckets to exist and be writeable.';
+
+		// --------------------------------------------------------------------------
+
+		return $this->_info;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	protected function _test_canwritedirs()
 	{
 		//	Reset result
@@ -339,39 +457,15 @@ class NAILS_Test extends NAILS_System_Controller
 		$_dirs		= array();
 
 		//	Cache directory
-		if ( defined( 'CACHE_DIR' ) ) :
+		$_dirs[]	= DEPLOY_CACHE_DIR;
 
-			$_dirs[]	= CACHE_DIR;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Check CDN buckets/dirs
-		if ( module_is_enabled( 'cdn' ) && CDN_DRIVER == 'LOCAL' ) :
-
-			$_dirs[]	= CDN_PATH;
-
-			//	Get all the buckets and check that directories exist and are writable
-			$this->load->library( 'cdn' );
-			$_buckets = $this->cdn->get_buckets();
-
-			foreach ( $_buckets AS $bucket ) :
-
-				$_dirs[] = CDN_PATH . $bucket->slug . '/';
-
-			endforeach;
-
-		endif;
+		//	Log folder
+		$_dirs[]	= DEPLOY_LOG_DIR;
 
 		// --------------------------------------------------------------------------
 
-		//	Is the app routes file writeable? Various modules might require access to it
-		if ( module_is_enabled( 'cms' ) || module_is_enabled( 'blog' ) || module_is_enabled( 'shop' ) ) :
-
-			$_dirs[] = FCPATH . APPPATH . 'config/routes_cms_page.php';
-
-		endif;
+		//	Rhe routes_app.php file should exist
+		$_dirs[] = DEPLOY_CACHE_DIR . 'routes_app.php';
 
 		// --------------------------------------------------------------------------
 
@@ -426,20 +520,21 @@ class NAILS_Test extends NAILS_System_Controller
 
 		$_email				= new stdClass();
 		$_email->type		= 'test_email';
-		$_email->to_email	= APP_EMAIL_DEVELOPER ? APP_EMAIL_DEVELOPER : NAILS_EMAIL_DEVELOPER;
 
-		if ( ! $_email->to_email ) :
+		if ( ! APP_DEVELOPER_EMAIL ) :
 
 			$this->_result->pass		= FALSE;
-			$this->_result->errors[]	= 'APP_EMAIL_DEVELOPER and NAILS_EMAIL_DEVELOPER are blank.';
+			$this->_result->errors[]	= 'APP_DEVELOPER_EMAIL is not defined.';
 
 		else :
 
 			//	Send the email
+			$_email->to_email = APP_DEVELOPER_EMAIL;
+
 			$_config = array( 'graceful_startup' => TRUE );
 			$this->load->library( 'emailer', $_config );
 
-			//	Any startup errorS?
+			//	Any startup errors?
 			if ( $this->emailer->get_errors() ) :
 
 				$this->_result->pass	= FALSE;
@@ -491,12 +586,12 @@ class NAILS_Test extends NAILS_System_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -512,5 +607,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_TESTS' ) ) :
 
 endif;
 
-/* End of file admin.php */
-/* Location: ./application/modules/api/controllers/admin.php */
+/* End of file test.php */
+/* Location: ./modules/system/controllers/test.php */

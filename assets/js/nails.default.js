@@ -5,18 +5,20 @@
 
 // --------------------------------------------------------------------------
 
-//	Import libraries - no need to lead them individually
-//@codekit-prepend 'jquery.js';
-//@codekit-prepend 'jquery.ui.js';
-//@codekit-prepend 'jquery.ui.datetimepicker.js';
-//@codekit-prepend 'jquery.tipsy.js';
-//@codekit-prepend 'jquery.fancybox.js';
-//@codekit-prepend 'jquery.fancybox.thumbs.js';
-//@codekit-prepend 'jquery.fancybox.media.js';
-//@codekit-prepend 'jquery.fancybox.buttons.js';
-//@codekit-prepend 'jquery.chosen.js';
-//@codekit-prepend 'jquery.scrollto.js';
-//@codekit-prepend 'jquery.easing.js';
+//	Catch undefined console
+/* jshint ignore:start */
+if ( typeof( console ) === "undefined" )
+{
+	var console;
+	console = {
+		log: function() {},
+		debug: function() {},
+		info: function() {},
+		warn: function() {},
+		error: function() {}
+	};
+}
+/* jshint ignore:end */
 
 // --------------------------------------------------------------------------
 
@@ -28,7 +30,6 @@ NAILS_JS = function()
 		this._init_system_alerts();
 		this._init_tipsy();
 		this._init_fancybox();
-		this._init_chosen();
 		this._init_confirm();
 		this._init_nicetime();
 		this._init_tabs();
@@ -44,28 +45,8 @@ NAILS_JS = function()
 	 * Add a close button to any system-alerts which are on the page
 	 *
 	 **/
-	this._init_system_alerts = function(){
-
-		//	Add close buttons to messages
-		var _close = $( '<p>' ).addClass( 'close' ).attr( 'rel', 'tipsy' ).attr( 'title', 'Dismiss' );
-		_close.html( $( '<a>' ).attr( 'href', '#' ) );
-
-		$( '.system-alert:not(.no-close)' ).addClass( 'close-enabled' ).find( '.padder' ).prepend( _close );
-
-		// --------------------------------------------------------------------------
-
-		//	Add handler to close button
-		$( '.system-alert p.close a' ).on( 'click', function(){
-
-			$(this).closest( '.padder' ).fadeOut();
-			$(this).closest( '.system-alert' ).slideUp();
-
-			return false;
-
-		});
-
-		// --------------------------------------------------------------------------
-
+	this._init_system_alerts = function()
+	{
 		//	Scroll to first error, if scrollTo is available
 		if ( $.fn.scrollTo )
 		{
@@ -91,7 +72,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: scrollTo not available.' );
+			this.log( 'NAILS_JS: scrollTo not available.' );
 		}
 	};
 
@@ -108,16 +89,19 @@ NAILS_JS = function()
 	{
 		if ( $.fn.tipsy )
 		{
-			$( '*[rel=tipsy]' ).tipsy();
-			$( '*[rel=tipsy-html]' ).tipsy({html:true});
-			$( '*[rel=tipsy-right]' ).tipsy( { gravity: 'w' } );
-			$( '*[rel=tipsy-left]' ).tipsy( { gravity: 'e' } );
-			$( '*[rel=tipsy-top]' ).tipsy( { gravity: 's' } );
-			$( '*[rel=tipsy-bottom]' ).tipsy( { gravity: 'n' } );
+			//	Once tipsy'd, add drunk class - so it's not called twice should this method be called again
+			//	Tipsy... drunk... geddit?
+
+			$( '*[rel=tipsy]:not(.drunk)' ).tipsy({ opacity : 0.85 }).addClass( 'drunk' );
+			$( '*[rel=tipsy-html]:not(.drunk)' ).tipsy({ opacity : 0.85, html: true }).addClass( 'drunk' );
+			$( '*[rel=tipsy-right]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'w' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-left]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'e' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-top]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 's' }).addClass( 'drunk' );
+			$( '*[rel=tipsy-bottom]:not(.drunk)' ).tipsy({ opacity : 0.85, gravity: 'n' }).addClass( 'drunk' );
 		}
 		else
 		{
-			this.error( 'NAILS_JS: Tipsy not available.' );
+			this.log( 'NAILS_JS: Tipsy not available.' );
 		}
 	};
 
@@ -180,34 +164,7 @@ NAILS_JS = function()
 		}
 		else
 		{
-			this.error( 'NAILS_JS: Fancybox not available.' );
-		}
-	};
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 *
-	 * Initialise any chosen elements on the page
-	 *
-	 **/
-	this._init_chosen = function()
-	{
-		if ( $.fn.chosen )
-		{
-			$( 'select.chosen' ).each(function()
-			{
-				$(this).chosen(
-				{
-					width: $(this).css( 'width' )
-				});
-			});
-		}
-		else
-		{
-			this.error( 'NAILS_JS: Chosen not available.' );
+			this.log( 'NAILS_JS: Fancybox not available.' );
 		}
 	};
 
@@ -231,7 +188,7 @@ NAILS_JS = function()
 
 			if ( _body.length )
 			{
-				$('<div>').text(_body).dialog({
+				$('<div>').html(_body).dialog({
 					title: _title,
 					resizable: false,
 					draggable: false,
@@ -459,7 +416,7 @@ NAILS_JS = function()
 	this._init_tabs = function()
 	{
 		var _this = this;	/*	Ugly Scope Hack	*/
-		$( document ).on( 'click', 'ul.tabs li.tab a', function()
+		$( document ).on( 'click', 'ul.tabs:not(.disabled) li.tab a', function()
 		{
 			if ( ! $(this).hasClass( 'disabled' ) )
 			{
@@ -467,6 +424,27 @@ NAILS_JS = function()
 			}
 
 			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Look for tabs which contain error'd fields
+		$( 'li.tab a' ).each(function(){
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' div.field.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' .system-alert.error' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
+
+			if ( $( '#' + $(this).data( 'tab' ) + ' .error.show-in-tabs' ).length )
+			{
+				$(this).addClass( 'error' );
+			}
 		});
 	};
 
@@ -489,8 +467,8 @@ NAILS_JS = function()
 
 		//	Show results
 		var _tab = switch_to.attr( 'data-tab' );
-		$( 'section.tabs' + _tabgroup + ' > div.tab.page' ).hide();
-		$( '#' + _tab ).show();
+		$( 'section.tabs' + _tabgroup + ' > div.tab.page' ).removeClass( 'active' );
+		$( '#' + _tab ).addClass( 'active' );
 
 		// --------------------------------------------------------------------------
 
@@ -514,12 +492,17 @@ NAILS_JS = function()
 			//	Date pickers
 			$( 'div.field.date input.date' ).each(function()
 			{
-				//	Fetch some info which may be available in the data- attributes
+				//	Fetch some info which may be available in the data attributes
+				var _dateformat	= $(this).data( 'datepicker-dateformat' ) || 'yy-mm-dd';
+				var _yearrange	= $(this).data( 'datepicker-yearrange' ) || 'c-100:c+10';
+
+				//	Instanciate datepicker
 				$(this).datepicker(
 				{
-					dateFormat:'yy-mm-dd',
-					changeMonth: true,
-					changeYear: true
+					dateFormat	: _dateformat,
+					changeMonth	: true,
+					changeYear	: true,
+					yearRange	: _yearrange
 				}).prop( 'readonly', true );
 			});
 		}
@@ -533,17 +516,25 @@ NAILS_JS = function()
 			//	Datetime pickers
 			$( 'div.field.datetime input.datetime' ).each( function()
 			{
+				//	Fetch some info which may be available in the data attributes
+				var _dateformat	= $(this).data( 'datepicker-dateformat' ) || 'yy-mm-dd';
+				var _timeformat	= $(this).data( 'datepicker-timeformat' ) || 'HH:mm:ss';
+				var _yearrange	= $(this).data( 'datepicker-yearrange' ) || 'c-100:c+10';
+
 				$(this).datetimepicker(
 				{
-					dateFormat:'yy-mm-dd',
-					timeFormat:'HH:mm:ss'
+					dateFormat	: _dateformat,
+					timeFormat	: _timeformat,
+					changeMonth	: true,
+					changeYear	: true,
+					yearRange	: _yearrange
 				}).prop( 'readonly', true );
 
 			});
 		}
 		else
 		{
-			this.error( 'NAILS_JS: datetimepicker not available.' );
+			this.log( 'NAILS_JS: datetimepicker not available.' );
 		}
 	};
 
@@ -586,9 +577,9 @@ NAILS_JS = function()
 
 	this.log = function( output )
 	{
-		if ( window.console && ENVIRONMENT !== 'production' )
+		if ( window.console && window.ENVIRONMENT !== 'production' )
 		{
-			console.log( output);
+			console.log( output );
 		}
 	};
 
@@ -598,9 +589,21 @@ NAILS_JS = function()
 
 	this.error = function( output )
 	{
-		if ( window.console && ENVIRONMENT !== 'production' )
+		if ( window.console && window.ENVIRONMENT !== 'production' )
 		{
-			console.error( output);
+			console.error( output );
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this.warn = function( output )
+	{
+		if ( window.console && window.ENVIRONMENT !== 'production' )
+		{
+			console.warn( output );
 		}
 	};
 };

@@ -43,7 +43,7 @@
 	<p class="row">
 		The following tests are configured to run on this application. Select which tests you'd like to execute and hit the 'Run Tests' button below to begin testing.
 	</p>
-	<p class="row system-alert message no-close">
+	<p class="row system-alert message">
 		<strong>Please Remember: </strong> Tests can sometimes take a while to execute. If you're finding page timeouts occur or out of memory limits please try running these tests from the command line.
 	</p>
 

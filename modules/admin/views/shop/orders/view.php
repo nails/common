@@ -508,7 +508,7 @@
 
 					if ( $item->was_on_sale ) :
 
-						echo img( array( 'src' => NAILS_URL . 'img/modules/shop/basket/ribbon-on-sale.png', 'class' => 'ribbon' ) );
+						echo img( array( 'src' => NAILS_ASSETS_URL . 'img/modules/shop/basket/ribbon-on-sale.png', 'class' => 'ribbon' ) );
 
 					endif;
 
@@ -571,7 +571,7 @@
 							// --------------------------------------------------------------------------
 
 							echo '<td class="actions">';
-							if ( $user->has_permission( 'admin.shop.process' ) ) :
+							if ( user_has_permission( 'admin.shop.process' ) ) :
 
 								echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/unprocessed' . $_is_fancybox, 'Mark as Unprocessed', 'class="awesome small red"' );
 
@@ -589,7 +589,7 @@
 							// --------------------------------------------------------------------------
 
 							echo '<td class="actions">';
-							if ( $user->has_permission( 'admin.shop.process' ) ) :
+							if ( user_has_permission( 'admin.shop.process' ) ) :
 
 								echo anchor( 'admin/shop/orders/process/' . $order->id . '/' . $item->id . '/processed' . $_is_fancybox, 'Mark as Processed', 'class="awesome small green"' );
 

@@ -20,22 +20,24 @@
 		<meta name="author" content="">
 
 		<!--	STYLES	-->
-		<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_URL . 'css/nails.admin.css'?>" />
+		<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.css'?>" />
 		<?=$this->asset->output( 'css' )?>
 
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
-			var ENVIRONMENT		= '<?=ENVIRONMENT?>';
-			window.SITE_URL		= '<?=site_url()?>';
-			window.NAILS_URL	= '<?=NAILS_URL?>';
-			window.NAILS_LANG	= {};
+			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
+			window.NAILS					= {};
+			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
+			window.NAILS.LANG				= {};
+			window.NAILS.USER				= {};
+			window.NAILS.USER.ID			= <?=active_user( 'id' ) ? active_user( 'id' ) : 'null'?>;
+			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
+			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
+			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
 		</script>
 
 		<!-- JAVASCRIPT[S] -->
-
-		<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.default.min.js'?>"></script>
-		<script type="text/javascript" src="<?=NAILS_URL . 'js/nails.admin.min.js'?>"></script>
-
 		<?=$this->asset->output( 'js' )?>
 
 	</head>

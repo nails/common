@@ -8,32 +8,32 @@
 
 	$this->load->view( 'email/shop/utilities/order_table', array( 'type' => 'receipt' ) );
 
-	if ( shop_setting( 'invoice_company' ) || shop_setting( 'invoice_vat_no' ) || shop_setting( 'invoice_address' ) || shop_setting( 'invoice_company_no' ) ) :
+	if ( app_setting( 'invoice_company', 'shop' ) || app_setting( 'invoice_vat_no', 'shop' ) || app_setting( 'invoice_address', 'shop' ) || app_setting( 'invoice_company_no', 'shop' ) ) :
 
 		echo '<hr />';
 		echo '<p><small>';
 
-		if ( shop_setting( 'invoice_company' ) ) :
+		if ( app_setting( 'invoice_company', 'shop' ) ) :
 
-			echo '<div>Company: ' . shop_setting( 'invoice_company' ) . '</div>';
-
-		endif;
-
-		if ( shop_setting( 'invoice_vat_no' ) ) :
-
-			echo '<div>VAT: ' . shop_setting( 'invoice_vat_no' ) . '</div>';
+			echo '<div>Company: ' . app_setting( 'invoice_company', 'shop' ) . '</div>';
 
 		endif;
 
-		if ( shop_setting( 'invoice_address' ) ) :
+		if ( app_setting( 'invoice_vat_no', 'shop' ) ) :
 
-			echo '<div>Address: ' . shop_setting( 'invoice_address' ) . '</div>';
+			echo '<div>VAT: ' . app_setting( 'invoice_vat_no', 'shop' ) . '</div>';
 
 		endif;
 
-		if ( shop_setting( 'invoice_company_no' ) ) :
+		if ( app_setting( 'invoice_address', 'shop' ) ) :
 
-			echo '<div>Company No.: ' . shop_setting( 'invoice_company_no' ) . '</div>';
+			echo '<div>Address: ' . app_setting( 'invoice_address', 'shop' ) . '</div>';
+
+		endif;
+
+		if ( app_setting( 'invoice_company_no', 'shop' ) ) :
+
+			echo '<div>Company No.: ' . app_setting( 'invoice_company_no', 'shop' ) . '</div>';
 
 		endif;
 

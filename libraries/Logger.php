@@ -7,10 +7,11 @@
  *
  */
 
-class Logger {
-
-	private $ci;
-	private $log;
+class Logger
+{
+	private $_log;
+	private $_is_cli;
+	public $mute_output;
 
 
 	// --------------------------------------------------------------------------
@@ -22,19 +23,24 @@ class Logger {
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function __construct( $log_file = NULL, $log_dir = NULL )
+	public function __construct()
 	{
-		$this->ci =& get_instance();
+		//	Load helper
+		get_instance()->load->helper( 'file' );
 
-		$this->ci->load->helper( 'file' );
+		// --------------------------------------------------------------------------
 
-		$this->log			= new stdClass();
-		$this->log->exists	= FALSE;
-		$this->log->file	= $log_file ? $log_file : date( 'Y-m-d' ) . '.php';
+		//	On the CLI?
+		$this->_is_cli = get_instance()->input->is_cli_request();
 
-		$this->log_dir( $log_dir );
+		// --------------------------------------------------------------------------
+
+		//	Define defaults
+		$this->_log			= new stdClass();
+		$this->_log->exists	= FALSE;
+		$this->_log->file	= DEPLOY_LOG_DIR .  'log-' . date( 'Y-m-d' ) . '.php';
+		$this->mute_output	= FALSE;
 	}
 
 
@@ -47,28 +53,39 @@ class Logger {
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function line( $line = '' )
 	{
 		//	If the log file doesn't exist (or we haven't checked already), attempt to create it
-		if ( ! $this->log->exists ) :
+		if ( ! $this->_log->exists ) :
 
-			if ( ! file_exists( $this->log->dir . $this->log->file ) ) :
+			if ( ! file_exists( $this->_log->file ) ) :
 
-				if ( write_file( $this->log->dir . $this->log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n" ) ) :
+				//	Check directory is there
+				$_dir = dirname( $this->_log->file );
 
-					$this->log->exists = TRUE;
+				if ( ! is_dir( $_dir ) ) :
+
+					//	Create structure
+					mkdir( $_dir, 0750, TRUE );
+
+				endif;
+
+				// --------------------------------------------------------------------------
+
+				if ( write_file( $this->_log->file, '<?php if ( ! defined(\'BASEPATH\')) exit(\'No direct script access allowed\'); ?>'."\n\n" ) ) :
+
+					$this->_log->exists = TRUE;
 
 				else :
 
-					$this->log->exists = FALSE;
+					$this->_log->exists = FALSE;
 
 				endif;
 
 			else :
 
-				$this->log->exists = TRUE;
+				$this->_log->exists = TRUE;
 
 			endif;
 
@@ -76,15 +93,15 @@ class Logger {
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->log->exists ) :
+		if ( $this->_log->exists ) :
 
 			if ( empty( $line ) ) :
 
-				write_file( $this->log->dir . $this->log->file, "\n", 'a' );
+				write_file( $this->_log->file, "\n", 'a' );
 
 			else :
 
-				write_file( $this->log->dir . $this->log->file, date('Y-m-d H:i:s').' -- ' . trim( $line ) . "\n", 'a' );
+				write_file( $this->_log->file, 'INFO - ' . date( 'Y-m-d H:i:s' ) . ' --> ' . trim( $line ) . "\n", 'a' );
 
 			endif;
 
@@ -94,7 +111,7 @@ class Logger {
 
 		//	If we're working on the command line then pump it out there too
 
-		if ( $this->ci->input->is_cli_request() ) :
+		if ( $this->_is_cli ) :
 
 			fwrite( STDOUT, $line . "\n" );
 
@@ -103,8 +120,9 @@ class Logger {
 		// --------------------------------------------------------------------------
 
 		//	If we're not on production and the request is not CLI then echo to the browser
-		if ( ENVIRONMENT != 'production' && ! $this->ci->input->is_cli_request() ) :
+		if ( ENVIRONMENT != 'production' && ! $this->_is_cli && ! $this->mute_output ) :
 
+			@ob_start();
 			echo $line . "<br />\n";
 			@ob_flush();
 
@@ -121,47 +139,15 @@ class Logger {
 	 * @access	public
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function log_file( $log_file = NULL )
+	public function set_file( $file = NULL )
 	{
 		//	Reset the log exists var so that line() checks again
-		$this->log->exists = FALSE;
+		$this->_log->exists = FALSE;
 
 		// --------------------------------------------------------------------------
 
-		$this->log->file = ( $log_file ) ? $log_file : date( 'Y-m-d' ) . '.php';
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Change the directory which is being logged to
-	 *
-	 * @access	public
-	 * @param	string
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function log_dir( $log_dir = NULL )
-	{
-		//	Reset the log exists var so that line() checks again
-		$this->log->exists = FALSE;
-
-		// --------------------------------------------------------------------------
-
-		if ( $log_dir ) :
-
-			$this->log->dir = FCPATH . APPPATH . 'logs/' . $log_dir;
-			$this->log->dir .= substr( $this->log->dir, -1 ) != '/' ? '/' : '';
-
-		else :
-
-			$this->log->dir = FCPATH . APPPATH . 'logs/';
-
-		endif;
+		$this->_log->file = $file ? FCPATH . APPPATH . 'logs/' . $file : FCPATH . APPPATH . 'logs/' .  date( 'Y-m-d' ) . '.php';
 	}
 }
 

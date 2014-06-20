@@ -20,65 +20,32 @@ class NAILS_Country_model extends NAILS_Model
 	public function __construct()
 	{
 		parent::__construct();
-
-		// --------------------------------------------------------------------------
-
-		$this->_table	= 'country';
-		$this->_prefix	= 'c';
+		$this->config->load( 'countries' );
 	}
 
 
+	// --------------------------------------------------------------------------
+	//	COUNTRY METHODS
 	// --------------------------------------------------------------------------
 
 
 	public function get_all()
 	{
-		$this->db->select( 'c.*, l.slug lang_slug,l.name lang_label' );
-		$this->db->join( 'language l', 'l.id = c.language_id', 'left' );
-		$this->db->order_by( 'c.iso_name' );
-		$_result = $this->db->get( 'country c' );
-
-		if ( ! $_result ) :
-
-			return array();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_results = $_result->result();
-
-		//	Format
-		foreach ( $_results AS $country ) :
-
-			$this->_format_country_object( $country );
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_results;
+		return $this->config->item( 'countries' );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Fetches all objects as a flat array
-	 *
-	 * @access public
-	 * @param none
-	 * @return array
-	 **/
 	public function get_all_flat()
 	{
-		$_countrys	= $this->get_all();
 		$_out		= array();
+		$_countries	= $this->get_all();
 
-		foreach ( $_countrys AS $country ) :
+		foreach( $_countries AS $c ) :
 
-			$_out[$country->id] = $country->iso_name;
+			$_out[$c->code] = $c->label;
 
 		endforeach;
 
@@ -89,21 +56,42 @@ class NAILS_Country_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _format_country_object( &$country )
+	public function get_by_code( $code )
 	{
-		$country->id	= (int) $country->id;
+		$_countries = $this->get_all();
 
-		// --------------------------------------------------------------------------
+		return ! empty( $_countries[$code] ) ? $_countries[$code] : FALSE;
+	}
 
-		//	Langauge
-		$country->language			= new stdClass();
-		$country->language->id		= (int) $country->language_id;
-		$country->language->slug	= (int) $country->lang_slug;
-		$country->language->label	= (int) $country->lang_label;
 
-		unset( $country->language_id );
-		unset( $country->lang_slug );
-		unset( $country->lang_label );
+	// --------------------------------------------------------------------------
+	//	CONTINENT METHODS
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_continents()
+	{
+		return $this->config->item( 'continents' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_all_continents_flat()
+	{
+		return $this->get_all_continents();
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_continent_by_code( $code )
+	{
+		$_continents = $this->get_all();
+
+		return ! empty( $_continents[$code] ) ? $_continents[$code] : FALSE;
 	}
 }
 
@@ -122,12 +110,12 @@ class NAILS_Country_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

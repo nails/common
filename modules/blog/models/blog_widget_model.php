@@ -17,10 +17,34 @@
 
 class NAILS_Blog_widget_model extends NAILS_Model
 {
-	public function __construct()
+	/**
+	 * Fetches the latest blog posts
+	 * @param  integer $limit The maximum number of posts to return
+	 * @return array
+	 */
+	public function latest_posts( $limit = 5 )
 	{
-		//	Fetch the Blog URL
-		$this->data['blog_url'] = blog_setting( 'blog_url' );
+		$this->db->select( 'id,slug,title,published' );
+		$this->db->where( 'is_published', TRUE );
+		$this->db->where( 'published <=', 'NOW()', FALSE );
+		$this->db->where( 'is_deleted', FALSE );
+		$this->db->limit( $limit );
+		$this->db->order_by( 'published', 'DESC' );
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post' )->result();
+
+		if ( ! $this->load->model_is_loaded( 'blog_post_model' ) ) :
+
+			$this->load->model( 'blog/blog_post_model' );
+
+		endif;
+
+		foreach ( $_posts AS $post ) :
+
+			$post->url = $this->blog_post_model->format_url( $post->slug );
+
+		endforeach;
+
+		return $_posts;
 	}
 
 
@@ -32,72 +56,35 @@ class NAILS_Blog_widget_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param array $config Changes to the default configs
-	 * @param boolean $return_html Whether to return HTML or just the data
-	 * @return mixed``
+	 * @return array
 	 **/
-	public function latest_posts( $config = array(), $return_html = TRUE )
+	public function popular_posts( $limit = 5 )
 	{
-		//	Define defaults
-		$_config				= new stdClass();
-		$_config->limit			= isset( $config['limit'] ) ? (int) $config['limit'] : 5;
-		$_config->h_tag			= isset( $config['h_tag'] ) ? $config['h_tag'] : '5';
-		$_config->h_class		= isset( $config['h_class'] ) ? $config['h_class'] : '';
-		$_config->li_class		= isset( $config['li_class'] ) ? $config['li_class'] : '';
-		$_config->title			= isset( $config['title'] ) ? $config['title'] : 'Latest Posts';
-		$_config->meta_show		= isset( $config['meta_show'] ) ? $config['meta_show'] : TRUE;
-		$_config->meta_class	= isset( $config['meta_class'] ) ? $config['meta_class'] : '';
+		$this->db->select( 'bp.id,bp.slug,bp.title,bp.published,COUNT(bph.id) hits' );
+		$this->db->join( NAILS_DB_PREFIX . 'blog_post bp', 'bp.id = bph.post_id' );
+		$this->db->where( 'bp.is_published', TRUE );
+		$this->db->where( 'bp.published <=', 'NOW()', FALSE );
+		$this->db->where( 'bp.is_deleted', FALSE );
+		$this->db->group_by( 'bp.id' );
+		$this->db->order_by( 'hits', 'DESC' );
+		$this->db->order_by( 'bp.published', 'DESC' );
+		$this->db->limit( $limit );
 
-		// --------------------------------------------------------------------------
+		$_posts = $this->db->get( NAILS_DB_PREFIX . 'blog_post_hit bph' )->result();
 
-		$this->db->select( 'id,slug,title,published' );
-		$this->db->where( 'is_published', TRUE );
-		$this->db->where( 'is_deleted', FALSE );
-		$this->db->limit( $_config->limit );
-		$this->db->order_by( 'published', 'DESC' );
-		$_posts = $this->db->get( 'blog_post' )->result();
+		if ( ! $this->load->model_is_loaded( 'blog_post_model' ) ) :
 
-		// --------------------------------------------------------------------------
-
-		//	Any data?
-		if ( ! $_posts ) :
-
-			return FALSE;
+			$this->load->model( 'blog/blog_post_model' );
 
 		endif;
 
-		// --------------------------------------------------------------------------
+		foreach ( $_posts AS $post ) :
 
-		//	Render HTML?
-		if ( $return_html ) :
+			$post->url = $this->blog_post_model->format_url( $post->slug );
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
-			$_out .= '<ul>';
+		endforeach;
 
-			foreach ( $_posts AS $post ) :
-
-				$_out .= '<li class="' . $_config->li_class . '">';
-				$_out .= anchor( $this->data['blog_url'] . $post->slug, $post->title );
-
-				if ( $_config->meta_show ) :
-
-					$_out .= '<small class="' . $_config->meta_class . '">';
-					$_out .= 'Published ' . date( 'jS F Y, H:i', strtotime( $post->published ) );
-					$_out .= '</small>';
-
-				endif;
-				$_out .= '</li>';
-
-			endforeach;
-
-			$_out .= '</ul>';
-
-			return $_out;
-
-		else :
-
-			return $_posts;
-
-		endif;
+		return $_posts;
 	}
 
 
@@ -110,74 +97,41 @@ class NAILS_Blog_widget_model extends NAILS_Model
 	 * @access public
 	 * @param array $config Changes to the default configs
 	 * @param boolean $return_html Whether to return HTML or just the data
-	 * @return mixed
+	 * @return array
 	 **/
-	public function categories( $config = array(), $return_html = TRUE )
+	public function categories( $include_count = TRUE, $only_populated = TRUE )
 	{
-		//	Define defaults
-		$_config				= new stdClass();
-		$_config->limit			= isset( $config['limit'] ) ? (int) $config['limit'] : NULL;
-		$_config->h_tag			= isset( $config['h_tag'] ) ? $config['h_tag'] : '5';
-		$_config->h_class		= isset( $config['h_class'] ) ? $config['h_class'] : '';
-		$_config->li_class		= isset( $config['li_class'] ) ? $config['li_class'] : '';
-		$_config->title			= isset( $config['title'] ) ? $config['title'] : 'Categories';
-		$_config->show_count	= isset( $config['show_count'] ) ? $config['show_count'] : TRUE;
-
-		// --------------------------------------------------------------------------
-
 		$this->db->select( 'c.id,c.slug,c.label' );
 
-		if ( $_config->show_count ) :
+		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT bpc.post_id) FROM blog_post_category bpc JOIN blog_post bp ON bpc.post_id = bp.id WHERE bpc.category_id = c.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpc.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_category bpc JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpc.post_id = bp.id WHERE bpc.category_id = c.id AND bp.is_published = 1 AND bp.is_deleted = 0 AND bp.published <= NOW()) post_count' );
 
 		endif;
 
-		if ( ! is_null( $_config->limit ) && is_numeric( $_config->limit ) ) :
+		if ( $only_populated ) :
 
-			$this->db->limit( $_config->limit );
+			$this->db->having( 'post_count > ', 0 );
 
 		endif;
 
 		$this->db->order_by( 'c.label' );
-		$_cats = $this->db->get( 'blog_category c' )->result();
 
-		// --------------------------------------------------------------------------
+		$_categories = $this->db->get( NAILS_DB_PREFIX . 'blog_category c' )->result();
 
-		//	Any data?
-		if ( ! $_cats ) :
+		if ( ! $this->load->model_is_loaded( 'blog_category_model' ) ) :
 
-			return FALSE;
+			$this->load->model( 'blog/blog_category_model' );
 
 		endif;
 
-		// --------------------------------------------------------------------------
+		foreach ( $_categories AS $cat ) :
 
-		//	Render HTML?
-		if ( $return_html ) :
+			$cat->url = $this->blog_category_model->format_url( $cat->slug );
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
-			$_out .= '<ul>';
+		endforeach;
 
-			foreach ( $_cats AS $cat ) :
-
-				$_out .= '<li class="' . $_config->li_class . '">';
-
-				$_count = $_config->show_count ? ' (' . $cat->post_count . ')' : '';
-				$_out .= '&rsaquo; ' . anchor( $this->data['blog_url'] . 'category/' . $cat->slug, $cat->label ) . $_count;
-				$_out .= '</li>';
-
-			endforeach;
-
-			$_out .= '</ul>';
-
-			return $_out;
-
-		else :
-
-			return $_cats;
-
-		endif;
+		return $_categories;
 	}
 
 
@@ -192,72 +146,39 @@ class NAILS_Blog_widget_model extends NAILS_Model
 	 * @param boolean $return_html Whether to return HTML or just the data
 	 * @return mixed
 	 **/
-	public function tags( $config = array(), $return_html = TRUE )
+	public function tags( $include_count = TRUE, $only_populated = TRUE )
 	{
-		//	Define defaults
-		$_config				= new stdClass();
-		$_config->limit			= isset( $config['limit'] ) ? (int) $config['limit'] : NULL;
-		$_config->h_tag			= isset( $config['h_tag'] ) ? $config['h_tag'] : '5';
-		$_config->h_class		= isset( $config['h_class'] ) ? $config['h_class'] : '';
-		$_config->li_class		= isset( $config['li_class'] ) ? $config['li_class'] : '';
-		$_config->title			= isset( $config['title'] ) ? $config['title'] : 'Tags';
-		$_config->show_count	= isset( $config['show_count'] ) ? $config['show_count'] : TRUE;
-
-		// --------------------------------------------------------------------------
-
 		$this->db->select( 't.id,t.slug,t.label' );
 
-		if ( $_config->show_count ) :
+		if ( $include_count ) :
 
-			$this->db->select( '(SELECT COUNT(DISTINCT bpt.post_id) FROM blog_post_tag bpt JOIN blog_post bp ON bpt.post_id = bp.id WHERE tag_id = t.id AND bp.is_published = 1 AND bp.is_deleted = 0) post_count' );
+			$this->db->select( '(SELECT COUNT(DISTINCT bpt.post_id) FROM ' . NAILS_DB_PREFIX . 'blog_post_tag bpt JOIN ' . NAILS_DB_PREFIX . 'blog_post bp ON bpt.post_id = bp.id WHERE bpt.tag_id = t.id AND bp.is_published = 1 AND bp.is_deleted = 0 AND bp.published <= NOW()) post_count' );
 
 		endif;
 
-		if ( ! is_null( $_config->limit ) && is_numeric( $_config->limit ) ) :
+		if ( $only_populated ) :
 
-			$this->db->limit( $_config->limit );
+			$this->db->having( 'post_count > ', 0 );
 
 		endif;
 
 		$this->db->order_by( 't.label' );
-		$_tags = $this->db->get( 'blog_tag t' )->result();
 
-		// --------------------------------------------------------------------------
+		$_tags = $this->db->get( NAILS_DB_PREFIX . 'blog_tag t' )->result();
 
-		//	Any data?
-		if ( ! $_tags ) :
+		if ( ! $this->load->model_is_loaded( 'blog_tag_model' ) ) :
 
-			return FALSE;
+			$this->load->model( 'blog/blog_tag_model' );
 
 		endif;
 
-		// --------------------------------------------------------------------------
+		foreach ( $_tags AS $tag ) :
 
-		//	Render HTML?
-		if ( $return_html ) :
+			$tag->url = $this->blog_tag_model->format_url( $tag->slug );
 
-			$_out = '<h' . $_config->h_tag . ' class="' . $_config->h_class . '">' . $_config->title . '</h' . $_config->h_tag . '>';
-			$_out .= '<ul>';
+		endforeach;
 
-			foreach ( $_tags AS $tag ) :
-
-				$_out .= '<li class="' . $_config->li_class . '">';
-
-				$_count = $_config->show_count ? ' (' . $tag->post_count . ')' : '';
-				$_out .= '&rsaquo; ' . anchor( $this->data['blog_url'] . 'tag/' . $tag->slug, $tag->label ) . $_count;
-				$_out .= '</li>';
-
-			endforeach;
-
-			$_out .= '</ul>';
-
-			return $_out;
-
-		else :
-
-			return $_cats;
-
-		endif;
+		return $_tags;
 	}
 }
 
@@ -276,12 +197,12 @@ class NAILS_Blog_widget_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

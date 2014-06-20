@@ -4,51 +4,48 @@
 * Name:			Event
 *
 * Description:	A library for creating and reading event objects.
-* 
+*
 */
 
 class Event {
-	
+
 	private $_ci;
 	private $db;
 	private $_event_table;
 	private	$_error;
 	private $_event_type;
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
 		$this->_ci	=& get_instance();
 		$this->db	=& $this->_ci->db;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Set defaults
-		$this->_event_table		= 'event';
-		$this->_event_table_ip	= 'event_interested_party';
 		$this->_error			= array();
 		$this->_event_type		= array();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Load helper
 		$this->_ci->load->helper( 'event' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Create an event object
 	 *
@@ -60,54 +57,53 @@ class Event {
 	 * @param	int			$ref				A numeric reference to store alongside the event (e.g the id of the object the event relates to)
 	 * @param	string		$recorded			A strtotime() friendly string of the date to use instead of NOW() for the created date
 	 * @return	int or boolean
-	 * @author	Pablo
 	 **/
 	public function create( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $data = NULL, $ref = NULL, $recorded = NULL )
 	{
 		//	Admins logged in as people shouldn't be creating events, GHOST MODE, woooooooo
 		//	Ghost mode runs on production only, all other environments generate events (for testing)
-		
+
 		if ( ENVIRONMENT == 'production' && get_userobject()->was_admin() ) :
-		
+
 			return TRUE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( empty( $type ) ) :
-		
+
 			$this->_add_error( 'Event type not defined.' );
 			return FALSE;
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! is_string( $type ) ) :
-		
+
 			$this->_add_error( 'Event type must be a string.' );
 			return FALSE;
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Get the event type
 		if ( ! isset( $this->_event_type[$type] ) ) :
-		
+
 			$this->db->select( 'id' );
 			$this->db->where( 'slug', $type );
-			$this->_event_type[$type] = $this->db->get( 'event_type' )->row();
-			
+			$this->_event_type[$type] = $this->db->get( NAILS_DB_PREFIX . 'event_type' )->row();
+
 			if ( ! $this->_event_type[$type] )
 				show_error( 'Unrecognised event type.' );
-			
-		
+
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Prep created by
 		$created_by = (int) $created_by;
 		if ( ! $created_by ) :
@@ -117,7 +113,7 @@ class Event {
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		//	Prep data
 		$_data					= array();
 		$_data['type_id']		= (int) $this->_event_type[$type]->id;
@@ -127,188 +123,186 @@ class Event {
 		$_data['ref']			= (int) $ref;
 		$_data['ref']			= $_data['ref'] ? $_data['ref'] : NULL;
 		$_data['level']			= $level;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( $_data );
-		
+
 		if ( $recorded ) :
-		
+
 			$_data['created'] = date( 'Y-m-d H:i:s', strtotime( $recorded ) );
-		
+
 		else :
-		
+
 			$this->db->set( 'created', 'NOW()', FALSE );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Create the event
-		$this->db->insert( $this->_event_table );
-		
+		$this->db->insert( NAILS_DB_PREFIX . 'event' );
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $this->db->affected_rows() ) :
-		
+
 			$this->_add_error( 'Event could not be created' );
 			return FALSE;
-		
+
 		else :
-		
+
 			$_event_id = $this->db->insert_id();
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		/**
 		 *	Add the interested parties.
 		 *	The creator (if one is defined) will also be added as an interested party
 		 *	however it will be immediately marked as read (so as not to generate a
 		 *	notification badge for them.
-		 * 
+		 *
 		 **/
-		
+
 		//	Prep the $_data array
 		$_data = array();
-		
+
 		if ( $created_by ) :
-		
+
 			$_data[] = array(
-				'event_id'	=> $_event_id,	
+				'event_id'	=> $_event_id,
 				'user_id'	=> $created_by,
 				'is_read'	=> TRUE
 			);
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Add the other interested parties (if any)
-		
+
 		if ( $interested_parties !== NULL ) :
-		
+
 			if ( is_numeric( $interested_parties ) )
 				$interested_parties = array( $interested_parties );
-			
+
 			// --------------------------------------------------------------------------
-			
+
 			foreach( $interested_parties AS $ip ) :
-			
+
 				//	Don't add the creator as an interested party
 				if ( $ip == $created_by )
 					continue;
-					
+
 				// --------------------------------------------------------------------------
-				
+
 				$_data[] = array(
-					'event_id'	=> $_event_id,	
+					'event_id'	=> $_event_id,
 					'user_id'	=> $ip,
 					'is_read'	=> FALSE
 				);
-			
+
 			endforeach;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $_data ) :
-		
+
 			//	Attempt to add interested parties
-			$this->db->insert_batch( $this->_event_table_ip, $_data );
-			
+			$this->db->insert_batch( NAILS_DB_PREFIX . 'event_interested_party', $_data );
+
 			if ( $this->db->affected_rows() ) :
-			
+
 				//	All good! Return the new event ID
 				return $_event_id;
-			
+
 			else :
-			
+
 				$this->_add_error( 'Interested parties failed to add, event not created' );
-				
+
 				//	Roll back the event
 				$this->db->where( 'id', $_event_id );
-				$this->db->delete( $this->_event_table );
-				
+				$this->db->delete( NAILS_DB_PREFIX . 'event' );
+
 				return FALSE;
-			
+
 			endif;
-			
+
 		else :
-		
+
 			//	No interested parties, so simply return the event ID
 			return $_event_id;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Return result
 		return TRUE;
-			
+
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Destroy an event object
 	 *
 	 * @access	public
 	 * @param	int		$id		The ID of the event object to destroy
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	public function destroy( $id )
 	{
 		if ( empty( $id ) ) :
-		
+
 			$this->_add_error( 'Event ID not defined.' );
 			return FALSE;
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Perform delete
-		$this->db->where( 'id', $id );	
-		$this->db->delete( $this->_event_table );
-		
+		$this->db->where( 'id', $id );
+		$this->db->delete( NAILS_DB_PREFIX . 'event' );
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Spit back result
 		if  ( $this->db->affected_rows() ) :
-		
+
 			return TRUE;
-		
+
 		else :
-		
+
 			$this->_add_error( 'Event failed to delete' );
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Get all event objects
 	 *
 	 * @access	public
 	 * @param	array	$limit	An optional limit value
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $include_interested_parties = FALSE )
 	{
 		//	Fetch all objects from the table
 		$this->db->select( 'e.*, et.slug type_slug, et.label type_label, et.description type_description, et.ref_join_table, et.ref_join_column' );
-		$this->db->select( 'u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
+		$this->db->select( 'ue.email,u.first_name,u.last_name,u.profile_img,u.gender' );
 
 		//	Set Order
 		if ( is_array( $order ) ) :
@@ -320,35 +314,35 @@ class Event {
 			$this->db->order_by( 'e.created', 'DESC' );
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Set Limit
 		if ( is_array( $limit ) ) :
 
 			$this->db->limit( $limit[0], $limit[1] );
 
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Build conditionals
 		$this->_getcount_common( $where );
 
 		// --------------------------------------------------------------------------
-		
-		$_events = $this->db->get( $this->_event_table . ' e' )->result();
-		
+
+		$_events = $this->db->get( NAILS_DB_PREFIX . 'event' . ' e' )->result();
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Prep the output. Loop the results and organise into single events with
 		//	interested parties as a sub-array. This method only requires a single
 		//	query to the DB rather than one for each returned event.
-		
+
 		$_created_parts_keys	= array( 'year', 'month', 'day' );
-		
+
 		foreach( $_events AS $event ) :
-		
+
 			$this->_format_event_object( $event) ;
 
 			// --------------------------------------------------------------------------
@@ -358,18 +352,18 @@ class Event {
 				$event->interested_parties = $this->_get_interested_parties_for_event( $event->id );
 
 			endif;
-		
+
 		endforeach;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_events;
 	}
 
 
 	// --------------------------------------------------------------------------
 
-	
+
 	/**
 	 * Counts the total amount of events for a partricular query/search key. Essentially performs
 	 * the same query as $this->get_all() but without limiting.
@@ -378,107 +372,104 @@ class Event {
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function count_all( $where = NULL )
 	{
 		$this->_getcount_common( $where );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Execute Query
-		return $this->db->count_all_results( $this->_event_table . ' e' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'event' . ' e' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	private function _getcount_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'event_type et', 'e.type_id = et.id', 'LEFT' );
-		$this->db->join( 'user u', 'u.id = e.created_by', 'LEFT' );
-		
+		$this->db->join( NAILS_DB_PREFIX . 'event_type et', 'e.type_id = et.id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = e.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Set Where
 		if ( $where ) :
-		
+
 			$this->db->where( $where );
-			
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Get a particular event
 	 *
 	 * @access	public
 	 * @param	int		$id		the ID of the event to fetch
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_id( $id )
 	{
 		$this->db->where( 'e.id', $id );
 		$_event = $this->get_all();
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( $_event ) :
-		
+
 			return $_event[0];
-		
+
 		else :
-					
+
 			$this->_add_error( 'No event by that ID (' . $id . ').' );
 			return FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch event objects of a particular type
 	 *
 	 * @access	public
 	 * @param	string	$type	The Type of event to fetch
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_type( $type )
 	{
 		if ( is_numeric( $type ) ) :
-		
+
 			$this->db->where( 'et.id', $type );
-		
+
 		else :
-		
+
 			$this->db->where( 'et.slug', $type );
-		
+
 		endif;
-		
+
 		return $this->get_all();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch event objects created by a particular user
 	 *
 	 * @access	public
 	 * @param	int		$id		The Id of the user who created the objects
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function get_by_user( $user_id )
 	{
@@ -493,7 +484,7 @@ class Event {
 	public function get_types()
 	{
 		$this->db->order_by( 'label,slug' );
-		return $this->db->get( 'event_type' )->result();;
+		return $this->db->get( NAILS_DB_PREFIX . 'event_type' )->result();
 	}
 
 
@@ -514,10 +505,10 @@ class Event {
 
 		return $_out;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
+
 
 	/**
 	 * Return the error array
@@ -525,24 +516,22 @@ class Event {
 	 * @access	public
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	public function errors()
 	{
 		return $this->_error;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Set an error
 	 *
 	 * @access	private
 	 * @param	string	$error the error to add to the $_error array
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _add_error( $error )
 	{
@@ -558,7 +547,7 @@ class Event {
 		//	Ints
 		$obj->id	= (int) $obj->id;
 		$obj->level	= (int) $obj->level;
-		$obj->ref	= is_null( $obj->ref ) ? NULL : (int) $obj->ref;
+		$obj->ref	= NULL === $obj->ref ? NULL : (int) $obj->ref;
 
 		//	Type
 		$obj->type					= new stdClass();

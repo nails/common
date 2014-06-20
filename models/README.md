@@ -12,4 +12,4 @@ Current generic models are stored in system/models.
 
 See the docs for more information
 
-http://docs.nailsapp.co.uk/extending-nails/models
+TODO: link to docs

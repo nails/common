@@ -1,19 +1,29 @@
 var NAILS_CDN_Manager;
 NAILS_CDN_Manager =  function() {
 
-	this.handler		= '';
-	this.callback		= '';
-	this.url_schemes	= {};
-	this.is_fancybox	= '';
+	this.handler			= '';
+	this.callback			= '';
+	this.url_schemes		= {};
+	this.is_fancybox		= '';
+	this.reopen_fancybox	= '';
+	this._api				= null;
 
 	// --------------------------------------------------------------------------
 
-	this.init = function( handler, callback, url_schemes, is_fancybox )
+	this.init = function( handler, callback, url_schemes, is_fancybox, reopen_fancybox )
 	{
-		this.handler		= handler;
-		this.callback		= callback;
-		this.url_schemes	= url_schemes;
-		this.is_fancybox	= is_fancybox;
+		this.handler			= handler;
+		this.callback			= callback;
+		this.url_schemes		= url_schemes;
+		this.is_fancybox		= is_fancybox;
+		this.reopen_fancybox	= reopen_fancybox;
+
+		// --------------------------------------------------------------------------
+
+		//	Set up the API interface
+		this._api = new window.NAILS_API();
+
+		// --------------------------------------------------------------------------
 
 		this._init_submit();
 		this._init_alerts();
@@ -37,13 +47,13 @@ NAILS_CDN_Manager =  function() {
 		{
 			if ( this.is_fancybox )
 			{
-				_callable = typeof( parent[this.callback] ) === 'function' ? true : false;
+				_callable = typeof( window.parent._nails_forms[this.callback] ) === 'function' ? true : false;
 			}
 			else
 			{
 				if ( window.opener )
 				{
-					_callable = typeof( window.opener[this.callback] ) === 'function' ? true : false;
+					_callable = typeof( window.opener._nails_forms[this.callback] ) === 'function' ? true : false;
 				}
 				else
 				{
@@ -56,6 +66,22 @@ NAILS_CDN_Manager =  function() {
 		{
 			$( 'a.insert' ).remove();
 		}
+
+		// --------------------------------------------------------------------------
+
+		//	Initiate the fancyboxes, doing so here so we can style it slightly differently
+		$( 'a.cdn-fancybox' ).fancybox(
+		{
+			padding:0,
+			wrapCSS: 'cdn-fancybox',
+			helpers :
+			{
+				title:
+				{
+					type: 'over'
+				}
+			}
+		});
 	};
 
 
@@ -75,7 +101,7 @@ NAILS_CDN_Manager =  function() {
 	this._init_alerts = function()
 	{
 		var _this = this;	/*	Ugly Scope Hack	*/
-		$( '.system-alert .awesome' ).on( 'click', function() { _this._hide_alert(); } );
+		$( '.system-alert .awesome' ).on( 'click', function() { _this._hide_alert(); return false; } );
 
 		// --------------------------------------------------------------------------
 
@@ -135,8 +161,6 @@ NAILS_CDN_Manager =  function() {
 			});
 
 			return false;
-
-			return confirm( 'Are you sure?\n\n' );
 		});
 	};
 
@@ -150,17 +174,17 @@ NAILS_CDN_Manager =  function() {
 
 		$( 'a.insert' ).on( 'click', function()
 		{
-			var _bucket	= $(this).attr( 'data-bucket' );
-			var _file	= $(this).attr( 'data-file' );
-			var _id		= $(this).attr( 'data-id' );
+			var _file		= $(this).attr( 'data-file' );
+			var _id			= $(this).attr( 'data-id' );
+			var _fieldid	= $(this).attr( 'data-fieldid' );
 
 			if ( _this.handler === 'ckeditor' )
 			{
-				_this._insert_ckeditor( _bucket, _file, _id );
+				_this._insert_ckeditor( _file, _id, _fieldid );
 			}
 			else
 			{
-				_this._insert_native( _bucket, _file, _id );
+				_this._insert_native( _file, _id, _fieldid );
 			}
 
 			//	Close window
@@ -190,15 +214,19 @@ NAILS_CDN_Manager =  function() {
 		//	Choose the scheme to use (TODO, make this dynamic)
 		var _scheme = this.url_schemes.serve;
 
+		//	Break into filename and extensions
+		var _file = file.split( '.' );
+
 		//	Define the data object
 		var _data = {
-			bucket	: bucket,
-			file	: file,
-			id		: id,
-			width	: 0,		//	TODO
-			height	: 0,		//	TODO
-			sex		: '',		//	TODO
-			border	: 0			//	TODO
+			bucket		: bucket,
+			filename	: _file[0],
+			extension	: '.' + _file[1],
+			id			: id,
+			width		: 0,		//	TODO
+			height		: 0,		//	TODO
+			sex			: '',		//	TODO
+			border		: 0			//	TODO
 		};
 
 		//	Apply the scheme
@@ -212,15 +240,15 @@ NAILS_CDN_Manager =  function() {
 	// --------------------------------------------------------------------------
 
 
-	this._insert_native = function( bucket, file, id )
+	this._insert_native = function( file, id, fieldid )
 	{
 		if ( this.is_fancybox )
 		{
-			parent[this.callback].call( bucket, file, id );
+			window.parent._nails_forms[this.callback].call( null, file, id, this.reopen_fancybox, fieldid );
 		}
 		else
 		{
-			window.opener[this.callback].call( bucket, file, id );
+			window.opener._nails_forms[this.callback].call( null, file, id, this.reopen_fancybox, fieldid );
 		}
 	};
 
@@ -245,7 +273,7 @@ NAILS_CDN_Manager =  function() {
 				var _droppable = $(this);
 				var _draggable = $(ui.draggable);
 
-				_api.call(
+				_this._api.call(
 				{
 					controller	: 'cdnapi',
 					method		: 'add_object_tag',
@@ -278,7 +306,7 @@ NAILS_CDN_Manager =  function() {
 				var _droppable = $(this);
 				var _draggable = $(ui.draggable);
 
-				_api.call(
+				_this._api.call(
 				{
 					controller	: 'cdnapi',
 					method		: 'delete_object_tag',
@@ -309,7 +337,15 @@ NAILS_CDN_Manager =  function() {
 
 	this._add_tag_fail = function( dropabble, draggable, data )
 	{
-		var _data = JSON.parse( data.responseText );
+		var _data;
+		try
+		{
+			_data = JSON.parse( data.responseText );
+		}
+		catch( err )
+		{
+			_data = { 'error' : 'An unknown error occurred' };
+		}
 		alert( _data.error );
 		dropabble.find( '.count' ).removeClass( 'saving' );
 	};
@@ -331,7 +367,15 @@ NAILS_CDN_Manager =  function() {
 
 	this._remove_tag_fail = function( dropabble, draggable, data )
 	{
-		var _data = JSON.parse( data.responseText );
+		var _data;
+		try
+		{
+			_data = JSON.parse( data.responseText );
+		}
+		catch( err )
+		{
+			_data = { 'error' : 'An unknown error occurred' };
+		}
 		alert( _data.error );
 		dropabble.removeClass( 'saving' );
 	};
@@ -367,7 +411,7 @@ NAILS_CDN_Manager =  function() {
 
 	this._do_search = function( term )
 	{
-		$( 'li.file' ).each(function()
+		$( 'li.file,tr.file:not(.head)' ).each(function()
 		{
 			var regex = new RegExp( term, 'gi' );
 

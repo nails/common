@@ -9,7 +9,7 @@
 		for ( $x=0; $x < count( $_data ); $x++ ) :
 
 			echo $x == 0 ? '' : ',';
-			echo '"' . str_replace( '"', '\"', $_data[$x] ) . '"';
+			echo '"' . str_replace( '"', '""', $_data[$x] ) . '"';
 
 		endfor;
 

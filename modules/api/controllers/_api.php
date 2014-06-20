@@ -16,7 +16,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	public function __construct()
@@ -25,18 +24,8 @@ class NAILS_API_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'api' ) ) :
-
-			//	Cancel execution, module isn't enabled
-			show_404();
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	Load language file
-		$this->lang->load( 'api', RENDER_LANG_SLUG );
+		$this->lang->load( 'api' );
 	}
 
 	// --------------------------------------------------------------------------
@@ -48,15 +37,14 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	protected function _out( $out = array(), $format = 'JSON', $send_header = TRUE )
 	{
 		//	Set JSON headers
+		$this->output->set_content_type( 'application/json' );
 		$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		$this->output->set_header( 'Content-type: application/json' );
 		$this->output->set_header( 'Pragma: no-cache' );
 
 		// --------------------------------------------------------------------------
@@ -68,11 +56,11 @@ class NAILS_API_Controller extends NAILS_Controller
 
 				switch ( $out['status'] ) :
 
-					case 400 :	$this->output->set_header( 'HTTP/1.0 400 Bad Request' );			break;
-					case 401 :	$this->output->set_header( 'HTTP/1.0 401 Unauthorized' );			break;
-					case 404 :	$this->output->set_header( 'HTTP/1.0 404 Not Found' );				break;
-					case 500 :	$this->output->set_header( 'HTTP/1.0 500 Internal Server Error' );	break;
-					default  :	$this->output->set_header( 'HTTP/1.0 200 OK' );						break;
+					case 400 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );			break;
+					case 401 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 401 Unauthorized' );			break;
+					case 404 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 404 Not Found' );				break;
+					case 500 :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 500 Internal Server Error' );	break;
+					default  :	$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 200 OK' );						break;
 
 				endswitch;
 
@@ -84,7 +72,7 @@ class NAILS_API_Controller extends NAILS_Controller
 
 			if ( $send_header ) :
 
-				$this->output->set_header( 'HTTP/1.0 200 OK' );
+				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 200 OK' );
 
 			endif;
 
@@ -106,7 +94,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	public function _remap( $method )
@@ -132,7 +119,6 @@ class NAILS_API_Controller extends NAILS_Controller
 	 *	@access	public
 	 *	@param	none
 	 *	@return void
-	 *	@author Pablo
 	 *
 	 **/
 	protected function _method_not_found( $method )

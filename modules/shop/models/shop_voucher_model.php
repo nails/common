@@ -4,22 +4,22 @@
  * Name:			shop_voucher_model.php
  *
  * Description:		This model handles everything to do with vouchers
- * 
+ *
  **/
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * Note the name of this class; done like this to allow apps to extend this class.
  * Read full explanation at the bottom of this file.
- * 
+ *
  **/
 
 class NAILS_Shop_voucher_model extends NAILS_Model
 {
 	/**
 	 * Creates a new object
-	 * 
+	 *
 	 * @access public
 	 * @param array $data The data to create the object with
 	 * @param bool $return_obj Whether to return just the new ID or the full object
@@ -29,49 +29,49 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		if ( $data )
 			$this->db->set( $data );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		
-		if ( $this->user->is_logged_in() ) :
-		
+
+		if ( $this->user_model->is_logged_in() ) :
+
 			$this->db->set( 'created_by', active_user( 'id' ) );
 			$this->db->set( 'modified_by', active_user( 'id' ) );
-		
+
 		endif;
-		
-		$this->db->insert( 'shop_voucher' );
-		
+
+		$this->db->insert( NAILS_DB_PREFIX . 'shop_voucher' );
+
 		if ( $return_obj ) :
-		
+
 			if ( $this->db->affected_rows() ) :
-			
+
 				$_id = $this->db->insert_id();
-				
+
 				return $this->get_by_id( $_id );
-			
+
 			else :
-			
+
 				return FALSE;
-			
+
 			endif;
-		
+
 		else :
-		
+
 			return $this->db->affected_rows() ? $this->db->insert_id() : FALSE;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Updates an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to update
 	 * @param array $data The data to update the object with
@@ -81,29 +81,29 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		if ( ! $data )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
-		if ( $this->user->is_logged_in() ) :
-		
+		if ( $this->user_model->is_logged_in() ) :
+
 			$this->db->set( 'modified_by', active_user( 'id' ) );
-		
+
 		endif;
 		$this->db->where( 'id', $id );
-		$this->db->update( 'shop_voucher' );
-		
+		$this->db->update( NAILS_DB_PREFIX . 'shop_voucher' );
+
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Deletes an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to delete
 	 * @return bool
@@ -113,14 +113,14 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		$_data = array( 'is_deleted' => TRUE );
 		return $this->update( $id, $_data );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Permenantly deletes an existing object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to delete
 	 * @return bool
@@ -128,17 +128,17 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	public function destroy( $id )
 	{
 		$this->db->where( 'id', $id );
-		$this->db->delete( 'shop_voucher' );
+		$this->db->delete( NAILS_DB_PREFIX . 'shop_voucher' );
 		return (bool) $this->db->affected_rows();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Recovers a deleted object
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to recover
 	 * @return bool
@@ -163,8 +163,8 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		if ( is_numeric( $order ) ) :
 
-			$this->load->model( 'shop/shop_order_model', 'order' );
-			$order = $this->order->get_by_id( $order );
+			$this->load->model( 'shop/shop_order_model' );
+			$order = $this->shop_order_model->get_by_id( $order );
 
 		endif;
 
@@ -181,7 +181,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 				$this->db->set( 'use_count', 'use_count+1', FALSE );
 
 				$this->db->where( 'id', $voucher->id );
-				$this->db->update( 'shop_voucher' );
+				$this->db->update( NAILS_DB_PREFIX . 'shop_voucher' );
 
 			break;
 
@@ -196,7 +196,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		if ( $order->requires_shipping ) :
 
-			if ( shop_setting( 'free_shipping_threshold' ) <= $order->totals->sub ) :
+			if ( app_setting( 'free_shipping_threshold', 'shop' ) <= $order->totals->sub ) :
 
 				//	The order qualifies for free shipping, ignore the discount
 				//	given in discount->shipping
@@ -211,13 +211,13 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 				$_spend = $order->discount->items + $order->discount->shipping;
 
 			endif;
-		else: 
+		else:
 
 			//	The discount given by the giftcard is that of discount->items
 			$_spend = $order->discount->items;
 
 		endif;
-		
+
 		//	Bump the use count
 		$this->db->set( 'last_used', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
@@ -230,23 +230,23 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		$this->db->set( 'gift_card_balance', 'gift_card_balance-' . $_spend , FALSE );
 
 		$this->db->where( 'id', $voucher->id );
-		$this->db->update( 'shop_voucher' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_voucher' );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches all objects
-	 * 
+	 *
 	 * @access public
 	 * @param none
 	 * @return array
 	 **/
 	public function get_all( $only_active = TRUE, $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
-		$this->db->select( 'v.*, u.email,u.first_name,u.last_name,u.profile_img,u.gender' );
+		$this->db->select( 'v.*, ue.email,u.first_name,u.last_name,u.profile_img,u.gender' );
 
 		// --------------------------------------------------------------------------
 
@@ -285,19 +285,19 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		//	Ignore deleted vouchers
 		$this->db->where( 'v.is_deleted', FALSE );
 
-		$_vouchers = $this->db->get( 'shop_voucher v' )->result();
+		$_vouchers = $this->db->get( NAILS_DB_PREFIX . 'shop_voucher v' )->result();
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_type_model' );
 
 		foreach ( $_vouchers AS $voucher ) :
 
-			//	Fetch extra data 
+			//	Fetch extra data
 			switch ( $voucher->discount_application ) :
 
 				case 'PRODUCT_TYPES' :
-				
+
 					$_cache = $this->_get_cache(  'voucher-product-type-' . $voucher->product_type_id );
 					if ( $_cache ) :
 
@@ -307,7 +307,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 					else :
 
 						//	Doesn't exist, fetch and save
-						$voucher->product = $this->product->get_product_type_by_id( $voucher->product_type_id );
+						$voucher->product = $this->shop_product_type_model->get_by_id( $voucher->product_type_id );
 						$this->_set_cache( 'voucher-product-type-' . $voucher->product_type_id, $voucher->product );
 
 					endif;
@@ -326,11 +326,11 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 		return $_vouchers;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Counts the total amount of vouchers for a partricular query/search key. Essentially performs
 	 * the same query as $this->get_all() but without limiting.
@@ -339,8 +339,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
-	 * 
+	 *
 	 **/
 	public function count_vouchers( $only_active = TRUE, $where = NULL, $search = NULL )
 	{
@@ -352,18 +351,18 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		// --------------------------------------------------------------------------
-		
+
 		$this->_getcount_vouchers_common( $where, $search );
 
 		// --------------------------------------------------------------------------
 
 		//	Ignore deleted vouchers
 		$this->db->where( 'v.is_deleted', FALSE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_voucher v' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_voucher v' );
 	}
 
 
@@ -372,132 +371,133 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	protected function _getcount_vouchers_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user u', 'u.id = v.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = v.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		//	Set Where
 		if ( $where ) :
-		
+
 			$this->db->where( $where );
-			
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Set Search
 		if ( $search && is_string( $search ) ) :
-		
+
 			//	Search is a simple string, no columns are being specified to search across
 			//	so define a default set to search across
-			
+
 			$search								= array( 'keywords' => $search, 'columns' => array() );
 			$search['columns']['id']			= 'v.id';
 			$search['columns']['code']			= 'v.code';
-			
+
 		endif;
-		
+
 		//	If there is a search term to use then build the search query
 		if ( isset( $search[ 'keywords' ] ) && $search[ 'keywords' ] ) :
-		
+
 			//	Parse the keywords, look for specific column searches
 			preg_match_all('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', $search['keywords'], $_matches );
-			
+
 			if ( $_matches[1] && $_matches[2] ) :
-			
+
 				$_specifics = array_combine( $_matches[1], $_matches[2] );
-				
+
 			else :
-			
+
 				$_specifics = array();
-			
+
 			endif;
-			
+
 			//	Match the specific labels to a column
 			if ( $_specifics ) :
-			
+
 				$_temp = array();
 				foreach ( $_specifics AS $col => $value ) :
-				
+
 					if ( isset( $search['columns'][ strtolower( $col )] ) ) :
-						
+
 						$_temp[] = array(
 							'cols'	=> $search['columns'][ strtolower( $col )],
 							'value'	=> $value
 						);
-						
+
 					endif;
-				
+
 				endforeach;
 				$_specifics = $_temp;
 				unset( $_temp );
-				
+
 				// --------------------------------------------------------------------------
-				
+
 				//	Remove controls from search string
 				$search['keywords'] = preg_replace('/\(([a-zA-Z0-9\.\- ]+):([a-zA-Z0-9\.\- ]+)\)/', '', $search['keywords'] );
-			
+
 			endif;
-			
+
 			if ( $_specifics ) :
-			
+
 				//	We have some specifics
 				foreach( $_specifics AS $specific ) :
-				
+
 					if ( is_array( $specific['cols'] ) ) :
-					
+
 						$_separator = array_shift( $specific['cols'] );
 						$this->db->like( 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $specific['cols'] ) . ' )', $specific['value'] );
-					
+
 					else :
-					
+
 						$this->db->like( $specific['cols'], $specific['value'] );
-					
+
 					endif;
-				
+
 				endforeach;
-			
+
 			endif;
-			
-			
+
+
 			// --------------------------------------------------------------------------
-			
-			if ( $search['keywords'] ) : 
-			
+
+			if ( $search['keywords'] ) :
+
 				$_where  = '(';
-				
+
 				if ( isset( $search[ 'columns' ] ) && $search[ 'columns' ] ) :
-				
+
 					//	We have some specifics
 					foreach( $search[ 'columns' ] AS $col ) :
-					
+
 						if ( is_array( $col ) ) :
-						
+
 							$_separator = array_shift( $col );
 							$_where .= 'CONCAT_WS( \'' . $_separator . '\', ' . implode( ',', $col ) . ' ) LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
-						
+
 						else :
-						
+
 							$_where .= $col . ' LIKE \'%' . trim( $search['keywords'] ) . '%\' OR ';
-						
+
 						endif;
-					
+
 					endforeach;
-				
+
 				endif;
-				
+
 				$this->db->where( substr( $_where, 0, -3 ) . ')' );
-				
+
 			endif;
-		
+
 		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's code
-	 * 
+	 *
 	 * @access public
 	 * @param int $code The code of the object to fetch
 	 * @return	stdClass
@@ -506,24 +506,24 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		$this->db->where( 'v.code', $code );
 		$_result = $this->get_all( FALSE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an object by it's ID
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The ID of the object to fetch
 	 * @return	stdClass
@@ -532,14 +532,14 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 	{
 		$this->db->where( 'v.id', $id );
 		$_result = $this->get_all( FALSE );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		if ( ! $_result )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_result[0];
 	}
 
@@ -549,7 +549,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	/**
 	 * Validate a voucher
-	 * 
+	 *
 	 * @access public
 	 * @param int $id The voucher code to validate
 	 * @return	boolean
@@ -564,7 +564,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		$_voucher = $this->get_by_code( $code );
-		
+
 		if ( ! $_voucher ) :
 
 			$this->_set_error( 'Invalid voucher code.' );
@@ -596,7 +596,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		//	Voucher expired?
-		if ( ! is_null( $_voucher->valid_to ) && $_voucher->valid_to != '0000-00-00 00:00:00' && strtotime( $_voucher->valid_to ) < time() ) :
+		if ( NULL !== $_voucher->valid_to && $_voucher->valid_to != '0000-00-00 00:00:00' && strtotime( $_voucher->valid_to ) < time() ) :
 
 			$this->_set_error( 'Voucher has expired.' );
 			return FALSE;
@@ -604,7 +604,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 		//	Is this a shipping voucher being applied to an order with no shippable items?
-		if ( ! is_null( $basket ) && $_voucher->discount_application == 'SHIPPING' && ! $basket->requires_shipping ) :
+		if ( NULL !== $basket && $_voucher->discount_application == 'SHIPPING' && ! $basket->requires_shipping ) :
 
 			$this->_set_error( 'Your order does not contian any items which require shipping, voucher not needed!' );
 			return FALSE;
@@ -615,9 +615,9 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		//	and the threshold has been reached then prevent it being added as it
 		//	doesn't make sense.
 
-		if ( ! is_null( $basket ) && shop_setting( 'free_shipping_threshold' ) && $_voucher->discount_application == 'SHIPPING' ) :
+		if ( NULL !== $basket && app_setting( 'free_shipping_threshold', 'shop' ) && $_voucher->discount_application == 'SHIPPING' ) :
 
-			if ( $basket->totals->sub >= shop_setting( 'free_shipping_threshold' ) ) :
+			if ( $basket->totals->sub >= app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 				$this->_set_error( 'Your order qualifies for free shipping, voucher not needed!' );
 				return FALSE;
@@ -627,10 +627,10 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 		endif;
 
 
-		//	If the voucher applies to a particular product type, check the absket contains
+		//	If the voucher applies to a particular product type, check the basket contains
 		//	that product, otherwise it doesn't make sense to add it
 
-		if ( ! is_null( $basket ) && $_voucher->discount_application == 'PRODUCT_TYPES' ) :
+		if ( NULL !== $basket && $_voucher->discount_application == 'PRODUCT_TYPES' ) :
 
 			$_matched = FALSE;
 
@@ -675,7 +675,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	/**
 	 * Obligatory validation method for 'normal' vouchers
-	 * 
+	 *
 	 * @access public
 	 * @param stdClass $voucher The voucher we're validating
 	 * @return	mixed
@@ -694,7 +694,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	/**
 	 * Checks that a limited use voucher has not been used too many times
-	 * 
+	 *
 	 * @access public
 	 * @param stdClass $voucher The voucher we're validating
 	 * @return	mixed
@@ -719,7 +719,7 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 	/**
 	 * Checks that a gift card has available balance
-	 * 
+	 *
 	 * @access public
 	 * @param stdClass $voucher The voucher we're validating
 	 * @return	mixed
@@ -779,28 +779,28 @@ class NAILS_Shop_voucher_model extends NAILS_Model
 
 /**
  * OVERLOADING NAILS' MODELS
- * 
+ *
  * The following block of code makes it simple to extend one of the core shop
  * models. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
  * Loader class well enough to change it 'properly').
- * 
+ *
  * Here's how it works:
- * 
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
- * 
+ *
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
+ *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
- * 
+ * declaring this helper class below; the helper gets instantiated et voila.
+ *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
  * the helper won't be declared so we can declare our own one, app specific.
- * 
+ *
  **/
- 
+
 if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_VOUCHER_MODEL' ) ) :
 
 	class Shop_voucher_model extends NAILS_Shop_voucher_model
@@ -810,4 +810,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_VOUCHER_MODEL' ) ) :
 endif;
 
 /* End of file shop_voucher_model.php */
-/* Location: ./application/models/shop_voucher_model.php */
+/* Location: ./modules/shop/models/shop_voucher_model.php */

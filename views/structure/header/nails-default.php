@@ -4,103 +4,75 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 	<head>
-
-		<!--	META	-->
-		<meta charset="utf-8">
-		<title><?=isset( $page->title ) && $page->title ? $page->title . ' - ' : ''?><?=APP_NAME?></title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="description" content="<?=isset( $page->description ) && $page->description ? $page->description : ''?>">
-		<meta name="description" content="<?=isset( $page->keywords ) && $page->keywords ? $page->keywords : ''?>">
-
-		<!--	JS GLOBALS	-->
-		<script type="text/javascript" src="<?=NAILS_URL?>config/assets.json?uid=<?=uniqid()?>"></script>
-		<script type="text/javascript">
-			var ENVIRONMENT				= '<?=ENVIRONMENT?>';
-			window.SITE_URL				= '<?=site_url()?>';
-			window.NAILS				= {}
-			window.NAILS.URL			= '<?=NAILS_URL?>';
-			window.NAILS.LANG			= {};
-		</script>
-
-		<noscript>
-			<style type="text/css">
-
-				.js-only
-				{
-					display:none;
-				}
-
-			</style>
-		</noscript>
-
-		<!--	STYLES	-->
 		<?php
 
-			$this->asset->output();
+			echo '<title>';
+
+				if ( ! empty( $page->seo->title ) ) :
+
+					echo $page->seo->title . ' - ';
+
+				elseif ( ! empty( $page->title ) ) :
+
+					echo $page->title . ' - ';
+
+				endif;
+
+				echo APP_NAME;
+
+			echo '</title>';
 
 		?>
 
-		<!--	HTML5 shim, for IE6-8 support of HTML5 elements	-->
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8">
+		<meta name="description" content="<?=! empty( $page->seo->description ) ? $page->seo->description : ''?>">
+		<meta name="keywords" content="<?=! empty( $page->seo->keywords ) ? $page->seo->keywords : ''?>">
+		<?php
 
+			$this->asset->output( 'css' );
+			$this->asset->output( 'css-inline' );
+
+		?>
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/html5shiv/dist/html5shiv.js'?>"></script>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
+		<![endif]-->
 	</head>
 	<body>
+		<div class="container">
+			<div class="row text-center" style="margin-top:1em;">
+				<?php
 
-	<div class="container">
+					if ( $user->was_admin() ) :
 
-		<!--	HEADER	-->
-		<div class="row" id="nails-default-header">
-			<div class="sixteen columns">
-				<h1><a href="<?=site_url()?>" class="brand"><?=APP_NAME?></a></h1>
-			</div>
-		</div>
+						echo '<div class="alert alert-info text-left">';
+							echo 'Logged in as <strong>' . active_user( 'first_name,last_name' ) . ' (' . active_user( 'email' ) . ')</strong>.';
+							echo anchor( $this->session->userdata( 'admin_recovery' )->back_to_admin_url, 'Back to Admin', 'class="pull-right btn btn-sm btn-default" style="margin-top:-0.5em;"' );
+						echo '</div>';
 
+					endif;
 
-		<!--	CONTENT	-->
-		<div class="row" id="nails-default-content">
-			<div class="sixteen columns">
+				?>
+				<h1>
+					<?=anchor( '', APP_NAME, 'style="text-decoration:none;color:inherit;"' )?>
+				</h1>
+				<p>
+					<?=NAILS_APP_STRAPLINE?>
+				</p>
+			</div><!-- /.row -->
+			<hr />
+			<?php
 
-				<?=isset( $page->title ) ? '<h2>' . $page->title . '</h2>' : NULL?>
+				if ( empty( $_NAILS_DEFAULT_HIDE_SYSTEM_ALERTS ) && ( $success || $error || $message || $notice ) ) :
 
-				<!--	SYSTEM ALERTS	-->
-				<?php if ( isset( $error ) && $error ) : ?>
-					<div class="system-alert error">
-						<div class="padder">
-							<p>
-								<?=$error?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+					echo '<div class="container row">';
+						echo $success	? '<p class="alert alert-success">' . $success . '</p>' : '';
+						echo $error		? '<p class="alert alert-danger">' . $error . '</p>' : '';
+						echo $message	? '<p class="alert alert-warning">' . $message . '</p>' : '';
+						echo $notice	? '<p class="alert alert-info">' . $notice . '</p>' : '';
+					echo '</div>';
 
-				<?php if ( isset( $success ) && $success ) : ?>
-					<div class="system-alert success">
-						<div class="padder">
-							<p>
-								<?=$success?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<?php if ( isset( $message ) && $message ) : ?>
-					<div class="system-alert message">
-						<div class="padder">
-							<p>
-								<?=$message?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<?php if ( isset( $notice ) && $notice ) : ?>
-					<div class="system-alert notice">
-						<div class="padder">
-							<p>
-								<?=$notice?>
-							</p>
-						</div>
-					</div>
-				<?php endif; ?>
+				endif;

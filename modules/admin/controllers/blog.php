@@ -1,8 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:			Admin : Blog
-*
+* Name:			Admin: Blog
 * Description:	Blog Manager
 *
 */
@@ -43,7 +42,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Configurations
-		$d->name				= 'Blog';					//	Display name.
+		$d->name = 'Blog';	//	Display name.
 
 		// --------------------------------------------------------------------------
 
@@ -54,15 +53,15 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		get_instance()->load->helper( 'blog_helper' );
 
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$d->funcs['manager_category']	= 'Manage Categories';	//	Sub-nav function.
+			$d->funcs['manage/categories']	= 'Manage Categories';	//	Sub-nav function.
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$d->funcs['manager_tag']		= 'Manage Tags';		//	Sub-nav function.
+			$d->funcs['manage/tags']		= 'Manage Tags';		//	Sub-nav function.
 
 		endif;
 
@@ -89,10 +88,10 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'blog/blog_model',			'blog' );
-		$this->load->model( 'blog/blog_post_model',		'post' );
-		$this->load->model( 'blog/blog_category_model',	'category' );
-		$this->load->model( 'blog/blog_tag_model',		'tag' );
+		$this->load->model( 'blog/blog_model' );
+		$this->load->model( 'blog/blog_post_model' );
+		$this->load->model( 'blog/blog_category_model' );
+		$this->load->model( 'blog/blog_tag_model' );
 	}
 
 
@@ -113,13 +112,31 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Fetch posts
-		$this->data['posts'] = $this->post->get_all( FALSE, FALSE );
+		//	Define the $_data variable, this'll be passed to the get_all() and count_all() methods
+		$_data = array( 'where' => array(), 'sort' => array() );
 
 		// --------------------------------------------------------------------------
 
-		//	Load assets
-		$this->asset->load( 'nails.admin.blog.min.js', TRUE );
+		//	Set useful vars
+		$_page			= $this->input->get( 'page' )		? $this->input->get( 'page' )		: 0;
+		$_per_page		= $this->input->get( 'per_page' )	? $this->input->get( 'per_page' )	: 50;
+		$_sort_on		= $this->input->get( 'sort_on' )	? $this->input->get( 'sort_on' )	: 'bp.published';
+		$_sort_order	= $this->input->get( 'order' )		? $this->input->get( 'order' )		: 'desc';
+		$_search		= $this->input->get( 'search' )		? $this->input->get( 'search' )		: '';
+
+		//	Set sort variables for view and for $_data
+		$this->data['sort_on']		= $_data['sort']['column']	= $_sort_on;
+		$this->data['sort_order']	= $_data['sort']['order']	= $_sort_order;
+		$this->data['search']		= $_data['search']			= $_search;
+
+		//	Define and populate the pagination object
+		$this->data['pagination']				= new stdClass();
+		$this->data['pagination']->page			= $_page;
+		$this->data['pagination']->per_page		= $_per_page;
+		$this->data['pagination']->total_rows	= $this->blog_post_model->count_all( $_data );
+
+		//	Fetch all the items for this page
+		$this->data['posts'] = $this->blog_post_model->get_all( $_page, $_per_page, $_data );
 
 		// --------------------------------------------------------------------------
 
@@ -151,20 +168,21 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->load->library( 'form_validation' );
 
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
-			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'is_published',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'published',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'body',				'',	'required' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
 			if ( $this->form_validation->run() ) :
 
 				//	Prepare data
-				$_data = array();
+				$_data						= array();
 				$_data['title']				= $this->input->post( 'title' );
 				$_data['excerpt']			= $this->input->post( 'excerpt' );
 				$_data['image_id']			= $this->input->post( 'image_id' );
@@ -172,22 +190,32 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
+				$_data['published']			= $this->input->post( 'published' );
 				$_data['associations']		= $this->input->post( 'associations' );
+				$_data['gallery']			= $this->input->post( 'gallery' );
 
-				if ( blog_setting( 'categories_enabled' ) ) :
+				if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-					$_data['categories']	= $this->input->post( 'categories' );
-
-				endif;
-
-				if ( blog_setting( 'tags_enabled' ) ) :
-
-					$_data['tags']			= $this->input->post( 'tags' );
+					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
-				if ( $this->post->create( $_data ) ) :
+				if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
+					$_data['tags'] = $this->input->post( 'tags' );
+
+				endif;
+
+				$_post_id = $this->blog_post_model->create( $_data );
+
+				if ( $_post_id ) :
+
+					//	Update admin changelog
+					_ADMIN_CHANGE_ADD( 'created', 'a', 'blog post', $_post_id, $_data['title'], 'admin/blog/edit/' . $_post_id );
+
+					// --------------------------------------------------------------------------
+
+					//	Set flashdata and redirect
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was created.' );
 					redirect( 'admin/blog' );
 					return;
@@ -209,34 +237,36 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Categories and Tags
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->data['categories']	= $this->category->get_all();
+			$this->data['categories'] = $this->blog_category_model->get_all();
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->data['tags']			= $this->tag->get_all();
+			$this->data['tags'] = $this->blog_tag_model->get_all();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Load associations
-		$this->data['associations'] = $this->blog->get_associations();
+		$this->data['associations'] = $this->blog_model->get_associations();
 
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->library( 'ckeditor' );
-		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.min.js', TRUE );
+		$this->asset->library( 'uploadify' );
+		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
+		$this->asset->load( 'mustache.js/mustache.js',									'BOWER' );
+		$this->asset->load( 'nails.admin.blog.create_edit.js',							TRUE );
+
 
 		// --------------------------------------------------------------------------
 
 		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'admin/blog/create',	$this->data );
+		$this->load->view( 'admin/blog/edit',	$this->data );
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 
@@ -256,7 +286,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$this->data['post'] = $this->post->get_by_id( $_post_id );
+		$this->data['post'] = $this->blog_post_model->get_by_id( $_post_id );
 
 		if ( ! $this->data['post'] ) :
 
@@ -278,13 +308,14 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 			$this->load->library( 'form_validation' );
 
-			$this->form_validation->set_rules( 'is_published',		'Is Published',		'xss_clean' );
-			$this->form_validation->set_rules( 'title',				'Title',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'excerpt',			'Excerpt',			'xss_clean|required' );
-			$this->form_validation->set_rules( 'image_id',			'Featured Image',	'xss_clean' );
-			$this->form_validation->set_rules( 'body',				'Body',				'required' );
-			$this->form_validation->set_rules( 'seo_description',	'SEO Description',	'xss_clean|required' );
-			$this->form_validation->set_rules( 'seo_keywords',		'SEO Keywords',		'xss_clean|required' );
+			$this->form_validation->set_rules( 'is_published',		'',	'xss_clean' );
+			$this->form_validation->set_rules( 'published',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'title',				'',	'xss_clean|required' );
+			$this->form_validation->set_rules( 'excerpt',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'image_id',			'',	'xss_clean' );
+			$this->form_validation->set_rules( 'body',				'',	'required' );
+			$this->form_validation->set_rules( 'seo_description',	'',	'xss_clean' );
+			$this->form_validation->set_rules( 'seo_keywords',		'',	'xss_clean' );
 
 			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
 
@@ -299,22 +330,124 @@ class NAILS_Blog extends NAILS_Admin_Controller
 				$_data['seo_description']	= $this->input->post( 'seo_description' );
 				$_data['seo_keywords']		= $this->input->post( 'seo_keywords' );
 				$_data['is_published']		= (bool) $this->input->post( 'is_published' );
+				$_data['published']			= $this->input->post( 'published' );
 				$_data['associations']		= $this->input->post( 'associations' );
+				$_data['gallery']			= $this->input->post( 'gallery' );
 
-				if ( blog_setting( 'categories_enabled' ) ) :
+				if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-					$_data['categories']	= $this->input->post( 'categories' );
-
-
-				endif;
-
-				if ( blog_setting( 'tags_enabled' ) ) :
-
-					$_data['tags']			= $this->input->post( 'tags' );
+					$_data['categories'] = $this->input->post( 'categories' );
 
 				endif;
 
-				if ( $this->post->update( $_post_id, $_data ) ) :
+				if ( app_setting( 'tags_enabled', 'blog' ) ) :
+
+					$_data['tags'] = $this->input->post( 'tags' );
+
+				endif;
+
+				if ( $this->blog_post_model->update( $_post_id, $_data ) ) :
+
+					//	Update admin change log
+					foreach ( $_data AS $field => $value ) :
+
+						if ( isset( $this->data['post']->$field ) ) :
+
+							switch( $field ) :
+
+								case 'associations' :
+
+									//	TODO: changelog associations
+
+								break;
+
+								case 'categories' :
+
+									$_old_categories = array();
+									$_new_categories = array();
+
+									foreach( $this->data['post']->$field AS $v ) :
+
+										$_old_categories[] = $v->label;
+
+									endforeach;
+
+									if ( is_array( $value ) ) :
+
+										foreach( $value AS $v ) :
+
+											$_temp = $this->blog_category_model->get_by_id( $v );
+
+											if ( $_temp ) :
+
+												$_new_categories[] = $_temp->label;
+
+											endif;
+
+										endforeach;
+
+									endif;
+
+									asort( $_old_categories );
+									asort( $_new_categories );
+
+									$_old_categories = implode( ',', $_old_categories );
+									$_new_categories = implode( ',', $_new_categories );
+
+									_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $_old_categories, $_new_categories, FALSE );
+
+								break;
+
+								case 'tags' :
+
+									$_old_tags = array();
+									$_new_tags = array();
+
+									foreach( $this->data['post']->$field AS $v ) :
+
+										$_old_tags[] = $v->label;
+
+									endforeach;
+
+									if ( is_array( $value ) ) :
+
+										foreach( $value AS $v ) :
+
+											$_temp = $this->blog_tag_model->get_by_id( $v );
+
+											if ( $_temp ) :
+
+												$_new_tags[] = $_temp->label;
+
+											endif;
+
+										endforeach;
+
+									endif;
+
+									asort( $_old_tags );
+									asort( $_new_tags );
+
+									$_old_tags = implode( ',', $_old_tags );
+									$_new_tags = implode( ',', $_new_tags );
+
+									_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $_old_tags, $_new_tags, FALSE );
+
+								break;
+
+								default :
+
+										_ADMIN_CHANGE_ADD( 'updated', 'a', 'blog post', $_post_id,  $_data['title'], 'admin/accounts/edit/' . $_post_id, $field, $this->data['post']->$field, $value, FALSE );
+
+								break;
+
+							endswitch;
+
+						endif;
+
+					endforeach;
+
+					// --------------------------------------------------------------------------
 
 					$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was updated.' );
 					redirect( 'admin/blog' );
@@ -337,29 +470,30 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Categories and Tags
-		if ( blog_setting( 'categories_enabled' ) ) :
+		if ( app_setting( 'categories_enabled', 'blog' ) ) :
 
-			$this->data['categories']	= $this->category->get_all();
+			$this->data['categories'] = $this->blog_category_model->get_all();
 
 		endif;
 
-		if ( blog_setting( 'tags_enabled' ) ) :
+		if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
-			$this->data['tags']			= $this->tag->get_all();
+			$this->data['tags'] = $this->blog_tag_model->get_all();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Load associations
-		$this->data['associations'] = $this->blog->get_associations( $this->data['post']->id );
+		$this->data['associations'] = $this->blog_model->get_associations( $this->data['post']->id );
 
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->library( 'ckeditor' );
-		$this->asset->load( 'jquery.serializeobject.min.js', TRUE );
-		$this->asset->load( 'nails.admin.blog.create_edit.min.js', TRUE );
+		$this->asset->library( 'uploadify' );
+		$this->asset->load( 'jquery-serialize-object/jquery.serialize-object.min.js',	'BOWER' );
+		$this->asset->load( 'mustache.js/mustache.js',										'BOWER' );
+		$this->asset->load( 'nails.admin.blog.create_edit.js',							TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -377,7 +511,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$_post = $this->post->get_by_id( $_post_id );
+		$_post = $this->blog_post_model->get_by_id( $_post_id );
 
 		if ( ! $_post ) :
 
@@ -389,9 +523,12 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->post->delete( $_post_id ) ) :
+		if ( $this->blog_post_model->delete( $_post_id ) ) :
 
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/recover/' . $_post_id, 'Undo?' ) );
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was deleted successfully. ' . anchor( 'admin/blog/restore/' . $_post_id, 'Undo?' ) );
+
+			//	Update admin changelog
+			_ADMIN_CHANGE_ADD( 'deleted', 'a', 'blog post', $_post_id, $_post->title );
 
 		else :
 
@@ -408,30 +545,25 @@ class NAILS_Blog extends NAILS_Admin_Controller
 	// --------------------------------------------------------------------------
 
 
-	public function recover()
+	public function restore()
 	{
 		//	Fetch and check post
 		$_post_id = $this->uri->segment( 4 );
 
-		$_post = $this->post->get_by_id( $_post_id );
-
-		if ( ! $_post ) :
-
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I could\'t find a post by that ID.' );
-			redirect( 'admin/blog' );
-			return;
-
-		endif;
-
 		// --------------------------------------------------------------------------
 
-		if ( $this->post->recover( $_post_id ) ) :
+		if ( $this->blog_post_model->restore( $_post_id ) ) :
 
-			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was recovered successfully. ' );
+			$_post = $this->blog_post_model->get_by_id( $_post_id );
+
+			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Post was restored successfully. ' );
+
+			//	Update admin changelog
+			_ADMIN_CHANGE_ADD( 'restored', 'a', 'blog post', $_post_id, $_post->title, 'admin/blog/edit/' . $_post_id );
 
 		else :
 
-			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I failed to recover that post.' );
+			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> I failed to restore that post.' );
 
 		endif;
 
@@ -477,7 +609,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Handle POST
 		if ( $this->input->post() ) :
 
-			if ( $this->category->create( $this->input->post( 'category' ) ) ) :
+			if ( $this->blog_category_model->create( $this->input->post( 'category' ) ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Category created.';
 
@@ -491,7 +623,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->data['categories']	= $this->category->get_all( TRUE );
+		$this->data['categories']	= $this->blog_category_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -506,7 +638,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 	public function delete_category()
 	{
-		if ( $this->category->delete( $this->uri->segment( 4 ) ) ) :
+		if ( $this->blog_category_model->delete( $this->uri->segment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Category Deleted.' );
 
@@ -545,7 +677,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		//	Handle POST
 		if ( $this->input->post() ) :
 
-			if ( $this->tag->create( $this->input->post( 'tag' ) ) ) :
+			if ( $this->blog_tag_model->create( $this->input->post( 'tag' ) ) ) :
 
 				$this->data['success'] = '<strong>Success!</strong> Tag created.';
 
@@ -560,7 +692,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load Tags
-		$this->data['tags']	= $this->tag->get_all( TRUE );
+		$this->data['tags']	= $this->blog_tag_model->get_all( TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -575,7 +707,7 @@ class NAILS_Blog extends NAILS_Admin_Controller
 
 	public function delete_tag()
 	{
-		if ( $this->tag->delete( $this->uri->segment( 4 ) ) ) :
+		if ( $this->blog_tag_model->delete( $this->uri->segment( 4 ) ) ) :
 
 			$this->session->set_flashdata( 'success', '<strong>Success!</strong> Tag Deleted.' );
 
@@ -608,12 +740,12 @@ class NAILS_Blog extends NAILS_Admin_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -631,4 +763,4 @@ endif;
 
 
 /* End of file blog.php */
-/* Location: ./application/modules/admin/controllers/blog.php */
+/* Location: ./modules/admin/controllers/blog.php */

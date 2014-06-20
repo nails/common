@@ -27,7 +27,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function track_open()
 	{
@@ -58,6 +57,14 @@ class NAILS_Tracker extends NAILS_Email_Controller
 		header( 'Pragma: no-cache' );
 
 		echo base64_decode('R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -70,7 +77,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function track_link()
 	{
@@ -102,23 +108,25 @@ class NAILS_Tracker extends NAILS_Email_Controller
 
 			case 'BAD_HASH' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
-				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
+				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_email' ) ) ) );
+				log_message( 'error', 'Emailer link failed with reason BAD_HASH' );
 
 			break;
 
 			case 'BAD_LINK' :
 
+				$this->output->set_content_type( 'application/json' );
 				$this->output->set_header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 				$this->output->set_header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-				$this->output->set_header( 'Content-type: application/json' );
 				$this->output->set_header( 'Pragma: no-cache' );
-				$this->output->set_header( 'HTTP/1.0 400 Bad Request' );
+				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 				$this->output->set_output( json_encode( array( 'status' => 400, 'error' => lang( 'invalid_link' ) ) ) );
+				log_message( 'error', 'Emailer link failed with reason BAD_LINK' );
 
 			break;
 
@@ -141,7 +149,6 @@ class NAILS_Tracker extends NAILS_Email_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function _remap( $method )
 	{
@@ -172,12 +179,12 @@ class NAILS_Tracker extends NAILS_Email_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);

@@ -15,7 +15,7 @@ if ( ! function_exists( 'nice_time' ) )
 {
 	function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
 	{
-		return get_instance()->datetime->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
+		return get_instance()->datetime_model->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
 	}
 }
 
@@ -37,33 +37,33 @@ if ( ! function_exists( 'calculate_age' ) )
 	function calculate_age( $y, $m, $d, $death_y = NULL, $death_m = NULL, $death_d = NULL )
 	{
 		//	Only calculate to a date which isn't today if all values are supplied
-		if ( is_null( $death_y ) || is_null( $death_m ) || is_null( $death_d) ) :
-		
+		if ( NULL === $death_y  || NULL === $death_m || NULL === $death_d ) :
+
 			$death_y = date( 'Y' );
 			$death_m = date( 'm' );
 			$death_d = date( 'd' );
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$_birth_time = mktime( 0, 0, 0, $m, $d, $y );
 		$_death_time = mktime( 0, 0, 0, $death_m, $death_d, $death_y );
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	If $_death_time is smaller than $_birth_time then something's wrong
 		if ( $_death_time < $_birth_time )
 			return FALSE;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Calculate age
 		$_age		= ( $_birth_time < 0 ) ? ( $_death_time + ( $_birth_time * -1 ) ) : $_death_time - $_birth_time;
 		$_age_years	= floor( $_age / ( 31536000 ) );	//	Divide by number of seconds in a year
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		return $_age_years;
 	}
 }
@@ -86,32 +86,32 @@ if ( ! function_exists( 'dropdown_years' ) )
 	function dropdown_years( $field_name, $start_year = NULL, $end_year = NULL, $selected = NULL, $placeholder = NULL )
 	{
 		/*** defaults ***/
-		$start_year = ( is_null( $start_year ) )	? date( 'Y' )		: $start_year;
-		$end_year	= ( is_null( $end_year ) )		? $start_year - 10	: $end_year;
-		
+		$start_year = NULL === $start_year	? date( 'Y' )		: $start_year;
+		$end_year	= NULL === $end_year	? $start_year - 10	: $end_year;
+
 		/*** the current year ***/
-		$selected = is_null( $selected ) ? date( 'Y' ) : $selected;
-		
+		$selected = NULL ===$selected ? date( 'Y' ) : $selected;
+
 		/*** range of years ***/
 		$r = range( $start_year, $end_year );
-		
+
 		/*** create the select ***/
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">';
-		
+
 		$select .= "<option value=\"0000\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
-		
+
 		foreach( $r as $year ) :
-		
+
 			$select .= "<option value=\"$year\"";
 			$select .= ( $year == $selected ) ? ' selected="selected"' : '';
 			$select .= ">$year</option>\n";
-			
+
 		endforeach;
-		
+
 		$select .= '</select>';
-		
+
 		return $select;
 	}
 }
@@ -119,7 +119,7 @@ if ( ! function_exists( 'dropdown_years' ) )
 
 // --------------------------------------------------------------------------
 
-	
+
 /**
  * Dropdown - Months
  *
@@ -146,7 +146,7 @@ if ( ! function_exists( 'dropdown_months' ) )
 								10	=>	'Oct',
 								11	=>	'Nov',
 								12	=>	'Dec');
-		
+
 		$months_long = array(	1	=>	'January',
 								2	=>	'February',
 								3	=>	'March',
@@ -159,28 +159,28 @@ if ( ! function_exists( 'dropdown_months' ) )
 								10	=>	'October',
 								11	=>	'November',
 								12	=>	'December');
-								
-		$months = ( $short === FALSE ) ? $months_long : $months_short;
-		
+
+		$months = $short === FALSE ? $months_long : $months_short;
+
 		/*** current month ***/
-		$selected = is_null( $selected ) ? date( 'n' ) : $selected;
-		
+		$selected = NULL === $selected ? date( 'n' ) : $selected;
+
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
-		
+
 		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
-		
+
 		foreach( $months as $key => $mon ) :
-		
+
 			$select .= "<option value=\"".str_pad( $key, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $key == $selected ) ? ' selected="selected"' : '';
 			$select .= ">$mon</option>\n";
-		
+
 		endforeach;
-		
+
 		$select .= '</select>';
-		
+
 		return $select;
 	}
 }
@@ -204,26 +204,26 @@ if ( ! function_exists( 'dropdown_days' ) )
 	{
 		/*** range of days ***/
 		$r = range( 1, 31 );
-		
+
 		/*** current day ***/
-		$selected = is_null( $selected ) ? date( 'j' ) : $selected;
-		
+		$selected = NULL === $selected ? date( 'j' ) : $selected;
+
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
-		
+
 		$select .= "<option value=\"00\"";
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
-		
+
 		foreach ( $r as $day ) :
-		
+
 			$select .= "<option value=\"".str_pad( $day, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $day == $selected ) ? ' selected="selected"' : '';
 			$select .= ">".str_pad( $day, 2, '0', STR_PAD_LEFT )."</option>\n";
-		
+
 		endforeach;
-		
+
 		$select .= '</select>';
-		
+
 		return $select;
 	}
 }
@@ -247,24 +247,24 @@ if ( ! function_exists( 'dropdown_hours' ) )
 	{
 		/*** range of hours ***/
 		$r = range( 0, 23 );
-		
+
 		/*** current hour ***/
-		$selected = is_null( $selected ) ? date( 'G' ) : $selected;
-		
+		$selected = NULL === $selected ? date( 'G' ) : $selected;
+
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 		foreach ($r as $hour) :
-		
+
 			$select .= "<option value=\"".str_pad( $hour, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $hour == $selected ) ? ' selected="selected"' : '';
 			$select .= ">".str_pad ( $hour, 2, '0', STR_PAD_LEFT )."</option>\n";
-		
+
 		endforeach;
-		
+
 		$select .= '</select>';
-		
+
 		return $select;
 	}
-}	
+}
 
 
 // --------------------------------------------------------------------------
@@ -284,21 +284,21 @@ if ( ! function_exists( 'dropdown_minutes' ) )
 	function dropdown_minutes( $field_name, $range = NULL, $selected = NULL )
 	{
 		/*** array of mins ***/
-		$minutes = is_null( $range ) ? range( 0, 59 ) : $range ;
-		
+		$minutes = NULL === $range ? range( 0, 59 ) : $range ;
+
 		$selected = in_array( $selected, $minutes ) ? $selected : 0;
-		
+
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 		foreach( $minutes as $min ) :
-		
+
 			$select .= "<option value=\"".str_pad( $min, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $min == $selected ) ? ' selected="selected"' : '';
 			$select .= ">".str_pad( $min, 2, '0', STR_PAD_LEFT )."</option>\n";
-		
+
 		endforeach;
-		
+
 		$select .= '</select>';
-		
+
 		return $select;
 	}
 }
@@ -327,7 +327,7 @@ if ( ! function_exists( 'datepicker' ) )
 		$out .= ' &nbsp; ';
 		$out .= dropdown_hours( $field_name.'_hour' );
 		$out .= dropdown_minutes( $field_name.'_minute' );
-		
+
 		return $out;
 	}
 }

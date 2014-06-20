@@ -45,7 +45,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		if ( ! $this->_items ) :
 
 			//	Check the active_user data in case it exists there
-			$_saved_basket = unserialize( active_user( 'shop_basket' ) );
+			$_saved_basket = @unserialize( active_user( 'shop_basket' ) );
 
 			if ( $_saved_basket ) :
 
@@ -61,7 +61,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_personal_details	= $this->session->userdata( $this->sess_var . '_pd' );
+		$this->_personal_details = $this->session->userdata( $this->sess_var . '_pd' );
 
 		if ( ! $this->_personal_details ) :
 
@@ -74,21 +74,15 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_payment_gateway		= (int) $this->session->userdata( $this->sess_var . '_pg' );
+		$this->_payment_gateway	 = (int) $this->session->userdata( $this->sess_var . '_pg' );
 
 		// --------------------------------------------------------------------------
 
 		$this->_shipping_method	= $this->session->userdata( $this->sess_var . '_sm' );
 
-		$this->load->model( 'shop/shop_shipping_model', 'shipping' );
+		// --------------------------------------------------------------------------
 
-		if ( ! $this->_shipping_method ) :
-
-			$this->_shipping_method = $this->shipping->get_default_id();
-
-		endif;
-
-		$this->_shipping_details	= $this->session->userdata( $this->sess_var . '_sd' );
+		$this->_shipping_details = $this->session->userdata( $this->sess_var . '_sd' );
 
 		if ( ! $this->_shipping_details ) :
 
@@ -107,18 +101,18 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->_order_id			= (int) $this->session->userdata( $this->sess_var . '_oi' );
+		$this->_order_id = (int) $this->session->userdata( $this->sess_var . '_oi' );
 
 		// --------------------------------------------------------------------------
 
 		//	Handle voucher
-		$this->_voucher_code		= $this->session->userdata( $this->sess_var . '_vc' );
+		$this->_voucher_code = $this->session->userdata( $this->sess_var . '_vc' );
 
 		//	Check voucher is still valid
 		if ( $this->_voucher_code ) :
 
-			$this->load->model( 'shop/shop_voucher_model', 'voucher' );
-			$_voucher = $this->voucher->validate( $this->_voucher_code );
+			$this->load->model( 'shop/shop_voucher_model' );
+			$_voucher = $this->shop_voucher_model->validate( $this->_voucher_code );
 
 			if ( ! $_voucher ) :
 
@@ -141,7 +135,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 	public function get_basket()
 	{
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -183,12 +177,12 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		foreach ( $this->_items AS $basket_key => $item ) :
 
 			//	Fetch details about product and check availability
-			$_product = $this->product->get_by_id( $item->product_id );
+			$_product = $this->shop_product_model->get_by_id( $item->product_id );
 
 			//	Fetch shipping costs for this product
 			if ( $_product->type->requires_shipping ) :
 
-				$_product->shipping = $this->shipping->get_price_for_product( $_product->id, $_basket->shipping_method );
+				$_product->shipping = $this->shop_shipping_model->get_price_for_product( $_product->id, $_basket->shipping_method );
 
 			else :
 
@@ -197,17 +191,15 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				$_product->shipping->price_additional	= 0;
 				$_product->shipping->tax_rate			= 0;
 
-
 			endif;
 
-
-			if ( $_product && $_product->is_active && ( is_null( $_product->quantity_available ) || $_product->quantity_available ) ) :
+			if ( $_product && $_product->is_active && ( NULL === $_product->quantity_available || $_product->quantity_available ) ) :
 
 				//	Product is still available, calculate all we need to calculate
 				//	and format the basket object
 
 				//	Do we need to adjust quantities?
-				if ( ! is_null( $_product->quantity_available ) && $_product->quantity_available < $item->quantity ) :
+				if ( NULL !== $_product->quantity_available && $_product->quantity_available < $item->quantity ) :
 
 					$_basket->quantity_adjusted = $_product->title;
 
@@ -380,9 +372,9 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	If there's a free-shipping threshold, and it's been reached, apply a discount to the shipping
-		if ( shop_setting( 'free_shipping_threshold' ) && $_basket->requires_shipping ) :
+		if ( app_setting( 'free_shipping_threshold', 'shop' ) && $_basket->requires_shipping ) :
 
-			if ( $_basket->totals->sub >= shop_setting( 'free_shipping_threshold' ) ) :
+			if ( $_basket->totals->sub >= app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 				$_basket->discount->shipping	= $_basket->totals->shipping + $_basket->totals->tax_shipping;
 				$_basket->totals->grand			-=$_basket->discount->shipping;
@@ -397,7 +389,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Apply any vouchers which apply to just shipping
-		if ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && ( ! shop_setting( 'free_shipping_threshold' ) || shop_setting( 'free_shipping_threshold' ) > $_basket->totals->sub ) ) :
+		if ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && ( ! app_setting( 'free_shipping_threshold', 'shop' ) || app_setting( 'free_shipping_threshold', 'shop' ) > $_basket->totals->sub ) ) :
 
 			if ( $_basket->voucher->discount_type == 'PERCENTAGE' ) :
 
@@ -444,7 +436,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 			$_basket->totals->grand			= $_basket->totals->sub + $_basket->totals->shipping + $_basket->totals->tax_shipping + $_basket->totals->tax_items - $_basket->discount->shipping;
 			$_basket->totals->grand_render	= $_basket->totals->sub_render + $_basket->totals->shipping_render + $_basket->totals->tax_shipping_render + $_basket->totals->tax_items_render - $_basket->discount->shipping_render;
 
-		elseif ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && shop_setting( 'free_shipping_threshold' ) && shop_setting( 'free_shipping_threshold' ) < $_basket->totals->sub ) :
+		elseif ( $_basket->voucher && $_basket->voucher->discount_application == 'SHIPPING' && app_setting( 'free_shipping_threshold', 'shop' ) && app_setting( 'free_shipping_threshold', 'shop' ) < $_basket->totals->sub ) :
 
 			//	Voucher no longer makes sense. Remove it.
 			$this->_voucher_code		= FALSE;
@@ -531,7 +523,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 				//	Simple percentage, just knock that off the product and shipping totals
 
 				//	Check free shipping threshold
-				if ( ! shop_setting( 'free_shipping_threshold' ) || $_basket->totals->sub < shop_setting( 'free_shipping_threshold' ) ) :
+				if ( ! app_setting( 'free_shipping_threshold', 'shop' ) || $_basket->totals->sub < app_setting( 'free_shipping_threshold', 'shop' ) ) :
 
 					$_sdiscount			= ( $_basket->totals->shipping + $_basket->totals->tax_shipping ) * ( $_basket->voucher->discount_value / 100 );
 					$_sdiscount_render	= ( $_basket->totals->shipping_render + $_basket->totals->tax_shipping_render ) * ( $_basket->voucher->discount_value / 100 );
@@ -679,7 +671,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'shop/shop_product_model', 'product' );
+		$this->load->model( 'shop/shop_product_model' );
 
 		//	Check item isn't already in the basket
 		$_key = $this->_get_basket_key_by_product_id( $product_id );
@@ -696,7 +688,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Check the product ID is valid
-		$_product = $this->product->get_by_id( $product_id );
+		$_product = $this->shop_product_model->get_by_id( $product_id );
 
 		if ( ! $_product ) :
 
@@ -718,7 +710,7 @@ class NAILS_Shop_basket_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Check quantity is available, if more are being requested, then reduce.
-		if ( ! is_null( $_product->quantity_available ) && $quantity > $_product->quantity_available ) :
+		if ( NULL !== $_product->quantity_available && $quantity > $_product->quantity_available ) :
 
 			$quantity = $_product->quantity_available;
 
@@ -1041,10 +1033,10 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	{
 		$this->session->set_userdata( $this->sess_var, $this->_items );
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$_data = array( 'shop_basket' => serialize( $this->_items ) );
-			$this->user->update( active_user( 'id' ), $_data );
+			$this->user_model->update( active_user( 'id' ), $_data );
 
 		endif;
 	}
@@ -1077,10 +1069,10 @@ class NAILS_Shop_basket_model extends NAILS_Model
 	public function __destruct()
 	{
 		//	If logged in, save the basket to the user's meta data for safe keeping.
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$_data = array( 'shop_basket' => serialize( $this->_items ) );
-			$this->user->update( active_user( 'id' ), $_data );
+			$this->user_model->update( active_user( 'id' ), $_data );
 
 		endif;
 	}
@@ -1101,12 +1093,12 @@ class NAILS_Shop_basket_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -1123,4 +1115,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_BASKET_MODEL' ) ) :
 endif;
 
 /* End of file shop_basket_model.php */
-/* Location: ./application/models/shop_basket_model.php */
+/* Location: ./modules/shop/models/shop_basket_model.php */

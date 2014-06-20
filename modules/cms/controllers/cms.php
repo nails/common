@@ -32,7 +32,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->model( 'cms/cms_page_model', 'cms_page' );
+		$this->load->model( 'cms/cms_page_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 
 	public function index()
 	{
-		$_page = $this->cms_page->get_by_slug( $this->_slug, TRUE );
+		$_page = $this->cms_page_model->get_by_slug( $this->_slug, TRUE );
 
 		if ( ! $_page ) :
 
@@ -60,7 +60,7 @@ class NAILS_Cms extends NAILS_CMS_Controller
 		$this->data['page']->slug			= $_page->slug;
 		$this->data['page']->layout			= $_page->layout;
 		$this->data['page']->sidebar_width	= $_page->sidebar_width;
-		$this->data['rendered_page']		= $this->cms_page->render( $_page );
+		$this->data['rendered_page']		= $this->cms_page_model->render( $_page );
 
 		// --------------------------------------------------------------------------
 
@@ -69,7 +69,6 @@ class NAILS_Cms extends NAILS_CMS_Controller
 		$this->load->view( 'structure/footer',	$this->data );
 	}
 }
-
 
 
 // --------------------------------------------------------------------------
@@ -86,12 +85,12 @@ class NAILS_Cms extends NAILS_CMS_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

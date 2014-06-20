@@ -1,208 +1,226 @@
 //	Generic
 .group-members
 {
-	table
+	&.all
 	{
-		margin-bottom:1em;
-	}
-	
-	th.id,
-	td.id
-	{
-		width:50px;
-		text-align:center;
-	}
-	
-	th.group,
-	td.group
-	{
-		width:50px;
-		text-align:center;
-	}
-	
-	th.actions,
-	td.actions
-	{
-		width:225px;
-	}
-	
-	td
-	{
-		.awesome
+		table
 		{
-			margin-right:5px;
-			margin-bottom:5px;
-			width:60px;
-			padding: 8px 5px 6px 5px;
-		}
-	}
-	td.details
-	{
-		img.profile-img
-		{
-			float:left;
-			margin-right:10px;
-			width:65px;
-			height:65px;
-			background:#CCC url('@{imgPath}loader-CCCCCC.gif') center no-repeat;
-			.nifty-drop-shadow();
-			border:1px solid #ccc;
-			.rounded(3px);
-			margin-top:5px;
-		}
-		
-		img.verified
-		{
-			margin-left:5px;
-			width:10px;
-			height:10px;
-			position:relative;
-			top:2px;
-			.drop-shadow( 0, 0, 0, 0 );
-		}
-		
-		div
-		{
-			float:left;
-			
-			small
+			margin-bottom:1em;
+
+			th,
+			td
 			{
-				display:block;
-			}
-		}
-	}
-	td.id,
-	td.group
-	{
-		vertical-align:middle;
-		color:#666;
-	}
-	td.profile.zero
-	{
-		color:#ccc;
-	}
-	
-	td.actions
-	{
-		.not-editable
-		{
-			color:#AAA;
-		}
-	}
-
-}
-
-//	All members
-.group-members.all
-{
-}
-
-// --------------------------------------------------------------------------
-
-//	Common to create and Edit
-.group-members.create,
-.group-members.edit
-{
-	#user-group-descriptions
-	{
-		margin:10px 0;
-		
-		li
-		{
-			margin:0;
-		}
-	}
-}
-
-// --------------------------------------------------------------------------
-
-//	Create Member
-.group-members.create
-{
-}
-
-// --------------------------------------------------------------------------
-
-//	Edit Member
-.group-members.edit
-{
-	.social
-	{	
-		.icon
-		{
-			float:left;
-			border:1px solid #999;
-			.rounded(3px);
-			background:#F3F3F3;
-			padding:5px;
-			margin-right:15px;
-			padding-left:42px;
-			line-height: 16px;
-			background-position: 5px center;
-			background-repeat: no-repeat;
-			word-wrap:break-word;
-		}
-		
-		p
-		{
-			margin-top:5px;
-		}
-	}
-	
-	.uploads
-	{
-		ul
-		{
-			li
-			{
-				vertical-align:middle;
-				display:block;
-				float:left;
-				margin-right:10px;
-				margin-bottom:10px;
-
-
-				a
+				&.id,
+				&.group
 				{
-					display:block;
-					position:relative;
-					min-height:40px;
-					padding:7px 10px;
-					background:#EFEFEF;
-					.rounded(3px);
-					.nifty-drop-shadow();
-					text-decoration: none;
+					width:50px;
+					text-align:center;
+				}
+
+				&.actions
+				{
+					width:225px;
+				}
+			}
+
+			td
+			{
+				&.details
+				{
+					img
+					{
+						&.profile-img
+						{
+							float:left;
+							margin-right:10px;
+							width:65px;
+							height:65px;
+							background:#CCC url(../img/loader-CCCCCC.gif) center no-repeat;
+							.nifty-drop-shadow();
+							border:1px solid #ccc;
+							.rounded(3px);
+							margin-top:5px;
+						}
+
+						&.verified
+						{
+							margin-left:5px;
+							width:10px;
+							height:10px;
+							position:relative;
+							top:2px;
+							.drop-shadow( 0, 0, 0, 0 );
+						}
+					}
+				}
+
+				&.id,
+				&.group
+				{
+					vertical-align:middle;
+					color:#666;
+				}
+
+				&.profile.zero
+				{
+					color:#ccc;
+				}
+
+				&.actions
+				{
+					.not-editable
+					{
+						color:#AAA;
+					}
+				}
+
+				.awesome
+				{
+					margin-right:5px;
+					margin-bottom:5px;
+					width:60px;
+					padding: 8px 5px 6px 5px;
+				}
+
+				div
+				{
+					float:left;
 
 					small
 					{
 						display:block;
 					}
 				}
+			}
+		}
+	}
 
-				a.image
+	&.create
+	{
+		#user-group-descriptions
+		{
+			margin:10px 0;
+
+			li
+			{
+				margin:0;
+			}
+		}
+	}
+
+	&.edit
+	{
+
+		.social
+		{
+			.icon
+			{
+				float:left;
+				border:1px solid #999;
+				.rounded(3px);
+				background:#F3F3F3;
+				padding:5px;
+				margin-right:15px;
+				padding-left:42px;
+				line-height: 16px;
+				background-position: 5px center;
+				background-repeat: no-repeat;
+				word-wrap:break-word;
+			}
+
+			p
+			{
+				margin-top:5px;
+			}
+		}
+
+		.uploads
+		{
+			ul
+			{
+				li
 				{
-					padding-left:55px;
-					
-					img
+					vertical-align:middle;
+					display:block;
+					float:left;
+					margin-right:10px;
+					margin-bottom:10px;
+
+
+					a
 					{
-						position:absolute;
-						left:5px;
-						top:5px;
-						width:35px;
-						height:35px;
-						border:1px solid #CCC;
-						margin:0px;
-						margin-right:10px;
-						vertical-align: middle;
-						padding:2px;
-						background:#FFF;
-						.rounded(2px);
+						display:block;
+						position:relative;
+						min-height:40px;
+						padding:7px 10px;
+						background:#EFEFEF;
+						.rounded(3px);
+						.nifty-drop-shadow();
+						text-decoration: none;
+
+						small
+						{
+							display:block;
+						}
+
+						&.image
+						{
+							padding-left:55px;
+
+							img
+							{
+								position:absolute;
+								left:5px;
+								top:5px;
+								width:35px;
+								height:35px;
+								border:1px solid #CCC;
+								margin:0px;
+								margin-right:10px;
+								vertical-align: middle;
+								padding:2px;
+								background:#FFF;
+								.rounded(2px);
+							}
+						}
+					}
+
+					&.no-data
+					{
+						color:#777;
 					}
 				}
 			}
-			li.no-data
+		}
+	}
+
+	&.groups
+	{
+		table
+		{
+			th,
+			td
 			{
-				color:#777;
+				vertical-align: middle;
+
+				&.actions,
+				&.actions
+				{
+					width:210px;
+					text-align: center;
+				}
+
+				&.default,
+				&.default
+				{
+					width:50px;
+					text-align: center;
+
+					span
+					{
+						font-size: 1.5em;
+					}
+				}
 			}
 		}
 	}

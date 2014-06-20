@@ -16,7 +16,7 @@
 		Use categories to group broad post topics together. For example, a category might be 'Music', or 'Travel'.
 		<?php
 
-			if ( blog_setting( 'tags_enabled' ) ) :
+			if ( app_setting( 'tags_enabled', 'blog' ) ) :
 
 				echo 'For specific details (e.g New Year ' . date( 'Y') . ') consider using a ' . anchor( 'admin/blog/manage/tags' . $_is_fancybox, 'tag' ) . '.';
 
@@ -54,7 +54,7 @@
 
 		else :
 
-			echo '<p class="system-alert message no-close">';
+			echo '<p class="system-alert message">';
 			echo '<strong>No Categories!</strong> Create a category using the form above.';
 			echo '</p>';
 

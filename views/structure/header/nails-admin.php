@@ -20,10 +20,10 @@
 
 	<!--	NAILS JS GLOBALS	-->
 	<script style="text/javascript">
-		var ENVIRONMENT					= '<?=ENVIRONMENT?>';
-		window.SITE_URL					= '<?=site_url()?>';
+		window.ENVIRONMENT				= '<?=ENVIRONMENT?>';
+		window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
 		window.NAILS					= {};
-		window.NAILS.URL				= '<?=NAILS_URL?>';
+		window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
 		window.NAILS.LANG				= {};
 		window.NAILS.USER				= {};
 		window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
@@ -52,15 +52,14 @@
 	<!--	ASSETS	-->
 	<?php
 
-		echo $this->asset->output( 'css' );
-		echo $this->asset->output( 'js' );
-		echo $this->asset->output( 'css-inline' );
+		echo $this->asset->output();
 
 	?>
-	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_URL . 'css/nails.admin.print.css'?>" />
+	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.print.css'?>" />
 
 </head>
-<body class="<?=!$loaded_modules ? 'no-modules' : ''?>">
+
+<body class="<?=empty( $loaded_modules ) ? 'no-modules' : ''?>">
 
 	<div class="header">
 
@@ -73,13 +72,13 @@
 				</a>
 			</li>
 			<li><?=anchor( 'admin', lang( 'admin_home' ) )?></li>
-			<?=( isset( $page->module->name ) ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
-			<?=( isset( $page->title ) ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
+			<?=! empty( $page->module->name ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
+			<?=! empty( $page->title ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
 		</ul>
 
 		<ul class="right shaded">
 			<li>
-				<?=anchor( '/', lang( 'admin_switch_frontend' ) )?>
+				<?=anchor( '', lang( 'admin_switch_frontend' ) )?>
 			</li>
 			<li style="color:#999;">
 				<?php
@@ -116,7 +115,7 @@
 
 	</div>
 
-	<div class="sidebar left">
+	<div class="sidebar">
 		<div class="padder">
 
 		<div class="nav-search">
@@ -128,6 +127,7 @@
 			$_acl			= active_user( 'acl' );
 			$_mobile_menu	= array();
 			$_counter		= 0;
+			$loaded_modules	= ! empty( $loaded_modules ) ? $loaded_modules : array();
 
 			foreach ( $loaded_modules AS $module => $config ) :
 
@@ -179,9 +179,9 @@
 						$_temp->is_active = $this->uri->rsegment( 1 ) == $module && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
 
 						//	Notifications for this method?
-						if ( isset( $_notifications[$method] ) && $_notifications[$method] ) :
+						if ( ! empty( $_notifications[$method] ) ) :
 
-							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'info';
+							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'neutral';
 							$_temp->notification->title		= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
 							$_temp->notification->value		= isset( $_notifications[$method]['value'] ) ? $_notifications[$method]['value'] : '';
 							$_temp->notification->options	= isset( $_notifications[$method]['options'] ) ? $_notifications[$method]['options'] : '';
@@ -249,7 +249,7 @@
 
 												foreach ( $option->notification->options AS $notification ) :
 
-													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'info';
+													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'neutral';
 													$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
 
 													if ( $notification['value'] ) :
@@ -370,35 +370,27 @@
 
 			?>
 
-			<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
+			<?php if ( ! empty( $error ) ) : ?>
 			<div class="system-alert error">
-				<div class="padder">
-					<p><?=$error?></p>
-				</div>
+				<p><?=$error?></p>
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $success ) && ! empty( $success ) ) : ?>
+			<?php if ( ! empty( $success ) ) : ?>
 			<div class="system-alert success">
-				<div class="padder">
-					<p><?=$success?></p>
-				</div>
+				<p><?=$success?></p>
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
+			<?php if ( ! empty( $message ) ) : ?>
 			<div class="system-alert message">
-				<div class="padder">
-					<p><?=$message?></p>
-				</div>
+				<p><?=$message?></p>
 			</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
+			<?php if ( ! empty( $notice ) ) : ?>
 			<div class="system-alert notice">
-				<div class="padder">
-					<p><?=$notice?></p>
-				</div>
+				<p><?=$notice?></p>
 			</div>
 			<?php endif; ?>
 

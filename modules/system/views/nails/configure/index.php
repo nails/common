@@ -1,8 +1,8 @@
 <div class="container">
 	<div id="nails-configure">
 		<h1>Nails. Configuration Manager</h1>
-		<p class="system-alert notice no-close testing">
-			<?=img( NAILS_URL . 'img/loader/20px-TRANS.gif' )?>
+		<p class="system-alert notice testing">
+			<?=img( NAILS_ASSETS_URL . 'img/loader/20px-TRANS.gif' )?>
 			<strong>Hey!</strong> Please exscuse me while I run some tests...
 		</p>
 
@@ -20,8 +20,8 @@
 
 		<section class="tabs pages">
 
-			<?php $_display = $this->input->post( 'update' ) == 'app' || ! $this->input->post() ? 'block' : 'none'?>
-			<div id="tab-modules" class="tab page modules" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'app' || ! $this->input->post() ? 'active' : ''?>
+			<div id="tab-modules" class="tab page <?=$_display?> modules">
 				<table class="modules">
 					<thead>
 						<tr>
@@ -48,16 +48,16 @@
 							<td>Auth</td>
 							<td>Yes</td>
 							<td>
-								<?=anchor( $_SERVER['REQUEST_URI'], 'Reinstall', 'class="awesome small confirm" data-confirm="Are you sure?\n\nReinstalling will destroy any existing content"' )?>
-								<?=anchor( $_SERVER['REQUEST_URI'], 'Uninstall', 'class="awesome small confirm red" data-confirm="Are you sure?\n\nDatabase data will be left (so the module can be re-enabled if nessecary)."' )?>
+								<?=anchor( $_SERVER['REQUEST_URI'], 'Reinstall', 'class="awesome small confirm" data-title="Are you sure?" data-body="Reinstalling will destroy any existing content"' )?>
+								<?=anchor( $_SERVER['REQUEST_URI'], 'Uninstall', 'class="awesome small confirm red" data-title="Are you sure?" data-body="Database data will be left (so the module can be re-enabled if nessecary)."' )?>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
-			<?php $_display = $this->input->post( 'update' ) == 'deploy' ? 'block' : 'none'?>
-			<div id="tab-deploy" class="tab page deploy" style="display:<?=$_display?>;">
+			<?php $_display = $this->input->post( 'update' ) == 'deploy' ? 'active' : ''?>
+			<div id="tab-deploy" class="tab page <?=$_display?> deploy">
 				<p>
 					These settings are specific to this deployment only.
 				</p>

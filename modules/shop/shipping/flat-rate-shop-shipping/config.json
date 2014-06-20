@@ -1,0 +1,19 @@
+{
+	"name" : "Flat Rate",
+	"description": "Define a flat rate for all shipping.",
+	"license":"",
+	"authors": [
+		{
+			"name": "Pablo de la Pena",
+			"email": "p@shedcollective.org",
+			"homepage": "http://shedcollective.org",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "hello@shedcollective.org"
+	},
+	"require" : {
+		"nails" : ""
+	}
+}

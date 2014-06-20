@@ -33,7 +33,6 @@ class NAILS_Serve extends NAILS_CDN_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -153,7 +152,7 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 			log_message( 'error', 'CDN: Serve: File does not exist' );
 
-			if ( $this->user->is_superuser() ) :
+			if ( $this->user_model->is_superuser() ) :
 
 				return $this->_bad_src( lang( 'cdn_error_serve_file_not_found' ) . ': ' . $_usefile );
 
@@ -170,42 +169,40 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		//	Determine headers to send. Are we forcing the download?
 		if ( $this->input->get( 'dl' ) ) :
 
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
+			header( 'Content-Description: File Transfer', TRUE );
+			header( 'Content-Type: application/octet-stream', TRUE );
+			header( 'Content-Transfer-Encoding: binary', TRUE );
+			header( 'Expires: 0', TRUE );
+			header( 'Cache-Control: must-revalidate', TRUE );
+			header( 'Pragma: public', TRUE );
 
 			//	If the object is known about, add some extra headers
 			if ( $_object ) :
 
-				header('Content-Disposition: attachment; filename="' . $_object->filename_display . '"');
-				header( 'Content-Length: ' . $_object->filesize );
+				header( 'Content-Disposition: attachment; filename="' . $_object->filename_display . '"', TRUE );
+				header( 'Content-Length: ' . $_object->filesize, TRUE );
 
 			else :
 
-				header('Content-Disposition: attachment; filename="' . $this->_object . '"');
+				header( 'Content-Disposition: attachment; filename="' . $this->_object . '"', TRUE );
 
 			endif;
 
 		else :
 
-			$_stats = stat( $_usefile );
-
 			//	Determine headers to send
 			$_finfo = new finfo( FILEINFO_MIME_TYPE ); // return mime type ala mimetype extension
+			header( 'Content-type: ' . $_finfo->file($_usefile ), TRUE );
 
-			header( 'Content-type: ' . $_finfo->file( $_usefile ) );
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $_stats[9] ) . 'GMT' );
-			header( 'ETag: "' . md5( $this->_bucket . $this->_object ) . '"' );
+			$_stats = stat( $_usefile );
+			$this->_set_cache_headers( $_stats[9], $this->_bucket . $this->_object, FALSE );
 
 			// --------------------------------------------------------------------------
 
 			//	If the object is known about, add some extra headers
 			if ( $_object ) :
 
-				header( 'Content-Length: ' . $_object->filesize );
+				header( 'Content-Length: ' . $_object->filesize, TRUE );
 
 			endif;
 
@@ -232,6 +229,14 @@ class NAILS_Serve extends NAILS_CDN_Controller
 			endif;
 
 		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -240,10 +245,10 @@ class NAILS_Serve extends NAILS_CDN_Controller
 
 	protected function _bad_src( $error = NULL )
 	{
-		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Content-type: application/json' );
-		header( 'HTTP/1.0 400 Bad Request' );
+		header( 'Cache-Control: no-cache, must-revalidate', TRUE );
+		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT', TRUE );
+		header( 'Content-type: application/json', TRUE );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request', TRUE, 400 );
 
 		// --------------------------------------------------------------------------
 
@@ -261,6 +266,14 @@ class NAILS_Serve extends NAILS_CDN_Controller
 		endif;
 
 		echo json_encode( $_out );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 
 
@@ -288,12 +301,12 @@ class NAILS_Serve extends NAILS_CDN_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -311,4 +324,4 @@ endif;
 
 
 /* End of file serve.php */
-/* Location: ./application/modules/cdn/controllers/server.php */
+/* Location: ./modules/cdn/controllers/serve.php */

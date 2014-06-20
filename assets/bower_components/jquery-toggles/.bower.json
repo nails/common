@@ -1,0 +1,20 @@
+{
+  "name": "simontabor/jquery-toggles",
+  "version": "3.0.1",
+  "main": "toggles.min.js",
+  "description": "Toggles is a lightweight jQuery plugin that creates easily-styleable toggle buttons.",
+  "license": "MIT",
+  "ignore": [
+    "lib/*"
+  ],
+  "homepage": "https://github.com/simontabor/jquery-toggles",
+  "_release": "3.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v3.0.1",
+    "commit": "7414327fc448753f8c6f30c2972ebe6dfec15de2"
+  },
+  "_source": "git://github.com/simontabor/jquery-toggles.git",
+  "_target": "~3.0.1",
+  "_originalSource": "jquery-toggles"
+}

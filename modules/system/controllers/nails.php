@@ -26,12 +26,11 @@ class NAILS_Nails extends NAILS_System_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function info()
 	{
 		//	Command line or super user only
-		if ( ! $this->input->is_cli_request() && ! $this->user->is_superuser() ) :
+		if ( ! $this->input->is_cli_request() && ! $this->user_model->is_superuser() ) :
 
 			show_404();
 
@@ -49,7 +48,6 @@ class NAILS_Nails extends NAILS_System_Controller
 		$_out->nails->major			= isset( $_version[0] ) ? (int) $_version[0] : 0;
 		$_out->nails->minor			= isset( $_version[1] ) ? (int) $_version[1] : 0;
 		$_out->nails->patch			= isset( $_version[2] ) ? (int) $_version[2] : 0;
-		$_out->nails->environment	= NAILS_ENVIRONMENT;
 
 		$_out->app->name			= APP_NAME;
 		$_out->app->path			= FCPATH;
@@ -64,21 +62,11 @@ class NAILS_Nails extends NAILS_System_Controller
 
 	public function configure()
 	{
-		if ( ! $this->user->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
+		if ( ! $this->user_model->is_superuser() && ! $this->input->is_cli_request() && ! $this->input->get( 'token' ) ) :
 
-			if ( module_is_enabled( 'auth' ) ) :
-
-				unauthorised();
-
-			else :
-
-				show_404();
-
-			endif;
+			show_404();
 
 		endif;
-
-		$this->_validate_token();
 
 		// --------------------------------------------------------------------------
 
@@ -88,9 +76,9 @@ class NAILS_Nails extends NAILS_System_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load assets
-		$this->asset->load( 'nails.configure.css', TRUE );
-		$this->asset->load( 'nails.configure.min.js', TRUE );
-		$this->asset->load( 'jquery.ui.min.js', TRUE );
+		$this->asset->library( 'jqueryui' );
+		$this->asset->load( 'nails.configure.css',		TRUE );
+		$this->asset->load( 'nails.configure.min.js',	TRUE );
 
 		// --------------------------------------------------------------------------
 
@@ -119,12 +107,12 @@ class NAILS_Nails extends NAILS_System_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);

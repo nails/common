@@ -1,203 +1,197 @@
-<?php
-
-	/**
-	 *	THE REGISTRATION FORM
-	 *	
-	 *	This view contains only the basic form required for registering a user. The controller
-	 *	will look for an app version of the file  first and load that up. It will fall back
-	 *	to the empty Nails view if not available (which includes some basic styling so
-	 *	as not to look totally rubbish).
-	 *	
-	 *	You can completely overload this view by creating a view at:
-	 *	
-	 *	application/views/auth/register/form
-	 *	
-	 **/
-	
-	// --------------------------------------------------------------------------
-	
-	/**
-	 *	REGISTRATION ERRORS
-	 *	
-	 *	Only individual field errors are shown, generic erros should be handled by the
-	 *	containing header files.
-	 *	
-	 **/
-	 
-	
-	//	Form attributes
-	$attr = array(
-	
-		'id'	=> 'register-form',
-		'class'	=> 'container nails-default-form'
-		
-	);
-	
-	echo form_open( 'auth/register', $attr );
-	
-	// --------------------------------------------------------------------------
-	
-	//	Write the HTML for the register form
-?>
-	
-	<div class="row">
-	
-		<!--	FORCE REGISTER CHECK	-->
-		<?=form_hidden( 'registerme', TRUE )?>
-		
-			
-		<!--	INPUT FIELDS	-->
-		<div class="first seven columns">
-		
-			<p>
-				<?=lang( 'auth_register_message', APP_NAME )?>
-			</p>
-		
-			<?php
-				
-				$_field			= 'first_name';
-				$_name			= lang( 'form_label_first_name' );
-				$_placeholder	= lang( 'auth_register_first_name_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
-			
-			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-				</div>
-			</div>
-			
-			<?php
-				
-				$_field			= 'last_name';
-				$_name			= lang( 'form_label_last_name' );
-				$_placeholder	= lang( 'auth_register_last_name_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
-			
-			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-				</div>
-			</div>
-			
-			<?php
-				
-				$_field			= 'email';
-				$_name			= lang( 'form_label_email' );
-				$_placeholder	= lang( 'auth_register_email_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
-			
-			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns last">
-					<?=form_input( $_field, set_value( $_field ), 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-				</div>
-			</div>
-			
-			<?php
-				
-				$_field			= 'password';
-				$_name			= lang( 'form_label_password' );
-				$_placeholder	= lang( 'auth_register_password_placeholder' );
-				$_error			= form_error( $_field ) ? 'error' : NULL
-			
-			?>
-			<div class="row <?=$_error?>">
-				<?=form_label( $_name, 'input-' . $_field, array( 'class' => 'two columns first' ) ); ?>
-				<div class="four columns last">
-					<?=form_password( $_field, NULL, 'id="input-' . $_field . '" placeholder="' . $_placeholder . '"' )?>
-					<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-				</div>
-			</div>
-			
-			<!--	ACCEPT T&C's	-->
-			<?php
-				
-				$_field	= 'terms';
-				$_name	= lang ( 'auth_register_label_accept_tc', site_url( 'legal/terms' ) );
-				$_error = form_error( $_field ) ? 'error' : NULL
-			
-			?>
-			<div class="row <?=$_error?>">
-				<label class="two columns first">&nbsp;</label>
-				<div class="four columns last">
-					<label class="checkbox">
-						<?=form_checkbox( $_field, TRUE, FALSE )?>
-						<?=$_name?>
-						<?=form_error( $_field, '<div class="system-alert error no-close">', '</div>' )?>
-					</label>
-				</div>
-			</div>
-			
-			<!--	SUBMIT BUTTON	-->
-			<div class="row button-row">
-				<label class="two columns first">&nbsp;</label>
-				<div class="four columns last">
-					<?=form_submit( 'submit', lang( 'action_register' ), 'class="awesome"' )?>
-				</div>
-			</div>
-		
-		</div>
-		
+<div class="row">
+	<div class="well well-lg <?=BS_COL_SM_6?> <?=BS_COL_SM_OFFSET_3?>">
 		<!--	SOCIAL NETWORK BUTTONS	-->
 		<?php
-		
-			if ( module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) || module_is_enabled( 'auth[facebook]' ) ) :
-			
-				echo '<div class="eight columns last offset-by-one">';
-				echo '<p style="text-align:center;">' . lang( 'auth_register_social_message' ) . '</p>';
-				
-				// --------------------------------------------------------------------------
-				
-				//	This is technically not needed for the default group, but left here by
-				//	way of an example
-				
-				$_token				= array();
-				$_token['nonce']	= time();
-				$_token['ip']		= $this->input->ip_address();
-				$_token['group']	= APP_USER_DEFAULT_GROUP;
-				
-				$_token = urlencode( $this->encrypt->encode( serialize($_token) . '|' . $_token['ip'] . '|' . $_token['nonce'], APP_PRIVATE_KEY ) );
-				
-				//	FACEBOOK
-				if ( module_is_enabled( 'auth[facebook]' ) ) :
-				
-					echo '<p style="text-align:center;">' . anchor( 'auth/fb/connect?token=' . $_token, lang( 'auth_register_social_register', 'Facebook' ), 'class="social-signin fb"' ) . '</p>';
-				
-				endif;
-				
-				//	TWITTER
-				if ( module_is_enabled( 'auth[twitter]' ) ) :
-				
-					echo '<p style="text-align:center;">' . anchor( 'auth/tw/connect?token=' . $_token, lang( 'auth_register_social_register', 'Twitter' ), 'class="social-signin tw"' ) . '</p>';
-				
-				endif;
-				
-				//	LINKEDIN
-				if ( module_is_enabled( 'auth[linkedin]' ) ) :
-				
-					echo '<p style="text-align:center;">' . anchor( 'auth/li/connect?token=' . $_token, lang( 'auth_register_social_register', 'LinkedIn' ), 'class="social-signin li"' ) . '</p>';
-				
-				endif;
-				
+
+			if ( app_setting( 'social_signin_enabled' ) ) :
+
+				echo '<p class="text-center" style="margin:1em 0 2em 0;">';
+					echo 'Register using your preferred social network.';
+				echo '</p>';
+
+				echo '<div class="row" style="margin-top:1em;">';
+
+					//	This is technically not needed for the default group, but left here by
+					//	way of an example
+
+					$_token				= array();
+					$_token['nonce']	= time();
+					$_token['ip']		= $this->input->ip_address();
+					$_token['group']	= $this->user_group_model->get_default_group_id();
+
+					$_token = urlencode( $this->encrypt->encode( serialize($_token) . '|' . $_token['ip'] . '|' . $_token['nonce'], APP_PRIVATE_KEY ) );
+
+					$_buttons = array();
+
+					//	FACEBOOK
+					if ( app_setting( 'social_signin_fb_enabled' ) ) :
+
+						$_buttons[] = array( 'auth/fb/connect?token=' . $_token, 'Facebook' );
+
+					endif;
+
+					//	TWITTER
+					if ( app_setting( 'social_signin_tw_enabled' ) ) :
+
+						$_buttons[] = array( 'auth/tw/connect?token=' . $_token, 'Twitter' );
+
+					endif;
+
+					//	LINKEDIN
+					if ( app_setting( 'social_signin_li_enabled' ) ) :
+
+						$_buttons[] = array( 'auth/li/connect?token=' . $_token, 'LinkedIn' );
+
+					endif;
+
+					// --------------------------------------------------------------------------
+
+					//	Render the buttons
+					$_cols_each = floor( APP_BOOTSTRAP_GRID / count( $_buttons ) );
+
+					foreach ( $_buttons AS $btn ) :
+
+						$_class = $_cols_each == ( APP_BOOTSTRAP_GRID / 3 ) ? 'md' : 'sm';
+
+						echo '<div class="col-' . $_class . '-' . $_cols_each . ' text-center" style="margin-bottom:1em;">';
+							echo anchor( $btn[0], $btn[1], 'class="btn btn-primary btn-lg btn-block"' );
+						echo '</div>';
+
+					endforeach;
+
 				echo '</div>';
-			
+
+				echo '<hr />';
+
+				echo '<p class="text-center" style="margin:1em 0 2em 0;">';
+					switch ( APP_NATIVE_LOGIN_USING ) :
+
+						case 'EMAIL' :
+
+							echo 'Or register using your email address.';
+
+						break;
+
+						case 'USERNAME' :
+
+							echo 'Or register using a username.';
+
+						break;
+
+						case 'BOTH' :
+						default :
+
+							echo 'Or register using your email address and username.';
+
+						break;
+
+					endswitch;
+				echo '</p>';
+
 			endif;
-			
+
+			// --------------------------------------------------------------------------
+
+			echo form_open( site_url( 'auth/register' ), 'class="form form-horizontal"' );
+			echo form_hidden( 'registerme', TRUE );
+
+			// --------------------------------------------------------------------------
+
+			if ( APP_NATIVE_LOGIN_USING == 'EMAIL' || APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$_field			= 'email';
+				$_label			= lang( 'form_label_email' );
+				$_placeholder	= lang( 'auth_register_email_placeholder' );
+
+				?>
+				<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+					<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$_field?>"><?=$_label?></label>
+					<div class="<?=BS_COL_SM_9?>">
+						<?=form_email( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+						<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
+					</div>
+				</div>
+				<?php
+
+			endif;
+
+			if ( APP_NATIVE_LOGIN_USING == 'USERNAME' || APP_NATIVE_LOGIN_USING == 'BOTH' ) :
+
+				$_field			= 'username';
+				$_label			= lang( 'form_label_username' );
+				$_placeholder	= lang( 'auth_register_username_placeholder' );
+
+				?>
+				<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+					<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$_field?>"><?=$_label?></label>
+					<div class="<?=BS_COL_SM_9?>">
+						<?=form_input( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+						<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
+					</div>
+				</div>
+				<?php
+
+			endif;
+
+		// --------------------------------------------------------------------------
+
+
+		$_field			= 'password';
+		$_label			= lang( 'form_label_password' );
+		$_placeholder	= lang( 'auth_register_password_placeholder' );
+
 		?>
-	
+		<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+			<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$_field?>"><?=$_label?></label>
+			<div class="<?=BS_COL_SM_9?>">
+				<?=form_password( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+				<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
+			</div>
+		</div>
+		<?php
+
+
+		$_field			= 'first_name';
+		$_label			= lang( 'form_label_first_name' );
+		$_placeholder	= lang( 'auth_register_first_name_placeholder' );
+
+		?>
+		<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+			<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$_field?>"><?=$_label?></label>
+			<div class="<?=BS_COL_SM_9?>">
+				<?=form_input( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+				<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
+			</div>
+		</div>
+		<?php
+
+
+		$_field			= 'last_name';
+		$_label			= lang( 'form_label_last_name' );
+		$_placeholder	= lang( 'auth_register_last_name_placeholder' );
+
+		?>
+		<div class="form-group <?=form_error( $_field ) ? 'has-error' : ''?>">
+			<label class="<?=BS_COL_SM_3?> control-label" for="input-<?=$_field?>"><?=$_label?></label>
+			<div class="<?=BS_COL_SM_9?>">
+				<?=form_input( $_field, set_value( $_field ), 'id="input-<?=$_field?>" placeholder="' . $_placeholder . '" class="form-control "' )?>
+				<?=form_error( $_field, '<p class="help-block">', '</p>' )?>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="<?=BS_COL_SM_OFFSET_3?> <?=BS_COL_SM_9?>">
+				<button type="submit" class="btn btn-primary"><?=lang( 'action_register' )?></button>
+			</div>
+		</div>
+		<hr />
+		<p class="text-center">
+			Already got an account? <?=anchor( 'auth/login', 'Sign in now' )?>.
+		</p>
 	</div>
-	
+</div>
 <?php
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	Close the form
 	echo form_close();

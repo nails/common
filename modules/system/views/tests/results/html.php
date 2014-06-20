@@ -57,11 +57,11 @@
 
 		if ( $summary->fail ) :
 
-			echo '<p class="system-alert message no-close"><strong>Oh no!</strong> Unfortunately ' . $summary->fail . ' test(s) failed. See below for specific errors.</p>';
+			echo '<p class="system-alert message"><strong>Oh no!</strong> Unfortunately ' . $summary->fail . ' test(s) failed. See below for specific errors.</p>';
 
 		else :
 
-			echo '<p class="system-alert success no-close"><strong>Good News Everyone!</strong> All tests passed.</p>';
+			echo '<p class="system-alert success"><strong>Good News Everyone!</strong> All tests passed.</p>';
 
 		endif;
 	?>
@@ -79,13 +79,13 @@
 				echo '<p class="expecting"><span>Expecting:</span>' . $result->info->expecting . '</p>';
 				if ( $result->pass ) :
 
-					echo '<p class="system-alert success no-close">';
+					echo '<p class="system-alert success">';
 					echo '<strong>Success:</strong> Test passed.';
 					echo '</p>';
 
 				else :
 
-					echo '<div class="system-alert error no-close">';
+					echo '<div class="system-alert error">';
 					echo '<p>The following errors were reported by this test:</p>';
 					echo '<ul>';
 					foreach ( $result->errors AS $error ) :

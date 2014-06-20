@@ -28,53 +28,6 @@ class NAILS_Blog_model extends NAILS_Model
 		$this->config->load( 'blog', FALSE, TRUE );
 	}
 
-	// --------------------------------------------------------------------------
-
-
-	public function settings( $key = NULL, $force_refresh = FALSE )
-	{
-		if ( ! $this->_settings || $force_refresh ) :
-
-			$_settings = $this->db->get( 'blog_settings' )->result();
-
-			foreach ( $_settings AS $setting ) :
-
-				$this->_settings[ $setting->key ] = unserialize( $setting->value );
-
-			endforeach;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $key ) :
-
-			return $this->_settings;
-
-		else :
-
-			return isset( $this->_settings[$key] ) ? $this->_settings[$key] : NULL;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function set_settings( $key_values )
-	{
-		foreach ( $key_values AS $key => $value ) :
-
-			$this->db->where( 'key', $key );
-			$this->db->set( 'value', serialize( $value ) );
-			$this->db->update( 'blog_settings' );
-
-		endforeach;
-
-		return TRUE;
-	}
-
 
 	// --------------------------------------------------------------------------
 
@@ -134,12 +87,12 @@ class NAILS_Blog_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -156,4 +109,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_BLOG_MODEL' ) ) :
 endif;
 
 /* End of file blog_model.php */
-/* Location: ./application/models/blog_model.php */
+/* Location: ./modules/blog/models/blog_model.php */

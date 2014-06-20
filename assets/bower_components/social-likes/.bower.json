@@ -1,0 +1,33 @@
+{
+  "name": "social-likes",
+  "version": "3.0.4",
+  "main": [
+    "./src/social-likes.js",
+    "./social-likes_classic.css",
+    "./social-likes_flat.css",
+    "./social-likes_birman.css"
+  ],
+  "ignore": [
+    "contrib/icons",
+    "contrib/styles",
+    "src/styles",
+    "src/Gruntfile.js",
+    "src/package.json",
+    "src/update-gh-pages.sh",
+    "src/.jscs.json",
+    "src/.jshintrc"
+  ],
+  "dependencies": {
+    "jquery": ">=1.8"
+  },
+  "homepage": "https://github.com/sapegin/social-likes",
+  "_release": "3.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v3.0.4",
+    "commit": "5b2e413dba3b8ea5b976dcf11ab5f10d77a8bd1f"
+  },
+  "_source": "git://github.com/sapegin/social-likes.git",
+  "_target": "~3.0.4",
+  "_originalSource": "social-likes"
+}

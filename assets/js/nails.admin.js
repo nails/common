@@ -1,5 +1,23 @@
+//	Catch undefined console
+/* jshint ignore:start */
+if ( typeof( console ) === "undefined" )
+{
+	var console;
+	console = {
+		log: function() {},
+		debug: function() {},
+		info: function() {},
+		warn: function() {},
+		error: function() {}
+	};
+}
+/* jshint ignore:end */
+
+// --------------------------------------------------------------------------
+
 var NAILS_Admin;
-NAILS_Admin = function() {
+NAILS_Admin = function()
+{
 	this.error_delay = 6000; //	Amount of time the error message will stay on screen.
 
 
@@ -13,6 +31,8 @@ NAILS_Admin = function() {
 		this.init_mobile_menu();
 		this.init_fieldsets();
 		this.init_toggles();
+		this.init_ckeditor();
+		this.init_select2();
 	};
 
 
@@ -44,8 +64,8 @@ NAILS_Admin = function() {
 
 		$('.box .toggle').each(function() {
 
-			_id = $(this).parents('.box').attr('id');
-			_state = _this._get('adminbox-' + _id);
+			_id		= $(this).parents('.box').attr('id');
+			_state	= _this._get('adminbox-' + _id);
 
 			// --------------------------------------------------------------------------
 
@@ -57,10 +77,10 @@ NAILS_Admin = function() {
 
 			// --------------------------------------------------------------------------
 
-			if (_state === 'closed') {
-				_this._close_box(this, false, false);
-			} else {
+			if (_state === 'open') {
 				_this._open_box(this, false, false);
+			} else {
+				_this._close_box(this, false, false);
 			}
 
 		});
@@ -305,7 +325,8 @@ NAILS_Admin = function() {
 	// --------------------------------------------------------------------------
 
 
-	this._fieldset_toggle = function(obj) {
+	this._fieldset_toggle = function(obj)
+	{
 		var _fieldset = obj.closest('fieldset');
 
 		if (_fieldset.hasClass('closed')) {
@@ -327,13 +348,14 @@ NAILS_Admin = function() {
 	// --------------------------------------------------------------------------
 
 
-	this.init_toggles = function() {
-		if ($.fn.toggles)
+	this.init_toggles = function()
+	{
+		if ( $.fn.toggles )
 		{
 			$('.field.boolean:not(.toggled)').each(function()
 			{
 				var _checkbox	= $(this).find('input[type=checkbox]');
-				var _readonly	= _checkbox.prop( 'disabled' );
+				var _readonly	= $(this).hasClass('readonly');
 				var _on			= $(this).data('text-on')	? $(this).data('text-on')	: 'ON';
 				var _off		= $(this).data('text-off')	? $(this).data('text-off')	: 'OFF';
 
@@ -343,6 +365,7 @@ NAILS_Admin = function() {
 				}).toggles({
 					checkbox:	_checkbox,
 					click:		!_readonly,
+					drag:		!_readonly,
 					clicker:	_checkbox,
 					on:			_checkbox.is(':checked'),
 					text:
@@ -368,6 +391,45 @@ NAILS_Admin = function() {
 	// --------------------------------------------------------------------------
 
 
+	this.init_ckeditor = function()
+	{
+		if ( $.fn.ckeditor )
+		{
+			$( '.wysiwyg' ).ckeditor(
+			{
+				customConfig: window.NAILS.URL + 'js/libraries/ckeditor/ckeditor.config.min.js'
+			});
+		}
+		else
+		{
+			this.error('NAILS_ADMIN_JS: CKEditor not available.');
+		}
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 *
+	 * Initialise any select2 elements on the page
+	 *
+	 **/
+	this.init_select2 = function()
+	{
+		if ( $.fn.select2 )
+		{
+			$( 'select.select2:not(.select2-offscreen)' ).select2();
+		}
+		else
+		{
+			this.error( 'NAILS_JS: Select2 not available.' );
+		}
+	};
+
+	// --------------------------------------------------------------------------
+
+
 	this._show_error = function(msg) {
 		$('.js_error span.message').text(msg);
 		$('.js_error').slideDown().delay(this.error_delay).slideUp();
@@ -379,7 +441,7 @@ NAILS_Admin = function() {
 
 
 	this.error = function(output) {
-		if (window.console && ENVIRONMENT !== 'production') {
+		if (window.console && window.ENVIRONMENT !== 'production') {
 			console.error(output);
 		}
 	};

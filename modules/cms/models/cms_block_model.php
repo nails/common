@@ -56,14 +56,14 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'cms_block' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cms_block' );
 
 		if ( $this->db->affected_rows() ) :
 
 			$_id = $this->db->insert_id();
 
 			$this->db->set( 'block_id', $_id );
-			$this->db->set( 'lang_id', $this->language->get_default_id() );
+			$this->db->set( 'language', $this->language_model->get_default_code() );
 			$this->db->set( 'value', $default_value );
 			$this->db->set( 'created', 'NOW()', FALSE );
 			$this->db->set( 'modified', 'NOW()', FALSE );
@@ -75,7 +75,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 			endif;
 
-			$this->db->insert( 'cms_block_translation' );
+			$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 			if ( $this->db->affected_rows() ) :
 
@@ -92,7 +92,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			else :
 
 				$this->db->where( 'id', $_id );
-				$this->db->delete( 'cms_block' );
+				$this->db->delete( NAILS_DB_PREFIX . 'cms_block' );
 				return FALSE;
 
 			endif;
@@ -137,7 +137,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 		endif;
 
 		$this->db->where( 'id', $id );
-		$this->db->update( 'cms_block' );
+		$this->db->update( NAILS_DB_PREFIX . 'cms_block' );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -165,7 +165,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->delete( 'cms_block' );
+		$this->db->delete( NAILS_DB_PREFIX . 'cms_block' );
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -179,14 +179,14 @@ class NAILS_Cms_block_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param int $block_id The ID of the block this translation belongs to
-	 * @param int $lang_id The ID of the language this block is written in
+	 * @param int $language The ID of the language this block is written in
 	 * @param string $value The contents of this translation
 	 * @return mixed
 	 **/
-	public function create_translation( $block_id, $lang_id, $value )
+	public function create_translation( $block_id, $language, $value )
 	{
 		$this->db->set( 'block_id', $block_id );
-		$this->db->set( 'lang_id', $lang_id );
+		$this->db->set( 'language', $language );
 		$this->db->set( 'value', trim( $value ) );
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
@@ -203,7 +203,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 		endif;
 
-		$this->db->insert( 'cms_block_translation' );
+		$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -228,16 +228,16 @@ class NAILS_Cms_block_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param int $block_id The ID of the block this translation belongs to
-	 * @param int $lang_id The ID of the language this block is written in
+	 * @param int $language The ID of the language this block is written in
 	 * @param string $value The contents of this translation
 	 * @return bool
 	 **/
-	public function update_translation( $block_id, $lang_id, $value )
+	public function update_translation( $block_id, $language, $value )
 	{
 		//	Get existing translation
 		$this->db->where( 'block_id', $block_id );
-		$this->db->where( 'lang_id', $lang_id );
-		$_old = $this->db->get( 'cms_block_translation' )->row();
+		$this->db->where( 'language', $language );
+		$_old = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation' )->row();
 
 		if ( ! $_old )
 			return FALSE;
@@ -264,24 +264,24 @@ class NAILS_Cms_block_model extends NAILS_Model
 		endif;
 
 		$this->db->where( 'block_id', $block_id );
-		$this->db->where( 'lang_id', $lang_id );
-		$this->db->update( 'cms_block_translation' );
+		$this->db->where( 'language', $language );
+		$this->db->update( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
 			//	Create a new revision if value has changed
 			$this->db->select( 'id' );
 			$this->db->where( 'block_id', $block_id );
-			$this->db->where( 'lang_id', $lang_id );
-			$_block_translation = $this->db->get( 'cms_block_translation' )->row();
+			$this->db->where( 'language', $language );
+			$_block_translation = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation' )->row();
 
 			if ( $_block_translation ) :
 
 				$this->db->set( 'block_translation_id', $_block_translation->id );
 				$this->db->set( 'value', $_old->value );
-				$this->db->set( 'created', $_old->created );
+				$this->db->set( 'created', $_old->modified );
 				$this->db->set( 'created_by', $_old->modified_by );
-				$this->db->insert( 'cms_block_translation_revision' );
+				$this->db->insert( NAILS_DB_PREFIX . 'cms_block_translation_revision' );
 
 				//	Upate the main block's modified date and user
 				$this->update_block( $_old->block_id );
@@ -306,14 +306,14 @@ class NAILS_Cms_block_model extends NAILS_Model
 	 *
 	 * @access public
 	 * @param int $block_id The ID of the block the translation belongs to
-	 * @param int $lang_id The language ID of the block
+	 * @param int $language The language ID of the block
 	 * @return bool
 	 **/
-	public function delete_translation( $block_id, $lang_id )
+	public function delete_translation( $block_id, $language )
 	{
 		$this->db->where( 'block_id', $block_id );
-		$this->db->where( 'lang_id', $lang_id );
-		$this->db->delete( 'cms_block_translation' );
+		$this->db->where( 'language', $language );
+		$this->db->delete( NAILS_DB_PREFIX . 'cms_block_translation' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -342,15 +342,15 @@ class NAILS_Cms_block_model extends NAILS_Model
 	 **/
 	public function get_all( $include_revisions = FALSE )
 	{
-		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, u.email, u.last_name, l.name lang_name, l.slug lang_slug, u.gender, u.profile_img' );
+		$this->db->select( 'cb.type, cb.slug, cb.title, cb.description, cb.located, cbv.*, u.first_name, ue.email, u.last_name, u.gender, u.profile_img' );
 
-		$this->db->join( 'cms_block cb', 'cb.id = cbv.block_id' );
-		$this->db->join( 'user u', 'u.id = cbv.created_by', 'LEFT' );
-		$this->db->join( 'language l', 'l.id = cbv.lang_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'cms_block cb', 'cb.id = cbv.block_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbv.created_by', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 
 		$this->db->order_by( 'cb.title' );
 
-		$_blocks = $this->db->get( 'cms_block_translation cbv' )->result();
+		$_blocks = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation cbv' )->result();
 
 		$_out = array();
 
@@ -372,10 +372,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			$_temp						= new stdClass();
 			$_temp->id					= (int) $_blocks[$i]->id;
 			$_temp->value				= $_blocks[$i]->value;
-			$_temp->lang				= new stdClass();
-			$_temp->lang->id			= (int) $_blocks[$i]->lang_id;
-			$_temp->lang->name			= $_blocks[$i]->lang_name;
-			$_temp->lang->slug			= $_blocks[$i]->lang_slug;
+			$_temp->language			= $_blocks[$i]->language;
 			$_temp->created				= $_blocks[$i]->created;
 			$_temp->modified			= $_blocks[$i]->modified;
 			$_temp->user				= new stdClass();
@@ -389,7 +386,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 			// --------------------------------------------------------------------------
 
 			//	Save the default version
-			if ( $_blocks[$i]->lang_slug == APP_DEFAULT_LANG_SLUG ) :
+			if ( $_blocks[$i]->language == APP_DEFAULT_LANG_CODE ) :
 
 				$_out[$_blocks[$i]->block_id]->default_value = $_blocks[$i]->value;
 
@@ -400,11 +397,12 @@ class NAILS_Cms_block_model extends NAILS_Model
 			//	Are we including revisions?
 			if ( $include_revisions ) :
 
-				$this->db->select( 'cbtr.*, u.email, u.first_name, u.last_name, u.gender, u.profile_img' );
+				$this->db->select( 'cbtr.*, ue.email, u.first_name, u.last_name, u.gender, u.profile_img' );
 				$this->db->where( 'cbtr.block_translation_id', $_blocks[$i]->id );
-				$this->db->join( 'user u', 'u.id = cbtr.created_by', 'LEFT' );
+				$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = cbtr.created_by', 'LEFT' );
+				$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
 				$this->db->order_by( 'created', 'DESC' );
-				$_temp->revisions = $this->db->get( 'cms_block_translation_revision cbtr' )->result();
+				$_temp->revisions = $this->db->get( NAILS_DB_PREFIX . 'cms_block_translation_revision cbtr' )->result();
 
 				foreach( $_temp->revisions AS $revision ) :
 
@@ -425,7 +423,7 @@ class NAILS_Cms_block_model extends NAILS_Model
 
 				endforeach;
 
-				if ( $_blocks[$i]->lang_slug == APP_DEFAULT_LANG_SLUG ) :
+				if ( $_blocks[$i]->language == APP_DEFAULT_LANG_CODE) :
 
 					$_out[$_blocks[$i]->block_id]->default_value_revisions = $_temp->revisions;
 
@@ -512,12 +510,12 @@ class NAILS_Cms_block_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

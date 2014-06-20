@@ -34,7 +34,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function index()
@@ -42,14 +41,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( ! $this->_can_checkout() ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
-			redirect( shop_setting( 'shop_url' ) . 'basket' );
+			redirect( app_setting( 'url', 'shop' ) . 'basket' );
 			return;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :
@@ -88,16 +87,16 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				//	Save payment gateway info to the session
 				if ( $this->data['basket']->totals->grand != 0 ) :
 
-					$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+					$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
 				else :
 
-					$this->basket->remove_payment_gateway();
+					$this->shop_basket_model->remove_payment_gateway();
 
 				endif;
 
 				//	... and redirect to confirm
-				$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
+				$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
 				$_uri .= $this->data['guest'] ? '?guest=true' : '';
 
 				redirect( $_uri );
@@ -184,12 +183,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 						$_details->last_name	= $this->input->post( 'last_name' );
 						$_details->email		= $this->input->post( 'email' );
 
-						$this->basket->add_personal_details( $_details );
+						$this->shop_basket_model->add_personal_details( $_details );
 
 					else :
 
 						//	In case it's already there for some reason
-						$this->basket->remove_personal_details();
+						$this->shop_basket_model->remove_personal_details();
 
 					endif;
 
@@ -220,12 +219,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 						endif;
 
-						$this->basket->add_shipping_details( $_details );
+						$this->shop_basket_model->add_shipping_details( $_details );
 
 					else :
 
 						//	In case it's already there for some reason
-						$this->basket->remove_shipping_details();
+						$this->shop_basket_model->remove_shipping_details();
 
 					endif;
 
@@ -237,10 +236,10 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					if ( $this->data['basket']->totals->grand > 0 && count( $this->data['payment_gateways'] ) == 1 ) :
 
 						//	Save payment gateway info to the session
-						$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+						$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
 						//	... and confirm
-						$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
+						$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
 						$_uri .= $this->data['guest'] ? '?guest=true' : '';
 
 						redirect( $_uri );
@@ -252,10 +251,10 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 							if ( $pg->id == $this->input->post( 'payment_gateway' ) ) :
 
 								//	Save payment gateway info to the session
-								$this->basket->add_payment_gateway( $pg->id );
+								$this->shop_basket_model->add_payment_gateway( $pg->id );
 
 								//	... and confirm
-								$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
+								$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
 								$_uri .= $this->data['guest'] ? '?guest=true' : '';
 
 								redirect( $_uri );
@@ -268,11 +267,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					elseif ( $this->data['basket']->totals->grand == 0 ) :
 
 						//	Incase it's already there for some reason
-						$this->basket->remove_payment_gateway();
+						$this->shop_basket_model->remove_payment_gateway();
 
 						// --------------------------------------------------------------------------
 
-						$_uri  = shop_setting( 'shop_url' ) . 'checkout/confirm';
+						$_uri  = app_setting( 'url', 'shop' ) . 'checkout/confirm';
 						$_uri .= $this->data['guest'] ? '?guest=true' : '';
 
 						redirect( $_uri );
@@ -320,9 +319,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	Load veiws
-			$this->load->view( 'structure/header',			$this->data );
-			$this->load->view( 'shop/checkout/checkout',	$this->data );
-			$this->load->view( 'structure/footer',			$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/checkout',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		else :
 
@@ -330,13 +329,13 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
-			$this->lang->load( 'auth/auth', RENDER_LANG_SLUG );
+			$this->lang->load( 'auth/auth' );
 
 			// --------------------------------------------------------------------------
 
-			$this->load->view( 'structure/header',		$this->data );
-			$this->load->view( 'shop/checkout/signin',	$this->data );
-			$this->load->view( 'structure/footer',		$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/signin',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		endif;
 	}
@@ -350,7 +349,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function confirm()
@@ -358,14 +356,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( ! $this->_can_checkout() ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
-			redirect( shop_setting( 'shop_url' ) . 'basket' );
+			redirect( app_setting( 'url', 'shop' ) . 'basket' );
 			return;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :
@@ -386,9 +384,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			if ( ! $this->data['basket']->requires_shipping && count( $this->data['payment_gateways'] ) == 1 ) :
 
-				$this->basket->add_payment_gateway( $this->data['payment_gateways'][0]->id );
+				$this->shop_basket_model->add_payment_gateway( $this->data['payment_gateways'][0]->id );
 
-				$_uri  = shop_setting( 'shop_url' ) . 'checkout/payment';
+				$_uri  = app_setting( 'url', 'shop' ) . 'checkout/payment';
 				$_uri .= $this->data['guest'] ? '?guest=true' : '';
 
 				redirect( $_uri );
@@ -399,17 +397,17 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			$this->data['page']->title	= 'Checkout &rsaquo; Confirm Your Order';
-			$this->data['currencies']	= $this->currency->get_all();
+			$this->data['currencies']	= $this->shop_currency_model->get_all();
 
 			// --------------------------------------------------------------------------
 
-			$this->load->view( 'structure/header',		$this->data );
-			$this->load->view( 'shop/checkout/confirm',	$this->data );
-			$this->load->view( 'structure/footer',		$this->data );
+			$this->load->view( 'structure/header',									$this->data );
+			$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/confirm',	$this->data );
+			$this->load->view( 'structure/footer',									$this->data );
 
 		else :
 
-			redirect( shop_setting( 'shop_url' ) . 'checkout' );
+			redirect( app_setting( 'url', 'shop' ) . 'checkout' );
 
 		endif;
 	}
@@ -423,14 +421,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( ! $this->_can_checkout() ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you can\'t checkout right now: ' . $this->data['error'] );
-			redirect( shop_setting( 'shop_url' ) . 'basket' );
+			redirect( app_setting( 'url', 'shop' ) . 'basket' );
 			return;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() || $this->input->get( 'guest' ) ) :
+		if ( $this->user_model->is_logged_in() || $this->input->get( 'guest' ) ) :
 
 			//	Continue, user is logged in or is checking out as a guest
 			if ( $this->input->get( 'guest' ) ) :
@@ -445,45 +443,50 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			// --------------------------------------------------------------------------
 
+			//	Mute the logger (causes issues on non-production environments)
+			_LOG_MUTE_OUTPUT();
+
+			// --------------------------------------------------------------------------
+
 			//	Is the order a zero-value order? If so, just mark it as paid and send
 			//	to processing immediately
 
 			if ( $this->data['basket']->totals->grand == 0 ) :
 
 				//	Create order, then set as paid and redirect to processing page
-				$_order = $this->order->create( $this->data['basket'], TRUE );
+				$_order = $this->shop_order_model->create( $this->data['basket'], TRUE );
 
 				if ( ! $_order ) :
 
 					$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . $this->data['error'] );
-					redirect( shop_setting( 'shop_url' ) . 'basket' );
+					redirect( app_setting( 'url', 'shop' ) . 'basket' );
 					return;
 
 				endif;
 
 				//	Set as paid
-				$this->order->paid( $_order->id );
+				$this->shop_order_model->paid( $_order->id );
 
 				//	Process the order, send receipt and send order notification
-				$this->order->process( $_order );
-				$this->order->send_receipt( $_order );
-				$this->order->send_order_notification( $_order );
+				$this->shop_order_model->process( $_order );
+				$this->shop_order_model->send_receipt( $_order );
+				$this->shop_order_model->send_order_notification( $_order );
 
 				if ( $_order->voucher ) :
 
-					$this->voucher->redeem( $_order->voucher->id, $_order );
+					$this->shop_voucher_model->redeem( $_order->voucher->id, $_order );
 
 				endif;
 
 				// --------------------------------------------------------------------------
 
 				//	Destory the basket
-				$this->basket->destroy();
+				$this->shop_basket_model->destroy();
 
 				// --------------------------------------------------------------------------
 
 				//	Redirect to processing page
-				redirect( shop_setting( 'shop_url' ) . 'checkout/processing?ref=' . $_order->ref );
+				redirect( app_setting( 'url', 'shop' ) . 'checkout/processing?ref=' . $_order->ref );
 
 			endif;
 
@@ -505,7 +508,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				default :
 
 					$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> there was a problem verifying your chosen payment option. Please try again.' );
-					redirect( shop_setting( 'shop_url' ) . 'basket' );
+					redirect( app_setting( 'url', 'shop' ) . 'basket' );
 
 				break;
 
@@ -513,7 +516,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		else :
 
-			redirect( shop_setting( 'shop_url' ) . 'checkout' );
+			redirect( app_setting( 'url', 'shop' ) . 'checkout' );
 
 		endif;
 	}
@@ -525,12 +528,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _payment_paypal()
 	{
 		//	Create the order
-		$this->data['order'] = $this->order->create( $this->data['basket'], TRUE );
+		$this->data['order'] = $this->shop_order_model->create( $this->data['basket'], TRUE );
 
 		if ( ! $this->data['order'] ) :
 
 			$this->session->set_flashdata( 'error', 'There was a problem checking out: ' . $this->data['error'] );
-			redirect( shop_setting( 'shop_url' ) . 'basket' );
+			redirect( app_setting( 'url', 'shop' ) . 'basket' );
 			return;
 
 		endif;
@@ -572,14 +575,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		endswitch;
 
-		$this->data['paypal']->notify		= site_url( shop_setting( 'shop_url' ) . 'checkout/notify/paypal' );
-		$this->data['paypal']->cancel		= site_url( shop_setting( 'shop_url' ) . 'checkout/cancel' );
-		$this->data['paypal']->processing	= site_url( shop_setting( 'shop_url' ) . 'checkout/processing' );
+		$this->data['paypal']->notify		= site_url( app_setting( 'url', 'shop' ) . 'checkout/notify/paypal' );
+		$this->data['paypal']->cancel		= site_url( app_setting( 'url', 'shop' ) . 'checkout/cancel' );
+		$this->data['paypal']->processing	= site_url( app_setting( 'url', 'shop' ) . 'checkout/processing' );
 
 		// --------------------------------------------------------------------------
 
 		//	Load the views
-		$this->load->view( 'shop/checkout/payment/paypal/index',	$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/paypal/index',	$this->data );
 	}
 
 
@@ -634,27 +637,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	protected function _can_checkout()
 	{
 		//	Check basket isn't empty
-		$this->data['basket'] = $this->basket->get_basket();
+		$this->data['basket'] = $this->shop_basket_model->get_basket();
 
 		if ( ! $this->data['basket']->items ) :
 
 			$this->data['error'] = 'Your basket is empty.';
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Load the payment gateway model
-		$this->load->model( 'shop_payment_gateway_model', 'payment_gateway' );
-
-		//	Fetch the supported payment gateways
-		$this->data['payment_gateways'] = $this->payment_gateway->get_all_supported();
-
-		if ( ! $this->data['payment_gateways'] ) :
-
-			//	Uh-oh, no supported payment gateways. Bad times but feedback to the user.
-			$this->data['error'] = 'There\'s an issue at the moment which is preventing ' . APP_NAME . ' form accepting online payment at the moment. Please try again later.';
 			return FALSE;
 
 		endif;
@@ -670,7 +657,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	public function processing()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 		if ( ! $this->data['order'] ) :
 
@@ -681,7 +668,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		// --------------------------------------------------------------------------
 
 		//	Empty the basket
-		$this->basket->destroy();
+		$this->shop_basket_model->destroy();
 
 		// --------------------------------------------------------------------------
 
@@ -704,7 +691,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _processing_unpaid()
 	{
-		$this->load->view( 'shop/checkout/payment/processing/unpaid', $this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/unpaid', $this->data );
 	}
 
 
@@ -713,9 +700,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _processing_pending()
 	{
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/pending', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',														$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/pending',	$this->data );
+		$this->load->view( 'structure/footer',														$this->data );
 	}
 
 
@@ -729,9 +716,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/paid', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',													$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/paid',	$this->data );
+		$this->load->view( 'structure/footer',													$this->data );
 	}
 
 
@@ -781,9 +768,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'shop/checkout/payment/processing/error', $this->data );
-		$this->load->view( 'structure/footer',	$this->data );
+		$this->load->view( 'structure/header',													$this->data );
+		$this->load->view( 'shop/' . $this->_skin->dir . '/checkout/payment/processing/error',	$this->data );
+		$this->load->view( 'structure/footer',													$this->data );
 	}
 
 
@@ -792,7 +779,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	public function cancel()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 		if ( ! $this->data['order'] ) :
 
@@ -802,11 +789,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		// --------------------------------------------------------------------------
 
-		$this->order->cancel( $this->data['order']->id );
+		$this->shop_order_model->cancel( $this->data['order']->id );
 
 		$this->session->set_flashdata( 'message', '<strong>Checkout was cancelled.</strong><br />At your request, we cancelled checkout - you have not been charged.' );
 
-		redirect( shop_setting( 'shop_url' ) . 'basket' );
+		redirect( app_setting( 'url', 'shop' ) . 'basket' );
 	}
 
 
@@ -817,9 +804,6 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 	{
 		//	Testing, testing, 1, 2, 3?
 		$this->data['testing'] = $this->_notify_is_testing();
-
-		//	Load the logger
-		$this->load->library( 'logger' );
 
 		//	Handle the notification in a way appropriate to the payment gateway
 		switch( $this->uri->rsegment( 3 ) ) :
@@ -839,13 +823,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 	protected function _notify_paypal()
 	{
-		//	Configure logger
-		$this->logger->log_dir( shop_setting( 'shop_url' ) . 'notify/paypal' );
-		$this->logger->log_file( 'ipn-' . date( 'Y-m-d' ) . '.php' );
+		//	Configure log
+		_LOG_FILE( app_setting( 'url', 'shop' ) . 'notify/paypal/ipn-' . date( 'Y-m-d' ) . '.php' );
 
-		$this->logger->line();
-		$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-		$this->logger->line( 'Waking up IPN responder; handling with PayPal' );
+		_LOG();
+		_LOG( '- - - - - - - - - - - - - - - - - - -' );
+		_LOG( 'Waking up IPN responder; handling with PayPal' );
 
 		// --------------------------------------------------------------------------
 
@@ -860,9 +843,9 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		if ( ! $this->data['testing'] && ! $this->input->post() ) :
 
-			$this->logger->line( 'No POST data, going back to sleep...' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'No POST data, going back to sleep...' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 			return;
 
@@ -874,19 +857,19 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		if ( $this->data['testing'] ) :
 
 			$_ipn = TRUE;
-			$this->logger->line();
-			$this->logger->line( '**TESTING**' );
-			$this->logger->line( '**Simulating data sent from PayPal**' );
-			$this->logger->line();
+			_LOG();
+			_LOG( '**TESTING**' );
+			_LOG( '**Simulating data sent from PayPal**' );
+			_LOG();
 
 			//	Check order exists
-			$_order = $this->order->get_by_ref( $this->input->get( 'ref' ) );
+			$_order = $this->shop_order_model->get_by_ref( $this->input->get( 'ref' ) );
 
 			if ( ! $_order ) :
 
-				$this->logger->line( 'Invalid order reference, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Invalid order reference, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -906,19 +889,19 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 		else :
 
-			$this->logger->line( 'Validating the IPN call' );
+			_LOG( 'Validating the IPN call' );
 			$this->load->library( 'paypal' );
 
 			$_ipn		= $this->paypal->validate_ipn();
 			$_paypal	= $this->input->post();
 
-			$_order = $this->order->get_by_ref( $this->input->post( 'invoice' ) );
+			$_order = $this->shop_order_model->get_by_ref( $this->input->post( 'invoice' ) );
 
 			if ( ! $_order ) :
 
-				$this->logger->line( 'Invalid order ID, aborting. Likely a transaction not initiated by the site.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Invalid order ID, aborting. Likely a transaction not initiated by the site.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -931,14 +914,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 		//	Did the IPN validate?
 		if ( $_ipn ) :
 
-			$this->logger->line( 'IPN Verified with PayPal' );
-			$this->logger->line();
+			_LOG( 'IPN Verified with PayPal' );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Extra verification step, check the 'custom' variable decodes appropriately
-			$this->logger->line( 'Verifying data' );
-			$this->logger->line();
+			_LOG( 'Verifying data' );
+			_LOG();
 
 			$_verification = $this->encrypt->decode( $_paypal['custom'], APP_PRIVATE_KEY );
 
@@ -947,11 +930,11 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				$_data = array(
 					'pp_txn_id'	=> $_paypal['txn_id']
 				);
-				$this->order->fail( $_order->id, $_data );
+				$this->shop_order_model->fail( $_order->id, $_data );
 
-				$this->logger->line( 'Order failed secondary verification, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Order failed secondary verification, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				// --------------------------------------------------------------------------
 
@@ -966,14 +949,14 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 
 			//	Only bother to handle certain types
 			//	TODO: handle refunds
-			$this->logger->line( 'Checking txn_type is supported' );
-			$this->logger->line();
+			_LOG( 'Checking txn_type is supported' );
+			_LOG();
 
 			if ( $_paypal['txn_type'] != 'cart' ) :
 
-				$this->logger->line( '"' . $_paypal['txn_type'] . '" is not a supported PayPal txn_type, gracefully aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( '"' . $_paypal['txn_type'] . '" is not a supported PayPal txn_type, gracefully aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
@@ -982,29 +965,29 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	Check if order has already been processed
-			$this->logger->line( 'Checking if order has already been processed' );
-			$this->logger->line();
+			_LOG( 'Checking if order has already been processed' );
+			_LOG();
 
 			if ( ENVIRONMENT == 'production' && $_order->status != 'UNPAID' ) :
 
-				$this->logger->line( 'Order has already been processed, aborting.' );
-				$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-				$this->logger->line();
+				_LOG( 'Order has already been processed, aborting.' );
+				_LOG( '- - - - - - - - - - - - - - - - - - -' );
+				_LOG();
 
 				return;
 
 			elseif ( ENVIRONMENT != 'production' && $_order->status != 'UNPAID' ) :
 
-				$this->logger->line( 'Order has already been processed, but not on production so continuing anyway.' );
-				$this->logger->line();
+				_LOG( 'Order has already been processed, but not on production so continuing anyway.' );
+				_LOG();
 
 			endif;
 
 			// --------------------------------------------------------------------------
 
 			//	Check the status of the payment
-			$this->logger->line( 'Checking the status of the payment' );
-			$this->logger->line();
+			_LOG( 'Checking the status of the payment' );
+			_LOG();
 
 
 			switch( strtolower( $_paypal['payment_status'] ) ) :
@@ -1013,7 +996,7 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				case 'completed' :
 
 					//	Do nothing, this transaction is OK
-					$this->logger->line( 'Payment status is "completed"; continuing...' );
+					_LOG( 'Payment status is "completed"; continuing...' );
 
 				break;
 
@@ -1022,12 +1005,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				case 'reversed' :
 
 					//	Transaction was cancelled, mark order as FAILED
-					$this->logger->line( 'Payment was reversed, marking as failed and aborting' );
+					_LOG( 'Payment was reversed, marking as failed and aborting' );
 
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
 					);
-					$this->order->fail( $_order->id, $_data );
+					$this->shop_order_model->fail( $_order->id, $_data );
 
 				break;
 
@@ -1038,25 +1021,25 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 					//	Check the pending_reason, if it's 'paymentreview' then gracefully stop
 					//	processing; PayPal will send a further IPN once the payment is complete
 
-					$this->logger->line( 'Payment status is "pending"; check the reason.' );
+					_LOG( 'Payment status is "pending"; check the reason.' );
 
 					if ( strtolower( $_paypal['pending_reason'] ) == 'paymentreview' ) :
 
 						//	The transaction is pending review, gracefully stop proicessing, but don't cancel the order
-						$this->logger->line( 'Payment is pending review by PayPal, gracefully aborting just now.' );
-						$this->order->pending( $_order->id );
+						_LOG( 'Payment is pending review by PayPal, gracefully aborting just now.' );
+						$this->shop_order_model->pending( $_order->id );
 						return;
 
 					else :
 
-						$this->logger->line( 'Unsupported payment reason "' . $_paypal['pending_reason'] . '", aborting.' );
+						_LOG( 'Unsupported payment reason "' . $_paypal['pending_reason'] . '", aborting.' );
 
 						// --------------------------------------------------------------------------
 
 						$_data = array(
 							'pp_txn_id'	=> $_paypal['txn_id']
 						);
-						$this->order->fail( $_order->id, $_data );
+						$this->shop_order_model->fail( $_order->id, $_data );
 
 						// --------------------------------------------------------------------------
 
@@ -1078,12 +1061,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 				default :
 
 					//	Unknown/invalid payment status
-					$this->logger->line( 'Invalid payment status' );
+					_LOG( 'Invalid payment status' );
 
 					$_data = array(
 						'pp_txn_id'	=> $_paypal['txn_id']
 					);
-					$this->order->fail( $_order->id, $_data );
+					$this->shop_order_model->fail( $_order->id, $_data );
 
 					// --------------------------------------------------------------------------
 
@@ -1098,68 +1081,68 @@ class NAILS_Checkout extends NAILS_Shop_Controller
 			// --------------------------------------------------------------------------
 
 			//	All seems good, continue with order processing
-			$this->logger->line( 'All seems well, continuing...' );
-			$this->logger->line();
+			_LOG( 'All seems well, continuing...' );
+			_LOG();
 
-			$this->logger->line( 'Setting txn_id (' . $_paypal['txn_id'] . ') and fees_deducted (' . $_paypal['mc_fee'] . ').' );
-			$this->logger->line();
+			_LOG( 'Setting txn_id (' . $_paypal['txn_id'] . ') and fees_deducted (' . $_paypal['mc_fee'] . ').' );
+			_LOG();
 
 			$_data = array(
 				'pp_txn_id'		=> $_paypal['txn_id'],
 				'fees_deducted'	=> $_paypal['mc_fee']
 			);
-			$this->order->paid( $_order->id, $_data );
+			$this->shop_order_model->paid( $_order->id, $_data );
 
 			// --------------------------------------------------------------------------
 
 			//	PROCESSSSSS...
-			$this->order->process( $_order, $this->logger );
-			$this->logger->line();
+			$this->shop_order_model->process( $_order );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a receipt to the customer
-			$this->logger->line( 'Sending receipt to customer: ' . $_order->user->email );
-			$this->order->send_receipt( $_order, $this->logger );
-			$this->logger->line();
+			_LOG( 'Sending receipt to customer: ' . $_order->user->email );
+			$this->shop_order_model->send_receipt( $_order );
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
 			//	Send a notification to the store owner(s)
-			$this->logger->line( 'Sending notification to store owner(s): ' . shop_setting( 'notify_order' ) );
-			$this->order->send_order_notification( $_order, $this->logger );
+			_LOG( 'Sending notification to store owner(s): ' . notification( 'notify_order', 'shop' ) );
+			$this->shop_order_model->send_order_notification( $_order );
 
 			// --------------------------------------------------------------------------
 
 			if ( $_order->voucher ) :
 
 				//	Redeem the voucher, if it's there
-				$this->logger->line( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
-				$this->voucher->redeem( $_order->voucher->id, $_order );
+				_LOG( 'Redeeming voucher: ' . $_order->voucher->code . ' - ' . $_order->voucher->label );
+				$this->shop_voucher_model->redeem( $_order->voucher->id, $_order );
 
 			endif;
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line();
+			_LOG();
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line( 'All done here, going back to sleep...' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'All done here, going back to sleep...' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 			if ( $this->data['testing'] ) :
 
-				echo anchor( shop_setting( 'shop_url' ) . 'checkout/processing?ref=' . $_order->ref, 'Continue to Processing Page' );
+				echo anchor( app_setting( 'url', 'shop' ) . 'checkout/processing?ref=' . $_order->ref, 'Continue to Processing Page' );
 
 			endif;
 
 		else :
 
-			$this->logger->line( 'PayPal did not verify this IPN call, aborting.' );
-			$this->logger->line( '- - - - - - - - - - - - - - - - - - -' );
-			$this->logger->line();
+			_LOG( 'PayPal did not verify this IPN call, aborting.' );
+			_LOG( '- - - - - - - - - - - - - - - - - - -' );
+			_LOG();
 
 		endif;
 	}
@@ -1202,12 +1185,12 @@ class NAILS_Checkout extends NAILS_Shop_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

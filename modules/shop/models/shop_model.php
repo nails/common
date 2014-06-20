@@ -24,9 +24,13 @@ class NAILS_Shop_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function __construct()
+	public function __construct( $config = array() )
 	{
 		parent::__construct();
+
+		// --------------------------------------------------------------------------
+
+		$_config_set_session = isset( $config['set_session'] ) ? (bool) $config['set_session'] : TRUE;
 
 		// --------------------------------------------------------------------------
 
@@ -39,7 +43,6 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_BASE_CURRENCY_SYMBOL_POS' ) )	define( 'SHOP_BASE_CURRENCY_SYMBOL_POS',	$_base->symbol_position );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_PRECISION' ) )	define( 'SHOP_BASE_CURRENCY_PRECISION',		$_base->decimal_precision );
 		if ( ! defined( 'SHOP_BASE_CURRENCY_CODE' ) )		define( 'SHOP_BASE_CURRENCY_CODE',			$_base->code );
-		if ( ! defined( 'SHOP_BASE_CURRENCY_ID' ) )			define( 'SHOP_BASE_CURRENCY_ID',			$_base->id );
 
 		//	Formatting constants
 		if ( ! defined( 'SHOP_BASE_CURRENCY_THOUSANDS' ) )	define( 'SHOP_BASE_CURRENCY_THOUSANDS',		$_base->thousands_seperator );
@@ -49,62 +52,76 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( $this->session->userdata( 'shop_currency' ) ) :
 
 			//	Use the currency defined in the session
-			$_currency_id = $this->session->userdata( 'shop_currency' );
+			$_currency_code = $this->session->userdata( 'shop_currency' );
 
 		elseif( active_user( 'shop_currency' ) ) :
 
 			//	Use the currency defined in the user object
-			$_currency_id = active_user( 'shop_currency' );
-			$this->session->set_userdata( 'shop_currency', $_currency_id );
+			$_currency_code = active_user( 'shop_currency' );
+
+			if ( ! headers_sent() ) :
+
+				$this->session->set_userdata( 'shop_currency', $_currency_code );
+
+			endif;
 
 		else :
 
 			//	Can we determine the user's location and set a currency based on that?
 			//	If not, fall back to base currency
 
-			$this->load->library('geoip');
-			$this->geoip->InfoIP('90.221.187.105');
-			$_country_code = $this->geoip->result_country_code();
+			$this->load->library('geo_ip');
 
-			if ( $_country_code ) :
+			$_lookup = $this->geo_ip->country();
+
+			if ( ! empty( $_lookup->status ) && $_lookup->status == 200 ) :
 
 				//	We know the code, does it have a known currency?
-				$_country_currency = $this->currency->get_by_country( $_country_code );
+				$_country_currency = $this->shop_currency_model->get_by_country( $_lookup->country->iso );
 
 				if ( $_country_currency ) :
 
-					$_currency_id = $_country_currency->id;
+					$_currency_code = $_country_currency->code;
 
 				else :
 
 					//	Fall back to default
-					$_currency_id = $_base->id;
+					$_currency_code = $_base->code;
 
 				endif;
 
 			else :
 
-				$_currency_id = $_base->id;
+				$_currency_code = $_base->code;
 
 			endif;
 
 			//	Save to session
-			$this->session->set_userdata( 'shop_currency', $_currency_id );
+			if ( ! headers_sent() ) :
+
+				$this->session->set_userdata( 'shop_currency', $_currency_code );
+
+			endif;
 
 		endif;
 
 		//	Fetch the user's render currency
-		$_user_currency = $this->currency->get_by_id( $_currency_id );
+		$_user_currency = $this->shop_currency_model->get_by_code( $_currency_code );
 
-		if ( ! $_user_currency || ! $_user_currency->is_active ) :
+		if ( ! $_user_currency  ) :
 
-			//	Bad currency ID or not active, use base
+			//	Bad currency code
 			$_user_currency = $_base;
-			$this->session->unset_userdata( 'shop_currency', $_currency_id );
 
-			if ( $this->user->is_logged_in() ) :
+			if ( ! headers_sent() ) :
 
-				$this->user->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
+				$this->session->unset_userdata( 'shop_currency', $_currency_code );
+
+			endif;
+
+			if ( $this->user_model->is_logged_in() ) :
+
+				$this->user_model->update( active_user( 'id' ), array( 'shop_currency' => NULL ) );
 
 			endif;
 
@@ -115,71 +132,10 @@ class NAILS_Shop_model extends NAILS_Model
 		if ( ! defined( 'SHOP_USER_CURRENCY_SYMBOL_POS' ) )		define( 'SHOP_USER_CURRENCY_SYMBOL_POS',	$_user_currency->symbol_position );
 		if ( ! defined( 'SHOP_USER_CURRENCY_PRECISION' ) )		define( 'SHOP_USER_CURRENCY_PRECISION',		$_user_currency->decimal_precision );
 		if ( ! defined( 'SHOP_USER_CURRENCY_CODE' ) )			define( 'SHOP_USER_CURRENCY_CODE',			$_user_currency->code );
-		if ( ! defined( 'SHOP_USER_CURRENCY_ID' ) )				define( 'SHOP_USER_CURRENCY_ID',			$_user_currency->id );
 
 		//	Formatting constants
 		if ( ! defined( 'SHOP_USER_CURRENCY_THOUSANDS' ) )		define( 'SHOP_USER_CURRENCY_THOUSANDS',		$_user_currency->thousands_seperator );
 		if ( ! defined( 'SHOP_USER_CURRENCY_DECIMALS' ) )		define( 'SHOP_USER_CURRENCY_DECIMALS',		$_user_currency->decimal_symbol );
-
-		//	Exchange rate betweent the two currencies
-		if ( ! defined( 'SHOP_USER_CURRENCY_BASE_EXCHANGE' ) )	define( 'SHOP_USER_CURRENCY_BASE_EXCHANGE',	$_user_currency->base_exchange );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function settings( $key = NULL, $force_refresh = FALSE )
-	{
-		if ( ! $this->_settings || $force_refresh ) :
-
-			$_settings = $this->db->get( 'shop_settings' )->result();
-
-			foreach ( $_settings AS $setting ) :
-
-				$this->_settings[ $setting->key ] = unserialize( $setting->value );
-
-			endforeach;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $key ) :
-
-			return $this->_settings;
-
-		else :
-
-			return isset( $this->_settings[$key] ) ? $this->_settings[$key] : NULL;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function set_settings( $key_values )
-	{
-		foreach ( $key_values AS $key => $value ) :
-
-			$this->db->where( 'key', $key );
-			$this->db->set( 'value', serialize( $value ) );
-			$this->db->update( 'shop_settings' );
-
-			// --------------------------------------------------------------------------
-
-			//	Unset the cache if the base_currency is being updated
-			if ( $key == 'base_currency' ) :
-
-				$this->_unset_cache( 'base_currency' );
-
-			endif;
-
-		endforeach;
-
-		return TRUE;
 	}
 
 
@@ -199,16 +155,16 @@ class NAILS_Shop_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Load the currency model, if not already loaded
-		if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+		if ( ! $this->load->model_is_loaded( 'shop_currency_model' ) ) :
 
-			$this->load->model( 'shop/shop_currency_model', 'currency' );
+			$this->load->model( 'shop/shop_currency_model' );
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Fetch base currency
-		$_base = $this->currency->get_by_id( $this->settings( 'base_currency' ) );
+		$_base = $this->shop_currency_model->get_by_code( app_setting( 'base_currency', 'shop' ) );
 
 		//	Cache
 		$this->_set_cache( 'base_currency', $_base );
@@ -222,8 +178,8 @@ class NAILS_Shop_model extends NAILS_Model
 
 	public function format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE, $for_currency = NULL, $decode_symbol = FALSE )
 	{
-		//	Foratting for which currency? If null or emptyt, assume user currency
-		if ( is_null( $for_currency ) || ! $for_currency ) :
+		//	Formatting for which currency? If null or emptyt, assume user currency
+		if ( NULL === $for_currency || ! $for_currency ) :
 
 			$_code		= SHOP_USER_CURRENCY_CODE;
 			$_symbol	= SHOP_USER_CURRENCY_SYMBOL;
@@ -251,19 +207,19 @@ class NAILS_Shop_model extends NAILS_Model
 				//	Fetch currency
 
 				//	Load the currency model, if not already loaded
-				if ( ! $this->load->model_is_loaded( 'currency' ) ) :
+				if ( ! $this->load->model_is_loaded( 'shop_currency_model' ) ) :
 
-					$this->load->model( 'shop/shop_currency_model', 'currency' );
+					$this->load->model( 'shop/shop_currency_model' );
 
 				endif;
 
 				if ( is_numeric( $for_currency ) ) :
 
-					$_currency = $this->currency->get_by_id( $for_currency );
+					$_currency = $this->shop_currency_model->get_by_id( $for_currency );
 
 				else :
 
-					$_currency = $this->currency->get_by_code( $for_currency );
+					$_currency = $this->shop_currency_model->get_by_code( $for_currency );
 
 				endif;
 
@@ -368,12 +324,12 @@ class NAILS_Shop_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -390,4 +346,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_MODEL' ) ) :
 endif;
 
 /* End of file shop_model.php */
-/* Location: ./application/models/shop_model.php */
+/* Location: ./modules/shop/models/shop_model.php */

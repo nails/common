@@ -22,7 +22,7 @@ class NAILS_Orders extends NAILS_Shop_Controller
 {
 	public function invoice()
 	{
-		$this->data['order'] = $this->order->get_by_ref( $this->uri->segment( 4 ) );
+		$this->data['order'] = $this->shop_order_model->get_by_ref( $this->uri->segment( 4 ) );
 
 		//	Order exist?
 		if ( ! $this->data['order'] ) :
@@ -37,7 +37,7 @@ class NAILS_Orders extends NAILS_Shop_Controller
 		$_id_match		= $this->data['order']->user->id && $this->data['order']->user->id != active_user( 'id' );
 		$_email_match	= $this->data['order']->user->email && $this->data['order']->user->email != active_user( 'email' );
 
-		if ( ! $this->user->is_admin() && ! $_id_match && ! $_email_match ) :
+		if ( ! $this->user_model->is_admin() && ! $_id_match && ! $_email_match ) :
 
 			return $this->_bad_invoice( 'Permission Denied.' );
 
@@ -48,12 +48,12 @@ class NAILS_Orders extends NAILS_Shop_Controller
 		//	Render PDF
 		if ( isset( $_GET['dl'] ) && ! $_GET['dl'] ) :
 
-			$this->load->view('shop/orders/invoice', $this->data );
+			$this->load->view('shop/' . $this->_skin->dir . '/orders/invoice', $this->data );
 
 		else :
 
 			$this->load->library( 'pdf' );
-			$this->pdf->load_view('shop/orders/invoice', $this->data );
+			$this->pdf->load_view('shop/' . $this->_skin->dir . '/orders/invoice', $this->data );
 			$this->pdf->render();
 			$this->pdf->stream( 'INVOICE-' . $this->data['order']->ref . '.pdf' );
 
@@ -69,7 +69,7 @@ class NAILS_Orders extends NAILS_Shop_Controller
 		header( 'Cache-Control: no-cache, must-revalidate' );
 		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Content-type: application/json' );
-		header( 'HTTP/1.0 400 Bad Request' );
+		header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 400 Bad Request' );
 
 		// --------------------------------------------------------------------------
 
@@ -81,6 +81,14 @@ class NAILS_Orders extends NAILS_Shop_Controller
 		);
 
 		echo json_encode( $_out );
+
+		// --------------------------------------------------------------------------
+
+		//	Kill script, th, th, that's all folks.
+		//	Stop the output class from hijacking our headers and
+		//	setting an incorrect Content-Type
+
+		exit(0);
 	}
 }
 
@@ -99,12 +107,12 @@ class NAILS_Orders extends NAILS_Shop_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

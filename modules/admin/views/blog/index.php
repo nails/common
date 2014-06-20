@@ -5,13 +5,12 @@
 
 	<hr />
 
-	<div class="search">
-		<div class="search-text">
-			<input type="text" name="search" value="" autocomplete="off" placeholder="Search post titles by typing in here...">
-		</div>
-	</div>
+	<?php
 
-	<hr />
+		$this->load->view( 'admin/blog/_utilities/search' );
+		$this->load->view( 'admin/_utilities/pagination' );
+
+	?>
 
 	<table>
 		<thead>
@@ -44,7 +43,7 @@
 
 					else :
 
-						echo img( NAILS_URL . 'img/admin/blog/image-icon.png' );
+						echo img( NAILS_ASSETS_URL . 'img/admin/modules/blog/image-icon.png' );
 
 					endif;
 
@@ -59,23 +58,29 @@
 						echo '<small>' . anchor( $post->url, $post->url, 'target="_blank"' ) . '</small>';
 
 						//	Exceprt
-						echo '<small>' . $post->excerpt . '</small>';
+						if ( app_setting( 'use_excerpt', 'blog' ) ) :
+
+							echo '<small>' . $post->excerpt . '</small>';
+
+						endif;
 
 					echo '</td>';
 
-					echo '<td class="status">';
 					if ( $post->is_published ) :
 
-						echo '<span class="yes">Yes</span>';
+						echo '<td class="status success">';
+						echo '<span class="ion-checkmark-circled"></span>';
 						echo '<small class="nice-time">' . user_datetime( $post->published, 'Y-m-d', 'H:i:s' ) . '</small>';
+						echo '</td>';
 
 					else :
 
-						echo '<span class="no">No</span>';
+						echo '<td class="status error">';
+						echo '<span class="ion-close-circled"></span>';
+						echo '</td>';
 
 					endif;
 
-					echo '</td>';
 
 					//	User common cells
 					$this->load->view( 'admin/_utilities/table-cell-user',		$post->author );
@@ -103,18 +108,10 @@
 		?>
 		</tbody>
 	</table>
+
+	<?php
+
+		$this->load->view( 'admin/_utilities/pagination' );
+
+	?>
 </div>
-
-<script type="text/javascript">
-<!--//
-
-	$(function(){
-
-		var Blog = new NAILS_Admin_Blog;
-		Blog.init_search();
-
-
-	});
-
-//-->
-</script>

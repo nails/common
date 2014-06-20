@@ -25,7 +25,7 @@
 					echo '<td class="order">' . $testimonial->order . '</td>';
 					echo '<td class="actions">';
 					echo anchor( 'admin/testimonials/edit/' . $testimonial->id, lang( 'action_edit' ), 'class="awesome small"' );
-					echo anchor( 'admin/testimonials/delete/' . $testimonial->id, lang( 'action_delete' ), 'class="awesome red small confirm" data-confirm="Are you sure?"' );
+					echo anchor( 'admin/testimonials/delete/' . $testimonial->id, lang( 'action_delete' ), 'class="awesome red small confirm" data-title="Are you sure?" data-body="You cannot undo this action"' );
 					echo '</td>';
 					echo '<tr>';
 

@@ -1,67 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * get_userobject()
- *
- * Gets a reference to the IA user object
- *
- * @access	public
- * @return	object
- */
-if ( ! function_exists( 'get_userobject' ) )
-{
-	function get_userobject()
-	{
-		if ( ! defined( 'NAILS_USR_OBJ' ) )
-			return FALSE;
-
-		$_ci =& get_instance();
-
-		if ( ! isset( $_ci->{NAILS_USR_OBJ} ) )
-			return FALSE;
-
-		return $_ci->{NAILS_USR_OBJ};
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-
-/**
- * active_user()
- *
- * Handy way of getting data from the active user object
- *
- * @access	public
- * @param	string	$key	The key(s) to fetch
- * @return	object
- */
-if ( ! function_exists( 'active_user' ) )
-{
-	function active_user( $keys = FALSE, $delimiter = ' ' )
-	{
-		$_usr_obj =& get_userobject();
-
-		if ( $_usr_obj ) :
-
-			return $_usr_obj->active_user( $keys, $delimiter );
-
-		else :
-
-			return FALSE;
-
-		endif;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-
-/**
  * get_loaded_modules()
  *
  * Fetch the loaded modules for this app
@@ -146,6 +85,18 @@ if ( ! function_exists( 'module_is_enabled' ) )
 
 		// --------------------------------------------------------------------------
 
+		//	Allow wildcard
+		reset( $_nails_modules );
+		$_wildcard = key( $_nails_modules );
+
+		if ( $_wildcard == '*' ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
 
 		$_module	= isset( $_matches[1] ) ? $_matches[1] : '';
@@ -177,33 +128,6 @@ if ( ! function_exists( 'module_is_enabled' ) )
 
 
 /**
- * is_https()
- *
- * Determine whether the current connection is using SSL
- *
- *
- * @access	public
- * @return	boolean
- */
-if ( ! function_exists( 'is_https' ) )
-{
-	function is_https()
-	{
-		if ( ! isset( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] == 'off' || ! $_SERVER['HTTPS'] ) :
-
-			return FALSE;
-
-		endif;
-
-		return TRUE;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
  * send_developer_mail()
  *
  * Quickly send a high priority email via mail() to the APP_DEVELOPER
@@ -218,25 +142,7 @@ if ( ! function_exists( 'send_developer_mail' ) )
 {
 	function send_developer_mail( $subject, $message )
 	{
-		if ( ! APP_EMAIL_DEVELOPER && ! NAILS_EMAIL_DEVELOPER ) :
-
-			//	Log the fact there's no email
-			log_message( 'error', 'Attempting to send developer email, but APP_EMAIL_DEVELOPER and NAILS_EMAIL_DEVELOPER are not defined.' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_to		= APP_EMAIL_DEVELOPER ? APP_EMAIL_DEVELOPER : NAILS_EMAIL_DEVELOPER;
-		$_headers	= 'From: ' . APP_EMAIL_FROM_NAME . ' <' . 'root@' . gethostname() . '>' . "\r\n" .
-					  'Reply-To: ' . APP_EMAIL_FROM_EMAIL . "\r\n" .
-					  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-					  'X-Priority: 1 (Highest)' . "\r\n" .
-					  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-					  'Importance: High';
-
-		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
+		return get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
 	}
 }
 

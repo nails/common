@@ -1,21 +1,25 @@
 var NAILS_Admin_Shop_Inventory_Create_Edit;
 NAILS_Admin_Shop_Inventory_Create_Edit = function()
 {
-	this.mode = null;
-	this.product_types = [];
-	this.upload_token = null;
-	this._variation_counter = 0;
+	this.product_types		= [];
+	this.upload_token		= null;
+	this._api				= null;
+	this._variation_counter	= 0;
 
 
 	// --------------------------------------------------------------------------
 
 
-	this.init = function(mode, product_types, upload_token)
+	this.init = function( product_types, upload_token )
 	{
 		//	Set vars
-		this.mode = mode;
-		this.product_types = product_types;
-		this.upload_token = upload_token;
+		this.product_types	= product_types;
+		this.upload_token	= upload_token;
+
+		// --------------------------------------------------------------------------
+
+		//	Set up the API interface
+		this._api = new window.NAILS_API();
 
 		// --------------------------------------------------------------------------
 
@@ -24,7 +28,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		this._init_variations();
 		this._init_gallery();
 		this._init_attributes();
-		this._init_chosens();
+		this._init_select2();
 		this._init_submit();
 	};
 
@@ -35,17 +39,17 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	this._init_info = function()
 	{
 		//	Show the correct meta field
-		this.info_chosen_type_change();
+		this.info_select2_type_change();
 	};
 
 
 	// --------------------------------------------------------------------------
 
 
-	this.info_chosen_type_change = function()
+	this.info_select2_type_change = function()
 	{
 		//	Make sure the appropriate meta fields are being displayed
-		var _type_id = $('#tab-basics select[name=type_id]').val();
+		var _type_id = parseInt( $('#tab-basics .type_id:input').val(), 10 );
 
 		//	We'll be updating the template, so fetch it now
 		var _template = $('<div>').html($.parseHTML($.trim($('#template-variation').html(), null, true)));
@@ -66,11 +70,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		// --------------------------------------------------------------------------
 
 		//	Does this product type require shipping?
-		var _is_physical = 0;
+		var _is_physical = false;
+
 		for (var _key in this.product_types)
 		{
-			if (this.product_types[_key].id === _type_id) {
-				_is_physical = parseInt(this.product_types[_key].is_physical, 10);
+			if (this.product_types[_key].id === _type_id)
+			{
+				_is_physical = this.product_types[_key].is_physical;
+				break;
 			}
 		}
 
@@ -78,13 +85,11 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		{
 			//	Ensure shipping tabs are hidden and the physical fields are not showing
 			$( 'li.tab a.tabber-variation-shipping' ).addClass( 'disabled' ).hide();
-			$( '.fields-is-physical .physical-fields' ).hide();
-			$( '.fields-is-physical .no-dimensions' ).show();
 
 			//	If the shipping tab is active, make it non active
 			$( 'li.tab a.tabber-variation-shipping' ).each(function()
 			{
-				var _shipping_tab	= $(this);
+				var _shipping_tab = $(this);
 
 				if ( _shipping_tab.parent().hasClass( 'active' ) )
 				{
@@ -95,28 +100,22 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 					_details_tab.parent().addClass( 'active' );
 
 					//	Swap bodies
-					$( '#' + _shipping_tab.data( 'tab' ) ).hide();
-					$( '#' + _details_tab.data( 'tab' ) ).show();
+					$( '#' + _shipping_tab.data( 'tab' ) ).removeClass( 'active' );
+					$( '#' + _details_tab.data( 'tab' ) ).addClass( 'active' );
 				}
 			});
 
 			//	Update template
 			$( 'li.tab a.tabber-variation-shipping', _template ).addClass( 'disabled' ).hide();
-			$( '.fields-is-physical .physical-fields', _template ).hide();
-			$( '.fields-is-physical .no-dimensions', _template ).show();
 
 		}
 		else
 		{
 			//	Enable shipping tabs and show physical fields
 			$( 'li.tab a.tabber-variation-shipping' ).removeClass( 'disabled' ).css( 'display', 'inline-block' );
-			$( '.fields-is-physical .physical-fields' ).show();
-			$( '.fields-is-physical .no-dimensions' ).hide();
 
 			//	Update template
 			$( 'li.tab a.tabber-variation-shipping', _template ).removeClass( 'disabled' ).css( 'display', 'inline-block' );
-			$( '.fields-is-physical .physical-fields', _template ).show();
-			$( '.fields-is-physical .no-dimensions', _template ).hide();
 		}
 
 		// --------------------------------------------------------------------------
@@ -136,23 +135,25 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		//	Add a variation
 		$('#product-variation-add').on('click', function()
 		{
-			var _template = $('#template-variation').html().replace('<!--script type="text/javascript"-->', '<script type="text/javascript">').replace('<!--/script-->', '</script>');
-			var _counter = $('#product-variations .variation').length;
+			var _template	= $('#template-variation').html();
+			var _counter	= $('#product-variations .variation').length;
 
 			_template = Mustache.render(_template, {
 				counter: _counter
 			});
 
-			$('#product-variations').append(_template);
+			$('#product-variations').append( _template );
 
 			_nails.add_stripes();
+			_nails._init_tipsy();
 			_nails.process_prefixed_inputs();
 			_nails_admin.init_toggles();
+			_nails_admin.init_select2();
 			_this._variations_checkmax();
 
 			//	Show the price syncher
 			$( '#variation-sync-prices' ).show();
-			$( '#sync-shipping-options' ).show();
+			$( '#variation-sync-shipping' ).show();
 
 			return false;
 		});
@@ -183,7 +184,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 						if ( $( 'product-variations .variation' ).length <= 1 )
 						{
 							$( '#variation-sync-prices' ).hide();
-							$( '#sync-shipping-options' ).hide();
+							$( '#variation-sync-shipping' ).hide();
 						}
 
 						//	Close dialog
@@ -197,6 +198,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			});
 
 			return false;
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Stock status
+		$('#product-variations').on('change', 'select.stock-status', function()
+		{
+			_this._variation_stock_status_change( $(this) );
 		});
 
 		// --------------------------------------------------------------------------
@@ -265,68 +274,21 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			return false;
 		});
 
+
 		// --------------------------------------------------------------------------
 
-		//	Add a shipping option
-		$(document).on('click', '#add-shipping-option', function()
+		//	Helper: copy the fill price to the sale price on blur
+		$( 'input.base-price, input.variation-price' ).on( 'blur', function()
 		{
-			var _template	= $( '#template-shipping-option' ).html();
-			var _variation	= $( '#variation-' + $(this).data( 'variation-counter' ) );
-			var _counter	= $( 'tr.shipping-option', _variation ).length;
+			var _price = $(this).val();
+			var _sale_price = $(this).closest( 'tr' ).find( 'input.base-price-sale, input.variation-price' );
 
-			_template = Mustache.render(_template, {
-				counter: _counter+1
-			});
+			if ( $.trim( _sale_price.val() ).length === 0 )
+			{
+				_sale_price.val( _price );
+			}
 
-			$( 'table.shipping-options tbody', _variation ).append(_template);
-			$( 'table.shipping-options', _variation ).removeClass( 'empty' );
-
-			_nails.add_stripes();
-			_nails.process_prefixed_inputs();
-			_this._init_chosens();
-
-			return false;
 		});
-
-		// --------------------------------------------------------------------------
-
-		$('#product-variations').on('click', 'a.delete-shipping', function()
-		{
-			var _option = this;
-
-			$('#dialog-confirm-delete').dialog({
-				resizable: false,
-				draggable: false,
-				modal: true,
-				dialogClass: "no-close",
-				buttons:
-				{
-					"Delete Option": function()
-				{
-						//	Last one?
-						if ( $(_option).closest('table.shipping-options').find( 'tr.shipping-option' ).length === 1 )
-						{
-							$(_option).closest('table.shipping-options').addClass( 'empty' );
-						}
-
-						//	Remove the variation
-						$(_option).closest('tr.shipping-option').remove();
-
-						//	Close dialog
-						$(this).dialog("close");
-					},
-					Cancel: function()
-					{
-						$(this).dialog("close");
-					}
-				}
-			});
-
-			return false;
-		});
-
-
-		// --------------------------------------------------------------------------
 
 		//	Sync prices
 		$( '#variation-sync-prices a' ).on( 'click', function()
@@ -343,14 +305,14 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 					OK: function()
 					{
 						//	Get base prices
-						$( '#variation-0 .base-price' ).each(function()
+						$( '#tab-variation-0-pricing .base-price' ).each(function()
 						{
 							var _code = $(this).data( 'code' );
 
 							$( '#product-variations .variation-price.' + _code ).val( $(this).val() );
 						});
 
-						$( '#variation-0 .base-price-sale' ).each(function()
+						$( '#tab-variation-0-pricing .base-price-sale' ).each(function()
 						{
 							var _code = $(this).data( 'code' );
 
@@ -370,10 +332,11 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			return false;
 		});
 
+
 		// --------------------------------------------------------------------------
 
 		//	Sync shipping options
-		$( '#sync-shipping-options' ).on( 'click', function()
+		$( '#variation-sync-shipping a' ).on( 'click', function()
 		{
 			$('<div>').html( 'This action will take the values form the first variation and <strong>overwrite</strong> the corresponding values in each other variation.' ).dialog(
 			{
@@ -386,7 +349,32 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				{
 					OK: function()
 					{
-						alert( 'TODO' );
+						//	Measurement unit
+						var _measurement_unit = $( '#tab-variation-0-shipping select.measurement-unit' ).val();
+						$( '#product-variations select.measurement-unit' ).val( _measurement_unit ).trigger( 'change' );
+
+						//	Length
+						var _length = $( '#tab-variation-0-shipping input.length' ).val();
+						$( '#product-variations input.length' ).val( _length );
+
+						//	Width
+						var _width = $( '#tab-variation-0-shipping input.width' ).val();
+						$( '#product-variations input.width' ).val( _width );
+
+						//	Height
+						var _height = $( '#tab-variation-0-shipping input.height' ).val();
+						$( '#product-variations input.height' ).val( _height );
+
+						//	Weight unit
+						var _weight_unit = $( '#tab-variation-0-shipping select.weight-unit' ).val();
+						$( '#product-variations .weight-unit' ).val( _weight_unit ).trigger( 'change' );
+
+						//	Weight
+						var _weight = $( '#tab-variation-0-shipping input.weight' ).val();
+						$( '#product-variations input.weight' ).val( _weight );
+
+						//	Collection
+						//	TODO
 
 						//	Close dialog
 						$(this).dialog("close");
@@ -400,7 +388,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 			return false;
 		});
-
 	};
 
 
@@ -435,20 +422,39 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
+	this._variation_stock_status_change = function( obj )
+	{
+		//	Get parent
+		var _parent = obj.closest( '.variation' );
+
+		//	Hide all fields
+		_parent.find( 'div.stock-status-field' ).hide();
+
+		//	Show the ones we're interested in
+		_parent.find( 'div.stock-status-field.' + obj.val() ).show();
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
 	this._init_gallery = function()
 	{
 		var _this = this;
 
 		//	Init uploadify
+		//	TODO: replace uploadify, it's lack of session support is killing me.
+		//	Additionally, if CSRF is enabled, this won't work.
+
 		$('#file_upload').uploadify({
 			'debug': false,
 			'auto': true,
-			'swf': SITE_URL + 'nails_assets/proxy/swf/jquery.uploadify/uploadify.swf',
+			'swf': window.SITE_URL + 'vendor/shed/nails/assets/swf/jquery.uploadify/uploadify.swf',
 			'queueID': 'gallery-items',
-			'uploader': SITE_URL + 'api/cdnapi/object_create/script.php',
+			'uploader': window.SITE_URL + 'api/cdnapi/object_create/script.php',
 			'fileSizeLimit': 2048,
 			'fileObjName': 'upload',
-			'fileTypeExts': '*.gif; *.jpg; *.png',
+			'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',
 			'formData': {
 				'token': this.upload_token,
 				'bucket': 'shop-product-images',
@@ -502,7 +508,15 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 				$('#' + file.id + ' .progress').css('height', _percent + '%');
 			},
 			'onUploadSuccess': function(file, data) {
-				var _data = JSON.parse(data);
+				var _data;
+				try
+				{
+					_data = JSON.parse( data );
+				}
+				catch( err )
+				{
+					_data = {};
+				}
 
 				// --------------------------------------------------------------------------
 
@@ -704,7 +718,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		//	Deletes an uploaded image
 		$(document).on('click', '#gallery-items .gallery-item .delete', function()
 		{
-
 			var _object = this;
 
 			$('#dialog-confirm-delete').dialog(
@@ -729,13 +742,13 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 								'object_id': _object_id
 							}
 						};
-						window.NAILS.API.call(_call);
+						_this._api.call( _call );
 
 						// --------------------------------------------------------------------------
 
 						$(_object).closest('li.gallery-item').addClass('deleted').fadeOut('slow', function()
 						{
-							$(_object).remove();
+							$(_object).closest('li.gallery-item').remove();
 						});
 
 						//	Remove the image from any variations
@@ -790,10 +803,6 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 	this._init_attributes = function()
 	{
-		var _this = this;
-
-		// --------------------------------------------------------------------------
-
 		$('#product-attribute-add').on('click', function()
 		{
 			var _template = $('#template-attribute').html();
@@ -805,8 +814,7 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 			});
 
 			$('#product-attributes').append(_template);
-
-			_this._init_chosens();
+			$('#product-attributes tr:last-child select.attributes').select2();
 
 			return false;
 		});
@@ -826,101 +834,57 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._init_chosens = function()
+	this._init_select2 = function()
 	{
 		var _this = this;
 
 		// --------------------------------------------------------------------------
 
 		//	Define targets and URLs
-		var _target = {};
-		var _url = {};
+		var _target	= {};
+		var _url	= {};
 
-		_target.types = '#tab-basics select.type_id';
-		_url.types = SITE_URL + 'admin/shop/manage/types?mode=' + _this.mode + '&is_fancybox=1';
+		_target.types			= '#tab-basics select.type_id';
+		_url.types				= window.SITE_URL + 'admin/shop/manage/product_type?is_fancybox=1';
 
-		_target.brands = '#tab-basics select.brands';
-		_url.brands = SITE_URL + 'admin/shop/manage/brands?mode=' + _this.mode + '&is_fancybox=1';
+		_target.brands			= '#tab-basics select.brands';
+		_url.brands				= window.SITE_URL + 'admin/shop/manage/brand?is_fancybox=1';
 
-		_target.categories = '#tab-basics select.categories';
-		_url.categories = SITE_URL + 'admin/shop/manage/categories?mode=' + _this.mode + '&is_fancybox=1';
+		_target.categories		= '#tab-basics select.categories';
+		_url.categories			= window.SITE_URL + 'admin/shop/manage/category?is_fancybox=1';
 
-		_target.tags = '#tab-basics select.tags';
-		_url.tags = SITE_URL + 'admin/shop/manage/tags?mode=' + _this.mode + '&is_fancybox=1';
+		_target.tags			= '#tab-basics select.tags';
+		_url.tags				= window.SITE_URL + 'admin/shop/manage/tag?is_fancybox=1';
 
-		_target.tax_rates = '#tab-basics select.tax_rate_id';
-		_url.tax_rates = SITE_URL + 'admin/shop/manage/tax_rates?mode=' + _this.mode + '&is_fancybox=1';
+		_target.tax_rates		= '#tab-basics select.tax_rate_id';
+		_url.tax_rates			= window.SITE_URL + 'admin/shop/manage/tax_rate?is_fancybox=1';
 
-		_target.attributes = '#tab-attributes select.attributes';
-		_url.attributes = SITE_URL + 'admin/shop/manage/attributes?mode=' + _this.mode + '&is_fancybox=1';
+		_target.attributes		= '#tab-attributes select.attributes';
+		_url.attributes			= window.SITE_URL + 'admin/shop/manage/attribute?is_fancybox=1';
 
-		_target.ranges = '#tab-ranges-collections select.ranges';
-		_url.ranges = SITE_URL + 'admin/shop/manage/ranges?mode=' + _this.mode + '&is_fancybox=1';
+		_target.ranges			= '#tab-ranges-collections select.ranges';
+		_url.ranges				= window.SITE_URL + 'admin/shop/manage/range?is_fancybox=1';
 
-		_target.collections = '#tab-ranges-collections select.collections';
-		_url.collections = SITE_URL + 'admin/shop/manage/collections?mode=' + _this.mode + '&is_fancybox=1';
-
-		_target.courier_method = '#tab-variations select.shipping_methods';
-		_url.courier_method = SITE_URL + 'admin/shop/manage/shipping_methods?mode=' + _this.mode + '&is_fancybox=1';
+		_target.collections		= '#tab-ranges-collections select.collections';
+		_url.collections		= window.SITE_URL + 'admin/shop/manage/collection?is_fancybox=1';
 
 		// --------------------------------------------------------------------------
 
-		//	Init chosens
-		$(_target.types).chosen({
-			footer_html: '<a href="#" class="manage-types">Manage Product Types</a>',
-			width: '100%'
-		}).change(function() {
-			_this.info_chosen_type_change();
-		});
-
-		$(_target.brands).chosen({
-			footer_html: '<a href="#" class="manage-brands">Manage Brands</a>',
-			width: '100%'
-		});
-
-		$(_target.categories).chosen({
-			footer_html: '<a href="#" class="manage-categories">Manage Categories</a>',
-			width: '100%'
-		});
-
-		$(_target.tags).chosen({
-			footer_html: '<a href="#" class="manage-tags">Manage Tags</a>',
-			width: '100%'
-		});
-
-		$(_target.tax_rates).chosen({
-			footer_html: '<a href="#" class="manage-tax-rates">Manage Tax Rates</a>',
-			width: '100%'
-		});
-
-		$(_target.attributes).chosen({
-			footer_html: '<a href="#" class="manage-attributes">Manage Attributes</a>',
-			width: '100%'
-		});
-
-		$(_target.ranges).chosen({
-			footer_html: '<a href="#" class="manage-ranges">Manage Ranges</a>',
-			width: '100%'
-		});
-
-		$(_target.collections).chosen({
-			footer_html: '<a href="#" class="manage-collections">Manage Collections</a>',
-			width: '100%'
-		});
-
-		$(_target.courier_method).chosen({
-			footer_html: '<a href="#" class="manage-shipping-options">Manage Shipping Options</a>',
-			width: '100%'
+		//	Bind to select2 changes
+		$(_target.types).change(function() {
+			_this.info_select2_type_change();
 		});
 
 		// --------------------------------------------------------------------------
 
-		//	Bind fancybox to chosens
+		//	Bind fancybox to select2's
 		$(document).on('click', 'a.manage-types', function() {
 			$.fancybox.open(_url.types, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.types);
+					_this._rebuild_select2(_target.types);
 				}
 			});
 			return false;
@@ -929,8 +893,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-brands', function() {
 			$.fancybox.open(_url.brands, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.brands);
+					_this._rebuild_select2(_target.brands);
 				}
 			});
 			return false;
@@ -939,8 +905,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-categories', function() {
 			$.fancybox.open(_url.categories, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.categories);
+					_this._rebuild_select2(_target.categories);
 				}
 			});
 			return false;
@@ -949,8 +917,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-tags', function() {
 			$.fancybox.open(_url.tags, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.tags);
+					_this._rebuild_select2(_target.tags);
 				}
 			});
 			return false;
@@ -959,8 +929,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-tax-rates', function() {
 			$.fancybox.open(_url.tax_rates, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.tax_rates);
+					_this._rebuild_select2(_target.tax_rates);
 				}
 			});
 			return false;
@@ -969,8 +941,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-attributes', function() {
 			$.fancybox.open(_url.attributes, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.attributes);
+					_this._rebuild_select2(_target.attributes, 'template-attribute');
 				}
 			});
 			return false;
@@ -979,8 +953,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-ranges', function() {
 			$.fancybox.open(_url.ranges, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.ranges);
+					_this._rebuild_select2(_target.ranges);
 				}
 			});
 			return false;
@@ -989,18 +965,10 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		$(document).on('click', 'a.manage-collections', function() {
 			$.fancybox.open(_url.collections, {
 				type: 'iframe',
+				width: '95%',
+				height: '95%',
 				beforeClose: function() {
-					_this._rebuild_chosen(_target.collections);
-				}
-			});
-			return false;
-		});
-
-		$(document).on('click', 'a.manage-shipping-options', function() {
-			$.fancybox.open(_url.courier_method, {
-				type: 'iframe',
-				beforeClose: function() {
-					_this._rebuild_chosen(_target.courier_method);
+					_this._rebuild_select2(_target.collections);
 				}
 			});
 			return false;
@@ -1008,20 +976,19 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 
 		// --------------------------------------------------------------------------
 
-		//	Ensure all chosens are updated when their tab is shown
+		//	Ensure all select2's are updated when their tab is shown
 		$( 'ul.tabs a:not(.disabled)' ).on( 'click', function()
 		{
 			setTimeout(function()
 			{
-				$(_target.types).trigger( 'chosen:updated' );
-				$(_target.brands).trigger( 'chosen:updated' );
-				$(_target.categories).trigger( 'chosen:updated' );
-				$(_target.tags).trigger( 'chosen:updated' );
-				$(_target.tax_rates).trigger( 'chosen:updated' );
-				$(_target.attributes).trigger( 'chosen:updated' );
-				$(_target.ranges).trigger( 'chosen:updated' );
-				$(_target.collections).trigger( 'chosen:updated' );
-				$(_target.courier_method).trigger( 'chosen:updated' );
+				$(_target.types).trigger( 'change' );
+				$(_target.brands).trigger( 'change' );
+				$(_target.categories).trigger( 'change' );
+				$(_target.tags).trigger( 'change' );
+				$(_target.tax_rates).trigger( 'change' );
+				$(_target.attributes).trigger( 'change' );
+				$(_target.ranges).trigger( 'change' );
+				$(_target.collections).trigger( 'change' );
 			}, 1);
 		});
 	};
@@ -1030,11 +997,12 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 	// --------------------------------------------------------------------------
 
 
-	this._rebuild_chosen = function(target)
+	this._rebuild_select2 = function(target, template)
 	{
 		var _DATA = $('.fancybox-iframe').get(0).contentWindow._DATA;
 
-		if (typeof(_DATA) === 'undefined') {
+		if (typeof(_DATA) === 'undefined')
+		{
 			//	Do nothing, nothing to work with
 			return false;
 		}
@@ -1042,42 +1010,67 @@ NAILS_Admin_Shop_Inventory_Create_Edit = function()
 		//	Fetch the target(s)
 		var _targets = $(target);
 
-		if (!_targets.length) {
+		if (!_targets.length)
+		{
 			//	Target doesn't exist, ignore
 			return false;
 		}
 
 		//	Rebuild the target(s)
-		_targets.each(function() {
-			//	Save a referene to the target
+		_targets.each(function()
+		{
+			//	Save a reference to the target
 			var _target = this;
 
 			//	Get the currently selected items in this select
 			//	and store as an array of ID's
 
 			var _selected = [];
-			$('option:selected', this).each(function() {
+			$('option:selected', this).each(function()
+			{
 				_selected.push(parseInt($(this).val(), 10));
 			});
 
 			//	Rebuild, marking as selected where appropriate
 			$(this).empty();
-			$.each(_DATA, function() {
+			$.each(_DATA, function()
+			{
 				var _option = $('<option>');
 
 				_option.val(this.id);
 				_option.html(this.label);
 
-				if ($.inArray(this.id, _selected) > -1) {
+				if ($.inArray(this.id, _selected) > -1)
+				{
 					_option.prop('selected', true);
 				}
 
 				$(_target).append(_option);
 			});
 
-			//	Trigger the chosen
-			$(this).trigger('chosen:updated');
+			//	Trigger the select2
+			$(this).trigger('change');
 		});
+
+		//	Rebuild template
+		if ( template )
+		{
+			var _template = $('<div>').html($.parseHTML($.trim($('#' + template).html(), null, true)));
+
+			var _target = $( 'select', _template ).empty();
+
+			$.each(_DATA, function()
+			{
+				var _option = $('<option>');
+
+				_option.val(this.id);
+				_option.html(this.label);
+
+				$(_target).append(_option);
+			});
+
+			$('#' + template).html($(_template).html());
+		}
 	};
 
 

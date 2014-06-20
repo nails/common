@@ -80,7 +80,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			//	Test it
 			$this->db->where( 'ref', $_order->ref );
 
-		} while ( $this->db->count_all_results( 'shop_order' ) );
+		} while ( $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order' ) );
 
 		// --------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			$_order->user_last_name		= $basket->personal_details->last_name;
 
 			//	Double check to make sure this isn't a user we can associate with instead
-			$_user = $this->user->get_by_email( $_order->user_email );
+			$_user = $this->user_model->get_by_email( $_order->user_email );
 
 			if ( $_user ) :
 
@@ -112,7 +112,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 			unset( $_user );
 
-		elseif ( $this->user->is_logged_in() ) :
+		elseif ( $this->user_model->is_logged_in() ) :
 
 			$_order->user_id			= active_user( 'id' );
 			$_order->user_email			= active_user( 'email' );
@@ -197,7 +197,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->set( 'created', 'NOW()', FALSE );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 
-		$this->db->insert( 'shop_order' );
+		$this->db->insert( NAILS_DB_PREFIX . 'shop_order' );
 
 		if ( $this->db->affected_rows() ) :
 
@@ -245,7 +245,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 			if ( $this->db->affected_rows() ) :
 
 				//	Associate the basket with this order
-				$this->basket->add_order_id( $_order->id );
+				$this->shop_basket_model->add_order_id( $_order->id );
 
 				// --------------------------------------------------------------------------
 
@@ -263,7 +263,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 				//	Failed to insert products, delete order
 				$this->db->where( 'id', $_order->id );
-				$this->db->delete( 'shop_order' );
+				$this->db->delete( NAILS_DB_PREFIX . 'shop_order' );
 
 				//	Set error message
 				$this->_set_error( 'Unable to add products to order, aborting.' );
@@ -302,7 +302,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->set( $data );
 		$this->db->set( 'modified', 'NOW()', FALSE );
 		$this->db->where( 'id', $id );
-		$this->db->update( 'shop_order' );
+		$this->db->update( NAILS_DB_PREFIX . 'shop_order' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -321,7 +321,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	public function delete( $id )
 	{
 		$this->db->where( 'id', $id );
-		$this->db->delete( 'shop_order' );
+		$this->db->delete( NAILS_DB_PREFIX . 'shop_order' );
 
 		return $this->db->affected_rows() ? TRUE : FALSE;
 	}
@@ -340,7 +340,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	public function get_all( $order = NULL, $limit = NULL, $where = NULL, $search = NULL )
 	{
 		$this->db->select( 'o.*' );
-		$this->db->select( 'u.email, u.first_name, u.last_name, u.gender, u.profile_img,ug.id user_group_id,ug.display_name user_group_label' );
+		$this->db->select( 'ue.email, u.first_name, u.last_name, u.gender, u.profile_img,ug.id user_group_id,ug.label user_group_label' );
 		$this->db->select( 'pg.slug pg_slug, pg.label pg_label, pg.logo pg_logo' );
 		$this->db->select( 'oc.code oc_code,oc.symbol oc_symbol, oc.decimal_precision oc_precision,bc.code bc_code,bc.symbol bc_symbol,bc.decimal_precision bc_precision' );
 		$this->db->select( 'v.code v_code,v.label v_label, v.type v_type, v.discount_type v_discount_type, v.discount_value v_discount_value, v.discount_application v_discount_application' );
@@ -372,7 +372,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_orders = $this->db->get( 'shop_order o' )->result();
+		$_orders = $this->db->get( NAILS_DB_PREFIX . 'shop_order o' )->result();
 
 		foreach ( $_orders AS $order ) :
 
@@ -401,7 +401,6 @@ class NAILS_Shop_order_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_orders( $where = NULL, $search = NULL )
@@ -411,7 +410,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_order o' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order o' );
 	}
 
 
@@ -426,7 +425,6 @@ class NAILS_Shop_order_model extends NAILS_Model
 	 * @param	string	$where	An array of where conditions
 	 * @param	mixed	$search	A string containing the search terms
 	 * @return	int
-	 * @author	Pablo
 	 *
 	 **/
 	public function count_unfulfilled_orders( $where = NULL, $search = NULL )
@@ -437,7 +435,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Execute Query
-		return $this->db->count_all_results( 'shop_order o' );
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order o' );
 	}
 
 
@@ -446,13 +444,14 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 	protected function _getcount_orders_common( $where = NULL, $search = NULL )
 	{
-		$this->db->join( 'user u', 'u.id = o.user_id', 'LEFT' );
-		$this->db->join( 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
-		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
-		$this->db->join( 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
-		$this->db->join( 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
-		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
-		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = o.user_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.user_id = u.id AND ue.is_primary = 1', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_group ug', 'ug.id = u.group_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_currency oc', 'oc.id = o.currency_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_currency bc', 'bc.id = o.base_currency_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
 
 		// --------------------------------------------------------------------------
 
@@ -640,17 +639,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 
-		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
 		$this->db->where( 'op.order_id', $order_id );
-		$_items = $this->db->get( 'shop_order_product op' )->result();
+		$_items = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result();
 
 		foreach ( $_items AS $item ) :
 
 			$this->db->where( 'product_id', $item->product_id );
-			$item->meta = $this->db->get( 'shop_product_meta' )->row();
+			$item->meta = $this->db->get( NAILS_DB_PREFIX . 'shop_product_meta' )->row();
 			$this->_format_item( $item );
 
 		endforeach;
@@ -686,10 +685,10 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->select( 'pt.id pt_id, pt.slug pt_slug, pt.label pt_label, pt.ipn_method pt_ipn_method' );
 		$this->db->select( 'tr.id tax_rate_id, tr.label tax_rate_label, tr.rate tax_rate_rate' );
 
-		$this->db->join( 'shop_order o', 'o.id = op.order_id', 'LEFT' );
-		$this->db->join( 'shop_product p', 'p.id = op.product_id', 'LEFT' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id', 'LEFT' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_order o', 'o.id = op.order_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
 		$this->db->where( '(o.user_id = ' . $user_id . ' OR o.user_email = \'' . $email . '\')' );
 		$this->db->where( 'o.status', 'PAID' );
@@ -708,12 +707,12 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		endif;
 
-		$_items = $this->db->get( 'shop_order_product op' )->result();
+		$_items = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result();
 
 		foreach ( $_items AS $item ) :
 
 			$this->db->where( 'product_id', $item->product_id );
-			$item->meta = $this->db->get( 'shop_product_meta' )->row();
+			$item->meta = $this->db->get( NAILS_DB_PREFIX . 'shop_product_meta' )->row();
 			$this->_format_item( $item );
 
 		endforeach;
@@ -808,33 +807,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function process( $order, &$logger = NULL )
+	public function process( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID' );
 				return FALSE;
 
@@ -844,7 +827,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		// --------------------------------------------------------------------------
 
-		$_logger( 'Processing order #' . $order->id );
+		_LOG( 'Processing order #' . $order->id );
 
 		//	Loop through all the items in the order. If there's a proccessor method
 		//	for the object type then begin grouping the products so we can execute
@@ -854,7 +837,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 
 		foreach ( $order->items AS $item ) :
 
-			$_logger( 'Processing item #' . $item->id . ': ' . $item->title . ' (' . $item->type->label . ')' );
+			_LOG( 'Processing item #' . $item->id . ': ' . $item->title . ' (' . $item->type->label . ')' );
 
 			if ( $item->type->ipn_method && method_exists( $this, '_process_' . $item->type->ipn_method ) ) :
 
@@ -875,12 +858,12 @@ class NAILS_Shop_order_model extends NAILS_Model
 		//	Execute the processors
 		if ( $_processors ) :
 
-			$_logger( 'Executing processors...' );
+			_LOG( 'Executing processors...' );
 
 			foreach ( $_processors AS $method => $products ) :
 
-				$_logger( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
-				call_user_func_array( array( $this, $method), array( &$_logger, &$products, &$order ) );
+				_LOG( '... ' . $method . '(); with ' . count( $products ) . ' items.' );
+				call_user_func_array( array( $this, $method), array( &$products, &$order ) );
 
 			endforeach;
 
@@ -894,7 +877,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$this->db->where( 'order_id', $order->id );
 		$this->db->where( 'processed', FALSE );
 
-		if ( ! $this->db->count_all_results( 'shop_order_product' ) ) :
+		if ( ! $this->db->count_all_results( NAILS_DB_PREFIX . 'shop_order_product' ) ) :
 
 			//	No unprocessed items, consider order FULFILLED
 			$this->fulfil( $order->id );
@@ -910,7 +893,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	protected function _process_download( &$_logger, &$items, &$order )
+	protected function _process_download( &$items, &$order )
 	{
 		//	Generate links for all the items
 		$_urls		= array();
@@ -933,7 +916,7 @@ class NAILS_Shop_order_model extends NAILS_Model
 		// --------------------------------------------------------------------------
 
 		//	Send the user an email with the links
-		$_logger( 'Sending download email to ' . $order->user->email  . '; email contains ' . count( $_urls ) . ' expiring URLs' );
+		_LOG( 'Sending download email to ' . $order->user->email  . '; email contains ' . count( $_urls ) . ' expiring URLs' );
 
 		$this->load->library( 'emailer' );
 
@@ -953,13 +936,13 @@ class NAILS_Shop_order_model extends NAILS_Model
 			//	Mark items as processed
 			$this->db->set( 'processed', TRUE );
 			$this->db->where_in( 'id', $_ids );
-			$this->db->update( 'shop_order_product' );
+			$this->db->update( NAILS_DB_PREFIX . 'shop_order_product' );
 
 		else :
 
 			//	Email failed to send, alert developers
-			$_logger( '!! Failed to send download links, alerting developers' );
-			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			_LOG( '!! Failed to send download links, alerting developers' );
+			_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 			send_developer_mail( 'Unable to send download email', 'Unable to send the email with download links to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
@@ -970,33 +953,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function send_receipt( $order, $logger = NULL )
+	public function send_receipt( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID' );
 				return FALSE;
 
@@ -1017,8 +984,8 @@ class NAILS_Shop_order_model extends NAILS_Model
 		if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 			//	Email failed to send, alert developers
-			$_logger( '!! Failed to send receipt, alerting developers' );
-			$_logger( implode( "\n", $this->emailer->get_errors() ) );
+			_LOG( '!! Failed to send receipt, alerting developers' );
+			_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 			send_developer_mail( 'Unable to send receipt email', 'Unable to send the email receipt to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
@@ -1035,33 +1002,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 	// --------------------------------------------------------------------------
 
 
-	public function send_order_notification( $order, $logger = NULL )
+	public function send_order_notification( $order )
 	{
-		//	Check to see if a logger object has been passed, if not create
-		//	a dummy method so we don't get errors
-
-		if ( ! method_exists( $logger, 'line' ) ) :
-
-			//	It hasn't, define a dummy
-			$_logger = function( $line ) {};
-
-		else :
-
-			$_logger = function( $line ) use ( &$logger) { $logger->line( $line ); };
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If an ID has been passed, look it up
 		if ( is_numeric( $order ) ) :
 
-			$_logger( 'Looking up order #' . $order );
+			_LOG( 'Looking up order #' . $order );
 			$order = $this->get_by_id( $order );
 
 			if ( ! $order ) :
 
-				$_logger( 'Invalid order ID' );
+				_LOG( 'Invalid order ID' );
 				$this->_set_error( 'Invalid order ID.' );
 				return FALSE;
 
@@ -1079,23 +1030,17 @@ class NAILS_Shop_order_model extends NAILS_Model
 		$_email->data					= array();
 		$_email->data['order']			= $order;
 
-		$_recipients = explode( ',', shop_setting( 'notify_order' ) );
+		$_recipients = explode( ',', notification( 'notify_order', 'shop' ) );
 
 		foreach ( $_recipients AS $recipient ) :
 
-			$_email->to_email = trim( $recipient );
-
-			if ( ! valid_email( shop_setting( 'notify_order' ) ) ) :
-
-				continue;
-
-			endif;
+			$_email->to_email = $recipient;
 
 			if ( ! $this->emailer->send( $_email, TRUE ) ) :
 
 				//	Email failed to send, alert developers
-				$_logger( '!! Failed to send order notification to ' . $_email->to_email . ', alerting developers.' );
-				$_logger( implode( "\n", $this->emailer->get_errors() ) );
+				_LOG( '!! Failed to send order notification to ' . $_email->to_email . ', alerting developers.' );
+				_LOG( implode( "\n", $this->emailer->get_errors() ) );
 
 				send_developer_mail( 'Unable to send order notification email', 'Unable to send the order notification to ' . $_email->to_email . '; order: #' . $order->id . "\n\nEmailer errors:\n\n" . print_r( $this->emailer->get_errors(), TRUE ) );
 
@@ -1399,12 +1344,12 @@ class NAILS_Shop_order_model extends NAILS_Model
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -1421,4 +1366,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_SHOP_ORDER_MODEL' ) ) :
 endif;
 
 /* End of file shop_order_model.php */
-/* Location: ./application/models/shop_order_model.php */
+/* Location: ./modules/shop/models/shop_order_model.php */

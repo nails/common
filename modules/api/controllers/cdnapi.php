@@ -31,7 +31,6 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -65,7 +64,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->user->is_logged_in() ) :
+		if ( $this->user_model->is_logged_in() ) :
 
 			$_out['token'] = $this->cdn->generate_api_upload_token( active_user( 'id' ) );
 
@@ -92,35 +91,54 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	User must supply a valid upload token
-		$_user = $this->cdn->validate_api_upload_token( $this->input->post( 'token' ) );
+		if ( ! $this->user_model->is_logged_in() ) :
 
-		if ( ! $_user ) :
+			//	User is not logged in must supply a valid upload token
+			$_token = $this->input->get_post( 'token' );
 
-			$_out['status']	= 400;
-			$_out['error']	= $this->cdn->error();
+			if ( ! $_token ) :
 
-			$this->_out( $_out, 'JSON', FALSE );
-			return;
+				//	Sent as a header?
+				$_token = $this->input->get_request_header( 'X-cdn-token' );
 
-		else :
+			endif;
 
-			$this->user->set_active_user( $_user );
+			$_user = $this->cdn->validate_api_upload_token( $_token );
+
+			if ( ! $_user ) :
+
+				$_out['status']	= 400;
+				$_out['error']	= $this->cdn->last_error();
+
+				$this->_out( $_out );
+				return;
+
+			else :
+
+				$this->user_model->set_active_user( $_user );
+
+			endif;
 
 		endif;
-
 
 		// --------------------------------------------------------------------------
 
 		//	Uploader verified, bucket defined and valid?
-		$_bucket = $this->input->post( 'bucket' );
+		$_bucket = $this->input->get_post( 'bucket' );
+
+		if ( ! $_bucket ) :
+
+			//	Sent as a header?
+			$_bucket = $this->input->get_request_header( 'X-cdn-bucket' );
+
+		endif;
 
 		if ( ! $_bucket ) :
 
 			$_out['status']	= 400;
 			$_out['error']	= 'Bucket not defined.';
 
-			$this->_out( $_out, 'JSON', FALSE );
+			$this->_out( $_out );
 			return;
 
 		endif;
@@ -133,9 +151,18 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		if ( $_upload ) :
 
 			//	Success! Return as per the user's preference
-			if ( $this->input->post( 'return' ) ) :
+			$_return = $this->input->post( 'return' );
 
-				$_format = explode( '|', $this->input->post( 'return' ) );
+			if ( ! $_return ) :
+
+				//	Sent as a header?
+				$_return = $this->input->get_request_header( 'X-cdn-return' );
+
+			endif;
+
+			if ( $_return ) :
+
+				$_format = explode( '|', $_return );
 
 				switch( strtoupper( $_format[0] ) ) :
 
@@ -238,7 +265,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		else :
 
 			$_out['status']	= 400;
-			$_out['error']	= $this->cdn->error();
+			$_out['error']	= $this->cdn->last_error();
 
 		endif;
 
@@ -247,7 +274,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 		//	Make sure the _out() method doesn't send a header, annoyingly SWFupload does
 		//	not return the server response to the script when a non-200 status code is detected
 
-		$this->_out( $_out, 'JSON', FALSE );
+		$this->_out( $_out );
 	}
 
 
@@ -256,24 +283,28 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 	public function object_delete()
 	{
+		//	TODO: Have a good think about security here, somehow verify that this
+		//	person has permission to delete objects. Perhaps only an objects creator
+		//	or a super user can delete. Maybe have a CDN permission?
+
 		//	Define $_out array
 		$_out = array();
 
 		// --------------------------------------------------------------------------
 
-		$_object_id	= $this->input->post( 'object_id' );
+		$_object_id	= $this->input->get_post( 'object_id' );
 		$_delete	= $this->cdn->object_delete( $_object_id );
 
 		if ( ! $_delete ) :
 
 			$_out['status']	= 400;
-			$_out['error']	= implode( '', $this->cdn->errors() );
+			$_out['error']	= $this->cdn->last_error();
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->_out( $_out, 'JSON' );
+		$this->_out( $_out );
 	}
 
 	// --------------------------------------------------------------------------
@@ -298,7 +329,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 			$_out = array(
 				'status'	=> 400,
-				'error'		=> implode( $this->cdn->errors() )
+				'error'		=> $this->cdn->last_error()
 			);
 
 		endif;
@@ -331,7 +362,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 
 			$_out = array(
 				'status'	=> 400,
-				'error'		=> implode( $this->cdn->errors() )
+				'error'		=> $this->cdn->last_error()
 			);
 
 		endif;
@@ -349,7 +380,7 @@ class NAILS_Cdnapi extends NAILS_API_Controller
 /**
  * OVERLOADING NAILS' API MODULES
  *
- * The following block of code makes it simple to extend one of the core admin
+ * The following block of code makes it simple to extend one of the core API
  * controllers. Some might argue it's a little hacky but it's a simple 'fix'
  * which negates the need to massively extend the CodeIgniter Loader class
  * even further (in all honesty I just can't face understanding the whole
@@ -357,12 +388,12 @@ class NAILS_Cdnapi extends NAILS_API_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -379,4 +410,4 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_CDN' ) ) :
 endif;
 
 /* End of file cdn.php */
-/* Location: ./application/modules/api/controllers/cdn.php */
+/* Location: ./modules/api/controllers/cdn.php */

@@ -19,6 +19,17 @@ require_once '_cron.php';
 
 class NAILS_Maintenance extends NAILS_Cron_Controller
 {
+	public function index()
+	{
+		//	TODO: Running the index method should automatically determine
+		//	which tasks should be run. Either it knows that it runs every hour
+		//	and tracks what's been going on, or it looks at the time and works
+		//	out when the last items were run etc. Think about it.
+	}
+
+	// --------------------------------------------------------------------------
+
+
 	public function hourly()
 	{
 		$this->_start( 'maintenance', 'hourly', 'Hourly Maintenance Tasks' );
@@ -47,25 +58,58 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 		//	Shop related tasks
 		if ( module_is_enabled( 'shop' ) ) :
 
-			$this->logger->line( 'Shop Module Enabled. Beginning Shop Tasks.' );
+			_LOG( 'Shop Module Enabled. Beginning Shop Tasks.' );
 
 			// --------------------------------------------------------------------------
 
 			//	Load models
-			$this->load->model( 'shop/shop_model', 'shop' );
-			$this->load->model( 'shop/shop_currency_model', 'currency' );
+			$this->load->model( 'shop/shop_model' );
+			$this->load->model( 'shop/shop_currency_model' );
 
 			// --------------------------------------------------------------------------
 
 			//	Sync Currencies
-			$this->logger->line( '... Synching Currencies' );
-			$this->currency->sync( $this->logger );
+			_LOG( '... Synching Currencies' );
+			if ( ! $this->shop_currency_model->sync() ) :
+
+				_LOG( '... ... FAILED: ' . $this->shop_currency_model->last_error() );
+
+			endif;
 
 			// --------------------------------------------------------------------------
 
-			$this->logger->line( 'Finished Shop Tasks' );
+			_LOG( 'Finished Shop Tasks' );
 
 		endif;
+
+		//	Site map related tasks, makes sense for this one to come last in case any of
+		//	the previous have an impact
+
+		if ( module_is_enabled( 'sitemap' ) ) :
+
+			_LOG( 'Sitemap Module Enabled. Beginning Sitemap Tasks.' );
+
+			// --------------------------------------------------------------------------
+
+			//	Load models
+			$this->load->model( 'sitemap/sitemap_model' );
+
+			// --------------------------------------------------------------------------
+
+			//	Generate sitemap
+			_LOG( '... Generating Sitemap data' );
+			if ( ! $this->sitemap_model->generate() ) :
+
+				_LOG( '... ... FAILED: ' . $this->sitemap_model->last_error() );
+
+			endif;
+
+			// --------------------------------------------------------------------------
+
+			_LOG( 'Finished Site Tasks' );
+
+		endif;
+
 
 		// --------------------------------------------------------------------------
 
@@ -85,7 +129,7 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
 		//	Weekly Tasks
 
 		//	CDN AWS Sourcefile clearout
-		//	TODO
+		//	Log file zip up and cleanup
 
 		// --------------------------------------------------------------------------
 
@@ -108,12 +152,12 @@ class NAILS_Maintenance extends NAILS_Cron_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter  instanciate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiate a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION
  * before including this PHP file and extend as normal (i.e in the same way as below);

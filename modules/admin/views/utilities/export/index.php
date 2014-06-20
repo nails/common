@@ -3,7 +3,7 @@
 	<p>
 		<?=lang( 'utilities_export_intro' )?>
 	</p>
-	<p class="system-alert message no-close">
+	<p class="system-alert message">
 		<?=lang( 'utilities_export_warn' )?>
 	</p>
 
@@ -17,8 +17,8 @@
 			$_field['key']			= 'source';
 			$_field['label']		= lang( 'utilities_export_field_source' );
 			$_field['required']		= TRUE;
-			$_field['class']		= 'chosen';
-			
+			$_field['class']		= 'select2';
+
 			$_options = array();
 			foreach ( $sources AS $key => $source ) :
 
@@ -40,8 +40,8 @@
 			$_field['key']			= 'format';
 			$_field['label']		= lang( 'utilities_export_field_format' );
 			$_field['required']		= TRUE;
-			$_field['class']		= 'chosen';
-			
+			$_field['class']		= 'select2';
+
 			$_options = array();
 			foreach ( $formats AS $key => $format ) :
 

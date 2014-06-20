@@ -3,15 +3,15 @@
 /**
 * Name:			Emailer
 *
-* Description:	Easily manage the email queue
+* Description:	Easily send email within apps
 *
 */
 
 class Emailer
 {
-
 	public $from;
 	private $ci;
+	private $db;
 	private $email_type;
 	private $track_link_cache;
 	private $_errors;
@@ -25,11 +25,11 @@ class Emailer
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct( $config = array() )
 	{
-		$this->ci =& get_instance();
+		$this->ci	=& get_instance();
+		$this->db	=& $this->ci->db;
 
 		// --------------------------------------------------------------------------
 
@@ -70,30 +70,11 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Check SMTP is configured
-		if ( ! SMTP_HOST || ! SMTP_PORT ) :
+		if ( ! DEPLOY_SMTP_HOST || ! DEPLOY_SMTP_PORT ) :
 
 			$_error = 'EMAILER: SMTP not configured';
 
-			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
-
-				$this->_set_error( $_error );
-
-			else :
-
-				show_error( $_error );
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Ensure there is a DB
-		if ( ! NAILS_DB_ENABLED ) :
-
-			$_error = 'EMAILER: Database not available';
-
-			if ( isset( $config['graceful_startup'] ) && $config['graceful_startup'] ) :
+			if ( ! empty( $config['graceful_startup'] ) ) :
 
 				$this->_set_error( $_error );
 
@@ -111,14 +92,12 @@ class Emailer
 
 
 	/**
-	 * The touchpoint for sending email. In short, this method will determine whether
-	 * to send the mail immediately or to queue it up for the cron jobs
+	 * Send an email
 	 *
 	 * @access	public
 	 * @param	object	$input		The input object
 	 * @param	bool	$graceful	Whether to gracefully fail or not
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function send( $input, $graceful = FALSE )
 	{
@@ -152,7 +131,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	If no email has been given make sure it's NULL
-		if ( ! isset( $input->to_email ) ) :
+		if ( empty( $input->to_email ) ) :
 
 			$input->to_email = NULL;
 
@@ -161,25 +140,25 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	If no id has been given make sure it's NULL
-		if ( ! isset( $input->to_id ) ) :
+		if ( empty( $input->to_id ) ) :
 
-			$input->to_id = 'NULL';
+			$input->to_id = NULL;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	If no internal_ref has been given make sure it's NULL
-		if ( ! isset( $input->internal_ref ) ) :
+		if ( empty( $input->internal_ref ) ) :
 
-			$input->internal_ref = 'NULL';
+			$input->internal_ref = NULL;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Make sure that at least empty data is available
-		if ( ! isset( $input->data ) ) :
+		if ( empty( $input->data ) ) :
 
 			$input->data = array();
 
@@ -188,12 +167,11 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Lookup the email type (caching it as we go)
-		if ( ! isset( $this->email_type[ $input->type ] ) ) :
+		if ( empty( $this->email_type[ $input->type ] ) ) :
 
-			$this->ci->db->select( 'eqt.id, eqt.cron_run, eqt.type' );
-			$this->ci->db->where( 'eqt.slug', $input->type );
+			$this->db->where( 'et.slug', $input->type );
 
-			$this->email_type[ $input->type ] = $this->ci->db->get( 'email_queue_type eqt' )->row();
+			$this->email_type[ $input->type ] = $this->db->get( NAILS_DB_PREFIX . 'email_type et' )->row();
 
 			if ( ! $this->email_type[ $input->type ] ) :
 
@@ -215,53 +193,6 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	Check to see if the user is subscribed to this email type; service_acct emails
-		//	always go out
-
-		if ( $input->to_id && $this->email_type[ $input->type ]->type != 'service_acct' ) :
-
-			if ( is_array( $input->to_id ) ) :
-
-				//	If to_id is an array we'll need to prune out those who have unsubscribed
-				foreach( $input->to_id AS $k => $id ) :
-
-					if ( ! $this->_is_subscribed( $id, $this->email_type[ $input->type ]->type ) ) :
-
-						unset( $input->to_id[$k] );
-
-					endif;
-
-				endforeach;
-
-				//	If there is no one to send to then failover gracefully here
-				if ( ! $input->to_id ) :
-
-					return TRUE;
-
-				else :
-
-					$input->to_id = array_values( $input->to_id );
-
-				endif;
-
-			else :
-
-				//	to_id is a single integer, check for this one user
-				if ( ! $this->_is_subscribed( $input->to_id, $this->email_type[ $input->type ]->type ) ) :
-
-					//	Failover gracefully, the calling method doest need to know
-					//	the email wasn't actually sent
-
-					return TRUE;
-
-				endif;
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		//	If we're sending to an email address, try and associate it to a registered user
 		if ( $input->to_email ) :
 
@@ -269,181 +200,80 @@ class Emailer
 
 			if ( $_user ) :
 
-				$input->to_email	= $_user->email;
 				$input->to_id		= $_user->id;
 
 			endif;
 
+		else :
+
+			//	Sending to an ID, fetch the user's email
+			$_user = get_userobject()->get_by_id( $input->to_id );
+
+			if ( ! empty( $_user->email ) ) :
+
+				$input->to_email = $_user->email;
+
+			endif;
+
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	If the cron run is instant then send now, otherwise queue it up
-		if ( $this->email_type[ $input->type ]->cron_run == 'instant' ) :
+		//	Check to see if the user has opted out of receiving these emails
+		if ( $input->to_id ) :
 
-			return $this->_send_now( $input, $graceful );
+			if ( $this->user_has_unsubscribed( $input->to_id, $this->email_type[ $input->type ]->id ) ) :
 
-		else :
+				//	User doesn't want to receive these notifications; abort.
+				return TRUE;
 
-			return $this->_queue( $input );
+			endif;
 
 		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Preps data and add's it to the queue
-	 *
-	 * @access	private
-	 * @param	object	$input	The input object
-	 * @param	boolean	$_queue	Whether to add to the queue (private parameter used only so the send_now function doesn't duplicate functionality)
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	private function _queue( $input = FALSE, $_queue = TRUE )
-	{
-		//	Are we dealing with a single user or multiple users?
-		if ( is_array( $input->to_id ) ) :
-
-			$_refs = array();
-
-			//	Basic queries
-			$_sql				= array();
-			$_sql['archive']	= 'INSERT INTO email_queue_archive (ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES';
-
-			if ( $_queue ) :
-
-				$_sql['queue']	= 'INSERT INTO email_queue (ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES ';
-
-			endif;
-
-			foreach ( $input->to_id AS $to_id ) :
-
-				//	Generate a new reference
-				$_ref		= $this->_generate_reference( $_refs );
-				$_refs[]	= $_ref;
-
-				// --------------------------------------------------------------------------
-
-				//	Append to queries
-				if ( $_queue ) :
-
-					$_sql['queue']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';
-
-				endif;
-
-				$_sql['archive']	.= '( \'' . $_ref . '\', ' . $input->internal_ref . ', ' . $to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' ),';
-
-			endforeach;
-
-			//	Trim queries
-			if ( $_queue ) :
-
-				$_sql['queue'] = substr( $_sql['queue'], 0, -1 );
-
-			endif;
-
-			$_sql['archive'] = substr( $_sql['archive'], 0, -1 );
-
-		else :
-
-			//	Generate a unique reference - ref is sent in each email and can allow the
-			//	system to generate 'view online' links
-
-			$input->ref = $this->_generate_reference();
-
-			// --------------------------------------------------------------------------
-
-			//	Insert into the appropriate tables
-			$_sql	= array();
-
-			if ( $_queue ) :
-
-				$_sql[]	= '	INSERT INTO email_queue
-							(ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES
-							( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
-
-			endif;
-
-			$_sql[]	= '	INSERT INTO email_queue_archive
-						(ref, internal_ref, user_id, user_email, time_queued, type_id, email_vars) VALUES
-						( \'' . $input->ref . '\', ' . $input->internal_ref . ', ' . $input->to_id . ', \'' . $input->to_email . '\', NOW(), ' . $this->email_type[ $input->type ]->id . ', ' . $this->ci->db->escape( serialize( $input->data ) ) . ' );';
-
-		endif;
-
-		foreach( $_sql AS $sql ) :
-
-			$this->ci->db->query( $sql );
-
-			if ( is_array( $input->to_id ) ) :
-
-				//	$this->ci->db->insert_id(); will return the ID of the FIRST inserted row,
-				//	the following inserts are guaranteed to be sequential. In order to pass
-				//	back the ID's of all the inserted rows we need to do a quick bit of maths.
-
-				$_first		= $this->ci->db->insert_id();
-				$_rows		= $this->ci->db->affected_rows() - 1; //	Adjusted as range() will go to the limit, rather than below.
-				$input->id	= range( $_first, $_first + $_rows, 1 );
-
-			else :
-
-				$input->id = $this->ci->db->insert_id();
-
-			endif;
-
-		endforeach;
 
 		// --------------------------------------------------------------------------
 
-		return $input;
-	}
+		//	Generate a unique reference - ref is sent in each email and can allow the
+		//	system to generate 'view online' links
 
+		$input->ref = $this->_generate_reference();
 
-	// --------------------------------------------------------------------------
+		// --------------------------------------------------------------------------
 
+		//	Double check we have an email address (a user may exist but not have an
+		//	email address set)
 
-	/**
-	 * Sends an item immediately
-	 *
-	 * @access	private
-	 * @param	object	$input	Data input
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	private function _send_now( $input, $graceful = FALSE )
-	{
-		//	Generate the correct input object and archive the email
-		$_input = $this->_queue( $input, FALSE );
+		if ( empty( $input->to_email ) ) :
 
-		if ( $_input ) :
+			if ( ! $graceful ) :
 
-			//	Send the email now.
-			if ( is_array( $input->id ) ) :
-
-				$_out = array();
-
-				foreach ( $input->id AS $id ) :
-
-					$this->_send( $id, $graceful );
-
-				endforeach;
+				show_error( 'EMAILER: No email address to send to.' );
 
 			else :
 
-				if ( $this->_send( $_input->id, $graceful ) ) :
-
-					return $_input->ref;
-
-				else :
-
-					return FALSE;
-
-				endif;
+				$this->_set_error( 'EMAILER: No email address to send to.' );
+				FALSE;
 
 			endif;
+
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Add to the archive table
+		$this->db->set( 'ref',			$input->ref );
+		$this->db->set( 'user_id',		$input->to_id );
+		$this->db->set( 'user_email',	$input->to_email );
+		$this->db->set( 'type_id',		$this->email_type[ $input->type ]->id );
+		$this->db->set( 'email_vars',	serialize( $input->data ) );
+		$this->db->set( 'internal_ref',	$input->internal_ref );
+
+		$this->db->insert( NAILS_DB_PREFIX . 'email_archive' );
+
+		if ( $this->db->affected_rows() ) :
+
+			$input->id = $this->db->insert_id();
 
 		else :
 
@@ -459,516 +289,72 @@ class Emailer
 			endif;
 
 		endif;
-	}
 
+		if ( $this->_send( $input->id, $graceful ) ) :
 
-	// --------------------------------------------------------------------------
-
-
-	/* !GETTING */
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Gets email from the archive
-	 *
-	 * @access	public
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_all( $order = 'eqa.time_queued', $sort = 'ASC', $offset = 0, $per_page = 25 )
-	{
-		$this->ci->db->select( 'eqa.id, eqa.ref, eqa.time_queued, eqa.email_vars, eqa.user_email, eqa.time_queued, eqa.time_sent, eqa.read_count, eqa.link_click_count' );
-		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender' );
-		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
-
-		$this->ci->db->join( 'user u', 'u.id = eqa.user_id OR u.email = eqa.user_email', 'LEFT' );
-		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eqa.type_id' );
-
-		$this->ci->db->order_by( $order, $sort );
-		$this->ci->db->limit( $per_page, $offset );
-
-		$_emails = $this->ci->db->get( 'email_queue_archive eqa' )->result();
-
-		// --------------------------------------------------------------------------
-
-		//	Format emails
-		foreach ( $_emails AS $email ) :
-
-			$this->_format_email( $email );
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_emails;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns the number of items in the arcive
-	 *
-	 * @access	public
-	 * @return	int
-	 * @author	Pablo
-	 **/
-	public function count_all()
-	{
-		return $this->ci->db->count_all_results( 'email_queue_archive' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Fetches emails from the queue
-	 *
-	 * @access	public
-	 * @return	object
-	 * @author	Pablo
-	 **/
-	public function get_queue( $cron_run = NULL, $queue_id = NULL )
-	{
-		$this->ci->db->select( 'eq.id, eq.ref, eq.time_queued, eq.email_vars, eq.user_email' );
-		$this->ci->db->select( 'u.email send_to, u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img' );
-		$this->ci->db->select( 'eqt.name, eqt.cron_run, eqt.template_file, eqt.subject' );
-
-		$this->ci->db->join( 'user u', 'u.id = eq.user_id', 'LEFT' );
-		$this->ci->db->join( 'email_queue_type eqt', 'eqt.id = eq.type_id' );
-
-		if ( $cron_run ) :
-
-			$this->ci->db->where( 'eqt.cron_run', $cron_run );
-
-		endif;
-
-		if ( $queue_id ) :
-
-			$this->ci->db->where( 'eq.queue_id', $queue_id );
+			return $input->ref;
 
 		else :
 
-			$this->ci->db->where( 'eq.queue_id IS NULL' );
-
-		endif;
-
-		$this->ci->db->order_by( 'eq.time_queued', 'ASC' );
-
-		$_emails = $this->ci->db->get( 'email_queue eq' )->result();
-
-		// --------------------------------------------------------------------------
-
-		//	Process emails
-		foreach ( $_emails AS $email ) :
-
-			$email->email_vars = unserialize( $email->email_vars );
-
-			// --------------------------------------------------------------------------
-
-			//	If no subject is defined in the variables, if not check to see if one was
-			//	defined in the template; if not, fall back to a default subject
-
-			$_subject = isset( $email->email_vars['email_subject'] );
-
-			if ( $_subject ) :
-
-				$email->subject = $email->email_vars['email_subject'];
-
-			else :
-
-				//	Check the template
-				if ( ! $email->subject ) :
-
-					$email->subject = 'An email from ' . APP_NAME;
-
-				endif;
-
-			endif;
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_emails;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Gets email from the archive by it's ID
-	 *
-	 * @access	public
-	 * @return	object
-	 * @author	Pablo
-	 **/
-	public function get_by_id( $id )
-	{
-		$this->ci->db->where( 'eqa.id', $id );
-		$_item = $this->get_all();
-
-		if ( ! $_item )
 			return FALSE;
 
-		// --------------------------------------------------------------------------
-
-		return $_item[0];
+		endif;
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Gets email from the archive by it's ID
-	 *
-	 * @access	public
-	 * @return	object
-	 * @author	Pablo
-	 **/
-	public function get_queue_by_id( $id )
+	public function user_has_unsubscribed( $user_id, $type_id )
 	{
-		$this->ci->db->where( 'eq.id', $id );
-		$_item = $this->get_queue();
+		$this->db->where( 'user_id', $user_id );
+		$this->db->where( 'type_id', $type_id );
 
-		if ( ! $_item )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		return $_item[0];
+		return (bool) $this->db->count_all_results( NAILS_DB_PREFIX . 'user_email_blocker' );
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Gets items from the archive by it's reference
-	 *
-	 * @access	public
-	 * @param	string	$ref	The reference of the item to get
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function get_by_ref( $ref, $guid = FALSE, $hash = FALSE )
+	public function unsubscribe_user( $user_id, $type_id )
 	{
-		//	If guid and hash === FALSE then by-pass the check
-		if ( $guid !== FALSE && $hash !== FALSE ) :
+		if ( $this->user_has_unsubscribed( $user_id, $type_id ) ) :
 
-			//	Check hash
-			$_check = md5( $guid . APP_PRIVATE_KEY . $ref );
-
-			if ( $_check !== $hash )
-				return 'BAD_HASH';
+			return TRUE;
 
 		endif;
-		// --------------------------------------------------------------------------
-
-		$this->ci->db->where( 'eqa.ref', $ref );
-		$_item = $this->get_all();
-
-		if ( ! $_item )
-			return FALSE;
 
 		// --------------------------------------------------------------------------
 
-		//	If this isn't an instant or prompt email then CRUNCH!
-		if ( $_item[0]->cron_run != 'instant' && $_item[0]->cron_run != 'prompt' ) :
+		$this->db->set( 'user_id', $user_id );
+		$this->db->set( 'type_id', $type_id );
+		$this->db->set( 'created', 'NOW()', FALSE );
+		$this->db->insert( NAILS_DB_PREFIX . 'user_email_blocker' );
 
-			$_crunch = $this->_crunch_data( $_item );
-			return $_crunch['email'];
-
-		else :
-
-			return $_item[0];
-
-		endif;
+		return (bool) $this->db->affected_rows();
 	}
 
 
 	// --------------------------------------------------------------------------
 
 
-	/* !QUEUE */
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Processes a particular queue
-	 *
-	 * @access	public
-	 * @param	string $cron_run The queue to process
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	public function process_queue( $cron_run )
+	public function subscribe_user( $user_id, $type_id )
 	{
-		$_stats = array();
-		$_stats['total']	= 0;
-		$_stats['failed']	= 0;
+		if ( ! $this->user_has_unsubscribed( $user_id, $type_id ) ) :
 
-		//	Generate an ID for this queue
-		$_queue_id = microtime( TRUE ) * 10000;
-
-		// --------------------------------------------------------------------------
-
-		//	If we're dealing with the 'prompt' cron run then we just need to send each
-		//	email as we come across it. If we're dealing with any other cron run then
-		//	we need to compile each email type into one and send it as one object.
-
-		if ( $cron_run == 'prompt' ) :
-
-
-			//	Fetch all emails in the queue
-			$this->ci->logger->line( 'Fetching queue items for "' . $cron_run . '" cron run...' );
-			$_emails = $this->get_queue( $cron_run );
-
-			// --------------------------------------------------------------------------
-
-			//	If there are no queue items then we're done
-			if ( ! count( $_emails ) ) :
-
-				$this->ci->logger->line( '...nothing here. Terminating.' );
-				return '0 emails processed.';
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			//	We found something, process...
-			$_stats['total'] = count( $_emails );
-			$this->ci->logger->line( $_stats['total'] . ' queue items found. Processing...' );
-
-			// --------------------------------------------------------------------------
-
-			//	Assign all these items the same queue ID
-			$_queue_ids = array();
-			for ( $i = 0; $i < $_stats['total']; $i++ ) :
-
-				$_queue_ids[] = $_emails[$i]->id;
-
-			endfor;
-
-			$this->ci->db->set( 'eq.queue_id', $_queue_id );
-			$this->ci->db->where_in( 'eq.id', $_queue_ids );
-			$this->ci->db->update( 'email_queue eq' );
-
-			// --------------------------------------------------------------------------
-
-			$_unqueue = array();
-
-			foreach ( $_emails AS $e ) :
-
-				$this->ci->logger->line( '...sending email ref: ' . $e->ref . ' to: ' . $e->send_to . $e->user_email );
-
-				if ( $this->_send( $e, FALSE, FALSE ) ) :
-
-					$_unqueue[] = $e->id;
-
-				else :
-
-					$_stats['failed']++;
-					$this->ci->logger->line( 'Email to  ' . $e->send_to . ' failed to send. Queue item: ' . $e->id );
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				//	Clean up
-				_flush_db();
-
-			endforeach;
-
-		else :
-
-			//	Get a distinct list of user ID's and types we're going to be sending to, we'll then use this to
-			//	cherry pick the emails we need to compile and send
-
-			$this->ci->logger->line( 'Fetching queue items for "' . $cron_run . '" cron run...' );
-
-			//	Fetch user ID's
-			$_sql = 'SELECT
-					DISTINCT `eq`.`user_id`, `eq`.`type_id`
-					FROM `email_queue` eq
-					LEFT JOIN `email_queue_type` eqt ON `eqt`.`id` = `eq`.`type_id`
-					WHERE `eqt`.`cron_run` = "' . $cron_run . '"
-					AND `eq`.`user_id` != \'\'';
-
-			$_values_id = $this->ci->db->query( $_sql )->result();
-
-			//	Fetch emails (no user ID)
-			$_sql = 'SELECT
-					DISTINCT `eq`.`user_email`, `eq`.`type_id`
-					FROM `email_queue` eq
-					LEFT JOIN `email_queue_type` eqt ON `eqt`.`id` = `eq`.`type_id`
-					WHERE `eqt`.`cron_run` = "' . $cron_run . '"
-					AND `eq`.`user_email` != \'\'';
-
-			$_values_email = $this->ci->db->query( $_sql )->result();
-
-			//	Merge the two
-			$_values = array_merge( $_values_id, $_values_email );
-
-			// --------------------------------------------------------------------------
-
-			//	If there are no queue items then we're done
-			if ( ! count( $_values ) ) :
-
-				$this->ci->logger->line( '...nothing here. Terminating.' );
-				return '0 emails processed.';
-
-			endif;
-
-			// --------------------------------------------------------------------------
-
-			//	We found something, process...
-			$this->ci->logger->line( count( $_values ) . ' queue items found. Processing...' );
-
-			//	We loop through these results and pull out the relevant emails from the database, each one of these
-			//	represents a single email which must be crunched down into a single entity and then sent
-
-			$_unqueue = array();
-
-			foreach ( $_values AS $item ) :
-
-				$this->ci->logger->line( '' );
-
-				if ( isset( $item->user_id ) )
-					$this->ci->logger->line( 'Beginning processing for user #' . $item->user_id );
-
-				if ( isset( $item->user_email ) )
-					$this->ci->logger->line( 'Beginning processing for email ' . $item->user_email );
-
-				//	Fetch the appropriate queue items from the DB
-				if ( isset( $item->user_id ) )
-					$this->ci->db->where( 'eq.user_id', $item->user_id );
-
-				if ( isset( $item->user_email ) )
-					$this->ci->db->where( 'eq.user_email', $item->user_email );
-
-				$this->ci->db->where( 'eq.type_id', $item->type_id );
-				$_emails = $this->get_queue( $cron_run );
-				$_count		= count( $_emails );
-
-				// --------------------------------------------------------------------------
-
-				if ( ! $_emails ) :
-
-					$this->ci->logger->line( '...No queue items found, weird, oh well - finished for this guy.' );
-					continue;
-
-				else :
-
-					$this->ci->logger->line( '...' . $_count . ' emails found, getting ready to crunch!' );
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				//	Assign all these items the same queue ID
-				$_queue_ids = array();
-
-				for ( $i = 0; $i < $_count; $i++ ) :
-
-					$_queue_ids[] = $_emails[$i]->id;
-
-				endfor;
-
-				if ( $_queue_ids ) :
-
-					$this->ci->db->set( 'eq.queue_id', $_queue_id );
-					$this->ci->db->where_in( 'eq.id', $_queue_ids );
-					$this->ci->db->update( 'email_queue eq' );
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				$_crunch = $this->_crunch_data( $_emails );
-
-				$this->ci->logger->line( '...finished crunching data' );
-
-				// --------------------------------------------------------------------------
-
-				//	Send the email now
-				$this->ci->logger->line( '...sending email' );
-
-				if ( $this->_send( $_crunch['email'] ) ) :
-
-					$_unqueue = array_merge( $_unqueue, $_crunch['ids'] );
-
-					// --------------------------------------------------------------------------
-
-					//	Update all the emails in the archive to have a common ref
-					$this->ci->logger->line( '...sent successfully, reassigning email refs.' );
-
-					$this->ci->db->where_in( 'ref', $_crunch['refs'] );
-					$this->ci->db->set( 'ref', $_crunch['email']->ref );
-					$this->ci->db->update( 'email_queue_archive' );
-
-				else :
-
-					$_stats['failed']++;
-					$this->ci->logger->line( '...email failed to send.' );
-
-				endif;
-
-				// --------------------------------------------------------------------------
-
-				//	Clean up
-				_flush_db();
-
-			endforeach;
+			return TRUE;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Clearing the queue
-		if ( $_unqueue ) :
+		$this->db->where( 'user_id', $user_id );
+		$this->db->where( 'type_id', $type_id );
+		$this->db->delete( NAILS_DB_PREFIX . 'user_email_blocker' );
 
-			$this->ci->logger->line( 'Clearing ' . count( $_unqueue ) . ' items from the queue...');
-			$this->ci->db->where_in( 'id', $_unqueue );
-			$this->ci->db->delete( 'email_queue' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Releasing items from this queue_id
-		$this->ci->db->set( 'queue_id', NULL );
-		$this->ci->db->where( 'queue_id', $_queue_id );
-		$this->ci->db->update( 'email_queue' );
-
-		// --------------------------------------------------------------------------
-
-		//	Handle the log message
-		if ( $_stats['failed'] ) :
-
-			return $_stats['total'] . ' emails processed, ' . $_stats['failed'] . ' failed to send.';
-
-		else :
-
-			return $_stats['total'] . ' emails processed.';
-
-		endif;
+		return (bool) $this->db->affected_rows();
 	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/* !HELPERS */
 
 
 	// --------------------------------------------------------------------------
@@ -980,24 +366,14 @@ class Emailer
 	 * @access	private
 	 * @param	object	$input			The input object
 	 * @param	boolean	$graceful		Whether to fail gracefully or not
-	 * @param	boolean	$use_archive	Whetehr to use the archive or the live queue for the email look up
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
-	private function _send( $email_id = FALSE, $graceful = FALSE, $use_archive = TRUE )
+	private function _send( $email_id = FALSE, $graceful = FALSE )
 	{
 		//	Get the email if $email_id is not an object
 		if ( ! is_object( $email_id ) ) :
 
-			if ( $use_archive ) :
-
-				$_email = $this->get_by_id( $email_id );
-
-			else :
-
-				$_email = $this->get_queue_by_id( $email_id );
-
-			endif;
+			$_email = $this->get_by_id( $email_id );
 
 		else :
 
@@ -1016,33 +392,53 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		$_send						= new stdClass();
-		$_send->to					= new stdClass();
-		$_send->to->email			= $_email->user_email ? $_email->user_email : $_email->send_to;
-		$_send->to->first			= $_email->first_name;
-		$_send->to->last			= $_email->last_name;
-		$_send->to->id				= (int) $_email->user_id;
-		$_send->to->group_id		= $_email->user_group;
-		$_send->to->login_url		= $_email->user_id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user_id ) . '/' . md5( $_email->user_password ) ) : NULL;
-		$_send->subject				= $_email->subject;
-		$_send->template			= $_email->template_file;
-		$_send->template_pt			= $_email->template_file . '_plaintext';
-		$_send->data				= $_email->email_vars;
+		$_send							= new stdClass();
+		$_send->to						= new stdClass();
+		$_send->to->email				= $_email->user->email;
+		$_send->to->email_verified		= (bool) $_email->email_verified;
+		$_send->to->email_verified_code	= $_email->email_verified_code;
+		$_send->to->first				= $_email->user->first_name;
+		$_send->to->last				= $_email->user->last_name;
+		$_send->to->id					= (int) $_email->user->id;
+		$_send->to->username			= $_email->user->username;
+		$_send->to->group_id			= $_email->user->group_id;
+		$_send->to->login_url			= $_email->user->id ? site_url( 'auth/login/with_hashes/' . md5( $_email->user->id ) . '/' . md5( $_email->user->password ) ) : NULL;
+		$_send->email_type_id			= $_email->type_id;
+		$_send->subject					= $_email->subject;
+		$_send->template				= $_email->template_file;
+		$_send->template_pt				= $_email->template_file . '_plaintext';
+		$_send->data					= $_email->email_vars;
+		$_send->data['ci']				=& get_instance();
+
+		//	Check login URLs are allowed
+		get_instance()->config->load( 'auth' );
+
+		if ( ! get_instance()->config->item( 'auth_enable_hashed_login' ) ) :
+
+			$_send->to->login_url = '';
+
+		endif;
+
+		if ( ! is_array( $_send->data ) ) :
+
+			$_send->data = array();
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	From user
-		$_send->from				= new stdClass();
+		$_send->from = new stdClass();
 
-		if ( isset( $_send->data['email_from_email'] ) ) :
+		if ( ! empty( $_send->data['email_from_email'] ) ) :
 
-			$_send->from->email			= $_send->data['email_from_email'];
-			$_send->from->name			= isset( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
+			$_send->from->email	= $_send->data['email_from_email'];
+			$_send->from->name	= ! empty( $_send->data['email_from_name'] ) ? $_send->data['email_from_name'] : $_send->data['email_from_email'];
 
 		else :
 
-			$_send->from->email			= $this->from->email;
-			$_send->from->name			= $this->from->name;
+			$_send->from->email	= $this->from->email;
+			$_send->from->name	= $this->from->name;
 
 		endif;
 
@@ -1054,6 +450,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Add some extra, common variables for the template
+		$_send->data['email_type_id']	= $_email->type_id;
 		$_send->data['email_ref']		= $_email->ref;
 		$_send->data['sent_from']		= $_send->from;
 		$_send->data['sent_to']			= $_send->to;
@@ -1063,10 +460,28 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	If we're not on a production server, never queue or send out to any
-		//	live addresses please
+		//	If we're not on a production server, never send out to any live addresses
+		$_send_to = $_send->to->email;
 
-		$_send_to = ( ENVIRONMENT != 'production' ) ? EMAIL_OVERRIDE : $_send->to->email;
+		if ( ENVIRONMENT != 'production' || EMAIL_OVERRIDE ) :
+
+			if ( EMAIL_OVERRIDE ) :
+
+				$_send_to = EMAIL_OVERRIDE;
+
+			elseif ( APP_DEVELOPER_EMAIL ) :
+
+				$_send_to = APP_DEVELOPER_EMAIL;
+
+			else :
+
+				//	Not sure where this is going; fall over *waaaa*
+				show_error( 'EMAILER: Non production environment and neither EMAIL_OVERRIDE nor APP_DEVELOPER_EMAIL is set.' );
+				return FALSE;
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -1090,7 +505,7 @@ class Emailer
 		//	If any errors occurred while attempting to generate the body of this email
 		//	then abort the sending and log it
 
-		if ( ! ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) && ( defined( 'APP_EMAIL_DEVELOPER' ) && APP_EMAIL_DEVELOPER ) && $_error->error_has_occurred() ) :
+		if ( EMAIL_DEBUG && APP_DEVELOPER_EMAIL && $_error->error_has_occurred() ) :
 
 			//	The templates error'd, abort the send and let dev know
 			$_subject	= 'Email #' . $_email->id . ' failed to send due to errors occurring in the templates';
@@ -1139,13 +554,26 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Parse the body for <a> links and replace with a tracking URL
-		//	First clear out any previous link caches
+		//	First clear out any previous link caches (production only)
 
 		$this->track_link_cache = array();
 
 		if ( ENVIRONMENT == 'production' ) :
 
-			$body = $this->_parse_links( $body, $_email->id, $_email->ref, TRUE );
+			if ( $_send->to->id && ! $_send->to->email_verified ) :
+
+				$_needs_verified = array(
+					'id' => $_send->to->id,
+					'code' => $_send->to->email_verified_code
+				);
+
+			else :
+
+				$_needs_verified = FALSE;
+
+			endif;
+
+			$body = $this->_parse_links( $body, $_email->id, $_email->ref, TRUE, $_needs_verified );
 
 		endif;
 
@@ -1166,7 +594,7 @@ class Emailer
 		//	Parse the body for URLs and replace with a tracking URL (production only)
 		if ( ENVIRONMENT == 'production' ) :
 
-			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE );
+			$plaintext = $this->_parse_links( $plaintext, $_email->id, $_email->ref, FALSE, $_needs_verified );
 
 		endif;
 
@@ -1177,11 +605,9 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Add any attachments
-		if ( isset( $input->attachment ) ) :
+		if ( isset( $_send->data['attachments'] ) && is_array( $_send->data['attachments'] ) && $_send->data['attachments'] ) :
 
-			$input->attachment = (object) $input->attachment;
-
-			foreach ( $input->attachment AS $file ) :
+			foreach ( $_send->data['attachments'] AS $file ) :
 
 				if ( ! $this->_add_attachment( $file ) ) :
 
@@ -1205,7 +631,7 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	Debugging?
-		if ( defined( 'EMAIL_DEBUG' ) && EMAIL_DEBUG ) :
+		if ( EMAIL_DEBUG ) :
 
 			$this->_debugger( $_send, $body, $plaintext, $_error->recent_errors() );
 			return FALSE;
@@ -1214,17 +640,30 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	Send!
+		//	Send! Turn off error reporting, if it fails we should handle it gracefully
+		$_previous_error_reporting = error_reporting();
+		error_reporting(0);
+
 		if ( $this->ci->email->send() ) :
 
+			//	Put error reporting back as it was
+			error_reporting( $_previous_error_reporting );
+
+			// --------------------------------------------------------------------------
+
 			//	Mail sent, mark the time
-			$this->ci->db->set( 'time_sent', 'NOW()', FALSE );
-			$this->ci->db->where( 'id', $_email->id );
-			$this->ci->db->update( 'email_queue_archive' );
+			$this->db->set( 'time_sent', 'NOW()', FALSE );
+			$this->db->where( 'id', $_email->id );
+			$this->db->update( NAILS_DB_PREFIX . 'email_archive' );
 
 			return TRUE;
 
 		else:
+
+			//	Put error reporting back as it was
+			error_reporting( $_previous_error_reporting );
+
+			// --------------------------------------------------------------------------
 
 			//	Failed to send, notify developers
 			$_subject	= 'Email #' . $_email->id . ' failed to send at SMTP time';
@@ -1281,16 +720,153 @@ class Emailer
 	// --------------------------------------------------------------------------
 
 
+	/* !GETTING */
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Gets email from the archive
+	 *
+	 * @access	public
+	 * @return	array
+	 **/
+	public function get_all( $order = NULL, $sort = NULL, $offset = NULL, $per_page = NULL )
+	{
+		//	Set defaults
+		$order		= $order	? $order	: 'ea.time_sent';
+		$sort		= $sort		? $sort		: 'ASC';
+		$offset		= $offset	? $offset	: 0;
+		$per_page	= $per_page	? $per_page	: 25;
+
+		// --------------------------------------------------------------------------
+
+		$this->db->select( 'ea.id, ea.ref, ea.type_id, ea.email_vars, ea.user_email sent_to, ue.is_verified email_verified, ue.code email_verified_code, ea.time_sent, ea.read_count, ea.link_click_count' );
+		$this->db->select( 'u.first_name, u.last_name, u.id user_id, u.password user_password, u.group_id user_group, u.profile_img, u.gender, u.username' );
+		$this->db->select( 'et.name, et.template_file, et.default_subject' );
+
+		$this->db->join( NAILS_DB_PREFIX . 'user u', 'u.id = ea.user_id OR u.id = ea.user_email', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'email_type et', 'et.id = ea.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'user_email ue', 'ue.email = ea.user_email', 'LEFT' );
+
+		$this->db->order_by( $order, $sort );
+		$this->db->limit( $per_page, $offset );
+
+		$_emails = $this->db->get( NAILS_DB_PREFIX . 'email_archive ea' )->result();
+
+		// --------------------------------------------------------------------------
+
+		//	Format emails
+		foreach ( $_emails AS $email ) :
+
+			$this->_format_email( $email );
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		return $_emails;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the number of items in the arcive
+	 *
+	 * @access	public
+	 * @return	int
+	 **/
+	public function count_all()
+	{
+		return $this->db->count_all_results( NAILS_DB_PREFIX . 'email_archive' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Gets email from the archive by it's ID
+	 *
+	 * @access	public
+	 * @return	object
+	 **/
+	public function get_by_id( $id )
+	{
+		$this->db->where( 'ea.id', $id );
+		$_item = $this->get_all();
+
+		if ( ! $_item )
+			return FALSE;
+
+		// --------------------------------------------------------------------------
+
+		return $_item[0];
+	}
+
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Gets items from the archive by it's reference
+	 *
+	 * @access	public
+	 * @param	string	$ref	The reference of the item to get
+	 * @return	array
+	 **/
+	public function get_by_ref( $ref, $guid = FALSE, $hash = FALSE )
+	{
+		//	If guid and hash === FALSE then by-pass the check
+		if ( $guid !== FALSE && $hash !== FALSE ) :
+
+			//	Check hash
+			$_check = md5( $guid . APP_PRIVATE_KEY . $ref );
+
+			if ( $_check !== $hash )
+				return 'BAD_HASH';
+
+		endif;
+		// --------------------------------------------------------------------------
+
+		$this->db->where( 'ea.ref', $ref );
+		$_item = $this->get_all();
+
+		if ( ! $_item )
+			return FALSE;
+
+		return $_item[0];
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/* !HELPERS */
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Add an attachment to the email
 	 *
 	 * @access	private
 	 * @param	string	file to add
 	 * @return	boolean
-	 * @author	Pablo
 	 **/
 	private function _add_attachment( $file )
 	{
+		if ( ! file_exists( $file ) ) :
+
+			return FALSE;
+
+		endif;
+
 		if ( ! $this->ci->email->attach( $file ) ) :
 
 			return FALSE;
@@ -1312,7 +888,6 @@ class Emailer
 	 * @access	public
 	 * @param	array $exclude An array of strings to exclude
 	 * @return	array
-	 * @author	Pablo
 	 **/
 	private function _generate_reference( $exclude = array() )
 	{
@@ -1330,8 +905,8 @@ class Emailer
 
 			} while( ! $_ref_ok );
 
-			$this->ci->db->where( 'ref', $ref );
-			$_query = $this->ci->db->get( 'email_queue_archive' );
+			$this->db->where( 'ref', $ref );
+			$_query = $this->db->get( NAILS_DB_PREFIX . 'email_archive' );
 
 		} while( $_query->num_rows() );
 
@@ -1351,11 +926,19 @@ class Emailer
 	 * @param	string
 	 * @param	string
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	private function _debugger( $input, $body, $plaintext, $recent_errors )
 	{
 		//	Debug mode, output data and don't actually send
+
+		//	Remove the reference to CI; takes up a ton'na space
+		if ( isset( $input->data['ci'] ) ) :
+
+			$input->data['ci'] = '**REFERENCE TO CODEIGNITER INSTANCE**';
+
+		endif;
+
+		// --------------------------------------------------------------------------
 
 		//	Input variables
 		echo '<pre>';
@@ -1441,83 +1024,6 @@ class Emailer
 	// --------------------------------------------------------------------------
 
 
-	/**
-	 * Crunches multiple emails into a single entity
-	 *
-	 * @access	private
-	 * @param	string
-	 * @param	string
-	 * @return	array
-	 * @author	Pablo
-	 **/
-	private function _crunch_data( $emails )
-	{
-		$_out			= array();
-		$_out['email']	= clone $emails[0];
-
-		// --------------------------------------------------------------------------
-
-		//	Reset the data
-		$_out['email']->email_vars			= array();
-		$_out['email']->email_vars['data']	= array();
-
-		// --------------------------------------------------------------------------
-
-		//	Crunch each email's data into a single item
-		$_out['ids']	= array();
-		$_out['refs']	= array();
-
-		foreach( $emails AS $email ) :
-
-			$_out['email']->email_vars['data'][] = $email->email_vars;
-
-			// --------------------------------------------------------------------------
-
-			//	Store the ID's so we can unqueue them when the main email sends successfully
-			$_out['ids'][] = $email->id;
-
-			// --------------------------------------------------------------------------
-
-			//	Store the ref for this email so we can reset them later (so that all emails
-			//	which were crunched together have a common ref)
-
-			$_out['refs'][] = $email->ref;
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		return $_out;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Determines whether a user is subscribed to a particular email group
-	 *
-	 * @access	public
-	 * @param	int $user_id The ID of the user to test
-	 * @param	string $email_type The type of email to test
-	 * @return	bool
-	 * @author	Pablo
-	 **/
-	private function _is_subscribed( $user_id, $email_type )
-	{
-		$this->ci->db->where( 'u.id', $user_id );
-		$this->ci->db->where( 'u.is_verified', TRUE );
-		$this->ci->db->where( 'um.email_' . $email_type, TRUE );
-
-		$this->ci->db->join( 'user u', 'u.id = um.user_id' );
-
-		return (bool) $this->ci->db->count_all_results( 'user_meta um' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
 	/* !TRACKING */
 
 
@@ -1532,7 +1038,6 @@ class Emailer
 	 * @param	string $guid the unique counter used to generate the hash
 	 * @param	string $hash The secutiry hash to check (i.e verify the ref and guid).
 	 * @return	bool
-	 * @author	Pablo
 	 **/
 	public function track_open( $ref, $guid, $hash )
 	{
@@ -1541,20 +1046,20 @@ class Emailer
 		if ( $_email && $_email != 'BAD_HASH' ) :
 
 			//	Update the read count and a add a track data point
-			$this->ci->db->set( 'read_count', 'read_count+1', FALSE );
-			$this->ci->db->where( 'id', $_email->id );
-			$this->ci->db->update( 'email_queue_archive' );
+			$this->db->set( 'read_count', 'read_count+1', FALSE );
+			$this->db->where( 'id', $_email->id );
+			$this->db->update( NAILS_DB_PREFIX . 'email_archive' );
 
-			$this->ci->db->set( 'created', 'NOW()', FALSE );
-			$this->ci->db->set( 'email_id', $_email->id );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'email_id', $_email->id );
 
 			if ( active_user( 'id' ) ) :
 
-				$this->ci->db->set( 'user_id', active_user( 'id' ) );
+				$this->db->set( 'user_id', active_user( 'id' ) );
 
 			endif;
 
-			$this->ci->db->insert( 'email_queue_track_open' );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_archive_track_open' );
 
 			return TRUE;
 
@@ -1577,7 +1082,6 @@ class Emailer
 	 * @param	string $url
 	 * @param	string $type
 	 * @return	bool
-	 * @author	Pablo
 	 **/
 	public function track_link( $ref, $guid, $hash, $link_id )
 	{
@@ -1586,30 +1090,30 @@ class Emailer
 		if ( $_email && $_email != 'BAD_HASH' ) :
 
 			//	Get the link which was clicked
-			$this->ci->db->select( 'url' );
-			$this->ci->db->where( 'email_id', $_email->id );
-			$this->ci->db->where( 'id', $link_id );
-			$_link = $this->ci->db->get( 'email_queue_link' )->row();
+			$this->db->select( 'url' );
+			$this->db->where( 'email_id', $_email->id );
+			$this->db->where( 'id', $link_id );
+			$_link = $this->db->get( NAILS_DB_PREFIX . 'email_archive_link' )->row();
 
 			if ( $_link ) :
 
 				//	Update the read count and a add a track data point
-				$this->ci->db->set( 'link_click_count', 'link_click_count+1', FALSE );
-				$this->ci->db->where( 'id', $_email->id );
-				$this->ci->db->update( 'email_queue_archive' );
+				$this->db->set( 'link_click_count', 'link_click_count+1', FALSE );
+				$this->db->where( 'id', $_email->id );
+				$this->db->update( NAILS_DB_PREFIX . 'email_archive' );
 
 				//	Add a link trackback
-				$this->ci->db->set( 'created', 'NOW()', FALSE );
-				$this->ci->db->set( 'email_id', $_email->id );
-				$this->ci->db->set( 'link_id', $link_id );
+				$this->db->set( 'created', 'NOW()', FALSE );
+				$this->db->set( 'email_id', $_email->id );
+				$this->db->set( 'link_id', $link_id );
 
 				if ( active_user( 'id' ) ) :
 
-					$this->ci->db->set( 'user_id', active_user( 'id' ) );
+					$this->db->set( 'user_id', active_user( 'id' ) );
 
 				endif;
 
-				$this->ci->db->insert( 'email_queue_track_link' );
+				$this->db->insert( NAILS_DB_PREFIX . 'email_archive_track_link' );
 
 				//	Return the URL to go to
 				return $_link->url;
@@ -1637,19 +1141,19 @@ class Emailer
 	 * @param	int $email_id The ID of the email being processed
 	 * @param	bool $is_html Whether body is HTML (i.e look for <a> tags) or plaintext (i.e look for plain URL)
 	 * @return	string
-	 * @author	Pablo
 	 **/
-	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE )
+	private function _parse_links( $body, $email_id, $email_ref, $is_html = TRUE, $needs_verified = FALSE )
 	{
 		//	Set the class variables for the ID and ref (need those in the callbacks)
-		$this->_generate_tracking_email_id	= $email_id;
-		$this->_generate_tracking_email_ref	= $email_ref;
+		$this->_generate_tracking_email_id			= $email_id;
+		$this->_generate_tracking_email_ref			= $email_ref;
+		$this->_generate_tracking_needs_verified	= $needs_verified;
 
 		// --------------------------------------------------------------------------
 
 		if ( $is_html ) :
 
-			$body = preg_replace_callback( '/<a .*?(href="(.*?)").*?>(.*)<\/a>/', array( $this, '__process_link_html' ), $body );
+			$body = preg_replace_callback( '/<a .*?(href="(.*?)").*?>(.*?)<\/a>/', array( $this, '__process_link_html' ), $body );
 
 		else :
 
@@ -1660,19 +1164,24 @@ class Emailer
 		// --------------------------------------------------------------------------
 
 		//	And null these again, so nothing gets confused
-		$this->_generate_tracking_email_id	= NULL;
-		$this->_generate_tracking_email_ref	= NULL;
+		$this->_generate_tracking_email_id			= NULL;
+		$this->_generate_tracking_email_ref			= NULL;
+		$this->_generate_tracking_needs_verified	= NULL;
 
 		// --------------------------------------------------------------------------
 
 		return $body;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
 	private function __process_link_html( $link )
 	{
-		$_html	= isset( $link[0] ) && $link[0] ? $link[0] : '';
-		$_href	= isset( $link[1] ) && $link[1] ? $link[1] : '';
-		$_url	= isset( $link[2] ) && $link[2] ? $link[2] : '';
+		$_html	= ! empty( $link[0] ) ? $link[0] : '';
+		$_href	= ! empty( $link[1] ) ? $link[1] : '';
+		$_url	= ! empty( $link[2] ) ? $link[2] : '';
 		$_title	= isset( $link[3] ) && strip_tags( $link[3] ) ? strip_tags( $link[3] ) : $_url;
 
 		// --------------------------------------------------------------------------
@@ -1689,9 +1198,13 @@ class Emailer
 		return $_html;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
 	private function __process_link_url( $url )
 	{
-		$_html	= isset( $url[0] ) && $url[0] ? $url[0] : '';
+		$_html	= ! empty( $url[0] ) ? $url[0] : '';
 		$_url	= $_html;
 		$_title	= $_html;
 
@@ -1706,6 +1219,10 @@ class Emailer
 
 		return $_html;
 	}
+
+
+	// --------------------------------------------------------------------------
+
 
 	private function __process_link_generate( $html, $url, $title, $is_html )
 	{
@@ -1725,14 +1242,42 @@ class Emailer
 			//	database and generate the new tracking link (inc. hashes etc). We'll cache
 			//	this link so we don't have to process it again.
 
-			$this->ci->db->set( 'email_id', $this->_generate_tracking_email_id );
-			$this->ci->db->set( 'url', $url );
-			$this->ci->db->set( 'title', $title );
-			$this->ci->db->set( 'created', 'NOW()', FALSE );
-			$this->ci->db->set( 'is_html', $is_html );
-			$this->ci->db->insert( 'email_queue_link' );
+			//	If the email we're sending to hasn't been verified yet we should set the
+			//	actual URL as the return_to value of the email verifier, that means that
+			//	every link in this email behaves as a verifying email. Obviously we shouldn't
+			//	do this for the actual email verifier...
 
-			$_id = $this->ci->db->insert_id();
+			if ( $this->_generate_tracking_needs_verified ) :
+
+				//	Make sure we're not applying this to an activation URL
+				if ( ! preg_match( '#email/verify/[0-9]*?/(.*?)#', $url ) ) :
+
+					$_user_id	= $this->_generate_tracking_needs_verified['id'];
+					$_code		= $this->_generate_tracking_needs_verified['code'];
+					$_return	= urlencode( $url );
+
+					$_url = site_url( 'email/verify/' . $_user_id . '/' . $_code . '?return_to=' . $_return );
+
+				else :
+
+					$_url = $url;
+
+				endif;
+
+			else :
+
+				$_url = $url;
+
+			endif;
+
+			$this->db->set( 'email_id', $this->_generate_tracking_email_id );
+			$this->db->set( 'url', $_url );
+			$this->db->set( 'title', $title );
+			$this->db->set( 'created', 'NOW()', FALSE );
+			$this->db->set( 'is_html', $is_html );
+			$this->db->insert( NAILS_DB_PREFIX . 'email_archive_link' );
+
+			$_id = $this->db->insert_id();
 
 			if ( $_id ) :
 
@@ -1772,6 +1317,15 @@ class Emailer
 	// --------------------------------------------------------------------------
 
 
+	public function last_error()
+	{
+		return end( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	private function _set_error( $message )
 	{
 		$this->_errors[] = $message;
@@ -1787,22 +1341,20 @@ class Emailer
 
 		// --------------------------------------------------------------------------
 
-		//	If no subject is defined in the variables, if not check to see if one was
-		//	defined in the emplate; if not, fall back to a default subject
-		$_subject = isset( $email->email_vars['email_subject'] );
+		//	If a subject is defined in the variables use that, if not check to see if one was
+		//	defined in the template; if not, fall back to a default subject
 
-		if ( $_subject ) :
+		if ( isset( $email->email_vars['email_subject'] ) ) :
 
 			$email->subject = $email->email_vars['email_subject'];
 
+		elseif ( $email->default_subject ) :
+
+			$email->subject = $email->default_subject;
+
 		else :
 
-			//	Check the template
-			if ( ! $email->subject ) :
-
-				$email->subject = 'An E-mail from ' . APP_NAME;
-
-			endif;
+			$email->subject = 'An E-mail from ' . APP_NAME;
 
 		endif;
 
@@ -1811,21 +1363,26 @@ class Emailer
 		//	Sent to
 		$email->user 				= new stdClass();
 		$email->user->id			= $email->user_id;
-		$email->user->email			= $email->send_to;
+		$email->user->group_id		= $email->user_group;
+		$email->user->email			= $email->sent_to;
+		$email->user->username		= $email->username;
+		$email->user->password		= $email->user_password;
 		$email->user->first_name	= $email->first_name;
 		$email->user->last_name		= $email->last_name;
 		$email->user->profile_img	= $email->profile_img;
 		$email->user->gender		= $email->gender;
 
-		//	If the email is still empty, fallback to another
-		if ( ! $email->user->email ) :
 
-			$email->user->email = $email->user_email;
+		unset( $email->user_id );
+		unset( $email->sent_to );
+		unset( $email->username );
+		unset( $email->first_name );
+		unset( $email->last_name );
+		unset( $email->profile_img );
+		unset( $email->gender );
+		unset( $email->user_group );
+		unset( $email->user_password );
 
-		endif;
-
-		//	Not unsetting anything in case anything else is using it.
-		//	This is a TODO and should be fixed when the email module/library gets an overhaul.
 	}
 
 }

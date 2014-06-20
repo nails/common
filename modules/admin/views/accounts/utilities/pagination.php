@@ -19,6 +19,9 @@
 	if ( $this->input->get( 'per_page' ) )
 		$_config['base_url'] .= '&per_page=' . urlencode( $this->input->get( 'per_page' ) );	
 		
+	if ( $this->input->get( 'filter' ) )
+		$_config['base_url'] .= '&filter=' . urlencode( $this->input->get( 'filter' ) );	
+		
 	$_config['total_rows']				= $users->pagination->total_results;
 	$_config['per_page']				= $this->input->get( 'per_page' ) ? $this->input->get( 'per_page' ) : 50; 
 	$_config['page_query_string']		= TRUE;

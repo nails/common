@@ -1,45 +1,55 @@
-			</div>
-		</div>
+			<hr />
+			<div class="row">
+				<p class="text-center">
+					<small>
+						&copy; <?=APP_NAME?> <?=date( 'Y' ) == '2014' ? '2014' : '2014-' . date( 'Y' )?>
+						<br />
+						<?=lang( 'nails_footer_powered_by', array( NAILS_PACKAGE_URL, NAILS_PACKAGE_NAME ) )?>
+					</small>
+				</p>
+			</div><!-- /.row -->
+		</div><!-- /.container -->
+		<script type="text/javascript">
+			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
+			window.NAILS					= {};
+			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
+			window.NAILS.LANG				= {};
+			window.NAILS.USER				= {};
+			window.NAILS.USER.ID			= <?=active_user( 'id' ) ? active_user( 'id' ) : 'null'?>;
+			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
+			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
+			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
+		</script>
+		<?php
 
-		<!--	FOOTER	-->
-		<div class="row" id="nails-default-footer">
-			<div class="four columns nails-footer-1">
-				<small>
-					<?=lang( 'nails_footer_powered_by', NAILS_VERSION )?>
-				</small>
-			</div>
-			<div class="four columns nails-footer-2">&nbsp;</div>
-			<div class="four columns nails-footer-3">&nbsp;</div>
-			<div class="four columns nails-footer-4">
-				<small>
-					<?=lang( 'nails_footer_developed_by' )?>
-				</small>
-			</div>
-		</div>
-		
-	</div><!--	/.container	-->
+			//	Load JS
+			$this->asset->output( 'js' );
+			$this->asset->output( 'js-inline' );
 
-	<!-- JS HOOK -->
-	<?php $this->asset->output( 'js-inline' ); ?>
+			//	Analytics
+			if ( ENVIRONMENT == 'production' && app_setting( 'google_analytics_account' ) ) :
 
-	<script type="text/javascript">
-	<!--//
+				?>
+				<script type="text/javascript">
+				<!--//
 
-		<?php if ( ENVIRONMENT == 'production' && site_settings( 'google_analytics_account' ) ) : ?>
+					var _gaq = _gaq || [];
+					_gaq.push(['_setAccount', '<?=app_setting( 'google_analytics_account' )?>]);
+					_gaq.push(['_trackPageview']);
 
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '<?=site_settings( 'google_analytics_account' )?>]);
-		_gaq.push(['_trackPageview']);
+					(function() {
+						var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+						ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+						var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+					})();
 
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
+				//-->
+				</script>
+				<?php
 
-		<?php endif; ?>
-	
-	//-->
-	</script>
-</body>
+			endif;
+
+		?>
+	</body>
 </html>

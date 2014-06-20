@@ -1,5 +1,5 @@
 <p>
-	A request was made at <?=anchor( '', APP_NAME )?> to reset the password for <strong><?=$sent_to->email?></strong>.
+	A request was made at <?=anchor( '', APP_NAME )?> to reset the password for <strong><?=$identifier?></strong>.
 </p>
 <p>
 	If you made this request and wish to create a new password, click on the link below

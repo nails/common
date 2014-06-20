@@ -4,20 +4,12 @@
 * Name:			Generic Langfile
 *
 * Description:  Generic language file for Nails
-* 
+*
 */
-	//	Startup notices
-	$lang['startup_db_error']	= 'There was a problem starting the application, the database is perhaps configured incorrectly.';
-
-	// --------------------------------------------------------------------------
-
 	//	Default header/footer
-	$lang['nails_footer_powered_by']	= 'Powered by <a href="http://nailsapp.co.uk">Nails. v%s</a>';
-	$lang['nails_footer_developed_by']	= 'Developed by <a href="http://shedcollective.org">Shed Collective</a> &copy; 2012 - 2013';
-	
-	
+	$lang['nails_footer_powered_by']	= 'Powered by <a href="%s">%s</a>';
+
 	// --------------------------------------------------------------------------
-	
 
 	//	Verbs / common actions
 	$lang['action_save']			= 'Save';
@@ -54,11 +46,9 @@
 	$lang['action_verify']			= 'Verify';
 	$lang['action_unverify']		= 'Unverify';
 	$lang['action_choose']			= 'Choose';
-	
-	
+
 	// --------------------------------------------------------------------------
-	
-	
+
 	//	Common form validation
 	$lang['fv_there_were_errors']			= '<strong>Sorry,</strong> there were errors. Please check highlighted fields.';
 	$lang['fv_required']					= 'This field is required.';
@@ -66,6 +56,8 @@
 	$lang['fv_valid_email']					= 'This must be a valid email.';
 	$lang['fv_valid_email_field']			= 'The %s field is must be a valid email.';
 	$lang['fv_email_already_registered']	= 'This email is already registered.';
+	$lang['fv_username_already_registered']	= 'This username is already registered.';
+	$lang['fv_identity_already_registered']	= 'This is already registered.';
 	$lang['fv_matches']						= 'This field does not match the %2$s field.';
 	$lang['fv_matches_field']				= 'The %s field does not match the %s field.';
 	$lang['fv_is_unique']					= 'This field must be unique.';
@@ -94,27 +86,35 @@
 	$lang['fv_datetime_before_field']		= 'The %s field must be before the %s field.';
 	$lang['fv_datetime_after']				= 'This must be after the %2$s field.';
 	$lang['fv_datetime_after_field']		= 'The %s field must be before the %s field.';
-	
-	
+	$lang['fv_numeric']						= 'This field must be numeric.';
+	$lang['fv_numeric_field']				= 'The %s field must be numeric.';
+	$lang['fv_is_natural']					= 'This field must be a positive number.';
+	$lang['fv_is_natural_field']			= 'The %s field must contain only positive numbers.';
+	$lang['fv_is_natural_no_zero']			= 'This field must be a positive number greater than zero.';
+	$lang['fv_is_natural_no_zero_field']	= 'The %s field must contain only positive numbers greater than zero.';
+	$lang['fv_in_range']					= 'This field must be within the range %2$s.';
+	$lang['fv_in_range_field']				= 'The %s field must be within the range %s.';
+	$lang['fv_max_length']					= 'This field is too long, maximum length is %2$s characters.';
+	$lang['fv_max_length_field']			= 'The %s field is too long, maximum length is %2$s characters.';
+
 	// --------------------------------------------------------------------------
-	
-	
+
 	//	Common form field labels
 	$lang['form_label_email']				= 'Email';
+	$lang['form_label_username']			= 'Username';
 	$lang['form_label_password']			= 'Password';
 	$lang['form_label_password_confirm']	= 'Confirm Password';
 	$lang['form_label_first_name']			= 'First Name';
 	$lang['form_label_last_name']			= 'Surname';
 	$lang['form_label_title']				= 'Title';
 	$lang['form_label_body']				= 'Body';
-	
+
 	// --------------------------------------------------------------------------
-	
+
 	//	Common strings
 	$lang['yes']							= 'Yes';
 	$lang['no']								= 'No';
 	$lang['no_records_found']				= 'No Records found';
-
 
 	// --------------------------------------------------------------------------
 

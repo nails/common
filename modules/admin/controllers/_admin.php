@@ -21,7 +21,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	public function __construct()
@@ -30,18 +29,23 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		//	Check this module is enabled in settings
-		if ( ! module_is_enabled( 'auth' ) || ! module_is_enabled( 'admin' ) ) :
+		//	IP whitelist?
+		$_ip_whitelist = json_decode( APP_ADMIN_IP_WHITELIST );
 
-			//	Cancel execution, module isn't enabled
-			show_404();
+		if ( $_ip_whitelist ) :
+
+			if ( ! ip_in_range( $this->input->ip_address(), $_ip_whitelist ) ) :
+
+				show_404();
+
+			endif;
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	Admins only please
-		if ( ! $this->user->is_admin() ) :
+		if ( ! $this->user_model->is_admin() ) :
 
 			unauthorised();
 
@@ -50,7 +54,31 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load up the generic admin langfile
-		$this->lang->load( 'admin_generic', RENDER_LANG_SLUG );
+		$this->lang->load( 'admin_generic' );
+
+		// --------------------------------------------------------------------------
+
+		//	Check that admin is running on the SECURE_BASE_URL url
+		if ( APP_SSL_ROUTING ) :
+
+			$_host1 = $this->input->server( 'HTTP_HOST' );
+			$_host2 = parse_url( SECURE_BASE_URL );
+
+			if ( ! empty( $_host2['host'] ) && $_host2['host'] != $_host1 ) :
+
+				//	Not on the secure URL, redirect with message
+				$_redirect = $this->input->server( 'REQUEST_URI' );
+
+				if ( $_redirect ) :
+
+					$this->session->set_flashdata( 'message', lang( 'admin_not_secure' ) );
+					redirect( $_redirect );
+
+				endif;
+
+			endif;
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -81,7 +109,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		$_active_method	= $this->uri->segment( 3, 'index' );
 		$_acl			= active_user( 'acl' );
 
-		if ( ! $this->user->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $this->_loaded_modules[$_active_module] ) ) :
 
 			//	If this is the dashboard, we should see if the user has permission to
 			//	access any other modules before we 404 their ass.
@@ -115,7 +143,7 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 			endif;
 
-		elseif ( ! $this->user->is_superuser() ) :
+		elseif ( ! $this->user_model->is_superuser() ) :
 
 			//	Module is OK, check to make sure they can access this method
 			if ( ! isset( $_acl['admin'][$_active_module][$_active_method] ) ) :
@@ -152,11 +180,30 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		//	Unload any previously loaded assets, admin handles it's own assets
 		$this->asset->clear_all();
 
-		//	Load admin styles and JS
-		$this->asset->load( 'nails.admin.css', TRUE );
-		$this->asset->load( 'nails.default.min.js', TRUE );
-		$this->asset->load( 'nails.admin.min.js', TRUE );
-		$this->asset->load( 'jquery.toggles.min.js', TRUE );
+		//	CSS
+		$this->asset->load( 'fancybox/source/jquery.fancybox.css',		'BOWER' );
+		$this->asset->load( 'jquery-toggles/toggles.css',				'BOWER' );
+		$this->asset->load( 'jquery-toggles/themes/toggles-modern.css',	'BOWER' );
+		$this->asset->load( 'tipsy/src/stylesheets/tipsy.css',			'BOWER' );
+		$this->asset->load( 'ionicons/css/ionicons.min.css',			'BOWER' );
+		$this->asset->load( 'nails.admin.css',							TRUE );
+
+		//	JS
+		$this->asset->load( 'jquery/dist/jquery.min.js',				'BOWER' );
+		$this->asset->load( 'fancybox/source/jquery.fancybox.pack.js',	'BOWER' );
+		$this->asset->load( 'jquery-toggles/toggles.min.js',			'BOWER' );
+		$this->asset->load( 'tipsy/src/javascripts/jquery.tipsy.js',	'BOWER' );
+		$this->asset->load( 'jquery.scrollTo/jquery.scrollTo.min.js',	'BOWER' );
+		$this->asset->load( 'jquery-cookie/jquery.cookie.js',			'BOWER' );
+		$this->asset->load( 'nails.default.min.js',						TRUE );
+		$this->asset->load( 'nails.admin.min.js',						TRUE );
+		$this->asset->load( 'nails.forms.min.js',						TRUE );
+		$this->asset->load( 'nails.api.min.js',							TRUE );
+
+		//	Libraries
+		$this->asset->library( 'jqueryui' );
+		$this->asset->library( 'select2' );
+		$this->asset->library( 'ckeditor' );
 
 		//	Look for any Admin styles provided by the app
 		if ( file_exists( FCPATH . 'assets/css/admin.css' ) ) :
@@ -166,21 +213,35 @@ class NAILS_Admin_Controller extends NAILS_Controller
 		endif;
 
 		//	Inline assets
-		$_js  = 'var _nails,_nails_admin;';
+		$_js  = 'var _nails,_nails_admin,_nails_forms;';
 		$_js .= '$(function(){';
 
 		$_js .= 'if ( typeof( NAILS_JS ) === \'function\' ){';
 		$_js .= '_nails = new NAILS_JS();';
-		$_js .= '_nails.init();}';
-
+		$_js .= '_nails.init();';
+		$_js .= '}';
 
 		$_js .= 'if ( typeof( NAILS_Admin ) === \'function\' ){';
 		$_js .= '_nails_admin = new NAILS_Admin();';
-		$_js .= '_nails_admin.init();}';
+		$_js .= '_nails_admin.init();';
+		$_js .= '}';
+
+		$_js .= 'if ( typeof( NAILS_Forms ) === \'function\' ){';
+		$_js .= '_nails_forms = new NAILS_Forms();';
+		$_js .= '}';
+
+		$_js .= 'if ( typeof( NAILS_API ) === \'function\' ){';
+		$_js .= '_nails_api = new NAILS_API();';
+		$_js .= '}';
 
 		$_js .= '});';
 
 		$this->asset->inline( '<script>' . $_js . '</script>' );
+
+		// --------------------------------------------------------------------------
+
+		//	Initialise the admin change log model
+		$this->load->model( 'admin_changelog_model' );
 	}
 
 
@@ -188,13 +249,12 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 
 	/**
-	 * Determines wether the active_user() can access the specified module
+	 * Determines whether the active_user() can access the specified module
 	 *
 	 * @access	static
 	 * @param	$module A reference to the module definition
 	 * @param	$file The file we're checking
 	 * @return	mixed
-	 * @author	Pablo
 	 *
 	 **/
 	static function _can_access( &$module, $file )
@@ -231,12 +291,11 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 	/**
 	 * Loop through the enabled modules and see if a controller exists for it; if
-	 * it does load it up and execute the annouce static method to see if we can
+	 * it does load it up and execute the announce static method to see if we can
 	 * display it to the active user.
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 *
 	 **/
 	private function _load_active_modules()
@@ -250,17 +309,44 @@ class NAILS_Admin_Controller extends NAILS_Controller
 
 		// --------------------------------------------------------------------------
 
-		foreach( $_modules['admin'] AS $module ) :
+		//	Handle wildcard
+		reset( $_modules );
+		if ( key( $_modules ) == '*' ) :
 
-			$_module = $this->admin_model->find_module( $module );
+			$_modules['admin']	= array();
+			$_controllers		= scandir( NAILS_PATH . 'modules/admin/controllers/' );
+			$_ignore			= array( '.','..','_admin.php' );
 
-			if ( (array) $_module ) :
+			foreach ( $_controllers AS $controller ) :
 
-				$this->_loaded_modules[$module] = $_module;
+				if ( array_search( $controller, $_ignore ) === FALSE ) :
 
-			endif;
+					$_temp					= pathinfo( $controller );
+					$_modules['admin'][]	= $_temp['filename'];
 
-		endforeach;
+				endif;
+
+			endforeach;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( isset( $_modules['admin'] ) && $_modules['admin'] ) :
+
+			foreach( $_modules['admin'] AS $module ) :
+
+				$_module = $this->admin_model->find_module( $module );
+
+				if ( (array) $_module ) :
+
+					$this->_loaded_modules[$module] = $_module;
+
+				endif;
+
+			endforeach;
+
+		endif;
 	}
 
 
@@ -272,7 +358,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	NULL
-	 * @author	Pablo
 	 *
 	 **/
 	static function announce()
@@ -289,7 +374,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 *
 	 **/
 	static function notifications()
@@ -306,7 +390,6 @@ class NAILS_Admin_Controller extends NAILS_Controller
 	 *
 	 * @access	public
 	 * @return	array
-	 * @author	Pablo
 	 *
 	 **/
 	static function permissions()

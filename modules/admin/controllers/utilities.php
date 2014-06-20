@@ -1,12 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Name:		Admin - Utilities
- *
- * Description:	-
+ * Name:		Admin: Utilities
+ * Description:	Various admin utilities
  *
  **/
-
 
 //	Include Admin_Controller; executes common admin functionality.
 require_once '_admin.php';
@@ -34,7 +32,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	static
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	static function announce()
 	{
@@ -43,7 +40,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		//	Load the laguage file
-		get_instance()->lang->load( 'admin_utilities', RENDER_LANG_SLUG );
+		get_instance()->lang->load( 'admin_utilities' );
 
 		// --------------------------------------------------------------------------
 
@@ -55,10 +52,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Navigation options
 		$d->funcs					= array();
 		$d->funcs['test_email']		= lang( 'utilities_nav_test_email' );
-		$d->funcs['user_access']	= lang( 'utilities_nav_user_access' );
-		$d->funcs['languages']		= lang( 'utilities_nav_languages' );
 		$d->funcs['export']			= lang( 'utilities_nav_export' );
 
+		if ( module_is_enabled( 'cdn' ) ) :
+
+			$d->funcs['cdn/orphans']	= 'CDN: Find orphaned objects';
+
+		endif;
 
 		// --------------------------------------------------------------------------
 
@@ -66,6 +66,8 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		return self::_can_access( $d, __FILE__ );
 	}
 
+
+	// --------------------------------------------------------------------------
 
 
 	public function __construct()
@@ -78,18 +80,18 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$_acl						= active_user( 'acl' );
 		$this->_export_sources		= array();
 
-		if ( $this->user->is_superuser() || isset( $_acl['admin']['accounts']['index'] ) )
+		if ( $this->user_model->is_superuser() || isset( $_acl['admin']['accounts']['index'] ) )
 		$this->_export_sources[]	= array( 'Members: All', 'Export a list of all the site\'s registered users and their meta data.', 'users_all' );
 
 		if ( module_is_enabled( 'shop' ) ) :
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['inventory'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['inventory'] ) )
 			$this->_export_sources[]	= array( 'Shop: Inventory', 'Export a list of the shop\'s inventory.', 'shop_inventory' );
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['orders'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['orders'] ) )
 			$this->_export_sources[]	= array( 'Shop: Orders', 'Export a list of all shop orders and their products.', 'shop_orders' );
 
-			if ( $this->user->is_superuser() || isset( $_acl['admin']['shop']['vouchers'] ) )
+			if ( $this->user_model->is_superuser() || isset( $_acl['admin']['shop']['vouchers'] ) )
 			$this->_export_sources[]	= array( 'Shop: Vouchers', 'Export a list of all shop vouchers.', 'shop_vouchers' );
 
 		endif;
@@ -113,7 +115,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	 * @access	public
 	 * @param	none
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function test_email()
 	{
@@ -141,6 +142,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 				$_email				= new stdClass();
 				$_email->to_email	= $this->input->post( 'recipient' );
 				$_email->type		= 'test_email';
+				$_email->data		= array();
 
 				//	Send the email
 				$this->load->library( 'emailer' );
@@ -167,194 +169,6 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->load->view( 'structure/header',			$this->data );
 		$this->load->view( 'admin/utilities/send_test',	$this->data );
 		$this->load->view( 'structure/footer',			$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Manage user groups ACL's
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Gary
-	 **/
-	public function user_access()
-	{
-		//	Page Title
-		$this->data['page']->title = lang ( 'utilities_user_access_title' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['groups'] = $this->user->get_groups();
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/utilities/user_access',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Edit a group
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 * @author	Pablo
-	 **/
-	public function edit_group()
-	{
-		$_gid = $this->uri->segment( 4, NULL );
-
-		// --------------------------------------------------------------------------
-
-		if ( $this->input->post() ) :
-
-			//	Load library
-			$this->load->library( 'form_validation' );
-
-			//	Define rules
-			$this->form_validation->set_rules( 'display_name',			lang( 'utilities_edit_group_basic_field_label_display' ),		'xss_clean|required' );
-			$this->form_validation->set_rules( 'name',					lang( 'utilities_edit_group_basic_field_label_name' ),			'xss_clean|required' );
-			$this->form_validation->set_rules( 'description',			lang( 'utilities_edit_group_basic_field_label_description' ),	'xss_clean|required' );
-			$this->form_validation->set_rules( 'default_homepage',		lang( 'utilities_edit_group_basic_field_label_homepage' ), 		'xss_clean|required' );
-			$this->form_validation->set_rules( 'registration_redirect',	lang( 'utilities_edit_group_basic_field_label_registration' ), 	'xss_clean' );
-			$this->form_validation->set_rules( 'acl[]',					lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[superuser]',		lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-			$this->form_validation->set_rules( 'acl[admin][]',			lang( 'utilities_edit_group_permission_legend' ), 				'xss_clean' );
-
-			//	Set messages
-			$this->form_validation->set_message( 'required', lang( 'fv_required' ) );
-
-			if ( $this->form_validation->run() ) :
-
-				$_data = array();
-				$_data['display_name']			= $this->input->post( 'display_name' );
-				$_data['name']					= url_title( $this->input->post( 'name' ), 'dash', TRUE );
-				$_data['description']			= $this->input->post( 'description' );
-				$_data['default_homepage']		= $this->input->post( 'default_homepage' );
-				$_data['registration_redirect']	= $this->input->post( 'registration_redirect' );
-
-				//	Parse ACL's
-				$_acl = $this->input->post( 'acl' );
-
-				if ( isset( $_acl['admin'] ) ) :
-
-					//	Remove ACLs which have no enabled methods - pointless
-					$_acl['admin'] = array_filter( $_acl['admin'] );
-
-				endif;
-
-				$_data['acl']				= serialize( $_acl );
-
-				$this->user->update_group( $_gid, $_data );
-
-				$this->session->set_flashdata( 'success', '<strong>Huzzah!</strong> Group updated successfully!' );
-				redirect( 'admin/utilities/user_access' );
-				return;
-
-			else :
-
-				$this->data['error'] = validation_errors();
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$this->data['group'] = $this->user->get_group( $_gid );
-
-		if ( ! $this->data['group'] ) :
-
-			$this->session->set_flashdata( 'error', 'Group does not exist.' );
-			redirect( 'admin/utilities/user_access' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Page title
-		$this->data['page']->title = lang( 'utilities_edit_group_title', $this->data['group']->display_name );
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',				$this->data );
-		$this->load->view( 'admin/utilities/edit_group',	$this->data );
-		$this->load->view( 'structure/footer',				$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function languages()
-	{
-		//	Page Title
-		$this->data['page']->title = lang ( 'utilities_languages_title' );
-
-		// --------------------------------------------------------------------------
-
-		$this->data['languages'] = $this->language->get_all();
-
-		// --------------------------------------------------------------------------
-
-		//	Load views
-		$this->load->view( 'structure/header',					$this->data );
-		$this->load->view( 'admin/utilities/languages/index',	$this->data );
-		$this->load->view( 'structure/footer',					$this->data );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function mark_lang_supported()
-	{
-		$_id = $this->uri->segment( 4 );
-
-		if ( $this->language->mark_supported( $_id ) ) :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_ok' ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_supported_fail' ) );
-
-		endif;
-
-		redirect( 'admin/utilities/languages' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function mark_lang_unsupported()
-	{
-		$_id = $this->uri->segment( 4 );
-
-		if ( $this->language->mark_unsupported( $_id ) ) :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_ok' ) );
-
-		else :
-
-			$this->session->set_flashdata( 'success', lang( 'utilities_languages_mark_unsupported_fail' ) );
-
-		endif;
-
-		redirect( 'admin/utilities/languages' );
 	}
 
 
@@ -460,7 +274,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_users_all( $out = array() )
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['accounts']['index'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -476,58 +290,52 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		//	User
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_group
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_group';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_group';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_auth_method
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_auth_method';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_auth_method';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
 		//	user_meta
 		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'user_meta';
+		$_out[$_counter]->filename	= NAILS_DB_PREFIX . 'user_meta';
 		$_out[$_counter]->fields	= array();
 		$_out[$_counter]->data		= array();
 		$_counter++;
 
-		//	date_format_date
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'date_format_date';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
+		//	Nails user_meta_* tables
+		$_tables = $this->db->query( 'SHOW TABLES LIKE \'' . NAILS_DB_PREFIX . 'user_meta_%\'' )->result();
+		foreach( $_tables AS $table ) :
 
-		//	date_format_time
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'date_format_time';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
+			$_table = array_values( (array) $table );
 
-		//	langauge
-		$_out[$_counter]			= new stdClass();
-		$_out[$_counter]->filename	= 'language';
-		$_out[$_counter]->fields	= array();
-		$_out[$_counter]->data		= array();
-		$_counter++;
+			$_out[$_counter]			= new stdClass();
+			$_out[$_counter]->filename	= $_table[0];
+			$_out[$_counter]->fields	= array();
+			$_out[$_counter]->data		= array();
+
+			$_counter++;
+
+		endforeach;
 
 		//	All other user_meta_* tables
 		$_tables = $this->db->query( 'SHOW TABLES LIKE \'user_meta_%\'' )->result();
 		foreach( $_tables AS $table ) :
 
-			$_table = array_values((array)$table);
+			$_table = array_values( (array) $table );
 
 			$_out[$_counter]			= new stdClass();
 			$_out[$_counter]->filename	= $_table[0];
@@ -544,10 +352,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		foreach( $_out AS &$out ) :
 
 			$_fields = $this->db->query( 'DESCRIBE ' . $out->filename )->result();
-			foreach ( $_fields AS $field )
+			foreach ( $_fields AS $field ) :
+
 				$out->fields[] = $field->Field;
 
-			$out->data		= $this->db->get( $out->filename )->result_array();
+			endforeach;
+
+			$out->data	= $this->db->get( $out->filename )->result_array();
 
 		endforeach;
 
@@ -563,7 +374,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_inventory()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['inventory'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['inventory'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -590,7 +401,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_orders()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['orders'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['orders'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -605,13 +416,13 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Orders
 		$_out				= array();
 		$_out[0]			= new stdClass();
-		$_out[0]->filename	= 'shop_orders';
+		$_out[0]->filename	= NAILS_DB_PREFIX . 'shop_orders';
 		$_out[0]->fields	= array();
 		$_out[0]->data		= array();
 
 		//	Order_products
 		$_out[1]			= new stdClass();
-		$_out[1]->filename	= 'shop_order_products';
+		$_out[1]->filename	= NAILS_DB_PREFIX . 'shop_order_products';
 		$_out[1]->fields	= array();
 		$_out[1]->data		= array();
 
@@ -628,11 +439,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'v.discount_value voucher_discount_value,v.discount_application voucher_discount_application' );
 		$this->db->select( 'v.label voucher_label, v.valid_from voucher_valid_from,v.valid_to voucher_valid_to, v.use_count voucher_use_count' );
 
-		$this->db->join( 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
-		$this->db->join( 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
-		$this->db->join( 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_payment_gateway pg', 'pg.id = o.payment_gateway_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_shipping_method sm', 'sm.id = o.shipping_method_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_voucher v', 'v.id = o.voucher_id', 'LEFT' );
 
-		$_out[0]->data = $this->db->get( 'shop_order o' )->result_array();
+		$_out[0]->data = $this->db->get( NAILS_DB_PREFIX . 'shop_order o' )->result_array();
 
 		if ( $_out[0]->data ) :
 
@@ -647,11 +458,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'op.was_on_sale,op.shipping,op.tax,op.shipping_tax,op.total,tr.label tax_rate_label,tr.rate tax_rate,op.processed' );
 		$this->db->select( 'op.refunded,op.refunded_date,op.extra_data' );
 
-		$this->db->join( 'shop_product p', 'p.id = op.product_id' );
-		$this->db->join( 'shop_product_type pt', 'pt.id = p.type_id' );
-		$this->db->join( 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product p', 'p.id = op.product_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_product_type pt', 'pt.id = p.type_id' );
+		$this->db->join( NAILS_DB_PREFIX . 'shop_tax_rate tr', 'tr.id = p.tax_rate_id', 'LEFT' );
 
-		$_out[1]->data = $this->db->get( 'shop_order_product op' )->result_array();
+		$_out[1]->data = $this->db->get( NAILS_DB_PREFIX . 'shop_order_product op' )->result_array();
 
 		if ( $_out[1]->data ) :
 
@@ -671,7 +482,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 	protected function _export_source_shop_vouchers()
 	{
 		$_acl = active_user( 'acl' );
-		if ( ! $this->user->is_superuser() && ! isset( $_acl['admin']['shop']['vouchers'] ) ) :
+		if ( ! $this->user_model->is_superuser() && ! isset( $_acl['admin']['shop']['vouchers'] ) ) :
 
 			$this->session->set_flashdata( 'error', '<strong>Sorry,</strong> you do not have permission to export that data.' );
 			redirect( 'admin/utilities/export' );
@@ -682,7 +493,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		// --------------------------------------------------------------------------
 
 		$_out			= new stdClass();
-		$_out->filename	= 'shop_vouchers';
+		$_out->filename	= NAILS_DB_PREFIX . 'shop_vouchers';
 		$_out->fields	= array();
 		$_out->data		= array();
 
@@ -692,7 +503,7 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		$this->db->select( 'v.id,v.code,v.type,v.discount_type,v.discount_value,v.discount_application,v.label,v.valid_from' );
 		$this->db->select( 'v.valid_to,v.use_count,v.limited_use_limit,v.gift_card_balance,v.product_type_id,v.created' );
 		$this->db->select( 'v.modified,v.is_active,v.is_deleted' );
-		$_out->data = $this->db->get( 'shop_voucher v' )->result_array();
+		$_out->data = $this->db->get( NAILS_DB_PREFIX . 'shop_voucher v' )->result_array();
 
 		if ( $_out->data ) :
 
@@ -714,11 +525,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Send header
 		if ( ! $return_data ) :
 
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.csv;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 
@@ -757,11 +568,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Send header
 		if ( ! $return_data ) :
 
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.html;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 
@@ -800,11 +611,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Send header
 		if ( ! $return_data ) :
 
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.txt;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 
@@ -842,11 +653,11 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 		//	Send header
 		if ( ! $return_data ) :
 
+			$this->output->set_content_type( 'application/octet-stream' );
 			$this->output->set_header( 'Pragma: public' );
 			$this->output->set_header( 'Expires: 0' );
 			$this->output->set_header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			$this->output->set_header( 'Cache-Control: private', FALSE );
-			$this->output->set_header( 'Content-Type: application/octet-stream' );
 			$this->output->set_header( 'Content-Disposition: attachment; filename=data-export-' . $data->filename . '-' . date( 'Y-m-d_H-i-s' ) . '.json;' );
 			$this->output->set_header( 'Content-Transfer-Encoding: binary' );
 
@@ -874,6 +685,113 @@ class NAILS_Utilities extends NAILS_Admin_Controller
 
 		endif;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function cdn()
+	{
+		switch ( $this->uri->segment( 4 ) ) :
+
+			case 'orphans' :	$this->_cdn_orphans();	break;
+			default :			show_404();				break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _cdn_orphans()
+	{
+		if ( $this->input->is_cli_request() ) :
+
+			return $this->_cdn_orphans_cli();
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		if ( $this->input->post() ) :
+
+			//	A little form validation
+			$_type		= $this->input->post( 'type' );
+			$_parser	= $this->input->post( 'parser' );
+			$_pass		= TRUE;
+
+			if ( $_type == 'db' && $_parser == 'create' ) :
+
+				$_pass	= FALSE;
+				$_error	= 'Cannot use "Add to database" results parser when finding orphaned database objects.';
+
+			endif;
+
+
+			if ( $_pass ) :
+
+				switch( $_type ) :
+
+					case 'db'	:	$this->data['orphans']	= $this->cdn->find_orphaned_objects();				break;
+
+					//	TODO
+					case 'file'	:	$this->data['message']	= '<strong>TODO:</strong> find orphaned files.';	break;
+
+					//	Invalid request
+					default		:	$this->data['error']	= '<strong>Sorry,</strong> invalid search type.';	break;
+
+				endswitch;
+
+				if ( isset( $this->data['orphans'] ) ) :
+
+					switch( $_parser ) :
+
+						case 'list'		:	$this->data['success'] = '<strong>Search complete!</strong> your results are show below.';								break;
+
+						//	TODO: keep the unset(), it prevents the table from rendering
+						case 'purge'	:	$this->data['message']	= '<strong>TODO:</strong> purge results.'; unset( $this->data['orphans'] );						break;
+						case 'create'	:	$this->data['message']	= '<strong>TODO:</strong> create objects using results.'; unset( $this->data['orphans'] );		break;
+
+						//	Invalid request
+						default			:	$this->data['error']	= '<strong>Sorry,</strong> invalid result parse selected.'; unset( $this->data['orphans'] );	break;
+
+					endswitch;
+
+				endif;
+
+			else :
+
+				$this->data['error'] = '<strong>Sorry,</strong> an error occurred. ' . $_error;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$this->data['page']->title = 'CDN: Find Orphaned Objects';
+
+		// --------------------------------------------------------------------------
+
+		$this->asset->load( 'nails.admin.utilities.cdn.orphans.min.js', TRUE );
+
+		// --------------------------------------------------------------------------
+
+		$this->load->view( 'structure/header',				$this->data );
+		$this->load->view( 'admin/utilities/cdn/orphans',	$this->data );
+		$this->load->view( 'structure/footer',				$this->data );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _cdn_orphans_cli()
+	{
+		echo 'Sorry, this functionality is not complete yet. If you are experiencing timeouts please increase the timeout limit for PHP.';
+	}
+
 }
 
 
@@ -891,12 +809,12 @@ class NAILS_Utilities extends NAILS_Admin_Controller
  *
  * Here's how it works:
  *
- * CodeIgniter instanciates a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclre class X' errors
- * and if we call our overloading class something else it will never get instanciated.
+ * CodeIgniter instantiates a class with the same name as the file, therefore
+ * when we try to extend the parent class we get 'cannot redeclare class X' errors
+ * and if we call our overloading class something else it will never get instantiated.
  *
  * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instanciated et voila.
+ * declaring this helper class below; the helper gets instantiated et voila.
  *
  * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
  * before including this PHP file and extend as normal (i.e in the same way as below);
@@ -913,5 +831,5 @@ if ( ! defined( 'NAILS_ALLOW_EXTENSION_UTILITIES' ) ) :
 endif;
 
 
-/* End of file faq.php */
-/* Location: ./application/modules/admin/controllers/faq.php */
+/* End of file utilities.php */
+/* Location: ./modules/admin/controllers/utilities.php */

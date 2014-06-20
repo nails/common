@@ -8,21 +8,21 @@
 */
 
 	//	General Errors
-	$lang['cdn_error_not_configured']		= 'CDN Not configured correctly';
-	$lang['cdn_error_no_file']				= 'You did not select a file to upload.';
-	$lang['cdn_error_cache_write_fail']		= 'Cache directory is not writeable.';
-	$lang['cdn_error_target_write_fail']	= 'The target directory is not writable. <small>(%s)</small>';
+	$lang['cdn_error_not_configured']			= 'CDN Not configured correctly';
+	$lang['cdn_error_no_file']					= 'You did not select a file to upload.';
+	$lang['cdn_error_cache_write_fail']			= 'Cache directory is not writeable.';
+	$lang['cdn_error_target_write_fail_mkdir']	= 'The target directory does not exist and could not be created. <small>(%s)</small>';
+	$lang['cdn_error_target_write_fail']		= 'The target directory is not writable. <small>(%s)</small>';
 
 	//	Bucket errors
 	$lang['cdn_error_bucket_mkdir']			= 'Failed to create bucket directory.';
+	$lang['cdn_error_bucket_mkdir_su']		= 'Failed to create bucket directory (%s).';
 	$lang['cdn_error_bucket_insert']		= 'Failed to create bucket record.';
 	$lang['cdn_error_bucket_unlink']		= 'Failed to destroy bucket.';
 	$lang['cdn_error_bucket_invalid']		= 'Not a valid bucket';
-	$lang['cdn_error_bucket_nopermission']	= 'You do not have permission to modify that bucket.';
 
 	//	Object Errors
 	$lang['cdn_error_object_invalid']		= 'Not a valid object';
-	$lang['cdn_error_object_nopermission']	= 'You do not have permission to modify that object.';
 
 	//	Object Upload Errors
 	$lang['cdn_stream_content_type']		= 'A Content-Type must be defined for data stream uploads.';
@@ -36,6 +36,7 @@
 	$lang['cdn_error_delete']				= 'File failed to delete, it may be in use.';
 	$lang['cdn_error_delete_nofile']		= 'No file to delete.';
 	$lang['cdn_error_couldnotmove']			= 'Failed to move uploaded file into the bucket.';
+	$lang['cdn_error_bad_extension_mime']	= '%s is not a valid extension for this file type.';
 
 	//	Tag Errors
 	$lang['cdn_error_tag_exists']			= 'Tag already exists';

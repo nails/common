@@ -4,80 +4,158 @@
 * Name:			Twitter
 *
 * Description:	Gateway to the Twitter API
-* 
+*
 */
 
-class Twitter_Connect {
-	
-	private $ci;
-	private $settings;
-	private $twitter;
-	
-	
+class Twitter_Connect
+{
+
+	private $_ci;
+	private $_settings;
+	private $_twitter;
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
-		$this->ci =& get_instance();
-		
+		$this->_ci =& get_instance();
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch our config variables
-		$this->ci->config->load( 'twitter' );
-		$this->settings = $this->ci->config->item( 'twitter' );
-		
+		$this->_settings			= array();
+		$this->_settings['consumer_key']	= app_setting( 'social_signin_fb_app_id' );
+		$this->_settings['consumer_secret']	= app_setting( 'social_signin_fb_app_secret' );
+
+		if ( $this->_settings['consumer_secret'] ) :
+
+			$this->_settings['consumer_secret'] = $this->_ci->encrypt->decode( $this->_settings['consumer_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		//	Sanity check
+		if ( ! $this->_settings['consumer_key'] || ! $this->_settings['consumer_secret'] ) :
+
+			if ( ENVIRONMENT === 'production' ) :
+
+				show_fatal_error( 'Twitter has not been configured correctly', 'The Twitter App ID and secret must be specified in Admin under Site Settings.' );
+
+			else :
+
+				show_error( 'The Twitter App ID and secret must be specified in Admin under Site Settings.' );
+
+			endif;
+
+		endif;
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fire up and initialize the SDK
-		require NAILS_PATH . 'libraries/_resources/twitter-codebird/codebird.php';
-		Codebird::setConsumerKey( $this->settings['consumer_key'], $this->settings['consumer_secret'] );
-		$this->twitter = new Codebird();
+		Codebird\Codebird::setConsumerKey( $this->_settings['consumer_key'], $this->_settings['consumer_secret'] );
+		$this->_twitter = new Codebird\Codebird();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Determines whether the active user has already linked their Twitter profile
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function user_is_linked()
+	public function user_is_linked( $user_id = NULL )
 	{
-		return (bool) active_user( 'tw_id' );
+		if ( NULL === $user_id ) :
+
+			return (bool) active_user( 'tw_id' );
+
+		else :
+
+			$_u = get_userobject()->get_by_id( $user_id );
+
+			return ! empty( $_u->tw_id );
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Unlinks a local account from Twitter
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function unlink_user( $user_id )
+	public function unlink_user( $user_id = NULL )
 	{
-		dumpanddie( 'TODO Unlink a user' );
+		//	Grab reference to the userobject
+		$_userobj =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		if ( NULL === $user_id ) :
+
+			$_uid = active_user( 'id' );
+
+		else :
+
+			if ( is_callable( array( $_userobj, 'get_by_id' ) ) ) :
+
+				$_u = get_userobject()->get_by_id( $user_id );
+
+				if ( ! empty( $_u->id ) ) :
+
+					$_uid	= $_u->id;
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Update our user
+		if ( is_callable( array( $_userobj, 'update' ) ) ) :
+
+			$_data				= array();
+			$_data['tw_id']		= NULL;
+			$_data['tw_token']	= NULl;
+			$_data['tw_secret']	= NULl;
+
+			return $_userobj->update( $_uid, $_data );
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches the login URL
 	 *
@@ -87,29 +165,30 @@ class Twitter_Connect {
 	 * @return	void
 	 **/
 	public function get_login_url( $success, $fail )
-	{	
+	{
 		$_params					= array();
 		$_params['oauth_callback']	= $this->_get_redirect_url( $success, $fail );
-		$_request_token = $this->oauth_requestToken( $_params );
-		
-		if ( ! $_request_token ) :
-		
+
+		$_request_token = $this->_twitter->oauth_requestToken( $_params );
+
+		if ( ! $_request_token || ( ! empty( $_request_token->httpstatus ) && $_request_token->httpstatus !== 200 ) ) :
+
 			return FALSE;
-		
+
 		endif;
-		
+
 		// --------------------------------------------------------------------------
-		
+
 		$this->setToken( $_request_token->oauth_token, $_request_token->oauth_token_secret );
-		$this->ci->session->set_userdata( 'tw_request_token', $_request_token );
-		
-		return $this->oauth_authenticate();
+		$this->_ci->session->set_userdata( 'tw_request_token', $_request_token );
+
+		return $this->_twitter->oauth_authenticate();
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Gets the URL where the user will be redirected to after connecting/logging in
 	 *
@@ -124,18 +203,18 @@ class Twitter_Connect {
 		$_data									= array();
 		$_data['nailsTWConnectReturnTo']		= $success ? $success : active_user( 'group_homepage' );
 		$_data['nailsTWConnectReturnToFail']	= $fail ? $fail : $success;
-		
+
 		//	Filter out empty items
 		$_data = array_filter( $_data );
 		$_query_string = $_data ? '?' . http_build_query( $_data ) : NULL;
-		
+
 		return site_url( 'auth/tw/connect/verify' . $_query_string  );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Sets a user's access token
 	 *
@@ -146,13 +225,13 @@ class Twitter_Connect {
 	 **/
 	public function set_access_token( $token, $secret )
 	{
-		$this->twitter->setToken( $token, $secret );
+		$this->_twitter->setToken( $token, $secret );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetches a user's access token
 	 *
@@ -161,23 +240,30 @@ class Twitter_Connect {
 	 **/
 	public function get_access_token( $code )
 	{
-		return $this->oauth_accessToken( array( 'oauth_verifier' => $code ) );
+		return $this->_twitter->oauth_accessToken( array( 'oauth_verifier' => $code ) );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Map unknown method calls to the Twitter library
 	 *
 	 * @access	public
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
 	public function __call( $method, $arguments )
 	{
-		return call_user_func_array( array( $this->twitter, $method ), $arguments );
+		if ( is_callable( array( $this->_twitter, $method ) ) ) :
+
+			return call_user_func_array( array( $this->_twitter, $method ), $arguments );
+
+		else:
+
+			show_error( 'Method does not exist Twitter::' . $method );
+
+		endif;
 	}
 }
 

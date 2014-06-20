@@ -5,6 +5,9 @@
 			<strong>Title:</strong> <?=$block->title?>
 		</p>
 		<p>
+			<strong>Slug:</strong> <?=$block->slug?>
+		</p>
+		<p>
 			<strong>Description:</strong> <?=$block->description?>
 		</p>
 		<p>
@@ -17,84 +20,92 @@
 
 	<?=form_open()?>
 	<fieldset>
-	<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
-		<legend>Translations</legend>
-		<p class="system-alert message no-close">
-			<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_NAME?> version, however more translations can be
-			added if needed. Translations will only be used when viewing the site in a particular language (if supported).
-			If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_NAME?>.
-		</p>
+		<?php
+
+			if ( count( $languages ) > 1 ) :
+
+				?>
+				<legend>Translations</legend>
+				<p class="system-alert message">
+					<strong>Note:</strong> Every block is required to have an <?=APP_DEFAULT_LANG_LABEL?> version, however more translations can be
+					added if needed. Translations will only be used when viewing the site in a particular language (if supported).
+					If no translation is available the system will fall back to <?=APP_DEFAULT_LANG_LABEL?>.
+				</p>
 
 
-		<!--	DEFAULT LANG	-->
-		<fieldset class="translation" data-lang_id="<?=$default_id?>">
-			<legend><?=APP_DEFAULT_LANG_NAME?></legend>
+				<!--	DEFAULT LANG	-->
+				<fieldset class="translation" data-language="<?=$default_code?>">
+					<legend><?=APP_DEFAULT_LANG_LABEL?></legend>
+				<?php
 
-	<?php else : ?>
-		<legend>Value</legend>
-		<div class="translation" data-lang_id="<?=$default_id?>">
+			else :
 
-	<?php endif; ?>
+				?>
+				<legend>Value</legend>
+				<div class="translation" data-language="<?=$default_code?>">
+				<?php
 
-			<?=form_hidden( 'translation[0][lang_id]', $default_id )?>
-			<div class="system-alert error no-close">
-				<strong>Oops!</strong> Please ensure a value is set.
-			</div>
-			<?php
+			endif;
 
-				//	Render the correct display
-				switch ( $block->type ) :
+			echo form_hidden( 'translation[0][language]', $default_code );
 
-					case 'plaintext' :
+			echo '<div class="system-alert error">';
+				echo '<strong>Oops!</strong> Please ensure a value is set.';
+			echo '</div>';
 
-						echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
+			//	Render the correct display
+			switch ( $block->type ) :
 
-					break;
+				case 'plaintext' :
 
-					// --------------------------------------------------------------------------
+					echo '<textarea name="translation[0][value]">' . $block->default_value . '</textarea>';
 
-					case 'richtext' :
-
-						echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="ckeditor"' );
-
-						echo '<p class="system-alert notice no-close">';
-						echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
-						echo 'due to application stylesheets on the front end which are not loaded here.';
-						echo '</p>';
-
-					break;
-
-				endswitch;
+				break;
 
 				// --------------------------------------------------------------------------
 
-				//	Revisions
-				if ( $block->default_value_revisions ) :
+				case 'richtext' :
 
-					?>
-					<ul class="revisions">
-						<li class="summary">
-							<?=count( $block->default_value_revisions )?> Revisions
-							<a href="#" class="toggle-revisions right">Show/Hide</a>
+					echo form_textarea( 'translation[0][value]',  $block->default_value, 'class="wysiwyg"' );
+
+				break;
+
+			endswitch;
+
+			// --------------------------------------------------------------------------
+
+			//	Revisions
+			if ( $block->default_value_revisions ) :
+
+				?>
+				<ul class="revisions">
+					<li class="summary">
+						<?=count( $block->default_value_revisions )?> Revisions
+						<a href="#" class="toggle-revisions right">Show/Hide</a>
+					</li>
+					<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
+						<li class="revision">
+							<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
+								<?=$revision->value ? $revision->value : '<span class="no-data">No Value</span>'?>
+							</span>
 						</li>
-						<?php foreach ( $block->default_value_revisions AS $revision ) : ?>
-							<li class="revision">
-								<span class="revision-content" rel="tipsy-left" title="<?=$revision->created?> by <?=$revision->user->id ? $revision->user->first_name . ' ' . $revision->user->last_name : 'Unknown'?>">
-									<?=$revision->value?>
-								</span>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-					<?php
+					<?php endforeach; ?>
+				</ul>
+				<?php
 
-				endif;
+			endif;
 
-			?>
-		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
-		</fieldset>
-		<?php else : ?>
-		</div>
-		<?php endif; ?>
+			if ( count( $languages ) > 1 ) :
+
+				echo '</fieldset>';
+
+			else :
+
+				echo '</div>';
+
+			endif;
+
+		?>
 
 		<!--	OTHER LANGUAGES	-->
 		<?php
@@ -102,17 +113,17 @@
 			$_counter = 1;
 			foreach ( $block->translations AS $translation ) :
 
-				if ( $translation->lang->slug == APP_DEFAULT_LANG_SLUG )
+				if ( $translation->language == APP_DEFAULT_LANG_CODE )
 					continue;
 
 				?>
-				<fieldset class="translation" data-lang_id="<?=$translation->lang->id?>">
+				<fieldset class="translation" data-language="<?=$translation->language?>">
 					<legend>
-						<?=$translation->lang->name?>
+						<?=! empty( $languages[$translation->language] ) ? $languages[$translation->language] : $translation->language?>
 						<a href="#" class="remove-translation">Remove Translation</a>
 					</legend>
-					<?=form_hidden( 'translation[' . $_counter . '][lang_id]', $translation->lang->id )?>
-					<div class="system-alert error no-close">
+					<?=form_hidden( 'translation[' . $_counter . '][language]', $translation->language )?>
+					<div class="system-alert error">
 						<strong>Oops!</strong> Please ensure a value is set.
 					</div>
 					<?php
@@ -130,16 +141,7 @@
 
 							case 'richtext' :
 
-								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="ckeditor"' );
-
-								if ( $block->type == 'richtext' ) :
-
-									echo '<p class="system-alert notice no-close">';
-									echo '<strong>Note:</strong> The editor\'s display might not be a true representation of the final layout';
-									echo 'due to application stylesheets on the front end which are not loaded here.';
-									echo '</p>';
-
-								endif;
+								echo form_textarea( 'translation[' . $_counter . '][value]',  $translation->value, 'class="wysiwyg"' );
 
 							break;
 
@@ -170,7 +172,7 @@
 		?>
 
 
-		<?php if ( APP_MULTI_LANG && count( $languages ) > 1 ) : ?>
+		<?php if ( count( $languages ) > 1 ) : ?>
 		<!--	ACTIONS	-->
 		<p class="add-translation">
 			<a href="#" class="awesome small right" id="new-translation">Add Translation</a>
@@ -180,7 +182,7 @@
 	</fieldset>
 
 	<p>
-		<?=form_submit( 'submit', lang( 'action_save_changes' ), 'class="awesome"' )?>
+		<?=form_submit( 'submit', lang( 'action_save_changes' ) )?>
 	</p>
 
 	<?=form_close()?>
@@ -189,19 +191,13 @@
 
 <script type="text/template" id="template-translation">
 	<legend>
-		<?=form_dropdown( 'new_translation[{{new_count}}][lang_id]', $languages )?>
+		<?=form_dropdown( 'new_translation[{{new_count}}][language]', $languages )?>
 		<a href="#" class="remove-translation">Remove Translation</a>
 	</legend>
-	<div class="system-alert error no-close">
+	<div class="system-alert error">
 		<strong>Oops!</strong> Please ensure a language and value is set.
 	</div>
 	<textarea name="new_translation[{{new_count}}][value]" id="translation_{{new_count}}"></textarea>
-	<?php if ( $block->type == 'richtext' ) : ?>
-	<p class="system-alert notice no-close">
-		<strong>Note:</strong> The editor's display might not be a true representation of the final layout
-		due to application stylesheets on the front end which are not loaded here.
-	</p>
-	<?php endif; ?>
 </script>
 
 <script type="text/javascript">

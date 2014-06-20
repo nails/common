@@ -2,262 +2,339 @@
 
 /**
 * Name:			LinkedIn
-* 
+*
 * Description:	Gateway to the LinkedIn API
-* 
+*
 */
 
-class Linkedin_connect {
-	
-	private $ci;
-	private $settings;
-	private $oauth;
-	private $access;
-	
+class Linkedin_connect
+{
+
+	private $_ci;
+	private $_settings;
+	private $_oauth;
+	private $_access_token;
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
 	public function __construct()
 	{
-		$this->ci =& get_instance();
-		
+		$this->_ci =& get_instance();
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Default vars
-		$this->access			= new stdClass();
-		$this->access->token	= NULL;
-		$this->access->secret	= NULL;
-		
+		$this->_access_token	= '';
+		$this->api_endpoint		= 'https://api.linkedin.com/';
+
 		// --------------------------------------------------------------------------
-		
+
 		//	Fetch our config variables
-		$this->ci->config->load( 'linkedin' );
-		$this->settings = $this->ci->config->item( 'linkedin' );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Fire up a new oAuth instance
-		$this->oauth = new OAuth( $this->settings['consumer_key'], $this->settings['consumer_secret'] );
+		$this->_ci->config->load( 'linkedin' );
+		$this->_settings = $this->_ci->config->item( 'linkedin' );
+
+		//	Fetch our config variables
+		$this->_settings				= array();
+		$this->_settings['api_key']		= app_setting( 'social_signin_li_app_key' );
+		$this->_settings['api_secret']	= app_setting( 'social_signin_li_app_secret' );
+
+		if ( $this->_settings['api_secret'] ) :
+
+			$this->_settings['api_secret'] = $this->_ci->encrypt->decode( $this->_settings['api_secret'], APP_PRIVATE_KEY );
+
+		endif;
+
+		//	Sanity check
+		if ( ! $this->_settings['api_key'] || ! $this->_settings['api_secret'] ) :
+
+			if ( ENVIRONMENT === 'production' ) :
+
+				show_fatal_error( 'LinkedIn has not been configured correctly', 'The LinkedIn App ID and secret must be specified in Admin under Site Settings.' );
+
+			else :
+
+				show_error( 'The LinkedIn App ID and secret must be specified in Admin under Site Settings.' );
+
+			endif;
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Determines whether the active user has already linked their LinkedIn profile
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function user_is_linked()
+	public function user_is_linked( $user_id = NULL )
 	{
-		return (bool) active_user( 'li_id' );
+		if ( NULL === $user_id ) :
+
+			return (bool) active_user( 'li_id' );
+
+		else :
+
+			$_u = get_userobject()->get_by_id( $user_id );
+
+			return ! empty( $_u->li_id );
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Generate a URL for authentication
 	 *
 	 * @access	public
 	 * @param	string	$callback	The callback to return to the user to.
 	 * @return	string
-	 * @author	Pablo
 	 **/
-	public function get_auth_url( $callback = NULL )
+	public function get_auth_url( $callback, $state )
 	{
-		$_request_url	= $this->settings['api_endpoint'] . 'uas/oauth/requestToken';
-		$_response		= $this->oauth->getRequestToken( $_request_url, $callback );
-		
-		// --------------------------------------------------------------------------
-		
-		//	If an error was received throw back an error
-		if ( ! $_response )
-			return FALSE;
-			
-		// --------------------------------------------------------------------------
-		
-		//	Build URL
-		$_out = 'https://www.linkedin.com/uas/oauth/authenticate?oauth_token=' . $_response['oauth_token'];
-		
-		// --------------------------------------------------------------------------
-		
-		//	Save the response into the session for picking up later (i.e when we get our access token)
-		$this->ci->session->set_userdata( 'li_request_token', $_response );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Return the URL
-		return $_out;
+		$_params					= array();
+		$_params['response_type']	= 'code';
+		$_params['client_id']		= $this->_settings['api_key'];
+		$_params['scope']			= 'r_basicprofile r_emailaddress';
+		$_params['state']			= $state;
+		$_params['redirect_uri']	= $callback;
+
+		return 'https://www.linkedin.com/uas/oauth2/authorization?' . http_build_query( $_params, '', '&', PHP_QUERY_RFC3986 );
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Fetch an access token for the user
 	 *
 	 * @access	public
 	 * @param	none
 	 * @return	array
-	 * @author	Pablo
 	 **/
-	public function get_access_token( $verifier )
+	public function get_access_token( $callback, $code, $set_token_on_success = TRUE )
 	{
-		$_request_url	= $this->settings['api_endpoint'] . 'uas/oauth/accessToken';
-		
-		// --------------------------------------------------------------------------
-		
-		//	Fetch our previously saved request tokens and set as the oAuth token to use
-		$_token			= $this->ci->session->userdata( 'li_request_token' );
-		
-		$this->oauth->setToken( $_token['oauth_token'], $_token['oauth_token_secret'] );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Fetch the access token
-		$_response		= $this->oauth->getAccessToken( $_request_url, NULL, $verifier );
-		
-		// --------------------------------------------------------------------------
-		
-		//	If an error was received throw back an error
-		if ( ! $_response )
+		//	Build URL
+		$_params					= array();
+		$_params['grant_type']		= 'authorization_code';
+		$_params['code']			= $code;
+		$_params['redirect_uri']	= $callback;
+		$_params['client_id']		= $this->_settings['api_key'];
+		$_params['client_secret']	= $this->_settings['api_secret'];
+
+		$_url = 'https://www.linkedin.com/uas/oauth2/accessToken?' . http_build_query( $_params, '', '&', PHP_QUERY_RFC3986 );
+
+		//	Request token
+		$this->_ci->load->library( 'curl' );
+		$_response = $this->_ci->curl->simple_post( $_url );
+		$_response = json_decode( $_response );
+
+		if ( ! empty( $_response->access_token ) ) :
+
+			if ( $set_token_on_success ) :
+
+				$this->set_access_token( $_response->access_token );
+
+			endif;
+
+			return $_response;
+
+		else :
+
 			return FALSE;
-		
-		// --------------------------------------------------------------------------
-		
-		return $_response;
+
+		endif;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
-	 * Set the oAuth tokens to use for subsequent calls
+	 * Set the access_token to use for subsequent calls
 	 *
 	 * @access	public
 	 * @param	string	$token			The token
-	 * @param	string	$token_secret	The token secret
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function set_access_token( $token, $token_secret )
+	public function set_access_token( $token )
 	{
-		$this->access->token	= $token;
-		$this->access->secret	= $token_secret;
-		
-		// --------------------------------------------------------------------------
-		
-		$this->oauth->setToken( $token, $token_secret );
+		$this->_access_token = $token;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
 	/**
 	 * Call the LinkedIn API
 	 *
-	 * @access	public
+	 * @access	private
 	 * @param	string	$method		The API method to call
 	 * @param	array	$params		Parameters to send along with the request
 	 * @return	mixed
-	 * @author	Pablo
 	 **/
-	public function call( $method, $params = NULL )
+	private function _call( $method, $api_method, $params = array() )
 	{
 		//	Prep the API URL
-		$_url = $this->settings['api_endpoint'] . 'v1/' . $method;
-		
-		$_params = array(
-			//'format'					=>	'json',
-		);
-		
-		$_params_oauth = array(
-		
-			//	Oauth
-			'oauth_consumer_key'		=>	$this->settings['consumer_key'],
-			'oauth_nonce'				=>	md5( microtime( TRUE ) * 10000 ),
-			'oauth_signature_method'	=>	'HMAC-SHA1',
-			'oauth_timestamp'			=>	time(),
-			'oauth_token'				=>	$this->access->token,
-			'oauth_version'				=>	'1.0',
-		);
-		
+		$_params	= array_merge( $params, array( 'oauth2_access_token' => $this->_access_token ) );
+		$_url		= $this->api_endpoint . 'v1/' . $api_method;
+
 		// --------------------------------------------------------------------------
-		
-		//	Add in user supplied params
-		if ( $params )
-			$_params = array_merge( $_params, $params );
-		
-		// --------------------------------------------------------------------------
-		
-		//	Sign the call
-		ksort( $_params_oauth );
-		
-		$_key	 = $this->settings['consumer_secret'] . '&' . $this->access->secret;
-		$_base	 = 'GET&' . rawurlencode( $_url ) . '&' . rawurlencode( http_build_query( $_params_oauth ) );
-		$_sig	 = base64_encode( hash_hmac( 'sha1', $_base, $_key, TRUE ) );
-		$_url	.= ( $_params ) ? '?' . http_build_query( $_params ) : NULL;
-		
-		// --------------------------------------------------------------------------
-		
-		//	Build auth header
-		$_auth_header = "Authorization: OAuth ";
-		
-		foreach( $_params_oauth AS $key => $value ) :
-		
-			$_auth_header .= $key . '="' . $value . '", ';
-		
-		endforeach;
-		
-		$_auth_header .= 'oauth_signature="' . rawurlencode( $_sig ) . '"';
-		
-		// --------------------------------------------------------------------------
-		
+
 		//	Make the call
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, $_url );
-		curl_setopt( $ch, CURLOPT_HEADER, FALSE );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, array( $_auth_header, 'x-li-format: json' ) );
-		$_response = curl_exec($ch);
-		curl_close($ch);
-		
+		$this->_ci->load->library( 'curl' );
+
+		$this->_ci->curl->option( CURLOPT_HTTPHEADER, array( 'x-li-format:json' )  );
+
+		switch ( $method ) :
+
+			case 'GET' :
+
+				$_url .= '?' . http_build_query( $_params, '', '&', PHP_QUERY_RFC3986 );
+
+				$this->_ci->curl->create( $_url );
+				$_response = $this->_ci->curl->execute();
+
+			break;
+
+			case 'POST' :
+			case 'PUT' :
+			case 'DELETE' :
+
+				$this->_ci->curl->create( $_url );
+
+				$_method = strtolower( $method );
+
+				$_response = $this->_ci->curl->$_method( $_params );
+
+			break;
+
+		endswitch;
+
 		return json_decode( $_response );
 	}
-	
+
+
 	// --------------------------------------------------------------------------
-	
-	
+
+
+	public function call( $api_method, $params = array() )
+	{
+		return $this->_call( 'GET', $api_method, $params );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get( $api_method, $params = array() )
+	{
+		return $this->_call( 'GET', $api_method, $params );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function post( $api_method, $params = array() )
+	{
+		return $this->_call( 'POST', $api_method, $params );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function put( $api_method, $params = array() )
+	{
+		return $this->_call( 'PUT', $api_method, $params );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function delete( $api_method, $params = array() )
+	{
+		return $this->_call( 'DELETE', $api_method, $params );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
 	/**
 	 * Unlinks a local account from LinkedIn
 	 *
 	 * @access	public
 	 * @return	void
-	 * @author	Pablo
 	 **/
-	public function unlink_user( $user_id )
+	public function unlink_user( $user_id = NULL )
 	{
+		//	Grab reference to the userobject
+		$_userobj =& get_userobject();
+
+		// --------------------------------------------------------------------------
+
+		if ( NULL === $user_id ) :
+
+			$_uid = active_user( 'id' );
+
+		else :
+
+			if ( is_callable( array( $_userobj, 'get_by_id' ) ) ) :
+
+				$_u = get_userobject()->get_by_id( $user_id );
+
+				if ( ! empty( $_u->id ) ) :
+
+					$_uid	= $_u->id;
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			else :
+
+				return FALSE;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	Update our user
-		$_data['li_id']		= NULL;
-		$_data['li_token']	= NULl;
-		$_data['li_secret']	= NULl;
-		
-		return get_userobject()->update( $user_id, $_data );
+		if ( is_callable( array( $_userobj, 'update' ) ) ) :
+
+			$_data				= array();
+			$_data['li_id']		= NULL;
+			$_data['li_token']	= NULl;
+
+			return $_userobj->update( $_uid, $_data );
+
+		else :
+
+			return TRUE;
+
+		endif;
 	}
 }
 
