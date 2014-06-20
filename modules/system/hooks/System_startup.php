@@ -140,11 +140,11 @@ class NAILS_System_startup
 
 			if ( APP_SSL_ROUTING && page_is_secure() ) :
 
-				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/shed/nails/' );
+				define( 'NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/common/' );
 
 			else :
 
-				define( 'NAILS_URL', BASE_URL . 'vendor/shed/nails/' );
+				define( 'NAILS_URL', BASE_URL . 'vendor/nailsapp/common/' );
 
 			endif;
 

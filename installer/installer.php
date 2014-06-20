@@ -66,7 +66,7 @@ class CORE_NAILS_Installer
 		//	Check Nails is there
 		if ( ! defined( 'NAILS_PATH' ) ) :
 
-			$_NAILS_PATH = './vendor/shed/nails/';
+			$_NAILS_PATH = './vendor/nailsapp/common/';
 
 		else :
 
@@ -707,7 +707,7 @@ class CORE_NAILS_Installer
 			$_abpath = str_replace( '[', '\[', $_abpath );
 			$_abpath = str_replace( ']', '\]', $_abpath );
 
-			$_files = glob( $_abpath . '/vendor/shed/nails/migrations/*_*.php' );
+			$_files = glob( $_abpath . '/vendor/nailsapp/common/migrations/*_*.php' );
 
 			$_file_count = count( $_files );
 
