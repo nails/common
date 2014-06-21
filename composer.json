@@ -24,15 +24,7 @@
 	"require":
 	{
 		"php": ">=5.4.0",
-		"aws/aws-sdk-php": "~2.4.5",
-		"dompdf/dompdf" : "~0.6.1",
-		"facebook/php-sdk": "v3.2.2",
-		"mustache/mustache": "v2.6.0",
-		"jublonet/codebird-php": "~2.4.1",
-		"masterexploder/phpthumb": "v2.0",
-		"sybio/gif-creator": "~1.0.0",
-		"sybio/gif-frame-extractor": "~1.0.0",
-		"stripe/stripe-php": "v1.11.0",
-		"omnipay/omnipay": "~2.0"
+		"nailsapp/module-admin" : "dev-master",
+		"nailsapp/module-system" : "dev-master"
 	}
 }
