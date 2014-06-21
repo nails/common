@@ -535,8 +535,27 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _autoload_items()
 	{
-		$_packages		= array();
-		$_packages[]	= NAILS_PATH;
+		$_packages = array();
+
+		$_nails_data = get_nails_data();
+
+		if ( ! empty( $_nails_data->modules ) && is_array( $_nails_data->modules ) ) :
+
+			foreach( $_nails_data->modules AS $module ) :
+
+				$_path = FCPATH . 'vendor/nailsapp/' . $module;
+
+				if ( is_dir( $_path ) ) :
+
+					$_packages[] = $_path;
+
+				endif;
+
+			endforeach;
+
+		endif;
+
+		$_packages[] = NAILS_PATH;
 
 		foreach ( $_packages AS $package ) :
 

@@ -1,66 +1,148 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * get_loaded_modules()
+ * get_potential_modules()
  *
- * Fetch the loaded modules for this app
+ * Fetch all the potentially available modules for this app
  *
  * @access	public
  * @param	none
  * @return	object
  */
-if ( ! function_exists( 'get_loaded_modules' ) )
+if ( ! function_exists( 'get_potential_modules' ) )
 {
-	function get_loaded_modules()
+	function get_potential_modules()
 	{
-		//	If we already know which modules are loaded then return that, save
+		//	If we already know which modules are available then return that, save
 		//	the [small] overhead of working out the modules again and again.
 
-		if ( isset( $GLOBALS['NAILS_LOADED_MODULES'] ) ) :
+		if ( isset( $GLOBALS['NAILS_POTENTIAL_MODULES'] ) ) :
 
-			return $GLOBALS['NAILS_LOADED_MODULES'];
+			return $GLOBALS['NAILS_POTENTIAL_MODULES'];
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		//	Determine which modules are to be loaded
-		$_app_modules	= explode( ',', APP_NAILS_MODULES );
-		$_app_modules	= array_unique( $_app_modules );
-		$_app_modules	= array_filter( $_app_modules );
+		$_nails_data	= get_nails_data();
+		$_modules		= array();
 
-		//	Prevent errors from being thrown if there are no elements
-		if ( $_app_modules ) :
+		if ( ! empty( $_nails_data ) && is_array( $_nails_data->modules ) ) :
 
-			$_app_modules	= array_combine( $_app_modules, $_app_modules );
+			foreach ( $_nails_data->modules AS $module ) :
+
+				$_modules[] = $module;
+
+			endforeach;
 
 		endif;
 
-		$_nails_modules = array();
-		foreach ( $_app_modules AS $module ) :
+		//	Save as a $GLOBAL for next time
+		$GLOBALS['NAILS_POTENTIAL_MODULES'] = $_modules;
 
-			preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
+		// --------------------------------------------------------------------------
 
-			if ( isset( $_matches[1] ) && isset( $_matches[3] ) ) :
+		return $_modules;
+	}
+}
 
-				$_nails_modules[$_matches[1]] = explode( '|', $_matches[3] );
 
-			elseif ( isset( $_matches[1] ) ) :
+// --------------------------------------------------------------------------
 
-				$_nails_modules[$_matches[1]] = array();
+
+/**
+ * get_available_modules()
+ *
+ * Fetch the avalable modules for this app
+ *
+ * @access	public
+ * @param	none
+ * @return	object
+ */
+if ( ! function_exists( 'get_available_modules' ) )
+{
+	function get_available_modules()
+	{
+		//	If we already know which modules are available then return that, save
+		//	the [small] overhead of working out the modules again and again.
+
+		if ( isset( $GLOBALS['NAILS_AVAILABLE_MODULES'] ) ) :
+
+			return $GLOBALS['NAILS_AVAILABLE_MODULES'];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_potential	= get_potential_modules();
+		$_modules	= array();
+
+		foreach ( $_potential AS $module ) :
+
+			if ( is_dir( FCPATH . 'vendor/nailsapp/' . $module ) ) :
+
+				$_modules[] = $module;
 
 			endif;
 
 		endforeach;
 
+		//	Save as a $GLOBAL for next time
+		$GLOBALS['NAILS_AVAILABLE_MODULES'] = $_modules;
+
 		// --------------------------------------------------------------------------
+
+		return $_modules;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * get_unavailable_modules()
+ *
+ * Fetch the unavalable modules for this app
+ *
+ * @access	public
+ * @param	none
+ * @return	object
+ */
+if ( ! function_exists( 'get_unavailable_modules' ) )
+{
+	function get_unavailable_modules()
+	{
+		//	If we already know which modules are unavailable then return that, save
+		//	the [small] overhead of working out the modules again and again.
+
+		if ( isset( $GLOBALS['NAILS_UNAVAILABLE_MODULES'] ) ) :
+
+			return $GLOBALS['NAILS_UNAVAILABLE_MODULES'];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_potential	= get_potential_modules();
+		$_modules	= array();
+
+		foreach ( $_potential AS $module ) :
+
+			if ( ! is_dir( FCPATH . 'vendor/nailsapp/' . $module ) ) :
+
+				$_modules[] = $module;
+
+			endif;
+
+		endforeach;
 
 		//	Save as a $GLOBAL for next time
-		$GLOBALS['NAILS_LOADED_MODULES'] = $_nails_modules;
+		$GLOBALS['NAILS_UNAVAILABLE_MODULES'] = $_modules;
 
 		// --------------------------------------------------------------------------
 
-		return $_nails_modules;
+		return $_modules;
 	}
 }
 
@@ -81,45 +163,15 @@ if ( ! function_exists( 'module_is_enabled' ) )
 {
 	function module_is_enabled( $module )
 	{
-		$_nails_modules = get_loaded_modules();
+		$_potential	= get_potential_modules();
 
-		// --------------------------------------------------------------------------
-
-		//	Allow wildcard
-		reset( $_nails_modules );
-		$_wildcard = key( $_nails_modules );
-
-		if ( $_wildcard == '*' ) :
+		if ( array_search( 'module-' . $module, $_potential ) !== FALSE ) :
 
 			return TRUE;
 
 		endif;
 
-		// --------------------------------------------------------------------------
-
-		preg_match( '/^(.*?)(\[(.*?)\])?$/', $module, $_matches );
-
-		$_module	= isset( $_matches[1] ) ? $_matches[1] : '';
-		$_submodule	= isset( $_matches[3] ) ? $_matches[3] : '';
-
-		if ( isset( $_nails_modules[$_module] ) ) :
-
-			//	Are we testing for a submodule in particular?
-			if ( $_submodule ) :
-
-				return array_search( $_submodule, $_nails_modules[$_module] ) !== FALSE;
-
-			else :
-
-				return TRUE;
-
-			endif;
-
-		else :
-
-			return FALSE;
-
-		endif;
+		return FALSE;
 	}
 }
 

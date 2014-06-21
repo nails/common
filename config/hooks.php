@@ -9,11 +9,22 @@
 | http://codeigniter.com/user_guide/general/hooks.html
 |
 */
+
+	if ( is_file( FCPATH . APPPATH . 'modules/system/hooks/' ) ) :
+
+		$_path = FCPATH . APPPATH . 'modules/system/hooks/';
+
+	else :
+
+		$_path = FCPATH . 'vendor/nailsapp/module-system/system/hooks/';
+
+	endif;
+
 	$hook['pre_system'] =	array(
 								'class'		=> 'System_startup',
 								'function'	=> 'init',
 								'filename'	=> 'System_startup.php',
-								'filepath'	=> is_file( FCPATH . APPPATH . 'modules/system/hooks/System_startup.php' ) ? FCPATH . APPPATH . 'modules/system/hooks/' : NAILS_PATH . 'modules/system/hooks/',
+								'filepath'	=> $_path,
 							);
 
 /* End of file hooks.php */
