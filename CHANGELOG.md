@@ -2,6 +2,12 @@
 
 ---
 
+## Version 0.2.3
+
+Release date: 21st June 2014
+- Removed dependencies, modules should depend on this not the other way around.
+
+
 ## Version 0.2.2
 
 Release date: 21st June 2014
