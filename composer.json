@@ -23,8 +23,6 @@
 	},
 	"require":
 	{
-		"php": ">=5.4.0",
-		"nailsapp/module-admin" : "dev-master",
-		"nailsapp/module-system" : "dev-master"
+		"php": ">=5.4.0"
 	}
 }
