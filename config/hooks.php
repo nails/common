@@ -11,7 +11,7 @@
 */
 	$hook['pre_system'] =	array(
 								'class'		=> 'System_startup',
-								'function'	=> 'define_constants',
+								'function'	=> 'init',
 								'filename'	=> 'System_startup.php',
 								'filepath'	=> is_file( FCPATH . APPPATH . 'modules/system/hooks/System_startup.php' ) ? FCPATH . APPPATH . 'modules/system/hooks/' : NAILS_PATH . 'modules/system/hooks/',
 							);

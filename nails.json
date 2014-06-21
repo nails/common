@@ -2,22 +2,19 @@
 	"version" : "0.2.1",
 	"released" : "2014-06-20",
 	"modules" :
-	{
-		"blog" :
-		{
-			"skins" :
-			[
-				"getting-started",
-				"classic"
-			]
-		},
-		"shop" :
-		{
-			"skins" :
-			[
-				"getting-started",
-				"classic"
-			]
-		}
-	}
+	[
+		"module-admin",
+		"module-api",
+		"module-auth",
+		"module-blog",
+		"module-cdn",
+		"module-cms",
+		"module-cron",
+		"module-deploy",
+		"module-email",
+		"module-shop",
+		"module-sitemap",
+		"module-system",
+		"module-testimonial"
+	]
 }
