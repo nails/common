@@ -1,0 +1,20 @@
+{
+	"version" : "0.2.2",
+	"released" : "2014-06-21",
+	"modules" :
+	[
+		"module-admin",
+		"module-api",
+		"module-auth",
+		"module-blog",
+		"module-cdn",
+		"module-cms",
+		"module-cron",
+		"module-deploy",
+		"module-email",
+		"module-shop",
+		"module-sitemap",
+		"module-system",
+		"module-testimonial"
+	]
+}

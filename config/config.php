@@ -400,21 +400,5 @@ $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips'] = '';
 
 
-/*
-|--------------------------------------------------------------------------
-| Modules Location
-|--------------------------------------------------------------------------
-|
-| The full path to where modules are located. Key is full path, value is
-| relative path from the application controllers directory to where the
-| modules are; because Nails might be anywhere we need to calculate the
-| relative path on the fly.
-|
-|
-*/
-
-$config['modules_locations'][APPPATH . 'modules/']		= '../modules/';
-$config['modules_locations'][NAILS_PATH . 'modules/']	= get_relative_path( FCPATH . APPPATH . 'controllers/', NAILS_PATH . 'modules/' );
-
 /* End of file config.php */
 /* Location: ./application/config/config.php */

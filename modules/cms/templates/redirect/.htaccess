@@ -1,7 +1,0 @@
-Order Deny,Allow
-Deny from All
-
-<Files "icon.png">
-	Order Deny,Allow
-	Allow from All
-</Files>

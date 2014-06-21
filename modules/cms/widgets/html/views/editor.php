@@ -1,1 +1,0 @@
-<textarea name="body"><?=isset( $body ) ? $body : '' ?></textarea>
