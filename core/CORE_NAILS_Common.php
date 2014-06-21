@@ -1,6 +1,42 @@
 <?php
 
 /**
+ * $NAILS_DATA is an object populated by System_startup from nails.json. This
+ * function provides an easy interface to this array when it's not in scope.
+ *
+ * @access	public
+ * @return	array	A reference to $NAILS_DATA
+ **/
+function &get_nails_data()
+{
+	global $NAILS_DATA;
+	return $NAILS_DATA;
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * $NAILS_DATA is an object populated by System_startup from nails.json,
+ * this function provides an easy interface to set this object when it's not
+ * in scope.
+ *
+ * @access	public
+ * @param mixed $data The data to set
+ * @return	void
+ **/
+function set_nails_data( $data )
+{
+	global $NAILS_DATA;
+	$NAILS_DATA = $data;
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
  * this function provides an easy interface to this array when it's not in scope.
  *

@@ -1,0 +1,23 @@
+{
+	"version" : "0.2.1",
+	"released" : "2014-06-20",
+	"modules" :
+	{
+		"blog" :
+		{
+			"skins" :
+			[
+				"getting-started",
+				"classic"
+			]
+		},
+		"shop" :
+		{
+			"skins" :
+			[
+				"getting-started",
+				"classic"
+			]
+		}
+	}
+}

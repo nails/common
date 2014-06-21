@@ -27,7 +27,7 @@
 	$lang['admin_rendered_in']		= 'Rendered in %s seconds';
 	$lang['admin_rendered_in_tip']	= 'That\'s hella fast!';
 	$lang['admin_powered_by']		= 'Powered by <a href="%s">Nails v%s</a>';
-	$lang['admin_powered_by_tip']	= 'A framework from Shed Collective';
+	$lang['admin_powered_by_tip']	= 'Released %s';
 
 	// --------------------------------------------------------------------------
 
