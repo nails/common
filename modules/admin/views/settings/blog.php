@@ -154,7 +154,7 @@
 
 					if ( $skins ) :
 
-						$_selected_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'getting-started';
+						$_selected_skin = app_setting( 'skin', 'blog' ) ? app_setting( 'skin', 'blog' ) : 'skin-blog-gettingstarted';
 
 						echo '<ul class="skins">';
 						foreach( $skins AS $skin ) :

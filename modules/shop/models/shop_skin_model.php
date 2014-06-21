@@ -19,6 +19,7 @@ class NAILS_Shop_skin_model extends NAILS_Model
 {
 	protected $_available;
 	protected $_skins;
+	protected $_skin_locations;
 
 	// --------------------------------------------------------------------------
 
@@ -33,22 +34,23 @@ class NAILS_Shop_skin_model extends NAILS_Model
 		$this->_skin_prefix	= 'skin-shop-';
 
 		//	Skin locations
+		//	The model will search these directories for skins; to add more directories extend this
 		//	This must be an array with 2 indexes:
-		//	`path`		=> The absolute path to the directory containing the skins (required)
-		//	`url`		=> The URL to access the skins (required)
+		//	`path`	=> The absolute path to the directory containing the skins (required)
+		//	`url`	=> The URL to access the skins (required)
+		//	`regex`	=> If the directory doesn't only contain skins then specify a regex to filter by
 
-		$this->_skin_locations		= array();
+		if ( empty( $this->_skin_locations) ) :
 
-		//	Nails skins
-		$this->_skin_locations[]	= array(
-										'path'	=> NAILS_PATH . 'modules/shop/skins',
-										'url'	=> NAILS_URL . 'modules/shop/skins'
-									);
+			$this->_skin_locations		= array();
+
+		endif;
 
 		//	'Official' skins
 		$this->_skin_locations[]	= array(
-										'path' => FCPATH . 'vendor/nailsapp',
-										'url' => site_url( 'vendor/nailsapp', page_is_secure() )
+										'path'	=> FCPATH . 'vendor/nailsapp',
+										'url'	=> site_url( 'vendor/nailsapp', page_is_secure() ),
+										'regex'	=> '/^skin-shop-(.*)$/'
 									);
 
 		//	App Skins
@@ -120,13 +122,15 @@ class NAILS_Shop_skin_model extends NAILS_Model
 
 				foreach( $_skins AS $skin ) :
 
-					//	Filter out non-skins
-					$_pattern = '/^' . preg_quote( $this->_skin_prefix, '/' ) . '(.*)$/';
+					//	do we need to filter out non skins?
+					if ( ! empty( $skin_location['regex'] ) ) :
 
-					if ( ! preg_match( $_pattern, $skin ) ) :
+						if ( ! preg_match( $skin_location['regex'], $skin ) ) :
 
-						log_message( 'debug', '"' . $skin . '" is not a shop skin.' );
-						continue;
+							log_message( 'debug', '"' . $skin . '" is not a shop skin.' );
+							continue;
+
+						endif;
 
 					endif;
 
@@ -227,13 +231,13 @@ class NAILS_Shop_skin_model extends NAILS_Model
 					//	All good!
 
 					//	Set the slug
-					$_config->slug	= preg_replace( '/^' . preg_quote( $this->_skin_prefix, '/' ) . '(.*?)$/', '$1', $skin );
+					$_config->slug = $skin;
 
 					//	Set the path
-					$_config->path	= $_path . $skin . '/';
+					$_config->path = $_path . $skin . '/';
 
 					//	Set the URL
-					$_config->url	= $skin_location['url'] . $skin . '/';
+					$_config->url = $skin_location['url'] . $skin . '/';
 
 					$this->_available[$skin] = $_config;
 
