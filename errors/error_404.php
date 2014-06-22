@@ -4,7 +4,7 @@
 		<title>404 Page Not Found</title>
 		<?php
 
-			require_once NAILS_PATH . 'errors/_styles.php';
+			require_once NAILS_COMMON_PATH . 'errors/_styles.php';
 
 		?>
 	</head>

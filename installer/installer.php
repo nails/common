@@ -74,7 +74,7 @@ class CORE_NAILS_Installer
 
 		endif;
 
-		if ( ! file_exists( $_NAILS_PATH . 'core/CORE_NAILS_Controller.php' ) ) :
+		if ( ! file_exists( $_NAILS_COMMON_PATH . 'core/CORE_NAILS_Controller.php' ) ) :
 
 			$this->_errors = '<strong>CANNOT FIND NAILS.</strong><br />Make sure you have run Composer.';
 

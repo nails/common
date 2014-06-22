@@ -7,7 +7,7 @@
 *
 */
 
-requirE_once NAILS_PATH . 'libraries/_resources/geoip_drivers/_Geo_ip_driver.php';
+requirE_once NAILS_COMMON_PATH . 'libraries/_resources/geoip_drivers/_Geo_ip_driver.php';
 
 class Geo_ip_driver_Nails_ip_services extends NAILS_Geo_ip_driver
 {

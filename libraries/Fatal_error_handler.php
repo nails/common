@@ -131,7 +131,7 @@ class Fatal_error_handler
 
 		else :
 
-			include_once NAILS_PATH . 'errors/error_fatal.php';
+			include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
 
 		endif;
 		exit(0);

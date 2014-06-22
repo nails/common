@@ -16,7 +16,7 @@
 
 	else :
 
-		$_path = FCPATH . 'vendor/nailsapp/module-system/system/hooks/';
+		$_path = NAILS_PATH . 'module-system/system/hooks/';
 
 	endif;
 

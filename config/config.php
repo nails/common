@@ -17,7 +17,7 @@
 if ( ! defined( 'BASE_URL' ) ) :
 
 	$_ERROR = 'The <code>BASE_URL</code> constant has not been set.';
-	include NAILS_PATH . 'errors/startup_error.php';
+	include NAILS_COMMON_PATH . 'errors/startup_error.php';
 
 endif;
 
@@ -305,7 +305,7 @@ else :
 	else :
 
 		$_ERROR = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> constants do not share the same domain, this can cause issues with sessions.';
-		include NAILS_PATH . 'errors/startup_error.php';
+		include NAILS_COMMON_PATH . 'errors/startup_error.php';
 
 	endif;
 

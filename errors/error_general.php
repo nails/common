@@ -4,7 +4,7 @@
 		<title>Error <?= $status_code . ' - ' . $heading?></title>
 		<?php
 
-			require_once NAILS_PATH . 'errors/_styles.php';
+			require_once NAILS_COMMON_PATH . 'errors/_styles.php';
 
 		?>
 	</head>

@@ -141,7 +141,7 @@ class Cdn
 
 			case 'AWS_LOCAL' :
 
-				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/aws_local.php';
+				include_once NAILS_COMMON_PATH . 'libraries/_resources/cdn_drivers/aws_local.php';
 				return 'Aws_local_CDN';
 
 			break;
@@ -151,7 +151,7 @@ class Cdn
 			case 'LOCAL':
 			default:
 
-				include_once NAILS_PATH . 'libraries/_resources/cdn_drivers/local.php';
+				include_once NAILS_COMMON_PATH . 'libraries/_resources/cdn_drivers/local.php';
 				return 'Local_CDN';
 
 			break;
@@ -3642,9 +3642,9 @@ class Cdn
 			//	small a file as possible.
 
 			$_file			= array();
-			$_file['txt']	= NAILS_PATH . 'assets/tests/cdn/txt.txt';
-			$_file['jpg']	= NAILS_PATH . 'assets/tests/cdn/jpg.jpg';
-			$_file['pdf']	= NAILS_PATH . 'assets/tests/cdn/pdf.pdf';
+			$_file['txt']	= NAILS_COMMON_PATH . 'assets/tests/cdn/txt.txt';
+			$_file['jpg']	= NAILS_COMMON_PATH . 'assets/tests/cdn/jpg.jpg';
+			$_file['pdf']	= NAILS_COMMON_PATH . 'assets/tests/cdn/pdf.pdf';
 
 			if ( empty( $_bucket->allowed_types ) ) :
 

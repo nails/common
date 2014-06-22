@@ -19,7 +19,7 @@ class Geo_ip
 	public function __construct( $config = array() )
 	{
 		$_driver		= ! empty( $config['driver'] ) ? $config['driver'] : 'Nails_ip_services';
-		$_driver_path	= ! empty( $config['driver_path'] ) ? $config['driver_path'] : NAILS_PATH . 'libraries/_resources/geoip_drivers/';
+		$_driver_path	= ! empty( $config['driver_path'] ) ? $config['driver_path'] : NAILS_COMMON_PATH . 'libraries/_resources/geoip_drivers/';
 		$_driver_path	.= substr( $_driver_path, -1 ) != '/' ? '/' : '';
 		$_driver_config	= ! empty( $config['driver_config'] ) ? (array) $config['driver_config'] : array();
 

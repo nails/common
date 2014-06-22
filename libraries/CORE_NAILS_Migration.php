@@ -331,7 +331,7 @@ class CORE_NAILS_Migration
 
 	public function set_nails()
 	{
-		$this->_migration_path		= NAILS_PATH . 'migrations/';
+		$this->_migration_path		= NAILS_COMMON_PATH . 'migrations/';
 		$this->_migration_path		= str_replace( ' ', '\ ', $this->_migration_path );
 		$this->_migration_path		= str_replace( '.', '\.', $this->_migration_path );
 		$this->_migration_path		= str_replace( '[', '\[', $this->_migration_path );

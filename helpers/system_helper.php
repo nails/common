@@ -79,7 +79,7 @@ if ( ! function_exists( 'get_available_modules' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( is_dir( FCPATH . 'vendor/nailsapp/' . $module ) ) :
+			if ( is_dir( NAILS_PATH . $module ) ) :
 
 				$_modules[] = $module;
 
@@ -129,7 +129,7 @@ if ( ! function_exists( 'get_unavailable_modules' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( ! is_dir( FCPATH . 'vendor/nailsapp/' . $module ) ) :
+			if ( ! is_dir( NAILS_PATH . $module ) ) :
 
 				$_modules[] = $module;
 

@@ -36,9 +36,9 @@ class Freeagent {
 		// --------------------------------------------------------------------------
 
 		//	Fire up and initialize the libraries
-		require NAILS_PATH . 'libraries/_resources/freeagent-api/base_api.php';
-		require NAILS_PATH . 'libraries/_resources/freeagent-api/freeagent_api.php';
-		require NAILS_PATH . 'libraries/_resources/freeagent-api/xml_generator.php';
+		require NAILS_COMMON_PATH . 'libraries/_resources/freeagent-api/base_api.php';
+		require NAILS_COMMON_PATH . 'libraries/_resources/freeagent-api/freeagent_api.php';
+		require NAILS_COMMON_PATH . 'libraries/_resources/freeagent-api/xml_generator.php';
 
 		// --------------------------------------------------------------------------
 

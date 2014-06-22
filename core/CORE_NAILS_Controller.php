@@ -35,7 +35,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 		if ( ! file_exists( FCPATH . 'vendor/autoload.php' ) ) :
 
 			$_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies.';
-			include NAILS_PATH . 'errors/startup_error.php';
+			include NAILS_COMMON_PATH . 'errors/startup_error.php';
 
 		endif;
 
@@ -264,9 +264,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 			 			require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
 
 			 		//	Fall back to the Nails maintenance page
-			 		elseif ( file_exists( NAILS_PATH . 'views/maintenance/maintenance.php' ) ):
+			 		elseif ( file_exists( NAILS_COMMON_PATH . 'views/maintenance/maintenance.php' ) ):
 
-			 			require NAILS_PATH . 'views/maintenance/maintenance.php';
+			 			require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
 
 			 		//	Fall back, back to plain text
 			 		else :
@@ -543,7 +543,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			foreach( $_nails_data->modules AS $module ) :
 
-				$_path = FCPATH . 'vendor/nailsapp/' . $module;
+				$_path = NAILS_PATH . $module;
 
 				if ( is_dir( $_path ) ) :
 
@@ -555,7 +555,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endif;
 
-		$_packages[] = NAILS_PATH;
+		$_packages[] = NAILS_COMMON_PATH . '';
 
 		foreach ( $_packages AS $package ) :
 

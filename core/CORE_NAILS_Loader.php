@@ -10,7 +10,7 @@
  */
 
 /* load the MX Loader class */
-require NAILS_PATH . 'MX/Loader.php';
+require NAILS_COMMON_PATH . 'MX/Loader.php';
 
 class CORE_NAILS_Loader extends MX_Loader {
 
@@ -144,9 +144,9 @@ class CORE_NAILS_Loader extends MX_Loader {
 			}
 
 			$ext_helper					= APPPATH.'helpers/'.config_item('subclass_prefix').$helper.EXT;
-			$_nails_ext_helper			= NAILS_PATH . 'helpers/'.config_item('subclass_prefix').$helper.EXT;
-			$_nails_ext_module_helper	= ($this->router->current_module()) ? NAILS_PATH . 'modules/'.$this->router->current_module().'/helpers/'.config_item('subclass_prefix').$helper.EXT : NULL;
-			$_nails_module_helper		= ($this->router->current_module()) ? NAILS_PATH . 'modules/'.$this->router->current_module().'/helpers/'.$helper.EXT : NULL;
+			$_nails_ext_helper			= NAILS_COMMON_PATH . 'helpers/'.config_item('subclass_prefix').$helper.EXT;
+			$_nails_ext_module_helper	= ($this->router->current_module()) ? NAILS_COMMON_PATH . 'modules/'.$this->router->current_module().'/helpers/'.config_item('subclass_prefix').$helper.EXT : NULL;
+			$_nails_module_helper		= ($this->router->current_module()) ? NAILS_COMMON_PATH . 'modules/'.$this->router->current_module().'/helpers/'.$helper.EXT : NULL;
 
 			// Is this a helper extension request?
 			if (file_exists($ext_helper))
@@ -268,8 +268,8 @@ class CORE_NAILS_Loader extends MX_Loader {
 
 		foreach (array(ucfirst($class), strtolower($class)) as $class)
 		{
-			$subclass	= APPPATH.'libraries/'.$subdir.config_item('subclass_prefix').$class.EXT;
-			$nailsclass = NAILS_PATH.'libraries/'.$subdir.'CORE_'.config_item('subclass_prefix').$class.EXT;
+			$subclass	= APPPATH . 'libraries/'.$subdir.config_item('subclass_prefix').$class.EXT;
+			$nailsclass = NAILS_COMMON_PATH . 'libraries/'.$subdir.'CORE_'.config_item('subclass_prefix').$class.EXT;
 
 			// Is this a class extension request?
 			if (file_exists($subclass))
