@@ -113,6 +113,63 @@ body
 			padding:15px 20px 20px 10px;
 		}
 
+		ul.modules
+		{
+			li
+			{
+				&.module,
+				&.sort-placeholder
+				{
+					padding:0;
+					margin:0;
+				}
+
+				&.module.ui-sortable-helper
+				{
+					.box
+					{
+						h2
+						{
+							cursor: url(https://mail.google.com/mail/images/2/closedhand.cur), move !important;
+
+							.handle
+							{
+								cursor: url(https://mail.google.com/mail/images/2/closedhand.cur), move !important;
+								.opacity(1);
+							}
+						}
+					}
+				}
+
+				&.sort-placeholder
+				{
+					background:#FFF;
+				}
+
+				&:first-of-type
+				{
+					.box
+					{
+						.border-radius( 3px, 0, 0, 3px );
+					}
+				}
+
+				&:last-of-type
+				{
+					.box
+					{
+						.border-radius( 0, 3px, 3px, 0 );
+						border-bottom:0;
+
+						ul
+						{
+							.border-radius( 0, 3px, 3px, 0 );
+						}
+					}
+				}
+			}
+		}
+
 		.box
 		{
 			background: #000;
@@ -132,8 +189,26 @@ body
 				padding: 8px 12px 8px 32px;
 				color: #fff;
 				font-weight: bold;
-
+				position:relative;
 				background:url(../img/admin/icons/settings-icon.png) 7px center no-repeat;
+
+				.handle
+				{
+					position: absolute;
+					left: 3px;
+					top: 3px;
+					font-size: 1.5em;
+					font-weight: 700;
+					.opacity(0);
+					background: #000;
+					padding: 4px;
+
+					&:hover
+					{
+						.opacity(1);
+						cursor: url(https://mail.google.com/mail/images/2/openhand.cur), move !important;
+					}
+				}
 
 				.toggle
 				{
@@ -295,22 +370,6 @@ body
 				{
 					background: #FF0000;
 					color:#FFF;
-				}
-			}
-
-			&.first
-			{
-				.border-radius( 3px, 0, 0, 3px );
-			}
-
-			&.last
-			{
-				.border-radius( 0, 3px, 3px, 0 );
-				border-bottom:0;
-
-				ul
-				{
-					.border-radius( 0, 3px, 3px, 0 );
 				}
 			}
 

@@ -20,16 +20,16 @@
 
 	<!--	NAILS JS GLOBALS	-->
 	<script style="text/javascript">
-		window.ENVIRONMENT				= '<?=ENVIRONMENT?>';
-		window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
-		window.NAILS					= {};
-		window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
-		window.NAILS.LANG				= {};
-		window.NAILS.USER				= {};
-		window.NAILS.USER.ID			= <?=active_user( 'id' )?>;
-		window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
-		window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
-		window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
+		window.ENVIRONMENT		= '<?=ENVIRONMENT?>';
+		window.SITE_URL			= '<?=site_url( '', page_is_secure() )?>';
+		window.NAILS			= {};
+		window.NAILS.URL		= '<?=NAILS_ASSETS_URL?>';
+		window.NAILS.LANG		= {};
+		window.NAILS.USER		= {};
+		window.NAILS.USER.ID	= <?=active_user( 'id' )?>;
+		window.NAILS.USER.FNAME	= '<?=active_user( 'first_name' )?>';
+		window.NAILS.USER.LNAME	= '<?=active_user( 'last_name' )?>';
+		window.NAILS.USER.EMAIL	= '<?=active_user( 'email' )?>';
 	</script>
 
 	<noscript>
@@ -118,10 +118,11 @@
 	<div class="sidebar">
 		<div class="padder">
 
-		<div class="nav-search">
-		<input type="search" placeholder="Type to search menu" />
-		</div>
+			<div class="nav-search">
+				<input type="search" placeholder="Type to search menu" />
+			</div>
 
+		<ul class="modules">
 		<?php
 
 			$_acl			= active_user( 'acl' );
@@ -199,7 +200,6 @@
 
 				// --------------------------------------------------------------------------
 
-
 				//	Render the options (if there are any)
 				if ( $_options ) :
 
@@ -211,106 +211,140 @@
 
 					// --------------------------------------------------------------------------
 
+					//	Dashboard is not sortable
+					$_sortable = $module == 'dashboard' ? 'no-sort' : '';
+
+					// --------------------------------------------------------------------------
+
+					//	Initial open/close state?
+					$_user_nav_pref = @unserialize( active_user( 'admin_nav' ) );
+
+					if ( $_user_nav_pref ) :
+
+						if ( empty( $_user_nav_pref->{$module}->open ) ) :
+
+							$_state = 'closed';
+
+						else :
+
+							$_state = 'open';
+
+						endif;
+
+					else :
+
+						//	Closed by default
+						$_state = 'closed';
+
+					endif;
+
+
 					?>
-					<div class="box <?=$_class?>" id="box_<?=url_title( $config->name )?>">
-						<h2 class="<?=$module?>">
-							<?=$config->name?>
-							<a href="#" class="toggle">
-								<span class="close"><?=lang( 'action_close' )?></span>
-								<span class="open"><?=lang( 'action_open' )?></span>
-							</a>
-						</h2>
-						<div class="box-container">
-							<ul>
-							<?php
+					<li class="module <?=$_sortable?>" data-module="<?=$module?>" data-initial-state="<?=$_state?>">
+						<div class="box <?=$_class?>" id="box_<?=url_title( $config->name )?>">
+							<h2 class="<?=$module?>">
+								<?=$_sortable !== 'no-sort' ? '<span class="handle ion-drag"></span>' : '';?>
+								<?=$config->name?>
+								<a href="#" class="toggle">
+									<span class="close"><?=lang( 'action_close' )?></span>
+									<span class="open"><?=lang( 'action_open' )?></span>
+								</a>
+							</h2>
+							<div class="box-container">
+								<ul>
+								<?php
 
-								foreach( $_options AS $option ) :
+									foreach( $_options AS $option ) :
 
-									//	Add to the mobile menu
-									$_mobile_menu[$module]->subs[$option->method]			= new stdClass();
-									$_mobile_menu[$module]->subs[$option->method]->label	= $option->label;
-									$_mobile_menu[$module]->subs[$option->method]->url		= $option->url;
+										//	Add to the mobile menu
+										$_mobile_menu[$module]->subs[$option->method]			= new stdClass();
+										$_mobile_menu[$module]->subs[$option->method]->label	= $option->label;
+										$_mobile_menu[$module]->subs[$option->method]->url		= $option->url;
 
-								?>
 
-								<li class="<?=$option->is_active?>">
+										//	Render
+										echo '<li class="' . $option->is_active . '">';
 
-									<!-- LINK -->
-									<?=anchor( $option->url, $option->label )?>
+											//	Link
+											echo anchor( $option->url, $option->label );
 
-									<!-- NOTIFICATION -->
-									<?php
+											//	Notification
+											switch ( $option->notification->type ) :
 
-										switch ( $option->notification->type ) :
+												case 'split' :
 
-											case 'split' :
+													$_mobile_notification	= array();
 
-												$_mobile_notification	= array();
+													foreach ( $option->notification->options AS $notification ) :
 
-												foreach ( $option->notification->options AS $notification ) :
+														$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'neutral';
+														$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
 
-													$_split_type 	= isset( $notification['type'] ) ? $notification['type'] : 'neutral';
-													$_split_title	= isset( $notification['title'] ) ? $notification['title'] : '';
+														if ( $notification['value'] ) :
 
-													if ( $notification['value'] ) :
+															echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
 
-														echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
+															//	Update mobile menu
+															if ( $_split_title ) :
 
-														//	Update mobile menu
-														if ( $_split_title ) :
+																$_mobile_notification[] = $_split_title . ': ' . number_format( $notification['value'] );
 
-															$_mobile_notification[] = $_split_title . ': ' . number_format( $notification['value'] );
+															else :
+
+																$_mobile_notification[] = number_format( $notification['value'] );
+
+															endif;
+
+														endif;
+
+													endforeach;
+
+													$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . implode( ', ', $_mobile_notification ) . ')';
+
+												break;
+
+												default :
+
+													if ( $option->notification->value ) :
+
+														echo '<span class="indicator ' . $option->notification->type . '" title="' . $option->notification->title . '" rel="tipsy-right">' . number_format( $option->notification->value ) . '</span>';
+
+														if ( $option->notification->title ) :
+
+															$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . $option->notification->title . ': ' . number_format( $option->notification->value ) . ')';
 
 														else :
 
-															$_mobile_notification[] = number_format( $notification['value'] );
+															$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . number_format( $option->notification->value ) . ')';
 
 														endif;
 
 													endif;
 
-												endforeach;
+												break;
 
-												$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . implode( ', ', $_mobile_notification ) . ')';
+											endswitch;
 
-											break;
+											echo '<div class="clear"></div>';
 
-											default :
+										echo '</li>';
 
-												if ( $option->notification->value ) :
+									endforeach;
 
-													echo '<span class="indicator ' . $option->notification->type . '" title="' . $option->notification->title . '" rel="tipsy-right">' . number_format( $option->notification->value ) . '</span>';
-
-													if ( $option->notification->title ) :
-
-														$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . $option->notification->title . ': ' . number_format( $option->notification->value ) . ')';
-
-													else :
-
-														$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . number_format( $option->notification->value ) . ')';
-
-													endif;
-
-												endif;
-
-											break;
-
-										endswitch;
-
-									?>
-
-									<div class="clear"></div>
-								</li>
-
-							<?php endforeach; ?>
-							</ul>
+								?>
+								</ul>
+							</div>
 						</div>
-					</div>
+					</li>
 					<?php
 
 				endif;
 
 			endforeach;
+
+		?>
+		</ul>
+		<?php
 
 			// --------------------------------------------------------------------------
 

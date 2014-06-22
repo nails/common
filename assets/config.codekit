@@ -45825,6 +45825,17 @@
 		"outputPathIsSetByUser": 0,
 		"processed": 0
 		},
+	"\/img\/admin\/modules\/shop\/manager\/no-image.jpg": {
+		"fileType": 16384,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 605,
+		"inputAbbreviatedPath": "\/img\/admin\/modules\/shop\/manager\/no-image.jpg",
+		"outputAbbreviatedPath": "\/img\/admin\/modules\/shop\/manager\/no-image.jpg",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
 	"\/img\/admin\/sort\/asc-active.png": {
 		"fileType": 32768,
 		"ignore": 0,
@@ -49212,7 +49223,7 @@
 	"javascriptOutputStyle": 1,
 	"javascriptOutputSuffix": ".min",
 	"javascriptSyntaxCheckerStyle": 1,
-	"jsCheckerReservedNamesString": "_nails,_nails_admin,Mustache,CKEDITOR",
+	"jsCheckerReservedNamesString": "_nails,_nails_admin,_nails_api,Mustache,CKEDITOR",
 	"jsHintFlags2": {
 		"asi": {
 			"active": 0,

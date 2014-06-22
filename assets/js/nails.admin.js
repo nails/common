@@ -45,11 +45,19 @@ NAILS_Admin = function()
 		//	Bind click events
 		$('.box .toggle').on('click', function(e) {
 
-			if ($(this).parents('.box').hasClass('open')) {
-				_this._open_box(this, true, true);
-			} else {
-				_this._close_box(this, true, true);
+			if ($(this).parents('.box').hasClass('open'))
+			{
+				_this._open_box(this, true);
 			}
+			else
+			{
+				_this._close_box(this, true);
+			}
+
+			// --------------------------------------------------------------------------
+
+			//	Save user's preference
+			_this._save_nav();
 
 			// --------------------------------------------------------------------------
 
@@ -60,29 +68,51 @@ NAILS_Admin = function()
 		// --------------------------------------------------------------------------
 
 		//	Set initial state of each box
-		var _id, _state, _height, _container;
+		var _state, _toggle, _height, _container;
 
-		$('.box .toggle').each(function() {
+		$('ul.modules li.module').each(function() {
 
-			_id		= $(this).parents('.box').attr('id');
-			_state	= _this._get('adminbox-' + _id);
+			_state = $(this).data( 'initial-state' );
 
 			// --------------------------------------------------------------------------
 
 			//	Determine height of each box and set it
-			_container = $(this).parents('.box').find('.box-container');
-			_height = _container.outerHeight();
+			_toggle		= $(this).find( '.toggle' );
+			_container	= $(this).find('.box-container');
+			_height		= _container.outerHeight();
 
-			$(this).attr('data-height', _height);
+			_toggle.attr('data-height', _height);
 
 			// --------------------------------------------------------------------------
 
-			if (_state === 'open') {
-				_this._open_box(this, false, false);
-			} else {
-				_this._close_box(this, false, false);
+			if ( _state === 'open' )
+			{
+				_this._open_box(_toggle, false);
+			}
+			else
+			{
+				_this._close_box(_toggle, false);
 			}
 
+		});
+
+		// --------------------------------------------------------------------------
+
+		//	Sortables!
+		$( 'ul.modules' ).sortable({
+			axis:'y',
+			placeholder: 'sort-placeholder',
+			items: 'li.module:not(.no-sort)',
+			handle: '.handle',
+			containment: 'parent',
+			start: function(e, ui )
+			{
+				ui.placeholder.height(ui.helper.outerHeight());
+			},
+			stop: function()
+			{
+				_this._save_nav();
+			}
 		});
 	};
 
@@ -90,10 +120,40 @@ NAILS_Admin = function()
 	// --------------------------------------------------------------------------
 
 
-	this._open_box = function(toggle, save, animate) {
-		var _save, _id, _height;
+	this._save_nav = function()
+	{
+		var _data, _call, _open;
 
-		_save = save ? true : false;
+		_data = {};
+
+		$( 'ul.modules li.module' ).each(function()
+		{
+			_open = $( '.box', this ).hasClass( 'closed' );
+			_data[$(this).data( 'module' )] = {
+				open : _open
+			};
+		});
+
+		_call =
+		{
+			controller : 'admin',
+			method: 'nav/save',
+			data :
+			{
+				preferences : _data
+			}
+		};
+
+		_nails_api.call(_call);
+	};
+
+
+	// --------------------------------------------------------------------------
+
+
+	this._open_box = function(toggle, animate) {
+		var _id, _height;
+
 		_id = $(toggle).parents('.box').attr('id');
 
 		// --------------------------------------------------------------------------
@@ -111,22 +171,15 @@ NAILS_Admin = function()
 		} else {
 			$(toggle).parents('.box').find('.box-container').height(_height);
 		}
-
-		// --------------------------------------------------------------------------
-
-		if (_save) {
-			this._save('adminbox-' + _id, 'open');
-		}
 	};
 
 
 	// --------------------------------------------------------------------------
 
 
-	this._close_box = function(toggle, save, animate) {
-		var _save, _id;
+	this._close_box = function(toggle, animate) {
+		var _id;
 
-		_save = save ? true : false;
 		_id = $(toggle).parents('.box').attr('id');
 
 		// --------------------------------------------------------------------------
@@ -141,12 +194,6 @@ NAILS_Admin = function()
 			});
 		} else {
 			$(toggle).parents('.box').find('.box-container').height(0);
-		}
-
-		// --------------------------------------------------------------------------
-
-		if (_save) {
-			this._save('adminbox-' + _id, 'closed');
 		}
 	};
 
@@ -241,9 +288,9 @@ NAILS_Admin = function()
 					var _state = _this._get('adminbox-' + $(this).parents('.box').attr('id'));
 
 					if (_state === 'closed') {
-						_this._close_box(this, false, false);
+						_this._close_box(this, false);
 					} else {
-						_this._open_box(this, false, false);
+						_this._open_box(this, false);
 					}
 
 				});
