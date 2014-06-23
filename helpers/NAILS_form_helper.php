@@ -403,7 +403,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		// --------------------------------------------------------------------------
 
 		//	Quick script to instantiate the field, not indented due to heredoc syntax
-		get_instance()->load->library( 'cdn' );
+		get_instance()->load->library( 'cdn/cdn' );
 		$_scheme = get_instance()->cdn->url_serve_scheme( TRUE );
 
 		$_scheme = str_replace( '{{bucket}}', $_field['bucket'], $_scheme );
@@ -573,7 +573,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		// --------------------------------------------------------------------------
 
 		//	Quick script to instantiate the field, not indented due to heredoc syntax
-		get_instance()->load->library( 'cdn' );
+		get_instance()->load->library( 'cdn/cdn' );
 		$_scheme = get_instance()->cdn->url_scale_scheme();
 
 		$_scheme = str_replace( '{{width}}', 100, $_scheme );
@@ -711,7 +711,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		// --------------------------------------------------------------------------
 
 		//	Quick script to instantiate the field, not indented due to heredoc syntax
-		get_instance()->load->library( 'cdn' );
+		get_instance()->load->library( 'cdn/cdn' );
 
 		$_movie_url		= NAILS_ASSETS_URL . 'swf/jquery.uploadify/uploadify.swf';
 		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php', page_is_secure() );

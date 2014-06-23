@@ -27,11 +27,15 @@ if ( ! function_exists( 'get_potential_modules' ) )
 		$_nails_data	= get_nails_data();
 		$_modules		= array();
 
-		if ( ! empty( $_nails_data ) && is_array( $_nails_data->modules ) ) :
+		if ( ! empty( $_nails_data ) ) :
 
-			foreach ( $_nails_data->modules AS $module ) :
+			foreach ( $_nails_data->modules AS $vendor => $modules ) :
 
-				$_modules[] = $module;
+				foreach ( $modules AS $module ) :
+
+					$_modules[] = $vendor . '/' . $module;
+
+				endforeach;
 
 			endforeach;
 
@@ -79,7 +83,7 @@ if ( ! function_exists( 'get_available_modules' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( is_dir( NAILS_PATH . $module ) ) :
+			if ( is_dir( FCPATH . 'vendor/' . $module ) ) :
 
 				$_modules[] = $module;
 
@@ -129,7 +133,7 @@ if ( ! function_exists( 'get_unavailable_modules' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( ! is_dir( NAILS_PATH . $module ) ) :
+			if ( ! is_dir( FCPATH . 'vendor/' . $module ) ) :
 
 				$_modules[] = $module;
 
@@ -163,9 +167,9 @@ if ( ! function_exists( 'module_is_enabled' ) )
 {
 	function module_is_enabled( $module )
 	{
-		$_potential	= get_potential_modules();
+		$_potential	= get_available_modules();
 
-		if ( array_search( 'module-' . $module, $_potential ) !== FALSE ) :
+		if ( array_search( 'nailsapp/module-' . $module, $_potential ) !== FALSE ) :
 
 			return TRUE;
 

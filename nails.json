@@ -2,19 +2,27 @@
 	"version" : "0.2.3",
 	"released" : "2014-06-21",
 	"modules" :
-	[
-		"module-admin",
-		"module-api",
-		"module-auth",
-		"module-blog",
-		"module-cdn",
-		"module-cms",
-		"module-cron",
-		"module-deploy",
-		"module-email",
-		"module-shop",
-		"module-sitemap",
-		"module-system",
-		"module-testimonial"
-	]
+	{
+		"nailsapp" :
+		[
+			"module-admin",
+			"module-api",
+			"module-asset",
+			"module-auth",
+			"module-blog",
+			"module-cdn",
+			"module-cms",
+			"module-cron",
+			"module-curl",
+			"module-deploy",
+			"module-email",
+			"module-event",
+			"module-geo-ip",
+			"module-pdf",
+			"module-shop",
+			"module-sitemap",
+			"module-system",
+			"module-testimonial"
+		]
+	}
 }

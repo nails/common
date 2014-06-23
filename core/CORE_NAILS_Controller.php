@@ -539,17 +539,21 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		$_nails_data = get_nails_data();
 
-		if ( ! empty( $_nails_data->modules ) && is_array( $_nails_data->modules ) ) :
+		if ( ! empty( $_nails_data->modules ) ) :
 
-			foreach( $_nails_data->modules AS $module ) :
+			foreach( $_nails_data->modules AS $vendor => $modules ) :
 
-				$_path = NAILS_PATH . $module;
+				foreach ( $modules AS $module ) :
 
-				if ( is_dir( $_path ) ) :
+					$_path = FCPATH . 'vendor/' . $vendor . '/' . $module . '/';
 
-					$_packages[] = $_path;
+					if ( is_dir( $_path ) ) :
 
-				endif;
+						$_packages[] = $_path;
+
+					endif;
+
+				endforeach;
 
 			endforeach;
 
@@ -560,60 +564,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		foreach ( $_packages AS $package ) :
 
 			$this->load->add_package_path( $package );
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		$_libraries		= array();
-
-		//	Test that $_SERVER is available, the session library needs this
-		//	Generally not available when running on the command line. If it's
-		//	not available then load up the faux session which has the same methods
-		//	as the session library, but behave as if logged out - comprende?
-
-		if ( $this->input->server( 'REMOTE_ADDR' ) ) :
-
-			$_libraries[]	= 'session';
-
-		else :
-
-			$_libraries[]	= array( 'faux_session', 'session' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	STOP! Before we load the session library, we need to check if we're using
-		//	the database. If we are then check if `sess_table_name` is "nails_session".
-		//	If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
-
-		$_sess_table_name = $this->config->item( 'sess_table_name' );
-
-		if ( $_sess_table_name === 'nails_session' && NAILS_DB_PREFIX !== 'nails_' ) :
-
-			$_sess_table_name = str_replace( 'nails_', NAILS_DB_PREFIX, $_sess_table_name );
-			$this->config->set_item( 'sess_table_name', $_sess_table_name );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_libraries[]	= 'encrypt';
-		$_libraries[]	= 'asset';
-		$_libraries[]	= 'logger';
-
-		foreach ( $_libraries AS $library ) :
-
-			if ( is_array( $library ) ) :
-
-				$this->load->library( $library[0], array(), $library[1] );
-
-			else :
-
-				$this->load->library( $library );
-
-			endif;
 
 		endforeach;
 
@@ -678,6 +628,61 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		endforeach;
 
+		// --------------------------------------------------------------------------
+
+		$_libraries = array();
+
+		//	Test that $_SERVER is available, the session library needs this
+		//	Generally not available when running on the command line. If it's
+		//	not available then load up the faux session which has the same methods
+		//	as the session library, but behaves as if logged out - comprende?
+
+		if ( $this->input->server( 'REMOTE_ADDR' ) ) :
+
+			$_libraries[] = 'session';
+
+		else :
+
+			$_libraries[] = array( 'auth/faux_session', 'session' );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	STOP! Before we load the session library, we need to check if we're using
+		//	the database. If we are then check if `sess_table_name` is "nails_session".
+		//	If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
+
+		$_sess_table_name = $this->config->item( 'sess_table_name' );
+
+		if ( $_sess_table_name === 'nails_session' && NAILS_DB_PREFIX !== 'nails_' ) :
+
+			$_sess_table_name = str_replace( 'nails_', NAILS_DB_PREFIX, $_sess_table_name );
+			$this->config->set_item( 'sess_table_name', $_sess_table_name );
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_libraries[]	= 'encrypt';
+		$_libraries[]	= 'asset/asset';
+		$_libraries[]	= 'email/emailer';
+		$_libraries[]	= 'event/event';
+		$_libraries[]	= 'logger';
+
+		foreach ( $_libraries AS $library ) :
+
+			if ( is_array( $library ) ) :
+
+				$this->load->library( $library[0], array(), $library[1] );
+
+			else :
+
+				$this->load->library( $library );
+
+			endif;
+
+		endforeach;
 
 		// --------------------------------------------------------------------------
 
