@@ -674,7 +674,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all( $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE, $_caller = 'GET_ALL' )
+	public function get_all( $page = NULL, $per_page = NULL, $data = array(), $include_deleted = FALSE, $_caller = 'GET_ALL' )
 	{
 		if ( ! $this->_table ) :
 
@@ -750,7 +750,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all_flat( $page = NULL, $per_page = NULL, $data = NULL, $include_deleted = FALSE, $_caller = 'GET_ALL_FLAT' )
+	public function get_all_flat( $page = NULL, $per_page = NULL, $data = array(), $include_deleted = FALSE, $_caller = 'GET_ALL_FLAT' )
 	{
 		$_items	= $this->get_all( $page, $per_page, $data, $include_deleted, $_caller );
 		$_out	= array();
@@ -804,7 +804,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_id( $id, $data = NULL )
+	public function get_by_id( $id, $data = array() )
 	{
 		if ( ! $this->_table ) :
 
@@ -846,7 +846,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return array
 	 **/
-	public function get_by_ids( $ids, $data = NULL )
+	public function get_by_ids( $ids, $data = array() )
 	{
 		if ( ! $this->_table ) :
 
@@ -880,7 +880,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_slug( $slug, $data = NULL )
+	public function get_by_slug( $slug, $data = array() )
 	{
 		if ( ! $this->_table ) :
 
@@ -922,7 +922,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return array
 	 **/
-	public function get_by_slugs( $slugs, $data = NULL )
+	public function get_by_slugs( $slugs, $data = array() )
 	{
 		if ( ! $this->_table ) :
 
@@ -961,7 +961,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_id_or_slug( $id_slug, $data = NULL )
+	public function get_by_id_or_slug( $id_slug, $data = array() )
 	{
 		if ( is_numeric( $id_slug ) ) :
 
@@ -985,7 +985,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data any data to pass to _getcount_common()
 	 * @return int
 	 **/
-	public function count_all( $data = NULL )
+	public function count_all( $data = array() )
 	{
 		if ( ! $this->_table ) :
 
