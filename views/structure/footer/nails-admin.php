@@ -14,6 +14,6 @@
 		<div class="clear"></div>
 
 		<!--	GLOBAL JS	-->
-		<?php $this->asset->output( 'js-inline' ); ?>
+		<?php $this->asset->output( 'JS-INLINE' ); ?>
 	</body>
 </html>

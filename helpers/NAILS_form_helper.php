@@ -713,7 +713,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		//	Quick script to instantiate the field, not indented due to heredoc syntax
 		get_instance()->load->library( 'cdn/cdn' );
 
-		$_movie_url		= NAILS_ASSETS_URL . 'swf/jquery.uploadify/uploadify.swf';
+		$_movie_url		= NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
 		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php', page_is_secure() );
 		$_upload_token	= get_instance()->cdn->generate_api_upload_token();
 		$_bucket		= $_field_bucket;
