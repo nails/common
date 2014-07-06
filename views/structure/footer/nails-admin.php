@@ -12,6 +12,9 @@
 
 		<!--	CLEARFIX	-->
 		<div class="clear"></div>
+		<div class="background">
+			<div class="sidebar admin-branding-background-primary"></div>
+		</div>
 
 		<!--	GLOBAL JS	-->
 		<?php $this->asset->output( 'JS-INLINE' ); ?>

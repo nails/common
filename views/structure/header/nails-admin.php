@@ -50,6 +50,7 @@
 	</script>
 
 	<!--	ASSETS	-->
+	<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
 	<?php
 
 		echo $this->asset->output( 'CSS' );
@@ -59,70 +60,117 @@
 	?>
 	<link rel="stylesheet" type="text/css" media="print" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.print.css'?>" />
 
+	<?php
+
+		$_primary	= app_setting( 'primary_colour', 'admin' )		? app_setting( 'primary_colour', 'admin' )		: '#171D20';
+		$_secondary	= app_setting( 'secondary_colour', 'admin' )	? app_setting( 'secondary_colour', 'admin' )	: '#515557';
+		$_highlight	= app_setting( 'highlight_colour', 'admin' )	? app_setting( 'highlight_colour', 'admin' )	: '#F09634';
+
+	?>
+	<style type="text/css">
+
+		.admin-branding-text-primary
+		{
+			color: <?=$_primary?>;
+		}
+		.admin-branding-background-primary
+		{
+			background: <?=$_primary?>;
+		}
+
+		.admin-branding-text-secondary
+		{
+			color: <?=$_secondary?>;
+		}
+		.admin-branding-background-secondary
+		{
+			background: <?=$_secondary?>;
+		}
+
+		.admin-branding-text-highlight
+		{
+			color: <?=$_highlight?>;
+		}
+		.admin-branding-background-highlight
+		{
+			background: <?=$_highlight?>;
+		}
+
+		table thead tr th
+		{
+			background-color : <?=$_primary?>;
+		}
+
+	</style>
+
 </head>
 
 <body class="<?=empty( $loaded_modules ) ? 'no-modules' : ''?>">
 
 	<div class="header">
 
-		<ul class="left">
+		<div class="app-name">
+			<a href="<?=site_url( 'admin' )?>">
+				<span class="app-name admin-branding-text-primary">
+					<?=APP_NAME?>
+				</span>
+			</a>
+		</div>
 
-			<li style="display:block;margin-bottom:4px;">
-				<a href="<?=site_url( 'admin' )?>" style="font-size:18px;font-weight:bold;color:#fff;">
-					<span class="app-name"><?=APP_NAME?></span>
-					<?=lang( 'admin_word_long' )?>
-				</a>
-			</li>
-			<li><?=anchor( 'admin', lang( 'admin_home' ) )?></li>
-			<?=! empty( $page->module->name ) ? '<li>&rsaquo;</li><li>' . $page->module->name : NULL?></li>
-			<?=! empty( $page->title ) ? '<li>&rsaquo;</li><li>' . $page->title : NULL?></li>
-		</ul>
+		<div class="user-shortcuts">
 
-		<ul class="right shaded">
-			<li>
-				<?=anchor( '', lang( 'admin_switch_frontend' ) )?>
-			</li>
-			<li style="color:#999;">
-				<?php
+			<div class="shortcut loggedin-as" rel="tipsy" title="Logged in as <?=active_user( 'first_name,last_name' )?>">
+			<?php
 
-				//	Logged in as
-				$_link = anchor( 'admin/accounts/edit/' . active_user( 'id' ), active_user( 'first_name' ), 'class="fancybox" data-fancybox-type="iframe"' );
-				echo lang( 'admin_loggedin_as', $_link );
+				$_link = 'admin/accounts/edit/' . active_user( 'id' );
+				$_attr = 'class="fancybox admin-branding-text-primary" data-fancybox-type="iframe"';
 
 				if ( active_user( 'profile_img' ) ) :
 
-					echo img( array( 'src' => cdn_thumb( active_user( 'profile_img' ), 16, 16 ), 'class' => 'avatar' ) );
+					$_img = img( array( 'src' => cdn_thumb( active_user( 'profile_img' ), 30, 30 ), 'class' => 'avatar' ) );
+
+				else :
+
+					$_img =  img( array( 'src' => cdn_blank_avatar( 30, 30 ), 'class' => 'avatar' ) );
 
 				endif;
 
-				// --------------------------------------------------------------------------
+				echo anchor( $_link, '<span class="name">' . active_user( 'first_name,last_name' ) . '</span>' . $_img, $_attr );
+
+			?>
+			</div>
+
+			<div class="shortcut to-frontend" rel="tipsy" title="Switch to front end">
+				<?=anchor( '', '<span class="ion-reply-all"></span>', 'class="admin-branding-text-primary"' )?>
+			</div>
+
+			<?php
 
 				$_admin_recovery = $this->session->userdata( 'admin_recovery' );
 
 				if ( $this->session->userdata( 'admin_recovery' ) ) :
 
-					echo lang( 'admin_admin_recover', array( site_url( 'auth/override/login_as/' . $_admin_recovery->id . '/' . $_admin_recovery->hash ), $_admin_recovery->name ) );
+					echo '<div class="shortcut admin-recovery" rel="tipsy" title="Log back in as ' . $_admin_recovery->name . '">';
+						echo anchor( 'auth/override/login_as/' . $_admin_recovery->id . '/' . $_admin_recovery->hash, '<span class="ion-arrow-return-right"></span>', 'class="admin-branding-text-primary"' );
+					echo '</div>';
 
 				endif;
 
-				?>
-			</li>
-			<li class="logout">
-				<?=anchor( 'auth/logout', lang( 'action_logout' ) )?>
-			</li>
-		</ul>
+			?>
 
-		<!--	CLEARFIX	-->
-		<div class="clear"></div>
+			<div class="shortcut logout" rel="tipsy" title="Log out">
+				<?=anchor( 'auth/logout', '<span class="ion-power"></span>', 'class="admin-branding-text-primary"' )?>
+			</div>
+
+		</div>
 
 	</div>
 
 	<div class="sidebar">
-		<div class="padder">
 
-			<div class="nav-search">
-				<input type="search" placeholder="Type to search menu" />
-			</div>
+		<div class="nav-search admin-branding-background-secondary">
+			<input type="search" placeholder="Type to search menu" />
+		</div>
 
 		<ul class="modules">
 		<?php
@@ -242,14 +290,28 @@
 
 
 					?>
-					<li class="module <?=$_sortable?>" data-module="<?=$module?>" data-initial-state="<?=$_state?>">
+					<li class="module <?=$_sortable?> admin-branding-background-primary" data-module="<?=$module?>" data-initial-state="<?=$_state?>">
 						<div class="box <?=$_class?>" id="box_<?=url_title( $config->name )?>">
 							<h2 class="<?=$module?>">
-								<?=$_sortable !== 'no-sort' ? '<span class="handle ion-drag"></span>' : '';?>
-								<?=$config->name?>
+								<div class="icon admin-branding-text-highlight">
+								<?php
+
+									echo $_sortable !== 'no-sort' ? '<span class="handle admin-branding-background-primary ion-drag"></span>' : '';
+
+									echo ! empty( $config->icon ) ? '<b class="' . $config->icon . '"></b>' : '<b class="ion-gear-a"></b>';
+
+								?>
+								</div>
+								<span class="module-name">
+									<?=$config->name?>
+								</span>
 								<a href="#" class="toggle">
-									<span class="close"><?=lang( 'action_close' )?></span>
-									<span class="open"><?=lang( 'action_open' )?></span>
+									<span class="close">
+										<b class="ion-close-round"></b>
+									</span>
+									<span class="open">
+										<b class="ion-plus-round"></b>
+									</span>
 								</a>
 							</h2>
 							<div class="box-container">
@@ -262,7 +324,6 @@
 										$_mobile_menu[$module]->subs[$option->method]			= new stdClass();
 										$_mobile_menu[$module]->subs[$option->method]->label	= $option->label;
 										$_mobile_menu[$module]->subs[$option->method]->url		= $option->url;
-
 
 										//	Render
 										echo '<li class="' . $option->is_active . '">';
@@ -284,7 +345,8 @@
 
 														if ( $notification['value'] ) :
 
-															echo '<span class="indicator split ' . $_split_type .  '" title="' . $_split_title . '" rel="tipsy-right">' . number_format( $notification['value'] ) . '</span>';
+															$_tipsy = $_split_title ? ' title="' . $_split_title . '" rel="tipsy-right"' : '';
+															echo '<span class="indicator split ' . $_split_type .  '"' . $_tipsy . '>' . number_format( $notification['value'] ) . '</span>';
 
 															//	Update mobile menu
 															if ( $_split_title ) :
@@ -309,7 +371,8 @@
 
 													if ( $option->notification->value ) :
 
-														echo '<span class="indicator ' . $option->notification->type . '" title="' . $option->notification->title . '" rel="tipsy-right">' . number_format( $option->notification->value ) . '</span>';
+														$_tipsy = $option->notification->title ? ' title="' . $option->notification->title . '" rel="tipsy-right"' : '';
+														echo '<span class="indicator ' . $option->notification->type . '"' . $_tipsy . '>' . number_format( $option->notification->value ) . '</span>';
 
 														if ( $option->notification->title ) :
 
@@ -326,8 +389,6 @@
 												break;
 
 											endswitch;
-
-											echo '<div class="clear"></div>';
 
 										echo '</li>';
 
@@ -346,13 +407,20 @@
 
 		?>
 		</ul>
+		<div class="no-modules">
+			<p class="system-alert error">
+				<strong>No modules available.</strong>
+				</br>
+				This is a configuration error and should be reported to the app developers.
+			</p>
+		</div>
 		<?php
 
 			// --------------------------------------------------------------------------
 
 			//	Build the Dropdown menu
 			echo '<div id="mobile-menu-main">';
-			echo '<select>';
+			echo '<select class="select2">';
 			echo '<option data-url="" disabled>' . lang( 'admin_nav_menu' ) . '</option>';
 
 			$_module	= $this->uri->rsegment( 1 );
@@ -374,7 +442,7 @@
 			echo '</div>';
 
 		?>
-		</div>
+
 	</div>
 
 
@@ -382,29 +450,32 @@
 	<div class="content">
 		<div class="content_inner">
 
-			<?php
+			<div class="page-title">
+				<?php
 
-				if ( isset( $page->module->name ) && isset( $page->title ) ) :
+					//	Page title
+					if ( isset( $page->module->name ) && isset( $page->title ) ) :
 
-					echo '<h1>';
-					echo $page->module->name . ' &rsaquo; ' . $page->title;
-					echo '</h1>';
+						echo '<h1>';
+						echo $page->module->name . ' &rsaquo; ' . $page->title;
+						echo '</h1>';
 
-				elseif ( ! isset( $page->module->name ) && isset( $page->title ) ) :
+					elseif ( ! isset( $page->module->name ) && isset( $page->title ) ) :
 
-					echo '<h1>';
-					echo $page->title;
-					echo '</h1>';
+						echo '<h1>';
+						echo $page->title;
+						echo '</h1>';
 
-				else :
+					else :
 
-					echo '<h1>';
-					echo $page->module->name;
-					echo '</h1>';
+						echo '<h1>';
+						echo $page->module->name;
+						echo '</h1>';
 
-				endif;
+					endif;
 
-			?>
+				?>
+			</div>
 
 			<?php if ( ! empty( $error ) ) : ?>
 			<div class="system-alert error">

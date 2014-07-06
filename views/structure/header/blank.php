@@ -21,11 +21,12 @@
 
 		<!--	STYLES	-->
 		<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.css'?>" />
-		<?=$this->asset->output( 'css' )?>
+		<?=$this->asset->output( 'CSS' )?>
+		<?=$this->asset->output( 'CSS-INLINE' )?>
 
 		<!--	JS GLOBALS	-->
 		<script type="text/javascript">
-			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+			var ENVIRONMENT					= '<?=strtoupper( ENVIRONMENT )?>';
 			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
 			window.NAILS					= {};
 			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
@@ -38,7 +39,7 @@
 		</script>
 
 		<!-- JAVASCRIPT[S] -->
-		<?=$this->asset->output( 'js' )?>
+		<?=$this->asset->output( 'JS' )?>
 
 	</head>
 	<body class="blank">
