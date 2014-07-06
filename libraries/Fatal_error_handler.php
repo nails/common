@@ -186,9 +186,32 @@ class Fatal_error_handler
 
 		// --------------------------------------------------------------------------
 
-		$_from_email	= 'root@' . gethostname();
-		$_from_name		= APP_EMAIL_FROM_NAME;
-		$_reply_to		= APP_EMAIL_FROM_EMAIL;
+		$_from_email = 'root@' . gethostname();
+
+		if ( function_exists( 'app_setting' ) ) :
+
+			$_from_name = app_setting( 'from_name', 'email' );
+
+			if ( empty( $_from_name ) ) :
+
+				$_from_name = 'Log Error Reporter';
+
+			endif;
+
+			$_reply_to = app_setting( 'from_email', 'email' );
+
+			if ( empty( $_reply_to ) ) :
+
+				$_reply_to = 'Fatal Error Reporter';
+
+			endif;
+
+		else :
+
+			$_from_name	= 'Fatal Error Reporter';
+			$_reply_to	= $_from_email;
+
+		endif;
 
 		$_to			= ENVIRONMENT != 'production' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 		$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
@@ -197,8 +220,7 @@ class Fatal_error_handler
 						  'X-Priority: 1 (Highest)' . "\r\n" .
 						  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
 						  'Importance: High';
-
-		$_message	 = $message;
+		$_message		= $message;
 
 		// --------------------------------------------------------------------------
 
@@ -234,7 +256,11 @@ class Fatal_error_handler
 
 		endif;
 
-		@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
+		if ( ! empty( $_to ) ) :
+
+			@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
+
+		endif;
 	}
 }
 

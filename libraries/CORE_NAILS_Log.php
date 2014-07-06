@@ -8,7 +8,7 @@ class CORE_NAILS_Log extends CI_Log
 
 		// --------------------------------------------------------------------------
 
-		//	Ignore whatever the aprent constructor says about whether logging is
+		//	Ignore whatever the parent constructor says about whether logging is
 		//	enabled or not. We'll work it out below.
 
 		$this->_enabled = NULL;
@@ -91,9 +91,33 @@ class CORE_NAILS_Log extends CI_Log
 						$_message	.= '' . "\n";
 						$_message	.= serialize( debug_backtrace() ) . "\n";
 
-						$_from_email	= 'root@' . gethostname();
-						$_from_name		= defined( 'APP_EMAIL_FROM_NAME' ) ? APP_EMAIL_FROM_NAME : 'Log Error Reporter';
-						$_reply_to		= defined( 'APP_EMAIL_FROM_EMAIL' ) ? APP_EMAIL_FROM_EMAIL : $_from_email;
+						//	Set from details
+						$_from_email = 'root@' . gethostname();
+
+						if ( function_exists( 'app_setting' ) ) :
+
+							$_from_name = app_setting( 'from_name', 'email' );
+
+							if ( empty( $_from_name ) ) :
+
+								$_from_name = 'Log Error Reporter';
+
+							endif;
+
+							$_reply_to = app_setting( 'from_email', 'email' );
+
+							if ( empty( $_reply_to ) ) :
+
+								$_reply_to = 'Log Error Reporter';
+
+							endif;
+
+						else :
+
+							$_from_name	= 'Log Error Reporter';
+							$_reply_to	= $_from_email;
+
+						endif;
 
 						$_to			= defined( 'ENVIRONMENT' ) && ENVIRONMENT != 'production' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 						$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
@@ -103,7 +127,11 @@ class CORE_NAILS_Log extends CI_Log
 										  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
 										  'Importance: High';
 
-						@mail( $_to, '!! ' . $_subject, $_message, $_headers );
+						if ( ! empty( $_to ) ) :
+
+							@mail( $_to, '!! ' . $_subject, $_message, $_headers );
+
+						endif;
 
 						define( 'NAILS_LOG_ERROR_REPORTED', TRUE );
 
