@@ -119,7 +119,7 @@ class CORE_NAILS_Log extends CI_Log
 
 						endif;
 
-						$_to			= defined( 'ENVIRONMENT' ) && ENVIRONMENT != 'production' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+						$_to			= defined( 'ENVIRONMENT' ) && strtoupper( ENVIRONMENT ) != 'PRODUCTION' && defined( 'EMAIL_OVERRIDE' ) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 						$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
 										  'Reply-To: ' . $_reply_to . "\r\n" .
 										  'X-Mailer: PHP/' . phpversion()  . "\r\n" .

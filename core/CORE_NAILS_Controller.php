@@ -162,9 +162,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _set_error_reporting()
 	{
-	 	switch( ENVIRONMENT ) :
+	 	switch( strtoupper( ENVIRONMENT ) ) :
 
-	 		case 'production' :
+	 		case 'PRODUCTION' :
 
 	 			//	Suppress all errors on production
 	 			error_reporting( 0 );
@@ -200,7 +200,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 				return TRUE;
 
-			elseif ( ENVIRONMENT !== 'production' ) :
+			elseif ( strtoupper( ENVIRONMENT ) !== 'PRODUCTION' ) :
 
 				show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.' );
 
@@ -214,7 +214,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			return TRUE;
 
-		elseif ( ENVIRONMENT !== 'production' ) :
+		elseif ( strtoupper( ENVIRONMENT ) !== 'PRODUCTION' ) :
 
 			show_error( 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.' );
 
@@ -304,7 +304,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 	{
 		$_users = @json_decode( APP_STAGING_USERPASS );
 
-		if ( ENVIRONMENT == 'staging' && $_users ) :
+		if ( strtoupper( ENVIRONMENT ) == 'STAGING' && $_users ) :
 
 			$_users = (array) $_users;
 

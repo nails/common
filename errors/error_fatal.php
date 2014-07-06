@@ -43,7 +43,7 @@
 		</p>
 		<?php
 
-			if ( ENVIRONMENT != 'production' ) :
+			if ( strtoupper( ENVIRONMENT ) != 'PRODUCTION' ) :
 
 				if ( ! empty( $subject ) ) :
 

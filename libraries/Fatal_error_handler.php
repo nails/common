@@ -20,7 +20,7 @@ class Fatal_error_handler
 	public function handleShutdown()
 	{
 		//	On non-production systems don't bother reporting
-		if ( ENVIRONMENT != 'production' ) :
+		if ( strtoupper( ENVIRONMENT ) != 'PRODUCTION' ) :
 
 			return FALSE;
 
@@ -213,7 +213,7 @@ class Fatal_error_handler
 
 		endif;
 
-		$_to			= ENVIRONMENT != 'production' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+		$_to			= strtoupper( ENVIRONMENT ) != 'PRODUCTION' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 		$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
 						  'Reply-To: ' . $_reply_to . "\r\n" .
 						  'X-Mailer: PHP/' . phpversion()  . "\r\n" .

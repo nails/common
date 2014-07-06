@@ -381,26 +381,26 @@ class CORE_NAILS_Installer
 
 					if ( isset( $_POST['environment'] ) ) :
 
-						$_environment = $_POST['environment'];
+						$_environment = strtoupper( $_POST['environment'] );
 
 					elseif( defined( 'ENVIRONMENT' ) ) :
 
-						$_environment = ENVIRONMENT;
+						$_environment = strtoupper( ENVIRONMENT );
 					else :
 
-						$_environment = 'development';
+						$_environment = 'DEVELOPMENT';
 
 					endif;
 
 					echo '<select name="environment">';
-						$_selected = $_environment == 'development' ? 'selected="selected"' : '';
-						echo '<option value="development" ' . $_selected . '>Development - Normally a local development build</option>';
+						$_selected = $_environment == 'DEVELOPMENT' ? 'selected="selected"' : '';
+						echo '<option value="DEVELOPMENT" ' . $_selected . '>Development - Normally a local development build</option>';
 
-						$_selected = $_environment == 'staging' ? 'selected="selected"' : '';
-						echo '<option value="staging" ' . $_selected . '>Staging - A mirror of the production environment</option>';
+						$_selected = $_environment == 'STAGING' ? 'selected="selected"' : '';
+						echo '<option value="STAGING" ' . $_selected . '>Staging - A mirror of the production environment</option>';
 
-						$_selected = $_environment == 'production' ? 'selected="selected"' : '';
-						echo '<option value="production" ' . $_selected . '>Production - The live website; errors are suppressed.</option>';
+						$_selected = $_environment == 'PRODUCTION' ? 'selected="selected"' : '';
+						echo '<option value="PRODUCTION" ' . $_selected . '>Production - The live website; errors are suppressed.</option>';
 					echo '</select>';
 
 				?>

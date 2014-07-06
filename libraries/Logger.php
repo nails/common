@@ -120,7 +120,7 @@ class Logger
 		// --------------------------------------------------------------------------
 
 		//	If we're not on production and the request is not CLI then echo to the browser
-		if ( ENVIRONMENT != 'production' && ! $this->_is_cli && ! $this->mute_output ) :
+		if ( strtoupper( ENVIRONMENT ) != 'PRODUCTION' && ! $this->_is_cli && ! $this->mute_output ) :
 
 			@ob_start();
 			echo $line . "<br />\n";

@@ -28,7 +28,7 @@
 			$this->asset->output( 'js-inline' );
 
 			//	Analytics
-			if ( ENVIRONMENT == 'production' && app_setting( 'google_analytics_account' ) ) :
+			if ( app_setting( 'google_analytics_account' ) ) :
 
 				?>
 				<script type="text/javascript">
