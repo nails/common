@@ -48,6 +48,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		//	Instantiate the database?
+		$this->_instantiate_db();
+
+		// --------------------------------------------------------------------------
+
+		//	Define all the packages
+		$this->_autoload_items();
+
+		// --------------------------------------------------------------------------
+
 		//	Is Nails in maintenance mode?
 		$this->_maintenance_mode();
 
@@ -75,11 +85,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Do we need to instantiate the database?
-		$this->_instantiate_db();
-
-		// --------------------------------------------------------------------------
-
 		//	Instanciate the user model
 		$this->_instantiate_user();
 
@@ -100,11 +105,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		//	Instanciate DateTime
 		$this->_instantiate_datetime();
-
-		// --------------------------------------------------------------------------
-
-		//	Profiling
-		$this->_instantiate_profiler();
 
 		// --------------------------------------------------------------------------
 
@@ -231,9 +231,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _maintenance_mode()
 	{
-		if ( MAINTENANCE || file_exists( FCPATH . '.MAINTENANCE' ) ) :
+		if ( app_setting( 'maintenance_mode_enabled' ) || file_exists( FCPATH . '.MAINTENANCE' ) ) :
 
-			$whitelist_ip = explode(',', MAINTENANCE_WHITELIST );
+			$whitelist_ip = (array) app_setting( 'maintenance_mode_whitelist' );
 
 			if ( ! $this->input->is_cli_request() && array_search( $this->input->ip_address(), $whitelist_ip ) === FALSE ) :
 
@@ -464,29 +464,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 		$this->db->query( 'SET time_zone = \'+0:00\'' );
 	}
 
-	// --------------------------------------------------------------------------
-
-
-	protected function _instantiate_profiler()
-	{
-		if ( PROFILING ) :
-
-			/**
-			 * Enable profiler if not AJAX or CI request and there's no user_token. user_token
-			 * is used by uploadify to validate the upload due to uploadify not passing
-			 * the session during upload.
-			 *
-			 **/
-
-			if ( ! $this->input->is_cli_request() && ! $this->input->is_ajax_request() && ! $this->input->post( 'user_token' ) ) :
-
-				$this->output->enable_profiler( TRUE );
-
-			endif;
-
-		endif;
-	}
-
 
 	// --------------------------------------------------------------------------
 
@@ -664,6 +641,22 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
+		$_models	= array();
+		$_models[]	= 'system/app_setting_model';
+		$_models[]	= 'system/user_model';
+		$_models[]	= 'system/user_group_model';
+		$_models[]	= 'system/user_password_model';
+		$_models[]	= 'system/datetime_model';
+		$_models[]	= 'system/language_model';
+
+		foreach ( $_models AS $model ) :
+
+			$this->load->model( $model );
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
 		$_libraries[]	= 'encrypt';
 		$_libraries[]	= 'asset/asset';
 		$_libraries[]	= 'email/emailer';
@@ -681,22 +674,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 				$this->load->library( $library );
 
 			endif;
-
-		endforeach;
-
-		// --------------------------------------------------------------------------
-
-		$_models	= array();
-		$_models[]	= 'system/app_setting_model';
-		$_models[]	= 'system/user_model';
-		$_models[]	= 'system/user_group_model';
-		$_models[]	= 'system/user_password_model';
-		$_models[]	= 'system/datetime_model';
-		$_models[]	= 'system/language_model';
-
-		foreach ( $_models AS $model ) :
-
-			$this->load->model( $model );
 
 		endforeach;
 	}
