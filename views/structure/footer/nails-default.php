@@ -10,7 +10,7 @@
 			</div><!-- /.row -->
 		</div><!-- /.container -->
 		<script type="text/javascript">
-			var ENVIRONMENT					= '<?=ENVIRONMENT?>';
+			var ENVIRONMENT					= '<?=strtoupper( ENVIRONMENT )?>';
 			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
 			window.NAILS					= {};
 			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
