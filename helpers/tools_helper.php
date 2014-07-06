@@ -156,19 +156,30 @@ if ( ! function_exists( 'ip_in_range' ) )
 	{
 		if ( ! array( $range ) ) :
 
-			if ( strpos( $range, ',' ) !== FALSE ) :
+			//	Prepare the range
+			$_range_raw	= $range;
+			$_range_raw	= str_replace( "\n\r", "\n", $_whitelist_raw );
+			$_range_raw	= explode( "\n", $_whitelist_raw );
+			$_range		= array();
 
-				$range = explode( ',', $range );
+			foreach ( $_range_raw AS $line ) :
 
-			else :
+				$_range = array_merge( explode( ',', $line ), $_range );
 
-				$range = (array) $range;
+			endforeach;
 
-			endif;
+			$_range = array_unique( $_range );
+			$_range = array_filter( $_range );
+			$_range = array_map( 'trim', $_range );
+			$_range = array_values( $_range );
+
+		else :
+
+			$_range = $range;
 
 		endif;
 
-		foreach ( $range AS $cidr_mask ) :
+		foreach ( $_range AS $cidr_mask ) :
 
 			if ( strpos( $cidr_mask, '/' ) !== FALSE ) :
 
