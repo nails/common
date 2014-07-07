@@ -306,11 +306,13 @@
 									<?=$config->name?>
 								</span>
 								<a href="#" class="toggle">
-									<span class="close">
-										<b class="ion-close-round"></b>
-									</span>
-									<span class="open">
-										<b class="ion-plus-round"></b>
+									<span class="toggler">
+										<span class="close">
+											<b class="ion-close-round"></b>
+										</span>
+										<span class="open">
+											<b class="ion-plus-round"></b>
+										</span>
 									</span>
 								</a>
 							</h2>
@@ -327,9 +329,6 @@
 
 										//	Render
 										echo '<li class="' . $option->is_active . '">';
-
-											//	Link
-											echo anchor( $option->url, $option->label );
 
 											//	Notification
 											switch ( $option->notification->type ) :
@@ -390,6 +389,9 @@
 
 											endswitch;
 
+											//	Link
+											echo anchor( $option->url, $option->label );
+
 										echo '</li>';
 
 									endforeach;
@@ -420,25 +422,25 @@
 
 			//	Build the Dropdown menu
 			echo '<div id="mobile-menu-main">';
-			echo '<select class="select2">';
-			echo '<option data-url="" disabled>' . lang( 'admin_nav_menu' ) . '</option>';
+				echo '<select name="mobile-menu">';
+					echo '<option value="" disabled>' . lang( 'admin_nav_menu' ) . '</option>';
 
-			$_module	= $this->uri->rsegment( 1 );
-			$_method	= $this->uri->rsegment( 2 );
+					$_module	= $this->uri->rsegment( 1 );
+					$_method	= $this->uri->rsegment( 2 );
 
-			foreach ( $_mobile_menu AS $module => $item ) :
+					foreach ( $_mobile_menu AS $module => $item ) :
 
-				echo '<optgroup label="' . str_replace( '"', '\"', $item->module ) . '">';
-				foreach ( $item->subs AS $method => $sub ) :
+						echo '<optgroup label="' . str_replace( '"', '\"', $item->module ) . '">';
+						foreach ( $item->subs AS $method => $sub ) :
 
-					$_selected = $_module == $module && $_method == $method ? 'selected="selected"' : '';
-					echo '<option data-url="' . $sub->url . '" ' . $_selected . '>' . $sub->label . '</option>';
+							$_selected = $_module == $module && $_method == $method ? 'selected="selected"' : '';
+							echo '<option value="' . $sub->url . '" ' . $_selected . '>' . $sub->label . '</option>';
 
-				endforeach;
-				echo '</optgroup>';
+						endforeach;
+						echo '</optgroup>';
 
-			endforeach;
-			echo '</select>';
+					endforeach;
+				echo '</select>';
 			echo '</div>';
 
 		?>
