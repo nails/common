@@ -75,7 +75,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Define defaults
-		$this->_errors						= $this->clear_errors();
+		$this->clear_errors();
 		$this->_destructive_delete			= TRUE;
 		$this->_table_id_column				= 'id';
 		$this->_table_slug_column			= 'slug';
@@ -210,7 +210,6 @@ class CORE_NAILS_Model extends CI_Model
 	public function clear_errors()
 	{
 		$this->_errors = array();
-		return array();
 	}
 
 

@@ -258,7 +258,7 @@ class Fatal_error_handler
 
 		if ( ! empty( $_to ) ) :
 
-			@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $message, $_headers );
+			@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $_message, $_headers );
 
 		endif;
 	}
