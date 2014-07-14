@@ -308,7 +308,7 @@
 								<a href="#" class="toggle">
 									<span class="toggler">
 										<span class="close">
-											<b class="ion-close-round"></b>
+											<b class="ion-minus-round"></b>
 										</span>
 										<span class="open">
 											<b class="ion-plus-round"></b>
