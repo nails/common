@@ -212,5 +212,64 @@ if ( ! function_exists( 'ip_in_range' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+/**
+ * Flushes DB caches
+ */
+if ( ! function_exists( '_db_flush_caches' ) )
+{
+	function _db_flush_caches()
+	{
+		$_ci =& get_instance();
+
+		if ( isset( $_ci->db ) ) :
+
+			$_ci->db->queries		= array();
+			$_ci->db->query_times	= array();
+			$_ci->db->data_cache	= array();
+
+		endif;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+
+/**
+ * Resets Active Record values
+ */
+if ( ! function_exists( '_db_reset_active_record' ) )
+{
+	function _db_reset_active_record()
+	{
+		$_ci = get_instance();
+
+		if ( isset( $_ci->db ) ) :
+
+			$_ci->db->ar_select			= array();
+			$_ci->db->ar_from			= array();
+			$_ci->db->ar_join			= array();
+			$_ci->db->ar_where			= array();
+			$_ci->db->ar_like			= array();
+			$_ci->db->ar_groupby		= array();
+			$_ci->db->ar_having			= array();
+			$_ci->db->ar_orderby		= array();
+			$_ci->db->ar_wherein		= array();
+			$_ci->db->ar_aliased_tables	= array();
+			$_ci->db->ar_no_escape		= array();
+			$_ci->db->ar_distinct		= FALSE;
+			$_ci->db->ar_limit			= FALSE;
+			$_ci->db->ar_offset			= FALSE;
+			$_ci->db->ar_order			= FALSE;
+
+		endif;
+	}
+}
+
+
 /* End of file tools_helper.php */
 /* Location: ./helpers/tools_helper.php */
