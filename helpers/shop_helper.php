@@ -112,101 +112,6 @@ if ( ! function_exists( 'get_basket_total' ) )
 
 
 /**
- * Gets the number of items of the basket
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'add_to_basket_button' ) )
-{
-	function add_to_basket_button( $product_id, $button_text = NULL, $attr = 'class="add-to-basket awesome small"', $return_to = NULL )
-	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_basket_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_basket_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$_in_basket = get_instance()->shop_basket_model->is_in_basket( $product_id );
-
-		// --------------------------------------------------------------------------
-
-		if ( ! $button_text ) :
-
-			get_instance()->lang->load( 'shop/shop' );
-
-			if ( $_in_basket ) :
-
-				return anchor( remove_from_basket_url( $product_id, $return_to ), lang( 'button_remove_from_basket' ), $attr );
-
-			else :
-
-				return anchor( add_to_basket_url( $product_id, $return_to ), lang( 'button_add_to_basket' ), $attr );
-
-			endif;
-
-		endif;
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Get's the URL for adding to the basket
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'add_to_basket_url' ) )
-{
-	function add_to_basket_url( $product_id, $return_to = NULL )
-	{
-		$_return = $return_to ? '?return=' . urlencode( $return_to ) : '';
-		return site_url( app_setting( 'url', 'shop' ) . 'basket/add/' . $product_id . $_return );
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Get's the URL for removing from the basket
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'remove_from_basket_url' ) )
-{
-	function remove_from_basket_url( $product_id, $return_to = NULL )
-	{
-		$_return = $return_to ? '?return=' . urlencode( $return_to ) : '';
-		return site_url( app_setting( 'url', 'shop' ) . 'basket/remove/' . $product_id . $_return );
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
  * Get's the URL for adding to the basket
  *
  * @access	public
@@ -317,9 +222,9 @@ if ( ! function_exists( 'shop_convert_using_rate' ) )
  * @param	none
  * @return	void
  */
-if ( ! function_exists( 'shop_nested_categories_html' ) )
+if ( ! function_exists( '_shop_sidebar_nested_categories_html' ) )
 {
-	function shop_nested_categories_html( $categories, $include_count = TRUE, $return = TRUE,  $level = 0 )
+	function _shop_sidebar_nested_categories_html( $categories, $include_count = TRUE, $return = TRUE,  $level = 0 )
 	{
 		if ( ! is_array( $categories ) ) :
 
@@ -329,7 +234,8 @@ if ( ! function_exists( 'shop_nested_categories_html' ) )
 
 		// --------------------------------------------------------------------------
 
-		$_out = '<ul class="categories nested level-' . $level . '">';
+		$_styled = empty( $level ) ? 'list-unstyled' : '';
+		$_out = '<ul class="categories nested level-' . $level . ' ' . $_styled . '">';
 
 		foreach( $categories AS $category ) :
 
@@ -341,20 +247,20 @@ if ( ! function_exists( 'shop_nested_categories_html' ) )
 			endif;
 
 			$_out .= '<li class="category">';
-			$_out .= '<a href="' . site_url( app_setting( 'url', 'shop' ) ) . '/category/' . $category->slug . '" class="label">';
+			$_out .= '<p><a href="' . site_url( app_setting( 'url', 'shop' ) ) . '/category/' . $category->slug . '">';
 			$_out .= $category->label;
 
 			if ( $include_count && isset( $category->product_count ) ) :
 
-				$_out .= '<span class="count">' . $category->product_count . '</span>';
+				$_out .= '&nbsp;<span class="badge">' . $category->product_count . '</span>';
 
 			endif;
 
-			$_out .= '</a>';
+			$_out .= '</a></p>';
 
 			if ( $category->children ) :
 
-				$_out .= shop_nested_categories_html( $category->children, $include_count, $return, $level+1 );
+				$_out .= _shop_sidebar_nested_categories_html( $category->children, $include_count, $return, $level+1 );
 
 			endif;
 
@@ -376,6 +282,17 @@ if ( ! function_exists( 'shop_nested_categories_html' ) )
 			echo $_out;
 
 		endif;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+if ( ! function_exists( '_shop_sidebar_render_category' ) )
+{
+	function _shop_sidebar_render_category( $category )
+	{
 	}
 }
 
