@@ -11,25 +11,12 @@ if ( ! function_exists( 'get_basket' ) )
 {
 	function get_basket()
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_model' );
+		get_instance()->load->model( 'shop/shop_basket_model' );
 
 		// --------------------------------------------------------------------------
 
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_basket_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_basket_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->shop_basket_model->get_basket();
+		return get_instance()->shop_basket_model->get();
 	}
 }
 
@@ -48,25 +35,12 @@ if ( ! function_exists( 'get_basket_count' ) )
 {
 	function get_basket_count( $respect_quantity = TRUE )
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_model' );
+		get_instance()->load->model( 'shop/shop_basket_model' );
 
 		// --------------------------------------------------------------------------
 
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_basket_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_basket_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->shop_basket_model->get_basket_count( $respect_quantity );
+		return get_instance()->shop_basket_model->get_count( $respect_quantity );
 	}
 }
 
@@ -85,25 +59,12 @@ if ( ! function_exists( 'get_basket_total' ) )
 {
 	function get_basket_total( $include_symbol = FALSE, $include_thousands = FALSE )
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_model' );
+		get_instance()->load->model( 'shop/shop_basket_model' );
 
 		// --------------------------------------------------------------------------
 
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_basket_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_basket_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->shop_basket_model->get_basket_total( $include_symbol, $include_thousands );
+		return get_instance()->shop_basket_model->get_total( $include_symbol, $include_thousands );
 	}
 }
 
@@ -142,12 +103,7 @@ if ( ! function_exists( 'shop_format_price' ) )
 {
 	function shop_format_price( $price, $include_symbol = FALSE, $include_thousands = FALSE, $for_currency = NULL, $decode_symbol = FALSE )
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -170,12 +126,7 @@ if ( ! function_exists( 'shop_convert_to_user' ) )
 {
 	function shop_convert_to_user( $price )
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_currency_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_currency_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_currency_model' );
 
 		// --------------------------------------------------------------------------
 
@@ -198,12 +149,7 @@ if ( ! function_exists( 'shop_convert_using_rate' ) )
 {
 	function shop_convert_using_rate( $price, $rate )
 	{
-		//	Load the shop model, if not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'shop_currency_model' ) ) :
-
-			get_instance()->load->model( 'shop/shop_currency_model' );
-
-		endif;
+		get_instance()->load->model( 'shop/shop_currency_model' );
 
 		// --------------------------------------------------------------------------
 
