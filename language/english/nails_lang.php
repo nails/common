@@ -94,8 +94,12 @@
 	$lang['fv_is_natural_no_zero_field']	= 'The %s field must contain only positive numbers greater than zero.';
 	$lang['fv_in_range']					= 'This field must be within the range %2$s.';
 	$lang['fv_in_range_field']				= 'The %s field must be within the range %s.';
+	$lang['fv_min_length']					= 'This field is too short, minimum length is %2$s characters.';
+	$lang['fv_min_length_field']			= 'The %s field is too short, minimum length is %2$s characters.';
 	$lang['fv_max_length']					= 'This field is too long, maximum length is %2$s characters.';
 	$lang['fv_max_length_field']			= 'The %s field is too long, maximum length is %2$s characters.';
+	$lang['fv_alpha_dash']					= 'This field may only contain alpha-numeric characters, underscores, and dashes.';
+	$lang['fv_alpha_dash_field']			= 'The %s field may only contain alpha-numeric characters, underscores, and dashes.';
 
 	// --------------------------------------------------------------------------
 
