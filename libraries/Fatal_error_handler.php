@@ -94,7 +94,7 @@ class Fatal_error_handler
 		$_message	.= '' . "\n";
 		$_message	.= 'A Fatal Error just occurred within ' . APP_NAME . ' (' . $_host . ')' . "\n";
 		$_message	.= '' . "\n";
-		$_message	.= 'Please take a look as a matter of urgency; details are noted below:' . "\n";
+		$_message	.= 'Please take a look as a matter of urgency; details are noted below and extended system state data is attached:' . "\n";
 		$_message	.= '' . "\n";
 		$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
 		$_message	.= '' . "\n";
@@ -213,15 +213,6 @@ class Fatal_error_handler
 
 		endif;
 
-		$_to			= strtoupper( ENVIRONMENT ) != 'PRODUCTION' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
-		$_headers		= 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n" .
-						  'Reply-To: ' . $_reply_to . "\r\n" .
-						  'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-						  'X-Priority: 1 (Highest)' . "\r\n" .
-						  'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-						  'Importance: High';
-		$_message		= $message;
-
 		// --------------------------------------------------------------------------
 
 		$_ci =& get_instance();
@@ -237,28 +228,57 @@ class Fatal_error_handler
 			'debug_backtrace'	=> serialize( debug_backtrace() )
 		);
 
-		$_message	.= '' . "\n";
-		$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'DEBUGGING DATA' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'URI: ' .				$_info['uri'] . "\n\n";
-		$_message	.= 'SESSION: ' .			$_info['session'] . "\n\n";
-		$_message	.= 'POST: ' .				$_info['post'] . "\n\n";
-		$_message	.= 'GET: ' .				$_info['get'] . "\n\n";
-		$_message	.= 'SERVER: ' .				$_info['server'] . "\n\n";
-		$_message	.= 'GLOBALS: ' .			$_info['globals'] . "\n\n";
-		$_message	.= 'BACKTRACE: ' .			$_info['debug_backtrace'] . "\n\n";
+		$_extended	 = 'URI: ' .				$_info['uri'] . "\n\n";
+		$_extended	.= 'SESSION: ' .			$_info['session'] . "\n\n";
+		$_extended	.= 'POST: ' .				$_info['post'] . "\n\n";
+		$_extended	.= 'GET: ' .				$_info['get'] . "\n\n";
+		$_extended	.= 'SERVER: ' .				$_info['server'] . "\n\n";
+		$_extended	.= 'GLOBALS: ' .			$_info['globals'] . "\n\n";
+		$_extended	.= 'BACKTRACE: ' .			$_info['debug_backtrace'] . "\n\n";
 
 		if ( isset( $_ci->db ) ) :
 
-			$_message	.= 'LAST KNOWN QUERY: ' .	$_ci->db->last_query() . "\n\n";
+			$_extended	.= 'LAST KNOWN QUERY: ' .	$_ci->db->last_query() . "\n\n";
 
 		endif;
 
+
+		// --------------------------------------------------------------------------
+
+		//	Prepare and send
+		$_mime_boundary	= md5(uniqid(time()));
+		$_to			= strtoupper( ENVIRONMENT ) != 'PRODUCTION' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+
+		//	Headers
+		$_headers		 = 'From: ' . $_from_name . ' <' . $_from_email . '>' . "\r\n";
+		$_headers		.= 'Reply-To: ' . $_reply_to . "\r\n";
+		$_headers		.= 'X-Mailer: PHP/' . phpversion()  . "\r\n";
+		$_headers		.= 'X-Priority: 1 (Highest)' . "\r\n";
+		$_headers		.= 'X-Mailer: X-MSMail-Priority: High/' . "\r\n";
+		$_headers		.= 'Importance: High' . "\r\n";
+		$_headers		.= 'MIME-Version:1.0' . "\r\n";
+		$_headers		.= 'Content-Type:multipart/mixed; boundary="' . $_mime_boundary . '"' . "\r\n\r\n";
+
+		//	Message
+		$_headers		.= '--' . $_mime_boundary . "\r\n";
+		$_headers		.= 'Content-Type:text/html; charset="ISO-8859-1"' . "\r\n";
+		$_headers		.= 'Content-Transfer-Encoding:7bit' . "\r\n\r\n";
+
+		$_headers		.= '<html><head><style type="text/css">body { font:10pt Arial; }</style></head><body>' . str_replace( "\r", '', str_replace( "\n", '<br />', $message ) ) . '</body></html>' . "\r\n\r\n";
+
+		//	Attachment
+		$_headers .= '--' . $_mime_boundary . "\r\n";
+		$_headers .= 'Content-Type:application/octet-stream; name="debugging-data.txt"' . "\r\n";
+		$_headers .= 'Content-Transfer-Encoding:base64' . "\r\n";
+		$_headers .= 'Content-Disposition:attachment; filename="debugging-data.txt"' . "\r\n";
+		$_headers .= base64_encode( $_extended ) . "\r\n\r\n";
+
+		// --------------------------------------------------------------------------
+
+		//	Send!
 		if ( ! empty( $_to ) ) :
 
-			@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , $_message, $_headers );
+			@mail( $_to, '!! ' . $subject . ' - ' . APP_NAME , '', $_headers );
 
 		endif;
 	}
