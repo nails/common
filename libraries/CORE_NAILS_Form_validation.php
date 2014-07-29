@@ -1,14 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class CORE_NAILS_Form_validation extends CI_Form_validation {
-
-
-	/*
-	 *
-	 * Quick mod of run() to allow for HMVC
-	 *
+class CORE_NAILS_Form_validation extends CI_Form_validation
+{
+	/**
+	 * Quick mod of run() to allow for HMVC.
 	 */
-
 	public function run($module = '', $group = '')
 	{
 		( is_object( $module ) ) AND $this->CI = &$module;
@@ -19,6 +15,10 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Returns the form validation error array.
+	 * @return array
+	 */
 	public function get_error_array()
 	{
 		return $this->_error_array;
@@ -29,12 +29,11 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a certain value is unique in a specified table
-	 * if different from current value.
-	 *
-	 * @param	string
-	 * @param	string - column.value
-	 * @return	bool
+	 * Checks if a certain value is unique in a specified table if different
+	 * from current value.
+	 * @param  string $new    The form value
+	 * @param  string $params Parameters passed from set_rules() method
+	 * @return boolean
 	 */
 	public function unique_if_diff( $new, $params )
 	{
@@ -42,8 +41,11 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		list($table, $column, $old) = explode(".", $params, 3);
 
-		if ( $new == $old )
+		if ( $new == $old ) :
+
 			return TRUE;
+
+		endif;
 
 		if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) ) :
 
@@ -62,14 +64,14 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 		return TRUE;
 	}
 
+
 	// --------------------------------------------------------------------------
 
 
 	/**
-	 * Checks if a string is in valid UK postcode format
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a string is in a valid UK post code format.
+	 * @param  string $str The form value
+	 * @return boolean
 	 */
 	public function valid_postcode( $str )
 	{
@@ -90,10 +92,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a date is valid
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a date is valid.
+	 * @param  string $date The form value
+	 * @return boolean
 	 */
 	public function valid_date( $date )
 	{
@@ -134,10 +135,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a date is in the future
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a date us in the future.
+	 * @param  string $date The form value
+	 * @return boolean
 	 */
 	public function date_future( $date )
 	{
@@ -178,10 +178,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a date is in the future
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a date is in the past.
+	 * @param  string $date The form value
+	 * @return boolean
 	 */
 	public function date_past( $date )
 	{
@@ -221,6 +220,12 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Checks if a date is before another date field.
+	 * @param  string $date  The form value
+	 * @param  string $field The other POST field to check against
+	 * @return boolean
+	 */
 	public function date_before( $date, $field )
 	{
 		//	If blank, then assume the datetime is not required
@@ -249,6 +254,12 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Checks if a date is after another date field.
+	 * @param  string $date  The form value
+	 * @param  string $field The other POST field to check against
+	 * @return boolean
+	 */
 	public function date_after( $date, $field )
 	{
 		//	If blank, then assume the datetime is not required
@@ -278,10 +289,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a series of date dropdowns is valid
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a datetime is valid.
+	 * @param  string $datetime The form value
+	 * @return boolean
 	 */
 	public function valid_datetime( $datetime )
 	{
@@ -302,7 +312,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_datetime = explode( ' ', $datetime );
+		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
 		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
@@ -310,7 +320,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_time = strtotime( $datetime[0] );
+		$_time = strtotime( $_datetime[0] );
 
 		if ( $_time === FALSE ) :
 
@@ -333,10 +343,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a datetime is in the future
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a datetime is in the future.
+	 * @param  string $datetime The form value
+	 * @return boolean
 	 */
 	public function datetime_future( $datetime )
 	{
@@ -357,7 +366,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_datetime	= explode( ' ', $datetime );
+		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
 		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
@@ -365,7 +374,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_time = strtotime( $datetime[0] );
+		$_time = strtotime( $_datetime[0] );
 
 		if ( $_time === FALSE ) :
 
@@ -404,10 +413,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 
 	/**
-	 * Checks if a datetime is in the future
-	 *
-	 * @param	string
-	 * @return	bool
+	 * Checks if a datetime is in the past.
+	 * @param  string $datetime The form value
+	 * @return boolean]
 	 */
 	public function datetime_past( $datetime )
 	{
@@ -428,7 +436,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_datetime	= explode( ' ', $datetime );
+		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
 		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
@@ -436,7 +444,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 
 		endif;
 
-		$_time = strtotime( $datetime[0] );
+		$_time = strtotime( $_datetime[0] );
 
 		if ( $_time === FALSE ) :
 
@@ -474,6 +482,12 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Checks if a datetime is before another field.
+	 * @param  string $datetime The form value
+	 * @param  string $field    The other POST field to check against
+	 * @return boolean
+	 */
 	public function datetime_before( $datetime, $field )
 	{
 		//	If blank, then assume the datetime is not required
@@ -502,6 +516,12 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Checks if a datetime is after another field.
+	 * @param  string $datetime The form value
+	 * @param  string $field    The other POST field to check against
+	 * @return boolean
+	 */
 	public function datetime_after( $datetime, $field )
 	{
 		//	If blank, then assume the datetime is not required
@@ -530,6 +550,12 @@ class CORE_NAILS_Form_validation extends CI_Form_validation {
 	// --------------------------------------------------------------------------
 
 
+	/**
+	 * Checks if a value is within a range as defined in $field
+	 * @param  string $str   The form value
+	 * @param  string $field The range, e.g., 0-10
+	 * @return boolean
+	 */
 	public function in_range( $str, $field )
 	{
 		$_range = explode( '-', $field );
