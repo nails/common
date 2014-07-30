@@ -693,7 +693,7 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Facilitate pagination
-		if ( NULL !== $page ) :
+		if ( ! is_null( $page ) ) :
 
 			//	Adjust the page variable, reduce by one so that the offset is calculated
 			//	correctly. Make sure we don't go into negative numbers
@@ -701,7 +701,7 @@ class CORE_NAILS_Model extends CI_Model
 			$page = $page < 0 ? 0 : $page;
 
 			//	Work out what the offset should be
-			$_per_page	= NULL == $per_page ? $this->_per_page : (int) $per_page;
+			$_per_page	= is_null( $per_page ) ? $this->_per_page : (int) $per_page;
 			$_offset	= $page * $per_page;
 
 			$this->db->limit( $per_page, $_offset );
@@ -1358,6 +1358,24 @@ class CORE_NAILS_Model extends CI_Model
 			$obj->order = (int) $obj->order;
 
 		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_property_table()
+	{
+		return $this->_table;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	public function get_property_table_prefix()
+	{
+		return $this->_table_prefix;
 	}
 }
 

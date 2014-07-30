@@ -4,74 +4,41 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 	<head>
+		<?php
 
-		<!--	META	-->
+			echo '<title>';
+
+				if ( ! empty( $page->seo->title ) ) :
+
+					echo $page->seo->title . ' - ';
+
+				elseif ( ! empty( $page->title ) ) :
+
+					echo $page->title . ' - ';
+
+				endif;
+
+				echo APP_NAME;
+
+			echo '</title>';
+
+		?>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta charset="utf-8">
-		<title><?php
+		<meta name="description" content="<?=! empty( $page->seo->description ) ? $page->seo->description : ''?>">
+		<meta name="keywords" content="<?=! empty( $page->seo->keywords ) ? $page->seo->keywords : ''?>">
+		<?php
 
-			echo isset( $page->title ) ? $page->title : '';
-			echo isset( $page->title ) && APP_NAME ? ' - ' : '';
-			echo APP_NAME;
+			$this->asset->output( 'css' );
+			$this->asset->output( 'css-inline' );
 
-
-		?></title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="description" content="">
-		<meta name="author" content="">
-
-		<!--	STYLES	-->
-		<link rel="stylesheet" type="text/css" media="screen" href="<?=NAILS_ASSETS_URL . 'css/nails.admin.css'?>" />
-		<?=$this->asset->output( 'CSS' )?>
-		<?=$this->asset->output( 'CSS-INLINE' )?>
-
-		<!--	JS GLOBALS	-->
-		<script type="text/javascript">
-			var ENVIRONMENT					= '<?=strtoupper( ENVIRONMENT )?>';
-			window.SITE_URL					= '<?=site_url( '', page_is_secure() )?>';
-			window.NAILS					= {};
-			window.NAILS.URL				= '<?=NAILS_ASSETS_URL?>';
-			window.NAILS.LANG				= {};
-			window.NAILS.USER				= {};
-			window.NAILS.USER.ID			= <?=active_user( 'id' ) ? active_user( 'id' ) : 'null'?>;
-			window.NAILS.USER.FNAME			= '<?=active_user( 'first_name' )?>';
-			window.NAILS.USER.LNAME			= '<?=active_user( 'last_name' )?>';
-			window.NAILS.USER.EMAIL			= '<?=active_user( 'email' )?>';
-		</script>
-
-		<!-- JAVASCRIPT[S] -->
-		<?=$this->asset->output( 'JS' )?>
-
+		?>
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/html5shiv/dist/html5shiv.js'?>"></script>
+		  <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
+		<![endif]-->
 	</head>
-	<body class="blank">
-
-		<?php if ( isset( $error ) && ! empty( $error ) ) : ?>
-		<div class="system-alert error">
-			<div class="padder">
-				<p><?=$error?></p>
-			</div>
-		</div>
-		<?php endif; ?>
-
-		<?php if ( isset( $success ) && ! empty( $success ) ) : ?>
-		<div class="system-alert success">
-			<div class="padder">
-				<p><?=$success?></p>
-			</div>
-		</div>
-		<?php endif; ?>
-
-		<?php if ( isset( $message ) && ! empty( $message ) ) : ?>
-		<div class="system-alert message">
-			<div class="padder">
-				<p><?=$message?></p>
-			</div>
-		</div>
-		<?php endif; ?>
-
-		<?php if ( isset( $notice ) && ! empty( $notice ) ) : ?>
-		<div class="system-alert notice">
-			<div class="padder">
-				<p><?=$notice?></p>
-			</div>
-		</div>
-		<?php endif; ?>
+	<body>
