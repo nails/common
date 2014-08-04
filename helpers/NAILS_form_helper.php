@@ -11,7 +11,7 @@
  */
 if ( ! function_exists('form_email'))
 {
-	function form_email($data = '', $value = '', $extra = '')
+	function form_email( $data = '', $value = '', $extra = '' )
 	{
 		$defaults = array('type' => 'email', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
 
@@ -101,7 +101,7 @@ if ( ! function_exists('form_open'))
  */
 if ( ! function_exists( 'form_field' ) )
 {
-	function form_field( $field, $help = '' )
+	function form_field( $field, $tip = '' )
 	{
 		//	Set var defaults
 		$_field				= array();
@@ -120,13 +120,14 @@ if ( ! function_exists( 'form_field' ) )
 		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
 		$_field_data		= isset( $field['data'] )			? $field['data'] 		: array();
 		$_field_info		= isset( $field['info'] )			? $field['info'] 		: FALSE;
+		$_field_tip			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
-		$_help				= array();
-		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
-		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy-left';
-		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
-		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
+		$_tip				= array();
+		$_tip['src']		= is_array( $_field_tip ) && isset( $_field_tip['src'] )	? $_field_tip['src']	: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'tip';
+		$_tip['rel']		= is_array( $_field_tip ) && isset( $_field_tip['rel'] )	? $_field_tip['rel']	: 'tipsy-left';
+		$_tip['title']		= is_array( $_field_tip ) && isset( $_field_tip['title'] )	? $_field_tip['title']	: NULL;
+		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_field_tip['title'];
 
 		$_error				= form_error( $_field_key ) || $_field_error ? 'error' : '';
 		$_error_class		= $_error ? 'error' : '';
@@ -142,8 +143,8 @@ if ( ! function_exists( 'form_field' ) )
 		$_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
 		//	Has the field got a tip?
-		$_tipclass	= $_help['title'] ? 'with-tip' : '';
-		$_tip 		= $_help['title'] ? img( $_help ) : '';
+		$_tipclass	= $_tip['title'] ? 'with-tip' : '';
+		$_tip 		= $_tip['title'] ? img( $_tip ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -286,7 +287,7 @@ EOT;
  */
 if ( ! function_exists( 'form_field_mm' ) )
 {
-	function form_field_mm( $field, $help = '' )
+	function form_field_mm( $field, $tip = '' )
 	{
 		//	Set var defaults
 		$_field					= array();
@@ -304,13 +305,14 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_field['bucket']		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
 		$_field['class']		= isset( $field['class'] )			? $field['class']		: FALSE;
 		$_field['data']			= isset( $field['data'] )			? $field['data'] 		: array();
+		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
-		$_help					= array();
-		$_help['src']			= is_array( $help ) && isset( $help['src'] )	? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']			= is_array( $help ) && isset( $help['class'] )	? $help['class'] : 'help';
-		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy-left';
-		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
-		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_field_error_cls		= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
 		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
@@ -363,7 +365,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_field_tip = $_help['title'] ? img( $_help ) : '';
+		$_field_tip = $_tip['title'] ? img( $_tip ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -460,7 +462,7 @@ if ( ! function_exists( 'form_field_mm' ) )
  */
 if ( ! function_exists( 'form_field_mm_image' ) )
 {
-	function form_field_mm_image( $field, $help = '' )
+	function form_field_mm_image( $field, $tip = '' )
 	{
 		//	Set var defaults
 		$_field					= array();
@@ -478,15 +480,16 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_field['bucket']		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
 		$_field['class']		= isset( $field['class'] )			? $field['class']		: FALSE;
 		$_field['data']			= isset( $field['data'] )			? $field['data'] 		: array();
+		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
-		$_help					= array();
-		$_help['src']			= is_array( $help ) && isset( $help['src'] )	? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']			= is_array( $help ) && isset( $help['class'] )	? $help['class'] : 'help';
-		$_help['rel']			= is_array( $help ) && isset( $help['rel'] )	? $help['rel'] : 'tipsy-left';
-		$_help['title']			= is_array( $help ) && isset( $help['title'] )	? $help['title'] : NULL;
-		$_help['title']			= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
-		$_field_error					= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
+		$_field_error			= form_error( $_field['key'] ) || $_field['error'] ? 'error' : '';
 		$_readonly				= $_field['readonly'] ? 'readonly="readonly"' : '';
 		$_readonly_cls			= $_field['readonly'] ? 'readonly' : '';
 
@@ -537,7 +540,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_field_tip = $_help['title'] ? img( $_help ) : '';
+		$_field_tip = $_tip['title'] ? img( $_tip ) : '';
 
 		// --------------------------------------------------------------------------
 
@@ -621,7 +624,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 if ( ! function_exists( 'form_field_multiimage' ) )
 {
-	function form_field_multiimage( $field, $help = '' )
+	function form_field_multiimage( $field, $tip = '' )
 	{
 		//	Set var defaults
 		$_field_id			= isset( $field['id'] )				? $field['id']			: NULL;
@@ -637,13 +640,14 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		$_field_error		= isset( $field['error'] )			? $field['error']		: FALSE;
 		$_field_bucket		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
 		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field_tip			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
-		$_help				= array();
-		$_help['src']		= is_array( $help ) && isset( $help['src'] )	? $help['src']		: NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']		= is_array( $help ) && isset( $help['class'] )	? $help['class']	: 'help';
-		$_help['rel']		= is_array( $help ) && isset( $help['rel'] )	? $help['rel']		: 'tipsy-left';
-		$_help['title']		= is_array( $help ) && isset( $help['title'] )	? $help['title']	: NULL;
-		$_help['title']		= is_string( $help ) ? $help : $_help['title'];
+		$_tip				= array();
+		$_tip['src']		= is_array( $_field_tip ) && isset( $_field_tip['src'] )	? $_field_tip['src']	: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'tip';
+		$_tip['rel']		= is_array( $_field_tip ) && isset( $_field_tip['rel'] )	? $_field_tip['rel']	: 'tipsy-left';
+		$_tip['title']		= is_array( $_field_tip ) && isset( $_field_tip['title'] )	? $_field_tip['title']	: NULL;
+		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_field_tip['title'];
 
 		$_error				= form_error( $_field_key ) || $_field_error ? 'error' : '';
 		$_error_class		= $_error ? 'error' : '';
@@ -705,8 +709,8 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_tip				= $_help['title'] ? img( $_help ) : '';
-		$_filelist_class	= $_help['title'] ? 'has-tip ' : '';
+		$_tip				= $_tip['title'] ? img( $_tip ) : '';
+		$_filelist_class	= $_tip['title'] ? 'has-tip ' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -1011,14 +1015,14 @@ EOT;
  */
 if ( ! function_exists( 'form_field_date' ) )
 {
-	function form_field_date( $field, $help = '' )
+	function form_field_date( $field, $tip = '' )
 	{
 		$_field					= $field;
 		$_field['type']			= 'date';
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] . ' date' : 'date';
 		$_field['placeholder']	= 'YYYY-MM-DD';
 
-		return form_field( $_field, $help );
+		return form_field( $_field, $tip );
 	}
 }
 
@@ -1038,14 +1042,14 @@ if ( ! function_exists( 'form_field_date' ) )
  */
 if ( ! function_exists( 'form_field_datetime' ) )
 {
-	function form_field_datetime( $field, $help = '' )
+	function form_field_datetime( $field, $tip = '' )
 	{
 		$_field					= $field;
 		$_field['type']			= 'datetime';
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] . ' datetime' : 'datetime';
 		$_field['placeholder']	= 'YYYY-MM-DD HH:mm:ss';
 
-		return form_field( $_field, $help );
+		return form_field( $_field, $tip );
 	}
 }
 
@@ -1065,7 +1069,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
  */
 if ( ! function_exists( 'form_field_dropdown' ) )
 {
-	function form_field_dropdown( $field, $options, $help = '' )
+	function form_field_dropdown( $field, $options, $tip = '' )
 	{
 		//	Set var defaults
 		$_field						= array();
@@ -1084,14 +1088,14 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
 		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
 		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
-		$_field['help_block']		= isset( $field['help_block'] )		? $field['help_block'] 	: FALSE;
+		$_field['tip']				= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_error			= form_error( $_field['key'] ) ? 'error' : '';
 		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
@@ -1112,7 +1116,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		// --------------------------------------------------------------------------
 
 		//	Field
-		$_withtip = $_help['title'] ? 'with-tip' : '';
+		$_withtip = $_tip['title'] ? 'with-tip' : '';
 		$_out .= '<span class="input ' . $_withtip . '">';
 
 		//	Does the field have an id?
@@ -1175,7 +1179,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endif;
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_out .= $_tip['title'] ? img( $_tip ) : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1210,7 +1214,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
  */
 if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 {
-	function form_field_dropdown_multiple( $field, $options, $help = '' )
+	function form_field_dropdown_multiple( $field, $options, $tip = '' )
 	{
 		//	Set var defaults
 		$_field						= array();
@@ -1229,13 +1233,14 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_field['data']				= isset( $field['data'] ) ? $field['data'] : array();
 		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
 		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
+		$_field['tip']				= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_error			= form_error( $_field['key'] ) ? 'error' : '';
 		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
@@ -1256,7 +1261,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		// --------------------------------------------------------------------------
 
 		//	Field
-		$_withtip = $_help['title'] ? 'with-tip' : '';
+		$_withtip = $_tip['title'] ? 'with-tip' : '';
 		$_out .= '<span class="input ' . $_withtip . '">';
 
 		//	Does the field have an id?
@@ -1320,7 +1325,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_out .= $_tip['title'] ? img( $_tip ) : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1355,7 +1360,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
  */
 if ( ! function_exists( 'form_field_boolean' ) )
 {
-	function form_field_boolean( $field, $help = '' )
+	function form_field_boolean( $field, $tip = '' )
 	{
 		$_ci =& get_instance();
 
@@ -1377,13 +1382,14 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_field['data']			= isset( $field['data'] )			? $field['data']		: array();
 		$_field['readonly']		= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
 		$_field['info']			= isset( $field['info'] )			? $field['info'] 		: FALSE;
+		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] . ' help' : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_error			= form_error( $_field['key'] ) ? 'error' : '';
 		$_readonly		= $_field['readonly'] ? 'disabled="disabled"' : '';
@@ -1420,7 +1426,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class );
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_out .= $_tip['title'] ? img( $_tip ) : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1453,7 +1459,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
  */
 if ( ! function_exists( 'form_field_radio' ) )
 {
-	function form_field_radio( $field, $options, $help = '' )
+	function form_field_radio( $field, $options, $tip = '' )
 	{
 		$_ci =& get_instance();
 
@@ -1469,13 +1475,14 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_error = form_error( $_field['key'] ) ? 'error' : '';
 
@@ -1509,7 +1516,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_out .= $_tip['title'] ? img( $_tip ) : '';
 
 		$_out .= '</label>';
 
@@ -1569,7 +1576,7 @@ if ( ! function_exists( 'form_field_radio' ) )
  */
 if ( ! function_exists( 'form_field_checkbox' ) )
 {
-	function form_field_checkbox( $field, $options, $help = '' )
+	function form_field_checkbox( $field, $options, $tip = '' )
 	{
 		$_ci =& get_instance();
 
@@ -1586,13 +1593,14 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['required']		= isset( $field['required'] ) ? $field['required'] : FALSE;
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
+		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
-		$_help			= array();
-		$_help['src']	= is_array( $help ) && isset( $help['src'] ) ? $help['src'] : NAILS_ASSETS_URL . 'img/form/help.png';
-		$_help['class']	= is_array( $help ) && isset( $help['class'] ) ? $help['class'] : 'help';
-		$_help['rel']	= is_array( $help ) && isset( $help['rel'] ) ? $help['rel'] : 'tipsy-left';
-		$_help['title']	= is_array( $help ) && isset( $help['title'] ) ? $help['title'] : NULL;
-		$_help['title']	= is_string( $help ) ? $help : $_help['title'];
+		$_tip					= array();
+		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
+		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
+		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
 
 		$_error = form_error( $_field['key'] ) ? 'error' : '';
 
@@ -1649,7 +1657,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_help['title'] ? img( $_help ) : '';
+		$_out .= $_tip['title'] ? img( $_tip ) : '';
 
 		$_out .= '</span>';
 		$_out .= '</label>';
