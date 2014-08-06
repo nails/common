@@ -298,7 +298,7 @@
 
 									echo $_sortable !== 'no-sort' ? '<span class="handle admin-branding-background-primary fa fa-navicon"></span>' : '';
 
-									echo ! empty( $config->icon ) ? '<b class="' . $config->icon . '"></b>' : '<b class="fa fa-cog"></b>';
+									echo ! empty( $config->icon ) ? '<b class="fa fa-fw ' . $config->icon . '"></b>' : '<b class="fa fa-fw fa-cog"></b>';
 
 								?>
 								</div>
