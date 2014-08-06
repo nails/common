@@ -141,7 +141,7 @@
 			</div>
 
 			<div class="shortcut to-frontend" rel="tipsy" title="Switch to front end">
-				<?=anchor( '', '<span class="ion-reply-all"></span>', 'class="admin-branding-text-primary"' )?>
+				<?=anchor( '', '<span class="fa fa-reply-all"></span>', 'class="admin-branding-text-primary"' )?>
 			</div>
 
 			<?php
@@ -151,7 +151,7 @@
 				if ( $this->session->userdata( 'admin_recovery' ) ) :
 
 					echo '<div class="shortcut admin-recovery" rel="tipsy" title="Log back in as ' . $_admin_recovery->name . '">';
-						echo anchor( 'auth/override/login_as/' . $_admin_recovery->id . '/' . $_admin_recovery->hash, '<span class="ion-arrow-return-right"></span>', 'class="admin-branding-text-primary"' );
+						echo anchor( 'auth/override/login_as/' . $_admin_recovery->id . '/' . $_admin_recovery->hash, '<span class="fa fa-sign-out"></span>', 'class="admin-branding-text-primary"' );
 					echo '</div>';
 
 				endif;
@@ -159,7 +159,7 @@
 			?>
 
 			<div class="shortcut logout" rel="tipsy" title="Log out">
-				<?=anchor( 'auth/logout', '<span class="ion-power"></span>', 'class="admin-branding-text-primary"' )?>
+				<?=anchor( 'auth/logout', '<span class="fa fa-power-off"></span>', 'class="admin-branding-text-primary"' )?>
 			</div>
 
 		</div>
@@ -296,9 +296,9 @@
 								<div class="icon admin-branding-text-highlight">
 								<?php
 
-									echo $_sortable !== 'no-sort' ? '<span class="handle admin-branding-background-primary ion-drag"></span>' : '';
+									echo $_sortable !== 'no-sort' ? '<span class="handle admin-branding-background-primary fa fa-navicon"></span>' : '';
 
-									echo ! empty( $config->icon ) ? '<b class="' . $config->icon . '"></b>' : '<b class="ion-gear-a"></b>';
+									echo ! empty( $config->icon ) ? '<b class="' . $config->icon . '"></b>' : '<b class="fa fa-cog"></b>';
 
 								?>
 								</div>
@@ -308,10 +308,10 @@
 								<a href="#" class="toggle">
 									<span class="toggler">
 										<span class="close">
-											<b class="ion-minus-round"></b>
+											<b class="fa fa-minus"></b>
 										</span>
 										<span class="open">
-											<b class="ion-plus-round"></b>
+											<b class="fa fa-plus"></b>
 										</span>
 									</span>
 								</a>
