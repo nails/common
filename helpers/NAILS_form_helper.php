@@ -123,8 +123,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field_tip			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
 		$_tip				= array();
-		$_tip['src']		= is_array( $_field_tip ) && isset( $_field_tip['src'] )	? $_field_tip['src']	: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'tip';
+		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']		= is_array( $_field_tip ) && isset( $_field_tip['rel'] )	? $_field_tip['rel']	: 'tipsy-left';
 		$_tip['title']		= is_array( $_field_tip ) && isset( $_field_tip['title'] )	? $_field_tip['title']	: NULL;
 		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_field_tip['title'];
@@ -144,7 +143,7 @@ if ( ! function_exists( 'form_field' ) )
 
 		//	Has the field got a tip?
 		$_tipclass	= $_tip['title'] ? 'with-tip' : '';
-		$_tip 		= $_tip['title'] ? img( $_tip ) : '';
+		$_tip 		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -308,8 +307,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -365,7 +363,8 @@ if ( ! function_exists( 'form_field_mm' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_field_tip = $_tip['title'] ? img( $_tip ) : '';
+		$_field_tipclass	= $_tip['title'] ? 'with-tip' : '';
+		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -421,7 +420,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		$_out .= '	<span class="label">';
 		$_out .= '		' . $_field_label;
 		$_out .= '	</span>';
-		$_out .= '	<span class="mm-file-container">';
+		$_out .= '	<span class="mm-file-container input ' . $_field_tipclass . '">';
 		$_out .= '		<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-file-choose">';
 		$_out .= '			Choose';
 		$_out .= '		</a>';
@@ -483,8 +482,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -540,7 +538,8 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_field_tip = $_tip['title'] ? img( $_tip ) : '';
+		$_field_tipclass	= $_tip['title'] ? 'with-tip' : '';
+		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -597,7 +596,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		$_out .= '	<span class="mm-image-preview">';
 		$_out .= '		' . $_field_preview;
 		$_out .= '	</span>';
-		$_out .= '	<span class="mm-image-container">';
+		$_out .= '	<span class="mm-image-container input ' . $_field_tipclass . '">';
 		$_out .= '		<a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-image-choose">';
 		$_out .= '			Choose';
 		$_out .= '		</a>';
@@ -643,8 +642,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		$_field_tip			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
 		$_tip				= array();
-		$_tip['src']		= is_array( $_field_tip ) && isset( $_field_tip['src'] )	? $_field_tip['src']	: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'tip';
+		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']		= is_array( $_field_tip ) && isset( $_field_tip['rel'] )	? $_field_tip['rel']	: 'tipsy-left';
 		$_tip['title']		= is_array( $_field_tip ) && isset( $_field_tip['title'] )	? $_field_tip['title']	: NULL;
 		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_field_tip['title'];
@@ -709,8 +707,8 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_tip				= $_tip['title'] ? img( $_tip ) : '';
-		$_filelist_class	= $_tip['title'] ? 'has-tip ' : '';
+		$_tipclass	= $_tip['title'] ? 'with-tip' : '';
+		$_tip		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -730,7 +728,7 @@ $_out = <<<EOT
 				$_field_label
 				$_field_sub_label
 			</span>
-			<span class="input">
+			<span class="input $_tipclass">
 				<p class="system-alert error" id="$_id-uploadify-not-available">
 					<strong>Configuration Error.</strong> Uploadify is not available.
 				</p>
@@ -741,6 +739,7 @@ $_out = <<<EOT
 					</ul>
 					<button id="$_id-uploadify">Choose Images</button>
 				</span>
+				$_tip
 				$_error
 			<span>
 		</label>
@@ -1091,8 +1090,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['tip']				= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -1108,9 +1106,9 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 
 		//	Label
 		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+			$_out .= $_field['label'];
+			$_out .= $_field['required'] ? '*' : '';
+			$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 
 		// --------------------------------------------------------------------------
@@ -1179,7 +1177,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endif;
 
 		//	Tip
-		$_out .= $_tip['title'] ? img( $_tip ) : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1236,8 +1234,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		$_field['tip']				= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -1325,7 +1322,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_out .= $_tip['title'] ? img( $_tip ) : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1385,8 +1382,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_field['tip']			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -1413,20 +1409,21 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		//	Label
 		$_out .= '<span class="label">';
-		$_out .= $_field['label'];
-		$_out .= $_field['required'] ? '*' : '';
-		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+			$_out .= $_field['label'];
+			$_out .= $_field['required'] ? '*' : '';
+			$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 
 		//	Field
-		$_out .= '<span class="input">';
+		$_tipclass = $_tip['title'] ? 'with-tip' : '';
+		$_out .= '<span class="input ' . $_tipclass . '">';
 		$_selected = set_value( $_field['key'], (bool) $_field['default'] );
 
 		$_out .= '<div class="toggle toggle-modern"></div>';
 		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class );
 
 		//	Tip
-		$_out .= $_tip['title'] ? img( $_tip ) : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1478,8 +1475,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -1516,7 +1512,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_tip['title'] ? img( $_tip ) : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		$_out .= '</label>';
 
@@ -1596,8 +1592,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
 
 		$_tip					= array();
-		$_tip['src']			= is_array( $_field['tip'] ) && isset( $_field['src'] )		? $_tip['src']		: NAILS_ASSETS_URL . 'img/form/tip.png';
-		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'tip';
+		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']			= is_array( $_field['tip'] ) && isset( $_field['rel'] )		? $_tip['rel']		: 'tipsy-left';
 		$_tip['title']			= is_array( $_field['tip'] ) && isset( $_field['title'] )	? $_tip['title']	: NULL;
 		$_tip['title']			= is_string( $_field['tip'] ) ? $_field['tip'] : $_field['title'];
@@ -1618,7 +1613,8 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
 		$_out .= '</span>';
 
-		$_out .= '<span class="input">';
+		$_tipclass = $_tip['title'] ? 'with-tip' : '';
+		$_out .= '<span class="input ' . $_tipclass . '">';
 
 		//	Does the field have an id?
 		$_id = isset( $options[0]['id'] ) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
@@ -1657,7 +1653,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_tip['title'] ? img( $_tip ) : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
 
 		$_out .= '</span>';
 		$_out .= '</label>';
