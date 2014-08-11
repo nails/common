@@ -6,7 +6,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
 
 	// --------------------------------------------------------------------------
 
-	//	Override this method so as to detect whether the dev wants to sue the rsegments
+	//	Override this method so as to detect whether the dev wants to use the rsegments
 	//	as opposed to normal segments..
 	//	I _REALLY_ hate how I have to override the entire method.
 
