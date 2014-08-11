@@ -155,18 +155,18 @@ if ( ! function_exists( 'cdn_expiring_url' ) )
 
 
 /**
- * Get the extension of a file from it's mimetype
+ * Get the extension of a file from it's mime
  *
- * @param	string	$mime_type	The mimetype to look up
+ * @param	string	$mime	The mime to look up
  * @return	string
  */
-if ( ! function_exists( 'get_ext_from_mimetype' ) )
+if ( ! function_exists( 'get_ext_from_mime' ) )
 {
-	function get_ext_from_mimetype( $mime_type )
+	function get_ext_from_mime( $mime )
 	{
 		get_instance()->load->library( 'cdn/cdn' );
 
-		return get_instance()->cdn->get_ext_from_mimetype( $mime_type );
+		return get_instance()->cdn->get_ext_from_mime( $mime );
 	}
 }
 
@@ -175,18 +175,18 @@ if ( ! function_exists( 'get_ext_from_mimetype' ) )
 
 
 /**
- * Get the mimetype of a file from it's extension
+ * Get the mime of a file from it's extension
  *
  * @param	string	$ext	The extension to look up
  * @return	string
  */
-if ( ! function_exists( 'get_mimetype_from_ext' ) )
+if ( ! function_exists( 'get_mime_from_ext' ) )
 {
-	function get_mimetype_from_ext( $ext )
+	function get_mime_from_ext( $ext )
 	{
 		get_instance()->load->library( 'cdn/cdn' );
 
-		return get_instance()->cdn->get_mimetype_from_ext( $ext );
+		return get_instance()->cdn->get_mime_from_ext( $ext );
 	}
 }
 
@@ -195,18 +195,18 @@ if ( ! function_exists( 'get_mimetype_from_ext' ) )
 
 
 /**
- * Get the mimetype from a file on disk
+ * Get the mime from a file on disk
  *
  * @param	string	$file	The file to look up
  * @return	string
  */
-if ( ! function_exists( 'get_mime_type_from_file' ) )
+if ( ! function_exists( 'get_mime_from_file' ) )
 {
-	function get_mime_type_from_file( $file )
+	function get_mime_from_file( $file )
 	{
 		get_instance()->load->library( 'cdn/cdn' );
 
-		return get_instance()->cdn->get_mime_type_from_file( $file );
+		return get_instance()->cdn->get_mime_from_file( $file );
 	}
 }
 
