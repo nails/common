@@ -192,8 +192,10 @@ if ( ! function_exists( '_shop_sidebar_nested_categories_html' ) )
 
 			endif;
 
+			$_base_url = app_setting( 'url', 'shop' ) ? app_setting( 'url', 'shop' ) : 'shop/';
+
 			$_out .= '<li class="category">';
-			$_out .= '<p><a href="' . site_url( app_setting( 'url', 'shop' ) ) . '/category/' . $category->slug . '">';
+			$_out .= '<p><a href="' . site_url( $_base_url ) . '/category/' . $category->slug . '">';
 			$_out .= $category->label;
 
 			if ( $include_count && isset( $category->product_count ) ) :
