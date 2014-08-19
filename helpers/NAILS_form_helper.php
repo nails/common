@@ -126,7 +126,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_tip['class']		= is_array( $_field_tip ) && isset( $_field_tip['class'] )	? $_field_tip['class']	: 'fa fa-question-circle fa-lg tip';
 		$_tip['rel']		= is_array( $_field_tip ) && isset( $_field_tip['rel'] )	? $_field_tip['rel']	: 'tipsy-left';
 		$_tip['title']		= is_array( $_field_tip ) && isset( $_field_tip['title'] )	? $_field_tip['title']	: NULL;
-		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_field_tip['title'];
+		$_tip['title']		= is_string( $_field_tip ) ? $_field_tip : $_tip['title'];
 
 		$_error				= form_error( $_field_key ) || $_field_error ? 'error' : '';
 		$_error_class		= $_error ? 'error' : '';
