@@ -2,8 +2,8 @@
 					<small rel="tooltip-r" title="<?=lang( 'admin_rendered_in_tip' )?>">
 						<?=lang( 'admin_rendered_in', '{elapsed_time}' )?>
 					</small>
-					<small class="right" rel="tooltip-l" title="<?=lang( 'admin_powered_by_tip', NAILS_VERSION_RELEASED )?>">
-						<?=lang( 'admin_powered_by', array( 'http://nailsapp.co.uk', NAILS_VERSION ) )?>
+					<small class="right">
+						<?=lang( 'admin_powered_by', 'http://nailsapp.co.uk' )?>
 					</small>
 				</footer>
 

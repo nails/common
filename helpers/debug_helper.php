@@ -166,5 +166,29 @@ if ( ! function_exists( 'last_query' ) )
 }
 
 
+// --------------------------------------------------------------------------
+
+
+/**
+ * send_developer_mail()
+ *
+ * Quickly send a high priority email via mail() to the APP_DEVELOPER
+ *
+ *
+ * @access	public
+ * @param	string $subject The subject of the email
+ * @param	string $message The message of the email
+ * @return	object
+ */
+if ( ! function_exists( 'send_developer_mail' ) )
+{
+	function send_developer_mail( $subject, $message )
+	{
+		return get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
+	}
+}
+
+
+
 /* End of file debug_helper.php */
 /* Location: ./helpers/debug_helper.php */

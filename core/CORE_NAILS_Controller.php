@@ -512,29 +512,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 	protected function _autoload_items()
 	{
-		$_packages = array();
+		$_packages			= array();
+		$_available_modules	= _NAILS_GET_AVAILABLE_MODULES();
 
-		$_nails_data = get_nails_data();
+		foreach ( $_available_modules AS $module ) :
 
-		if ( ! empty( $_nails_data->modules ) ) :
+			$_packages[] = FCPATH . 'vendor/' . $module . '/';
 
-			foreach( $_nails_data->modules AS $vendor => $modules ) :
-
-				foreach ( $modules AS $module ) :
-
-					$_path = FCPATH . 'vendor/' . $vendor . '/' . $module . '/';
-
-					if ( is_dir( $_path ) ) :
-
-						$_packages[] = $_path;
-
-					endif;
-
-				endforeach;
-
-			endforeach;
-
-		endif;
+		endforeach;
 
 		$_packages[] = NAILS_COMMON_PATH . '';
 
@@ -546,13 +531,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 		// --------------------------------------------------------------------------
 
-		//	Load the system & user helper
-		$this->load->helper( 'system' );
-		$this->load->helper( 'user' );
-
-		// --------------------------------------------------------------------------
-
+		//	Load the user helper
 		$_helpers		= array();
+		$_helpers[]		= 'user';
 		$_helpers[]		= 'app_setting';
 		$_helpers[]		= 'app_notification';
 		$_helpers[]		= 'datetime';

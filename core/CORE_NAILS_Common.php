@@ -1,16 +1,65 @@
 <?php
 
 /**
- * $NAILS_DATA is an object populated by System_startup from nails.json. This
- * function provides an easy interface to this array when it's not in scope.
+ * _NAILS_GET_POTENTIAL_MODULES()
+ *
+ * Fetch all the potentially available modules for this app
  *
  * @access	public
- * @return	array	A reference to $NAILS_DATA
- **/
-function &get_nails_data()
+ * @param	none
+ * @return	object
+ */
+if ( ! function_exists( '_NAILS_GET_POTENTIAL_MODULES' ) )
 {
-	global $NAILS_DATA;
-	return $NAILS_DATA;
+	function _NAILS_GET_POTENTIAL_MODULES()
+	{
+		//	If we already know which modules are available then return that, save
+		//	the [small] overhead of working out the modules again and again.
+
+		if ( isset( $GLOBALS['NAILS_POTENTIAL_MODULES'] ) ) :
+
+			return $GLOBALS['NAILS_POTENTIAL_MODULES'];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+
+		$_composer = @file_get_contents(NAILS_PATH . 'nails/composer.json');
+
+		if ( empty( $_composer ) ) :
+
+			_NAILS_ERROR('Failed to discover potential modules; could not load composer.json' );
+
+		endif;
+
+		$_composer = json_decode( $_composer );
+
+		if ( empty( $_composer->extra->modules ) ) :
+
+			_NAILS_ERROR('Failed to discover potential modules; could not decode composer.json' );
+
+		endif;
+
+		$_modules = array();
+
+		foreach ( $_composer->extra->modules AS $vendor => $modules ) :
+
+			foreach ( $modules AS $module ) :
+
+				$_modules[] = $vendor . '/' . $module;
+
+			endforeach;
+
+		endforeach;
+
+		//	Save as a $GLOBAL for next time
+		$GLOBALS['NAILS_POTENTIAL_MODULES'] = $_modules;
+
+		// --------------------------------------------------------------------------
+
+		return $_modules;
+	}
 }
 
 
@@ -18,23 +67,131 @@ function &get_nails_data()
 
 
 /**
- * $NAILS_DATA is an object populated by System_startup from nails.json,
- * this function provides an easy interface to set this object when it's not
- * in scope.
+ * _NAILS_GET_AVAILABLE_MODULES()
+ *
+ * Fetch the avalable modules for this app
  *
  * @access	public
- * @param mixed $data The data to set
- * @return	void
- **/
-function set_nails_data( $data )
+ * @param	none
+ * @return	object
+ */
+if ( ! function_exists( '_NAILS_GET_AVAILABLE_MODULES' ) )
 {
-	global $NAILS_DATA;
-	$NAILS_DATA = $data;
+	function _NAILS_GET_AVAILABLE_MODULES()
+	{
+		//	If we already know which modules are available then return that, save
+		//	the [small] overhead of working out the modules again and again.
+
+		if ( isset( $GLOBALS['NAILS_AVAILABLE_MODULES'] ) ) :
+
+			return $GLOBALS['NAILS_AVAILABLE_MODULES'];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_potential	= _NAILS_GET_POTENTIAL_MODULES();
+		$_modules	= array();
+
+		foreach ( $_potential AS $module ) :
+
+			if ( is_dir( FCPATH . 'vendor/' . $module ) ) :
+
+				$_modules[] = $module;
+
+			endif;
+
+		endforeach;
+
+		//	Save as a $GLOBAL for next time
+		$GLOBALS['NAILS_AVAILABLE_MODULES'] = $_modules;
+
+		// --------------------------------------------------------------------------
+
+		return $_modules;
+	}
 }
 
 
 // --------------------------------------------------------------------------
 
+
+/**
+ * _NAILS_GET_UNAVAILABLE_MODULES()
+ *
+ * Fetch the unavalable modules for this app
+ *
+ * @access	public
+ * @param	none
+ * @return	object
+ */
+if ( ! function_exists( '_NAILS_GET_UNAVAILABLE_MODULES' ) )
+{
+	function _NAILS_GET_UNAVAILABLE_MODULES()
+	{
+		//	If we already know which modules are unavailable then return that, save
+		//	the [small] overhead of working out the modules again and again.
+
+		if ( isset( $GLOBALS['NAILS_UNAVAILABLE_MODULES'] ) ) :
+
+			return $GLOBALS['NAILS_UNAVAILABLE_MODULES'];
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$_potential	= _NAILS_GET_POTENTIAL_MODULES();
+		$_modules	= array();
+
+		foreach ( $_potential AS $module ) :
+
+			if ( ! is_dir( FCPATH . 'vendor/' . $module ) ) :
+
+				$_modules[] = $module;
+
+			endif;
+
+		endforeach;
+
+		//	Save as a $GLOBAL for next time
+		$GLOBALS['NAILS_UNAVAILABLE_MODULES'] = $_modules;
+
+		// --------------------------------------------------------------------------
+
+		return $_modules;
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * module_is_enabled()
+ *
+ * Handy way of determining whether a module is enabled or not in the app's config
+ *
+ * @access	public
+ * @param	string	$key	The key(s) to fetch
+ * @return	object
+ */
+if ( ! function_exists( 'module_is_enabled' ) )
+{
+	function module_is_enabled( $module )
+	{
+		$_potential	= _NAILS_GET_AVAILABLE_MODULES();
+
+		if ( array_search( 'nailsapp/module-' . $module, $_potential ) !== FALSE ) :
+
+			return TRUE;
+
+		endif;
+
+		return FALSE;
+	}
+}
+
+// --------------------------------------------------------------------------
 
 /**
  * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
