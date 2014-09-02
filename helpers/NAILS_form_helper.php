@@ -1068,7 +1068,7 @@ if ( ! function_exists( 'form_field_datetime' ) )
  */
 if ( ! function_exists( 'form_field_dropdown' ) )
 {
-	function form_field_dropdown( $field, $options, $tip = '' )
+	function form_field_dropdown( $field, $options = NULL, $tip = '' )
 	{
 		//	Set var defaults
 		$_field						= array();
@@ -1088,6 +1088,12 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_field['disabled_options']	= isset( $field['disabled_options'] ) ? $field['disabled_options'] : array();
 		$_field['info']				= isset( $field['info'] ) ? $field['info'] : array();
 		$_field['tip']				= isset( $field['tip'] ) ? $field['tip'] : $tip;
+
+		if ( is_null( $options ) ) :
+
+			$options = isset( $field['options'] ) ? $field['options'] : array();
+
+		endif;
 
 		$_tip					= array();
 		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
