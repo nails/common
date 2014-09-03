@@ -587,6 +587,29 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 		endif;
 	}
 
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Valid Email, using filter_var if possible falling back to CI's regex
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	bool
+	 */
+	public function valid_email($str)
+	{
+		if ( function_exists( 'filter_var' ) ) :
+
+			return (bool) filter_var( $str, FILTER_VALIDATE_EMAIL );
+
+		else :
+
+			return parent::valid_email($str);
+
+		endif;
+	}
 }
 
 
