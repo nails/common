@@ -1,17 +1,20 @@
 <?php
 
-/*
- | --------------------------------------------------------------------
- | NAILS MIGRATION TOOL
- | --------------------------------------------------------------------
- |
- | This class handles database migrations
- |
- | Documentation: http://docs.nailsapp.co.uk
- |
+/**
+ * ---------------------------------------------------------------
+ * NAILS CONSOLE: DATABASE MIGRATION TOOL
+ * ---------------------------------------------------------------
+ *
+ * This app handles migrating the parent app's database tables and
+ * all enabled modules.
+ *
+ * Lead Developer: Pablo de la Peña	(p@shedcollective.org, @hellopablo)
+ * Lead Developer: Gary Duncan		(g@shedcollective.org, @gsdd)
+ *
+ * Documentation: http://nailsapp.co.uk/console/migrate
  */
 
-namespace Nails\Console\MigrationTool;
+namespace Nails\Console\Apps;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,18 +22,28 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CORE_NAILS_MigrationTool extends Command
+class CORE_NAILS_Migrate extends Command
 {
+	/**
+	 * Configures the app
+	 * @return void
+	 */
 	protected function configure()
 	{
-		$this
-			->setName('go')
-			->setDescription('Runs database migration across all enabled modules.')
-		;
+		$this->setName('migrate');
+		$this->setDescription('Runs database migration across all enabled modules');
 	}
+
 
 	// --------------------------------------------------------------------------
 
+
+	/**
+	 * Executes the app
+	 * @param  InputInterface  $input  The Input Interface proivided by Symfony
+	 * @param  OutputInterface $output The Output Interface proivided by Symfony
+	 * @return void
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$output->writeln('<info>-----------------------------</info>');
@@ -49,3 +62,6 @@ class CORE_NAILS_MigrationTool extends Command
 		$output->writeln('Complete!');
 	}
 }
+
+/* End of file migrate.php */
+/* Location: ./nailsapp/common/console/apps/migrate.php */
