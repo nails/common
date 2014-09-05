@@ -21,8 +21,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class CORE_NAILS_Migrate extends Command
+require_once 'vendor/nailsapp/common/console/apps/_app.php';
+
+class CORE_NAILS_Migrate extends CORE_NAILS_App
 {
 	/**
 	 * Configures the app
@@ -46,20 +49,126 @@ class CORE_NAILS_Migrate extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$output->writeln('<info>-----------------------------</info>');
-		$output->writeln('<info>Nails Database Migration Tool</info>');
-		$output->writeln('<info>-----------------------------</info>');
-		$output->writeln('Beginning...');
+		$output->writeln( '<info>-----------------------------</info>' );
+		$output->writeln( '<info>Nails Database Migration Tool</info>' );
+		$output->writeln( '<info>-----------------------------</info>' );
 
-		$output->writeln('<comment>TODO:</comment> check environment and confirm if production (handle -no-interaction)');
-		$output->writeln('<comment>TODO:</comment> fetch all enabled modules and look for migration scripts');
-		$output->writeln('<comment>TODO:</comment> gather everything and test things');
-		$output->writeln('<comment>TODO:</comment> setup migration table stuff');
-		$output->writeln('<comment>TODO:</comment> confirm with user what\'s going to happen (handle -no-interaction)');
-		$output->writeln('<comment>TODO:</comment> execute migrations (handle failures)');
+		// --------------------------------------------------------------------------
 
-		$output->writeln('Cleaning up...');
-		$output->writeln('Complete!');
+		//	Load configs
+		if ( ! file_exists( 'config/deploy.php' ) ) :
+
+			$output->writeln( '<error>ERROR:</error> Could not load config/deploy.php.' );
+			return FALSE;
+
+		endif;
+
+		include 'config/deploy.php';
+
+		if ( ! defined( 'ENVIRONMENT' ) ) :
+
+			$output->writeln( '<error>ERROR:</error> ENVIRONMENT is not defined.' );
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Check environment
+		if ( strtoupper( ENVIRONMENT ) == 'PRODUCTION' ) :
+
+			$output->writeln( '' );
+			$output->writeln( '--------------------------------------' );
+			$output->writeln( '| <info>WARNING: The app is in PRODUCTION.</info> |' );
+			$output->writeln( '--------------------------------------' );
+			$output->writeln( '' );
+
+			if ( ! $this->confirm( 'Continue with migration?', TRUE, $input, $output ) ) :
+
+				$output->writeln( '' );
+				$output->writeln( 'Aborting migration.' );
+				return;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Look for enabled modules
+		$output->writeln( '' );
+		$output->writeln( '<comment>Searchng for modules...</comment> found 4 modules' );
+
+		// --------------------------------------------------------------------------
+
+		//	Gather everything and perform any preliminary tests
+		$output->writeln( '<comment>Preparing for migration...</comment> done' );
+
+		// --------------------------------------------------------------------------
+
+		//	Confirm what's going to happen
+		$output->writeln( '' );
+		$output->writeln( 'The following modules are to be migrated:' );
+		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
+		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
+		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
+		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
+		$output->writeln( '' );
+
+		if ( ! $this->confirm( 'Continue?', TRUE, $input, $output ) ) :
+
+			$output->writeln( '' );
+			$output->writeln( 'Aborting migration.' );
+			return;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		$output->writeln( '' );
+		$output->writeln( '<comment>Starting migration...</comment>' );
+		$progress = $this->getHelper('progress');
+
+		$progress->start($output, 4);
+		$progress->setCurrent( 0 );
+		$i = 0;
+		while ($i++ < 4) :
+
+			//	do something
+			sleep(2);
+
+			// advances the progress bar 1 unit
+			$progress->advance();
+
+		endwhile;
+
+		$progress->finish();
+
+
+		// --------------------------------------------------------------------------
+
+		$output->writeln( '' );
+		$output->writeln( '<comment>Cleaning up...</comment>' );
+
+		// --------------------------------------------------------------------------
+
+		//	And we're done
+		$output->writeln( '' );
+		$output->writeln( 'Complete!' );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function confirm( $question, $default, $input, $output )
+	{
+		$question		= is_array( $question ) ? implode( "\n", $question ) : $question;
+		$helper			= $this->getHelper( 'question' );
+		$defaultString	= $default ? 'Y' : 'N';
+		$question		= new ConfirmationQuestion(  $question . ' [' . $defaultString . ']: ', $default ) ;
+
+		return $helper->ask( $input, $output, $question );
 	}
 }
 
