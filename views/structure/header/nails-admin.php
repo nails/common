@@ -180,10 +180,11 @@
 			$_counter		= 0;
 			$loaded_modules	= ! empty( $loaded_modules ) ? $loaded_modules : array();
 
-			foreach ( $loaded_modules AS $module => $config ) :
+			foreach ( $loaded_modules AS $module_index => $config ) :
 
 				//	Get any notifications for this module if applicable
-				$_notifications = $module::notifications();
+				$_class_name	= $config->class_name;
+				$_notifications	= $_class_name::notifications();
 
 				$_class = '';
 
@@ -217,17 +218,17 @@
 					$_temp->is_active			= FALSE;
 					$_temp->label				= $label;
 					$_temp->method				= $method;
-					$_temp->url					= 'admin/' . $module . '/' . $method;
+					$_temp->url					= 'admin/' . $config->class_name . '/' . $method;
 					$_temp->notification		= new stdClass();
 					$_temp->notification->type	= '';
 					$_temp->notification->title	= '';
 					$_temp->notification->value	= '';
 
 					//	Is the method enabled?
-					if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$module][$method] ) ) :
+					if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$config->class_name][$method] ) ) :
 
 						//	Method enabled?
-						$_temp->is_active = $this->uri->rsegment( 1 ) == $module && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
+						$_temp->is_active = $this->uri->rsegment( 1 ) == $config->class_name && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
 
 						//	Notifications for this method?
 						if ( ! empty( $_notifications[$method] ) ) :
@@ -254,15 +255,15 @@
 				if ( $_options ) :
 
 					//	Add this to the mobile version of the menu
-					$_mobile_menu[$module]			= new stdClass();
-					$_mobile_menu[$module]->module	= $config->name;
-					$_mobile_menu[$module]->url		= NULL;
-					$_mobile_menu[$module]->subs	= array();
+					$_mobile_menu[$config->class_name]			= new stdClass();
+					$_mobile_menu[$config->class_name]->module	= $config->name;
+					$_mobile_menu[$config->class_name]->url		= NULL;
+					$_mobile_menu[$config->class_name]->subs	= array();
 
 					// --------------------------------------------------------------------------
 
 					//	Dashboard is not sortable
-					$_sortable = $module == 'dashboard' ? 'no-sort' : '';
+					$_sortable = $config->class_name == 'dashboard' ? 'no-sort' : '';
 
 					// --------------------------------------------------------------------------
 
@@ -271,7 +272,7 @@
 
 					if ( $_user_nav_pref ) :
 
-						if ( empty( $_user_nav_pref->{$module}->open ) ) :
+						if ( empty( $_user_nav_pref->{$config->class_index}->open ) ) :
 
 							$_state = 'closed';
 
@@ -288,11 +289,10 @@
 
 					endif;
 
-
 					?>
-					<li class="module <?=$_sortable?> admin-branding-background-primary" data-module="<?=$module?>" data-initial-state="<?=$_state?>">
-						<div class="box <?=$_class?>" id="box_<?=url_title( $config->name )?>">
-							<h2 class="<?=$module?>">
+					<li class="module <?=$_sortable?> admin-branding-background-primary" data-module="<?=$config->class_index?>" data-initial-state="<?=$_state?>">
+						<div class="box <?=$_class?>" id="box_<?=str_replace( ':', '__', $config->class_index )?>">
+							<h2 class="<?=$config->class_name?>">
 								<div class="icon admin-branding-text-highlight">
 								<?php
 
@@ -323,9 +323,9 @@
 									foreach( $_options AS $option ) :
 
 										//	Add to the mobile menu
-										$_mobile_menu[$module]->subs[$option->method]			= new stdClass();
-										$_mobile_menu[$module]->subs[$option->method]->label	= $option->label;
-										$_mobile_menu[$module]->subs[$option->method]->url		= $option->url;
+										$_mobile_menu[$config->class_name]->subs[$option->method]			= new stdClass();
+										$_mobile_menu[$config->class_name]->subs[$option->method]->label	= $option->label;
+										$_mobile_menu[$config->class_name]->subs[$option->method]->url		= $option->url;
 
 										//	Render
 										echo '<li class="' . $option->is_active . '">';
@@ -362,7 +362,7 @@
 
 													endforeach;
 
-													$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . implode( ', ', $_mobile_notification ) . ')';
+													$_mobile_menu[$config->class_name]->subs[$option->method]->label .= ' (' . implode( ', ', $_mobile_notification ) . ')';
 
 												break;
 
@@ -375,11 +375,11 @@
 
 														if ( $option->notification->title ) :
 
-															$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . $option->notification->title . ': ' . number_format( $option->notification->value ) . ')';
+															$_mobile_menu[$config->class_name]->subs[$option->method]->label .= ' (' . $option->notification->title . ': ' . number_format( $option->notification->value ) . ')';
 
 														else :
 
-															$_mobile_menu[$module]->subs[$option->method]->label .= ' (' . number_format( $option->notification->value ) . ')';
+															$_mobile_menu[$config->class_name]->subs[$option->method]->label .= ' (' . number_format( $option->notification->value ) . ')';
 
 														endif;
 
