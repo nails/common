@@ -31,7 +31,7 @@
 					if ( get_instance()->uri->segment( 1 ) == 'admin' && $_admin ) :
 
 						echo '<small>';
-							echo 'You\'re getting this error because you are currently logged in as ' . active_user( 'email' ) . ', a user who does not have access to Administration. ';
+							echo 'You\'re getting this error because you are currently logged in as ' . active_user( 'email' ) . ', a user who does not have access to this administration contet. ';
 							echo 'If you\'d like to log back in as ' . $_admin->email . ' then please click ' . anchor( 'auth/override/login_as/' . $_admin->id . '/' . $_admin->hash, 'here' ) . '.';
 						echo '</small>';
 

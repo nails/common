@@ -610,6 +610,21 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 
 		endif;
 	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Same as alpha_dash, but includes periods
+	 * @param  string $str The string to test
+	 * @return boolean
+	 */
+	public function alpha_dash_period($str)
+	{
+		return ( ! preg_match("/^([\.-a-z0-9_-])+$/i", $str)) ? FALSE : TRUE;
+	}
+
 }
 
 

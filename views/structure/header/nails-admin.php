@@ -105,7 +105,7 @@
 
 </head>
 
-<body class="<?=empty( $loaded_modules ) ? 'no-modules' : ''?>">
+<body class="<?=!$has_modules ? 'no-modules' : ''?>">
 
 	<div class="header">
 
@@ -178,13 +178,12 @@
 			$_acl			= active_user( 'acl' );
 			$_mobile_menu	= array();
 			$_counter		= 0;
-			$loaded_modules	= ! empty( $loaded_modules ) ? $loaded_modules : array();
 
-			foreach ( $loaded_modules AS $module_index => $config ) :
+			foreach ( $loaded_modules AS $config ) :
 
 				//	Get any notifications for this module if applicable
 				$_class_name	= $config->class_name;
-				$_notifications	= $_class_name::notifications();
+				$_notifications	= $_class_name::notifications( $config->class_index );
 
 				$_class = '';
 
@@ -204,11 +203,12 @@
 
 				// --------------------------------------------------------------------------
 
-				//	Loop all the module methods and prepare an array, we do this so that we
-				//	can make sure there'll be some output before we render the box header (i.e
-				//	if a user only has access to an unlisted method they won't have an options
-				//	here - e.g edit member - themselves - but not view members).
-
+				/**
+				 * Loop all the module methods and prepare an array, we do this so that we
+				 * can make sure there'll be some output before we render the box header (i.e
+				 * if a user only has access to an unlisted method they won't have an options
+				 * here - e.g edit member - themselves - but not view members).
+				 */
 
 				$_options = array();
 
@@ -224,28 +224,23 @@
 					$_temp->notification->title	= '';
 					$_temp->notification->value	= '';
 
-					//	Is the method enabled?
-					if ( get_userobject()->is_superuser() || isset( $_acl['admin'][$config->class_name][$method] ) ) :
+					//	Method enabled?
+					$_temp->is_active = $this->uri->rsegment( 1 ) == $config->class_name && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
 
-						//	Method enabled?
-						$_temp->is_active = $this->uri->rsegment( 1 ) == $config->class_name && $this->uri->rsegment( 2 ) == $method ? 'current' : '';
+					//	Notifications for this method?
+					if ( ! empty( $_notifications[$method] ) ) :
 
-						//	Notifications for this method?
-						if ( ! empty( $_notifications[$method] ) ) :
-
-							$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'neutral';
-							$_temp->notification->title		= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
-							$_temp->notification->value		= isset( $_notifications[$method]['value'] ) ? $_notifications[$method]['value'] : '';
-							$_temp->notification->options	= isset( $_notifications[$method]['options'] ) ? $_notifications[$method]['options'] : '';
-
-						endif;
-
-						// --------------------------------------------------------------------------
-
-						//	Add to main $_options array
-						$_options[] = $_temp;
+						$_temp->notification->type		= isset( $_notifications[$method]['type'] ) ? $_notifications[$method]['type'] : 'neutral';
+						$_temp->notification->title		= isset( $_notifications[$method]['title'] ) ? $_notifications[$method]['title'] : '';
+						$_temp->notification->value		= isset( $_notifications[$method]['value'] ) ? $_notifications[$method]['value'] : '';
+						$_temp->notification->options	= isset( $_notifications[$method]['options'] ) ? $_notifications[$method]['options'] : '';
 
 					endif;
+
+					// --------------------------------------------------------------------------
+
+					//	Add to main $_options array
+					$_options[] = $_temp;
 
 				endforeach;
 
@@ -262,8 +257,13 @@
 
 					// --------------------------------------------------------------------------
 
-					//	Dashboard is not sortable
-					$_sortable = $config->class_name == 'dashboard' ? 'no-sort' : '';
+					//	Some modules are not sortable
+					$_not_sortable		= array();
+					$_not_sortable[]	= 'dashboard';
+					$_not_sortable[]	= 'settings';
+					$_not_sortable[]	= 'utilities';
+
+					$_sortable = array_search( $config->class_name, $_not_sortable ) !== FALSE ? 'no-sort' : '';
 
 					// --------------------------------------------------------------------------
 
@@ -456,22 +456,22 @@
 				<?php
 
 					//	Page title
-					if ( isset( $page->module->name ) && isset( $page->title ) ) :
+					if ( ! empty( $page->module->name ) && ! empty( $page->title ) ) :
 
 						echo '<h1>';
-						echo $page->module->name . ' &rsaquo; ' . $page->title;
+							echo $page->module->name . ' &rsaquo; ' . $page->title;
 						echo '</h1>';
 
-					elseif ( ! isset( $page->module->name ) && isset( $page->title ) ) :
+					elseif ( empty( $page->module->name ) && ! empty( $page->title ) ) :
 
 						echo '<h1>';
-						echo $page->title;
+							echo $page->title;
 						echo '</h1>';
 
-					else :
+					elseif ( ! empty( $page->module->name ) ) :
 
 						echo '<h1>';
-						echo $page->module->name;
+							echo $page->module->name;
 						echo '</h1>';
 
 					endif;

@@ -100,6 +100,8 @@
 	$lang['fv_max_length_field']			= 'The %s field is too long, maximum length is %2$s characters.';
 	$lang['fv_alpha_dash']					= 'This field may only contain alpha-numeric characters, underscores, and dashes.';
 	$lang['fv_alpha_dash_field']			= 'The %s field may only contain alpha-numeric characters, underscores, and dashes.';
+	$lang['fv_alpha_dash_period']			= 'This field may only contain alpha-numeric characters, underscores, periods, and dashes.';
+	$lang['fv_alpha_dash_period_field']		= 'The %s field may only contain alpha-numeric characters, underscores, periods, and dashes.';
 
 	// --------------------------------------------------------------------------
 
