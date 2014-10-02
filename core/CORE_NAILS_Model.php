@@ -2,17 +2,14 @@
 
 class CORE_NAILS_Model extends CI_Model
 {
+	//	Class traits
+	use NAILS_COMMON_TRAIT_ERROR_HANDLING;
+	use NAILS_COMMON_TRAIT_CACHING;
 
 	//	Common data
 	protected $data;
 	protected $user;
 	protected $user_model;
-	protected $_cache_values;
-	protected $_cache_keys;
-	protected $_cache_method;
-
-	//	Errors
-	protected $_errors;
 
 	//	Data/Table structure
 	protected $_table;
@@ -29,6 +26,9 @@ class CORE_NAILS_Model extends CI_Model
 	//	Preferences
 	protected $_destructive_delete;
 	protected $_per_page;
+
+
+	// --------------------------------------------------------------------------
 
 
 	/**
@@ -61,16 +61,6 @@ class CORE_NAILS_Model extends CI_Model
 			$this->user			= get_userobject();
 
 		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Set the cache method
-		//	TODO: check for availability of things like memcached
-		//	TODO: apply same logic to CDN library
-
-		$this->_cache_values	= array();
-		$this->_cache_keys		= array();
-		$this->_cache_method	= 'LOCAL';
 
 		// --------------------------------------------------------------------------
 
@@ -126,254 +116,6 @@ class CORE_NAILS_Model extends CI_Model
 	public function _set_user_object( &$user )
 	{
 		$this->user = $user;
-	}
-
-
-	/**
-	 * --------------------------------------------------------------------------
-	 *
-	 * ERROR METHODS
-	 * These methods provide a consistent interface for setting and retrieving
-	 * errors which are generated.
-	 *
-	 * --------------------------------------------------------------------------
-	 **/
-
-
-	/**
-	 * Set a generic error
-	 * @param string $error The error message
-	 */
-	protected function _set_error( $error )
-	{
-		$this->_errors[] = $error;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Return the error array
-	 * @return array
-	 */
-	public function get_errors()
-	{
-		return $this->_errors;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Returns the last error
-	 * @return string
-	 */
-	public function last_error()
-	{
-		return end( $this->_errors );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Clears the last error
-	 * @return mixed
-	 */
-	public function clear_last_error()
-	{
-		return array_pop( $this->_errors );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Clears all errors
-	 * @return void
-	 */
-	public function clear_errors()
-	{
-		$this->_errors = array();
-	}
-
-
-	/**
-	 * --------------------------------------------------------------------------
-	 *
-	 * CACHE METHODS
-	 * These methods provide a consistent interface for setting and retrieving
-	 * items from the cache
-	 *
-	 * --------------------------------------------------------------------------
-	 **/
-
-
-	/**
-	 * Provides models with the an easy interface for saving data to a cache.
-	 *
-	 * @access	protected
-	 * @param string $key The key for the cached item
-	 * @param mixed $value The data to be cached
-	 * @return array
-	 **/
-	protected function _set_cache( $key, $value )
-	{
-		if ( ! $key )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		//	Prep the key, the key should have a prefix unique to this model
-		$_prefix = $this->_cache_prefix();
-
-		// --------------------------------------------------------------------------
-
-		switch ( $this->_cache_method ) :
-
-			case 'LOCAL' :
-
-				$this->_cache_values[md5( $_prefix . $key )] = serialize( $value );
-				$this->_cache_keys[]	= $key;
-
-			break;
-
-			// --------------------------------------------------------------------------
-
-			case 'MEMCACHED' :
-
-				//	TODO
-
-			break;
-
-		endswitch;
-
-		// --------------------------------------------------------------------------
-
-		return TRUE;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Lookup a cache item
-	 *
-	 * @access	protected
-	 * @param	string	$key	The key to fetch
-	 * @return mixed
-	 **/
-	protected function _get_cache( $key )
-	{
-		if ( ! $key )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		//	Prep the key, the key should have a prefix unique to this model
-		$_prefix = $this->_cache_prefix();
-
-		// --------------------------------------------------------------------------
-
-		switch ( $this->_cache_method ) :
-
-			case 'LOCAL' :
-
-				if ( isset( $this->_cache_values[md5( $_prefix . $key )] ) ) :
-
-					return unserialize( $this->_cache_values[md5( $_prefix . $key )] );
-
-				else :
-
-					return FALSE;
-
-				endif;
-
-			break;
-
-			// --------------------------------------------------------------------------
-
-			case 'MEMCACHED' :
-
-				//	TODO
-
-			break;
-
-		endswitch;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Unset a cache item
-	 *
-	 * @access	protected
-	 * @param	string	$key	The key to fetch
-	 * @return boolean
-	 **/
-	protected function _unset_cache( $key )
-	{
-		if ( ! $key )
-			return FALSE;
-
-		// --------------------------------------------------------------------------
-
-		//	Prep the key, the key should have a prefix unique to this model
-		$_prefix = $this->_cache_prefix();
-
-		// --------------------------------------------------------------------------
-
-		switch ( $this->_cache_method ) :
-
-			case 'LOCAL' :
-
-				unset( $this->_cache_values[md5( $_prefix . $key )] );
-
-				$_key = array_search( $key, $this->_cache_keys );
-
-				if ( $_key !== FALSE ) :
-
-					unset( $this->_cache_keys[$_key] );
-
-				endif;
-
-			break;
-
-			// --------------------------------------------------------------------------
-
-			case 'MEMCACHED' :
-
-				//	TODO
-
-			break;
-
-		endswitch;
-
-		// --------------------------------------------------------------------------
-
-		return TRUE;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Define the cache key prefix
-	 *
-	 * @access	private
-	 * @return string
-	 **/
-	protected function _cache_prefix()
-	{
-		return get_called_class();
 	}
 
 

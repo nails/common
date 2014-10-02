@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * The following functions are used internally by Nails
+ */
+
+// --------------------------------------------------------------------------
+
+/**
  * _NAILS_GET_POTENTIAL_MODULES()
  *
  * Fetch all the potentially available modules for this app
@@ -25,7 +31,7 @@ if ( ! function_exists( '_NAILS_GET_POTENTIAL_MODULES' ) )
 		// --------------------------------------------------------------------------
 
 
-		$_composer = @file_get_contents(NAILS_PATH . 'nails/composer.json');
+		$_composer = @file_get_contents( NAILS_PATH . 'nails/composer.json' );
 
 		if ( empty( $_composer ) ) :
 
@@ -35,7 +41,7 @@ if ( ! function_exists( '_NAILS_GET_POTENTIAL_MODULES' ) )
 
 		$_composer = json_decode( $_composer );
 
-		if ( empty( $_composer->extra->modules ) ) :
+		if ( empty( $_composer->extra->nails->modules ) ) :
 
 			_NAILS_ERROR('Failed to discover potential modules; could not decode composer.json' );
 
@@ -43,7 +49,7 @@ if ( ! function_exists( '_NAILS_GET_POTENTIAL_MODULES' ) )
 
 		$_modules = array();
 
-		foreach ( $_composer->extra->modules AS $vendor => $modules ) :
+		foreach ( $_composer->extra->nails->modules AS $vendor => $modules ) :
 
 			foreach ( $modules AS $module ) :
 
@@ -95,7 +101,7 @@ if ( ! function_exists( '_NAILS_GET_AVAILABLE_MODULES' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( is_dir( FCPATH . 'vendor/' . $module ) ) :
+			if ( is_dir( 'vendor/' . $module ) ) :
 
 				$_modules[] = $module;
 
@@ -145,7 +151,7 @@ if ( ! function_exists( '_NAILS_GET_UNAVAILABLE_MODULES' ) )
 
 		foreach ( $_potential AS $module ) :
 
-			if ( ! is_dir( FCPATH . 'vendor/' . $module ) ) :
+			if ( ! is_dir( 'vendor/' . $module ) ) :
 
 				$_modules[] = $module;
 
@@ -225,6 +231,87 @@ function set_controller_data( $key, $value )
 	global $NAILS_CONTROLLER_DATA;
 	$NAILS_CONTROLLER_DATA[$key] = $value;
 }
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * PHP Version Check
+ * =================
+ *
+ * We need to loop through all available modules and have a look at what version
+ * of PHP they require, we'll then take the highest version and set that as our
+ * minimum supported value.
+ *
+ * To set a requirement, within the module's nails object in composer.json,
+ * specify the min_php_version value. You should also specify the appropriate
+ * constraint for composer in the "require" section of composer.json.
+ *
+ * e.g:
+ *
+ * 	"extra":
+ * 	{
+ *		"nails" :
+ *		{
+ *			"min_php_version":"5.4.0"
+ *		}
+ * 	}
+ */
+
+if ( ! function_exists( '_NAILS_MIN_PHP_VERSION' ) )
+{
+	function _NAILS_MIN_PHP_VERSION()
+	{
+		$_modules		= array( 'nailsapp/common' ) + _NAILS_GET_AVAILABLE_MODULES();
+		$_min_version	= 0;
+
+		foreach ( $_modules AS $m ) :
+
+			$_composer = @file_get_contents( 'vendor/' . $m . '/composer.json' );
+
+			if ( ! empty( $_composer ) ) :
+
+				$_composer = json_decode( $_composer );
+
+				if ( ! empty( $_composer->extra->nails->min_php_version ) ) :
+
+					if ( version_compare( $_composer->extra->nails->min_php_version, $_min_version, '>' ) ) :
+
+						$_min_version = $_composer->extra->nails->min_php_version;
+
+					endif;
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		return $_min_version;
+	}
+}
+
+define( 'NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION() );
+
+if ( version_compare( PHP_VERSION, NAILS_MIN_PHP_VERSION, '<' ) ) :
+
+	$subject	= 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
+	$message	= 'The version of PHP you are running is not supported. Nails requires at least PHP version ' . NAILS_MIN_PHP_VERSION;
+
+	if ( function_exists( '_NAILS_ERROR' ) ) :
+
+		_NAILS_ERROR( $message, $subject );
+
+	else :
+
+		echo '<h1>ERROR: ' . $subject . '</h1>';
+		echo '<h2>' . $message . '</h2>';
+		exit(0);
+
+	endif;
+
+endif;
 
 
 // --------------------------------------------------------------------------
@@ -422,5 +509,269 @@ function page_is_secure()
 	return FALSE;
 }
 
+
+// --------------------------------------------------------------------------
+
+
+/**
+ *
+ * The following class traits are used throughout Nails
+ *
+ */
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Implements a common API for error handling in classes
+ */
+trait NAILS_COMMON_TRAIT_ERROR_HANDLING
+{
+	protected $_errors;
+
+	// --------------------------------------------------------------------------
+
+	/**
+	 * Set a generic error
+	 * @param string $error The error message
+	 */
+	protected function _set_error( $error )
+	{
+		$this->_errors[] = $error;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Return the error array
+	 * @return array
+	 */
+	public function get_errors()
+	{
+		return $this->_errors;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Returns the last error
+	 * @return string
+	 */
+	public function last_error()
+	{
+		return end( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Clears the last error
+	 * @return mixed
+	 */
+	public function clear_last_error()
+	{
+		return array_pop( $this->_errors );
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Clears all errors
+	 * @return void
+	 */
+	public function clear_errors()
+	{
+		$this->_errors = array();
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Implements a common API for caching in classes
+ */
+trait NAILS_COMMON_TRAIT_CACHING
+{
+	protected $_cache_values;
+	protected $_cache_keys;
+	protected $_cache_method;
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Saves an item to the cache
+	 * @param string $key   The cache key
+	 * @param mixed  $value The data to be cached
+	 */
+	protected function _set_cache( $key, $value )
+	{
+		if ( empty( $key ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+			case 'LOCAL' :
+			default :
+
+				$this->_cache_values[md5( $_prefix . $key )] = serialize( $value );
+				$this->_cache_keys[]	= $key;
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Fetches an item from the cache
+	 * @param  string $key The cache key
+	 * @return mixed
+	 */
+	protected function _get_cache( $key )
+	{
+		if ( empty( $key ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+			case 'LOCAL' :
+			default :
+
+				if ( isset( $this->_cache_values[md5( $_prefix . $key )] ) ) :
+
+					return unserialize( $this->_cache_values[md5( $_prefix . $key )] );
+
+				else :
+
+					return FALSE;
+
+				endif;
+
+			break;
+
+		endswitch;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * Deletes an item from the cache
+	 * @param  string $key The cache key
+	 * @return boolean
+	 */
+	protected function _unset_cache( $key )
+	{
+		if ( empty( $key ) ) :
+
+			return FALSE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		//	Prep the key, the key should have a prefix unique to this model
+		$_prefix = $this->_cache_prefix();
+
+		// --------------------------------------------------------------------------
+
+		switch ( $this->_cache_method ) :
+
+			case 'MEMCACHED' :
+
+				//	TODO
+
+			break;
+
+			case 'LOCAL' :
+			default :
+
+				unset( $this->_cache_values[md5( $_prefix . $key )] );
+
+				$_key = array_search( $key, $this->_cache_keys );
+
+				if ( $_key !== FALSE ) :
+
+					unset( $this->_cache_keys[$_key] );
+
+				endif;
+
+			break;
+
+		endswitch;
+
+		// --------------------------------------------------------------------------
+
+		return TRUE;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	/**
+	 * In order to avoid collission between classes a prefix is used; this method
+	 * defines the cache key prefix using the calling class' name.
+	 * @return string
+	 */
+	protected function _cache_prefix()
+	{
+		return get_called_class();
+	}
+}
+
 /* End of file CORE_NAILS_Common.php */
-/* Location: ./core/CORE_NAILS_Common.php */
+/* Location: ./common/CORE_NAILS_Common.php */
