@@ -387,6 +387,14 @@ class CORE_NAILS_Controller extends MX_Controller {
 
 			$this->load->database();
 
+			/**
+			 * Don't run transactions in strict mode. In my opinion it's odd behaviour:
+			 * When a transaction is committed it should be the end of the story. If it's
+			 * not then a failure elsewhere can cause a rollback unexpectedly. Silly CI.
+			 */
+
+			$this->db->trans_strict( FALSE );
+
 		else :
 
 			show_error( 'No database is configured.' );
