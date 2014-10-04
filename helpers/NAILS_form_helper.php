@@ -167,7 +167,7 @@ if ( ! function_exists( 'form_field' ) )
 
 			case 'password' :
 
-				$_field_html = form_password( $_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html = form_password( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 

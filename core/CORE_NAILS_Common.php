@@ -603,9 +603,9 @@ trait NAILS_COMMON_TRAIT_ERROR_HANDLING
  */
 trait NAILS_COMMON_TRAIT_CACHING
 {
-	protected $_cache_values;
-	protected $_cache_keys;
-	protected $_cache_method;
+	protected $_cache_values	= array();
+	protected $_cache_keys		= array();
+	protected $_cache_method	= 'LOCAL';
 
 
 	// --------------------------------------------------------------------------

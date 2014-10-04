@@ -16,6 +16,15 @@ if ( ! function_exists( 'dumpanddie' ) )
 	}
 }
 
+//	Common Misspellings, too.
+if ( ! function_exists( 'dumapnddie' ) )
+{
+	function dumapnddie( $var = NULL )
+	{
+		dumpanddie( $var );
+	}
+}
+
 
 // --------------------------------------------------------------------------
 
