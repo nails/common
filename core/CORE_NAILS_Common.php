@@ -528,7 +528,7 @@ function page_is_secure()
  */
 trait NAILS_COMMON_TRAIT_ERROR_HANDLING
 {
-	protected $_errors;
+	protected $_errors = array();
 
 	// --------------------------------------------------------------------------
 
