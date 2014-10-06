@@ -12,6 +12,7 @@ class Logger
 	private $_log;
 	private $_is_cli;
 	public $mute_output;
+	public $dummy_mode;
 
 
 	// --------------------------------------------------------------------------
@@ -41,6 +42,7 @@ class Logger
 		$this->_log->exists	= FALSE;
 		$this->_log->file	= DEPLOY_LOG_DIR .  'log-' . date( 'Y-m-d' ) . '.php';
 		$this->mute_output	= FALSE;
+		$this->dummy_mode	= FALSE;
 	}
 
 
@@ -56,6 +58,15 @@ class Logger
 	 **/
 	public function line( $line = '' )
 	{
+		//	Is dummy mode enabled? If it is then don't do anything.
+		if ( $this->dummy_mode ) :
+
+			return TRUE;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
 		//	If the log file doesn't exist (or we haven't checked already), attempt to create it
 		if ( ! $this->_log->exists ) :
 

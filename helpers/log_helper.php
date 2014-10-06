@@ -24,5 +24,13 @@ if ( ! function_exists( '_LOG_MUTE_OUTPUT' ) )
 	}
 }
 
+if ( ! function_exists( '_LOG_DUMMY_MODE' ) )
+{
+	function _LOG_DUMMY_MODE( $dummy_mode = TRUE )
+	{
+		get_instance()->logger->dummy_mode = $dummy_mode;
+	}
+}
+
 /* End of file log_helper.php */
 /* Location: ./helpers/log_helper.php */
