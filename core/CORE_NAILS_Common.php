@@ -773,5 +773,200 @@ trait NAILS_COMMON_TRAIT_CACHING
 	}
 }
 
+/**
+ * Implements the common getcount_common() and _getcount_common_parse_sort() methods
+ */
+trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
+{
+	/**
+	 * Applies common conditionals
+	 *
+	 * This method applies the conditionals which are common across the get_*()
+	 * methods and the count() method.
+	 * @param string $data Data passed from the calling method
+	 * @param string $_caller The name of the calling method
+	 * @return void
+	 **/
+	protected function _getcount_common( $data = array(), $_caller = NULL )
+	{
+		//	Handle wheres
+		$_wheres = array( 'where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in' );
+
+		foreach ( $_wheres AS $where_type ) :
+
+			if ( ! empty( $data[$where_type] ) ) :
+
+				if ( is_array( $data[$where_type] ) ) :
+
+					/**
+					 * If it's a single dimensional array then just bung that into
+					 * the db->where(). If not, loop it and parse.
+					 */
+
+					$_first = reset( $data[$where_type] );
+
+					if ( is_string( $_first ) ) :
+
+						$this->db->$where_type( $data[$where_type] );
+
+					else :
+
+						foreach( $data[$where_type] AS $where ) :
+
+							//	Work out column
+							$_column = ! empty( $where['column'] ) ? $where['column'] : NULL;
+
+							if ( $_column === NULL ) :
+
+								$_column = ! empty( $where[0] ) && is_string( $where[0] ) ? $where[0] : NULL;
+
+							endif;
+
+							//	Work out value
+							$_value = isset( $where['value'] ) ? $where['value'] : NULL;
+
+							if ( $_value === NULL ) :
+
+								$_value = ! empty( $where[1] ) ? $where[1] : NULL;
+
+							endif;
+
+							//	Escaped?
+							$_escape = isset( $where['escape'] ) ? (bool) $where['escape'] : TRUE;
+
+							if ( $_column ) :
+
+								$this->db->$where_type( $_column, $_value, $_escape );
+
+							endif;
+
+						endforeach;
+
+					endif;
+
+				elseif ( is_string( $data[$where_type] ) ) :
+
+					$this->db->$where_type( $data[$where_type] );
+
+				endif;
+
+			endif;
+
+		endforeach;
+
+		// --------------------------------------------------------------------------
+
+		//	Handle Likes
+		//	TODO
+
+		// --------------------------------------------------------------------------
+
+		//	Handle sorting
+		if ( ! empty( $data['sort'] ) ) :
+
+			/**
+			 * How we handle sorting
+			 * =====================
+			 *
+			 * - If $data['sort'] is a string assume it's the field to sort on, use the default order
+			 * - If $data['sort'] is a single dimension array then assume the first element (or the element
+			 *   named 'column') is the column; and the second element (or the element named 'order') is the
+			 *   direction to sort in
+			 * - If $data['sort'] is a multidimensional array then loop each element and test as above.
+			 *
+			 **/
+
+
+			if ( is_string( $data['sort'] ) ) :
+
+				//	String
+				$this->db->order_by( $data['sort'] );
+
+			elseif( is_array( $data['sort'] ) ) :
+
+				$_first = reset( $data['sort'] );
+
+				if ( is_string( $_first ) ) :
+
+					//	Single dimension array
+					$_sort = $this->_getcount_common_parse_sort( $data['sort'] );
+
+					if ( ! empty( $_sort['column'] ) ) :
+
+						$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+					endif;
+
+				else :
+
+					//	Multi dimension array
+					foreach( $data['sort'] AS $sort ) :
+
+						$_sort = $this->_getcount_common_parse_sort( $sort );
+
+						if ( ! empty( $_sort['column'] ) ) :
+
+							$this->db->order_by( $_sort['column'], $_sort['order'] );
+
+						endif;
+
+					endforeach;
+
+				endif;
+
+			endif;
+
+		endif;
+	}
+
+
+	// --------------------------------------------------------------------------
+
+
+	protected function _getcount_common_parse_sort( $sort )
+	{
+		$_out = array( 'column' => NULL, 'order' => NULL );
+
+		// --------------------------------------------------------------------------
+
+		if ( is_string( $sort ) ) :
+
+			$_out['column'] = $sort;
+			return $_out;
+
+		elseif ( isset( $sort['column'] ) ) :
+
+			$_out['column'] = $sort['column'];
+
+		else :
+
+			//	Take the first element
+			$_out['column'] = reset( $sort );
+			$_out['column'] = is_string( $_out['column'] ) ? $_out['column'] : NULL;
+
+		endif;
+
+		if ( $_out['column'] ) :
+
+			//	Determine order
+			if ( isset( $sort['order'] ) ) :
+
+				$_out['order'] = $sort['order'];
+
+			elseif( count( $sort ) > 1 ) :
+
+				//	Take the last element
+				$_out['order'] = end( $sort );
+				$_out['order'] = is_string( $_out['order'] ) ? $_out['order'] : NULL;
+
+			endif;
+
+		endif;
+
+		// --------------------------------------------------------------------------
+
+		return $_out;
+	}
+}
 /* End of file CORE_NAILS_Common.php */
 /* Location: ./common/CORE_NAILS_Common.php */

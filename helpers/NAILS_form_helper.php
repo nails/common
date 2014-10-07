@@ -1,13 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Text Input Field
- *
- * @access	public
- * @param	mixed
- * @param	string
- * @param	string
- * @return	string
+ * Generates an input using the "email" type
+ * @param  mixed  $data  The field's name or the config array
+ * @param  mixed  $value The form element's value
+ * @param  string $extra Any additional attributes to give to the field
+ * @return string
  */
 if ( ! function_exists('form_email'))
 {
@@ -24,13 +22,11 @@ if ( ! function_exists('form_email'))
 
 
 /**
- * form_field
- *
- * Generates a form field (of type text, password or textarea)
- *
- * @access	public
- * @param	array
- * @param	mixed
+ * Form Declaration
+ * Creates the opening portion of the form, taking into account Secure base URL
+ * @param	string	the URI segments of the form destination
+ * @param	array	a key/value pair of attributes
+ * @param	array	a key/value pair hidden data
  * @return	string
  */
 if ( ! function_exists('form_open'))
@@ -60,7 +56,6 @@ if ( ! function_exists('form_open'))
 		$form .= '>';
 
 		// Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
-
 		$_base_url			= $CI->config->base_url();
 		$_secure_base_url	= $CI->config->secure_base_url();
 
@@ -89,15 +84,15 @@ if ( ! function_exists('form_open'))
 	}
 }
 
+
+// --------------------------------------------------------------------------
+
+
 /**
- * form_field
- *
- * Generates a form field (of type text, password or textarea)
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field' ) )
 {
@@ -168,6 +163,12 @@ if ( ! function_exists( 'form_field' ) )
 			case 'password' :
 
 				$_field_html = form_password( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+
+			break;
+
+			case 'email' :
+
+				$_field_html = form_email( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
@@ -261,7 +262,6 @@ $_out = <<<EOT
 		</label>
 	</div>
 
-
 EOT;
 
 		// --------------------------------------------------------------------------
@@ -275,14 +275,86 @@ EOT;
 
 
 /**
- * form_field_mm
- *
- * Generates a form field which uses the media manager to select a file
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "email" input type
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
+if ( ! function_exists( 'form_field_email' ) )
+{
+	function form_field_email( $field, $tip = '' )
+	{
+		$field['type'] = 'email';
+		return form_field( $field, $tip );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Generates a form field using the "password" input type
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
+if ( ! function_exists( 'form_field_password' ) )
+{
+	function form_field_password( $field, $tip = '' )
+	{
+		$field['type'] = 'password';
+		return form_field( $field, $tip );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Generates a form field using the "textarea" input type
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
+if ( ! function_exists( 'form_field_textarea' ) )
+{
+	function form_field_textarea( $field, $tip = '' )
+	{
+		$field['type'] = 'textarea';
+		return form_field( $field, $tip );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Generates a form field using the "text" input type
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
+if ( ! function_exists( 'form_field_text' ) )
+{
+	function form_field_text( $field, $tip = '' )
+	{
+		$field['type'] = 'text';
+		return form_field( $field, $tip );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Generates a form field containing the media manager to select a file.
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field_mm' ) )
 {
@@ -450,14 +522,10 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 
 /**
- * form_field_image
- *
- * Generates a form field which uses the media manager to select an image
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field containing the media manager to select an image
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field_mm_image' ) )
 {
@@ -621,6 +689,13 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 // --------------------------------------------------------------------------
 
+
+/**
+ * Generates a form field which allows for the upload of multiple images.
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
 if ( ! function_exists( 'form_field_multiimage' ) )
 {
 	function form_field_multiimage( $field, $tip = '' )
@@ -1003,14 +1078,10 @@ EOT;
 
 
 /**
- * form_field_date
- *
- * Generates a form field (of type select) for dates
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field for dates
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field_date' ) )
 {
@@ -1030,14 +1101,10 @@ if ( ! function_exists( 'form_field_date' ) )
 
 
 /**
- * form_field_datetime
- *
- * Generates a form field (of type select) for datetime
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field for datetimes
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field_datetime' ) )
 {
@@ -1057,14 +1124,11 @@ if ( ! function_exists( 'form_field_datetime' ) )
 
 
 /**
- * form_field_dropdown
- *
- * Generates a form field (of type select)
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "select" input type
+ * @param  array  $field   The config array
+ * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
+ * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string          The form HTML
  */
 if ( ! function_exists( 'form_field_dropdown' ) )
 {
@@ -1207,14 +1271,11 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 
 
 /**
- * form_field_dropdown
- *
- * Generates a form field (of type select)
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "select" input type, with multiple selections allowed
+ * @param  array  $field   The config array
+ * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
+ * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string          The form HTML
  */
 if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 {
@@ -1358,14 +1419,10 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 
 
 /**
- * form_field_boolean
- *
- * Generates a form field (of type select, with two options: yes and no)
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "select" input type containing two options.
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
  */
 if ( ! function_exists( 'form_field_boolean' ) )
 {
@@ -1457,18 +1514,15 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 
 /**
- * form_field
- *
- * Generates a form field containing radio buttons
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "radio" input type
+ * @param  array  $field   The config array
+ * @param  array  $options The options to use for the radios (DEPRECATED: use $field['options'] instead)
+ * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string          The form HTML
  */
 if ( ! function_exists( 'form_field_radio' ) )
 {
-	function form_field_radio( $field, $options, $tip = '' )
+	function form_field_radio( $field, $options = NULL, $tip = '' )
 	{
 		$_ci =& get_instance();
 
@@ -1485,6 +1539,12 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
+
+		if ( is_null( $options ) ) :
+
+			$options = isset( $field['options'] ) ? $field['options'] : array();
+
+		endif;
 
 		$_tip					= array();
 		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
@@ -1573,18 +1633,15 @@ if ( ! function_exists( 'form_field_radio' ) )
 
 
 /**
- * form_field
- *
- * Generates a form field containing checboxes
- *
- * @access	public
- * @param	array
- * @param	mixed
- * @return	string
+ * Generates a form field using the "checkbox" input type
+ * @param  array  $field   The config array
+ * @param  array  $options The options to use for the checkboxes (DEPRECATED: use $field['options'] instead)
+ * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string          The form HTML
  */
 if ( ! function_exists( 'form_field_checkbox' ) )
 {
-	function form_field_checkbox( $field, $options, $tip = '' )
+	function form_field_checkbox( $field, $options = NULL, $tip = '' )
 	{
 		$_ci =& get_instance();
 
@@ -1602,6 +1659,12 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_field['placeholder']	= isset( $field['placeholder'] ) ? $field['placeholder'] : NULL;
 		$_field['class']		= isset( $field['class'] ) ? $field['class'] : FALSE;
 		$_field['tip']			= isset( $field['tip'] ) ? $field['tip'] : $tip;
+
+		if ( is_null( $options ) ) :
+
+			$options = isset( $field['options'] ) ? $field['options'] : array();
+
+		endif;
 
 		$_tip					= array();
 		$_tip['class']			= is_array( $_field['tip'] ) && isset( $_field['class'] )	? $_tip['class']	: 'fa fa-question-circle fa-lg tip';
@@ -1746,8 +1809,16 @@ if ( ! function_exists( 'form_field_checkbox' ) )
  * @param	mixed
  * @return	string
  */
+
 if ( ! function_exists( 'form_field_submit' ) )
 {
+	/**
+	 * Generates a submit button which is aligned properly with the form_field_* functions
+	 * @param  string $button_value      The value to give the button
+	 * @param  string $button_name       The name to give the button
+	 * @param  string $button_attributes Any additional attributes to give the button
+	 * @return string                    The form HTML
+	 */
 	function form_field_submit( $button_value = 'Submit', $button_name = 'submit', $button_attributes = '' )
 	{
 		$_field_html = form_submit( $button_name, $button_value, $button_attributes );
