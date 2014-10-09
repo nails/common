@@ -112,7 +112,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_field_readonly	= isset( $field['readonly'] )		? $field['readonly']	: FALSE;
 		$_field_error		= isset( $field['error'] )			? $field['error']		: FALSE;
 		$_field_bucket		= isset( $field['bucket'] )			? $field['bucket']		: FALSE;
-		$_field_class		= isset( $field['class'] )			? $field['class']		: FALSE;
+		$_field_class		= isset( $field['class'] )			? $field['class']		: '';
 		$_field_data		= isset( $field['data'] )			? $field['data'] 		: array();
 		$_field_info		= isset( $field['info'] )			? $field['info'] 		: FALSE;
 		$_field_tip			= isset( $field['tip'] )			? $field['tip'] 		: $tip;
@@ -172,9 +172,17 @@ if ( ! function_exists( 'form_field' ) )
 
 			break;
 
+			case 'wysiwyg' :
 			case 'textarea' :
 
-				$_field_html = form_textarea( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				if ( $_field_type == 'wysiwyg' ) :
+
+					$_field_type	= 'textarea';
+					$_field_class	.= ' wysiwyg';
+
+				endif;
+
+				$_field_html	= form_textarea( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
 
 			break;
 
