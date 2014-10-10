@@ -268,7 +268,7 @@
 					// --------------------------------------------------------------------------
 
 					//	Initial open/close state?
-					$_user_nav_pref = @unserialize( active_user( 'admin_nav' ) );
+					$_user_nav_pref = $this->admin_model->get_admin_data( 'nav' );
 
 					if ( $_user_nav_pref ) :
 
@@ -409,6 +409,9 @@
 
 		?>
 		</ul>
+		<p class="text-center">
+			<a href="#" id="admin-nav-reset">Reset Nav</a>
+		</p>
 		<div class="no-modules">
 			<p class="system-alert error">
 				<strong>No modules available.</strong>
