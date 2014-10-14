@@ -138,7 +138,7 @@ if ( ! function_exists( 'form_field' ) )
 
 		//	Has the field got a tip?
 		$_tipclass	= $_tip['title'] ? 'with-tip' : '';
-		$_tip 		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_tip 		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -162,13 +162,13 @@ if ( ! function_exists( 'form_field' ) )
 
 			case 'password' :
 
-				$_field_html = form_password( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html = form_password( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities( $_field_placeholder, ENT_QUOTES ) . '" ' . $_readonly );
 
 			break;
 
 			case 'email' :
 
-				$_field_html = form_email( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html = form_email( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities( $_field_placeholder, ENT_QUOTES ) . '" ' . $_readonly );
 
 			break;
 
@@ -182,21 +182,21 @@ if ( ! function_exists( 'form_field' ) )
 
 				endif;
 
-				$_field_html	= form_textarea( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html	= form_textarea( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities( $_field_placeholder, ENT_QUOTES ) . '" ' . $_readonly );
 
 			break;
 
 			case 'upload' :
 			case 'file' :
 
-				$_field_html = form_upload( $_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html = form_upload( $_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities( $_field_placeholder, ENT_QUOTES ) . '" ' . $_readonly );
 
 			break;
 
 			case 'text' :
 			default :
 
-				$_field_html = form_input( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . $_field_placeholder . '" ' . $_readonly );
+				$_field_html = form_input( $_field_key, set_value( $_field_key, $_field_default ), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities( $_field_placeholder, ENT_QUOTES ) . '" ' . $_readonly );
 
 			break;
 
@@ -444,7 +444,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 
 		//	Tip
 		$_field_tipclass	= $_tip['title'] ? 'with-tip' : '';
-		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -615,7 +615,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 
 		//	Tip
 		$_field_tipclass	= $_tip['title'] ? 'with-tip' : '';
-		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_field_tip			= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -791,7 +791,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 
 		//	Tip
 		$_tipclass	= $_tip['title'] ? 'with-tip' : '';
-		$_tip		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_tip		= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		// --------------------------------------------------------------------------
 
@@ -1210,7 +1210,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		$_selected = set_value( $_field['key'], $_field['default'] );
 
 		//	Build the select
-		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities( $_field['placeholder'], ENT_QUOTES ) . '"' : '';
 		$_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :
@@ -1255,7 +1255,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 		endif;
 
 		//	Tip
-		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1370,7 +1370,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		endif;
 
 		//	Build the select
-		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . $_field['placeholder'] . '"' : '';
+		$_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities( $_field['placeholder'], ENT_QUOTES ) . '"' : '';
 		$_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
 		foreach ( $options AS $value => $label ) :
@@ -1403,7 +1403,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 		// --------------------------------------------------------------------------
 
 		//	Tip
-		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1500,7 +1500,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 		$_out .= form_checkbox( $_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class );
 
 		//	Tip
-		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		//	Error
 		$_out .= form_error( $_field['key'], '<span class="error">', '</span>' );
@@ -1592,7 +1592,7 @@ if ( ! function_exists( 'form_field_radio' ) )
 		$_out .= form_radio( $_field['key'], $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		$_out .= '</label>';
 
@@ -1736,7 +1736,7 @@ if ( ! function_exists( 'form_field_checkbox' ) )
 		$_out .= form_checkbox( $_key, $options[0]['value'], $_selected, $_id ) . '<span class="text">' . $options[0]['label'] . '</span>';
 
 		//	Tip
-		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $_tip['title'] . '"></b>' : '';
+		$_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities( $_tip['title'], ENT_QUOTES ) . '"></b>' : '';
 
 		$_out .= '</span>';
 		$_out .= '</label>';
