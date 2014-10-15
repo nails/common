@@ -191,7 +191,8 @@ class CORE_NAILS_Deploy extends CORE_NAILS_App
 			unset($exec_output);
 			unset($exit_code);
 			$output->write( '<comment>Bower:</comment> Installing... ' );
-			exec( 'bower install 2>&1', $exec_output, $exit_code );
+			$_interactive = $input->isInteractive() ? '' : ' --config.interactive=false';
+			exec( 'bower install' . $_interactive . ' 2>&1', $exec_output, $exit_code );
 
 			if ( $exit_code == 0 ) :
 
