@@ -63,7 +63,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
 		endif;
 
-		include 'config/deploy.php';
+		require_once 'config/deploy.php';
 
 		if ( ! defined( 'ENVIRONMENT' ) ) :
 
@@ -97,7 +97,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
 		//	Look for enabled modules
 		$output->writeln( '' );
-		$output->writeln( '<comment>Searchng for modules...</comment> found 4 modules' );
+		$output->write( '<comment>Searching for modules... </comment>' );
+		$output->writeln( 'found <info>4</info> modules' );
 
 		// --------------------------------------------------------------------------
 
@@ -134,10 +135,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 		$i = 0;
 		while ($i++ < 4) :
 
-			//	do something
-			sleep(2);
+			//	Do something
+			sleep(1);
 
-			// advances the progress bar 1 unit
+			// Advances the progress bar 1 unit
 			$progress->advance();
 
 		endwhile;
@@ -147,6 +148,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
 		// --------------------------------------------------------------------------
 
+		//	Cleaning up
 		$output->writeln( '' );
 		$output->writeln( '<comment>Cleaning up...</comment>' );
 

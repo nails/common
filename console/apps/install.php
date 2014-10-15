@@ -57,14 +57,14 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 		if ( file_exists( 'config/app.php' ) ) :
 
 			$output->writeln( 'Found <comment>config/app.php</comment> will use values for defaults' );
-			include 'config/app.php';
+			require_once 'config/app.php';
 
 		endif;
 
 		if ( file_exists( 'config/deploy.php' ) ) :
 
 			$output->writeln( 'Found <comment>config/deploy.php</comment> will use values for defaults' );
-			include 'config/deploy.php';
+			require_once 'config/deploy.php';
 
 		endif;
 
@@ -90,7 +90,14 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
 		// --------------------------------------------------------------------------
 
-		$output->writeln( 'Cleaning up...' );
+		//	Cleaning up
+		$output->writeln( '' );
+		$output->writeln( '<comment>Cleaning up...</comment>' );
+
+		// --------------------------------------------------------------------------
+
+		//	And we're done
+		$output->writeln( '' );
 		$output->writeln( 'Complete!' );
 	}
 }
