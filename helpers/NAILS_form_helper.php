@@ -340,6 +340,37 @@ if ( ! function_exists( 'form_field_textarea' ) )
 
 
 /**
+ * Generates a form field using the "textarea" input type, and sets it's class
+ * to "wysiwyg"
+ * @param  array  $field The config array
+ * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+ * @return string        The form HTML
+ */
+if (!function_exists('form_field_wysiwyg')) {
+
+    function form_field_wysiwyg($field, $tip = '')
+    {
+        $field['type'] = 'textarea';
+
+        if (isset($field['class'])) {
+
+            $field['class'] .= ' wysiwyg';
+
+        } else {
+
+            $field['class'] = 'wysiwyg';
+
+        }
+
+        return form_field($field, $tip);
+    }
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
  * Generates a form field using the "text" input type
  * @param  array  $field The config array
  * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
