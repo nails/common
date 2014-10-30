@@ -100,7 +100,6 @@ if ( ! function_exists('secure_site_url'))
 // --------------------------------------------------------------------------
 
 
-
 /**
  * Header Redirect
  *
@@ -143,6 +142,21 @@ if ( ! function_exists('redirect'))
 		exit;
 	}
 }
+
+
+// --------------------------------------------------------------------------
+
+
+if (!function_exists('tel')) {
+
+    function tel($uri = '', $title = '', $attributes = '')
+    {
+        $title	= empty($title) ? $uri : $title;
+        $uri	= 'tel://' . $uri;
+        return anchor($uri, $title, $attributes);
+    }
+}
+
 
 
 /* End of file url_helper.php */
