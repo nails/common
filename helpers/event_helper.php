@@ -1,13 +1,13 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-if ( ! function_exists( 'create_event' ) )
-{
-	function create_event( $type, $created_by = NULL, $level = 0, $interested_parties = NULL, $vars = NULL, $ref = NULL, $_recorded = NULL )
-	{
-		$_ci =& get_instance();
-		$_ci->load->library( 'event' );
-		return $_ci->event->create( $type, $created_by, $level, $interested_parties, $vars, $ref );
-	}
+if (!function_exists('create_event')) {
+
+    function create_event($type, $vars = null, $created_by = null, $ref = null, $_recorded = null)
+    {
+        $_ci =& get_instance();
+        $_ci->load->library('event');
+        return $_ci->event->create($type, $vars, $created_by, $ref);
+    }
 }
 
 /* End of file event_helper.php */
