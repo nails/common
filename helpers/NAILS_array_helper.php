@@ -65,5 +65,38 @@ if ( ! function_exists( 'array_sort_multi' ) )
 }
 
 
+if ( ! function_exists( 'array_search_multi' ) ) {
+
+	function array_search_multi($value, $key, array $array)
+	{
+		foreach ($array as $k => $val) {
+
+			if (is_array($val)) {
+
+				if ($val[$key] == $value) {
+					return $k;
+				}
+
+			} elseif (is_object($val)) {
+
+				if ($val->$key == $value) {
+					return $k;
+				}
+			}
+		}
+		return false;
+	}
+}
+
+
+if ( ! function_exists( 'in_array_multi' ) ) {
+
+	function in_array_multi($value, $key, array $array)
+	{
+		return array_search_multi($value, $key, $array) !== false;
+	}
+}
+
+
 /* End of file array_helper.php */
 /* Location: ./helpers/array_helper.php */
