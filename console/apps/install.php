@@ -267,8 +267,15 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 );
 
         $vars[] = array(
+                    'key'       => 'APP_DEFAULT_TIMEZONE',
+                    'label'     => 'App Timezone',
+                    'value'     => date_default_timezone_get(),
+                    'options'   => array()
+                );
+
+        $vars[] = array(
                     'key'       => 'APP_PRIVATE_KEY',
-                    'label'     => 'App\'s Private Key',
+                    'label'     => 'App Private Key',
                     'value'     => md5(rand(0,1000) . microtime(true)),
                     'options'   => array()
                 );
