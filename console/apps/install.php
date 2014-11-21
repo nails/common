@@ -7,8 +7,8 @@
  *
  * This app handles configuring and reconfiguring a Nails app.
  *
- * Lead Developer: Pablo de la Peña	(p@shedcollective.org, @hellopablo)
- * Lead Developer: Gary Duncan		(g@shedcollective.org, @gsdd)
+ * Lead Developer: Pablo de la Peña (p@shedcollective.org, @hellopablo)
+ * Lead Developer: Gary Duncan      (g@shedcollective.org, @gsdd)
  *
  * Documentation: http://nailsapp.co.uk/console/install
  */
@@ -24,82 +24,429 @@ require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
 class CORE_NAILS_Install extends CORE_NAILS_App
 {
-	/**
-	 * Configures the app
-	 * @return void
-	 */
-	protected function configure()
-	{
-		$this->setName( 'install' );
-		$this->setDescription( 'Configures or reconfigures a Nails site' );
-	}
+    /**
+     * Configures the app
+     * @return void
+     */
+    protected function configure()
+    {
+        $this->setName('install');
+        $this->setDescription('Configures or reconfigures a Nails site');
+    }
 
 
-	// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
 
-	/**
-	 * Executes the app
-	 * @param  InputInterface  $input  The Input Interface proivided by Symfony
-	 * @param  OutputInterface $output The Output Interface proivided by Symfony
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$output->writeln( '<info>---------------</info>' );
-		$output->writeln( '<info>Nails Installer</info>' );
-		$output->writeln( '<info>---------------</info>' );
-		$output->writeln( 'Beginning...' );
+    /**
+     * Executes the app
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return void
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>---------------</info>');
+        $output->writeln('<info>Nails Installer</info>');
+        $output->writeln('<info>---------------</info>');
+        $output->writeln('Beginning...');
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	Load configs
-		if ( file_exists( 'config/app.php' ) ) :
+        //  Define app & deploy vars
+        $appVars    = $this->defineAppVars();
+        $deployVars = $this->defineDeployVars();
 
-			$output->writeln( 'Found <comment>config/app.php</comment> will use values for defaults' );
-			require_once 'config/app.php';
+        // --------------------------------------------------------------------------
 
-		endif;
+        //  Load configs
+        if (file_exists('config/app.php')) {
 
-		if ( file_exists( 'config/deploy.php' ) ) :
+            $output->writeln('Found <comment>config/app.php</comment> will use values for defaults');
 
-			$output->writeln( 'Found <comment>config/deploy.php</comment> will use values for defaults' );
-			require_once 'config/deploy.php';
+            require_once 'config/app.php';
 
-		endif;
+            foreach($appVars AS &$v) {
 
-		// --------------------------------------------------------------------------
+                if (defined($v['key'])) {
 
-		$output->writeln( '' );
-		$output->writeln( '<info>App Settings</info>' );
-		$_app_name = $this->ask( 'What\'s the name of this app?', 'My App', $input, $output  );
+                    $v['value'] = constant($v['key']);
+                }
+            }
+        }
 
-		// --------------------------------------------------------------------------
+        if (file_exists('config/deploy.php')) {
 
-		$output->writeln( '' );
-		$output->writeln( '<info>Deploy Settings</info>' );
-		$_deploy_environment = $this->ask( 'What should the environment be set to?', 'PRODUCTION', $input, $output  );
+            $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
 
-		// --------------------------------------------------------------------------
+            require_once 'config/deploy.php';
 
-		$output->writeln( '<comment>TODO:</comment> ask user which additional modules they would like to include' );
-		$output->writeln( '<comment>TODO:</comment> run intial tests' );
-		$output->writeln( '<comment>TODO:</comment> confirm with user what\'s going to happen (handle -no-interaction)' );
-		$output->writeln( '<comment>TODO:</comment> execute (handle failures)' );
-		$output->writeln( '<comment>TODO:</comment> migrate DB (handle failures)' );
+            foreach($deployVars AS &$v) {
 
-		// --------------------------------------------------------------------------
+                if (defined($v['key'])) {
 
-		//	Cleaning up
-		$output->writeln( '' );
-		$output->writeln( '<comment>Cleaning up...</comment>' );
+                    $v['value'] = constant($v['key']);
+                }
+            }
+        }
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	And we're done
-		$output->writeln( '' );
-		$output->writeln( 'Complete!' );
-	}
+        //  Pre-Install tests
+        $preTestErrors = $this->preInstallTests();
+
+        // --------------------------------------------------------------------------
+
+        if (empty($preTestErrors)) {
+
+            $output->writeln('');
+            $output->writeln('<info>App Settings</info>');
+            $this->setVars($appVars, $input, $output);
+
+            // --------------------------------------------------------------------------
+
+            $output->writeln('');
+            $output->writeln('<info>Deploy Settings</info>');
+            $this->setVars($deployVars, $input, $output);
+
+            // --------------------------------------------------------------------------
+
+            $output->writeln('');
+            $output->writeln('<info>Modules</info>');
+
+            $question = 'Would you like to define modules to enable now?';
+            $installModules = $this->confirm($question, false, $input, $output);
+
+            if ($installModules) {
+
+                $output->writeln('');
+                $output->writeln('<comment>@TODO:</comment> Interface for installing modules');
+                $output->writeln('');
+
+                $installTheseModules    = array();
+                $installTheseModules[]  = 'test/module-1';
+                $installTheseModules[]  = 'test/module-2';
+                $installTheseModules[]  = 'test/module-3';
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Tell user what's about to happen
+            $output->writeln('<info>I\'m about to do the following:</info>');
+
+            //  app.php
+            $output->writeln('');
+            $output->writeln('Write <info>config/app.php</info>');
+
+            foreach($appVars AS $var) {
+
+                $output->writeln(' - Set <comment>' . $var['label'] . '</comment> to <comment>' . $var['value'] . '</comment>');
+            }
+
+            //  deploy.php
+            $output->writeln('');
+            $output->writeln('Write <info>config/deploy.php</info>');
+
+            foreach($deployVars AS $var) {
+
+                $output->writeln(' - Set <comment>' . $var['label'] . '</comment> to <comment>' . $var['value'] . '</comment>');
+            }
+
+            //  Install modules
+            if (!empty($installTheseModules)) {
+
+                $output->writeln('');
+
+                if (count($installTheseModules) > 1) {
+
+                    $output->writeln('The following module(s) will be installed:');
+
+                } else {
+
+                    $output->writeln('The following module will be installed:');
+                }
+
+                foreach ($installTheseModules as $moduleName) {
+
+                    $output->writeln(' - <comment>' . $moduleName . '</comment>');
+                }
+
+            } else {
+
+                $output->writeln('');
+                $output->writeln('No additional modules will be installed');
+            }
+
+            //  Migrate databases
+            $output->writeln('');
+            $output->writeln('Migrate the database');
+
+
+            $output->writeln('');
+            $question = 'Does this look OK?';
+            $doInstall = $this->confirm($question, true, $input, $output);
+
+            if ($doInstall) {
+
+                $output->writeln('');
+                $output->writeln('<info>Installing...</info>');
+
+                //  Write app.php
+                $output->write('<comment>[1 of 4]</comment> Writing <info>config/app.php</info>...');
+                $this->writeFile($appVars, 'config/app.php');
+                $output->writeln('<info>DONE</info>');
+
+                //  Write deploy.php
+                $output->write('<comment>[2 of 4]</comment> Writing <info>config/deploy.php</info>...');
+                $this->writeFile($deployVars, 'config/deploy.php');
+                $output->writeln('<info>DONE</info>');
+
+                //  Install Modules
+                if (!empty($installTheseModules)) {
+
+                    $output->writeln('<comment>[3 of 4]</comment> Installing modules</info>...');
+
+                    foreach ($installTheseModules as $moduleName) {
+
+                        $output->write(' - <comment>' . $moduleName . '</comment>...');
+                        $this->installModule($moduleName);
+                        $output->writeln('<info>DONE</info>');
+                    }
+
+                    $output->writeln('<comment>@TODO:</comment> installModule() method');
+
+                } else {
+
+                    $output->writeln('<comment>[3 of 4]</comment> No additonal modules to be installed');
+                }
+
+                //  Migrate DB
+                $output->write('<comment>[4 of 4]</comment> Migrating database..');
+                $this->migrateDb();
+                $output->writeln('<info>DONE</info>');
+                $output->writeln('<comment>@TODO:</comment> migrateDb() method');
+
+                // --------------------------------------------------------------------------
+
+                //  Cleaning up
+                $output->writeln('');
+                $output->writeln('<comment>Cleaning up...</comment>');
+
+                //  And we're done!
+                $output->writeln('');
+                $output->writeln('Complete!');
+
+            } else {
+
+                $output->writeln('');
+                $output->writeln('<error>Aborting install.</error>');
+            }
+
+        } else {
+
+            $output->writeln('');
+            $output->writeln('<error>ERROR:</error> Aborting install');
+
+            foreach($preTestErrors as $error) {
+
+                $output->writeln(' - ' . $error);
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function defineAppVars()
+    {
+        $vars   = array();
+        $vars[] = array(
+                    'key'       => 'APP_NAME',
+                    'label'     => 'App Name',
+                    'value'     => 'My App',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'APP_PRIVATE_KEY',
+                    'label'     => 'App\'s Private Key',
+                    'value'     => md5(rand(0,1000) . microtime(true)),
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'APP_DEVELOPER_EMAIL',
+                    'label'     => 'Developer Email',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        return $vars;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function defineDeployVars()
+    {
+        $vars   = array();
+        $vars[] = array(
+                    'key'       => 'ENVIRONMENT',
+                    'label'     => 'Environment',
+                    'value'     => 'PRODUCTION',
+                    'options'   => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
+                );
+
+        $vars[] = array(
+                    'key'       => 'BASE_URL',
+                    'label'     => 'Base URL',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_PRIVATE_KEY',
+                    'label'     => 'Deployment Private Key',
+                    'value'     => md5(rand(0,1000) . microtime(true)),
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_DB_HOST',
+                    'label'     => 'Database Host',
+                    'value'     => 'localhost',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_DB_USERNAME',
+                    'label'     => 'Database User',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_DB_PASSWORD',
+                    'label'     => 'Database Password',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_DB_DATABASE',
+                    'label'     => 'Database Name',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_EMAIL_HOST',
+                    'label'     => 'Email Host',
+                    'value'     => 'localhost',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_EMAIL_USER',
+                    'label'     => 'Email Username',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_EMAIL_PASS',
+                    'label'     => 'Email Password',
+                    'value'     => '',
+                    'options'   => array()
+                );
+
+        $vars[] = array(
+                    'key'       => 'DEPLOY_EMAIL_PORT',
+                    'label'     => 'Email Port',
+                    'value'     => '25',
+                    'options'   => array()
+                );
+
+        return $vars;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function preInstallTests()
+    {
+        $preTestErrors      = array();
+        $appConfigExists    = file_exists('config/app.php');
+        $deployConfigExists = file_exists('config/deploy.php');
+
+        //  If config/app.php is there is it writeable?
+        if ($appConfigExists) {
+
+            if (!is_writable('config/app.php')) {
+
+                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
+            }
+        }
+
+        //  If config/deploy.php is there, is it writeable?
+        if ($deployConfigExists) {
+
+            if (!is_writable('config/deploy.php')) {
+
+                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
+            }
+        }
+
+        //  If neither fiels are there, is the directory writeable?
+        if (!$appConfigExists && !$deployConfigExists) {
+
+            if (!is_writable('config/')) {
+
+                $preTestErrors[] = '<comment>config/</comment> is not writeable.';
+            }
+        }
+
+        return $preTestErrors;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function setVars(&$vars, $input, $output)
+    {
+        foreach($vars AS &$v) {
+
+            $question  = 'What should "' . $v['label'] . '" be set to?';
+            $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
+
+            $v['value'] = $this->ask($question, $v['value'], $input, $output);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function writeFile($vars, $file)
+    {
+        $fp = fopen($file, 'w');
+
+        fwrite($fp, "<?php\n");
+        foreach($vars as $v) {
+
+            fwrite($fp, "define('" . $v['key'] . "', '" . str_replace("'", "\'", $v['value']) . "');\n");
+        }
+
+        fclose($fp);
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function installModule($moduleName)
+    {
+        //  @TODO: Add module to composer.json
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function migrateDb()
+    {
+        //  @TODO: No idea how to do this just yet
+    }
 }
 
 /* End of file install.php */

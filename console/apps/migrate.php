@@ -86,7 +86,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 			if ( ! $this->confirm( 'Continue with migration?', TRUE, $input, $output ) ) :
 
 				$output->writeln( '' );
-				$output->writeln( 'Aborting migration.' );
+				$output->writeln( '<error>Aborting migration.</error>' );
 				return;
 
 			endif;
@@ -119,7 +119,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 		if ( ! $this->confirm( 'Continue?', TRUE, $input, $output ) ) :
 
 			$output->writeln( '' );
-			$output->writeln( 'Aborting migration.' );
+			$output->writeln( '<error>Aborting migration.</error>' );
 			return;
 
 		endif;
