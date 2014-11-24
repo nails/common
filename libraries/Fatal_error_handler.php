@@ -223,10 +223,18 @@ class Fatal_error_handler
 			'post'				=> isset( $_POST )				? serialize( $_POST )					: '',
 			'get'				=> isset( $_GET )				? serialize( $_GET )					: '',
 			'server'			=> isset( $_SERVER )			? serialize( $_SERVER )					: '',
-			'globals'			=> isset( $GLOBALS['error'] )	? serialize( $GLOBALS['error'] )		: '',
-
-			'debug_backtrace'	=> serialize( debug_backtrace() )
+			'globals'			=> isset( $GLOBALS['error'] )	? serialize( $GLOBALS['error'] )		: ''
 		);
+
+		//	Closures cannot be serialized
+		try
+		{
+			$_info['debug_backtrace'] = serialize(debug_backtrace());
+
+		} catch(Exception $e) {
+
+			$_info['debug_backtrace'] = 'Failed to serialize get Backtrace: ' .  $e->getMessage();
+		}
 
 		$_extended	 = 'URI: ' .				$_info['uri'] . "\n\n";
 		$_extended	.= 'SESSION: ' .			$_info['session'] . "\n\n";
