@@ -245,7 +245,7 @@ function set_controller_data( $key, $value )
  * minimum supported value.
  *
  * To set a requirement, within the module's nails object in composer.json,
- * specify the min_php_version value. You should also specify the appropriate
+ * specify the minPhpVersion value. You should also specify the appropriate
  * constraint for composer in the "require" section of composer.json.
  *
  * e.g:
@@ -254,7 +254,7 @@ function set_controller_data( $key, $value )
  * 	{
  *		"nails" :
  *		{
- *			"min_php_version":"5.4.0"
+ *			"minPhpVersion": "5.4.0"
  *		}
  * 	}
  */
@@ -274,11 +274,11 @@ if ( ! function_exists( '_NAILS_MIN_PHP_VERSION' ) )
 
 				$_composer = json_decode( $_composer );
 
-				if ( ! empty( $_composer->extra->nails->min_php_version ) ) :
+				if ( ! empty( $_composer->extra->nails->minPhpVersion ) ) :
 
-					if ( version_compare( $_composer->extra->nails->min_php_version, $_min_version, '>' ) ) :
+					if ( version_compare( $_composer->extra->nails->minPhpVersion, $_min_version, '>' ) ) :
 
-						$_min_version = $_composer->extra->nails->min_php_version;
+						$_min_version = $_composer->extra->nails->minPhpVersion;
 
 					endif;
 

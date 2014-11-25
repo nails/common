@@ -23,14 +23,6 @@
 	},
 	"require":
 	{
-		"php": ">=5.4.0",
 		"symfony/console": "~2.5.4"
-	},
-	"extra":
-	{
-		"nails" :
-		{
-			"min_php_version":"5.4.0"
-		}
 	}
 }
