@@ -1,4 +1,4 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 
 /**
@@ -8,13 +8,13 @@
  * @param	boolean $force_download Whether or not the URL should stream to the browser, or forcibly download
  * @return	string
  */
-if ( ! function_exists( 'cdn_serve' ) )
+if (!function_exists('cdn_serve'))
 {
-	function cdn_serve( $object, $force_download = FALSE )
+	function cdn_serve($object, $force_download = FALSE)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_serve( $object, $force_download );
+		return get_instance()->cdn->url_serve($object, $force_download);
 	}
 }
 
@@ -28,13 +28,13 @@ if ( ! function_exists( 'cdn_serve' ) )
  * @param	array	$object	An array of IDs to zip together
  * @return	string
  */
-if ( ! function_exists( 'cdn_serve_zipped' ) )
+if (!function_exists('cdn_serve_zipped'))
 {
-	function cdn_serve_zipped( $objects, $filename = 'download.zip' )
+	function cdn_serve_zipped($objects, $filename = 'download.zip')
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_serve_zipped( $objects, $filename );
+		return get_instance()->cdn->url_serve_zipped($objects, $filename);
 	}
 }
 
@@ -51,13 +51,13 @@ if ( ! function_exists( 'cdn_serve_zipped' ) )
  * @param	string	$height	The height of the thumbnail
  * @return	string
  */
-if ( ! function_exists( 'cdn_thumb' ) )
+if (!function_exists('cdn_thumb'))
 {
-	function cdn_thumb( $object, $width, $height )
+	function cdn_thumb($object, $width, $height)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_thumb( $object, $width, $height );
+		return get_instance()->cdn->url_thumb($object, $width, $height);
 	}
 }
 
@@ -74,13 +74,13 @@ if ( ! function_exists( 'cdn_thumb' ) )
  * @param	string	$height	The height of the scaled image
  * @return	string
  */
-if ( ! function_exists( 'cdn_scale' ) )
+if (!function_exists('cdn_scale'))
 {
-	function cdn_scale( $object, $width, $height )
+	function cdn_scale($object, $width, $height)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_scale( $object, $width, $height );
+		return get_instance()->cdn->url_scale($object, $width, $height);
 	}
 }
 
@@ -96,13 +96,13 @@ if ( ! function_exists( 'cdn_scale' ) )
  * @param	string	$border	The width of the border, if any
  * @return	string
  */
-if ( ! function_exists( 'cdn_placeholder' ) )
+if (!function_exists('cdn_placeholder'))
 {
-	function cdn_placeholder( $width = 100, $height = 100, $border = 0 )
+	function cdn_placeholder($width = 100, $height = 100, $border = 0)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_placeholder( $width, $height, $border );
+		return get_instance()->cdn->url_placeholder($width, $height, $border);
 	}
 }
 
@@ -118,13 +118,35 @@ if ( ! function_exists( 'cdn_placeholder' ) )
  * @param	string	$border	The width of the border, if any
  * @return	string
  */
-if ( ! function_exists( 'cdn_blank_avatar' ) )
+if (!function_exists('cdn_blank_avatar'))
 {
-	function cdn_blank_avatar( $width = 100, $height = 100, $sex = 'male' )
+	function cdn_blank_avatar($width = 100, $height = 100, $sex = 'male')
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_blank_avatar( $width, $height, $sex );
+		return get_instance()->cdn->url_blank_avatar($width, $height, $sex);
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+/**
+ * Returns the URL for a user's avatar
+ *
+ * @param	int	$userId	The user ID to use
+ * @param	int	$width	The width of the avatar
+ * @param	int	$height	The height of the avatar
+ * @return	string
+ */
+if (!function_exists('cdn_avatar'))
+{
+	function cdn_avatar($userId = null, $width = 100, $height = 100)
+	{
+		get_instance()->load->library('cdn/cdn');
+
+		return get_instance()->cdn->url_avatar($userId, $width, $height);
 	}
 }
 
@@ -140,13 +162,13 @@ if ( ! function_exists( 'cdn_blank_avatar' ) )
  * @param	string	$expires	The length of time the URL should be valid for, in seconds
  * @return	string
  */
-if ( ! function_exists( 'cdn_expiring_url' ) )
+if (!function_exists('cdn_expiring_url'))
 {
-	function cdn_expiring_url( $object, $expires )
+	function cdn_expiring_url($object, $expires)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->url_expiring( $object, $expires );
+		return get_instance()->cdn->url_expiring($object, $expires);
 	}
 }
 
@@ -160,13 +182,13 @@ if ( ! function_exists( 'cdn_expiring_url' ) )
  * @param	string	$mime	The mime to look up
  * @return	string
  */
-if ( ! function_exists( 'get_ext_from_mime' ) )
+if (!function_exists('get_ext_from_mime'))
 {
-	function get_ext_from_mime( $mime )
+	function get_ext_from_mime($mime)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->get_ext_from_mime( $mime );
+		return get_instance()->cdn->get_ext_from_mime($mime);
 	}
 }
 
@@ -180,13 +202,13 @@ if ( ! function_exists( 'get_ext_from_mime' ) )
  * @param	string	$ext	The extension to look up
  * @return	string
  */
-if ( ! function_exists( 'get_mime_from_ext' ) )
+if (!function_exists('get_mime_from_ext'))
 {
-	function get_mime_from_ext( $ext )
+	function get_mime_from_ext($ext)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->get_mime_from_ext( $ext );
+		return get_instance()->cdn->get_mime_from_ext($ext);
 	}
 }
 
@@ -200,13 +222,13 @@ if ( ! function_exists( 'get_mime_from_ext' ) )
  * @param	string	$file	The file to look up
  * @return	string
  */
-if ( ! function_exists( 'get_mime_from_file' ) )
+if (!function_exists('get_mime_from_file'))
 {
-	function get_mime_from_file( $file )
+	function get_mime_from_file($file)
 	{
-		get_instance()->load->library( 'cdn/cdn' );
+		get_instance()->load->library('cdn/cdn');
 
-		return get_instance()->cdn->get_mime_from_file( $file );
+		return get_instance()->cdn->get_mime_from_file($file);
 	}
 }
 
