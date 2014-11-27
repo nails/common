@@ -120,7 +120,7 @@ if (!function_exists('cdn_placeholder'))
  */
 if (!function_exists('cdn_blank_avatar'))
 {
-	function cdn_blank_avatar($width = 100, $height = 100, $sex = 'male')
+	function cdn_blank_avatar($width = 100, $height = 100, $sex = '')
 	{
 		get_instance()->load->library('cdn/cdn');
 
