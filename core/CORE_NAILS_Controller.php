@@ -4,6 +4,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     protected $data;
     private $_supported_lang;
+    protected $nailsErrorHandler;
 
     // --------------------------------------------------------------------------
 
@@ -66,11 +67,6 @@ class CORE_NAILS_Controller extends MX_Controller {
         //  but only if a password has been defined in app.php
 
         $this->staging();
-
-        // --------------------------------------------------------------------------
-
-        //  Load, instantiate and apply the fatal error handler
-        $this->fatalErrorHandler();
 
         // --------------------------------------------------------------------------
 
@@ -148,6 +144,13 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->data['page']->seo->title       = '';
         $this->data['page']->seo->description = '';
         $this->data['page']->seo->keywords    = '';
+
+
+
+        // echo $doesNotExist;
+        throw new Exception("Error Processing Request", 1);
+        thisCausesAFatal();
+        show_fatal_error('tits', 'cunts');
     }
 
     // --------------------------------------------------------------------------
@@ -173,16 +176,31 @@ class CORE_NAILS_Controller extends MX_Controller {
                 break;
         }
 
+        require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_ErrorHandler.php';
+        $this->nailsErrorHandler = new CORE_NAILS_ErrorHandler();
+
+
+
+        return;
+
         // Are errors being reported elsewhere?
-        if (defined('APP_ROLLBAR_ACCESS_TOKEN')) {
+        // if (ENVIRONMENT == 'PRODUCTION') {
 
-            $config = array(
-                'access_token' => APP_ROLLBAR_ACCESS_TOKEN,
-                'environment' => ENVIRONMENT
-            );
+            if (defined('APP_ROLLBAR_ACCESS_TOKEN')) {
 
-            Rollbar::init($config, true, false);
-        }
+                $config = array(
+                    'access_token' => APP_ROLLBAR_ACCESS_TOKEN,
+                    'environment' => ENVIRONMENT
+                );
+
+                Rollbar::init($config, true, false);
+
+                $this->nailsFatalErrorHandlerSendReports = false;
+            }
+
+            //  @TODO: Support for other suppliers, e.g. AirBrake
+            //  Adding suppliers? Make sure you update CORE_NAILS_Exceptions.php too
+        // }
     }
 
     // --------------------------------------------------------------------------
@@ -634,15 +652,6 @@ class CORE_NAILS_Controller extends MX_Controller {
                 $this->load->library($library);
             }
         }
-    }
-
-
-    // --------------------------------------------------------------------------
-
-
-    protected function fatalErrorHandler()
-    {
-        $this->load->library('Fatal_error_handler');
     }
 
 

@@ -1,15 +1,25 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
 class Fatal_error_handler
 {
+	private $sendReports = true;
+
+	// --------------------------------------------------------------------------
+
 	/**
 	 * @return void
 	 */
 	public function __construct()
 	{
+		//	Only register the Nails Fatal Error Handler if someone else isn't already doing so
 		register_shutdown_function( array( &$this, 'handleShutdown' ) );
 	}
 
+
+	public function setSendReports($value)
+	{
+		$this->sendReports = (bool) $value;
+	}
 
 	// --------------------------------------------------------------------------
 
@@ -19,15 +29,6 @@ class Fatal_error_handler
 	 */
 	public function handleShutdown()
 	{
-		//	On non-production systems don't bother reporting
-		if ( strtoupper( ENVIRONMENT ) != 'PRODUCTION' ) :
-
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
 		$aError = error_get_last();
 
 		if ( ! is_null( $aError ) && $aError['type'] === E_ERROR ) :
@@ -52,60 +53,63 @@ class Fatal_error_handler
 	 */
 	public function saveAndEmailError( $insSeverity, $insMessage, $insFilePath, $insLine, $infFull = true )
 	{
-		$oCI =& get_instance();
+		if ($this->sendReports) {
 
-		$aInfo = array(
-			'type'				=> $infFull? 'Triggered' : 'HandleShutdown',
-			'severity'			=> $this->getSeverityText( $insSeverity ),
-			'message'			=> $insMessage,
-			'filepath'			=> $insFilePath,
-			'line'				=> $insLine,
-			'session'			=> json_encode( $oCI->session->userdata ),
-			'post'				=> json_encode( $_POST ),
-			'get'				=> json_encode( $_GET ),
-			'server'			=> json_encode( $_SERVER ),
-			'globals'			=> isset( $GLOBALS['error'] )? json_encode( $GLOBALS['error'] ): '',
-			'uri'				=> $oCI->uri->uri_string(),
-			'debug_backtrace'	=> json_encode( debug_backtrace() )
-		);
+			$oCI =& get_instance();
 
-		//	Prep the email and send
-		if ( isset( $_SERVER['HTTP_HOST'] ) ) :
+			$aInfo = array(
+				'type'				=> $infFull? 'Triggered' : 'HandleShutdown',
+				'severity'			=> $this->getSeverityText( $insSeverity ),
+				'message'			=> $insMessage,
+				'filepath'			=> $insFilePath,
+				'line'				=> $insLine,
+				'session'			=> json_encode( $oCI->session->userdata ),
+				'post'				=> json_encode( $_POST ),
+				'get'				=> json_encode( $_GET ),
+				'server'			=> json_encode( $_SERVER ),
+				'globals'			=> isset( $GLOBALS['error'] )? json_encode( $GLOBALS['error'] ): '',
+				'uri'				=> $oCI->uri->uri_string(),
+				'debug_backtrace'	=> json_encode( debug_backtrace() )
+			);
 
-			$_host = $_SERVER['HTTP_HOST'];
+			//	Prep the email and send
+			if ( isset( $_SERVER['HTTP_HOST'] ) ) :
 
-		else :
-
-			if ( $oCI->input->is_cli_request() || isset( $_SERVER['argv'] ) ) :
-
-				//	CLI
-				$_host = 'CLI REQUEST';
+				$_host = $_SERVER['HTTP_HOST'];
 
 			else :
 
-				$_host = 'UNABLE TO DETERMINE HOST, SERVER HOST: ' . gethostname();
+				if ( $oCI->input->is_cli_request() || isset( $_SERVER['argv'] ) ) :
+
+					//	CLI
+					$_host = 'CLI REQUEST';
+
+				else :
+
+					$_host = 'UNABLE TO DETERMINE HOST, SERVER HOST: ' . gethostname();
+
+				endif;
 
 			endif;
 
-		endif;
+			$_subject	= 'FATAL ERROR OCCURRED ON ' . strtoupper( APP_NAME );
+			$_message	= 'Hi,' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= 'A Fatal Error just occurred within ' . APP_NAME . ' (' . $_host . ')' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= 'Please take a look as a matter of urgency; details are noted below and extended system state data is attached:' . "\n";
+			$_message	.= '' . "\n";
+			$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
+			$_message	.= '' . "\n";
 
-		$_subject	= 'FATAL ERROR OCCURRED ON ' . strtoupper( APP_NAME );
-		$_message	= 'Hi,' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'A Fatal Error just occurred within ' . APP_NAME . ' (' . $_host . ')' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= 'Please take a look as a matter of urgency; details are noted below and extended system state data is attached:' . "\n";
-		$_message	.= '' . "\n";
-		$_message	.= '- - - - - - - - - - - - - - - - - - - - - -' . "\n";
-		$_message	.= '' . "\n";
+			$_message	.= 'Type: ' . $aInfo['type'] . "\n";
+			$_message	.= 'Severity: ' . $aInfo['severity'] . "\n";
+			$_message	.= 'Message: ' . $aInfo['message'] . "\n";
+			$_message	.= 'File Path: ' . $aInfo['filepath'] . "\n";
+			$_message	.= 'Line: ' . $aInfo['line'] . "\n\n";
 
-		$_message	.= 'Type: ' . $aInfo['type'] . "\n";
-		$_message	.= 'Severity: ' . $aInfo['severity'] . "\n";
-		$_message	.= 'Message: ' . $aInfo['message'] . "\n";
-		$_message	.= 'File Path: ' . $aInfo['filepath'] . "\n";
-		$_message	.= 'Line: ' . $aInfo['line'] . "\n\n";
-
-		$this->send_developer_mail( $_subject, $_message );
+			$this->send_developer_mail($_subject, $_message);
+		}
 
 		// --------------------------------------------------------------------------
 
