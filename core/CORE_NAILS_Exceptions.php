@@ -101,6 +101,40 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 		echo $this->show_error( $heading, $message, 'error_404', 404 );
 		exit;
 	}
+
+	// --------------------------------------------------------------------------
+
+	public function log_exception($severity, $message, $filepath, $line)
+	{
+		parent::log_exception($severity, $message, $filepath, $line);
+
+		// --------------------------------------------------------------------------
+
+		//	Do we need to tell anybody else about this error?
+		$levels = array(
+					E_ERROR				=> 'E_ERROR',
+					E_WARNING			=> 'E_WARNING',
+					E_PARSE				=> 'E_PARSE',
+					E_NOTICE			=> 'E_NOTICE',
+					E_CORE_ERROR		=> 'E_CORE_ERROR',
+					E_CORE_WARNING		=> 'E_CORE_WARNING',
+					E_COMPILE_ERROR		=> 'E_COMPILE_ERROR',
+					E_COMPILE_WARNING	=> 'E_COMPILE_WARNING',
+					E_USER_ERROR		=> 'E_USER_ERROR',
+					E_USER_WARNING		=> 'E_USER_WARNING',
+					E_USER_NOTICE		=> 'E_USER_NOTICE',
+					E_STRICT			=> 'E_STRICT'
+				);
+
+
+		$level   = !isset($levels[$severity]) ? $severity : $levels[$severity];
+		$message = $level . ': ' . $message . ' in ' . $filepath . ' on ' . $line;
+
+		if (defined('APP_ROLLBAR_ACCESS_TOKEN')) {
+
+			Rollbar::report_message($message, $level);
+		}
+	}
 }
 
 /* End of file CORE_NAILS_Exceptions.php */
