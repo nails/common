@@ -70,7 +70,7 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
             $message = '';
         }
 
-        self::showFatalErrorScreen($subject, $message);
+        CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
     }
 
     // --------------------------------------------------------------------------
