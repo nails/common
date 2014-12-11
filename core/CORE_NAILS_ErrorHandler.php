@@ -19,14 +19,15 @@ class CORE_NAILS_ErrorHandler
          * error reporting, that is CI Error reporting
          */
 
-        if (ENVIRONMENT === 'DEVELOPMENT')
+        if (ENVIRONMENT === 'PRODUCTION')
         {
-            switch (DEPLOY_ERROR_REPORTING_HANDLER) {
+            switch (strtoupper(DEPLOY_ERROR_REPORTING_HANDLER)) {
 
                 /**
                  * Rollbar
                  * Always enabled on PRODUCTION, selectively enabled elsewhere (fallsback to )
                  */
+
                 case 'ROLLBAR':
 
                     if (ENVIRONMENT === 'PRODUCTION') {
