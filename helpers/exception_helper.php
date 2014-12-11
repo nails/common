@@ -67,31 +67,29 @@ if ( ! function_exists( 'unauthorised' ) )
  * Shows a fatal error
  *
  */
-if ( ! function_exists( 'show_fatal_error' ) )
+if ( ! function_exists( 'showFatalError' ) )
 {
-	function show_fatal_error( $subject = '', $message = '' )
+	function showFatalError($subject = '', $message = '')
 	{
-		if ( isset( get_instance()->fatal_error_handler ) && is_callable( array( get_instance()->fatal_error_handler, 'send_developer_mail' ) ) ) :
+		if (is_callable("CORE_NAILS_ErrorHandler::showFatalErrorScreen")) {
 
-			if ( $subject && $message ) :
+			if (!empty($subject) || !empty($message)) {
 
-				get_instance()->fatal_error_handler->send_developer_mail( $subject, $message );
+				CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+			}
 
-			endif;
+			CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
 
-			get_instance()->fatal_error_handler->show( $subject, $message );
+		} elseif(function_exists('_NAILS_ERROR')) {
 
-		elseif( function_exists( '_NAILS_ERROR' ) ) :
+			_NAILS_ERROR($message, $subject);
 
-			_NAILS_ERROR( $message, $subject );
-
-		else :
+		} else {
 
 			echo '<h1>ERROR: ' . $subject . '</h1>';
 			echo '<h2>' . $message . '</h2>';
 			exit(0);
-
-		endif;
+		}
 	}
 }
 

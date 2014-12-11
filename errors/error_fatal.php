@@ -34,30 +34,47 @@
 				margin-top:40px;
 			}
 
+			code
+			{
+				margin-top: 2em;
+				display: block;
+				border: 1px solid #CCC;
+				background: #EFEFEF;
+				padding: 1em;
+			}
+
+			code strong
+			{
+				font-weight: bold;
+				color: red;
+			}
+
 		</style>
 	</head>
 	<body>
 		<h1>Sorry, an error occurred ☹</h1>
 		<p>
-			An error occurred which we couldn't recover from. The technical team have been informed, we apologise for the inconvenience.
+			An error occurred which we couldn't recover from. The technical team have
+			been informed, we apologise for the inconvenience.
 		</p>
 		<?php
 
-			if ( strtoupper( ENVIRONMENT ) != 'PRODUCTION' ) :
+			if (!empty($subject) || !empty($message)) {
 
-				if ( ! empty( $subject ) ) :
+				if (empty($subject)) {
 
-					echo '<h2>' . $subject . '</h2>';
+					$subject = 'Error:';
+				}
 
-				endif;
+				if (empty($message)) {
 
-				if ( ! empty( $message ) ) :
+					$message = '';
+				}
 
-					echo '<p>' . $message . '</p>';
-
-				endif;
-
-			endif;
+				echo '<code>';
+					echo '<strong>' . $subject . ':</strong> ' . $message;
+				echo '</code>';
+			}
 
 		?>
 		<p>

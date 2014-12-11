@@ -108,7 +108,7 @@ class CORE_NAILS_Controller extends MX_Controller {
             if (!$this->routes_model->update()) {
 
                 //  Fall over, routes_app.php *must* be there
-                show_fatal_error('Failed To generate routes_app.php', 'routes_app.php was not found and could not be generated. ' . $this->routes_model->last_error());
+                showFatalError('Failed To generate routes_app.php', 'routes_app.php was not found and could not be generated. ' . $this->routes_model->last_error());
 
             } else {
 
@@ -144,21 +144,18 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->data['page']->seo->title       = '';
         $this->data['page']->seo->description = '';
         $this->data['page']->seo->keywords    = '';
-
-
-
-        // echo $doesNotExist;
-        throw new Exception("Error Processing Request", 1);
-        thisCausesAFatal();
-        show_fatal_error('tits', 'cunts');
     }
 
     // --------------------------------------------------------------------------
 
     protected function setErrorReporting()
     {
-        //  Configure how verbose PHP is
-        error_reporting(E_ALL ^ E_STRICT);
+        /**
+         * Configure how verbose PHP is; Everything except E_STRICT and E_ERROR;
+         * we'll let the errorHandler pickup fatal erros
+         */
+
+        error_reporting(E_ALL ^ E_STRICT ^ E_ERROR);
 
         //  Configure whether errors are shown or not
         switch(strtoupper(ENVIRONMENT)) {
@@ -178,29 +175,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_ErrorHandler.php';
         $this->nailsErrorHandler = new CORE_NAILS_ErrorHandler();
-
-
-
-        return;
-
-        // Are errors being reported elsewhere?
-        // if (ENVIRONMENT == 'PRODUCTION') {
-
-            if (defined('APP_ROLLBAR_ACCESS_TOKEN')) {
-
-                $config = array(
-                    'access_token' => APP_ROLLBAR_ACCESS_TOKEN,
-                    'environment' => ENVIRONMENT
-                );
-
-                Rollbar::init($config, true, false);
-
-                $this->nailsFatalErrorHandlerSendReports = false;
-            }
-
-            //  @TODO: Support for other suppliers, e.g. AirBrake
-            //  Adding suppliers? Make sure you update CORE_NAILS_Exceptions.php too
-        // }
     }
 
     // --------------------------------------------------------------------------
@@ -224,7 +198,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
             } else {
 
-                show_fatal_error('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.');
+                showFatalError('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.');
             }
 
         } elseif(@mkdir(DEPLOY_CACHE_DIR)) {
@@ -237,7 +211,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         } else {
 
-            show_fatal_error('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.');
+            showFatalError('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.');
         }
     }
 
@@ -412,7 +386,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         if (empty($_default)) {
 
-            show_fatal_error('No default date format has been set, or it\'s been set incorrectly.');
+            showFatalError('No default date format has been set, or it\'s been set incorrectly.');
         }
 
         define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $_default->slug);
@@ -424,7 +398,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         if (empty($_default)) {
 
-            show_fatal_error('No default time format has been set, or it\'s been set incorrectly.');
+            showFatalError('No default time format has been set, or it\'s been set incorrectly.');
         }
 
         define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $_default->slug);
@@ -480,7 +454,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         if (empty($_default)) {
 
-            show_fatal_error('No default language has been set, or it\'s been set incorrectly.');
+            showFatalError('No default language has been set, or it\'s been set incorrectly.');
         }
 
         define('APP_DEFAULT_LANG_CODE', $_default->code);

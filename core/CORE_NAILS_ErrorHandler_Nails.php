@@ -4,7 +4,6 @@ class CORE_NAILS_ErrorHandler_Nails implements CORE_NAILS_ErrorHandler_Interface
 {
     public static function init()
     {
-
     }
 
     // --------------------------------------------------------------------------
@@ -20,18 +19,32 @@ class CORE_NAILS_ErrorHandler_Nails implements CORE_NAILS_ErrorHandler_Interface
     public static function exception($exception)
     {
         //  Show we log the item?
-        if (config_item('log_threshold') == 0)
+        if (config_item('log_threshold') != 0)
         {
-            return;
+            $code    = $exception->getCode();
+            $msg     = $exception->getMessage();
+            $file    = $exception->getFile();
+            $line    = $exception->getLine();
+            $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "';
+            $errMsg .= $code . '" in ' . $file . ' on line ' . $line;
+
+            log_message('error', $errMsg, true);
         }
 
-        $code    = $exception->getCode();
-        $msg     = $exception->getMessage();
-        $file    = $exception->getFile();
-        $line    = $exception->getLine();
-        $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "' . $code . '" in ' . $file . ' on line ' . $line;
+        //  Show something to the user
+        if (ENVIRONMENT != 'PRODUCTION') {
 
-        log_message('error', $errMsg, true);
+            $subject = 'Uncaught Exception';
+            $message = $errMsg;
+
+        } else {
+
+            $subject = '';
+            $message = '';
+        }
+
+        CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+        CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
     }
 
     // --------------------------------------------------------------------------
@@ -42,16 +55,20 @@ class CORE_NAILS_ErrorHandler_Nails implements CORE_NAILS_ErrorHandler_Interface
 
         if (!is_null($error) && $error['type'] === E_ERROR) {
 
-            //  Finally, show the user something
-            if (is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
+            //  Show something to the user
+            if (ENVIRONMENT != 'PRODUCTION') {
 
-                include_once FCPATH . APPPATH . 'errors/error_fatal.php';
+                $subject = 'Fatal Error';
+                $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
 
             } else {
 
-                include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
+                $subject = '';
+                $message = '';
             }
-            exit(0);
+
+            CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+            CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
         }
     }
 }
