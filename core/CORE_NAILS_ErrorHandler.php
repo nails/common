@@ -82,15 +82,16 @@ class CORE_NAILS_ErrorHandler
 
     public static function exception($exception)
     {
+        $code    = $exception->getCode();
+        $msg     = $exception->getMessage();
+        $file    = $exception->getFile();
+        $line    = $exception->getLine();
+        $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "';
+        $errMsg .= $code . '" in ' . $file . ' on line ' . $line;
+
         //  Show we log the item?
         if (config_item('log_threshold') != 0)
         {
-            $code    = $exception->getCode();
-            $msg     = $exception->getMessage();
-            $file    = $exception->getFile();
-            $line    = $exception->getLine();
-            $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "';
-            $errMsg .= $code . '" in ' . $file . ' on line ' . $line;
 
             log_message('error', $errMsg, true);
         }

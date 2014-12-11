@@ -44,7 +44,33 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
     public static function exception($exception)
     {
         Rollbar::report_exception($exception);
-        CORE_NAILS_ErrorHandler::exception($exception);
+
+        $code    = $exception->getCode();
+        $msg     = $exception->getMessage();
+        $file    = $exception->getFile();
+        $line    = $exception->getLine();
+        $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "';
+        $errMsg .= $code . '" in ' . $file . ' on line ' . $line;
+
+        //  Show we log the item?
+        if (config_item('log_threshold') != 0)
+        {
+            log_message('error', $errMsg, true);
+        }
+
+        //  Show something to the user
+        if (ENVIRONMENT != 'PRODUCTION') {
+
+            $subject = 'Uncaught Exception';
+            $message = $errMsg;
+
+        } else {
+
+            $subject = '';
+            $message = '';
+        }
+
+        self::showFatalErrorScreen($subject, $message);
     }
 
     // --------------------------------------------------------------------------
