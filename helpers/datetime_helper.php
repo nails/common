@@ -39,6 +39,18 @@ if ( ! function_exists( 'user_mysql_date' ) )
 // --------------------------------------------------------------------------
 
 
+if ( ! function_exists( 'user_mysql_rdate' ) )
+{
+	function user_mysql_rdate( $timestamp = NULL )
+	{
+		return get_instance()->datetime_model->user_rdate( $timestamp, 'Y-m-d' );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
 /**
  * Calls the datetime_model's user_rdate() method, with the format as date
  *
@@ -91,6 +103,18 @@ if ( ! function_exists( 'user_mysql_datetime' ) )
 	function user_mysql_datetime( $timestamp = NULL )
 	{
 		return get_instance()->datetime_model->user_datetime( $timestamp, 'Y-m-d', 'H:i:s' );
+	}
+}
+
+
+// --------------------------------------------------------------------------
+
+
+if ( ! function_exists( 'user_mysql_rdatetime' ) )
+{
+	function user_mysql_rdatetime( $timestamp = NULL )
+	{
+		return get_instance()->datetime_model->user_rdatetime( $timestamp, 'Y-m-d', 'H:i:s' );
 	}
 }
 
