@@ -1,27 +1,4 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
-/**
- * Generates a human friendly time reference
- * TODO: implement language files into this
- * TODO: add N/A message (optional) - if you pass 0000-00-00 at the moment it returns BAD DATE SUPPLIED
- *
- * @access	public
- * @param	string
- * @param	boolean
- * @param	string
- * @return	string
- */
-if ( ! function_exists( 'nice_time' ) )
-{
-	function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
-	{
-		return get_instance()->datetime_model->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
-	}
-}
-
-
-// --------------------------------------------------------------------------
-
+<?php
 
 /**
  * calculate_age()
