@@ -157,20 +157,23 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         error_reporting(E_ALL ^ E_STRICT ^ E_ERROR);
 
-        //  Configure whether errors are shown or not
-        switch(strtoupper(ENVIRONMENT)) {
+        //  Configure whether errors are shown or no
+        if (function_exists('ini_set')) {
 
-            case 'PRODUCTION' :
+            switch(strtoupper(ENVIRONMENT)) {
 
-                //  Suppress all errors on production
-                ini_set('display_errors', '0');
-                break;
+                case 'PRODUCTION' :
 
-            default :
+                    //  Suppress all errors on production
+                    ini_set('display_errors', '0');
+                    break;
 
-                //  Show errors everywhere else
-                ini_set('display_errors', '1');
-                break;
+                default :
+
+                    //  Show errors everywhere else
+                    ini_set('display_errors', '1');
+                    break;
+            }
         }
 
         require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_ErrorHandler.php';

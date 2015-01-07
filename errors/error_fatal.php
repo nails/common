@@ -57,29 +57,6 @@
 			An error occurred which we couldn't recover from. The technical team have
 			been informed, we apologise for the inconvenience.
 		</p>
-		<?php
-
-			if (!empty($subject) || !empty($message)) {
-
-				if (empty($subject)) {
-
-					$subject = 'Error:';
-				}
-
-				if (empty($message)) {
-
-					$message = '';
-				}
-
-				echo '<code>';
-					echo '<strong>' . $subject . ':</strong> ' . $message;
-				echo '</code>';
-			}
-
-		?>
-		<p>
-
-		</p>
 		<p>
 			<small>Powered by <a href="http://nailsapp.co.uk">Nails</a></small>
 		</p>

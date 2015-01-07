@@ -25,7 +25,7 @@ class CORE_NAILS_ErrorHandler
 
                 /**
                  * Rollbar
-                 * Always enabled on PRODUCTION, selectively enabled elsewhere (fallsback to )
+                 * Always enabled on PRODUCTION, selectively enabled elsewhere (fallsback to Nails ErrorHandler)
                  */
 
                 case 'ROLLBAR':
@@ -67,6 +67,13 @@ class CORE_NAILS_ErrorHandler
                 set_exception_handler('CORE_NAILS_ErrorHandler::exception');
                 register_shutdown_function('CORE_NAILS_ErrorHandler::fatal');
             }
+
+        } else {
+
+            //  Basic Nails ErrorHandler
+            set_error_handler('CORE_NAILS_ErrorHandler::error');
+            set_exception_handler('CORE_NAILS_ErrorHandler::exception');
+            register_shutdown_function('CORE_NAILS_ErrorHandler::fatal');
         }
     }
 
@@ -82,12 +89,14 @@ class CORE_NAILS_ErrorHandler
 
     public static function exception($exception)
     {
-        $code    = $exception->getCode();
-        $msg     = $exception->getMessage();
-        $file    = $exception->getFile();
-        $line    = $exception->getLine();
-        $errMsg  = 'Uncaught Exception with message "' . $msg . '" and code "';
-        $errMsg .= $code . '" in ' . $file . ' on line ' . $line;
+        $details       = new stdClass();
+        $details->code = $exception->getCode();
+        $details->msg  = $exception->getMessage();
+        $details->file = $exception->getFile();
+        $details->line = $exception->getLine();
+
+        $errMsg  = 'Uncaught Exception with message "' . $details->msg . '" and code "';
+        $errMsg .= $details->code . '" in ' . $details->file . ' on line ' . $details->line;
 
         //  Show we log the item?
         if (config_item('log_threshold') != 0)
@@ -96,20 +105,16 @@ class CORE_NAILS_ErrorHandler
             log_message('error', $errMsg, true);
         }
 
-        //  Show something to the user
-        if (ENVIRONMENT != 'PRODUCTION') {
+        $subject = 'Uncaught Exception';
+        $message = $errMsg;
 
-            $subject = 'Uncaught Exception';
-            $message = $errMsg;
+        if (ENVIRONMENT == 'PRODUCTION') {
 
-        } else {
-
-            $subject = '';
-            $message = '';
+            self::sendDeveloperMail($subject, $message);
         }
 
-        self::sendDeveloperMail($subject, $message);
-        self::showFatalErrorScreen($subject, $message);
+
+        self::showFatalErrorScreen($subject, $message, $details);
     }
 
     // --------------------------------------------------------------------------
@@ -120,35 +125,69 @@ class CORE_NAILS_ErrorHandler
 
         if (!is_null($error) && $error['type'] === E_ERROR) {
 
-            //  Show something to the user
-            if (ENVIRONMENT != 'PRODUCTION') {
+            $details       = new stdClass();
+            $details->code = $error['type'];
+            $details->msg  = $error['message'];
+            $details->file = $error['file'];
+            $details->line = $error['line'];
 
-                $subject = 'Fatal Error';
-                $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
+            $subject = 'Fatal Error';
+            $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
 
-            } else {
+            //  Send a note to the dev if on production
+            if (ENVIRONMENT == 'PRODUCTION') {
 
-                $subject = '';
-                $message = '';
+                self::sendDeveloperMail($subject, $message);
             }
 
-            self::sendDeveloperMail($subject, $message);
-            self::showFatalErrorScreen($subject, $message);
+            self::showFatalErrorScreen($subject, $message, $details);
         }
     }
 
     // --------------------------------------------------------------------------
 
-    public static function showFatalErrorScreen($subject = '', $message = '')
+    public static function showFatalErrorScreen($subject = '', $message = '', $details = null)
     {
-        if (is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
+        if (is_null($details)) {
+
+            $details            = new stdClass();
+            $details->code      = '';
+            $details->msg       = '';
+            $details->file      = '';
+            $details->line      = '';
+        }
+
+        //  Get the backtrace
+        if (function_exists('debug_backtrace')) {
+
+            $details->backtrace = debug_backtrace();
+
+        } else {
+
+            $details->backtrace = array();
+        }
+
+        //  Non-production and have an app-specific dev error file?
+        if (ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
+
+            include_once FCPATH . APPPATH . 'errors/error_fatal_dev.php';
+
+        //  Production and have an app-specific error file?
+        } elseif (ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal.php';
 
+        //  Non-production?
+        } elseif (ENVIRONMENT != 'PRODUCTION') {
+
+            include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev.php';
+
+        //  Production
         } else {
 
             include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
         }
+
         exit(0);
     }
 
@@ -262,8 +301,15 @@ class CORE_NAILS_ErrorHandler
         //  Send!
         if (!empty($to)) {
 
-            @mail($to, '!! ' . $subject . ' - ' . APP_NAME , '', $headers);
-            return true;
+            if (function_exists('mail')) {
+
+                @mail($to, '!! ' . $subject . ' - ' . APP_NAME , '', $headers);
+                return true;
+
+            } else {
+
+                return false;
+            }
 
         } else {
 
