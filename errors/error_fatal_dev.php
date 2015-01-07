@@ -182,6 +182,13 @@
 
     // --------------------------------------------------------------------------
 
+    $queries = get_instance()->db->queries;
+    $queries = array_reverse($queries);
+
+    echo keyValueSection('Database Queries (most recent first)', $queries);
+
+    // --------------------------------------------------------------------------
+
     //  Environment and state variables
     if (isset($_SERVER)) {
 
