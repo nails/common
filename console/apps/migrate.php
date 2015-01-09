@@ -21,11 +21,6 @@ require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
 
 class CORE_NAILS_Migrate extends CORE_NAILS_App
 {
-    private $db;
-    private $dbTransRunning = false;
-
-    // --------------------------------------------------------------------------
-
     /**
      * Configures the app
      * @return void
@@ -80,27 +75,24 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             if (!$this->confirm('Continue with migration?', true, $input, $output)) {
 
-                $this->abort($output);
-                return;
+                return $this->abort($output, 1);
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Connect to the Database
-        if (!$this->dbConnect($input, $output)) {
+        if (!$this->dbConnect($output)) {
 
-            $this->abort($output);
-            return;
+            return $this->abort($output, 2);
         }
 
         //  Test the db
-        if (!$this->dbTest()) {
+        if (!$this->dbMigrationTest()) {
 
             $output->writeln('');
             $output->writeln('Database isn\'t ready for migrations.');
-            $this->abort($output);
-            return;
+            return $this->abort($output, 3);
         }
 
         // --------------------------------------------------------------------------
@@ -165,8 +157,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             $output->writeln('');
             $output->writeln('Nothing to migrate');
-            $this->abort($output);
-            return;
+            return $this->abort($output, 0);
         }
 
         // --------------------------------------------------------------------------
@@ -216,8 +207,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         if (!$this->confirm('Continue?', true, $input, $output)) {
 
-            $this->abort($output);
-            return;
+            return $this->abort($output, 4);
         }
 
         // --------------------------------------------------------------------------
@@ -256,8 +246,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             } else {
 
-                $this->abort($output);
-                return;
+                return $this->abort($output, 5);
             }
         }
 
@@ -273,8 +262,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             } else {
 
-                $this->abort($output);
-                return;
+                return $this->abort($output, 6);
             }
         }
 
@@ -293,8 +281,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                 } else {
 
-                    $this->abort($output);
-                    return;
+                    return $this->abort($output, 7);
                 }
 
                 $counter++;
@@ -327,39 +314,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Ensures that the database has the appropriate migrations table
-     * @return boolean
-     */
-    private function dbTest()
-    {
-        //  Test for the migrations table
-        $result = $this->dbQuery('SHOW Tables LIKE \'' . NAILS_DB_PREFIX . 'migration\'')->rowCount();
-
-        if (!$result) {
-
-            //  Create the migrations table
-            $sql = "CREATE TABLE `" . NAILS_DB_PREFIX . "migration` (
-              `module` varchar(100) NOT NULL DEFAULT '',
-              `version` int(11) unsigned DEFAULT NULL,
-              PRIMARY KEY (`module`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-
-            if (!(bool) $this->dbQuery($sql)) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Determines whether or not the module needs to migration, and if so between what versions
      * @return mixed stdClass when migration needed, null when not needed
      */
-    private function determineModuleState($moduleName, $migrationsPath)
+    protected function determineModuleState($moduleName, $migrationsPath)
     {
         $module        = new \stdClass();
         $module->name  = $moduleName;
@@ -416,7 +374,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
      * Looks for enabled Nails modules which support migration
      * @return array
      */
-    private function findEnabledModules()
+    protected function findEnabledModules()
     {
         //  Look for modules
         $modules = _NAILS_GET_AVAILABLE_MODULES();
@@ -439,7 +397,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
      * @param  OutputInterface $output The Output Interface proivided by Symfony
      * @return boolean
      */
-    private function doMigration($module, $input, $output)
+    protected function doMigration($module, $input, $output)
     {
         //  Map the directory and fetch only the files we need
         $path       = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
@@ -519,138 +477,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
-    /**
-     * Connects to the database
-     * @param  InputInterface  $input  The Input Interface proivided by Symfony
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
-     * @return boolean
-     */
-    private function dbConnect($input, $output)
-    {
-        //  Locate the database details
-        $host   = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
-        $user   = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
-        $pass   = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
-        $dbname = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
-
-        if (!defined('NAILS_DB_PREFIX')) {
-
-            define('NAILS_DB_PREFIX', 'nails_');
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Attempt to connect
-        try {
-
-            //  Connect...
-            $this->db = new \PDO('mysql:host=' . $host. ';dbname=' . $dbname, $user, $pass);
-
-            //  Set error mode
-            $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            return true;
-
-        } catch(\PDOException $e) {
-
-            $output->writeln('');
-            $output->writeln('<error>Database Error:</error> ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Disconnects from the database
-     * @return void
-     */
-    private function dbClose()
-    {
-        $this->db = null;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Starts a DB transaction
-     * @return boolean
-     */
-    private function dbTransactionStart()
-    {
-        try {
-
-            $this->db->beginTransaction();
-            $this->dbTransRunning = true;
-            return true;
-
-        } catch(\Exception $e) {
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Commits a DB transaction
-     * @return void
-     */
-    private function dbTransactionCommit()
-    {
-        try {
-
-            $this->db->commit();
-            $this->dbTransRunning = false;
-            return true;
-
-        } catch(\Exception $e) {
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Rollsback a DB transaction
-     * @return void
-     */
-    private function dbTransactionRollback()
-    {
-        try {
-
-            $this->db->rollback();
-            $this->dbTransRunning = false;
-            return true;
-
-        } catch(\Exception $e) {
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Executes a database query
-     * @param  string $sql The query to execute
-     * @return void
-     */
-    private function dbQuery($sql)
-    {
-        try {
-
-            return $this->db->query($sql);
-
-        } catch (\Exception $e) {
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
     private function mapDir($dir)
     {
         if (is_dir($dir)) {
@@ -684,7 +510,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
-    private function abort($output)
+    private function abort($output, $exitCode = 1)
     {
         $output->writeln('');
 
@@ -696,6 +522,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         $output->writeln('<error>Aborting migration</error>');
         $output->writeln('');
-        return;
+        return $exitCode;
     }
 }
