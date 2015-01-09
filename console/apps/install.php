@@ -34,9 +34,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $this->setDescription('Configures or reconfigures a Nails site');
     }
 
-
     // --------------------------------------------------------------------------
-
 
     /**
      * Executes the app
@@ -66,7 +64,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             require_once 'config/app.php';
 
-            foreach($appVars AS &$v) {
+            foreach ($appVars as &$v) {
 
                 if (defined($v['key'])) {
 
@@ -81,7 +79,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             require_once 'config/deploy.php';
 
-            foreach($deployVars AS &$v) {
+            foreach ($deployVars as &$v) {
 
                 if (defined($v['key'])) {
 
@@ -138,18 +136,18 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('');
             $output->writeln('Write <info>config/app.php</info>');
 
-            foreach($appVars AS $var) {
+            foreach ($appVars as &$v) {
 
-                $output->writeln(' - Set <comment>' . $var['label'] . '</comment> to <comment>' . $var['value'] . '</comment>');
+                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
             }
 
             //  deploy.php
             $output->writeln('');
             $output->writeln('Write <info>config/deploy.php</info>');
 
-            foreach($deployVars AS $var) {
+            foreach ($deployVars as &$v) {
 
-                $output->writeln(' - Set <comment>' . $var['label'] . '</comment> to <comment>' . $var['value'] . '</comment>');
+                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
             }
 
             //  Install modules
@@ -181,7 +179,6 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('');
             $output->writeln('Migrate the database');
 
-
             $output->writeln('');
             $question = 'Does this look OK?';
             $doInstall = $this->confirm($question, true, $input, $output);
@@ -209,11 +206,9 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                     foreach ($installTheseModules as $moduleName) {
 
                         $output->write(' - <comment>' . $moduleName . '</comment>...');
-                        $this->installModule($moduleName);
+                        $this->installModule($moduleName, $input, $output);
                         $output->writeln('<info>DONE</info>');
                     }
-
-                    $output->writeln('<comment>@TODO:</comment> installModule() method');
 
                 } else {
 
@@ -222,9 +217,8 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                 //  Migrate DB
                 $output->write('<comment>[4 of 4]</comment> Migrating database..');
-                $this->migrateDb();
+                $this->migrateDb($input, $output);
                 $output->writeln('<info>DONE</info>');
-                $output->writeln('<comment>@TODO:</comment> migrateDb() method');
 
                 // --------------------------------------------------------------------------
 
@@ -247,7 +241,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('');
             $output->writeln('<error>ERROR:</error> Aborting install');
 
-            foreach($preTestErrors as $error) {
+            foreach ($preTestErrors as $error) {
 
                 $output->writeln(' - ' . $error);
             }
@@ -256,6 +250,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Defines all the App vars and their defaults
+     * @return array
+     */
     private function defineAppVars()
     {
         $vars   = array();
@@ -276,7 +274,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $vars[] = array(
                     'key'       => 'APP_PRIVATE_KEY',
                     'label'     => 'App Private Key',
-                    'value'     => md5(rand(0,1000) . microtime(true)),
+                    'value'     => md5(rand(0, 1000) . microtime(true)),
                     'options'   => array()
                 );
 
@@ -292,6 +290,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Defines all the Deploy vars and their defaults
+     * @return array
+     */
     private function defineDeployVars()
     {
         $vars   = array();
@@ -312,7 +314,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $vars[] = array(
                     'key'       => 'DEPLOY_PRIVATE_KEY',
                     'label'     => 'Deployment Private Key',
-                    'value'     => md5(rand(0,1000) . microtime(true)),
+                    'value'     => md5(rand(0, 1000) . microtime(true)),
                     'options'   => array()
                 );
 
@@ -377,6 +379,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Checks for the existance and writeability of the config files and directory
+     * @return array
+     */
     private function preInstallTests()
     {
         $preTestErrors      = array();
@@ -401,8 +407,8 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             }
         }
 
-        //  If neither fiels are there, is the directory writeable?
-        if (!$appConfigExists && !$deployConfigExists) {
+        //  If a file is missing we need to be able to write to the directory.
+        if (!$appConfigExists || !$deployConfigExists) {
 
             if (!is_writable('config/')) {
 
@@ -415,9 +421,15 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Requests the user to confirm all the variables
+     * @param array           &$vars  An array of the variables to set
+     * @param InputInterface  $input  The Input Interface proivided by Symfony
+     * @param OutputInterface $output The Output Interface proivided by Symfony
+     */
     private function setVars(&$vars, $input, $output)
     {
-        foreach($vars AS &$v) {
+        foreach ($vars as &$v) {
 
             $question  = 'What should "' . $v['label'] . '" be set to?';
             $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
@@ -428,12 +440,18 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Writes the supplied variables to the config file
+     * @param  array  $vars The variables to write
+     * @param  string $file The file to write to
+     * @return void
+     */
     private function writeFile($vars, $file)
     {
         $fp = fopen($file, 'w');
 
         fwrite($fp, "<?php\n");
-        foreach($vars as $v) {
+        foreach ($vars as $v) {
 
             fwrite($fp, "define('" . $v['key'] . "', '" . str_replace("'", "\'", $v['value']) . "');\n");
         }
@@ -443,18 +461,30 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
-    private function installModule($moduleName)
+    /**
+     * Installs a particular module
+     * @param  string          $moduleName The name of the modoule to install
+     * @param  InputInterface  $input      The Input Interface proivided by Symfony
+     * @param  OutputInterface $output     The Output Interface proivided by Symfony
+     * @return boolean
+     */
+    private function installModule($moduleName, $input, $output)
     {
+        $output->writeln('<comment>@TODO:</comment> installModule() method');
         //  @TODO: Add module to composer.json
     }
 
     // --------------------------------------------------------------------------
 
-    private function migrateDb()
+    /**
+     * Migrates the DB for a fresh install
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return boolean
+     */
+    private function migrateDb($input, $output)
     {
         //  @TODO: No idea how to do this just yet
+        $output->writeln('<comment>@TODO:</comment> migrateDb() method');
     }
 }
-
-/* End of file install.php */
-/* Location: ./nailsapp/common/console/apps/install.php */

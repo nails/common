@@ -1,19 +1,5 @@
 <?php
 
-/**
- * ---------------------------------------------------------------
- * NAILS CONSOLE: DATABASE MIGRATION TOOL
- * ---------------------------------------------------------------
- *
- * This app handles migrating the parent app's database tables and
- * all enabled modules.
- *
- * Lead Developer: Pablo de la Peña	(p@shedcollective.org, @hellopablo)
- * Lead Developer: Gary Duncan		(g@shedcollective.org, @gsdd)
- *
- * Documentation: http://nailsapp.co.uk/console/migrate
- */
-
 namespace Nails\Console\Apps;
 
 use Symfony\Component\Console\Command\Command;
@@ -25,154 +11,691 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
-class CORE_NAILS_Migrate extends CORE_NAILS_App
-{
-	/**
-	 * Configures the app
-	 * @return void
-	 */
-	protected function configure()
-	{
-		$this->setName('migrate');
-		$this->setDescription('Runs database migration across all enabled modules');
-	}
+//  Define the nails path so CORE_NAILS_Common doesn't freak out
+if (!defined('NAILS_PATH')) {
 
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Executes the app
-	 * @param  InputInterface  $input  The Input Interface proivided by Symfony
-	 * @param  OutputInterface $output The Output Interface proivided by Symfony
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$output->writeln( '<info>-----------------------------</info>' );
-		$output->writeln( '<info>Nails Database Migration Tool</info>' );
-		$output->writeln( '<info>-----------------------------</info>' );
-
-		// --------------------------------------------------------------------------
-
-		//	Load configs
-		if ( ! file_exists( 'config/deploy.php' ) ) :
-
-			$output->writeln( '<error>ERROR:</error> Could not load config/deploy.php.' );
-			return FALSE;
-
-		endif;
-
-		require_once 'config/deploy.php';
-
-		if ( ! defined( 'ENVIRONMENT' ) ) :
-
-			$output->writeln( '<error>ERROR:</error> ENVIRONMENT is not defined.' );
-			return FALSE;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Check environment
-		if ( strtoupper( ENVIRONMENT ) == 'PRODUCTION' ) :
-
-			$output->writeln( '' );
-			$output->writeln( '--------------------------------------' );
-			$output->writeln( '| <info>WARNING: The app is in PRODUCTION.</info> |' );
-			$output->writeln( '--------------------------------------' );
-			$output->writeln( '' );
-
-			if ( ! $this->confirm( 'Continue with migration?', TRUE, $input, $output ) ) :
-
-				$output->writeln( '' );
-				$output->writeln( '<error>Aborting migration.</error>' );
-				return;
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Look for enabled modules
-		$output->writeln( '' );
-		$output->write( '<comment>Searching for modules... </comment>' );
-		$output->writeln( 'found <info>4</info> modules' );
-
-		// --------------------------------------------------------------------------
-
-		//	Gather everything and perform any preliminary tests
-		$output->writeln( '<comment>Preparing for migration...</comment> done' );
-
-		// --------------------------------------------------------------------------
-
-		//	Confirm what's going to happen
-		$output->writeln( '' );
-		$output->writeln( 'The following modules are to be migrated:' );
-		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
-		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
-		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
-		$output->writeln( ' - <comment>nailsapp/module-name</comment> from <info>0</info> to <info>123</info>' );
-		$output->writeln( '' );
-
-		if ( ! $this->confirm( 'Continue?', TRUE, $input, $output ) ) :
-
-			$output->writeln( '' );
-			$output->writeln( '<error>Aborting migration.</error>' );
-			return;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		$output->writeln( '' );
-		$output->writeln( '<comment>Starting migration...</comment>' );
-		$progress = $this->getHelper('progress');
-
-		$progress->start($output, 4);
-		$progress->setCurrent( 0 );
-		$i = 0;
-		while ($i++ < 4) :
-
-			//	Do something
-			sleep(1);
-
-			// Advances the progress bar 1 unit
-			$progress->advance();
-
-		endwhile;
-
-		$progress->finish();
-
-
-		// --------------------------------------------------------------------------
-
-		//	Cleaning up
-		$output->writeln( '' );
-		$output->writeln( '<comment>Cleaning up...</comment>' );
-
-		// --------------------------------------------------------------------------
-
-		//	And we're done
-		$output->writeln( '' );
-		$output->writeln( 'Complete!' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function confirm( $question, $default, $input, $output )
-	{
-		$question		= is_array( $question ) ? implode( "\n", $question ) : $question;
-		$helper			= $this->getHelper( 'question' );
-		$defaultString	= $default ? 'Y' : 'N';
-		$question		= new ConfirmationQuestion(  $question . ' [' . $defaultString . ']: ', $default ) ;
-
-		return $helper->ask( $input, $output, $question );
-	}
+    define('NAILS_PATH', 'vendor/nailsapp/');
 }
 
-/* End of file migrate.php */
-/* Location: ./nailsapp/common/console/apps/migrate.php */
+require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
+
+class CORE_NAILS_Migrate extends CORE_NAILS_App
+{
+    private $db;
+    private $dbTransRunning = false;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Configures the app
+     * @return void
+     */
+    protected function configure()
+    {
+        $this->setName('migrate');
+        $this->setDescription('Runs database migration across all enabled modules');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes the app
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return void
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>-----------------------------</info>');
+        $output->writeln('<info>Nails Database Migration Tool</info>');
+        $output->writeln('<info>-----------------------------</info>');
+
+        // --------------------------------------------------------------------------
+
+        //  Load configs
+        if (!file_exists('config/deploy.php')) {
+
+            $output->writeln('<error>ERROR:</error> Could not load config/deploy.php.');
+            return false;
+        }
+
+        require_once 'config/deploy.php';
+
+        if (!defined('ENVIRONMENT')) {
+
+            $output->writeln('<error>ERROR:</error> ENVIRONMENT is not defined.');
+            return false;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Check environment
+        if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
+
+            $output->writeln('');
+            $output->writeln('--------------------------------------');
+            $output->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
+            $output->writeln('--------------------------------------');
+            $output->writeln('');
+
+            if (!$this->confirm('Continue with migration?', true, $input, $output)) {
+
+                $this->abort($output);
+                return;
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Connect to the Database
+        if (!$this->dbConnect($input, $output)) {
+
+            $this->abort($output);
+            return;
+        }
+
+        //  Test the db
+        if (!$this->dbTest()) {
+
+            $output->writeln('');
+            $output->writeln('Database isn\'t ready for migrations.');
+            $this->abort($output);
+            return;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Work out what the App's doing
+        $output->writeln('');
+        $output->write('<comment>Determining state of the App database... </comment>');
+
+        $app = $this->determineModuleState('APP', 'application/migrations/');
+
+        if ($app) {
+
+            $output->writeln('done, requires migration');
+
+        } else {
+
+            $output->writeln('done, no App migrations detected');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Work out what Nails is doing, `common` won't be detected as a module
+        $output->write('<comment>Determining state of the Nails database... </comment>');
+
+        $nails = $this->determineModuleState('nailsapp/common', 'vendor/nailsapp/common/migrations/');
+
+        if ($nails) {
+
+            $output->writeln('done, requires migration');
+
+        } else {
+
+            $output->writeln('done, no Nails migrations detected');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Look for enabled modules
+        $output->write('<comment>Searching for modules... </comment>');
+        $enabledModules = $this->findEnabledModules();
+
+        if ($enabledModules) {
+
+            if (count($enabledModules) == 1) {
+
+                $output->writeln('found <info>1</info> module requiring migration');
+
+            } else {
+
+                $output->writeln('found <info>' . count($enabledModules) . '</info> modules requiring migration');
+            }
+
+        } else {
+
+            $output->writeln('no modules found which require migration');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Anything to migrate?
+        if (!$app && !$nails && !$enabledModules) {
+
+            $output->writeln('');
+            $output->writeln('Nothing to migrate');
+            $this->abort($output);
+            return;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Confirm what's going to happen
+        $output->writeln('');
+        $output->writeln('OK, here\'s what\'s going to happen:');
+        $output->writeln('');
+
+        if ($app) {
+
+            $start = is_null($app->start) ? 'The beginning of time' : $app->start;
+            $output->writeln('The App\'s database will be migrated from <info>' . $start . '</info> to <info>#' . $app->end . '</info>');
+        }
+
+        if ($nails) {
+
+            $start = is_null($nails->start) ? 'The beginning of time' : $nails->start;
+            $output->writeln('Nails\' database will be migrated from <info>' . $start . '</info> to <info>#' . $nails->end . '</info>');
+        }
+
+        if ($enabledModules) {
+
+            $output->writeln('');
+
+            if ($app || $nails) {
+
+                $output->writeln('Additionally, the following modules are to be migrated:');
+
+            } else {
+
+                $output->writeln('The following modules are to be migrated:');
+            }
+
+            foreach ($enabledModules as $module) {
+
+                $start = is_null($module->start) ? 'The beginning of time' : $module->start;
+
+                $line  = ' - <comment>' . $module->name . '</comment> from ';
+                $line .= '<info>' . $start . '</info> to <info>#' . $module->end . '</info>';
+
+                $output->writeln($line);
+            }
+        }
+
+        $output->writeln('');
+
+        if (!$this->confirm('Continue?', true, $input, $output)) {
+
+            $this->abort($output);
+            return;
+        }
+
+        // --------------------------------------------------------------------------
+
+        $output->writeln('');
+        $output->writeln('<comment>Starting migration...</comment>');
+
+        // --------------------------------------------------------------------------
+
+        //  Start the DB transaction
+        $this->dbTransactionStart();
+
+        // --------------------------------------------------------------------------
+
+        //  Start migrating
+        $numMigrations  = 0;
+        $numMigrations += !empty($app) ? 1 : 0;
+        $numMigrations += !empty($nails) ? 1 : 0;
+        $numMigrations += !empty($enabledModules);
+
+        //  Disable foreign key checks
+        $result = $this->dbQuery('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
+        $oldForeignKeychecks = $result->Value;
+
+        $this->dbQuery('SET FOREIGN_KEY_CHECKS = 0;');
+
+        //  Migrate the app
+        if (!empty($app)) {
+
+            $output->write('[1/' . $numMigrations . '] Migrating <info>App</info>... ');
+            $result = $this->doMigration($app, $input, $output);
+
+            if ($result) {
+
+                $output->writeln('done!');
+
+            } else {
+
+                $this->abort($output);
+                return;
+            }
+        }
+
+        //  Migrate nails
+        if (!empty($nails)) {
+
+            $output->write('[2/' . $numMigrations . '] Migrating <info>Nails</info>... ');
+            $result = $this->doMigration($nails, $input, $output);
+
+            if ($result) {
+
+                $output->writeln('done!');
+
+            } else {
+
+                $this->abort($output);
+                return;
+            }
+        }
+
+        //  Migrate the modules
+        if (!empty($enabledModules)) {
+
+            $counter = 3;
+            foreach ($enabledModules as $module) {
+
+                $output->write('[' . $counter . '/' . $numMigrations . '] Migrating <info>' . $module->name . '</info>... ');
+                $result = $this->doMigration($module, $input, $output);
+
+                if ($result) {
+
+                    $output->writeln('done!');
+
+                } else {
+
+                    $this->abort($output);
+                    return;
+                }
+
+                $counter++;
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Commit the transaction
+        $this->dbTransactionCommit();
+
+        // --------------------------------------------------------------------------
+
+        //  Cleaning up
+        $output->writeln('<comment>Cleaning up...</comment>');
+
+        //  Restore previous foreign key checks
+        $this->dbQuery('SET FOREIGN_KEY_CHECKS = \'' . $oldForeignKeychecks . '\';');
+
+        //  Disconnect from the DB
+        $this->dbClose();
+
+        // --------------------------------------------------------------------------
+
+        //  And we're done
+        $output->writeln('');
+        $output->writeln('Complete!');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Ensures that the database has the appropriate migrations table
+     * @return boolean
+     */
+    private function dbTest()
+    {
+        //  Test for the migrations table
+        $result = $this->dbQuery('SHOW Tables LIKE \'' . NAILS_DB_PREFIX . 'migration\'')->rowCount();
+
+        if (!$result) {
+
+            //  Create the migrations table
+            $sql = "CREATE TABLE `" . NAILS_DB_PREFIX . "migration` (
+              `module` varchar(100) NOT NULL DEFAULT '',
+              `version` int(11) unsigned DEFAULT NULL,
+              PRIMARY KEY (`module`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+            if (!(bool) $this->dbQuery($sql)) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether or not the module needs to migration, and if so between what versions
+     * @return mixed stdClass when migration needed, null when not needed
+     */
+    private function determineModuleState($moduleName, $migrationsPath)
+    {
+        $module        = new \stdClass();
+        $module->name  = $moduleName;
+        $module->start = null;
+        $module->end   = null;
+
+        // --------------------------------------------------------------------------
+
+        //  Work out if the module needs migrated and if so between what and what
+        $dirMap = $this->mapDir($migrationsPath);
+
+        if (!empty($dirMap)) {
+
+            //  Work out all the files we have and get their index
+            $migrations = array();
+            foreach($dirMap as $dir) {
+
+                $migrations[$dir['path']] = $dir['index'];
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Work out the current version
+            $sql = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$moduleName';";
+            $result = $this->dbQuery($sql);
+
+            if ($result->rowCount() === 0) {
+
+                //  Add a row for the module
+                $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$moduleName', NULL);";
+                $result = $this->dbQuery($sql);
+
+                $currentVersion = null;
+
+            } else {
+
+                $currentVersion = $result->fetch(\PDO::FETCH_OBJ)->version;
+                $currentVersion = is_null($currentVersion) ? null : (int) $currentVersion;
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Define the variable
+            $module->start = $currentVersion;
+            $module->end   = end($migrations);
+        }
+
+        return $module->start === $module->end ? null : $module;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Looks for enabled Nails modules which support migration
+     * @return array
+     */
+    private function findEnabledModules()
+    {
+        //  Look for modules
+        $modules = _NAILS_GET_AVAILABLE_MODULES();
+        $out     = array();
+
+        foreach ($modules as $module) {
+
+            $out[] = $this->determineModuleState($module, 'vendor/' . $module . '/migrations/');
+        }
+
+        return array_filter($out);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes a migration
+     * @param  string          $module The migration details object
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return boolean
+     */
+    private function doMigration($module, $input, $output)
+    {
+        //  Map the directory and fetch only the files we need
+        $path       = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
+        $dirMap     = $this->mapDir($path);
+        $migrations = array();
+
+        //  Set the current version to -1 if null so migrations with a zero index are picked up
+        $current = is_null($module->start) ? -1 : $module->start;
+
+        //  Go through all the migrations, skip any which have already been executed
+        $lastMigration = null;
+        foreach ($dirMap as $migration) {
+
+            if ($migration['index'] > $current) {
+
+                //  Go through the file and execute each line.
+                $handle = fopen($migration['path'], 'r');
+
+                if ($handle) {
+
+                    $lineNumber = 1;
+                    while (($line = fgets($handle)) !== false) {
+
+                        //  Remove comments
+                        $line = trim($line);
+                        $line = preg_replace('#^//.+$#', '', $line);
+                        $line = preg_replace('/^#.+$/', '', $line);
+                        $line = preg_replace('/^--.+$/', '', $line);
+                        $line = preg_replace('#/\*.*\*/#', '', $line);
+                        $line = trim($line);
+
+                        if (!empty($line)) {
+
+                            //  We have something!
+                            $result = $this->dbQuery($line);
+
+                            if (!$result) {
+
+                                $output->writeln('');
+                                $output->writeln('');
+                                $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed.');
+                                return false;
+                            }
+                        }
+
+                        $lineNumber++;
+                    }
+
+                } else {
+
+                    // error opening the file.
+                    $output->writeln('');
+                    $output->writeln('');
+                    $output->writeln('<error>ERROR</error>: Failed to open <info>' . $migration['path'] . '</info> for reading.');
+                    return false;
+                }
+            }
+
+            $lastMigration = $migration['index'];
+        }
+
+        //  Update the database
+        $sql = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $module->name . "'";
+        $result = $this->dbQuery($sql);
+
+        if (!$result) {
+
+            // Error updating migration record
+            $output->writeln('');
+            $output->writeln('');
+            $output->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $module->name . '</info>.');
+            return false;
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Connects to the database
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return boolean
+     */
+    private function dbConnect($input, $output)
+    {
+        //  Locate the database details
+        $host   = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
+        $user   = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
+        $pass   = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
+        $dbname = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
+
+        if (!defined('NAILS_DB_PREFIX')) {
+
+            define('NAILS_DB_PREFIX', 'nails_');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Attempt to connect
+        try {
+
+            //  Connect...
+            $this->db = new \PDO('mysql:host=' . $host. ';dbname=' . $dbname, $user, $pass);
+
+            //  Set error mode
+            $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+            return true;
+
+        } catch(\PDOException $e) {
+
+            $output->writeln('');
+            $output->writeln('<error>Database Error:</error> ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Disconnects from the database
+     * @return void
+     */
+    private function dbClose()
+    {
+        $this->db = null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Starts a DB transaction
+     * @return boolean
+     */
+    private function dbTransactionStart()
+    {
+        try {
+
+            $this->db->beginTransaction();
+            $this->dbTransRunning = true;
+            return true;
+
+        } catch(\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Commits a DB transaction
+     * @return void
+     */
+    private function dbTransactionCommit()
+    {
+        try {
+
+            $this->db->commit();
+            $this->dbTransRunning = false;
+            return true;
+
+        } catch(\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Rollsback a DB transaction
+     * @return void
+     */
+    private function dbTransactionRollback()
+    {
+        try {
+
+            $this->db->rollback();
+            $this->dbTransRunning = false;
+            return true;
+
+        } catch(\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes a database query
+     * @param  string $sql The query to execute
+     * @return void
+     */
+    private function dbQuery($sql)
+    {
+        try {
+
+            return $this->db->query($sql);
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function mapDir($dir)
+    {
+        if (is_dir($dir)) {
+
+            $out = array();
+
+            foreach (new \DirectoryIterator($dir) as $fileInfo) {
+
+                if ($fileInfo->isDot()) {
+
+                    continue;
+                }
+
+                //  In the correct format?
+                if ( preg_match('/^(\d)+(.*)\.sql$/', $fileInfo->getFilename(), $matches)) {
+
+                    $out[] = array(
+                        'path'  => $fileInfo->getPathname(),
+                        'index' => (int) $matches[1]
+                    );
+                }
+            }
+
+            return $out;
+
+        } else {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function abort($output)
+    {
+        $output->writeln('');
+
+        if ($this->dbTransRunning) {
+
+            $output->writeln('<error>Rolling back Database</error>');
+            $this->dbTransactionRollback();
+        }
+
+        $output->writeln('<error>Aborting migration</error>');
+        $output->writeln('');
+        return;
+    }
+}

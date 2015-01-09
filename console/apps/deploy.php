@@ -1,18 +1,5 @@
 <?php
 
-/**
- * ---------------------------------------------------------------
- * NAILS CONSOLE: DEPLOY
- * ---------------------------------------------------------------
- *
- * This app handles deploying a Nails app
- *
- * Lead Developer: Pablo de la Peña	(p@shedcollective.org, @hellopablo)
- * Lead Developer: Gary Duncan		(g@shedcollective.org, @gsdd)
- *
- * Documentation: http://nailsapp.co.uk/console/deploy
- */
-
 namespace Nails\Console\Apps;
 
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,228 +12,223 @@ require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
 class CORE_NAILS_Deploy extends CORE_NAILS_App
 {
-	/**
-	 * Configures the app
-	 * @return void
-	 */
-	protected function configure()
-	{
-		$this->setName( 'deploy' );
-		$this->setDescription( 'Sets up Nails after a fresh deploy' );
-	}
+    /**
+     * Configures the app
+     * @return void
+     */
+    protected function configure()
+    {
+        $this->setName('deploy');
+        $this->setDescription('Sets up Nails after a fresh deploy');
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Executes the app
+     * @param  InputInterface  $input  The Input Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @return void
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>------------------</info>');
+        $output->writeln('<info>Nails Post Deploy </info>');
+        $output->writeln('<info>------------------</info>');
+        $output->writeln('Beginning...');
 
+        // --------------------------------------------------------------------------
 
-	/**
-	 * Executes the app
-	 * @param  InputInterface  $input  The Input Interface proivided by Symfony
-	 * @param  OutputInterface $output The Output Interface proivided by Symfony
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$output->writeln( '<info>------------------</info>' );
-		$output->writeln( '<info>Nails Post Deploy </info>' );
-		$output->writeln( '<info>------------------</info>' );
-		$output->writeln( 'Beginning...' );
+        //  Load configs
+        if (file_exists('config/app.php')) {
 
-		// --------------------------------------------------------------------------
+            $output->writeln('Found <comment>config/app.php</comment> will use values for defaults');
+            require_once 'config/app.php';
+        }
 
-		//	Load configs
-		if ( file_exists( 'config/app.php' ) ) :
+        if (file_exists('config/deploy.php')) {
 
-			$output->writeln( 'Found <comment>config/app.php</comment> will use values for defaults' );
-			require_once 'config/app.php';
+            $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
+            require_once 'config/deploy.php';
+        }
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		if ( file_exists( 'config/deploy.php' ) ) :
+        //  Check environment
+        if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
 
-			$output->writeln( 'Found <comment>config/deploy.php</comment> will use values for defaults' );
-			require_once 'config/deploy.php';
+            $output->writeln('');
+            $output->writeln('--------------------------------------');
+            $output->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
+            $output->writeln('--------------------------------------');
+            $output->writeln('');
 
-		endif;
+            if (!$this->confirm('Continue with deployment?', true, $input, $output)) {
 
-		// --------------------------------------------------------------------------
+                $output->writeln('');
+                $output->writeln('Aborting deployment.');
+                return;
+            }
+        }
 
-		//	Check environment
-		if ( strtoupper( ENVIRONMENT ) == 'PRODUCTION' ) :
+        // --------------------------------------------------------------------------
 
-			$output->writeln( '' );
-			$output->writeln( '--------------------------------------' );
-			$output->writeln( '| <info>WARNING: The app is in PRODUCTION.</info> |' );
-			$output->writeln( '--------------------------------------' );
-			$output->writeln( '' );
+        $ok = true;
+        $output->writeln('');
+        $output->writeln('<info>Testing environment</info>');
 
-			if ( ! $this->confirm( 'Continue with deployment?', TRUE, $input, $output ) ) :
+        //  Shell exec
+        $output->write('PHP\'s <comment>exec()</comment> is enabled... ');
 
-				$output->writeln( '' );
-				$output->writeln( 'Aborting deployment.' );
-				return;
+        if (function_exists('exec')) {
 
-			endif;
+            $output->writeln('<info>OK!</info>');
 
-		endif;
+        } else {
 
-		// --------------------------------------------------------------------------
+            $output->writeln('<error>Not Found</error>');
+            $ok = false;
+        }
 
-		$_ok = TRUE;
-		$output->writeln( '' );
-		$output->writeln( '<info>Testing environment</info>' );
+        if ($ok) {
 
-		//	Shell exec
-		$output->write( 'PHP\'s <comment>exec()</comment> is enabled... ' );
+            //  Composer exists
+            $output->write('<comment>composer</comment> is installed... ');
 
-		if ( function_exists( 'exec' ) ) :
+            if ($this->cmdExists('composer')) {
 
-			$output->writeln( '<info>OK!</info>' );
+                $output->writeln('<info>OK!</info>');
+                $composerExecutable = 'composer';
 
-		else :
+            } elseif ($this->cmdExists('composer.phar')) {
 
-			$output->writeln( '<error>Not Found</error>' );
-			$_ok = FALSE;
+                $output->writeln('<info>OK!</info>');
+                $composerExecutable = 'composer.phar';
 
-		endif;
+            } else {
 
-		if ( $_ok ) :
+                $output->writeln('<error>Not Found</error>');
+                $ok = false;
+            }
 
-			//	Composer exists
-			$output->write( '<comment>composer</comment> is installed... ' );
-			if ( $this->_cmd_exists( 'composer' ) ) :
+            //  Bower exists, but only if there's a bower.json
+            if (file_exists('bower.json')) {
 
-				$output->writeln( '<info>OK!</info>' );
-				$_composer_executable = 'composer';
+                $output->write('<comment>bower</comment> is installed... ');
 
-			elseif ( $this->_cmd_exists( 'composer.phar' ) ) :
+                if ($this->cmdExists('composer')) {
 
-				$output->writeln( '<info>OK!</info>' );
-				$_composer_executable = 'composer.phar';
+                    $output->writeln('<info>OK!</info>');
 
-			else :
+                } else {
 
-				$output->writeln( '<error>Not Found</error>' );
-				$_ok = FALSE;
+                    $output->writeln('<error>Not Found</error>');
+                    $ok = false;
+                }
+            }
+        }
 
-			endif;
+        //  All good?
+        if (!$ok) {
 
-			//	Bower exists, but only if there's a bower.json
-			if ( file_exists( 'bower.json' ) ) :
+            $output->writeln('<error>Cannot Continue</error>');
+            $output->writeln('The environment is not ready for deployment, you should roll your changes back.');
+            return;
+        }
 
-				$output->write( '<comment>bower</comment> is installed... ' );
-				if ( $this->_cmd_exists( 'composer' ) ) :
+        // --------------------------------------------------------------------------
 
-					$output->writeln( '<info>OK!</info>' );
+        $output->writeln('');
+        $output->writeln('<info>Beginning deployment</info>');
 
-				else :
+        // --------------------------------------------------------------------------
 
-					$output->writeln( '<error>Not Found</error>' );
-					$_ok = FALSE;
+        //  Composer
+        unset($execOutput);
+        unset($exitCode);
+        $output->write('<comment>Composer:</comment> Installing... ');
 
-				endif;
+        $cmd  = $composerExecutable;
+        $cmd .= $input->isInteractive() ? '' : ' --no-interaction';
+        $cmd .= ' --prefer-dist --optimize-autoloader --no-dev install 2>&1';
 
-			endif;
+        exec($cmd, $execOutput, $exitCode);
 
-		endif;
+        if ($exitCode == 0) {
 
-		//	All good?
-		if ( ! $_ok ) :
+            $output->writeln('<info>OK!</info>');
 
-			$output->writeln( '<error>Cannot Continue</error>' );
-			$output->writeln( 'The environment is not ready for deployment, you should roll your changes back.' );
-			return;
+        } else {
 
-		endif;
+            $output->writeln('<error>FAILED</error>');
+        }
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		$output->writeln( '' );
-		$output->writeln( '<info>Beginning deployment</info>' );
+        //  Bower
+        if (file_exists('bower.json')) {
 
-		// --------------------------------------------------------------------------
+            unset($execOutput);
+            unset($exitCode);
+            $output->write('<comment>Bower:</comment> Installing... ');
 
-		//	Composer
-		unset($exec_output);
-		unset($exit_code);
-		$output->write( '<comment>Composer:</comment> Installing... ' );
-		$_interactive = $input->isInteractive() ? '' : ' --no-interaction';
-		exec( $_composer_executable . $_interactive . ' --prefer-dist --optimize-autoloader --no-dev install 2>&1', $exec_output, $exit_code );
+            $cmd  = 'bower install';
+            $cmd .= $input->isInteractive() ? '' : ' --config.interactive=false ';
+            $cmd .= '2>&1';
 
-		if ( $exit_code == 0 ) :
+            exec($cmd, $execOutput, $exitCode);
 
-			$output->writeln( '<info>OK!</info>' );
+            if ($exitCode == 0) {
 
-		else :
+                $output->writeln('<info>OK!</info>');
 
-			$output->writeln( '<error>FAILED</error>' );
+            } else {
 
-		endif;
+                $output->writeln('<error>FAILED</error>');
+            }
+        }
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	Bower
-		if ( file_exists( 'bower.json' ) ) :
+        //  Migration
+        $output->writeln('');
+        $output->writeln('<info>Beginning database migration</info>');
 
-			unset($exec_output);
-			unset($exit_code);
-			$output->write( '<comment>Bower:</comment> Installing... ' );
-			$_interactive = $input->isInteractive() ? '' : ' --config.interactive=false';
-			exec( 'bower install' . $_interactive . ' 2>&1', $exec_output, $exit_code );
+        $command = $this->getApplication()->find('migrate');
 
-			if ( $exit_code == 0 ) :
+        $arguments = array(
+            'command'          => 'migrate',
+            '--no-interaction' => true
+        );
 
-				$output->writeln( '<info>OK!</info>' );
+        $input = new ArrayInput($arguments);
+        $input->setInteractive($input->isInteractive());
+        $result = $command->run($input, $output);
 
-			else :
+        $output->writeln('<info>Finished database migration</info>');
 
-				$output->writeln( '<error>FAILED</error>' );
+        // --------------------------------------------------------------------------
 
-			endif;
+        //  Cleaning up
+        $output->writeln('');
+        $output->writeln('<comment>Cleaning up...</comment>');
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+        //  And we're done
+        $output->writeln('');
+        $output->writeln('Complete!');
+    }
 
-		//	Migration
-		$output->writeln( '' );
-		$output->writeln( '<info>Beginning database migration</info>' );
+    // --------------------------------------------------------------------------
 
-		$command = $this->getApplication()->find( 'migrate' );
-
-		$arguments = array(
-			'command'			=> 'migrate',
-			'--no-interaction'	=> TRUE
-		);
-
-		$_input		= new ArrayInput( $arguments );
-		$_input->setInteractive( $input->isInteractive() );
-		$_result	= $command->run($_input, $output);
-
-		$output->writeln( '<info>Finished database migration</info>' );
-
-		// --------------------------------------------------------------------------
-
-		//	Cleaning up
-		$output->writeln( '' );
-		$output->writeln( '<comment>Cleaning up...</comment>' );
-
-		// --------------------------------------------------------------------------
-
-		//	And we're done
-		$output->writeln( '' );
-		$output->writeln( 'Complete!' );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	private function _cmd_exists( $cmd )
-	{
-		return (bool) exec( 'which ' . $cmd );
-	}
+    /**
+     * Checks whether a particular command exists
+     * @param  string $cmd The command to check
+     * @return boolean
+     */
+    private function cmdExists($cmd)
+    {
+        return (bool) exec('which ' . $cmd);
+    }
 }
-
-/* End of file install.php */
-/* Location: ./nailsapp/common/console/apps/install.php */
