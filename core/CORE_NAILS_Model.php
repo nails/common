@@ -114,7 +114,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param object $user The user object
 	 * @return void
 	 **/
-	public function _set_user_object( &$user )
+	public function setUserObject( &$user )
 	{
 		$this->user = $user;
 	}

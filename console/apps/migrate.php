@@ -1,7 +1,5 @@
 <?php
 
-namespace Nails\Console\Apps;
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -223,10 +221,11 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Start migrating
+        $curStep        = 1;
         $numMigrations  = 0;
         $numMigrations += !empty($app) ? 1 : 0;
         $numMigrations += !empty($nails) ? 1 : 0;
-        $numMigrations += !empty($enabledModules);
+        $numMigrations += !empty($enabledModules) ? count($enabledModules) : 0;
 
         //  Disable foreign key checks
         $result = $this->dbQuery('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
@@ -237,23 +236,26 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         //  Migrate the app
         if (!empty($app)) {
 
-            $output->write('[1/' . $numMigrations . '] Migrating <info>App</info>... ');
+            $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>App</info>... ');
             $result = $this->doMigration($app, $input, $output);
 
             if ($result) {
 
                 $output->writeln('done!');
+                $curStep++;
 
             } else {
 
                 return $this->abort($output, 5);
             }
+
+            $curStep++;
         }
 
         //  Migrate nails
         if (!empty($nails)) {
 
-            $output->write('[2/' . $numMigrations . '] Migrating <info>Nails</info>... ');
+            $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>Nails</info>... ');
             $result = $this->doMigration($nails, $input, $output);
 
             if ($result) {
@@ -264,15 +266,16 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                 return $this->abort($output, 6);
             }
+
+            $curStep++;
         }
 
         //  Migrate the modules
         if (!empty($enabledModules)) {
 
-            $counter = 3;
             foreach ($enabledModules as $module) {
 
-                $output->write('[' . $counter . '/' . $numMigrations . '] Migrating <info>' . $module->name . '</info>... ');
+                $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>' . $module->name . '</info>... ');
                 $result = $this->doMigration($module, $input, $output);
 
                 if ($result) {
@@ -284,7 +287,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                     return $this->abort($output, 7);
                 }
 
-                $counter++;
+                $curStep++;
             }
         }
 

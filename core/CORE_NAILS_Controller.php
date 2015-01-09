@@ -561,11 +561,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         // --------------------------------------------------------------------------
 
+        //  Fairly sure load order is important here.
         $_models   = array();
         $_models[] = 'system/app_setting_model';
-        $_models[] = 'system/user_model';
-        $_models[] = 'system/user_group_model';
-        $_models[] = 'system/user_password_model';
+        $_models[] = 'auth/user_model';
+        $_models[] = 'auth/user_group_model';
+        $_models[] = 'auth/user_password_model';
         $_models[] = 'system/datetime_model';
         $_models[] = 'system/language_model';
 
@@ -647,9 +648,9 @@ class CORE_NAILS_Controller extends MX_Controller {
         // --------------------------------------------------------------------------
 
         //  Inject the user object into the user_group, user_password & datetime models
-        $this->user_group_model->_set_user_object($this->user_model);
-        $this->user_password_model->_set_user_object($this->user_model);
-        $this->datetime_model->_set_user_object($this->user_model);
+        $this->user_group_model->setUserObject($this->user_model);
+        $this->user_password_model->setUserObject($this->user_model);
+        $this->datetime_model->setUserObject($this->user_model);
 
         // --------------------------------------------------------------------------
 

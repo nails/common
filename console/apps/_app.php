@@ -1,7 +1,5 @@
 <?php
 
-namespace Nails\Console\Apps;
-
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Command\Command;
@@ -89,10 +87,10 @@ class CORE_NAILS_App extends Command
     protected function dbConnect($output)
     {
         //  Locate the database details
-        $host   = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
-        $user   = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
-        $pass   = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
-        $dbname = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
+        $host   = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost';
+        $user   = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : 'localuser';
+        $pass   = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : 'localpassword';
+        $dbname = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : 'nailsapp_main';
 
         if (!defined('NAILS_DB_PREFIX')) {
 
@@ -207,6 +205,34 @@ class CORE_NAILS_App extends Command
         } catch (\Exception $e) {
 
             return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function dbInsertId()
+    {
+        try {
+
+            return $this->db->lastInsertId();
+
+        } catch (\Exception $e) {
+
+            return null;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function dbEscape($string)
+    {
+        try {
+
+            return $this->db->quote($string);
+
+        } catch (\Exception $e) {
+
+            return null;
         }
     }
 }

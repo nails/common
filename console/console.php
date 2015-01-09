@@ -24,7 +24,7 @@ use Symfony\Component\Console\Application;
 
 //	Instantiate and run the application
 $app = new Application();
-$app->add(new Nails\Console\Apps\CORE_NAILS_Install());
-$app->add(new Nails\Console\Apps\CORE_NAILS_Migrate());
-$app->add(new Nails\Console\Apps\CORE_NAILS_Deploy());
+$app->add(new CORE_NAILS_Install());
+$app->add(new CORE_NAILS_Migrate());
+$app->add(new CORE_NAILS_Deploy());
 $app->run();

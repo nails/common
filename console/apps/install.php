@@ -1,20 +1,5 @@
 <?php
 
-/**
- * ---------------------------------------------------------------
- * NAILS CONSOLE: INSTALLER
- * ---------------------------------------------------------------
- *
- * This app handles configuring and reconfiguring a Nails app.
- *
- * Lead Developer: Pablo de la Peña (p@shedcollective.org, @hellopablo)
- * Lead Developer: Gary Duncan      (g@shedcollective.org, @gsdd)
- *
- * Documentation: http://nailsapp.co.uk/console/install
- */
-
-namespace Nails\Console\Apps;
-
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,6 +8,13 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 require_once 'vendor/nailsapp/common/console/apps/_app.php';
+
+/**
+ * Load the password model, so we can use it's static methods to generate
+ * the user's passwords. We will have to immitate CI's Model Classthough.
+ */
+
+class CI_Model {}
 
 class CORE_NAILS_Install extends CORE_NAILS_App
 {
@@ -53,42 +45,24 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Define app & deploy vars
-        $appVars    = $this->defineAppVars();
-        $deployVars = $this->defineDeployVars();
-
-        // --------------------------------------------------------------------------
-
         //  Load configs
         if (file_exists('config/app.php')) {
 
             $output->writeln('Found <comment>config/app.php</comment> will use values for defaults');
-
             require_once 'config/app.php';
-
-            foreach ($appVars as &$v) {
-
-                if (defined($v['key'])) {
-
-                    $v['value'] = constant($v['key']);
-                }
-            }
         }
 
         if (file_exists('config/deploy.php')) {
 
             $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
-
             require_once 'config/deploy.php';
-
-            foreach ($deployVars as &$v) {
-
-                if (defined($v['key'])) {
-
-                    $v['value'] = constant($v['key']);
-                }
-            }
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Define app & deploy vars
+        $appVars    = $this->defineAppVars();
+        $deployVars = $this->defineDeployVars();
 
         // --------------------------------------------------------------------------
 
@@ -190,6 +164,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             foreach ($appVars as &$v) {
 
+                if (is_string($v)) {
+
+                    continue;
+                }
+
                 $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
             }
 
@@ -198,6 +177,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('Write <info>config/deploy.php</info>');
 
             foreach ($deployVars as &$v) {
+
+                if (is_string($v)) {
+
+                    continue;
+                }
 
                 $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
             }
@@ -318,12 +302,15 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                         foreach ($users as $user) {
 
                             $output->write(' - <comment>' . $user['first_name'] . ' ' . $user['last_name'] . '</comment>... ');
-                            if ($this->createUser($user, $output)) {
+                            $result = $this->createUser($user, $appVars, $deployVars, $output);
+
+                            if ($result === true) {
 
                                 $output->writeln('<info>DONE</info>');
+
                             } else {
 
-                                $output->writeln('<error>FAILED</error>');
+                                $output->writeln('<error>FAILED: ' . $result . '</error>');
                             }
                         }
 
@@ -373,33 +360,48 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     private function defineAppVars()
     {
         $vars   = array();
+        $vars[] = '// App Constants';
         $vars[] = array(
                     'key'       => 'APP_NAME',
                     'label'     => 'App Name',
-                    'value'     => 'My App',
+                    'value'     => defined('APP_NAME') ? APP_NAME : 'My App',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'APP_DEFAULT_TIMEZONE',
                     'label'     => 'App Timezone',
-                    'value'     => date_default_timezone_get(),
+                    'value'     => defined('APP_DEFAULT_TIMEZONE') ? APP_DEFAULT_TIMEZONE : date_default_timezone_get(),
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'APP_PRIVATE_KEY',
                     'label'     => 'App Private Key',
-                    'value'     => md5(rand(0, 1000) . microtime(true)),
+                    'value'     => defined('APP_PRIVATE_KEY') ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'APP_DEVELOPER_EMAIL',
                     'label'     => 'Developer Email',
-                    'value'     => '',
+                    'value'     => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
                     'options'   => array()
                 );
+
+        // --------------------------------------------------------------------------
+
+        //  Any constants defined by the modules?
+        $moduleVars = $this->getConstantsFromModules('APP', $vars);
+        $vars = array_merge($vars, $moduleVars);
+
+        // --------------------------------------------------------------------------
+
+        //  Any other constants defined in app.php?
+        $appFile = $this->getConstantsFromFile('config/app.php', $vars);
+        $vars = array_merge($vars, $appFile);
+
+        // --------------------------------------------------------------------------
 
         return $vars;
     }
@@ -416,81 +418,175 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $vars[] = array(
                     'key'       => 'ENVIRONMENT',
                     'label'     => 'Environment',
-                    'value'     => 'PRODUCTION',
+                    'value'     => defined('ENVIRONMENT') ? ENVIRONMENT : 'PRODUCTION',
                     'options'   => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
                 );
 
         $vars[] = array(
                     'key'       => 'BASE_URL',
                     'label'     => 'Base URL',
-                    'value'     => '',
+                    'value'     => defined('BASE_URL') ? BASE_URL : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_PRIVATE_KEY',
                     'label'     => 'Deployment Private Key',
-                    'value'     => md5(rand(0, 1000) . microtime(true)),
+                    'value'     => defined('DEPLOY_PRIVATE_KEY') ? DEPLOY_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_DB_HOST',
                     'label'     => 'Database Host',
-                    'value'     => 'localhost',
+                    'value'     => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_DB_USERNAME',
                     'label'     => 'Database User',
-                    'value'     => '',
+                    'value'     => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_DB_PASSWORD',
                     'label'     => 'Database Password',
-                    'value'     => '',
+                    'value'     => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_DB_DATABASE',
                     'label'     => 'Database Name',
-                    'value'     => '',
+                    'value'     => defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_EMAIL_HOST',
                     'label'     => 'Email Host',
-                    'value'     => 'localhost',
+                    'value'     => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_EMAIL_USER',
                     'label'     => 'Email Username',
-                    'value'     => '',
+                    'value'     => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_EMAIL_PASS',
                     'label'     => 'Email Password',
-                    'value'     => '',
+                    'value'     => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
                     'options'   => array()
                 );
 
         $vars[] = array(
                     'key'       => 'DEPLOY_EMAIL_PORT',
                     'label'     => 'Email Port',
-                    'value'     => '25',
+                    'value'     => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : '25',
                     'options'   => array()
                 );
 
+        // --------------------------------------------------------------------------
+
+        //  Any constants defined by the modules?
+        $moduleVars = $this->getConstantsFromModules('DEPLOY', $vars);
+        $vars = array_merge($vars, array_filter($moduleVars));
+
+        // --------------------------------------------------------------------------
+
+        //  Any other constants defined in deploy.php?
+        $appFile = $this->getConstantsFromFile('config/deploy.php', $vars);
+        $vars = array_merge($vars, array_filter($appFile));
+
+        // --------------------------------------------------------------------------
+
         return $vars;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Finds all constants defined in a particular file
+     * @param  string $path The path to analyse
+     * @param  array  $vars The existing variables to check against (so only new variables are returned)
+     * @return array
+     */
+    private function getConstantsFromFile($path, $vars = array())
+    {
+        $out = array();
+
+        if (file_exists($path)) {
+
+            $appFile = file_get_contents($path);
+            $pattern = '/define\([\'|"](.+?)[\'|"]\,.*[\'|"](.+?)[\'|"]\)/';
+            $appVars = preg_match_all($pattern, $appFile, $matches);
+
+            if (!empty($matches[0])) {
+
+                for ($i = 0; $i < count($matches[0]); $i++) {
+
+                    //  Check to see if it's already been requested
+                    $exists = false;
+                    foreach ($vars as $existing) {
+
+                        if (!is_string($existing) && $existing['key'] == $matches[1][$i]) {
+
+                            $exists = true;
+                        }
+                    }
+
+                    if (!$exists) {
+
+                        $name = str_replace('_', ' ', $matches[1][$i]);
+                        $name = strtolower($name);
+                        $name = ucwords($name);
+
+                        $out[] = array(
+                            'key'       => $matches[1][$i],
+                            'label'     => $name,
+                            'value'     => defined($matches[1][$i]) ? constant($matches[1][$i]) : '',
+                            'options'   => array()
+                        );
+                    }
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Finds all constants defined by the enabled modules for either app.php or deploy.php
+     * @param  string $type The type of constant (either APP or DEPLOY)
+     * @param  array  $vars The existing variables to check against (so only new variables are returned)
+     * @return array
+     */
+    private function getConstantsFromModules($type, $vars = array())
+    {
+        //  @TODO: Look for modules
+        return array();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Finds constants for a particular module
+     * @param  string $module The name of the module to look at
+     * @param  string $type   The type of constant (either APP or DEPLOY)
+     * @return array
+     */
+    private function getConstantsFromModule($module, $type)
+    {
+        //  @TODO: Analyse module
+        return array();
     }
 
     // --------------------------------------------------------------------------
@@ -547,10 +643,13 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     {
         foreach ($vars as &$v) {
 
-            $question  = 'What should "' . $v['label'] . '" be set to?';
-            $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
+            if (is_array($v)) {
 
-            $v['value'] = $this->ask($question, $v['value'], $input, $output);
+                $question  = 'What should "' . $v['label'] . '" be set to?';
+                $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
+
+                $v['value'] = $this->ask($question, $v['value'], $input, $output);
+            }
         }
     }
 
@@ -569,7 +668,14 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         fwrite($fp, "<?php\n");
         foreach ($vars as $v) {
 
-            fwrite($fp, "define('" . $v['key'] . "', '" . str_replace("'", "\'", $v['value']) . "');\n");
+            if (is_string($v)) {
+
+                fwrite($fp, $v . "\n");
+
+            } else {
+
+                fwrite($fp, "define('" . $v['key'] . "', '" . str_replace("'", "\'", $v['value']) . "');\n");
+            }
         }
 
         fclose($fp);
@@ -589,7 +695,6 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     private function installModule($moduleName, $input, $output)
     {
         //  @TODO: Add module to composer.json
-
         return true;
     }
 
@@ -603,10 +708,14 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     private function migrateDb($output)
     {
         //  Execute the migrate command, silently
-        $cmd       = $this->getApplication()->find('migrate');
+        $cmd = $this->getApplication()->find('migrate');
+
         $cmdInput  = new ArrayInput(array('command' => 'migrate'));
+        $cmdInput->setInteractive(false);
+
         $cmdOutput = new NullOutput();
-        $exitCode  = $cmd->run($cmdInput, $cmdOutput);
+
+        $exitCode = $cmd->run($cmdInput, $cmdOutput);
 
         if ($exitCode == 0) {
 
@@ -626,9 +735,138 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
-    public function createUser($user, $output)
+    public function createUser($user, $appVars, $deployVars, $output)
     {
-        //  @TODO Create users
+        //  @TODO: Test username/email for duplicates
+
+        //  Load the password model if not loaded
+        require_once 'vendor/nailsapp/module-auth/auth/models/user_password_model.php';
+
+        //  Correctly encode the password
+        if (!defined('APP_PRIVATE_KEY')) {
+
+            foreach ($appVars AS $var) {
+
+                if (is_array($var) && $var['key'] == 'APP_PRIVATE_KEY') {
+
+                    define('APP_PRIVATE_KEY', $var['value']);
+                    break;
+                }
+            }
+        }
+
+        if (!defined('APP_PRIVATE_KEY')) {
+
+            foreach ($deployVars AS $var) {
+
+                if (is_array($var) && $var['key'] == 'DEPLOY_PRIVATE_KEY') {
+
+                    define('DEPLOY_PRIVATE_KEY', $var['value']);
+                    break;
+                }
+            }
+        }
+
+        $password = NAILS_User_password_model::generateHashObject($user['password']);
+
+        // --------------------------------------------------------------------------
+
+        //  Create the main record
+        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user`
+        (
+            `group_id`,
+            `ip_address`,
+            `last_ip`,
+            `username`,
+            `password`,
+            `password_md5`,
+            `password_engine`,
+            `salt`,
+            `created`,
+            `first_name`,
+            `last_name`
+        )
+        VALUES
+        (
+            1,
+            '127.0.0.1',
+            '127.0.0.1',
+            " . $this->dbEscape(strtolower(trim($user['username']))) . ",
+            '" . $password->password . "',
+            '" . $password->password_md5 . "',
+            '" . $password->engine . "',
+            '" . $password->salt . "',
+            NOW(),
+            " . $this->dbEscape($user['first_name']) . ",
+            " . $this->dbEscape($user['last_name']) . "
+        );";
+
+        $result = $this->dbQuery($sql);
+        if (!$result) {
+
+            return 'Could not create main user record.';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Get the user's ID
+        $userId = $this->dbInsertId();
+
+        // --------------------------------------------------------------------------
+
+        //  Update the main record's id_md5 value
+        $sql = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
+        $result = $this->dbQuery($sql);
+        if (!$result) {
+
+            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            return 'Could not set MD5 ID on main user record.';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Create the user meta record
+        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta` (`user_id`) VALUES (" . $userId . ");";
+        $result = $this->dbQuery($sql);
+        if (!$result) {
+
+            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            return 'Could not create user_meta record.';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Create the email record
+        $emailCode = NAILS_User_password_model::salt();
+        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_email`
+        (
+            `user_id`,
+            `email`,
+            `code`,
+            `is_verified`,
+            `is_primary`,
+            `date_added`,
+            `date_verified`
+        )
+        VALUES
+        (
+            " . $userId . ",
+            " . $this->dbEscape(strtolower(trim($user['email']))) . ",
+            '" . $emailCode . "',
+            1,
+            1,
+            NOW(),
+            NOW()
+        );";
+
+        $result = $this->dbQuery($sql);
+        if (!$result) {
+
+            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta` WHERE `user_id` = " . $userId);
+            return 'Could not create main user email record.';
+        }
+
         return true;
     }
 }
