@@ -433,7 +433,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                         $line = trim($line);
 
                         //  Replace {{NAILS_DB_PREFIX}} with the constant
-                        $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX);
+                        $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $line);
 
                         if (!empty($line)) {
 
