@@ -1,4 +1,4 @@
-		<!--	GLOBAL JS	-->
-		<?php $this->asset->output( 'JS-INLINE' ); ?>
-	</body>
+        <!--    GLOBAL JS   -->
+        <?php $this->asset->output('JS-INLINE'); ?>
+    </body>
 </html>
