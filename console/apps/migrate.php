@@ -96,23 +96,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Work out what the App's doing
-        $output->writeln('');
-        $output->write('<comment>Determining state of the App database... </comment>');
-
-        $app = $this->determineModuleState('APP', 'application/migrations/');
-
-        if ($app) {
-
-            $output->writeln('done, requires migration');
-
-        } else {
-
-            $output->writeln('done, no App migrations detected');
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Work out what Nails is doing, `common` won't be detected as a module
         $output->write('<comment>Determining state of the Nails database... </comment>');
 
@@ -151,8 +134,25 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
+        //  Work out what the App's doing
+        $output->writeln('');
+        $output->write('<comment>Determining state of the App database... </comment>');
+
+        $app = $this->determineModuleState('APP', 'application/migrations/');
+
+        if ($app) {
+
+            $output->writeln('done, requires migration');
+
+        } else {
+
+            $output->writeln('done, no App migrations detected');
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Anything to migrate?
-        if (!$app && !$nails && !$enabledModules) {
+        if (!$nails && !$enabledModules && !$app) {
 
             $output->writeln('');
             $output->writeln('Nothing to migrate');
@@ -165,12 +165,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         $output->writeln('');
         $output->writeln('OK, here\'s what\'s going to happen:');
         $output->writeln('');
-
-        if ($app) {
-
-            $start = is_null($app->start) ? 'The beginning of time' : $app->start;
-            $output->writeln('The App\'s database will be migrated from <info>' . $start . '</info> to <info>#' . $app->end . '</info>');
-        }
 
         if ($nails) {
 
@@ -202,6 +196,12 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             }
         }
 
+        if ($app) {
+
+            $start = is_null($app->start) ? 'The beginning of time' : $app->start;
+            $output->writeln('The App\'s database will be migrated from <info>' . $start . '</info> to <info>#' . $app->end . '</info>');
+        }
+
         $output->writeln('');
 
         if (!$this->confirm('Continue?', true, $input, $output)) {
@@ -224,34 +224,15 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         //  Start migrating
         $curStep        = 1;
         $numMigrations  = 0;
-        $numMigrations += !empty($app) ? 1 : 0;
         $numMigrations += !empty($nails) ? 1 : 0;
         $numMigrations += !empty($enabledModules) ? count($enabledModules) : 0;
+        $numMigrations += !empty($app) ? 1 : 0;
 
         //  Disable foreign key checks
         $result = $this->dbQuery('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
         $oldForeignKeychecks = $result->Value;
 
         $this->dbQuery('SET FOREIGN_KEY_CHECKS = 0;');
-
-        //  Migrate the app
-        if (!empty($app)) {
-
-            $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>App</info>... ');
-            $result = $this->doMigration($app, $input, $output);
-
-            if ($result) {
-
-                $output->writeln('done!');
-                $curStep++;
-
-            } else {
-
-                return $this->abort($output, 5);
-            }
-
-            $curStep++;
-        }
 
         //  Migrate nails
         if (!empty($nails)) {
@@ -290,6 +271,25 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                 $curStep++;
             }
+        }
+
+        //  Migrate the app
+        if (!empty($app)) {
+
+            $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>App</info>... ');
+            $result = $this->doMigration($app, $input, $output);
+
+            if ($result) {
+
+                $output->writeln('done!');
+                $curStep++;
+
+            } else {
+
+                return $this->abort($output, 5);
+            }
+
+            $curStep++;
         }
 
         // --------------------------------------------------------------------------
