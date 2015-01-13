@@ -524,7 +524,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         if (file_exists($path)) {
 
             $appFile = file_get_contents($path);
-            $pattern = '/define\([\'|"](.+?)[\'|"]\,.*[\'|"](.+?)[\'|"]\)/';
+            $pattern = '/define\([\'|"](.+?)[\'|"]\,.*[\'|"](.*?)[\'|"]\)/';
             $appVars = preg_match_all($pattern, $appFile, $matches);
 
             if (!empty($matches[0])) {
