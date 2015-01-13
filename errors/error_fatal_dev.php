@@ -67,9 +67,9 @@
         html,
         body
         {
-            padding:0;
-            margin:0;
-            background:#FAFAFA;
+            padding: 0;
+            margin: 0;
+            background: #FAFAFA;
             font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
             font-weight: 300;
             font-size: 13px;
@@ -80,13 +80,21 @@
         header,
         section.data-section
         {
-            padding:1em;
+            padding: 1em;
         }
 
         .dev-only
         {
-            background:#EB4100;
-            color:#FFF;
+            background: #D55600;
+            color: #FFFFFF;
+            height: 30px;
+            line-height: 30px;
+        }
+
+        #nailsLogo
+        {
+            float: right;
+            max-height: 100%;
         }
 
         header
@@ -96,9 +104,9 @@
 
         section.data-section h3
         {
-            border-bottom:1px solid #CCC;
-            padding-bottom:1em;
-            margin-bottom:1em;
+            border-bottom: 1px solid #CCCCCC;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
         }
 
         section.data-section .table-responsive
@@ -109,18 +117,18 @@
 
         section.data-section table
         {
-            background: #FFF;
-            border:1px solid #EFEFEF;
-            width:100%;
+            background: #FFFFFF;
+            border: 1px solid #EFEFEF;
+            width: 100%;
             box-sizing: border-box;
         }
 
         section.data-section table td
         {
-            border-bottom:1px solid #EEE;
-            border-right:1px dotted #EEE;
-            padding:0.75em;
-            font-family:monospace;
+            border-bottom: 1px solid #EEEEEE;
+            border-right: 1px dotted #EEEEEE;
+            padding: 0.75em;
+            font-family: monospace;
         }
 
         section.data-section table tr:last-of-type td
@@ -140,7 +148,12 @@
 
         section.data-section table td.value
         {
-            color:#555;
+            color: #555555;
+        }
+
+        section.data-section code
+        {
+            color: green;
         }
 
     </style>
@@ -148,6 +161,9 @@
 <body>
     <div class="dev-only">
         This page is viewable in development environments only.
+        <a href="http://docs.nailsapp.co.uk">
+            <img src="<?=NAILS_ASSETS_URL?>img/nails/icon/icon@2x.png" id="nailsLogo"/>
+        </a>
     </div>
     <header>
         <h1><?=$subject?></h1>
@@ -176,7 +192,7 @@
         $class = !empty($bt['class']) ? $bt['class'] . '-&gt;' : '';
         $func  = !empty($bt['function']) ? $bt['function'] : '&lt;unknown&gt;';
 
-        $backtrace[] = 'File "' . $file . '" line ' . $line . ' in ' . $class . $func;
+        $backtrace[] = 'File <code>"' . $file . '"</code> line <code>' . $line . '</code> in <code>' . $class . $func . '</code>';
     }
     echo keyValueSection('Backtrace', $backtrace);
 
