@@ -96,6 +96,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
+        $output->writeln('');
+
+        // --------------------------------------------------------------------------
+
         //  Work out what Nails is doing, `common` won't be detected as a module
         $output->write('<comment>Determining state of the Nails database... </comment>');
 
@@ -135,7 +139,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Work out what the App's doing
-        $output->writeln('');
         $output->write('<comment>Determining state of the App database... </comment>');
 
         $app = $this->determineModuleState('APP', 'application/migrations/');
@@ -164,10 +167,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         //  Confirm what's going to happen
         $output->writeln('');
         $output->writeln('OK, here\'s what\'s going to happen:');
-        $output->writeln('');
 
         if ($nails) {
 
+            $output->writeln('');
             $start = is_null($nails->start) ? 'The beginning of time' : $nails->start;
             $output->writeln('Nails\' database will be migrated from <info>' . $start . '</info> to <info>#' . $nails->end . '</info>');
         }
@@ -175,15 +178,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         if ($enabledModules) {
 
             $output->writeln('');
-
-            if ($app || $nails) {
-
-                $output->writeln('Additionally, the following modules are to be migrated:');
-
-            } else {
-
-                $output->writeln('The following modules are to be migrated:');
-            }
+            $output->writeln('The following modules are to be migrated:');
 
             foreach ($enabledModules as $module) {
 
@@ -198,6 +193,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         if ($app) {
 
+            $output->writeln('');
             $start = is_null($app->start) ? 'The beginning of time' : $app->start;
             $output->writeln('The App\'s database will be migrated from <info>' . $start . '</info> to <info>#' . $app->end . '</info>');
         }
