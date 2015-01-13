@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
 /*
 |--------------------------------------------------------------------------
@@ -8,20 +8,19 @@
 | URL to your CodeIgniter root. Typically this will be your base URL,
 | WITH a trailing slash:
 |
-|	http://example.com/
+|   http://example.com/
 |
 | If this is not set then CodeIgniter will guess the protocol, domain and
 | path to your installation.
 |
 */
-if ( ! defined( 'BASE_URL' ) ) :
+if (!defined('BASE_URL')) {
 
-	$_ERROR = 'The <code>BASE_URL</code> constant has not been set.';
-	include NAILS_COMMON_PATH . 'errors/startup_error.php';
+    $_ERROR = 'The <code>BASE_URL</code> constant has not been set.';
+    include NAILS_COMMON_PATH . 'errors/startup_error.php';
+}
 
-endif;
-
-$config['base_url']	= BASE_URL;
+$config['base_url'] = BASE_URL;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,14 +43,14 @@ $config['index_page'] = '';
 | URI string.  The default setting of 'AUTO' works for most servers.
 | If your links do not seem to work, try one of the other delicious flavors:
 |
-| 'AUTO'			Default - auto detects
-| 'PATH_INFO'		Uses the PATH_INFO
-| 'QUERY_STRING'	Uses the QUERY_STRING
-| 'REQUEST_URI'		Uses the REQUEST_URI
-| 'ORIG_PATH_INFO'	Uses the ORIG_PATH_INFO
+| 'AUTO'            Default - auto detects
+| 'PATH_INFO'       Uses the PATH_INFO
+| 'QUERY_STRING'    Uses the QUERY_STRING
+| 'REQUEST_URI'     Uses the REQUEST_URI
+| 'ORIG_PATH_INFO'  Uses the ORIG_PATH_INFO
 |
 */
-$config['uri_protocol']	= 'AUTO';
+$config['uri_protocol'] = 'AUTO';
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +76,7 @@ $config['url_suffix'] = '';
 |
 */
 
-$config['language']	= 'english';
+$config['language'] = 'english';
 
 /*
 |--------------------------------------------------------------------------
@@ -162,11 +161,11 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 | use segment based URLs.
 |
 */
-$config['allow_get_array']		= TRUE;
+$config['allow_get_array']      = TRUE;
 $config['enable_query_strings'] = FALSE;
-$config['controller_trigger']	= 'c';
-$config['function_trigger']		= 'm';
-$config['directory_trigger']	= 'd'; // experimental not currently in use
+$config['controller_trigger']   = 'c';
+$config['function_trigger']     = 'm';
+$config['directory_trigger']    = 'd'; // experimental not currently in use
 
 /*
 |--------------------------------------------------------------------------
@@ -178,11 +177,11 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | You can enable error logging by setting a threshold over zero. The
 | threshold determines what gets logged. Threshold options are:
 |
-|	0 = Disables logging, Error logging TURNED OFF
-|	1 = Error Messages (including PHP errors)
-|	2 = Debug Messages
-|	3 = Informational Messages
-|	4 = All Messages
+|   0 = Disables logging, Error logging TURNED OFF
+|   1 = Error Messages (including PHP errors)
+|   2 = Debug Messages
+|   3 = Informational Messages
+|   4 = All Messages
 |
 | For a live site you'll usually only enable Errors (1) to be logged otherwise
 | your log files will fill up very fast.
@@ -222,7 +221,7 @@ $config['log_date_format'] = 'Y-m-d H:i:s';
 |
 */
 
-$config['cache_path'] = defined( 'DEPLOY_CACHE_DIR' ) ? DEPLOY_CACHE_DIR : FCPATH . APPPATH . 'cache/';
+$config['cache_path'] = defined('DEPLOY_CACHE_DIR') ? DEPLOY_CACHE_DIR : FCPATH . APPPATH . 'cache/';
 
 /*
 |--------------------------------------------------------------------------
@@ -234,37 +233,37 @@ $config['cache_path'] = defined( 'DEPLOY_CACHE_DIR' ) ? DEPLOY_CACHE_DIR : FCPAT
 |
 */
 
-$_app_private_key		= defined( 'APP_PRIVATE_KEY' )		? APP_PRIVATE_KEY		: '';
+$_app_private_key       = defined('APP_PRIVATE_KEY')        ? APP_PRIVATE_KEY       : '';
 
-$config['encryption_key'] = md5( $_app_private_key );
+$config['encryption_key'] = md5($_app_private_key);
 
 /*
 |--------------------------------------------------------------------------
 | Session Variables
 |--------------------------------------------------------------------------
 |
-| 'sess_cookie_name'		= the name you want for the cookie
-| 'sess_expiration'			= the number of SECONDS you want the session to last.
+| 'sess_cookie_name'        = the name you want for the cookie
+| 'sess_expiration'         = the number of SECONDS you want the session to last.
 |   by default sessions last 7200 seconds (two hours).  Set to zero for no expiration.
-| 'sess_expire_on_close'	= Whether to cause the session to expire automatically
+| 'sess_expire_on_close'    = Whether to cause the session to expire automatically
 |   when the browser window is closed
-| 'sess_encrypt_cookie'		= Whether to encrypt the cookie
-| 'sess_use_database'		= Whether to save the session data to a database
-| 'sess_table_name'			= The name of the session database table
-| 'sess_match_ip'			= Whether to match the user's IP address when reading the session data
-| 'sess_match_useragent'	= Whether to match the User Agent when reading the session data
-| 'sess_time_to_update'		= how many seconds between CI refreshing Session Information
+| 'sess_encrypt_cookie'     = Whether to encrypt the cookie
+| 'sess_use_database'       = Whether to save the session data to a database
+| 'sess_table_name'         = The name of the session database table
+| 'sess_match_ip'           = Whether to match the user's IP address when reading the session data
+| 'sess_match_useragent'    = Whether to match the User Agent when reading the session data
+| 'sess_time_to_update'     = how many seconds between CI refreshing Session Information
 |
 */
-$config['sess_cookie_name']		= 'nailssession';
-$config['sess_expiration']		= 1209600; // 2 weeks
-$config['sess_expire_on_close']	= TRUE;
-$config['sess_encrypt_cookie']	= TRUE;
-$config['sess_use_database']	= TRUE;
-$config['sess_table_name']		= 'nails_session';
-$config['sess_match_ip']		= FALSE;
-$config['sess_match_useragent']	= FALSE;
-$config['sess_time_to_update']	= 300;
+$config['sess_cookie_name']     = 'nailssession';
+$config['sess_expiration']      = 1209600; // 2 weeks
+$config['sess_expire_on_close'] = TRUE;
+$config['sess_encrypt_cookie']  = TRUE;
+$config['sess_use_database']    = TRUE;
+$config['sess_table_name']      = 'nails_session';
+$config['sess_match_ip']        = FALSE;
+$config['sess_match_useragent'] = FALSE;
+$config['sess_time_to_update']  = 300;
 
 /*
 |--------------------------------------------------------------------------
@@ -276,41 +275,46 @@ $config['sess_time_to_update']	= 300;
 | 'cookie_path'   =  Typically will be a forward slash
 |
 */
-$config['cookie_prefix']	= '';
-$config['cookie_path']		= '/';
-$config['cookie_httponly']	= TRUE;
+$config['cookie_prefix']    = '';
+$config['cookie_path']      = '/';
+$config['cookie_httponly']  = TRUE;
 
-if ( defined( 'CONF_COOKIE_DOMAIN' ) ) :
+if (defined('CONF_COOKIE_DOMAIN')) {
 
-	//	The developer has specified the specific domain to use for cookies
-	$config['cookie_domain'] = CONF_COOKIE_DOMAIN;
+    //  The developer has specified the specific domain to use for cookies
+    $config['cookie_domain'] = CONF_COOKIE_DOMAIN;
 
-else :
+} else {
 
-	//	No specific domain has been specified, set a cookie which spans
-	//	the use of all specified BASE_URLs, i.e BASE_URL and SECURE_BASE_URL
-	$config['cookie_domain'] = '';
+    /**
+     * No specific domain has been specified, set a cookie which spans the
+     * use of all specified BASE_URLs, i.e BASE_URL and SECURE_BASE_URL
+     */
 
-	//	Are the BASE_URL and SECURE_BASE_URL on the same domain?
-	// if so, cool, if not then...
+    $config['cookie_domain'] = '';
 
-	$_base_domain			= getDomainFromUrl( BASE_URL );
-	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? getDomainFromUrl( SECURE_BASE_URL ) : $_base_domain;
+    /**
+     * Are the BASE_URL and SECURE_BASE_URL on the same domain? if so, cool,
+     * if not then...
+     */
 
-	if ( $_base_domain == $_secure_base_domain ) :
+    $baseDomain       = getDomainFromUrl(BASE_URL);
+    $secureBaseDomain = defined('SECURE_BASE_URL') ? getDomainFromUrl(SECURE_BASE_URL) : $baseDomain;
 
-		//	If the two match, then define it
-		$config['cookie_domain'] = $_base_domain;
+    if ($baseDomain == $secureBaseDomain) {
 
-	else :
+        //  If the two match, then define it
+        $config['cookie_domain'] = $baseDomain;
 
-		$_ERROR = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> constants do not share the same domain, this can cause issues with sessions.';
-		include NAILS_COMMON_PATH . 'errors/startup_error.php';
+    } else {
 
-	endif;
+        $_ERROR  = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> ';
+        $_ERROR .= 'constants do not share the same domain, this can cause issues ';
+        $_ERROR .= 'with sessions.';
 
-
-endif;
+        include NAILS_COMMON_PATH . 'errors/startup_error.php';
+    }
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -336,8 +340,8 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_expire' = The number in seconds the token should expire.
 */
 $config['csrf_protection'] = FALSE;
-$config['csrf_token_name'] = 'nailscsrftest';	//	This is hardcoded into nails.api.js
-$config['csrf_cookie_name'] = 'nailscsrftoken';	//	This is hardcoded into nails.api.js
+$config['csrf_token_name'] = 'nailscsrftest';   //  This is hardcoded into nails.api.js
+$config['csrf_cookie_name'] = 'nailscsrftoken'; //  This is hardcoded into nails.api.js
 $config['csrf_expire'] = 7200;
 
 /*

@@ -1,9 +1,32 @@
-<style type="text/css">
-    p {font-family:monospace;margin:20px 10px;}
-    strong { color:red;}
-    code { padding:5px;border:1px solid #CCC;background:#EEE }
-</style>
-<p>
-	<strong>ERROR:</strong> <?=$_ERROR?>
-</p>
-<?php exit( 0 ); ?>
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <title>Startup Error<?=defined('APP_NAME') ? ' - ' . APP_NAME : ''?></title>
+    <?php
+
+    include NAILS_COMMON_PATH . 'errors/components/styles.php';
+
+    ?>
+</head>
+<body>
+    <div id="container">
+        <?php
+
+        include NAILS_COMMON_PATH . 'errors/components/header.php';
+
+        echo '<p>';
+        echo '<strong style="color:red;">STARTUP ERROR: </strong>';
+        echo $_ERROR;
+        echo '</p>';
+
+        include NAILS_COMMON_PATH . 'errors/components/footer.php';
+
+        ?>
+    </div>
+</body>
+<?php
+
+exit();

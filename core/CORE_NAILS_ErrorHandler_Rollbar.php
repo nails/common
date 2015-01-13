@@ -33,6 +33,17 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
             'person_fn' => 'CORE_NAILS_ErrorHandler_Rollbar::getPerson'
         );
 
+        //  Check Rollbar is available
+        if (!class_exists('Rollbar')) {
+
+            $subject  = 'Rollbar is not configured properly.';
+            $message  = 'Rollbar is set as the error handler, but the Rollbar class ';
+            $message .= 'could not be found. Ensure that it is in composer.json.';
+
+            CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+            CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
+        }
+
         Rollbar::init($config, false, false, false);
     }
 
