@@ -12,7 +12,7 @@ if (!function_exists('app_notification'))
 	function app_notification($key = NULL, $grouping = 'app', $forceRefresh = FALSE)
 	{
 		//	Load the model if it's not already loaded
-		if (!get_instance()->load->model_is_loaded('app_notification_model')) {
+		if (!get_instance()->load->isModelLoaded('app_notification_model')) {
 
 			get_instance()->load->model('app_notification_model');
 		}
@@ -38,7 +38,7 @@ if (!function_exists('app_notification_notify'))
 	function app_notification_notify($key = NULL, $grouping = 'app', $data = array(), $override = array())
 	{
 		//	Load the model if it's not already loaded
-		if (!get_instance()->load->model_is_loaded('app_notification_model')) {
+		if (!get_instance()->load->isModelLoaded('app_notification_model')) {
 
 			get_instance()->load->model('app_notification_model');
 		}

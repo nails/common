@@ -6,7 +6,7 @@ if ( ! function_exists( 'cms_render_block' ) )
 	function cms_render_block( $slug, $lang = NULL )
 	{
 		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->model_is_loaded( 'cms_block_model' ) ) :
+		if ( ! get_instance()->load->isModelLoaded( 'cms_block_model' ) ) :
 
 			get_instance()->load->model( 'cms/cms_block_model' );
 

@@ -1,4 +1,14 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * This class brings about uniformity to Nails models.
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    models
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class CORE_NAILS_Model extends CI_Model
 {
@@ -49,14 +59,14 @@ class CORE_NAILS_Model extends CI_Model
 	 * @access	public
 	 * @return void
 	 **/
-	public function __construct( )
+	public function __construct()
 	{
 		parent::__construct();
 
 		// --------------------------------------------------------------------------
 
 		//	Ensure models all have access to the global user_model
-		if ( function_exists( 'get_userobject' ) ) :
+		if (function_exists('get_userobject')) :
 
 			$this->user_model	= get_userobject();
 			$this->user			= get_userobject();
@@ -67,11 +77,11 @@ class CORE_NAILS_Model extends CI_Model
 
 		//	Define defaults
 		$this->clear_errors();
-		$this->_destructive_delete			= TRUE;
+		$this->_destructive_delete			= true;
 		$this->_table_id_column				= 'id';
 		$this->_table_slug_column			= 'slug';
 		$this->_table_label_column			= 'label';
-		$this->_table_auto_set_timestamps	= TRUE;
+		$this->_table_auto_set_timestamps	= true;
 		$this->_deleted_flag				= 'is_deleted';
 		$this->_per_page					= 50;
 	}
@@ -91,11 +101,11 @@ class CORE_NAILS_Model extends CI_Model
 		//	TODO: decide whether this is necessary; should caches be persistent; gut says yes.
 
 		//	Clear cache's
-		if ( isset( $this->_cache_keys ) && $this->_cache_keys ) :
+		if (isset($this->_cache_keys) && $this->_cache_keys) :
 
-			foreach ( $this->_cache_keys AS $key ) :
+			foreach ($this->_cache_keys as $key) :
 
-				$this->_unset_cache( $key );
+				$this->_unset_cache($key);
 
 			endforeach;
 
@@ -114,7 +124,7 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param object $user The user object
 	 * @return void
 	 **/
-	public function setUserObject( &$user )
+	public function setUserObject(&$user)
 	{
 		$this->user = $user;
 	}
@@ -142,57 +152,57 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param bool $return_obj Whether to return just the new ID or the full object
 	 * @return mixed
 	 **/
-	public function create( $data = array(), $return_object = FALSE )
+	public function create($data = array(), $return_object = false)
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::create() Table variable not set' );
+			show_error(get_called_class() . '::create() Table variable not set');
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_table_auto_set_timestamps ) :
+		if ($this->_table_auto_set_timestamps) :
 
-			$this->db->set( 'created', 'NOW()', FALSE );
-			$this->db->set( 'modified', 'NOW()', FALSE );
+			$this->db->set('created', 'NOW()', false);
+			$this->db->set('modified', 'NOW()', false);
 
-			if ( $this->user_model->is_logged_in() ) :
+			if ($this->user_model->is_logged_in()) :
 
-				$this->db->set( 'created_by', active_user( 'id' ) );
-				$this->db->set( 'modified_by', active_user( 'id' ) );
+				$this->db->set('created_by', active_user('id'));
+				$this->db->set('modified_by', active_user('id'));
 
 			else :
 
-				$this->db->set( 'created_by', NULL );
-				$this->db->set( 'modified_by', NULL );
+				$this->db->set('created_by', null);
+				$this->db->set('modified_by', null);
 
 			endif;
 
-		elseif ( ! $data ) :
+		elseif (!$data) :
 
-			$this->_set_error( 'No data to insert.' );
-			return FALSE;
-
-		endif;
-
-		if ( $data ) :
-
-			$this->db->set( $data );
+			$this->_set_error('No data to insert.');
+			return false;
 
 		endif;
 
-		$this->db->insert( $this->_table );
+		if ($data) :
 
-		if ( $this->db->affected_rows() ) :
+			$this->db->set($data);
+
+		endif;
+
+		$this->db->insert($this->_table);
+
+		if ($this->db->affected_rows()) :
 
 			$_id = $this->db->insert_id();
 
 			// --------------------------------------------------------------------------
 
-			if ( $return_object ) :
+			if ($return_object) :
 
-				return $this->get_by_id( $_id );
+				return $this->get_by_id($_id);
 
 			else :
 
@@ -202,7 +212,7 @@ class CORE_NAILS_Model extends CI_Model
 
 		else :
 
-			return FALSE;
+			return false;
 
 		endif;
 	}
@@ -219,11 +229,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param array $data The data to update the object with
 	 * @return bool
 	 **/
-	public function update( $id, $data = array() )
+	public function update($id, $data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::update() Table variable not set' );
+			show_error(get_called_class() . '::update() Table variable not set');
 
 		else :
 
@@ -234,37 +244,37 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_table_auto_set_timestamps ) :
+		if ($this->_table_auto_set_timestamps) :
 
-			$this->db->set( $_prefix . 'modified', 'NOW()', FALSE );
+			$this->db->set($_prefix . 'modified', 'NOW()', false);
 
-			if ( $this->user_model->is_logged_in() ) :
+			if ($this->user_model->is_logged_in()) :
 
-				$this->db->set( $_prefix . 'modified_by', active_user( 'id' ) );
+				$this->db->set($_prefix . 'modified_by', active_user('id'));
 
 			else :
 
-				$this->db->set( $_prefix . 'modified_by', NULL );
+				$this->db->set($_prefix . 'modified_by', null);
 
 			endif;
 
-		elseif ( ! $data ) :
+		elseif (!$data) :
 
-			$this->_set_error( 'No data to update.' );
-			return FALSE;
+			$this->_set_error('No data to update.');
+			return false;
 
 		endif;
 
-		if ( $data ) :
+		if ($data) :
 
-			$this->db->set( $data );
+			$this->db->set($data);
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . 'id', $id );
-		return $this->db->update( $_table );
+		$this->db->where($_prefix . 'id', $id);
+		return $this->db->update($_table);
 	}
 
 
@@ -276,36 +286,36 @@ class CORE_NAILS_Model extends CI_Model
 	 *
 	 * If destructive deletion is enabled then this method will permanently
 	 * destroy the object. If Non-destructive deletion is enabled then the
-	 * $this->_deleted_flag field will be set to TRUE.
+	 * $this->_deleted_flag field will be set to true.
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to mark as deleted
 	 * @return bool
 	 **/
-	public function delete( $id )
+	public function delete($id)
 	{
 		//	Perform this check here so the error message is more easily traced.
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::delete() Table variable not set' );
+			show_error(get_called_class() . '::delete() Table variable not set');
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_destructive_delete ) :
+		if ($this->_destructive_delete) :
 
 			//	Destructive delete; nuke that row.
-			return $this->destroy( $id );
+			return $this->destroy($id);
 
 		else :
 
 			//	Non-destructive delete, update the flag
 			$_data = array(
-				$this->_deleted_flag => TRUE
+				$this->_deleted_flag => true
 			);
 
-			return $this->update( $id, $_data );
+			return $this->update($id, $_data);
 
 		endif;
 	}
@@ -317,37 +327,37 @@ class CORE_NAILS_Model extends CI_Model
 	/**
 	 * Unmarks an object as deleted
 	 *
-	 * If destructive deletion is enabled then this method will return FALSE.
+	 * If destructive deletion is enabled then this method will return false.
 	 * If Non-destructive deletion is enabled then the $this->_deleted_flag
-	 * field will be set to FALSE.
+	 * field will be set to false.
 	 *
 	 * @access public
 	 * @param int $id The ID of the object to restore
 	 * @return bool
 	 **/
-	public function restore( $id )
+	public function restore($id)
 	{
 		//	Perform this check here so the error message is more easily traced.
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::restore() Table variable not set' );
+			show_error(get_called_class() . '::restore() Table variable not set');
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		if ( $this->_destructive_delete ) :
+		if ($this->_destructive_delete) :
 
 			//	Destructive delete; can't be resurrecting the dead.
-			return FALSE;
+			return false;
 
 		else :
 
 			//	Non-destructive delete, update the flag
 			$_data = array(
-				$this->_deleted_flag => FALSE
+				$this->_deleted_flag => false
 			);
-			return $this->update( $id, $_data );
+			return $this->update($id, $_data);
 
 		endif;
 	}
@@ -366,19 +376,19 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param int $id The ID of the object to destroy
 	 * @return bool
 	 **/
-	public function destroy( $id )
+	public function destroy($id)
 	{
 		//	Perform this check here so the error message is more easily traced.
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::destroy() Table variable not set' );
+			show_error(get_called_class() . '::destroy() Table variable not set');
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( 'id', $id );
-		$this->db->delete( $this->_table );
+		$this->db->where('id', $id);
+		$this->db->delete($this->_table);
 
 		return (bool) $this->db->affected_rows();
 	}
@@ -398,18 +408,18 @@ class CORE_NAILS_Model extends CI_Model
 	 * Fetches all objects, optionally paginated.
 	 *
 	 * @access public
-	 * @param int $page The page number of the results, if NULL then no pagination
+	 * @param int $page The page number of the results, if null then no pagination
 	 * @param int $per_page How many items per page of paginated results
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @param bool $include_deleted If non-destructive delete is enabled then this flag allows you to include deleted items
 	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all( $page = NULL, $per_page = NULL, $data = array(), $include_deleted = FALSE, $_caller = 'GET_ALL' )
+	public function get_all($page = null, $per_page = null, $data = array(), $include_deleted = false, $_caller = 'GET_ALL')
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::get_all() Table variable not set' );
+			show_error(get_called_class() . '::get_all() Table variable not set');
 
 		else :
 
@@ -420,12 +430,12 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Apply common items; pass $data
-		$this->_getcount_common( $data, $_caller );
+		$this->_getcount_common($data, $_caller);
 
 		// --------------------------------------------------------------------------
 
 		//	Facilitate pagination
-		if ( ! is_null( $page ) ) :
+		if (!is_null($page)) :
 
 			//	Adjust the page variable, reduce by one so that the offset is calculated
 			//	correctly. Make sure we don't go into negative numbers
@@ -433,31 +443,31 @@ class CORE_NAILS_Model extends CI_Model
 			$page = $page < 0 ? 0 : $page;
 
 			//	Work out what the offset should be
-			$_per_page	= is_null( $per_page ) ? $this->_per_page : (int) $per_page;
+			$_per_page	= is_null($per_page) ? $this->_per_page : (int) $per_page;
 			$_offset	= $page * $per_page;
 
-			$this->db->limit( $per_page, $_offset );
+			$this->db->limit($per_page, $_offset);
 
 		endif;
 
 		// --------------------------------------------------------------------------
 
 		//	If non-destructive delete is enabled then apply the delete query
-		if ( ! $this->_destructive_delete && ! $include_deleted ) :
+		if (!$this->_destructive_delete && !$include_deleted) :
 
 			$_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
-			$this->db->where( $_prefix . $this->_deleted_flag, FALSE );
+			$this->db->where($_prefix . $this->_deleted_flag, false);
 
 		endif;
 
 
 		// --------------------------------------------------------------------------
 
-		$_results = $this->db->get( $_table )->result();
+		$_results = $this->db->get($_table)->result();
 
-		for ( $i = 0; $i < count( $_results ); $i++ ) :
+		for ($i = 0; $i < count($_results); $i++) :
 
-			$this->_format_object( $_results[$i] );
+			$this->_format_object($_results[$i]);
 
 		endfor;
 
@@ -475,19 +485,19 @@ class CORE_NAILS_Model extends CI_Model
 	 * the value of the element is the object's label
 	 *
 	 * @access public
-	 * @param int $page The page number of the results, if NULL then no pagination
+	 * @param int $page The page number of the results, if null then no pagination
 	 * @param int $per_page How many items per page of paginated results
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @param string $_caller Internal flag to pass to _getcount_common(), contains the calling method
 	 * @return array
 	 **/
-	public function get_all_flat( $page = NULL, $per_page = NULL, $data = array(), $include_deleted = FALSE, $_caller = 'GET_ALL_FLAT' )
+	public function get_all_flat($page = null, $per_page = null, $data = array(), $include_deleted = false, $_caller = 'GET_ALL_FLAT')
 	{
-		$_items	= $this->get_all( $page, $per_page, $data, $include_deleted, $_caller );
+		$_items	= $this->get_all($page, $per_page, $data, $include_deleted, $_caller);
 		$_out	= array();
 
 		//	Nothing returned? Skip the rest of this method, it's pointless.
-		if ( ! $_items ) :
+		if (!$_items) :
 
 			return array();
 
@@ -496,25 +506,25 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Test columns
-		$_test = reset( $_items );
+		$_test = reset($_items);
 
-		if ( ! isset( $_test->{$this->_table_label_column} ) ) :
+		if (!isset($_test->{$this->_table_label_column})) :
 
-			show_error( get_called_class() . '::get_all_flat() "' . $this->_table_label_column . '" is not a valid label column.' );
-
-		endif;
-
-		if ( ! isset( $_test->{$this->_table_id_column} ) ) :
-
-			show_error( get_called_class() . '::get_all_flat() "' . $this->_table_id_column . '" is not a valid id column.' );
+			show_error(get_called_class() . '::get_all_flat() "' . $this->_table_label_column . '" is not a valid label column.');
 
 		endif;
 
-		unset( $_test );
+		if (!isset($_test->{$this->_table_id_column})) :
+
+			show_error(get_called_class() . '::get_all_flat() "' . $this->_table_id_column . '" is not a valid id column.');
+
+		endif;
+
+		unset($_test);
 
 		// --------------------------------------------------------------------------
 
-		foreach ( $_items AS $item ) :
+		foreach ($_items as $item) :
 
 			$_out[$item->{$this->_table_id_column}] = $item->{$this->_table_label_column};
 
@@ -535,11 +545,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_id( $id, $data = array() )
+	public function get_by_id($id, $data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::get_by_id() Table variable not set' );
+			show_error(get_called_class() . '::get_by_id() Table variable not set');
 
 		else :
 
@@ -549,14 +559,14 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . $this->_table_id_column, $id );
-		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_ID' );
+		$this->db->where($_prefix . $this->_table_id_column, $id);
+		$_result = $this->get_all(null, null, $data, false, 'GET_BY_ID');
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $_result ) :
+		if (!$_result) :
 
-			return FALSE;
+			return false;
 
 		endif;
 
@@ -577,11 +587,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return array
 	 **/
-	public function get_by_ids( $ids, $data = array() )
+	public function get_by_ids($ids, $data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::get_by_ids() Table variable not set' );
+			show_error(get_called_class() . '::get_by_ids() Table variable not set');
 
 		else :
 
@@ -591,8 +601,8 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where_in( $_prefix . $this->_table_id_column, $ids );
-		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_IDS' );
+		$this->db->where_in($_prefix . $this->_table_id_column, $ids);
+		$_result = $this->get_all(null, null, $data, false, 'GET_BY_IDS');
 
 		// --------------------------------------------------------------------------
 
@@ -611,11 +621,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_slug( $slug, $data = array() )
+	public function get_by_slug($slug, $data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::get_by_slug() Table variable not set' );
+			show_error(get_called_class() . '::get_by_slug() Table variable not set');
 
 		else :
 
@@ -625,14 +635,14 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where( $_prefix . $this->_table_slug_column, $slug );
-		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_SLUG' );
+		$this->db->where($_prefix . $this->_table_slug_column, $slug);
+		$_result = $this->get_all(null, null, $data, false, 'GET_BY_SLUG');
 
 		// --------------------------------------------------------------------------
 
-		if ( ! $_result ) :
+		if (!$_result) :
 
-			return FALSE;
+			return false;
 
 		endif;
 
@@ -653,11 +663,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return array
 	 **/
-	public function get_by_slugs( $slugs, $data = array() )
+	public function get_by_slugs($slugs, $data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::get_by_slug() Table variable not set' );
+			show_error(get_called_class() . '::get_by_slug() Table variable not set');
 
 		else :
 
@@ -667,8 +677,8 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		$this->db->where_in( $_prefix . $this->_table_slug_column, $slugs );
-		$_result = $this->get_all( NULL, NULL, $data, FALSE, 'GET_BY_SLUGS' );
+		$this->db->where_in($_prefix . $this->_table_slug_column, $slugs);
+		$_result = $this->get_all(null, null, $data, false, 'GET_BY_SLUGS');
 
 		// --------------------------------------------------------------------------
 
@@ -692,15 +702,15 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data Any data to pass to _getcount_common()
 	 * @return stdClass
 	 **/
-	public function get_by_id_or_slug( $id_slug, $data = array() )
+	public function get_by_id_or_slug($id_slug, $data = array())
 	{
-		if ( is_numeric( $id_slug ) ) :
+		if (is_numeric($id_slug)) :
 
-			return $this->get_by_id( $id_slug, $data );
+			return $this->get_by_id($id_slug, $data);
 
 		else :
 
-			return $this->get_by_slug( $id_slug, $data );
+			return $this->get_by_slug($id_slug, $data);
 
 		endif;
 	}
@@ -716,11 +726,11 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param mixed $data any data to pass to _getcount_common()
 	 * @return int
 	 **/
-	public function count_all( $data = array() )
+	public function count_all($data = array())
 	{
-		if ( ! $this->_table ) :
+		if (!$this->_table) :
 
-			show_error( get_called_class() . '::count_all() Table variable not set' );
+			show_error(get_called_class() . '::count_all() Table variable not set');
 
 		else :
 
@@ -731,11 +741,11 @@ class CORE_NAILS_Model extends CI_Model
 		// --------------------------------------------------------------------------
 
 		//	Apply common items
-		$this->_getcount_common( $data, 'COUNT_ALL' );
+		$this->_getcount_common($data, 'COUNT_ALL');
 
 		// --------------------------------------------------------------------------
 
-		return $this->db->count_all_results( $_table );
+		return $this->db->count_all_results($_table);
 	}
 
 
@@ -764,14 +774,14 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param string $id_column The column to use for the ID, defaults to $this->_table_id_column
 	 * @return string
 	 **/
-	protected function _generate_slug( $label, $prefix = '', $suffix = '', $table = NULL, $column = NULL, $ignore_id = NULL, $id_column = NULL )
+	protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignore_id = null, $id_column = null)
 	{
 		//	Perform this check here so the error message is more easily traced.
-		if ( NULL === $table ) :
+		if (null === $table) :
 
-			if ( ! $this->_table ) :
+			if (!$this->_table) :
 
-				show_error( get_called_class() . '::_generate_slug() Table variable not set' );
+				show_error(get_called_class() . '::_generate_slug() Table variable not set');
 
 			endif;
 
@@ -783,11 +793,11 @@ class CORE_NAILS_Model extends CI_Model
 
 		endif;
 
-		if ( NULL === $column ) :
+		if (null === $column) :
 
-			if ( ! $this->_table_slug_column ) :
+			if (!$this->_table_slug_column) :
 
-				show_error( get_called_class() . '::_generate_slug() Column variable not set' );
+				show_error(get_called_class() . '::_generate_slug() Column variable not set');
 
 			endif;
 
@@ -805,9 +815,9 @@ class CORE_NAILS_Model extends CI_Model
 
 		do
 		{
-			$_slug = url_title( str_replace( '/', '-', $label ), 'dash', TRUE );
+			$_slug = url_title(str_replace('/', '-', $label), 'dash', true);
 
-			if ( $_counter ) :
+			if ($_counter) :
 
 				$_slug_test = $prefix . $_slug . $suffix . '-' . $_counter;
 
@@ -817,17 +827,17 @@ class CORE_NAILS_Model extends CI_Model
 
 			endif;
 
-			if ( $ignore_id ) :
+			if ($ignore_id) :
 
 				$_id_column = $id_column ? $id_column : $this->_table_id_column;
-				$this->db->where( $_id_column . ' !=', $ignore_id );
+				$this->db->where($_id_column . ' !=', $ignore_id);
 
 			endif;
 
-			$this->db->where( $_column, $_slug_test );
+			$this->db->where($_column, $_slug_test);
 			$_counter++;
 
-		} while( $this->db->count_all_results( $_table ) );
+		} while($this->db->count_all_results($_table));
 
 		return $_slug_test;
 	}
@@ -846,16 +856,16 @@ class CORE_NAILS_Model extends CI_Model
 	 * @param object $obj A reference to the object being formatted.
 	 * @return void
 	 **/
-	protected function _format_object( &$obj )
+	protected function _format_object(&$obj)
 	{
 		//	Extend this method to format the returned objects
 
 		// --------------------------------------------------------------------------
 
 		//	Some common items
-		if ( $this->_table_id_column ) :
+		if ($this->_table_id_column) :
 
-			if ( ! empty( $obj->{$this->_table_id_column} ) && is_numeric( $obj->{$this->_table_id_column} ) ) :
+			if (!empty($obj->{$this->_table_id_column}) && is_numeric($obj->{$this->_table_id_column})) :
 
 				$obj->{$this->_table_id_column} = (int) $obj->{$this->_table_id_column};
 
@@ -863,25 +873,25 @@ class CORE_NAILS_Model extends CI_Model
 
 		endif;
 
-		if ( ! empty( $obj->parent_id ) && is_numeric( $obj->parent_id ) ) :
+		if (!empty($obj->parent_id) && is_numeric($obj->parent_id)) :
 
 			$obj->parent_id = (int) $obj->parent_id;
 
 		endif;
 
-		if ( ! empty( $obj->user_id ) && is_numeric( $obj->user_id ) ) :
+		if (!empty($obj->user_id) && is_numeric($obj->user_id)) :
 
 			$obj->user_id = (int) $obj->user_id;
 
 		endif;
 
-		if ( ! empty( $obj->created_by ) && is_numeric( $obj->created_by ) ) :
+		if (!empty($obj->created_by) && is_numeric($obj->created_by)) :
 
 			$obj->created_by = (int) $obj->created_by;
 
 		endif;
 
-		if ( ! empty( $obj->modified_by ) && is_numeric( $obj->modified_by ) ) :
+		if (!empty($obj->modified_by) && is_numeric($obj->modified_by)) :
 
 			$obj->modified_by = (int) $obj->modified_by;
 
@@ -889,7 +899,7 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		if ( ! empty( $obj->order ) && is_numeric( $obj->order ) ) :
+		if (!empty($obj->order) && is_numeric($obj->order)) :
 
 			$obj->order = (int) $obj->order;
 
@@ -914,6 +924,3 @@ class CORE_NAILS_Model extends CI_Model
 		return $this->_table_prefix;
 	}
 }
-
-/* End of file CORE_NAILS_Model.php */
-/* Location: ./core/CORE_NAILS_Model.php */

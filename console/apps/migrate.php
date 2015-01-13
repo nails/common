@@ -16,6 +16,7 @@ if (!defined('NAILS_PATH')) {
 }
 
 require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
+require_once 'vendor/nailsapp/common/core/CORE_NAILS_Traits.php';
 
 class CORE_NAILS_Migrate extends CORE_NAILS_App
 {

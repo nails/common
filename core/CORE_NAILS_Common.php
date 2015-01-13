@@ -1,10 +1,14 @@
 <?php
 
 /**
- * The following functions are used internally by Nails
+ * This file provides functions used internally by Nails
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    helper
+ * @author      Nails Dev Team
+ * @link
  */
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('_NAILS_GET_POTENTIAL_MODULES')) {
 
@@ -165,88 +169,6 @@ if (!function_exists('_NAILS_GET_UNAVAILABLE_MODULES')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('module_is_enabled')) {
-
-    /**
-     * Handy way of determining whether a module is enabled or not in the app's config
-     * @param  string $module the name of the module to check
-     * @return boolean
-     */
-    function module_is_enabled($module)
-    {
-        $potential = _NAILS_GET_AVAILABLE_MODULES();
-
-        if (array_search('nailsapp/module-' . $module, $potential) !== false) {
-
-            return true;
-        }
-
-        return false;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('get_controller_data')) {
-
-    /**
-     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
-     * this function provides an easy interface to this array when it's not in scope.
-     * @return  array   A reference to $NAILS_CONTROLLER_DATA
-     **/
-    function &get_controller_data()
-    {
-        global $NAILS_CONTROLLER_DATA;
-        return $NAILS_CONTROLLER_DATA;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('set_controller_data')) {
-
-    /**
-     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
-     * this function provides an easy interface to populate this array when it's not
-     * in scope.
-     * @param string $key The key to populate
-     * @param mixed $value The value to assign
-     * @return  void
-     **/
-    function set_controller_data($key, $value)
-    {
-        global $NAILS_CONTROLLER_DATA;
-        $NAILS_CONTROLLER_DATA[$key] = $value;
-    }
-}
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * PHP Version Check
- * =================
- *
- * We need to loop through all available modules and have a look at what version
- * of PHP they require, we'll then take the highest version and set that as our
- * minimum supported value.
- *
- * To set a requirement, within the module's nails object in composer.json,
- * specify the minPhpVersion value. You should also specify the appropriate
- * constraint for composer in the "require" section of composer.json.
- *
- * e.g:
- *
- *  "extra":
- *  {
- *      "nails" :
- *      {
- *          "minPhpVersion": "5.4.0"
- *      }
- *  }
- */
-
 if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
 
     /**
@@ -280,29 +202,66 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
     }
 }
 
-define('NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION());
+// --------------------------------------------------------------------------
 
-if (version_compare(PHP_VERSION, NAILS_MIN_PHP_VERSION, '<')) {
+if (!function_exists('isModuleEnabled')) {
 
-    $subject  = 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
-    $message  = 'The version of PHP you are running is not supported. Nails requires at least ';
-    $message .= 'PHP version ' . NAILS_MIN_PHP_VERSION;
+    /**
+     * Handy way of determining whether a module is enabled or not in the app's config
+     * @param  string $module the name of the module to check
+     * @return boolean
+     */
+    function isModuleEnabled($module)
+    {
+        $potential = _NAILS_GET_AVAILABLE_MODULES();
 
-    if (function_exists('_NAILS_ERROR')) {
+        if (array_search('nailsapp/module-' . $module, $potential) !== false) {
 
-        _NAILS_ERROR($message, $subject);
+            return true;
+        }
 
-    } else {
-
-        echo '<h1>ERROR: ' . $subject . '</h1>';
-        echo '<h2>' . $message . '</h2>';
-        exit(0);
+        return false;
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('get_domain_from_url')) {
+if (!function_exists('getControllerData')) {
+
+    /**
+     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
+     * this function provides an easy interface to this array when it's not in scope.
+     * @return  array   A reference to $NAILS_CONTROLLER_DATA
+     **/
+    function &getControllerData()
+    {
+        global $NAILS_CONTROLLER_DATA;
+        return $NAILS_CONTROLLER_DATA;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('setControllerData')) {
+
+    /**
+     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
+     * this function provides an easy interface to populate this array when it's not
+     * in scope.
+     * @param string $key The key to populate
+     * @param mixed $value The value to assign
+     * @return  void
+     **/
+    function setControllerData($key, $value)
+    {
+        global $NAILS_CONTROLLER_DATA;
+        $NAILS_CONTROLLER_DATA[$key] = $value;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('getDomainFromUrl')) {
 
     /**
      * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
@@ -312,7 +271,7 @@ if (!function_exists('get_domain_from_url')) {
      * @param  string $url The URL to analyse
      * @return mixed       string on success, false on failure
      */
-    function get_domain_from_url($url)
+    function getDomainFromUrl($url)
     {
         $bits = explode('/', $url);
 
@@ -371,7 +330,7 @@ if (!function_exists('get_domain_from_url')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('get_relative_path')) {
+if (!function_exists('getRelativePath')) {
 
     /**
      * Fetches the relative path between two directories
@@ -380,7 +339,7 @@ if (!function_exists('get_relative_path')) {
      * @param  string $to   Path 2
      * @return string
      */
-    function get_relative_path($from, $to)
+    function getRelativePath($from, $to)
     {
         $from    = explode('/', $from);
         $to      = explode('/', $to);
@@ -419,22 +378,7 @@ if (!function_exists('get_relative_path')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('add_trailing_slash')) {
-
-    /**
-     * Adds a trailing slash to the input string if there isn't already one there
-     * @param   string The string to add a trailing shash to.
-     * @return  string
-     **/
-    function add_trailing_slash($str)
-    {
-        return rtrim($str, '/') . '/';
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('page_is_secure')) {
+if (!function_exists('isPageSecure')) {
 
     /**
      * Detects whether the current page is secure or not
@@ -443,7 +387,7 @@ if (!function_exists('page_is_secure')) {
      * @param   string
      * @return  bool
      */
-    function page_is_secure()
+    function isPageSecure()
     {
         if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') {
 
@@ -471,410 +415,5 @@ if (!function_exists('page_is_secure')) {
 
         //  Unknown, assume not
         return false;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-/**
- *
- * The following class traits are used throughout Nails
- *
- */
-
-/**
- * Implements a common API for error handling in classes
- */
-trait NAILS_COMMON_TRAIT_ERROR_HANDLING
-{
-    protected $_errors = array();
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Set a generic error
-     * @param string $error The error message
-     */
-    protected function _set_error($error)
-    {
-        $this->_errors[] = $error;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Return the error array
-     * @return array
-     */
-    public function get_errors()
-    {
-        return $this->_errors;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the last error
-     * @return string
-     */
-    public function last_error()
-    {
-        return end($this->_errors);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Clears the last error
-     * @return mixed
-     */
-    public function clear_last_error()
-    {
-        return array_pop($this->_errors);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Clears all errors
-     * @return void
-     */
-    public function clear_errors()
-    {
-        $this->_errors = array();
-    }
-}
-
-// --------------------------------------------------------------------------
-
-/**
- * Implements a common API for caching in classes
- */
-trait NAILS_COMMON_TRAIT_CACHING
-{
-    protected $_cache_values    = array();
-    protected $_cache_keys      = array();
-    protected $_cache_method    = 'LOCAL';
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Saves an item to the cache
-     * @param string $key   The cache key
-     * @param mixed  $value The data to be cached
-     */
-    protected function _set_cache($key, $value)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                break;
-
-            case 'LOCAL':
-            default:
-
-                $this->_cache_values[md5($_prefix . $key)] = serialize($value);
-                $this->_cache_keys[] = $key;
-                break;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Fetches an item from the cache
-     * @param  string $key The cache key
-     * @return mixed
-     */
-    protected function _get_cache($key)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                break;
-
-            case 'LOCAL':
-            default:
-
-                if (isset($this->_cache_values[md5($_prefix . $key)])) {
-
-                    return unserialize($this->_cache_values[md5($_prefix . $key)]);
-
-                } else {
-
-                    return false;
-
-                }
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Deletes an item from the cache
-     * @param  string $key The cache key
-     * @return boolean
-     */
-    protected function _unset_cache($key)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                break;
-
-            case 'LOCAL':
-            default:
-
-                unset($this->_cache_values[md5($_prefix . $key)]);
-
-                $_key = array_search($key, $this->_cache_keys);
-
-                if ($_key !== false) {
-
-                    unset($this->_cache_keys[$_key]);
-                }
-                break;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * In order to avoid collission between classes a prefix is used; this method
-     * defines the cache key prefix using the calling class' name.
-     * @return string
-     */
-    protected function _cache_prefix()
-    {
-        return get_called_class();
-    }
-}
-
-/**
- * Implements the common getcount_common() and _getcount_common_parse_sort() methods
- */
-trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
-{
-    /**
-     * Applies common conditionals
-     *
-     * This method applies the conditionals which are common across the get_*()
-     * methods and the count() method.
-     * @param string $data Data passed from the calling method
-     * @param string $_caller The name of the calling method
-     * @return void
-     **/
-    protected function _getcount_common($data = array(), $_caller = null)
-    {
-        //  Handle wheres
-        $_wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
-
-        foreach ($_wheres as $where_type) {
-
-            if (!empty($data[$where_type])) {
-
-                if (is_array($data[$where_type])) {
-
-                    /**
-                     * If it's a single dimensional array then just bung that into
-                     * the db->where(). If not, loop it and parse.
-                     */
-
-                    $_first = reset($data[$where_type]);
-
-                    if (is_string($_first)) {
-
-                        $this->db->$where_type($data[$where_type]);
-
-                    } else {
-
-                        foreach ($data[$where_type] as $where) {
-
-                            //  Work out column
-                            $_column = !empty($where['column']) ? $where['column'] : null;
-
-                            if ($_column === null) {
-
-                                $_column = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
-                            }
-
-                            //  Work out value
-                            $_value = isset($where['value']) ? $where['value'] : null;
-
-                            if ($_value === null) {
-
-                                $_value = !empty($where[1]) ? $where[1] : null;
-                            }
-
-                            //  Escaped?
-                            $_escape = isset($where['escape']) ? (bool) $where['escape'] : true;
-
-                            if ($_column) {
-
-                                $this->db->$where_type($_column, $_value, $_escape);
-                            }
-                        }
-                    }
-
-                } elseif (is_string($data[$where_type])) {
-
-                    $this->db->$where_type($data[$where_type]);
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Handle Likes
-        //  @TODO
-
-        // --------------------------------------------------------------------------
-
-        //  Handle sorting
-        if (!empty($data['sort'])) {
-
-            /**
-             * How we handle sorting
-             * =====================
-             *
-             * - If $data['sort'] is a string assume it's the field to sort on, use the default order
-             * - If $data['sort'] is a single dimension array then assume the first element (or the element
-             *   named 'column') is the column; and the second element (or the element named 'order') is the
-             *   direction to sort in
-             * - If $data['sort'] is a multidimensional array then loop each element and test as above.
-             *
-             **/
-
-
-            if (is_string($data['sort'])) {
-
-                //  String
-                $this->db->order_by($data['sort']);
-
-            } elseif (is_array($data['sort'])) {
-
-                $_first = reset($data['sort']);
-
-                if (is_string($_first)) {
-
-                    //  Single dimension array
-                    $_sort = $this->_getcount_common_parse_sort($data['sort']);
-
-                    if (!empty($_sort['column'])) {
-
-                        $this->db->order_by($_sort['column'], $_sort['order']);
-
-                    }
-
-                } else {
-
-                    //  Multi dimension array
-                    foreach ($data['sort'] as $sort) {
-
-                        $_sort = $this->_getcount_common_parse_sort($sort);
-
-                        if (!empty($_sort['column'])) {
-
-                            $this->db->order_by($_sort['column'], $_sort['order']);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    protected function _getcount_common_parse_sort($sort)
-    {
-        $_out = array('column' => null, 'order' => null);
-
-        // --------------------------------------------------------------------------
-
-        if (is_string($sort)) {
-
-            $_out['column'] = $sort;
-            return $_out;
-
-        } elseif (isset($sort['column'])) {
-
-            $_out['column'] = $sort['column'];
-
-        } else {
-
-            //  Take the first element
-            $_out['column'] = reset($sort);
-            $_out['column'] = is_string($_out['column']) ? $_out['column'] : null;
-        }
-
-        if ($_out['column']) {
-
-            //  Determine order
-            if (isset($sort['order'])) {
-
-                $_out['order'] = $sort['order'];
-
-            } elseif(count($sort) > 1) {
-
-                //  Take the last element
-                $_out['order'] = end($sort);
-                $_out['order'] = is_string($_out['order']) ? $_out['order'] : null;
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $_out;
     }
 }

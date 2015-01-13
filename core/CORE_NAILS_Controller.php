@@ -1,4 +1,15 @@
-<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * This class is the main execution point for all page requests. It
+ * checks and configures the Nails environment.
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    controller
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class CORE_NAILS_Controller extends MX_Controller {
 
@@ -29,7 +40,22 @@ class CORE_NAILS_Controller extends MX_Controller {
             include NAILS_COMMON_PATH . 'errors/startup_error.php';
         }
 
-        require_once(FCPATH . 'vendor/autoload.php');
+        require_once FCPATH . 'vendor/autoload.php';
+
+        // --------------------------------------------------------------------------
+
+        //  Is Nails in maintenance mode?
+        $this->maintenanceMode();
+
+        // --------------------------------------------------------------------------
+
+        //  Nails PHP Version Check
+        $this->checkPhpVersion();
+
+        // --------------------------------------------------------------------------
+
+        //  Include global Nails files
+        require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_Traits.php';
 
         // --------------------------------------------------------------------------
 
@@ -44,7 +70,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         // --------------------------------------------------------------------------
 
         //  Define data array (used extensively in views)
-        $this->data =& get_controller_data();
+        $this->data =& getControllerData();
 
         // --------------------------------------------------------------------------
 
@@ -55,11 +81,6 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         //  Define all the packages
         $this->autoloadItems();
-
-        // --------------------------------------------------------------------------
-
-        //  Is Nails in maintenance mode?
-        $this->maintenanceMode();
 
         // --------------------------------------------------------------------------
 
@@ -147,6 +168,62 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Checks that the version of PHP is sufficient to run all enabled modules
+     * @return void
+     */
+    protected function checkPhpVersion()
+    {
+        /**
+         * PHP Version Check
+         * =================
+         *
+         * We need to loop through all available modules and have a look at what version
+         * of PHP they require, we'll then take the highest version and set that as our
+         * minimum supported value.
+         *
+         * To set a requirement, within the module's nails object in composer.json,
+         * specify the minPhpVersion value. You should also specify the appropriate
+         * constraint for composer in the "require" section of composer.json.
+         *
+         * e.g:
+         *
+         *  "extra":
+         *  {
+         *      "nails" :
+         *      {
+         *          "minPhpVersion": "5.4.0"
+         *      }
+         *  }
+         */
+
+        define('NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION());
+
+        if (version_compare(PHP_VERSION, NAILS_MIN_PHP_VERSION, '<')) {
+
+            $subject  = 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
+            $message  = 'The version of PHP you are running is not supported. Nails requires at least ';
+            $message .= 'PHP version ' . NAILS_MIN_PHP_VERSION;
+
+            if (function_exists('_NAILS_ERROR')) {
+
+                _NAILS_ERROR($message, $subject);
+
+            } else {
+
+                echo '<h1>ERROR: ' . $subject . '</h1>';
+                echo '<h2>' . $message . '</h2>';
+                exit(0);
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the appropriate error reporting values and handlers
+     * @return void
+     */
     protected function setErrorReporting()
     {
         /**
@@ -181,6 +258,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Tests that the cache is writeable
+     * @return void
+     */
     protected function testCache()
     {
         if (is_writable(DEPLOY_CACHE_DIR)) {
@@ -219,67 +300,102 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Checks if Maintenance Mode is enabled, shows the holding page if so.
+     * @return void
+     */
     protected function maintenanceMode()
     {
-        if (app_setting('maintenance_mode_enabled') || file_exists(FCPATH . '.MAINTENANCE')) {
+        if (file_exists(FCPATH . '.MAINTENANCE')) {
 
-            $whitelist_ip = (array) app_setting('maintenance_mode_whitelist');
+            /**
+             * We're in maintenance mode. This happens very early so we need to
+             * make sure that we've loaded everything we need to load as we're
+             * exiting whether we like it or not
+             */
 
-            if (!$this->input->is_cli_request() && ip_in_range($this->input->ip_address(), $whitelist_ip) === false) {
+            //  Whitelist
+            if ($this->instantiateDb(true)) {
 
-                header($this->input->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
-                header('Status: 503 Service Temporarily Unavailable');
-                header('Retry-After: 7200');
+                //  Load the traits
+                require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_Traits.php';
 
-                // --------------------------------------------------------------------------
+                //  Set the package path (so helpers are loaded correctly)
+                $this->load->add_package_path(NAILS_COMMON_PATH);
 
-                //  If the request is an AJAX request, or the URL is on the API then spit back JSON
-                if ($this->input->is_ajax_request() || $this->uri->segment(1) == 'api') {
+                //  Load the helpers
+                $this->load->helper('app_setting');
+                $this->load->helper('tools');
 
-                    header('Cache-Control: no-store, no-cache, must-revalidate');
-                    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-                    header('Content-type: application/json');
-                    header('Pragma: no-cache');
+                $whitelistIp   = (array) app_setting('maintenance_mode_whitelist');
+                $isWhitelisted = isIpInRange($this->input->ip_address(), $whitelistIp);
 
-                    $_out = array('status' => 503, 'error' => 'Down for Maintenance');
+            } else {
 
-                    echo json_encode($_out);
+                //  No database, or it failed, defaults
+                $isWhiteListed = false;
+            }
 
-                //  Otherwise, render some HTML
-                } else {
+            // --------------------------------------------------------------------------
 
-                    //  Look for an app override
-                    if (file_exists(FCPATH . APPPATH . 'views/maintenance/maintenance.php')) {
+            if (!$isWhitelisted) {
 
-                        require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+                if (!$this->input->is_cli_request()) {
 
-                    //  Fall back to the Nails maintenance page
-                    } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
+                    header($this->input->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+                    header('Status: 503 Service Temporarily Unavailable');
+                    header('Retry-After: 7200');
 
-                        require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
+                    // --------------------------------------------------------------------------
 
-                    //  Fall back, back to plain text
+                    //  If the request is an AJAX request, or the URL is on the API then spit back JSON
+                    if ($this->input->is_ajax_request() || $this->uri->segment(1) == 'api') {
+
+                        header('Cache-Control: no-store, no-cache, must-revalidate');
+                        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+                        header('Content-type: application/json');
+                        header('Pragma: no-cache');
+
+                        $_out = array('status' => 503, 'error' => 'Down for Maintenance');
+
+                        echo json_encode($_out);
+
+                    //  Otherwise, render some HTML
                     } else {
 
-                        echo '<h1>Down for maintenance</h1>';
+                        //  Look for an app override
+                        if (file_exists(FCPATH . APPPATH . 'views/maintenance/maintenance.php')) {
+
+                            require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+
+                        //  Fall back to the Nails maintenance page
+                        } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
+
+                            require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
+
+                        //  Fall back, back to plain text
+                        } else {
+
+                            echo '<h1>Down for maintenance</h1>';
+                        }
                     }
+
+                } else {
+
+                    echo 'Down for Maintenance' . "\n";
                 }
-
-                exit(0);
-
-            } elseif ($this->input->is_cli_request()) {
-
-                echo 'Down for Maintenance' . "\n";
-                exit(0);
             }
+
+            exit(0);
         }
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Checks if credentials should be requested for staging environments
+     * @return void
+     */
     protected function staging()
     {
         $users = @json_decode(APP_STAGING_USERPASS);
@@ -310,10 +426,12 @@ class CORE_NAILS_Controller extends MX_Controller {
         }
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Requests staging credentials
+     * @return void
+     */
     protected function stagingRequestCredentials()
     {
         header('WWW-Authenticate: Basic realm="' . APP_NAME . ' Staging Area"');
@@ -353,11 +471,14 @@ class CORE_NAILS_Controller extends MX_Controller {
         exit(0);
     }
 
-
     // --------------------------------------------------------------------------
 
-
-    protected function instantiateDb()
+    /**
+     * Loads the database
+     * @param  boolean $failGracefully Whether or not to fail gracefully
+     * @return boolean
+     */
+    protected function instantiateDb($failGracefully = false)
     {
         if (DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE) {
 
@@ -371,16 +492,21 @@ class CORE_NAILS_Controller extends MX_Controller {
 
             $this->db->trans_strict(false);
 
-        } else {
+            return true;
+
+        } elseif (!$failGracefully) {
 
             show_error('No database is configured.');
+            return false;
         }
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Sets up date & time handling
+     * @return void
+     */
     protected function instantiateDateTime()
     {
         //  Define default date format
@@ -445,10 +571,12 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->db->query('SET time_zone = \'+0:00\'');
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Sets up language handling
+     * @return void
+     */
     protected function instantiateLanguages()
     {
         //  Define default language
@@ -485,10 +613,12 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->lang->load('nails');
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Autoloads all items (helpers, models, libraries etc) that we'll need
+     * @return void [description]
+     */
     protected function autoloadItems()
     {
         /**
@@ -509,7 +639,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         $_packages = array();
 
         //  Nails Common
-        $_packages[] = NAILS_COMMON_PATH . '';
+        $_packages[] = NAILS_COMMON_PATH;
 
         //  Available Modules
         $_available_modules = _NAILS_GET_AVAILABLE_MODULES();
@@ -550,25 +680,25 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         //  Module specific helpers
         //  CDN
-        if (module_is_enabled('cdn')) {
+        if (isModuleEnabled('cdn')) {
 
             $_helpers[] = 'cdn';
         }
 
         //  Shop
-        if (module_is_enabled('shop')) {
+        if (isModuleEnabled('shop')) {
 
             $_helpers[] = 'shop';
         }
 
         //  Blog
-        if (module_is_enabled('blog')) {
+        if (isModuleEnabled('blog')) {
 
             $_helpers[] = 'blog';
         }
 
         //  CMS
-        if (module_is_enabled('cms')) {
+        if (isModuleEnabled('cms')) {
 
             $_helpers[] = 'cms';
         }
@@ -652,10 +782,12 @@ class CORE_NAILS_Controller extends MX_Controller {
         }
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Set up the active user
+     * @return void
+     */
     protected function instantiateUser()
     {
         /**
@@ -683,10 +815,12 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->data['user_password'] = $this->user_password_model;
     }
 
-
     // --------------------------------------------------------------------------
 
-
+    /**
+     * Determines whether the active user is suspended and, if so, logs them out.
+     * @return void
+     */
     protected function isUserSuspended()
     {
         //  Check if this user is suspended
@@ -708,6 +842,3 @@ class CORE_NAILS_Controller extends MX_Controller {
         }
     }
 }
-
-/* End of file NAILS_Controller.php */
-/* Location: ./application/core/NAILS_Controller.php */

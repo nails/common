@@ -1,132 +1,137 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * This class overrides some default CodeIgniter language handling, namely allowing
+ * parameters to be provided to line() method
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    language
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class CORE_NAILS_Lang extends MX_Lang {
 
-	/**
-	 * Overriding the default line() method so that parameters can be specified
-	 *
-	 * @access	public
-	 * @param	string	$line	the language line
-	 * @param	array	$params	any parameters to sub in
-	 * @return	string
-	 */
-	public function line( $line = '', $params = NULL )
-	{
-		if ( $params === NULL ) :
+    /**
+     * Overriding the default line() method so that parameters can be specified
+     * @param   string  $line   the language line
+     * @param   array   $params any parameters to sub in
+     * @return  string
+     */
+    public function line($line = '', $params = NULL)
+    {
+        if (is_null($params)) {
 
-			return parent::line( $line );
+            return parent::line($line);
+        }
 
-		endif;
+        //  We have some parameters, sub 'em in or the unicorns will die.
+        $line = parent::line($line);
 
-		//	We have some parameters, sub 'em in or the unicorns will die.
-		$line = parent::line( $line );
+        if ($line !== false) {
 
-		if ( $line !== FALSE ) :
+            if (is_array($params)) {
 
-			if ( is_array( $params ) ) :
+                $line = vsprintf($line, $params);
 
-				$line = vsprintf( $line, $params );
+            } else {
 
-			else :
+                $line = sprintf($line, $params);
+            }
+        }
 
-				$line = sprintf( $line, $params );
+        return $line;
+    }
 
-			endif;
+    // --------------------------------------------------------------------------
 
-		endif;
+    /**
+     * Loads a lang file
+     * @param  string  $langfile   The lang file to load
+     * @param  string  $lang       The language to load
+     * @param  boolean $return     Whether to return the file or not
+     * @param  boolean $add_suffix The suffix to add
+     * @param  string  $alt_path   An alternative path
+     * @param  string  $_module    The module to look in
+     * @return mixed
+     */
+    public function load($langfile, $lang = '', $return = false, $add_suffix = true, $alt_path = '', $_module = '')
+    {
+        //  Are we loading an array of languages? If so, handle each one on its own.
+        if (is_array($langfile)) {
 
-		return $line;
-	}
+            foreach ($langfile as $_lang) {
 
+                $this->load($_lang);
+            }
 
-	// --------------------------------------------------------------------------
+            return $this->language;
+        }
 
+        // --------------------------------------------------------------------------
 
-	public function load($langfile, $lang = '', $return = FALSE, $add_suffix = TRUE, $alt_path = '', $_module = '')
-	{
-		//	Are we loading an array of languages? If so, handle each one on its own.
-		if ( is_array( $langfile ) ) :
+        //  Determine which language we're using, if not specified, use the app's default
+        $_default = CI::$APP->config->item('language');
+        $idiom    = $lang == '' ? $_default : $lang;
 
-			foreach ( $langfile as $_lang ) :
+        // --------------------------------------------------------------------------
 
-				$this->load( $_lang );
+        //  Check to see if the language file has already been loaded
+        if (in_array ($langfile . '_lang' . EXT, $this->is_loaded, true)) {
 
-			endforeach;
+            return $this->language;
+        }
 
-			return $this->language;
+        // --------------------------------------------------------------------------
 
-		endif;
+        //  Look for the language
+        $_module OR $_module = CI::$APP->router->fetch_module();
+        list($path, $_langfile) = Modules::find($langfile . '_lang', $_module, 'language/' . $idiom . '/');
 
-		// --------------------------------------------------------------------------
+        /**
+         * Confession. I'm not entirely sure how/why this works. Dumping out debug statements confuses
+         * me as they don't make sense, but the right lang files seem to be laoded. Sorry, future Pablo.
+         **/
 
-		//	Determine which language we're using, if not specified, use the app's default
-		$_default = CI::$APP->config->item('language');
-		$idiom = ($lang == '') ? $_default : $lang;
+        if ($path === false) {
 
-		// --------------------------------------------------------------------------
+            //  File not found, fallback to the default language if not already using it
+            if ($idiom != $_default) {
 
-		//	Check to see if the language file has already been loaded
-		if ( in_array ($langfile.'_lang'.EXT, $this->is_loaded, TRUE ) ) :
+                //  Using MXs version seems to work as expected.
+                if ($lang = parent::load($langfile, $_default, $return, $add_suffix, $alt_path)) {
 
-			return $this->language;
+                    return $lang;
+                }
 
-		endif;
+            } else {
 
-		// --------------------------------------------------------------------------
+                //  Not found within modules, try normal load()
+                if ($lang = CI_Lang::load($langfile, $idiom, $return, $add_suffix, $alt_path)) {
 
-		//	Look for the language
-		$_module OR $_module = CI::$APP->router->fetch_module();
-		list($path, $_langfile) = Modules::find( $langfile.'_lang', $_module, 'language/'.$idiom.'/' );
+                    return $lang;
+                }
+            }
 
-		/**
-		 *
-		 * Confession. I'm not entirely sure how/why this works. Dumping out debug statements confuses
-		 * me as they don't make sense, but the right lang files seem to be laoded. Sorry, future Pablo.
-		 *
-		 **/
+        } else {
 
-		if ( $path === FALSE ) :
+            //  Lang file was found. Load it.
+            if ($lang = Modules::load_file($_langfile, $path, 'lang')) {
 
-			//	File not found, fallback to the default language if not already using it
-			if ( $idiom != $_default ) :
+                if ($return) {
 
-				//	Using MXs version seems to work as expected.
-				if ( $lang = parent::load( $langfile, $_default, $return, $add_suffix, $alt_path ) ) :
+                    return $lang;
+                }
 
-					return $lang;
+                $this->language = array_merge($this->language, $lang);
+                $this->is_loaded[] = $langfile.'_lang'.EXT;
+                unset($lang);
+            }
+        }
 
-				endif;
+        // --------------------------------------------------------------------------
 
-			else :
-
-				//	Not found within modules, try normal load()
-				if ( $lang = CI_Lang::load($langfile, $idiom, $return, $add_suffix, $alt_path ) ) :
-
-					return $lang;
-
-				endif;
-
-			endif;
-
-		else :
-
-			//	Lang file was found. Load it.
-			if ( $lang = Modules::load_file($_langfile, $path, 'lang')) :
-
-				if ($return) return $lang;
-				$this->language = array_merge($this->language, $lang);
-				$this->is_loaded[] = $langfile.'_lang'.EXT;
-				unset($lang);
-
-			endif;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return $this->language;
-	}
+        return $this->language;
+    }
 }
-
-/* End of file NAILS_Lang.php */
-/* Location: ./application/core/NAILS_Lang.php */

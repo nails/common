@@ -151,7 +151,7 @@ class NAILS_System_startup
 
         if (!defined('NAILS_URL')) {
 
-            if (APP_SSL_ROUTING && page_is_secure()) {
+            if (APP_SSL_ROUTING && isPageSecure()) {
 
                 define('NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/');
 
@@ -167,6 +167,12 @@ class NAILS_System_startup
         if (!defined('NAILS_ASSETS_URL')) {
 
             define('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/asset/assets/');
+        }
+
+        //  Set the NAILS_ASSETS_PATH
+        if (!defined('NAILS_ASSETS_PATH')) {
+
+            define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/asset/assets/');
         }
 
         // --------------------------------------------------------------------------

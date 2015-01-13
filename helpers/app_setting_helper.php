@@ -1,36 +1,30 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-/**
- * Helper for quickly accessing app settings
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'app_setting' ) )
-{
-	function app_setting( $key = NULL, $grouping = 'app', $force_refresh = FALSE )
+if (!function_exists('app_setting')) {
+
+    /**
+     * Helper for quickly accessing app settings
+     * @return  mixed
+     */
+	function app_setting($key = null, $grouping = 'app', $force_refresh = false)
 	{
-		return get_instance()->app_setting_model->get( $key, $grouping, $force_refresh );
+        get_instance()->load->model('app_setting_model');
+		return get_instance()->app_setting_model->get($key, $grouping, $force_refresh);
 	}
 }
 
-
 // --------------------------------------------------------------------------
 
+if (!function_exists('set_app_setting')) {
 
-/**
- * Helper for quickly setting app settings
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'set_app_setting' ) )
-{
-	function set_app_setting( $key, $grouping = 'app', $value = NULL, $encrypt = FALSE )
+    /**
+     * Helper for quickly setting app settings
+     * @return  void
+     */
+	function set_app_setting($key, $grouping = 'app', $value = null, $encrypt = false)
 	{
-		return get_instance()->app_setting_model->set( $key, $grouping, $value, $encrypt );
+        get_instance()->load->model('app_setting_model');
+		return get_instance()->app_setting_model->set($key, $grouping, $value, $encrypt);
 	}
 }
 

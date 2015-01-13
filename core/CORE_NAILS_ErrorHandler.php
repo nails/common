@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This interface is implemnted by ErrorHandler drivers.
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    errors
+ * @author      Nails Dev Team
+ * @link
+ */
+
 interface CORE_NAILS_ErrorHandler_Interface
 {
     //  Object methods
@@ -9,8 +19,22 @@ interface CORE_NAILS_ErrorHandler_Interface
     public static function fatal();
 }
 
+/**
+ * This is the main error handler for Nails. Generated errors are caught here
+ * and directed to the appropriate driver.
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    errors
+ * @author      Nails Dev Team
+ * @link
+ */
+
 class CORE_NAILS_ErrorHandler
 {
+    /**
+     * Sets up the appropriate error handling driver
+     */
     public function __construct()
     {
         /**
@@ -19,8 +43,8 @@ class CORE_NAILS_ErrorHandler
          * error reporting, that is CI Error reporting
          */
 
-        if (ENVIRONMENT === 'PRODUCTION')
-        {
+        if (ENVIRONMENT === 'PRODUCTION') {
+
             switch (strtoupper(DEPLOY_ERROR_REPORTING_HANDLER)) {
 
                 /**
@@ -79,6 +103,14 @@ class CORE_NAILS_ErrorHandler
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Called when a PHP error occurs
+     * @param  int    $errno   The error number
+     * @param  string $errstr  The error message
+     * @param  string $errfile The file where the error occurred
+     * @param  int    $errline The line number where the error occurred
+     * @return boolean
+     */
     public static function error($errno, $errstr, $errfile, $errline)
     {
         //  Let this bubble to the normal Codeigniter error handler
@@ -87,6 +119,11 @@ class CORE_NAILS_ErrorHandler
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Catches uncaught exceptions
+     * @param  exception $exception The caught exception
+     * @return void
+     */
     public static function exception($exception)
     {
         $details       = new stdClass();
@@ -99,8 +136,7 @@ class CORE_NAILS_ErrorHandler
         $errMsg .= $details->code . '" in ' . $details->file . ' on line ' . $details->line;
 
         //  Show we log the item?
-        if (config_item('log_threshold') != 0)
-        {
+        if (config_item('log_threshold') != 0) {
 
             log_message('error', $errMsg, true);
         }
@@ -113,12 +149,15 @@ class CORE_NAILS_ErrorHandler
             self::sendDeveloperMail($subject, $message);
         }
 
-
         self::showFatalErrorScreen($subject, $message, $details);
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Catches fatal errors on shut down
+     * @return void
+     */
     public static function fatal()
     {
         $error = error_get_last();
@@ -146,6 +185,14 @@ class CORE_NAILS_ErrorHandler
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Shows the fatal error screen. A diagnostic screen is shown on non-production
+     * environments
+     * @param  string   $subject The error subject
+     * @param  string   $message The error message
+     * @param  stdClass $details Breakdown of the error which occurred
+     * @return void
+     */
     public static function showFatalErrorScreen($subject = '', $message = '', $details = null)
     {
         if (is_null($details)) {
@@ -196,13 +243,19 @@ class CORE_NAILS_ErrorHandler
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Sends a diagnostic email to the developers
+     * @param  string $subject The diagnostic subject
+     * @param  string $message The diagnostic message
+     * @return boolean
+     */
     public static function sendDeveloperMail($subject, $message)
     {
         if (!APP_DEVELOPER_EMAIL) {
 
             //  Log the fact there's no email
             log_message('error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.');
-            return FALSE;
+            return false;
         }
 
         // --------------------------------------------------------------------------
@@ -245,11 +298,11 @@ class CORE_NAILS_ErrorHandler
         );
 
         //  Closures cannot be serialized
-        try
-        {
+        try {
+
             $info['debug_backtrace'] = serialize(debug_backtrace());
 
-        } catch(Exception $e) {
+        } catch (Exception $e) {
 
             $info['debug_backtrace'] = 'Failed to serialize get Backtrace: ' .  $e->getMessage();
         }
@@ -306,7 +359,7 @@ class CORE_NAILS_ErrorHandler
 
             if (function_exists('mail')) {
 
-                @mail($to, '!! ' . $subject . ' - ' . APP_NAME , '', $headers);
+                @mail($to, '!! ' . $subject . ' - ' . APP_NAME, '', $headers);
                 return true;
 
             } else {

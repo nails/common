@@ -1,6 +1,6 @@
         <script type="text/javascript">
             var ENVIRONMENT         = '<?=strtoupper(ENVIRONMENT)?>';
-            window.SITE_URL         = '<?=site_url('', page_is_secure())?>';
+            window.SITE_URL         = '<?=site_url('', isPageSecure())?>';
             window.NAILS            = {};
             window.NAILS.URL        = '<?=NAILS_ASSETS_URL?>';
             window.NAILS.LANG       = {};

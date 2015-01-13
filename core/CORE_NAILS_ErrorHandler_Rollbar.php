@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * This driver brings support for Rollbar error handling
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    errors
+ * @author      Nails Dev Team
+ * @link
+ */
+
 class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interface
 {
+    /**
+     * Sets up the driver
+     * @return void
+     */
     public static function init()
     {
         if (!defined('DEPLOY_ROLLBAR_ACCESS_TOKEN')) {
@@ -24,6 +38,14 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Called when a PHP error occurs
+     * @param  int    $errno   The error number
+     * @param  string $errstr  The error message
+     * @param  string $errfile The file where the error occurred
+     * @param  int    $errline The line number where the error occurred
+     * @return boolean
+     */
     public static function error($errno, $errstr, $errfile, $errline)
     {
         //  Ignore strict errors
@@ -41,6 +63,11 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Catches uncaught exceptions
+     * @param  exception $exception The caught exception
+     * @return void
+     */
     public static function exception($exception)
     {
         Rollbar::report_exception($exception);
@@ -75,6 +102,10 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Catches fatal errors on shut down
+     * @return void
+     */
     public static function fatal()
     {
         Rollbar::report_fatal_error();
@@ -102,6 +133,10 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Get's the active user, if any
+     * @return array
+     */
     public static function getPerson()
     {
         $person = array(

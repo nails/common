@@ -86,12 +86,80 @@
             font-size:0.65em;
         }
 
+        #logoContainer
+        {
+            width: 125px;
+            margin: auto;
+        }
+
+        #logo
+        {
+            max-width: 100%;
+            height: auto;
+        }
+
     </style>
 </head>
 <body>
     <div id="container">
         <h1>
-            <img src="<?=NAILS_ASSETS_URL?>img/nails/icon/icon@2x.png" width="125" height="125" />
+        <?php
+
+            $paths   = array();
+
+            $paths[] = array(
+                FCPATH . 'assets/img/error_db.png',
+                BASE_URL . 'assets/img/error_db.png'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo.png',
+                BASE_URL . 'assets/img/logo.png'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo.jpg',
+                BASE_URL . 'assets/img/logo.jpg'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo.gif',
+                BASE_URL . 'assets/img/logo.gif'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo/logo.png',
+                BASE_URL . 'assets/img/logo/logo.png'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo/logo.jpg',
+                BASE_URL . 'assets/img/logo/logo.jpg'
+            );
+
+            $paths[] = array(
+                FCPATH . 'assets/img/logo/logo.gif',
+                BASE_URL . 'assets/img/logo/logo.gif'
+            );
+
+            $paths[] = array(
+                NAILS_ASSETS_PATH . 'img/nails/icon/icon@2x.png',
+                NAILS_ASSETS_URL . 'img/nails/icon/icon@2x.png'
+            );
+
+
+            foreach ($paths AS $path) {
+
+                if (is_file($path[0])) {
+
+                    echo '<div id="logoContainer">';
+                        echo '<img src="' . $path[1] . '" id="logo" />';
+                    echo '</div>';
+                    break;
+                }
+            }
+
+        ?>
         </h1>
         <?=$message?>
         <hr />

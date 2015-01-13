@@ -98,7 +98,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (module_is_enabled('sitemap')) {
+        if (isModuleEnabled('sitemap')) {
 
             $this->load->model('sitemap/sitemap_model');
 
@@ -120,7 +120,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (module_is_enabled('cms')) {
+        if (isModuleEnabled('cms')) {
 
             $routes['//BEGIN CMS'] = '';
 
@@ -180,7 +180,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (module_is_enabled('shop')) {
+        if (isModuleEnabled('shop')) {
 
             $_settings = app_setting(NULL, 'shop', true);
 
@@ -208,7 +208,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (module_is_enabled('blog')) {
+        if (isModuleEnabled('blog')) {
 
             $this->load->model('blog/blog_model');
             $_blogs = $this->blog_model->get_all();

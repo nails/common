@@ -448,7 +448,7 @@ if ( ! function_exists( 'form_field_mm' ) )
 		// --------------------------------------------------------------------------
 
 		//	Choose image button
-		$_force_secure = page_is_secure();
+		$_force_secure = isPageSecure();
 
 		if ( $_field['bucket'] ) :
 
@@ -619,7 +619,7 @@ if ( ! function_exists( 'form_field_mm_image' ) )
 		// --------------------------------------------------------------------------
 
 		//	Choose image button
-		$_force_secure = page_is_secure();
+		$_force_secure = isPageSecure();
 
 		if ( $_field['bucket'] ) :
 
@@ -830,7 +830,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		get_instance()->load->library( 'cdn/cdn' );
 
 		$_movie_url		= NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
-		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php', page_is_secure() );
+		$_upload_url	= site_url( 'api/cdnapi/object_create/script.php', isPageSecure() );
 		$_upload_token	= get_instance()->cdn->generate_api_upload_token();
 		$_bucket		= $_field_bucket;
 

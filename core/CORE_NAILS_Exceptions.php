@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * This class overrides some default CodeIgniter exception handling and provides
+ * some additional methods.
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    errors
+ * @author      Nails Dev Team
+ * @link
+ */
+
 class CORE_NAILS_Exceptions extends CI_Exceptions {
 
     private $error_has_occured = false;
@@ -94,8 +105,8 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
         }
 
         // By default we log this, but allow a dev to skip it
-        if ($logError)
-        {
+        if ($logError) {
+
             log_message('error', '404 Page Not Found --> ' . $page);
         }
 

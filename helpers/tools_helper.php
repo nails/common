@@ -141,14 +141,14 @@ if (!function_exists('stringToBoolean'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('ip_in_range'))
+if (!function_exists('isIpInRange'))
 {
     /**
      * Match an IP to a given CIDR range
      * @param   string
-     * @return  float
+     * @return  boolean
      */
-    function ip_in_range($ip, $range)
+    function isIpInRange($ip, $range)
     {
         if (!array($range)) {
 

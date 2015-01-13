@@ -294,8 +294,8 @@ else :
 	//	Are the BASE_URL and SECURE_BASE_URL on the same domain?
 	// if so, cool, if not then...
 
-	$_base_domain			= get_domain_from_url( BASE_URL );
-	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? get_domain_from_url( SECURE_BASE_URL ) : $_base_domain;
+	$_base_domain			= getDomainFromUrl( BASE_URL );
+	$_secure_base_domain	= defined( 'SECURE_BASE_URL' ) ? getDomainFromUrl( SECURE_BASE_URL ) : $_base_domain;
 
 	if ( $_base_domain == $_secure_base_domain ) :
 

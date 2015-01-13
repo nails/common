@@ -56,3 +56,18 @@ if (!function_exists('camelcase_to_underscore'))
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $str));
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('addTrailingSlash')) {
+
+    /**
+     * Adds a trailing slash to the input string if there isn't already one there
+     * @param   string The string to add a trailing shash to.
+     * @return  string
+     **/
+    function addTrailingSlash($str)
+    {
+        return rtrim($str, '/') . '/';
+    }
+}

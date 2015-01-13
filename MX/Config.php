@@ -122,7 +122,7 @@ class MX_Config extends CI_Config
 
 			if ( isset( $_SERVER ) ) :
 
-				$_page_is_secure = page_is_secure();
+				$_page_is_secure = isPageSecure();
 
 				if (
 					   ( $_is_secure_route )
