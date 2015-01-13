@@ -514,7 +514,7 @@ class CORE_NAILS_Model extends CI_Model
 
 		// --------------------------------------------------------------------------
 
-		foreach( $_items AS $item ) :
+		foreach ( $_items AS $item ) :
 
 			$_out[$item->{$this->_table_id_column}] = $item->{$this->_table_label_column};
 

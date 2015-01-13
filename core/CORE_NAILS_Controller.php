@@ -103,7 +103,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         //  Need to generate the routes_app.php file?
         if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
 
-            $this->load->model('system/routes_model');
+            $this->load->model('routes_model');
 
             if (!$this->routes_model->update()) {
 
@@ -120,7 +120,6 @@ class CORE_NAILS_Controller extends MX_Controller {
                 } else {
 
                     redirect($this->input->server('REQUEST_URI'));
-
                 }
             }
         }
@@ -492,7 +491,27 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     protected function autoloadItems()
     {
-        $_packages          = array();
+        /**
+         * This is an important part. Here we are defining all the packages to load.
+         * this translates as "where CodeIgniter will look for stuff".
+         *
+         * We have to do a few manual hacks to ensure things work as expected, i.e.
+         * the load/check order is:
+         *
+         * 1. The Application
+         * 2. Available modules
+         * 3. Nails Common
+         */
+
+        //  Reset
+        $this->config->_config_paths = array();
+
+        $_packages = array();
+
+        //  Nails Common
+        $_packages[] = NAILS_COMMON_PATH . '';
+
+        //  Available Modules
         $_available_modules = _NAILS_GET_AVAILABLE_MODULES();
 
         foreach ($_available_modules as $module) {
@@ -500,7 +519,8 @@ class CORE_NAILS_Controller extends MX_Controller {
             $_packages[] = FCPATH . 'vendor/' . $module . '/';
         }
 
-        $_packages[] = NAILS_COMMON_PATH . '';
+        //  The Application
+        $_packages[] = FCPATH . APPPATH;
 
         foreach ($_packages as $package) {
 
@@ -563,12 +583,12 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         //  Fairly sure load order is important here.
         $_models   = array();
-        $_models[] = 'system/app_setting_model';
+        $_models[] = 'app_setting_model';
         $_models[] = 'auth/user_model';
         $_models[] = 'auth/user_group_model';
         $_models[] = 'auth/user_password_model';
-        $_models[] = 'system/datetime_model';
-        $_models[] = 'system/language_model';
+        $_models[] = 'datetime_model';
+        $_models[] = 'language_model';
 
         foreach ($_models as $model) {
 

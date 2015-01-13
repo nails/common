@@ -336,7 +336,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             //  Work out all the files we have and get their index
             $migrations = array();
-            foreach($dirMap as $dir) {
+            foreach ($dirMap as $dir) {
 
                 $migrations[$dir['path']] = $dir['index'];
             }

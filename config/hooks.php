@@ -1,4 +1,5 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
 /*
 | -------------------------------------------------------------------------
 | Hooks
@@ -10,22 +11,18 @@
 |
 */
 
-	if ( is_file( FCPATH . APPPATH . 'modules/system/hooks/' ) ) :
+    if (is_file(FCPATH . APPPATH . '/hooks/')) {
 
-		$_path = FCPATH . APPPATH . 'modules/system/hooks/';
+        $path = FCPATH . APPPATH . '/hooks/';
 
-	else :
+    } else {
 
-		$_path = NAILS_PATH . 'module-system/system/hooks/';
+        $path = NAILS_PATH . 'common/hooks/';
+    }
 
-	endif;
-
-	$hook['pre_system'] =	array(
-								'class'		=> 'System_startup',
-								'function'	=> 'init',
-								'filename'	=> 'System_startup.php',
-								'filepath'	=> $_path,
-							);
-
-/* End of file hooks.php */
-/* Location: ./application/config/hooks.php */
+    $hook['pre_system'] = array(
+        'class'     => 'System_startup',
+        'function'  => 'init',
+        'filename'  => 'System_startup.php',
+        'filepath'  => $path,
+    );

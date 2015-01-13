@@ -180,7 +180,7 @@ class Modules
 		}
 
 		foreach (Modules::$locations as $location => $offset) {
-			foreach($modules as $module => $subpath) {
+			foreach ($modules as $module => $subpath) {
 				$fullpath = $location.$module.'/'.$base.$subpath;
 
 				if ($base == 'libraries/' AND is_file($fullpath.ucfirst($file_ext)))

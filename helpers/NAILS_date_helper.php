@@ -79,7 +79,7 @@ if ( ! function_exists( 'dropdown_years' ) )
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
 
-		foreach( $r as $year ) :
+		foreach ( $r as $year ) :
 
 			$select .= "<option value=\"$year\"";
 			$select .= ( $year == $selected ) ? ' selected="selected"' : '';
@@ -148,7 +148,7 @@ if ( ! function_exists( 'dropdown_months' ) )
 		$select .= ( ! $selected ) ? ' selected="selected"' : '';
 		$select .= ">" . ( $placeholder ? $placeholder : '-' ) . "</option>\n";
 
-		foreach( $months as $key => $mon ) :
+		foreach ( $months as $key => $mon ) :
 
 			$select .= "<option value=\"".str_pad( $key, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $key == $selected ) ? ' selected="selected"' : '';
@@ -266,7 +266,7 @@ if ( ! function_exists( 'dropdown_minutes' ) )
 		$selected = in_array( $selected, $minutes ) ? $selected : 0;
 
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
-		foreach( $minutes as $min ) :
+		foreach ( $minutes as $min ) :
 
 			$select .= "<option value=\"".str_pad( $min, 2, '0', STR_PAD_LEFT )."\"";
 			$select .= ( $min == $selected ) ? ' selected="selected"' : '';

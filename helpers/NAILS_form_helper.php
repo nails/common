@@ -149,7 +149,7 @@ if ( ! function_exists( 'form_field' ) )
 		$_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
 
 		//	Any data attributes?
-		foreach( $_field_data AS $attr => $value ) :
+		foreach ( $_field_data AS $attr => $value ) :
 
 			$_attr .= ' data-' . $attr . '="' . $value . '"';
 
@@ -793,7 +793,7 @@ if ( ! function_exists( 'form_field_multiimage' ) )
 		//	Render any defaults
 		if ( is_array( $_field_default ) ) :
 
-			foreach( $_field_default AS $file ) :
+			foreach ( $_field_default AS $file ) :
 
 				$_default_html .= '<li class="item">';
 				$_default_html .= '<a href="#" class="delete" data-object_id="' . $file . '"></a>';
@@ -1231,7 +1231,7 @@ if ( ! function_exists( 'form_field_dropdown' ) )
 
 		//	Any data attributes?
 		$_data = '';
-		foreach( $_field['data'] AS $attr => $value ) :
+		foreach ( $_field['data'] AS $attr => $value ) :
 
 			$_data .= ' data-' . $attr . '="' . $value . '"';
 
@@ -1378,7 +1378,7 @@ if ( ! function_exists( 'form_field_dropdown_multiple' ) )
 
 		//	Any data attributes?
 		$_data = '';
-		foreach( $_field['data'] AS $attr => $value ) :
+		foreach ( $_field['data'] AS $attr => $value ) :
 
 			$_data .= ' data-' . $attr . '="' . $value . '"';
 
@@ -1509,7 +1509,7 @@ if ( ! function_exists( 'form_field_boolean' ) )
 
 		//	Any data attributes?
 		$_data = '';
-		foreach( $_field['data'] AS $attr => $value ) :
+		foreach ( $_field['data'] AS $attr => $value ) :
 
 			$_data .= ' data-' . $attr . '="' . $value . '"';
 

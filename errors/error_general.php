@@ -1,47 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<title>Error <?= $status_code . ' - ' . $heading?></title>
-		<?php
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <title><?=$heading?></title>
+    <style type="text/css">
 
-			require_once NAILS_COMMON_PATH . 'errors/_styles.php';
+        html,
+        body
+        {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+            color: #333;
+            overflow: hidden;
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+            font-size: 16px;
+            line-height: 1.6em;
+        }
 
-		?>
-	</head>
-	<body>
-		<div id="container">
-		<?php
+        #container {
+            word-wrap: break-word;
+            max-width: 600px;
+            min-width: 200px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+        }
 
-			echo '<h1>';
-				echo '<span>' . $status_code . '</span>';
-				echo $heading;
-			echo '</h1>';
-			echo $message;
+        h1
+        {
+            position: relative;
+            margin: 0.67em 0;
+            margin-top: 1em;
+            margin-bottom: 16px;
+            padding-bottom: 0.3em;
+            font-size: 2.25em;
+            font-weight: bold;
+            line-height: 1.2;
+        }
 
-			//	Custom 'small' messages
+        h1,
+        hr
+        {
+            border: 0;
+            border-bottom: 1px solid #eee;
+        }
 
-			//	Need to check that the CI_Controller is defined otherwise the get_instance() call will break.
-			//	This error template might be loaded /very/ early on, e.g CSRF failure.
+        img
+        {
+            border: 0;
+            max-width: 100%;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
 
-			if ( array_search( 'CI_Controller', get_declared_classes() ) !== FALSE ) :
+        p
+        {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
 
-				if ( isset( get_instance()->session ) ) :
+        a
+        {
+            background: transparent;
+            color: #4183c4;
+            text-decoration: none;
+        }
 
-					$_admin = get_instance()->session->userdata( 'admin_recovery' );
-					if ( get_instance()->uri->segment( 1 ) == 'admin' && $_admin ) :
+        a:active,
+        a:hover
+        {
+            outline: 0;
+        }
 
-						echo '<small>';
-							echo 'You\'re getting this error because you are currently logged in as ' . active_user( 'email' ) . ', a user who does not have access to this administration contet. ';
-							echo 'If you\'d like to log back in as ' . $_admin->email . ' then please click ' . anchor( 'auth/override/login_as/' . $_admin->id . '/' . $_admin->hash, 'here' ) . '.';
-						echo '</small>';
+        a:hover,
+        a:focus,
+        a:active
+        {
+            text-decoration: underline;
+        }
 
-					endif;
+        small
+        {
+            font-size:0.65em;
+        }
 
-				endif;
-
-			endif;
-
-		?>
-		</div>
-	</body>
-</html>
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>
+            <img src="<?=NAILS_ASSETS_URL?>img/nails/icon/icon@2x.png" width="125" height="125" />
+        </h1>
+        <?=$message?>
+        <hr />
+        <p>
+            <small>
+                Powered by <a href="http://nailsapp.co.uk">Nails</a>
+            </small>
+        </p>
+    </div>
+</body>

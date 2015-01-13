@@ -1,64 +1,107 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Error</title>
-		<meta charset="utf-8">
-		<style type="text/css">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <title><?=$heading?></title>
+    <style type="text/css">
 
-			body {
-			   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-			   font-weight: 300;
-			   text-align: center;
-			   font-size:14px;
-			   color:#444;
-			   margin:100px;
-			}
+        html,
+        body
+        {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+            color: #333;
+            overflow: hidden;
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+            font-size: 16px;
+            line-height: 1.6em;
+        }
 
-			h1
-			{
-				margin:auto;
-				width:400px;
-				margin-bottom:30px;
-			}
+        #container {
+            word-wrap: break-word;
+            max-width: 600px;
+            min-width: 200px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+        }
 
-			p
-			{
-				margin:auto;
-				width:400px;
-			}
+        h1
+        {
+            position: relative;
+            margin: 0.67em 0;
+            margin-top: 1em;
+            margin-bottom: 16px;
+            padding-bottom: 0.3em;
+            font-size: 2.25em;
+            font-weight: bold;
+            line-height: 1.2;
+        }
 
-			p small
-			{
-				font-size:10px;
-				display:block;
-				margin-top:40px;
-			}
+        h1,
+        hr
+        {
+            border: 0;
+            border-bottom: 1px solid #eee;
+        }
 
-			code
-			{
-				margin-top: 2em;
-				display: block;
-				border: 1px solid #CCC;
-				background: #EFEFEF;
-				padding: 1em;
-			}
+        img
+        {
+            border: 0;
+            max-width: 100%;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
 
-			code strong
-			{
-				font-weight: bold;
-				color: red;
-			}
+        p
+        {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
 
-		</style>
-	</head>
-	<body>
-		<h1>Sorry, an error occurred ☹</h1>
-		<p>
-			An error occurred which we couldn't recover from. The technical team have
-			been informed, we apologise for the inconvenience.
-		</p>
-		<p>
-			<small>Powered by <a href="http://nailsapp.co.uk">Nails</a></small>
-		</p>
-	</body>
-</html>
+        a
+        {
+            background: transparent;
+            color: #4183c4;
+            text-decoration: none;
+        }
+
+        a:active,
+        a:hover
+        {
+            outline: 0;
+        }
+
+        a:hover,
+        a:focus,
+        a:active
+        {
+            text-decoration: underline;
+        }
+
+        small
+        {
+            font-size:0.65em;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>
+            <img src="<?=NAILS_ASSETS_URL?>img/nails/icon/icon@2x.png" width="125" height="125" />
+        </h1>
+        <p>
+            Sorry, an error occurred which we couldn't recover from. The technical team have
+            been informed, we apologise for the inconvenience.
+        </p>
+        <hr />
+        <p>
+            <small>
+                Powered by <a href="http://nailsapp.co.uk">Nails</a>
+            </small>
+        </p>
+    </div>
+</body>
