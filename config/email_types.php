@@ -17,6 +17,6 @@ $config['email_types'][0]->slug				= 'app_notification';
 $config['email_types'][0]->name				= 'App Notification';
 $config['email_types'][0]->description		= 'Email template used by the App Notification system.';
 $config['email_types'][0]->template_header	= '';
-$config['email_types'][0]->template_body	= 'common/email/app_notification';
+$config['email_types'][0]->template_body	= 'email/app_notification';
 $config['email_types'][0]->template_footer	= '';
 $config['email_types'][0]->default_subject	= 'App Notification';

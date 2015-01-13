@@ -4,7 +4,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
-    <title><?=$heading?></title>
+    <title><?=$heading . ' - ' . APP_NAME?></title>
     <style type="text/css">
 
         html,
@@ -64,7 +64,7 @@
         a
         {
             background: transparent;
-            color: #4183c4;
+            color: #4183C4;
             text-decoration: none;
         }
 
@@ -79,6 +79,31 @@
         a:active
         {
             text-decoration: underline;
+        }
+
+        a.btn
+        {
+            border: 1px solid #396C9E;
+            background: #4183C4;
+            padding: 0.4em 0.8em;
+            color: #FFFFFF;
+            border-radius: 3px;
+            box-shadow: 0px 0px 1px rgba(0,0,0,0.5)
+        }
+
+        a.btn:hover,
+        a.btn:focus,
+        a.btn:active
+        {
+            text-decoration: none;
+            background: #396C9E;
+        }
+
+        a.btn:active
+        {
+            position: relative;
+            top: 1px;
+            box-shadow: none;
         }
 
         small

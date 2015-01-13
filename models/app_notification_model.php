@@ -2,327 +2,309 @@
 
 class NAILS_App_notification_model extends NAILS_Model
 {
-	protected $_notifications;
-	protected $_emails;
+    protected $notifications;
+    protected $emails;
 
-	// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-	/**
-	 * Construct the notification model, set defaults
-	 */
-	public function __construct()
-	{
-		parent::__construct();
+    /**
+     * Construct the notification model, set defaults
+     */
+    public function __construct()
+    {
+        parent::__construct();
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		$this->_table			= NAILS_DB_PREFIX . 'app_notification';
-		$this->_table_prefix	= 'n';
-		$this->_notifications	= array();
-		$this->_emails			= array();
+        $this->_table        = NAILS_DB_PREFIX . 'app_notification';
+        $this->_table_prefix = 'n';
+        $this->notifications = array();
+        $this->emails        = array();
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		$this->_set_definitions();
-	}
+        $this->setDefinitions();
+    }
 
-	// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-	/**
-	 * Defines the notifications
-	 */
-	protected function _set_definitions()
-	{
-		//	Look for notification definitions defined by enabled modules
-		$_modules = _NAILS_GET_AVAILABLE_MODULES();
+    /**
+     * Defines the notifications
+     */
+    protected function setDefinitions()
+    {
+        //  Define where we should look
+        $definitionLocations   = array();
+        $definitionLocations[] = NAILS_COMMON_PATH . 'config/app_notifications.php';
 
-		foreach ($_modules AS $module) :
+        $modules = _NAILS_GET_AVAILABLE_MODULES();
+        foreach ($modules AS $module) {
 
-			$_module	= explode('-', $module);
-			$_path		= FCPATH . 'vendor/' . $module . '/' . $_module[1] . '/config/app_notifications.php';
+            $moduleBits            = explode('-', $module);
+            $definitionLocations[] = FCPATH . 'vendor/' . $module . '/' . $moduleBits[1] . '/config/app_notifications.php';
+        }
 
-			if (file_exists($_path)) :
+        $definitionLocations[] = FCPATH . APPPATH . 'config/app_notifications.php';
 
-				include $_path;
+        //  Find definitions
+        foreach ($definitionLocations as $path) {
 
-				if (!empty($config['notification_definitions'])) :
+            $this->loadDefinitions($path);
+        }
 
-					$this->_notifications = array_merge($this->_notifications, $config['notification_definitions']);
+        //  Put into a vague order
+        ksort($this->notifications);
+    }
 
-				endif;
+    // --------------------------------------------------------------------------
 
-			endif;
+    /**
+     * Loads definitions located at $path
+     * @param  string $path The path to load
+     * @return void
+     */
+    protected function loadDefinitions($path)
+    {
+        if (file_exists($path)) {
 
-		endforeach;
+            include $path;
 
-		//	Finally, look for app notification definitions
-		$_path = FCPATH . APPPATH . 'config/app_notifications.php';
+            if (!empty($config['notification_definitions'])) {
 
-		if (file_exists($_path)) :
+                $this->notifications = array_merge($this->notifications, $config['notification_definitions']);
+            }
+        }
+    }
 
-			include $_path;
+    // --------------------------------------------------------------------------
 
-			if (!empty($config['notification_definitions'])) :
+    /**
+     * Returns the notification defnintions, optionally limited per group
+     * @param  string $grouping The group to limit to
+     * @return array
+     */
+    public function getDefinitions($grouping = null)
+    {
+        if (is_null($grouping)) {
 
-				$this->_notifications = array_merge($this->_notifications, $config['notification_definitions']);
+            return $this->notifications;
 
-			endif;
+        } elseif (isset($this->notifications[$grouping])) {
 
-		endif;
+            return $this->notifications[$grouping];
 
-		//	Put into a vague order
-		ksort($this->_notifications);
-	}
+        } else {
 
-	// --------------------------------------------------------------------------
+            return array();
+        }
+    }
 
-	/**
-	 * Returns the notification defnintions, optionally limited per group
-	 * @param  string $grouping The group to limit to
-	 * @return array
-	 */
-	public function get_definitions($grouping = NULL)
-	{
-		if (is_null($grouping)) :
+    // --------------------------------------------------------------------------
 
-			return $this->_notifications;
+    /**
+     * Gets emails associated with a particular group/key
+     * @param  string  $key           The key to retrieve
+     * @param  string  $grouping      The group the key belongs to
+     * @param  boolean $force_refresh Whether to force a group refresh
+     * @return array
+     */
+    public function get($key = null, $grouping = 'app', $force_refresh = false)
+    {
+        //  Check that it's a valid key/grouping pair
+        if (!isset($this->notifications[$grouping]->options[$key])) {
 
-		elseif (isset($this->_notifications[$grouping])) :
+            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            return false;
+        }
 
-			return $this->_notifications[$grouping];
+        // --------------------------------------------------------------------------
 
-		else :
+        if (empty($this->emails[$grouping]) || $force_refresh) {
 
-			return array();
+            $this->db->where('grouping', $grouping);
+            $notifications = $this->db->get($this->_table)->result();
+            $this->emails[$grouping] = array();
 
-		endif;
-	}
+            foreach ($notifications as $setting) {
 
-	// --------------------------------------------------------------------------
+                $this->emails[$grouping][ $setting->key ] = json_decode($setting->value);
+            }
+        }
 
-	/**
-	 * Get's emails associated with a particular group/key
-	 * @param  string  $key           The key to retrieve
-	 * @param  string  $grouping      The group the key belongs to
-	 * @param  boolean $force_refresh Whether to force a group refresh
-	 * @return array
-	 */
-	public function get($key = NULL, $grouping = 'app', $force_refresh = false)
-	{
-		//	Check that it's a valid key/grouping pair
-		if (!isset($this->_notifications[$grouping]->options[$key])) :
+        // --------------------------------------------------------------------------
+
+        if (empty($key)) {
 
-			$this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
-			return false;
+            return $this->emails[$grouping];
+
+        } else {
 
-		endif;
+            return isset($this->emails[$grouping][$key]) ? $this->emails[$grouping][$key] : array();
+        }
+    }
 
-		// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-		if (empty($this->_emails[$grouping]) || $force_refresh) :
+    /**
+     * Set a group/key either by passing an array of key=>value pairs as the $key
+     * or by passing a string to $key and setting $value
+     * @param mixed  $key      The key to set, or an array of key => value pairs
+     * @param string $grouping The grouping to store the keys under
+     * @param mixed  $value    The data to store, only used if $key is a string
+     * @return boolean
+     */
+    public function set($key, $grouping = 'app', $value = null)
+    {
+        $this->db->trans_begin();
 
-			$this->db->where('grouping', $grouping);
-			$_notifications = $this->db->get($this->_table)->result();
-			$this->_emails[$grouping] = array();
+        if (is_array($key)) {
 
-			foreach ($_notifications AS $setting) :
+            foreach ($key as $key => $value) {
 
-				$this->_emails[$grouping][ $setting->key ] = json_decode($setting->value);
+                $this->doSet($key, $grouping, $value);
+            }
 
-			endforeach;
+        } else {
 
-		endif;
+            $this->doSet($key, $grouping, $value);
+        }
 
-		// --------------------------------------------------------------------------
+        if ($this->db->trans_status() === false) {
 
-		if (empty($key)) :
+            $this->db->trans_rollback();
+            return false;
 
-			return $this->_emails[$grouping];
+        } else {
 
-		else :
+            $this->db->trans_commit();
+            return true;
+        }
+    }
 
-			return isset($this->_emails[$grouping][$key]) ? $this->_emails[$grouping][$key] : array();
+    // --------------------------------------------------------------------------
 
-		endif;
-	}
+    /**
+     * Inserts/Updates a group/key value
+     * @param string $key      The key to set
+     * @param string $grouping The key's grouping
+     * @param mixed  $value    The value of the group/key
+     * @return void
+     */
+    protected function doSet($key, $grouping, $value)
+    {
+        //  Check that it's a valid key/grouping pair
+        if (!isset($this->notifications[$grouping]->options[$key])) {
 
-	// --------------------------------------------------------------------------
+            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            return false;
+        }
 
-	/**
-	 * Set a group/key either by passing an array of key=>value pairs as the $key
-	 * or by passing a string to $key and setting $value
-	 * @param mixed  $key      The key to set, or an array of key => value pairs
-	 * @param string $grouping The grouping to store the keys under
-	 * @param mixed  $value    The data to store, only used if $key is a string
-	 * @return boolean
-	 */
-	public function set($key, $grouping = 'app', $value = NULL)
-	{
-		$this->db->trans_begin();
+        // --------------------------------------------------------------------------
 
-		if (is_array($key)) :
+        $this->db->where('key', $key);
+        $this->db->where('grouping', $grouping);
+        if ($this->db->count_all_results($this->_table)) {
 
-			foreach ($key AS $key => $value) :
+            $this->db->where('grouping', $grouping);
+            $this->db->where('key', $key);
+            $this->db->set('value', json_encode($value));
+            $this->db->update($this->_table);
 
-				$this->_set($key, $grouping, $value);
+        } else {
 
-			endforeach;
+            $this->db->set('grouping', $grouping);
+            $this->db->set('key', $key);
+            $this->db->set('value', json_encode($value));
+            $this->db->insert($this->_table);
+        }
+    }
 
-		else :
+    // --------------------------------------------------------------------------
 
-			$this->_set($key, $grouping, $value);
+    /**
+     * Sends a notification to the email addresses associated with a particular key/grouping
+     * @param  string $key      The key to send to
+     * @param  string $grouping The key's grouping
+     * @param  array  $data     An array of values to pass to the email template
+     * @param  array  $override Override any of the definition values (this time only). Useful for defining custom email templates etc.
+     * @return boolean
+     */
+    public function notify($key, $grouping = 'app', $data = array(), $override = array())
+    {
+        //  Check that it's a valid key/grouping pair
+        if (!isset($this->notifications[$grouping]->options[$key])) {
 
-		endif;
+            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            return false;
+        }
 
-		if ($this->db->trans_status() === false) :
+        // --------------------------------------------------------------------------
 
-			$this->db->trans_rollback();
-			return false;
+        //  Fetch emails
+        $emails = $this->get($key, $grouping);
 
-		else :
+        if (empty($emails)) {
 
-			$this->db->trans_commit();
-			return true;
+            //  Notification disabled, silently fail
+            return true;
+        }
 
-		endif;
-	}
+        //  Definition to use; clone so overrides aren't permenant
+        $definition = clone $this->notifications[$grouping]->options[$key];
 
-	// --------------------------------------------------------------------------
+        //  Overriding the definition?
+        if (!empty($override) && is_array($override)) {
 
-	/**
-	 * Inserts/Updates a group/key value
-	 * @param string $key      The key to set
-	 * @param string $grouping The key's grouping
-	 * @param mixed  $value    The value of the group/key
-	 * @return void
-	 */
-	protected function _set($key, $grouping, $value)
-	{
-		//	Check that it's a valid key/grouping pair
-		if (!isset($this->_notifications[$grouping]->options[$key])) :
+            foreach ($override as $or_key => $or_value) {
 
-			$this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
-			return false;
+                if (isset($definition->{$or_key})) {
 
-		endif;
+                    $definition->{$or_key} = $or_value;
+                }
+            }
+        }
 
-		// --------------------------------------------------------------------------
+        if (empty($definition->email_tpl)) {
 
-		$this->db->where('key', $key);
-		$this->db->where('grouping', $grouping);
-		if ($this->db->count_all_results($this->_table)) :
+            $this->_set_error('No email template defined for ' . $grouping . '/' . $key);
+            return false;
+        }
 
-			$this->db->where('grouping', $grouping);
-			$this->db->where('key', $key);
-			$this->db->set('value', json_encode($value));
-			$this->db->update($this->_table);
+        // --------------------------------------------------------------------------
 
-		else :
+        //  Send the email
+        $this->load->library('emailer');
 
-			$this->db->set('grouping', $grouping);
-			$this->db->set('key', $key);
-			$this->db->set('value', json_encode($value));
-			$this->db->insert($this->_table);
+        //  Build the email
+        $email       = new stdClass();
+        $email->type = 'app_notification';
+        $email->data = $data;
 
-		endif;
-	}
+        if (!empty($definition->email_subject)) {
 
-	// --------------------------------------------------------------------------
+            $email->data['email_subject'] = $definition->email_subject;
+        }
 
-	/**
-	 * Sends a notification to the email addresses associated with a particular key/grouping
-	 * @param  string $key      The key to send to
-	 * @param  string $grouping The key's grouping
-	 * @param  array  $data     An array of values to pass to the email template
-	 * @param  array  $override Override any of the definition values (this time only). Useful for defining custom email templates etc.
-	 * @return boolean
-	 */
-	public function notify($key, $grouping = 'app', $data = array(), $override = array())
-	{
-		//	Check that it's a valid key/grouping pair
-		if (!isset($this->_notifications[$grouping]->options[$key])) :
+        if (!empty($definition->email_tpl)) {
 
-			$this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
-			return false;
+            $email->data['email_template'] = $definition->email_tpl;
+        }
 
-		endif;
+        foreach ($emails as $e) {
 
-		// --------------------------------------------------------------------------
+            log_message('debug', 'Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
 
-		//	Fetch emails
-		$_emails = $this->get($key, $grouping);
+            $email->to_email = $e;
 
-		if (empty($_emails)) :
+            if (!$this->emailer->send($email, true)) {
 
-			//	Notification disabled, silently fail
-			return true;
+                $this->_set_error($this->emailer->last_error());
+                return false;
+            }
+        }
 
-		endif;
-
-		//	Definition to use; clone so overrides aren't permenant
-		$_definition = clone $this->_notifications[$grouping]->options[$key];
-
-		//	Overriding the definition?
-		if (!empty($override) && is_array($override)) :
-
-			foreach ($override AS $or_key => $or_value) :
-
-				if (isset($_definition->{$or_key})) :
-
-					$_definition->{$or_key} = $or_value;
-
-				endif;
-
-			endforeach;
-
-		endif;
-
-		if (empty($_definition->email_tpl)) :
-
-			$this->_set_error('No email template defined for ' . $grouping . '/' . $key);
-			return false;
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		//	Send the email
-		$this->load->library('emailer');
-
-		//	Build the email
-		$_email			= new stdClass();
-		$_email->type	= 'app_notification';
-		$_email->data	= $data;
-
-		if (!empty($_definition->email_subject)) :
-
-			$_email->data['email_subject'] = $_definition->email_subject;
-
-		endif;
-
-		if (!empty($_definition->email_tpl)) :
-
-			$_email->data['email_template'] = $_definition->email_tpl;
-
-		endif;
-
-		foreach ($_emails AS $e) :
-
-			log_message('debug', 'Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
-
-			$_email->to_email = $e;
-
-			if (!$this->emailer->send($_email, true)) :
-
-				$this->_set_error($this->emailer->last_error());
-				return false;
-
-			endif;
-
-		endforeach;
-
-		return true;
-	}
+        return true;
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -353,7 +335,7 @@ class NAILS_App_notification_model extends NAILS_Model
 
 if (!defined('NAILS_ALLOW_EXTENSION_APP_NOTIFICATION_MODEL')) {
 
-	class App_notification_model extends NAILS_App_notification_model
-	{
-	}
+    class App_notification_model extends NAILS_App_notification_model
+    {
+    }
 }

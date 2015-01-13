@@ -296,7 +296,7 @@ class NAILS_Routes_model extends NAILS_Model
      * Determine whether or not the routes can be written
      * @return boolean
      */
-    protected function canWriteRoutes()
+    public function canWriteRoutes()
     {
         if (!is_null($this->canWriteRoutes)) {
 

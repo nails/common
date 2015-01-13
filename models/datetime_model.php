@@ -20,7 +20,7 @@ class NAILS_Datetime_model extends NAILS_Model
     public function __construct()
     {
         parent::__construct();
-        $this->config->load('common/datetime');
+        $this->config->load('datetime');
     }
 
     /**
