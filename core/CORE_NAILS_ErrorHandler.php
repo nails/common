@@ -215,7 +215,11 @@ class CORE_NAILS_ErrorHandler
         }
 
         //  Flush the output buffer
-        ob_clean();
+        $obContents = ob_get_contents();
+        if (!empty($obContents)) {
+
+            ob_clean();
+        }
 
         //  Non-production and have an app-specific dev error file?
         if (ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
