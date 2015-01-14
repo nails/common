@@ -15,6 +15,15 @@
     <div id="container">
         <?php
 
+        if (defined('FCPATH') && defined('BASE_URL')) {
+
+            $paths   = array();
+            $paths[] = array(
+                FCPATH . 'assets/img/errors/fatal.png',
+                BASE_URL . 'assets/img/errors/fatal.png'
+            );
+        }
+
         include NAILS_COMMON_PATH . 'errors/components/header.php';
 
         ?>

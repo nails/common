@@ -1,14 +1,12 @@
 <h1>
 <?php
 
-    $paths = array();
+    if (!isset($paths)) {
+
+        $paths = array();
+    }
 
     if (defined('FCPATH') && defined('BASE_URL')) {
-
-        $paths[] = array(
-            FCPATH . 'assets/img/error_fatal.png',
-            BASE_URL . 'assets/img/error_fatal.png'
-        );
 
         $paths[] = array(
             FCPATH . 'assets/img/logo.png',
