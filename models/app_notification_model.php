@@ -38,7 +38,7 @@ class NAILS_App_notification_model extends NAILS_Model
         $definitionLocations[] = NAILS_COMMON_PATH . 'config/app_notifications.php';
 
         $modules = _NAILS_GET_AVAILABLE_MODULES();
-        foreach ($modules AS $module) {
+        foreach ($modules as $module) {
 
             $moduleBits            = explode('-', $module);
             $definitionLocations[] = FCPATH . 'vendor/' . $module . '/' . $moduleBits[1] . '/config/app_notifications.php';

@@ -154,7 +154,7 @@ class NAILS_Routes_model extends NAILS_Model
             $this->db->where('p.is_published', true);
             $_slugs = $this->db->get(NAILS_DB_PREFIX . 'cms_page_slug_history sh')->result();
 
-            foreach ($_slugs AS $route) {
+            foreach ($_slugs as $route) {
 
                 if (!isset($routes[$route->slug])) {
 

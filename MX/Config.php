@@ -82,7 +82,7 @@ class MX_Config extends CI_Config
 
 			//	Analyse target URL, if it matches a route then change it to be an https URL
 			$_is_secure_route = FALSE;
-			foreach ( $this->routes_ssl AS $route ) :
+			foreach ( $this->routes_ssl as $route ) :
 
 				//	Swap out the pseudo regex's
 				$route = str_replace( ':any', '.*', $route );

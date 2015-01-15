@@ -178,7 +178,7 @@ class CORE_NAILS_Migration
 		log_message('debug', 'Migrating from ' . $method . ' to version ' . $version);
 
 		// Loop through the migrations
-		foreach ($migrations AS $migration)
+		foreach ($migrations as $migration)
 		{
 			// Run the migration class
 			$class = 'Migration_' . ucfirst(strtolower($migration));

@@ -745,7 +745,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         //  Correctly encode the password
         if (!defined('APP_PRIVATE_KEY')) {
 
-            foreach ($appVars AS $var) {
+            foreach ($appVars as $var) {
 
                 if (is_array($var) && $var['key'] == 'APP_PRIVATE_KEY') {
 
@@ -757,7 +757,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         if (!defined('APP_PRIVATE_KEY')) {
 
-            foreach ($deployVars AS $var) {
+            foreach ($deployVars as $var) {
 
                 if (is_array($var) && $var['key'] == 'DEPLOY_PRIVATE_KEY') {
 
