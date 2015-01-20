@@ -247,6 +247,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
     {
         //  Handle wheres
         $_wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
+        $_wheres = array('where_in');
 
         foreach ($_wheres as $where_type) {
 
@@ -270,27 +271,27 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                         foreach ($data[$where_type] as $where) {
 
                             //  Work out column
-                            $_column = !empty($where['column']) ? $where['column'] : null;
+                            $column = !empty($where['column']) ? $where['column'] : null;
 
-                            if ($_column === null) {
+                            if (is_null($column)) {
 
-                                $_column = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
+                                $column = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
                             //  Work out value
-                            $_value = isset($where['value']) ? $where['value'] : null;
+                            $value = isset($where['value']) ? $where['value'] : null;
 
-                            if ($_value === null) {
+                            if (is_null($value)) {
 
-                                $_value = !empty($where[1]) ? $where[1] : null;
+                                $value = !empty($where[1]) ? $where[1] : null;
                             }
 
                             //  Escaped?
-                            $_escape = isset($where['escape']) ? (bool) $where['escape'] : true;
+                            $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
 
-                            if ($_column) {
+                            if ($column) {
 
-                                $this->db->$where_type($_column, $_value, $_escape);
+                                $this->db->$where_type($column, $value, $escape);
                             }
                         }
                     }
@@ -305,7 +306,42 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
         // --------------------------------------------------------------------------
 
         //  Handle Likes
-        //  @TODO
+        if (!empty($data['like'])) {
+
+            if (is_string($data['like'])) {
+
+                $this->db->like($data['like']);
+
+            } elseif (is_array($data['like'])) {
+
+                foreach ($data['like'] as $like) {
+
+                    //  Work out column
+                    $column = !empty($like['column']) ? $like['column'] : null;
+
+                    if (is_null($column)) {
+
+                        $column = !empty($like[0]) && is_string($like[0]) ? $like[0] : null;
+                    }
+
+                    //  Work out value
+                    $value = isset($like['value']) ? $like['value'] : null;
+
+                    if (is_null($value)) {
+
+                        $value = !empty($like[1]) ? $like[1] : null;
+                    }
+
+                    //  Escaped?
+                    $escape = isset($like['escape']) ? (bool) $like['escape'] : false;
+
+                    if ($column) {
+
+                        $this->db->like($column, $value, $escape);
+                    }
+                }
+            }
+        }
 
         // --------------------------------------------------------------------------
 
