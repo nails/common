@@ -496,12 +496,14 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 //  In the correct format?
                 if ( preg_match('/^(\d)+(.*)\.sql$/', $fileInfo->getFilename(), $matches)) {
 
-                    $out[] = array(
+                    $out[$matches[1]] = array(
                         'path'  => $fileInfo->getPathname(),
                         'index' => (int) $matches[1]
                     );
                 }
             }
+
+            ksort($out);
 
             return $out;
 
