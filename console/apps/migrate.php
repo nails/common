@@ -34,8 +34,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     /**
      * Executes the app
-     * @param  InputInterface  $input  The Input Interface proivided by Symfony
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @param  InputInterface  $input  The Input Interface provided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -393,8 +393,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     /**
      * Executes a migration
      * @param  string          $module The migration details object
-     * @param  InputInterface  $input  The Input Interface proivided by Symfony
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @param  InputInterface  $input  The Input Interface provided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return boolean
      */
     protected function doMigration($module, $input, $output)

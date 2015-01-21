@@ -9,6 +9,14 @@ use Symfony\Component\Console\Output\NullOutput;
 
 require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
+//  Define the nails path so CORE_NAILS_Common doesn't freak out
+if (!defined('NAILS_PATH')) {
+
+    define('NAILS_PATH', 'vendor/nailsapp/');
+}
+
+require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
+
 /**
  * Load the password model, so we can use it's static methods to generate
  * the user's passwords. We will have to immitate CI's Model Classthough.
@@ -26,17 +34,45 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     {
         $this->setName('install');
         $this->setDescription('Configures or reconfigures a Nails site');
+
+        $this->addArgument(
+            'moduleName',
+            InputArgument::OPTIONAL,
+            'If a module name is provided it will be added to composer.json if valid'
+        );
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Executes the app
-     * @param  InputInterface  $input  The Input Interface proivided by Symfony
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @param  InputInterface  $input  The Input Interface provided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $module = $input->getArgument('moduleName');
+
+        if (!empty($module)) {
+
+            return $this->executeModuleInstaller($module, $input, $output);
+
+        } else {
+
+            return $this->executeInstaller($input, $output);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes the Nails Installer
+     * @param  InputInterface  $input  The Input Interface provided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @return void
+     */
+    protected function executeInstaller(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>---------------</info>');
         $output->writeln('<info>Nails Installer</info>');
@@ -85,22 +121,29 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             // --------------------------------------------------------------------------
 
-            $output->writeln('');
-            $output->writeln('<info>Modules</info>');
+            //  Can we install modules? We need exec() and composer to be available
+            $execAvailable     = function_exists('exec');
+            $composerAvailable = (bool) $this->detectComposerBin();
 
-            $question = 'Would you like to define modules to enable now?';
-            $installModules = $this->confirm($question, false, $input, $output);
-
-            if ($installModules) {
+            if ($execAvailable && $composerAvailable) {
 
                 $output->writeln('');
-                $output->writeln('<comment>@TODO:</comment> Interface for installing modules');
-                $output->writeln('');
+                $output->writeln('<info>Modules</info>');
 
-                $installTheseModules    = array();
-                $installTheseModules[]  = 'test/module-1';
-                $installTheseModules[]  = 'test/module-2';
-                $installTheseModules[]  = 'test/module-3';
+                $question = 'Would you like to define modules to enable now?';
+                $installModules = $this->confirm($question, false, $input, $output);
+
+                $installTheseModules = array();
+
+                while ($installModules) {
+
+                    $module = $this->requestModule('', $input, $output);
+                    $installTheseModules[$module[0]] = $module[1];
+
+                    $output->writeln('');
+                    $question = 'Would you like to enable another module?';
+                    $installModules = $this->confirm($question, false, $input, $output);
+                }
             }
 
             // --------------------------------------------------------------------------
@@ -193,18 +236,17 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                 if (count($installTheseModules) > 1) {
 
-                    $output->writeln('The following module(s) will be installed:');
+                    $output->writeln('The following modules will be installed:');
 
                 } else {
 
                     $output->writeln('The following module will be installed:');
                 }
 
-                foreach ($installTheseModules as $moduleName) {
+                foreach ($installTheseModules as $moduleName => $moduleVersion) {
 
-                    $output->writeln(' - <comment>' . $moduleName . '</comment>');
+                    $output->writeln(' - <comment>' . $moduleName . ':' . $moduleVersion . '</comment>');
                 }
-
             }
 
             //  Migrate databases
@@ -272,17 +314,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Installing modules</info>...');
 
-                    foreach ($installTheseModules as $moduleName) {
+                    foreach ($installTheseModules as $moduleName => $moduleVersion) {
 
-                        $output->write(' - <comment>' . $moduleName . '</comment>... ');
-                        if ($this->installModule($moduleName, $input, $output)) {
-
-                            $output->writeln('<info>DONE</info>');
-
-                        } else {
-
-                            $output->writeln('<error>FAILED</error>');
-                        }
+                        $output->write(' - <comment>' . $moduleName . ':' . $moduleVersion . '</comment>... ');
+                        $this->installModule($moduleName, $moduleVersion, $output);
                     }
                     $curStep++;
                 }
@@ -335,19 +370,79 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             } else {
 
-                $output->writeln('');
-                $output->writeln('<error>Aborting install.</error>');
+                return $this->abort($output);
             }
 
         } else {
 
-            $output->writeln('');
-            $output->writeln('<error>ERROR:</error> Aborting install');
+            $exitCode = $this->abort($output);
 
             foreach ($preTestErrors as $error) {
 
                 $output->writeln(' - ' . $error);
             }
+
+            return $exitCode;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes the Nails Module Installer
+     * @param  InputInterface  $input  The Input Interface provided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @return void
+     */
+    protected function executeModuleInstaller($module, InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>----------------------</info>');
+        $output->writeln('<info>Nails Module Installer</info>');
+        $output->writeln('<info>----------------------</info>');
+
+        // --------------------------------------------------------------------------
+
+        //  Get the Module
+        $module = $this->requestModule($module, $input, $output);
+
+        //  confirm with user
+        $output->writeln('');
+        $output->writeln('<info>I\'m about to do the following:</info>');
+        $output->writeln(' - Install <info>' . $module[0] . ':' . $module[1] . '</info>');
+        $output->writeln(' - Migrate the database');
+        $output->writeln('');
+
+        $question = 'Continue?';
+        $doInstall = $this->confirm($question, true, $input, $output);
+
+        if ($doInstall) {
+
+            //  Attempt to install
+            $output->writeln('');
+            $output->write('<comment>[1/2]</comment> Installing <info>' . $module[0] . ':' . $module[1] . '</info>... ');
+            if (!$this->installModule($module[0], $module[1], $output)) {
+
+                return $this->abort($output, 3);
+            }
+
+            //  Migrate DB
+            $output->write('<comment>[2/2]</comment> Migrating database... ');
+            if (!$this->migrateDb($output)) {
+
+                return $this->abort($output, 4);
+            }
+
+            //  Cleaning up
+            $output->writeln('');
+            $output->writeln('<comment>Cleaning up...</comment>');
+
+            //  And we're done!
+            $output->writeln('');
+            $output->writeln('Complete!');
+
+        } else {
+
+            return $this->abort($output, 0);
         }
     }
 
@@ -636,8 +731,8 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     /**
      * Requests the user to confirm all the variables
      * @param array           &$vars  An array of the variables to set
-     * @param InputInterface  $input  The Input Interface proivided by Symfony
-     * @param OutputInterface $output The Output Interface proivided by Symfony
+     * @param InputInterface  $input  The Input Interface provided by Symfony
+     * @param OutputInterface $output The Output Interface provided by Symfony
      */
     private function setVars(&$vars, $input, $output)
     {
@@ -687,14 +782,25 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     /**
      * Installs a particular module
-     * @param  string          $moduleName The name of the modoule to install
-     * @param  InputInterface  $input      The Input Interface proivided by Symfony
-     * @param  OutputInterface $output     The Output Interface proivided by Symfony
+     * @param  string          $moduleName    The name of the module to install
+     * @param  string          $moduleVersion The version of the module to install
+     * @param  OutputInterface $output        The Output Interface provided by Symfony
      * @return boolean
      */
-    private function installModule($moduleName, $input, $output)
+    private function installModule($moduleName, $moduleVersion, $output)
     {
-        //  @TODO: Add module to composer.json
+        $composerBin = $this->detectComposerBin();
+
+        exec($composerBin . ' require ' . $moduleName . ':' . $moduleVersion, $execOutput, $execReturn);
+
+        if ($execReturn !== 0) {
+
+            $output->writeln('<error>FAILED</error>');
+            $output->writeln('Composer failed with exit code "' . $execReturn . '"');
+            return false;
+        }
+
+        $output->writeln('<info>DONE</info>');
         return true;
     }
 
@@ -702,7 +808,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     /**
      * Migrates the DB for a fresh install
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return boolean
      */
     private function migrateDb($output)
@@ -868,5 +974,116 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         }
 
         return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function abort($output, $exitCode = 1)
+    {
+        $output->writeln('');
+
+        if ($this->dbTransRunning) {
+
+            $output->writeln('<error>Rolling back Database</error>');
+            $this->dbTransactionRollback();
+        }
+
+        $output->writeln('<error>Aborting install</error>');
+        $output->writeln('');
+        return $exitCode;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function detectComposerBin()
+    {
+        //  Detect composer
+        $composerBin = 'composer';
+        $result = shell_exec('which ' . $composerBin);
+
+        if (empty($result)) {
+
+            $composerBin = 'composer.phar';
+            $result = shell_exec('which ' . $composerBin);
+
+            if (empty($result)) {
+
+                $composerBin = '';
+            }
+        }
+
+        return $composerBin;
+    }
+
+    // --------------------------------------------------------------------------
+
+    private function requestModule($moduleName, $input, $output)
+    {
+        //  Get the module
+        do {
+
+            $isValidModule = $this->isValidModule($moduleName);
+
+            if (!$isValidModule) {
+
+                if ($moduleName) {
+
+                    //  Tell user their module name isn't valid
+                    $output->writeln('');
+                    $output->writeln('Sorry, <info>' . $moduleName . '</info> is not a valid Nails module.');
+
+                    //  Search to see if what they said vaguely matches any module name
+                    $searchResult = $this->searchModules($moduleName);
+
+                    if ($searchResult) {
+
+                        $output->writeln('');
+                        $output->writeln('Did you mean any of the following:');
+
+                        foreach ($searchResult as $resultModuleName) {
+
+                            $output->writeln(' - <comment>' . $resultModuleName . '</comment>');
+                        }
+                    }
+                }
+
+                $output->writeln('');
+                $question = 'Enter the module name you\'d like to install';
+                $moduleName = $this->ask($question, '', $input, $output);
+            }
+
+        } while (!$isValidModule);
+
+        //  Get the version to install
+        $question = 'Enter the version you require for <info>' . $moduleName . '</info>';
+        $moduleVersion = $this->ask($question, 'dev-develop', $input, $output);
+
+        return array($moduleName, $moduleVersion);
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function isValidModule($moduleName)
+    {
+        $potentialModules = _NAILS_GET_POTENTIAL_MODULES();
+        return in_array($moduleName, $potentialModules);
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function searchModules($moduleName)
+    {
+        $potentialModules = _NAILS_GET_POTENTIAL_MODULES();
+        $results          = array();
+
+        foreach ($potentialModules as $module) {
+
+            if (strpos($module, $moduleName) !== FALSE) {
+
+                $results[] = $module;
+            }
+        }
+
+        return $results;
     }
 }
