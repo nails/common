@@ -48,10 +48,6 @@ if (!function_exists('show_401'))
 
 // --------------------------------------------------------------------------
 
-/**
- * Alias of show_401()
- *
- */
 if (!function_exists('unauthorised'))
 {
 	/**
@@ -98,6 +94,29 @@ if (!function_exists('showFatalError'))
 			echo '<h1>ERROR: ' . $subject . '</h1>';
 			echo '<h2>' . $message . '</h2>';
 			exit(0);
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('sendDeveloperMail')) {
+
+	/**
+	 * Quickly send a high priority email via mail() to the APP_DEVELOPER
+	 * @param  string $subject The email's subject
+	 * @param  string $message The email's body
+	 * @return boolean
+	 */
+	function sendDeveloperMail($subject, $message)
+	{
+		if (is_callable('CORE_NAILS_ErrorHandler::sendDeveloperMail')) {
+
+			return CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+
+		} else {
+
+			return false;
 		}
 	}
 }
