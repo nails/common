@@ -131,7 +131,11 @@ class CORE_NAILS_Controller extends MX_Controller {
             if (!$this->routes_model->update()) {
 
                 //  Fall over, routes_app.php *must* be there
-                showFatalError('Failed To generate routes_app.php', 'routes_app.php was not found and could not be generated. ' . $this->routes_model->last_error());
+                $subject  = 'Failed To generate routes_app.php';
+                $message  = 'routes_app.php was not found and could not be generated. ';
+                $messgae .= $this->routes_model->last_error();
+
+                showFatalError($subject, $message);
 
             } else {
 
@@ -283,7 +287,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
             } else {
 
-                showFatalError('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.');
+                $subject = 'Cache Dir is not writeable';
+                $message = 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.';
+                showFatalError($subject, $message);
             }
 
         } elseif(@mkdir(DEPLOY_CACHE_DIR)) {
@@ -296,7 +302,9 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         } else {
 
-            showFatalError('Cache Dir is not writeable', 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.');
+            $subject = 'Cache Dir is not writeable';
+            $message = 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.';
+            showFatalError($subject, $message);
         }
     }
 
@@ -416,7 +424,10 @@ class CORE_NAILS_Controller extends MX_Controller {
                 //  Determine the users
                 $users = array_filter($users);
 
-                if (!isset($users[$_SERVER['PHP_AUTH_USER']]) || $users[$_SERVER['PHP_AUTH_USER']] != md5(trim($_SERVER['PHP_AUTH_PW']))) {
+                if (
+                    !isset($users[$_SERVER['PHP_AUTH_USER']])
+                    || $users[$_SERVER['PHP_AUTH_USER']] != md5(trim($_SERVER['PHP_AUTH_PW']))
+                ) {
 
                     $this->stagingRequestCredentials();
                 }

@@ -144,11 +144,7 @@ class CORE_NAILS_ErrorHandler
         $subject = 'Uncaught Exception';
         $message = $errMsg;
 
-        if (ENVIRONMENT == 'PRODUCTION') {
-
-            self::sendDeveloperMail($subject, $message);
-        }
-
+        self::sendDeveloperMail($subject, $message);
         self::showFatalErrorScreen($subject, $message, $details);
     }
 
@@ -173,12 +169,7 @@ class CORE_NAILS_ErrorHandler
             $subject = 'Fatal Error';
             $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
 
-            //  Send a note to the dev if on production
-            if (ENVIRONMENT == 'PRODUCTION') {
-
-                self::sendDeveloperMail($subject, $message);
-            }
-
+            self::sendDeveloperMail($subject, $message);
             self::showFatalErrorScreen($subject, $message, $details);
         }
     }
@@ -255,6 +246,15 @@ class CORE_NAILS_ErrorHandler
      */
     public static function sendDeveloperMail($subject, $message)
     {
+        //  Production only
+        if (ENVIRONMENT != 'PRODUCTION') {
+
+            return true;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Do we know who we're sending to?
         if (!APP_DEVELOPER_EMAIL) {
 
             //  Log the fact there's no email

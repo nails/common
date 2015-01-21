@@ -1,205 +1,138 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-
-/**
- * Alias to dump( $var, TRUE )
- *
- * @access	public
- * @param	mixed
- * @return	void
- */
-if ( ! function_exists( 'dumpanddie' ) )
+if (!function_exists('dumpanddie'))
 {
-	function dumpanddie( $var = NULL )
-	{
-		dump( $var, TRUE );
-	}
+    /**
+     * Alias to dump($var, true)
+     * @param  mixed $var The variable to dump
+     * @return void
+     */
+    function dumpanddie($var = null)
+    {
+        dump($var, true);
+    }
 }
-
-//	Common Misspellings, too.
-if ( ! function_exists( 'dumapnddie' ) )
-{
-	function dumapnddie( $var = NULL )
-	{
-		dumpanddie( $var );
-	}
-}
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Dumps data, similar to var_dump()
- *
- * @access	public
- * @param	mixed
- * @return	void
- */
-if ( ! function_exists( 'dump' ) )
+if (!function_exists('dump'))
 {
-	function dump( $var = NULL, $die = FALSE )
-	{
-		if ( is_string( $var ) ) :
+    /**
+     * Dumps data, similar to var_dump()
+     * @param mixed The variable to dump
+     * @return void
+     */
+    function dump($var = null, $die = false)
+    {
+        if (is_string($var)) {
 
-			$output = "<pre>(string) {$var}</pre>";
+            $output = '<pre>(string) ' . $var . '</pre>';
 
-		elseif ( is_int( $var ) ) :
+        } elseif (is_int($var)) {
 
-			$output = "<pre>(int) {$var}</pre>";
+            $output = '<pre>(int) ' . $var . '</pre>';
 
-		elseif ( is_bool( $var ) ) :
+        } elseif (is_bool($var)) {
 
-			$var = ( $var === TRUE )?"TRUE":"FALSE";
+            $var = ($var === true) ? "true" : "false" ;
+            $output = '<pre>(bool) ' . $var . '</pre>';
 
-			$output = "<pre>(bool) {$var}</pre>";
+        } elseif (is_float($var)) {
 
-		elseif ( is_float( $var ) ) :
+            $output = '<pre>(float) ' . $var . '</pre>';
 
-			$output = "<pre>(float) {$var}</pre>";
+        } elseif (is_null($var)) {
 
-		elseif ( is_null( $var ) ) :
+            $output = '<pre>(null) null</pre>';
 
-			$output = "<pre>(NULL) NULL</pre>";
+        } else {
 
-		else:
+            $output = '<pre>' . print_r($var, true) . '</pre>';
+        }
 
-			$output = "<pre>".print_r( $var, TRUE )."</pre>";
+        //  Check the global ENVIRONMENT setting.
+        switch (ENVIRONMENT) {
 
-		endif;
+            case 'PRODUCTION':
 
-		//	Check the global ENVIRONMENT setting.
-		switch( strtoupper( ENVIRONMENT ) ) :
+                //  Mute output regardless of setting
+                return;
+                break;
 
-			case 'PRODUCTION':
+            default:
 
-				//	Mute output regardless of setting
-				return;
+                //  Continue execution unless instructed otherwise
+                if ($die !== false) {
 
-			break;
+                    die("\n\n" . $output . "\n\n");
+                }
 
-			case 'STAGING':
-			case 'DEVELOPMENT':
-
-				//	Continue execution unless instructed otherwise
-				if ( $die !== FALSE ) :
-
-					die( "\n\n" . $output . "\n\n" );
-
-				endif;
-
-				echo "\n\n" . $output . "\n\n";
-
-			break;
-
-		endswitch;
-	}
+                echo "\n\n" . $output . "\n\n";
+                break;
+        }
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Outputs a 'here at date()' string using dumpanddie(); useful for debugging.
- *
- * @access	public
- * @param	mixed
- * @return	void
- */
-if ( ! function_exists( 'here' ) )
+if (!function_exists('here'))
 {
-	function here( $dump = NULL )
-	{
-		$_now = gmdate( 'H:i:s' );
+    /**
+     * Outputs a 'here at date()' string using dumpanddie(); useful for debugging.
+     * @param  mixed $dump The variable to dump
+     * @return void
+     */
+    function here($dump = null)
+    {
+        $now = gmdate('H:i:s');
 
-		//	Dump payload if there
-		if ( NULL !== $dump ) :
+        //  Dump payload if there
+        if (!is_null($dump)) {
 
-			dump( $dump );
+            dump($dump);
+        }
 
-		endif;
-
-		dumpanddie( 'Here @ ' . $_now );
-	}
+        dumpanddie('Here @ ' . $now);
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Dumps the last known query
- *
- * @access	public
- * @param	mixed
- * @return	void
- */
-if ( ! function_exists( 'lastquery' ) )
+if (!function_exists('lastquery'))
 {
-	function lastquery( $die = TRUE )
-	{
-		$_last_query = get_instance()->db->last_query();
+    /**
+     * Dumps the last known query
+     * @param  boolean $die Whetehr to die or not
+     * @return void
+     */
+    function lastquery($die = true)
+    {
+        $lastQuery = get_instance()->db->last_query();
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		if ( $die ) :
+        if ($die) {
 
-			dumpanddie( $_last_query );
+            dumpanddie($lastQuery);
 
-		else :
+        } else {
 
-			dump( $_last_query );
-
-		endif;
-	}
+            dump($lastQuery);
+        }
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * alias of lastquery()
- *
- * @access	public
- * @param	mixed
- * @return	void
- */
-if ( ! function_exists( 'last_query' ) )
+if (!function_exists('last_query'))
 {
-	function last_query( $die = TRUE )
-	{
-		return lastquery( $die );
-	}
+    /**
+     * Alias of lastquery()
+     * @param  boolean $die Whether to die or not
+     * @return void
+     */
+    function last_query($die = true)
+    {
+        lastquery($die);
+    }
 }
-
-
-// --------------------------------------------------------------------------
-
-
-if (!function_exists('sendDeveloperMail')) {
-
-	/**
-	 * Quickly send a high priority email via mail() to the APP_DEVELOPER
-	 * @param  string $subject The email's subject
-	 * @param  string $message The email's body
-	 * @return boolean
-	 */
-	function sendDeveloperMail($subject, $message)
-	{
-		if (is_callable('CORE_NAILS_ErrorHandler::sendDeveloperMail')) {
-
-			return CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
-
-		} else {
-
-			return false;
-		}
-	}
-}
-
-
-
-/* End of file debug_helper.php */
-/* Location: ./helpers/debug_helper.php */
