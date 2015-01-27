@@ -13,8 +13,8 @@
         <?php
 
             //  Load JS
-            $this->asset->output('js');
-            $this->asset->output('js-inline');
+            $this->asset->output('JS');
+            $this->asset->output('JS-INLINE');
 
             //  Analytics
             if (app_setting('google_analytics_account')) {
