@@ -246,29 +246,28 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
     protected function _getcount_common($data = array(), $_caller = null)
     {
         //  Handle wheres
-        $_wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
-        $_wheres = array('where_in');
+        $wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
 
-        foreach ($_wheres as $where_type) {
+        foreach ($wheres as $whereType) {
 
-            if (!empty($data[$where_type])) {
+            if (!empty($data[$whereType])) {
 
-                if (is_array($data[$where_type])) {
+                if (is_array($data[$whereType])) {
 
                     /**
                      * If it's a single dimensional array then just bung that into
                      * the db->where(). If not, loop it and parse.
                      */
 
-                    $_first = reset($data[$where_type]);
+                    $_first = reset($data[$whereType]);
 
                     if (is_string($_first)) {
 
-                        $this->db->$where_type($data[$where_type]);
+                        $this->db->$whereType($data[$whereType]);
 
                     } else {
 
-                        foreach ($data[$where_type] as $where) {
+                        foreach ($data[$whereType] as $where) {
 
                             //  Work out column
                             $column = !empty($where['column']) ? $where['column'] : null;
@@ -291,14 +290,14 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                             if ($column) {
 
-                                $this->db->$where_type($column, $value, $escape);
+                                $this->db->$whereType($column, $value, $escape);
                             }
                         }
                     }
 
-                } elseif (is_string($data[$where_type])) {
+                } elseif (is_string($data[$whereType])) {
 
-                    $this->db->$where_type($data[$where_type]);
+                    $this->db->$whereType($data[$whereType]);
                 }
             }
         }
@@ -359,7 +358,6 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
              * - If $data['sort'] is a multidimensional array then loop each element and test as above.
              *
              **/
-
 
             if (is_string($data['sort'])) {
 
@@ -429,7 +427,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                 $_out['order'] = $sort['order'];
 
-            } elseif(count($sort) > 1) {
+            } elseif (count($sort) > 1) {
 
                 //  Take the last element
                 $_out['order'] = end($sort);
