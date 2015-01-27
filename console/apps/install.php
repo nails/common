@@ -322,9 +322,19 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                     $curStep++;
                 }
 
+                /**
+                 * Get the current database credential values. If ane xisting deploy.php is already there then
+                 * we can't rely on it having the latest details (as it might have just been updated).
+                 */
+
+                $dbHost = $this->getVarValue('DEPLOY_DB_HOST', $deployVars);
+                $dbUser = $this->getVarValue('DEPLOY_DB_USERNAME', $deployVars);
+                $dbPass = $this->getVarValue('DEPLOY_DB_PASSWORD', $deployVars);
+                $dbName = $this->getVarValue('DEPLOY_DB_DATABASE', $deployVars);
+
                 //  Migrate DB
                 $output->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Migrating database... ');
-                $this->migrateDb($output);
+                $this->migrateDb($output, $dbHost, $dbUser, $dbPass, $dbName);
                 $curStep++;
 
                 //  Add Uers
@@ -332,7 +342,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Creating Users</info>...');
 
-                    if ($this->dbConnect($output)) {
+                    if ($this->dbConnect($output, $dbHost, $dbUser, $dbPassword, $dbName)) {
 
                         foreach ($users as $user) {
 
@@ -607,6 +617,27 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the current value of a variable
+     * @param  string $key  The key to return
+     * @param  array  $vars The variable array to look at
+     * @return mixed        var value (usually string) on success, null on failure
+     */
+    private function getVarValue($key, $vars)
+    {
+        foreach($vars AS $var) {
+
+            if ($key == $var['key']) {
+
+                return $var['value'];
+            }
+        }
+
+        return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Finds all constants defined in a particular file
      * @param  string $path The path to analyse
      * @param  array  $vars The existing variables to check against (so only new variables are returned)
@@ -809,14 +840,27 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     /**
      * Migrates the DB for a fresh install
      * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @param  string          $dbhost The database hsot to connect to
+     * @param  string          $dbuser The database user to connect with
+     * @param  string          $dbpass The database password to connect with
+     * @param  string          $dbname The database name to connect to
      * @return boolean
      */
-    private function migrateDb($output)
+    private function migrateDb($output, $dbhost = null, $dbuser = null, $dbpass = null, $dbname = null)
     {
         //  Execute the migrate command, silently
         $cmd = $this->getApplication()->find('migrate');
 
-        $cmdInput  = new ArrayInput(array('command' => 'migrate'));
+        $cmdInput  = new ArrayInput(
+            array(
+                'command'  => 'migrate',
+                '--dbHost' => $dbhost,
+                '--dbUser' => $dbuser,
+                '--dbPass' => $dbpass,
+                '--dbName' => $dbname
+            )
+        );
+
         $cmdInput->setInteractive(false);
 
         $cmdOutput = new NullOutput();

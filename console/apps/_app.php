@@ -81,16 +81,27 @@ class CORE_NAILS_App extends Command
 
     /**
      * Connects to the database
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @param  string          $host   The database hsot to connect to
+     * @param  string          $user   The database user to connect with
+     * @param  string          $pass   The database password to connect with
+     * @param  string          $dbname The database name to connect to
      * @return boolean
      */
-    protected function dbConnect($output)
+    protected function dbConnect($output, $host = null, $user = null, $pass = null, $dbname = null)
     {
         //  Locate the database details
-        $host   = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost';
-        $user   = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : 'localuser';
-        $pass   = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : 'localpassword';
-        $dbname = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : 'nailsapp_main';
+        $host   = is_null($host) && defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : $host;
+        $user   = is_null($user) && defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : $user;
+        $pass   = is_null($pass) && defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : $pass;
+        $dbname = is_null($dbname) && defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : $dbname;
+
+        if (empty($dbname)) {
+
+            $output->writeln('');
+            $output->writeln('<error>Database Error:</error> Database name must be set.');
+            return false;
+        }
 
         if (!defined('NAILS_DB_PREFIX')) {
 
@@ -210,6 +221,10 @@ class CORE_NAILS_App extends Command
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Returns the index of the last inserted row
+     * @return int
+     */
     protected function dbInsertId()
     {
         try {
@@ -224,6 +239,11 @@ class CORE_NAILS_App extends Command
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Escapes a string to make it query safe
+     * @param  string $string The string to escape
+     * @return mixed          String on success, null on failure
+     */
     protected function dbEscape($string)
     {
         try {

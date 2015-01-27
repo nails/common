@@ -28,6 +28,34 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     {
         $this->setName('migrate');
         $this->setDescription('Runs database migration across all enabled modules');
+
+        $this->addOption(
+            'dbHost',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Host'
+        );
+
+        $this->addOption(
+            'dbUser',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database User'
+        );
+
+        $this->addOption(
+            'dbPass',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Password'
+        );
+
+        $this->addOption(
+            'dbName',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Name'
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -80,10 +108,45 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Connect to the Database
-        if (!$this->dbConnect($output)) {
+        //  Work out the DB credentials to use
+        $dbHost = $input->getOption('dbHost');
+        if (empty($dbHost)) {
+
+            //  Try the constant
+            $dbHost = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
+        }
+
+        $dbUser = $input->getOption('dbUser');
+        if (empty($dbUser)) {
+
+            //  Try the constant
+            $dbUser = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
+        }
+
+        $dbPass = $input->getOption('dbPass');
+        if (empty($dbPass)) {
+
+            //  Try the constant
+            $dbPass = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
+        }
+
+        $dbName = $input->getOption('dbName');
+        if (empty($dbName)) {
+
+            //  Try the constant
+            $dbName = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
+        }
+
+        //  Check we have a database to connect to
+        if (empty($dbName)) {
 
             return $this->abort($output, 2);
+        }
+
+        //  Connect to the Database
+        if (!$this->dbConnect($output, $dbHost, $dbUser, $dbPass, $dbName)) {
+
+            return $this->abort($output, 3);
         }
 
         //  Test the db
@@ -91,7 +154,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             $output->writeln('');
             $output->writeln('Database isn\'t ready for migrations.');
-            return $this->abort($output, 3);
+            return $this->abort($output, 4);
         }
 
         // --------------------------------------------------------------------------
@@ -202,7 +265,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         if (!$this->confirm('Continue?', true, $input, $output)) {
 
-            return $this->abort($output, 4);
+            return $this->abort($output, 5);
         }
 
         // --------------------------------------------------------------------------
@@ -282,7 +345,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             } else {
 
-                return $this->abort($output, 5);
+                return $this->abort($output, 8);
             }
 
             $curStep++;
@@ -480,6 +543,11 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Generates an array of files in a directory
+     * @param  string $dir The directory to analyse
+     * @return array
+     */
     private function mapDir($dir)
     {
         if (is_dir($dir)) {
@@ -515,17 +583,26 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
-    private function abort($output, $exitCode = 1)
+    /**
+     * Performs the abort functionality and returns the exit code
+     * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @param  integer $exitCode The exit code
+     * @return int
+     */
+    private function abort($output, $exitCode = 0)
     {
         $output->writeln('');
 
+        $colorOpen  = $exitCode === 0 ? '' : '<error>';
+        $colorClose = $exitCode === 0 ? '' : '</error>';
+
         if ($this->dbTransRunning) {
 
-            $output->writeln('<error>Rolling back Database</error>');
+            $output->writeln($colorOpen . 'Rolling back Database' . $colorClose);
             $this->dbTransactionRollback();
         }
 
-        $output->writeln('<error>Aborting migration</error>');
+        $output->writeln($colorOpen . 'Aborting migration' . $colorClose);
         $output->writeln('');
         return $exitCode;
     }
