@@ -26,7 +26,6 @@
         <meta charset="utf-8">
         <meta name="description" content="<?=!empty($page->seo->description) ? $page->seo->description : ''?>">
         <meta name="keywords" content="<?=!empty($page->seo->keywords) ? $page->seo->keywords : ''?>">
-        <link href="<?=NAILS_ASSETS_URL?>bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <?php
 
             $this->asset->output('css');
