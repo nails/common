@@ -440,12 +440,12 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     protected function findEnabledModules()
     {
         //  Look for modules
-        $modules = _NAILS_GET_AVAILABLE_MODULES();
+        $modules = _NAILS_GET_MODULES();
         $out     = array();
 
         foreach ($modules as $module) {
 
-            $out[] = $this->determineModuleState($module, 'vendor/' . $module . '/migrations/');
+            $out[] = $this->determineModuleState($module->name, $module->path . '/migrations/');
         }
 
         return array_filter($out);

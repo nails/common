@@ -48,6 +48,7 @@
 $route['default_controller'] = 'home/index';
 $route['404_override']       = 'system/render_404';
 
+$route['admin(.*)'] = 'admin/index$1';
 
 /*
 | -------------------------------------------------------------------------

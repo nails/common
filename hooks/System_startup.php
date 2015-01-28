@@ -203,14 +203,8 @@ class NAILS_System_startup
             $this->moduleLocations = array();
         }
 
-        // --------------------------------------------------------------------------
-
-        /**
-         * Set the module locations, by default we include the App's path and then
-         * follow it up with all known official Nails modules.
-         */
-
-        $modules = _NAILS_GET_POTENTIAL_MODULES();
+        //  Discover Nails modules
+        $modules = _NAILS_GET_MODULES();
 
         /**
          * Note: Key is full path, value is relative path from the application controllers
@@ -223,24 +217,23 @@ class NAILS_System_startup
         //  Nails Common should be included too
         $this->moduleLocations[FCPATH . 'vendor/nailsapp/common/'] = '../../vendor/nailsapp/common/';
 
-        //  Individual "official" Nails module locations
+        //  Discovered Nails modules
         foreach ($modules as $module) {
 
-            $this->moduleLocations[FCPATH . 'vendor/' . $module . '/'] = '../../vendor/' . $module . '/';
+            $this->moduleLocations[$module->path] = '../../vendor/' . $module->name . '/';
         }
 
         // --------------------------------------------------------------------------
 
         /**
          * This hook happens before the config class loads (but the config file has
-         * already been loaded).CI provides an interface to pass items to the config
+         * already been loaded). CI provides an interface to pass items to the config
          * file via the index.php file; we're going to leverage that here to set
          * the module locations.
          */
 
-        global $assign_to_config;
-
         //  Underscore casing is important
+        global $assign_to_config;
         $key = 'modules_locations';
 
         if (empty($assign_to_config)) {

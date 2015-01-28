@@ -35,6 +35,7 @@ class NAILS_Routes_model extends NAILS_Model
         }
 
         //  Default writers
+        $this->routeWriters['admin']   = array($this, 'routesAdmin');
         $this->routeWriters['sitemap'] = array($this, 'routesSitemap');
         $this->routeWriters['cms']     = array($this, 'routesCms');
         $this->routeWriters['shop']    = array($this, 'routesShop');
@@ -91,6 +92,26 @@ class NAILS_Routes_model extends NAILS_Model
     // --------------------------------------------------------------------------
 
     /**
+     * Get all Admin routes
+     * @return array
+     */
+    protected function routesAdmin()
+    {
+        $routes = array();
+
+        if (isModuleEnabled('nailsapp/module-admin')) {
+
+            $routes['//BEGIN ADMIN'] = '';
+            $routes['admin(.*)']     = 'admin/index$2';
+            $routes['//END ADMIN']   = '';
+        }
+
+        return $routes;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Get all Sitemap routes
      * @return array
      */
@@ -98,12 +119,12 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (isModuleEnabled('sitemap')) {
+        if (isModuleEnabled('nailsapp/module-sitemap')) {
 
             $this->load->model('sitemap/sitemap_model');
 
             $routes['//BEGIN SITEMAP'] = '';
-            $routes = $routes + $this->sitemap_model->get_routes();
+            $routes = $routes + $this->sitemap_model->getRoutes();
             $routes['//END SITEMAP'] = '';
         }
 
@@ -120,7 +141,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (isModuleEnabled('cms')) {
+        if (isModuleEnabled('nailsapp/module-cms')) {
 
             $routes['//BEGIN CMS'] = '';
 
@@ -180,7 +201,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (isModuleEnabled('shop')) {
+        if (isModuleEnabled('nailsapp/module-shop')) {
 
             $_settings = app_setting(NULL, 'shop', true);
 
@@ -208,7 +229,7 @@ class NAILS_Routes_model extends NAILS_Model
     {
         $routes = array();
 
-        if (isModuleEnabled('blog')) {
+        if (isModuleEnabled('nailsapp/module-blog')) {
 
             $this->load->model('blog/blog_model');
             $_blogs = $this->blog_model->get_all();

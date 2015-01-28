@@ -655,11 +655,11 @@ class CORE_NAILS_Controller extends MX_Controller {
         $_packages[] = NAILS_COMMON_PATH;
 
         //  Available Modules
-        $_available_modules = _NAILS_GET_AVAILABLE_MODULES();
+        $_available_modules = _NAILS_GET_MODULES();
 
         foreach ($_available_modules as $module) {
 
-            $_packages[] = FCPATH . 'vendor/' . $module . '/';
+            $_packages[] = $module->path;
         }
 
         //  The Application
@@ -693,25 +693,25 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         //  Module specific helpers
         //  CDN
-        if (isModuleEnabled('cdn')) {
+        if (isModuleEnabled('nailsapp/module-cdn')) {
 
             $_helpers[] = 'cdn';
         }
 
         //  Shop
-        if (isModuleEnabled('shop')) {
+        if (isModuleEnabled('nailsapp/module-shop')) {
 
             $_helpers[] = 'shop';
         }
 
         //  Blog
-        if (isModuleEnabled('blog')) {
+        if (isModuleEnabled('nailsapp/module-blog')) {
 
             $_helpers[] = 'blog';
         }
 
         //  CMS
-        if (isModuleEnabled('cms')) {
+        if (isModuleEnabled('nailsapp/module-cms')) {
 
             $_helpers[] = 'cms';
         }

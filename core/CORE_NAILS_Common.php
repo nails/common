@@ -10,31 +10,31 @@
  * @link
  */
 
-if (!function_exists('_NAILS_GET_POTENTIAL_MODULES')) {
+if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
     /**
-     * Fetch all the potentially available modules for this app
+     * Fetch all the Nails components which are installed
      * @return array
      */
-    function _NAILS_GET_POTENTIAL_MODULES()
+    function _NAILS_GET_COMPONENTS()
     {
         /**
-         * If we already know which modules are available then return that, save
+         * If we already know which Nails components are available then return that, save
          * the [small] overhead of working out the modules again and again.
          */
 
-        if (isset($GLOBALS['NAILS_POTENTIAL_MODULES'])) {
+        if (isset($GLOBALS['NAILS_COMPONENTS'])) {
 
-            return $GLOBALS['NAILS_POTENTIAL_MODULES'];
+            return $GLOBALS['NAILS_COMPONENTS'];
         }
 
         // --------------------------------------------------------------------------
 
-        $composer = @file_get_contents(NAILS_PATH . 'nails/composer.json');
+        $composer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
 
         if (empty($composer)) {
 
-            $message = 'Failed to discover potential modules; could not load composer.json';
+            $message = 'Failed to discover potential modules; could not load composer/installed.json';
 
             if (function_exists('_NAILS_ERROR')) {
 
@@ -47,11 +47,11 @@ if (!function_exists('_NAILS_GET_POTENTIAL_MODULES')) {
             }
         }
 
-        $composer = json_decode($composer);
+        $composer = @json_decode($composer);
 
-        if (empty($composer->extra->nails->modules)) {
+        if (empty($composer)) {
 
-            $message = 'Failed to discover potential modules; could not decode composer.json';
+            $message = 'Failed to discover potential modules; could not decode composer/installed.json';
 
             if (function_exists('_NAILS_ERROR')) {
 
@@ -66,16 +66,26 @@ if (!function_exists('_NAILS_GET_POTENTIAL_MODULES')) {
 
         $out = array();
 
-        foreach ($composer->extra->nails->modules as $vendor => $modules) {
+        foreach ($composer as $package) {
 
-            foreach ($modules as $module) {
+            if (isset($package->extra->nails)) {
 
-                $out[] = $vendor . '/' . $module;
+                $temp              = new stdClass();
+                $temp->name        = $package->name;
+                $temp->description = $package->description;
+                $temp->homepage    = $package->homepage;
+                $temp->authors     = $package->authors;
+                $temp->path        = FCPATH . 'vendor/' . $package->name . '/';
+                $temp->moduleName  = !empty($package->extra->nails->moduleName) ? $package->extra->nails->moduleName : null;
+                $temp->type        = !empty($package->extra->nails->type) ? $package->extra->nails->type : null;
+                $temp->subType     = !empty($package->extra->nails->subType) ? $package->extra->nails->subType : null;
+
+                $out[] = $temp;
             }
         }
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS_POTENTIAL_MODULES'] = $out;
+        $GLOBALS['NAILS_COMPONENTS'] = $out;
 
         // --------------------------------------------------------------------------
 
@@ -83,41 +93,39 @@ if (!function_exists('_NAILS_GET_POTENTIAL_MODULES')) {
     }
 }
 
-// --------------------------------------------------------------------------
-
-if (!function_exists('_NAILS_GET_AVAILABLE_MODULES')) {
+if (!function_exists('_NAILS_GET_MODULES')) {
 
     /**
-     * Fetch the available modules for this app
+     * Fetch all the Nails modules which are installed
      * @return array
      */
-    function _NAILS_GET_AVAILABLE_MODULES()
+    function _NAILS_GET_MODULES()
     {
         /**
-         * If we already know which modules are available then return that, save
+         * If we already know which Nails modules are available then return that, save
          * the [small] overhead of working out the modules again and again.
          */
 
-        if (isset($GLOBALS['NAILS_AVAILABLE_MODULES'])) {
+        if (isset($GLOBALS['NAILS_MODULES'])) {
 
-            return $GLOBALS['NAILS_AVAILABLE_MODULES'];
+            return $GLOBALS['NAILS_MODULES'];
         }
 
         // --------------------------------------------------------------------------
 
-        $potential = _NAILS_GET_POTENTIAL_MODULES();
-        $out       = array();
+        $components = _NAILS_GET_COMPONENTS();
+        $out        = array();
 
-        foreach ($potential as $module) {
+        foreach ($components as $package) {
 
-            if (is_dir('vendor/' . $module)) {
+            if ($package->type == 'module') {
 
-                $out[] = $module;
+                $out[] = $package;
             }
         }
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS_AVAILABLE_MODULES'] = $out;
+        $GLOBALS['NAILS_MODULES'] = $out;
 
         // --------------------------------------------------------------------------
 
@@ -125,47 +133,106 @@ if (!function_exists('_NAILS_GET_AVAILABLE_MODULES')) {
     }
 }
 
-// --------------------------------------------------------------------------
-
-if (!function_exists('_NAILS_GET_UNAVAILABLE_MODULES')) {
+if (!function_exists('_NAILS_GET_SKINS')) {
 
     /**
-     * Fetch the unavailable modules for this app
+     * Fetch all the Nails skins of a particular subType which are installed
      * @return array
      */
-    function _NAILS_GET_UNAVAILABLE_MODULES()
+    function _NAILS_GET_SKINS($subType)
     {
         /**
-         * If we already know which modules are available then return that, save
+         * If we already know which Nails skins are available then return that, save
          * the [small] overhead of working out the modules again and again.
          */
 
-        if (isset($GLOBALS['NAILS_UNAVAILABLE_MODULES'])) {
+        if (isset($GLOBALS['NAILS_SKINS'][$subType])) {
 
-            return $GLOBALS['NAILS_UNAVAILABLE_MODULES'];
+            return $GLOBALS['NAILS_SKINS'][$subType];
         }
 
         // --------------------------------------------------------------------------
 
-        $potential = _NAILS_GET_POTENTIAL_MODULES();
-        $out       = array();
+        $components = _NAILS_GET_COMPONENTS();
+        $out        = array();
 
-        foreach ($potential as $module) {
+        foreach ($components as $package) {
 
-            if (!is_dir('vendor/' . $module)) {
+            if ($package->type == 'skin' && $package->subType == $subType) {
 
-                $out[] = $module;
+                $out[] = $package;
             }
         }
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS_UNAVAILABLE_MODULES'] = $out;
+        if (isset($GLOBALS['NAILS_SKINS'])) {
+
+            return $GLOBALS['NAILS_SKINS'] = array();
+        }
+
+        $GLOBALS['NAILS_SKINS'][$subType] = $out;
 
         // --------------------------------------------------------------------------
 
         return $out;
     }
 }
+
+if (!function_exists('_NAILS_GET_DRIVERS')) {
+
+    /**
+     * Fetch all the Nails drivers of a particular subType which are installed
+     * @return array
+     */
+    function _NAILS_GET_DRIVERS($subType)
+    {
+        /**
+         * If we already know which Nails skins are available then return that, save
+         * the [small] overhead of working out the modules again and again.
+         */
+
+        if (isset($GLOBALS['NAILS_DRIVERS'][$subType])) {
+
+            return $GLOBALS['NAILS_DRIVERS'][$subType];
+        }
+
+        // --------------------------------------------------------------------------
+
+        $components = _NAILS_GET_COMPONENTS();
+        $out        = array();
+
+        foreach ($components as $package) {
+
+            if ($package->type == 'driver' && $package->subType == $subType) {
+
+                $out[] = $package;
+            }
+        }
+
+        //  Save as a $GLOBAL for next time
+        if (isset($GLOBALS['NAILS_DRIVERS'])) {
+
+            return $GLOBALS['NAILS_DRIVERS'] = array();
+        }
+
+        $GLOBALS['NAILS_DRIVERS'][$subType] = $out;
+
+        // --------------------------------------------------------------------------
+
+        return $out;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // --------------------------------------------------------------------------
 
@@ -177,24 +244,33 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
      */
     function _NAILS_MIN_PHP_VERSION()
     {
-        $modules    = array('nailsapp/common') + _NAILS_GET_AVAILABLE_MODULES();
-        $minVersion = 0;
+        //  First check nailsapp/nails
+        $composer   = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        $composer   = @json_decode($composer);
+        $minVersion = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
 
-        foreach ($modules as $m) {
+        //  Next, check nailsapp/common
+        $composer         = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        $composer   = @json_decode($composer);
+        $minVersionCommon = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
 
-            $composer = @file_get_contents('vendor/' . $m . '/composer.json');
+        if (version_compare($minVersionCommon, $minVersion, '>')) {
 
-            if (!empty($composer)) {
+            $minVersion = $minVersionCommon;
+        }
 
-                $composer = json_decode($composer);
+        //  Now we check all the components
+        $components = _NAILS_GET_COMPONENTS();
 
-                if (!empty($composer->extra->nails->minPhpVersion)) {
+        foreach ($components as $component) {
 
-                    if (version_compare($composer->extra->nails->minPhpVersion, $minVersion, '>')) {
+            $composer            = @file_get_contents($component->path . 'composer.json');
+            $composer            = @json_decode($composer);
+            $minVersionComponent = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
 
-                        $minVersion = $composer->extra->nails->minPhpVersion;
-                    }
-                }
+            if (version_compare($minVersionComponent, $minVersion, '>')) {
+
+                $minVersion = $minVersionComponent;
             }
         }
 
@@ -207,17 +283,20 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
 if (!function_exists('isModuleEnabled')) {
 
     /**
-     * Handy way of determining whether a module is enabled or not in the app's config
-     * @param  string $module the name of the module to check
+     * Handy way of determining whether a module is available
+     * @param  string $moduleName The name of the module to check
      * @return boolean
      */
-    function isModuleEnabled($module)
+    function isModuleEnabled($moduleName)
     {
-        $potential = _NAILS_GET_AVAILABLE_MODULES();
+        $modules = _NAILS_GET_MODULES();
 
-        if (array_search('nailsapp/module-' . $module, $potential) !== false) {
+        foreach ($modules AS $module) {
 
-            return true;
+            if ($moduleName = $module->name) {
+
+                return true;
+            }
         }
 
         return false;
