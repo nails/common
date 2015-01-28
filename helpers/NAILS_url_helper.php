@@ -67,7 +67,7 @@ if (!function_exists('redirect'))
             $uri = site_url($uri);
         }
 
-        switch($method)
+        switch ($method)
         {
             case 'refresh':
 

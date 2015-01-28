@@ -242,7 +242,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         //  Configure whether errors are shown or no
         if (function_exists('ini_set')) {
 
-            switch(strtoupper(ENVIRONMENT)) {
+            switch (strtoupper(ENVIRONMENT)) {
 
                 case 'PRODUCTION' :
 

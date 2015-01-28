@@ -14,13 +14,12 @@ if ( ! function_exists( 'calculate_age' ) )
 	function calculate_age( $y, $m, $d, $death_y = NULL, $death_m = NULL, $death_d = NULL )
 	{
 		//	Only calculate to a date which isn't today if all values are supplied
-		if ( NULL === $death_y  || NULL === $death_m || NULL === $death_d ) :
+		if (is_null($death_y) || is_null($death_m) || is_null($death_d)) {
 
 			$death_y = date( 'Y' );
 			$death_m = date( 'm' );
 			$death_d = date( 'd' );
-
-		endif;
+		}
 
 		// --------------------------------------------------------------------------
 
@@ -63,11 +62,11 @@ if ( ! function_exists( 'dropdown_years' ) )
 	function dropdown_years( $field_name, $start_year = NULL, $end_year = NULL, $selected = NULL, $placeholder = NULL )
 	{
 		/*** defaults ***/
-		$start_year = NULL === $start_year	? date( 'Y' )		: $start_year;
-		$end_year	= NULL === $end_year	? $start_year - 10	: $end_year;
+		$start_year = is_null($start_year)	? date( 'Y' )		: $start_year;
+		$end_year	= is_null($end_year)	? $start_year - 10	: $end_year;
 
 		/*** the current year ***/
-		$selected = NULL ===$selected ? date( 'Y' ) : $selected;
+		$selected = is_null($selected) ? date( 'Y' ) : $selected;
 
 		/*** range of years ***/
 		$r = range( $start_year, $end_year );
@@ -140,7 +139,7 @@ if ( ! function_exists( 'dropdown_months' ) )
 		$months = $short === FALSE ? $months_long : $months_short;
 
 		/*** current month ***/
-		$selected = NULL === $selected ? date( 'n' ) : $selected;
+		$selected = is_null($selected) ? date( 'n' ) : $selected;
 
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 
@@ -183,7 +182,7 @@ if ( ! function_exists( 'dropdown_days' ) )
 		$r = range( 1, 31 );
 
 		/*** current day ***/
-		$selected = NULL === $selected ? date( 'j' ) : $selected;
+		$selected = is_null($selected) ? date( 'j' ) : $selected;
 
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 
@@ -226,7 +225,7 @@ if ( ! function_exists( 'dropdown_hours' ) )
 		$r = range( 0, 23 );
 
 		/*** current hour ***/
-		$selected = NULL === $selected ? date( 'G' ) : $selected;
+		$selected = is_null($selected) ? date( 'G' ) : $selected;
 
 		$select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
 		foreach ($r as $hour) :
@@ -261,7 +260,7 @@ if ( ! function_exists( 'dropdown_minutes' ) )
 	function dropdown_minutes( $field_name, $range = NULL, $selected = NULL )
 	{
 		/*** array of mins ***/
-		$minutes = NULL === $range ? range( 0, 59 ) : $range ;
+		$minutes = is_null($range) ? range( 0, 59 ) : $range ;
 
 		$selected = in_array( $selected, $minutes ) ? $selected : 0;
 

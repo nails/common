@@ -562,11 +562,10 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 		$_low	= isset( $_range[0] ) ? (float) $_range[0] : NULL;
 		$_high	= isset( $_range[1] ) ? (float) $_range[1] : NULL;
 
-		if ( NULL === $_low || NULL === $_high ) :
+		if (is_null($_low) || is_null($_high)) {
 
-			return TRUE;
-
-		endif;
+			return true;
+		}
 
 		if ( (float) $str >= $_low && (float) $str <= $_high ) :
 
