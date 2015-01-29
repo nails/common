@@ -40,9 +40,9 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $this->setDescription('Configures or reconfigures a Nails site');
 
         $this->addArgument(
-            'moduleName',
+            'componentName',
             InputArgument::OPTIONAL,
-            'If a module name is provided it will be added to composer.json if valid'
+            'If a component name is provided it will be added to composer.json if valid'
         );
     }
 
@@ -56,11 +56,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $module = $input->getArgument('moduleName');
+        $component = $input->getArgument('componentName');
 
-        if (!empty($module)) {
+        if (!empty($component)) {
 
-            return $this->executeModuleInstaller($module, $input, $output);
+            return $this->executeComponentInstaller($component, $input, $output);
 
         } else {
 
@@ -125,83 +125,132 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             // --------------------------------------------------------------------------
 
-            //  Can we install modules? We need exec() and composer to be available
+            //  Can we install components? We need exec() and composer to be available
             $execAvailable     = function_exists('exec');
             $composerAvailable = (bool) $this->detectComposerBin();
 
             if ($execAvailable && $composerAvailable) {
 
                 $output->writeln('');
-                $output->writeln('<info>Modules</info>');
+                $output->writeln('<info>Nails Components</info>');
 
-                $question = 'Would you like to define modules to enable now?';
-                $installModules = $this->confirm($question, false, $input, $output);
+                $question = 'Would you like to define components to enable now?';
+                $installComponents = $this->confirm($question, false, $input, $output);
 
-                $installTheseModules = array();
+                //  Show a list of already installed components
+                $installedComponents = _NAILS_GET_COMPONENTS();
 
-                while ($installModules) {
+                //  I know the variables are almost the same name. Just to confuse ya. >_<
+                if ($installComponents) {
 
-                    $module = $this->requestModule('', $input, $output);
+                    if ($installedComponents) {
 
-                    if (is_array($module)) {
+                        $output->writeln('');
+                        $output->writeln('The following components are already installed:');
+                        $output->writeln('');
 
-                        $installTheseModules[$module[0]] = $module[1];
+                        foreach ($installedComponents as $component) {
+
+                            $output->writeln(' - <info>' . $component->name . '</info>');
+                        }
+
+                        $output->writeln('');
+                    }
+                }
+
+                $installTheseComponents = array();
+
+                while ($installComponents) {
+
+                    $component = $this->requestComponent(null, $input, $output);
+
+                    if (is_array($component)) {
+
+                        $installTheseComponents[$component[0]] = $component[1];
                     }
 
                     $output->writeln('');
-                    $question = 'Would you like to enable another module?';
-                    $installModules = $this->confirm($question, false, $input, $output);
+                    $question = 'Would you like to enable another component?';
+                    $installComponents = $this->confirm($question, false, $input, $output);
                 }
             }
 
             // --------------------------------------------------------------------------
 
-            $output->writeln('');
-            $output->writeln('<info>Users</info>');
+            //  Only ask to create users if nailsapp/module-auth is installed (or will be installed)
+            $isAuthModuleAvailable = false;
 
-            $question   = 'Would you like to create some users?';
-            $createUser = $this->confirm($question, false, $input, $output);
-            $users      = array();
+            foreach ($installedComponents AS $component) {
 
-            $userFields = array();
-            $userField['first_name'] = 'First Name';
-            $userField['last_name']  = 'Surname';
-            $userField['email']      = 'Email Address';
-            $userField['username']   = 'Username';
-            $userField['password']   = 'Password';
+                if ($component->name == 'nailsapp/module-auth') {
 
-            if ($createUser) {
+                    $isAuthModuleAvailable = true;
+                    break;
+                }
+            }
 
-                do {
+            //  Not instaled, will it be installed?
+            if (!$isAuthModuleAvailable) {
 
-                    $temp       = array();
-                    $userCount  = count($users) + 1;
+                foreach ($installTheseComponents as $componentName => $componentVersion) {
 
-                    $output->writeln('');
-                    $output->writeln('User #' . $userCount);
+                    if ($componentName == 'nailsapp/module-auth') {
 
-                    foreach ($userField as $key => $label) {
-
-                        do {
-
-                            $temp[$key] = $this->ask($label, '', $input, $output);
-
-                        } while (empty($temp[$key]));
+                        $isAuthModuleAvailable = true;
+                        break;
                     }
+                }
+            }
 
-                    $users[] = $temp;
+            if ($isAuthModuleAvailable) {
 
-                    $output->writeln('');
+                $output->writeln('');
+                $output->writeln('<info>Users</info>');
 
-                    $question = 'Create another user?';
-                    $createUser = $this->confirm($question, false, $input, $output);
+                $question   = 'Would you like to create some users?';
+                $createUser = $this->confirm($question, false, $input, $output);
+                $users      = array();
 
-                    if (!$createUser) {
+                $userFields = array();
+                $userField['first_name'] = 'First Name';
+                $userField['last_name']  = 'Surname';
+                $userField['email']      = 'Email Address';
+                $userField['username']   = 'Username';
+                $userField['password']   = 'Password';
+
+                if ($createUser) {
+
+                    do {
+
+                        $temp       = array();
+                        $userCount  = count($users) + 1;
 
                         $output->writeln('');
-                    }
+                        $output->writeln('User #' . $userCount);
 
-                } while ($createUser);
+                        foreach ($userField as $key => $label) {
+
+                            do {
+
+                                $temp[$key] = $this->ask($label, '', $input, $output);
+
+                            } while (empty($temp[$key]));
+                        }
+
+                        $users[] = $temp;
+
+                        $output->writeln('');
+
+                        $question = 'Create another user?';
+                        $createUser = $this->confirm($question, false, $input, $output);
+
+                        if (!$createUser) {
+
+                            $output->writeln('');
+                        }
+
+                    } while ($createUser);
+                }
             }
 
             // --------------------------------------------------------------------------
@@ -237,23 +286,23 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
             }
 
-            //  Install modules
-            if (!empty($installTheseModules)) {
+            //  Install components
+            if (!empty($installTheseComponents)) {
 
                 $output->writeln('');
 
-                if (count($installTheseModules) > 1) {
+                if (count($installTheseComponents) > 1) {
 
-                    $output->writeln('The following modules will be installed:');
+                    $output->writeln('The following components will be installed:');
 
                 } else {
 
-                    $output->writeln('The following module will be installed:');
+                    $output->writeln('The following component will be installed:');
                 }
 
-                foreach ($installTheseModules as $moduleName => $moduleVersion) {
+                foreach ($installTheseComponents as $componentName => $componentVersion) {
 
-                    $output->writeln(' - <comment>' . $moduleName . ':' . $moduleVersion . '</comment>');
+                    $output->writeln(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>');
                 }
             }
 
@@ -262,7 +311,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('Migrate the database');
 
             //  Add users
-            if ($users) {
+            if (!empty($users)) {
 
                 $output->writeln('');
 
@@ -286,7 +335,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 $curStep   = 1;
                 $numSteps  = 1; //  app.php
                 $numSteps += 1; //  deploy.php
-                $numSteps += !empty($installTheseModules)? 1 : 0;
+                $numSteps += !empty($installTheseComponents)? 1 : 0;
                 $numSteps += 1; //  migrate DB.php
                 $numSteps += !empty($users)? 1 : 0;
 
@@ -317,15 +366,15 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 }
                 $curStep++;
 
-                //  Install Modules
-                if (!empty($installTheseModules)) {
+                //  Install Components
+                if (!empty($installTheseComponents)) {
 
-                    $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Installing modules</info>...');
+                    $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Installing components</info>...');
 
-                    foreach ($installTheseModules as $moduleName => $moduleVersion) {
+                    foreach ($installTheseComponents as $componentName => $componentVersion) {
 
-                        $output->write(' - <comment>' . $moduleName . ':' . $moduleVersion . '</comment>... ');
-                        $this->installModule($moduleName, $moduleVersion, $output);
+                        $output->write(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>... ');
+                        $this->installComponent($componentName, $componentVersion, $output);
                     }
                     $curStep++;
                 }
@@ -350,7 +399,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Creating Users</info>...');
 
-                    if ($this->dbConnect($output, $dbHost, $dbUser, $dbPassword, $dbName)) {
+                    if ($this->dbConnect($output, $dbHost, $dbUser, $dbPass, $dbName)) {
 
                         foreach ($users as $user) {
 
@@ -407,26 +456,31 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Executes the Nails Module Installer
+     * Executes the Nails Component Installer
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
      */
-    protected function executeModuleInstaller($module, InputInterface $input, OutputInterface $output)
+    protected function executeComponentInstaller($component, InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>----------------------</info>');
-        $output->writeln('<info>Nails Module Installer</info>');
-        $output->writeln('<info>----------------------</info>');
+        $output->writeln('<info>-------------------------</info>');
+        $output->writeln('<info>Nails Component Installer</info>');
+        $output->writeln('<info>-------------------------</info>');
 
         // --------------------------------------------------------------------------
 
-        //  Get the Module
-        $module = $this->requestModule($module, $input, $output);
+        //  Get the Component
+        $component = $this->requestComponent($component, $input, $output);
 
-        //  confirm with user
+        if (!$component) {
+
+            return $this->abort($output, 0);
+        }
+
+        //  Confirm with user
         $output->writeln('');
         $output->writeln('<info>I\'m about to do the following:</info>');
-        $output->writeln(' - Install <info>' . $module[0] . ':' . $module[1] . '</info>');
+        $output->writeln(' - Install <info>' . $component[0] . ':' . $component[1] . '</info>');
         $output->writeln(' - Migrate the database');
         $output->writeln('');
 
@@ -437,8 +491,8 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             //  Attempt to install
             $output->writeln('');
-            $output->write('<comment>[1/2]</comment> Installing <info>' . $module[0] . ':' . $module[1] . '</info>... ');
-            if (!$this->installModule($module[0], $module[1], $output)) {
+            $output->write('<comment>[1/2]</comment> Installing <info>' . $component[0] . ':' . $component[1] . '</info>... ');
+            if (!$this->installComponent($component[0], $component[1], $output)) {
 
                 return $this->abort($output, 3);
             }
@@ -504,9 +558,9 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Any constants defined by the modules?
-        $moduleVars = $this->getConstantsFromModules('APP', $vars);
-        $vars = array_merge($vars, $moduleVars);
+        //  Any constants defined by the components?
+        $componentVars = $this->getConstantsFromComponents('APP', $vars);
+        $vars = array_merge($vars, $componentVars);
 
         // --------------------------------------------------------------------------
 
@@ -607,9 +661,9 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Any constants defined by the modules?
-        $moduleVars = $this->getConstantsFromModules('DEPLOY', $vars);
-        $vars = array_merge($vars, array_filter($moduleVars));
+        //  Any constants defined by the components?
+        $componentVars = $this->getConstantsFromComponents('DEPLOY', $vars);
+        $vars = array_merge($vars, array_filter($componentVars));
 
         // --------------------------------------------------------------------------
 
@@ -698,28 +752,28 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Finds all constants defined by the enabled modules for either app.php or deploy.php
+     * Finds all constants defined by the enabled components for either app.php or deploy.php
      * @param  string $type The type of constant (either APP or DEPLOY)
      * @param  array  $vars The existing variables to check against (so only new variables are returned)
      * @return array
      */
-    private function getConstantsFromModules($type, $vars = array())
+    private function getConstantsFromComponents($type, $vars = array())
     {
-        //  @TODO: Look for modules
+        //  @TODO: Look for components
         return array();
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Finds constants for a particular module
-     * @param  string $module The name of the module to look at
+     * Finds constants for a particular component
+     * @param  string $component The name of the component to look at
      * @param  string $type   The type of constant (either APP or DEPLOY)
      * @return array
      */
-    private function getConstantsFromModule($module, $type)
+    private function getConstantsFromComponent($component, $type)
     {
-        //  @TODO: Analyse module
+        //  @TODO: Analyse component
         return array();
     }
 
@@ -820,17 +874,17 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Installs a particular module
-     * @param  string          $moduleName    The name of the module to install
-     * @param  string          $moduleVersion The version of the module to install
-     * @param  OutputInterface $output        The Output Interface provided by Symfony
+     * Installs a particular component
+     * @param  string          $componentName    The name of the component to install
+     * @param  string          $componentVersion The version of the component to install
+     * @param  OutputInterface $output           The Output Interface provided by Symfony
      * @return boolean
      */
-    private function installModule($moduleName, $moduleVersion, $output)
+    private function installComponent($componentName, $componentVersion, $output)
     {
         $composerBin = $this->detectComposerBin();
 
-        exec($composerBin . ' require ' . $moduleName . ':' . $moduleVersion, $execOutput, $execReturn);
+        exec($composerBin . ' require ' . $componentName . ':' . $componentVersion, $execOutput, $execReturn);
 
         if ($execReturn !== 0) {
 
@@ -1088,65 +1142,86 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Asks the suer which module they'd like to install and validates it against
+     * Asks the suer which component they'd like to install and validates it against
      * the Nails Components repository.
-     * @param  string          $moduleName The module name to install
-     * @param  InputInterface  $input      The Input Interface provided by Symfony
-     * @param  OutputInterface $output     The Output Interface provided by Symfony
+     * @param  string          $componentName The component name to install
+     * @param  InputInterface  $input         The Input Interface provided by Symfony
+     * @param  OutputInterface $output        The Output Interface provided by Symfony
      * @return array
      */
-    private function requestModule($moduleName, $input, $output)
+    private function requestComponent($componentName, $input, $output)
     {
-        //  Get the module
+        //  Get the component
         do {
 
-            if ($moduleName) {
+            //  If a component name has been specified, check to see if it's valid
+            if (!empty($componentName)) {
 
-                $isValidModule = $this->isValidModule($moduleName, $output);
+                /**
+                 * A component name has been given, check it out against the Nails
+                 * Component repository to see if it's valid.
+                 */
+
+                $isValidComponent = $this->isValidComponent($componentName, $output);
+
+            } elseif (empty($componentName) && !is_null($componentName)) {
+
+                /**
+                 * If the component name is empty, but not null then it means the user hit
+                 * enter without typing anything, skip out of this so they're not stuck in
+                 * a loop
+                 */
+
+                return false;
 
             } else {
 
-                $isValidModule = false;
+                /**
+                 * Set isValidComponent to false so that the loop continues.
+                 */
+
+                $isValidComponent = false;
             }
 
-            if (!$isValidModule) {
+            if (!$isValidComponent) {
 
                 $output->writeln('');
-                $question = 'Enter the module name you\'d like to install';
-                $moduleName = $this->ask($question, '', $input, $output);
+                $question = 'Enter the component name you\'d like to install';
+                $componentName = $this->ask($question, '', $input, $output);
+
             } else {
 
-                $moduleName    = $isValidModule;
-                $isValidModule = true;
+                $componentName    = $isValidComponent;
+                $isValidComponent = true;
             }
 
-        } while (!$isValidModule);
+        } while (!$isValidComponent);
 
         //  Already installed?
         $installed         = _NAILS_GET_COMPONENTS();
-        $moduleIsInstalled = false;
+        $componentIsInstalled = false;
 
-        foreach ($installed as $module) {
+        foreach ($installed as $component) {
 
-            if ($moduleName == $module->name) {
+            if ($componentName == $component->name) {
 
-                $moduleIsInstalled = true;
+                $componentIsInstalled = true;
                 break;
             }
         }
 
-        if (!$moduleIsInstalled) {
+        if (!$componentIsInstalled) {
 
             //  Get the version to install
-            $question = 'Enter the version you require for <info>' . $moduleName . '</info>';
-            $moduleVersion = $this->ask($question, 'dev-develop', $input, $output);
+            $question = 'Enter the version you require for <info>' . $componentName . '</info>';
+            $componentVersion = $this->ask($question, 'dev-develop', $input, $output);
 
-            return array($moduleName, $moduleVersion);
+            return array($componentName, $componentVersion);
 
         } else {
 
             $output->writeln('');
-            $output->writeln('<info>' . $moduleName. '</info> is already installed.');
+            $output->writeln('<info>' . $componentName. '</info> is already installed.');
 
             return false;
         }
@@ -1155,20 +1230,20 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
-     * Searches Nails components Repository for the module name.
-     * @param  string           $moduleName The module's name
+     * Searches Nails components Repository for the component name.
+     * @param  string           $componentName The component's name
      * @param  OutputInterface  $output     The Output Interface provided by Symfony
-     * @return mixed                        String on success (module's full name), false on failure
+     * @return mixed                        String on success (component's full name), false on failure
      */
-    protected function isValidModule($moduleName, $output)
+    protected function isValidComponent($componentName, $output)
     {
-        $result = @file_get_contents($this->componentEndpoint . 'api/search?term=' . urlencode($moduleName));
+        $result = @file_get_contents($this->componentEndpoint . 'api/search?term=' . urlencode($componentName));
 
         if (empty($result)) {
 
             $output->writeln('');
             $output->writeln('<error>ERROR</error>');
-            $output->writeln('Query to ' . $this->componentEndpoint . ' failed. Could not validate module.');
+            $output->writeln('Query to ' . $this->componentEndpoint . ' failed. Could not validate component.');
             $output->writeln('');
 
             return false;
@@ -1193,7 +1268,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         } elseif (count($result->results) > 1) {
 
             $output->writeln('');
-            $output->writeln('More than 1 component for <info>' . $moduleName . '</info>. Did you mean?</comment>');
+            $output->writeln('More than 1 component for <info>' . $componentName . '</info>. Did you mean:</comment>');
 
             foreach($result->results as $component) {
 

@@ -439,6 +439,12 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
      */
     protected function findEnabledModules()
     {
+        //  Unset the global so we get a fresh look at what's available
+        if (isset($GLOBALS['NAILS_COMPONENTS'])) {
+
+            unset($GLOBALS['NAILS_COMPONENTS']);
+        }
+
         //  Look for modules
         $modules = _NAILS_GET_MODULES();
         $out     = array();

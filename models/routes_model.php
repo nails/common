@@ -102,7 +102,7 @@ class NAILS_Routes_model extends NAILS_Model
         if (isModuleEnabled('nailsapp/module-admin')) {
 
             $routes['//BEGIN ADMIN'] = '';
-            $routes['admin(.*)']     = 'admin/index$2';
+            $routes['admin(.*)']     = 'admin/adminRouter/index$1';
             $routes['//END ADMIN']   = '';
         }
 
