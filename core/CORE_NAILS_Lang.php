@@ -91,7 +91,7 @@ class CORE_NAILS_Lang extends MX_Lang {
 
         /**
          * Confession. I'm not entirely sure how/why this works. Dumping out debug statements confuses
-         * me as they don't make sense, but the right lang files seem to be laoded. Sorry, future Pablo.
+         * me as they don't make sense, but the right lang files seem to be loaded. Sorry, future Pablo.
          **/
 
         if ($path === false) {
