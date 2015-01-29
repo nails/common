@@ -293,7 +293,7 @@ if (!function_exists('isModuleEnabled')) {
 
         foreach ($modules AS $module) {
 
-            if ($moduleName = $module->name) {
+            if ($moduleName == $module->name) {
 
                 return true;
             }

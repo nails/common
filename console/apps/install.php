@@ -9,10 +9,10 @@ use Symfony\Component\Console\Output\NullOutput;
 
 require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
-//  Define the nails path so CORE_NAILS_Common doesn't freak out
-if (!defined('NAILS_PATH')) {
+//  Define FCPATH so CORE_NAILS_Common doesn't freak out
+if (!defined('FCPATH')) {
 
-    define('NAILS_PATH', 'vendor/nailsapp/');
+    define('FCPATH', './');
 }
 
 require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
@@ -26,6 +26,10 @@ class CI_Model {}
 
 class CORE_NAILS_Install extends CORE_NAILS_App
 {
+    protected $componentEndpoint = 'http://components.nailsapp.co.uk/';
+
+    // --------------------------------------------------------------------------
+
     /**
      * Configures the app
      * @return void
@@ -138,7 +142,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 while ($installModules) {
 
                     $module = $this->requestModule('', $input, $output);
-                    $installTheseModules[$module[0]] = $module[1];
+
+                    if (is_array($module)) {
+
+                        $installTheseModules[$module[0]] = $module[1];
+                    }
 
                     $output->writeln('');
                     $question = 'Would you like to enable another module?';
@@ -885,6 +893,14 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Creates a new user account using group_id 1; i.e the default super user group
+     * @param  array           $user       The user's details
+     * @param  array           $appVars    The application vars
+     * @param  array           $deployVars The deploy vars
+     * @param  OutputInterface $output     The Output Interface provided by Symfony
+     * @return mixed                       boolean on success, false on failure
+     */
     public function createUser($user, $appVars, $deployVars, $output)
     {
         //  @TODO: Test username/email for duplicates
@@ -1022,6 +1038,12 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Performs the abort functionality and returns the exit code
+     * @param  OutputInterface $output   The Output Interface provided by Symfony
+     * @param  integer         $exitCode The exit code
+     * @return int
+     */
     private function abort($output, $exitCode = 1)
     {
         $output->writeln('');
@@ -1039,6 +1061,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Works out which binary to use for composer
+     * @return string
+     */
     private function detectComposerBin()
     {
         //  Detect composer
@@ -1061,73 +1087,137 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Asks the suer which module they'd like to install and validates it against
+     * the Nails Components repository.
+     * @param  string          $moduleName The module name to install
+     * @param  InputInterface  $input      The Input Interface provided by Symfony
+     * @param  OutputInterface $output     The Output Interface provided by Symfony
+     * @return array
+     */
     private function requestModule($moduleName, $input, $output)
     {
         //  Get the module
         do {
 
-            $isValidModule = $this->isValidModule($moduleName);
+            if ($moduleName) {
+
+                $isValidModule = $this->isValidModule($moduleName, $output);
+
+            } else {
+
+                $isValidModule = false;
+            }
 
             if (!$isValidModule) {
-
-                if ($moduleName) {
-
-                    //  Tell user their module name isn't valid
-                    $output->writeln('');
-                    $output->writeln('Sorry, <info>' . $moduleName . '</info> is not a valid Nails module.');
-
-                    //  Search to see if what they said vaguely matches any module name
-                    $searchResult = $this->searchModules($moduleName);
-
-                    if ($searchResult) {
-
-                        $output->writeln('');
-                        $output->writeln('Did you mean any of the following:');
-
-                        foreach ($searchResult as $resultModuleName) {
-
-                            $output->writeln(' - <comment>' . $resultModuleName . '</comment>');
-                        }
-                    }
-                }
 
                 $output->writeln('');
                 $question = 'Enter the module name you\'d like to install';
                 $moduleName = $this->ask($question, '', $input, $output);
+            } else {
+
+                $moduleName    = $isValidModule;
+                $isValidModule = true;
             }
 
         } while (!$isValidModule);
 
-        //  Get the version to install
-        $question = 'Enter the version you require for <info>' . $moduleName . '</info>';
-        $moduleVersion = $this->ask($question, 'dev-develop', $input, $output);
+        //  Already installed?
+        $installed         = _NAILS_GET_COMPONENTS();
+        $moduleIsInstalled = false;
 
-        return array($moduleName, $moduleVersion);
-    }
+        foreach ($installed as $module) {
 
-    // --------------------------------------------------------------------------
+            if ($moduleName == $module->name) {
 
-    protected function isValidModule($moduleName)
-    {
-        $potentialModules = _NAILS_GET_POTENTIAL_MODULES();
-        return in_array($moduleName, $potentialModules);
-    }
-
-    // --------------------------------------------------------------------------
-
-    protected function searchModules($moduleName)
-    {
-        $potentialModules = _NAILS_GET_POTENTIAL_MODULES();
-        $results          = array();
-
-        foreach ($potentialModules as $module) {
-
-            if (strpos($module, $moduleName) !== FALSE) {
-
-                $results[] = $module;
+                $moduleIsInstalled = true;
+                break;
             }
         }
 
-        return $results;
+        if (!$moduleIsInstalled) {
+
+            //  Get the version to install
+            $question = 'Enter the version you require for <info>' . $moduleName . '</info>';
+            $moduleVersion = $this->ask($question, 'dev-develop', $input, $output);
+
+            return array($moduleName, $moduleVersion);
+
+        } else {
+
+            $output->writeln('');
+            $output->writeln('<info>' . $moduleName. '</info> is already installed.');
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Searches Nails components Repository for the module name.
+     * @param  string           $moduleName The module's name
+     * @param  OutputInterface  $output     The Output Interface provided by Symfony
+     * @return mixed                        String on success (module's full name), false on failure
+     */
+    protected function isValidModule($moduleName, $output)
+    {
+        $result = @file_get_contents($this->componentEndpoint . 'api/search?term=' . urlencode($moduleName));
+
+        if (empty($result)) {
+
+            $output->writeln('');
+            $output->writeln('<error>ERROR</error>');
+            $output->writeln('Query to ' . $this->componentEndpoint . ' failed. Could not validate module.');
+            $output->writeln('');
+
+            return false;
+        }
+
+        $result = json_decode($result);
+
+        if (empty($result)) {
+
+            $output->writeln('');
+            $output->writeln('<error>ERROR</error>');
+            $output->writeln('Failed to decode search results from ' . $this->componentEndpoint);
+            $output->writeln('');
+
+            return false;
+        }
+
+        if (empty($result->results)) {
+
+            return false;
+
+        } elseif (count($result->results) > 1) {
+
+            $output->writeln('');
+            $output->writeln('More than 1 component for <info>' . $moduleName . '</info>. Did you mean?</comment>');
+
+            foreach($result->results as $component) {
+
+                $url = $component->homepage;
+                $url = !$url ? $component->repository : $url;
+
+                $output->writeln('');
+                $output->writeln(' - <info>' . $component->name . '</info>');
+
+                if (!empty($component->description)) {
+
+                    $output->writeln('   ' . $component->description);
+                }
+
+                if (!empty($url)) {
+
+                    $output->writeln('   ' . $url);
+                }
+            }
+            return false;
+
+        } else {
+
+            return $result->results[0]->name;
+        }
     }
 }

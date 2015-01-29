@@ -9,10 +9,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 require_once 'vendor/nailsapp/common/console/apps/_app.php';
 
-//  Define the nails path so CORE_NAILS_Common doesn't freak out
-if (!defined('NAILS_PATH')) {
+//  Define FCPATH so CORE_NAILS_Common doesn't freak out
+if (!defined('FCPATH')) {
 
-    define('NAILS_PATH', 'vendor/nailsapp/');
+    define('FCPATH', './');
 }
 
 require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
@@ -585,8 +585,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     /**
      * Performs the abort functionality and returns the exit code
-     * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @param  integer $exitCode The exit code
+     * @param  OutputInterface $output   The Output Interface provided by Symfony
+     * @param  integer         $exitCode The exit code
      * @return int
      */
     private function abort($output, $exitCode = 0)
