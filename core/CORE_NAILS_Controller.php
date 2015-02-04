@@ -330,10 +330,11 @@ class CORE_NAILS_Controller extends MX_Controller {
                 //  Load the traits
                 require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_Traits.php';
 
-                //  Set the package path (so helpers are loaded correctly)
+                //  Set the package path (so helpers and libraries are loaded correctly)
                 $this->load->add_package_path(NAILS_COMMON_PATH);
 
                 //  Load the helpers
+                $this->load->library('encrypt');
                 $this->load->helper('app_setting');
                 $this->load->helper('tools');
 
