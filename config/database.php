@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 /*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
@@ -38,8 +38,8 @@
 | the active record class
 */
 
-$active_group = 'default';
-$active_record = TRUE;
+$active_group  = 'default';
+$active_record = true;
 
 $db['default']['hostname'] = DEPLOY_DB_HOST;
 $db['default']['username'] = DEPLOY_DB_USERNAME;
@@ -47,16 +47,12 @@ $db['default']['password'] = DEPLOY_DB_PASSWORD;
 $db['default']['database'] = DEPLOY_DB_DATABASE;
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
-$db['default']['pconnect'] = TRUE;
+$db['default']['pconnect'] = true;
 $db['default']['db_debug'] = DEPLOY_DB_DEBUG;
 $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = DEPLOY_CACHE_DIR;
-$db['default']['char_set'] = 'utf8';
-$db['default']['dbcollat'] = 'utf8_general_ci';
+$db['default']['char_set'] = 'utf8mb4';
+$db['default']['dbcollat'] = 'utf8mb4_unicode_ci';
 $db['default']['swap_pre'] = '';
-$db['default']['autoinit'] = TRUE;
-$db['default']['stricton'] = FALSE;
-
-
-/* End of file database.php */
-/* Location: ./application/config/database.php */
+$db['default']['autoinit'] = true;
+$db['default']['stricton'] = false;
