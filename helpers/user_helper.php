@@ -63,7 +63,7 @@ if ( ! function_exists( 'active_user' ) )
 
 
 /**
- * user_has_permission()
+ * userHasPermission()
  *
  * Alias to user->has_permission(); method
  *
@@ -72,9 +72,9 @@ if ( ! function_exists( 'active_user' ) )
  * @param	string	$user	A user ID or object to check against, defaults to active_user()
  * @return	object
  */
-if ( ! function_exists( 'user_has_permission' ) )
+if ( ! function_exists( 'userHasPermission' ) )
 {
-	function user_has_permission( $permission, $user = NULL )
+	function userHasPermission( $permission, $user = NULL )
 	{
 		$_usr_obj = get_userobject();
 

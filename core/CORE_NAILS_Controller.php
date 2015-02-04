@@ -524,7 +524,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     protected function instantiateDateTime()
     {
         //  Define default date format
-        $_default = $this->datetime_model->get_date_format_default();
+        $_default = $this->datetime_model->getDateFormatDefault();
 
         if (empty($_default)) {
 
@@ -536,7 +536,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $_default->format);
 
         //  Define default time format
-        $_default = $this->datetime_model->get_time_format_default();
+        $_default = $this->datetime_model->getTimeFormatDefault();
 
         if (empty($_default)) {
 
@@ -561,10 +561,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         } else {
 
-            $_timezone_user = $this->datetime_model->get_timezone_default();
+            $_timezone_user = $this->datetime_model->getTimezoneDefault();
         }
 
-        $this->datetime_model->set_timezones('UTC', $_timezone_user);
+        $this->datetime_model->setTimezones('UTC', $_timezone_user);
 
         // --------------------------------------------------------------------------
 
@@ -572,7 +572,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         $_format_date = active_user('datetime_format_date') ? active_user('datetime_format_date') : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
         $_format_time = active_user('datetime_format_time') ? active_user('datetime_format_time') : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
-        $this->datetime_model->set_formats($_format_date, $_format_time);
+        $this->datetime_model->setFormats($_format_date, $_format_time);
 
         // --------------------------------------------------------------------------
 

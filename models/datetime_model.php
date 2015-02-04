@@ -17,6 +17,9 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Constructs the model and laods the date helper
+     */
     public function __construct()
     {
         parent::__construct();
@@ -24,45 +27,60 @@ class NAILS_Datetime_model extends NAILS_Model
     }
 
     /**
-     * DATE FORMAT
-     * The Following methods deal with formatting dates
+     * Returns the default date format object
+     * @return stdClass
      */
-
-    public function get_date_format_default()
+    public function getDateFormatDefault()
     {
         $default    = $this->config->item('datetime_format_date_default');
-        $dateFormat = $this->get_date_format_by_slug($default);
+        $dateFormat = $this->getDateFormatBySlug($default);
 
         return !empty($dateFormat) ? $dateFormat : false;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_date_format_default_slug()
+    /**
+     * Returns the default date format's slug
+     * @return string
+     */
+    public function getDateFormatDefaultSlug()
     {
-        $default = $this->get_date_format_default();
+        $default = $this->getDateFormatDefault();
         return empty($default->slug) ? false : $default->slug;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_date_format_default_label()
+    /**
+     * Returns the default date format's label
+     * @return string
+     */
+    public function getDateFormatDefaultLabel()
     {
-        $default = $this->get_date_format_default();
+        $default = $this->getDateFormatDefault();
         return empty($default->label) ? false : $default->label;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_date_format_default_format()
+    /**
+     * Returns the default date format's format
+     * @return string
+     */
+    public function getDateFormatDefaultFormat()
     {
-        $default = $this->get_date_format_default();
+        $default = $this->getDateFormatDefault();
         return empty($default->format) ? false : $default->format;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_date_format()
+    /**
+     * Returns all the defined date format objects
+     * @return array
+     */
+    public function getAllDateFormat()
     {
         $formats = $this->config->item('datetime_format_date');
 
@@ -76,10 +94,14 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_all_date_format_flat()
+    /**
+     * Returns all the date format objects as a flat array
+     * @return array
+     */
+    public function getAllDateFormatFlat()
     {
         $out     = array();
-        $formats = $this->get_all_date_format();
+        $formats = $this->getAllDateFormat();
 
         foreach ($formats as $format) {
 
@@ -91,53 +113,75 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_date_format_by_slug($slug)
+    /**
+     * Looks for a date format by it's slug
+     * @param  string $slug The slug to search for
+     * @return mixed        stdClass on success, false on failure
+     */
+    public function getDateFormatBySlug($slug)
     {
-        $formats = $this->get_all_date_format();
+        $formats = $this->getAllDateFormat();
 
         return !empty($formats[$slug]) ? $formats[$slug] : false;
     }
 
-    /**
-     * TIME FORMAT
-     * The Following methods deal with formatting times
-     */
+    // --------------------------------------------------------------------------
 
-    public function get_time_format_default()
+    /**
+     * Returns the default time format object
+     * @return stdClass
+     */
+    public function getTimeFormatDefault()
     {
         $default    = $this->config->item('datetime_format_time_default');
-        $timeFormat = $this->get_time_format_by_slug($default);
+        $timeFormat = $this->getTimeFormatBySlug($default);
 
         return !empty($timeFormat) ? $timeFormat : false;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_time_format_default_slug()
+    /**
+     * Returns the default time format's slug
+     * @return string
+     */
+    public function getTimeFormatDefaultSlug()
     {
-        $default = $this->get_time_format_default();
+        $default = $this->getTimeFormatDefault();
         return empty($default->slug) ? false : $default->slug;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_time_format_default_label()
+    /**
+     * Returns the default time format's label
+     * @return string
+     */
+    public function getTimeFormatDefaultLabel()
     {
-        $default = $this->get_time_format_default();
+        $default = $this->getTimeFormatDefault();
         return empty($default->label) ? false : $default->label;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_time_format_default_format()
+    /**
+     * Returns the default time format's format
+     * @return string
+     */
+    public function getTimeFormatDefaultFormat()
     {
-        $default = $this->get_time_format_default();
+        $default = $this->getTimeFormatDefault();
         return empty($default->format) ? false : $default->format;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_time_format()
+    /**
+     * Returns all the defined time format objects
+     * @return array
+     */
+    public function getAllTimeFormat()
     {
         $formats = $this->config->item('datetime_format_time');
 
@@ -145,7 +189,7 @@ class NAILS_Datetime_model extends NAILS_Model
 
             foreach ($formats as $format) {
 
-                $time = strtotime($this->convert_datetime(time(), $this->timezone_user));
+                $time = strtotime($this->convertDatetime(time(), $this->timezone_user));
                 $format->example = date($format->format, $time);
             }
         }
@@ -155,10 +199,14 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_all_time_format_flat()
+    /**
+     * Returns all the time format objects as a flat array
+     * @return array
+     */
+    public function getAllTimeFormatFlat()
     {
         $out     = array();
-        $formats = $this->get_all_time_format();
+        $formats = $this->getAllTimeFormat();
 
         foreach ($formats as $format) {
 
@@ -170,31 +218,43 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_time_format_by_slug($slug)
-    {
-        $formats = $this->get_all_time_format();
-        return !empty($formats[$slug]) ? $formats[$slug] : false;
-    }
-
     /**
-     * GENERIC FORMAT METHODS
+     * Looks for a time format by it's slug
+     * @param  string $slug The slug to search for
+     * @return mixed        stdClass on success, false on failure
      */
-
-    public function set_formats($dateSlug, $timeSlug)
+    public function getTimeFormatBySlug($slug)
     {
-        $this->set_date_format($dateSlug);
-        $this->set_time_format($timeSlug);
+        $formats = $this->getAllTimeFormat();
+        return !empty($formats[$slug]) ? $formats[$slug] : false;
     }
 
     // --------------------------------------------------------------------------
 
-    public function set_date_format($slug)
+    /**
+     * Set both the date and the time format at the same time
+     * @param string $dateSlug The date format's slug
+     * @param string $timeSlug The time format's slug
+     */
+    public function setFormats($dateSlug, $timeSlug)
     {
-        $dateFormat = $this->get_date_format_by_slug($slug);
+        $this->setDateFormat($dateSlug);
+        $this->setTimeFormat($timeSlug);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the date format to use, uses default if slug cannot be found
+     * @param string $slug The date format's slug
+     */
+    public function setDateFormat($slug)
+    {
+        $dateFormat = $this->getDateFormatBySlug($slug);
 
         if (empty($dateFormat)) {
 
-            $dateFormat = $this->get_date_format_default();
+            $dateFormat = $this->getDateFormatDefault();
         }
 
         $this->_format_date = $dateFormat->format;
@@ -202,23 +262,30 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function set_time_format($slug)
+    /**
+     * Set the time format to use, uses default if slug cannot be found
+     * @param string $slug The time format's slug
+     */
+    public function setTimeFormat($slug)
     {
-        $timeFormat = $this->get_time_format_by_slug($slug);
+        $timeFormat = $this->getTimeFormatBySlug($slug);
 
         if (empty($timeFormat)) {
 
-            $timeFormat = $this->get_time_format_default();
+            $timeFormat = $this->getTimeFormatDefault();
         }
 
         $this->_format_time = $timeFormat->format;
     }
 
-    /**
-     * USER METHODS
-     */
+    // --------------------------------------------------------------------------
 
-    public function user_date($timestamp = null, $formatDate = null)
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date preferences.
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userDate($timestamp = null)
     {
         //  Has a specific timestamp been given?
         if (is_null($timestamp)) {
@@ -250,8 +317,59 @@ class NAILS_Datetime_model extends NAILS_Model
 
         // --------------------------------------------------------------------------
 
-        //  Has a date/time format been supplied? If so overwrite the defaults
-        $formatDate = is_null($formatDate) ? $this->_format_date : $formatDate;
+        //  Create the new DateTime object
+        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
+
+        // --------------------------------------------------------------------------
+
+        //  If the user's timezone is different from the Nails. timezone then set it so.
+        if ($this->timezone_nails != $this->timezone_user) {
+
+            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Return the formatted date
+        return $datetime->format($this->_format_date);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date preferences.
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userDateMySql($timestamp = null)
+    {
+        //  Has a specific timestamp been given?
+        if (is_null($timestamp)) {
+
+            $timestamp = date('Y-m-d');
+
+        } else {
+
+            //  Are we dealing with a UNIX timestamp or a datetime?
+            if (!is_numeric($timestamp)) {
+
+                if (!$timestamp || $timestamp == '0000-00-00') {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d', strtotime($timestamp));
+
+            } else {
+
+                if (!$timestamp) {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d', $timestamp);
+            }
+        }
 
         // --------------------------------------------------------------------------
 
@@ -269,12 +387,17 @@ class NAILS_Datetime_model extends NAILS_Model
         // --------------------------------------------------------------------------
 
         //  Return the formatted date
-        return $datetime->format($formatDate);
+        return $datetime->format('Y-m-d');
     }
 
     // --------------------------------------------------------------------------
 
-    public function user_rdate($timestamp = null, $format = 'date')
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userReverseDate($timestamp = null)
     {
         //  Has a specific timestamp been given?
         if (is_null($timestamp)) {
@@ -312,12 +435,17 @@ class NAILS_Datetime_model extends NAILS_Model
         // --------------------------------------------------------------------------
 
         //  Return the formatted date
-        return $format == 'date' ? $datetime->format('Y-m-d') : $datetime->format('Y-m-d H:i:s');
+        return $datetime->format('Y-m-d');
     }
 
     // --------------------------------------------------------------------------
 
-    public function user_datetime($timestamp = null, $formatDate = null, $formatTime = null)
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userReverseDateMySql($timestamp = null)
     {
         //  Has a specific timestamp been given?
         if (is_null($timestamp)) {
@@ -326,89 +454,18 @@ class NAILS_Datetime_model extends NAILS_Model
 
         } else {
 
+            $format = $format == 'date' ? 'Y-m-d' : 'Y-m-d H:i:s';
+
             //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
+            if (!is_numeric($timestamp)) {
 
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
+                $timestamp = date($format, strtotime($timestamp));
 
             } else {
 
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
+                $timestamp = date($format, $timestamp);
             }
         }
-
-        // --------------------------------------------------------------------------
-
-        //  Has a date/time format been supplied? If so overwrite the defaults
-        $formatDate = is_null($formatDate) ? $this->_format_date : $formatDate;
-        $formatTime = is_null($formatTime) ? $this->_format_time : $formatTime;
-
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format($formatDate . ' ' . $formatTime);
-    }
-
-    // --------------------------------------------------------------------------
-
-    public function user_rdatetime($timestamp = null, $formatDate = null, $formatTime = null)
-    {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Has a date/time format been supplied? If so overwrite the defaults
-        $formatDate = is_null($formatDate) ? $this->_format_date : $formatDate;
-        $formatTime = is_null($formatTime) ? $this->_format_time : $formatTime;
 
         // --------------------------------------------------------------------------
 
@@ -426,14 +483,238 @@ class NAILS_Datetime_model extends NAILS_Model
         // --------------------------------------------------------------------------
 
         //  Return the formatted date
-        return $datetime->format($formatDate . ' ' . $formatTime);
+        return $datetime->format('Y-m-d');
     }
 
-    /**
-     * TIMEZONE METHODS
-     */
+    // --------------------------------------------------------------------------
 
-    public function get_timezone_default()
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userDatetime($timestamp = null)
+    {
+        //  Has a specific timestamp been given?
+        if (is_null($timestamp)) {
+
+            $timestamp = date('Y-m-d H:i:s');
+
+        } else {
+
+            //  Are we dealing with a UNIX timestamp or a datetime?
+            if ($timestamp && !is_numeric($timestamp)) {
+
+                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
+
+            } else {
+
+                if (!$timestamp) {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', $timestamp);
+            }
+        }
+        // --------------------------------------------------------------------------
+
+        //  Create the new DateTime object
+        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
+
+        // --------------------------------------------------------------------------
+
+        //  If the user's timezone is different from the Nails. timezone then set it so.
+        if ($this->timezone_nails != $this->timezone_user) {
+
+            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Return the formatted date
+        return $datetime->format($this->_format_date . ' ' . $this->_format_time);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userDatetimeMySql($timestamp = null)
+    {
+        //  Has a specific timestamp been given?
+        if (is_null($timestamp)) {
+
+            $timestamp = date('Y-m-d H:i:s');
+
+        } else {
+
+            //  Are we dealing with a UNIX timestamp or a datetime?
+            if ($timestamp && !is_numeric($timestamp)) {
+
+                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
+
+            } else {
+
+                if (!$timestamp) {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', $timestamp);
+            }
+        }
+        // --------------------------------------------------------------------------
+
+        //  Create the new DateTime object
+        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
+
+        // --------------------------------------------------------------------------
+
+        //  If the user's timezone is different from the Nails. timezone then set it so.
+        if ($this->timezone_nails != $this->timezone_user) {
+
+            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Return the formatted date
+        return $datetime->format('Y-m-d H:i:s');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userReverseDatetime($timestamp = null)
+    {
+        //  Has a specific timestamp been given?
+        if (is_null($timestamp)) {
+
+            $timestamp = date('Y-m-d H:i:s');
+
+        } else {
+
+            //  Are we dealing with a UNIX timestamp or a datetime?
+            if ($timestamp && !is_numeric($timestamp)) {
+
+                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
+
+            } else {
+
+                if (!$timestamp) {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', $timestamp);
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Create the new DateTime object
+        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
+
+        // --------------------------------------------------------------------------
+
+        //  If the user's timezone is different from the Nails. timezone then set it so.
+        if ($this->timezone_nails != $this->timezone_user) {
+
+            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Return the formatted date
+        return $datetime->format($this->_format_date . ' ' . $this->_format_time);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    public function userReverseDatetimeMySql($timestamp = null)
+    {
+        //  Has a specific timestamp been given?
+        if (is_null($timestamp)) {
+
+            $timestamp = date('Y-m-d H:i:s');
+
+        } else {
+
+            //  Are we dealing with a UNIX timestamp or a datetime?
+            if ($timestamp && !is_numeric($timestamp)) {
+
+                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
+
+            } else {
+
+                if (!$timestamp) {
+
+                    return '';
+                }
+
+                $timestamp = date('Y-m-d H:i:s', $timestamp);
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Create the new DateTime object
+        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
+
+        // --------------------------------------------------------------------------
+
+        //  If the user's timezone is different from the Nails. timezone then set it so.
+        if ($this->timezone_nails != $this->timezone_user) {
+
+            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Return the formatted date
+        return $datetime->format('Y-m-d H:i:s');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return's the default timezone
+     * @return string
+     */
+    public function getTimezoneDefault()
     {
         $default = $this->config->item('datetime_timezone_default');
 
@@ -449,29 +730,46 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function set_timezones($tzNails, $tzUser)
+    /**
+     * Sets the Nails and User timezones simultaneously
+     * @param string $tzNails The Nails timezone
+     * @param string $tzUser  The User's timezone
+     */
+    public function setTimezones($tzNails, $tzUser)
     {
-        $this->set_nails_timezone($tzNails);
-        $this->set_user_timezone($tzUser);
+        $this->setNailsTimezone($tzNails);
+        $this->setUserTimezone($tzUser);
     }
 
     // --------------------------------------------------------------------------
 
-    public function set_nails_timezone($tz)
+    /**
+     * Set the Nails timezone
+     * @param string $tz The timezone to set
+     */
+    public function setNailsTimezone($tz)
     {
         $this->timezone_nails = $tz;
     }
 
     // --------------------------------------------------------------------------
 
-    public function set_user_timezone($tz)
+    /**
+     * Set the User's timezone
+     * @param string $tz The timezone to set
+     */
+    public function setUserTimezone($tz)
     {
         $this->timezone_user = $tz;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_timezone()
+    /**
+     * Returns a multi-dimensional array of supported timezones
+     * @return array
+     */
+    public function getAllTimezone()
     {
         //  Hat-tip to: https://gist.github.com/serverdensity/82576
         $zones     = DateTimeZone::listIdentifiers();
@@ -517,9 +815,13 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_all_timezone_flat()
+    /**
+     * Returns all the supported timezones as a flat array
+     * @return array
+     */
+    public function getAllTimezoneFlat()
     {
-        $locations = $this->get_all_timezone();
+        $locations = $this->getAllTimezone();
         $out       = array();
 
         foreach ($locations as $key => $value) {
@@ -544,11 +846,18 @@ class NAILS_Datetime_model extends NAILS_Model
         return $out;
     }
 
-    /**
-     * OTHER METHODS
-     */
+    // --------------------------------------------------------------------------
 
-    public static function nice_time($date = false, $tense = true, $optBadMsg = null, $greaterOneWeek = null, $lessTenMins = null)
+    /**
+     * Converts a datetime into a human friendly relative string
+     * @param  mixed   $date           The timestamp to convert
+     * @param  boolean $tense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param  string  $optBadMsg      The message to show if a bad timestamp is supplied
+     * @param  string  $greaterOneWeek The message to show if the timestanmp is greater than one week away
+     * @param  string  $lessTenMins    The message to show if the timestamp is less than ten minutes away
+     * @return string
+     */
+    public static function niceTime($date = false, $tense = true, $optBadMsg = null, $greaterOneWeek = null, $lessTenMins = null)
     {
         if (empty($date) || $date == '0000-00-00') {
 
@@ -632,7 +941,7 @@ class NAILS_Datetime_model extends NAILS_Model
             return $greaterOneWeek;
         }
 
-        // If it's less than 20 seconds, return 'Just now'
+        // If it's less than 20 seconds, return 'a moment ago'
         if (is_null($lessTenMins) && substr($periods[$j], 0, 6) == 'second' && $difference <=20) {
 
             return 'a moment ago';
@@ -666,7 +975,12 @@ class NAILS_Datetime_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public static function get_code_from_timezone($timezone)
+    /**
+     * Get the timezone code from the timezone string
+     * @param  string $timezone The timezone, e.g. Europe/London
+     * @return mixed            String on success, false on failure
+     */
+    public static function getCodeFromTimezone($timezone)
     {
         $abbreviations = DateTimeZone::listAbbreviations();
 
@@ -680,13 +994,20 @@ class NAILS_Datetime_model extends NAILS_Model
                 }
             }
         }
+
+        return false;
     }
 
-    /**
-     * CONVERSION METHODS
-     */
+    // --------------------------------------------------------------------------
 
-    public static function convert_datetime($timestamp, $toTz, $fromTz = 'UTC')
+    /**
+     * Arbitarially convert a timestamp between timezones
+     * @param  mixed  $timestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @param  string $toTz      The timezone to convert to
+     * @param  string $fromTz    The timezone to convert from
+     * @return string
+     */
+    public static function convertDatetime($timestamp, $toTz, $fromTz = 'UTC')
     {
         //  Has a specific timestamp been given?
         if (is_null($timestamp)) {

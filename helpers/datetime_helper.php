@@ -1,161 +1,139 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-/**
- * Calls the datetime_model's user_date() method.
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string to format
- * @param	string $format_date A date format string recognised by the DateTime class
- * @return	string
- */
-if ( ! function_exists( 'user_date' ) )
+if (!function_exists('userDate'))
 {
-	function user_date( $timestamp = NULL, $format_date = NULL )
-	{
-		return get_instance()->datetime_model->user_date( $timestamp, $format_date );
-	}
+    /**
+     * Calls the datetime_model's userDate() method.
+     * @param   mixed  $timestamp  Either a UNIX timestamp or valid strtotime() string to format
+     * @param   string $formatDate A date format string recognised by the DateTime class
+     * @return  string
+     */
+    function userDate($timestamp = null, $formatDate = null)
+    {
+        return get_instance()->datetime_model->userDate($timestamp, $formatDate);
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Quickly formats a date into a MySQL date, but in the user's timezone
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string to format
- * @return	string
- */
-if ( ! function_exists( 'user_mysql_date' ) )
+if (!function_exists('userMysqlDate'))
 {
-	function user_mysql_date( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_date( $timestamp, 'Y-m-d' );
-	}
+    /**
+     * Quickly formats a date into a MySQL date, but in the user's timezone
+     * @param  mixed  $timestamp Either a UNIX timestamp or valid strtotime() string to format
+     * @return string
+     */
+    function userMysqlDate($timestamp = null)
+    {
+        return get_instance()->datetime_model->userDate($timestamp, 'Y-m-d');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-if ( ! function_exists( 'user_mysql_rdate' ) )
+if (!function_exists('userMysqlReverseDate'))
 {
-	function user_mysql_rdate( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_rdate( $timestamp, 'Y-m-d' );
-	}
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userMysqlReverseDate($timestamp = null)
+    {
+        return get_instance()->datetime_model->userReverseDate($timestamp, 'Y-m-d');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Calls the datetime_model's user_rdate() method, with the format as date
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string
- * @return	string
- */
-if ( ! function_exists( 'user_rdate' ) )
+if (!function_exists('userReverseDate'))
 {
-	function user_rdate( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_rdate( $timestamp, 'date' );
-	}
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userReverseDate($timestamp = null)
+    {
+        return get_instance()->datetime_model->userReverseDate($timestamp, 'date');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Calls the datetime_model's user_datetime() method.
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string to format
- * @param	string $format_date A date format string recognised by the DateTime class
- * @param	string $format_time A time format string recognised by the DateTime class
- * @return	string
- */
-if ( ! function_exists( 'user_datetime' ) )
+if (!function_exists('userDatetime'))
 {
-	function user_datetime( $timestamp = NULL, $format_date = NULL, $format_time = NULL )
-	{
-		return get_instance()->datetime_model->user_datetime( $timestamp, $format_date, $format_time );
-	}
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userDatetime($timestamp = null, $formatDate = null, $formatTime = null)
+    {
+        return get_instance()->datetime_model->userDatetime($timestamp, $formatDate, $formatTime);
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Quickly formats a date into a MySQL datetime, but in the user's timezone
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string to format
- * @return	string
- */
-if ( ! function_exists( 'user_mysql_datetime' ) )
+if (!function_exists('userMysqlDatetime'))
 {
-	function user_mysql_datetime( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_datetime( $timestamp, 'Y-m-d', 'H:i:s' );
-	}
+    /**
+     * Converts a timestamp in the Nails timezone to the User's timezone and format's as Y-m-d H:i:s
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userMysqlDatetime($timestamp = null)
+    {
+        return get_instance()->datetime_model->userDatetime($timestamp, 'Y-m-d', 'H:i:s');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-if ( ! function_exists( 'user_mysql_rdatetime' ) )
+if (!function_exists('userMysqlReverseDatetime'))
 {
-	function user_mysql_rdatetime( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_rdatetime( $timestamp, 'Y-m-d', 'H:i:s' );
-	}
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userMysqlReverseDatetime($timestamp = null)
+    {
+        return get_instance()->datetime_model->userReverseDatetime($timestamp, 'Y-m-d', 'H:i:s');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Calls the datetime_model's user_rdate() method, with the format as datetime
- *
- * @access	public
- * @param	mixed $timestamp Either a UNIX timestamp or valid strtotime() string
- * @return	string
- */
-if ( ! function_exists( 'user_rdatetime' ) )
+if (!function_exists('userReverseDatetime'))
 {
-	function user_rdatetime( $timestamp = NULL )
-	{
-		return get_instance()->datetime_model->user_rdate( $timestamp, 'datetime' );
-	}
+    /**
+     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d H:i:s
+     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @return string
+     */
+    function userReverseDatetime($timestamp = null)
+    {
+        return get_instance()->datetime_model->userReverseDate($timestamp, 'datetime');
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
-
-/**
- * Generates a human friendly time reference
- * TODO: implement language files into this
- * TODO: add N/A message (optional) - if you pass 0000-00-00 at the moment it returns BAD DATE SUPPLIED
- *
- * @access	public
- * @param	string
- * @param	boolean
- * @param	string
- * @return	string
- */
-if ( ! function_exists( 'nice_time' ) )
+if (!function_exists('nice_time'))
 {
-	function nice_time( $date = FALSE, $tense = TRUE, $opt_bad_msg = NULL, $greater_1_week = NULL, $less_10_mins = NULL )
-	{
-		return get_instance()->datetime_model->nice_time( $date, $tense, $opt_bad_msg, $greater_1_week, $less_10_mins );
-	}
+    /**
+     * Converts a datetime into a human friendly relative string
+     * @param  mixed   $date           The timestamp to convert
+     * @param  boolean $tense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param  string  $optBadMsg      The message to show if a bad timestamp is supplied
+     * @param  string  $greaterOneWeek The message to show if the timestanmp is greater than one week away
+     * @param  string  $lessTenMins    The message to show if the timestamp is less than ten minutes away
+     * @return string
+     */
+    function niceTime($date = false, $tense = true, $optBadMsg = null, $greaterOneWeek = null, $LessTenMins = null)
+    {
+        return get_instance()->datetime_model->niceTime($date, $tense, $optBadMsg, $greaterOneWeek, $LessTenMins);
+    }
 }
