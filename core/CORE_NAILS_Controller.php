@@ -234,7 +234,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     {
         /**
          * Configure how verbose PHP is; Everything except E_STRICT and E_ERROR;
-         * we'll let the errorHandler pickup fatal erros
+         * we'll let the errorHandler pickup fatal errors
          */
 
         error_reporting(E_ALL ^ E_STRICT ^ E_ERROR);
@@ -247,13 +247,13 @@ class CORE_NAILS_Controller extends MX_Controller {
                 case 'PRODUCTION' :
 
                     //  Suppress all errors on production
-                    ini_set('display_errors', '0');
+                    ini_set('display_errors', false);
                     break;
 
                 default :
 
                     //  Show errors everywhere else
-                    ini_set('display_errors', '1');
+                    ini_set('display_errors', true);
                     break;
             }
         }

@@ -32,6 +32,23 @@ interface CORE_NAILS_ErrorHandler_Interface
 
 class CORE_NAILS_ErrorHandler
 {
+    protected static $levels = array(
+                        E_ERROR           =>  'Error',
+                        E_WARNING         =>  'Warning',
+                        E_PARSE           =>  'Parsing Error',
+                        E_NOTICE          =>  'Notice',
+                        E_CORE_ERROR      =>  'Core Error',
+                        E_CORE_WARNING    =>  'Core Warning',
+                        E_COMPILE_ERROR   =>  'Compile Error',
+                        E_COMPILE_WARNING =>  'Compile Warning',
+                        E_USER_ERROR      =>  'User Error',
+                        E_USER_WARNING    =>  'User Warning',
+                        E_USER_NOTICE     =>  'User Notice',
+                        E_STRICT          =>  'Runtime Notice'
+                    );
+
+    // --------------------------------------------------------------------------
+
     /**
      * Sets up the appropriate error handling driver
      */
@@ -113,8 +130,29 @@ class CORE_NAILS_ErrorHandler
      */
     public static function error($errno, $errstr, $errfile, $errline)
     {
-        //  Let this bubble to the normal Codeigniter error handler
-        return _exception_handler($errno, $errstr, $errfile, $errline);
+        //  Don't clog the logs up with strict notices
+        if ($errno === E_STRICT) {
+
+            return;
+        }
+
+        //  Should we show this error?
+        if ((bool)ini_get('display_errors')) {
+
+            $severity = isset(self::$levels[$errno]) ? self::$levels[$errno] : 'Unknown';
+            $message  = $errstr;
+            $filepath = $errfile;
+            $line     = $errline;
+
+            include FCPATH . APPPATH . 'errors/error_php.php';
+        }
+
+        //  Show we log the item?
+        if (config_item('log_threshold') != 0) {
+
+            $errMsg = $errstr . ' (' . $errfile . ':' . $errline . ')';
+            log_message('error', $errMsg, true);
+        }
     }
 
     // --------------------------------------------------------------------------
