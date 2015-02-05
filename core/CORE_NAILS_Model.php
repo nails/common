@@ -423,11 +423,10 @@ class CORE_NAILS_Model extends CI_Model
 
         $results = $this->db->get($table)->result();
 
-        for ($i = 0; $i < count($results); $i++) :
+        for ($i = 0; $i < count($results); $i++) {
 
             $this->_format_object($results[$i]);
-
-        endfor;
+        }
 
         return $results;
     }
@@ -754,7 +753,7 @@ class CORE_NAILS_Model extends CI_Model
      **/
     protected function _format_object(&$obj)
     {
-        //  Extend this method to format the returned objects
+        //  extended this method to format the returned objects
 
         // --------------------------------------------------------------------------
 

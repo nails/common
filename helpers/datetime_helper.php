@@ -1,127 +1,68 @@
 <?php
 
-if (!function_exists('userDate'))
+if (!function_exists('toUserDate'))
 {
     /**
-     * Calls the datetime_model's userDate() method.
-     * @param   mixed  $timestamp  Either a UNIX timestamp or valid strtotime() string to format
-     * @param   string $formatDate A date format string recognised by the DateTime class
-     * @return  string
-     */
-    function userDate($timestamp = null, $formatDate = null)
-    {
-        return get_instance()->datetime_model->userDate($timestamp, $formatDate);
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('userMysqlDate'))
-{
-    /**
-     * Quickly formats a date into a MySQL date, but in the user's timezone
-     * @param  mixed  $timestamp Either a UNIX timestamp or valid strtotime() string to format
+     * Convert a date timestamp to the User's timezone from the Nails timezone
+     * @param  mixed  $timestamp The timestamp to convert
+     * @param  string $format    The format of the timestamp to return, defaults to User's date preference
      * @return string
      */
-    function userMysqlDate($timestamp = null)
+    function toUserDate($timestamp = null, $format = null)
     {
-        return get_instance()->datetime_model->userDate($timestamp, 'Y-m-d');
+        return get_instance()->datetime_model->toUserDate($timestamp, $format);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('userMysqlReverseDate'))
+if (!function_exists('toNailsDate'))
 {
     /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a date timestamp to the Nails timezone from the User's timezone
+     * @param  mixed  $timestamp The timestamp to convert
      * @return string
      */
-    function userMysqlReverseDate($timestamp = null)
+    function toNailsDate($timestamp = null)
     {
-        return get_instance()->datetime_model->userReverseDate($timestamp, 'Y-m-d');
+        return get_instance()->datetime_model->toNailsDate($timestamp);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('userReverseDate'))
+if (!function_exists('toUserDatetime'))
 {
     /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a datetime timestamp to the user's timezone from the Nails timezone
+     * @param  mixed  $timestamp The timestamp to convert
+     * @param  string $format    The format of the timestamp to return, defaults to User's dateTime preference
      * @return string
      */
-    function userReverseDate($timestamp = null)
+    function toUserDatetime($timestamp = null, $format = null)
     {
-        return get_instance()->datetime_model->userReverseDate($timestamp, 'date');
+        return get_instance()->datetime_model->toUserDatetime($timestamp, $format);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('userDatetime'))
+if (!function_exists('toNailsDatetime'))
 {
     /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a datetime timestamp to the Nails timezone from the User's timezone
+     * @param  mixed  $timestamp The timestamp to convert
      * @return string
      */
-    function userDatetime($timestamp = null, $formatDate = null, $formatTime = null)
+    function toNailsDatetime($timestamp = null)
     {
-        return get_instance()->datetime_model->userDatetime($timestamp, $formatDate, $formatTime);
+        return get_instance()->datetime_model->toNailsDatetime($timestamp);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('userMysqlDatetime'))
-{
-    /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as Y-m-d H:i:s
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    function userMysqlDatetime($timestamp = null)
-    {
-        return get_instance()->datetime_model->userDatetime($timestamp, 'Y-m-d', 'H:i:s');
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('userMysqlReverseDatetime'))
-{
-    /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    function userMysqlReverseDatetime($timestamp = null)
-    {
-        return get_instance()->datetime_model->userReverseDatetime($timestamp, 'Y-m-d', 'H:i:s');
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('userReverseDatetime'))
-{
-    /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d H:i:s
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    function userReverseDatetime($timestamp = null)
-    {
-        return get_instance()->datetime_model->userReverseDate($timestamp, 'datetime');
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('nice_time'))
+if (!function_exists('niceTime'))
 {
     /**
      * Converts a datetime into a human friendly relative string

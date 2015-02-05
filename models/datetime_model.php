@@ -10,10 +10,10 @@
 
 class NAILS_Datetime_model extends NAILS_Model
 {
-    public $timezone_nails;
-    public $timezone_user;
-    protected $formatDate;
-    protected $formatTime;
+    public $timezoneNails;
+    public $timezoneUser;
+    protected $userFormatDate;
+    protected $userFormatTime;
 
     // --------------------------------------------------------------------------
 
@@ -185,12 +185,12 @@ class NAILS_Datetime_model extends NAILS_Model
     {
         $formats = $this->config->item('datetime_format_time');
 
-        if ($this->timezone_user) {
+        if ($this->timezoneUser) {
 
             foreach ($formats as $format) {
 
-                $time = strtotime($this->convertDatetime(time(), $this->timezone_user));
-                $format->example = date($format->format, $time);
+                $dateTimeObject  = $this->convertDatetime(time(), $this->timezoneUser);
+                $format->example = $dateTimeObject->format($format->format);
             }
         }
 
@@ -257,7 +257,7 @@ class NAILS_Datetime_model extends NAILS_Model
             $dateFormat = $this->getDateFormatDefault();
         }
 
-        $this->_format_date = $dateFormat->format;
+        $this->userFormatDate = $dateFormat->format;
     }
 
     // --------------------------------------------------------------------------
@@ -275,437 +275,73 @@ class NAILS_Datetime_model extends NAILS_Model
             $timeFormat = $this->getTimeFormatDefault();
         }
 
-        $this->_format_time = $timeFormat->format;
+        $this->userFormatTime = $timeFormat->format;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date preferences.
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a date timestamp to the User's timezone from the Nails timezone
+     * @param  mixed  $timestamp The timestamp to convert
+     * @param  string $format    The format of the timestamp to return, defaults to User's date preference
      * @return string
      */
-    public function userDate($timestamp = null)
+    public function toUserDate($timestamp = null, $format = null)
     {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
+        $converted = $this->convertDatetime($timestamp, $this->timezoneUser, $this->timezoneNails);
 
-            $timestamp = date('Y-m-d');
+        if (is_null($format)) {
 
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if (!is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d', $timestamp);
-            }
+            $format = $this->userFormatDate;
         }
 
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format($this->_format_date);
+        return $converted->format($format);
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date preferences.
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a date timestamp to the Nails timezone from the User's timezone, formatted as Y-m-d
+     * @param  mixed  $timestamp The timestamp to convert
      * @return string
      */
-    public function userDateMySql($timestamp = null)
+    public function toNailsDate($timestamp = null)
     {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if (!is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d', $timestamp);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format('Y-m-d');
+        $converted = $this->convertDatetime($timestamp, $this->timezoneNails, $this->timezoneUser);
+        return $converted->format('Y-m-d');
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a datetime timestamp to the user's timezone from the Nails timezone
+     * @param  mixed  $timestamp The timestamp to convert
+     * @param  string $format    The format of the timestamp to return, defaults to User's dateTime preference
      * @return string
      */
-    public function userReverseDate($timestamp = null)
+    public function toUserDatetime($timestamp = null, $format = null)
     {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
+        $converted = $this->convertDatetime($timestamp, $this->timezoneUser, $this->timezoneNails);
 
-            $timestamp = date('Y-m-d H:i:s');
+        if (is_null($format)) {
 
-        } else {
-
-            $format = $format == 'date' ? 'Y-m-d' : 'Y-m-d H:i:s';
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if (!is_numeric($timestamp)) {
-
-                $timestamp = date($format, strtotime($timestamp));
-
-            } else {
-
-                $timestamp = date($format, $timestamp);
-            }
+            $format = $this->userFormatDate . ' ' . $this->userFormatTime;
         }
 
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format('Y-m-d');
+        return $converted->format($format);
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's a Y-m-d
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * Convert a datetime timestamp to the Nails timezone from the User's timezone
+     * @param  mixed  $timestamp The timestamp to convert
      * @return string
      */
-    public function userReverseDateMySql($timestamp = null)
+    public function toNailsDatetime($timestamp = null)
     {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            $format = $format == 'date' ? 'Y-m-d' : 'Y-m-d H:i:s';
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if (!is_numeric($timestamp)) {
-
-                $timestamp = date($format, strtotime($timestamp));
-
-            } else {
-
-                $timestamp = date($format, $timestamp);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format('Y-m-d');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    public function userDatetime($timestamp = null)
-    {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
-        }
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format($this->_format_date . ' ' . $this->_format_time);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Converts a timestamp in the Nails timezone to the User's timezone and format's as per their date & time preferences.
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    public function userDatetimeMySql($timestamp = null)
-    {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
-        }
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_nails));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_user));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format('Y-m-d H:i:s');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    public function userReverseDatetime($timestamp = null)
-    {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format($this->_format_date . ' ' . $this->_format_time);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Converts a timestamp in the User's timezone to the Nails timezone and format's as Y-m-d H:i:s
-     * @param  mixed  $timestamp  The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @return string
-     */
-    public function userReverseDatetimeMySql($timestamp = null)
-    {
-        //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
-
-            $timestamp = date('Y-m-d H:i:s');
-
-        } else {
-
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if ($timestamp && !is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00 00:00:00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the new DateTime object
-        $datetime = new DateTime($timestamp, new DateTimeZone($this->timezone_user));
-
-        // --------------------------------------------------------------------------
-
-        //  If the user's timezone is different from the Nails. timezone then set it so.
-        if ($this->timezone_nails != $this->timezone_user) {
-
-            $datetime->setTimeZone(new DateTimeZone($this->timezone_nails));
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Return the formatted date
-        return $datetime->format('Y-m-d H:i:s');
+        $converted = $this->convertDatetime($timestamp, $this->timezoneNails, $this->timezoneUser);
+        return $converted->format('Y-m-d H:i:s');
     }
 
     // --------------------------------------------------------------------------
@@ -749,7 +385,7 @@ class NAILS_Datetime_model extends NAILS_Model
      */
     public function setNailsTimezone($tz)
     {
-        $this->timezone_nails = $tz;
+        $this->timezoneNails = $tz;
     }
 
     // --------------------------------------------------------------------------
@@ -760,7 +396,7 @@ class NAILS_Datetime_model extends NAILS_Model
      */
     public function setUserTimezone($tz)
     {
-        $this->timezone_user = $tz;
+        $this->timezoneUser = $tz;
     }
 
     // --------------------------------------------------------------------------
@@ -1047,7 +683,7 @@ class NAILS_Datetime_model extends NAILS_Model
         $toTz = new DateTimeZone($toTz);
         $out->setTimeZone($toTz);
 
-        return $out->format('Y-m-d H:i:s');
+        return $out;
     }
 }
 

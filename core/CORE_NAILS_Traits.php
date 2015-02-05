@@ -235,11 +235,9 @@ trait NAILS_COMMON_TRAIT_CACHING
 trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 {
     /**
-     * Applies common conditionals
-     *
      * This method applies the conditionals which are common across the get_*()
      * methods and the count() method.
-     * @param string $data Data passed from the calling method
+     * @param string $data    Data passed from the calling method
      * @param string $_caller The name of the calling method
      * @return void
      **/
@@ -288,6 +286,12 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                             //  Escaped?
                             $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
 
+                            //  If the $column is an array then we should concat them together
+                            if (is_array($column)) {
+
+                                $column = 'CONCAT_WS(" ", ' . implode(',', $column) . ')';
+                            }
+
                             if ($column) {
 
                                 $this->db->$whereType($column, $value, $escape);
@@ -305,38 +309,49 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
         // --------------------------------------------------------------------------
 
         //  Handle Likes
-        if (!empty($data['like'])) {
+        $likes = array('like', 'or_like', 'not_like', 'or_not_like');
 
-            if (is_string($data['like'])) {
+        foreach ($likes as $likeType) {
 
-                $this->db->like($data['like']);
+            if (!empty($data[$likeType])) {
 
-            } elseif (is_array($data['like'])) {
+                if (is_string($data[$likeType])) {
 
-                foreach ($data['like'] as $like) {
+                    $this->db->{$likeType}($data[$likeType]);
 
-                    //  Work out column
-                    $column = !empty($like['column']) ? $like['column'] : null;
+                } elseif (is_array($data[$likeType])) {
 
-                    if (is_null($column)) {
+                    foreach ($data[$likeType] as $like) {
 
-                        $column = !empty($like[0]) && is_string($like[0]) ? $like[0] : null;
-                    }
+                        //  Work out column
+                        $column = !empty($like['column']) ? $like['column'] : null;
 
-                    //  Work out value
-                    $value = isset($like['value']) ? $like['value'] : null;
+                        if (is_null($column)) {
 
-                    if (is_null($value)) {
+                            $column = !empty($like[0]) && is_string($like[0]) ? $like[0] : null;
+                        }
 
-                        $value = !empty($like[1]) ? $like[1] : null;
-                    }
+                        //  Work out value
+                        $value = isset($like['value']) ? $like['value'] : null;
 
-                    //  Escaped?
-                    $escape = isset($like['escape']) ? (bool) $like['escape'] : false;
+                        if (is_null($value)) {
 
-                    if ($column) {
+                            $value = !empty($like[1]) ? $like[1] : null;
+                        }
 
-                        $this->db->like($column, $value, $escape);
+                        //  Escaped?
+                        $escape = isset($like['escape']) ? (bool) $like['escape'] : false;
+
+                        //  If the $column is an array then we should concat them together
+                        if (is_array($column)) {
+
+                            $column = 'CONCAT_WS(" ", ' . implode(',', $column) . ')';
+                        }
+
+                        if ($column) {
+
+                            $this->db->{$likeType}($column, $value, $escape);
+                        }
                     }
                 }
             }

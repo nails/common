@@ -557,22 +557,25 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         if (active_user('timezone')) {
 
-            $_timezone_user = active_user('timezone');
+            $timezoneUser = active_user('timezone');
 
         } else {
 
-            $_timezone_user = $this->datetime_model->getTimezoneDefault();
+            $timezoneUser = $this->datetime_model->getTimezoneDefault();
         }
 
-        $this->datetime_model->setTimezones('UTC', $_timezone_user);
+        $this->datetime_model->setTimezones('UTC', $timezoneUser);
 
         // --------------------------------------------------------------------------
 
         //  Set the user date/time formats
-        $_format_date = active_user('datetime_format_date') ? active_user('datetime_format_date') : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
-        $_format_time = active_user('datetime_format_time') ? active_user('datetime_format_time') : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+        $formatDate = active_user('datetime_format_date');
+        $formatDate = $formatDate ? $formatDate : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
 
-        $this->datetime_model->setFormats($_format_date, $_format_time);
+        $formatTime = active_user('datetime_format_time');
+        $formatTime = $formatTime ? $formatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+
+        $this->datetime_model->setFormats($formatDate, $formatTime);
 
         // --------------------------------------------------------------------------
 
