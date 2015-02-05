@@ -136,7 +136,6 @@ if (!function_exists('cdn_expiring_url'))
     /**
      * Returns an expiring url
      * @param  string  $bucket  The bucket which the image resides in
-     * @param  integer $object  The object to be served
      * @param  string  $expires The length of time the URL should be valid for, in seconds
      * @return string
      */
