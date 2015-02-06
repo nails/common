@@ -1,631 +1,604 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * Adds additional validation rules to the Form_validation library
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Library
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class CORE_NAILS_Form_validation extends CI_Form_validation
 {
-	/**
-	 * Quick mod of run() to allow for HMVC.
-	 */
-	public function run($module = '', $group = '')
-	{
-		( is_object( $module ) ) AND $this->CI = &$module;
-			return parent::run($group);
-	}
+    /**
+     * Quick mod of run() to allow for HMVC.
+     */
+    public function run($module = '', $group = '')
+    {
+        ( is_object( $module ) ) AND $this->CI = &$module;
+            return parent::run($group);
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Returns the form validation error array.
+     * @return array
+     */
+    public function get_error_array()
+    {
+        return $this->_error_array;
+    }
 
+    // --------------------------------------------------------------------------
 
-	/**
-	 * Returns the form validation error array.
-	 * @return array
-	 */
-	public function get_error_array()
-	{
-		return $this->_error_array;
-	}
+    /**
+     * Checks if a certain value is unique in a specified table if different
+     * from current value.
+     * @param  string $new    The form value
+     * @param  string $params Parameters passed from set_rules() method
+     * @return boolean
+     */
+    public function unique_if_diff( $new, $params )
+    {
+        $CI =& get_instance();
 
+        list($table, $column, $old) = explode(".", $params, 3);
 
-	// --------------------------------------------------------------------------
+        if ( $new == $old ) :
 
+            return TRUE;
 
-	/**
-	 * Checks if a certain value is unique in a specified table if different
-	 * from current value.
-	 * @param  string $new    The form value
-	 * @param  string $params Parameters passed from set_rules() method
-	 * @return boolean
-	 */
-	public function unique_if_diff( $new, $params )
-	{
-		$CI =& get_instance();
+        endif;
 
-		list($table, $column, $old) = explode(".", $params, 3);
+        if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) ) :
 
-		if ( $new == $old ) :
+            $CI->form_validation->set_message( 'unique_if_diff', lang( 'fv_unique_if_diff_field' ) );
 
-			return TRUE;
+        endif;
 
-		endif;
+        $CI->db->where( $column . ' !=', $old );
+        $CI->db->where( $column, $new );
+        $CI->db->limit( 1 );
+        $q = $CI->db->get( $table );
 
-		if ( ! array_key_exists( 'unique_if_diff', $CI->form_validation->_error_messages ) ) :
+        if ($q->row())
+            return FALSE;
 
-			$CI->form_validation->set_message( 'unique_if_diff', lang( 'fv_unique_if_diff_field' ) );
+        return TRUE;
+    }
 
-		endif;
+    // --------------------------------------------------------------------------
 
-		$CI->db->where( $column . ' !=', $old );
-		$CI->db->where( $column, $new );
-		$CI->db->limit( 1 );
-		$q = $CI->db->get( $table );
+    /**
+     * Checks if a string is in a valid UK post code format.
+     * @param  string $str The form value
+     * @return boolean
+     */
+    public function valid_postcode( $str )
+    {
+        $CI =& get_instance();
 
-		if ($q->row())
-			return FALSE;
+        if ( ! array_key_exists( 'valid_postcode', $CI->form_validation->_error_messages ) ) :
 
-		return TRUE;
-	}
+            $CI->form_validation->set_message( 'valid_postcode', lang( 'fv_valid_postcode' ) );
 
+        endif;
 
-	// --------------------------------------------------------------------------
+        $pattern = '/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/';
+        return preg_match( $pattern, strtoupper( $str ) ) ? TRUE : FALSE;
+    }
 
+    // --------------------------------------------------------------------------
 
-	/**
-	 * Checks if a string is in a valid UK post code format.
-	 * @param  string $str The form value
-	 * @return boolean
-	 */
-	public function valid_postcode( $str )
-	{
-		$CI =& get_instance();
+    /**
+     * Checks if a date is valid.
+     * @param  string $date The form value
+     * @return boolean
+     */
+    public function valid_date( $date )
+    {
+        //  If blank, then assume the date is not required
+        if ( ! $date  ) :
 
-		if ( ! array_key_exists( 'valid_postcode', $CI->form_validation->_error_messages ) ) :
+            return TRUE;
 
-			$CI->form_validation->set_message( 'valid_postcode', lang( 'fv_valid_postcode' ) );
+        endif;
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		$pattern = '/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/';
-		return preg_match( $pattern, strtoupper( $str ) ) ? TRUE : FALSE;
-	}
+        $CI =& get_instance();
 
+        if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) ) :
 
-	// --------------------------------------------------------------------------
+            $CI->form_validation->set_message( 'valid_date', lang( 'fv_valid_date_field' ) );
 
+        endif;
 
-	/**
-	 * Checks if a date is valid.
-	 * @param  string $date The form value
-	 * @return boolean
-	 */
-	public function valid_date( $date )
-	{
-		//	If blank, then assume the date is not required
-		if ( ! $date  ) :
+        $_time = strtotime( $date );
 
-			return TRUE;
+        if ( $_time === FALSE ) :
 
-		endif;
+            return FALSE;
 
-		// --------------------------------------------------------------------------
+        endif;
 
-		$CI =& get_instance();
+        $_date = date( 'Y-m-d', $_time );
 
-		if ( ! array_key_exists( 'valid_date', $CI->form_validation->_error_messages ) ) :
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-			$CI->form_validation->set_message( 'valid_date', lang( 'fv_valid_date_field' ) );
+        return checkdate( (int) $_month, (int) $_day, (int) $_year );
+    }
 
-		endif;
+    // --------------------------------------------------------------------------
 
-		$_time = strtotime( $date );
+    /**
+     * Checks if a date us in the future.
+     * @param  string $date The form value
+     * @return boolean
+     */
+    public function date_future( $date )
+    {
+        //  If blank, then assume the date is not required
+        if ( ! $date  ) :
 
-		if ( $_time === FALSE ) :
+            return TRUE;
 
-			return FALSE;
+        endif;
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		$_date = date( 'Y-m-d', $_time );
+        $CI =& get_instance();
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+        if ( ! array_key_exists( 'date_future', $CI->form_validation->_error_messages ) ) :
 
-		return checkdate( (int) $_month, (int) $_day, (int) $_year );
-	}
+            $CI->form_validation->set_message( 'date_future', lang( 'fv_valid_date_future_field' ) );
 
+        endif;
 
-	// --------------------------------------------------------------------------
+        $_time = strtotime( $date );
 
+        if ( $_time === FALSE ) :
 
-	/**
-	 * Checks if a date us in the future.
-	 * @param  string $date The form value
-	 * @return boolean
-	 */
-	public function date_future( $date )
-	{
-		//	If blank, then assume the date is not required
-		if ( ! $date  ) :
+            return FALSE;
 
-			return TRUE;
+        endif;
 
-		endif;
+        $_date = date( 'Y-m-d', $_time );
 
-		// --------------------------------------------------------------------------
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-		$CI =& get_instance();
+        return strtotime( (int) $_year . '-' . (int) $_month . '-' . (int) $_day ) < strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+    }
 
-		if ( ! array_key_exists( 'date_future', $CI->form_validation->_error_messages ) ) :
+    // --------------------------------------------------------------------------
 
-			$CI->form_validation->set_message( 'date_future', lang( 'fv_valid_date_future_field' ) );
+    /**
+     * Checks if a date is in the past.
+     * @param  string $date The form value
+     * @return boolean
+     */
+    public function date_past( $date )
+    {
+        //  If blank, then assume the date is not required
+        if ( ! $date  ) :
 
-		endif;
+            return TRUE;
 
-		$_time = strtotime( $date );
+        endif;
 
-		if ( $_time === FALSE ) :
+        // --------------------------------------------------------------------------
 
-			return FALSE;
+        $CI =& get_instance();
 
-		endif;
+        if ( ! array_key_exists( 'date_past', $CI->form_validation->_error_messages ) ) :
 
-		$_date = date( 'Y-m-d', $_time );
+            $CI->form_validation->set_message( 'date_past', lang( 'fv_valid_date_past_field' ) );
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+        endif;
 
-		return strtotime( (int) $_year . '-' . (int) $_month . '-' . (int) $_day ) < strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
-	}
+        $_time = strtotime( $date );
 
+        if ( $_time === FALSE ) :
 
-	// --------------------------------------------------------------------------
+            return FALSE;
 
+        endif;
 
-	/**
-	 * Checks if a date is in the past.
-	 * @param  string $date The form value
-	 * @return boolean
-	 */
-	public function date_past( $date )
-	{
-		//	If blank, then assume the date is not required
-		if ( ! $date  ) :
+        $_date = date( 'Y-m-d', $_time );
 
-			return TRUE;
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-		endif;
+        return strtotime( (int) $_year . '-' . (int) $_month . '-' . (int) $_day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
+    }
 
-		// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-		$CI =& get_instance();
+    /**
+     * Checks if a date is before another date field.
+     * @param  string $date  The form value
+     * @param  string $field The other POST field to check against
+     * @return boolean
+     */
+    public function date_before( $date, $field )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $date  ) :
 
-		if ( ! array_key_exists( 'date_past', $CI->form_validation->_error_messages ) ) :
+            return TRUE;
 
-			$CI->form_validation->set_message( 'date_past', lang( 'fv_valid_date_past_field' ) );
+        endif;
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		$_time = strtotime( $date );
+        $CI =& get_instance();
 
-		if ( $_time === FALSE ) :
+        if ( ! array_key_exists( 'date_before', $CI->form_validation->_error_messages ) ) :
 
-			return FALSE;
+            $CI->form_validation->set_message( 'date_before', lang( 'fv_valid_date_before_field' ) );
 
-		endif;
+        endif;
 
-		$_date = date( 'Y-m-d', $_time );
+        // --------------------------------------------------------------------------
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+        return strtotime( $date ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
+    }
 
-		return strtotime( (int) $_year . '-' . (int) $_month . '-' . (int) $_day ) > strtotime( date( 'Y-m-d' ) ) ? FALSE : TRUE;
-	}
+    // --------------------------------------------------------------------------
 
+    /**
+     * Checks if a date is after another date field.
+     * @param  string $date  The form value
+     * @param  string $field The other POST field to check against
+     * @return boolean
+     */
+    public function date_after( $date, $field )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $date  ) :
 
-	// --------------------------------------------------------------------------
+            return TRUE;
 
+        endif;
 
-	/**
-	 * Checks if a date is before another date field.
-	 * @param  string $date  The form value
-	 * @param  string $field The other POST field to check against
-	 * @return boolean
-	 */
-	public function date_before( $date, $field )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $date  ) :
+        // --------------------------------------------------------------------------
 
-			return TRUE;
+        $CI =& get_instance();
 
-		endif;
+        if ( ! array_key_exists( 'date_after', $CI->form_validation->_error_messages ) ) :
 
-		// --------------------------------------------------------------------------
+            $CI->form_validation->set_message( 'date_after', lang( 'fv_valid_date_after_field' ) );
 
-		$CI =& get_instance();
+        endif;
 
-		if ( ! array_key_exists( 'date_before', $CI->form_validation->_error_messages ) ) :
+        // --------------------------------------------------------------------------
 
-			$CI->form_validation->set_message( 'date_before', lang( 'fv_valid_date_before_field' ) );
+        return strtotime( $date ) > strtotime( $CI->input->post( $field ) );
+    }
 
-		endif;
+    // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+    /**
+     * Checks if a datetime is valid.
+     * @param  string $datetime The form value
+     * @return boolean
+     */
+    public function valid_datetime( $datetime )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $datetime  ) :
 
-		return strtotime( $date ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
-	}
+            return TRUE;
 
+        endif;
 
-	// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
+        $CI =& get_instance();
 
-	/**
-	 * Checks if a date is after another date field.
-	 * @param  string $date  The form value
-	 * @param  string $field The other POST field to check against
-	 * @return boolean
-	 */
-	public function date_after( $date, $field )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $date  ) :
+        if ( ! array_key_exists( 'valid_datetime', $CI->form_validation->_error_messages ) ) :
 
-			return TRUE;
+            $CI->form_validation->set_message( 'valid_datetime', lang( 'fv_valid_datetime_field' ) );
 
-		endif;
+        endif;
 
-		// --------------------------------------------------------------------------
+        $_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
-		$CI =& get_instance();
+        if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
-		if ( ! array_key_exists( 'date_after', $CI->form_validation->_error_messages ) ) :
+            return FALSE;
 
-			$CI->form_validation->set_message( 'date_after', lang( 'fv_valid_date_after_field' ) );
+        endif;
 
-		endif;
+        $_time = strtotime( $_datetime[0] );
 
-		// --------------------------------------------------------------------------
+        if ( $_time === FALSE ) :
 
-		return strtotime( $date ) > strtotime( $CI->input->post( $field ) );
-	}
+            return FALSE;
 
+        endif;
 
-	// --------------------------------------------------------------------------
+        $_date = date( 'Y-m-d', $_time );
 
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-	/**
-	 * Checks if a datetime is valid.
-	 * @param  string $datetime The form value
-	 * @return boolean
-	 */
-	public function valid_datetime( $datetime )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $datetime  ) :
+        $_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
+        $_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
 
-			return TRUE;
+        return $_valid_date && $_valid_time ? TRUE : FALSE;
+    }
 
-		endif;
+    // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+    /**
+     * Checks if a datetime is in the future.
+     * @param  string $datetime The form value
+     * @return boolean
+     */
+    public function datetime_future( $datetime )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $datetime  ) :
 
-		$CI =& get_instance();
+            return TRUE;
 
-		if ( ! array_key_exists( 'valid_datetime', $CI->form_validation->_error_messages ) ) :
+        endif;
 
-			$CI->form_validation->set_message( 'valid_datetime', lang( 'fv_valid_datetime_field' ) );
+        // --------------------------------------------------------------------------
 
-		endif;
+        $CI =& get_instance();
 
-		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
+        if ( ! array_key_exists( 'datetime_future', $CI->form_validation->_error_messages ) ) :
 
-		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
+            $CI->form_validation->set_message( 'datetime_future', lang( 'fv_valid_datetime_future_field' ) );
 
-			return FALSE;
+        endif;
 
-		endif;
+        $_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
-		$_time = strtotime( $_datetime[0] );
+        if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
-		if ( $_time === FALSE ) :
+            return FALSE;
 
-			return FALSE;
+        endif;
 
-		endif;
+        $_time = strtotime( $_datetime[0] );
 
-		$_date = date( 'Y-m-d', $_time );
+        if ( $_time === FALSE ) :
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+            return FALSE;
 
-		$_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
-		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
+        endif;
 
-		return $_valid_date && $_valid_time ? TRUE : FALSE;
-	}
+        $_date = date( 'Y-m-d', $_time );
 
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-	// --------------------------------------------------------------------------
+        $_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
+        $_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
 
+        if ( $_valid_date && $_valid_time ) :
 
-	/**
-	 * Checks if a datetime is in the future.
-	 * @param  string $datetime The form value
-	 * @return boolean
-	 */
-	public function datetime_future( $datetime )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $datetime  ) :
+            if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) > time() ) :
 
-			return TRUE;
+                return TRUE;
 
-		endif;
+            else :
 
-		// --------------------------------------------------------------------------
+                return FALSE;
 
-		$CI =& get_instance();
+            endif;
 
-		if ( ! array_key_exists( 'datetime_future', $CI->form_validation->_error_messages ) ) :
+        else :
 
-			$CI->form_validation->set_message( 'datetime_future', lang( 'fv_valid_datetime_future_field' ) );
+            return FALSE;
 
-		endif;
+        endif;
+    }
 
-		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
+    // --------------------------------------------------------------------------
 
-		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
+    /**
+     * Checks if a datetime is in the past.
+     * @param  string $datetime The form value
+     * @return boolean]
+     */
+    public function datetime_past( $datetime )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $datetime  ) :
 
-			return FALSE;
+            return TRUE;
 
-		endif;
+        endif;
 
-		$_time = strtotime( $_datetime[0] );
+        // --------------------------------------------------------------------------
 
-		if ( $_time === FALSE ) :
+        $CI =& get_instance();
 
-			return FALSE;
+        if ( ! array_key_exists( 'datetime_past', $CI->form_validation->_error_messages ) ) :
 
-		endif;
+            $CI->form_validation->set_message( 'datetime_past', lang( 'fv_valid_datetime_past_field' ) );
 
-		$_date = date( 'Y-m-d', $_time );
+        endif;
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+        $_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
 
-		$_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
-		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
+        if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
 
-		if ( $_valid_date && $_valid_time ) :
+            return FALSE;
 
-			if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) > time() ) :
+        endif;
 
-				return TRUE;
+        $_time = strtotime( $_datetime[0] );
 
-			else :
+        if ( $_time === FALSE ) :
 
-				return FALSE;
+            return FALSE;
 
-			endif;
+        endif;
 
-		else :
+        $_date = date( 'Y-m-d', $_time );
 
-			return FALSE;
+        @list( $_year, $_month, $_day ) = explode( '-', $_date );
 
-		endif;
-	}
+        $_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
+        $_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
 
+        if ( $_valid_date && $_valid_time ) :
 
-	// --------------------------------------------------------------------------
+            if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) < time() ) :
 
+                return TRUE;
 
-	/**
-	 * Checks if a datetime is in the past.
-	 * @param  string $datetime The form value
-	 * @return boolean]
-	 */
-	public function datetime_past( $datetime )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $datetime  ) :
+            else :
 
-			return TRUE;
+                return FALSE;
 
-		endif;
+            endif;
 
-		// --------------------------------------------------------------------------
+        else :
 
-		$CI =& get_instance();
+            return FALSE;
 
-		if ( ! array_key_exists( 'datetime_past', $CI->form_validation->_error_messages ) ) :
+        endif;
+    }
 
-			$CI->form_validation->set_message( 'datetime_past', lang( 'fv_valid_datetime_past_field' ) );
+    // --------------------------------------------------------------------------
 
-		endif;
+    /**
+     * Checks if a datetime is before another field.
+     * @param  string $datetime The form value
+     * @param  string $field    The other POST field to check against
+     * @return boolean
+     */
+    public function datetime_before( $datetime, $field )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $datetime  ) :
 
-		$_datetime = explode( ' ', date( 'Y-m-d H:i:s', strtotime( $datetime ) ) );
+            return TRUE;
 
-		if ( ! isset( $_datetime[0] ) || ! isset( $_datetime[1] ) ) :
+        endif;
 
-			return FALSE;
+        // --------------------------------------------------------------------------
 
-		endif;
+        $CI =& get_instance();
 
-		$_time = strtotime( $_datetime[0] );
+        if ( ! array_key_exists( 'datetime_before', $CI->form_validation->_error_messages ) ) :
 
-		if ( $_time === FALSE ) :
+            $CI->form_validation->set_message( 'datetime_before', lang( 'fv_valid_datetime_before_field' ) );
 
-			return FALSE;
+        endif;
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		$_date = date( 'Y-m-d', $_time );
+        return strtotime( $datetime ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
+    }
 
-		@list( $_year, $_month, $_day ) = explode( '-', $_date );
+    // --------------------------------------------------------------------------
 
-		$_valid_date = checkdate( (int) $_month, (int) $_day, (int) $_year );
-		$_valid_time = preg_match( '/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1] );
+    /**
+     * Checks if a datetime is after another field.
+     * @param  string $datetime The form value
+     * @param  string $field    The other POST field to check against
+     * @return boolean
+     */
+    public function datetime_after( $datetime, $field )
+    {
+        //  If blank, then assume the datetime is not required
+        if ( ! $datetime  ) :
 
-		if ( $_valid_date && $_valid_time ) :
+            return TRUE;
 
-			if ( strtotime( $year . '-' . $month . '-' . $day . ' ' . $_datetime[1] ) < time() ) :
+        endif;
 
-				return TRUE;
+        // --------------------------------------------------------------------------
 
-			else :
+        $CI =& get_instance();
 
-				return FALSE;
+        if ( ! array_key_exists( 'datetime_after', $CI->form_validation->_error_messages ) ) :
 
-			endif;
+            $CI->form_validation->set_message( 'datetime_after', lang( 'fv_valid_datetime_after_field' ) );
 
-		else :
+        endif;
 
-			return FALSE;
+        // --------------------------------------------------------------------------
 
-		endif;
-	}
+        return strtotime( $datetime ) > strtotime( $CI->input->post( $field ) );
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Checks if a value is within a range as defined in $field
+     * @param  string $str   The form value
+     * @param  string $field The range, e.g., 0-10
+     * @return boolean
+     */
+    public function in_range( $str, $field )
+    {
+        $_range = explode( '-', $field );
+        $_low   = isset( $_range[0] ) ? (float) $_range[0] : NULL;
+        $_high  = isset( $_range[1] ) ? (float) $_range[1] : NULL;
 
+        if (is_null($_low) || is_null($_high)) {
 
-	/**
-	 * Checks if a datetime is before another field.
-	 * @param  string $datetime The form value
-	 * @param  string $field    The other POST field to check against
-	 * @return boolean
-	 */
-	public function datetime_before( $datetime, $field )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $datetime  ) :
+            return true;
+        }
 
-			return TRUE;
+        if ( (float) $str >= $_low && (float) $str <= $_high ) :
 
-		endif;
+            return TRUE;
 
-		// --------------------------------------------------------------------------
+        else :
 
-		$CI =& get_instance();
+            $CI =& get_instance();
 
-		if ( ! array_key_exists( 'datetime_before', $CI->form_validation->_error_messages ) ) :
+            if ( ! array_key_exists( 'in_range', $CI->form_validation->_error_messages ) ) :
 
-			$CI->form_validation->set_message( 'datetime_before', lang( 'fv_valid_datetime_before_field' ) );
+                $CI->form_validation->set_message( 'in_range', lang( 'fv_in_range_field' ) );
 
-		endif;
+            endif;
 
-		// --------------------------------------------------------------------------
+            return FALSE;
 
-		return strtotime( $datetime ) < strtotime( $CI->input->post( $field ) ) ? TRUE : FALSE;
-	}
+        endif;
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Valid Email, using filter_var if possible falling back to CI's regex
+     *
+     * @access  public
+     * @param   string
+     * @return  bool
+     */
+    public function valid_email($str)
+    {
+        if ( function_exists( 'filter_var' ) ) :
 
+            return (bool) filter_var( $str, FILTER_VALIDATE_EMAIL );
 
-	/**
-	 * Checks if a datetime is after another field.
-	 * @param  string $datetime The form value
-	 * @param  string $field    The other POST field to check against
-	 * @return boolean
-	 */
-	public function datetime_after( $datetime, $field )
-	{
-		//	If blank, then assume the datetime is not required
-		if ( ! $datetime  ) :
+        else :
 
-			return TRUE;
+            return parent::valid_email($str);
 
-		endif;
+        endif;
+    }
 
-		// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-		$CI =& get_instance();
-
-		if ( ! array_key_exists( 'datetime_after', $CI->form_validation->_error_messages ) ) :
-
-			$CI->form_validation->set_message( 'datetime_after', lang( 'fv_valid_datetime_after_field' ) );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return strtotime( $datetime ) > strtotime( $CI->input->post( $field ) );
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Checks if a value is within a range as defined in $field
-	 * @param  string $str   The form value
-	 * @param  string $field The range, e.g., 0-10
-	 * @return boolean
-	 */
-	public function in_range( $str, $field )
-	{
-		$_range = explode( '-', $field );
-		$_low	= isset( $_range[0] ) ? (float) $_range[0] : NULL;
-		$_high	= isset( $_range[1] ) ? (float) $_range[1] : NULL;
-
-		if (is_null($_low) || is_null($_high)) {
-
-			return true;
-		}
-
-		if ( (float) $str >= $_low && (float) $str <= $_high ) :
-
-			return TRUE;
-
-		else :
-
-			$CI =& get_instance();
-
-			if ( ! array_key_exists( 'in_range', $CI->form_validation->_error_messages ) ) :
-
-				$CI->form_validation->set_message( 'in_range', lang( 'fv_in_range_field' ) );
-
-			endif;
-
-			return FALSE;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Valid Email, using filter_var if possible falling back to CI's regex
-	 *
-	 * @access	public
-	 * @param	string
-	 * @return	bool
-	 */
-	public function valid_email($str)
-	{
-		if ( function_exists( 'filter_var' ) ) :
-
-			return (bool) filter_var( $str, FILTER_VALIDATE_EMAIL );
-
-		else :
-
-			return parent::valid_email($str);
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	/**
-	 * Same as alpha_dash, but includes periods
-	 * @param  string $str The string to test
-	 * @return boolean
-	 */
-	public function alpha_dash_period($str)
-	{
-		return ( ! preg_match("/^([\.-a-z0-9_-])+$/i", $str)) ? FALSE : TRUE;
-	}
-
+    /**
+     * Same as alpha_dash, but includes periods
+     * @param  string $str The string to test
+     * @return boolean
+     */
+    public function alpha_dash_period($str)
+    {
+        return ( ! preg_match("/^([\.-a-z0-9_-])+$/i", $str)) ? FALSE : TRUE;
+    }
 }
-
-
-/* End of file NAILS_Form_validation.php */
-/* Location: ./core/NAILS_Form_validation.php */

@@ -1,36 +1,47 @@
 <?php
 
 /**
- * OVERLOADING NAILS' MODELS
+ * Fetch countries
  *
- * Note the name of this class; done like this to allow apps to extend this class.
- * Read full explanation at the bottom of this file.
- *
- **/
+ * @package     Nails
+ * @subpackage  common
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class NAILS_Country_model extends NAILS_Model
 {
+    /**
+     * Construct the model
+     */
     public function __construct()
     {
         parent::__construct();
         $this->config->load('countries');
     }
 
-    /**
-     * COUNTRY METHODS
-     */
+    // --------------------------------------------------------------------------
 
-    public function get_all()
+    /**
+     * Get all defined countries
+     * @return array
+     */
+    public function getAll()
     {
         return $this->config->item('countries');
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_flat()
+    /**
+     * Get all defined countries as a flat array
+     * @return array
+     */
+    public function getAllFlat()
     {
         $out       = array();
-        $countries = $this->get_all();
+        $countries = $this->getAll();
 
         foreach ($countries as $c) {
 
@@ -42,43 +53,56 @@ class NAILS_Country_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_by_code($code)
+    /**
+     * Get a country by it's code
+     * @param  string $code The code to look for
+     * @return mixed        stdClass on success, false on failure
+     */
+    public function getByCode($code)
     {
-        $countries = $this->get_all();
+        $countries = $this->getAll();
 
         return ! empty($countries[$code]) ? $countries[$code] : false;
     }
 
     // --------------------------------------------------------------------------
-    //  CONTINENT METHODS
-    // --------------------------------------------------------------------------
 
-
-    public function get_all_continents()
+    /**
+     * Get all the defined continents
+     * @return array
+     */
+    public function getAllContinents()
     {
         return $this->config->item('continents');
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_continents_flat()
+    /**
+     * Get all defined continents as a flat array
+     * @return array
+     */
+    public function getAllContinentsFlat()
     {
-        return $this->get_all_continents();
+        return $this->getAllContinents();
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_continent_by_code($code)
+    /**
+     * Get a continent by it's code
+     * @param  string $code The continents code
+     * @return mixed        stdClass on success, false on failure
+     */
+    public function getContinentByCode($code)
     {
-        $continents = $this->get_all();
+        $continents = $this->getAll();
 
         return ! empty($continents[$code]) ? $continents[$code] : false;
     }
 }
 
-
 // --------------------------------------------------------------------------
-
 
 /**
  * OVERLOADING NAILS' MODELS

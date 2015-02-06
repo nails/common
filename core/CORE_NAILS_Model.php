@@ -403,8 +403,8 @@ class CORE_NAILS_Model extends CI_Model
             $page = $page < 0 ? 0 : $page;
 
             //  Work out what the offset should be
-            $_per_page  = is_null($perPage) ? $this->_per_page : (int) $perPage;
-            $_offset    = $page * $perPage;
+            $_per_page = is_null($perPage) ? $this->_per_page : (int) $perPage;
+            $_offset   = $page * $perPage;
 
             $this->db->limit($perPage, $_offset);
 

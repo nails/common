@@ -1,17 +1,19 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
 /**
-* Name:			NAILS_Calendar
-*
-* Description:	This extension overrides the generate function allowing more data to be made available to the cells
-				i.e month and year information. Also added new pseudo variable {day_padded}
-* 
-*/
-
+ * This extension overrides the generate function allowing more data to be made available to
+ * the cells i.e month and year information. Also added new pseudo variable {day_padded}
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Library
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class CORE_NAILS_Calendar extends CI_Calendar {
-	
-	
+
+
 	/**
 	 * Generate the calendar
 	 *
@@ -140,13 +142,12 @@ class CORE_NAILS_Calendar extends CI_Calendar {
 
 				if ($day > 0 AND $day <= $total_days)
 				{
-				
+
 				/* --------------------------------------------------------------------------
-				 * 
-				 * Start of Shed modification. Making more information available to cells
-				 * 
+				 * Start of Shed modification.
+				 * Making more information available to cells
 				/* ------------------------------------------------------------------------*/
-				
+
 					if (isset($data[$day]))
 					{
 						// Cells with content
@@ -156,7 +157,7 @@ class CORE_NAILS_Calendar extends CI_Calendar {
 						$temp = str_replace('{month}', $month, $temp);
 						$temp = str_replace('{year}', $year, $temp);
 						$temp = str_replace('{content}', $data[$day], $temp);
-						
+
 						$out .= $temp;
 					}
 					else
@@ -167,16 +168,14 @@ class CORE_NAILS_Calendar extends CI_Calendar {
 						$temp = str_replace('{day_padded}', str_pad( $day, 2, '0', STR_PAD_LEFT ), $temp);
 						$temp = str_replace('{month}', $month, $temp);
 						$temp = str_replace('{year}', $year, $temp);
-						
+
 						$out .= $temp;
 					}
-					
+
 				/* --------------------------------------------------------------------------
-				 * 
-				 * End of Shed modification. Making more information available to cells
-				 * 
+				 * End of Shed modification.
 				/* ------------------------------------------------------------------------*/
-				
+
 				}
 				else
 				{
@@ -184,7 +183,7 @@ class CORE_NAILS_Calendar extends CI_Calendar {
 					$out .= $this->temp['cal_cell_blank'];
 				}
 
-				$out .= ($is_current_month == TRUE AND $day == $cur_day) ? $this->temp['cal_cell_end_today'] : $this->temp['cal_cell_end'];					
+				$out .= ($is_current_month == TRUE AND $day == $cur_day) ? $this->temp['cal_cell_end_today'] : $this->temp['cal_cell_end'];
 				$day++;
 			}
 
@@ -201,6 +200,3 @@ class CORE_NAILS_Calendar extends CI_Calendar {
 
 
 }
-
-/* End of file NAILS_Calendar.php */
-/* Location: ./application/libraries/NAILS_Calendar.php */

@@ -1,12 +1,14 @@
 <?php
 
 /**
- * OVERLOADING NAILS' MODELS
+ * Gets datetime formats and provides a convinient mechanism for converting timestamps between datetime zones
  *
- * Note the name of this class; done like this to allow apps to extend this class.
- * Read full explanation at the bottom of this file.
- *
- **/
+ * @package     Nails
+ * @subpackage  module-testimonial
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class NAILS_Datetime_model extends NAILS_Model
 {
@@ -25,6 +27,8 @@ class NAILS_Datetime_model extends NAILS_Model
         parent::__construct();
         $this->config->load('datetime');
     }
+
+    // --------------------------------------------------------------------------
 
     /**
      * Returns the default date format object

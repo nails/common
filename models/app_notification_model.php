@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Manage app notification
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
+
 class NAILS_App_notification_model extends NAILS_Model
 {
     protected $notifications;

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Manage app routes
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
+
 class NAILS_Routes_model extends NAILS_Model
 {
     protected $canWriteRoutes;

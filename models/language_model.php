@@ -1,15 +1,20 @@
 <?php
 
 /**
- * OVERLOADING NAILS' MODELS
+ * Language model
  *
- * Note the name of this class; done like this to allow apps to extend this class.
- * Read full explanation at the bottom of this file.
- *
- **/
+ * @package     Nails
+ * @subpackage  module-testimonial
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class NAILS_Language_model extends NAILS_Model
 {
+    /**
+     * Constructs the model
+     */
     public function __construct()
     {
         parent::__construct();
@@ -18,95 +23,125 @@ class NAILS_Language_model extends NAILS_Model
 
     // --------------------------------------------------------------------------
 
-    public function get_default()
+    /**
+     * Retursn the default language object
+     * @return mixed stdClass on success, false on failure
+     */
+    public function getDefault()
     {
-        $_default   = $this->config->item('languages_default');
-        $_language  = $this->get_by_code($_default);
+        $default  = $this->config->item('languages_default');
+        $language = $this->getByCode($default);
 
-        return !empty($_language) ? $_language : false;
+        return !empty($language) ? $language : false;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_default_code()
+    /**
+     * Returns the default language's code
+     * @return mixed stdClass on success, false on failure
+     */
+    public function getDefaultCode()
     {
-        $_default = $this->get_default();
-        return empty($_default->code) ? false : $_default->code;
+        $default = $this->getDefault();
+        return empty($default->code) ? false : $default->code;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_default_label()
+    /**
+     * Returns the default language's label
+     * @return mixed stdClass on success, false on failure
+     */
+    public function getDefaultLabel()
     {
-        $_default = $this->get_default();
-        return empty($_default->label) ? false : $_default->label;
+        $default = $this->getDefault();
+        return empty($default->label) ? false : $default->label;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all()
+    /**
+     * Returns all defined languages
+     * @return array
+     */
+    public function getAll()
     {
         return $this->config->item('languages');
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_flat()
+    /**
+     * Returns all defined languages as a flat array
+     * @return array
+     */
+    public function getAllFlat()
     {
-        $_out       = array();
-        $_languages = $this->get_all();
+        $out       = array();
+        $languages = $this->getAll();
 
-        foreach ($_languages as $l) {
+        foreach ($languages as $language) {
 
-            $_out[$l->code] = $l->label;
+            $out[$language->code] = $language->label;
         }
 
-        return $_out;
+        return $out;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_enabled()
+    /**
+     * Returns all the enabled languages
+     * @return array
+     */
+    public function getAllEnabled()
     {
-        $_enabled   = $this->config->item('languages_enabled');
-        $_out       = array();
+        $enabled = $this->config->item('languages_enabled');
+        $out     = array();
 
-        foreach ($_enabled as $e) {
+        foreach ($enabled as $code) {
 
-            $_out[] = $this->get_by_code($e);
+            $out[] = $this->getByCode($code);
         }
 
-        return array_filter($_out);
+        return array_filter($out);
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_all_enabled_flat()
+    /**
+     * Returns all the enabled languages as a flat array
+     * @return array
+     */
+    public function getAllEnabledFlat()
     {
-        $_out       = array();
-        $_languages = $this->get_all_enabled();
+        $out       = array();
+        $languages = $this->getAllEnabled();
 
-        foreach ($_languages as $l) {
+        foreach ($languages as $language) {
 
-            $_out[$l->code] = $l->label;
+            $out[$language->code] = $language->label;
         }
 
-        return $_out;
+        return $out;
     }
 
     // --------------------------------------------------------------------------
 
-    public function get_by_code($code)
+    /**
+     * Returns a language by it's code
+     * @param  string $code The language code
+     * @return mixed        stdClass on success, false on failure
+     */
+    public function getByCode($code)
     {
-        $_languages = $this->get_all();
-
-        return !empty($_languages[$code]) ? $_languages[$code] : false;
+        $languages = $this->getAll();
+        return !empty($languages[$code]) ? $languages[$code] : false;
     }
 }
 
-
 // --------------------------------------------------------------------------
-
 
 /**
  * OVERLOADING NAILS' MODELS

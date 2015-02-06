@@ -597,7 +597,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     protected function instantiateLanguages()
     {
         //  Define default language
-        $_default = $this->language_model->get_default();
+        $_default = $this->language_model->getDefault();
 
         if (empty($_default)) {
 
