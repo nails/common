@@ -86,8 +86,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         // --------------------------------------------------------------------------
 
-        //  If we're on a staging environment then prompt for a password;
-        //  but only if a password has been defined in app.php
+        /**
+         * If we're on a staging environment then prompt for a password; but only if
+         * a password has been defined in app.php
+         */
 
         $this->staging();
 
