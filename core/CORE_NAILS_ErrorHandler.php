@@ -137,7 +137,7 @@ class CORE_NAILS_ErrorHandler
         }
 
         //  Should we show this error?
-        if ((bool)ini_get('display_errors')) {
+        if ((bool) ini_get('display_errors') && error_reporting() !== 0) {
 
             $severity = isset(self::$levels[$errno]) ? self::$levels[$errno] : 'Unknown';
             $message  = $errstr;
