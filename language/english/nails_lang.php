@@ -54,7 +54,7 @@ $lang['action_choose']       = 'Choose';
 // --------------------------------------------------------------------------
 
 //  Common form validation
-$lang['fv_there_were_errors']           = '<strong>Sorry,</strong> there were errors. Please check highlighted fields.';
+$lang['fv_there_were_errors']           = 'Please check highlighted fields.';
 $lang['fv_required']                    = 'This field is required.';
 $lang['fv_required_field']              = 'The %s field is required.';
 $lang['fv_valid_email']                 = 'This must be a valid email.';
