@@ -30,3 +30,26 @@ if (!function_exists('cmsBlock'))
         return $block->value;
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cmsSlider'))
+{
+    /**
+     * Returns a CMS slider
+     * @param  string $slug The slider's ID or slug
+     * @return mixed        stdClass on success, false on failure
+     */
+    function cmsSlider($idSlug)
+    {
+        get_instance()->load->model('cms/cms_slider_model');
+        $slider = get_instance()->cms_block_model->get_by_id_or_slug($idSlug);
+
+        if (!$slider) {
+
+            return false;
+        }
+
+        return $slider;
+    }
+}

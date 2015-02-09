@@ -197,3 +197,48 @@ if (!function_exists('get_mime_from_file'))
         return get_instance()->cdn->get_mime_from_file($file);
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnManageUrl'))
+{
+    /**
+     * Generate a valid URL for the CDN manager
+     * @param  string  $bucket   The bucket the manager should use
+     * @param  array   $callback The callback the manager should use for the "insert" buttons.
+     * @param  boolean $secure   Whether or not the link should be secure or not
+     * @return string
+     */
+    function cdnManageUrl($bucket, $callback = array(), $passback = null, $secure = false)
+    {
+        $params = array();
+
+        /**
+         * The callback should be a two element array, the first being the
+         * instance variable, the second being the method name.
+         */
+        $params['callback'] = $callback;
+
+        /**
+         * Passback is any data that the caller wishes to be sent back to the callback
+         */
+
+        $params['passback'] = json_encode($passback);
+
+        /**
+         * The bucket should be hashed up and paired with an irreversible hash for
+         * verification. Why? So that it's not trivial to mess about with buckets
+         * willy nilly.
+         */
+
+        $nonce = time();
+
+        $params['bucket'] = get_instance()->encrypt->encode($bucket . '|' . $nonce, APP_PRIVATE_KEY);
+        $params['hash']   = md5($bucket . '|' . $nonce . '|' . APP_PRIVATE_KEY);
+
+        //  Prep the query string
+        $params = http_build_query($params);
+
+        return site_url('cdn/manager/browse?' . $params, $secure);
+    }
+}
