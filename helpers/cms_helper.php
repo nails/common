@@ -14,8 +14,8 @@ if (!function_exists('cmsBlock'))
 {
     /**
      * Returns a block's value
-     * @param  string $slug The block's slug
-     * @return mixed        String on success, false on failure
+     * @param  string $idSlug The block's ID or slug
+     * @return mixed          String on success, false on failure
      */
     function cmsBlock($slug)
     {
@@ -37,8 +37,8 @@ if (!function_exists('cmsSlider'))
 {
     /**
      * Returns a CMS slider
-     * @param  string $slug The slider's ID or slug
-     * @return mixed        stdClass on success, false on failure
+     * @param  string $idSlug The slider's ID or slug
+     * @return mixed          stdClass on success, false on failure
      */
     function cmsSlider($idSlug)
     {
@@ -51,5 +51,28 @@ if (!function_exists('cmsSlider'))
         }
 
         return $slider;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cmsMenu'))
+{
+    /**
+     * Returns a CMS menu
+     * @param  string $idSlug The menu's ID or slug
+     * @return mixed          stdClass on success, false on failure
+     */
+    function cmsMenu($idSlug)
+    {
+        get_instance()->load->model('cms/cms_slider_model');
+        $menu = get_instance()->cms_block_model->get_by_id_or_slug($idSlug);
+
+        if (!$menu) {
+
+            return false;
+        }
+
+        return $menu;
     }
 }
