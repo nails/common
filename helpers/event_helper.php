@@ -14,7 +14,6 @@ if (!function_exists('create_event')) {
     function create_event($type, $data = null, $createdBy = null, $ref = null, $recorded = null)
     {
         $ci =& get_instance();
-        $ci->load->library('event');
         return $ci->event->create($type, $data, $createdBy, $ref, $recorded);
     }
 }
