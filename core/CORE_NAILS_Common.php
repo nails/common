@@ -93,6 +93,8 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
     }
 }
 
+// --------------------------------------------------------------------------
+
 if (!function_exists('_NAILS_GET_MODULES')) {
 
     /**
@@ -132,6 +134,8 @@ if (!function_exists('_NAILS_GET_MODULES')) {
         return $out;
     }
 }
+
+// --------------------------------------------------------------------------
 
 if (!function_exists('_NAILS_GET_SKINS')) {
 
@@ -178,6 +182,8 @@ if (!function_exists('_NAILS_GET_SKINS')) {
     }
 }
 
+// --------------------------------------------------------------------------
+
 if (!function_exists('_NAILS_GET_DRIVERS')) {
 
     /**
@@ -222,17 +228,6 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
         return $out;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 // --------------------------------------------------------------------------
 
@@ -494,5 +489,28 @@ if (!function_exists('isPageSecure')) {
 
         //  Unknown, assume not
         return false;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('show_404'))
+{
+    /**
+     * Renders the 404 page, logging disabled by default.
+     *
+     * Note that the Exception class does log by default. Manual 404's are probably
+     * a result of some other checking and not technically a 404 so shouldn't be
+     * logged as one. )Actual_ 404's should continue to be logged however.
+     *
+     * @param  string  $page     The page which 404'd
+     * @param  boolean $logError whether to log the error or not
+     * @return void
+     */
+    function show_404($page = '', $logError = false)
+    {
+        $_error =& load_class('Exceptions', 'core');
+        $_error->show_404($page, $logError);
+        exit;
     }
 }

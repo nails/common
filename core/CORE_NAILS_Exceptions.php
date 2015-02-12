@@ -66,7 +66,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
     // --------------------------------------------------------------------------
 
     /**
-     * Returns an array of errors which ahve occurred
+     * Returns an array of errors which have occurred
      * @return array
      */
     public function recent_errors()
@@ -90,22 +90,34 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
 
     /**
      * Renders the 404 page and halts script execution
-     * @param  string  $page     The URI which 404'd
-     * @param  boolean $logError Whether or not to log the 404
+     * @param  string $page The URI which 404'd
      * @return void
      */
     public function show_404($page = '', $logError = true)
     {
-        $heading = "404 Page Not Found";
-        $message = "The page you requested was not found.";
+        $heading = '404 Page Not Found';
+        $message = 'The page you requested was not found.';
 
         if (empty($page)) {
 
             $page = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         }
 
-        // By default we log this, but allow a dev to skip it
-        if ($logError) {
+        /**
+         * By default we log this, but allow a dev to skip it. Additionally, skip
+         * if it's a HEAD request.
+         *
+         * Reasoning: I often use HEAD requests to check the existance of a file
+         * in JS before fetching it. I feel that these shouldn't be logged. A
+         * direct GET/POST/etc request to a non existant file is more  likely a
+         * user following a deadlink so these _should_ be logged.
+         *
+         * If you disagree, open up an issue and we'll work something out.
+         */
+
+        $requestMethod = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
+
+        if ($logError && $requestMethod != 'HEAD') {
 
             log_message('error', '404 Page Not Found --> ' . $page);
         }

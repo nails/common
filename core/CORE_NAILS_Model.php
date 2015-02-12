@@ -421,14 +421,27 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $results = $this->db->get($table)->result();
+        /**
+         * How are we handling execution? If $data['RETURN_QUERY_OBJECT'] is truthy,
+         * then simply return the raw query object - leave it up to the caller to
+         * process/iterate as required
+         */
 
-        for ($i = 0; $i < count($results); $i++) {
+        if (empty($data['RETURN_QUERY_OBJECT'])) {
 
-            $this->_format_object($results[$i]);
+            $results = $this->db->get($table)->result();
+
+            for ($i = 0; $i < count($results); $i++) {
+
+                $this->_format_object($results[$i]);
+            }
+
+            return $results;
+
+        } else {
+
+            return $this->db->get($table);
         }
-
-        return $results;
     }
 
     // --------------------------------------------------------------------------
@@ -808,7 +821,7 @@ class CORE_NAILS_Model extends CI_Model
      * Returns protected property $_table
      * @return string
      */
-    public function get_property_table()
+    public function getTableName()
     {
         return $this->_table;
     }
@@ -819,7 +832,7 @@ class CORE_NAILS_Model extends CI_Model
      * Returns protected property $_table_prefix
      * @return string
      */
-    public function get_property_table_prefix()
+    public function getTablePrefix()
     {
         return $this->_table_prefix;
     }
