@@ -584,7 +584,7 @@ class NAILS_Datetime_model extends NAILS_Model
         // If it's less than 20 seconds, return 'a moment ago'
         if (is_null($lessTenMins) && substr($periods[$j], 0, 6) == 'second' && $difference <=20) {
 
-            return 'a moment ago';
+            return 'a moment ' . $tense;
         }
 
         //  If $lessTenMins is set then return that if less than 10 minutes

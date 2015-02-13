@@ -243,6 +243,42 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      **/
     protected function _getcount_common($data = array(), $_caller = null)
     {
+        /**
+         * Handle filters
+         *
+         * Filters are basically an easyw ay to modify the query's where element.
+         */
+
+        if (!empty($data['filters'])) {
+
+            if ($this->input->get('filter')) {
+
+                foreach ($data['filters'] as $filterIndex => $filter) {
+
+                    $whereFilter = array()  ;
+                    foreach ($filter->options as $optionIndex => $option) {
+
+                        if (!empty($_GET['filter'][$filterIndex][$optionIndex])) {
+
+                            $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
+                        }
+                    }
+
+                    if (!empty($whereFilter)) {
+
+                        if (!isset($data['where'])) {
+
+                            $data['where'] = array();
+                        }
+
+                        $data['where'][] = '(' . implode(' OR ', $whereFilter) . ')';
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Handle wheres
         $wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
 
@@ -252,20 +288,13 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                 if (is_array($data[$whereType])) {
 
-                    /**
-                     * If it's a single dimensional array then just bung that into
-                     * the db->where(). If not, loop it and parse.
-                     */
+                    foreach ($data[$whereType] as $where) {
 
-                    $_first = reset($data[$whereType]);
+                        if (is_string($where)) {
 
-                    if (is_string($_first)) {
+                            $this->db->where($where);
 
-                        $this->db->$whereType($data[$whereType]);
-
-                    } else {
-
-                        foreach ($data[$whereType] as $where) {
+                        } else {
 
                             //  Work out column
                             $column = !empty($where['column']) ? $where['column'] : null;
