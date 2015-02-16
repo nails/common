@@ -243,13 +243,28 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      **/
     protected function _getcount_common($data = array(), $_caller = null)
     {
+        $this->_getcount_compile_filters($data);
+        $this->_getcount_compile_wheres($data);
+        $this->_getcount_compile_likes($data);
+        $this->_getcount_compile_sort($data);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles any active filters back into the $data array
+     * @param  array &$data The data array
+     * @return void
+     */
+    protected function _getcount_compile_filters(&$data)
+    {
         /**
          * Handle filters
          *
-         * Filters are basically an easyw ay to modify the query's where element.
+         * Filters are basically an easy way to modify the query's where element.
          */
 
-        if (!empty($data['filters']) && !empty($_GET['filter'])) {
+        if (!empty($data['filters'])) {
 
             foreach ($data['filters'] as $filterIndex => $filter) {
 
@@ -258,6 +273,12 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                     if (!empty($_GET['filter'][$filterIndex][$optionIndex])) {
 
+                        //  Filtering is happening and the item is to be filtered
+                        $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
+
+                    } elseif (empty($_GET['filter']) && $option->checked) {
+
+                        //  There's no filtering happening and the item is checked by default
                         $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
                     }
                 }
@@ -273,119 +294,349 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                 }
             }
         }
+    }
 
-        // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-        //  Handle wheres
-        $wheres = array('where', 'where_in', 'or_where_in', 'where_not_in', 'or_where_not_in');
+    /**
+     * Compiles any where's into the query
+     * @param  array &$data The data array
+     * @return void
+     */
+    protected function _getcount_compile_wheres(&$data)
+    {
+        /**
+         * Handle where's
+         *
+         * This is an array of the various type of where that can be passed in via $data.
+         * The first element is the key and the second is how multiple items within the
+         * group should be glued together.
+         *
+         * Each type of where is grouped in it's own set of parenthesis, multiple groups
+         * are glued together with ANDs
+         */
 
-        foreach ($wheres as $whereType) {
+        $wheres = array(
+            'where' => 'AND',
+            'or_where' => 'OR',
+            'where_in' => 'AND',
+            'or_where_in' => 'OR',
+            'where_not_in' => 'AND',
+            'or_where_not_in' => 'OR'
+        );
+
+        $whereCompiled = array();
+
+        foreach ($wheres as $whereType => $whereGlue) {
 
             if (!empty($data[$whereType])) {
 
+                $whereCompiled[$whereType] = array();
+
                 if (is_array($data[$whereType])) {
+
+                    /**
+                     * The value is an array. For each element we need to compile as appropriate
+                     * and add to $whereCompiled.
+                     */
 
                     foreach ($data[$whereType] as $where) {
 
                         if (is_string($where)) {
 
-                            $this->db->where($where);
+                            /**
+                             * The value is a straight up string, assume this is a compiled
+                             * where string,
+                             */
+
+                            $whereCompiled[$whereType][] = $where;
 
                         } else {
 
+                            /**
+                             * The value is an array, try and determine the various parts
+                             * of the query. We use strings which are unlikely to be found
+                             * as falsey values (such as null) are perfectly likely.
+                             */
+
                             //  Work out column
-                            $column = !empty($where['column']) ? $where['column'] : null;
+                            $col = !empty($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
-                            if (is_null($column)) {
+                            if ($col === '[NAILS-COL-NOT-FOUND]') {
 
-                                $column = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
+                                $col = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
                             //  Work out value
-                            $value = isset($where['value']) ? $where['value'] : null;
+                            $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
 
-                            if (is_null($value)) {
+                            if ($val === '[NAILS-VAL-NOT-FOUND]') {
 
-                                $value = !empty($where[1]) ? $where[1] : null;
+                                $val = !empty($where[1]) ? $where[1] : null;
                             }
 
                             //  Escaped?
                             $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
 
-                            //  If the $column is an array then we should concat them together
-                            if (is_array($column)) {
+                            //  If the $col is an array then we should concat them together
+                            if (is_array($col)) {
 
-                                $column = 'CONCAT_WS(" ", ' . implode(',', $column) . ')';
+                                $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
                             }
 
-                            if ($column) {
+                            //  What's the operator?
+                            if (!$this->db->_has_operator($col)) {
 
-                                $this->db->$whereType($column, $value, $escape);
+                                $operator = '=';
+
+                            } else {
+
+                                $operator = '';
+                            }
+
+                            //  Got something?
+                            if ($col) {
+
+                                switch ($whereType) {
+
+                                    case 'where' :
+                                    case 'or_where' :
+
+                                        if ($escape) {
+
+                                            $val = $this->db->escape($val);
+                                        }
+
+                                        $whereCompiled[$whereType][] = $col . $operator . $val;
+                                        break;
+
+                                    case 'where_in' :
+                                    case 'or_where_in' :
+
+                                        if (!is_array($val)) {
+
+                                            $val = (array) $val;
+                                        }
+
+                                        if ($escape) {
+
+                                            foreach ($val as &$value) {
+
+                                                $value = $this->db->escape($value);
+                                            }
+                                        }
+
+                                        $whereCompiled[$whereType][] = $col . ' IN (' . implode(',', $val) . ')';
+                                        break;
+
+                                    case 'where_not_in' :
+                                    case 'or_where_not_in' :
+
+                                        if (!is_array($val)) {
+
+                                            $val = (array) $val;
+                                        }
+
+                                        if ($escape) {
+
+                                            foreach ($val as &$value) {
+
+                                                $value = $this->db->escape($value);
+                                            }
+                                        }
+
+                                        $whereCompiled[$whereType][] = $col . ' NOT IN (' . implode(',', $val) . ')';
+                                        break;
+                                }
                             }
                         }
                     }
 
                 } elseif (is_string($data[$whereType])) {
 
-                    $this->db->$whereType($data[$whereType]);
+                    /**
+                     * The value is a straight up string, assume this is a compiled
+                     * where string,
+                     */
+
+                    $whereCompiled[$whereType][] = $data[$whereType];
                 }
             }
         }
 
-        // --------------------------------------------------------------------------
+        /**
+         * Now we need to compile all the conditionals into one big super query.
+         * $whereStr is an array of the compressed where strings... will make
+         * sense shortly...
+         */
 
-        //  Handle Likes
-        $likes = array('like', 'or_like', 'not_like', 'or_not_like');
+        if (!empty($whereCompiled)) {
 
-        foreach ($likes as $likeType) {
+            $whereStr = array();
+
+            foreach ($whereCompiled as $whereType => $value) {
+
+                $whereStr[] = '(' . implode(' ' . $wheres[$whereType] . ' ', $value) . ')';
+            }
+
+            //  And reduce $whereStr to an actual string, like the name suggests
+            $whereStr = implode(' AND ', $whereStr);
+            $this->db->where($whereStr);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles any like's into the query
+     * @param  array &$data The data array
+     * @return void
+     */
+    protected function _getcount_compile_likes(&$data)
+    {
+        $likes = array(
+            'like' => 'AND',
+            'or_like' => 'OR',
+            'not_like' => 'AND',
+            'or_not_like' => 'OR'
+        );
+
+        $likeCompiled = array();
+
+        foreach ($likes as $likeType => $likeGlue) {
 
             if (!empty($data[$likeType])) {
 
-                if (is_string($data[$likeType])) {
+                $likeCompiled[$likeType] = array();
 
-                    $this->db->{$likeType}($data[$likeType]);
+                if (is_array($data[$likeType])) {
 
-                } elseif (is_array($data[$likeType])) {
+                    /**
+                     * The value is an array. For each element we need to compile as appropriate
+                     * and add to $likeCompiled.
+                     */
 
-                    foreach ($data[$likeType] as $like) {
+                    foreach ($data[$likeType] as $where) {
 
-                        //  Work out column
-                        $column = !empty($like['column']) ? $like['column'] : null;
+                        if (is_string($where)) {
 
-                        if (is_null($column)) {
+                            /**
+                             * The value is a straight up string, assume this is a compiled
+                             * where string,
+                             */
 
-                            $column = !empty($like[0]) && is_string($like[0]) ? $like[0] : null;
-                        }
+                            $likeCompiled[$likeType][] = $where;
 
-                        //  Work out value
-                        $value = isset($like['value']) ? $like['value'] : null;
+                        } else {
 
-                        if (is_null($value)) {
+                            /**
+                             * The value is an array, try and determine the various parts
+                             * of the query. We use strings which are unlikely to be found
+                             * as falsey values (such as null) are perfectly likely.
+                             */
 
-                            $value = !empty($like[1]) ? $like[1] : null;
-                        }
+                            //  Work out column
+                            $col = !empty($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
-                        //  Escaped?
-                        $escape = isset($like['escape']) ? (bool) $like['escape'] : false;
+                            if ($col === '[NAILS-COL-NOT-FOUND]') {
 
-                        //  If the $column is an array then we should concat them together
-                        if (is_array($column)) {
+                                $col = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
+                            }
 
-                            $column = 'CONCAT_WS(" ", ' . implode(',', $column) . ')';
-                        }
+                            //  Work out value
+                            $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
 
-                        if ($column) {
+                            if ($val === '[NAILS-VAL-NOT-FOUND]') {
 
-                            $this->db->{$likeType}($column, $value, $escape);
+                                $val = !empty($where[1]) ? $where[1] : null;
+                            }
+
+                            //  Escaped?
+                            $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
+
+                            if ($escape) {
+
+                                $val = $this->db->escape_like_str($val);
+                            }
+
+                            //  If the $col is an array then we should concat them together
+                            if (is_array($col)) {
+
+                                $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
+                            }
+
+                            //  What's the operator?
+                            if (!$this->db->_has_operator($col)) {
+
+                                $operator = '=';
+
+                            } else {
+
+                                $operator = '';
+                            }
+
+                            //  Got something?
+                            if ($col) {
+                                switch ($likeType) {
+
+                                    case 'like' :
+                                    case 'or_like' :
+
+                                        $likeCompiled[$likeType][] = $col . ' LIKE "%' . $val . '%"';
+                                        break;
+
+                                    case 'not_like' :
+                                    case 'or_not_like' :
+
+                                        $likeCompiled[$likeType][] = $col . ' NOT LIKE "%' . $val . '%"';
+                                        break;
+                                }
+                            }
                         }
                     }
+
+                } elseif (is_string($data[$likeType])) {
+
+                    /**
+                     * The value is a straight up string, assume this is a compiled
+                     * where string,
+                     */
+
+                    $likeCompiled[$likeType][] = $data[$likeType];
                 }
             }
         }
 
-        // --------------------------------------------------------------------------
+        /**
+         * Now we need to compile all the conditionals into one big super query.
+         * $whereStr is an array of the compressed where strings... will make
+         * sense shortly...
+         */
 
-        //  Handle sorting
+        if (!empty($likeCompiled)) {
+
+            $whereStr = array();
+
+            foreach ($likeCompiled as $likeType => $value) {
+
+                $whereStr[] = '(' . implode(' ' . $likes[$likeType] . ' ', $value) . ')';
+            }
+
+            //  And reduce $whereStr to an actual string, like the name suggests
+            $whereStr = implode(' AND ', $whereStr);
+            $this->db->where($whereStr);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles the sort element into the query
+     * @param  array &$data The data array
+     * @return void
+     */
+    protected function _getcount_compile_sort(&$data)
+    {
         if (!empty($data['sort'])) {
 
             /**

@@ -36,7 +36,7 @@ class CORE_NAILS_Model extends CI_Model
 
     //  Preferences
     protected $_destructive_delete;
-    protected $_per_page;
+    protected $perPage;
 
 
     /**
@@ -47,13 +47,13 @@ class CORE_NAILS_Model extends CI_Model
      * The destructor clears
      *
      * --------------------------------------------------------------------------
-     **/
+     */
 
 
     /**
      * Construct the model
      * @return void
-     **/
+     */
     public function __construct()
     {
         parent::__construct();
@@ -77,7 +77,7 @@ class CORE_NAILS_Model extends CI_Model
         $this->_table_label_column        = 'label';
         $this->_table_auto_set_timestamps = true;
         $this->_deleted_flag              = 'is_deleted';
-        $this->_per_page                  = 50;
+        $this->perPage                  = 50;
     }
 
     // --------------------------------------------------------------------------
@@ -86,7 +86,7 @@ class CORE_NAILS_Model extends CI_Model
     /**
      * Destruct the model
      * @return void
-     **/
+     */
     public function __destruct()
     {
         /**
@@ -110,7 +110,7 @@ class CORE_NAILS_Model extends CI_Model
      * Inject the user object, private by convention - only really used by a few core Nails classes
      * @param object $user The user object
      * @return void
-     **/
+     */
     public function setUserObject(&$user)
     {
         $this->user = $user;
@@ -129,7 +129,7 @@ class CORE_NAILS_Model extends CI_Model
      * @TODO: link to docs
      *
      * --------------------------------------------------------------------------
-     **/
+     */
 
 
     /**
@@ -205,7 +205,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param int      $id   The ID of the object to update
      * @param array    $data The data to update the object with
      * @return boolean
-     **/
+     */
     public function update($id, $data = array())
     {
         if (!$this->_table) {
@@ -261,7 +261,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * @param int      $id The ID of the object to mark as deleted
      * @return boolean
-     **/
+     */
     public function delete($id)
     {
         //  Perform this check here so the error message is more easily traced.
@@ -300,7 +300,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * @param int      $id The ID of the object to restore
      * @return boolean
-     **/
+     */
     public function restore($id)
     {
         //  Perform this check here so the error message is more easily traced.
@@ -336,7 +336,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * @param int      $id The ID of the object to destroy
      * @return boolean
-     **/
+     */
     public function destroy($id)
     {
         //  Perform this check here so the error message is more easily traced.
@@ -361,7 +361,7 @@ class CORE_NAILS_Model extends CI_Model
      * These methods provide a consistent interface for retrieving and counting objects
      *
      * --------------------------------------------------------------------------
-     **/
+     */
 
 
     /**
@@ -372,7 +372,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @param string $_caller        Internal flag to pass to _getcount_common(), contains the calling method
      * @return array
-     **/
+     */
     public function get_all($page = null, $perPage = null, $data = array(), $includeDeleted = false, $_caller = 'GET_ALL')
     {
         if (!$this->_table) {
@@ -403,11 +403,10 @@ class CORE_NAILS_Model extends CI_Model
             $page = $page < 0 ? 0 : $page;
 
             //  Work out what the offset should be
-            $_per_page = is_null($perPage) ? $this->_per_page : (int) $perPage;
-            $_offset   = $page * $perPage;
+            $perPage = is_null($perPage) ? $this->perPage : (int) $perPage;
+            $offset   = $page * $perPage;
 
-            $this->db->limit($perPage, $_offset);
-
+            $this->db->limit($perPage, $offset);
         }
 
         // --------------------------------------------------------------------------
@@ -500,7 +499,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param  int      $id   The ID of the object to fetch
      * @param  mixed    $data Any data to pass to _getcount_common()
      * @return stdClass
-     **/
+     */
     public function get_by_id($id, $data = array())
     {
         if (!$this->_table) {
@@ -544,7 +543,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param  array $id   An array of IDs to fetch
      * @param  mixed $data Any data to pass to _getcount_common()
      * @return array
-     **/
+     */
     public function get_by_ids($ids, $data = array())
     {
         if (!$this->_table) {
@@ -577,7 +576,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param  int      $slug The slug of the object to fetch
      * @param  mixed    $data Any data to pass to _getcount_common()
      * @return stdClass
-     **/
+     */
     public function get_by_slug($slug, $data = array())
     {
         if (!$this->_table) {
@@ -621,7 +620,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param  array $slug An array of slugs to fetch
      * @param  mixed $data Any data to pass to _getcount_common()
      * @return array
-     **/
+     */
     public function get_by_slugs($slugs, $data = array())
     {
         if (!$this->_table) {
@@ -660,7 +659,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param  mixed    $idSlug The ID or slug of the object to fetch
      * @param  mixed    $data   Any data to pass to _getcount_common()
      * @return stdClass
-     **/
+     */
     public function get_by_id_or_slug($idSlug, $data = array())
     {
         if (is_numeric($idSlug)) {
@@ -677,10 +676,11 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Counts all objects
-     * @param  mixed $data Any data to pass to _getcount_common()
-     * @return int
-     **/
-    public function count_all($data = array())
+     * @param  array   $data           An array of data to pass to _Getcount_common()
+     * @param  boolean $includeDeleted Whetehr to include deleted objects or not
+     * @return integer
+     */
+    public function count_all($data = array(), $includeDeleted = false)
     {
         if (!$this->_table) {
 
@@ -698,6 +698,15 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
+        //  If non-destructive delete is enabled then apply the delete query
+        if (!$this->_destructive_delete && !$includeDeleted) {
+
+            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $this->db->where($prefix . $this->_deleted_flag, false);
+        }
+
+        // --------------------------------------------------------------------------
+
         return $this->db->count_all_results($table);
     }
 
@@ -709,7 +718,7 @@ class CORE_NAILS_Model extends CI_Model
      * These methods provide additional functionality to models
      *
      * --------------------------------------------------------------------------
-     **/
+     */
 
 
     /**
@@ -722,7 +731,7 @@ class CORE_NAILS_Model extends CI_Model
      * @param int    $ignoreId An ID to ignore when searching
      * @param string $idColumn The column to use for the ID, defaults to $this->_table_id_column
      * @return string
-     **/
+     */
     protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
     {
         //  Perform this check here so the error message is more easily traced.
@@ -795,7 +804,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * @param object $obj A reference to the object being formatted.
      * @return void
-     **/
+     */
     protected function _format_object(&$obj)
     {
         //  extended this method to format the returned objects
