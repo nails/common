@@ -240,8 +240,8 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
     /**
      * This method applies the conditionals which are common across the get_*()
      * methods and the count() method.
-     * @param array  $data    Data passed from the calling method
-     * @param string $_caller The name of the calling method
+     * @param  array  $data    Data passed from the calling method
+     * @param  string $_caller The name of the calling method
      * @return void
      **/
     protected function _getcount_common($data = array(), $_caller = null)
@@ -256,10 +256,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
     /**
      * Compiles any active filters back into the $data array
-     * @param  array &$data The data array
+     * @param  array  &$data   The data array
+     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_filters(&$data)
+    protected function _getcount_compile_filters(&$data, $_caller = null)
     {
         /**
          * Handle filters
@@ -303,10 +304,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
     /**
      * Compiles any where's into the query
-     * @param  array &$data The data array
+     * @param  array  &$data   The data array
+     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_wheres(&$data)
+    protected function _getcount_compile_wheres(&$data, $_caller = null)
     {
         /**
          * Handle where's
@@ -492,10 +494,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
     /**
      * Compiles any like's into the query
-     * @param  array &$data The data array
+     * @param  array  &$data   The data array
+     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_likes(&$data)
+    protected function _getcount_compile_likes(&$data, $_caller = null)
     {
         $likes = array(
             'like' => 'AND',
@@ -625,10 +628,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
     /**
      * Compiles the sort element into the query
-     * @param  array &$data The data array
+     * @param  array  &$data   The data array
+     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_sort(&$data)
+    protected function _getcount_compile_sort(&$data, $_caller = null)
     {
         if (!empty($data['sort'])) {
 
