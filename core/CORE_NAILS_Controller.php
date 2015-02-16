@@ -14,7 +14,7 @@
 class CORE_NAILS_Controller extends MX_Controller {
 
     protected $data;
-    private $_supported_lang;
+    protected $user;
     protected $nailsErrorHandler;
 
     // --------------------------------------------------------------------------
@@ -22,11 +22,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     /**
      * Build the main framework. All autoloaded items have been loaded and
      * instantiated by this point and are safe to use.
-     *
-     * @access  public
-     * @return  void
-     *
-     **/
+     */
     public function __construct()
     {
         parent::__construct();
@@ -135,7 +131,7 @@ class CORE_NAILS_Controller extends MX_Controller {
                 //  Fall over, routes_app.php *must* be there
                 $subject  = 'Failed To generate routes_app.php';
                 $message  = 'routes_app.php was not found and could not be generated. ';
-                $messgae .= $this->routes_model->last_error();
+                $message .= $this->routes_model->last_error();
 
                 showFatalError($subject, $message);
 
@@ -341,7 +337,7 @@ class CORE_NAILS_Controller extends MX_Controller {
                 $this->load->helper('tools');
 
                 $whitelistIp   = (array) app_setting('maintenance_mode_whitelist');
-                $isWhitelisted = isIpInRange($this->input->ip_address(), $whitelistIp);
+                $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
 
             } else {
 
@@ -351,7 +347,7 @@ class CORE_NAILS_Controller extends MX_Controller {
 
             // --------------------------------------------------------------------------
 
-            if (!$isWhitelisted) {
+            if (!$isWhiteListed) {
 
                 if (!$this->input->is_cli_request()) {
 

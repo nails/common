@@ -95,7 +95,6 @@ if (!function_exists('form_field')) {
     function form_field($field, $tip = '')
     {
         //  Set var defaults
-        $_field             = array();
         $_field_id          = isset($field['id'])             ? $field['id']          : NULL;
         $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
         $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
@@ -107,7 +106,6 @@ if (!function_exists('form_field')) {
         $_field_placeholder = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
         $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : FALSE;
         $_field_error       = isset($field['error'])          ? $field['error']       : FALSE;
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : FALSE;
         $_field_class       = isset($field['class'])          ? $field['class']       : '';
         $_field_data        = isset($field['data'])           ? $field['data']        : array();
         $_field_info        = isset($field['info'])           ? $field['info']        : FALSE;
@@ -408,7 +406,6 @@ if (!function_exists('form_field_mm')) {
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_field_error_cls       = form_error($_field['key']) || $_field['error'] ? 'error' : '';
-        $_readonly              = $_field['readonly'] ? 'readonly="readonly"' : '';
         $_readonly_cls          = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
@@ -565,7 +562,6 @@ if (!function_exists('form_field_mm_image')) {
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_field_error           = form_error($_field['key']) || $_field['error'] ? 'error' : '';
-        $_readonly              = $_field['readonly'] ? 'readonly="readonly"' : '';
         $_readonly_cls          = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
@@ -697,7 +693,6 @@ if (!function_exists('form_field_multiimage')) {
     function form_field_multiimage($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : NULL;
         $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
         $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
         $_field_key         = isset($field['key'])            ? $field['key']         : NULL;
@@ -705,11 +700,9 @@ if (!function_exists('form_field_multiimage')) {
         $_field_default     = isset($field['default'])        ? $field['default']     : NULL;
         $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
         $_field_required    = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field_placeholder = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
         $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : FALSE;
         $_field_error       = isset($field['error'])          ? $field['error']       : FALSE;
         $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : FALSE;
-        $_field_class       = isset($field['class'])          ? $field['class']       : FALSE;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip               = array();
@@ -720,7 +713,6 @@ if (!function_exists('form_field_multiimage')) {
 
         $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
         $_error_class       = $_error ? 'error' : '';
-        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
         $_readonly_cls      = $_field_readonly ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
@@ -1573,7 +1565,8 @@ if (!function_exists('form_field_radio')) {
 
 
         //  Remaining options
-        for ($i = 1; $i < count($options); $i++) :
+        $numOptions = count($options);
+        for ($i = 1; $i < $numOptions; $i++) :
 
             $_out .= '<label>';
 
@@ -1594,7 +1587,8 @@ if (!function_exists('form_field_radio')) {
             //  Does the field have an ID?
             $_id = isset($options[$i]['id']) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
 
-            $_out .= form_radio($_field['key'], $options[$i]['value'], $_selected) . '<span class="text">' . $options[$i]['label'] . '</span>';
+            $_out .= form_radio($_field['key'], $options[$i]['value'], $_selected, $_id);
+            $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
 
             $_out .= '</label>';
 
@@ -1716,7 +1710,8 @@ if (!function_exists('form_field_checkbox')) {
 
 
         //  Remaining options
-        for ($i = 1; $i < count($options); $i++) :
+        $numOptions = count($options);
+        for ($i = 1; $i < $numOptions; $i++) :
 
             $_out .= '<label>';
 

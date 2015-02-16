@@ -97,23 +97,26 @@ if (!function_exists('return_bytes'))
 
             case 'M':
 
-                return (int) $sizeStr * 1048576;
+                $return = (int) $sizeStr * 1048576;
                 break;
 
             case 'K':
 
-                return (int) $sizeStr * 1024;
+                $return = (int) $sizeStr * 1024;
                 break;
 
             case 'G':
 
-                return (int) $sizeStr * 1073741824;
+                $return = (int) $sizeStr * 1073741824;
                 break;
 
+            default:
 
-                return $sizeStr;
+                $return = $sizeStr;
                 break;
         }
+
+        return $return;
     }
 }
 
@@ -270,7 +273,6 @@ if (!function_exists('readFileChunked'))
      */
     function readFileChunked($filename, $chunkSize = 1048576)
     {
-        $buffer    = '';
         $bytesRead = 0;
 
         // $handle = fopen($filename, "rb");

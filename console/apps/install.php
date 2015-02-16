@@ -211,7 +211,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 $createUser = $this->confirm($question, false, $input, $output);
                 $users      = array();
 
-                $userFields = array();
+                $userField = array();
                 $userField['first_name'] = 'First Name';
                 $userField['last_name']  = 'Surname';
                 $userField['email']      = 'Email Address';
@@ -713,11 +713,12 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
             $appFile = file_get_contents($path);
             $pattern = '/define\([\'|"](.+?)[\'|"]\,.*[\'|"](.*?)[\'|"]\)/';
-            $appVars = preg_match_all($pattern, $appFile, $matches);
+            preg_match_all($pattern, $appFile, $matches);
 
             if (!empty($matches[0])) {
 
-                for ($i = 0; $i < count($matches[0]); $i++) {
+                $numMatches = count($matches[0]);
+                for ($i = 0; $i < $numMatches; $i++) {
 
                     //  Check to see if it's already been requested
                     $exists = false;

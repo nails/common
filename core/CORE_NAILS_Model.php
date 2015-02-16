@@ -52,7 +52,6 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Construct the model
-     * @return void
      */
     public function __construct()
     {
@@ -428,9 +427,10 @@ class CORE_NAILS_Model extends CI_Model
 
         if (empty($data['RETURN_QUERY_OBJECT'])) {
 
-            $results = $this->db->get($table)->result();
+            $results    = $this->db->get($table)->result();
+            $numResults = count($results);
 
-            for ($i = 0; $i < count($results); $i++) {
+            for ($i = 0; $i < $numResults; $i++) {
 
                 $this->_format_object($results[$i]);
             }
@@ -629,7 +629,7 @@ class CORE_NAILS_Model extends CI_Model
 
         } else {
 
-            $_prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------

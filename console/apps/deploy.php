@@ -201,7 +201,7 @@ class CORE_NAILS_Deploy extends CORE_NAILS_App
 
         $input = new ArrayInput($arguments);
         $input->setInteractive($input->isInteractive());
-        $result = $command->run($input, $output);
+        $command->run($input, $output);
 
         $output->writeln('<info>Finished database migration</info>');
 

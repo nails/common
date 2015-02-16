@@ -60,7 +60,6 @@ class MX_Config extends CI_Config
 		//	If SSL routing is enabled then parse the URL
 		if ( APP_SSL_ROUTING ) :
 
-			$_prefix = 'https://';
 			$this->load( 'routes_ssl' );
 
 			// --------------------------------------------------------------------------

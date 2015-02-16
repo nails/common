@@ -142,7 +142,7 @@ trait NAILS_COMMON_TRAIT_CACHING
         // --------------------------------------------------------------------------
 
         //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
+        $prefix = $this->_cache_prefix();
 
         // --------------------------------------------------------------------------
 
@@ -151,22 +151,25 @@ trait NAILS_COMMON_TRAIT_CACHING
             case 'MEMCACHED':
 
                 //  @TODO
+                $return = false;
                 break;
 
             case 'LOCAL':
             default:
 
-                if (isset($this->_cache_values[md5($_prefix . $key)])) {
+                if (isset($this->_cache_values[md5($prefix . $key)])) {
 
-                    return unserialize($this->_cache_values[md5($_prefix . $key)]);
+                    $return = unserialize($this->_cache_values[md5($prefix . $key)]);
 
                 } else {
 
-                    return false;
+                    $return = false;
 
                 }
                 break;
         }
+
+        return $return;
     }
 
     // --------------------------------------------------------------------------
@@ -186,7 +189,7 @@ trait NAILS_COMMON_TRAIT_CACHING
         // --------------------------------------------------------------------------
 
         //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
+        $prefix = $this->_cache_prefix();
 
         // --------------------------------------------------------------------------
 
@@ -200,7 +203,7 @@ trait NAILS_COMMON_TRAIT_CACHING
             case 'LOCAL':
             default:
 
-                unset($this->_cache_values[md5($_prefix . $key)]);
+                unset($this->_cache_values[md5($prefix . $key)]);
 
                 $_key = array_search($key, $this->_cache_keys);
 
@@ -243,10 +246,10 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      **/
     protected function _getcount_common($data = array(), $_caller = null)
     {
-        $this->_getcount_compile_filters($data);
-        $this->_getcount_compile_wheres($data);
-        $this->_getcount_compile_likes($data);
-        $this->_getcount_compile_sort($data);
+        $this->_getcount_compile_filters($data, $_caller);
+        $this->_getcount_compile_wheres($data, $_caller);
+        $this->_getcount_compile_likes($data, $_caller);
+        $this->_getcount_compile_sort($data, $_caller);
     }
 
     // --------------------------------------------------------------------------
@@ -563,16 +566,6 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                             if (is_array($col)) {
 
                                 $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
-                            }
-
-                            //  What's the operator?
-                            if (!$this->db->_has_operator($col)) {
-
-                                $operator = '=';
-
-                            } else {
-
-                                $operator = '';
                             }
 
                             //  Got something?

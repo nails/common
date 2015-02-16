@@ -297,7 +297,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         if (!empty($nails)) {
 
             $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>Nails</info>... ');
-            $result = $this->doMigration($nails, $input, $output);
+            $result = $this->doMigration($nails, $output);
 
             if ($result) {
 
@@ -317,7 +317,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             foreach ($enabledModules as $module) {
 
                 $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>' . $module->name . '</info>... ');
-                $result = $this->doMigration($module, $input, $output);
+                $result = $this->doMigration($module, $output);
 
                 if ($result) {
 
@@ -336,7 +336,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         if (!empty($app)) {
 
             $output->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>App</info>... ');
-            $result = $this->doMigration($app, $input, $output);
+            $result = $this->doMigration($app, $output);
 
             if ($result) {
 
@@ -411,7 +411,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                 //  Add a row for the module
                 $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$moduleName', NULL);";
-                $result = $this->dbQuery($sql);
+                $this->dbQuery($sql);
 
                 $currentVersion = null;
 
@@ -462,16 +462,14 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     /**
      * Executes a migration
      * @param  string          $module The migration details object
-     * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return boolean
      */
-    protected function doMigration($module, $input, $output)
+    protected function doMigration($module, $output)
     {
         //  Map the directory and fetch only the files we need
         $path       = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
         $dirMap     = $this->mapDir($path);
-        $migrations = array();
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
         $current = is_null($module->start) ? -1 : $module->start;

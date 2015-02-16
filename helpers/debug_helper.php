@@ -50,25 +50,20 @@ if (!function_exists('dump'))
             $output = '<pre>' . print_r($var, true) . '</pre>';
         }
 
-        //  Check the global ENVIRONMENT setting.
-        switch (ENVIRONMENT) {
+        /**
+         * Check the global ENVIRONMENT setting. We only output/die in
+         * non-production environments
+         */
 
-            case 'PRODUCTION':
+        if (ENVIRONMENT != 'PRODUCTION') {
 
-                //  Mute output regardless of setting
-                return;
-                break;
+            //  Continue execution unless instructed otherwise
+            if ($die !== false) {
 
-            default:
+                die("\n\n" . $output . "\n\n");
+            }
 
-                //  Continue execution unless instructed otherwise
-                if ($die !== false) {
-
-                    die("\n\n" . $output . "\n\n");
-                }
-
-                echo "\n\n" . $output . "\n\n";
-                break;
+            echo "\n\n" . $output . "\n\n";
         }
     }
 }
