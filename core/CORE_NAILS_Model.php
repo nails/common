@@ -514,7 +514,15 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $this->db->where($prefix . $this->_table_id_column, $id);
+        if (!isset($data['where'])) {
+
+            $data['where'] = array();
+        }
+
+        $data['where'][] = array($prefix . $this->_table_id_column, $id);
+
+        // --------------------------------------------------------------------------
+
         $result = $this->get_all(null, null, $data, false, 'GET_BY_ID');
 
         // --------------------------------------------------------------------------
@@ -550,7 +558,15 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $this->db->where_in($prefix . $this->_table_id_column, $ids);
+        if (!isset($data['where_in'])) {
+
+            $data['where_in'] = array();
+        }
+
+        $data['where_in'][] = array($prefix . $this->_table_id_column, $ids);
+
+        // --------------------------------------------------------------------------
+
         return $this->get_all(null, null, $data, false, 'GET_BY_IDS');
     }
 
@@ -575,7 +591,15 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $this->db->where($prefix . $this->_table_slug_column, $slug);
+        if (!isset($data['where'])) {
+
+            $data['where'] = array();
+        }
+
+        $data['where'][] = array($prefix . $this->_table_slug_column, $slug);
+
+        // --------------------------------------------------------------------------
+
         $result = $this->get_all(null, null, $data, false, 'GET_BY_SLUG');
 
         // --------------------------------------------------------------------------
@@ -611,7 +635,15 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $this->db->where_in($_prefix . $this->_table_slug_column, $slugs);
+        if (!isset($data['where_in'])) {
+
+            $data['where_in'] = array();
+        }
+
+        $data['where_in'][] = array($prefix . $this->_table_slug_column, $slugs);
+
+        // --------------------------------------------------------------------------
+
         return $this->get_all(null, null, $data, false, 'GET_BY_SLUGS');
     }
 

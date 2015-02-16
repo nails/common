@@ -249,30 +249,27 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
          * Filters are basically an easyw ay to modify the query's where element.
          */
 
-        if (!empty($data['filters'])) {
+        if (!empty($data['filters']) && !empty($_GET['filter'])) {
 
-            if ($this->input->get('filter')) {
+            foreach ($data['filters'] as $filterIndex => $filter) {
 
-                foreach ($data['filters'] as $filterIndex => $filter) {
+                $whereFilter = array()  ;
+                foreach ($filter->options as $optionIndex => $option) {
 
-                    $whereFilter = array()  ;
-                    foreach ($filter->options as $optionIndex => $option) {
+                    if (!empty($_GET['filter'][$filterIndex][$optionIndex])) {
 
-                        if (!empty($_GET['filter'][$filterIndex][$optionIndex])) {
+                        $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
+                    }
+                }
 
-                            $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
-                        }
+                if (!empty($whereFilter)) {
+
+                    if (!isset($data['where'])) {
+
+                        $data['where'] = array();
                     }
 
-                    if (!empty($whereFilter)) {
-
-                        if (!isset($data['where'])) {
-
-                            $data['where'] = array();
-                        }
-
-                        $data['where'][] = '(' . implode(' OR ', $whereFilter) . ')';
-                    }
+                    $data['where'][] = '(' . implode(' OR ', $whereFilter) . ')';
                 }
             }
         }

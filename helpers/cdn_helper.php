@@ -135,15 +135,16 @@ if (!function_exists('cdn_expiring_url'))
 {
     /**
      * Returns an expiring url
-     * @param  string  $bucket  The bucket which the image resides in
-     * @param  string  $expires The length of time the URL should be valid for, in seconds
+     * @param  string  $bucket        The bucket which the image resides in
+     * @param  string  $expires       The length of time the URL should be valid for, in seconds
+     * @param  boolean $forceDownload Whether or not the URL should stream to the browser, or forcibly download
      * @return string
      */
-    function cdn_expiring_url($object, $expires)
+    function cdn_expiring_url($object, $expires, $forceDownload = false)
     {
         get_instance()->load->library('cdn/cdn');
 
-        return get_instance()->cdn->url_expiring($object, $expires);
+        return get_instance()->cdn->url_expiring($object, $expires, $forceDownload);
     }
 }
 
