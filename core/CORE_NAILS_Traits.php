@@ -264,23 +264,34 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
     {
         /**
          * Handle filters
-         *
          * Filters are basically an easy way to modify the query's where element.
          */
 
-        if (!empty($data['filters'])) {
+        //  Checkbox Filters
+        if (!empty($data['cbFilters'])) {
 
-            foreach ($data['filters'] as $filterIndex => $filter) {
+            foreach ($data['cbFilters'] as $filterIndex => $filter) {
+
+                /**
+                 * If a column isn't specified by the filter then ignore it. This is a
+                 * feature/hack to allow the dev to add items to the search box but not
+                 * force them to use the default filtering mechanism
+                 */
+
+                if (empty($filter->column)) {
+
+                    continue;
+                }
 
                 $whereFilter = array()  ;
                 foreach ($filter->options as $optionIndex => $option) {
 
-                    if (!empty($_GET['filter'][$filterIndex][$optionIndex])) {
+                    if (!empty($_GET['cbF'][$filterIndex][$optionIndex])) {
 
                         //  Filtering is happening and the item is to be filtered
                         $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
 
-                    } elseif (empty($_GET['filter']) && $option->checked) {
+                    } elseif (empty($_GET['cbF']) && $option->checked) {
 
                         //  There's no filtering happening and the item is checked by default
                         $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
@@ -298,6 +309,9 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                 }
             }
         }
+
+        //  Dropdown Filters
+        //  @todo: implement these
     }
 
     // --------------------------------------------------------------------------
