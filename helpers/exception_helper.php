@@ -14,7 +14,7 @@ if (!function_exists('show_401'))
 		 * an unauthorised page
 		 */
 
-		if ( get_userobject()->is_logged_in()) {
+		if ( get_userobject()->isLoggedIn()) {
 
 			$title    = 'Sorry, you are not authorised to view this page';
 			$message  = 'The page you are trying to view is restricted. Sadly you don\'t have enough ';

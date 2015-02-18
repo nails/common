@@ -151,10 +151,10 @@ class CORE_NAILS_Model extends CI_Model
             $this->db->set('created', 'NOW()', false);
             $this->db->set('modified', 'NOW()', false);
 
-            if ($this->user_model->is_logged_in()) {
+            if ($this->user_model->isLoggedIn()) {
 
-                $this->db->set('created_by', active_user('id'));
-                $this->db->set('modified_by', active_user('id'));
+                $this->db->set('created_by', activeUser('id'));
+                $this->db->set('modified_by', activeUser('id'));
 
             } else {
 
@@ -223,9 +223,9 @@ class CORE_NAILS_Model extends CI_Model
 
             $this->db->set($prefix . 'modified', 'NOW()', false);
 
-            if ($this->user_model->is_logged_in()) {
+            if ($this->user_model->isLoggedIn()) {
 
-                $this->db->set($prefix . 'modified_by', active_user('id'));
+                $this->db->set($prefix . 'modified_by', activeUser('id'));
 
             } else {
 

@@ -1,94 +1,167 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-/**
- * get_userobject()
- *
- * Gets a reference to the IA user object
- *
- * @access	public
- * @return	object
- */
-if ( ! function_exists( 'get_userobject' ) )
-{
-	function &get_userobject()
-	{
-		//	So we can return a reference
-		$_fail = FALSE;
+if (!function_exists('get_userobject')) {
 
-		$_ci =& get_instance();
+    /**
+     * Returns a reference to the Nails user object
+     * @return mixed
+     */
+    function &get_userobject()
+    {
+        //  So we can return a reference
+        $fail = FALSE;
 
-		if ( ! isset( $_ci->user_model ) ) :
+        $ci =& get_instance();
 
-			return $_fail;
+        if (!isset($ci->user_model)) {
 
-		endif;
+            return $fail;
+        }
 
-		return $_ci->user_model;
-	}
+        return $ci->user_model;
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('activeUser')) {
 
-/**
- * active_user()
- *
- * Handy way of getting data from the active user object
- *
- * @access	public
- * @param	string	$key	The key(s) to fetch
- * @return	object
- */
-if ( ! function_exists( 'active_user' ) )
-{
-	function active_user( $keys = FALSE, $delimiter = ' ' )
-	{
-		$_usr_obj = get_userobject();
+    /**
+     * Alias to user_model->activeUser(); method
+     * @param  string  $keys      The key to look up in activeUser
+     * @param  string  $delimiter If multiple fields are requested they'll be joined by this string
+     * @return mixed
+     */
+    function activeUser($keys = FALSE, $delimiter = ' ')
+    {
+        $userObject =& get_userobject();
 
-		if ( $_usr_obj ) :
+        if ($userObject) {
 
-			return $_usr_obj->active_user( $keys, $delimiter );
+            return $userObject->activeUser($keys, $delimiter);
 
-		else :
+        } else {
 
-			return FALSE;
-
-		endif;
-	}
+            return false;
+        }
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('userHasPermission')) {
 
-/**
- * userHasPermission()
- *
- * Alias to user->has_permission(); method
- *
- * @access	public
- * @param	mixed	$permission	The permission to check for
- * @param	string	$user	A user ID or object to check against, defaults to active_user()
- * @return	object
- */
-if ( ! function_exists( 'userHasPermission' ) )
-{
-	function userHasPermission( $permission, $user = NULL )
-	{
-		$_usr_obj = get_userobject();
+    /**
+     * Alias to user_model->hasPermission(); method
+     * @param   string  $permission The permission to check for
+     * @param   mixed   $user       The user to check for; if null uses activeUser, if numeric, fetches user, if object uses that object
+     * @return  boolean
+     */
+    function userHasPermission($permission, $user = null)
+    {
+        $userObject = get_userobject();
 
-		if ( $_usr_obj ) :
+        if ($userObject) {
 
-			return $_usr_obj->has_permission( $permission, $user );
+            return $userObject->hasPermission($permission, $user);
 
-		else :
+        } else {
 
-			return FALSE;
-
-		endif;
-	}
+            return false;
+        }
+    }
 }
 
-/* End of file user_helper.php */
-/* Location: ./helpers/user_helper.php */
+// --------------------------------------------------------------------------
+
+if (!function_exists('isLoggedIn')) {
+
+    /**
+     * Alias to user_model->isLoggedIn()
+     * @return boolean
+     */
+    function isLoggedIn()
+    {
+        $userObject = get_userobject();
+
+        if ($userObject) {
+
+            return $userObject->isLoggedIn();
+
+        } else {
+
+            return false;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('isAdmin')) {
+
+    /**
+     * Alias to user_model->isAdmin()
+     * @param  mixed   $user The user to check, uses activeUser if null
+     * @return boolean
+     */
+    function isAdmin($user = null)
+    {
+        $userObject = get_userobject();
+
+        if ($userObject) {
+
+            return $userObject->isAdmin($user);
+
+        } else {
+
+            return false;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('wasAdmin')) {
+
+    /**
+     * Alias to user_model->wasAdmin()
+     * @return boolean
+     */
+    function wasAdmin()
+    {
+        $userObject = get_userobject();
+
+        if ($userObject) {
+
+            return $userObject->wasAdmin();
+
+        } else {
+
+            return false;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('isSuperuser')) {
+
+    /**
+     * Alias to user_model->isSuperuser()
+     * @param  mixed   $user The user to check, uses activeUser if null
+     * @return boolean
+     */
+    function isSuperuser($user = null)
+    {
+        $userObject = get_userobject();
+
+        if ($userObject) {
+
+            return $userObject->isSuperuser($user);
+
+        } else {
+
+            return false;
+        }
+    }
+}

@@ -553,9 +553,9 @@ class CORE_NAILS_Controller extends MX_Controller {
          * the app's default.
          */
 
-        if (active_user('timezone')) {
+        if (activeUser('timezone')) {
 
-            $timezoneUser = active_user('timezone');
+            $timezoneUser = activeUser('timezone');
 
         } else {
 
@@ -567,10 +567,10 @@ class CORE_NAILS_Controller extends MX_Controller {
         // --------------------------------------------------------------------------
 
         //  Set the user date/time formats
-        $formatDate = active_user('datetime_format_date');
+        $formatDate = activeUser('datetime_format_date');
         $formatDate = $formatDate ? $formatDate : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
 
-        $formatTime = active_user('datetime_format_time');
+        $formatTime = activeUser('datetime_format_time');
         $formatTime = $formatTime ? $formatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
         $this->datetime_model->setFormats($formatDate, $formatTime);
@@ -610,7 +610,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         //  Set any global preferences for this user, e.g languages, fall back to
         //  the app's default language (defined in config.php).
 
-        $_user_lang = active_user('language');
+        $_user_lang = activeUser('language');
 
         if (!empty($_user_lang)) {
 
@@ -839,7 +839,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     protected function isUserSuspended()
     {
         //  Check if this user is suspended
-        if ($this->user_model->is_logged_in() && active_user('is_suspended')) {
+        if ($this->user_model->isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
             $this->load->model('auth/auth_model');

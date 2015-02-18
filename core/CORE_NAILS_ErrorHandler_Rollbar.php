@@ -151,9 +151,9 @@ class CORE_NAILS_ErrorHandler_Rollbar implements CORE_NAILS_ErrorHandler_Interfa
     public static function getPerson()
     {
         $person = array(
-            'id' => active_user('id'),
-            'username' => active_user('username'),
-            'email' => active_user('email')
+            'id' => activeUser('id'),
+            'username' => activeUser('username'),
+            'email' => activeUser('email')
         );
 
         return $person;
