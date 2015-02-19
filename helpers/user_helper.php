@@ -6,7 +6,7 @@ if (!function_exists('get_userobject')) {
      * Returns a reference to the Nails user object
      * @return mixed
      */
-    function &get_userobject()
+    function &getUserObject()
     {
         //  So we can return a reference
         $fail = FALSE;
@@ -34,7 +34,7 @@ if (!function_exists('activeUser')) {
      */
     function activeUser($keys = FALSE, $delimiter = ' ')
     {
-        $userObject =& get_userobject();
+        $userObject =& getUserObject();
 
         if ($userObject) {
 
@@ -59,7 +59,7 @@ if (!function_exists('userHasPermission')) {
      */
     function userHasPermission($permission, $user = null)
     {
-        $userObject = get_userobject();
+        $userObject = getUserObject();
 
         if ($userObject) {
 
@@ -82,7 +82,7 @@ if (!function_exists('isLoggedIn')) {
      */
     function isLoggedIn()
     {
-        $userObject = get_userobject();
+        $userObject = getUserObject();
 
         if ($userObject) {
 
@@ -106,7 +106,7 @@ if (!function_exists('isAdmin')) {
      */
     function isAdmin($user = null)
     {
-        $userObject = get_userobject();
+        $userObject = getUserObject();
 
         if ($userObject) {
 
@@ -129,7 +129,7 @@ if (!function_exists('wasAdmin')) {
      */
     function wasAdmin()
     {
-        $userObject = get_userobject();
+        $userObject = getUserObject();
 
         if ($userObject) {
 
@@ -153,7 +153,7 @@ if (!function_exists('isSuperuser')) {
      */
     function isSuperuser($user = null)
     {
-        $userObject = get_userobject();
+        $userObject = getUserObject();
 
         if ($userObject) {
 

@@ -14,11 +14,22 @@ if (!function_exists('show_401'))
 		 * an unauthorised page
 		 */
 
-		if ( get_userobject()->isLoggedIn()) {
+		if (getUserObject()->isLoggedIn()) {
 
 			$title    = 'Sorry, you are not authorised to view this page';
 			$message  = 'The page you are trying to view is restricted. Sadly you don\'t have enough ';
 			$message .= 'permissions to see it\'s content.';
+
+			if (getUserObject()->wasAdmin()) {
+
+				$adminRecoveryData = getUserObject()->getAdminRecoveryData();
+
+				$message .= '<br /><br />';
+				$message .= '<small>';
+				$message .= 'However, it looks like you\'re logged in as someone else.';
+				$message .= '<br />' . anchor($adminRecoveryData->loginUrl, 'Log back in as ' . $adminRecoveryData->name) . ' and try again.';
+				$message .= '</small>';
+			}
 
 			show_error($message, 401, $title);
 		}
