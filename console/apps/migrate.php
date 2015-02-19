@@ -508,7 +508,9 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                                 $output->writeln('');
                                 $output->writeln('');
-                                $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed.');
+                                $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed:');
+                                $output->writeln('');
+                                $output->writeln('<comment>' . $line . '</comment>');
                                 return false;
                             }
                         }
