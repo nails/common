@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('get_userobject')) {
+if (!function_exists('getUserObject')) {
 
     /**
      * Returns a reference to the Nails user object

@@ -235,7 +235,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             $output->writeln('');
             $start = is_null($nails->start) ? 'The beginning of time' : $nails->start;
-            $output->writeln('Nails\' database will be migrated from <info>' . $start . '</info> to <info>#' . $nails->end . '</info>');
+            $output->writeln('Nails\' database will be migrated from <info>#' . $start . '</info> to <info>#' . $nails->end . '</info>');
         }
 
         if ($enabledModules) {
@@ -248,7 +248,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 $start = is_null($module->start) ? 'The beginning of time' : $module->start;
 
                 $line  = ' - <comment>' . $module->name . '</comment> from ';
-                $line .= '<info>' . $start . '</info> to <info>#' . $module->end . '</info>';
+                $line .= '<info>#' . $start . '</info> to <info>#' . $module->end . '</info>';
 
                 $output->writeln($line);
             }
@@ -258,7 +258,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             $output->writeln('');
             $start = is_null($app->start) ? 'The beginning of time' : $app->start;
-            $output->writeln('The App\'s database will be migrated from <info>' . $start . '</info> to <info>#' . $app->end . '</info>');
+            $output->writeln('The App\'s database will be migrated from <info>#' . $start . '</info> to <info>#' . $app->end . '</info>');
         }
 
         $output->writeln('');

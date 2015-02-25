@@ -25,8 +25,8 @@ class NAILS_App_setting_model extends NAILS_Model
 
         // --------------------------------------------------------------------------
 
-        $this->_table        = NAILS_DB_PREFIX . 'app_setting';
-        $this->_table_prefix = 'n';
+        $this->table        = NAILS_DB_PREFIX . 'app_setting';
+        $this->tablePrefix = 'n';
         $this->settings      = array();
     }
 
@@ -44,7 +44,7 @@ class NAILS_App_setting_model extends NAILS_Model
         if (empty($this->settings[$grouping]) || $forceRefresh) {
 
             $this->db->where('grouping', $grouping);
-            $settings = $this->db->get($this->_table)->result();
+            $settings = $this->db->get($this->table)->result();
             $this->settings[$grouping] = array();
 
             foreach ($settings as $setting) {
@@ -135,13 +135,13 @@ class NAILS_App_setting_model extends NAILS_Model
         $this->db->where('key', $key);
         $this->db->where('grouping', $grouping);
 
-        if ($this->db->count_all_results($this->_table)) {
+        if ($this->db->count_all_results($this->table)) {
 
             $this->db->set('value', serialize($value));
             $this->db->set('is_encrypted', $isEncrypted);
             $this->db->where('grouping', $grouping);
             $this->db->where('key', $key);
-            $this->db->update($this->_table);
+            $this->db->update($this->table);
 
         } else {
 
@@ -149,7 +149,7 @@ class NAILS_App_setting_model extends NAILS_Model
             $this->db->set('grouping', $grouping);
             $this->db->set('key', $key);
             $this->db->set('is_encrypted', $isEncrypted);
-            $this->db->insert($this->_table);
+            $this->db->insert($this->table);
         }
     }
 
@@ -201,7 +201,7 @@ class NAILS_App_setting_model extends NAILS_Model
     {
         $this->db->where('key', $key);
         $this->db->where('grouping', $grouping);
-        $this->db->delete($this->_table);
+        $this->db->delete($this->table);
 
         return (bool) $this->db->affected_rows();
     }
@@ -216,7 +216,7 @@ class NAILS_App_setting_model extends NAILS_Model
     public function deleteGroup($grouping)
     {
         $this->db->where('grouping', $grouping);
-        $this->db->delete($this->_table);
+        $this->db->delete($this->table);
 
         return (bool) $this->db->affected_rows();
     }

@@ -23,19 +23,19 @@ class CORE_NAILS_Model extends CI_Model
     protected $user_model;
 
     //  Data/Table structure
-    protected $_table;
-    protected $_table_prefix;
+    protected $table;
+    protected $tablePrefix;
 
-    protected $_table_id_column;
-    protected $_table_slug_column;
-    protected $_table_label_column;
+    protected $tableIdColumn;
+    protected $tableSlugColumn;
+    protected $tableLabelColumn;
 
-    protected $_table_auto_set_timestamps;
+    protected $tableAutoSetTimestamps;
 
-    protected $_deleted_flag;
+    protected $deletedFlag;
 
     //  Preferences
-    protected $_destructive_delete;
+    protected $destructiveDelete;
     protected $perPage;
 
 
@@ -60,23 +60,22 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         //  Ensure models all have access to the global user_model
-        if (function_exists('get_userobject')) {
+        if (function_exists('getUserObject')) {
 
             $this->user_model = getUserObject();
-            $this->user       = getUserObject();
         }
 
         // --------------------------------------------------------------------------
 
         //  Define defaults
         $this->clear_errors();
-        $this->_destructive_delete        = true;
-        $this->_table_id_column           = 'id';
-        $this->_table_slug_column         = 'slug';
-        $this->_table_label_column        = 'label';
-        $this->_table_auto_set_timestamps = true;
-        $this->_deleted_flag              = 'is_deleted';
-        $this->perPage                  = 50;
+        $this->destructiveDelete      = true;
+        $this->tableIdColumn          = 'id';
+        $this->tableSlugColumn        = 'slug';
+        $this->tableLabelColumn       = 'label';
+        $this->tableAutoSetTimestamps = true;
+        $this->deletedFlag            = 'is_deleted';
+        $this->perPage                = 50;
     }
 
     // --------------------------------------------------------------------------
@@ -139,14 +138,14 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function create($data = array(), $returnObject = false)
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::create() Table variable not set');
         }
 
         // --------------------------------------------------------------------------
 
-        if ($this->_table_auto_set_timestamps) {
+        if ($this->tableAutoSetTimestamps) {
 
             $this->db->set('created', 'NOW()', false);
             $this->db->set('modified', 'NOW()', false);
@@ -173,7 +172,7 @@ class CORE_NAILS_Model extends CI_Model
             $this->db->set($data);
         }
 
-        $this->db->insert($this->_table);
+        $this->db->insert($this->table);
 
         if ($this->db->affected_rows()) {
 
@@ -207,19 +206,19 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function update($id, $data = array())
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::update() Table variable not set');
 
         } else {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
-            $table  = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $table  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
 
         // --------------------------------------------------------------------------
 
-        if ($this->_table_auto_set_timestamps) {
+        if ($this->tableAutoSetTimestamps) {
 
             $this->db->set($prefix . 'modified', 'NOW()', false);
 
@@ -256,7 +255,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * If destructive deletion is enabled then this method will permanently
      * destroy the object. If Non-destructive deletion is enabled then the
-     * $this->_deleted_flag field will be set to true.
+     * $this->deletedFlag field will be set to true.
      *
      * @param int      $id The ID of the object to mark as deleted
      * @return boolean
@@ -264,14 +263,14 @@ class CORE_NAILS_Model extends CI_Model
     public function delete($id)
     {
         //  Perform this check here so the error message is more easily traced.
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::delete() Table variable not set');
         }
 
         // --------------------------------------------------------------------------
 
-        if ($this->_destructive_delete) {
+        if ($this->destructiveDelete) {
 
             //  Destructive delete; nuke that row.
             return $this->destroy($id);
@@ -280,7 +279,7 @@ class CORE_NAILS_Model extends CI_Model
 
             //  Non-destructive delete, update the flag
             $data = array(
-                $this->_deleted_flag => true
+                $this->deletedFlag => true
             );
 
             return $this->update($id, $data);
@@ -294,7 +293,7 @@ class CORE_NAILS_Model extends CI_Model
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return false.
-     * If Non-destructive deletion is enabled then the $this->_deleted_flag
+     * If Non-destructive deletion is enabled then the $this->deletedFlag
      * field will be set to false.
      *
      * @param int      $id The ID of the object to restore
@@ -303,14 +302,14 @@ class CORE_NAILS_Model extends CI_Model
     public function restore($id)
     {
         //  Perform this check here so the error message is more easily traced.
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::restore() Table variable not set');
         }
 
         // --------------------------------------------------------------------------
 
-        if ($this->_destructive_delete) {
+        if ($this->destructiveDelete) {
 
             //  Destructive delete; can't be resurrecting the dead.
             return false;
@@ -319,7 +318,7 @@ class CORE_NAILS_Model extends CI_Model
 
             //  Non-destructive delete, update the flag
             $data = array(
-                $this->_deleted_flag => false
+                $this->deletedFlag => false
             );
             return $this->update($id, $data);
         }
@@ -339,7 +338,7 @@ class CORE_NAILS_Model extends CI_Model
     public function destroy($id)
     {
         //  Perform this check here so the error message is more easily traced.
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::destroy() Table variable not set');
         }
@@ -347,7 +346,7 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         $this->db->where('id', $id);
-        $this->db->delete($this->_table);
+        $this->db->delete($this->table);
 
         return (bool) $this->db->affected_rows();
     }
@@ -374,13 +373,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function get_all($page = null, $perPage = null, $data = array(), $includeDeleted = false, $_caller = 'GET_ALL')
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::get_all() Table variable not set');
 
         } else {
 
-            $table = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+            $table = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
 
         // --------------------------------------------------------------------------
@@ -411,10 +410,10 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->_destructive_delete && !$includeDeleted) {
+        if (!$this->destructiveDelete && !$includeDeleted) {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
-            $this->db->where($prefix . $this->_deleted_flag, false);
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $this->db->where($prefix . $this->deletedFlag, false);
         }
 
         // --------------------------------------------------------------------------
@@ -470,14 +469,14 @@ class CORE_NAILS_Model extends CI_Model
         //  Test columns
         $_test = reset($items);
 
-        if (!isset($_test->{$this->_table_label_column})) {
+        if (!isset($_test->{$this->tableLabelColumn})) {
 
-            show_error(get_called_class() . '::get_all_flat() "' . $this->_table_label_column . '" is not a valid label column.');
+            show_error(get_called_class() . '::get_all_flat() "' . $this->tableLabelColumn . '" is not a valid label column.');
         }
 
-        if (!isset($_test->{$this->_table_id_column})) {
+        if (!isset($_test->{$this->tableIdColumn})) {
 
-            show_error(get_called_class() . '::get_all_flat() "' . $this->_table_id_column . '" is not a valid id column.');
+            show_error(get_called_class() . '::get_all_flat() "' . $this->tableIdColumn . '" is not a valid id column.');
         }
 
         unset($_test);
@@ -486,7 +485,7 @@ class CORE_NAILS_Model extends CI_Model
 
         foreach ($items as $item) {
 
-            $out[$item->{$this->_table_id_column}] = $item->{$this->_table_label_column};
+            $out[$item->{$this->tableIdColumn}] = $item->{$this->tableLabelColumn};
         }
 
         return $out;
@@ -502,13 +501,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function get_by_id($id, $data = array())
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_id() Table variable not set');
 
         } else {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
@@ -518,7 +517,7 @@ class CORE_NAILS_Model extends CI_Model
             $data['where'] = array();
         }
 
-        $data['where'][] = array($prefix . $this->_table_id_column, $id);
+        $data['where'][] = array($prefix . $this->tableIdColumn, $id);
 
         // --------------------------------------------------------------------------
 
@@ -546,13 +545,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function get_by_ids($ids, $data = array())
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_ids() Table variable not set');
 
         } else {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
@@ -562,7 +561,7 @@ class CORE_NAILS_Model extends CI_Model
             $data['where_in'] = array();
         }
 
-        $data['where_in'][] = array($prefix . $this->_table_id_column, $ids);
+        $data['where_in'][] = array($prefix . $this->tableIdColumn, $ids);
 
         // --------------------------------------------------------------------------
 
@@ -579,13 +578,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function get_by_slug($slug, $data = array())
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
 
         } else {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
@@ -595,7 +594,7 @@ class CORE_NAILS_Model extends CI_Model
             $data['where'] = array();
         }
 
-        $data['where'][] = array($prefix . $this->_table_slug_column, $slug);
+        $data['where'][] = array($prefix . $this->tableSlugColumn, $slug);
 
         // --------------------------------------------------------------------------
 
@@ -623,13 +622,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function get_by_slugs($slugs, $data = array())
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
 
         } else {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
@@ -639,7 +638,7 @@ class CORE_NAILS_Model extends CI_Model
             $data['where_in'] = array();
         }
 
-        $data['where_in'][] = array($prefix . $this->_table_slug_column, $slugs);
+        $data['where_in'][] = array($prefix . $this->tableSlugColumn, $slugs);
 
         // --------------------------------------------------------------------------
 
@@ -682,13 +681,13 @@ class CORE_NAILS_Model extends CI_Model
      */
     public function count_all($data = array(), $includeDeleted = false)
     {
-        if (!$this->_table) {
+        if (!$this->table) {
 
             show_error(get_called_class() . '::count_all() Table variable not set');
 
         } else {
 
-            $table  = $this->_table_prefix ? $this->_table . ' ' . $this->_table_prefix : $this->_table;
+            $table  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
 
         // --------------------------------------------------------------------------
@@ -699,10 +698,10 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->_destructive_delete && !$includeDeleted) {
+        if (!$this->destructiveDelete && !$includeDeleted) {
 
-            $prefix = $this->_table_prefix ? $this->_table_prefix . '.' : '';
-            $this->db->where($prefix . $this->_deleted_flag, false);
+            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $this->db->where($prefix . $this->deletedFlag, false);
         }
 
         // --------------------------------------------------------------------------
@@ -726,10 +725,10 @@ class CORE_NAILS_Model extends CI_Model
      * @param string $label    The label from which to generate a slug
      * @param string $prefix   Any prefix to add to the slug
      * @param string $suffix   Any suffix to add to the slug
-     * @param string $table    The table to use defaults to $this->_table
-     * @param string $column   The column to use, defaults to $this->_table_slug_column
+     * @param string $table    The table to use defaults to $this->table
+     * @param string $column   The column to use, defaults to $this->tableSlugColumn
      * @param int    $ignoreId An ID to ignore when searching
-     * @param string $idColumn The column to use for the ID, defaults to $this->_table_id_column
+     * @param string $idColumn The column to use for the ID, defaults to $this->tableIdColumn
      * @return string
      */
     protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
@@ -737,12 +736,12 @@ class CORE_NAILS_Model extends CI_Model
         //  Perform this check here so the error message is more easily traced.
         if (is_null($table)) {
 
-            if (!$this->_table) {
+            if (!$this->table) {
 
                 show_error(get_called_class() . '::_generate_slug() Table variable not set');
             }
 
-            $table = $this->_table;
+            $table = $this->table;
 
         } else {
 
@@ -751,12 +750,12 @@ class CORE_NAILS_Model extends CI_Model
 
         if (is_null($column)) {
 
-            if (!$this->_table_slug_column) {
+            if (!$this->tableSlugColumn) {
 
                 show_error(get_called_class() . '::_generate_slug() Column variable not set');
             }
 
-            $column = $this->_table_slug_column;
+            $column = $this->tableSlugColumn;
 
         } else {
 
@@ -782,7 +781,7 @@ class CORE_NAILS_Model extends CI_Model
 
             if ($ignoreId) {
 
-                $_id_column = $idColumn ? $idColumn : $this->_table_id_column;
+                $_id_column = $idColumn ? $idColumn : $this->tableIdColumn;
                 $this->db->where($_id_column . ' !=', $ignoreId);
             }
 
@@ -812,11 +811,11 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         //  Some common items
-        if ($this->_table_id_column) {
+        if ($this->tableIdColumn) {
 
-            if (!empty($obj->{$this->_table_id_column}) && is_numeric($obj->{$this->_table_id_column})) {
+            if (!empty($obj->{$this->tableIdColumn}) && is_numeric($obj->{$this->tableIdColumn})) {
 
-                $obj->{$this->_table_id_column} = (int) $obj->{$this->_table_id_column};
+                $obj->{$this->tableIdColumn} = (int) $obj->{$this->tableIdColumn};
             }
         }
 
@@ -859,22 +858,22 @@ class CORE_NAILS_Model extends CI_Model
     // --------------------------------------------------------------------------
 
     /**
-     * Returns protected property $_table
+     * Returns protected property $table
      * @return string
      */
     public function getTableName()
     {
-        return $this->_table;
+        return $this->table;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Returns protected property $_table_prefix
+     * Returns protected property $tablePrefix
      * @return string
      */
     public function getTablePrefix()
     {
-        return $this->_table_prefix;
+        return $this->tablePrefix;
     }
 }

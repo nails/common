@@ -26,8 +26,8 @@ class NAILS_App_notification_model extends NAILS_Model
 
         // --------------------------------------------------------------------------
 
-        $this->_table        = NAILS_DB_PREFIX . 'app_notification';
-        $this->_table_prefix = 'n';
+        $this->table        = NAILS_DB_PREFIX . 'app_notification';
+        $this->tablePrefix = 'n';
         $this->notifications = array();
         $this->emails        = array();
 
@@ -132,7 +132,7 @@ class NAILS_App_notification_model extends NAILS_Model
         if (empty($this->emails[$grouping]) || $force_refresh) {
 
             $this->db->where('grouping', $grouping);
-            $notifications = $this->db->get($this->_table)->result();
+            $notifications = $this->db->get($this->table)->result();
             $this->emails[$grouping] = array();
 
             foreach ($notifications as $setting) {
@@ -213,19 +213,19 @@ class NAILS_App_notification_model extends NAILS_Model
 
         $this->db->where('key', $key);
         $this->db->where('grouping', $grouping);
-        if ($this->db->count_all_results($this->_table)) {
+        if ($this->db->count_all_results($this->table)) {
 
             $this->db->where('grouping', $grouping);
             $this->db->where('key', $key);
             $this->db->set('value', json_encode($value));
-            $this->db->update($this->_table);
+            $this->db->update($this->table);
 
         } else {
 
             $this->db->set('grouping', $grouping);
             $this->db->set('key', $key);
             $this->db->set('value', json_encode($value));
-            $this->db->insert($this->_table);
+            $this->db->insert($this->table);
         }
     }
 
