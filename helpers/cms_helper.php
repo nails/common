@@ -65,8 +65,8 @@ if (!function_exists('cmsMenu'))
      */
     function cmsMenu($idSlug)
     {
-        get_instance()->load->model('cms/cms_slider_model');
-        $menu = get_instance()->cms_block_model->get_by_id_or_slug($idSlug);
+        get_instance()->load->model('cms/cms_menu_model');
+        $menu = get_instance()->cms_menu_model->get_by_id_or_slug($idSlug);
 
         if (!$menu) {
 
