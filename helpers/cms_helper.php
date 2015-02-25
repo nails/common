@@ -76,3 +76,27 @@ if (!function_exists('cmsMenu'))
         return $menu;
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cmsMenuNested'))
+{
+    /**
+     * Returns a CMS menu
+     * @param  string $idSlug The menu's ID or slug
+     * @return mixed          stdClass on success, false on failure
+     */
+    function cmsMenuNested($idSlug)
+    {
+        get_instance()->load->model('cms/cms_menu_model');
+        $data = array('nestItems' => true);
+        $menu = get_instance()->cms_menu_model->get_by_id_or_slug($idSlug, $data);
+
+        if (!$menu) {
+
+            return false;
+        }
+
+        return $menu;
+    }
+}

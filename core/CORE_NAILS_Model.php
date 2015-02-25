@@ -431,7 +431,7 @@ class CORE_NAILS_Model extends CI_Model
 
             for ($i = 0; $i < $numResults; $i++) {
 
-                $this->_format_object($results[$i]);
+                $this->_format_object($results[$i], $data);
             }
 
             return $results;
@@ -801,15 +801,12 @@ class CORE_NAILS_Model extends CI_Model
      * The get_all() method iterates over each returned item with this method so as to
      * correctly format the output. Use this to typecast ID's and/or organise data into objects.
      *
-     * @param object $obj A reference to the object being formatted.
+     * @param  object $obj  A reference to the object being formatted.
+     * @param  array  $data The same data array which is passed to _getcount_common, for reference if needed
      * @return void
      */
-    protected function _format_object(&$obj)
+    protected function _format_object(&$obj, $data = array())
     {
-        //  extended this method to format the returned objects
-
-        // --------------------------------------------------------------------------
-
         //  Some common items
         if ($this->tableIdColumn) {
 
