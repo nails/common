@@ -71,3 +71,26 @@ if (!function_exists('addTrailingSlash')) {
         return rtrim($str, '/') . '/';
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('removeStopWords')) {
+
+    /**
+     * Removes stop and other common words from a string
+     * @param   string The string to filter
+     * @return  string
+     **/
+    function removeStopWords($str)
+    {
+        $stopWords = lang('string_helper_stop_words');
+        $stopWords = explode(',', $stopWords);
+        $stopWords = array_unique($stopWords);
+        $stopWords = array_filter($stopWords);
+
+        $str = preg_replace('/(\b(' . implode('|', $stopWords) . ')\b)/i', '', $str);
+        $str = preg_replace('/ {2,}/', ' ', $str);
+
+        return trim($str);
+    }
+}
