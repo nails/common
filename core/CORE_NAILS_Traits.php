@@ -379,11 +379,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                              */
 
                             //  Work out column
-                            $col = !empty($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
+                            $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
                             if ($col === '[NAILS-COL-NOT-FOUND]') {
 
-                                $col = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
+                                $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
                             //  Work out value
@@ -391,7 +391,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                             if ($val === '[NAILS-VAL-NOT-FOUND]') {
 
-                                $val = !empty($where[1]) ? $where[1] : null;
+                                $val = isset($where[1]) ? $where[1] : null;
                             }
 
                             //  Escaped?
@@ -556,11 +556,11 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                              */
 
                             //  Work out column
-                            $col = !empty($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
+                            $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
                             if ($col === '[NAILS-COL-NOT-FOUND]') {
 
-                                $col = !empty($where[0]) && is_string($where[0]) ? $where[0] : null;
+                                $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
                             //  Work out value
@@ -568,7 +568,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                             if ($val === '[NAILS-VAL-NOT-FOUND]') {
 
-                                $val = !empty($where[1]) ? $where[1] : null;
+                                $val = isset($where[1]) ? $where[1] : null;
                             }
 
                             //  Escaped?
