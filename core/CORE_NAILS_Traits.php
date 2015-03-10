@@ -406,7 +406,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                             //  What's the operator?
                             if (!$this->db->_has_operator($col)) {
 
-                                $operator = '=';
+                                $operator = is_null($val) ? ' IS ' : '=';
 
                             } else {
 
