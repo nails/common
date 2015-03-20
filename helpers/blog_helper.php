@@ -1,113 +1,83 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
 
 /**
- * Get latest blog posts
+ * This helper brings some convinient functions for interacting with the blog module
  *
- * @access	public
- * @param	none
- * @return	void
+ * @package     Nails
+ * @subpackage  module-blog
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
  */
-if ( ! function_exists( 'blog_latest_posts' ) )
-{
-	function blog_latest_posts( $limit = 9 )
-	{
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->isModelLoaded( 'blog_post_model' ) ) :
 
-			get_instance()->load->model( 'blog/blog_post_model' );
+if (!function_exists('blog_latest_posts')) {
 
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->blog_post_model->get_latest( $limit );
-	}
+    /**
+     * Get latest blog posts
+     * @param  integer $limit The maximum number of posts to return
+     * @return array
+     */
+    function blog_latest_posts($limit = 9)
+    {
+        get_instance()->load->model('blog/blog_post_model');
+        return get_instance()->blog_post_model->get_latest($limit);
+    }
 }
 
+// --------------------------------------------------------------------------
+
+if (!function_exists('blog_posts_with_tag')) {
+
+    /**
+     * Gets posts which are in a particular tag
+     * @param  mixed   $tagIdSlug      The tag's ID or slug
+     * @param  int     $page           The page to render
+     * @param  int     $perPage        The number of posts per page
+     * @param  array   $data           Data to pass to _getcount_common()
+     * @param  boolean $includeDeleted Whether to include deleted posts in the result
+     * @return array
+     */
+    function blog_posts_with_tag($tagIdSlug, $page = null, $perPage = null, $data = null, $includeDeleted = false)
+    {
+        get_instance()->load->model('blog/blog_post_model');
+        return get_instance()->blog_post_model->get_with_tag($tagIdSlug, $page, $perPage, $data, $includeDeleted);
+    }
+}
 
 // --------------------------------------------------------------------------
 
 
-/**
- * Get all posts for a certain tag
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'blog_posts_with_tag' ) )
-{
-	function blog_posts_with_tag( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
-	{
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->isModelLoaded( 'blog_post_model' ) ) :
+if (!function_exists('blog_posts_with_category')) {
 
-			get_instance()->load->model( 'blog/blog_post_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->blog_post_model->get_with_tag( $id_slug, $only_published, $include_body, $exclude_deleted );
-	}
+    /**
+     * Gets posts which are in a particular category
+     * @param  mixed   $categoryIdSlug The category's ID or slug
+     * @param  int     $page           The page to render
+     * @param  int     $perPage        The number of posts per page
+     * @param  array   $data           Data to pass to _getcount_common()
+     * @param  boolean $includeDeleted Whether to include deleted posts in the result
+     * @return array
+     */
+    function blog_posts_with_category($categoryIdSlug, $page = null, $perPage = null, $data = null, $includeDeleted = false)
+    {
+        get_instance()->load->model('blog/blog_post_model');
+        return get_instance()->blog_post_model->get_with_category($categoryIdSlug, $page, $perPage, $data, $includeDeleted);
+    }
 }
-
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('blog_posts_with_association')) {
 
-/**
- * Get all posts for a certain category
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'blog_posts_with_category' ) )
-{
-	function blog_posts_with_category( $id_slug, $only_published = TRUE, $include_body = FALSE, $exclude_deleted = TRUE )
-	{
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->isModelLoaded( 'blog_post_model' ) ) :
-
-			get_instance()->load->model( 'blog/blog_post_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->blog_post_model->get_with_category( $id_slug, $only_published, $include_body, $exclude_deleted );
-	}
+    /**
+     * Get posts with a particular association
+     * @param  int $associationIndex The association's index
+     * @param  int $associatedId     The Id of the item to be associated with
+     * @return array
+     */
+    function blog_posts_with_association($associationIndex, $associatedId)
+    {
+        get_instance()->load->model('blog/blog_post_model');
+        return get_instance()->blog_post_model->get_with_association($associationIndex, $associatedId);
+    }
 }
-
-
-// --------------------------------------------------------------------------
-
-
-/**
- * Get all posts which contain a certain association
- *
- * @access	public
- * @param	none
- * @return	void
- */
-if ( ! function_exists( 'blog_posts_with_association' ) )
-{
-	function blog_posts_with_association( $association_index, $associated_id )
-	{
-		//	Load the model if it's not already loaded
-		if ( ! get_instance()->load->isModelLoaded( 'blog_post_model' ) ) :
-
-			get_instance()->load->model( 'blog/blog_post_model' );
-
-		endif;
-
-		// --------------------------------------------------------------------------
-
-		return get_instance()->blog_post_model->get_with_association( $association_index, $associated_id );
-	}
-}
-
-/* End of file blog_helper.php */
-/* Location: ./modules/blog/helpers/blog_helper.php */
