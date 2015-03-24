@@ -693,7 +693,13 @@ class CORE_NAILS_Controller extends MX_Controller {
         $_helpers[] = 'event';
         $_helpers[] = 'log';
 
-        //  Module specific helpers
+        /**
+         * Module specific helpers
+         *
+         * @todo: Ether load these automatically by looking at availabl modules, or
+         * force dev/module to load as needed
+         */
+
         //  CDN
         if (isModuleEnabled('nailsapp/module-cdn')) {
 

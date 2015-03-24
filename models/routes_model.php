@@ -15,10 +15,9 @@ class NAILS_Routes_model extends NAILS_Model
     protected $canWriteRoutes;
     protected $routesDir;
     protected $routesFile;
-    protected $routeWriters;
     protected $routes;
 
-    public $cant_write_reason;
+    public $cantWriteReason;
 
     // --------------------------------------------------------------------------
 
@@ -34,23 +33,14 @@ class NAILS_Routes_model extends NAILS_Model
         //  Set Defaults
         $this->routesDir      = DEPLOY_CACHE_DIR;
         $this->routesFile     = 'routes_app.php';
-        $this->routeWriters   = array();
         $this->canWriteRoutes = null;
         $this->routes         = array();
 
         if (!$this->canWriteRoutes()) {
 
-            $this->cant_write_reason = $this->last_error();
+            $this->cantWriteReason = $this->last_error();
             $this->clear_errors();
         }
-
-        //  Default writers
-        $this->routeWriters['admin']   = array($this, 'routesAdmin');
-        $this->routeWriters['sitemap'] = array($this, 'routesSitemap');
-        $this->routeWriters['cms']     = array($this, 'routesCms');
-        $this->routeWriters['shop']    = array($this, 'routesShop');
-        $this->routeWriters['blog']    = array($this, 'routesBlog');
-        $this->routeWriters['api']     = array($this, 'routesApi');
     }
 
     // --------------------------------------------------------------------------
@@ -60,226 +50,43 @@ class NAILS_Routes_model extends NAILS_Model
      * @param  string $which For which model to restrict the route update
      * @return boolean
      */
-    public function update($which = NULL)
+    public function update($which = null)
     {
         if (!$this->canWriteRoutes) {
 
-            $this->_set_error($this->cant_write_reason);
+            $this->_set_error($this->cantWriteReason);
             return false;
         }
 
         // --------------------------------------------------------------------------
 
-        $this->_data = '<?php  if (!defined(\'BASEPATH\')) exit(\'No direct script access allowed\');' . "\n\n";
-        $this->_data .= '// THIS FILE IS CREATED/MODIFIED AUTOMATICALLY, ANY MANUAL EDITS WILL BE OVERWRITTEN'."\n\n";
+        //  Look for modules who wish to write to the routes file
+        $modules = _NAILS_GET_MODULES();
 
-        foreach ($this->routeWriters as $slug => $method) {
+        foreach ($modules as $module) {
 
-            /**
-             * @TODO: Give the ability to selectively update a part of the routes file.
-             * Perhaps restricting edits to be between two known comments...?
-             */
+            $routesFile = $module->path . 'routes/Routes.php';
 
-            // if (NULL == $which || $which == $slug) {
+            if (file_exists($routesFile)) {
 
-                if (is_callable(array($method[0], $method[1]))) {
+                include_once $routesFile;
 
-                    $_result = call_user_func(array($method[0], $method[1]));
+                $routesClass = 'Nails\\Routes\\' . ucfirst(strtolower($module->moduleName)) . '\\Routes';
+                $instance    = new $routesClass();
 
-                    if (is_array($_result)) {
+                if (is_callable(array($instance, 'getRoutes'))) {
 
-                        $this->routes = array_merge($this->routes, $_result);
-                    }
+                    $this->routes['//BEGIN ' . $module->name] = '';
+                    $this->routes = $this->routes + $instance->getRoutes();
+                    $this->routes['//END ' . $module->name] = '';
                 }
-            // }
+            }
         }
 
         // --------------------------------------------------------------------------
 
-        //  Start writing the file
-        return $this->_write_file();
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all Admin routes
-     * @return array
-     */
-    protected function routesAdmin()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-admin')) {
-
-            $routes['//BEGIN ADMIN'] = '';
-            $routes['admin(.*)']     = 'admin/adminRouter/index$1';
-            $routes['//END ADMIN']   = '';
-        }
-
-        return $routes;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all Sitemap routes
-     * @return array
-     */
-    protected function routesSitemap()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-sitemap')) {
-
-            $this->load->model('sitemap/sitemap_model');
-
-            $routes['//BEGIN SITEMAP'] = '';
-            $routes = $routes + $this->sitemap_model->getRoutes();
-            $routes['//END SITEMAP'] = '';
-        }
-
-        return $routes;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all API routes
-     * @return array
-     */
-    protected function routesApi()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-api')) {
-
-            $this->load->model('api/api_model');
-
-            $routes['//BEGIN API'] = '';
-            $routes = $routes + $this->api_model->getRoutes();
-            $routes['//END API'] = '';
-        }
-
-        return $routes;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all CMS routes
-     * @return array
-     */
-    protected function routesCms()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-cms')) {
-
-            $routes['//BEGIN CMS'] = '';
-
-            // --------------------------------------------------------------------------
-
-            $this->load->model('cms/cms_page_model');
-            $_pages = $this->cms_page_model->get_all();
-
-            foreach ($_pages as $page) {
-
-                if ($page->is_published) {
-
-                    $routes[$page->published->slug] = 'cms/render/page/' . $page->id;
-                }
-            }
-
-            // --------------------------------------------------------------------------
-
-            /**
-             *  Make a route for each slug history item, don't overwrite any existing route
-             *  Doing them second and checking (instead of letting the real pages overwrite
-             *  the key) in an attempt to optimise, the router takes the first route it comes
-             *  across so, the logic is that the "current" slug is the one which is getting
-             *  hit most often, so place it first, if a legacy slug is used (in theory less
-             *  often) then the router can work a little harder.
-             **/
-
-            $this->db->select('sh.slug,sh.page_id');
-            $this->db->join(NAILS_DB_PREFIX . 'cms_page p', 'p.id = sh.page_id');
-            $this->db->where('p.is_deleted', false);
-            $this->db->where('p.is_published', true);
-            $_slugs = $this->db->get(NAILS_DB_PREFIX . 'cms_page_slug_history sh')->result();
-
-            foreach ($_slugs as $route) {
-
-                if (!isset($routes[$route->slug])) {
-
-                    $routes[$route->slug] = 'cms/render/legacy_slug/' . $route->page_id;
-                }
-            }
-
-            // --------------------------------------------------------------------------
-
-            $routes['//END CMS'] = '';
-        }
-
-        return $routes;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all Shop routes
-     * @return array
-     */
-    protected function routesShop()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-shop')) {
-
-            $_settings = app_setting(NULL, 'shop', true);
-
-            $routes['//BEGIN SHOP'] = '';
-
-            //  Shop front page route
-            $_url = isset($_settings['url']) ? substr($_settings['url'], 0, -1) : 'shop';
-            $routes[$_url . '(/(.+))?'] = 'shop/$2';
-
-            //  @TODO: all shop product/category/tag/sale routes etc
-
-            $routes['//END SHOP'] = '';
-        }
-
-        return $routes;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get all Blog routes
-     * @return array
-     */
-    protected function routesBlog()
-    {
-        $routes = array();
-
-        if (isModuleEnabled('nailsapp/module-blog')) {
-
-            $this->load->model('blog/blog_model');
-            $_blogs = $this->blog_model->get_all();
-
-            $routes['//BEGIN BLOG'] = '';
-            foreach ($_blogs as $blog) {
-
-                $_settings = app_setting(NULL, 'blog-' . $blog->id, true);
-
-                //  Blog front page route
-                $_url = isset($_settings['url']) ? substr($_settings['url'], 0, -1) : 'blog';
-                $routes[$_url . '(/(.+))?'] = 'blog/' . $blog->id . '/$2';
-            }
-            $routes['//END BLOG'] = '';
-        }
-
-        return $routes;
+        //  Write the file
+        return $this->writeFile();
     }
 
     // --------------------------------------------------------------------------
@@ -288,10 +95,10 @@ class NAILS_Routes_model extends NAILS_Model
      * Write the routes file
      * @return boolean
      */
-    protected function _write_file()
+    protected function writeFile()
     {
         //  Routes are writeable, apparently, give it a bash
-        $_data = '<?php  if (!defined(\'BASEPATH\')) exit(\'No direct script access allowed\');' . "\n\n";
+        $_data = '<?php' . "\n\n";
         $_data .= '/**' . "\n";
         $_data .= ' * THIS FILE IS CREATED/MODIFIED AUTOMATICALLY'."\n";
         $_data .= ' * ==========================================='."\n";
