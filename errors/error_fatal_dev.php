@@ -58,7 +58,15 @@
         return $out;
     }
 
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
+<!--
+
+    SUBJECT: <?=$subject?>
+
+    MESSAGE: <?=$message?>
+
+-->
 <html>
 <head>
     <title>[Dev] An Error Occurred: <?=$subject?></title>

@@ -24,7 +24,7 @@ if (!function_exists('str_lreplace'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('underscore_to_camelcase'))
+if (!function_exists('underscoreToCamelcase'))
 {
     /**
      * Transforms a string with underscores into a camelcased string
@@ -32,7 +32,7 @@ if (!function_exists('underscore_to_camelcase'))
      * @param  boolean $lcfirst Whether or not to lowercase the first letter of the transformed string or not
      * @return string
      */
-    function underscore_to_camelcase($str, $lcfirst = true)
+    function underscoreToCamelcase($str, $lcfirst = true)
     {
         $str = explode('_', $str);
         $str = array_map('ucfirst', $str);

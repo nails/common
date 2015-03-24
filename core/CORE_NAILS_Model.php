@@ -200,8 +200,8 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Updates an existing object
-     * @param int      $id   The ID of the object to update
-     * @param array    $data The data to update the object with
+     * @param  int     $id   The ID of the object to update
+     * @param  array   $data The data to update the object with
      * @return boolean
      */
     public function update($id, $data = array())

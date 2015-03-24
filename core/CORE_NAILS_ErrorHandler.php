@@ -250,6 +250,11 @@ class CORE_NAILS_ErrorHandler
             ob_clean();
         }
 
+        //  Set a 500 error
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
+        $headerString   = '500 Internal Server Error';
+        header($serverProtocol . ' ' . $headerString);
+
         //  Non-production and have an app-specific dev error file?
         if (ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
 

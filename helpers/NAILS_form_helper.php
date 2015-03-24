@@ -779,7 +779,7 @@ if (!function_exists('form_field_multiimage')) {
         get_instance()->load->library('cdn/cdn');
 
         $_movie_url     = NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
-        $_upload_url    = site_url('api/cdnapi/object_create/script.php', isPageSecure());
+        $_upload_url    = site_url('api/cdn/object/create/script.php', isPageSecure());
         $_upload_token  = get_instance()->cdn->generate_api_upload_token();
         $_bucket        = $_field_bucket;
 
@@ -1008,8 +1008,8 @@ $_out = <<<EOT
 
                         //  Send off the delete request
                         var _call = {
-                            'controller'    : 'cdnapi',
-                            'method'        : 'object_delete',
+                            'controller'    : 'cdn/object',
+                            'method'        : 'delete',
                             'action'        : 'POST',
                             'data'          :
                             {

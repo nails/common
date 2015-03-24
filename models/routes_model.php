@@ -50,6 +50,7 @@ class NAILS_Routes_model extends NAILS_Model
         $this->routeWriters['cms']     = array($this, 'routesCms');
         $this->routeWriters['shop']    = array($this, 'routesShop');
         $this->routeWriters['blog']    = array($this, 'routesBlog');
+        $this->routeWriters['api']     = array($this, 'routesApi');
     }
 
     // --------------------------------------------------------------------------
@@ -136,6 +137,28 @@ class NAILS_Routes_model extends NAILS_Model
             $routes['//BEGIN SITEMAP'] = '';
             $routes = $routes + $this->sitemap_model->getRoutes();
             $routes['//END SITEMAP'] = '';
+        }
+
+        return $routes;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get all API routes
+     * @return array
+     */
+    protected function routesApi()
+    {
+        $routes = array();
+
+        if (isModuleEnabled('nailsapp/module-api')) {
+
+            $this->load->model('api/api_model');
+
+            $routes['//BEGIN API'] = '';
+            $routes = $routes + $this->api_model->getRoutes();
+            $routes['//END API'] = '';
         }
 
         return $routes;
