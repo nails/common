@@ -801,54 +801,48 @@ class CORE_NAILS_Model extends CI_Model
      * The get_all() method iterates over each returned item with this method so as to
      * correctly format the output. Use this to typecast ID's and/or organise data into objects.
      *
-     * @param  object $obj  A reference to the object being formatted.
-     * @param  array  $data The same data array which is passed to _getcount_common, for reference if needed
+     * @param  object $obj      A reference to the object being formatted.
+     * @param  array  $data     The same data array which is passed to _getcount_common, for reference if needed
+     * @param  array  $integers Fields which should be cast as integers if numerical
+     * @param  array  $bools    Fields which should be cast as booleans
      * @return void
      */
-    protected function _format_object(&$obj, $data = array())
+    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array())
     {
-        //  Some common items
-        if ($this->tableIdColumn) {
+        $integers   = (array) $integers;
+        $integers[] = $this->tableIdColumn;
+        $integers[] = 'parent_id';
+        $integers[] = 'parentId';
+        $integers[] = 'user_id';
+        $integers[] = 'userId';
+        $integers[] = 'created_by';
+        $integers[] = 'createdBy';
+        $integers[] = 'modified_by';
+        $integers[] = 'modifiedBy';
+        $integers[] = 'order';
 
-            if (!empty($obj->{$this->tableIdColumn}) && is_numeric($obj->{$this->tableIdColumn})) {
+        foreach ($integers as $property) {
 
-                $obj->{$this->tableIdColumn} = (int) $obj->{$this->tableIdColumn};
+            if (property_exists($obj, $property) && is_numeric($obj->{$property})) {
+
+                $obj->{$property} = (int) $obj->{$property};
             }
         }
 
-        if (!empty($obj->parent_id) && is_numeric($obj->parent_id)) {
+        // --------------------------------------------------------------------------
 
-            $obj->parent_id = (int) $obj->parent_id;
-        }
+        $bools   = (array) $bools;
+        $bools[] = 'is_active';
+        $bools[] = 'isActive';
+        $bools[] = 'is_deleted';
+        $bools[] = 'isDeleted';
 
-        if (!empty($obj->user_id) && is_numeric($obj->user_id)) {
+        foreach ($bools as $property) {
 
-            $obj->user_id = (int) $obj->user_id;
-        }
+            if (property_exists($obj, $property)) {
 
-        if (!empty($obj->created_by) && is_numeric($obj->created_by)) {
-
-            $obj->created_by = (int) $obj->created_by;
-        }
-
-        if (!empty($obj->modified_by) && is_numeric($obj->modified_by)) {
-
-            $obj->modified_by = (int) $obj->modified_by;
-        }
-
-        if (!empty($obj->order) && is_numeric($obj->order)) {
-
-            $obj->order = (int) $obj->order;
-        }
-
-        if (isset($obj->is_active)) {
-
-            $obj->is_active = (bool) $obj->is_active;
-        }
-
-        if (isset($obj->is_deleted)) {
-
-            $obj->is_deleted = (bool) $obj->is_deleted;
+                $obj->{$property} = (bool) $obj->{$property};
+            }
         }
     }
 
