@@ -297,7 +297,7 @@ class NAILS_App_notification_model extends NAILS_Model
 
         if (!empty($definition->email_tpl)) {
 
-            $email->data['email_template'] = $definition->email_tpl;
+            $email->data['template_body'] = $definition->email_tpl;
         }
 
         foreach ($emails as $e) {
