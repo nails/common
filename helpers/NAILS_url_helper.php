@@ -98,7 +98,10 @@ if (!function_exists('tel')) {
     function tel($uri = '', $title = '', $attributes = '')
     {
         $title = empty($title) ? $uri : $title;
+
+        $uri = preg_replace('/[^\+0-9]/', '', $uri);
         $uri   = 'tel://' . $uri;
+
         return anchor($uri, $title, $attributes);
     }
 }
