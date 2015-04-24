@@ -512,6 +512,12 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
+        if (empty($id)) {
+            return false;
+        }
+
+        // --------------------------------------------------------------------------
+
         if (!isset($data['where'])) {
 
             $data['where'] = array();
@@ -556,6 +562,12 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
+        if (empty($ids)) {
+            return array();
+        }
+
+        // --------------------------------------------------------------------------
+
         if (!isset($data['where_in'])) {
 
             $data['where_in'] = array();
@@ -585,6 +597,12 @@ class CORE_NAILS_Model extends CI_Model
         } else {
 
             $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (empty($slug)) {
+            return false;
         }
 
         // --------------------------------------------------------------------------
@@ -629,6 +647,12 @@ class CORE_NAILS_Model extends CI_Model
         } else {
 
             $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (empty($ids)) {
+            return array();
         }
 
         // --------------------------------------------------------------------------
