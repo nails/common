@@ -860,6 +860,8 @@ class CORE_NAILS_Model extends CI_Model
         $bools[] = 'isActive';
         $bools[] = 'is_deleted';
         $bools[] = 'isDeleted';
+        $bools[] = 'is_published';
+        $bools[] = 'isPublished';
 
         foreach ($bools as $property) {
 
