@@ -78,6 +78,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
      */
     protected function executeInstaller(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('');
         $output->writeln('<info>---------------</info>');
         $output->writeln('<info>Nails Installer</info>');
         $output->writeln('<info>---------------</info>');

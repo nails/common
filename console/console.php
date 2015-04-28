@@ -18,6 +18,7 @@ require_once 'vendor/autoload.php';
 require_once 'vendor/nailsapp/common/console/apps/install.php';
 require_once 'vendor/nailsapp/common/console/apps/migrate.php';
 require_once 'vendor/nailsapp/common/console/apps/deploy.php';
+require_once 'vendor/nailsapp/common/console/apps/test.php';
 
 //	Import the Symfony Console Application
 use Symfony\Component\Console\Application;
@@ -27,4 +28,5 @@ $app = new Application();
 $app->add(new CORE_NAILS_Install());
 $app->add(new CORE_NAILS_Migrate());
 $app->add(new CORE_NAILS_Deploy());
+$app->add(new CORE_NAILS_Test());
 $app->run();

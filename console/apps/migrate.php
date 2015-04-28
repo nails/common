@@ -68,6 +68,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('');
         $output->writeln('<info>-----------------------------</info>');
         $output->writeln('<info>Nails Database Migration Tool</info>');
         $output->writeln('<info>-----------------------------</info>');
