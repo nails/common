@@ -77,7 +77,7 @@ class NAILS_Routes_model extends NAILS_Model
                 if (is_callable(array($instance, 'getRoutes'))) {
 
                     $this->routes['//BEGIN ' . $module->name] = '';
-                    $this->routes = $this->routes + $instance->getRoutes();
+                    $this->routes = $this->routes + (array) $instance->getRoutes();
                     $this->routes['//END ' . $module->name] = '';
                 }
             }

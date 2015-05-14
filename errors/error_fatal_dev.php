@@ -62,9 +62,9 @@
 <!DOCTYPE html>
 <!--
 
-    SUBJECT: <?=$subject?>
-
-    MESSAGE: <?=$message?>
+    ERROR:   FATAL
+    SUBJECT: <?=strip_tags($subject)?>
+    MESSAGE: <?=strip_tags($message)?>
 
 -->
 <html>
