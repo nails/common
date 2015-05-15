@@ -11,11 +11,15 @@
  * @link
  */
 
+// use Monolog\Logger;
+// use Monolog\Handler\StreamHandler;
+
 class CORE_NAILS_Controller extends MX_Controller {
 
     protected $data;
     protected $user;
     protected $nailsErrorHandler;
+    protected $log;
 
     // --------------------------------------------------------------------------
 
@@ -57,7 +61,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         // --------------------------------------------------------------------------
 
-        //  Configure error reporting
+        //  Configure logging and error reporting
+        // $this->setLogging();
         $this->setErrorReporting();
 
         // --------------------------------------------------------------------------
@@ -220,6 +225,38 @@ class CORE_NAILS_Controller extends MX_Controller {
                 exit(0);
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets up and configures the global Nails log channel
+     * @return  void
+     */
+    protected function setLogging()
+    {
+        /**
+         * @todo Get centralised logging working throughout
+         * - Disable CI's logging
+         * - Remove the Logger, CORE_NAILS_Log and NAILS_Log classes
+         * - Update all calls to $this->logger, _LOG(), etc
+         * - Update areas which do log to do so more objectively, set as warning, debug etc
+         */
+
+        //  Using $GLOBALS so that it can be easily accessed from anywhere
+        $GLOBALS['NAILS_LOG'] = new Logger('NAILS::MAIN');
+
+        /**
+         * @todo Work out a way to easily configure this if needed
+         * @todo Utilise monolog's functionality like autorotating logs
+         */
+
+        $logFile = FCPATH . APPPATH . 'logs/' . ENVIRONMENT . '-' . date('Y-m-d') . '.php';
+
+        $GLOBALS['NAILS_LOG']->pushHandler(new StreamHandler($logFile));
+
+        //  Save a reference, for ease of access in the controllers
+        $this->log = $GLOBALS['NAILS_LOG'];
     }
 
     // --------------------------------------------------------------------------

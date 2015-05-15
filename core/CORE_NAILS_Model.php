@@ -21,6 +21,7 @@ class CORE_NAILS_Model extends CI_Model
     protected $data;
     protected $user;
     protected $user_model;
+    protected $log;
 
     //  Data/Table structure
     protected $table;
@@ -64,6 +65,9 @@ class CORE_NAILS_Model extends CI_Model
 
             $this->user_model = getUserObject();
         }
+
+        //  ... and the logger
+        $this->log = $GLOBALS['NAILS_LOG'];
 
         // --------------------------------------------------------------------------
 
