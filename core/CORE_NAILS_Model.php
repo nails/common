@@ -67,7 +67,7 @@ class CORE_NAILS_Model extends CI_Model
         }
 
         //  ... and the logger
-        $this->log = $GLOBALS['NAILS_LOG'];
+        // $this->log = $GLOBALS['NAILS_LOG'];
 
         // --------------------------------------------------------------------------
 
