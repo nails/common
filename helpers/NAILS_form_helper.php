@@ -400,9 +400,9 @@ if (!function_exists('form_field_mm')) {
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_field_error_cls       = form_error($_field['key']) || $_field['error'] ? 'error' : '';
@@ -556,9 +556,9 @@ if (!function_exists('form_field_mm_image')) {
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_field_error           = form_error($_field['key']) || $_field['error'] ? 'error' : '';
@@ -1141,9 +1141,9 @@ if (!function_exists('form_field_dropdown')) {
         endif;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_error         = form_error($_field['key']) ? 'error' : '';
@@ -1286,9 +1286,9 @@ if (!function_exists('form_field_dropdown_multiple')) {
         endif;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_error         = form_error($_field['key']) ? 'error' : '';
@@ -1428,9 +1428,9 @@ if (!function_exists('form_field_boolean')) {
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_error         = form_error($_field['key']) ? 'error' : '';
@@ -1522,9 +1522,9 @@ if (!function_exists('form_field_radio')) {
         endif;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_error = form_error($_field['key']) ? 'error' : '';
@@ -1642,9 +1642,9 @@ if (!function_exists('form_field_checkbox')) {
         endif;
 
         $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['class'])   ? $_tip['class']    : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['rel'])     ? $_tip['rel']      : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['title'])   ? $_tip['title']    : NULL;
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
         $_error = form_error($_field['key']) ? 'error' : '';
