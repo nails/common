@@ -26,8 +26,23 @@
 
         include NAILS_COMMON_PATH . 'errors/components/header.php';
 
-        echo '<p>We are down for maintenance.</p>';
-        echo '<p>Please bear with us while we bring improvements to the site.</p>';
+        if (empty($sMaintenanceTitle)) {
+
+            echo '<p>We are down for maintenance.</p>';
+
+        } else {
+
+            echo $sMaintenanceTitle;
+        }
+
+        if (empty($sMaintenanceBody)) {
+
+            echo '<p>Please bear with us while we bring improvements to the site.</p>';
+
+        } else {
+
+            echo $sMaintenanceBody;
+        }
 
         include NAILS_COMMON_PATH . 'errors/components/footer.php';
 

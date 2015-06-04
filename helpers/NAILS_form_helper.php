@@ -39,7 +39,7 @@ if (!function_exists('form_open')) {
         }
 
         // If an action is not a full URL then turn it into one
-        if ($action && strpos($action, '://') === FALSE)
+        if ($action && strpos($action, '://') === false)
         {
             $action = $CI->config->site_url($action);
         }
@@ -49,7 +49,7 @@ if (!function_exists('form_open')) {
 
         $form = '<form action="'.$action.'"';
 
-        $form .= _attributes_to_string($attributes, TRUE);
+        $form .= _attributes_to_string($attributes, true);
 
         $form .= '>';
 
@@ -57,7 +57,7 @@ if (!function_exists('form_open')) {
         $_base_url          = $CI->config->base_url();
         $_secure_base_url   = $CI->config->secure_base_url();
 
-        if ($CI->config->item('csrf_protection') === TRUE AND !(strpos($action, $_base_url) === FALSE OR strpos($form, 'method="get"')))
+        if ($CI->config->item('csrf_protection') === true AND !(strpos($action, $_base_url) === false OR strpos($form, 'method="get"')))
         {
             $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
         }
@@ -65,7 +65,7 @@ if (!function_exists('form_open')) {
         //  If the secure_base_url is different, then do a check for that domain/url too.
         if ($_base_url != $_secure_base_url) :
 
-            if ($CI->config->item('csrf_protection') === TRUE AND !(strpos($action, $_secure_base_url) === FALSE OR strpos($form, 'method="get"')))
+            if ($CI->config->item('csrf_protection') === true AND !(strpos($action, $_secure_base_url) === false OR strpos($form, 'method="get"')))
             {
                 $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
             }
@@ -95,28 +95,29 @@ if (!function_exists('form_field')) {
     function form_field($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : NULL;
+        $_field_id          = isset($field['id'])             ? $field['id']          : null;
         $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
-        $_field_key         = isset($field['key'])            ? $field['key']         : NULL;
-        $_field_label       = isset($field['label'])          ? $field['label']       : NULL;
-        $_field_default     = isset($field['default'])        ? $field['default']     : NULL;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
-        $_field_required    = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field_placeholder = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : FALSE;
-        $_field_error       = isset($field['error'])          ? $field['error']       : FALSE;
+        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field_key         = isset($field['key'])            ? $field['key']         : null;
+        $_field_label       = isset($field['label'])          ? $field['label']       : null;
+        $_field_default     = isset($field['default'])        ? $field['default']     : null;
+        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field_required    = isset($field['required'])       ? $field['required']    : false;
+        $_field_placeholder = isset($field['placeholder'])    ? $field['placeholder'] : null;
+        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field_error       = isset($field['error'])          ? $field['error']       : false;
         $_field_class       = isset($field['class'])          ? $field['class']       : '';
         $_field_data        = isset($field['data'])           ? $field['data']        : array();
-        $_field_info        = isset($field['info'])           ? $field['info']        : FALSE;
+        $_field_info        = isset($field['info'])           ? $field['info']        : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip               = array();
         $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
         $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : NULL;
+        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
         $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
+        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
         $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
         $_error_class       = $_error ? 'error' : '';
         $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
@@ -183,7 +184,7 @@ if (!function_exists('form_field')) {
             case 'upload' :
             case 'file' :
 
-                $_field_html = form_upload($_field_key, NULL, $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
+                $_field_html = form_upload($_field_key, null, $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
 
             break;
 
@@ -217,7 +218,7 @@ if (!function_exists('form_field')) {
 
                 default :
 
-                    $_field_html .= anchor(cdn_serve($_field_default, TRUE), 'Download', 'class="awesome small" target="_blank"');
+                    $_field_html .= anchor(cdn_serve($_field_default, true), 'Download', 'class="awesome small" target="_blank"');
 
                 break;
 
@@ -249,7 +250,7 @@ if (!function_exists('form_field')) {
 
 $_out = <<<EOT
 
-    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type">
+    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top>
         <label>
             <span class="label">
                 $_field_label
@@ -383,19 +384,19 @@ if (!function_exists('form_field_mm')) {
     {
         //  Set var defaults
         $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : NULL;
+        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
         $_field['type']         = isset($field['type'])           ? $field['type']        : 'text';
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : NULL;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : NULL;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : NULL;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : FALSE;
-        $_field['error']        = isset($field['error'])          ? $field['error']       : FALSE;
-        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : FALSE;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : FALSE;
+        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
+        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
+        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
+        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
+        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
+        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field['error']        = isset($field['error'])          ? $field['error']       : false;
+        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : false;
+        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
         $_field['data']         = isset($field['data'])           ? $field['data']        : array();
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
@@ -461,7 +462,7 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  If a default has been specified then show a download link
-        $_field_download = $_field['default'] ? anchor(cdn_serve($_field['default'], TRUE), 'Download File') : '';
+        $_field_download = $_field['default'] ? anchor(cdn_serve($_field['default'], true), 'Download File') : '';
 
         // --------------------------------------------------------------------------
 
@@ -484,7 +485,7 @@ if (!function_exists('form_field_mm')) {
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
         get_instance()->load->library('cdn/cdn');
-        $_scheme = get_instance()->cdn->url_serve_scheme(TRUE);
+        $_scheme = get_instance()->cdn->url_serve_scheme(true);
 
         /**
          * Replace the Mustache style syntax; this could/does get used in mustache
@@ -539,19 +540,19 @@ if (!function_exists('form_field_mm_image')) {
     {
         //  Set var defaults
         $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : NULL;
+        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
         $_field['type']         = isset($field['type'])           ? $field['type']        : 'text';
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : NULL;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : NULL;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : NULL;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : FALSE;
-        $_field['error']        = isset($field['error'])          ? $field['error']       : FALSE;
-        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : FALSE;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : FALSE;
+        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
+        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
+        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
+        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
+        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
+        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field['error']        = isset($field['error'])          ? $field['error']       : false;
+        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : false;
+        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
         $_field['data']         = isset($field['data'])           ? $field['data']        : array();
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
@@ -561,7 +562,7 @@ if (!function_exists('form_field_mm_image')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_error           = form_error($_field['key']) || $_field['error'] ? 'error' : '';
+        $_field_error_cls       = form_error($_field['key']) || $_field['error'] ? 'error' : '';
         $_readonly_cls          = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
@@ -650,7 +651,7 @@ if (!function_exists('form_field_mm_image')) {
         $_scheme = str_replace('{{filename}}', '{[filename]}', $_scheme);
         $_scheme = str_replace('{{extension}}', '{[extension]}', $_scheme);
 
-        $_out  = '<div class="field mm-image ' . $_field_error . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
+        $_out  = '<div class="field mm-image ' . $_field_error_cls . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
         $_out .= '<label>';
         $_out .= '  <span class="label">';
         $_out .= '      ' . $_field_label;
@@ -694,21 +695,21 @@ if (!function_exists('form_field_multiimage')) {
     {
         //  Set var defaults
         $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
-        $_field_key         = isset($field['key'])            ? $field['key']         : NULL;
-        $_field_label       = isset($field['label'])          ? $field['label']       : NULL;
-        $_field_default     = isset($field['default'])        ? $field['default']     : NULL;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
-        $_field_required    = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : FALSE;
-        $_field_error       = isset($field['error'])          ? $field['error']       : FALSE;
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : FALSE;
+        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field_key         = isset($field['key'])            ? $field['key']         : null;
+        $_field_label       = isset($field['label'])          ? $field['label']       : null;
+        $_field_default     = isset($field['default'])        ? $field['default']     : null;
+        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field_required    = isset($field['required'])       ? $field['required']    : false;
+        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field_error       = isset($field['error'])          ? $field['error']       : false;
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip               = array();
         $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
         $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : NULL;
+        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
         $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_field_tip['title'];
 
         $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
@@ -1113,22 +1114,22 @@ if (!function_exists('form_field_dropdown')) {
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      * @return string          The form HTML
      */
-    function form_field_dropdown($field, $options = NULL, $tip = '')
+    function form_field_dropdown($field, $options = null, $tip = '')
     {
         //  Set var defaults
         $_field                     = array();
-        $_field['id']               = isset($field['id']) ? $field['id'] : NULL;
+        $_field['id']               = isset($field['id']) ? $field['id'] : null;
         $_field['type']             = isset($field['type']) ? $field['type'] : 'text';
-        $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : NULL;
-        $_field['key']              = isset($field['key']) ? $field['key'] : NULL;
-        $_field['label']            = isset($field['label']) ? $field['label'] : NULL;
-        $_field['default']          = isset($field['default']) ? $field['default'] : NULL;
-        $_field['sub_label']        = isset($field['sub_label']) ? $field['sub_label'] : NULL;
-        $_field['required']         = isset($field['required']) ? $field['required'] : FALSE;
-        $_field['placeholder']      = isset($field['placeholder']) ? $field['placeholder'] : NULL;
-        $_field['class']            = isset($field['class']) ? $field['class'] : FALSE;
-        $_field['style']            = isset($field['style']) ? $field['style'] : FALSE;
-        $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : FALSE;
+        $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']              = isset($field['key']) ? $field['key'] : null;
+        $_field['label']            = isset($field['label']) ? $field['label'] : null;
+        $_field['default']          = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']        = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']         = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder']      = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']            = isset($field['class']) ? $field['class'] : false;
+        $_field['style']            = isset($field['style']) ? $field['style'] : false;
+        $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : false;
         $_field['data']             = isset($field['data']) ? $field['data'] : array();
         $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
@@ -1146,13 +1147,14 @@ if (!function_exists('form_field_dropdown')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
+        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
         $_error         = form_error($_field['key']) ? 'error' : '';
         $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
         $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '">';
+        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
         $_out .= '<label>';
 
         //  Label
@@ -1183,7 +1185,7 @@ if (!function_exists('form_field_dropdown')) {
         $_selected = set_value($_field['key'], $_field['default']);
 
         //  Build the select
-        $_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
+        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
         $_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($options as $value => $label) :
@@ -1197,7 +1199,7 @@ if (!function_exists('form_field_dropdown')) {
                     $_checked = $k == $_selected ? ' selected="selected"' : '';
 
                     //  Disabled?
-                    $_disabled = array_search($k, $_field['disabled_options']) !== FALSE ? ' disabled="disabled"' : '';
+                    $_disabled = array_search($k, $_field['disabled_options']) !== false ? ' disabled="disabled"' : '';
 
                     $_out .= '<option value="' . $k . '"' . $_checked . $_disabled . '>' . $v . '</option>';
 
@@ -1210,7 +1212,7 @@ if (!function_exists('form_field_dropdown')) {
                 $_checked = $value == $_selected ? ' selected="selected"' : '';
 
                 //  Disabled?
-                $_disabled = array_search($value, $_field['disabled_options']) !== FALSE ? ' disabled="disabled"' : '';
+                $_disabled = array_search($value, $_field['disabled_options']) !== false ? ' disabled="disabled"' : '';
 
                 $_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
 
@@ -1258,22 +1260,22 @@ if (!function_exists('form_field_dropdown_multiple')) {
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      * @return string          The form HTML
      */
-    function form_field_dropdown_multiple($field, $options = NULL, $tip = '')
+    function form_field_dropdown_multiple($field, $options = null, $tip = '')
     {
         //  Set var defaults
         $_field                     = array();
-        $_field['id']               = isset($field['id']) ? $field['id'] : NULL;
+        $_field['id']               = isset($field['id']) ? $field['id'] : null;
         $_field['type']             = isset($field['type']) ? $field['type'] : 'text';
-        $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : NULL;
-        $_field['key']              = isset($field['key']) ? $field['key'] : NULL;
-        $_field['label']            = isset($field['label']) ? $field['label'] : NULL;
-        $_field['default']          = isset($field['default']) ? $field['default'] : NULL;
-        $_field['sub_label']        = isset($field['sub_label']) ? $field['sub_label'] : NULL;
-        $_field['required']         = isset($field['required']) ? $field['required'] : FALSE;
-        $_field['placeholder']      = isset($field['placeholder']) ? $field['placeholder'] : NULL;
-        $_field['class']            = isset($field['class']) ? $field['class'] : FALSE;
-        $_field['style']            = isset($field['style']) ? $field['style'] : FALSE;
-        $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : FALSE;
+        $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']              = isset($field['key']) ? $field['key'] : null;
+        $_field['label']            = isset($field['label']) ? $field['label'] : null;
+        $_field['default']          = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']        = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']         = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder']      = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']            = isset($field['class']) ? $field['class'] : false;
+        $_field['style']            = isset($field['style']) ? $field['style'] : false;
+        $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : false;
         $_field['data']             = isset($field['data']) ? $field['data'] : array();
         $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
@@ -1291,13 +1293,14 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
+        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
         $_error         = form_error($_field['key']) ? 'error' : '';
         $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
         $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '">';
+        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
         $_out .= '<label>';
 
         //  Label
@@ -1341,7 +1344,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
         endif;
 
         //  Build the select
-        $_placeholder = NULL !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
+        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
         $_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($options as $value => $label) :
@@ -1358,7 +1361,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
             endif;
 
             //  Disabled?
-            $_disabled = array_search($value, $_field['disabled_options']) !== FALSE ? ' disabled="disabled"' : '';
+            $_disabled = array_search($value, $_field['disabled_options']) !== false ? ' disabled="disabled"' : '';
 
             $_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
 
@@ -1411,20 +1414,20 @@ if (!function_exists('form_field_boolean')) {
 
         //  Set var defaults
         $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : NULL;
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : NULL;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : NULL;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : NULL;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : NULL;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : NULL;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : FALSE;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : NULL;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : FALSE;
+        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
+        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
+        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
+        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
+        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
+        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
+        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
         $_field['text_on']      = isset($field['text_on'])        ? $field['text_on']     : 'ON';
         $_field['text_off']     = isset($field['text_off'])       ? $field['text_off']    : 'OFF';
         $_field['data']         = isset($field['data'])           ? $field['data']        : array();
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : FALSE;
-        $_field['info']         = isset($field['info'])           ? $field['info']        : FALSE;
+        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field['info']         = isset($field['info'])           ? $field['info']        : false;
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
@@ -1433,6 +1436,7 @@ if (!function_exists('form_field_boolean')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
+        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
         $_error         = form_error($_field['key']) ? 'error' : '';
         $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
         $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
@@ -1440,18 +1444,17 @@ if (!function_exists('form_field_boolean')) {
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '">';
+        $_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 
         //  Any data attributes?
-        $_data = '';
-        foreach ($_field['data'] as $attr => $value) :
+        $_data = 'data-is-boolean-field="true"';
+        foreach ($_field['data'] as $attr => $value) {
 
             $_data .= ' data-' . $attr . '="' . $value . '"';
-
-        endforeach;
+        }
 
         //  Label
         $_out .= '<span class="label">';
@@ -1466,7 +1469,7 @@ if (!function_exists('form_field_boolean')) {
         $_selected = set_value($_field['key'], (bool) $_field['default']);
 
         $_out .= '<div class="toggle toggle-modern"></div>';
-        $_out .= form_checkbox($_field['key'], TRUE, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class);
+        $_out .= form_checkbox($_field['key'], true, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class);
 
         //  Tip
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
@@ -1497,7 +1500,7 @@ if (!function_exists('form_field_radio')) {
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      * @return string          The form HTML
      */
-    function form_field_radio($field, $options = NULL, $tip = '')
+    function form_field_radio($field, $options = null, $tip = '')
     {
         $_ci =& get_instance();
 
@@ -1505,14 +1508,15 @@ if (!function_exists('form_field_radio')) {
 
         //  Set var defaults
         $_field                 = array();
-        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : NULL;
-        $_field['key']          = isset($field['key']) ? $field['key'] : NULL;
-        $_field['label']        = isset($field['label']) ? $field['label'] : NULL;
-        $_field['default']      = isset($field['default']) ? $field['default'] : NULL;
-        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : NULL;
-        $_field['required']     = isset($field['required']) ? $field['required'] : FALSE;
-        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : NULL;
-        $_field['class']        = isset($field['class']) ? $field['class'] : FALSE;
+        $_field['id']           = isset($field['id']) ? $field['id'] : null;
+        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']          = isset($field['key']) ? $field['key'] : null;
+        $_field['label']        = isset($field['label']) ? $field['label'] : null;
+        $_field['default']      = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']     = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']        = isset($field['class']) ? $field['class'] : false;
         $_field['tip']          = isset($field['tip']) ? $field['tip'] : $tip;
 
         if (is_null($options)) :
@@ -1527,11 +1531,12 @@ if (!function_exists('form_field_radio')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_error = form_error($_field['key']) ? 'error' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field radio ' . $_error . ' ' . $_field['oddeven'] . '">';
+        $_out  = '<div class="field radio ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
 
         //  First option
         $_out .= '<label>';
@@ -1549,11 +1554,11 @@ if (!function_exists('form_field_radio')) {
         //  Field
         if ($_ci->input->post($_field['key'])) :
 
-            $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? TRUE : FALSE;
+            $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? true : false;
 
         else :
 
-            $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : FALSE;
+            $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
 
         endif;
         $_out .= form_radio($_field['key'], $options[0]['value'], $_selected, $_id) . '<span class="text">' . $options[0]['label'] . '</span>';
@@ -1576,11 +1581,11 @@ if (!function_exists('form_field_radio')) {
             //  Input
             if ($_ci->input->post($_field['key'])) :
 
-                $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? TRUE : FALSE;
+                $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? true : false;
 
             else :
 
-                $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : FALSE;
+                $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
 
             endif;
 
@@ -1616,7 +1621,7 @@ if (!function_exists('form_field_checkbox')) {
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      * @return string          The form HTML
      */
-    function form_field_checkbox($field, $options = NULL, $tip = '')
+    function form_field_checkbox($field, $options = null, $tip = '')
     {
         $_ci =& get_instance();
 
@@ -1624,15 +1629,15 @@ if (!function_exists('form_field_checkbox')) {
 
         //  Set var defaults
         $_field                 = array();
-        $_field['id']           = isset($field['id']) ? $field['id'] : NULL;
-        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : NULL;
-        $_field['key']          = isset($field['key']) ? $field['key'] : NULL;
-        $_field['label']        = isset($field['label']) ? $field['label'] : NULL;
-        $_field['default']      = isset($field['default']) ? $field['default'] : NULL;
-        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : NULL;
-        $_field['required']     = isset($field['required']) ? $field['required'] : FALSE;
-        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : NULL;
-        $_field['class']        = isset($field['class']) ? $field['class'] : FALSE;
+        $_field['id']           = isset($field['id']) ? $field['id'] : null;
+        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']          = isset($field['key']) ? $field['key'] : null;
+        $_field['label']        = isset($field['label']) ? $field['label'] : null;
+        $_field['default']      = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']     = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']        = isset($field['class']) ? $field['class'] : false;
         $_field['tip']          = isset($field['tip']) ? $field['tip'] : $tip;
 
         if (is_null($options)) :
@@ -1647,11 +1652,12 @@ if (!function_exists('form_field_checkbox')) {
         $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_error = form_error($_field['key']) ? 'error' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field checkbox ' . $_error . ' ' . $_field['oddeven'] . '">';
+        $_out  = '<div class="field checkbox ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
 
         //  First option
         $_out .= '<label>';
@@ -1674,12 +1680,12 @@ if (!function_exists('form_field_checkbox')) {
 
             //  Field is an array, need to look for the value
             $_values        = $_ci->input->post(substr($_field['key'], 0, -2));
-            $_data_selected = isset($options[0]['selected']) ? $options[0]['selected'] : FALSE;
-            $_selected      = $_ci->input->post() ? FALSE : $_data_selected;
+            $_data_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
+            $_selected      = $_ci->input->post() ? false : $_data_selected;
 
-            if (is_array($_values) && array_search($options[0]['value'], $_values) !== FALSE) :
+            if (is_array($_values) && array_search($options[0]['value'], $_values) !== false) :
 
-                $_selected = TRUE;
+                $_selected = true;
 
             endif;
 
@@ -1688,11 +1694,11 @@ if (!function_exists('form_field_checkbox')) {
             //  Normal field, continue as normal Mr Norman!
             if ($_ci->input->post($_field['key'])) :
 
-                $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? TRUE : FALSE;
+                $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? true : false;
 
             else :
 
-                $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : FALSE;
+                $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
 
             endif;
 
@@ -1727,12 +1733,12 @@ if (!function_exists('form_field_checkbox')) {
 
                 //  Field is an array, need to look for the value
                 $_values    = $_ci->input->post(substr($_field['key'], 0, -2));
-                $_data_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : FALSE;
-                $_selected      = $_ci->input->post() ? FALSE : $_data_selected;
+                $_data_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
+                $_selected      = $_ci->input->post() ? false : $_data_selected;
 
-                if (is_array($_values) && array_search($options[$i]['value'], $_values) !== FALSE) :
+                if (is_array($_values) && array_search($options[$i]['value'], $_values) !== false) :
 
-                    $_selected = TRUE;
+                    $_selected = true;
 
                 endif;
 
@@ -1741,11 +1747,11 @@ if (!function_exists('form_field_checkbox')) {
                 //  Normal field, continue as normal Mr Norman!
                 if ($_ci->input->post($_field['key'])) :
 
-                    $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? TRUE : FALSE;
+                    $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? true : false;
 
                 else :
 
-                    $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : FALSE;
+                    $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
 
                 endif;
 

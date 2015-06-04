@@ -173,6 +173,16 @@ class CORE_NAILS_Controller extends MX_Controller {
         $this->data['page']->seo->title       = '';
         $this->data['page']->seo->description = '';
         $this->data['page']->seo->keywords    = '';
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * Forced maintenance mode?
+         */
+        if (app_setting('maintenance_mode_enabled', 'site')) {
+
+            $this->maintenanceMode(true);
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -347,19 +357,22 @@ class CORE_NAILS_Controller extends MX_Controller {
 
     /**
      * Checks if Maintenance Mode is enabled, shows the holding page if so.
+     * @param  boolean $force  Force maintenance mode on
+     * @param  string  $sTitle Override the page title
+     * @param  string  $sBody  Override the page body
      * @return void
      */
-    protected function maintenanceMode()
+    protected function maintenanceMode($force = false, $sTitle = '', $sBody = '')
     {
-        if (file_exists(FCPATH . '.MAINTENANCE')) {
+        if ($force || file_exists(FCPATH . '.MAINTENANCE')) {
 
             /**
-             * We're in maintenance mode. This happens very early so we need to
+             * We're in maintenance mode. This can happen very early so we need to
              * make sure that we've loaded everything we need to load as we're
              * exiting whether we like it or not
              */
 
-            //  Whitelist
+            //  Whitelist & Customisations
             if ($this->instantiateDb(true)) {
 
                 //  Load the traits
@@ -376,10 +389,17 @@ class CORE_NAILS_Controller extends MX_Controller {
                 $whitelistIp   = (array) app_setting('maintenance_mode_whitelist');
                 $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
 
+                //  Customisations
+
+                $sMaintenanceTitle = $sTitle ? $sTitle : app_setting('maintenance_mode_title', 'site');
+                $sMaintenanceBody  = $sBody ? $sBody : app_setting('maintenance_mode_body', 'site');
+
             } else {
 
                 //  No database, or it failed, defaults
-                $isWhiteListed = false;
+                $isWhiteListed     = false;
+                $sMaintenanceTitle = $sTitle;
+                $sMaintenanceBody  = $sBody;
             }
 
             // --------------------------------------------------------------------------
