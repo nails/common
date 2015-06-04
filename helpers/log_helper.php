@@ -1,36 +1,69 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
-if ( ! function_exists( '_LOG' ) )
-{
-	function _LOG( $line = '' )
-	{
-		return get_instance()->logger->line( $line );
-	}
+/**
+ * This helper brings some shorthand functions for writing to the log
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+if (!function_exists('_LOG')) {
+
+    /**
+     * Writes a line to the log
+     * @param  string $sLine The line to write
+     * @return void
+     */
+    function _LOG($sLine = '') {
+        return get_instance()->logger->line($sLine);
+    }
 }
 
-if ( ! function_exists( '_LOG_FILE' ) )
-{
-	function _LOG_FILE( $file = NULL )
-	{
-		return get_instance()->logger->set_file( $file );
-	}
+if (!function_exists('_LOG_DIR')) {
+
+    /**
+     * Set the log directory which is being written to
+     * @param string $sDir The directory to write to
+     */
+    function _LOG_DIR($sDir = '') {
+        return get_instance()->logger->setDir($sDir);
+    }
 }
 
-if ( ! function_exists( '_LOG_MUTE_OUTPUT' ) )
-{
-	function _LOG_MUTE_OUTPUT( $mute_output = TRUE )
-	{
-		get_instance()->logger->mute_output = $mute_output;
-	}
+if (!function_exists('_LOG_FILE')) {
+
+    /**
+     * Set the filename which is being written to
+     * @param string $sFile The file to write to
+     */
+    function _LOG_FILE($sFile = '') {
+        return get_instance()->logger->setFile($sFile);
+    }
 }
 
-if ( ! function_exists( '_LOG_DUMMY_MODE' ) )
-{
-	function _LOG_DUMMY_MODE( $dummy_mode = TRUE )
-	{
-		get_instance()->logger->dummy_mode = $dummy_mode;
-	}
+if (!function_exists('_LOG_MUTE_OUTPUT')) {
+
+    /**
+     * Temporarily mute logging
+     * @param  bool $bMute Whether mute is on or off
+     * @return void
+     */
+    function _LOG_MUTE_OUTPUT($bMute = true) {
+        get_instance()->logger->bMute = (bool) $bMute;
+    }
 }
 
-/* End of file log_helper.php */
-/* Location: ./helpers/log_helper.php */
+if (!function_exists('_LOG_DUMMY_MODE')) {
+
+    /**
+     * Switch the logger into dummy mode
+     * @param  boolean $bDummy Whether dummy mode is on or off
+     * @return void
+     */
+    function _LOG_DUMMY_MODE($bDummy = true) {
+        get_instance()->logger->bDummy = (bool) $bDummy;
+    }
+}
