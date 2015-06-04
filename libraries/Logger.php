@@ -81,7 +81,7 @@ class Logger
 
                 // --------------------------------------------------------------------------
 
-                $sFirstLine = '<?php exit(\'Unauthorised\')' . "\n\n";
+                $sFirstLine = '<?php exit(\'Unauthorised\');' . "\n\n";
                 if (write_file($sLogPath, $sFirstLine)) {
 
                     $this->oLog->exists = true;
