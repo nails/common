@@ -167,17 +167,13 @@ class Logger
 
         // --------------------------------------------------------------------------
 
-        if (!empty($sDir)) {
+        if (!empty($sDir) && substr($sDir, 0, 1) === '/') {
 
-            //  Absolute or relative?
-            if (substr($sDir, 0, 1) === '/') {
+            $this->oLog->dir = $sDir;
 
-                $this->oLog->dir = $sDir;
+        } elseif (!empty($sDir)) {
 
-            } else {
-
-                $this->oLog->dir = DEPLOY_LOG_DIR . $sDir;
-            }
+            $this->oLog->dir = DEPLOY_LOG_DIR . $sDir;
 
         } else {
 
