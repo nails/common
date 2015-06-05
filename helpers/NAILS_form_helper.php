@@ -623,15 +623,18 @@ if (!function_exists('form_field_mm_image')) {
         // --------------------------------------------------------------------------
 
         //  Error
-        if ($_field_error && $_field['error']) :
+        if ($_field_error_cls && $_field['error']) {
 
             $_field_error = '<span class="error">' . $_field['error'] . '</span>';
 
-        elseif ($_field_error) :
+        } elseif ($_field_error_cls) {
 
             $_field_error = form_error($_field['key'], '<span class="error">', '</span>');
 
-        endif;
+        } else {
+
+            $_field_error = '';
+        }
 
         // --------------------------------------------------------------------------
 
