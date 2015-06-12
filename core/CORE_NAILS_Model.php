@@ -21,7 +21,6 @@ class CORE_NAILS_Model extends CI_Model
     protected $data;
     protected $user;
     protected $user_model;
-    protected $log;
 
     //  Data/Table structure
     protected $table;
@@ -65,9 +64,6 @@ class CORE_NAILS_Model extends CI_Model
 
             $this->user_model = getUserObject();
         }
-
-        //  ... and the logger
-        // $this->log = $GLOBALS['NAILS_LOG'];
 
         // --------------------------------------------------------------------------
 
@@ -827,15 +823,16 @@ class CORE_NAILS_Model extends CI_Model
      * Formats a single object
      *
      * The get_all() method iterates over each returned item with this method so as to
-     * correctly format the output. Use this to typecast ID's and/or organise data into objects.
+     * correctly format the output. Use this to cast integers and booleans and/or organise data into objects.
      *
      * @param  object $obj      A reference to the object being formatted.
      * @param  array  $data     The same data array which is passed to _getcount_common, for reference if needed
-     * @param  array  $integers Fields which should be cast as integers if numerical
-     * @param  array  $bools    Fields which should be cast as booleans
+     * @param  array  $integers Fields which should be cast as integers if numerical and not null
+     * @param  array  $bools    Fields which should be cast as booleans if not null
+     * @param  array  $floats   Fields which should be cast as floats if not null
      * @return void
      */
-    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array())
+    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
     {
         $integers   = (array) $integers;
         $integers[] = $this->tableIdColumn;
@@ -851,7 +848,7 @@ class CORE_NAILS_Model extends CI_Model
 
         foreach ($integers as $property) {
 
-            if (property_exists($obj, $property) && is_numeric($obj->{$property})) {
+            if (property_exists($obj, $property) && is_numeric($obj->{$property}) && !is_null($obj->{$property})) {
 
                 $obj->{$property} = (int) $obj->{$property};
             }
@@ -869,9 +866,21 @@ class CORE_NAILS_Model extends CI_Model
 
         foreach ($bools as $property) {
 
-            if (property_exists($obj, $property)) {
+            if (property_exists($obj, $property) && !is_null($obj->{$property})) {
 
                 $obj->{$property} = (bool) $obj->{$property};
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        $floats = (array) $floats;
+
+        foreach ($floats as $property) {
+
+            if (property_exists($obj, $property) && is_numeric($obj->{$property}) && !is_null($obj->{$property})) {
+
+                $obj->{$property} = (float) $obj->{$property};
             }
         }
     }
