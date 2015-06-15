@@ -11,7 +11,58 @@ if (!function_exists('form_email')) {
      */
     function form_email($data = '', $value = '', $extra = '')
     {
-        $defaults = array('type' => 'email', 'name' => ((!is_array($data)) ? $data : ''), 'value' => $value);
+        $defaults = array(
+            'type' => 'email',
+            'name' => ((!is_array($data)) ? $data : ''),
+            'value' => $value
+        );
+
+        return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_number')) {
+
+    /**
+     * Generates an input using the "number" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_number($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type' => 'number',
+            'name' => ((!is_array($data)) ? $data : ''),
+            'value' => $value,
+            'step' => empty($data['step']) ? 'any' : $data['step']
+        );
+
+        return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_url')) {
+
+    /**
+     * Generates an input using the "url" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_url($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type' => 'url',
+            'name' => ((!is_array($data)) ? $data : ''),
+            'value' => $value
+        );
 
         return "<input "._parse_form_attributes($data, $defaults).$extra." />";
     }
@@ -153,49 +204,62 @@ if (!function_exists('form_field')) {
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
-        switch ($_field_type) :
+        $sFieldAttr  = $_attr;
+        $sFieldAttr .= ' class="' . $_field_class . '" ';
+        $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ';
+        $sFieldAttr .= $_readonly;
 
-            case 'password' :
+        switch ($_field_type) {
 
-                $_field_html = form_password($_field_key, set_value($_field_key, $_field_default), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
+            case 'password':
+            case 'email':
+            case 'number':
+            case 'url':
 
-            break;
+                $sMethodName = 'form_' . $_field_type;
+                $_field_html = $sMethodName(
+                    $_field_key,
+                    set_value($_field_key, $_field_default),
+                    $sFieldAttr
+                );
+                break;
 
-            case 'email' :
+            case 'wysiwyg':
+            case 'textarea':
 
-                $_field_html = form_email($_field_key, set_value($_field_key, $_field_default), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
+                if ($_field_type == 'wysiwyg') {
 
-            break;
+                    $_field_type   = 'textarea';
+                    $_field_class .= ' wysiwyg';
+                }
 
-            case 'wysiwyg' :
-            case 'textarea' :
+                $_field_html = form_textarea(
+                    $_field_key,
+                    set_value($_field_key, $_field_default),
+                    $sFieldAttr
+                );
+                break;
 
-                if ($_field_type == 'wysiwyg') :
+            case 'upload':
+            case 'file':
 
-                    $_field_type    = 'textarea';
-                    $_field_class   .= ' wysiwyg';
+                $_field_html = form_upload(
+                    $_field_key,
+                    null,
+                    $sFieldAttr
+                );
+                break;
 
-                endif;
+            case 'text':
+            default:
 
-                $_field_html    = form_textarea($_field_key, set_value($_field_key, $_field_default), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
-
-            break;
-
-            case 'upload' :
-            case 'file' :
-
-                $_field_html = form_upload($_field_key, null, $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
-
-            break;
-
-            case 'text' :
-            default :
-
-                $_field_html = form_input($_field_key, set_value($_field_key, $_field_default), $_attr . ' class="' . $_field_class . '" placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ' . $_readonly);
-
-            break;
-
-        endswitch;
+                $_field_html = form_input(
+                    $_field_key,
+                    set_value($_field_key, $_field_default),
+                    $sFieldAttr
+                );
+                break;
+        }
 
         //  Download original file, if type is file and original is available
         if (($_field_type == 'file' || $_field_type == 'upload') && $_field_default) :
@@ -286,6 +350,40 @@ if (!function_exists('form_field_email')) {
     function form_field_email($field, $tip = '')
     {
         $field['type'] = 'email';
+        return form_field($field, $tip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_number')) {
+
+    /**
+     * Generates a form field using the "number" input type
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_number($field, $tip = '')
+    {
+        $field['type'] = 'number';
+        return form_field($field, $tip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_url')) {
+
+    /**
+     * Generates a form field using the "url" input type
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_url($field, $tip = '')
+    {
+        $field['type'] = 'url';
         return form_field($field, $tip);
     }
 }
@@ -462,7 +560,7 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  If a default has been specified then show a download link
-        $_field_download = $_field['default'] ? anchor(cdn_serve($_field['default'], true), 'Download File') : '';
+        $_field_download = $_field['default'] ? anchor(cdn_serve($_field['default'], true), 'Download File', 'class="awesome small orange"') : '';
 
         // --------------------------------------------------------------------------
 
@@ -674,7 +772,6 @@ if (!function_exists('form_field_mm_image')) {
         $_out .= '      ' . $_field_error;
         $_out .= '  </span>';
         $_out .= '</label>';
-        $_out .= '<br /><br />';
         $_out .= $_field_field;
         $_out .= '</div>';
 
