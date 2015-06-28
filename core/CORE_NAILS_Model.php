@@ -132,11 +132,11 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Creates a new object
-     * @param  array   $data         The data to create the object with
-     * @param  boolean $returnObject Whether to return just the new ID or the full object
+     * @param  array   $aData         The data to create the object with
+     * @param  boolean $bReturnObject Whether to return just the new ID or the full object
      * @return mixed
      */
-    public function create($data = array(), $returnObject = false)
+    public function create($aData = array(), $bReturnObject = false)
     {
         if (!$this->table) {
 
@@ -147,46 +147,58 @@ class CORE_NAILS_Model extends CI_Model
 
         if ($this->tableAutoSetTimestamps) {
 
-            $this->db->set('created', 'NOW()', false);
-            $this->db->set('modified', 'NOW()', false);
+            if (empty($aData['created'])) {
+                $this->db->set('created', 'NOW()', false);
+            }
+            if (empty($aData['modified'])) {
+                $this->db->set('modified', 'NOW()', false);
+            }
 
             if ($this->user_model->isLoggedIn()) {
 
-                $this->db->set('created_by', activeUser('id'));
-                $this->db->set('modified_by', activeUser('id'));
+                if (empty($aData['created_by'])) {
+                    $this->db->set('created_by', activeUser('id'));
+                }
+                if (empty($aData['modified_by'])) {
+                    $this->db->set('modified_by', activeUser('id'));
+                }
 
             } else {
 
-                $this->db->set('created_by', null);
-                $this->db->set('modified_by', null);
+                if (empty($aData['created_by'])) {
+                    $this->db->set('created_by', null);
+                }
+                if (empty($aData['modified_by'])) {
+                    $this->db->set('modified_by', null);
+                }
             }
 
-        } elseif (!$data) {
+        } elseif (!$aData) {
 
             $this->_set_error('No data to insert.');
             return false;
         }
 
-        if ($data) {
+        if ($aData) {
 
-            $this->db->set($data);
+            $this->db->set($aData);
         }
 
         $this->db->insert($this->table);
 
         if ($this->db->affected_rows()) {
 
-            $id = $this->db->insert_id();
+            $iId = $this->db->insert_id();
 
             // --------------------------------------------------------------------------
 
-            if ($returnObject) {
+            if ($bReturnObject) {
 
-                return $this->get_by_id($id);
+                return $this->get_by_id($iId);
 
             } else {
 
-                return $id;
+                return $iId;
             }
 
         } else {
@@ -200,11 +212,11 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Updates an existing object
-     * @param  int     $id   The ID of the object to update
-     * @param  array   $data The data to update the object with
+     * @param  integer $iId   The ID of the object to update
+     * @param  array   $aData The data to update the object with
      * @return boolean
      */
-    public function update($id, $data = array())
+    public function update($iId, $aData = array())
     {
         if (!$this->table) {
 
@@ -212,40 +224,46 @@ class CORE_NAILS_Model extends CI_Model
 
         } else {
 
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $table  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
+            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $sTable  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
 
         // --------------------------------------------------------------------------
 
         if ($this->tableAutoSetTimestamps) {
 
-            $this->db->set($prefix . 'modified', 'NOW()', false);
+            if (empty($aData['modified'])) {
+                $this->db->set($sPrefix . 'modified', 'NOW()', false);
+            }
 
             if ($this->user_model->isLoggedIn()) {
 
-                $this->db->set($prefix . 'modified_by', activeUser('id'));
+                if (empty($aData['modified_by'])) {
+                    $this->db->set($sPrefix . 'modified_by', activeUser('id'));
+                }
 
             } else {
 
-                $this->db->set($prefix . 'modified_by', null);
+                if (empty($aData['modified_by'])) {
+                    $this->db->set($sPrefix . 'modified_by', null);
+                }
             }
 
-        } elseif (!$data) {
+        } elseif (!$aData) {
 
             $this->_set_error('No data to update.');
             return false;
         }
 
-        if ($data) {
+        if ($aData) {
 
-            $this->db->set($data);
+            $this->db->set($aData);
         }
 
         // --------------------------------------------------------------------------
 
-        $this->db->where($prefix . 'id', $id);
-        return $this->db->update($table);
+        $this->db->where($sPrefix . 'id', $iId);
+        return $this->db->update($sTable);
     }
 
     // --------------------------------------------------------------------------
