@@ -651,7 +651,7 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        if (empty($ids)) {
+        if (empty($slugs)) {
             return array();
         }
 
