@@ -141,6 +141,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::create() Table variable not set');
+            return;
         }
 
         // --------------------------------------------------------------------------
@@ -173,15 +174,16 @@ class CORE_NAILS_Model extends CI_Model
                 }
             }
 
-        } elseif (!$aData) {
+        }
+
+        if (!empty($aData)) {
+
+            $this->db->set($aData);
+
+        } else {
 
             $this->_set_error('No data to insert.');
             return false;
-        }
-
-        if ($aData) {
-
-            $this->db->set($aData);
         }
 
         $this->db->insert($this->table);
@@ -221,6 +223,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::update() Table variable not set');
+            return;
 
         } else {
 
@@ -249,15 +252,16 @@ class CORE_NAILS_Model extends CI_Model
                 }
             }
 
-        } elseif (!$aData) {
-
-            $this->_set_error('No data to update.');
-            return false;
         }
 
-        if ($aData) {
+        if (!empty($aData)) {
 
             $this->db->set($aData);
+
+        } else {
+
+            $this->_set_error('No data to insert.');
+            return false;
         }
 
         // --------------------------------------------------------------------------
@@ -284,6 +288,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::delete() Table variable not set');
+            return;
         }
 
         // --------------------------------------------------------------------------
@@ -323,6 +328,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::restore() Table variable not set');
+            return;
         }
 
         // --------------------------------------------------------------------------
@@ -359,6 +365,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::destroy() Table variable not set');
+            return;
         }
 
         // --------------------------------------------------------------------------
@@ -394,6 +401,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_all() Table variable not set');
+            return;
 
         } else {
 
@@ -490,11 +498,13 @@ class CORE_NAILS_Model extends CI_Model
         if (!isset($_test->{$this->tableLabelColumn})) {
 
             show_error(get_called_class() . '::get_all_flat() "' . $this->tableLabelColumn . '" is not a valid label column.');
+            return;
         }
 
         if (!isset($_test->{$this->tableIdColumn})) {
 
             show_error(get_called_class() . '::get_all_flat() "' . $this->tableIdColumn . '" is not a valid id column.');
+            return;
         }
 
         unset($_test);
@@ -522,6 +532,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_id() Table variable not set');
+            return;
 
         } else {
 
@@ -572,6 +583,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_ids() Table variable not set');
+            return;
 
         } else {
 
@@ -611,6 +623,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
+            return;
 
         } else {
 
@@ -661,6 +674,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
+            return;
 
         } else {
 
@@ -726,6 +740,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->table) {
 
             show_error(get_called_class() . '::count_all() Table variable not set');
+            return;
 
         } else {
 
@@ -781,6 +796,7 @@ class CORE_NAILS_Model extends CI_Model
             if (!$this->table) {
 
                 show_error(get_called_class() . '::_generate_slug() Table variable not set');
+                return;
             }
 
             $table = $this->table;
@@ -795,6 +811,7 @@ class CORE_NAILS_Model extends CI_Model
             if (!$this->tableSlugColumn) {
 
                 show_error(get_called_class() . '::_generate_slug() Column variable not set');
+                return;
             }
 
             $column = $this->tableSlugColumn;
