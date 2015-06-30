@@ -149,28 +149,29 @@ class CORE_NAILS_Model extends CI_Model
         if ($this->tableAutoSetTimestamps) {
 
             if (empty($aData['created'])) {
-                $this->db->set('created', 'NOW()', false);
+                $aData['created'] = date('Y-m-d H:i:s');
             }
             if (empty($aData['modified'])) {
-                $this->db->set('modified', 'NOW()', false);
+                $aData['modified'] = date('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
 
                 if (empty($aData['created_by'])) {
-                    $this->db->set('created_by', activeUser('id'));
+                    $aData['created_by'] = activeUser('id');
                 }
                 if (empty($aData['modified_by'])) {
-                    $this->db->set('modified_by', activeUser('id'));
+                    $aData['modified_by'] = activeUser('id');
                 }
 
             } else {
 
                 if (empty($aData['created_by'])) {
                     $this->db->set('created_by', null);
+                    $aData['created_by'] = null;
                 }
                 if (empty($aData['modified_by'])) {
-                    $this->db->set('modified_by', null);
+                    $aData['modified_by'] = null;
                 }
             }
 
@@ -180,10 +181,6 @@ class CORE_NAILS_Model extends CI_Model
 
             $this->db->set($aData);
 
-        } else {
-
-            $this->_set_error('No data to insert.');
-            return false;
         }
 
         $this->db->insert($this->table);
@@ -236,19 +233,19 @@ class CORE_NAILS_Model extends CI_Model
         if ($this->tableAutoSetTimestamps) {
 
             if (empty($aData['modified'])) {
-                $this->db->set($sPrefix . 'modified', 'NOW()', false);
+                $aData[$sPrefix . 'modified'] = date('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
 
                 if (empty($aData['modified_by'])) {
-                    $this->db->set($sPrefix . 'modified_by', activeUser('id'));
+                    $aData[$sPrefix . 'modified_by'] = activeUser('id');
                 }
 
             } else {
 
                 if (empty($aData['modified_by'])) {
-                    $this->db->set($sPrefix . 'modified_by', null);
+                    $aData[$sPrefix . 'modified_by'] = null;
                 }
             }
 
@@ -258,10 +255,6 @@ class CORE_NAILS_Model extends CI_Model
 
             $this->db->set($aData);
 
-        } else {
-
-            $this->_set_error('No data to insert.');
-            return false;
         }
 
         // --------------------------------------------------------------------------
