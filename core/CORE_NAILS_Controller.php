@@ -386,11 +386,10 @@ class CORE_NAILS_Controller extends MX_Controller {
                 $this->load->helper('app_setting');
                 $this->load->helper('tools');
 
-                $whitelistIp   = (array) app_setting('maintenance_mode_whitelist');
+                $whitelistIp   = (array) app_setting('maintenance_mode_whitelist', 'site');
                 $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
 
                 //  Customisations
-
                 $sMaintenanceTitle = $sTitle ? $sTitle : app_setting('maintenance_mode_title', 'site');
                 $sMaintenanceBody  = $sBody ? $sBody : app_setting('maintenance_mode_body', 'site');
 
@@ -450,9 +449,8 @@ class CORE_NAILS_Controller extends MX_Controller {
 
                     echo 'Down for Maintenance' . "\n";
                 }
+                exit(0);
             }
-
-            exit(0);
         }
     }
 
