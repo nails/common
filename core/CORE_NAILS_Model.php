@@ -179,8 +179,8 @@ class CORE_NAILS_Model extends CI_Model
 
         if (!empty($aData)) {
 
+            unset($aData['id']);
             $this->db->set($aData);
-
         }
 
         $this->db->insert($this->table);
@@ -248,13 +248,12 @@ class CORE_NAILS_Model extends CI_Model
                     $aData[$sPrefix . 'modified_by'] = null;
                 }
             }
-
         }
 
         if (!empty($aData)) {
 
+            unset($aData['id']);
             $this->db->set($aData);
-
         }
 
         // --------------------------------------------------------------------------
@@ -272,10 +271,10 @@ class CORE_NAILS_Model extends CI_Model
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->deletedFlag field will be set to true.
      *
-     * @param int      $id The ID of the object to mark as deleted
+     * @param  int     $iId The ID of the object to mark as deleted
      * @return boolean
      */
-    public function delete($id)
+    public function delete($iId)
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
@@ -289,16 +288,16 @@ class CORE_NAILS_Model extends CI_Model
         if ($this->destructiveDelete) {
 
             //  Destructive delete; nuke that row.
-            return $this->destroy($id);
+            return $this->destroy($iId);
 
         } else {
 
             //  Non-destructive delete, update the flag
-            $data = array(
+            $aData = array(
                 $this->deletedFlag => true
             );
 
-            return $this->update($id, $data);
+            return $this->update($iId, $aData);
 
         }
     }
@@ -312,10 +311,10 @@ class CORE_NAILS_Model extends CI_Model
      * If Non-destructive deletion is enabled then the $this->deletedFlag
      * field will be set to false.
      *
-     * @param int      $id The ID of the object to restore
+     * @param  int     $iId The ID of the object to restore
      * @return boolean
      */
-    public function restore($id)
+    public function restore($iId)
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
@@ -334,11 +333,11 @@ class CORE_NAILS_Model extends CI_Model
         } else {
 
             //  Non-destructive delete, update the flag
-            $data = array(
+            $aData = array(
                 $this->deletedFlag => false
             );
 
-            return $this->update($id, $data);
+            return $this->update($iId, $aData);
         }
     }
 
@@ -350,10 +349,10 @@ class CORE_NAILS_Model extends CI_Model
      * This method will attempt to delete the row from the table, regardless of whether
      * destructive deletion is enabled or not.
      *
-     * @param int      $id The ID of the object to destroy
+     * @param  int     $iId The ID of the object to destroy
      * @return boolean
      */
-    public function destroy($id)
+    public function destroy($iId)
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
@@ -364,7 +363,7 @@ class CORE_NAILS_Model extends CI_Model
 
         // --------------------------------------------------------------------------
 
-        $this->db->where('id', $id);
+        $this->db->where('id', $iId);
         $this->db->delete($this->table);
 
         return (bool) $this->db->affected_rows();
@@ -432,8 +431,8 @@ class CORE_NAILS_Model extends CI_Model
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->destructiveDelete && !$includeDeleted) {
 
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($prefix . $this->deletedFlag, false);
+            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $this->db->where($sPrefix . $this->deletedFlag, false);
         }
 
         // --------------------------------------------------------------------------
@@ -446,15 +445,15 @@ class CORE_NAILS_Model extends CI_Model
 
         if (empty($data['RETURN_QUERY_OBJECT'])) {
 
-            $results    = $this->db->get($table)->result();
-            $numResults = count($results);
+            $aResults   = $this->db->get($table)->result();
+            $numResults = count($aResults);
 
             for ($i = 0; $i < $numResults; $i++) {
 
-                $this->_format_object($results[$i], $data);
+                $this->_format_object($aResults[$i], $data);
             }
 
-            return $results;
+            return $aResults;
 
         } else {
 
@@ -517,182 +516,186 @@ class CORE_NAILS_Model extends CI_Model
 
     /**
      * Fetch an object by it's ID
-     * @param  int      $id   The ID of the object to fetch
-     * @param  mixed    $data Any data to pass to _getcount_common()
-     * @return stdClass
+     * @param  int      $iId   The ID of the object to fetch
+     * @param  mixed    $aData Any data to pass to _getcount_common()
+     * @return mixed           stdClass on success, false on failure
      */
-    public function get_by_id($id, $data = array())
+    public function get_by_id($iId, $aData = array())
     {
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_id() Table variable not set');
             return;
 
-        } else {
-
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
 
-        if (empty($id)) {
+        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+
+        // --------------------------------------------------------------------------
+
+        if (empty($iId)) {
             return false;
         }
 
         // --------------------------------------------------------------------------
 
-        if (!isset($data['where'])) {
+        if (!isset($aData['where'])) {
 
-            $data['where'] = array();
+            $aData['where'] = array();
         }
 
-        $data['where'][] = array($prefix . $this->tableIdColumn, $id);
+        $aData['where'][] = array($sPrefix . $this->tableIdColumn, $iId);
 
         // --------------------------------------------------------------------------
 
-        $result = $this->get_all(null, null, $data, false, 'GET_BY_ID');
+        $aResult = $this->get_all(null, null, $aData, false, 'GET_BY_ID');
 
         // --------------------------------------------------------------------------
 
-        if (!$result) {
+        if (empty($aResult)) {
 
             return false;
         }
 
         // --------------------------------------------------------------------------
 
-        return $result[0];
+        return $aResult[0];
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Fetch objects by their IDs
-     * @param  array $id   An array of IDs to fetch
-     * @param  mixed $data Any data to pass to _getcount_common()
+     * @param  array $aIds  An array of IDs to fetch
+     * @param  mixed $aData Any data to pass to _getcount_common()
      * @return array
      */
-    public function get_by_ids($ids, $data = array())
+    public function get_by_ids($aIds, $aData = array())
     {
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_ids() Table variable not set');
             return;
 
-        } else {
-
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
 
-        if (empty($ids)) {
+        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+
+        // --------------------------------------------------------------------------
+
+        if (empty($aIds)) {
             return array();
         }
 
         // --------------------------------------------------------------------------
 
-        if (!isset($data['where_in'])) {
+        if (!isset($aData['where_in'])) {
 
-            $data['where_in'] = array();
+            $aData['where_in'] = array();
         }
 
-        $data['where_in'][] = array($prefix . $this->tableIdColumn, $ids);
+        $aData['where_in'][] = array($sPrefix . $this->tableIdColumn, $aIds);
 
         // --------------------------------------------------------------------------
 
-        return $this->get_all(null, null, $data, false, 'GET_BY_IDS');
+        return $this->get_all(null, null, $aData, false, 'GET_BY_IDS');
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Fetch an object by it's slug
-     * @param  int      $slug The slug of the object to fetch
+     * @param  string   $sSlug The slug of the object to fetch
      * @param  mixed    $data Any data to pass to _getcount_common()
      * @return stdClass
      */
-    public function get_by_slug($slug, $data = array())
+    public function get_by_slug($sSlug, $aData = array())
     {
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
             return;
 
-        } else {
-
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
 
-        if (empty($slug)) {
+        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+
+        // --------------------------------------------------------------------------
+
+        if (empty($sSlug)) {
             return false;
         }
 
         // --------------------------------------------------------------------------
 
-        if (!isset($data['where'])) {
+        if (!isset($aData['where'])) {
 
-            $data['where'] = array();
+            $aData['where'] = array();
         }
 
-        $data['where'][] = array($prefix . $this->tableSlugColumn, $slug);
+        $aData['where'][] = array($sPrefix . $this->tableSlugColumn, $sSlug);
 
         // --------------------------------------------------------------------------
 
-        $result = $this->get_all(null, null, $data, false, 'GET_BY_SLUG');
+        $aResult = $this->get_all(null, null, $aData, false, 'GET_BY_SLUG');
 
         // --------------------------------------------------------------------------
 
-        if (!$result) {
+        if (empty($aResult)) {
 
             return false;
         }
 
         // --------------------------------------------------------------------------
 
-        return $result[0];
+        return $aResult[0];
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Fetch objects by their slugs
-     * @param  array $slug An array of slugs to fetch
-     * @param  mixed $data Any data to pass to _getcount_common()
+     * @param  array $aSlugs An array of slugs to fetch
+     * @param  mixed $aData  Any data to pass to _getcount_common()
      * @return array
      */
-    public function get_by_slugs($slugs, $data = array())
+    public function get_by_slugs($aSlugs, $aData = array())
     {
         if (!$this->table) {
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
             return;
 
-        } else {
-
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
         }
 
         // --------------------------------------------------------------------------
 
-        if (empty($slugs)) {
+        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+
+        // --------------------------------------------------------------------------
+
+        if (empty($aSlugs)) {
             return array();
         }
 
         // --------------------------------------------------------------------------
 
-        if (!isset($data['where_in'])) {
+        if (!isset($aData['where_in'])) {
 
-            $data['where_in'] = array();
+            $aData['where_in'] = array();
         }
 
-        $data['where_in'][] = array($prefix . $this->tableSlugColumn, $slugs);
+        $aData['where_in'][] = array($sPrefix . $this->tableSlugColumn, $aSlugs);
 
         // --------------------------------------------------------------------------
 
-        return $this->get_all(null, null, $data, false, 'GET_BY_SLUGS');
+        return $this->get_all(null, null, $aData, false, 'GET_BY_SLUGS');
     }
 
     // --------------------------------------------------------------------------
@@ -705,19 +708,19 @@ class CORE_NAILS_Model extends CI_Model
      * an ID or a slug has been passed, thus numeric slugs (which are against
      * Nails style guidelines) will be interpreted incorrectly.
      *
-     * @param  mixed    $idSlug The ID or slug of the object to fetch
-     * @param  mixed    $data   Any data to pass to _getcount_common()
+     * @param  mixed    $mIdSlug The ID or slug of the object to fetch
+     * @param  array    $aData   Any data to pass to _getcount_common()
      * @return stdClass
      */
-    public function get_by_id_or_slug($idSlug, $data = array())
+    public function get_by_id_or_slug($mIdSlug, $aData = array())
     {
-        if (is_numeric($idSlug)) {
+        if (is_numeric($mIdSlug)) {
 
-            return $this->get_by_id($idSlug, $data);
+            return $this->get_by_id($mIdSlug, $aData);
 
         } else {
 
-            return $this->get_by_slug($idSlug, $data);
+            return $this->get_by_slug($mIdSlug, $aData);
         }
     }
 
@@ -751,8 +754,8 @@ class CORE_NAILS_Model extends CI_Model
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->destructiveDelete && !$includeDeleted) {
 
-            $prefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($prefix . $this->deletedFlag, false);
+            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
+            $this->db->where($sPrefix . $this->deletedFlag, false);
         }
 
         // --------------------------------------------------------------------------
