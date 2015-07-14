@@ -26,13 +26,17 @@ class CORE_NAILS_Model extends CI_Model
     protected $table;
     protected $tablePrefix;
 
+    //  Column names
     protected $tableIdColumn;
     protected $tableSlugColumn;
     protected $tableLabelColumn;
+    protected $tableCreatedColumn;
+    protected $tableCreatedByColumn;
+    protected $tableModifiedColumn;
+    protected $tableModifiedByColumn;
+    protected $tableDeletedColumn;
 
     protected $tableAutoSetTimestamps;
-
-    protected $deletedFlag;
 
     //  Preferences
     protected $destructiveDelete;
@@ -73,8 +77,12 @@ class CORE_NAILS_Model extends CI_Model
         $this->tableIdColumn          = 'id';
         $this->tableSlugColumn        = 'slug';
         $this->tableLabelColumn       = 'label';
+        $this->tableCreatedColumn     = 'created';
+        $this->tableCreatedByColumn   = 'created_by';
+        $this->tableModifiedColumn    = 'modified';
+        $this->tableModifiedByColumn  = 'modified_by';
+        $this->tableDeletedColumn     = 'is_deleted';
         $this->tableAutoSetTimestamps = true;
-        $this->deletedFlag            = 'is_deleted';
         $this->perPage                = 50;
     }
 
@@ -148,30 +156,30 @@ class CORE_NAILS_Model extends CI_Model
 
         if ($this->tableAutoSetTimestamps) {
 
-            if (empty($aData['created'])) {
-                $aData['created'] = date('Y-m-d H:i:s');
+            if (empty($aData[$this->tableCreatedColumn])) {
+                $aData[$this->tableCreatedColumn] = date('Y-m-d H:i:s');
             }
-            if (empty($aData['modified'])) {
-                $aData['modified'] = date('Y-m-d H:i:s');
+            if (empty($aData[$this->tableModifiedColumn])) {
+                $aData[$this->tableModifiedColumn] = date('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
 
-                if (empty($aData['created_by'])) {
-                    $aData['created_by'] = activeUser('id');
+                if (empty($aData[$this->tableCreatedByColumn])) {
+                    $aData[$this->tableCreatedByColumn] = activeUser('id');
                 }
-                if (empty($aData['modified_by'])) {
-                    $aData['modified_by'] = activeUser('id');
+                if (empty($aData[$this->tableModifiedByColumn])) {
+                    $aData[$this->tableModifiedByColumn] = activeUser('id');
                 }
 
             } else {
 
-                if (empty($aData['created_by'])) {
-                    $this->db->set('created_by', null);
-                    $aData['created_by'] = null;
+                if (empty($aData[$this->tableCreatedByColumn])) {
+                    $this->db->set($this->tableCreatedByColumn, null);
+                    $aData[$this->tableCreatedByColumn] = null;
                 }
-                if (empty($aData['modified_by'])) {
-                    $aData['modified_by'] = null;
+                if (empty($aData[$this->tableModifiedByColumn])) {
+                    $aData[$this->tableModifiedByColumn] = null;
                 }
             }
 
@@ -232,20 +240,20 @@ class CORE_NAILS_Model extends CI_Model
 
         if ($this->tableAutoSetTimestamps) {
 
-            if (empty($aData['modified'])) {
-                $aData[$sPrefix . 'modified'] = date('Y-m-d H:i:s');
+            if (empty($aData[$this->tableModifiedColumn])) {
+                $aData[$sPrefix . $this->tableModifiedColumn] = date('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
 
-                if (empty($aData['modified_by'])) {
-                    $aData[$sPrefix . 'modified_by'] = activeUser('id');
+                if (empty($aData[$this->tableModifiedByColumn])) {
+                    $aData[$sPrefix . $this->tableModifiedByColumn] = activeUser('id');
                 }
 
             } else {
 
-                if (empty($aData['modified_by'])) {
-                    $aData[$sPrefix . 'modified_by'] = null;
+                if (empty($aData[$this->tableModifiedByColumn])) {
+                    $aData[$sPrefix . $this->tableModifiedByColumn] = null;
                 }
             }
         }
@@ -269,7 +277,7 @@ class CORE_NAILS_Model extends CI_Model
      *
      * If destructive deletion is enabled then this method will permanently
      * destroy the object. If Non-destructive deletion is enabled then the
-     * $this->deletedFlag field will be set to true.
+     * $this->tableDeletedColumn field will be set to true.
      *
      * @param  int     $iId The ID of the object to mark as deleted
      * @return boolean
@@ -294,7 +302,7 @@ class CORE_NAILS_Model extends CI_Model
 
             //  Non-destructive delete, update the flag
             $aData = array(
-                $this->deletedFlag => true
+                $this->tableDeletedColumn => true
             );
 
             return $this->update($iId, $aData);
@@ -308,7 +316,7 @@ class CORE_NAILS_Model extends CI_Model
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return false.
-     * If Non-destructive deletion is enabled then the $this->deletedFlag
+     * If Non-destructive deletion is enabled then the $this->tableDeletedColumn
      * field will be set to false.
      *
      * @param  int     $iId The ID of the object to restore
@@ -334,7 +342,7 @@ class CORE_NAILS_Model extends CI_Model
 
             //  Non-destructive delete, update the flag
             $aData = array(
-                $this->deletedFlag => false
+                $this->tableDeletedColumn => false
             );
 
             return $this->update($iId, $aData);
@@ -432,7 +440,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->destructiveDelete && !$includeDeleted) {
 
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($sPrefix . $this->deletedFlag, false);
+            $this->db->where($sPrefix . $this->tableDeletedColumn, false);
         }
 
         // --------------------------------------------------------------------------
@@ -755,7 +763,7 @@ class CORE_NAILS_Model extends CI_Model
         if (!$this->destructiveDelete && !$includeDeleted) {
 
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($sPrefix . $this->deletedFlag, false);
+            $this->db->where($sPrefix . $this->tableDeletedColumn, false);
         }
 
         // --------------------------------------------------------------------------
@@ -868,14 +876,12 @@ class CORE_NAILS_Model extends CI_Model
     {
         $integers   = (array) $integers;
         $integers[] = $this->tableIdColumn;
+        $integers[] = $this->tableCreatedByColumn;
+        $integers[] = $this->tableModifiedByColumn;
         $integers[] = 'parent_id';
         $integers[] = 'parentId';
         $integers[] = 'user_id';
         $integers[] = 'userId';
-        $integers[] = 'created_by';
-        $integers[] = 'createdBy';
-        $integers[] = 'modified_by';
-        $integers[] = 'modifiedBy';
         $integers[] = 'order';
 
         foreach ($integers as $property) {
@@ -889,10 +895,9 @@ class CORE_NAILS_Model extends CI_Model
         // --------------------------------------------------------------------------
 
         $bools   = (array) $bools;
+        $bools[] = $this->tableDeletedColumn;
         $bools[] = 'is_active';
         $bools[] = 'isActive';
-        $bools[] = 'is_deleted';
-        $bools[] = 'isDeleted';
         $bools[] = 'is_published';
         $bools[] = 'isPublished';
 
