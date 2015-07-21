@@ -306,7 +306,6 @@ class CORE_NAILS_Model extends CI_Model
             );
 
             return $this->update($iId, $aData);
-
         }
     }
 

@@ -204,10 +204,11 @@ if (!function_exists('get_mime_from_file'))
 if (!function_exists('cdnManageUrl'))
 {
     /**
-     * Generate a valid URL for the CDN manager
+     * Generate a valid URL for the CDN Manager
      * @param  string  $bucket   The bucket the manager should use
-     * @param  array   $callback The callback the manager should use for the "insert" buttons.
-     * @param  boolean $secure   Whether or not the link should be secure or not
+     * @param  array   $callback The callback the manager should use for "insert" buttons
+     * @param  mixed   $passback Any data to pass back to the callback
+     * @param  boolean $secure   Whether or not the link should be secure
      * @return string
      */
     function cdnManageUrl($bucket, $callback = array(), $passback = null, $secure = false)
