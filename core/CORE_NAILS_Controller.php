@@ -549,7 +549,10 @@ class CORE_NAILS_Controller extends MX_Controller {
     {
         if (DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE) {
 
-            $this->load->database();
+            if($this->load->database() === false ) {
+
+                show_error('Failed to connect to database.');
+            }
 
             /**
              * Don't run transactions in strict mode. In my opinion it's odd behaviour:
