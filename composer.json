@@ -3,7 +3,7 @@
     "keywords": ["Nails","Shed Collective","CodeIgniter"],
     "homepage": "http://nailsapp.co.uk",
     "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
-    "license":"MIT",
+    "license": "MIT",
     "authors": [
         {
             "name": "Pablo de la Pena",
@@ -21,10 +21,11 @@
     "support": {
         "email": "hello@shedcollective.org"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require":
     {
         "symfony/console": "~2.5.4",
-        "rogeriopradoj/codeigniter": "2.2.1-rc.2",
-        "monolog/monolog": "~1.13"
+        "rogeriopradoj/codeigniter": "2.2.1-rc.2"
     }
 }
