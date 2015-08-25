@@ -43,7 +43,7 @@ if (!function_exists('cmsSlider'))
     function cmsSlider($idSlug)
     {
         get_instance()->load->model('cms/cms_slider_model');
-        $slider = get_instance()->cms_block_model->get_by_id_or_slug($idSlug);
+        $slider = get_instance()->cms_slider_model->get_by_id_or_slug($idSlug);
 
         if (!$slider) {
 
