@@ -125,6 +125,8 @@ $lang['form_label_body']             = 'Body';
 //  Common strings
 $lang['yes']              = 'Yes';
 $lang['no']               = 'No';
+$lang['on']               = 'On';
+$lang['off']              = 'Off';
 $lang['no_records_found'] = 'No Records found';
 
 // --------------------------------------------------------------------------
