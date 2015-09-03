@@ -10,12 +10,12 @@
  * @link
  */
 
-if (!function_exists('cmsBlock'))
-{
+if (!function_exists('cmsBlock')) {
+
     /**
      * Returns a block's value
      * @param  string $idSlug The block's ID or slug
-     * @return mixed          String on success, false on failure
+     * @return string
      */
     function cmsBlock($slug)
     {
@@ -24,7 +24,7 @@ if (!function_exists('cmsBlock'))
 
         if (!$block) {
 
-            return false;
+            return '';
         }
 
         return $block->value;
@@ -33,8 +33,8 @@ if (!function_exists('cmsBlock'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cmsSlider'))
-{
+if (!function_exists('cmsSlider')) {
+
     /**
      * Returns a CMS slider
      * @param  string $idSlug The slider's ID or slug
@@ -43,21 +43,14 @@ if (!function_exists('cmsSlider'))
     function cmsSlider($idSlug)
     {
         get_instance()->load->model('cms/cms_slider_model');
-        $slider = get_instance()->cms_slider_model->get_by_id_or_slug($idSlug);
-
-        if (!$slider) {
-
-            return false;
-        }
-
-        return $slider;
+        return get_instance()->cms_slider_model->get_by_id_or_slug($idSlug);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cmsMenu'))
-{
+if (!function_exists('cmsMenu')) {
+
     /**
      * Returns a CMS menu
      * @param  string $idSlug The menu's ID or slug
@@ -66,21 +59,14 @@ if (!function_exists('cmsMenu'))
     function cmsMenu($idSlug)
     {
         get_instance()->load->model('cms/cms_menu_model');
-        $menu = get_instance()->cms_menu_model->get_by_id_or_slug($idSlug);
-
-        if (!$menu) {
-
-            return false;
-        }
-
-        return $menu;
+        return get_instance()->cms_menu_model->get_by_id_or_slug($idSlug);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cmsMenuNested'))
-{
+if (!function_exists('cmsMenuNested')) {
+
     /**
      * Returns a CMS menu
      * @param  string $idSlug The menu's ID or slug
@@ -90,13 +76,22 @@ if (!function_exists('cmsMenuNested'))
     {
         get_instance()->load->model('cms/cms_menu_model');
         $data = array('nestItems' => true);
-        $menu = get_instance()->cms_menu_model->get_by_id_or_slug($idSlug, $data);
+        return get_instance()->cms_menu_model->get_by_id_or_slug($idSlug, $data);
+    }
+}
 
-        if (!$menu) {
+// --------------------------------------------------------------------------
 
-            return false;
-        }
+if (!function_exists('cmsPage')) {
 
-        return $menu;
+    /**
+     * Returns a CMS page
+     * @param  string $idSlug The page's ID or slug
+     * @return mixed          stdClass on success, false on failure
+     */
+    function cmsPage($idSlug)
+    {
+        get_instance()->load->model('cms/cms_page_model');
+        return get_instance()->cms_menu_model->get_by_id_or_slug($idSlug);
     }
 }
