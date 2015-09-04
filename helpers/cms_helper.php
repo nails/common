@@ -92,6 +92,6 @@ if (!function_exists('cmsPage')) {
     function cmsPage($idSlug)
     {
         get_instance()->load->model('cms/cms_page_model');
-        return get_instance()->cms_menu_model->get_by_id_or_slug($idSlug);
+        return get_instance()->cms_page_model->get_by_id_or_slug($idSlug);
     }
 }
