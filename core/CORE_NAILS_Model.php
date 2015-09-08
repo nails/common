@@ -37,6 +37,7 @@ class CORE_NAILS_Model extends CI_Model
     protected $tableDeletedColumn;
 
     protected $tableAutoSetTimestamps;
+    protected $tableAutoSetSlugs;
 
     //  Preferences
     protected $destructiveDelete;
@@ -83,6 +84,7 @@ class CORE_NAILS_Model extends CI_Model
         $this->tableModifiedByColumn  = 'modified_by';
         $this->tableDeletedColumn     = 'is_deleted';
         $this->tableAutoSetTimestamps = true;
+        $this->tableAutoSetSlugs      = false;
         $this->perPage                = 50;
     }
 
@@ -185,6 +187,30 @@ class CORE_NAILS_Model extends CI_Model
 
         }
 
+        if (!empty($this->tableAutoSetSlugs) && !array_key_exists($this->tableSlugColumn, $aData)) {
+
+            if (empty($this->tableSlugColumn)) {
+                show_error(get_called_class() . '::create() Slug column variable not set');
+                return;
+            }
+
+            if (empty($this->tableLabelColumn)) {
+                show_error(get_called_class() . '::create() Label column variable not set');
+                return;
+            }
+
+            if (empty($aData[$this->tableLabelColumn])) {
+
+                show_error(
+                    get_called_class() . '::create() "' . $this->tableLabelColumn .
+                    '" is required when automatically generting slugs.'
+                );
+                return false;
+            }
+
+            $aData[$this->tableSlugColumn] = $this->_generate_slug($aData[$this->tableLabelColumn]);
+        }
+
         if (!empty($aData)) {
 
             unset($aData['id']);
@@ -255,6 +281,35 @@ class CORE_NAILS_Model extends CI_Model
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sPrefix . $this->tableModifiedByColumn] = null;
                 }
+            }
+        }
+
+        if (!empty($this->tableAutoSetSlugs) && !array_key_exists($this->tableSlugColumn, $aData)) {
+
+            if (empty($this->tableSlugColumn)) {
+                show_error(get_called_class() . '::update() Slug column variable not set');
+                return;
+            }
+
+            if (empty($this->tableLabelColumn)) {
+                show_error(get_called_class() . '::update() Label column variable not set');
+                return;
+            }
+
+            /**
+             *  We only need to re-generate the slug field if there's a label being passed. If
+             *  no label, assume slug is unchanged.
+             */
+            if (!empty($aData[$this->tableLabelColumn])) {
+
+                $aData[$sPrefix . $this->tableSlugColumn] = $this->_generate_slug(
+                    $aData[$this->tableLabelColumn],
+                    '',
+                    '',
+                    null,
+                    null,
+                    $iId
+                );
             }
         }
 
@@ -497,13 +552,17 @@ class CORE_NAILS_Model extends CI_Model
 
         if (!isset($_test->{$this->tableLabelColumn})) {
 
-            show_error(get_called_class() . '::get_all_flat() "' . $this->tableLabelColumn . '" is not a valid label column.');
+            show_error(
+                get_called_class() . '::get_all_flat() "' . $this->tableLabelColumn . '" is not a valid label column.'
+            );
             return;
         }
 
         if (!isset($_test->{$this->tableIdColumn})) {
 
-            show_error(get_called_class() . '::get_all_flat() "' . $this->tableIdColumn . '" is not a valid id column.');
+            show_error(
+                get_called_class() . '::get_all_flat() "' . $this->tableIdColumn . '" is not a valid id column.'
+            );
             return;
         }
 
