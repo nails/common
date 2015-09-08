@@ -27,5 +27,13 @@
     {
         "symfony/console": "~2.5.4",
         "rogeriopradoj/codeigniter": "2.2.1-rc.2"
+    },
+    "require-dev":
+    {
+        "phpunit/phpunit": "4.8.*"
+    },
+    "autoload":
+    {
+        "psr-4": {"Nails\\Common\\": "src/"}
     }
 }

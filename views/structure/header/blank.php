@@ -6,30 +6,31 @@
     <head>
         <?php
 
-            echo '<title>';
+        echo '<title>';
 
-                if (!empty($page->seo->title)) {
+        if (!empty($page->seo->title)) {
 
-                    echo $page->seo->title . ' - ';
+            echo $page->seo->title . ' - ';
 
-                } elseif (! empty($page->title)) {
+        } elseif (!empty($page->title)) {
 
-                    echo $page->title . ' - ';
-                }
+            echo $page->title . ' - ';
+        }
 
-                echo APP_NAME;
+        echo APP_NAME;
 
-            echo '</title>';
+        echo '</title>';
 
-        ?>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta charset="utf-8">
-        <meta name="description" content="<?=!empty($page->seo->description) ? $page->seo->description : ''?>">
-        <meta name="keywords" content="<?=!empty($page->seo->keywords) ? $page->seo->keywords : ''?>">
-        <?php
+        // --------------------------------------------------------------------------
 
-            $this->asset->output('css');
-            $this->asset->output('css-inline');
+        //  Meta tags
+        echo $this->meta->outputStr();
+
+        // --------------------------------------------------------------------------
+
+        //  CSS
+        $this->asset->output('css');
+        $this->asset->output('css-inline');
 
         ?>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

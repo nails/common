@@ -14,7 +14,8 @@
 // use Monolog\Logger;
 // use Monolog\Handler\StreamHandler;
 
-class CORE_NAILS_Controller extends MX_Controller {
+class CORE_NAILS_Controller extends MX_Controller
+{
 
     protected $data;
     protected $user;
@@ -183,6 +184,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
             $this->maintenanceMode(true);
         }
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * Finally, set some meta tags which should be used on every site.
+         */
+
+        $this->meta->addRaw(array(
+            'charset' => 'utf8'
+        ));
     }
 
     // --------------------------------------------------------------------------
@@ -337,7 +348,7 @@ class CORE_NAILS_Controller extends MX_Controller {
                 showFatalError($subject, $message);
             }
 
-        } elseif(@mkdir(DEPLOY_CACHE_DIR)) {
+        } elseif (@mkdir(DEPLOY_CACHE_DIR)) {
 
             return true;
 
@@ -477,11 +488,10 @@ class CORE_NAILS_Controller extends MX_Controller {
 
                 //  Determine the users
                 $users = array_filter($users);
+                $isSet = isset($users[$_SERVER['PHP_AUTH_USER']]);
+                $isNotEqual = $users[$_SERVER['PHP_AUTH_USER']] != md5(trim($_SERVER['PHP_AUTH_PW']));
 
-                if (
-                    !isset($users[$_SERVER['PHP_AUTH_USER']])
-                    || $users[$_SERVER['PHP_AUTH_USER']] != md5(trim($_SERVER['PHP_AUTH_PW']))
-                ) {
+                if (!$isSet || $isNotEqual) {
 
                     $this->stagingRequestCredentials();
                 }
@@ -549,7 +559,7 @@ class CORE_NAILS_Controller extends MX_Controller {
     {
         if (DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE) {
 
-            if($this->load->database() === false ) {
+            if ($this->load->database() === false) {
 
                 show_error('Failed to connect to database.');
             }
@@ -754,7 +764,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         /**
          * Module specific helpers
          *
-         * @todo: Ether load these automatically by looking at availabl modules, or
+         * @todo: Ether load these automatically by looking at available modules, or
          * force dev/module to load as needed
          */
 
@@ -806,6 +816,16 @@ class CORE_NAILS_Controller extends MX_Controller {
 
         // --------------------------------------------------------------------------
 
+        //  Common libraries
+        //  @todo: use DI manager such as Pimple
+        //  @note: We have to load this way so that the meta property is taken up by
+        //  the CI super object and therefore more reliably accessible (e.g in CMS module)
+
+        $CI =& get_instance();
+        $CI->meta = new \Nails\Common\Library\Meta();
+
+        // --------------------------------------------------------------------------
+
         $_libraries = array();
 
         /**
@@ -827,7 +847,7 @@ class CORE_NAILS_Controller extends MX_Controller {
         // --------------------------------------------------------------------------
 
         /**
-         * STOP!Before we load the session library, we need to check if we're using
+         * STOP! Before we load the session library, we need to check if we're using
          * the database. If we are then check if `sess_table_name` is "nails_session".
          * If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
          */

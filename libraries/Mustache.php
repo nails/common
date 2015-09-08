@@ -5,7 +5,7 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    Controller
+ * @category    Library
  * @author      Nails Dev Team
  * @link
  */
