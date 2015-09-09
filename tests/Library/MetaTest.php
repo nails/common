@@ -124,11 +124,11 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $oMeta = new \Nails\Common\Library\Meta();
 
         $oMeta->add('foo', 'bar');
-        $oMeta->add('cat', 'dog');
+        $oMeta->add('cat', 'dog', 'link');
 
         $aExpected = array(
-            '<meta name="foo" content="bar" />',
-            '<meta name="cat" content="dog" />'
+            '<meta name="foo" content="bar">',
+            '<link name="cat" content="dog">'
         );
 
         $this->assertEquals($aExpected, $oMeta->outputAr());
@@ -144,9 +144,9 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $oMeta = new \Nails\Common\Library\Meta();
 
         $oMeta->add('foo', 'bar');
-        $oMeta->add('cat', 'dog');
+        $oMeta->add('cat', 'dog', 'link');
 
-        $aExpected = '<meta name="foo" content="bar" />' . "\n" . '<meta name="cat" content="dog" />';
+        $aExpected = '<meta name="foo" content="bar">' . "\n" . '<link name="cat" content="dog">';
 
         $this->assertEquals($aExpected, $oMeta->outputStr());
     }

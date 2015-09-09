@@ -38,9 +38,7 @@ class Meta
     {
         if (!empty($aAttr)) {
 
-            //  Hash to identify the meta tag (so it can be removed easily)
             $sHash = md5(json_encode($aAttr));
-
             $this->aEntries[$sHash] = $aAttr;
         }
 
@@ -68,14 +66,16 @@ class Meta
 
     /**
      * Adds a basic meta tag, setting the name and the content attributes
-     * @param string $sName    The meta tag's name attribute
-     * @param string $sContent The meta tag's content attribute
+     * @param string $sName    The element's name attribute
+     * @param string $sContent The element's content attribute
+     * @param string $sTag     The elements's type
      */
-    public function add($sName, $sContent)
+    public function add($sName, $sContent, $sTag = '')
     {
         $aMeta = array(
-            'name' => $sName,
-            'content' => $sContent
+            'name'    => $sName,
+            'content' => $sContent,
+            'tag'     => $sTag
         );
 
         return $this->addRaw($aMeta);
@@ -85,14 +85,16 @@ class Meta
 
     /**
      * Removes a basic meta tag
-     * @param string $sName    The meta tag's name attribute
-     * @param string $sContent The meta tag's content attribute
+     * @param string $sName    The elements's name attribute
+     * @param string $sContent The elements's content attribute
+     * @param string $sTag     The elements's type
      */
-    public function remove($sName, $sContent)
+    public function remove($sName, $sContent, $sTag = '')
     {
         $aMeta = array(
-            'name' => $sName,
-            'content' => $sContent
+            'name'    => $sName,
+            'content' => $sContent,
+            'tag'     => $sTag
         );
 
         return $this->removeRaw($aMeta);
@@ -101,7 +103,7 @@ class Meta
     // --------------------------------------------------------------------------
 
     /**
-     * Compiles the meta tags into an array of strings
+     * Compiles the elements into an array of strings
      * @return array
      */
     public function outputAr()
@@ -110,12 +112,13 @@ class Meta
 
         foreach ($this->aEntries as $aEntry) {
 
-            $sTemp = '<meta ';
+            $sTemp = !empty($aEntry['tag']) ? '<' . $aEntry['tag'] . ' ' : '<meta ';
+            unset($aEntry['tag']);
             foreach ($aEntry as $sKey => $sValue) {
 
                 $sTemp .= $sKey . '="' . $sValue . '" ';
             }
-            $sTemp .= '/>';
+            $sTemp = trim($sTemp) . '>';
             $aOut[] = $sTemp;
         }
 
