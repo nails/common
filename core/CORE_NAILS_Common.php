@@ -341,26 +341,14 @@ if (!function_exists('getDomainFromUrl')) {
      * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
      * Hat tip: http://uk1.php.net/parse_url#104874
      * BUG: 2 character TLD's break this
-     * @TODO: Try and fix this bug
-     * @param  string $url The URL to analyse
-     * @return mixed       string on success, false on failure
+     * @todo: Try and fix this bug
+     * @param  string $sUrl The URL to analyse
+     * @return mixed        string on success, false on failure
      */
-    function getDomainFromUrl($url)
+    function getDomainFromUrl($sUrl)
     {
-        $bits = explode('/', $url);
-
-        if ($bits[0] == 'http:' || $bits[0] == 'https:') {
-
-            $_domain = $bits[2];
-
-        } else {
-
-            $_domain = $bits[0];
-        }
-
-        unset($bits);
-
-        $bits = explode('.', $_domain);
+        $sDomain  = parse_url($sUrl, PHP_URL_HOST);
+        $bits = explode('.', $sDomain);
         $idz = count($bits);
         $idz -=3;
 
