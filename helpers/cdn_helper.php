@@ -149,7 +149,7 @@ if (!function_exists('cdnPlaceholder')) {
      * @param  integer $iBorder The width of the border, if any
      * @return string
      */
-    function cdnPlaceholder($iWidth = 100, $iHeight = 100, $iBorder = 0)
+    function cdnPlaceholder($iWidth, $iHeight, $iBorder = 0)
     {
         get_instance()->load->library('cdn/cdn');
         return get_instance()->cdn->url_placeholder($iWidth, $iHeight, $iBorder);
@@ -164,7 +164,7 @@ if (!function_exists('cdn_placeholder')) {
      * Alias to cdnPlaceholder
      * @see cdnPlaceholder
      */
-    function cdn_placeholder($iWidth = 100, $iHeight = 100, $iBorder = 0)
+    function cdn_placeholder($iWidth, $iHeight, $iBorder = 0)
     {
         return cdnPlaceholder($iWidth, $iHeight, $iBorder);
     }
@@ -181,7 +181,7 @@ if (!function_exists('cdnBlankAvatar')) {
      * @param  string|integer $mSex    The gender of the avatar
      * @return string
      */
-    function cdnBlankAvatar($iWidth = 100, $iHeight = 100, $mSex = '')
+    function cdnBlankAvatar($iWidth, $iHeight, $mSex = '')
     {
         get_instance()->load->library('cdn/cdn');
         return get_instance()->cdn->url_blank_avatar($iWidth, $iHeight, $mSex);
@@ -196,7 +196,7 @@ if (!function_exists('cdn_blank_avatar')) {
      * Alias to cdnBlankAvatar
      * @see cdnBlankAvatar
      */
-    function cdn_blank_avatar($iWidth = 100, $iHeight = 100, $mSex = '')
+    function cdn_blank_avatar($iWidth, $iHeight, $mSex = '')
     {
         return cdnBlankAvatar($iWidth, $iHeight, $mSex);
     }
