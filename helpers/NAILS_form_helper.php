@@ -274,7 +274,7 @@ if (!function_exists('form_field')) {
                 case 'png' :
                 case 'gif' :
 
-                    $_field_html .= 'Download: ' . anchor(cdn_serve($_field_default), img(cdn_thumb($_field_default, 35, 35)), 'class="fancybox"');
+                    $_field_html .= 'Download: ' . anchor(cdnServe($_field_default), img(cdnCrop($_field_default, 35, 35)), 'class="fancybox"');
 
                 break;
 
@@ -282,7 +282,7 @@ if (!function_exists('form_field')) {
 
                 default :
 
-                    $_field_html .= anchor(cdn_serve($_field_default, true), 'Download', 'class="awesome small" target="_blank"');
+                    $_field_html .= anchor(cdnServe($_field_default, true), 'Download', 'class="awesome small" target="_blank"');
 
                 break;
 
@@ -560,7 +560,7 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  If a default has been specified then show a download link
-        $_field_download = $_field['default'] ? anchor(cdn_serve($_field['default'], true), 'Download File', 'class="awesome small orange"') : '';
+        $_field_download = $_field['default'] ? anchor(cdnServe($_field['default'], true), 'Download File', 'class="awesome small orange"') : '';
 
         // --------------------------------------------------------------------------
 
@@ -716,7 +716,7 @@ if (!function_exists('form_field_mm_image')) {
         // --------------------------------------------------------------------------
 
         //  If a default has been specified then show a download link
-        $_field_preview = $_field['default'] ? img(cdn_scale($_field['default'], 100, 100)) : '';
+        $_field_preview = $_field['default'] ? img(cdnScale($_field['default'], 100, 100)) : '';
 
         // --------------------------------------------------------------------------
 
@@ -847,7 +847,7 @@ if (!function_exists('form_field_multiimage')) {
 
                 $_default_html .= '<li class="item">';
                 $_default_html .= '<a href="#" class="delete" data-object_id="' . $file . '"></a>';
-                $_default_html .= img(cdn_thumb($file, 92, 92));
+                $_default_html .= img(cdnCrop($file, 92, 92));
                 $_default_html .= form_hidden($_field_key, $file);
                 $_default_html .= '</li>';
 

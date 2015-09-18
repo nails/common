@@ -1,231 +1,388 @@
 <?php
 
-if (!function_exists('cdn_serve'))
-{
+if (!function_exists('cdnServe')) {
+
     /**
      * Returns the URL for serving raw content from the CDN
-     * @param  string  $object        The ID of the object to serve
-     * @param  boolean $forceDownload Whether or not the URL should stream to the browser, or forcibly download
+     * @param  integer $iObjectId      The ID of the object to serve
+     * @param  boolean $bForceDownload Whether or not the URL should stream to the browser, or forcibly download
      * @return string
      */
-    function cdn_serve($object, $forceDownload = false)
+    function cdnServe($iObjectId, $bForceDownload = false)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_serve($object, $forceDownload);
+        return get_instance()->cdn->url_serve($iObjectId, $bForceDownload);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_serve_zipped'))
-{
+if (!function_exists('cdn_serve')) {
+
+    /**
+     * Alias to cdnServe
+     * @see cdnServe
+     */
+    function cdn_serve($iObjectId, $bForceDownload = false)
+    {
+        return cdnServe($iObjectId, $bForceDownload);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnServeZipped')) {
+
     /**
      * Returns the URL for serving zipped objects
-     * @param  array  $objects  An array of object ID's to zip together
-     * @param  string $filename the filename to give the zip file
+     * @param  array  $aObjectIds An array of object ID's to zip together
+     * @param  string $sFilename  The filename to give the zip file
      * @return string
      */
-    function cdn_serve_zipped($objects, $filename = 'download.zip')
+    function cdnServeZipped($aObjectIds, $sFilename = 'download.zip')
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_serve_zipped($objects, $filename);
+        return get_instance()->cdn->url_serve_zipped($aObjectIds, $sFilename);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_thumb'))
-{
+if (!function_exists('cdn_serve_zipped')) {
+
     /**
-     * Returns the URL for a thumbnail of an object
-     * @param  integer $object The Object's ID
-     * @param  integer $width  The width of the thumbnail
-     * @param  integer $height The height of the thumbnail
-     * @return string
+     * Alias to cdnServeZipped
+     * @see cdnServeZipped
      */
-    function cdn_thumb($object, $width, $height)
+    function cdn_serve_zipped($aObjectIds, $sFilename = 'download.zip')
     {
-        get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_thumb($object, $width, $height);
+        return cdnServeZipped($aObjectIds, $sFilename);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_scale'))
-{
+if (!function_exists('cdnCrop')) {
+
+    /**
+     * Returns the URL for a crop of an object
+     * @param  integer $iObjectId The Object's ID
+     * @param  integer $iWidth    The width of the thumbnail
+     * @param  integer $iHeight   The height of the thumbnail
+     * @return string
+     */
+    function cdnCrop($iObjectId, $iWidth, $iHeight)
+    {
+        get_instance()->load->library('cdn/cdn');
+        return get_instance()->cdn->url_crop($iObjectId, $iWidth, $iHeight);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdn_crop')) {
+
+    /**
+     * Alias to cdnCrop
+     * @see cdnCrop
+     */
+    function cdn_crop($iObjectId, $iWidth, $iHeight)
+    {
+        return cdnCrop($iObjectId, $iWidth, $iHeight);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdn_thumb')) {
+
+    /**
+     * Alias to cdnCrop
+     * @see cdnCrop
+     */
+    function cdn_thumb($iObjectId, $iWidth, $iHeight)
+    {
+        return cdnCrop($iObjectId, $iWidth, $iHeight);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnScale')) {
+
     /**
      * Returns the URL for a scaled thumbnail of an object
-     * @param  integer $object The Object's ID
-     * @param  integer $width  The width of the thumbnail
-     * @param  integer $height The height of the thumbnail
+     * @param  integer $iObjectId The Object's ID
+     * @param  integer $iWidth    The width of the thumbnail
+     * @param  integer $iHeight   The height of the thumbnail
      * @return string
      */
-    function cdn_scale($object, $width, $height)
+    function cdnScale($iObjectId, $iWidth, $iHeight)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_scale($object, $width, $height);
+        return get_instance()->cdn->url_scale($iObjectId, $iWidth, $iHeight);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_placeholder'))
-{
+if (!function_exists('cdn_scale')) {
+
+    /**
+     * Alias to cdnScale
+     * @see cdnScale
+     */
+    function cdn_scale($iObjectId, $iWidth, $iHeight)
+    {
+        return cdnCrop($iObjectId, $iWidth, $iHeight);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnPlaceholder')) {
+
     /**
      * Returns the URL for a placeholder graphic
-     * @param  integer $width  The width of the placeholder
-     * @param  integer $height The height of the placeholder
-     * @param  integer $border The width of the border, if any
+     * @param  integer $iWidth  The width of the placeholder
+     * @param  integer $iHeight The height of the placeholder
+     * @param  integer $iBorder The width of the border, if any
      * @return string
      */
-    function cdn_placeholder($width = 100, $height = 100, $border = 0)
+    function cdnPlaceholder($iWidth = 100, $iHeight = 100, $iBorder = 0)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_placeholder($width, $height, $border);
+        return get_instance()->cdn->url_placeholder($iWidth, $iHeight, $iBorder);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_blank_avatar'))
-{
+if (!function_exists('cdn_placeholder')) {
+
+    /**
+     * Alias to cdnPlaceholder
+     * @see cdnPlaceholder
+     */
+    function cdn_placeholder($iWidth = 100, $iHeight = 100, $iBorder = 0)
+    {
+        return cdnPlaceholder($iWidth, $iHeight, $iBorder);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnBlankAvatar')) {
+
     /**
      * Returns the URL for a blank avatar graphic
-     * @param  integer $width  The width of the placeholder
-     * @param  integer $height The height of the placeholder
-     * @param  integer $sex    The gender of the avatar
+     * @param  integer        $iWidth  The width of the placeholder
+     * @param  integer        $iHeight The height of the placeholder
+     * @param  string|integer $mSex    The gender of the avatar
      * @return string
      */
-    function cdn_blank_avatar($width = 100, $height = 100, $sex = '')
+    function cdnBlankAvatar($iWidth = 100, $iHeight = 100, $mSex = '')
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_blank_avatar($width, $height, $sex);
+        return get_instance()->cdn->url_blank_avatar($iWidth, $iHeight, $mSex);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_avatar'))
-{
+if (!function_exists('cdn_blank_avatar')) {
+
+    /**
+     * Alias to cdnBlankAvatar
+     * @see cdnBlankAvatar
+     */
+    function cdn_blank_avatar($iWidth = 100, $iHeight = 100, $mSex = '')
+    {
+        return cdnBlankAvatar($iWidth, $iHeight, $mSex);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnAvatar')) {
+
     /**
      * Returns the URL for a user's avatar
-     * @param  integer $userId The user ID to use
-     * @param  integer $width  The width of the avatar
-     * @param  integer $height The height of the avatar
+     * @param  integer $iUserId The user ID to use
+     * @param  integer $iWidth  The width of the avatar
+     * @param  integer $iHeight The height of the avatar
      * @return string
      */
-    function cdn_avatar($userId = null, $width = 100, $height = 100)
+    function cdnAvatar($iUserId = null, $iWidth = 100, $iHeight = 100)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_avatar($userId, $width, $height);
+        return get_instance()->cdn->url_avatar($iUserId, $iWidth, $iHeight);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdn_expiring_url'))
-{
+if (!function_exists('cdn_avatar')) {
+
     /**
-     * Returns an expiring url
-     * @param  string  $bucket        The bucket which the image resides in
-     * @param  string  $expires       The length of time the URL should be valid for, in seconds
-     * @param  boolean $forceDownload Whether or not the URL should stream to the browser, or forcibly download
-     * @return string
+     * Alias to cdnAvatar
+     * @see cdnAvatar
      */
-    function cdn_expiring_url($object, $expires, $forceDownload = false)
+    function cdn_avatar($iWidth = 100, $iHeight = 100, $iBorder = 0)
     {
-        get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->url_expiring($object, $expires, $forceDownload);
+        return cdnAvatar($iWidth, $iHeight, $iBorder);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('get_ext_from_mime'))
-{
+if (!function_exists('cdnExpiringUrl')) {
+
+    /**
+     * Returns an expiring URL
+     * @param  integer $iObject        The ID of the object to server
+     * @param  integer $expires        The length of time the URL should be valid for, in seconds
+     * @param  boolean $bForceDownload Whether or not the URL should stream to the browser, or forcibly download
+     * @return string
+     */
+    function cdnExpiringUrl($iObject, $iExpires, $bForceDownload = false)
+    {
+        get_instance()->load->library('cdn/cdn');
+        return get_instance()->cdn->url_expiring($iObject, $iExpires, $bForceDownload);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdn_expiring_url')) {
+
+    /**
+     * Alias to cdnExpiringUrl
+     * @see cdnExpiringUrl
+     */
+    function cdn_expiring_url($iObject, $iExpires, $bForceDownload = false)
+    {
+        return cdnExpiringUrl($iObject, $iExpires, $bForceDownload);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('getExtFromMime')) {
+
     /**
      * Get the extension of a file from it's mime
-     * @param  string $mime The mime to look up
+     * @param  string $sMime The mime to look up
      * @return string
      */
-    function get_ext_from_mime($mime)
+    function getExtFromMime($sMime)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->get_ext_from_mime($mime);
+        return get_instance()->cdn->get_ext_from_mime($sMime);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('get_mime_from_ext'))
-{
+if (!function_exists('get_ext_from_mime')) {
+
+    /**
+     * Alias to getExtFromMime
+     * @see getExtFromMime
+     */
+    function get_ext_from_mime($sMime)
+    {
+        return getExtFromMime($sMime);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('getMimeFromExt')) {
+
     /**
      * Get the mime of a file from it's extension
-     * @param  string $ext The extension to look up
+     * @param  string $sExt The extension to look up
      * @return string
      */
-    function get_mime_from_ext($ext)
+    function getMimeFromExt($sExt)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->get_mime_from_ext($ext);
+        return get_instance()->cdn->get_mime_from_ext($sExt);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('get_mime_from_file'))
-{
+if (!function_exists('get_mime_from_ext')) {
+
+    /**
+     * Alias to getMimeFromExt
+     * @see getMimeFromExt
+     */
+    function get_mime_from_ext($sExt)
+    {
+        return getMimeFromExt($sExt);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('getMimeFromFile')) {
+
     /**
      * Get the mime from a file on disk
-     * @param  string $file The file to look up
+     * @param  string $sFile The file to look up
      * @return string
      */
-    function get_mime_from_file($file)
+    function getMimeFromFile($sFile)
     {
         get_instance()->load->library('cdn/cdn');
-
-        return get_instance()->cdn->get_mime_from_file($file);
+        return get_instance()->cdn->get_mime_from_file($sFile);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('cdnManageUrl'))
-{
+if (!function_exists('get_mime_from_file')) {
+
+    /**
+     * Alias to getMimeFromFile
+     * @see getMimeFromFile
+     */
+    function get_mime_from_file($sExt)
+    {
+        return getMimeFromFile($sExt);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('cdnManageUrl')) {
+
     /**
      * Generate a valid URL for the CDN Manager
-     * @param  string  $bucket   The bucket the manager should use
-     * @param  array   $callback The callback the manager should use for "insert" buttons
-     * @param  mixed   $passback Any data to pass back to the callback
-     * @param  boolean $secure   Whether or not the link should be secure
+     * @param  string  $sBucket   The bucket the manager should use
+     * @param  array   $aCallback The callback the manager should use for "insert" buttons
+     * @param  mixed   $mPassback Any data to pass back to the callback
+     * @param  boolean $bSecure   Whether or not the link should be secure
      * @return string
      */
-    function cdnManageUrl($bucket, $callback = array(), $passback = null, $secure = false)
+    function cdnManageUrl($sBucket, $aCallback = array(), $mPassback = null, $bSecure = false)
     {
-        $params = array();
+        $aParams = array();
 
         /**
          * The callback should be a two element array, the first being the
          * instance variable, the second being the method name.
          */
-        $params['callback'] = $callback;
+        $aParams['callback'] = $aCallback;
 
         /**
          * Passback is any data that the caller wishes to be sent back to the callback
          */
 
-        $params['passback'] = json_encode($passback);
+        $aParams['passback'] = json_encode($mPassback);
 
         /**
          * The bucket should be hashed up and paired with an irreversible hash for
@@ -233,14 +390,14 @@ if (!function_exists('cdnManageUrl'))
          * willy nilly.
          */
 
-        $nonce = time();
+        $iNonce = time();
 
-        $params['bucket'] = get_instance()->encrypt->encode($bucket . '|' . $nonce, APP_PRIVATE_KEY);
-        $params['hash']   = md5($bucket . '|' . $nonce . '|' . APP_PRIVATE_KEY);
+        $aParams['bucket'] = get_instance()->encrypt->encode($sBucket . '|' . $iNonce, APP_PRIVATE_KEY);
+        $aParams['hash']   = md5($sBucket . '|' . $iNonce . '|' . APP_PRIVATE_KEY);
 
         //  Prep the query string
-        $params = http_build_query($params);
+        $aParams = http_build_query($aParams);
 
-        return site_url('cdn/manager/browse?' . $params, $secure);
+        return site_url('cdn/manager/browse?' . $aParams, $bSecure);
     }
 }
