@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common;
+namespace Nails\Common\Library;
 
 class MetaTest extends \PHPUnit_Framework_TestCase
 {

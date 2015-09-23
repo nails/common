@@ -84,19 +84,17 @@ if (!function_exists('form_open')) {
     {
         $CI =& get_instance();
 
-        if ($attributes == '')
-        {
+        if ($attributes == '') {
             $attributes = 'method="post"';
         }
 
         // If an action is not a full URL then turn it into one
-        if ($action && strpos($action, '://') === false)
-        {
+        if ($action && strpos($action, '://') === false) {
             $action = $CI->config->site_url($action);
         }
 
         // If no action is provided then set to the current url
-        $action OR $action = $CI->config->site_url($CI->uri->uri_string());
+        $action || $action = $CI->config->site_url($CI->uri->uri_string());
 
         $form = '<form action="'.$action.'"';
 
@@ -108,24 +106,19 @@ if (!function_exists('form_open')) {
         $_base_url          = $CI->config->base_url();
         $_secure_base_url   = $CI->config->secure_base_url();
 
-        if ($CI->config->item('csrf_protection') === true AND !(strpos($action, $_base_url) === false OR strpos($form, 'method="get"')))
-        {
+        if ($CI->config->item('csrf_protection') === true && !(strpos($action, $_base_url) === false || strpos($form, 'method="get"'))) {
             $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
         }
 
         //  If the secure_base_url is different, then do a check for that domain/url too.
-        if ($_base_url != $_secure_base_url) :
-
-            if ($CI->config->item('csrf_protection') === true AND !(strpos($action, $_secure_base_url) === false OR strpos($form, 'method="get"')))
-            {
+        if ($_base_url != $_secure_base_url) {
+            if ($CI->config->item('csrf_protection') === true && !(strpos($action, $_secure_base_url) === false || strpos($form, 'method="get"'))) {
                 $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
             }
-
-        endif;
+        }
 
         //  Render any hidden fields
-        if (is_array($hidden) AND count($hidden) > 0)
-        {
+        if (is_array($hidden) && count($hidden) > 0) {
             $form .= sprintf("<div style=\"display:none\">%s</div>", form_hidden($hidden));
         }
 
@@ -268,25 +261,22 @@ if (!function_exists('form_field')) {
 
             $_ext = end(explode('.', $_field_default));
 
-            switch ($_ext) :
+            switch ($_ext) {
 
                 case 'jpg' :
                 case 'png' :
                 case 'gif' :
 
                     $_field_html .= 'Download: ' . anchor(cdnServe($_field_default), img(cdnCrop($_field_default, 35, 35)), 'class="fancybox"');
-
-                break;
+                    break;
 
                 // --------------------------------------------------------------------------
 
                 default :
 
                     $_field_html .= anchor(cdnServe($_field_default, true), 'Download', 'class="awesome small" target="_blank"');
-
-                break;
-
-            endswitch;
+                    break;
+            }
 
             $_field_html .= '</span>';
 
@@ -299,7 +289,7 @@ if (!function_exists('form_field')) {
 
             $_error = '<span class="error">' . $_field_error . '</span>';
 
-        elseif($_error) :
+        elseif ($_error) :
 
             $_error = form_error($_field_key, '<span class="error">', '</span>');
 
@@ -862,7 +852,7 @@ if (!function_exists('form_field_multiimage')) {
 
             $_error = '<span class="error">' . $_field_error . '</span>';
 
-        elseif($_error) :
+        elseif ($_error) :
 
             $_error = form_error($_field_key, '<span class="error">', '</span>');
 
@@ -1456,7 +1446,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
                 else :
                     $_checked = '';
                 endif;
-            else:
+            else :
                 $_checked = $value == $_selected ? ' selected="selected"' : '';
             endif;
 
@@ -1769,11 +1759,17 @@ if (!function_exists('form_field_checkbox')) {
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
-        $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_out .= '<span class="input ' . $_tipclass . '">';
-
         //  Does the field have an id?
-        $_id = isset($options[0]['id']) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
+        $_id = !empty($options[0]['id']) ? 'id="' . $options[0]['id'] . '-0" ' : '';
+
+        //  Is the option disabled?
+        $_disabled = !empty($options[0]['disabled']) ? 'disabled="disabled" ' : '';
+
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_disabledclass = $_disabled ? 'is-disabled' : '';
+
+        $_out .= '<span class="input ' . $_tipclass . ' ' . $_disabledclass . '">';
+
 
         //  Field
         if (substr($_field['key'], -2) == '[]') :
@@ -1806,7 +1802,7 @@ if (!function_exists('form_field_checkbox')) {
 
         $_key   = isset($options[0]['key']) ? $options[0]['key'] : $_field['key'];
 
-        $_out .= form_checkbox($_key, $options[0]['value'], $_selected, $_id) . '<span class="text">' . $options[0]['label'] . '</span>';
+        $_out .= form_checkbox($_key, $options[0]['value'], $_selected, $_id . $_disabled) . '<span class="text">' . $options[0]['label'] . '</span>';
 
         //  Tip
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
@@ -1823,10 +1819,15 @@ if (!function_exists('form_field_checkbox')) {
 
             //  Label
             $_out .= '<span class="label">&nbsp;</span>';
-            $_out .= '<span class="input">';
 
             //  Does the field have an id?
-            $_id = isset($options[$i]['id']) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
+            $_id = !empty($options[$i]['id']) ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
+
+            //  Is the option disabled?
+            $_disabled = !empty($options[$i]['disabled']) ? 'disabled="disabled" ' : '';
+            $_disabledclass = $_disabled ? 'is-disabled' : '';
+
+            $_out .= '<span class="input ' . $_disabledclass . '">';
 
             //  Input
             if (substr($_field['key'], -2) == '[]') :
@@ -1859,7 +1860,7 @@ if (!function_exists('form_field_checkbox')) {
 
             $_key = isset($options[$i]['key']) ? $options[$i]['key'] : $_field['key'];
 
-            $_out .= form_checkbox($_key, $options[$i]['value'], $_selected, $_id) . '<span class="text">' . $options[$i]['label'] . '</span>';
+            $_out .= form_checkbox($_key, $options[$i]['value'], $_selected, $_id . $_disabled) . '<span class="text">' . $options[$i]['label'] . '</span>';
 
             $_out .= '</span>';
             $_out .= '</label>';

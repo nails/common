@@ -818,11 +818,12 @@ class CORE_NAILS_Controller extends MX_Controller
 
         //  Common libraries
         //  @todo: use DI manager such as Pimple
-        //  @note: We have to load this way so that the meta property is taken up by
-        //  the CI super object and therefore more reliably accessible (e.g in CMS module)
+        //  @note: We have to load this way so that the property is taken up by the CI
+        // super object and therefore more reliably accessible (e.g in CMS module)
 
         $CI =& get_instance();
         $CI->meta = new \Nails\Common\Library\Meta();
+        $CI->asset = new \Nails\Common\Library\Asset();
 
         // --------------------------------------------------------------------------
 
@@ -863,7 +864,6 @@ class CORE_NAILS_Controller extends MX_Controller
         // --------------------------------------------------------------------------
 
         $_libraries[] = 'encrypt';
-        $_libraries[] = 'asset/asset';
         $_libraries[] = 'email/emailer';
         $_libraries[] = 'event/event';
         $_libraries[] = 'logger';

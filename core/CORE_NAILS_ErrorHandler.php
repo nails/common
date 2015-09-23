@@ -298,7 +298,7 @@ class CORE_NAILS_ErrorHandler
         // --------------------------------------------------------------------------
 
         //  Do we know who we're sending to?
-        if (!APP_DEVELOPER_EMAIL) {
+        if (!defined(APP_DEVELOPER_EMAIL) || empty(APP_DEVELOPER_EMAIL)) {
 
             //  Log the fact there's no email
             log_message('error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.');

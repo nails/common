@@ -35,23 +35,33 @@ class NAILS_System_startup
     protected function defineConstants()
     {
         //  Define some generic Nails constants, allow dev to override these - just in case
-        if (!defined('NAILS_PACKAGE_NAME'))  define('NAILS_PACKAGE_NAME',  'Nails');
-        if (!defined('NAILS_PACKAGE_URL'))   define('NAILS_PACKAGE_URL',   'http://nailsapp.co.uk/');
+        if (!defined('NAILS_PACKAGE_NAME')) {
+            define('NAILS_PACKAGE_NAME', 'Nails');
+        }
+        if (!defined('NAILS_PACKAGE_URL')) {
+            define('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
+        }
 
         // --------------------------------------------------------------------------
 
         //  Environment
-        if (!defined('ENVIRONMENT')) define('ENVIRONMENT', 'DEVELOPMENT');
+        if (!defined('ENVIRONMENT')) {
+            define('ENVIRONMENT', 'DEVELOPMENT');
+        }
 
         // --------------------------------------------------------------------------
 
         //  Cache Directory
-        if (!defined('DEPLOY_CACHE_DIR')) define('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
+        if (!defined('DEPLOY_CACHE_DIR')) {
+            define('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
+        }
 
         // --------------------------------------------------------------------------
 
         //  Default Error Handler
-        if (!defined('DEPLOY_ERROR_REPORTING_HANDLER')) define('DEPLOY_ERROR_REPORTING_HANDLER', 'NAILS');
+        if (!defined('DEPLOY_ERROR_REPORTING_HANDLER')) {
+            define('DEPLOY_ERROR_REPORTING_HANDLER', 'NAILS');
+        }
 
         // --------------------------------------------------------------------------
 
@@ -60,22 +70,30 @@ class NAILS_System_startup
 
             if (is_file(DEPLOY_CACHE_DIR . 'routes_app.php')) {
 
-                define('NAILS_STARTUP_GENERATE_APP_ROUTES', FALSE);
+                define('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
 
             } else {
 
                 //  Not found, crude hook seeing as basically nothing has loaded yet
-                define('NAILS_STARTUP_GENERATE_APP_ROUTES', TRUE);
+                define('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Database
-        if (!defined('DEPLOY_DB_HOST'))     define('DEPLOY_DB_HOST',     'localhost');
-        if (!defined('DEPLOY_DB_USERNAME')) define('DEPLOY_DB_USERNAME', '');
-        if (!defined('DEPLOY_DB_PASSWORD')) define('DEPLOY_DB_PASSWORD', '');
-        if (!defined('DEPLOY_DB_DATABASE')) define('DEPLOY_DB_DATABASE', '');
+        if (!defined('DEPLOY_DB_HOST')) {
+            define('DEPLOY_DB_HOST', 'localhost');
+        }
+        if (!defined('DEPLOY_DB_USERNAME')) {
+            define('DEPLOY_DB_USERNAME', '');
+        }
+        if (!defined('DEPLOY_DB_PASSWORD')) {
+            define('DEPLOY_DB_PASSWORD', '');
+        }
+        if (!defined('DEPLOY_DB_DATABASE')) {
+            define('DEPLOY_DB_DATABASE', '');
+        }
 
         // --------------------------------------------------------------------------
 
@@ -84,12 +102,25 @@ class NAILS_System_startup
          * These should be specified in config/app.php
          */
 
-        if (!defined('NAILS_DB_PREFIX'))        define('NAILS_DB_PREFIX',        'nails_');
-        if (!defined('APP_PRIVATE_KEY'))        define('APP_PRIVATE_KEY',        '');
-        if (!defined('APP_NAME'))               define('APP_NAME',               'Untitled');
-        if (!defined('APP_STAGING_USERPASS'))   define('APP_STAGING_USERPASS',   serialize(array()));
-        if (!defined('APP_SSL_ROUTING'))        define('APP_SSL_ROUTING',        FALSE);
-        if (!defined('APP_NATIVE_LOGIN_USING')) define('APP_NATIVE_LOGIN_USING', 'BOTH'); //    [EMAIL|USERNAME|BOTH]
+        if (!defined('NAILS_DB_PREFIX')) {
+            define('NAILS_DB_PREFIX', 'nails_');
+        }
+        if (!defined('APP_PRIVATE_KEY')) {
+            define('APP_PRIVATE_KEY', '');
+        }
+        if (!defined('APP_NAME')) {
+            define('APP_NAME', 'Untitled');
+        }
+        if (!defined('APP_STAGING_USERPASS')) {
+            define('APP_STAGING_USERPASS', serialize(array()));
+        }
+        if (!defined('APP_SSL_ROUTING')) {
+            define('APP_SSL_ROUTING', false);
+        }
+        if (!defined('APP_NATIVE_LOGIN_USING')) {
+            //  [EMAIL|USERNAME|BOTH]
+            define('APP_NATIVE_LOGIN_USING', 'BOTH');
+        }
 
         // --------------------------------------------------------------------------
 
@@ -98,36 +129,36 @@ class NAILS_System_startup
          * specified in config/deploy.php
          */
 
-        if (!defined('DEPLOY_SYSTEM_TIMEZONE')) define('DEPLOY_SYSTEM_TIMEZONE', 'UTC');
+        if (!defined('DEPLOY_SYSTEM_TIMEZONE')) {
+            define('DEPLOY_SYSTEM_TIMEZONE', 'UTC');
+        }
 
         //  If this is changed, update CORE_NAILS_Log.php too
-        if (!defined('DEPLOY_LOG_DIR')) define('DEPLOY_LOG_DIR', FCPATH . APPPATH . 'logs/');
+        if (!defined('DEPLOY_LOG_DIR')) {
+            define('DEPLOY_LOG_DIR', FCPATH . APPPATH . 'logs/');
+        }
 
         // --------------------------------------------------------------------------
 
         //  Email
-        if (!defined('APP_DEVELOPER_EMAIL')) define('APP_DEVELOPER_EMAIL', '');
-        if (!defined('EMAIL_DEBUG'))         define('EMAIL_DEBUG',         FALSE);
-        if (!defined('EMAIL_OVERRIDE'))      define('EMAIL_OVERRIDE',      '');
-        if (!defined('DEPLOY_EMAIL_HOST'))   define('DEPLOY_EMAIL_HOST',   '127.0.0.1');
-        if (!defined('DEPLOY_EMAIL_USER'))   define('DEPLOY_EMAIL_USER',   '');
-        if (!defined('DEPLOY_EMAIL_PASS'))   define('DEPLOY_EMAIL_PASS',   '');
-        if (!defined('DEPLOY_EMAIL_PORT'))   define('DEPLOY_EMAIL_PORT',   '');
-
-        // --------------------------------------------------------------------------
-
-        //  CDN
-        if (!defined('APP_CDN_DRIVER'))   define('APP_CDN_DRIVER',   'LOCAL');
-        if (!defined('DEPLOY_CDN_MAGIC')) define('DEPLOY_CDN_MAGIC', '');
-        if (!defined('DEPLOY_CDN_PATH'))  define('DEPLOY_CDN_PATH',  FCPATH . 'assets/uploads/');
-
-        /**
-         * Define how long CDN items should be cached for, this is a maximum age in seconds
-         * According to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html this shouldn't be
-         * more than 1 year.
-         */
-
-        if (!defined('APP_CDN_CACHE_MAX_AGE')) define('APP_CDN_CACHE_MAX_AGE', '31536000'); // 1 year
+        if (!defined('APP_DEVELOPER_EMAIL')) {
+            define('APP_DEVELOPER_EMAIL', '');
+        }
+        if (!defined('EMAIL_OVERRIDE')) {
+            define('EMAIL_OVERRIDE', '');
+        }
+        if (!defined('DEPLOY_EMAIL_HOST')) {
+            define('DEPLOY_EMAIL_HOST', '127.0.0.1');
+        }
+        if (!defined('DEPLOY_EMAIL_USER')) {
+            define('DEPLOY_EMAIL_USER', '');
+        }
+        if (!defined('DEPLOY_EMAIL_PASS')) {
+            define('DEPLOY_EMAIL_PASS', '');
+        }
+        if (!defined('DEPLOY_EMAIL_PORT')) {
+            define('DEPLOY_EMAIL_PORT', '');
+        }
 
         // --------------------------------------------------------------------------
 
@@ -137,7 +168,6 @@ class NAILS_System_startup
          */
 
         if (!defined('SECURE_BASE_URL')) {
-
             //  Not defined, play it safe and just copy the BASE_URL
             define('SECURE_BASE_URL', BASE_URL);
         }
@@ -165,14 +195,12 @@ class NAILS_System_startup
 
         //  Set the NAILS_ASSETS_URL
         if (!defined('NAILS_ASSETS_URL')) {
-
-            define('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/asset/assets/');
+            define('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/assets/');
         }
 
         //  Set the NAILS_ASSETS_PATH
         if (!defined('NAILS_ASSETS_PATH')) {
-
-            define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/asset/assets/');
+            define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
         }
 
         // --------------------------------------------------------------------------
@@ -182,11 +210,11 @@ class NAILS_System_startup
 
             if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
 
-                define('DEPLOY_DB_DEBUG', FALSE);
+                define('DEPLOY_DB_DEBUG', false);
 
             } else {
 
-                define('DEPLOY_DB_DEBUG', TRUE);
+                define('DEPLOY_DB_DEBUG', true);
             }
         }
     }
@@ -199,7 +227,6 @@ class NAILS_System_startup
     protected function setModuleLocations()
     {
         if (empty($this->moduleLocations)) {
-
             $this->moduleLocations = array();
         }
 
