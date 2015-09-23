@@ -1592,111 +1592,8 @@ if (!function_exists('form_field_radio')) {
      */
     function form_field_radio($field, $options = null, $tip = '')
     {
-        $_ci =& get_instance();
-
-        // --------------------------------------------------------------------------
-
-        //  Set var defaults
-        $_field                 = array();
-        $_field['id']           = isset($field['id']) ? $field['id'] : null;
-        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : null;
-        $_field['key']          = isset($field['key']) ? $field['key'] : null;
-        $_field['label']        = isset($field['label']) ? $field['label'] : null;
-        $_field['default']      = isset($field['default']) ? $field['default'] : null;
-        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : null;
-        $_field['required']     = isset($field['required']) ? $field['required'] : false;
-        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : null;
-        $_field['class']        = isset($field['class']) ? $field['class'] : false;
-        $_field['tip']          = isset($field['tip']) ? $field['tip'] : $tip;
-
-        if (is_null($options)) :
-
-            $options = isset($field['options']) ? $field['options'] : array();
-
-        endif;
-
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
-
-        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
-        $_error        = form_error($_field['key']) ? 'error' : '';
-
-        // --------------------------------------------------------------------------
-
-        $_out  = '<div class="field radio ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
-
-        //  First option
-        $_out .= '<label>';
-
-        //  Label
-        $_out .= '<span class="label">';
-        $_out .= $_field['label'];
-        $_out .= $_field['required'] ? '*' : '';
-        $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-        $_out .= '</span>';
-
-        //  Does the field have an id?
-        $_id = isset($options[0]['id']) && $options[0]['id'] ? 'id="' . $options[0]['id'] . '-0" ' : '';
-
-        //  Field
-        if ($_ci->input->post($_field['key'])) :
-
-            $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? true : false;
-
-        else :
-
-            $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
-
-        endif;
-        $_out .= form_radio($_field['key'], $options[0]['value'], $_selected, $_id) . '<span class="text">' . $options[0]['label'] . '</span>';
-
-        //  Tip
-        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
-
-        $_out .= '</label>';
-
-
-        //  Remaining options
-        $numOptions = count($options);
-        for ($i = 1; $i < $numOptions; $i++) :
-
-            $_out .= '<label>';
-
-            //  Label
-            $_out .= '<span class="label">&nbsp;</span>';
-
-            //  Input
-            if ($_ci->input->post($_field['key'])) :
-
-                $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? true : false;
-
-            else :
-
-                $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
-
-            endif;
-
-            //  Does the field have an ID?
-            $_id = isset($options[$i]['id']) && $options[$i]['id'] ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
-
-            $_out .= form_radio($_field['key'], $options[$i]['value'], $_selected, $_id);
-            $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
-
-            $_out .= '</label>';
-
-        endfor;
-
-        //  Error
-        $_out .= form_error($_field['key'], '<span class="error">', '</span>');
-
-        $_out .= '</div>';
-
-        // --------------------------------------------------------------------------
-
-        return $_out;
+        $field['type'] = 'radio';
+        return form_field_checkbox($field, $options, $tip);
     }
 }
 
@@ -1719,6 +1616,7 @@ if (!function_exists('form_field_checkbox')) {
 
         //  Set var defaults
         $_field                 = array();
+        $_field['type']         = isset($field['type']) ? $field['type'] : 'checkbox';
         $_field['id']           = isset($field['id']) ? $field['id'] : null;
         $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : null;
         $_field['key']          = isset($field['key']) ? $field['key'] : null;
@@ -1747,7 +1645,7 @@ if (!function_exists('form_field_checkbox')) {
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field checkbox ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        $_out  = '<div class="field ' . $_field['type'] . ' ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
 
         //  First option
         $_out .= '<label>';
@@ -1802,14 +1700,36 @@ if (!function_exists('form_field_checkbox')) {
 
         $_key   = isset($options[0]['key']) ? $options[0]['key'] : $_field['key'];
 
-        $_out .= form_checkbox($_key, $options[0]['value'], $_selected, $_id . $_disabled) . '<span class="text">' . $options[0]['label'] . '</span>';
+        if ($_field['type'] == 'checkbox') {
+
+            $_out .= form_checkbox(
+                $_key,
+                $options[0]['value'],
+                $_selected,
+                $_id . $_disabled
+            );
+            $_out .= '<span class="text">' . $options[0]['label'] . '</span>';
+
+        } elseif ($_field['type'] == 'radio') {
+
+            $_out .= form_radio(
+                $_key,
+                $options[0]['value'],
+                $_selected,
+                $_id . $_disabled
+            );
+            $_out .= '<span class="text">' . $options[0]['label'] . '</span>';
+        }
 
         //  Tip
-        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        if (!empty($_tip['title'])) {
+
+            $sTitle = htmlentities($_tip['title'], ENT_QUOTES);
+            $_out .= '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $sTitle . '"></b>';
+        }
 
         $_out .= '</span>';
         $_out .= '</label>';
-
 
         //  Remaining options
         $numOptions = count($options);
@@ -1860,7 +1780,26 @@ if (!function_exists('form_field_checkbox')) {
 
             $_key = isset($options[$i]['key']) ? $options[$i]['key'] : $_field['key'];
 
-            $_out .= form_checkbox($_key, $options[$i]['value'], $_selected, $_id . $_disabled) . '<span class="text">' . $options[$i]['label'] . '</span>';
+            if ($_field['type'] == 'checkbox') {
+
+                $_out .= form_checkbox(
+                    $_key,
+                    $options[0]['value'],
+                    $_selected,
+                    $_id . $_disabled
+                );
+                $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
+
+            } elseif ($_field['type'] == 'radio') {
+
+                $_out .= form_radio(
+                    $_key,
+                    $options[$i]['value'],
+                    $_selected,
+                    $_id . $_disabled
+                );
+                $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
+            }
 
             $_out .= '</span>';
             $_out .= '</label>';
