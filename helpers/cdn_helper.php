@@ -134,7 +134,7 @@ if (!function_exists('cdn_scale')) {
      */
     function cdn_scale($iObjectId, $iWidth, $iHeight)
     {
-        return cdnCrop($iObjectId, $iWidth, $iHeight);
+        return cdnScale($iObjectId, $iWidth, $iHeight);
     }
 }
 
