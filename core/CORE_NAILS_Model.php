@@ -937,9 +937,7 @@ class CORE_NAILS_Model extends CI_Model
         $integers[] = $this->tableCreatedByColumn;
         $integers[] = $this->tableModifiedByColumn;
         $integers[] = 'parent_id';
-        $integers[] = 'parentId';
         $integers[] = 'user_id';
-        $integers[] = 'userId';
         $integers[] = 'order';
 
         foreach ($integers as $property) {
@@ -955,9 +953,7 @@ class CORE_NAILS_Model extends CI_Model
         $bools   = (array) $bools;
         $bools[] = $this->tableDeletedColumn;
         $bools[] = 'is_active';
-        $bools[] = 'isActive';
         $bools[] = 'is_published';
-        $bools[] = 'isPublished';
 
         foreach ($bools as $property) {
 
