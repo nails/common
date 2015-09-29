@@ -1,5 +1,5 @@
 <h1>
-<?php
+    <?php
 
     if (!isset($paths)) {
 
@@ -39,8 +39,8 @@
         );
 
         $paths[] = array(
-            FCPATH . 'vendor/nailsapp/module-asset/asset/assets/img/nails/icon/icon@2x.png',
-            BASE_URL . 'vendor/nailsapp/module-asset/asset/assets/img/nails/icon/icon@2x.png'
+            FCPATH . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png',
+            BASE_URL . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png'
         );
     }
 
@@ -54,5 +54,5 @@
             break;
         }
     }
-?>
+    ?>
 </h1>

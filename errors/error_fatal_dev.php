@@ -1,62 +1,73 @@
 <?php
 
-    /**
-     * Renders a data section
-     * @param  string $title The title to give the section
-     * @param  mixed  $data  The data to display
-     * @return string
-     */
-    function keyValueSection($title, $data) {
+/**
+ * Renders a data section
+ * @param  string $title The title to give the section
+ * @param  mixed  $data  The data to display
+ * @return string
+ */
+function keyValueSection($title, $data)
+{
+    ob_start();
 
-        ob_start();
-        echo '<section class="data-section">';
-            echo '<h3>' . $title . '</h3>';
-            echo '<div class="table-responsive">';
-                echo '<table>';
-                    echo '<tbody>';
+    ?>
+    <section class="data-section">
+        <h3><?=$title?></h3>
+        <div class="table-responsive">
+            <table>
+                <tbody>
+                <?php
 
-                    if (!empty($data)) {
+                if (!empty($data)) {
 
-                        foreach ($data as $k => $v) {
+                    foreach ($data as $k => $v) {
 
-                            echo '<tr>';
-                                echo '<td class="key">';
-                                    echo $k;
-                                echo '</td>';
-                                echo '<td class="value">';
+                        ?>
+                        <tr>
+                            <td class="key">
+                                <?=$k?>
+                            </td>
+                            <td class="value">
+                            <?php
 
-                                    if (is_string($v) || is_numeric($v)) {
+                            if (is_string($v) || is_numeric($v)) {
 
-                                        echo $v;
+                                echo $v;
 
-                                    } else {
+                            } else {
 
-                                        echo json_encode($v, JSON_PRETTY_PRINT);
-                                    }
+                                echo json_encode($v, JSON_PRETTY_PRINT);
+                            }
 
-                                echo '</td>';
-                            echo '</tr>';
-                        }
-
-                    } else {
-
-                        echo '<tr>';
-                            echo '<td class="no-data">';
-                                echo 'No Data';
-                            echo '</td>';
-                        echo '</tr>';
+                            ?>
+                            </td>
+                        </tr>
+                        <?php
                     }
 
-                    echo '</tbody>';
-                echo '</table>';
-            echo '</div>';
-        echo '</section>';
+                } else {
 
-        $out = ob_get_contents();
-        ob_end_clean();
+                    ?>
+                    <tr>
+                        <td class="no-data">
+                            No Data
+                        </td>
+                    </tr>
+                    <?php
+                }
 
-        return $out;
-    }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <?php
+
+    $out = ob_get_contents();
+    ob_end_clean();
+
+    return $out;
+}
 
 ?>
 <!DOCTYPE html>
