@@ -22,7 +22,9 @@ require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
  * the user's passwords. We will have to immitate CI's Model Classthough.
  */
 
-class CI_Model {}
+class CI_Model
+{
+}
 
 class CORE_NAILS_Install extends CORE_NAILS_App
 {
@@ -181,7 +183,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             //  Only ask to create users if nailsapp/module-auth is installed (or will be installed)
             $isAuthModuleAvailable = false;
 
-            foreach ($installedComponents AS $component) {
+            foreach ($installedComponents as $component) {
 
                 if ($component->name == 'nailsapp/module-auth') {
 
@@ -687,7 +689,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
      */
     private function getVarValue($key, $vars)
     {
-        foreach($vars AS $var) {
+        foreach ($vars as $var) {
 
             if ($key == $var['key']) {
 
@@ -1048,12 +1050,12 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Create the user meta record
-        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta` (`user_id`) VALUES (" . $userId . ");";
+        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
         $result = $this->dbQuery($sql);
         if (!$result) {
 
             $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            return 'Could not create user_meta record.';
+            return 'Could not create user_meta_app record.';
         }
 
         // --------------------------------------------------------------------------
@@ -1085,7 +1087,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         if (!$result) {
 
             $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta` WHERE `user_id` = " . $userId);
+            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
             return 'Could not create main user email record.';
         }
 
@@ -1272,7 +1274,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             $output->writeln('');
             $output->writeln('More than 1 component for <info>' . $componentName . '</info>. Did you mean:</comment>');
 
-            foreach($result->results as $component) {
+            foreach ($result->results as $component) {
 
                 $url = $component->homepage;
                 $url = !$url ? $component->repository : $url;
