@@ -824,6 +824,7 @@ class CORE_NAILS_Controller extends MX_Controller
         $CI =& get_instance();
         $CI->meta = new \Nails\Common\Library\Meta();
         $CI->asset = new \Nails\Common\Library\Asset();
+        $CI->event = new \Nails\Event\Library\Event();
 
         // --------------------------------------------------------------------------
 
@@ -865,7 +866,6 @@ class CORE_NAILS_Controller extends MX_Controller
 
         $_libraries[] = 'encrypt';
         $_libraries[] = 'email/emailer';
-        $_libraries[] = 'event/event';
         $_libraries[] = 'logger';
 
         foreach ($_libraries as $library) {
