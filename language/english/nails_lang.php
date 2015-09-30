@@ -60,6 +60,8 @@ $lang['fv_required']                    = 'This field is required.';
 $lang['fv_required_field']              = 'The %s field is required.';
 $lang['fv_valid_email']                 = 'This must be a valid email.';
 $lang['fv_valid_email_field']           = 'The %s field is must be a valid email.';
+$lang['fv_valid_emails']                = 'This must contain only valid email addresses.';
+$lang['fv_valid_emails_field']          = 'The %s field must contain only valid email addresses.';
 $lang['fv_email_already_registered']    = 'This email is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
 $lang['fv_username_already_registered'] = 'This username is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
 $lang['fv_identity_already_registered'] = 'This %%s is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
