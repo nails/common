@@ -30,12 +30,11 @@ class Factory
      */
     public static function setup()
     {
-        self::$aContainers = array();
-
-        $aDiscoveredServices = array();
-        $aDiscoveredServices['nailsapp/common'] = self::findServicesForModule('nailsapp/common');
-
-        $aModules = _NAILS_GET_MODULES();
+        $aModules            = _NAILS_GET_MODULES();
+        self::$aContainers   = array();
+        $aDiscoveredServices = array(
+            'nailsapp/common' => self::findServicesForModule('nailsapp/common')
+        );
 
         foreach ($aModules as $oModule) {
 
@@ -142,7 +141,7 @@ class Factory
      * @param  string $sModuleName  The name of the module which provides the property
      * @return mixed
      */
-    public static function property($sPropertyName, $sModuleName = null)
+    public static function property($sPropertyName, $sModuleName = '')
     {
         return self::getService($sPropertyName, $sModuleName);
     }
@@ -155,7 +154,7 @@ class Factory
      * @param  string $sModuleName  The name of the module which provides the service
      * @return mixed
      */
-    public static function service($sServiceName, $sModuleName = null)
+    public static function service($sServiceName, $sModuleName = '')
     {
         return self::getService($sServiceName, $sModuleName);
     }
@@ -168,14 +167,20 @@ class Factory
      * @param  string $sModuleName  The name of the module which provides the factory
      * @return mixed
      */
-    public static function factory($sFactoryName, $sModuleName = null)
+    public static function factory($sFactoryName, $sModuleName = '')
     {
         return self::getService($sFactoryName, $sModuleName);
     }
 
     // --------------------------------------------------------------------------
 
-    private static function getService($sServiceName, $sModuleName = null)
+    /**
+     * Returns a service from the namespaced container
+     * @param  string $sServiceName The name of the service to return
+     * @param  string $sModuleName  The name of the mdoule which defined it
+     * @return mixed
+     */
+    private static function getService($sServiceName, $sModuleName = '')
     {
         $sModuleName = empty($sModuleName) ? 'nailsapp/common' : $sModuleName;
 
