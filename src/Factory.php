@@ -33,13 +33,16 @@ class Factory
         self::$aContainers = array();
 
         $aDiscoveredServices = array();
-        $aDiscoveredServices['nailsapp/common'] = self::findServicesAtPath('vendor/nailsapp/common/');
+        $aDiscoveredServices['nailsapp/common'] = self::findServicesAtPath(
+            'nailsapp/common',
+            'vendor/nailsapp/common/'
+        );
 
         $aModules = _NAILS_GET_MODULES();
 
         foreach ($aModules as $oModule) {
 
-            $aDiscoveredServices[$oModule->name] = self::findServicesAtPath($oModule->path);
+            $aDiscoveredServices[$oModule->name] = self::findServicesAtPath($oModule->name, $oModule->path);
         }
 
         $aDiscoveredServices = array_filter($aDiscoveredServices);
@@ -77,12 +80,17 @@ class Factory
      * @param  string $sPath The base path to search
      * @return array
      */
-    private static function findServicesAtPath($sPath)
+    private static function findServicesAtPath($sModuleName, $sPath)
     {
+        $sEnvironment = strtolower(ENVIRONMENT);
         $aPaths = array(
-            $sPath . 'services/' . strtolower(ENVIRONMENT) . '/services.php',
-            $sPath . 'services/' . strtolower(ENVIRONMENT) . '.services.php',
-            $sPath . 'services/services.' . strtolower(ENVIRONMENT) . '.php',
+
+            //  App overrides
+            'application/services/' . $sEnvironment . '/' . $sModuleName . '/services.php',
+            'application/services/' . $sModuleName . '/services.php',
+
+            //  Default locations
+            $sPath . 'services/' . $sEnvironment . '/services.php',
             $sPath . 'services/services.php'
         );
 
