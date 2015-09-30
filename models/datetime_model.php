@@ -681,7 +681,9 @@ class NAILS_Datetime_model extends NAILS_Model
 
         //  Perform the conversion
         $fromTz = new DateTimeZone($fromTz);
-        $out    = new Datetime($timestamp, $fromTz);
+
+        $out = \Nails\Factory::factory('DateTime');
+        $out->modify($timestamp);
 
         //  Set the output timezone
         $toTz = new DateTimeZone($toTz);

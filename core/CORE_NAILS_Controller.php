@@ -47,6 +47,11 @@ class CORE_NAILS_Controller extends MX_Controller
 
         // --------------------------------------------------------------------------
 
+        //  Set up services
+        \Nails\Factory::setup();
+
+        // --------------------------------------------------------------------------
+
         //  Is Nails in maintenance mode?
         $this->maintenanceMode();
 
@@ -817,14 +822,13 @@ class CORE_NAILS_Controller extends MX_Controller
         // --------------------------------------------------------------------------
 
         //  Common libraries
-        //  @todo: use DI manager such as Pimple
         //  @note: We have to load this way so that the property is taken up by the CI
-        // super object and therefore more reliably accessible (e.g in CMS module)
+        //  super object and therefore more reliably accessible (e.g in CMS module)
 
-        $CI =& get_instance();
-        $CI->meta = new \Nails\Common\Library\Meta();
-        $CI->asset = new \Nails\Common\Library\Asset();
-        $CI->event = new \Nails\Event\Library\Event();
+        $CI        =& get_instance();
+        $CI->meta  = \Nails\Factory::service('Meta');
+        $CI->asset = \Nails\Factory::service('Asset');
+        $CI->event = \Nails\Factory::service('Event', 'nailsapp/module-event');
 
         // --------------------------------------------------------------------------
 

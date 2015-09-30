@@ -26,7 +26,8 @@
     "require":
     {
         "symfony/console": "~2.5.4",
-        "rogeriopradoj/codeigniter": "2.2.1-rc.2"
+        "rogeriopradoj/codeigniter": "2.2.1-rc.2",
+        "pimple/pimple": "~3.0"
     },
     "require-dev":
     {
@@ -34,6 +35,6 @@
     },
     "autoload":
     {
-        "psr-4": {"Nails\\Common\\": "src/"}
+        "psr-4": {"Nails\\": "src/"}
     }
 }
