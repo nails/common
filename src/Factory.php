@@ -33,17 +33,16 @@ class Factory
         self::$aContainers = array();
 
         $aDiscoveredServices = array();
-        $aDiscoveredServices['nailsapp/common'] = self::findServicesAtPath(
-            'nailsapp/common',
-            'vendor/nailsapp/common/'
-        );
+        $aDiscoveredServices['nailsapp/common'] = self::findServicesForModule('nailsapp/common');
 
         $aModules = _NAILS_GET_MODULES();
 
         foreach ($aModules as $oModule) {
 
-            $aDiscoveredServices[$oModule->name] = self::findServicesAtPath($oModule->name, $oModule->path);
+            $aDiscoveredServices[$oModule->name] = self::findServicesForModule($oModule->name);
         }
+
+        $aDiscoveredServices['app'] = self::findServicesForApp();
 
         $aDiscoveredServices = array_filter($aDiscoveredServices);
 
@@ -76,11 +75,11 @@ class Factory
     // --------------------------------------------------------------------------
 
     /**
-     * Looks for a services.php file at various possible places
-     * @param  string $sPath The base path to search
+     * Look for a module's services.php file, allowing for app and/or environment overrides
+     * @param  string $sModuleName The module name to search for
      * @return array
      */
-    private static function findServicesAtPath($sModuleName, $sPath)
+    private static function findServicesForModule($sModuleName)
     {
         $sEnvironment = strtolower(ENVIRONMENT);
         $aPaths = array(
@@ -90,10 +89,40 @@ class Factory
             'application/services/' . $sModuleName . '/services.php',
 
             //  Default locations
-            $sPath . 'services/' . $sEnvironment . '/services.php',
-            $sPath . 'services/services.php'
+            'vendor/' . $sModuleName . '/services/' . $sEnvironment . '/services.php',
+            'vendor/' . $sModuleName . '/services/services.php'
         );
 
+        return self::findServicesAtPaths($aPaths);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Look for the app's services.php file, allowing for environment overrides
+     * @return array
+     */
+    private static function findServicesForApp()
+    {
+        $sEnvironment = strtolower(ENVIRONMENT);
+        $aPaths = array(
+
+            'application/services/' . $sEnvironment . '/services.php',
+            'application/services/services.php',
+        );
+
+        return self::findServicesAtPaths($aPaths);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Traverses an array of paths until one exits
+     * @param  array $aPaths An array of paths to look for
+     * @return array
+     */
+    private static function findServicesAtPaths($aPaths)
+    {
         $aModuleServices = array();
 
         foreach ($aPaths as $sPath) {
