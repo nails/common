@@ -217,7 +217,8 @@ function keyValueSection($title, $data)
 
     // --------------------------------------------------------------------------
 
-    $queries = get_instance()->db->queries;
+    $oDb = \Nails\Factory::service('Database');
+    $queries = $oDb->queries;
     $queries = array_reverse($queries);
 
     echo keyValueSection('Database Queries (most recent first)', $queries);

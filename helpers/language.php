@@ -1,5 +1,17 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
+/**
+ * This file provides langauge related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/language_helper.php';
 
 /**
  * Lang
@@ -27,8 +39,3 @@ if ( ! function_exists('lang'))
 		return $line;
 	}
 }
-
-
-
-/* End of file NAILS_language_helper.php */
-/* Location: ./helpers/NAILS_language_helper.php */

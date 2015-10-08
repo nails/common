@@ -1,4 +1,17 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * This file provides HTML related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/html_helper.php';
 
 /**
  * Image
@@ -18,30 +31,30 @@ if ( ! function_exists( 'img' ) )
 		{
 			$src = array('src' => $src);
 		}
-		
+
 		// Modded by Pablo here...
 		// Ensure that the 'alt' and 'title' attributes are always in the markup (for validation)
 		if ( ! array_key_exists('alt', $src))
 		{
 			$src['alt'] = $alt;
 		}
-		
+
 		$title = ($title === FALSE) ? $alt : $title;
 		if ( ! array_key_exists('title', $src))
 		{
 			$src['title'] = $title;
 		}
-		// ... to here. 
-	
+		// ... to here.
+
 		$img = '<img';
-	
+
 		foreach ($src as $k=>$v)
 		{
-	
+
 			if ($k == 'src' AND strpos($v, '://') === FALSE)
 			{
 				$CI =& get_instance();
-	
+
 				if ($index_page === TRUE)
 				{
 					$img .= ' src="'.$CI->config->site_url($v).'" ';
@@ -56,15 +69,15 @@ if ( ! function_exists( 'img' ) )
 				$img .= " $k=\"$v\" ";
 			}
 		}
-	
+
 		$img .= '/>';
 
 		//	Force SSL for local images if running on non-standard port
 		if ( isset( $_SERVER['HTTPS'] ) && strtolower( $_SERVER['HTTPS'] ) == 'on' ) :
-		
+
 			$site_url_ssl = str_replace( 'http://', 'https://', site_url() );
 			$img = str_replace( site_url(), $site_url_ssl, $img );
-			
+
 		endif;
 
 		return $img;
@@ -189,9 +202,9 @@ if ( ! function_exists('list_first_last'))
 			}
 			$attributes = $atts;
 		}
-		
+
 		$attributes = ( $depth == 0 ) ? $attributes : NULL ;
-		
+
 		// Write the opening list tag
 		$out .= "<".$type.$attributes.">\n";
 
@@ -206,7 +219,7 @@ if ( ! function_exists('list_first_last'))
 			$_last_list_item = $key;
 
 			$out .= str_repeat(" ", $depth + 2);
-			
+
 			$class_f = ($i == 0)		? $first_class	: NULL;
 			$class_l = ($i == $total)	? $last_class	: NULL;
 			//	Work out if this li is the current one absed on $current
@@ -215,7 +228,7 @@ if ( ! function_exists('list_first_last'))
 			else :
 				$cur_val = $val;
 			endif;
-			
+
 			$cur = (preg_match('/href="\/'.$current.'/i', $cur_val)) ? ' current' : NULL;
 			$out .= "<li class=\"{$top_li} {$class_f}{$class_l}{$cur}\">";
 
@@ -231,7 +244,7 @@ if ( ! function_exists('list_first_last'))
 			}
 
 			$out .= "</li>\n";
-			
+
 			$i++;
 		}
 

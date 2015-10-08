@@ -26,7 +26,7 @@ class Logger
     public function __construct()
     {
         //  Load helper
-        get_instance()->load->helper('file');
+        \Nails\Factory::helper('file');
 
         // --------------------------------------------------------------------------
 

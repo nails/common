@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * This file provides string related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';
+
 if (!function_exists('str_lreplace'))
 {
     /**

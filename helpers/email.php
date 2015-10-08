@@ -1,4 +1,18 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+/**
+ * This file provides email related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/email_helper.php';
+
 /**
  * Validate email address
  *

@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * This file provides inflection related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';
+
 if (!function_exists('possessionise'))
 {
     /**
@@ -9,7 +22,7 @@ if (!function_exists('possessionise'))
      */
     function possessionise($str)
     {
-        return (substr($str, -1) == 's') ? $str . '\'' : $str . '\'s';
+        return substr($str, -1) == 's' ? $str . '\'' : $str . '\'s';
     }
 }
 

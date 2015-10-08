@@ -21,6 +21,7 @@ class Factory
      * @var array
      */
     private static $aContainers;
+    private static $aLoadedHelpers;
 
     // --------------------------------------------------------------------------
 
@@ -30,9 +31,10 @@ class Factory
      */
     public static function setup()
     {
-        $aModules            = _NAILS_GET_MODULES();
-        self::$aContainers   = array();
-        $aDiscoveredServices = array(
+        $aModules             = _NAILS_GET_MODULES();
+        self::$aContainers    = array();
+        self::$aLoadedHelpers = array();
+        $aDiscoveredServices  = array(
             'nailsapp/common' => self::findServicesForModule('nailsapp/common')
         );
 
@@ -66,6 +68,12 @@ class Factory
             if (!empty($aModuleServices['factories'])) {
                 foreach ($aModuleServices['factories'] as $sKey => $oCallable) {
                     self::$aContainers[$sModuleName][$sKey] = self::$aContainers[$sModuleName]->factory($oCallable);
+                }
+            }
+
+            if (!empty($aModuleServices['helpers'])) {
+                foreach ($aModuleServices['helpers'] as $sKey => $oCallable) {
+                    self::$aContainers[$sModuleName][$sKey] = $oCallable;
                 }
             }
         }
@@ -170,6 +178,44 @@ class Factory
     public static function factory($sFactoryName, $sModuleName = '')
     {
         return self::getService($sFactoryName, $sModuleName);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Load a helper file
+     * @param  string $sHelperName The helper name
+     * @param  string $sModuleName The name of the module which provides the factory
+     * @return mixed
+     */
+    public static function helper($sHelperName, $sModuleName = '')
+    {
+        $sModuleName = empty($sModuleName) ? 'nailsapp/common' : $sModuleName;
+
+        if (empty(self::$aLoadedHelpers[$sModuleName][$sHelperName])) {
+
+            if (empty(self::$aLoadedHelpers[$sModuleName])) {
+                self::$aLoadedHelpers[$sModuleName] = array();
+            }
+
+            $sModulePath = 'vendor/' . $sModuleName . '/helpers/' . $sHelperName . '.php';
+            $sAppPath    = 'application/helpers/' . $sModuleName . '/' . $sHelperName . '.php';
+
+            if (!file_exists($sModulePath)) {
+                throw new Common\Exception\FactoryException(
+                    'Helper "' . $sModuleName . '/' . $sHelperName . '" does not exist.',
+                    1
+                );
+            }
+
+            if (file_exists($sAppPath)) {
+                require_once $sAppPath;
+            }
+
+            require_once $sModulePath;
+
+            self::$aLoadedHelpers[$sModuleName][$sHelperName] = true;
+        }
     }
 
     // --------------------------------------------------------------------------

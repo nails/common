@@ -79,6 +79,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                 $temp->moduleName  = !empty($package->extra->nails->moduleName) ? $package->extra->nails->moduleName : null;
                 $temp->type        = !empty($package->extra->nails->type) ? $package->extra->nails->type : null;
                 $temp->subType     = !empty($package->extra->nails->subType) ? $package->extra->nails->subType : null;
+                $temp->autoload    = !empty($package->extra->nails->autoload) ? $package->extra->nails->autoload : null;
 
                 $out[] = $temp;
             }

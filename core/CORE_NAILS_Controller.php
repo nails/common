@@ -37,8 +37,7 @@ class CORE_NAILS_Controller extends MX_Controller
         //  Include the composer autoloader
         if (!file_exists(FCPATH . 'vendor/autoload.php')) {
 
-            $_ERROR  = 'Composer autoloader not found; run <code>composer install</code> ';
-            $_ERROR .= 'to install dependencies.';
+            $_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies';
 
             include NAILS_COMMON_PATH . 'errors/startup_error.php';
         }
@@ -62,11 +61,6 @@ class CORE_NAILS_Controller extends MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Include global Nails files
-        require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_Traits.php';
-
-        // --------------------------------------------------------------------------
-
         //  Configure logging and error reporting
         // $this->setLogging();
         $this->setErrorReporting();
@@ -80,11 +74,6 @@ class CORE_NAILS_Controller extends MX_Controller
 
         //  Define data array (used extensively in views)
         $this->data =& getControllerData();
-
-        // --------------------------------------------------------------------------
-
-        //  Instantiate the database?
-        $this->instantiateDb();
 
         // --------------------------------------------------------------------------
 
@@ -162,9 +151,11 @@ class CORE_NAILS_Controller extends MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Set alerts
-
-        //  These are hooks for code to add feedback messages to the user.
+        //  Set User Feedback alerts for the views
+        // $this->data['notice']  = $this->userFeedback->get('notice');
+        // $this->data['message'] = $this->userFeedback->get('message');
+        // $this->data['error']   = $this->userFeedback->get('error');
+        // $this->data['success'] = $this->userFeedback->get('success');
         $this->data['notice']  = $this->session->flashdata('notice');
         $this->data['message'] = $this->session->flashdata('message');
         $this->data['error']   = $this->session->flashdata('error');
@@ -388,19 +379,18 @@ class CORE_NAILS_Controller extends MX_Controller
              * exiting whether we like it or not
              */
 
-            //  Whitelist & Customisations
-            if ($this->instantiateDb(true)) {
+            try {
 
-                //  Load the traits
-                require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_Traits.php';
+                //  Get the database so that the app_setting() functions will work
+                $oDb = \Nails\Factory::service('Database');
 
                 //  Set the package path (so helpers and libraries are loaded correctly)
                 $this->load->add_package_path(NAILS_COMMON_PATH);
 
                 //  Load the helpers
-                $this->load->library('encrypt');
-                $this->load->helper('app_setting');
-                $this->load->helper('tools');
+                \Nails\Factory::service('encrypt');
+                \Nails\Factory::helper('app_setting');
+                \Nails\Factory::helper('tools');
 
                 $whitelistIp   = (array) app_setting('maintenance_mode_whitelist', 'site');
                 $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
@@ -409,7 +399,7 @@ class CORE_NAILS_Controller extends MX_Controller
                 $sMaintenanceTitle = $sTitle ? $sTitle : app_setting('maintenance_mode_title', 'site');
                 $sMaintenanceBody  = $sBody ? $sBody : app_setting('maintenance_mode_body', 'site');
 
-            } else {
+            } catch (\Exception $e) {
 
                 //  No database, or it failed, defaults
                 $isWhiteListed     = false;
@@ -556,67 +546,34 @@ class CORE_NAILS_Controller extends MX_Controller
     // --------------------------------------------------------------------------
 
     /**
-     * Loads the database
-     * @param  boolean $failGracefully Whether or not to fail gracefully
-     * @return boolean
-     */
-    protected function instantiateDb($failGracefully = false)
-    {
-        if (DEPLOY_DB_USERNAME && DEPLOY_DB_DATABASE) {
-
-            if ($this->load->database() === false) {
-
-                show_error('Failed to connect to database.');
-            }
-
-            /**
-             * Don't run transactions in strict mode. In my opinion it's odd behaviour:
-             * When a transaction is committed it should be the end of the story. If it's
-             * not then a failure elsewhere can cause a rollback unexpectedly. Silly CI.
-             */
-
-            $this->db->trans_strict(false);
-
-            return true;
-
-        } elseif (!$failGracefully) {
-
-            show_error('No database is configured.');
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Sets up date & time handling
      * @return void
      */
     protected function instantiateDateTime()
     {
         //  Define default date format
-        $_default = $this->datetime_model->getDateFormatDefault();
+        $oDefaultDateFormat = $this->datetime_model->getDateFormatDefault();
 
-        if (empty($_default)) {
+        if (empty($oDefaultDateFormat)) {
 
             showFatalError('No default date format has been set, or it\'s been set incorrectly.');
         }
 
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $_default->slug);
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $_default->label);
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $_default->format);
+        define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
+        define('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
+        define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
-        $_default = $this->datetime_model->getTimeFormatDefault();
+        $oDefaultTimeFormat = $this->datetime_model->getTimeFormatDefault();
 
-        if (empty($_default)) {
+        if (empty($oDefaultTimeFormat)) {
 
             showFatalError('No default time format has been set, or it\'s been set incorrectly.');
         }
 
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $_default->slug);
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $_default->label);
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $_default->format);
+        define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
+        define('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
+        define('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
 
         // --------------------------------------------------------------------------
 
@@ -628,34 +585,30 @@ class CORE_NAILS_Controller extends MX_Controller
 
         if (activeUser('timezone')) {
 
-            $timezoneUser = activeUser('timezone');
+            $sTimezoneUser = activeUser('timezone');
 
         } else {
 
-            $timezoneUser = $this->datetime_model->getTimezoneDefault();
+            $sTimezoneUser = $this->datetime_model->getTimezoneDefault();
         }
 
-        $this->datetime_model->setTimezones('UTC', $timezoneUser);
+        $this->datetime_model->setTimezones('UTC', $sTimezoneUser);
 
         // --------------------------------------------------------------------------
 
         //  Set the user date/time formats
-        $formatDate = activeUser('datetime_format_date');
-        $formatDate = $formatDate ? $formatDate : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
+        $sFormatDate = activeUser('datetime_format_date');
+        $sFormatDate = $sFormatDate ? $sFormatDate : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
 
-        $formatTime = activeUser('datetime_format_time');
-        $formatTime = $formatTime ? $formatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+        $sFormatTime = activeUser('datetime_format_time');
+        $sFormatTime = $sFormatTime ? $sFormatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
-        $this->datetime_model->setFormats($formatDate, $formatTime);
+        $this->datetime_model->setFormats($sFormatDate, $sFormatTime);
 
         // --------------------------------------------------------------------------
 
-        //  Make sure the system is running on UTC
+        //  Make sure the system and the database are running on UTC
         date_default_timezone_set('UTC');
-
-        // --------------------------------------------------------------------------
-
-        //  Make sure the DB is thinking along the same lines
         $this->db->query('SET time_zone = \'+0:00\'');
     }
 
@@ -668,26 +621,28 @@ class CORE_NAILS_Controller extends MX_Controller
     protected function instantiateLanguages()
     {
         //  Define default language
-        $_default = $this->language_model->getDefault();
+        $oDefault = $this->language_model->getDefault();
 
-        if (empty($_default)) {
+        if (empty($oDefault)) {
 
             showFatalError('No default language has been set, or it\'s been set incorrectly.');
         }
 
-        define('APP_DEFAULT_LANG_CODE', $_default->code);
-        define('APP_DEFAULT_LANG_LABEL', $_default->label);
+        define('APP_DEFAULT_LANG_CODE', $oDefault->code);
+        define('APP_DEFAULT_LANG_LABEL', $oDefault->label);
 
         // --------------------------------------------------------------------------
 
-        //  Set any global preferences for this user, e.g languages, fall back to
-        //  the app's default language (defined in config.php).
+        /**
+         * Set any global preferences for this user, e.g languages, fall back to the
+         * app's default language (defined in config.php).
+         */
 
-        $_user_lang = activeUser('language');
+        $sUserLangCode = activeUser('language');
 
-        if (!empty($_user_lang)) {
+        if (!empty($sUserLangCode)) {
 
-            define('RENDER_LANG_CODE', $_user_lang);
+            define('RENDER_LANG_CODE', $sUserLangCode);
 
         } else {
 
@@ -724,165 +679,97 @@ class CORE_NAILS_Controller extends MX_Controller
         //  Reset
         $this->config->_config_paths = array();
 
-        $_packages = array();
+        $aPaths = array();
 
         //  Nails Common
-        $_packages[] = NAILS_COMMON_PATH;
+        $aPaths[] = NAILS_COMMON_PATH;
 
         //  Available Modules
-        $_available_modules = _NAILS_GET_MODULES();
+        $aAvailableModules = _NAILS_GET_MODULES();
 
-        foreach ($_available_modules as $module) {
+        foreach ($aAvailableModules as $oModule) {
 
-            $_packages[] = $module->path;
+            $aPaths[] = $oModule->path;
         }
 
         //  The Application
-        $_packages[] = FCPATH . APPPATH;
+        $aPaths[] = FCPATH . APPPATH;
 
-        foreach ($_packages as $package) {
+        foreach ($aPaths as $sPath) {
 
-            $this->load->add_package_path($package);
+            $this->load->add_package_path($sPath);
         }
 
         // --------------------------------------------------------------------------
 
         //  Load the user helper
-        $_helpers   = array();
-        $_helpers[] = 'user';
-        $_helpers[] = 'app_setting';
-        $_helpers[] = 'app_notification';
-        $_helpers[] = 'datetime';
-        $_helpers[] = 'url';
-        $_helpers[] = 'cookie';
-        $_helpers[] = 'form';
-        $_helpers[] = 'html';
-        $_helpers[] = 'tools';
-        $_helpers[] = 'debug';
-        $_helpers[] = 'language';
-        $_helpers[] = 'text';
-        $_helpers[] = 'exception';
-        $_helpers[] = 'typography';
-        $_helpers[] = 'event';
-        $_helpers[] = 'log';
+        \Nails\Factory::helper('user');
+        \Nails\Factory::helper('app_setting');
+        \Nails\Factory::helper('app_notification');
+        \Nails\Factory::helper('date');
+        \Nails\Factory::helper('url');
+        \Nails\Factory::helper('cookie');
+        \Nails\Factory::helper('form');
+        \Nails\Factory::helper('html');
+        \Nails\Factory::helper('tools');
+        \Nails\Factory::helper('debug');
+        \Nails\Factory::helper('language');
+        \Nails\Factory::helper('text');
+        \Nails\Factory::helper('exception');
+        \Nails\Factory::helper('typography');
+        \Nails\Factory::helper('event');
+        \Nails\Factory::helper('log');
 
         /**
          * Module specific helpers
-         *
-         * @todo: Ether load these automatically by looking at available modules, or
-         * force dev/module to load as needed
          */
 
-        //  CDN
-        if (isModuleEnabled('nailsapp/module-cdn')) {
+        $aModules = _NAILS_GET_MODULES();
+        foreach ($aModules as $oModule) {
 
-            $_helpers[] = 'cdn';
-        }
-
-        //  Shop
-        if (isModuleEnabled('nailsapp/module-shop')) {
-
-            $_helpers[] = 'shop';
-        }
-
-        //  Blog
-        if (isModuleEnabled('nailsapp/module-blog')) {
-
-            $_helpers[] = 'blog';
-        }
-
-        //  CMS
-        if (isModuleEnabled('nailsapp/module-cms')) {
-
-            $_helpers[] = 'cms';
-        }
-
-        //  Load...
-        foreach ($_helpers as $helper) {
-
-            $this->load->helper($helper);
+            if (!empty($oModule->autoload->helpers) && is_array($oModule->autoload->helpers)) {
+                foreach ($oModule->autoload->helpers as $sHelper) {
+                    \Nails\Factory::helper($sHelper, $oModule->name);
+                }
+            }
         }
 
         // --------------------------------------------------------------------------
 
         //  Fairly sure load order is important here.
-        $_models   = array();
-        $_models[] = 'app_setting_model';
-        $_models[] = 'auth/user_model';
-        $_models[] = 'auth/user_group_model';
-        $_models[] = 'auth/user_password_model';
-        $_models[] = 'datetime_model';
-        $_models[] = 'language_model';
+        $aModels   = array();
+        $aModels[] = 'app_setting_model';
+        $aModels[] = 'auth/user_model';
+        $aModels[] = 'auth/user_group_model';
+        $aModels[] = 'auth/user_password_model';
+        $aModels[] = 'datetime_model';
+        $aModels[] = 'language_model';
 
-        foreach ($_models as $model) {
+        foreach ($aModels as $sModel) {
 
-            $this->load->model($model);
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Common libraries
-        //  @note: We have to load this way so that the property is taken up by the CI
-        //  super object and therefore more reliably accessible (e.g in CMS module)
-
-        $CI        =& get_instance();
-        $CI->meta  = \Nails\Factory::service('Meta');
-        $CI->asset = \Nails\Factory::service('Asset');
-        $CI->event = \Nails\Factory::service('Event', 'nailsapp/module-event');
-
-        // --------------------------------------------------------------------------
-
-        $_libraries = array();
-
-        /**
-         * Test that $_SERVER is available, the session library needs this
-         * Generally not available when running on the command line. If it's
-         * not available then load up the faux session which has the same methods
-         * as the session library, but behaves as if logged out - comprende?
-         */
-
-        if ($this->input->server('REMOTE_ADDR')) {
-
-            $_libraries[] = 'session';
-
-        } else {
-
-            $_libraries[] = array('auth/faux_session', 'session');
+            $this->load->model($sModel);
         }
 
         // --------------------------------------------------------------------------
 
         /**
-         * STOP! Before we load the session library, we need to check if we're using
-         * the database. If we are then check if `sess_table_name` is "nails_session".
-         * If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
+         * Common libraries
+         * @note: We have to load this way so that the property is taken up by the CI
+         * super object and therefore more reliably accessible (e.g in CMS module).
+         * @todo  reduce this coupling
+         * @todo  implement userFeedback library throughout
          */
 
-        $_sess_table_name = $this->config->item('sess_table_name');
-
-        if ($_sess_table_name === 'nails_session' && NAILS_DB_PREFIX !== 'nails_') {
-
-            $_sess_table_name = str_replace('nails_', NAILS_DB_PREFIX, $_sess_table_name);
-            $this->config->set_item('sess_table_name', $_sess_table_name);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $_libraries[] = 'encrypt';
-        $_libraries[] = 'email/emailer';
-        $_libraries[] = 'logger';
-
-        foreach ($_libraries as $library) {
-
-            if (is_array($library)) {
-
-                $this->load->library($library[0], array(), $library[1]);
-
-            } else {
-
-                $this->load->library($library);
-            }
-        }
+        $oCi               =& get_instance();
+        $oCi->db           = \Nails\Factory::service('Database');
+        $oCi->meta         = \Nails\Factory::service('Meta');
+        $oCi->asset        = \Nails\Factory::service('Asset');
+        $oCi->userFeedback = \Nails\Factory::service('UserFeedback');
+        $oCi->session      = \Nails\Factory::service('Session');
+        $oCi->encrypt      = \Nails\Factory::service('Encrypt');
+        $oCi->logger       = \Nails\Factory::service('Logger');
+        $oCi->event        = \Nails\Factory::service('Event', 'nailsapp/module-event');
+        $oCi->emailer      = \Nails\Factory::service('Emailer', 'nailsapp/module-email');
     }
 
     // --------------------------------------------------------------------------

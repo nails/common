@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file provides traits used internally by Nails
+ * Implements the common getcount_common() and _getcount_common_parse_sort() methods
  *
  * @package     Nails
  * @subpackage  common
@@ -10,232 +10,9 @@
  * @link
  */
 
-/**
- * Implements a common API for error handling in classes
- */
-trait NAILS_COMMON_TRAIT_ERROR_HANDLING
-{
-    protected $_errors = array();
+namespace Nails\Common\Traits;
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * Set a generic error
-     * @param string $error The error message
-     */
-    protected function _set_error($error)
-    {
-        $this->_errors[] = $error;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Return the error array
-     * @return array
-     */
-    public function get_errors()
-    {
-        return $this->_errors;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the last error
-     * @return string
-     */
-    public function last_error()
-    {
-        return end($this->_errors);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Clears the last error
-     * @return mixed
-     */
-    public function clear_last_error()
-    {
-        return array_pop($this->_errors);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Clears all errors
-     * @return void
-     */
-    public function clear_errors()
-    {
-        $this->_errors = array();
-    }
-}
-
-// --------------------------------------------------------------------------
-
-/**
- * Implements a common API for caching in classes
- */
-trait NAILS_COMMON_TRAIT_CACHING
-{
-    protected $_cache_values    = array();
-    protected $_cache_keys      = array();
-    protected $_cache_method    = 'LOCAL';
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Saves an item to the cache
-     * @param string $key   The cache key
-     * @param mixed  $value The data to be cached
-     */
-    protected function _set_cache($key, $value)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                break;
-
-            case 'LOCAL':
-            default:
-
-                $this->_cache_values[md5($_prefix . $key)] = serialize($value);
-                $this->_cache_keys[] = $key;
-                break;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Fetches an item from the cache
-     * @param  string $key The cache key
-     * @return mixed
-     */
-    protected function _get_cache($key)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                $return = false;
-                break;
-
-            case 'LOCAL':
-            default:
-
-                if (isset($this->_cache_values[md5($prefix . $key)])) {
-
-                    $return = unserialize($this->_cache_values[md5($prefix . $key)]);
-
-                } else {
-
-                    $return = false;
-
-                }
-                break;
-        }
-
-        return $return;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Deletes an item from the cache
-     * @param  string $key The cache key
-     * @return boolean
-     */
-    protected function _unset_cache($key)
-    {
-        if (empty($key)) {
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Prep the key, the key should have a prefix unique to this model
-        $prefix = $this->_cache_prefix();
-
-        // --------------------------------------------------------------------------
-
-        switch ($this->_cache_method) {
-
-            case 'MEMCACHED':
-
-                //  @TODO
-                break;
-
-            case 'LOCAL':
-            default:
-
-                unset($this->_cache_values[md5($prefix . $key)]);
-
-                $_key = array_search($key, $this->_cache_keys);
-
-                if ($_key !== false) {
-
-                    unset($this->_cache_keys[$_key]);
-                }
-                break;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * In order to avoid collission between classes a prefix is used; this method
-     * defines the cache key prefix using the calling class' name.
-     * @return string
-     */
-    protected function _cache_prefix()
-    {
-        return get_called_class();
-    }
-}
-
-/**
- * Implements the common getcount_common() and _getcount_common_parse_sort() methods
- */
-trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
+trait GetCountCommon
 {
     /**
      * This method applies the conditionals which are common across the get_*()
@@ -262,6 +39,8 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      */
     protected function _getcount_compile_filters(&$data, $_caller = null)
     {
+        $oDb = \Nails\Factory::service('Database');
+
         /**
          * Handle filters
          * Filters are basically an easy way to modify the query's where element.
@@ -289,12 +68,12 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                     if (!empty($_GET['cbF'][$filterIndex][$optionIndex])) {
 
                         //  Filtering is happening and the item is to be filtered
-                        $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
+                        $whereFilter[] = $oDb->escape_str($filter->column, false) . ' = ' . $oDb->escape($option->value);
 
                     } elseif (empty($_GET['cbF']) && $option->checked) {
 
                         //  There's no filtering happening and the item is checked by default
-                        $whereFilter[] = $this->db->escape_str($filter->column, false) . ' = ' . $this->db->escape($option->value);
+                        $whereFilter[] = $oDb->escape_str($filter->column, false) . ' = ' . $oDb->escape($option->value);
                     }
                 }
 
@@ -324,6 +103,8 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      */
     protected function _getcount_compile_wheres(&$data, $_caller = null)
     {
+        $oDb = \Nails\Factory::service('Database');
+
         /**
          * Handle where's
          *
@@ -404,7 +185,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
                             }
 
                             //  What's the operator?
-                            if (!$this->db->_has_operator($col)) {
+                            if (!$oDb->_has_operator($col)) {
 
                                 $operator = is_null($val) ? ' IS ' : '=';
 
@@ -423,7 +204,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                                         if ($escape) {
 
-                                            $val = $this->db->escape($val);
+                                            $val = $oDb->escape($val);
                                         }
 
                                         $whereCompiled[$whereType][] = $col . $operator . $val;
@@ -441,7 +222,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                                             foreach ($val as &$value) {
 
-                                                $value = $this->db->escape($value);
+                                                $value = $oDb->escape($value);
                                             }
                                         }
 
@@ -460,7 +241,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                                             foreach ($val as &$value) {
 
-                                                $value = $this->db->escape($value);
+                                                $value = $oDb->escape($value);
                                             }
                                         }
 
@@ -500,7 +281,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
             //  And reduce $whereStr to an actual string, like the name suggests
             $whereStr = implode(' AND ', $whereStr);
-            $this->db->where($whereStr);
+            $oDb->where($whereStr);
         }
     }
 
@@ -514,6 +295,8 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      */
     protected function _getcount_compile_likes(&$data, $_caller = null)
     {
+        $oDb = \Nails\Factory::service('Database');
+
         $likes = array(
             'like' => 'AND',
             'or_like' => 'OR',
@@ -576,7 +359,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                             if ($escape) {
 
-                                $val = $this->db->escape_like_str($val);
+                                $val = $oDb->escape_like_str($val);
                             }
 
                             //  If the $col is an array then we should concat them together
@@ -634,7 +417,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
             //  And reduce $whereStr to an actual string, like the name suggests
             $whereStr = implode(' AND ', $whereStr);
-            $this->db->where($whereStr);
+            $oDb->where($whereStr);
         }
     }
 
@@ -648,6 +431,8 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
      */
     protected function _getcount_compile_sort(&$data, $_caller = null)
     {
+        $oDb = \Nails\Factory::service('Database');
+
         if (!empty($data['sort'])) {
 
             /**
@@ -665,7 +450,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
             if (is_string($data['sort'])) {
 
                 //  String
-                $this->db->order_by($data['sort']);
+                $oDb->order_by($data['sort']);
 
             } elseif (is_array($data['sort'])) {
 
@@ -678,7 +463,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                     if (!empty($_sort['column'])) {
 
-                        $this->db->order_by($_sort['column'], $_sort['order']);
+                        $oDb->order_by($_sort['column'], $_sort['order']);
 
                     }
 
@@ -691,7 +476,7 @@ trait NAILS_COMMON_TRAIT_GETCOUNT_COMMON
 
                         if (!empty($_sort['column'])) {
 
-                            $this->db->order_by($_sort['column'], $_sort['order']);
+                            $oDb->order_by($_sort['column'], $_sort['order']);
                         }
                     }
                 }

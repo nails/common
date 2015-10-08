@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * This file provides form related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
+
 if (!function_exists('form_email')) {
 
     /**

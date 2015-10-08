@@ -12,10 +12,11 @@
 
 class CORE_NAILS_Model extends CI_Model
 {
-    //  Class traits
-    use NAILS_COMMON_TRAIT_ERROR_HANDLING;
-    use NAILS_COMMON_TRAIT_CACHING;
-    use NAILS_COMMON_TRAIT_GETCOUNT_COMMON;
+    use \Nails\Common\Traits\ErrorHandling;
+    use \Nails\Common\Traits\Caching;
+    use \Nails\Common\Traits\GetCountCommon;
+
+    // --------------------------------------------------------------------------
 
     //  Common data
     protected $data;
@@ -43,7 +44,6 @@ class CORE_NAILS_Model extends CI_Model
     protected $destructiveDelete;
     protected $perPage;
 
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -53,7 +53,6 @@ class CORE_NAILS_Model extends CI_Model
      *
      * --------------------------------------------------------------------------
      */
-
 
     /**
      * Construct the model
@@ -90,7 +89,6 @@ class CORE_NAILS_Model extends CI_Model
 
     // --------------------------------------------------------------------------
 
-
     /**
      * Destruct the model
      * @return void
@@ -98,7 +96,7 @@ class CORE_NAILS_Model extends CI_Model
     public function __destruct()
     {
         /**
-         * @TODO: decide whether this is necessary; should caches be persistent;
+         * @todo: decide whether this is necessary; should caches be persistent;
          * gut says yes.
          */
 
@@ -124,7 +122,6 @@ class CORE_NAILS_Model extends CI_Model
         $this->user = $user;
     }
 
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -138,7 +135,6 @@ class CORE_NAILS_Model extends CI_Model
      *
      * --------------------------------------------------------------------------
      */
-
 
     /**
      * Creates a new object
@@ -241,7 +237,6 @@ class CORE_NAILS_Model extends CI_Model
     }
 
     // --------------------------------------------------------------------------
-
 
     /**
      * Updates an existing object
@@ -431,7 +426,6 @@ class CORE_NAILS_Model extends CI_Model
         return (bool) $this->db->affected_rows();
     }
 
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -440,7 +434,6 @@ class CORE_NAILS_Model extends CI_Model
      *
      * --------------------------------------------------------------------------
      */
-
 
     /**
      * Fetches all objects, optionally paginated.
@@ -685,7 +678,6 @@ class CORE_NAILS_Model extends CI_Model
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
             return;
-
         }
 
         // --------------------------------------------------------------------------
@@ -737,7 +729,6 @@ class CORE_NAILS_Model extends CI_Model
 
             show_error(get_called_class() . '::get_by_slug() Table variable not set');
             return;
-
         }
 
         // --------------------------------------------------------------------------
@@ -829,7 +820,6 @@ class CORE_NAILS_Model extends CI_Model
         return $this->db->count_all_results($table);
     }
 
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -838,7 +828,6 @@ class CORE_NAILS_Model extends CI_Model
      *
      * --------------------------------------------------------------------------
      */
-
 
     /**
      * This method provides the functionality to generate a unique slug for an item in the database.

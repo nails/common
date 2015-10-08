@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * This file provides langauge related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';
+
 if (!function_exists('array_unique_multi')) {
 
     /**
