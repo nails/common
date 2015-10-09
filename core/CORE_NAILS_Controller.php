@@ -186,6 +186,11 @@ class CORE_NAILS_Controller extends MX_Controller
         $this->meta->addRaw(array(
             'charset' => 'utf8'
         ));
+
+        $this->meta->addRaw(array(
+            'name'    => 'viewport',
+            'content' => 'width=device-width, initial-scale=1'
+        ));
     }
 
     // --------------------------------------------------------------------------
