@@ -16,7 +16,6 @@
 
 class CORE_NAILS_Controller extends MX_Controller
 {
-
     protected $data;
     protected $user;
     protected $nailsErrorHandler;

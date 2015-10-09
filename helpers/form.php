@@ -582,8 +582,8 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        get_instance()->load->library('cdn/cdn');
-        $_scheme = get_instance()->cdn->url_serve_scheme(true);
+        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
+        $_scheme = $oCdn->url_serve_scheme(true);
 
         /**
          * Replace the Mustache style syntax; this could/does get used in mustache
@@ -737,8 +737,8 @@ if (!function_exists('form_field_mm_image')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        get_instance()->load->library('cdn/cdn');
-        $_scheme = get_instance()->cdn->url_scale_scheme();
+        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
+        $_scheme = $oCdn->url_scale_scheme();
 
         $_scheme = str_replace('{{width}}', 100, $_scheme);
         $_scheme = str_replace('{{height}}', 100, $_scheme);
@@ -877,11 +877,11 @@ if (!function_exists('form_field_multiimage')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        get_instance()->load->library('cdn/cdn');
+        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
 
         $_movie_url     = NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
         $_upload_url    = site_url('api/cdn/object/create', isPageSecure());
-        $_upload_token  = get_instance()->cdn->generate_api_upload_token();
+        $_upload_token  = $oCdn->generate_api_upload_token();
         $_bucket        = $_field_bucket;
 
 $_out = <<<EOT
