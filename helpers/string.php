@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';
-
 if (!function_exists('str_lreplace'))
 {
     /**
@@ -107,3 +104,8 @@ if (!function_exists('removeStopWords')) {
         return trim($str);
     }
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';

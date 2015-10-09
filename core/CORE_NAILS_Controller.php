@@ -152,14 +152,10 @@ class CORE_NAILS_Controller extends MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set User Feedback alerts for the views
-        // $this->data['notice']  = $this->userFeedback->get('notice');
-        // $this->data['message'] = $this->userFeedback->get('message');
-        // $this->data['error']   = $this->userFeedback->get('error');
-        // $this->data['success'] = $this->userFeedback->get('success');
-        $this->data['notice']  = $this->session->flashdata('notice');
-        $this->data['message'] = $this->session->flashdata('message');
-        $this->data['error']   = $this->session->flashdata('error');
-        $this->data['success'] = $this->session->flashdata('success');
+        $this->data['notice']  = $this->userFeedback->get('notice')  ?: $this->session->flashdata('notice');
+        $this->data['message'] = $this->userFeedback->get('message') ?: $this->session->flashdata('message');
+        $this->data['error']   = $this->userFeedback->get('error')   ?: $this->session->flashdata('error');
+        $this->data['success'] = $this->userFeedback->get('success') ?: $this->session->flashdata('success');
 
         // --------------------------------------------------------------------------
 
@@ -310,8 +306,7 @@ class CORE_NAILS_Controller extends MX_Controller
             }
         }
 
-        require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_ErrorHandler.php';
-        $this->nailsErrorHandler = new CORE_NAILS_ErrorHandler();
+        $this->nailsErrorHandler = \Nails\Factory::service('ErrorHandler');
     }
 
     // --------------------------------------------------------------------------

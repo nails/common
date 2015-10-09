@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/html_helper.php';
-
 /**
  * Image
  *
@@ -259,5 +256,7 @@ if ( ! function_exists('list_first_last'))
 	}
 }
 
-/* End of file NAILS_html_helper.php */
-/* Location: ./helpers/NAILS_html_helper.php */
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/html_helper.php';

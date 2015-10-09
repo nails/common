@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/email_helper.php';
-
 /**
  * Validate email address
  *
@@ -34,3 +31,8 @@ if ( ! function_exists('valid_email'))
 		endif;
 	}
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/email_helper.php';

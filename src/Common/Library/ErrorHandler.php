@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This interface is implemnted by ErrorHandler drivers.
+ * This is the main error handler for Nails. It sets assigns the appropriate handler for different types of errors
  *
  * @package     Nails
  * @subpackage  common
@@ -10,29 +10,11 @@
  * @link
  */
 
-interface CORE_NAILS_ErrorHandler_Interface
-{
-    //  Object methods
-    public static function init();
-    public static function error($errno, $errstr, $errfile, $errline);
-    public static function exception($exception);
-    public static function fatal();
-}
+namespace Nails\Common\Library;
 
-/**
- * This is the main error handler for Nails. Generated errors are caught here
- * and directed to the appropriate driver.
- *
- * @package     Nails
- * @subpackage  common
- * @category    errors
- * @author      Nails Dev Team
- * @link
- */
-
-class CORE_NAILS_ErrorHandler
+class ErrorHandler
 {
-    protected static $levels = array(
+    public static $levels = array(
                         E_ERROR           =>  'Error',
                         E_WARNING         =>  'Warning',
                         E_PARSE           =>  'Parsing Error',
@@ -60,155 +42,25 @@ class CORE_NAILS_ErrorHandler
          * error reporting, that is CI Error reporting
          */
 
-        if (ENVIRONMENT === 'PRODUCTION') {
+        $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ?: 'Nails';
+        $sDriverClass  = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
+        $sLoadError    = '';
 
-            switch (strtoupper(DEPLOY_ERROR_REPORTING_HANDLER)) {
+        if (!class_exists($sDriverClass)) {
 
-                /**
-                 * Rollbar
-                 * Always enabled on PRODUCTION, selectively enabled elsewhere (fallsback to Nails ErrorHandler)
-                 */
-
-                case 'ROLLBAR':
-
-                    if (ENVIRONMENT === 'PRODUCTION') {
-
-                        $className = 'Rollbar';
-
-                    } else {
-
-                        if (defined('DEPLOY_ROLLBAR_DEV_ENABLED')) {
-
-                            if (DEPLOY_ROLLBAR_DEV_ENABLED) {
-
-                                $className = 'Rollbar';
-                            }
-                        }
-                    }
-                    break;
-            }
-
-            if (!empty($className)) {
-
-                require_once NAILS_COMMON_PATH . 'core/CORE_NAILS_ErrorHandler_' . $className . '.php';
-
-                //  Init the chosen handler
-                $errorHandler = 'CORE_NAILS_ErrorHandler_' . $className;
-                $errorHandler::init();
-
-                //  Set the handlers
-                set_error_handler($errorHandler . '::error');
-                set_exception_handler($errorHandler . '::exception');
-                register_shutdown_function($errorHandler . '::fatal');
-
-            } else {
-
-                //  Basic Nails ErrorHandler
-                set_error_handler('CORE_NAILS_ErrorHandler::error');
-                set_exception_handler('CORE_NAILS_ErrorHandler::exception');
-                register_shutdown_function('CORE_NAILS_ErrorHandler::fatal');
-            }
-
-        } else {
-
-            //  Basic Nails ErrorHandler
-            set_error_handler('CORE_NAILS_ErrorHandler::error');
-            set_exception_handler('CORE_NAILS_ErrorHandler::exception');
-            register_shutdown_function('CORE_NAILS_ErrorHandler::fatal');
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Called when a PHP error occurs
-     * @param  int    $errno   The error number
-     * @param  string $errstr  The error message
-     * @param  string $errfile The file where the error occurred
-     * @param  int    $errline The line number where the error occurred
-     * @return boolean
-     */
-    public static function error($errno, $errstr, $errfile, $errline)
-    {
-        //  Don't clog the logs up with strict notices
-        if ($errno === E_STRICT) {
-
-            return;
+            $sLoadError   = '"' . $sDriverClass . '" is not a valid ErrorHandler';
+            $sDriverClass = '\Nails\Common\Driver\ErrorHandler\Nails';
         }
 
-        //  Should we show this error?
-        if ((bool) ini_get('display_errors') && error_reporting() !== 0) {
+        $sDriverClass::init();
 
-            $severity = isset(self::$levels[$errno]) ? self::$levels[$errno] : 'Unknown';
-            $message  = $errstr;
-            $filepath = $errfile;
-            $line     = $errline;
+        set_error_handler($sDriverClass . '::error');
+        set_exception_handler($sDriverClass . '::exception');
+        register_shutdown_function($sDriverClass . '::fatal');
 
-            include FCPATH . APPPATH . 'errors/error_php.php';
-        }
+        if (!empty($sLoadError)) {
 
-        //  Show we log the item?
-        if (config_item('log_threshold') != 0) {
-
-            $errMsg = $errstr . ' (' . $errfile . ':' . $errline . ')';
-            log_message('error', $errMsg, true);
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Catches uncaught exceptions
-     * @param  exception $exception The caught exception
-     * @return void
-     */
-    public static function exception($exception)
-    {
-        $details       = new stdClass();
-        $details->code = $exception->getCode();
-        $details->msg  = $exception->getMessage();
-        $details->file = $exception->getFile();
-        $details->line = $exception->getLine();
-
-        $errMsg  = 'Uncaught Exception with message "' . $details->msg . '" and code "';
-        $errMsg .= $details->code . '" in ' . $details->file . ' on line ' . $details->line;
-
-        //  Show we log the item?
-        if (config_item('log_threshold') != 0) {
-
-            log_message('error', $errMsg, true);
-        }
-
-        $subject = 'Uncaught Exception';
-        $message = $errMsg;
-
-        self::sendDeveloperMail($subject, $message);
-        self::showFatalErrorScreen($subject, $message, $details);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Catches fatal errors on shut down
-     * @return void
-     */
-    public static function fatal()
-    {
-        $error = error_get_last();
-
-        if (!is_null($error) && $error['type'] === E_ERROR) {
-
-            $details       = new stdClass();
-            $details->code = $error['type'];
-            $details->msg  = $error['message'];
-            $details->file = $error['file'];
-            $details->line = $error['line'];
-
-            $subject = 'Fatal Error';
-            $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
-
-            self::sendDeveloperMail($subject, $message);
-            self::showFatalErrorScreen($subject, $message, $details);
+            throw new \Nails\Common\Exception\ErrorHandlerException($sLoadError, 1);
         }
     }
 
@@ -226,7 +78,7 @@ class CORE_NAILS_ErrorHandler
     {
         if (is_null($details)) {
 
-            $details            = new stdClass();
+            $details            = new \stdClass();
             $details->code      = '';
             $details->msg       = '';
             $details->file      = '';

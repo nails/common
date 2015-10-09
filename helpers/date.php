@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/date_helper.php';
-
 if (!function_exists('toUserDate'))
 {
     /**
@@ -389,3 +386,8 @@ if ( ! function_exists( 'datepicker' ) )
 		return $out;
 	}
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/date_helper.php';

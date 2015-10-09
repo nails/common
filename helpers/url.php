@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/url_helper.php';
-
 if (!function_exists('site_url'))
 {
     /**
@@ -118,3 +115,8 @@ if (!function_exists('tel')) {
         return anchor($uri, $title, $attributes);
     }
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/url_helper.php';

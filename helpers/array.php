@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';
-
 if (!function_exists('array_unique_multi')) {
 
     /**
@@ -136,3 +133,8 @@ if (!function_exists('in_array_multi')) {
         return array_search_multi($value, $key, $array) !== false;
     }
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';

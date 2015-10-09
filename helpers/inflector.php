@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';
-
 if (!function_exists('possessionise'))
 {
     /**
@@ -136,3 +133,8 @@ if (!function_exists('genderise'))
         return $return;
     }
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';

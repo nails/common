@@ -58,13 +58,6 @@ class NAILS_System_startup
 
         // --------------------------------------------------------------------------
 
-        //  Default Error Handler
-        if (!defined('DEPLOY_ERROR_REPORTING_HANDLER')) {
-            define('DEPLOY_ERROR_REPORTING_HANDLER', 'NAILS');
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Check routes_app.php exists
         if (!defined('NAILS_STARTUP_GENERATE_APP_ROUTES')) {
 

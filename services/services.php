@@ -11,6 +11,9 @@ return array(
         'UserFeedback' => function() {
             return new \Nails\Common\Library\UserFeedback();
         },
+        'ErrorHandler' => function() {
+            return new \Nails\Common\Library\ErrorHandler();
+        },
         'Session' => function() {
 
             $oCi = get_instance();

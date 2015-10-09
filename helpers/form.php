@@ -10,9 +10,6 @@
  * @link
  */
 
-//  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
-
 if (!function_exists('form_email')) {
 
     /**
@@ -1863,3 +1860,8 @@ EOT;
         return $_out;
     }
 }
+
+// --------------------------------------------------------------------------
+
+//  Include the CodeIgniter original
+include 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
