@@ -91,6 +91,9 @@ return array(
     'factories' => array(
         'DateTime' => function() {
             return new \DateTime();
+        },
+        'Guzzle' => function() {
+            return new \GuzzleHttp\Client();
         }
     )
 );
