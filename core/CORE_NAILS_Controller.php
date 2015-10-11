@@ -33,18 +33,6 @@ class CORE_NAILS_Controller extends MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Include the composer autoloader
-        if (!file_exists(FCPATH . 'vendor/autoload.php')) {
-
-            $_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies';
-
-            include NAILS_COMMON_PATH . 'errors/startup_error.php';
-        }
-
-        require_once FCPATH . 'vendor/autoload.php';
-
-        // --------------------------------------------------------------------------
-
         //  Set up services
         \Nails\Factory::setup();
 
