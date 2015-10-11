@@ -92,7 +92,7 @@ return array(
         'DateTime' => function() {
             return new \DateTime();
         },
-        'Guzzle' => function() {
+        'HttpClient' => function() {
             return new \GuzzleHttp\Client();
         }
     )
