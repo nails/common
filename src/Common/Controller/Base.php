@@ -759,11 +759,11 @@ class Base extends \MX_Controller
         if ($this->user_model->isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
-            $this->load->model('auth/auth_model');
+            $oAuthModel = \Nails\Factory::model('Auth', 'nailsapp/module-auth');
             $this->lang->load('auth/auth');
 
             //  Log the user out
-            $this->auth_model->logout();
+            $oAuthModel->logout();
 
             //  Create a new session
             $this->session->sess_create();
