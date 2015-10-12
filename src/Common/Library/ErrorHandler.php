@@ -78,11 +78,11 @@ class ErrorHandler
     {
         if (is_null($details)) {
 
-            $details            = new \stdClass();
-            $details->code      = '';
-            $details->msg       = '';
-            $details->file      = '';
-            $details->line      = '';
+            $details       = new \stdClass();
+            $details->code = '';
+            $details->msg  = '';
+            $details->file = '';
+            $details->line = '';
         }
 
         //  Get the backtrace
@@ -95,17 +95,18 @@ class ErrorHandler
             $details->backtrace = array();
         }
 
+        //  Set a 500 error
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
+        $headerString   = '500 Internal Server Error';
+
+        header($serverProtocol . ' ' . $headerString);
+
         //  Flush the output buffer
         $obContents = ob_get_contents();
         if (!empty($obContents)) {
 
             ob_clean();
         }
-
-        //  Set a 500 error
-        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
-        $headerString   = '500 Internal Server Error';
-        header($serverProtocol . ' ' . $headerString);
 
         //  Non-production and have an app-specific dev error file?
         if (ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
@@ -128,7 +129,7 @@ class ErrorHandler
             include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
         }
 
-        exit(0);
+        exit(500);
     }
 
     // --------------------------------------------------------------------------

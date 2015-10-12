@@ -84,24 +84,26 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandler
     {
         Rollbar::report_exception($oException);
 
-        $sCode          = $oException->getCode();
-        $sMessage       = $oException->getMessage();
-        $sFile          = $oException->getFile();
-        $iLine          = $oException->getLine();
-        $sErrorMessage  = 'Uncaught Exception with message "' . $sMessage . '" and code "';
-        $sErrorMessage .= $sCode . '" in ' . $sFile . ' on line ' . $iLine;
+        $oDetails       = new \stdClass();
+        $oDetails->type = get_class($oException);
+        $oDetails->code = $oException->getCode();
+        $oDetails->msg  = $oException->getMessage();
+        $oDetails->file = $oException->getFile();
+        $oDetails->line = $oException->getLine();
+
+        $sMessage  = 'Uncaught Exception with message "' . $oDetails->msg . '" and code "';
+        $sMessage .= $oDetails->code . '" in ' . $oDetails->file . ' on line ' . $oDetails->line;
 
         //  Show we log the item?
         if (config_item('log_threshold') != 0) {
 
-            log_message('error', $sErrorMessage, true);
+            log_message('error', $sMessage, true);
         }
 
         //  Show something to the user
         if (ENVIRONMENT != 'PRODUCTION') {
 
             $sSubject = 'Uncaught Exception';
-            $sMessage = $sErrorMessage;
 
         } else {
 
@@ -109,7 +111,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandler
             $sMessage = '';
         }
 
-        \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+        \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------

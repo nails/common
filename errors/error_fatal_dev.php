@@ -192,11 +192,12 @@ function keyValueSection($title, $data)
     <?php
 
     //  Error Variables
-    $displayDetails              = array();
-    $displayDetails['Code/Type'] = $details->code;
-    $displayDetails['Message']   = $details->msg;
-    $displayDetails['File']      = $details->file;
-    $displayDetails['Line']      = $details->line;
+    $displayDetails            = array();
+    $displayDetails['Type']    = $details->type;
+    $displayDetails['Code']    = $details->code;
+    $displayDetails['Message'] = $details->msg;
+    $displayDetails['File']    = $details->file;
+    $displayDetails['Line']    = $details->line;
 
     echo keyValueSection('Error Details', $displayDetails);
 

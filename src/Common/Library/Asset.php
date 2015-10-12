@@ -4,7 +4,7 @@
  * The class provides a convinient way to load assets
  *
  * @package     Nails
- * @subpackage  module-asset
+ * @subpackage  common
  * @category    Library
  * @author      Nails Dev Team
  * @link

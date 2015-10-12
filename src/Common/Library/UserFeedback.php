@@ -1,10 +1,10 @@
 <?php
 
 /**
- * The class provides a centralsied, semantic way of giving the user feedback
+ * The class provides a centralised, semantic way of giving the user feedback
  *
  * @package     Nails
- * @subpackage  module-asset
+ * @subpackage  common
  * @category    Library
  * @author      Nails Dev Team
  * @link

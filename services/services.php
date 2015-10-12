@@ -64,27 +64,7 @@ return array(
             return $oCi->encrypt;
         },
         'Database' => function() {
-
-            $oCi = get_instance();
-            $oDb = $oCi->load->database();
-
-            if (empty($oDb->conn_id)) {
-
-                throw new \Nails\Common\Exception\FactoryException(
-                    'Failed to connect to database',
-                    0
-                );
-            }
-
-            /**
-             * Don't run transactions in strict mode. In my opinion it's odd behaviour:
-             * When a transaction is committed it should be the end of the story. If it's
-             * not then a failure elsewhere can cause a rollback unexpectedly. Silly CI.
-             */
-
-            $oCi->db->trans_strict(false);
-
-            return $oCi->db;
+            return new \Nails\Common\Library\Database();
         },
     ),
     'models' => array(

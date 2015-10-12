@@ -77,26 +77,25 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
      */
     public static function exception($exception)
     {
-        $details       = new \stdClass();
-        $details->code = $exception->getCode();
-        $details->msg  = $exception->getMessage();
-        $details->file = $exception->getFile();
-        $details->line = $exception->getLine();
+        $oDetails       = new \stdClass();
+        $oDetails->type = get_class($exception);
+        $oDetails->code = $exception->getCode();
+        $oDetails->msg  = $exception->getMessage();
+        $oDetails->file = $exception->getFile();
+        $oDetails->line = $exception->getLine();
 
-        $errMsg  = 'Uncaught Exception with message "' . $details->msg . '" and code "';
-        $errMsg .= $details->code . '" in ' . $details->file . ' on line ' . $details->line;
+        $sSubject   = 'Uncaught Exception';
+        $sMessage  = 'Uncaught Exception with message "' . $oDetails->msg . '" and code "';
+        $sMessage .= $oDetails->code . '" in ' . $oDetails->file . ' on line ' . $oDetails->line;
 
         //  Show we log the item?
         if (config_item('log_threshold') != 0) {
 
-            log_message('error', $errMsg, true);
+            log_message('error', $sMessage, true);
         }
 
-        $subject = 'Uncaught Exception';
-        $message = $errMsg;
-
-        \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
-        \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($subject, $message, $details);
+        \Nails\Common\Library\ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
+        \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------
