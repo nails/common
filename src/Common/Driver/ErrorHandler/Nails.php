@@ -111,6 +111,7 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
         if (!is_null($error) && $error['type'] === E_ERROR) {
 
             $details       = new \stdClass();
+            $details->type = 'Fatal Error';
             $details->code = $error['type'];
             $details->msg  = $error['message'];
             $details->file = $error['file'];

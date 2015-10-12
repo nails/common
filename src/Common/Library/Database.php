@@ -50,8 +50,39 @@ class Database
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Route calls to the CodeIgniter Database class
+     * @param  string $sMethod    The method being called
+     * @param  array  $aArguments Any arguments being passed
+     * @return mixed
+     */
     public function __call($sMethod, $aArguments)
     {
         return call_user_func_array(array($this->oDb, $sMethod), $aArguments);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Pass any property "gets" to the CodeIgniter Database class
+     * @param  string $sProperty The property to get
+     * @return mixed
+     */
+    public function __get($sProperty)
+    {
+        return $this->oDb->{$sProperty};
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Pass any property "sets" to the CodeIgniter Database class
+     * @param  string $sProperty The property to set
+     * @param  mixed  $mValue    The value to set
+     * @return mixed
+     */
+    public function __set($sProperty, $mValue)
+    {
+        $this->oDb->{$sProperty} = $mValue;
     }
 }
