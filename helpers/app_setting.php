@@ -8,8 +8,8 @@ if (!function_exists('app_setting')) {
      */
     function app_setting($key = null, $grouping = 'app', $force_refresh = false)
     {
-        get_instance()->load->model('app_setting_model');
-        return get_instance()->app_setting_model->get($key, $grouping, $force_refresh);
+        $oAppSettingModel = \Nails\Factory::model('AppSetting');
+        return $oAppSettingModel->get($key, $grouping, $force_refresh);
     }
 }
 
@@ -23,8 +23,8 @@ if (!function_exists('set_app_setting')) {
      */
     function set_app_setting($key, $grouping = 'app', $value = null, $encrypt = false)
     {
-        get_instance()->load->model('app_setting_model');
-        return get_instance()->app_setting_model->set($key, $grouping, $value, $encrypt);
+        $oAppSettingModel = \Nails\Factory::model('AppSetting');
+        return $oAppSettingModel->set($key, $grouping, $value, $encrypt);
     }
 }
 

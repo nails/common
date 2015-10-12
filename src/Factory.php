@@ -49,31 +49,57 @@ class Factory
 
         foreach ($aDiscoveredServices as $sModuleName => $aModuleServices) {
 
-            if (empty(self::$aContainers[$sModuleName])) {
-                self::$aContainers[$sModuleName] = new Container();
-            }
-
+            //  Properties
             if (!empty($aModuleServices['properties'])) {
+
+                if (empty(self::$aContainers[$sModuleName]['properties'])) {
+                    self::$aContainers[$sModuleName]['properties'] = new Container();
+                }
+
                 foreach ($aModuleServices['properties'] as $sKey => $mValue) {
-                    self::$aContainers[$sModuleName][$sKey] = $mValue;
+                    self::$aContainers[$sModuleName]['properties'][$sKey] = $mValue;
                 }
             }
 
+            // --------------------------------------------------------------------------
+
+            //  Services
             if (!empty($aModuleServices['services'])) {
+
+                if (empty(self::$aContainers[$sModuleName]['services'])) {
+                    self::$aContainers[$sModuleName]['services'] = new Container();
+                }
+
                 foreach ($aModuleServices['services'] as $sKey => $oCallable) {
-                    self::$aContainers[$sModuleName][$sKey] = $oCallable;
+                    self::$aContainers[$sModuleName]['services'][$sKey] = $oCallable;
                 }
             }
 
+            // --------------------------------------------------------------------------
+
+            //  Models
+            if (!empty($aModuleServices['models'])) {
+
+                if (empty(self::$aContainers[$sModuleName]['models'])) {
+                    self::$aContainers[$sModuleName]['models'] = new Container();
+                }
+
+                foreach ($aModuleServices['models'] as $sKey => $oCallable) {
+                    self::$aContainers[$sModuleName]['models'][$sKey] = $oCallable;
+                }
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Factories
             if (!empty($aModuleServices['factories'])) {
-                foreach ($aModuleServices['factories'] as $sKey => $oCallable) {
-                    self::$aContainers[$sModuleName][$sKey] = self::$aContainers[$sModuleName]->factory($oCallable);
-                }
-            }
 
-            if (!empty($aModuleServices['helpers'])) {
-                foreach ($aModuleServices['helpers'] as $sKey => $oCallable) {
-                    self::$aContainers[$sModuleName][$sKey] = $oCallable;
+                if (empty(self::$aContainers[$sModuleName]['factories'])) {
+                    self::$aContainers[$sModuleName]['factories'] = new Container();
+                }
+
+                foreach ($aModuleServices['factories'] as $sKey => $oCallable) {
+                    self::$aContainers[$sModuleName]['factories'][$sKey] = self::$aContainers[$sModuleName]['factories']->factory($oCallable);
                 }
             }
         }
@@ -151,7 +177,7 @@ class Factory
      */
     public static function property($sPropertyName, $sModuleName = '')
     {
-        return self::getService($sPropertyName, $sModuleName);
+        return self::getService('properties', $sPropertyName, $sModuleName);
     }
 
     // --------------------------------------------------------------------------
@@ -164,7 +190,20 @@ class Factory
      */
     public static function service($sServiceName, $sModuleName = '')
     {
-        return self::getService($sServiceName, $sModuleName);
+        return self::getService('services', $sServiceName, $sModuleName);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a model from the container.
+     * @param  string $sModelName  The model name
+     * @param  string $sModuleName The name of the module which provides the model
+     * @return mixed
+     */
+    public static function model($sModelName, $sModuleName = '')
+    {
+        return self::getService('models', $sModelName, $sModuleName);
     }
 
     // --------------------------------------------------------------------------
@@ -177,7 +216,7 @@ class Factory
      */
     public static function factory($sFactoryName, $sModuleName = '')
     {
-        return self::getService($sFactoryName, $sModuleName);
+        return self::getService('factories', $sFactoryName, $sModuleName);
     }
 
     // --------------------------------------------------------------------------
@@ -222,21 +261,22 @@ class Factory
 
     /**
      * Returns a service from the namespaced container
+     * @param  string $sServiceType The type of the service to return
      * @param  string $sServiceName The name of the service to return
      * @param  string $sModuleName  The name of the mdoule which defined it
      * @return mixed
      */
-    private static function getService($sServiceName, $sModuleName = '')
+    private static function getService($sServiceType, $sServiceName, $sModuleName = '')
     {
         $sModuleName = empty($sModuleName) ? 'nailsapp/common' : $sModuleName;
 
-        if (empty(self::$aContainers[$sModuleName])) {
+        if (empty(self::$aContainers[$sModuleName][$sServiceType][$sServiceName])) {
             throw new Common\Exception\FactoryException(
                 'Service "' . $sServiceName . '"  is not provided by module "' . $sModuleName . '"',
                 0
             );
         }
 
-        return self::$aContainers[$sModuleName][$sServiceName];
+        return self::$aContainers[$sModuleName][$sServiceType][$sServiceName];
     }
 }

@@ -28,7 +28,8 @@
         "symfony/console": "~2.5.4",
         "rogeriopradoj/codeigniter": "2.2.1-rc.2",
         "pimple/pimple": "~3.0",
-        "guzzlehttp/guzzle": "6.*"
+        "guzzlehttp/guzzle": "6.*",
+        "mustache/mustache": "~2.9"
     },
     "require-dev":
     {

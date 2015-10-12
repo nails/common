@@ -11,6 +11,8 @@
  * @link
  */
 
+namespace Nails\Common\Library;
+
 class Logger
 {
     private $oLog;
@@ -81,7 +83,7 @@ class Logger
 
                 // --------------------------------------------------------------------------
 
-                $sFirstLine = '<?php exit(\'Unauthorised\');' . "\n\n";
+                $sFirstLine = '<?php die(\'Unauthorised\'); ?>' . "\n\n";
                 if (write_file($sLogPath, $sFirstLine)) {
 
                     $this->oLog->exists = true;
@@ -114,7 +116,6 @@ class Logger
         // --------------------------------------------------------------------------
 
         //  If we're working on the command line then pump it out there too
-
         if ($this->bIsCli) {
 
             fwrite(STDOUT, $sLine . "\n");

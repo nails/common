@@ -14,6 +14,12 @@ return array(
         'ErrorHandler' => function() {
             return new \Nails\Common\Library\ErrorHandler();
         },
+        'Logger' => function() {
+            return new \Nails\Common\Library\Logger();
+        },
+        'Mustache' => function() {
+            return new Mustache_Engine();
+        },
         'Session' => function() {
 
             $oCi = get_instance();
@@ -57,13 +63,6 @@ return array(
 
             return $oCi->encrypt;
         },
-        'Logger' => function() {
-
-            $oCi = get_instance();
-            $oCi->load->library('logger');
-
-            return $oCi->logger;
-        },
         'Database' => function() {
 
             $oCi = get_instance();
@@ -87,6 +86,26 @@ return array(
 
             return $oCi->db;
         },
+    ),
+    'models' => array(
+        'AppNotification' => function() {
+            return new \Nails\Common\Model\AppNotification();
+        },
+        'AppSetting' => function() {
+            return new \Nails\Common\Model\AppSetting();
+        },
+        'Country' => function() {
+            return new \Nails\Common\Model\Country();
+        },
+        'DateTime' => function() {
+            return new \Nails\Common\Model\DateTime();
+        },
+        'Language' => function() {
+            return new \Nails\Common\Model\Language();
+        },
+        'Routes' => function() {
+            return new \Nails\Common\Model\Routes();
+        }
     ),
     'factories' => array(
         'DateTime' => function() {
