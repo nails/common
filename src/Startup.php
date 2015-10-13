@@ -45,6 +45,9 @@ class Startup
         if (!defined('NAILS_PACKAGE_URL')) {
             define('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
         }
+        if (!defined('NAILS_BRANDING')) {
+            define('NAILS_BRANDING', true);
+        }
 
         // --------------------------------------------------------------------------
 

@@ -38,10 +38,13 @@
             BASE_URL . 'assets/img/logo/logo.gif'
         );
 
-        $paths[] = array(
-            FCPATH . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png',
-            BASE_URL . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png'
-        );
+        if (NAILS_BRANDING) {
+
+            $paths[] = array(
+                FCPATH . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png',
+                BASE_URL . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png'
+            );
+        }
     }
 
     foreach ($paths as $path) {
