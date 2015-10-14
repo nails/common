@@ -14,9 +14,9 @@ namespace Nails\Common\Model;
 
 class Base
 {
-    use Nails\Common\Traits\ErrorHandling;
-    use Nails\Common\Traits\Caching;
-    use Nails\Common\Traits\GetCountCommon;
+    use \Nails\Common\Traits\ErrorHandling;
+    use \Nails\Common\Traits\Caching;
+    use \Nails\Common\Traits\GetCountCommon;
 
     // --------------------------------------------------------------------------
 
