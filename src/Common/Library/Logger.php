@@ -13,6 +13,8 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Factory;
+
 class Logger
 {
     private $oLog;
@@ -28,7 +30,7 @@ class Logger
     public function __construct()
     {
         //  Load helper
-        \Nails\Factory::helper('file');
+        Factory::helper('file');
 
         // --------------------------------------------------------------------------
 

@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Factory;
+
 class DateTime extends Base
 {
     public $timezoneNails;
@@ -643,7 +645,7 @@ class DateTime extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Arbitarially convert a timestamp between timezones
+     * Arbitrarily convert a timestamp between timezones
      * @param  mixed  $timestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
      * @param  string $toTz      The timezone to convert to
      * @param  string $fromTz    The timezone to convert from
@@ -684,7 +686,7 @@ class DateTime extends Base
         //  Perform the conversion
         $fromTz = new \DateTimeZone($fromTz);
 
-        $out = \Nails\Factory::factory('DateTime');
+        $out = Factory::factory('DateTime');
         $out->modify($timestamp);
 
         //  Set the output timezone

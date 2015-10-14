@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Traits;
 
+use Nails\Factory;
+
 trait GetCountCommon
 {
     /**
@@ -39,7 +41,7 @@ trait GetCountCommon
      */
     protected function _getcount_compile_filters(&$data, $_caller = null)
     {
-        $oDb = \Nails\Factory::service('Database');
+        $oDb = Factory::service('Database');
 
         /**
          * Handle filters
@@ -103,7 +105,7 @@ trait GetCountCommon
      */
     protected function _getcount_compile_wheres(&$data, $_caller = null)
     {
-        $oDb = \Nails\Factory::service('Database');
+        $oDb = Factory::service('Database');
 
         /**
          * Handle where's
@@ -295,7 +297,7 @@ trait GetCountCommon
      */
     protected function _getcount_compile_likes(&$data, $_caller = null)
     {
-        $oDb = \Nails\Factory::service('Database');
+        $oDb = Factory::service('Database');
 
         $likes = array(
             'like' => 'AND',
@@ -431,7 +433,7 @@ trait GetCountCommon
      */
     protected function _getcount_compile_sort(&$data, $_caller = null)
     {
-        $oDb = \Nails\Factory::service('Database');
+        $oDb = Factory::service('Database');
 
         if (!empty($data['sort'])) {
 

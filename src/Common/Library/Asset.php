@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Factory;
+
 class Asset
 {
     protected $oCi;
@@ -35,7 +37,7 @@ class Asset
     public function __construct()
     {
         $this->oCi =& get_instance();
-        \Nails\Factory::helper('string');
+        Factory::helper('string');
 
         $this->aCss           = array();
         $this->aCssInline     = array();

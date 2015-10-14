@@ -13,6 +13,8 @@
 
 namespace Nails\Common\Controller;
 
+use Nails\Factory;
+
 class Base extends \MX_Controller
 {
     protected $data;
@@ -33,7 +35,7 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set up services
-        \Nails\Factory::setup();
+        Factory::setup();
 
         // --------------------------------------------------------------------------
 
@@ -264,7 +266,7 @@ class Base extends \MX_Controller
             }
         }
 
-        $this->nailsErrorHandler = \Nails\Factory::service('ErrorHandler');
+        $this->nailsErrorHandler = Factory::service('ErrorHandler');
     }
 
     // --------------------------------------------------------------------------
@@ -335,15 +337,15 @@ class Base extends \MX_Controller
             try {
 
                 //  Get the database so that the app_setting() functions will work
-                $oDb = \Nails\Factory::service('Database');
+                $oDb = Factory::service('Database');
 
                 //  Set the package path (so helpers and libraries are loaded correctly)
                 $this->load->add_package_path(NAILS_COMMON_PATH);
 
                 //  Load the helpers
-                \Nails\Factory::service('encrypt');
-                \Nails\Factory::helper('app_setting');
-                \Nails\Factory::helper('tools');
+                Factory::service('encrypt');
+                Factory::helper('app_setting');
+                Factory::helper('tools');
 
                 $whitelistIp   = (array) app_setting('maintenance_mode_whitelist', 'site');
                 $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
@@ -656,28 +658,28 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Load Helpers
-        \Nails\Factory::helper('user');
-        \Nails\Factory::helper('app_setting');
-        \Nails\Factory::helper('app_notification');
-        \Nails\Factory::helper('date');
-        \Nails\Factory::helper('url');
-        \Nails\Factory::helper('cookie');
-        \Nails\Factory::helper('form');
-        \Nails\Factory::helper('html');
-        \Nails\Factory::helper('tools');
-        \Nails\Factory::helper('debug');
-        \Nails\Factory::helper('language');
-        \Nails\Factory::helper('text');
-        \Nails\Factory::helper('exception');
-        \Nails\Factory::helper('typography');
-        \Nails\Factory::helper('event');
-        \Nails\Factory::helper('log');
+        Factory::helper('user');
+        Factory::helper('app_setting');
+        Factory::helper('app_notification');
+        Factory::helper('date');
+        Factory::helper('url');
+        Factory::helper('cookie');
+        Factory::helper('form');
+        Factory::helper('html');
+        Factory::helper('tools');
+        Factory::helper('debug');
+        Factory::helper('language');
+        Factory::helper('text');
+        Factory::helper('exception');
+        Factory::helper('typography');
+        Factory::helper('event');
+        Factory::helper('log');
 
         //  Autoload module helpers
         foreach ($aAvailableModules as $oModule) {
             if (!empty($oModule->autoload->helpers) && is_array($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
-                    \Nails\Factory::helper($sHelper, $oModule->name);
+                    Factory::helper($sHelper, $oModule->name);
                 }
             }
         }
@@ -695,23 +697,24 @@ class Base extends \MX_Controller
         $oCi =& get_instance();
 
         //  Models - Load order is important
-        $oCi->app_setting_model   = \Nails\Factory::model('AppSetting');
-        $oCi->user_model          = \Nails\Factory::model('User', 'nailsapp/module-auth');
-        $oCi->user_group_model    = \Nails\Factory::model('UserGroup', 'nailsapp/module-auth');
-        $oCi->user_password_model = \Nails\Factory::model('UserPassword', 'nailsapp/module-auth');
-        $oCi->datetime_model      = \Nails\Factory::model('DateTime');
-        $oCi->language_model      = \Nails\Factory::model('Language');
+        $oCi->app_setting_model   = Factory::model('AppSetting');
+        $oCi->user_model          = Factory::model('User', 'nailsapp/module-auth');
+        $oCi->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
+        $oCi->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
+        $oCi->datetime_model      = Factory::model('DateTime');
+        $oCi->language_model      = Factory::model('Language');
+        $oCi->routes_model        = Factory::model('Routes');
 
         //  Libraries
-        $oCi->db           = \Nails\Factory::service('Database');
-        $oCi->meta         = \Nails\Factory::service('Meta');
-        $oCi->asset        = \Nails\Factory::service('Asset');
-        $oCi->userFeedback = \Nails\Factory::service('UserFeedback');
-        $oCi->session      = \Nails\Factory::service('Session');
-        $oCi->encrypt      = \Nails\Factory::service('Encrypt');
-        $oCi->logger       = \Nails\Factory::service('Logger');
-        $oCi->event        = \Nails\Factory::service('Event', 'nailsapp/module-event');
-        $oCi->emailer      = \Nails\Factory::service('Emailer', 'nailsapp/module-email');
+        $oCi->db           = Factory::service('Database');
+        $oCi->meta         = Factory::service('Meta');
+        $oCi->asset        = Factory::service('Asset');
+        $oCi->userFeedback = Factory::service('UserFeedback');
+        $oCi->session      = Factory::service('Session');
+        $oCi->encrypt      = Factory::service('Encrypt');
+        $oCi->logger       = Factory::service('Logger');
+        $oCi->event        = Factory::service('Event', 'nailsapp/module-event');
+        $oCi->emailer      = Factory::service('Emailer', 'nailsapp/module-email');
     }
 
     // --------------------------------------------------------------------------
@@ -759,7 +762,7 @@ class Base extends \MX_Controller
         if ($this->user_model->isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
-            $oAuthModel = \Nails\Factory::model('Auth', 'nailsapp/module-auth');
+            $oAuthModel = Factory::model('Auth', 'nailsapp/module-auth');
             $this->lang->load('auth/auth');
 
             //  Log the user out
