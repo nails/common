@@ -7,19 +7,19 @@
     "authors": [
         {
             "name": "Pablo de la Pena",
-            "email": "p@shedcollective.org",
-            "homepage": "http://shedcollective.org",
+            "email": "p@nailsapp.co.uk",
+            "homepage": "http://nailsapp.co.uk",
             "role": "Developer"
         },
         {
             "name": "Gary Duncan",
-            "email": "g@shedcollective.org",
-            "homepage": "http://shedcollective.org",
+            "email": "g@nailsapp.co.uk",
+            "homepage": "http://nailsapp.co.uk",
             "role": "Developer"
         }
     ],
     "support": {
-        "email": "hello@shedcollective.org"
+        "email": "hello@nailsapp.co.uk"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
