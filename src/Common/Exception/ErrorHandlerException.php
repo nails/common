@@ -2,6 +2,6 @@
 
 namespace Nails\Common\Exception;
 
-class ErrorHandlerException extends \Exception
+class ErrorHandlerException extends NailsException
 {
 }

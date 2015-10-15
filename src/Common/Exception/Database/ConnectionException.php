@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Exception\Database;
 
-class ConnectionException extends \Exception
+use Nails\Common\Exception\NailsException;
+
+class ConnectionException extends NailsException
 {
 }

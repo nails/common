@@ -2,6 +2,6 @@
 
 namespace Nails\Common\Exception;
 
-class FactoryException extends NailsException
+class NailsException extends \Exception
 {
 }
