@@ -111,8 +111,6 @@ class Base extends \MX_Controller
         //  Need to generate the routes_app.php file?
         if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
 
-            $this->load->model('routes_model');
-
             if (!$this->routes_model->update()) {
 
                 //  Fall over, routes_app.php *must* be there
