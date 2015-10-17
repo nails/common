@@ -3,22 +3,46 @@
 return array(
     'services' => array(
         'Asset' => function() {
-            return new \Nails\Common\Library\Asset();
+            if (class_exists('\App\Common\Library\Asset')) {
+                return new \App\Common\Library\Asset();
+            } else {
+                return new \Nails\Common\Library\Asset();
+            }
         },
         'Meta' => function() {
-            return new \Nails\Common\Library\Meta();
+            if (class_exists('\App\Common\Library\Meta')) {
+                return new \App\Common\Library\Meta();
+            } else {
+                return new \Nails\Common\Library\Meta();
+            }
         },
         'UserFeedback' => function() {
-            return new \Nails\Common\Library\UserFeedback();
+            if (class_exists('\App\Common\Library\UserFeedback')) {
+                return new \App\Common\Library\UserFeedback();
+            } else {
+                return new \Nails\Common\Library\UserFeedback();
+            }
         },
         'ErrorHandler' => function() {
-            return new \Nails\Common\Library\ErrorHandler();
+            if (class_exists('\App\Common\Library\ErrorHandler')) {
+                return new \App\Common\Library\ErrorHandler();
+            } else {
+                return new \Nails\Common\Library\ErrorHandler();
+            }
         },
         'Logger' => function() {
-            return new \Nails\Common\Library\Logger();
+            if (class_exists('\App\Common\Library\Logger')) {
+                return new \App\Common\Library\Logger();
+            } else {
+                return new \Nails\Common\Library\Logger();
+            }
         },
         'Mustache' => function() {
-            return new Mustache_Engine();
+            if (class_exists('\App\Common\Library\Asset')) {
+                return new \App\Common\Library\Mustache();
+            } else {
+                return new Mustache_Engine();
+            }
         },
         'Session' => function() {
 
@@ -69,22 +93,46 @@ return array(
     ),
     'models' => array(
         'AppNotification' => function() {
-            return new \Nails\Common\Model\AppNotification();
+            if (class_exists('\App\Common\Model\AppNotification')) {
+                return new \App\Common\Model\AppNotification();
+            } else {
+                return new \Nails\Common\Model\AppNotification();
+            }
         },
         'AppSetting' => function() {
-            return new \Nails\Common\Model\AppSetting();
+            if (class_exists('\App\Common\Model\AppSetting')) {
+                return new \App\Common\Model\AppSetting();
+            } else {
+                return new \Nails\Common\Model\AppSetting();
+            }
         },
         'Country' => function() {
-            return new \Nails\Common\Model\Country();
+            if (class_exists('\App\Common\Model\Country')) {
+                return new \App\Common\Model\Country();
+            } else {
+                return new \Nails\Common\Model\Country();
+            }
         },
         'DateTime' => function() {
-            return new \Nails\Common\Model\DateTime();
+            if (class_exists('\App\Common\Model\DateTime')) {
+                return new \App\Common\Model\DateTime();
+            } else {
+                return new \Nails\Common\Model\DateTime();
+            }
         },
         'Language' => function() {
-            return new \Nails\Common\Model\Language();
+            if (class_exists('\App\Common\Model\Language')) {
+                return new \App\Common\Model\Language();
+            } else {
+                return new \Nails\Common\Model\Language();
+            }
         },
         'Routes' => function() {
-            return new \Nails\Common\Model\Routes();
+            if (class_exists('\App\Common\Model\Routes')) {
+                return new \App\Common\Model\Routes();
+            } else {
+                return new \Nails\Common\Model\Routes();
+            }
         }
     ),
     'factories' => array(
@@ -92,7 +140,11 @@ return array(
             return new \DateTime();
         },
         'HttpClient' => function() {
-            return new \GuzzleHttp\Client();
+            if (class_exists('\App\Common\HttpClient')) {
+                return new \App\Common\HttpClient();
+            } else {
+                return new \GuzzleHttp\Client();
+            }
         }
     )
 );
