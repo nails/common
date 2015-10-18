@@ -695,10 +695,10 @@ class Base extends \MX_Controller
         $oCi =& get_instance();
 
         //  Models - Load order is important
-        $oCi->app_setting_model   = Factory::model('AppSetting');
-        $oCi->datetime_model      = Factory::model('DateTime');
-        $oCi->language_model      = Factory::model('Language');
-        $oCi->routes_model        = Factory::model('Routes');
+        $oCi->app_setting_model = Factory::model('AppSetting');
+        $oCi->datetime_model    = Factory::model('DateTime');
+        $oCi->language_model    = Factory::model('Language');
+        $oCi->routes_model      = Factory::model('Routes');
 
         //  Autoload module models
         foreach ($aAvailableModules as $oModule) {
