@@ -76,6 +76,8 @@ class ErrorHandler
      */
     public static function showFatalErrorScreen($subject = '', $message = '', $details = null)
     {
+        $bIsCli = php_sapi_name() == 'cli';
+
         if (is_null($details)) {
 
             $details       = new \stdClass();
@@ -108,22 +110,42 @@ class ErrorHandler
             ob_clean();
         }
 
-        //  Non-production and have an app-specific dev error file?
-        if (ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
+        //  Non-CLI and Non-production and have an app-specific dev error file?
+        if (!$bIsCli && ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal_dev.php';
 
-        //  Production and have an app-specific error file?
-        } elseif (ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
+        //  Non-CLI and Production and have an app-specific error file?
+        } elseif (!$bIsCli && ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal.php';
 
-        //  Non-production?
-        } elseif (ENVIRONMENT != 'PRODUCTION') {
+        //  Non-CLI and Non-production?
+        } elseif (!$bIsCli && ENVIRONMENT != 'PRODUCTION') {
 
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev.php';
 
-        //  Production
+        //  CLI and Non-production and have an app-specific dev error file?
+        } elseif ($bIsCli && ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
+
+            include_once FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php';
+
+        //  CLI and Production and have an app-specific error file?
+        } elseif ($bIsCli && ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
+
+            include_once FCPATH . APPPATH . 'errors/error_fatal_cli.php';
+
+        //  CLI and Non-production?
+        } elseif ($bIsCli && ENVIRONMENT != 'PRODUCTION') {
+
+            include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev_cli.php';
+
+        //  CLI Production
+        } elseif ($bIsCli) {
+
+            include_once NAILS_COMMON_PATH . 'errors/error_fatal_cli.php';
+
+        //  Non-CLI Production
         } else {
 
             include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';

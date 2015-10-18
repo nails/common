@@ -44,42 +44,6 @@ return array(
                 return new Mustache_Engine();
             }
         },
-        'Session' => function() {
-
-            $oCi = get_instance();
-
-            /**
-             * STOP! Before we load the session library, we need to check if we're using
-             * the database. If we are then check if `sess_table_name` is "nails_session".
-             * If it is, and NAILS_DB_PREFIX != nails_ then replace 'nails_' with NAILS_DB_PREFIX
-             */
-
-            $sSessionTable = $oCi->config->item('sess_table_name');
-
-            if ($sSessionTable === 'nails_session' && NAILS_DB_PREFIX !== 'nails_') {
-
-                $sSessionTable = str_replace('nails_', NAILS_DB_PREFIX, $sSessionTable);
-                $oCi->config->set_item('sess_table_name', $sSessionTable);
-            }
-
-            /**
-             * Test that $_SERVER is available, the session library needs this
-             * Generally not available when running on the command line. If it's
-             * not available then load up the faux session which has the same methods
-             * as the session library, but behaves as if logged out - comprende?
-             */
-
-            if ($oCi->input->server('REMOTE_ADDR')) {
-
-                $oCi->load->library('session');
-
-            } else {
-
-                $oCi->load->library('auth/faux_session', 'session');
-            }
-
-            return $oCi->session;
-        },
         'Encrypt' => function() {
 
             $oCi = get_instance();

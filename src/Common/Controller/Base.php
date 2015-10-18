@@ -685,7 +685,7 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         /**
-         * Common models &  libraries
+         * Common models & libraries
          * @note: We have to load this way so that the property is taken up by the CI
          * super object and therefore more reliably accessible (e.g in CMS module).
          * @todo  reduce this coupling
@@ -696,23 +696,39 @@ class Base extends \MX_Controller
 
         //  Models - Load order is important
         $oCi->app_setting_model   = Factory::model('AppSetting');
-        $oCi->user_model          = Factory::model('User', 'nailsapp/module-auth');
-        $oCi->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
-        $oCi->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
         $oCi->datetime_model      = Factory::model('DateTime');
         $oCi->language_model      = Factory::model('Language');
         $oCi->routes_model        = Factory::model('Routes');
+
+        //  Autoload module models
+        foreach ($aAvailableModules as $oModule) {
+            if (!empty($oModule->autoload->models) && is_array($oModule->autoload->models)) {
+                foreach ($oModule->autoload->models as $oModel) {
+                    foreach ($oModel as $sAssignTo => $sModelName) {
+                        $oCi->{$sAssignTo} = Factory::model($sModelName, $oModule->name);
+                    }
+                }
+            }
+        }
 
         //  Libraries
         $oCi->db           = Factory::service('Database');
         $oCi->meta         = Factory::service('Meta');
         $oCi->asset        = Factory::service('Asset');
         $oCi->userFeedback = Factory::service('UserFeedback');
-        $oCi->session      = Factory::service('Session');
         $oCi->encrypt      = Factory::service('Encrypt');
         $oCi->logger       = Factory::service('Logger');
-        $oCi->event        = Factory::service('Event', 'nailsapp/module-event');
-        $oCi->emailer      = Factory::service('Emailer', 'nailsapp/module-email');
+
+        //  Autoload module services
+        foreach ($aAvailableModules as $oModule) {
+            if (!empty($oModule->autoload->services) && is_array($oModule->autoload->services)) {
+                foreach ($oModule->autoload->services as $oService) {
+                    foreach ($oService as $sAssignTo => $sServiceName) {
+                        $oCi->{$sAssignTo} = Factory::service($sServiceName, $oModule->name);
+                    }
+                }
+            }
+        }
     }
 
     // --------------------------------------------------------------------------
