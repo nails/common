@@ -739,6 +739,18 @@ class Asset
                 );
                 break;
 
+            case 'CMSWIDGETEDITOR':
+
+                $this->library('JQUERYUI');
+                $this->load(
+                    array(
+                        'nails.admin.module.cms.css',
+                        'nails.admin.cms.widgeteditor.min.js'
+                    ),
+                    'NAILS'
+                );
+                break;
+
             case 'UPLOADIFY':
 
                 $this->load(
