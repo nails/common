@@ -1,5 +1,6 @@
 <?php
 
+use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -991,7 +992,8 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             }
         }
 
-        $password = NAILS_User_password_model::generateHashObject($user['password']);
+        $oPasswordModel = Factory::model('UserPassword', 'nailsapp/module-auth');
+        $password       = $oPasswordModel->generateHashObject($user['password']);
 
         // --------------------------------------------------------------------------
 
@@ -1061,7 +1063,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Create the email record
-        $emailCode = NAILS_User_password_model::salt();
+        $emailCode = $oPasswordModel->salt();
         $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_email`
         (
             `user_id`,
