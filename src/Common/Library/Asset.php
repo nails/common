@@ -44,9 +44,11 @@ class Asset
         $this->aJs            = array();
         $this->aJsInline      = array();
         $this->sCacheBuster   = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
-        $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : site_url('assets');
+        $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets';
+        $this->sBaseUrl       = site_url($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
-        $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : secure_site_url('assets');
+        $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets';
+        $this->sBaseUrlSecure = secure_site_url($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
         $this->sBowerDir      = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
         $this->sBowerDir      = addTrailingSlash($this->sBowerDir);
@@ -742,6 +744,12 @@ class Asset
             case 'CMSWIDGETEDITOR':
 
                 $this->library('JQUERYUI');
+                $this->load(
+                    array(
+                        'mustache.js/mustache.js',
+                        'jquery-serialize-object/dist/jquery.serialize-object.min.js'
+                    ),
+                    'NAILS-BOWER');
                 $this->load(
                     array(
                         'nails.admin.module.cms.css',
