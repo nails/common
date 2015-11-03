@@ -199,7 +199,7 @@ class Base
 
         }
 
-        if (!empty($this->tableAutoSetSlugs) && !array_key_exists($this->tableSlugColumn, $aData)) {
+        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
             if (empty($this->tableSlugColumn)) {
                 show_error(get_called_class() . '::create() Slug column variable not set');
@@ -295,7 +295,7 @@ class Base
             }
         }
 
-        if (!empty($this->tableAutoSetSlugs) && !array_key_exists($this->tableSlugColumn, $aData)) {
+        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
             if (empty($this->tableSlugColumn)) {
                 show_error(get_called_class() . '::update() Slug column variable not set');
