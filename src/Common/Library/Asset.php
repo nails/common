@@ -838,73 +838,74 @@ class Asset
      */
     public function output($sType = 'ALL', $bOutput = true)
     {
-        $sOut  = '';
+        $aOut  = array();
         $sType = strtoupper($sType);
 
         //  Linked Stylesheets
-        if ($sType == 'CSS' | $sType == 'ALL') {
+        if (!empty($this->aCss) && ($sType == 'CSS' || $sType == 'ALL')) {
 
             foreach ($this->aCss as $sAsset) {
 
                 $sAsset = $this->addCacheBuster($sAsset);
-                $sOut .= link_tag($sAsset) . "\n";
+                $aOut[] = link_tag($sAsset);
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Linked JS
-        if ($sType == 'JS' | $sType == 'ALL') {
+        if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
 
             foreach ($this->aJs as $sAsset) {
 
                 $sAsset = $this->addCacheBuster($sAsset);
-                $sOut .= '<script type="text/javascript" src="' . $sAsset . '"></script>' . "\n";
+                $aOut[] = '<script type="text/javascript" src="' . $sAsset . '"></script>';
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Inline CSS
-        if ($sType == 'CSS-INLINE' | $sType == 'ALL') {
+        if (!empty($this->aCssInline) && ($sType == 'CSS-INLINE' || $sType == 'ALL')) {
 
-            $sOut .= '<style type="text/css">';
+            $aOut[] = '<style type="text/css">';
             foreach ($this->aCssInline as $sAsset) {
 
-                $sOut .= preg_replace('/<\/?style.*?>/si', '', $sAsset) . "\n";
+                $aOut[] = preg_replace('/<\/?style.*?>/si', '', $sAsset);
             }
-            $sOut .= '</style>';
+            $aOut[] = '</style>';
         }
 
         // --------------------------------------------------------------------------
 
         //  Inline JS
-        if ($sType == 'JS-INLINE' | $sType == 'ALL') {
+        if (!empty($this->aJsInline) && ($sType == 'JS-INLINE' || $sType == 'ALL')) {
 
-            $sOut .= '<script type="text/javascript">';
+            $aOut[] = '<script type="text/javascript">';
             foreach ($this->aJsInline as $sAsset) {
 
-                $sOut .= preg_replace('/<\/?script.*?>/si', '', $sAsset);
+                $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
             }
-            $sOut .= '</script>';
+            $aOut[] = '</script>';
         }
 
         // --------------------------------------------------------------------------
 
         //  Force SSL for assets if page is secure
         if (isPageSecure()) {
-
-            $sOut = str_replace($this->sBaseUrl, $this->sBaseUrlSecure, $sOut);
+            foreach ($aOut as &$sLine) {
+                $sLine = str_replace($this->sBaseUrl, $this->sBaseUrlSecure, $sLine);
+            }
         }
 
         // --------------------------------------------------------------------------
 
         if ($bOutput) {
 
-            echo $sOut;
+            echo implode("\n", $aOut);
         }
 
-        return $sOut;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
