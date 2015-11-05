@@ -1,15 +1,5 @@
 <?php
 
-/**
- * This file provides form related helper functions
- *
- * @package     Nails
- * @subpackage  common
- * @category    Helper
- * @author      Nails Dev Team
- * @link
- */
-
 if (!function_exists('form_email')) {
 
     /**
@@ -297,11 +287,11 @@ if (!function_exists('form_field')) {
         //  Errors
         if ($_error && $_field_error) :
 
-            $_error = '<span class="error">' . $_field_error . '</span>';
+            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
 
         elseif ($_error) :
 
-            $_error = form_error($_field_key, '<span class="error">', '</span>');
+            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
 
         endif;
 
@@ -567,11 +557,11 @@ if (!function_exists('form_field_mm')) {
         //  Error
         if ($_field_error_cls && $_field['error']) :
 
-            $_field_error = '<span class="error">' . $_field['error'] . '</span>';
+            $_field_error = '<span class="alert alert-danger">' . $_field['error'] . '</span>';
 
         elseif ($_field_error_cls) :
 
-            $_field_error = form_error($_field['key'], '<span class="error">', '</span>');
+            $_field_error = form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         else :
 
@@ -723,11 +713,11 @@ if (!function_exists('form_field_mm_image')) {
         //  Error
         if ($_field_error_cls && $_field['error']) {
 
-            $_field_error = '<span class="error">' . $_field['error'] . '</span>';
+            $_field_error = '<span class="alert alert-danger">' . $_field['error'] . '</span>';
 
         } elseif ($_field_error_cls) {
 
-            $_field_error = form_error($_field['key'], '<span class="error">', '</span>');
+            $_field_error = form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         } else {
 
@@ -860,11 +850,11 @@ if (!function_exists('form_field_multiimage')) {
         //  Error
         if ($_error && $_field_error) :
 
-            $_error = '<span class="error">' . $_field_error . '</span>';
+            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
 
         elseif ($_error) :
 
-            $_error = form_error($_field_key, '<span class="error">', '</span>');
+            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
 
         endif;
 
@@ -893,7 +883,7 @@ $_out = <<<EOT
                 $_field_sub_label
             </span>
             <span class="input $_tipclass">
-                <p class="system-alert error" id="$_id-uploadify-not-available">
+                <p class="alert alert-danger" id="$_id-uploadify-not-available">
                     <strong>Configuration Error.</strong> Uploadify is not available.
                 </p>
                 <span id="$_id-uploadify-available" style="display:none;">
@@ -1333,7 +1323,7 @@ if (!function_exists('form_field_dropdown')) {
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         //  Error
-        $_out .= form_error($_field['key'], '<span class="error">', '</span>');
+        $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info
         $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
@@ -1480,7 +1470,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         //  Error
-        $_out .= form_error($_field['key'], '<span class="error">', '</span>');
+        $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info
         $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
@@ -1575,7 +1565,7 @@ if (!function_exists('form_field_boolean')) {
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         //  Error
-        $_out .= form_error($_field['key'], '<span class="error">', '</span>');
+        $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info block
         $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
@@ -1817,7 +1807,7 @@ if (!function_exists('form_field_checkbox')) {
         endfor;
 
         //  Error
-        $_out .= form_error($_field['key'], '<span class="error">', '</span>');
+        $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         $_out .= '</div>';
 

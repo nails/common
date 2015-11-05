@@ -3,6 +3,7 @@
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Command\Command;
+use Nails\Factory;
 
 class CORE_NAILS_App extends Command
 {

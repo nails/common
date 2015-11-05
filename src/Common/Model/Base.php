@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Factory;
+
 class Base
 {
     use \Nails\Common\Traits\ErrorHandling;
@@ -170,11 +172,13 @@ class Base
 
         if ($this->tableAutoSetTimestamps) {
 
+            $oDate = Factory::factory('DateTime');
+
             if (empty($aData[$this->tableCreatedColumn])) {
-                $aData[$this->tableCreatedColumn] = date('Y-m-d H:i:s');
+                $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
             }
             if (empty($aData[$this->tableModifiedColumn])) {
-                $aData[$this->tableModifiedColumn] = date('Y-m-d H:i:s');
+                $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
@@ -278,7 +282,8 @@ class Base
         if ($this->tableAutoSetTimestamps) {
 
             if (empty($aData[$this->tableModifiedColumn])) {
-                $aData[$sPrefix . $this->tableModifiedColumn] = date('Y-m-d H:i:s');
+                $oDate = Factory::factory('DateTime');
+                $aData[$sPrefix . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {

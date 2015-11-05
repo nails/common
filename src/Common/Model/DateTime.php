@@ -656,7 +656,8 @@ class DateTime extends Base
         //  Has a specific timestamp been given?
         if (is_null($timestamp)) {
 
-            $timestamp = date('Y-m-d H:i:s');
+            $oDate     = Factory::factory('DateTime');
+            $timestamp = $oDate->format('Y-m-d H:i:s');
 
         } else {
 

@@ -1,5 +1,6 @@
 <?php
 
+use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -50,6 +51,11 @@ class CORE_NAILS_Deploy extends CORE_NAILS_App
             $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
             require_once 'config/deploy.php';
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Setup Factory - config files are required prior to set up
+        Factory::setup();
 
         // --------------------------------------------------------------------------
 

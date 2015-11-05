@@ -13,6 +13,8 @@
  * @link
  */
 
-class CORE_NAILS_Controller extends \Nails\Common\Controller\Base
+use Nails\Common\Controller\Base;
+
+class CORE_NAILS_Controller extends Base
 {
 }

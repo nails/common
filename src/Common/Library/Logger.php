@@ -66,6 +66,7 @@ class Logger
         // --------------------------------------------------------------------------
 
         $sLogPath = $this->oLog->dir . $this->oLog->file;
+        $oDate    = Factory::factory('DateTime');
 
         // --------------------------------------------------------------------------
 
@@ -111,7 +112,7 @@ class Logger
 
             } else {
 
-                write_file($sLogPath, 'INFO - ' . date('Y-m-d H:i:s') . ' --> ' . trim($sLine) . "\n", 'a');
+                write_file($sLogPath, 'INFO - ' . $oDate->format('Y-m-d H:i:s') . ' --> ' . trim($sLine) . "\n", 'a');
             }
         }
 
@@ -153,7 +154,8 @@ class Logger
 
         } else {
 
-            $this->oLog->file = 'log-' . date('Y-m-d') . '.php';
+            $oDate = Factory::factory('DateTime');
+            $this->oLog->file = 'log-' . $oDate->format('Y-m-d H:i:s') . '.php';
         }
     }
 

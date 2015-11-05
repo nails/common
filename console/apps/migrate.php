@@ -1,5 +1,6 @@
 <?php
 
+use Nails\Factory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -88,6 +89,11 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             $output->writeln('<error>ERROR:</error> ENVIRONMENT is not defined.');
             return false;
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Setup Factory - config files are required prior to set up
+        Factory::setup();
 
         // --------------------------------------------------------------------------
 
@@ -397,8 +403,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             //  Work out all the files we have and get their index
             $migrations = array();
             foreach ($dirMap as $dir) {
-
-                $migrations[$dir['path']] = $dir['index'];
+                $migrations[$dir['path']] = array(
+                    'index' => $dir['index'],
+                    'type'  => $dir['type']
+                );
             }
 
             // --------------------------------------------------------------------------
@@ -424,8 +432,9 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             // --------------------------------------------------------------------------
 
             //  Define the variable
+            $lastMigration = end($migrations);
             $module->start = $currentVersion;
-            $module->end   = end($migrations);
+            $module->end   = $lastMigration['index'];
         }
 
         return $module->start === $module->end ? null : $module;
@@ -468,8 +477,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     protected function doMigration($module, $output)
     {
         //  Map the directory and fetch only the files we need
-        $path       = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
-        $dirMap     = $this->mapDir($path);
+        $path   = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
+        $dirMap = $this->mapDir($path);
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
         $current = is_null($module->start) ? -1 : $module->start;
@@ -480,51 +489,20 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             if ($migration['index'] > $current) {
 
-                //  Go through the file and execute each line.
-                $handle = fopen($migration['path'], 'r');
+                switch ($migration['type']) {
 
-                if ($handle) {
-
-                    $lineNumber = 1;
-                    while (($line = fgets($handle)) !== false) {
-
-                        //  Remove comments
-                        $line = trim($line);
-                        $line = preg_replace('#^//.+$#', '', $line);
-                        $line = preg_replace('/^#.+$/', '', $line);
-                        $line = preg_replace('/^--.+$/', '', $line);
-                        $line = preg_replace('#/\*.*\*/#', '', $line);
-                        $line = trim($line);
-
-                        //  Replace {{NAILS_DB_PREFIX}} with the constant
-                        $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $line);
-
-                        if (!empty($line)) {
-
-                            //  We have something!
-                            $result = $this->dbQuery($line);
-
-                            if (!$result) {
-
-                                $output->writeln('');
-                                $output->writeln('');
-                                $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed:');
-                                $output->writeln('');
-                                $output->writeln('<comment>' . $line . '</comment>');
-                                return false;
-                            }
+                    case 'SQL':
+                        if (!$this->migrateSql($migration, $output)) {
+                            return false;
                         }
+                        break;
 
-                        $lineNumber++;
-                    }
+                    case 'PHP':
 
-                } else {
-
-                    // error opening the file.
-                    $output->writeln('');
-                    $output->writeln('');
-                    $output->writeln('<error>ERROR</error>: Failed to open <info>' . $migration['path'] . '</info> for reading.');
-                    return false;
+                        if (!$this->migratePhp($migration, $output)) {
+                            return false;
+                        }
+                        break;
                 }
             }
 
@@ -550,6 +528,117 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
     // --------------------------------------------------------------------------
 
     /**
+     * Executes migrations on a SQL File where each line is a query
+     * @param  array           $migration The migration details
+     * @param  OutputInterface $output    The Output Interface provided by Symfony
+     * @return boolean
+     */
+    private function migrateSql($migration, $output)
+    {
+        //  Go through the file and execute each line.
+        $handle = fopen($migration['path'], 'r');
+
+        if ($handle) {
+
+            $lineNumber = 1;
+            while (($line = fgets($handle)) !== false) {
+
+                //  Remove comments
+                $line = trim($line);
+                $line = preg_replace('#^//.+$#', '', $line);
+                $line = preg_replace('/^#.+$/', '', $line);
+                $line = preg_replace('/^--.+$/', '', $line);
+                $line = preg_replace('#/\*.*\*/#', '', $line);
+                $line = trim($line);
+
+                //  Replace {{NAILS_DB_PREFIX}} with the constant
+                $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $line);
+
+                if (!empty($line)) {
+
+                    //  We have something!
+                    $result = $this->dbQuery($line);
+
+                    if (!$result) {
+
+                        $output->writeln('');
+                        $output->writeln('');
+                        $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed:');
+                        $output->writeln('');
+                        $output->writeln('<comment>' . $line . '</comment>');
+                        return false;
+                    }
+                }
+
+                $lineNumber++;
+            }
+
+            return true;
+
+        } else {
+
+            // error opening the file.
+            $output->writeln('');
+            $output->writeln('');
+            $output->writeln('<error>ERROR</error>: Failed to open <info>' . $migration['path'] . '</info> for reading.');
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes migrations on a PHP which extends Nails\Common\Migration\Base
+     * @param  array           $migration The migration details
+     * @param  OutputInterface $output    The Output Interface provided by Symfony
+     * @return boolean
+     */
+    private function migratePhp($migration, $output)
+    {
+        require_once $migration['path'];
+        $sClassName = 'Nails\Common\Migration\Migration_' . $migration['index'];
+        if (class_exists($sClassName)) {
+
+            $oMigration = new $sClassName();
+            if (is_subclass_of($oMigration, 'Nails\Common\Console\Migrate\Base')) {
+
+                try {
+
+                    $oMigration->execute();
+
+                } catch(\Exception $e) {
+
+                    $output->writeln('');
+                    $output->writeln('');
+                    $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" failed:');
+                    $output->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
+                    return false;
+                }
+
+            } else {
+
+                $output->writeln('');
+                $output->writeln('');
+                $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
+                $output->writeln('<error>ERROR</error>: Should be a sub-class of "Nails\Common\Console\Migrate\Base".');
+                return false;
+            }
+
+        } else {
+
+            $output->writeln('');
+            $output->writeln('');
+            $output->writeln('<error>ERROR</error>: Class "' . $sClassName . '" does not exist.');
+            $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
+            return false;
+        }
+        die($sClassName);
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Generates an array of files in a directory
      * @param  string $dir The directory to analyse
      * @return array
@@ -568,11 +657,12 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 }
 
                 //  In the correct format?
-                if ( preg_match('/^(\d+)(.*)\.sql$/', $fileInfo->getFilename(), $matches)) {
+                if ( preg_match('/^(\d+)(.*)\.(sql|php)$/', $fileInfo->getFilename(), $matches)) {
 
                     $out[$matches[1]] = array(
                         'path'  => $fileInfo->getPathname(),
-                        'index' => (int) $matches[1]
+                        'index' => (int) $matches[1],
+                        'type'  => strtoupper($fileInfo->getExtension())
                     );
                 }
             }

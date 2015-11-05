@@ -104,6 +104,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
+        //  Setup Factory - config files are required prior to set up
+        Factory::setup();
+
+        // --------------------------------------------------------------------------
+
         //  Define app & deploy vars
         $appVars    = $this->defineAppVars();
         $deployVars = $this->defineDeployVars();
@@ -963,9 +968,6 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     public function createUser($user, $appVars, $deployVars, $output)
     {
         //  @TODO: Test username/email for duplicates
-
-        //  Load the password model if not loaded
-        require_once 'vendor/nailsapp/module-auth/auth/models/user_password_model.php';
 
         //  Correctly encode the password
         if (!defined('APP_PRIVATE_KEY')) {

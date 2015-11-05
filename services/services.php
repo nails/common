@@ -48,12 +48,17 @@ return array(
 
             $oCi = get_instance();
             $oCi->load->library('encrypt');
-
             return $oCi->encrypt;
         },
         'Database' => function() {
             return new \Nails\Common\Library\Database();
         },
+        'FormValidation' => function() {
+
+            $oCi = get_instance();
+            $oCi->load->library('form_validation');
+            return $oCi->form_validation;
+        }
     ),
     'models' => array(
         'AppNotification' => function() {

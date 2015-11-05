@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Factory;
+
 class Routes extends BAse
 {
     protected $canWriteRoutes;
@@ -129,7 +131,8 @@ class Routes extends BAse
             }
         }
 
-        $_data .= "\n" . '//LAST GENERATED: ' . date('Y-m-d H:i:s');
+        $oDate  = Factory::factory('DateTime');
+        $_data .= "\n" . '//LAST GENERATED: ' . $oDate->format('Y-m-d H:i:s');
 
         // --------------------------------------------------------------------------
 
