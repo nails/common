@@ -3,7 +3,7 @@
 /**
  * Migration:   0
  * Started:     09/01/2015
- * Finalsied:   09/01/2015
+ * Finalised:   09/01/2015
  *
  * @package     Nails
  * @subpackage  common
