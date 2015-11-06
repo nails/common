@@ -29,7 +29,17 @@ class CI_Model
 
 class CORE_NAILS_Install extends CORE_NAILS_App
 {
+    /**
+     * The endpoint for the components API
+     * @var string
+     */
     protected $componentEndpoint = 'http://components.nailsapp.co.uk/';
+
+    /**
+     * The database instance
+     * @var Object
+     */
+    private $oDb;
 
     // --------------------------------------------------------------------------
 
@@ -408,29 +418,23 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Creating Users</info>...');
 
-                    if ($this->dbConnect($output, $dbHost, $dbUser, $dbPass, $dbName)) {
+                    $this->oDb = Factory::service('ConsoleDatabase');
 
-                        foreach ($users as $user) {
+                    foreach ($users as $user) {
 
-                            $output->write(' - <comment>' . $user['first_name'] . ' ' . $user['last_name'] . '</comment>... ');
-                            $result = $this->createUser($user, $appVars, $deployVars, $output);
+                        $output->write(' - <comment>' . $user['first_name'] . ' ' . $user['last_name'] . '</comment>... ');
+                        $result = $this->createUser($user, $appVars, $deployVars, $output);
 
-                            if ($result === true) {
+                        if ($result === true) {
 
-                                $output->writeln('<info>DONE</info>');
+                            $output->writeln('<info>DONE</info>');
 
-                            } else {
+                        } else {
 
-                                $output->writeln('<error>FAILED: ' . $result . '</error>');
-                            }
+                            $output->writeln('<error>FAILED: ' . $result . '</error>');
                         }
-
-                        $this->dbClose();
-
-                    } else {
-
-                        $output->writeln('<error>FAILED</error>');
                     }
+
                     $curStep++;
                 }
 
@@ -1019,17 +1023,17 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             1,
             '127.0.0.1',
             '127.0.0.1',
-            " . $this->dbEscape(strtolower(trim($user['username']))) . ",
+            " . $this->oDb->escape(strtolower(trim($user['username']))) . ",
             '" . $password->password . "',
             '" . $password->password_md5 . "',
             '" . $password->engine . "',
             '" . $password->salt . "',
             NOW(),
-            " . $this->dbEscape($user['first_name']) . ",
-            " . $this->dbEscape($user['last_name']) . "
+            " . $this->oDb->escape($user['first_name']) . ",
+            " . $this->oDb->escape($user['last_name']) . "
         );";
 
-        $result = $this->dbQuery($sql);
+        $result = $this->oDb->query($sql);
         if (!$result) {
 
             return 'Could not create main user record.';
@@ -1038,16 +1042,16 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Get the user's ID
-        $userId = $this->dbInsertId();
+        $userId = $this->oDb->lastInsertId();
 
         // --------------------------------------------------------------------------
 
         //  Update the main record's id_md5 value
         $sql = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
-        $result = $this->dbQuery($sql);
+        $result = $this->oDb->query($sql);
         if (!$result) {
 
-            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
             return 'Could not set MD5 ID on main user record.';
         }
 
@@ -1055,10 +1059,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         //  Create the user meta record
         $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
-        $result = $this->dbQuery($sql);
+        $result = $this->oDb->query($sql);
         if (!$result) {
 
-            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
             return 'Could not create user_meta_app record.';
         }
 
@@ -1079,7 +1083,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         VALUES
         (
             " . $userId . ",
-            " . $this->dbEscape(strtolower(trim($user['email']))) . ",
+            " . $this->oDb->escape(strtolower(trim($user['email']))) . ",
             '" . $emailCode . "',
             1,
             1,
@@ -1087,11 +1091,11 @@ class CORE_NAILS_Install extends CORE_NAILS_App
             NOW()
         );";
 
-        $result = $this->dbQuery($sql);
+        $result = $this->oDb->query($sql);
         if (!$result) {
 
-            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            $this->dbQuery("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
+            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
             return 'Could not create main user email record.';
         }
 
@@ -1110,10 +1114,10 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     {
         $output->writeln('');
 
-        if ($this->dbTransRunning) {
+        if ($this->oDb->isTransactionRunning()) {
 
             $output->writeln('<error>Rolling back Database</error>');
-            $this->dbTransactionRollback();
+            $this->oDb->transactionRollback();
         }
 
         $output->writeln('<error>Aborting install</error>');

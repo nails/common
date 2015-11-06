@@ -21,6 +21,14 @@ require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
 class CORE_NAILS_Migrate extends CORE_NAILS_App
 {
     /**
+     * The database instance
+     * @var Object
+     */
+    private $oDb;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Configures the app
      * @return void
      */
@@ -149,18 +157,30 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             return $this->abort($output, 2);
         }
 
-        //  Connect to the Database
-        if (!$this->dbConnect($output, $dbHost, $dbUser, $dbPass, $dbName)) {
+        //  Get the DB object
+        $this->oDb = Factory::service('ConsoleDatabase');
 
-            return $this->abort($output, 3);
+        if (!defined('NAILS_DB_PREFIX')) {
+            define('NAILS_DB_PREFIX', 'nails_');
         }
 
         //  Test the db
-        if (!$this->dbMigrationTest()) {
+        $iResult = $this->oDb->query('SHOW Tables LIKE \'' . NAILS_DB_PREFIX . 'migration\'')->rowCount();
+        if (!$iResult) {
 
-            $output->writeln('');
-            $output->writeln('Database isn\'t ready for migrations.');
-            return $this->abort($output, 4);
+            //  Create the migrations table
+            $sSql = "CREATE TABLE `" . NAILS_DB_PREFIX . "migration` (
+              `module` varchar(100) NOT NULL DEFAULT '',
+              `version` int(11) unsigned DEFAULT NULL,
+              PRIMARY KEY (`module`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+            if (!(bool) $this->oDb->query($sSql)) {
+
+                $output->writeln('');
+                $output->writeln('Database isn\'t ready for migrations.');
+                return $this->abort($output, 4);
+            }
         }
 
         // --------------------------------------------------------------------------
@@ -282,7 +302,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Start the DB transaction
-        $this->dbTransactionStart();
+        $this->oDb->transactionStart();
 
         // --------------------------------------------------------------------------
 
@@ -294,10 +314,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         $numMigrations += !empty($app) ? 1 : 0;
 
         //  Disable foreign key checks
-        $result = $this->dbQuery('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
+        $result = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
         $oldForeignKeychecks = $result->Value;
 
-        $this->dbQuery('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->oDb->query('SET FOREIGN_KEY_CHECKS = 0;');
 
         //  Migrate nails
         if (!empty($nails)) {
@@ -360,7 +380,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Commit the transaction
-        $this->dbTransactionCommit();
+        $this->oDb->transactionCommit();
 
         // --------------------------------------------------------------------------
 
@@ -368,10 +388,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         $output->writeln('<comment>Cleaning up...</comment>');
 
         //  Restore previous foreign key checks
-        $this->dbQuery('SET FOREIGN_KEY_CHECKS = \'' . $oldForeignKeychecks . '\';');
-
-        //  Disconnect from the DB
-        $this->dbClose();
+        $this->oDb->query('SET FOREIGN_KEY_CHECKS = \'' . $oldForeignKeychecks . '\';');
 
         // --------------------------------------------------------------------------
 
@@ -413,13 +430,13 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
             //  Work out the current version
             $sql = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$moduleName';";
-            $result = $this->dbQuery($sql);
+            $result = $this->oDb->query($sql);
 
             if ($result->rowCount() === 0) {
 
                 //  Add a row for the module
                 $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$moduleName', NULL);";
-                $this->dbQuery($sql);
+                $this->oDb->query($sql);
 
                 $currentVersion = null;
 
@@ -492,14 +509,14 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 switch ($migration['type']) {
 
                     case 'SQL':
-                        if (!$this->migrateSql($migration, $output)) {
+                        if (!$this->migrateSql($module, $migration, $output)) {
                             return false;
                         }
                         break;
 
                     case 'PHP':
 
-                        if (!$this->migratePhp($migration, $output)) {
+                        if (!$this->migratePhp($module, $migration, $output)) {
                             return false;
                         }
                         break;
@@ -511,7 +528,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         //  Update the database
         $sql = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $module->name . "'";
-        $result = $this->dbQuery($sql);
+        $result = $this->oDb->query($sql);
 
         if (!$result) {
 
@@ -529,11 +546,12 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     /**
      * Executes migrations on a SQL File where each line is a query
+     * @param  object          $module    The module being migrated
      * @param  array           $migration The migration details
      * @param  OutputInterface $output    The Output Interface provided by Symfony
      * @return boolean
      */
-    private function migrateSql($migration, $output)
+    private function migrateSql($module, $migration, $output)
     {
         //  Go through the file and execute each line.
         $handle = fopen($migration['path'], 'r');
@@ -557,7 +575,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 if (!empty($line)) {
 
                     //  We have something!
-                    $result = $this->dbQuery($line);
+                    $result = $this->oDb->query($line);
 
                     if (!$result) {
 
@@ -589,17 +607,29 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
     /**
      * Executes migrations on a PHP which extends Nails\Common\Migration\Base
+     * @param  object          $module    The module being migrated
      * @param  array           $migration The migration details
      * @param  OutputInterface $output    The Output Interface provided by Symfony
      * @return boolean
      */
-    private function migratePhp($migration, $output)
+    private function migratePhp($module, $migration, $output)
     {
         require_once $migration['path'];
-        $sClassName = 'Nails\Common\Migration\Migration_' . $migration['index'];
+        //  Generate the expected class name, i.e., "vendor-name/package-name" -> VendorName\PackageName"
+        $sPattern    = '[^a-zA-Z0-9' . preg_quote(DIRECTORY_SEPARATOR, '/\-') . ']';
+        $sModuleName = strtolower($module->name);
+        $sModuleName = preg_replace('/' . $sPattern . '/', ' ', $sModuleName);
+        $sModuleName = str_replace(DIRECTORY_SEPARATOR, ' ' . DIRECTORY_SEPARATOR . ' ', $sModuleName);
+        $sModuleName = ucwords($sModuleName);
+        $sModuleName = str_replace(' ', '', $sModuleName);
+        $sModuleName = str_replace(DIRECTORY_SEPARATOR, '\\', $sModuleName);
+
+        $sClassName = 'Nails\Database\Migration\\' . $sModuleName . '\Migration_' . $migration['index'];
+
         if (class_exists($sClassName)) {
 
             $oMigration = new $sClassName();
+
             if (is_subclass_of($oMigration, 'Nails\Common\Console\Migrate\Base')) {
 
                 try {
@@ -624,6 +654,8 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 return false;
             }
 
+            unset($oMigration);
+
         } else {
 
             $output->writeln('');
@@ -632,7 +664,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
             return false;
         }
-        die($sClassName);
+
         return true;
     }
 
@@ -692,10 +724,10 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         $colorOpen  = $exitCode === 0 ? '' : '<error>';
         $colorClose = $exitCode === 0 ? '' : '</error>';
 
-        if ($this->dbTransRunning) {
+        if ($this->oDb->isTransactionRunning()) {
 
             $output->writeln($colorOpen . 'Rolling back Database' . $colorClose);
-            $this->dbTransactionRollback();
+            $this->oDb->transactionRollback();
         }
 
         $output->writeln($colorOpen . 'Aborting migration' . $colorClose);

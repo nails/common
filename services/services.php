@@ -53,6 +53,10 @@ return array(
         'Database' => function() {
             return new \Nails\Common\Library\Database();
         },
+        'ConsoleDatabase' => function() {
+            //  @todo: replace this with the above once the above is not dependant on CI
+            return new \Nails\Common\Console\Database();
+        },
         'FormValidation' => function() {
 
             $oCi = get_instance();

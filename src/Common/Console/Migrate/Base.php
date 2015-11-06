@@ -2,26 +2,77 @@
 
 namespace Nails\Common\Console\Migrate;
 
+use Nails\Factory;
+
 class Base {
 
     /**
-     * Prepare and execute a DB query
-     * @return PDOStatement
+     * The database connection
+     * @var PDO
      */
-    public function query($sQuery)
+    public $oDb;
+
+    // --------------------------------------------------------------------------
+
+    private $sForeignKeyValue;
+
+    // --------------------------------------------------------------------------
+
+    public function __construct()
     {
-        die($sQuery);
-        //  @todo: replace the {{NAILS_DB_PREFIX}} string
+        $this->oDb = Factory::service('ConsoleDatabase');
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function __destruct()
+    {
+
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Execute the migration
-     * @return Void
+     * Execute a DB query
+     * @return PDOStatement
      */
-    public function execute()
+    public function query($sQuery)
     {
-        return true;
+        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
+        return $this->oDb->query($sQuery);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Prepare a DB query
+     * @return PDOStatement
+     */
+    public function prepare($sQuery)
+    {
+        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
+        return $this->oDb->prepare($sQuery);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the ID created by the previous write query
+     * @return string
+     */
+    public function lastInsertId()
+    {
+        return $this->oDb->lastInsertId();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Exposes the database API
+     * @return PDO
+     */
+    public function db()
+    {
+        return $this->oDb;
     }
 }

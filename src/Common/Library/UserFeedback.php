@@ -131,6 +131,29 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Set a "positive" feedback message
+     * @param  string $sMessage The message to set
+     * @return Object
+     */
+    public function positive($sMessage)
+    {
+        return $this->set('positive', $sMessage);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the "positive" feedback message
+     * @return string
+     */
+    public function getPositive()
+    {
+        return $this->get('positive');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "error" feedback message
      * @param  string $sMessage The message to set
      * @return Object
@@ -149,6 +172,29 @@ class UserFeedback
     public function getError()
     {
         return $this->get('error');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set a "negative" feedback message
+     * @param  string $sMessage The message to set
+     * @return Object
+     */
+    public function negative($sMessage)
+    {
+        return $this->set('negative', $sMessage);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the "negative" feedback message
+     * @return string
+     */
+    public function getNegative()
+    {
+        return $this->get('negative');
     }
 
     // --------------------------------------------------------------------------
