@@ -114,11 +114,6 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Setup Factory - config files are required prior to set up
-        Factory::setup();
-
-        // --------------------------------------------------------------------------
-
         //  Define app & deploy vars
         $appVars    = $this->defineAppVars();
         $deployVars = $this->defineDeployVars();
@@ -413,11 +408,13 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                 $this->migrateDb($output, $dbHost, $dbUser, $dbPass, $dbName);
                 $curStep++;
 
-                //  Add Uers
+                //  Add Users
                 if (!empty($users)) {
 
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Creating Users</info>...');
 
+                    //  Setup Factory - we need config files and/or constants to be set
+                    Factory::setup();
                     $this->oDb = Factory::service('ConsoleDatabase');
 
                     foreach ($users as $user) {
