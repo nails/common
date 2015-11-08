@@ -67,7 +67,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
         }
 
         //  Send report to Rollbar
-        Rollbar::report_php_error($iNumber, $sMessage, $sFile, $iLine);
+        \Rollbar::report_php_error($iNumber, $sMessage, $sFile, $iLine);
 
         //  Let this bubble to the normal Nails error handler
         \Nails\Common\Driver\ErrorHandler\Nails::error($iNumber, $sMessage, $sFile, $iLine);
@@ -82,7 +82,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
      */
     public static function exception($oException)
     {
-        Rollbar::report_exception($oException);
+        \Rollbar::report_exception($oException);
 
         $oDetails       = new \stdClass();
         $oDetails->type = get_class($oException);
