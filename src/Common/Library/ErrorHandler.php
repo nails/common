@@ -42,7 +42,7 @@ class ErrorHandler
          * error reporting, that is CI Error reporting
          */
 
-        $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ?: 'Nails';
+        $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ? DEPLOY_ERROR_REPORTING_HANDLER : 'Nails';
         $sDriverClass  = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
         $sLoadError    = '';
 

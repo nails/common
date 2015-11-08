@@ -12,7 +12,7 @@
 
 namespace Nails\Common\Driver\ErrorHandler;
 
-class Rollbar implements \Nails\Common\Interfaces\ErrorHandler
+class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
 {
     /**
      * Sets up the driver
