@@ -791,6 +791,16 @@ class Asset
                     'NAILS-BOWER'
                 );
                 break;
+
+            case 'ZEROCLIPBOARD':
+
+                $this->load(
+                    array(
+                        'zeroclipboard/dist/ZeroClipboard.min.js',
+                    ),
+                    'NAILS-BOWER'
+                );
+                break;
         }
 
         return $this;
