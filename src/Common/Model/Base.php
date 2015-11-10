@@ -841,6 +841,39 @@ class Base
         return $this->db->count_all_results($table);
     }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Searches for objects, optionally paginated.
+     * @param  string    $sKeywords       The search term
+     * @param  int       $iPage           The page number of the results, if null then no pagination
+     * @param  int       $iPerPage        How many items per page of paginated results
+     * @param  mixed     $aData           Any data to pass to _getcount_common()
+     * @param  bool      $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @param  string    $_caller         Internal flag to pass to _getcount_common(), contains the calling method
+     * @return \stdClass
+     */
+    public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    {
+        //  @todo: specify searchable fields in constructor and generate this manually
+        if (empty($aData['or_like'])) {
+            $aData['or_like'] = array();
+        }
+
+        $aData['or_like'][] = array(
+            'column' => $this->tablePrefix . '.' . $this->tableLabelColumn,
+            'value'  => $sKeywords
+        );
+
+        $oOut          = new \stdClass();
+        $oOut->page    = $iPage;
+        $oOut->perPage = $iPerPage;
+        $oOut->total   = $this->count_all($aData);
+        $oOut->results = $this->get_all($iPage, $iPerPage, $aData);
+
+        return $oOut;
+    }
+
     /**
      * --------------------------------------------------------------------------
      *
