@@ -624,7 +624,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         $sModuleName = str_replace(' ', '', $sModuleName);
         $sModuleName = str_replace(DIRECTORY_SEPARATOR, '\\', $sModuleName);
 
-        $sClassName = 'Nails\Database\Migration\\' . $sModuleName . '\Migration_' . $migration['index'];
+        $sClassName = 'Nails\Database\Migration\\' . $sModuleName . '\Migration' . $migration['index'];
 
         if (class_exists($sClassName)) {
 
@@ -636,7 +636,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
                     $oMigration->execute();
 
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
 
                     $output->writeln('');
                     $output->writeln('');
@@ -689,7 +689,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
                 }
 
                 //  In the correct format?
-                if ( preg_match('/^(\d+)(.*)\.(sql|php)$/', $fileInfo->getFilename(), $matches)) {
+                if (preg_match('/^(\d+)(.*)\.(sql|php)$/', $fileInfo->getFilename(), $matches)) {
 
                     $out[$matches[1]] = array(
                         'path'  => $fileInfo->getPathname(),

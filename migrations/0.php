@@ -16,8 +16,8 @@ namespace Nails\Database\Migration\Nailsapp\Common;
 
 use Nails\Common\Console\Migrate\Base;
 
-class Migration_0 extends Base {
-
+class Migration0 extends Base
+{
     /**
      * Execute the migration
      * @return Void

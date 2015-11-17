@@ -133,3 +133,20 @@ if (!function_exists('last_query'))
         lastquery($bDie);
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('dumpjson'))
+{
+    /**
+     * Dumps the passed variable as a JSON encoded string, setting JSON headers
+     * @param  mixed $mData The variable to dump
+     * @return void
+     */
+    function dumpjson($mData)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($mData, JSON_PRETTY_PRINT);
+        die();
+    }
+}

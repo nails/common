@@ -20,7 +20,7 @@ The migration system will automatically look for numerically (in ascending order
     vendor-name/module-name/migrations/0.php
     vendor-name/module-name/migrations/1.php
     vendor-name/module-name/migrations/2.php
-    
+
 You don't have to numerically index as shown above, but we recommend it for simplicity.
 
 ---
@@ -31,7 +31,7 @@ You can migrate using either [PHP](#php) or vanilla [SQL](#sql).
 <a name="php"></a>
 ### PHP Migrations
 
-Each migration takes the form of a class which extends the `Nails\Common\Console\Migrate\Base` class. The migration contains an `execute()` method which is called by the migration system when migrating. You should put your migrations in here. A basic migration will have a classname corresponding to the filename, for example a migration called `2.php` would contain a class called `Migration_2`.
+Each migration takes the form of a class which extends the `Nails\Common\Console\Migrate\Base` class. The migration contains an `execute()` method which is called by the migration system when migrating. You should put your migrations in here. A migration will have a classname corresponding to the filename, for example a migration called `2.php` would contain a class called `Migration2`.
 
 
 #### › Namespace
@@ -62,7 +62,7 @@ The following is a sample migration class for a module named `my-vendor/my-modul
 /**
  * Migration:   0
  * Started:     06/11/2015
- * Finalsied:   09/11/2015
+ * Finalised:   09/11/2015
  *
  * @package     Nails
  * @subpackage  my-module
@@ -75,8 +75,8 @@ namespace Nails\Database\Migration\MyVendor\MyModule;
 
 use Nails\Common\Console\Migrate\Base;
 
-class Migration_0 extends Base {
-
+class Migration0 extends Base
+{
     /**
      * Execute the migration
      * @return Void
