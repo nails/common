@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 if (!function_exists('form_email')) {
 
     /**
@@ -572,7 +574,7 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
+        $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
         $_scheme = $oCdn->url_serve_scheme(true);
 
         /**
@@ -727,7 +729,7 @@ if (!function_exists('form_field_mm_image')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
+        $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
         $_scheme = $oCdn->url_scale_scheme();
 
         $_scheme = str_replace('{{width}}', 100, $_scheme);
@@ -867,7 +869,7 @@ if (!function_exists('form_field_multiimage')) {
         // --------------------------------------------------------------------------
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn = \Nails\Factory::service('Cdn', 'nailsapp/module-cdn');
+        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
 
         $_movie_url     = NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
         $_upload_url    = site_url('api/cdn/object/create', isPageSecure());

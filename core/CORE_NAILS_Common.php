@@ -77,6 +77,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                 $temp->authors     = $package->authors;
                 $temp->path        = FCPATH . 'vendor/' . $package->name . '/';
                 $temp->moduleName  = !empty($package->extra->nails->moduleName) ? $package->extra->nails->moduleName : null;
+                $temp->moduleData  = !empty($package->extra->nails->moduleData) ? $package->extra->nails->moduleData : null;
                 $temp->type        = !empty($package->extra->nails->type) ? $package->extra->nails->type : null;
                 $temp->subType     = !empty($package->extra->nails->subType) ? $package->extra->nails->subType : null;
                 $temp->autoload    = !empty($package->extra->nails->autoload) ? $package->extra->nails->autoload : null;
@@ -271,6 +272,51 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
         }
 
         return $minVersion;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('nailsFactory')) {
+
+    /**
+     * A route to the Nails Factory
+     * @return miixed
+     */
+    function nailsFactory($sType, $sKey, $sModuleName = '')
+    {
+        switch (strtoupper($sType)) {
+
+            case 'PROPERTY':
+
+                return \Nails\Factory::property($sKey, $sModuleName);
+                break;
+
+            case 'SERVICE':
+
+                return \Nails\Factory::service($sKey, $sModuleName);
+                break;
+
+            case 'MODEL':
+
+                return \Nails\Factory::model($sKey, $sModuleName);
+                break;
+
+            case 'FACTORY':
+
+                return \Nails\Factory::factory($sKey, $sModuleName);
+                break;
+
+            case 'HELPER':
+
+                return \Nails\Factory::factory($sKey, $sModuleName);
+                break;
+
+            default:
+
+                throw new \NailsCommon\Exception\FactoryException('"' . $sType . '" is not valid', 1);
+                break;
+        }
     }
 }
 

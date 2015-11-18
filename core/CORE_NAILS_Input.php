@@ -10,23 +10,8 @@
  * @link
  */
 
-class CORE_NAILS_Input extends CI_Input
+use Nails\Common\Library\Input;
+
+class CORE_NAILS_Input extends Input
 {
-    /**
-     * Returns the user's IP Address. Extended to allow this method to be called from a command line environment.
-     * This override may not be needed in future implementations of CodeIgniter.
-     * @return string
-     */
-    public function ip_address()
-    {
-        if ($this->is_cli_request()) {
-
-            $hostname = gethostname();
-            return gethostbyname($hostname);
-
-        } else {
-
-            return parent::ip_address();
-        }
-    }
 }

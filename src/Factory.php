@@ -225,7 +225,7 @@ class Factory
      * Load a helper file
      * @param  string $sHelperName The helper name
      * @param  string $sModuleName The name of the module which provides the factory
-     * @return mixed
+     * @return void
      */
     public static function helper($sHelperName, $sModuleName = '')
     {

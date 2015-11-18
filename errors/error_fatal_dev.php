@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 /**
  * Renders a data section
  * @param  string $title The title to give the section
@@ -218,7 +220,7 @@ function keyValueSection($title, $data)
 
     // --------------------------------------------------------------------------
 
-    $oDb = \Nails\Factory::service('Database');
+    $oDb     = Factory::service('Database');
     $queries = $oDb->queries;
     $queries = array_reverse($queries);
 

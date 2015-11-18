@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 if (!function_exists('dumpanddie'))
 {
     /**
@@ -80,7 +82,7 @@ if (!function_exists('here'))
      */
     function here($mDump = null)
     {
-        $oNow = \Nails\Factory::factory('DateTime');
+        $oNow = Factory::factory('DateTime');
 
         //  Dump payload if there
         if (!is_null($mDump)) {
@@ -103,7 +105,7 @@ if (!function_exists('lastquery'))
      */
     function lastquery($bDie = true)
     {
-        $oDb        = \Nails\Factory::service('Database');
+        $oDb        = Factory::service('Database');
         $sLastQuery = $oDb->last_query();
 
         // --------------------------------------------------------------------------

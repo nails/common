@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 if (!function_exists('app_setting')) {
 
     /**
@@ -8,7 +10,7 @@ if (!function_exists('app_setting')) {
      */
     function app_setting($key = null, $grouping = 'app', $force_refresh = false)
     {
-        $oAppSettingModel = \Nails\Factory::model('AppSetting');
+        $oAppSettingModel = Factory::model('AppSetting');
         return $oAppSettingModel->get($key, $grouping, $force_refresh);
     }
 }
@@ -23,7 +25,7 @@ if (!function_exists('set_app_setting')) {
      */
     function set_app_setting($key, $grouping = 'app', $value = null, $encrypt = false)
     {
-        $oAppSettingModel = \Nails\Factory::model('AppSetting');
+        $oAppSettingModel = Factory::model('AppSetting');
         return $oAppSettingModel->set($key, $grouping, $value, $encrypt);
     }
 }

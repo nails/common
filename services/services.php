@@ -62,6 +62,11 @@ return array(
             $oCi = get_instance();
             $oCi->load->library('form_validation');
             return $oCi->form_validation;
+        },
+        'Input' => function() {
+
+            $oCi = get_instance();
+            return $oCi->input;
         }
     ),
     'models' => array(

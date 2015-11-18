@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 if (!function_exists('app_notification'))
 {
     /**
@@ -11,7 +13,7 @@ if (!function_exists('app_notification'))
      */
     function app_notification($key = NULL, $grouping = 'app', $forceRefresh = FALSE)
     {
-        $oAppNotificationModel = \Nails\Factory::model('AppNotification');
+        $oAppNotificationModel = Factory::model('AppNotification');
         return $oAppNotificationModel->get($key, $grouping, $forceRefresh);
     }
 }
@@ -30,7 +32,7 @@ if (!function_exists('app_notification_notify'))
      */
     function app_notification_notify($key = NULL, $grouping = 'app', $data = array(), $override = array())
     {
-        $oAppNotificationModel = \Nails\Factory::model('AppNotification');
+        $oAppNotificationModel = Factory::model('AppNotification');
         return $oAppNotificationModel->notify($key, $grouping, $data, $override);
     }
 }
@@ -45,7 +47,7 @@ if (!function_exists('app_notification_last_error'))
      */
     function app_notification_last_error()
     {
-        $oAppNotificationModel = \Nails\Factory::model('AppNotification');
+        $oAppNotificationModel = Factory::model('AppNotification');
         return $oAppNotificationModel->last_error();
     }
 }

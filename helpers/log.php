@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Factory;
+
 if (!function_exists('_LOG')) {
 
     /**
@@ -18,7 +20,7 @@ if (!function_exists('_LOG')) {
      * @return void
      */
     function _LOG($sLine = '') {
-        $oLogger = \Nails\Factory::service('Logger');
+        $oLogger = Factory::service('Logger');
         return $oLogger->line($sLine);
     }
 }
@@ -30,7 +32,7 @@ if (!function_exists('_LOG_DIR')) {
      * @param string $sDir The directory to write to
      */
     function _LOG_DIR($sDir = '') {
-        $oLogger = \Nails\Factory::service('Logger');
+        $oLogger = Factory::service('Logger');
         return $oLogger->setDir($sDir);
     }
 }
@@ -42,7 +44,7 @@ if (!function_exists('_LOG_FILE')) {
      * @param string $sFile The file to write to
      */
     function _LOG_FILE($sFile = '') {
-        $oLogger = \Nails\Factory::service('Logger');
+        $oLogger = Factory::service('Logger');
         return $oLogger->setFile($sFile);
     }
 }
@@ -55,7 +57,7 @@ if (!function_exists('_LOG_MUTE_OUTPUT')) {
      * @return void
      */
     function _LOG_MUTE_OUTPUT($bMute = true) {
-        $oLogger = \Nails\Factory::service('Logger');
+        $oLogger = Factory::service('Logger');
         $oLogger->bMute = (bool) $bMute;
     }
 }
@@ -68,7 +70,7 @@ if (!function_exists('_LOG_DUMMY_MODE')) {
      * @return void
      */
     function _LOG_DUMMY_MODE($bDummy = true) {
-        $oLogger = \Nails\Factory::service('Logger');
+        $oLogger = Factory::service('Logger');
         $oLogger->bDummy = (bool) $bDummy;
     }
 }
