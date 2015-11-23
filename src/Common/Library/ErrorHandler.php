@@ -186,14 +186,14 @@ class ErrorHandler
 
         if (function_exists('app_setting')) {
 
-            $fromName = app_setting('from_name', 'email');
+            $fromName = appSetting('from_name', 'email');
 
             if (empty($fromName)) {
 
                 $fromName = 'Log Error Reporter';
             }
 
-            $replyTo = app_setting('from_email', 'email');
+            $replyTo = appSetting('from_email', 'email');
 
             if (empty($replyTo)) {
 

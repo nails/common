@@ -2,13 +2,13 @@
 
 use Nails\Factory;
 
-if (!function_exists('app_setting')) {
+if (!function_exists('appSetting')) {
 
     /**
      * Helper for quickly accessing app settings
      * @return  mixed
      */
-    function app_setting($key = null, $grouping = 'app', $force_refresh = false)
+    function appSetting($key = null, $grouping = 'app', $force_refresh = false)
     {
         $oAppSettingModel = Factory::model('AppSetting');
         return $oAppSettingModel->get($key, $grouping, $force_refresh);
@@ -17,13 +17,13 @@ if (!function_exists('app_setting')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('set_app_setting')) {
+if (!function_exists('setAppSetting')) {
 
     /**
      * Helper for quickly setting app settings
      * @return  void
      */
-    function set_app_setting($key, $grouping = 'app', $value = null, $encrypt = false)
+    function setAppSetting($key, $grouping = 'app', $value = null, $encrypt = false)
     {
         $oAppSettingModel = Factory::model('AppSetting');
         return $oAppSettingModel->set($key, $grouping, $value, $encrypt);

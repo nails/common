@@ -336,7 +336,7 @@ class Base extends \MX_Controller
 
             try {
 
-                //  Get the database so that the app_setting() functions will work
+                //  Get the database so that the appSetting() functions will work
                 $oDb = Factory::service('Database');
 
                 //  Set the package path (so helpers and libraries are loaded correctly)
@@ -347,12 +347,12 @@ class Base extends \MX_Controller
                 Factory::helper('app_setting');
                 Factory::helper('tools');
 
-                $whitelistIp   = (array) app_setting('maintenance_mode_whitelist', 'site');
+                $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
                 $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
 
                 //  Customisations
-                $sMaintenanceTitle = $sTitle ? $sTitle : app_setting('maintenance_mode_title', 'site');
-                $sMaintenanceBody  = $sBody ? $sBody : app_setting('maintenance_mode_body', 'site');
+                $sMaintenanceTitle = $sTitle ? $sTitle : appSetting('maintenance_mode_title', 'site');
+                $sMaintenanceBody  = $sBody ? $sBody : appSetting('maintenance_mode_body', 'site');
 
             } catch (\Exception $e) {
 
