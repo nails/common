@@ -19,27 +19,25 @@ trait GetCountCommon
     /**
      * This method applies the conditionals which are common across the get_*()
      * methods and the count() method.
-     * @param  array  $data    Data passed from the calling method
-     * @param  string $_caller The name of the calling method
+     * @param  array  $aData Data passed from the calling method
      * @return void
      **/
-    protected function _getcount_common($data = array(), $_caller = null)
+    protected function _getcount_common($aData = array())
     {
-        $this->_getcount_compile_filters($data, $_caller);
-        $this->_getcount_compile_wheres($data, $_caller);
-        $this->_getcount_compile_likes($data, $_caller);
-        $this->_getcount_compile_sort($data, $_caller);
+        $this->_getcount_compile_filters($aData);
+        $this->_getcount_compile_wheres($aData);
+        $this->_getcount_compile_likes($aData);
+        $this->_getcount_compile_sort($aData);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Compiles any active filters back into the $data array
-     * @param  array  &$data   The data array
-     * @param  string $_caller The name of the calling method
+     * @param  array  &$data The data array
      * @return void
      */
-    protected function _getcount_compile_filters(&$data, $_caller = null)
+    protected function _getcount_compile_filters(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -100,10 +98,9 @@ trait GetCountCommon
     /**
      * Compiles any where's into the query
      * @param  array  &$data   The data array
-     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_wheres(&$data, $_caller = null)
+    protected function _getcount_compile_wheres(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -292,10 +289,9 @@ trait GetCountCommon
     /**
      * Compiles any like's into the query
      * @param  array  &$data   The data array
-     * @param  string $_caller The name of the calling method
      * @return void
      */
-    protected function _getcount_compile_likes(&$data, $_caller = null)
+    protected function _getcount_compile_likes(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -427,11 +423,10 @@ trait GetCountCommon
 
     /**
      * Compiles the sort element into the query
-     * @param  array  &$data   The data array
-     * @param  string $_caller The name of the calling method
+     * @param  array  &$data The data array
      * @return void
      */
-    protected function _getcount_compile_sort(&$data, $_caller = null)
+    protected function _getcount_compile_sort(&$data)
     {
         $oDb = Factory::service('Database');
 

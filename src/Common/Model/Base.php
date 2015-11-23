@@ -462,10 +462,9 @@ class Base
      * @param int    $perPage        How many items per page of paginated results
      * @param mixed  $data           Any data to pass to _getcount_common()
      * @param bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
-     * @param string $_caller        Internal flag to pass to _getcount_common(), contains the calling method
      * @return array
      */
-    public function get_all($page = null, $perPage = null, $data = array(), $includeDeleted = false, $_caller = 'GET_ALL')
+    public function getAll($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
         if (!$this->table) {
 
@@ -480,7 +479,7 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Apply common items; pass $data
-        $this->_getcount_common($data, $_caller);
+        $this->_getcount_common($data);
 
         // --------------------------------------------------------------------------
 
@@ -540,17 +539,26 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getAll(); backwards compatability.
+     */
+    public function get_all($page = null, $perPage = null, $data = array(), $includeDeleted = false)
+    {
+        return $this->getAll($page, $perPage, $data, $includeDeleted);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetches all objects as a flat array
      * @param  int     $page           The page number of the results
      * @param  int     $perPage        The number of items per page
      * @param  array   $data           Any data to pass to _getcount_common()
      * @param  boolean $includeDeleted Whether or not to include deleted items
-     * @param  string  $_caller        Passed to _getcount_common() as an easy means of identifying errors
      * @return array
      */
-    public function get_all_flat($page = null, $perPage = null, $data = array(), $includeDeleted = false, $_caller = 'GET_ALL_FLAT')
+    public function getAllFlat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
-        $items = $this->get_all($page, $perPage, $data, $includeDeleted, $_caller);
+        $items = $this->get_all($page, $perPage, $data, $includeDeleted);
         $out   = array();
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
@@ -595,12 +603,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getAllFlat(); backwards compatability.
+     */
+    public function get_all_flat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
+    {
+        return $this->getAllFlat($page, $perPage, $data, $includeDeleted);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch an object by it's ID
      * @param  int      $iId   The ID of the object to fetch
      * @param  mixed    $aData Any data to pass to _getcount_common()
      * @return mixed           stdClass on success, false on failure
      */
-    public function get_by_id($iId, $aData = array())
+    public function getById($iId, $aData = array())
     {
         if (!$this->table) {
 
@@ -647,12 +665,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getById(); backwards compatability.
+     */
+    public function get_by_id($iId, $aData = array())
+    {
+        return $this->getById($iId, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch objects by their IDs
      * @param  array $aIds  An array of IDs to fetch
      * @param  mixed $aData Any data to pass to _getcount_common()
      * @return array
      */
-    public function get_by_ids($aIds, $aData = array())
+    public function getByIds($aIds, $aData = array())
     {
         if (!$this->table) {
 
@@ -688,12 +716,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getByIds(); backwards compatability.
+     */
+    public function get_by_ids($iIds, $aData = array())
+    {
+        return $this->getByIds($iId, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch an object by it's slug
      * @param  string   $sSlug The slug of the object to fetch
      * @param  mixed    $data Any data to pass to _getcount_common()
      * @return stdClass
      */
-    public function get_by_slug($sSlug, $aData = array())
+    public function getBySlug($sSlug, $aData = array())
     {
         if (!$this->table) {
 
@@ -739,12 +777,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getBySlug(); backwards compatability.
+     */
+    public function get_by_slug($sSlug, $aData = array())
+    {
+        return $this->getBySlug($sSlug, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch objects by their slugs
      * @param  array $aSlugs An array of slugs to fetch
      * @param  mixed $aData  Any data to pass to _getcount_common()
      * @return array
      */
-    public function get_by_slugs($aSlugs, $aData = array())
+    public function getBySlugs($aSlugs, $aData = array())
     {
         if (!$this->table) {
 
@@ -779,6 +827,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getBySlugs(); backwards compatability.
+     */
+    public function get_by_slugs($aSlugs, $aData = array())
+    {
+        return $this->getBySlugs($aSlugs, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch an object by it's id or slug
      *
      * Auto-detects whether to use the ID or slug as the selector when fetching
@@ -790,7 +848,7 @@ class Base
      * @param  array    $aData   Any data to pass to _getcount_common()
      * @return stdClass
      */
-    public function get_by_id_or_slug($mIdSlug, $aData = array())
+    public function getByIdOrSlug($mIdSlug, $aData = array())
     {
         if (is_numeric($mIdSlug)) {
 
@@ -805,12 +863,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to getByIdOrSlug(); backwards compatability.
+     */
+    public function get_by_id_or_slug($mIdSlug, $aData = array())
+    {
+        return $this->getByIdOrSlug($mIdSlug, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Counts all objects
-     * @param  array   $data           An array of data to pass to _Getcount_common()
-     * @param  boolean $includeDeleted Whetehr to include deleted objects or not
+     * @param  array   $adata           An array of data to pass to _getcount_common()
+     * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
      * @return integer
      */
-    public function count_all($data = array(), $includeDeleted = false)
+    public function countAll($aData = array(), $bIncludeDeleted = false)
     {
         if (!$this->table) {
 
@@ -825,12 +893,12 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Apply common items
-        $this->_getcount_common($data, 'COUNT_ALL');
+        $this->_getcount_common($aData, 'COUNT_ALL');
 
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->destructiveDelete && !$includeDeleted) {
+        if (!$this->destructiveDelete && !$bIncludeDeleted) {
 
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
             $this->db->where($sPrefix . $this->tableDeletedColumn, false);
@@ -844,13 +912,22 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias to countAll(); backwards compatability.
+     */
+    public function count_all($aData = array(), $bIncludeDeleted = false)
+    {
+        return $this->countAll($aData, $bIncludeDeleted);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Searches for objects, optionally paginated.
      * @param  string    $sKeywords       The search term
      * @param  int       $iPage           The page number of the results, if null then no pagination
      * @param  int       $iPerPage        How many items per page of paginated results
      * @param  mixed     $aData           Any data to pass to _getcount_common()
      * @param  bool      $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
-     * @param  string    $_caller         Internal flag to pass to _getcount_common(), contains the calling method
      * @return \stdClass
      */
     public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
@@ -894,7 +971,7 @@ class Base
      * @param string $idColumn The column to use for the ID, defaults to $this->tableIdColumn
      * @return string
      */
-    protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
+    protected function generateSlug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
     {
         //  Perform this check here so the error message is more easily traced.
         if (is_null($table)) {
@@ -961,6 +1038,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Alias of generateslug(); backwards compatability
+     */
+    protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
+    {
+        return $this->generateSlug($label, $prefix, $suffix, $table, $column, $ignoreId, $idColumn);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Formats a single object
      *
      * The get_all() method iterates over each returned item with this method so as to
@@ -973,7 +1060,7 @@ class Base
      * @param  array  $floats   Fields which should be cast as floats if not null
      * @return void
      */
-    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
+    protected function formatObject(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
     {
         $integers   = (array) $integers;
         $integers[] = $this->tableIdColumn;
@@ -1017,6 +1104,16 @@ class Base
                 $obj->{$property} = (float) $obj->{$property};
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Alias of formatObject(); backwards compatability
+     */
+    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
+    {
+        return $this->formatObject($obj, $data, $integers, $bools, $floats);
     }
 
     // --------------------------------------------------------------------------
