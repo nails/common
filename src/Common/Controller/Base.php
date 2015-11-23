@@ -159,7 +159,7 @@ class Base extends \MX_Controller
         /**
          * Forced maintenance mode?
          */
-        if (app_setting('maintenance_mode_enabled', 'site')) {
+        if (appSetting('maintenance_mode_enabled', 'site')) {
 
             $this->maintenanceMode(true);
         }

@@ -17,7 +17,7 @@
             $this->asset->output('JS-INLINE');
 
             //  Analytics
-            if (app_setting('google_analytics_account')) {
+            if (appSetting('google_analytics_account')) {
 
                 ?>
                 <script>
@@ -26,7 +26,7 @@
                     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
                     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-                    ga('create', '<?=app_setting('google_analytics_account')?>', 'auto');
+                    ga('create', '<?=appSetting('google_analytics_account')?>', 'auto');
                     ga('send', 'pageview');
 
                 </script>
