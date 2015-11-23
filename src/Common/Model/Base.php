@@ -946,7 +946,7 @@ class Base
         $oOut->page    = $iPage;
         $oOut->perPage = $iPerPage;
         $oOut->total   = $this->count_all($aData);
-        $oOut->results = $this->get_all($iPage, $iPerPage, $aData);
+        $oOut->data    = $this->get_all($iPage, $iPerPage, $aData);
 
         return $oOut;
     }
