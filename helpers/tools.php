@@ -207,61 +207,6 @@ if (!function_exists('isIpInRange'))
 
 // --------------------------------------------------------------------------
 
-
-if (!function_exists('_db_flush_caches'))
-{
-    /**
-     * Flushes DB caches
-     * @return void
-     */
-    function _db_flush_caches()
-    {
-        $ci =& get_instance();
-
-        if (isset($ci->db)) {
-
-            $ci->db->queries     = array();
-            $ci->db->query_times = array();
-            $ci->db->data_cache  = array();
-        }
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('_db_reset_active_record'))
-{
-    /**
-     * Resets Active Record values
-     * @return void
-     */
-    function _db_reset_active_record()
-    {
-        $ci = get_instance();
-
-        if (isset($ci->db)) {
-
-            $ci->db->ar_select         = array();
-            $ci->db->ar_from           = array();
-            $ci->db->ar_join           = array();
-            $ci->db->ar_where          = array();
-            $ci->db->ar_like           = array();
-            $ci->db->ar_groupby        = array();
-            $ci->db->ar_having         = array();
-            $ci->db->ar_orderby        = array();
-            $ci->db->ar_wherein        = array();
-            $ci->db->ar_aliased_tables = array();
-            $ci->db->ar_no_escape      = array();
-            $ci->db->ar_distinct       = false;
-            $ci->db->ar_limit          = false;
-            $ci->db->ar_offset         = false;
-            $ci->db->ar_order          = false;
-        }
-    }
-}
-
-// --------------------------------------------------------------------------
-
 if (!function_exists('readFileChunked'))
 {
     /**

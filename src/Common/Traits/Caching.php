@@ -14,43 +14,42 @@ namespace Nails\Common\Traits;
 
 trait Caching
 {
-    protected $_cache_values    = array();
-    protected $_cache_keys      = array();
-    protected $_cache_method    = 'LOCAL';
+    protected $aCacheValues = array();
+    protected $aCacheKeys   = array();
+    protected $sCacheMethod = 'LOCAL';
 
     // --------------------------------------------------------------------------
 
     /**
      * Saves an item to the cache
-     * @param string $key   The cache key
-     * @param mixed  $value The data to be cached
+     * @param string $sKey   The cache key
+     * @param mixed  $mValue The data to be cached
      */
-    protected function _set_cache($key, $value)
+    protected function setCache($sKey, $mValue)
     {
-        if (empty($key)) {
-
+        if (empty($sKey)) {
             return false;
         }
 
         // --------------------------------------------------------------------------
 
         //  Prep the key, the key should have a prefix unique to this model
-        $_prefix = $this->_cache_prefix();
+        $sPrefix = $this->getCachePrefix();
 
         // --------------------------------------------------------------------------
 
-        switch ($this->_cache_method) {
+        switch ($this->sCacheMethod) {
 
             case 'MEMCACHED':
 
-                //  @TODO
+                //  @todo
                 break;
 
             case 'LOCAL':
             default:
 
-                $this->_cache_values[md5($_prefix . $key)] = serialize($value);
-                $this->_cache_keys[] = $key;
+                $this->aCacheValues[md5($sPrefix . $sKey)] = serialize($mValue);
+                $this->aCacheKeys[] = $sKey;
                 break;
         }
 
@@ -63,71 +62,69 @@ trait Caching
 
     /**
      * Fetches an item from the cache
-     * @param  string $key The cache key
+     * @param  string $sKey The cache key
      * @return mixed
      */
-    protected function _get_cache($key)
+    protected function getCache($sKey)
     {
-        if (empty($key)) {
-
+        if (empty($sKey)) {
             return false;
         }
 
         // --------------------------------------------------------------------------
 
         //  Prep the key, the key should have a prefix unique to this model
-        $prefix = $this->_cache_prefix();
+        $sPrefix = $this->getCachePrefix();
 
         // --------------------------------------------------------------------------
 
-        switch ($this->_cache_method) {
+        switch ($this->sCacheMethod) {
 
             case 'MEMCACHED':
 
                 //  @TODO
-                $return = false;
+                $mReturn = false;
                 break;
 
             case 'LOCAL':
             default:
 
-                if (isset($this->_cache_values[md5($prefix . $key)])) {
+                if (isset($this->aCacheValues[md5($sPrefix . $sKey)])) {
 
-                    $return = unserialize($this->_cache_values[md5($prefix . $key)]);
+                    $mReturn = unserialize($this->aCacheValues[md5($sPrefix . $sKey)]);
 
                 } else {
 
-                    $return = false;
+                    $mReturn = false;
 
                 }
                 break;
         }
 
-        return $return;
+        return $mReturn;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Deletes an item from the cache
-     * @param  string $key The cache key
+     * @param  string $sKey The cache key
      * @return boolean
      */
-    protected function _unset_cache($key)
+    protected function unsetCache($sKey)
     {
-        if (empty($key)) {
-
+        if (empty($sKey)) {
             return false;
         }
 
         // --------------------------------------------------------------------------
 
         //  Prep the key, the key should have a prefix unique to this model
-        $prefix = $this->_cache_prefix();
+        $sPrefix = $this->getCachePrefix();
 
         // --------------------------------------------------------------------------
 
-        switch ($this->_cache_method) {
+        switch ($this->sCacheMethod) {
 
             case 'MEMCACHED':
 
@@ -137,13 +134,13 @@ trait Caching
             case 'LOCAL':
             default:
 
-                unset($this->_cache_values[md5($prefix . $key)]);
+                unset($this->aCacheValues[md5($sPrefix . $sKey)]);
 
-                $_key = array_search($key, $this->_cache_keys);
+                $sIndex = array_search($sKey, $this->aCacheKeys);
 
-                if ($_key !== false) {
+                if ($sIndex !== false) {
 
-                    unset($this->_cache_keys[$_key]);
+                    unset($this->aCacheKeys[$sIndex]);
                 }
                 break;
         }
@@ -156,11 +153,26 @@ trait Caching
     // --------------------------------------------------------------------------
 
     /**
-     * In order to avoid collission between classes a prefix is used; this method
+     * Unsets all defined cache keys
+     * @return void
+     */
+    public function clearCache()
+    {
+        if (!empty($this->aCacheKeys)) {
+            foreach ($this->aCacheKeys as $sKey) {
+                $this->unsetCache($sKey);
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * In order to avoid collisions between classes a prefix is used; this method
      * defines the cache key prefix using the calling class' name.
      * @return string
      */
-    protected function _cache_prefix()
+    protected function getCachePrefix()
     {
         return get_called_class();
     }

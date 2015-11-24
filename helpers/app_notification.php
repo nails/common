@@ -48,6 +48,6 @@ if (!function_exists('app_notification_last_error'))
     function app_notification_last_error()
     {
         $oAppNotificationModel = Factory::model('AppNotification');
-        return $oAppNotificationModel->last_error();
+        return $oAppNotificationModel->lastError();
     }
 }

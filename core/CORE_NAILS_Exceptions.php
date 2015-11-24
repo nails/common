@@ -80,7 +80,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
      * Flushes recorded errors
      * @return void
      */
-    public function clear_errors()
+    public function clearErrors()
     {
         $this->error_has_occurred = false;
         $this->recent_errors      = array();

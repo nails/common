@@ -60,7 +60,7 @@ class Base
      * @param   string
      * @access private
      */
-    function __get($key)
+    public function __get($key)
     {
         $CI =& get_instance();
         return $CI->$key;
@@ -68,11 +68,7 @@ class Base
 
     /**
      * --------------------------------------------------------------------------
-     *
-     * CONSTRUCTOR && DESTRUCTOR
-     * The constructor preps common variables and sets the model up for user.
-     * The destructor clears
-     *
+     *     *
      * --------------------------------------------------------------------------
      */
 
@@ -90,7 +86,7 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Define defaults
-        $this->clear_errors();
+        $this->clearErrors();
         $this->destructiveDelete      = true;
         $this->tableIdColumn          = 'id';
         $this->tableSlugColumn        = 'slug';
@@ -118,14 +114,7 @@ class Base
          * gut says yes.
          */
 
-        //  Clear cache's
-        if (isset($this->_cache_keys) && $this->_cache_keys) {
-
-            foreach ($this->_cache_keys as $key) {
-
-                $this->_unset_cache($key);
-            }
-        }
+        $this->clearCache();
     }
 
     // --------------------------------------------------------------------------

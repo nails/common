@@ -116,7 +116,7 @@ class Base extends \MX_Controller
                 //  Fall over, routes_app.php *must* be there
                 $subject  = 'Failed To generate routes_app.php';
                 $message  = 'routes_app.php was not found and could not be generated. ';
-                $message .= $this->routes_model->last_error();
+                $message .= $this->routes_model->lastError();
 
                 showFatalError($subject, $message);
 

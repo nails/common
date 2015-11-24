@@ -125,7 +125,7 @@ class AppNotification extends Base
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
 
-            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
 
@@ -207,7 +207,7 @@ class AppNotification extends Base
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
 
-            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
 
@@ -246,7 +246,7 @@ class AppNotification extends Base
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
 
-            $this->_set_error($grouping . '/' . $key . ' is not a valid group/key pair.');
+            $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
 
@@ -278,7 +278,7 @@ class AppNotification extends Base
 
         if (empty($definition->email_tpl)) {
 
-            $this->_set_error('No email template defined for ' . $grouping . '/' . $key);
+            $this->setError('No email template defined for ' . $grouping . '/' . $key);
             return false;
         }
 
@@ -310,7 +310,7 @@ class AppNotification extends Base
 
             if (!$this->emailer->send($email, true)) {
 
-                $this->_set_error($this->emailer->last_error());
+                $this->setError($this->emailer->lastError());
                 return false;
             }
         }

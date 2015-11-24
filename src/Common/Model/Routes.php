@@ -42,8 +42,8 @@ class Routes extends BAse
 
         if (!$this->canWriteRoutes()) {
 
-            $this->cantWriteReason = $this->last_error();
-            $this->clear_errors();
+            $this->cantWriteReason = $this->lastError();
+            $this->clearErrors();
         }
     }
 
@@ -58,7 +58,7 @@ class Routes extends BAse
     {
         if (!$this->canWriteRoutes) {
 
-            $this->_set_error($this->cantWriteReason);
+            $this->setError($this->cantWriteReason);
             return false;
         }
 
@@ -140,14 +140,14 @@ class Routes extends BAse
 
         if (!$_fh) {
 
-            $this->_set_error('Unable to open routes file for writing.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
+            $this->setError('Unable to open routes file for writing.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
             return false;
         }
 
         if (!fwrite($_fh, $_data)) {
 
             fclose($_fh);
-            $this->_set_error('Unable to write data to routes file.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
+            $this->setError('Unable to write data to routes file.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
             return false;
         }
 
@@ -187,7 +187,7 @@ class Routes extends BAse
 
                 } else {
 
-                    $this->_set_error('The route config exists, but is not writeable. <small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
+                    $this->setError('The route config exists, but is not writeable. <small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
                     $this->canWriteRoutes = false;
                     return false;
                 }
@@ -208,7 +208,7 @@ class Routes extends BAse
 
             } else {
 
-                $this->_set_error('The route directory is not writeable. <small>' . $this->routesDir . '</small>');
+                $this->setError('The route directory is not writeable. <small>' . $this->routesDir . '</small>');
                 $this->canWriteRoutes = false;
                 return false;
             }

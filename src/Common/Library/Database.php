@@ -51,6 +51,46 @@ class Database
     // --------------------------------------------------------------------------
 
     /**
+     * Clears the query history and other memory hogs
+     * @return Object
+     */
+    public function flushCache()
+    {
+        $this->oDb->queries     = array();
+        $this->oDb->query_times = array();
+        $this->oDb->data_cache  = array();
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Resets Active Record/Query Builder
+     * @return Object
+     */
+    public function reset()
+    {
+        $this->oDb->ar_select         = array();
+        $this->oDb->ar_from           = array();
+        $this->oDb->ar_join           = array();
+        $this->oDb->ar_where          = array();
+        $this->oDb->ar_like           = array();
+        $this->oDb->ar_groupby        = array();
+        $this->oDb->ar_having         = array();
+        $this->oDb->ar_orderby        = array();
+        $this->oDb->ar_wherein        = array();
+        $this->oDb->ar_aliased_tables = array();
+        $this->oDb->ar_no_escape      = array();
+        $this->oDb->ar_distinct       = false;
+        $this->oDb->ar_limit          = false;
+        $this->oDb->ar_offset         = false;
+        $this->oDb->ar_order          = false;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Route calls to the CodeIgniter Database class
      * @param  string $sMethod    The method being called
      * @param  array  $aArguments Any arguments being passed
@@ -58,7 +98,14 @@ class Database
      */
     public function __call($sMethod, $aArguments)
     {
-        return call_user_func_array(array($this->oDb, $sMethod), $aArguments);
+        if (method_exists($this, $sMethod)) {
+
+            return call_user_func_array(array($this, $sMethod), $aArguments);
+
+        } else {
+
+            return call_user_func_array(array($this->oDb, $sMethod), $aArguments);
+        }
     }
 
     // --------------------------------------------------------------------------
