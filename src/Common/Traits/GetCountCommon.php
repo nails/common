@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implements the common getcount_common() and _getcount_common_parse_sort() methods
+ * Implements the common getcount_common() and getCountCommonParseSort() methods
  *
  * @package     Nails
  * @subpackage  common
@@ -22,12 +22,12 @@ trait GetCountCommon
      * @param  array  $aData Data passed from the calling method
      * @return void
      **/
-    protected function _getcount_common($aData = array())
+    protected function getCountCommon($aData = array())
     {
-        $this->_getcount_compile_filters($aData);
-        $this->_getcount_compile_wheres($aData);
-        $this->_getcount_compile_likes($aData);
-        $this->_getcount_compile_sort($aData);
+        $this->getCountCommonCompileFilters($aData);
+        $this->getCountCommonCompileWheres($aData);
+        $this->getCountCommonCompileLikes($aData);
+        $this->getCountCommonCompileSort($aData);
     }
 
     // --------------------------------------------------------------------------
@@ -37,7 +37,7 @@ trait GetCountCommon
      * @param  array  &$data The data array
      * @return void
      */
-    protected function _getcount_compile_filters(&$data)
+    protected function getCountCommonCompileFilters(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -100,7 +100,7 @@ trait GetCountCommon
      * @param  array  &$data   The data array
      * @return void
      */
-    protected function _getcount_compile_wheres(&$data)
+    protected function getCountCommonCompileWheres(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -291,7 +291,7 @@ trait GetCountCommon
      * @param  array  &$data   The data array
      * @return void
      */
-    protected function _getcount_compile_likes(&$data)
+    protected function getCountCommonCompileLikes(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -426,7 +426,7 @@ trait GetCountCommon
      * @param  array  &$data The data array
      * @return void
      */
-    protected function _getcount_compile_sort(&$data)
+    protected function getCountCommonCompileSort(&$data)
     {
         $oDb = Factory::service('Database');
 
@@ -456,7 +456,7 @@ trait GetCountCommon
                 if (is_string($_first)) {
 
                     //  Single dimension array
-                    $_sort = $this->_getcount_common_parse_sort($data['sort']);
+                    $_sort = $this->getCountCommonParseSort($data['sort']);
 
                     if (!empty($_sort['column'])) {
 
@@ -469,7 +469,7 @@ trait GetCountCommon
                     //  Multi dimension array
                     foreach ($data['sort'] as $sort) {
 
-                        $_sort = $this->_getcount_common_parse_sort($sort);
+                        $_sort = $this->getCountCommonParseSort($sort);
 
                         if (!empty($_sort['column'])) {
 
@@ -483,7 +483,7 @@ trait GetCountCommon
 
     // --------------------------------------------------------------------------
 
-    protected function _getcount_common_parse_sort($sort)
+    protected function getCountCommonParseSort($sort)
     {
         $_out = array('column' => null, 'order' => null);
 

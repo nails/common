@@ -79,7 +79,6 @@ class Base
     {
         //  Ensure models all have access to the global user_model
         if (function_exists('getUserObject')) {
-
             $this->user_model = getUserObject();
         }
 
@@ -213,7 +212,7 @@ class Base
                 return false;
             }
 
-            $aData[$this->tableSlugColumn] = $this->_generate_slug($aData[$this->tableLabelColumn]);
+            $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
         }
 
         if (!empty($aData)) {
@@ -232,7 +231,7 @@ class Base
 
             if ($bReturnObject) {
 
-                return $this->get_by_id($iId);
+                return $this->getById($iId);
 
             } else {
 
@@ -307,7 +306,7 @@ class Base
              */
             if (!empty($aData[$this->tableLabelColumn])) {
 
-                $aData[$sPrefix . $this->tableSlugColumn] = $this->_generate_slug(
+                $aData[$sPrefix . $this->tableSlugColumn] = $this->generateSlug(
                     $aData[$this->tableLabelColumn],
                     '',
                     '',
@@ -449,7 +448,7 @@ class Base
      * Fetches all objects, optionally paginated.
      * @param int    $page           The page number of the results, if null then no pagination
      * @param int    $perPage        How many items per page of paginated results
-     * @param mixed  $data           Any data to pass to _getcount_common()
+     * @param mixed  $data           Any data to pass to getCountCommon()
      * @param bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @return array
      */
@@ -457,7 +456,7 @@ class Base
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::get_all() Table variable not set');
+            show_error(get_called_class() . '::getAll() Table variable not set');
             return;
 
         } else {
@@ -468,7 +467,7 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Apply common items; pass $data
-        $this->_getcount_common($data);
+        $this->getCountCommon($data);
 
         // --------------------------------------------------------------------------
 
@@ -514,7 +513,7 @@ class Base
 
             for ($i = 0; $i < $numResults; $i++) {
 
-                $this->_format_object($aResults[$i], $data);
+                $this->formatObject($aResults[$i], $data);
             }
 
             return $aResults;
@@ -528,26 +527,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to getAll(); backwards compatability.
-     */
-    public function get_all($page = null, $perPage = null, $data = array(), $includeDeleted = false)
-    {
-        return $this->getAll($page, $perPage, $data, $includeDeleted);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Fetches all objects as a flat array
      * @param  int     $page           The page number of the results
      * @param  int     $perPage        The number of items per page
-     * @param  array   $data           Any data to pass to _getcount_common()
+     * @param  array   $data           Any data to pass to getCountCommon()
      * @param  boolean $includeDeleted Whether or not to include deleted items
      * @return array
      */
     public function getAllFlat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
-        $items = $this->get_all($page, $perPage, $data, $includeDeleted);
+        $items = $this->getAll($page, $perPage, $data, $includeDeleted);
         $out   = array();
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
@@ -564,7 +553,7 @@ class Base
         if (!isset($_test->{$this->tableLabelColumn})) {
 
             show_error(
-                get_called_class() . '::get_all_flat() "' . $this->tableLabelColumn . '" is not a valid label column.'
+                get_called_class() . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid label column.'
             );
             return;
         }
@@ -572,7 +561,7 @@ class Base
         if (!isset($_test->{$this->tableIdColumn})) {
 
             show_error(
-                get_called_class() . '::get_all_flat() "' . $this->tableIdColumn . '" is not a valid id column.'
+                get_called_class() . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid id column.'
             );
             return;
         }
@@ -592,26 +581,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to getAllFlat(); backwards compatability.
-     */
-    public function get_all_flat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
-    {
-        return $this->getAllFlat($page, $perPage, $data, $includeDeleted);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Fetch an object by it's ID
      * @param  int      $iId   The ID of the object to fetch
-     * @param  mixed    $aData Any data to pass to _getcount_common()
+     * @param  mixed    $aData Any data to pass to getCountCommon()
      * @return mixed           stdClass on success, false on failure
      */
     public function getById($iId, $aData = array())
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::get_by_id() Table variable not set');
+            show_error(get_called_class() . '::getById() Table variable not set');
             return;
 
         }
@@ -637,7 +616,7 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        $aResult = $this->get_all(null, null, $aData, false, 'GET_BY_ID');
+        $aResult = $this->getAll(null, null, $aData);
 
         // --------------------------------------------------------------------------
 
@@ -654,26 +633,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to getById(); backwards compatability.
-     */
-    public function get_by_id($iId, $aData = array())
-    {
-        return $this->getById($iId, $aData);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Fetch objects by their IDs
      * @param  array $aIds  An array of IDs to fetch
-     * @param  mixed $aData Any data to pass to _getcount_common()
+     * @param  mixed $aData Any data to pass to getCountCommon()
      * @return array
      */
     public function getByIds($aIds, $aData = array())
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::get_by_ids() Table variable not set');
+            show_error(get_called_class() . '::getByIds() Table variable not set');
             return;
 
         }
@@ -699,17 +668,7 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        return $this->get_all(null, null, $aData, false, 'GET_BY_IDS');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Alias to getByIds(); backwards compatability.
-     */
-    public function get_by_ids($iIds, $aData = array())
-    {
-        return $this->getByIds($iId, $aData);
+        return $this->getAll(null, null, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -717,14 +676,14 @@ class Base
     /**
      * Fetch an object by it's slug
      * @param  string   $sSlug The slug of the object to fetch
-     * @param  mixed    $data Any data to pass to _getcount_common()
+     * @param  mixed    $data Any data to pass to getCountCommon()
      * @return stdClass
      */
     public function getBySlug($sSlug, $aData = array())
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::get_by_slug() Table variable not set');
+            show_error(get_called_class() . '::getBySlug() Table variable not set');
             return;
         }
 
@@ -749,7 +708,7 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        $aResult = $this->get_all(null, null, $aData, false, 'GET_BY_SLUG');
+        $aResult = $this->getAll(null, null, $aData);
 
         // --------------------------------------------------------------------------
 
@@ -766,26 +725,16 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to getBySlug(); backwards compatability.
-     */
-    public function get_by_slug($sSlug, $aData = array())
-    {
-        return $this->getBySlug($sSlug, $aData);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Fetch objects by their slugs
      * @param  array $aSlugs An array of slugs to fetch
-     * @param  mixed $aData  Any data to pass to _getcount_common()
+     * @param  mixed $aData  Any data to pass to getCountCommon()
      * @return array
      */
     public function getBySlugs($aSlugs, $aData = array())
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::get_by_slug() Table variable not set');
+            show_error(get_called_class() . '::getBySlug() Table variable not set');
             return;
         }
 
@@ -810,17 +759,7 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        return $this->get_all(null, null, $aData, false, 'GET_BY_SLUGS');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Alias to getBySlugs(); backwards compatability.
-     */
-    public function get_by_slugs($aSlugs, $aData = array())
-    {
-        return $this->getBySlugs($aSlugs, $aData);
+        return $this->getAll(null, null, $aData, false);
     }
 
     // --------------------------------------------------------------------------
@@ -834,36 +773,26 @@ class Base
      * Nails style guidelines) will be interpreted incorrectly.
      *
      * @param  mixed    $mIdSlug The ID or slug of the object to fetch
-     * @param  array    $aData   Any data to pass to _getcount_common()
+     * @param  array    $aData   Any data to pass to getCountCommon()
      * @return stdClass
      */
     public function getByIdOrSlug($mIdSlug, $aData = array())
     {
         if (is_numeric($mIdSlug)) {
 
-            return $this->get_by_id($mIdSlug, $aData);
+            return $this->getById($mIdSlug, $aData);
 
         } else {
 
-            return $this->get_by_slug($mIdSlug, $aData);
+            return $this->getBySlug($mIdSlug, $aData);
         }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to getByIdOrSlug(); backwards compatability.
-     */
-    public function get_by_id_or_slug($mIdSlug, $aData = array())
-    {
-        return $this->getByIdOrSlug($mIdSlug, $aData);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Counts all objects
-     * @param  array   $adata           An array of data to pass to _getcount_common()
+     * @param  array   $adata           An array of data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
      * @return integer
      */
@@ -871,7 +800,7 @@ class Base
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::count_all() Table variable not set');
+            show_error(get_called_class() . '::countAll() Table variable not set');
             return;
 
         } else {
@@ -882,7 +811,7 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Apply common items
-        $this->_getcount_common($aData, 'COUNT_ALL');
+        $this->getCountCommon($aData, 'COUNT_ALL');
 
         // --------------------------------------------------------------------------
 
@@ -901,21 +830,11 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias to countAll(); backwards compatability.
-     */
-    public function count_all($aData = array(), $bIncludeDeleted = false)
-    {
-        return $this->countAll($aData, $bIncludeDeleted);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Searches for objects, optionally paginated.
      * @param  string    $sKeywords       The search term
      * @param  int       $iPage           The page number of the results, if null then no pagination
      * @param  int       $iPerPage        How many items per page of paginated results
-     * @param  mixed     $aData           Any data to pass to _getcount_common()
+     * @param  mixed     $aData           Any data to pass to getCountCommon()
      * @param  bool      $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @return \stdClass
      */
@@ -934,8 +853,8 @@ class Base
         $oOut          = new \stdClass();
         $oOut->page    = $iPage;
         $oOut->perPage = $iPerPage;
-        $oOut->total   = $this->count_all($aData);
-        $oOut->data    = $this->get_all($iPage, $iPerPage, $aData);
+        $oOut->total   = $this->countAll($aData);
+        $oOut->data    = $this->getAll($iPage, $iPerPage, $aData);
 
         return $oOut;
     }
@@ -967,7 +886,7 @@ class Base
 
             if (!$this->table) {
 
-                show_error(get_called_class() . '::_generate_slug() Table variable not set');
+                show_error(get_called_class() . '::generateSlug() Table variable not set');
                 return;
             }
 
@@ -982,7 +901,7 @@ class Base
 
             if (!$this->tableSlugColumn) {
 
-                show_error(get_called_class() . '::_generate_slug() Column variable not set');
+                show_error(get_called_class() . '::generateSlug() Column variable not set');
                 return;
             }
 
@@ -1027,19 +946,9 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Alias of generateslug(); backwards compatability
-     */
-    protected function _generate_slug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
-    {
-        return $this->generateSlug($label, $prefix, $suffix, $table, $column, $ignoreId, $idColumn);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Formats a single object
      *
-     * The get_all() method iterates over each returned item with this method so as to
+     * The getAll() method iterates over each returned item with this method so as to
      * correctly format the output. Use this to cast integers and booleans and/or organise data into objects.
      *
      * @param  object $obj      A reference to the object being formatted.
@@ -1075,9 +984,7 @@ class Base
         $bools[] = 'is_published';
 
         foreach ($bools as $property) {
-
             if (property_exists($obj, $property) && !is_null($obj->{$property})) {
-
                 $obj->{$property} = (bool) $obj->{$property};
             }
         }
@@ -1087,22 +994,10 @@ class Base
         $floats = (array) $floats;
 
         foreach ($floats as $property) {
-
             if (property_exists($obj, $property) && is_numeric($obj->{$property}) && !is_null($obj->{$property})) {
-
                 $obj->{$property} = (float) $obj->{$property};
             }
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Alias of formatObject(); backwards compatability
-     */
-    protected function _format_object(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
-    {
-        return $this->formatObject($obj, $data, $integers, $bools, $floats);
     }
 
     // --------------------------------------------------------------------------
