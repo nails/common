@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This file provides form related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
 use Nails\Factory;
 
 if (!function_exists('form_email')) {

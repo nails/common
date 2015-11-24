@@ -11,18 +11,17 @@
  * @link
  */
 
-class CORE_NAILS_Lang extends MX_Lang {
-
+class CORE_NAILS_Lang extends MX_Lang
+{
     /**
      * Overriding the default line() method so that parameters can be specified
      * @param   string  $line   the language line
      * @param   array   $params any parameters to sub in
      * @return  string
      */
-    public function line($line = '', $params = NULL)
+    public function line($line = '', $params = null)
     {
         if (is_null($params)) {
-
             return parent::line($line);
         }
 
@@ -78,7 +77,7 @@ class CORE_NAILS_Lang extends MX_Lang {
         // --------------------------------------------------------------------------
 
         //  Check to see if the language file has already been loaded
-        if (in_array ($langfile . '_lang' . EXT, $this->is_loaded, true)) {
+        if (in_array($langfile . '_lang' . EXT, $this->is_loaded, true)) {
 
             return $this->language;
         }
@@ -86,7 +85,7 @@ class CORE_NAILS_Lang extends MX_Lang {
         // --------------------------------------------------------------------------
 
         //  Look for the language
-        $_module OR $_module = CI::$APP->router->fetch_module();
+        $_module || $_module = CI::$APP->router->fetch_module();
         list($path, $_langfile) = Modules::find($langfile . '_lang', $_module, 'language/' . $idiom . '/');
 
         /**

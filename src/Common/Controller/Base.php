@@ -658,7 +658,6 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Load Helpers
-        Factory::helper('user');
         Factory::helper('app_setting');
         Factory::helper('app_notification');
         Factory::helper('date');
@@ -672,7 +671,6 @@ class Base extends \MX_Controller
         Factory::helper('text');
         Factory::helper('exception');
         Factory::helper('typography');
-        Factory::helper('event');
         Factory::helper('log');
 
         //  Autoload module helpers

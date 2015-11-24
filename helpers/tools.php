@@ -1,7 +1,17 @@
 <?php
 
-if (!function_exists('map'))
-{
+/**
+ * This file provides miscallaeneous related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
+if (!function_exists('map')) {
+
     /**
      * Re-maps a number from one range to another
      * See http://www.arduino.cc/en/Reference/Map
@@ -20,8 +30,8 @@ if (!function_exists('map'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('special_chars'))
-{
+if (!function_exists('special_chars')) {
+
     /**
      * Replaces special chars with their HTML counterpart
      * @param   string  String to parse
@@ -37,14 +47,18 @@ if (!function_exists('special_chars'))
         }
 
         // decode three byte unicode characters
-        $string = preg_replace("/([\340-\357])([\200-\277])([\200-\277])/e",
-        "'&#'.((ord('\\1')-224)*4096 + (ord('\\2')-128)*64 + (ord('\\3')-128)).';'",
-        $string);
+        $string = preg_replace(
+            "/([\340-\357])([\200-\277])([\200-\277])/e",
+            "'&#'.((ord('\\1')-224)*4096 + (ord('\\2')-128)*64 + (ord('\\3')-128)).';'",
+            $string
+        );
 
         // decode two byte unicode characters
-        $string = preg_replace("/([\300-\337])([\200-\277])/e",
-        "'&#'.((ord('\\1')-192)*64+(ord('\\2')-128)).';'",
-        $string);
+        $string = preg_replace(
+            "/([\300-\337])([\200-\277])/e",
+            "'&#'.((ord('\\1')-192)*64+(ord('\\2')-128)).';'",
+            $string
+        );
 
         return $string;
     }
@@ -52,8 +66,8 @@ if (!function_exists('special_chars'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('format_bytes'))
-{
+if (!function_exists('format_bytes')) {
+
     /**
      * Format a filesize in bytes, kilobytes, megabytes, etc...
      * @param   string
@@ -74,7 +88,7 @@ if (!function_exists('format_bytes'))
         $var = round($bytes, $precision) . ' ' . $units[$pow];
         $pattern = '/(.+?)\.(.*?)/';
 
-        return preg_replace_callback($pattern, function($matches) {
+        return preg_replace_callback($pattern, function ($matches) {
 
             return number_format($matches[1]) . '.' . $matches[2];
         }, $var);
@@ -83,8 +97,8 @@ if (!function_exists('format_bytes'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('return_bytes'))
-{
+if (!function_exists('return_bytes')) {
+
     /**
      * Formats a filesize as bytes (e.g max_upload_size)
      * hat-tip: http://php.net/manual/en/function.ini-get.php#96996
@@ -122,8 +136,8 @@ if (!function_exists('return_bytes'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('stringToBoolean'))
-{
+if (!function_exists('stringToBoolean')) {
+
     /**
      * Converts a string to a boolean
      * @param   string
@@ -144,8 +158,8 @@ if (!function_exists('stringToBoolean'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('isIpInRange'))
-{
+if (!function_exists('isIpInRange')) {
+
     /**
      * Match an IP to a given CIDR range
      * @param   string
@@ -207,8 +221,8 @@ if (!function_exists('isIpInRange'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('readFileChunked'))
-{
+if (!function_exists('readFileChunked')) {
+
     /**
      * Outputs a file in bytesized chunks.
      * http://teddy.fr/2007/11/28/how-serve-big-files-through-php/

@@ -10,8 +10,7 @@
  * @link
  */
 
-if (!function_exists('lang'))
-{
+if (!function_exists('lang')) {
 
     /**
      * Overriding the helper to incorporate language parameters
@@ -25,8 +24,7 @@ if (!function_exists('lang'))
         $oCi   =& get_instance();
         $sLine = $oCi->lang->line($sLine, $aParams);
 
-        if ($sId != '')
-        {
+        if ($sId != '') {
             $sLine = '<label for="' . $sId . '">' . $sLine . "</label>";
         }
 

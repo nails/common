@@ -11,8 +11,8 @@
  * @link
  */
 
-class CORE_NAILS_Exceptions extends CI_Exceptions {
-
+class CORE_NAILS_Exceptions extends CI_Exceptions
+{
     private $error_has_occured = false;
     private $recent_errors     = array();
 
@@ -30,7 +30,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions {
      * @param   boolean whether to log the error or not
      * @return  void
      */
-    function show_php_error($severity, $message, $filepath, $line)
+    public function show_php_error($severity, $message, $filepath, $line)
     {
         $_temp           = new stdClass();
         $_temp->severity = $severity;

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file provides langauge related helper functions
+ * This file provides array related helper functions
  *
  * @package     Nails
  * @subpackage  common
@@ -68,8 +68,8 @@ if (!function_exists('array_sort_multi')) {
      */
     function array_sort_multi(array &$array, $field)
     {
-        uasort($array, function($a, $b) use ($field)
-        {
+        uasort($array, function ($a, $b) use ($field) {
+
             //  Equal?
             if (trim($a->$field) == trim($b->$field)) {
 

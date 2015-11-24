@@ -10,8 +10,7 @@
  * @link
  */
 
-if (!function_exists('str_lreplace'))
-{
+if (!function_exists('str_lreplace')) {
     /**
      * Replace the last occurance of a string within a string with a string
      * @param  string $search  The substring to replace
@@ -34,8 +33,8 @@ if (!function_exists('str_lreplace'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('underscoreToCamelcase'))
-{
+if (!function_exists('underscoreToCamelcase')) {
+
     /**
      * Transforms a string with underscores into a camelcased string
      * @param  string  $str     The string to transform
@@ -54,8 +53,8 @@ if (!function_exists('underscoreToCamelcase'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('camelcase_to_underscore'))
-{
+if (!function_exists('camelcase_to_underscore')) {
+
     /**
      * Transforms a camelcased string to underscores
      * @param  string $str The string to transform

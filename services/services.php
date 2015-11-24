@@ -2,110 +2,110 @@
 
 return array(
     'services' => array(
-        'Asset' => function() {
+        'Asset' => function () {
             if (class_exists('\App\Common\Library\Asset')) {
                 return new \App\Common\Library\Asset();
             } else {
                 return new \Nails\Common\Library\Asset();
             }
         },
-        'Meta' => function() {
+        'Meta' => function () {
             if (class_exists('\App\Common\Library\Meta')) {
                 return new \App\Common\Library\Meta();
             } else {
                 return new \Nails\Common\Library\Meta();
             }
         },
-        'UserFeedback' => function() {
+        'UserFeedback' => function () {
             if (class_exists('\App\Common\Library\UserFeedback')) {
                 return new \App\Common\Library\UserFeedback();
             } else {
                 return new \Nails\Common\Library\UserFeedback();
             }
         },
-        'ErrorHandler' => function() {
+        'ErrorHandler' => function () {
             if (class_exists('\App\Common\Library\ErrorHandler')) {
                 return new \App\Common\Library\ErrorHandler();
             } else {
                 return new \Nails\Common\Library\ErrorHandler();
             }
         },
-        'Logger' => function() {
+        'Logger' => function () {
             if (class_exists('\App\Common\Library\Logger')) {
                 return new \App\Common\Library\Logger();
             } else {
                 return new \Nails\Common\Library\Logger();
             }
         },
-        'Mustache' => function() {
+        'Mustache' => function () {
             if (class_exists('\App\Common\Library\Asset')) {
                 return new \App\Common\Library\Mustache();
             } else {
                 return new Mustache_Engine();
             }
         },
-        'Encrypt' => function() {
+        'Encrypt' => function () {
 
             $oCi = get_instance();
             $oCi->load->library('encrypt');
             return $oCi->encrypt;
         },
-        'Database' => function() {
+        'Database' => function () {
             return new \Nails\Common\Library\Database();
         },
-        'ConsoleDatabase' => function() {
+        'ConsoleDatabase' => function () {
             //  @todo: replace this with the above once the above is not dependant on CI
             return new \Nails\Common\Console\Database();
         },
-        'FormValidation' => function() {
+        'FormValidation' => function () {
 
             $oCi = get_instance();
             $oCi->load->library('form_validation');
             return $oCi->form_validation;
         },
-        'Input' => function() {
+        'Input' => function () {
 
             $oCi = get_instance();
             return $oCi->input;
         }
     ),
     'models' => array(
-        'AppNotification' => function() {
+        'AppNotification' => function () {
             if (class_exists('\App\Common\Model\AppNotification')) {
                 return new \App\Common\Model\AppNotification();
             } else {
                 return new \Nails\Common\Model\AppNotification();
             }
         },
-        'AppSetting' => function() {
+        'AppSetting' => function () {
             if (class_exists('\App\Common\Model\AppSetting')) {
                 return new \App\Common\Model\AppSetting();
             } else {
                 return new \Nails\Common\Model\AppSetting();
             }
         },
-        'Country' => function() {
+        'Country' => function () {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
             } else {
                 return new \Nails\Common\Model\Country();
             }
         },
-        'DateTime' => function() {
+        'DateTime' => function () {
             if (class_exists('\App\Common\Model\DateTime')) {
                 return new \App\Common\Model\DateTime();
             } else {
                 return new \Nails\Common\Model\DateTime();
             }
         },
-        'Language' => function() {
+        'Language' => function () {
             if (class_exists('\App\Common\Model\Language')) {
                 return new \App\Common\Model\Language();
             } else {
                 return new \Nails\Common\Model\Language();
             }
         },
-        'Routes' => function() {
+        'Routes' => function () {
             if (class_exists('\App\Common\Model\Routes')) {
                 return new \App\Common\Model\Routes();
             } else {
@@ -114,10 +114,10 @@ return array(
         }
     ),
     'factories' => array(
-        'DateTime' => function() {
+        'DateTime' => function () {
             return new \DateTime();
         },
-        'HttpClient' => function() {
+        'HttpClient' => function () {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient();
             } else {

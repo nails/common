@@ -13,8 +13,8 @@
 /* load the MX Loader class */
 require NAILS_COMMON_PATH . 'MX/Loader.php';
 
-class CORE_NAILS_Loader extends MX_Loader {
-
+class CORE_NAILS_Loader extends MX_Loader
+{
     /**
      * Determines whether a model is loaded or not
      * @param  string $model The model to check
@@ -148,18 +148,17 @@ class CORE_NAILS_Loader extends MX_Loader {
         // --------------------------------------------------------------------------
 
         //  CI Loader
-        foreach ($toLoad as $helper)
-        {
+        foreach ($toLoad as $helper) {
             if (isset($this->_ci_helpers[$helper])) {
-
                 continue;
             }
 
             $classPrefix          = config_item('subclass_prefix');
             $appExtHelper         = APPPATH . 'helpers/' . $classPrefix . $helper . EXT;
             $nailsExtHelper       = NAILS_COMMON_PATH . 'helpers/' . $classPrefix . $helper . EXT;
-            $nailsExtModuleHelper = $this->router->current_module() ? NAILS_COMMON_PATH . 'modules/' . $this->router->current_module() . '/helpers/' . $classPrefix . $helper . EXT : null;
-            $nailsModuleHelper    = $this->router->current_module() ? NAILS_COMMON_PATH . 'modules/' . $this->router->current_module() . '/helpers/' . $helper . EXT : null;
+            $sHelperPath          = NAILS_COMMON_PATH . 'modules/' . $this->router->current_module() . '/helpers/';
+            $nailsExtModuleHelper = $this->router->current_module() ? $sHelperPath . $classPrefix . $helper . EXT : null;
+            $nailsModuleHelper    = $this->router->current_module() ? $sHelperPath . $helper . EXT : null;
 
             // Is this a helper extension request?
             if (file_exists($appExtHelper)) {
@@ -284,8 +283,8 @@ class CORE_NAILS_Loader extends MX_Loader {
         $classPrefix = config_item('subclass_prefix');
 
         // We'll test for both lowercase and capitalized versions of the file name
-        foreach (array(ucfirst($class), strtolower($class)) as $class)
-        {
+        foreach (array(ucfirst($class), strtolower($class)) as $class) {
+
             $subClass   = APPPATH . 'libraries/' . $subdir . $classPrefix . $class . EXT;
             $nailsClass = NAILS_COMMON_PATH . 'libraries/' . $subdir . 'CORE_' . $classPrefix . $class . EXT;
 
@@ -301,8 +300,8 @@ class CORE_NAILS_Loader extends MX_Loader {
                 }
 
                 // Safety:  Was the class already loaded by a previous call?
-                if (in_array($subClass, $this->_ci_loaded_files))
-                {
+                if (in_array($subClass, $this->_ci_loaded_files)) {
+
                     /**
                      * Before we deem this to be a duplicate request, let's see if
                      * a custom object name is being supplied.  If so, we'll return
@@ -355,8 +354,8 @@ class CORE_NAILS_Loader extends MX_Loader {
                 }
 
                 // Safety:  Was the class already loaded by a previous call?
-                if (in_array($nailsClass, $this->_ci_loaded_files))
-                {
+                if (in_array($nailsClass, $this->_ci_loaded_files)) {
+
                     /**
                      * Before we deem this to be a duplicate request, let's see if
                      * a custom object name is being supplied.  If so, we'll return
@@ -398,8 +397,8 @@ class CORE_NAILS_Loader extends MX_Loader {
                 }
 
                 // Safety:  Was the class already loaded by a previous call?
-                if (in_array($filepath, $this->_ci_loaded_files))
-                {
+                if (in_array($filepath, $this->_ci_loaded_files)) {
+
                     /**
                      * Before we deem this to be a duplicate request, let's see if
                      * a custom object name is being supplied.  If so, we'll return
@@ -438,8 +437,7 @@ class CORE_NAILS_Loader extends MX_Loader {
          * errors if the load call failed due to a duplicate request
          */
 
-        if ($isDuplicate == false)
-        {
+        if ($isDuplicate == false) {
             log_message('error', 'Unable to load the requested class: ' . $class);
             show_error('Unable to load the requested class: ' . $class);
         }

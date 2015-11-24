@@ -41,13 +41,9 @@ class CORE_NAILS_User_agent extends CI_User_agent
     private function _get_browser($agent)
     {
         $out = array('version' => 'Unknown Version', 'browser' => 'Unknown Browser');
-
-        if (is_array($this->browsers) AND count($this->browsers) > 0) {
-
+        if (is_array($this->browsers) && count($this->browsers) > 0) {
             foreach ($this->browsers as $key => $val) {
-
                 if (preg_match("|".preg_quote($key).".*?([0-9\.]+)|i", $agent, $match)) {
-
                     $out['version'] = $match[1];
                     $out['browser'] = $val;
                     return $out;
@@ -66,12 +62,9 @@ class CORE_NAILS_User_agent extends CI_User_agent
      */
     private function _get_platform($agent)
     {
-        if (is_array($this->platforms) AND count($this->platforms) > 0)
-        {
-            foreach ($this->platforms as $key => $val)
-            {
-                if (preg_match("|".preg_quote($key)."|i", $agent))
-                {
+        if (is_array($this->platforms) && count($this->platforms) > 0) {
+            foreach ($this->platforms as $key => $val) {
+                if (preg_match("|".preg_quote($key)."|i", $agent)) {
                     return $val;
                 }
             }

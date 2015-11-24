@@ -12,9 +12,10 @@
 
 class CORE_NAILS_Hooks extends CI_Hooks
 {
-    var $myhooks = array();
-    var $my_in_progress = false;
-    function MY_Hooks() {
+    public $myhooks = array();
+    public $my_in_progress = false;
+    public function MY_Hooks()
+    {
         parent::CI_Hooks();
     }
 
@@ -26,10 +27,11 @@ class CORE_NAILS_Hooks extends CI_Hooks
      * @param    array(classref, method, params)
      * @return    mixed
      */
-    function add_hook($hookwhere, $hook) {
+    public function add_hook($hookwhere, $hook)
+    {
         if (is_array($hook)) {
-            if (isset($hook['classref']) AND isset($hook['method']) AND isset($hook['params'])) {
-                if (is_object($hook['classref']) AND method_exists($hook['classref'], $hook['method'])) {
+            if (isset($hook['classref']) && isset($hook['method']) && isset($hook['params'])) {
+                if (is_object($hook['classref']) && method_exists($hook['classref'], $hook['method'])) {
                     $this->myhooks[$hookwhere][] = $hook;
                     return true;
                 }
@@ -38,12 +40,14 @@ class CORE_NAILS_Hooks extends CI_Hooks
         return false;
     }
 
+    // --------------------------------------------------------------------------
 
-    function _call_hook($which = '') {
+    public function _call_hook($which = '')
+    {
         if (!isset($this->myhooks[$which])) {
             return parent::_call_hook($which);
         }
-        if (isset($this->myhooks[$which][0]) AND is_array($this->myhooks[$which][0])) {
+        if (isset($this->myhooks[$which][0]) && is_array($this->myhooks[$which][0])) {
             foreach ($this->myhooks[$which] as $val) {
                 $this->_my_run_hook($val);
             }
@@ -53,7 +57,9 @@ class CORE_NAILS_Hooks extends CI_Hooks
         return parent::_call_hook($which);
     }
 
-    function _my_run_hook($data)
+    // --------------------------------------------------------------------------
+
+    public function _my_run_hook($data)
     {
         if (! is_array($data)) {
             return false;
@@ -71,9 +77,9 @@ class CORE_NAILS_Hooks extends CI_Hooks
         // -----------------------------------
         // Set class/method name
         // -----------------------------------
-        $class        = NULL;
-        $method        = NULL;
-        $params        = '';
+        $class  = null;
+        $method = null;
+        $params = '';
 
         if (isset($data['classref'])) {
             $class =& $data['classref'];
@@ -86,7 +92,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
             $params = $data['params'];
         }
 
-        if (!is_object($class) OR !method_exists($class, $method)) {
+        if (!is_object($class) || !method_exists($class, $method)) {
             return false;
         }
 
@@ -103,9 +109,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
         return true;
     }
 
-
     // --------------------------------------------------------------------------
-
 
     /**
      * Run Hook
@@ -116,10 +120,9 @@ class CORE_NAILS_Hooks extends CI_Hooks
      * @param   array   the hook details
      * @return  bool
      */
-    function _run_hook($data)
+    public function _run_hook($data)
     {
-        if (! is_array($data))
-        {
+        if (! is_array($data)) {
             return false;
         }
 
@@ -130,8 +133,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
         // If the script being called happens to have the same
         // hook call within it a loop can happen
 
-        if ($this->in_progress == true)
-        {
+        if ($this->in_progress == true) {
             return;
         }
 
@@ -139,8 +141,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
         // Set file path
         // -----------------------------------
 
-        if (! isset($data['filepath']) OR ! isset($data['filename']))
-        {
+        if (! isset($data['filepath']) || ! isset($data['filename'])) {
             return false;
         }
 
@@ -157,8 +158,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
             $filepath .= $data['filename'];
         }
 
-        if (! file_exists($filepath))
-        {
+        if (! file_exists($filepath)) {
             return false;
         }
 
@@ -170,23 +170,19 @@ class CORE_NAILS_Hooks extends CI_Hooks
         $function   = false;
         $params     = '';
 
-        if (isset($data['class']) AND $data['class'] != '')
-        {
+        if (isset($data['class']) && $data['class'] != '') {
             $class = $data['class'];
         }
 
-        if (isset($data['function']))
-        {
+        if (isset($data['function'])) {
             $function = $data['function'];
         }
 
-        if (isset($data['params']))
-        {
+        if (isset($data['params'])) {
             $params = $data['params'];
         }
 
-        if ($class === false AND $function === false)
-        {
+        if ($class === false && $function === false) {
             return false;
         }
 
@@ -200,20 +196,18 @@ class CORE_NAILS_Hooks extends CI_Hooks
         // Call the requested class and/or function
         // -----------------------------------
 
-        if ($class !== false)
-        {
-            if (! class_exists($class))
-            {
+        if ($class !== false) {
+
+            if (! class_exists($class)) {
                 require($filepath);
             }
 
             $HOOK = new $class;
             $HOOK->$function($params);
-        }
-        else
-        {
-            if (! function_exists($function))
-            {
+
+        } else {
+
+            if (! function_exists($function)) {
                 require($filepath);
             }
 

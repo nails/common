@@ -10,8 +10,8 @@
  * @link
  */
 
-if (!function_exists('site_url'))
-{
+if (!function_exists('site_url')) {
+
     /**
      * Create a local URL based on your basepath. Segments can be passed via the
      * first parameter either as a string or an array.
@@ -19,7 +19,7 @@ if (!function_exists('site_url'))
      * @param  boolean $force_secure Whether to force the url to be secure or not
      * @return string
      */
-    function site_url($uri = '', $force_secure = FALSE)
+    function site_url($uri = '', $force_secure = false)
     {
         $CI =& get_instance();
         return $CI->config->site_url($uri, $force_secure);
@@ -28,8 +28,8 @@ if (!function_exists('site_url'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('secure_site_url'))
-{
+if (!function_exists('secure_site_url')) {
+
     /**
      * Create a secure local URL based on your basepath. Segments can be passed via the
      * first parameter either as a string or an array.
@@ -45,8 +45,8 @@ if (!function_exists('secure_site_url'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('redirect'))
-{
+if (!function_exists('redirect')) {
+
     /**
      * Header Redirect
      *
@@ -77,8 +77,8 @@ if (!function_exists('redirect'))
             $uri = site_url($uri);
         }
 
-        switch ($method)
-        {
+        switch ($method) {
+
             case 'refresh':
 
                 header("Refresh:0;url=".$uri);
@@ -86,7 +86,7 @@ if (!function_exists('redirect'))
 
             default:
 
-                header("Location: ".$uri, TRUE, $http_response_code);
+                header('Location: ' . $uri, true, $http_response_code);
                 break;
         }
 

@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * This file provides debug related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
 use Nails\Factory;
 
-if (!function_exists('dumpanddie'))
-{
+if (!function_exists('dumpanddie')) {
+
     /**
      * Alias to dump($mVar, true)
      * @param  mixed $mVar The variable to dump
@@ -17,8 +27,8 @@ if (!function_exists('dumpanddie'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('dump'))
-{
+if (!function_exists('dump')) {
+
     /**
      * Dumps data, similar to var_dump()
      * @param  mixed   $mVar The variable to dump
@@ -73,8 +83,8 @@ if (!function_exists('dump'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('here'))
-{
+if (!function_exists('here')) {
+
     /**
      * Outputs a 'here at date()' string using dumpanddie(); useful for debugging.
      * @param  mixed $mDump The variable to dump
@@ -96,8 +106,8 @@ if (!function_exists('here'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('lastquery'))
-{
+if (!function_exists('lastquery')) {
+
     /**
      * Dumps the last known query
      * @param  boolean $bDie Whether to kill the script
@@ -123,8 +133,8 @@ if (!function_exists('lastquery'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('last_query'))
-{
+if (!function_exists('last_query')) {
+
     /**
      * Alias of lastquery()
      * @param  boolean $bDie Whether to kill the script
@@ -138,8 +148,8 @@ if (!function_exists('last_query'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('dumpjson'))
-{
+if (!function_exists('dumpjson')) {
+
     /**
      * Dumps the passed variable as a JSON encoded string, setting JSON headers
      * @param  mixed $mData The variable to dump

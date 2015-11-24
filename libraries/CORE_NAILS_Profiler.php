@@ -29,11 +29,9 @@ class CORE_NAILS_Profiler extends CI_Profiler {
 
         $output .= "\n\n<table style='width:100%; display:none' id='ci_profiler_config_table'>\n";
 
-        foreach ($this->CI->config->config as $config=>$val)
-        {
-            if (is_array($val)||is_object($val))
-            {
-                $val = print_r($val, TRUE);
+        foreach ($this->CI->config->config as $config => $val) {
+            if (is_array($val)||is_object($val)) {
+                $val = print_r($val, true);
             }
 
             $output .= "<tr><td style='padding:5px; vertical-align: top;color:#900;background-color:#ddd;'>".$config."&nbsp;&nbsp;</td><td style='padding:5px; color:#000;background-color:#ddd;'>".htmlspecialchars($val)."</td></tr>\n";
@@ -54,8 +52,7 @@ class CORE_NAILS_Profiler extends CI_Profiler {
      */
     protected function _compile_session_data()
     {
-        if ( ! isset($this->CI->session))
-        {
+        if (!isset($this->CI->session)) {
             return;
         }
 
@@ -63,11 +60,9 @@ class CORE_NAILS_Profiler extends CI_Profiler {
         $output .= '<legend style="color:#000;">&nbsp;&nbsp;'.$this->CI->lang->line('profiler_session_data').'&nbsp;&nbsp;(<span style="cursor: pointer;" onclick="var s=document.getElementById(\'ci_profiler_session_data\').style;s.display=s.display==\'none\'?\'\':\'none\';this.innerHTML=this.innerHTML==\''.$this->CI->lang->line('profiler_section_show').'\'?\''.$this->CI->lang->line('profiler_section_hide').'\':\''.$this->CI->lang->line('profiler_section_show').'\';">'.$this->CI->lang->line('profiler_section_show').'</span>)</legend>';
         $output .= "<table style='width:100%;display:none' id='ci_profiler_session_data'>";
 
-        foreach ($this->CI->session->all_userdata() as $key => $val)
-        {
-            if (is_array($val)||is_object($val))
-            {
-                $val = print_r($val, TRUE);
+        foreach ($this->CI->session->all_userdata() as $key => $val) {
+            if (is_array($val)||is_object($val)) {
+                $val = print_r($val, true);
             }
 
             $output .= "<tr><td style='padding:5px; vertical-align: top;color:#900;background-color:#ddd;'>".$key."&nbsp;&nbsp;</td><td style='padding:5px; color:#000;background-color:#ddd;'>".htmlspecialchars($val)."</td></tr>\n";

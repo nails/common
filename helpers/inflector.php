@@ -10,8 +10,8 @@
  * @link
  */
 
-if (!function_exists('possessionise'))
-{
+if (!function_exists('possessionise')) {
+
     /**
      * Correctly adds possession to a word
      * @param  string $str The word to possesionise
@@ -25,8 +25,8 @@ if (!function_exists('possessionise'))
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('genderise'))
-{
+if (!function_exists('genderise')) {
+
     /**
      * Performs a basic genderisation of a string, so that pronouns, etc are correct
      * @param  string $gender The gender to transform to
@@ -35,8 +35,8 @@ if (!function_exists('genderise'))
      */
     function genderise($gender, $str)
     {
-        $pattern = NULL;
-        $replace = NULL;
+        $pattern = null;
+        $replace = null;
 
         //  Rules
         switch (strtolower($gender)) {
@@ -91,7 +91,7 @@ if (!function_exists('genderise'))
     function _genderise($oldPre, $old, $oldPost, $new)
     {
         //  Determine case
-        $case = NULL;
+        $case = null;
 
         // work it out here...
         if (ctype_upper($old)) {

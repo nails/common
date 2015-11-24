@@ -12,7 +12,8 @@
 /* load the MX Router class */
 require NAILS_COMMON_PATH . 'MX/Router.php';
 
-class CORE_NAILS_Router extends MX_Router {
+class CORE_NAILS_Router extends MX_Router
+{
 
     public function current_module()
     {
@@ -31,26 +32,24 @@ class CORE_NAILS_Router extends MX_Router {
      * @param  array $segments The URI segments
      * @return array
      */
-    public function _validate_request($segments) {
-
-        if (count($segments) == 0){
+    public function _validate_request($segments)
+    {
+        if (count($segments) == 0) {
 
             return $segments;
         }
 
         /* locate module controller */
-        if ($located = $this->locate($segments)){
-
+        if ($located = $this->locate($segments)) {
             return $located;
         }
 
         /* use a default 404_override controller */
-        if (isset($this->routes['404_override']) AND $this->routes['404_override']) {
+        if (isset($this->routes['404_override']) && $this->routes['404_override']) {
 
             $segments = explode('/', $this->routes['404_override']);
 
             if ($located = $this->locate($segments)) {
-
                 return $located;
             }
         }

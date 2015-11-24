@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This file provides app setting related helper functions
+ *
+ * @package     Nails
+ * @subpackage  common
+ * @category    Helper
+ * @author      Nails Dev Team
+ * @link
+ */
+
 use Nails\Factory;
 
 if (!function_exists('appSetting')) {
@@ -29,4 +39,3 @@ if (!function_exists('setAppSetting')) {
         return $oAppSettingModel->set($key, $grouping, $value, $encrypt);
     }
 }
-

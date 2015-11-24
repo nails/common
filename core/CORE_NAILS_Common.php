@@ -333,7 +333,7 @@ if (!function_exists('isModuleEnabled')) {
     {
         $modules = _NAILS_GET_MODULES();
 
-        foreach ($modules AS $module) {
+        foreach ($modules as $module) {
 
             if ($moduleName == $module->name) {
 
@@ -529,8 +529,8 @@ if (!function_exists('isPageSecure')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('show_404'))
-{
+if (!function_exists('show_404')) {
+
     /**
      * Renders the 404 page, logging disabled by default.
      *
