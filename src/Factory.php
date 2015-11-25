@@ -238,21 +238,41 @@ class Factory
                 self::$aLoadedHelpers[$sModuleName] = array();
             }
 
-            $sModulePath = 'vendor/' . $sModuleName . '/helpers/' . $sHelperName . '.php';
-            $sAppPath    = 'application/helpers/' . $sModuleName . '/' . $sHelperName . '.php';
+            /**
+             * If we're only interested in the app version of the helper then we change things
+             * around a little as the paths and reliance of a "module" based helper aren't the same
+             */
+            if ($sModuleName == 'app') {
 
-            if (!file_exists($sModulePath)) {
-                throw new Common\Exception\FactoryException(
-                    'Helper "' . $sModuleName . '/' . $sHelperName . '" does not exist.',
-                    1
-                );
+                $sAppPath = 'application/helpers/' . $sHelperName . '.php';
+
+                if (!file_exists($sAppPath)) {
+                    throw new Common\Exception\FactoryException(
+                        'Helper "' . $sModuleName . '/' . $sHelperName . '" does not exist.',
+                        1
+                    );
+                }
+
+                require_once $sModulePath;
+
+            } else {
+
+                $sModulePath = 'vendor/' . $sModuleName . '/helpers/' . $sHelperName . '.php';
+                $sAppPath    = 'application/helpers/' . $sModuleName . '/' . $sHelperName . '.php';
+
+                if (!file_exists($sModulePath)) {
+                    throw new Common\Exception\FactoryException(
+                        'Helper "' . $sModuleName . '/' . $sHelperName . '" does not exist.',
+                        1
+                    );
+                }
+
+                if (file_exists($sAppPath)) {
+                    require_once $sAppPath;
+                }
+
+                require_once $sModulePath;
             }
-
-            if (file_exists($sAppPath)) {
-                require_once $sAppPath;
-            }
-
-            require_once $sModulePath;
 
             self::$aLoadedHelpers[$sModuleName][$sHelperName] = true;
         }
