@@ -286,7 +286,7 @@ if (!function_exists('form_field')) {
 
                 default :
 
-                    $_field_html .= anchor(cdnServe($_field_default, true), 'Download', 'class="awesome small" target="_blank"');
+                    $_field_html .= anchor(cdnServe($_field_default, true), 'Download', 'class="btn btn-xs btn-primary" target="_blank"');
                     break;
             }
 
@@ -562,7 +562,7 @@ if (!function_exists('form_field_mm')) {
         // --------------------------------------------------------------------------
 
         //  If a default has been specified then show a download link
-        $_field_download = $_field['default'] ? anchor(cdnServe($_field['default'], true), 'Download File', 'class="awesome small orange"') : '';
+        $_field_download = $_field['default'] ? anchor(cdnServe($_field['default'], true), 'Download File', 'class="btn btn-xs btn-warning"') : '';
 
         // --------------------------------------------------------------------------
 
@@ -602,12 +602,12 @@ if (!function_exists('form_field_mm')) {
         $_out .= '      ' . $_field_label;
         $_out .= '  </span>';
         $_out .= '  <span class="mm-file-container input ' . $_field_tipclass . '">';
-        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-file-choose">';
+        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="btn btn-primary mm-file-choose">';
         $_out .= '          Choose';
         $_out .= '      </a>';
         $_out .= '      ' . $_field_tip;
         $_out .= '      <br />';
-        $_out .= '      <a href="#" class="awesome small red mm-file-remove" style="display:' . $_remove_display . '">';
+        $_out .= '      <a href="#" class="btn btn-xs btn-danger mm-file-remove" style="display:' . $_remove_display . '">';
         $_out .= '          Remove';
         $_out .= '      </a>';
         $_out .= '      <span class="mm-file-preview">';
@@ -763,12 +763,12 @@ if (!function_exists('form_field_mm_image')) {
         $_out .= '      ' . $_field_preview;
         $_out .= '  </span>';
         $_out .= '  <span class="mm-image-container input ' . $_field_tipclass . '">';
-        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="awesome mm-image-choose">';
+        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="btn btn-primary mm-image-choose">';
         $_out .= '          Choose';
         $_out .= '      </a>';
         $_out .= '      ' . $_field_tip;
         $_out .= '      <br />';
-        $_out .= '      <a href="#" class="awesome small red mm-image-remove" style="display:' . $_remove_display . '">';
+        $_out .= '      <a href="#" class="btn btn-xs btn-danger mm-image-remove" style="display:' . $_remove_display . '">';
         $_out .= '          Remove';
         $_out .= '      </a>';
         $_out .= '      ' . $_field_error;
