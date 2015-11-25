@@ -11,4 +11,4 @@
 </div><!-- /.container -->
 <?php
 
-$this->load->view('structure/footer/blank');
+    $this->load->view('structure/footer/blank');

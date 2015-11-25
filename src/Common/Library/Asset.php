@@ -749,7 +749,8 @@ class Asset
                         'mustache.js/mustache.js',
                         'jquery-serialize-object/dist/jquery.serialize-object.min.js'
                     ),
-                    'NAILS-BOWER');
+                    'NAILS-BOWER'
+                );
                 $this->load(
                     array(
                         'nails.admin.module.cms.css',

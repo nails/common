@@ -12,13 +12,13 @@
     <hr />
     <?php
 
-        if ($success || $error || $message || $notice) {
+    if ($success || $error || $message || $notice) {
 
-            echo '<div class="container row">';
-                echo $success ? '<p class="alert alert-success">' . $success . '</p>' : '';
-                echo $error   ? '<p class="alert alert-danger">' . $error . '</p>' : '';
-                echo $message ? '<p class="alert alert-warning">' . $message . '</p>' : '';
-                echo $notice  ? '<p class="alert alert-info">' . $notice . '</p>' : '';
-            echo '</div>';
+        echo '<div class="container row">';
+        echo $success ? '<p class="alert alert-success">' . $success . '</p>' : '';
+        echo $error   ? '<p class="alert alert-danger">' . $error . '</p>' : '';
+        echo $message ? '<p class="alert alert-warning">' . $message . '</p>' : '';
+        echo $notice  ? '<p class="alert alert-info">' . $notice . '</p>' : '';
+        echo '</div>';
 
-        }
+    }

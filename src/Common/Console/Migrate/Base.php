@@ -4,8 +4,8 @@ namespace Nails\Common\Console\Migrate;
 
 use Nails\Factory;
 
-class Base {
-
+class Base
+{
     /**
      * The database connection
      * @var PDO
@@ -21,13 +21,6 @@ class Base {
     public function __construct()
     {
         $this->oDb = Factory::service('ConsoleDatabase');
-    }
-
-    // --------------------------------------------------------------------------
-
-    public function __destruct()
-    {
-
     }
 
     // --------------------------------------------------------------------------

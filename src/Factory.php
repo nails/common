@@ -11,6 +11,7 @@
  */
 
 namespace Nails;
+
 use Pimple\Container;
 
 class Factory

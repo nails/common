@@ -23,7 +23,7 @@ class Input extends CI_Input
      * This override may not be needed in future implementations of CodeIgniter.
      * @return string
      */
-    public function ip_address()
+    public function ipAddress()
     {
         if ($this->is_cli_request()) {
 
@@ -32,7 +32,7 @@ class Input extends CI_Input
 
         } else {
 
-            return parent::ip_address();
+            return $this->ip_address();
         }
     }
 }

@@ -348,7 +348,7 @@ class Base extends \MX_Controller
                 Factory::helper('tools');
 
                 $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
-                $isWhiteListed = isIpInRange($this->input->ip_address(), $whitelistIp);
+                $isWhiteListed = isIpInRange($this->input->ipAddress(), $whitelistIp);
 
                 //  Customisations
                 $sMaintenanceTitle = $sTitle ? $sTitle : appSetting('maintenance_mode_title', 'site');

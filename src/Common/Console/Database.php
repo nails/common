@@ -136,7 +136,7 @@ class Database
             $this->transactionRunning = true;
             return true;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
     }
@@ -159,7 +159,7 @@ class Database
             $this->transactionRunning = false;
             return true;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
     }
@@ -182,7 +182,7 @@ class Database
             $this->transactionRunning = false;
             return true;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
     }
