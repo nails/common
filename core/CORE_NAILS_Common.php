@@ -309,7 +309,7 @@ if (!function_exists('nailsFactory')) {
 
             case 'HELPER':
 
-                return \Nails\Factory::factory($sKey, $sModuleName);
+                return \Nails\Factory::helper($sKey, $sModuleName);
                 break;
 
             default:
