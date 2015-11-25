@@ -51,7 +51,7 @@ class AppSetting extends Base
 
             foreach ($settings as $setting) {
 
-                $this->settings[$grouping][$setting->key] = unserialize($setting->value);
+                $this->settings[$grouping][$setting->key] = json_decode($setting->value);
 
                 if (!empty($setting->is_encrypted)) {
 
@@ -139,7 +139,7 @@ class AppSetting extends Base
 
         if ($this->db->count_all_results($this->table)) {
 
-            $this->db->set('value', serialize($value));
+            $this->db->set('value', json_encode($value));
             $this->db->set('is_encrypted', $isEncrypted);
             $this->db->where('grouping', $grouping);
             $this->db->where('key', $key);
@@ -147,7 +147,7 @@ class AppSetting extends Base
 
         } else {
 
-            $this->db->set('value', serialize($value));
+            $this->db->set('value', json_encode($value));
             $this->db->set('grouping', $grouping);
             $this->db->set('key', $key);
             $this->db->set('is_encrypted', $isEncrypted);
