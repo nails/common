@@ -253,7 +253,7 @@ class Factory
                     );
                 }
 
-                require_once $sModulePath;
+                require_once $sAppPath;
 
             } else {
 
