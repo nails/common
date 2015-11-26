@@ -201,6 +201,7 @@ class UserFeedback
 
     /**
      * Set a "message" feedback message
+     * @deprecated
      * @param  string $sMessage The message to set
      * @return Object
      */
@@ -213,6 +214,7 @@ class UserFeedback
 
     /**
      * Return the "message" feedback message
+     * @deprecated
      * @return string
      */
     public function getMessage()
@@ -223,7 +225,31 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Set a "warning" feedback message
+     * @param  string $sMessage The message to set
+     * @return Object
+     */
+    public function warning($sMessage)
+    {
+        return $this->set('warning', $sMessage);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the "warning" feedback message
+     * @return string
+     */
+    public function getWarning()
+    {
+        return $this->get('message');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "notice" feedback message
+     * @deprecated
      * @param  string $sMessage The message to set
      * @return Object
      */
@@ -236,10 +262,34 @@ class UserFeedback
 
     /**
      * Return the "notice" feedback message
+     * @deprecated
      * @return string
      */
     public function getNotice()
     {
         return $this->get('notice');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set a "info" feedback message
+     * @param  string $sMessage The message to set
+     * @return Object
+     */
+    public function info($sMessage)
+    {
+        return $this->set('info', $sMessage);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the "notice" feedback message
+     * @return string
+     */
+    public function getInfo()
+    {
+        return $this->get('info');
     }
 }

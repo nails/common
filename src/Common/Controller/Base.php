@@ -137,12 +137,16 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set User Feedback alerts for the views
-        $this->data['notice']   = $this->userFeedback->get('notice')   ?: $this->session->flashdata('notice');
-        $this->data['message']  = $this->userFeedback->get('message')  ?: $this->session->flashdata('message');
         $this->data['error']    = $this->userFeedback->get('error')    ?: $this->session->flashdata('error');
+        $this->data['negative'] = $this->userFeedback->get('negative') ?: $this->session->flashdata('negative');
         $this->data['success']  = $this->userFeedback->get('success')  ?: $this->session->flashdata('success');
         $this->data['positive'] = $this->userFeedback->get('positive') ?: $this->session->flashdata('positive');
-        $this->data['negative'] = $this->userFeedback->get('negative') ?: $this->session->flashdata('negative');
+        $this->data['info']     = $this->userFeedback->get('info')     ?: $this->session->flashdata('info');
+        $this->data['warning']  = $this->userFeedback->get('message')  ?: $this->session->flashdata('warning');
+
+        //  @deprecated
+        $this->data['message']  = $this->userFeedback->get('message')  ?: $this->session->flashdata('message');
+        $this->data['notice']   = $this->userFeedback->get('notice')   ?: $this->session->flashdata('notice');
 
         // --------------------------------------------------------------------------
 
