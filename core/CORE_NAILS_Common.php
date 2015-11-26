@@ -10,6 +10,7 @@
  * @link
  */
 
+//  @todo move these into the factory
 $GLOBALS['NAILS'] = array();
 
 if (!function_exists('_NAILS_GET_COMPONENTS')) {
@@ -84,10 +85,52 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                 $oTemp->subType     = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : null;
                 $oTemp->forModule   = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : null;
                 $oTemp->autoload    = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
+                $oTemp->fromApp     = false;
 
                 $aOut[] = $oTemp;
             }
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Get App components, too
+        $sAppPath = FCPATH . 'application/components/';
+
+        if (is_dir($sAppPath)) {
+            $aDirs = scandir($sAppPath);
+            foreach ($aDirs as $sDirName) {
+                if ($sDirName == '.' || $sDirName == '..') {
+                    continue;
+                }
+
+                $sConfigPath = $sAppPath . $sDirName . '/config.json';
+                if (is_file($sConfigPath)) {
+                    $sConfig = file_get_contents($sConfigPath);
+                    $oConfig = json_decode($sConfig);
+
+                    if (!empty($oConfig)) {
+
+                        $oTemp              = new stdClass();
+                        $oTemp->name        = 'app/' . $sDirName;
+                        $oTemp->description = !empty($oConfig->description) ? $oConfig->description : null;
+                        $oTemp->homepage    = !empty($oConfig->homepage) ? $oConfig->homepage : null;
+                        $oTemp->authors     = !empty($oConfig->authors) ? $oConfig->authors : null;
+                        $oTemp->path        = $sAppPath . $sDirName;
+                        $oTemp->moduleName  = null;
+                        $oTemp->moduleData  = !empty($oConfig->moduleData) ? $oConfig->moduleData : null;
+                        $oTemp->type        = !empty($oConfig->type) ? $oConfig->type : null;
+                        $oTemp->subType     = !empty($oConfig->subType) ? $oConfig->subType : null;
+                        $oTemp->forModule   = !empty($oConfig->forModule) ? $oConfig->forModule : null;
+                        $oTemp->autoload    = !empty($oConfig->autoload) ? $oConfig->autoload : null;
+                        $oTemp->fromApp     = true;
+
+                        $aOut[] = $oTemp;
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------
 
         //  Save as a $GLOBAL for next time
         $GLOBALS['NAILS']['COMPONENTS'] = $aOut;
@@ -103,84 +146,31 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 if (!function_exists('_NAILS_GET_COMPONENTS_OF_TYPE')) {
 
     /**
-     * Fetches a type of component (e.e., drivers or skins), optionally filtered by sub type
+     * Fetches a type of component (e.e., modules, drivers or skins)
      * @return array
      */
-    function _NAILS_GET_COMPONENTS_OF_TYPE($sType, $sModule, $sSubType = '';)
+    function _NAILS_GET_COMPONENTS_OF_TYPE($sType)
     {
-        $sType   = ucfirst(strtolower($sType));
-        $sModule = strtolower($sModule);
+        if (isset($GLOBALS['NAILS'][$sType])) {
 
-        if (isset($GLOBALS['NAILS'][$sType][$sModule])) {
-
-            $aComponentsOfType = $GLOBALS['NAILS'][$sType][$sModule];
+            $aOut = $GLOBALS['NAILS'][$sType];
 
         } else {
 
-            $aComponents       = _NAILS_GET_COMPONENTS();
-            $aComponentsOfType = array();
-
-            foreach ($aComponents as $package) {
-                if ($package->type == $sType && $package->forModule == $sModuleName) {
-                    $aComponentsOfType[] = $package;
-                }
-            }
+            $aComponents = _NAILS_GET_COMPONENTS();
+            $aOut        = array();
 
             // --------------------------------------------------------------------------
 
-            //  Look for skins provided by the app
-            $sAppPath = 'src/' . $sType . '/' . $sModule . '/';
-
-            if (is_dir($sAppPath)) {
-
-                $aDirs = scandir($sAppPath);
-
-                foreach ($aDirs as $sDirName) {
-
-                    if ($sDirName == '.' || $sDirName == '..') {
-                        continue;
-                    }
-
-                    $oTemp              = new \stdClass();
-                    $oTemp->name        = 'app/' . $sModule . '/' . $sDirName;
-                    $oTemp->description = 'Auto-discovered "' . $sModule . '" driver from the application';
-                    $oTemp->homepage    = '';
-                    $oTemp->authors     = '';
-                    $oTemp->path        = FCPATH . $sAppPath . $sDirName . '/';
-                    $oTemp->moduleName  = '';
-                    $oTemp->moduleData  = '';
-                    $oTemp->type        = 'driver';
-                    $oTemp->subType     = $subType;
-                    $oTemp->autoload    = '';
-
-                    $aComponentsOfType[] = $oTemp;
-                }
-            }
-
-            // --------------------------------------------------------------------------
-
-            //  Save as a $GLOBAL for next time
-            if (isset($GLOBALS['NAILS'][$sType])) {
-
-                return $GLOBALS['NAILS'][$sType] = array();
-            }
-
-            $GLOBALS['NAILS'][$sType][$sModule] = $aSkins;
-        }
-
-        //  Filter by subtype if needed
-        if (!empty($sSubType)) {
-
-            $aOut = array();
-            foreach ($aComponentsOfType as $oComponent) {
-                if ($oComponent->subType == $sSubType) {
+            foreach ($aComponents as $oComponent) {
+                if ($oComponent->type == $sType) {
                     $aOut[] = $oComponent;
                 }
             }
 
-        } else {
+            // --------------------------------------------------------------------------
 
-            $aOut = $aSkins;
+            $GLOBALS['NAILS'][$sType] = $aOut;
         }
 
         return $aOut;
@@ -197,27 +187,7 @@ if (!function_exists('_NAILS_GET_MODULES')) {
      */
     function _NAILS_GET_MODULES()
     {
-        if (isset($GLOBALS['NAILS']['MODULES'])) {
-            return $GLOBALS['NAILS']['MODULES'];
-        }
-
-        // --------------------------------------------------------------------------
-
-        $aComponents = _NAILS_GET_COMPONENTS();
-        $aOut        = array();
-
-        foreach ($aComponents as $oPackage) {
-            if ($oPackage->type == 'module') {
-                $aOut[] = $oPackage;
-            }
-        }
-
-        //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS']['MODULES'] = $aOut;
-
-        // --------------------------------------------------------------------------
-
-        return $aOut;
+        return _NAILS_GET_COMPONENTS_OF_TYPE('module');
     }
 }
 
@@ -231,7 +201,20 @@ if (!function_exists('_NAILS_GET_SKINS')) {
      */
     function _NAILS_GET_SKINS($sModule, $sSubType = '')
     {
-        return _NAILS_GET_COMPONENTS_OF_TYPE('skin', $sModule, $sSubType);
+        $aSkins = _NAILS_GET_COMPONENTS_OF_TYPE('skin');
+        $aOut   = array();
+
+        foreach ($aSkins as $oSkin) {
+            if ($oSkin->forModule == $sModule) {
+                if (!empty($sSubType) && $sSubType == $oSkin->subType) {
+                    $aOut[] = $oSkin;
+                } elseif (empty($sSubType)) {
+                    $aOut[] = $oSkin;
+                }
+            }
+        }
+
+        return $aOut;
     }
 }
 
@@ -245,7 +228,20 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
      */
     function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
     {
-        return _NAILS_GET_COMPONENTS_OF_TYPE('driver', $sModule, $sSubType);
+        $aDrivers = _NAILS_GET_COMPONENTS_OF_TYPE('driver');
+        $aOut     = array();
+
+        foreach ($aDrivers as $oDriver) {
+            if ($oDriver->forModule == $sModule) {
+                if (!empty($sSubType) && $sSubType == $oDriver->subType) {
+                    $aOut[] = $oDriver;
+                } elseif (empty($sSubType)) {
+                    $aOut[] = $oDriver;
+                }
+            }
+        }
+
+        return $aOut;
     }
 }
 

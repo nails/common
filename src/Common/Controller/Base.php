@@ -647,7 +647,6 @@ class Base extends \MX_Controller
         $aAvailableModules = _NAILS_GET_MODULES();
 
         foreach ($aAvailableModules as $oModule) {
-
             $aPaths[] = $oModule->path;
         }
 
