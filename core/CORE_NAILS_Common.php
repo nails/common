@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Common\Exception\NailsException;
+
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = array();
 
@@ -73,19 +75,21 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
             if (isset($oPackage->extra->nails)) {
 
-                $oTemp              = new stdClass();
-                $oTemp->name        = $oPackage->name;
-                $oTemp->description = $oPackage->description;
-                $oTemp->homepage    = $oPackage->homepage;
-                $oTemp->authors     = $oPackage->authors;
-                $oTemp->path        = FCPATH . 'vendor/' . $oPackage->name . '/';
-                $oTemp->moduleName  = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : null;
-                $oTemp->moduleData  = !empty($oPackage->extra->nails->moduleData) ? $oPackage->extra->nails->moduleData : null;
-                $oTemp->type        = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : null;
-                $oTemp->subType     = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : null;
-                $oTemp->forModule   = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : null;
-                $oTemp->autoload    = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
-                $oTemp->fromApp     = false;
+                $oTemp               = new stdClass();
+                $oTemp->slug         = $oPackage->name;
+                $oTemp->name         = !empty($oPackage->extra->nails->data->name) ? $oPackage->extra->nails->data->name : $oTemp->slug;
+                $oTemp->description  = $oPackage->description;
+                $oTemp->homepage     = $oPackage->homepage;
+                $oTemp->authors      = $oPackage->authors;
+                $oTemp->path         = FCPATH . 'vendor/' . $oPackage->name . '/';
+                $oTemp->relativePath = 'vendor/' . $oPackage->name . '/';
+                $oTemp->moduleName   = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '';
+                $oTemp->data         = !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null;
+                $oTemp->type         = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '';
+                $oTemp->subType      = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '';
+                $oTemp->forModule    = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '';
+                $oTemp->autoload     = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
+                $oTemp->fromApp      = false;
 
                 $aOut[] = $oTemp;
             }
@@ -103,26 +107,35 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                     continue;
                 }
 
+                /**
+                 * Load up config.json, This is basically exactly like composer.json, but
+                 * the bit contained within extras->nails.
+                 */
+
                 $sConfigPath = $sAppPath . $sDirName . '/config.json';
+
                 if (is_file($sConfigPath)) {
+
                     $sConfig = file_get_contents($sConfigPath);
                     $oConfig = json_decode($sConfig);
 
                     if (!empty($oConfig)) {
 
-                        $oTemp              = new stdClass();
-                        $oTemp->name        = 'app/' . $sDirName;
-                        $oTemp->description = !empty($oConfig->description) ? $oConfig->description : null;
-                        $oTemp->homepage    = !empty($oConfig->homepage) ? $oConfig->homepage : null;
-                        $oTemp->authors     = !empty($oConfig->authors) ? $oConfig->authors : null;
-                        $oTemp->path        = $sAppPath . $sDirName;
-                        $oTemp->moduleName  = null;
-                        $oTemp->moduleData  = !empty($oConfig->moduleData) ? $oConfig->moduleData : null;
-                        $oTemp->type        = !empty($oConfig->type) ? $oConfig->type : null;
-                        $oTemp->subType     = !empty($oConfig->subType) ? $oConfig->subType : null;
-                        $oTemp->forModule   = !empty($oConfig->forModule) ? $oConfig->forModule : null;
-                        $oTemp->autoload    = !empty($oConfig->autoload) ? $oConfig->autoload : null;
-                        $oTemp->fromApp     = true;
+                        $oTemp               = new stdClass();
+                        $oTemp->slug         = 'app/' . $sDirName;
+                        $oTemp->name         = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
+                        $oTemp->description  = !empty($oConfig->description) ? $oConfig->description : '';
+                        $oTemp->homepage     = !empty($oConfig->homepage) ? $oConfig->homepage : '';
+                        $oTemp->authors      = !empty($oConfig->authors) ? $oConfig->authors : array();
+                        $oTemp->path         = $sAppPath . $sDirName;
+                        $oTemp->relativePath = 'application/components/' . $sDirName . '/';
+                        $oTemp->moduleName   = '';
+                        $oTemp->data         = !empty($oConfig->data) ? $oConfig->data : null;
+                        $oTemp->type         = !empty($oConfig->type) ? $oConfig->type : '';
+                        $oTemp->subType      = !empty($oConfig->subType) ? $oConfig->subType : '';
+                        $oTemp->forModule    = !empty($oConfig->forModule) ? $oConfig->forModule : '';
+                        $oTemp->autoload     = !empty($oConfig->autoload) ? $oConfig->autoload : null;
+                        $oTemp->fromApp      = true;
 
                         $aOut[] = $oTemp;
                     }
@@ -242,6 +255,61 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
         }
 
         return $aOut;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
+
+    /**
+     * Returns an instance of a single driver
+     * @param  object $oDriver The Driver definition
+     * @return object
+     */
+    function _NAILS_GET_DRIVER_INSTANCE($oDriver)
+    {
+        if (isset($GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name])) {
+            return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name];
+        }
+
+        //  Test driver
+        if (!empty($oDriver->data->namespace)) {
+
+            $sNamespace = $oDriver->data->namespace;
+
+        } else {
+
+            throw new NailsException('Driver Namespace missing from driver "' . $oDriver->name . '"', 1);
+        }
+
+        if (!empty($oDriver->data->class)) {
+
+            $sClassName = $oDriver->data->class;
+
+        } else {
+
+            throw new NailsException('Driver ClassName missing from driver "' . $oDriver->name . '"', 2);
+        }
+
+        //  Load the driver file
+        if (!file_exists($oDriver->path . '/driver.php')) {
+            throw new NailsException('Driver file does not exist "' . $oDriver->name . '"', 3);
+        }
+
+        require_once $oDriver->path . '/driver.php';
+
+        //  Check if the class exists
+        $sDriverClass = $sNamespace . $sClassName;
+
+        if (!class_exists($sDriverClass)) {
+            throw new NailsException('Driver class does not exist "' . $oDriver->name . '"', 4);
+        }
+
+        //  Save for later
+        $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name] = new $sDriverClass();
+
+        return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name];
     }
 }
 
