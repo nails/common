@@ -10,6 +10,8 @@
  * @link
  */
 
+$GLOBALS['NAILS'] = array();
+
 if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
     /**
@@ -23,75 +25,165 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
          * the [small] overhead of working out the modules again and again.
          */
 
-        if (isset($GLOBALS['NAILS_COMPONENTS'])) {
+        if (isset($GLOBALS['NAILS']['COMPONENTS'])) {
 
-            return $GLOBALS['NAILS_COMPONENTS'];
+            return $GLOBALS['NAILS']['COMPONENTS'];
         }
 
         // --------------------------------------------------------------------------
 
-        $composer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
+        $sComposer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
 
-        if (empty($composer)) {
+        if (empty($sComposer)) {
 
-            $message = 'Failed to discover potential modules; could not load composer/installed.json';
+            $sMessage = 'Failed to discover potential modules; could not load composer/installed.json';
 
             if (function_exists('_NAILS_ERROR')) {
 
-                _NAILS_ERROR($message);
+                _NAILS_ERROR($sMessage);
 
             } else {
 
-                echo 'ERROR: ' . $message;
+                echo 'ERROR: ' . $sMessage;
                 exit(0);
             }
         }
 
-        $composer = @json_decode($composer);
+        $aComposer = @json_decode($sComposer);
 
-        if (empty($composer)) {
+        if (empty($aComposer)) {
 
-            $message = 'Failed to discover potential modules; could not decode composer/installed.json';
+            $sMessage = 'Failed to discover potential modules; could not decode composer/installed.json';
 
             if (function_exists('_NAILS_ERROR')) {
 
-                _NAILS_ERROR($message);
+                _NAILS_ERROR($sMessage);
 
             } else {
 
-                echo 'ERROR: ' . $message;
+                echo 'ERROR: ' . $sMessage;
                 exit(0);
             }
         }
 
-        $out = array();
+        $aOut = array();
 
-        foreach ($composer as $package) {
+        foreach ($aComposer as $oPackage) {
 
-            if (isset($package->extra->nails)) {
+            if (isset($oPackage->extra->nails)) {
 
-                $temp              = new stdClass();
-                $temp->name        = $package->name;
-                $temp->description = $package->description;
-                $temp->homepage    = $package->homepage;
-                $temp->authors     = $package->authors;
-                $temp->path        = FCPATH . 'vendor/' . $package->name . '/';
-                $temp->moduleName  = !empty($package->extra->nails->moduleName) ? $package->extra->nails->moduleName : null;
-                $temp->moduleData  = !empty($package->extra->nails->moduleData) ? $package->extra->nails->moduleData : null;
-                $temp->type        = !empty($package->extra->nails->type) ? $package->extra->nails->type : null;
-                $temp->subType     = !empty($package->extra->nails->subType) ? $package->extra->nails->subType : null;
-                $temp->autoload    = !empty($package->extra->nails->autoload) ? $package->extra->nails->autoload : null;
+                $oTemp              = new stdClass();
+                $oTemp->name        = $oPackage->name;
+                $oTemp->description = $oPackage->description;
+                $oTemp->homepage    = $oPackage->homepage;
+                $oTemp->authors     = $oPackage->authors;
+                $oTemp->path        = FCPATH . 'vendor/' . $oPackage->name . '/';
+                $oTemp->moduleName  = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : null;
+                $oTemp->moduleData  = !empty($oPackage->extra->nails->moduleData) ? $oPackage->extra->nails->moduleData : null;
+                $oTemp->type        = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : null;
+                $oTemp->subType     = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : null;
+                $oTemp->forModule   = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : null;
+                $oTemp->autoload    = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
 
-                $out[] = $temp;
+                $aOut[] = $oTemp;
             }
         }
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS_COMPONENTS'] = $out;
+        $GLOBALS['NAILS']['COMPONENTS'] = $aOut;
 
         // --------------------------------------------------------------------------
 
-        return $out;
+        return $aOut;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('_NAILS_GET_COMPONENTS_OF_TYPE')) {
+
+    /**
+     * Fetches a type of component (e.e., drivers or skins), optionally filtered by sub type
+     * @return array
+     */
+    function _NAILS_GET_COMPONENTS_OF_TYPE($sType, $sModule, $sSubType = '';)
+    {
+        $sType   = ucfirst(strtolower($sType));
+        $sModule = strtolower($sModule);
+
+        if (isset($GLOBALS['NAILS'][$sType][$sModule])) {
+
+            $aComponentsOfType = $GLOBALS['NAILS'][$sType][$sModule];
+
+        } else {
+
+            $aComponents       = _NAILS_GET_COMPONENTS();
+            $aComponentsOfType = array();
+
+            foreach ($aComponents as $package) {
+                if ($package->type == $sType && $package->forModule == $sModuleName) {
+                    $aComponentsOfType[] = $package;
+                }
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Look for skins provided by the app
+            $sAppPath = 'src/' . $sType . '/' . $sModule . '/';
+
+            if (is_dir($sAppPath)) {
+
+                $aDirs = scandir($sAppPath);
+
+                foreach ($aDirs as $sDirName) {
+
+                    if ($sDirName == '.' || $sDirName == '..') {
+                        continue;
+                    }
+
+                    $oTemp              = new \stdClass();
+                    $oTemp->name        = 'app/' . $sModule . '/' . $sDirName;
+                    $oTemp->description = 'Auto-discovered "' . $sModule . '" driver from the application';
+                    $oTemp->homepage    = '';
+                    $oTemp->authors     = '';
+                    $oTemp->path        = FCPATH . $sAppPath . $sDirName . '/';
+                    $oTemp->moduleName  = '';
+                    $oTemp->moduleData  = '';
+                    $oTemp->type        = 'driver';
+                    $oTemp->subType     = $subType;
+                    $oTemp->autoload    = '';
+
+                    $aComponentsOfType[] = $oTemp;
+                }
+            }
+
+            // --------------------------------------------------------------------------
+
+            //  Save as a $GLOBAL for next time
+            if (isset($GLOBALS['NAILS'][$sType])) {
+
+                return $GLOBALS['NAILS'][$sType] = array();
+            }
+
+            $GLOBALS['NAILS'][$sType][$sModule] = $aSkins;
+        }
+
+        //  Filter by subtype if needed
+        if (!empty($sSubType)) {
+
+            $aOut = array();
+            foreach ($aComponentsOfType as $oComponent) {
+                if ($oComponent->subType == $sSubType) {
+                    $aOut[] = $oComponent;
+                }
+            }
+
+        } else {
+
+            $aOut = $aSkins;
+        }
+
+        return $aOut;
     }
 }
 
@@ -105,35 +197,27 @@ if (!function_exists('_NAILS_GET_MODULES')) {
      */
     function _NAILS_GET_MODULES()
     {
-        /**
-         * If we already know which Nails modules are available then return that, save
-         * the [small] overhead of working out the modules again and again.
-         */
-
-        if (isset($GLOBALS['NAILS_MODULES'])) {
-
-            return $GLOBALS['NAILS_MODULES'];
+        if (isset($GLOBALS['NAILS']['MODULES'])) {
+            return $GLOBALS['NAILS']['MODULES'];
         }
 
         // --------------------------------------------------------------------------
 
-        $components = _NAILS_GET_COMPONENTS();
-        $out        = array();
+        $aComponents = _NAILS_GET_COMPONENTS();
+        $aOut        = array();
 
-        foreach ($components as $package) {
-
-            if ($package->type == 'module') {
-
-                $out[] = $package;
+        foreach ($aComponents as $oPackage) {
+            if ($oPackage->type == 'module') {
+                $aOut[] = $oPackage;
             }
         }
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS_MODULES'] = $out;
+        $GLOBALS['NAILS']['MODULES'] = $aOut;
 
         // --------------------------------------------------------------------------
 
-        return $out;
+        return $aOut;
     }
 }
 
@@ -142,45 +226,12 @@ if (!function_exists('_NAILS_GET_MODULES')) {
 if (!function_exists('_NAILS_GET_SKINS')) {
 
     /**
-     * Fetch all the Nails skins of a particular subType which are installed
+     * Fetch Skins for a module, optionally filtered by subtype
      * @return array
      */
-    function _NAILS_GET_SKINS($subType)
+    function _NAILS_GET_SKINS($sModule, $sSubType = '')
     {
-        /**
-         * If we already know which Nails skins are available then return that, save
-         * the [small] overhead of working out the modules again and again.
-         */
-
-        if (isset($GLOBALS['NAILS_SKINS'][$subType])) {
-
-            return $GLOBALS['NAILS_SKINS'][$subType];
-        }
-
-        // --------------------------------------------------------------------------
-
-        $components = _NAILS_GET_COMPONENTS();
-        $out        = array();
-
-        foreach ($components as $package) {
-
-            if ($package->type == 'skin' && $package->subType == $subType) {
-
-                $out[] = $package;
-            }
-        }
-
-        //  Save as a $GLOBAL for next time
-        if (isset($GLOBALS['NAILS_SKINS'])) {
-
-            return $GLOBALS['NAILS_SKINS'] = array();
-        }
-
-        $GLOBALS['NAILS_SKINS'][$subType] = $out;
-
-        // --------------------------------------------------------------------------
-
-        return $out;
+        return _NAILS_GET_COMPONENTS_OF_TYPE('skin', $sModule, $sSubType);
     }
 }
 
@@ -189,45 +240,12 @@ if (!function_exists('_NAILS_GET_SKINS')) {
 if (!function_exists('_NAILS_GET_DRIVERS')) {
 
     /**
-     * Fetch all the Nails drivers of a particular subType which are installed
+     * Fetch drivers for a module, optionally filtered by subtype
      * @return array
      */
-    function _NAILS_GET_DRIVERS($subType)
+    function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
     {
-        /**
-         * If we already know which Nails skins are available then return that, save
-         * the [small] overhead of working out the modules again and again.
-         */
-
-        if (isset($GLOBALS['NAILS_DRIVERS'][$subType])) {
-
-            return $GLOBALS['NAILS_DRIVERS'][$subType];
-        }
-
-        // --------------------------------------------------------------------------
-
-        $components = _NAILS_GET_COMPONENTS();
-        $out        = array();
-
-        foreach ($components as $package) {
-
-            if ($package->type == 'driver' && $package->subType == $subType) {
-
-                $out[] = $package;
-            }
-        }
-
-        //  Save as a $GLOBAL for next time
-        if (isset($GLOBALS['NAILS_DRIVERS'])) {
-
-            return $GLOBALS['NAILS_DRIVERS'] = array();
-        }
-
-        $GLOBALS['NAILS_DRIVERS'][$subType] = $out;
-
-        // --------------------------------------------------------------------------
-
-        return $out;
+        return _NAILS_GET_COMPONENTS_OF_TYPE('driver', $sModule, $sSubType);
     }
 }
 
