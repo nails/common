@@ -77,10 +77,10 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                 $oTemp               = new stdClass();
                 $oTemp->slug         = $oPackage->name;
-                $oTemp->name         = !empty($oPackage->extra->nails->data->name) ? $oPackage->extra->nails->data->name : $oTemp->slug;
-                $oTemp->description  = $oPackage->description;
-                $oTemp->homepage     = $oPackage->homepage;
-                $oTemp->authors      = $oPackage->authors;
+                $oTemp->name         = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
+                $oTemp->description  = !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description;
+                $oTemp->homepage     = !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage;
+                $oTemp->authors      = !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors;
                 $oTemp->path         = FCPATH . 'vendor/' . $oPackage->name . '/';
                 $oTemp->relativePath = 'vendor/' . $oPackage->name . '/';
                 $oTemp->moduleName   = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '';
