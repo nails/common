@@ -531,7 +531,7 @@ if (!function_exists('form_field_mm')) {
 
         //  Choose image button
         $_force_secure = isPageSecure();
-        $_url = cdnManageUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm'), $_id, $_force_secure);
+        $_url = cdnManagerUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm'), $_id, $_force_secure);
 
         //  Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
         if (isset($_SERVER['HTTPS']) && strtoupper($_SERVER['HTTPS']) == 'ON') :
@@ -585,7 +585,7 @@ if (!function_exists('form_field_mm')) {
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
         $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
-        $_scheme = $oCdn->url_serve_scheme(true);
+        $_scheme = $oCdn->urlServeScheme(true);
 
         /**
          * Replace the Mustache style syntax; this could/does get used in mustache
@@ -687,7 +687,7 @@ if (!function_exists('form_field_mm_image')) {
 
         //  Choose image button
         $_force_secure = isPageSecure();
-        $_url = cdnManageUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm_image'), $_id, $_force_secure);
+        $_url = cdnManagerUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm_image'), $_id, $_force_secure);
 
         //  Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
         if (isset($_SERVER['HTTPS']) && strtoupper($_SERVER['HTTPS']) == 'ON') :
@@ -740,7 +740,7 @@ if (!function_exists('form_field_mm_image')) {
 
         //  Quick script to instantiate the field, not indented due to heredoc syntax
         $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
-        $_scheme = $oCdn->url_scale_scheme();
+        $_scheme = $oCdn->urlScaleScheme();
 
         $_scheme = str_replace('{{width}}', 100, $_scheme);
         $_scheme = str_replace('{{height}}', 100, $_scheme);
@@ -883,7 +883,7 @@ if (!function_exists('form_field_multiimage')) {
 
         $_movie_url     = NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
         $_upload_url    = site_url('api/cdn/object/create', isPageSecure());
-        $_upload_token  = $oCdn->generate_api_upload_token();
+        $_upload_token  = $oCdn->generateApiUploadToken();
         $_bucket        = $_field_bucket;
 
 $_out = <<<EOT

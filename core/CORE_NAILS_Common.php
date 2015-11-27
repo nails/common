@@ -218,6 +218,14 @@ if (!function_exists('_NAILS_GET_SKINS')) {
         $aOut   = array();
 
         foreach ($aSkins as $oSkin) {
+
+            //  Provide a url field for the skin
+            if (isPageSecure()) {
+                $oSkin->url = SECURE_BASE_URL . $oSkin->relativePath;
+            } else {
+                $oSkin->url = BASE_URL . $oSkin->relativePath;
+            }
+
             if ($oSkin->forModule == $sModule) {
                 if (!empty($sSubType) && $sSubType == $oSkin->subType) {
                     $aOut[] = $oSkin;
@@ -293,11 +301,12 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
         }
 
         //  Load the driver file
-        if (!file_exists($oDriver->path . '/driver.php')) {
+        $sDriverPath = $oDriver->path . 'src/' . $oDriver->data->class . '.php';
+        if (!file_exists($sDriverPath)) {
             throw new NailsException('Driver file does not exist "' . $oDriver->name . '"', 3);
         }
 
-        require_once $oDriver->path . '/driver.php';
+        require_once $sDriverPath;
 
         //  Check if the class exists
         $sDriverClass = $sNamespace . $sClassName;
