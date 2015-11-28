@@ -127,7 +127,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                         $oTemp->description  = !empty($oConfig->description) ? $oConfig->description : '';
                         $oTemp->homepage     = !empty($oConfig->homepage) ? $oConfig->homepage : '';
                         $oTemp->authors      = !empty($oConfig->authors) ? $oConfig->authors : array();
-                        $oTemp->path         = $sAppPath . $sDirName;
+                        $oTemp->path         = $sAppPath . $sDirName . '/';
                         $oTemp->relativePath = 'application/components/' . $sDirName . '/';
                         $oTemp->moduleName   = '';
                         $oTemp->data         = !empty($oConfig->data) ? $oConfig->data : null;
@@ -277,8 +277,8 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
      */
     function _NAILS_GET_DRIVER_INSTANCE($oDriver)
     {
-        if (isset($GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name])) {
-            return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name];
+        if (isset($GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug])) {
+            return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug];
         }
 
         //  Test driver
@@ -288,7 +288,7 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
 
         } else {
 
-            throw new NailsException('Driver Namespace missing from driver "' . $oDriver->name . '"', 1);
+            throw new NailsException('Driver Namespace missing from driver "' . $oDriver->slug . '"', 1);
         }
 
         if (!empty($oDriver->data->class)) {
@@ -297,13 +297,16 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
 
         } else {
 
-            throw new NailsException('Driver ClassName missing from driver "' . $oDriver->name . '"', 2);
+            throw new NailsException('Driver ClassName missing from driver "' . $oDriver->slug . '"', 2);
         }
 
         //  Load the driver file
         $sDriverPath = $oDriver->path . 'src/' . $oDriver->data->class . '.php';
         if (!file_exists($sDriverPath)) {
-            throw new NailsException('Driver file does not exist "' . $oDriver->name . '"', 3);
+            throw new NailsException(
+                'Driver file for "' . $oDriver->slug . '" does not exist at "' . $sDriverPath . '"',
+                3
+            );
         }
 
         require_once $sDriverPath;
@@ -312,13 +315,13 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
         $sDriverClass = $sNamespace . $sClassName;
 
         if (!class_exists($sDriverClass)) {
-            throw new NailsException('Driver class does not exist "' . $oDriver->name . '"', 4);
+            throw new NailsException('Driver class does not exist "' . $oDriver->slug . '"', 4);
         }
 
         //  Save for later
-        $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name] = new $sDriverClass();
+        $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug] = new $sDriverClass();
 
-        return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->name];
+        return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug];
     }
 }
 
