@@ -110,7 +110,7 @@ class CORE_NAILS_Log extends CI_Log
                         $message .= '' . "\n";
                         $message .= 'PHP Debug Backtrace:' . "\n";
                         $message .= '' . "\n";
-                        $message .= serialize(debug_backtrace()) . "\n";
+                        $message .= json_encode(debug_backtrace()) . "\n";
 
                         //  Set from details
                         $fromEmail = 'root@' . gethostname();

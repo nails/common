@@ -211,22 +211,22 @@ class ErrorHandler
         $_ci =& get_instance();
 
         $info = array(
-            'uri'     => isset($_ci->uri)         ? $_ci->uri->uri_string()            : '',
-            'session' => isset($_ci->session)     ? serialize($_ci->session->userdata) : '',
-            'post'    => isset($_POST)            ? serialize($_POST)                  : '',
-            'get'     => isset($_GET)             ? serialize($_GET)                   : '',
-            'server'  => isset($_SERVER)          ? serialize($_SERVER)                : '',
-            'globals' => isset($GLOBALS['error']) ? serialize($GLOBALS['error'])       : ''
+            'uri'     => isset($_ci->uri)         ? $_ci->uri->uri_string()              : '',
+            'session' => isset($_ci->session)     ? json_encode($_ci->session->userdata) : '',
+            'post'    => isset($_POST)            ? json_encode($_POST)                  : '',
+            'get'     => isset($_GET)             ? json_encode($_GET)                   : '',
+            'server'  => isset($_SERVER)          ? json_encode($_SERVER)                : '',
+            'globals' => isset($GLOBALS['error']) ? json_encode($GLOBALS['error'])       : ''
         );
 
         //  Closures cannot be serialized
         try {
 
-            $info['debug_backtrace'] = serialize(debug_backtrace());
+            $info['debug_backtrace'] = json_encode(debug_backtrace());
 
         } catch (Exception $e) {
 
-            $info['debug_backtrace'] = 'Failed to serialize get Backtrace: ' .  $e->getMessage();
+            $info['debug_backtrace'] = 'Failed to json_encode get Backtrace: ' .  $e->getMessage();
         }
 
         $extended   = 'URI: ' . $info['uri'] . "\n\n";

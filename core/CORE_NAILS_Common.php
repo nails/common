@@ -158,13 +158,36 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('_NAILS_GET_COMPONENTS_OF_TYPE')) {
+
+if (!function_exists('_NAILS_GET_COMPONENTS_BY_SLUG')) {
 
     /**
-     * Fetches a type of component (e.e., modules, drivers or skins)
+     * Fetches a component by it's slug
      * @return array
      */
-    function _NAILS_GET_COMPONENTS_OF_TYPE($sType)
+    function _NAILS_GET_COMPONENTS_BY_SLUG($sSlug)
+    {
+        $aComponents = _NAILS_GET_COMPONENTS();
+
+        foreach ($aComponents as $oComponent) {
+            if ($oComponent->slug == $sSlug) {
+                return $oComponent;
+            }
+        }
+
+        return null;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
+
+    /**
+     * Fetches a type of component (e.g., modules, drivers or skins)
+     * @return array
+     */
+    function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
     {
         if (isset($GLOBALS['NAILS'][$sType])) {
 
@@ -202,7 +225,7 @@ if (!function_exists('_NAILS_GET_MODULES')) {
      */
     function _NAILS_GET_MODULES()
     {
-        return _NAILS_GET_COMPONENTS_OF_TYPE('module');
+        return _NAILS_GET_COMPONENTS_BY_TYPE('module');
     }
 }
 
@@ -216,7 +239,7 @@ if (!function_exists('_NAILS_GET_SKINS')) {
      */
     function _NAILS_GET_SKINS($sModule, $sSubType = '')
     {
-        $aSkins = _NAILS_GET_COMPONENTS_OF_TYPE('skin');
+        $aSkins = _NAILS_GET_COMPONENTS_BY_TYPE('skin');
         $aOut   = array();
 
         foreach ($aSkins as $oSkin) {
@@ -251,7 +274,7 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
      */
     function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
     {
-        $aDrivers = _NAILS_GET_COMPONENTS_OF_TYPE('driver');
+        $aDrivers = _NAILS_GET_COMPONENTS_BY_TYPE('driver');
         $aOut     = array();
 
         foreach ($aDrivers as $oDriver) {
@@ -355,7 +378,7 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
         $aComponents = _NAILS_GET_COMPONENTS();
         foreach ($aComponents as $cComponent) {
             if (version_compare($cComponent->minPhpVersion, $sMinVersion, '>')) {
-                $sMinVersion = $minVersionComponent;
+                $sMinVersion = $cComponent->minPhpVersion;
             }
         }
 
