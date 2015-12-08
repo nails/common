@@ -75,21 +75,22 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
             if (isset($oPackage->extra->nails)) {
 
-                $oTemp               = new stdClass();
-                $oTemp->slug         = $oPackage->name;
-                $oTemp->name         = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
-                $oTemp->description  = !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description;
-                $oTemp->homepage     = !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage;
-                $oTemp->authors      = !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors;
-                $oTemp->path         = FCPATH . 'vendor/' . $oPackage->name . '/';
-                $oTemp->relativePath = 'vendor/' . $oPackage->name . '/';
-                $oTemp->moduleName   = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '';
-                $oTemp->data         = !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null;
-                $oTemp->type         = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '';
-                $oTemp->subType      = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '';
-                $oTemp->forModule    = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '';
-                $oTemp->autoload     = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
-                $oTemp->fromApp      = false;
+                $oTemp                = new stdClass();
+                $oTemp->slug          = $oPackage->name;
+                $oTemp->name          = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
+                $oTemp->description   = !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description;
+                $oTemp->homepage      = !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage;
+                $oTemp->authors       = !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors;
+                $oTemp->path          = FCPATH . 'vendor/' . $oPackage->name . '/';
+                $oTemp->relativePath  = 'vendor/' . $oPackage->name . '/';
+                $oTemp->moduleName    = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '';
+                $oTemp->data          = !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null;
+                $oTemp->type          = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '';
+                $oTemp->subType       = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '';
+                $oTemp->forModule     = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '';
+                $oTemp->autoload      = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
+                $oTemp->minPhpVersion = !empty($oPackage->extra->nails->minPhpVersion) ? $oPackage->extra->nails->minPhpVersion : null;
+                $oTemp->fromApp       = false;
 
                 $aOut[] = $oTemp;
             }
@@ -121,21 +122,22 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                     if (!empty($oConfig)) {
 
-                        $oTemp               = new stdClass();
-                        $oTemp->slug         = 'app/' . $sDirName;
-                        $oTemp->name         = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
-                        $oTemp->description  = !empty($oConfig->description) ? $oConfig->description : '';
-                        $oTemp->homepage     = !empty($oConfig->homepage) ? $oConfig->homepage : '';
-                        $oTemp->authors      = !empty($oConfig->authors) ? $oConfig->authors : array();
-                        $oTemp->path         = $sAppPath . $sDirName . '/';
-                        $oTemp->relativePath = 'application/components/' . $sDirName . '/';
-                        $oTemp->moduleName   = '';
-                        $oTemp->data         = !empty($oConfig->data) ? $oConfig->data : null;
-                        $oTemp->type         = !empty($oConfig->type) ? $oConfig->type : '';
-                        $oTemp->subType      = !empty($oConfig->subType) ? $oConfig->subType : '';
-                        $oTemp->forModule    = !empty($oConfig->forModule) ? $oConfig->forModule : '';
-                        $oTemp->autoload     = !empty($oConfig->autoload) ? $oConfig->autoload : null;
-                        $oTemp->fromApp      = true;
+                        $oTemp                = new stdClass();
+                        $oTemp->slug          = 'app/' . $sDirName;
+                        $oTemp->name          = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
+                        $oTemp->description   = !empty($oConfig->description) ? $oConfig->description : '';
+                        $oTemp->homepage      = !empty($oConfig->homepage) ? $oConfig->homepage : '';
+                        $oTemp->authors       = !empty($oConfig->authors) ? $oConfig->authors : array();
+                        $oTemp->path          = $sAppPath . $sDirName . '/';
+                        $oTemp->relativePath  = 'application/components/' . $sDirName . '/';
+                        $oTemp->moduleName    = '';
+                        $oTemp->data          = !empty($oConfig->data) ? $oConfig->data : null;
+                        $oTemp->type          = !empty($oConfig->type) ? $oConfig->type : '';
+                        $oTemp->subType       = !empty($oConfig->subType) ? $oConfig->subType : '';
+                        $oTemp->forModule     = !empty($oConfig->forModule) ? $oConfig->forModule : '';
+                        $oTemp->autoload      = !empty($oConfig->autoload) ? $oConfig->autoload : null;
+                        $oTemp->minPhpVersion = !empty($oConfig->minPhpVersion) ? $oConfig->minPhpVersion : null;
+                        $oTemp->fromApp       = true;
 
                         $aOut[] = $oTemp;
                     }
@@ -336,36 +338,28 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
     function _NAILS_MIN_PHP_VERSION()
     {
         //  First check nailsapp/nails
-        $composer   = @file_get_contents('vendor/nailsapp/nails/composer.json');
-        $composer   = @json_decode($composer);
-        $minVersion = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
+        $sComposer   = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        $oComposer   = @json_decode($sComposer);
+        $sMinVersion = isset($oComposer->extra->nails->minPhpVersion) ? $oComposer->extra->nails->minPhpVersion : 0;
 
         //  Next, check nailsapp/common
-        $composer         = @file_get_contents('vendor/nailsapp/nails/composer.json');
-        $composer   = @json_decode($composer);
-        $minVersionCommon = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
+        $sComposer         = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        $oComposer         = @json_decode($sComposer);
+        $sMinVersionCommon = isset($oComposer->extra->nails->minPhpVersion) ? $oComposer->extra->nails->minPhpVersion : 0;
 
-        if (version_compare($minVersionCommon, $minVersion, '>')) {
-
-            $minVersion = $minVersionCommon;
+        if (version_compare($sMinVersionCommon, $sMinVersion, '>')) {
+            $sMinVersion = $sMinVersionCommon;
         }
 
         //  Now we check all the components
-        $components = _NAILS_GET_COMPONENTS();
-
-        foreach ($components as $component) {
-
-            $composer            = @file_get_contents($component->path . 'composer.json');
-            $composer            = @json_decode($composer);
-            $minVersionComponent = isset($composer->extra->nails->minPhpVersion) ? $composer->extra->nails->minPhpVersion : 0;
-
-            if (version_compare($minVersionComponent, $minVersion, '>')) {
-
-                $minVersion = $minVersionComponent;
+        $aComponents = _NAILS_GET_COMPONENTS();
+        foreach ($aComponents as $cComponent) {
+            if (version_compare($cComponent->minPhpVersion, $sMinVersion, '>')) {
+                $sMinVersion = $minVersionComponent;
             }
         }
 
-        return $minVersion;
+        return $sMinVersion;
     }
 }
 
