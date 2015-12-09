@@ -1236,12 +1236,7 @@ if (!function_exists('form_field_dropdown')) {
         $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
-
-        if (is_null($options)) :
-
-            $options = isset($field['options']) ? $field['options'] : array();
-
-        endif;
+        $_field['options']          = isset($field['options']) ? $field['options'] : $options;
 
         $_tip                   = array();
         $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
@@ -1290,7 +1285,7 @@ if (!function_exists('form_field_dropdown')) {
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
         $_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
-        foreach ($options as $value => $label) :
+        foreach ($_field['options'] as $value => $label) :
 
             if (is_array($label)) :
 
