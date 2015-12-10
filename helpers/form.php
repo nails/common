@@ -1634,12 +1634,7 @@ if (!function_exists('form_field_checkbox')) {
         $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : null;
         $_field['class']        = isset($field['class']) ? $field['class'] : false;
         $_field['tip']          = isset($field['tip']) ? $field['tip'] : $tip;
-
-        if (is_null($options)) :
-
-            $options = isset($field['options']) ? $field['options'] : array();
-
-        endif;
+        $_field['options']      = isset($field['options']) ? $field['options'] : $options;
 
         $_tip                   = array();
         $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
@@ -1791,7 +1786,7 @@ if (!function_exists('form_field_checkbox')) {
 
                 $_out .= form_checkbox(
                     $_key,
-                    $options[0]['value'],
+                    $options[$i]['value'],
                     $_selected,
                     $_id . $_disabled
                 );
