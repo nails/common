@@ -802,6 +802,26 @@ class Asset
                     'NAILS-BOWER'
                 );
                 break;
+
+            case 'KNOCKOUT':
+
+                $this->load(
+                    array(
+                        'knockout/dist/knockout.js',
+                    ),
+                    'NAILS-BOWER'
+                );
+                break;
+
+            case 'MUSTACHE':
+
+                $this->load(
+                    array(
+                        'mustache.js/mustache.js',
+                    ),
+                    'NAILS-BOWER'
+                );
+                break;
         }
 
         return $this;
