@@ -471,330 +471,19 @@ if (!function_exists('form_field_text')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('form_field_mm')) {
+if (!function_exists('form_field_cdn_object_picker')) {
 
     /**
      * Generates a form field containing the media manager to select a file.
+     * @todo  when form builder is updated, ensure that other things can create custom field types
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      * @return string        The form HTML
      */
-    function form_field_mm($field, $tip = '')
+    function form_field_cdn_object_picker($field, $tip = '')
     {
         //  Set var defaults
-        $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
-        $_field['type']         = isset($field['type'])           ? $field['type']        : 'text';
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field['error']        = isset($field['error'])          ? $field['error']       : false;
-        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : false;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
-        $_field['data']         = isset($field['data'])           ? $field['data']        : array();
-        $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
-
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
-
-        $_field_error_cls       = form_error($_field['key']) || $_field['error'] ? 'error' : '';
-        $_readonly_cls          = $_field['readonly'] ? 'readonly' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Generate a unique ID for this field
-        $_id = 'field_mm_' . md5(microtime());
-
-        // --------------------------------------------------------------------------
-
-        //  Container data
-        $_field_oddeven = $_field['oddeven'];
-        $_field_type    = $_field['type'];
-
-        // --------------------------------------------------------------------------
-
-        //  Label
-        $_field_label = $_field['label'];
-        $_field_label .= $_field['required'] ? '*' : '';
-        $_field_label .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Choose image button
-        $_force_secure = isPageSecure();
-        $_url = cdnManagerUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm'), $_id, $_force_secure);
-
-        //  Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
-        if (isset($_SERVER['HTTPS']) && strtoupper($_SERVER['HTTPS']) == 'ON') :
-
-            $_url = str_replace('http://', 'https://', $_url);
-
-        endif;
-
-        // --------------------------------------------------------------------------
-
-        //  Tip
-        $_field_tipclass    = $_tip['title'] ? 'with-tip' : '';
-        $_field_tip         = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  If there's post data, use that value instead
-        $_field['default'] = set_value($_field['key'], $_field['default']);
-
-        //  The actual field which is submitted
-        $_field_field = '<input type="hidden" name="' . $_field['key'] . '"  class="mm-file-value" value="' . $_field['default'] . '" />';
-
-        // --------------------------------------------------------------------------
-
-        //  Remove button
-        $_remove_display = $_field['default'] ? 'inline-block' : 'none';
-
-        // --------------------------------------------------------------------------
-
-        //  If a default has been specified then show a download link
-        $_field_download = $_field['default'] ? anchor(cdnServe($_field['default'], true), 'Download File', 'class="btn btn-xs btn-warning"') : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Error
-        if ($_field_error_cls && $_field['error']) :
-
-            $_field_error = '<span class="alert alert-danger">' . $_field['error'] . '</span>';
-
-        elseif ($_field_error_cls) :
-
-            $_field_error = form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
-
-        else :
-
-            $_field_error = '';
-
-        endif;
-
-        // --------------------------------------------------------------------------
-
-        //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
-        $_scheme = $oCdn->urlServeScheme(true);
-
-        /**
-         * Replace the Mustache style syntax; this could/does get used in mustache
-         * templates so these fields get stripped out
-         */
-
-        $_scheme = str_replace('{{bucket}}', '{[bucket]}', $_scheme);
-        $_scheme = str_replace('{{filename}}', '{[filename]}', $_scheme);
-        $_scheme = str_replace('{{extension}}', '{[extension]}', $_scheme);
-
-        $_out  = '<div class="field mm-file ' . $_field_error_cls . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
-        $_out .= '<label>';
-        $_out .= '  <span class="label">';
-        $_out .= '      ' . $_field_label;
-        $_out .= '  </span>';
-        $_out .= '  <span class="mm-file-container input ' . $_field_tipclass . '">';
-        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="btn btn-primary mm-file-choose">';
-        $_out .= '          Choose';
-        $_out .= '      </a>';
-        $_out .= '      ' . $_field_tip;
-        $_out .= '      <br />';
-        $_out .= '      <a href="#" class="btn btn-xs btn-danger mm-file-remove" style="display:' . $_remove_display . '">';
-        $_out .= '          Remove';
-        $_out .= '      </a>';
-        $_out .= '      <span class="mm-file-preview">';
-        $_out .= '          ' . $_field_download;
-        $_out .= '      </span>';
-        $_out .= '      ' . $_field_error;
-        $_out .= '  </span>';
-        $_out .= '</label>';
-        $_out .= '<br /><br />';
-        $_out .= $_field_field;
-        $_out .= '</div>';
-
-        // --------------------------------------------------------------------------
-
-        return $_out;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('form_field_mm_image')) {
-
-    /**
-     * Generates a form field containing the media manager to select an image
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
-     * @return string        The form HTML
-     */
-    function form_field_mm_image($field, $tip = '')
-    {
-        //  Set var defaults
-        $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
-        $_field['type']         = isset($field['type'])           ? $field['type']        : 'text';
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field['error']        = isset($field['error'])          ? $field['error']       : false;
-        $_field['bucket']       = isset($field['bucket'])         ? $field['bucket']      : false;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
-        $_field['data']         = isset($field['data'])           ? $field['data']        : array();
-        $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
-
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
-
-        $_field_error_cls       = form_error($_field['key']) || $_field['error'] ? 'error' : '';
-        $_readonly_cls          = $_field['readonly'] ? 'readonly' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Generate a unique ID for this field
-        $_id = 'field_mm_image_' . md5(microtime());
-
-        // --------------------------------------------------------------------------
-
-        //  Container data
-        $_field_oddeven = $_field['oddeven'];
-        $_field_type    = $_field['type'];
-
-        // --------------------------------------------------------------------------
-
-        //  Label
-        $_field_label = $_field['label'];
-        $_field_label .= $_field['required'] ? '*' : '';
-        $_field_label .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Choose image button
-        $_force_secure = isPageSecure();
-        $_url = cdnManagerUrl($_field['bucket'], array('_nails_forms', '_callback_form_field_mm_image'), $_id, $_force_secure);
-
-        //  Is the site running on SSL? If so then change the protocol so as to avoid 'protocols don't match' errors
-        if (isset($_SERVER['HTTPS']) && strtoupper($_SERVER['HTTPS']) == 'ON') :
-
-            $_url = str_replace('http://', 'https://', $_url);
-
-        endif;
-
-        // --------------------------------------------------------------------------
-
-        //  Tip
-        $_field_tipclass    = $_tip['title'] ? 'with-tip' : '';
-        $_field_tip         = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  If there's post data, use that value instead
-        $_field['default'] = set_value($_field['key'], $_field['default']);
-
-        //  The actual field which is submitted
-        $_field_field = '<input type="hidden" name="' . $_field['key'] . '"  class="mm-image-value" value="' . $_field['default'] . '" />';
-
-        // --------------------------------------------------------------------------
-
-        //  Remove button
-        $_remove_display = $_field['default'] ? 'inline-block' : 'none';
-
-        // --------------------------------------------------------------------------
-
-        //  If a default has been specified then show a download link
-        $_field_preview = $_field['default'] ? img(cdnScale($_field['default'], 100, 100)) : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Error
-        if ($_field_error_cls && $_field['error']) {
-
-            $_field_error = '<span class="alert alert-danger">' . $_field['error'] . '</span>';
-
-        } elseif ($_field_error_cls) {
-
-            $_field_error = form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
-
-        } else {
-
-            $_field_error = '';
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn    = Factory::service('Cdn', 'nailsapp/module-cdn');
-        $_scheme = $oCdn->urlScaleScheme();
-
-        $_scheme = str_replace('{{width}}', 100, $_scheme);
-        $_scheme = str_replace('{{height}}', 100, $_scheme);
-
-        /**
-         * Replace the Mustache style syntax; this could/does get used in mustache
-         * templates so these fields get stripped out
-         */
-
-        $_scheme = str_replace('{{bucket}}', '{[bucket]}', $_scheme);
-        $_scheme = str_replace('{{filename}}', '{[filename]}', $_scheme);
-        $_scheme = str_replace('{{extension}}', '{[extension]}', $_scheme);
-
-        $_out  = '<div class="field mm-image ' . $_field_error_cls . ' ' . $_field_oddeven . ' ' . $_readonly_cls . ' ' . $_field_type . '" id="' . $_id . '" data-scheme="' . $_scheme . '">';
-        $_out .= '<label>';
-        $_out .= '  <span class="label">';
-        $_out .= '      ' . $_field_label;
-        $_out .= '  </span>';
-        $_out .= '  <span class="mm-image-preview">';
-        $_out .= '      ' . $_field_preview;
-        $_out .= '  </span>';
-        $_out .= '  <span class="mm-image-container input ' . $_field_tipclass . '">';
-        $_out .= '      <a href="' . $_url . '" data-fancybox-type="iframe" data-width="80%" data-height="80%" class="btn btn-primary mm-image-choose">';
-        $_out .= '          Choose';
-        $_out .= '      </a>';
-        $_out .= '      ' . $_field_tip;
-        $_out .= '      <br />';
-        $_out .= '      <a href="#" class="btn btn-xs btn-danger mm-image-remove" style="display:' . $_remove_display . '">';
-        $_out .= '          Remove';
-        $_out .= '      </a>';
-        $_out .= '      ' . $_field_error;
-        $_out .= '  </span>';
-        $_out .= '</label>';
-        $_out .= $_field_field;
-        $_out .= '</div>';
-
-        // --------------------------------------------------------------------------
-
-        return $_out;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('form_field_multiimage')) {
-
-    /**
-     * Generates a form field which allows for the upload of multiple images.
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
-     * @return string        The form HTML
-     */
-    function form_field_multiimage($field, $tip = '')
-    {
-        //  Set var defaults
+        $_field_id          = isset($field['id'])             ? $field['id']          : null;
         $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
         $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
         $_field_key         = isset($field['key'])            ? $field['key']         : null;
@@ -804,28 +493,25 @@ if (!function_exists('form_field_multiimage')) {
         $_field_required    = isset($field['required'])       ? $field['required']    : false;
         $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
         $_field_error       = isset($field['error'])          ? $field['error']       : false;
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : false;
+        $_field_class       = isset($field['class'])          ? $field['class']       : '';
+        $_field_data        = isset($field['data'])           ? $field['data']        : array();
+        $_field_info        = isset($field['info'])           ? $field['info']        : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+
+        //  CDN Specific
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
 
         $_tip               = array();
         $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
         $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
         $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
-        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_field_tip['title'];
+        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
+        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
         $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
         $_error_class       = $_error ? 'error' : '';
+        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
         $_readonly_cls      = $_field_readonly ? 'readonly' : '';
-
-        // --------------------------------------------------------------------------
-
-        //  Generate a unique ID for this field
-        $_id = 'field_multiimage_' . md5(microtime());
-
-        // --------------------------------------------------------------------------
-
-        //  Sanitize the key
-        $_field_key .= substr($_field_key, -2) != '[]' ? '[]' : '';
 
         // --------------------------------------------------------------------------
 
@@ -835,330 +521,108 @@ if (!function_exists('form_field_multiimage')) {
         //  Prep sublabel
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
-        // --------------------------------------------------------------------------
-
-        //  Set the defaults
-        $_field_default = set_value($_field_key, $_field_default);
-        $_default_html  = '';
-
-        //  Render any defaults
-        if (is_array($_field_default)) :
-
-            foreach ($_field_default as $file) :
-
-                $_default_html .= '<li class="item">';
-                $_default_html .= '<a href="#" class="delete" data-object_id="' . $file . '"></a>';
-                $_default_html .= img(cdnCrop($file, 92, 92));
-                $_default_html .= form_hidden($_field_key, $file);
-                $_default_html .= '</li>';
-
-            endforeach;
-
-        endif;
-
-        // --------------------------------------------------------------------------
-
-        //  Error
-        if ($_error && $_field_error) :
-
-            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-
-        elseif ($_error) :
-
-            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
-
-        endif;
-
-        // --------------------------------------------------------------------------
-
-        //  Tip
+        //  Has the field got a tip?
         $_tipclass  = $_tip['title'] ? 'with-tip' : '';
         $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
-        //  Quick script to instantiate the field, not indented due to heredoc syntax
-        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
+        //  Prep the field's attributes
+        $_attr = '';
 
-        $_movie_url     = NAILS_ASSETS_URL . 'packages/uploadify/uploadify.swf';
-        $_upload_url    = site_url('api/cdn/object/create', isPageSecure());
-        $_upload_token  = $oCdn->generateApiUploadToken();
-        $_bucket        = $_field_bucket;
+        //  Does the field have an id?
+        $_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
+
+        //  Any data attributes?
+        foreach ($_field_data as $attr => $value) {
+
+            $_attr .= ' data-' . $attr . '="' . $value . '"';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Generate the field's HTML
+        $sFieldAttr  = $_attr;
+        $sFieldAttr .= ' class="' . $_field_class . '" ';
+        $sFieldAttr .= $_readonly;
+
+        $_field_html = cdnObjectPicker($_field_key, $_field_bucket, $_field_default);
+
+        // --------------------------------------------------------------------------
+
+        //  Errors
+        if ($_error && $_field_error) {
+
+            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
+
+        } elseif ($_error) {
+
+            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  info block
+        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+
+        // --------------------------------------------------------------------------
 
 $_out = <<<EOT
 
-    <div class="field multiimage $_error_class $_field_oddeven $_readonly_cls $_field_type" id="$_id">
+    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top>
         <label>
             <span class="label">
                 $_field_label
                 $_field_sub_label
             </span>
             <span class="input $_tipclass">
-                <p class="alert alert-danger" id="$_id-uploadify-not-available">
-                    <strong>Configuration Error.</strong> Uploadify is not available.
-                </p>
-                <span id="$_id-uploadify-available" style="display:none;">
-                    <ul id="$_id-filelist" class="filelist empty">
-                        $_default_html
-                        <li class="empty">No Images, add some now.</li>
-                    </ul>
-                    <button id="$_id-uploadify">Choose Images</button>
-                </span>
+                $_field_html
                 $_tip
                 $_error
+                $info_block
             <span>
         </label>
     </div>
-
-    <script type="text/template" id="$_id-template-uploadify">
-        <li class="item uploadify-queue-item" id="$_id-\${fileID}" data-instance_id="\${instanceID}" data-file_id="\${fileID}">
-            <a href="#" data-instance_id="\${instanceID}" data-file_id="\${fileID}" class="remove"></a>
-            <div class="progress" style="height:0%"></div>
-            <div class="data data-cancel">CANCELLED</div>
-        </li>
-    </script>
-    <script type="text/template" id="$_id-template-item">
-        <li class="item crunching">
-            <div class="crunching"></div>
-            <input type="hidden" name="$_field_key" />
-        </li>
-    </script>
-    <div id="$_id-dialog-confirm-delete" title="Confirm Delete" style="display:none;">
-        <p>
-            <span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 0 0;"></span>
-            This item will be removed from the interface and cannot be recovered.
-            <strong>Are you sure?</strong>
-        </p>
-    </div>
-
-    <script type="text/javascript">
-
-    if (typeof($.fn.uploadify) === 'function')
-    {
-        $('#$_id-uploadify-not-available').hide();
-        $('#$_id-uploadify-available').show();
-
-        // --------------------------------------------------------------------------
-
-        $('#$_id-uploadify').uploadify(
-        {
-            'debug': false,
-            'auto': true,
-            'swf': '$_movie_url',
-            'buttonText':'Add Images',
-            'uploader': '$_upload_url',
-            'fileObjName': 'upload',
-            'fileTypeExts': '*.gif; *.jpg; *.jpeg; *.png',
-            'queueID': '$_id-filelist',
-            'formData':
-            {
-                'token': '$_upload_token',
-                'bucket': '$_bucket',
-                'return': 'URL|THUMB|92x92'
-            },
-            'itemTemplate': $('#$_id-template-uploadify').html(),
-            'onSelect': function()
-            {
-                if ($('#$_id-filelist li').length)
-                {
-                    $('#$_id-filelist').removeClass('empty');
-                }
-            },
-            'onUploadStart': function()
-            {
-                window.onbeforeunload = function()
-                {
-                    return 'Uploads are in progress. Leaving this page will cause them to stop.';
-                };
-
-                //  Disable tabs - SWFUpload aborts uploads if it is hidden.
-                $('ul.tabs li a').addClass('disabled');
-            },
-            'onQueueComplete': function()
-            {
-                window.onbeforeunload = null;
-                $('ul.tabs li a').removeClass('disabled');
-            },
-            'onUploadProgress': function(file, bytesUploaded, bytesTotal)
-            {
-                var _percent = bytesUploaded / bytesTotal * 100;
-                $('#$_id-' + file.id + ' .progress').css('height', _percent + '%');
-            },
-            'onUploadSuccess': function(file, data)
-            {
-                var _data = JSON.parse(data);
-
-                // --------------------------------------------------------------------------
-
-                var _html = $.trim($('#$_id-template-item').html());
-                var _item = $($.parseHTML(_html));
-
-                _item.attr('id', '$_id-' + file.id + '-complete');
-                $('#$_id-' + file.id).replaceWith(_item);
-
-                // --------------------------------------------------------------------------
-
-                var _target = $('#$_id-' + file.id + '-complete');
-
-                if (!_target.length)
-                {
-                    _html = $.trim($('#$_id-template-item').html());
-                    _item = $($.parseHTML(_html));
-
-                    _item.attr('id', '$_id-' + file.id + '-complete');
-                    $('#' + file.id).replaceWith(_item);
-
-                    _target = $('#$_id-' + file.id + '-complete');
-                }
-
-                // --------------------------------------------------------------------------
-
-                //  Switch the response code
-                if (_data.status === 200)
-                {
-                    //  Insert the image
-                    var _img = $('<img>').attr('src', _data.object_url[0]).on('load', function() {
-                        _target.removeClass('crunching');
-                    });
-                    var _del = $('<a>').attr({
-                        'href': '#',
-                        'class': 'delete',
-                        'data-object_id': _data.object_id
-                    });
-
-                    _target.append(_img).append(_del).find('input').val(_data.object_id);
-
-                }
-                else
-                {
-                    //  An error occurred
-                    var _filename = $('<p>').addClass('filename').text(file.name);
-                    var _message = $('<p>').addClass('message').text(_data.error);
-
-                    _target.addClass('error').append(_filename).append(_message).removeClass('crunching');
-                }
-            },
-            'onUploadError': function(file, errorCode, errorMsg, errorString)
-            {
-                var _target = $('#$_id-' + file.id + '-complete');
-
-                if (!_target.length)
-                {
-                    var _html = $.trim($('#$_id-template-item').html());
-                    var _item = $($.parseHTML(_html));
-
-                    _item.attr('id', '$_id-' + file.id + '-complete');
-                    $('#$_id-' + file.id).replaceWith(_item);
-
-                    _target = $('#$_id-' + file.id + '-complete');
-                }
-
-                var _filename = $('<p>').addClass('filename').text(file.name);
-                var _message = $('<p>').addClass('message').text(errorString);
-
-                _target.addClass('error').append(_filename).append(_message).removeClass('crunching');
-            }
-
-        });
-
-        if (typeof($.fn.sortable) === 'function')
-        {
-            $('#$_id-filelist').disableSelection().sortable({
-                placeholder: 'item placeholder',
-                items: "li.item"
-            });
-        }
-
-        //  Remove an item from the queue
-        $(document).on('click', '#$_id-filelist .item .remove', function()
-        {
-            var _instance_id = $(this).data('instance_id');
-            var _file_id = $(this).data('file_id');
-
-            $('#$_id-' + _instance_id).uploadify('cancel', _file_id);
-            $('#$_id-' + _file_id + ' .data-cancel').text('Cancelled').show();
-            $('#$_id-' + _file_id).addClass('cancelled');
-
-            if ($('#$_id-filelist li.item:not(.cancelled)').length === 0)
-            {
-                $('#$_id-filelist').addClass('empty');
-                $('#$_id-filelist li.empty').css('opacity', 0).delay(1000).animate({
-                    opacity: 1
-                }, 250);
-            }
-
-            return false;
-
-        });
-
-        //  Deletes an uploaded image
-        $(document).on('click', '#$_id-filelist .item .delete', function()
-        {
-            var _object = this;
-
-            $('#$_id-dialog-confirm-delete').dialog(
-            {
-                resizable: false,
-                draggable: false,
-                modal: true,
-                dialogClass: "no-close",
-                buttons:
-                {
-                    "Delete Image": function()
-                    {
-                        var _object_id = $(_object).data('object_id');
-
-                        //  Send off the delete request
-                        var _call = {
-                            'controller'    : 'cdn/object',
-                            'method'        : 'delete',
-                            'action'        : 'POST',
-                            'data'          :
-                            {
-                                'object_id': _object_id
-                            }
-                        };
-                        var _api = new window.NAILS_API();
-                        _api.call(_call);
-
-                        // --------------------------------------------------------------------------
-
-                        $(_object).closest('li.item').addClass('deleted').fadeOut('slow', function()
-                        {
-                            $(_object).remove();
-                        });
-
-                        // --------------------------------------------------------------------------
-
-                        //  Show the empty screens
-                        if ($('#$_id-filelist li.item:not(.deleted)').length === 0)
-                        {
-                            $('#$_id-filelist').addClass('empty');
-                        }
-
-                        // --------------------------------------------------------------------------
-
-                        //  Close dialog
-                        $(this).dialog("close");
-                    },
-                    Cancel: function()
-                    {
-                        $(this).dialog("close");
-                    }
-                }
-            });
-
-            return false;
-        });
-    }
-
-    </script>
 
 EOT;
 
         // --------------------------------------------------------------------------
 
         return $_out;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_mm')) {
+
+    /**
+     * Generates a form field containing the media manager to select a file.
+     * @deprecated Use form_field_cdn_object_picker instead
+     * @param  array  $aField The config array
+     * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string         The form HTML
+     */
+    function form_field_mm($aField, $sTip = '')
+    {
+        return form_field_cdn_object_picker($aField, $sTip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_mm_image')) {
+
+    /**
+     * Generates a form field containing the media manager to select an image
+     * @deprecated Use form_field_cdn_object_picker instead
+     * @param  array  $aField The config array
+     * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string         The form HTML
+     */
+    function form_field_mm_image($aField, $sTip = '')
+    {
+        return form_field_cdn_object_picker($aField, $sTip);
     }
 }
 
@@ -1810,6 +1274,100 @@ if (!function_exists('form_field_checkbox')) {
         //  Error
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
+        $_out .= '</div>';
+
+        // --------------------------------------------------------------------------
+
+        return $_out;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_cms_widgets')) {
+
+    /**
+     * Generates a form field containing a button to open the CMS widgets manager
+     * @todo oh God, sort this file out, use a proper form building class
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_cms_widgets($field, $tip = '')
+    {
+        $_ci =& get_instance();
+
+        // --------------------------------------------------------------------------
+
+        //  Set var defaults
+        $_field                 = array();
+        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
+        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
+        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
+        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
+        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
+        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
+        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
+        $_field['data']         = isset($field['data'])           ? $field['data']        : array();
+        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field['info']         = isset($field['info'])           ? $field['info']        : false;
+        $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
+
+        $_tip                   = array();
+        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+
+        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
+        $_error         = form_error($_field['key']) ? 'error' : '';
+        $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
+        $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
+        $_class         = $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
+
+        // --------------------------------------------------------------------------
+
+        $_out  = '<div class="field cms-widgets ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" ' . $_field_id_top . '>';
+
+        //  Does the field have an id?
+        $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
+
+        //  Any data attributes?
+        $_data = '';
+        foreach ($_field['data'] as $attr => $value) {
+
+            $_data .= ' data-' . $attr . '="' . $value . '"';
+        }
+
+        //  Label
+        $_out .= '<span class="label">';
+            $_out .= $_field['label'];
+            $_out .= $_field['required'] ? '*' : '';
+            $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+        $_out .= '</span>';
+
+        //  Field
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_out .= '<span class="input ' . $_tipclass . '">';
+        $_default = htmlentities(set_value($_field['key'], $_field['default']));
+
+        $_out .= '<input type="hidden" class="widget-data" name="' . $_field['key'] . '" value="' . $_default . '" ' . $_field['id'] . '/>';
+        $_out .= '<button class="btn btn-primary btn-sm open-editor" data-key="' . $_field['key'] . '">';
+        $_out .= '<span class="fa fa-cogs">&nbsp;</span> Open Widget Editor';
+        $_out .= '</button>';
+
+        //  Tip
+        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+
+        //  Error
+        $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
+
+        //  Info block
+        $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
+
+        $_out .= '</span>';
         $_out .= '</div>';
 
         // --------------------------------------------------------------------------
