@@ -68,7 +68,9 @@ class Base
 
     /**
      * --------------------------------------------------------------------------
-     *     *
+     * CONSTRUCTOR && DESTRUCTOR
+     * The constructor preps common variables and sets the model up for user.
+     * The destructor clears
      * --------------------------------------------------------------------------
      */
 
@@ -98,6 +100,20 @@ class Base
         $this->tableAutoSetTimestamps = true;
         $this->tableAutoSetSlugs      = false;
         $this->perPage                = 50;
+        $this->searchableFields       = array();
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * Set up default searchable fields. Each field is passed directly to the
+         * `column` parameter in getcountCommon() so can be in any form accepted by that.
+         *
+         * @todo  allow some sort of cleansing callback so that models can prep the
+         * search string if needed.
+         */
+        $this->searchableFields[] = $this->tablePrefix . $this->tableIdColumn;
+        $this->searchableFields[] = $this->tablePrefix . $this->tableLabelColumn;
+        $this->searchableFields[] = $this->tablePrefix . $this->tableSlugColumn;
     }
 
     // --------------------------------------------------------------------------
@@ -845,10 +861,12 @@ class Base
             $aData['or_like'] = array();
         }
 
-        $aData['or_like'][] = array(
-            'column' => $this->tablePrefix . '.' . $this->tableLabelColumn,
-            'value'  => $sKeywords
-        );
+        foreach ($this->searchableFields as $mField)    {
+            $aData['or_like'][] = array(
+                'column' => $mField,
+                'value'  => $sKeywords
+            );
+        }
 
         $oOut          = new \stdClass();
         $oOut->page    = $iPage;
