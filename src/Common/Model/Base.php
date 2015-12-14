@@ -40,7 +40,9 @@ class Base
     protected $tableModifiedColumn;
     protected $tableModifiedByColumn;
     protected $tableDeletedColumn;
+    protected $searchableFields;
 
+    //  Model options
     protected $tableAutoSetTimestamps;
     protected $tableAutoSetSlugs;
 
