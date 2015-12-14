@@ -79,39 +79,5 @@ if (!function_exists('title_case')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('clean')) {
-
-    /**
-     * Remove profanities from a string
-     * @param  string $sString The string to clean
-     * @return string
-     */
-    function clean($sString)
-    {
-        $oCi =& get_instance();
-        $oCi->load->library('profanity');
-        return $oCi->profanity->clean($sString);
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('is_clean')) {
-
-    /**
-     * Determines whether a string is clean or not
-     * @param  string  $sString Thes tring to check
-     * @return boolean
-     */
-    function is_clean($sString)
-    {
-        $oCi =& get_instance();
-        $oCi->load->library('profanity');
-        return $oCi->profanity->is_clean($sString);
-    }
-}
-
-// --------------------------------------------------------------------------
-
 //  Include the CodeIgniter original
 include 'vendor/rogeriopradoj/codeigniter/system/helpers/text_helper.php';

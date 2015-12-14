@@ -200,11 +200,10 @@ if (!function_exists('form_field')) {
         $_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
 
         //  Any data attributes?
-        foreach ($_field_data as $attr => $value) :
+        foreach ($_field_data as $attr => $value) {
 
             $_attr .= ' data-' . $attr . '="' . $value . '"';
-
-        endforeach;
+        }
 
         // --------------------------------------------------------------------------
 

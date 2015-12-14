@@ -822,6 +822,16 @@ class Asset
                     'NAILS-BOWER'
                 );
                 break;
+
+            case 'MOMENT':
+
+                $this->load(
+                    array(
+                        'moment/moment.js',
+                    ),
+                    'NAILS-BOWER'
+                );
+                break;
         }
 
         return $this;
