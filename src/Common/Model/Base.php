@@ -13,6 +13,7 @@
 namespace Nails\Common\Model;
 
 use Nails\Factory;
+use Nails\Common\Exception\ModelException;
 
 class Base
 {
@@ -169,9 +170,7 @@ class Base
     public function create($aData = array(), $bReturnObject = false)
     {
         if (!$this->table) {
-
-            show_error(get_called_class() . '::create() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::create() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -212,22 +211,20 @@ class Base
         if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
             if (empty($this->tableSlugColumn)) {
-                show_error(get_called_class() . '::create() Slug column variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::create() Slug column variable not set', 1);
             }
 
             if (empty($this->tableLabelColumn)) {
-                show_error(get_called_class() . '::create() Label column variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::create() Label column variable not set', 1);
             }
 
             if (empty($aData[$this->tableLabelColumn])) {
 
-                show_error(
+                throw new ModelException(
                     get_called_class() . '::create() "' . $this->tableLabelColumn .
-                    '" is required when automatically generting slugs.'
+                    '" is required when automatically generting slugs.',
+                    1
                 );
-                return false;
             }
 
             $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
@@ -274,7 +271,7 @@ class Base
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::update() Table variable not set');
+            throw new ModelException(get_called_class() . '::update() Table variable not set', 1);
             return;
 
         } else {
@@ -309,13 +306,11 @@ class Base
         if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
             if (empty($this->tableSlugColumn)) {
-                show_error(get_called_class() . '::update() Slug column variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::update() Slug column variable not set', 1);
             }
 
             if (empty($this->tableLabelColumn)) {
-                show_error(get_called_class() . '::update() Label column variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::update() Label column variable not set', 1);
             }
 
             /**
@@ -363,9 +358,7 @@ class Base
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
-
-            show_error(get_called_class() . '::delete() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::delete() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -402,9 +395,7 @@ class Base
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
-
-            show_error(get_called_class() . '::restore() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::restore() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -440,9 +431,7 @@ class Base
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
-
-            show_error(get_called_class() . '::destroy() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::destroy() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -463,19 +452,18 @@ class Base
      */
 
     /**
-     * Fetches all objects, optionally paginated.
+     * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
      * @param int    $page           The page number of the results, if null then no pagination
      * @param int    $perPage        How many items per page of paginated results
      * @param mixed  $data           Any data to pass to getCountCommon()
      * @param bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @return array
      */
-    public function getAll($page = null, $perPage = null, $data = array(), $includeDeleted = false)
+    public function getAllRawQuery($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::getAll() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::getAllRawQuery() Table variable not set', 1);
 
         } else {
 
@@ -516,30 +504,30 @@ class Base
             $this->db->where($sPrefix . $this->tableDeletedColumn, false);
         }
 
-        // --------------------------------------------------------------------------
+        return $this->db->get($table);
+    }
 
-        /**
-         * How are we handling execution? If $data['RETURN_QUERY_OBJECT'] is truthy,
-         * then simply return the raw query object - leave it up to the caller to
-         * process/iterate as required
-         */
+    // --------------------------------------------------------------------------
 
-        if (empty($data['RETURN_QUERY_OBJECT'])) {
+    /**
+     * Fetches all objects and formats them, optionally paginated
+     * @param int    $iPage           The page number of the results, if null then no pagination
+     * @param int    $iPerPage        How many items per page of paginated results
+     * @param mixed  $aData           Any data to pass to getCountCommon()
+     * @param bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @return array
+     */
+    public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    {
+        $oResults   = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
+        $aResults   = $oResults->result();
+        $numResults = count($aResults);
 
-            $aResults   = $this->db->get($table)->result();
-            $numResults = count($aResults);
-
-            for ($i = 0; $i < $numResults; $i++) {
-
-                $this->formatObject($aResults[$i], $data);
-            }
-
-            return $aResults;
-
-        } else {
-
-            return $this->db->get($table);
+        for ($i = 0; $i < $numResults; $i++) {
+            $this->formatObject($aResults[$i], $aData);
         }
+
+        return $aResults;
     }
 
     // --------------------------------------------------------------------------
@@ -566,30 +554,27 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Test columns
-        $_test = reset($items);
+        $oTest = reset($items);
 
-        if (!isset($_test->{$this->tableLabelColumn})) {
-
-            show_error(
-                get_called_class() . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid label column.'
+        if (!isset($oTest->{$this->tableLabelColumn})) {
+            throw new ModelException(
+                get_called_class() . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid column.',
+                1
             );
-            return;
         }
 
-        if (!isset($_test->{$this->tableIdColumn})) {
-
-            show_error(
-                get_called_class() . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid id column.'
+        if (!isset($oTest->{$this->tableIdColumn})) {
+            throw new ModelException(
+                get_called_class() . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid column.',
+                1
             );
-            return;
         }
 
-        unset($_test);
+        unset($oTest);
 
         // --------------------------------------------------------------------------
 
         foreach ($items as $item) {
-
             $out[$item->{$this->tableIdColumn}] = $item->{$this->tableLabelColumn};
         }
 
@@ -607,10 +592,7 @@ class Base
     public function getById($iId, $aData = array())
     {
         if (!$this->table) {
-
-            show_error(get_called_class() . '::getById() Table variable not set');
-            return;
-
+            throw new ModelException(get_called_class() . '::getById() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -659,10 +641,7 @@ class Base
     public function getByIds($aIds, $aData = array())
     {
         if (!$this->table) {
-
-            show_error(get_called_class() . '::getByIds() Table variable not set');
-            return;
-
+            throw new ModelException(get_called_class() . '::getByIds() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -700,9 +679,7 @@ class Base
     public function getBySlug($sSlug, $aData = array())
     {
         if (!$this->table) {
-
-            show_error(get_called_class() . '::getBySlug() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::getBySlug() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -751,9 +728,7 @@ class Base
     public function getBySlugs($aSlugs, $aData = array())
     {
         if (!$this->table) {
-
-            show_error(get_called_class() . '::getBySlug() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::getBySlugs() Table variable not set', 1);
         }
 
         // --------------------------------------------------------------------------
@@ -818,8 +793,7 @@ class Base
     {
         if (!$this->table) {
 
-            show_error(get_called_class() . '::countAll() Table variable not set');
-            return;
+            throw new ModelException(get_called_class() . '::countAll() Table variable not set', 1);
 
         } else {
 
@@ -905,9 +879,7 @@ class Base
         if (is_null($table)) {
 
             if (!$this->table) {
-
-                show_error(get_called_class() . '::generateSlug() Table variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::generateSlug() Table variable not set', 1);
             }
 
             $table = $this->table;
@@ -920,9 +892,7 @@ class Base
         if (is_null($column)) {
 
             if (!$this->tableSlugColumn) {
-
-                show_error(get_called_class() . '::generateSlug() Column variable not set');
-                return;
+                throw new ModelException(get_called_class() . '::generateSlug() Column variable not set', 1);
             }
 
             $column = $this->tableSlugColumn;
@@ -951,8 +921,8 @@ class Base
 
             if ($ignoreId) {
 
-                $_id_column = $idColumn ? $idColumn : $this->tableIdColumn;
-                $this->db->where($_id_column . ' !=', $ignoreId);
+                $sIdColumn = $idColumn ? $idColumn : $this->tableIdColumn;
+                $this->db->where($sIdColumn . ' !=', $ignoreId);
             }
 
             $this->db->where($column, $slugTest);
