@@ -451,16 +451,16 @@ trait GetCountCommon
 
             } elseif (is_array($data['sort'])) {
 
-                $_first = reset($data['sort']);
+                $mFirst = reset($data['sort']);
 
-                if (is_string($_first)) {
+                if (is_string($mFirst)) {
 
                     //  Single dimension array
-                    $_sort = $this->getCountCommonParseSort($data['sort']);
+                    $aSort = $this->getCountCommonParseSort($data['sort']);
 
-                    if (!empty($_sort['column'])) {
+                    if (!empty($aSort['column'])) {
 
-                        $oDb->order_by($_sort['column'], $_sort['order']);
+                        $oDb->order_by($aSort['column'], $aSort['order']);
 
                     }
 
@@ -469,11 +469,11 @@ trait GetCountCommon
                     //  Multi dimension array
                     foreach ($data['sort'] as $sort) {
 
-                        $_sort = $this->getCountCommonParseSort($sort);
+                        $aSort = $this->getCountCommonParseSort($sort);
 
-                        if (!empty($_sort['column'])) {
+                        if (!empty($aSort['column'])) {
 
-                            $oDb->order_by($_sort['column'], $_sort['order']);
+                            $oDb->order_by($aSort['column'], $aSort['order']);
                         }
                     }
                 }
@@ -485,43 +485,43 @@ trait GetCountCommon
 
     protected function getCountCommonParseSort($sort)
     {
-        $_out = array('column' => null, 'order' => null);
+        $aOut = array('column' => null, 'order' => null);
 
         // --------------------------------------------------------------------------
 
         if (is_string($sort)) {
 
-            $_out['column'] = $sort;
-            return $_out;
+            $aOut['column'] = $sort;
+            return $aOut;
 
         } elseif (isset($sort['column'])) {
 
-            $_out['column'] = $sort['column'];
+            $aOut['column'] = $sort['column'];
 
         } else {
 
             //  Take the first element
-            $_out['column'] = reset($sort);
-            $_out['column'] = is_string($_out['column']) ? $_out['column'] : null;
+            $aOut['column'] = reset($sort);
+            $aOut['column'] = is_string($aOut['column']) ? $aOut['column'] : null;
         }
 
-        if ($_out['column']) {
+        if ($aOut['column']) {
 
             //  Determine order
             if (isset($sort['order'])) {
 
-                $_out['order'] = $sort['order'];
+                $aOut['order'] = $sort['order'];
 
             } elseif (count($sort) > 1) {
 
                 //  Take the last element
-                $_out['order'] = end($sort);
-                $_out['order'] = is_string($_out['order']) ? $_out['order'] : null;
+                $aOut['order'] = end($sort);
+                $aOut['order'] = is_string($aOut['order']) ? $aOut['order'] : null;
             }
         }
 
         // --------------------------------------------------------------------------
 
-        return $_out;
+        return $aOut;
     }
 }
