@@ -453,11 +453,11 @@ class Base
 
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
-     * @param int    $page           The page number of the results, if null then no pagination
-     * @param int    $perPage        How many items per page of paginated results
-     * @param mixed  $data           Any data to pass to getCountCommon()
-     * @param bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
-     * @return array
+     * @param  int    $page           The page number of the results, if null then no pagination
+     * @param  int    $perPage        How many items per page of paginated results
+     * @param  mixed  $data           Any data to pass to getCountCommon()
+     * @param  bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @return object
      */
     public function getAllRawQuery($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {

@@ -24,6 +24,8 @@ class Asset
     protected $sCacheBuster;
     protected $sBaseUrl;
     protected $sBaseUrlSecure;
+    protected $sBaseModuleUrl;
+    protected $sBaseModuleUrlSecure;
     protected $sBowerDir;
     protected $sCssDir;
     protected $sJsDir;
