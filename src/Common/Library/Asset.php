@@ -44,16 +44,27 @@ class Asset
         $this->aJs            = array();
         $this->aJsInline      = array();
         $this->sCacheBuster   = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
+
         $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets';
         $this->sBaseUrl       = site_url($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
         $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets';
         $this->sBaseUrlSecure = secure_site_url($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
+
+        $this->sBaseModuleUrl       = defined('DEPLOY_ASSET_BASE_MODULE_URL') ? DEPLOY_ASSET_BASE_MODULE_URL : 'vendor';
+        $this->sBaseModuleUrl       = site_url($this->sBaseModuleUrl);
+        $this->sBaseModuleUrl       = addTrailingSlash($this->sBaseModuleUrl);
+        $this->sBaseModuleUrlSecure = defined('DEPLOY_ASSET_BASE_MODULE_URL_SECURE') ? DEPLOY_ASSET_BASE_MODULE_URL_SECURE : 'vendor';
+        $this->sBaseModuleUrlSecure = secure_site_url($this->sBaseModuleUrlSecure);
+        $this->sBaseModuleUrlSecure = addTrailingSlash($this->sBaseModuleUrlSecure);
+
         $this->sBowerDir      = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
         $this->sBowerDir      = addTrailingSlash($this->sBowerDir);
+
         $this->sCssDir        = defined('DEPLOY_ASSET_CSS_DIR') ? DEPLOY_ASSET_CSS_DIR : 'css';
         $this->sCssDir        = addTrailingSlash($this->sCssDir);
+
         $this->sJsDir         = defined('DEPLOY_ASSET_JS_DIR') ? DEPLOY_ASSET_CJS_DIR : 'js';
         $this->sJsDir         = addTrailingSlash($this->sJsDir);
 
@@ -84,35 +95,39 @@ class Asset
 
             case 'NAILS-BOWER':
 
-                $sAssetTypeMethod = 'loadNailsBower';
+                $sAssetLocationMethod = 'loadNailsBower';
                 break;
 
             case 'NAILS-PACKAGE':
 
-                $sAssetTypeMethod = 'loadNailsPackage';
+                $sAssetLocationMethod = 'loadNailsPackage';
                 break;
 
             case 'NAILS':
 
-                $sAssetTypeMethod = 'loadNails';
+                $sAssetLocationMethod = 'loadNails';
                 break;
 
             case 'APP-BOWER':
             case 'BOWER':
 
-                $sAssetTypeMethod = 'loadAppBower';
+                $sAssetLocationMethod = 'loadAppBower';
                 break;
 
             case 'APP-PACKAGE':
             case 'PACKAGE':
 
-                $sAssetTypeMethod = 'loadAppPackage';
+                $sAssetLocationMethod = 'loadAppPackage';
                 break;
 
             case 'APP':
+
+                $sAssetLocationMethod = 'loadApp';
+                break;
+
             default:
 
-                $sAssetTypeMethod = 'loadApp';
+                $sAssetLocationMethod = 'loadModule';
                 break;
         }
 
@@ -130,7 +145,7 @@ class Asset
 
             } else {
 
-                $this->{$sAssetTypeMethod}($sAsset, $sForceType);
+                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
             }
         }
 
@@ -199,7 +214,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadNails($sAsset, $sForceType = null)
+    protected function loadNails($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -225,7 +240,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadNailsBower($sAsset, $sForceType = null)
+    protected function loadNailsBower($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -251,7 +266,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadNailsPackage($sAsset, $sForceType = null)
+    protected function loadNailsPackage($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -277,7 +292,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadAppBower($sAsset, $sForceType = null)
+    protected function loadAppBower($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -303,7 +318,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadAppPackage($sAsset, $sForceType = null)
+    protected function loadAppPackage($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -329,7 +344,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadApp($sAsset, $sForceType = null)
+    protected function loadApp($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -350,13 +365,40 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
+     * Loads an asset from a module's asset directory
+     * @param  string $sAsset     The asset to load
+     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @return void
+     */
+    protected function loadModule($sAsset, $sForceType, $sModule)
+    {
+        $sType = $this->determineType($sAsset, $sForceType);
+        $sKey  = 'MODULE-' . $sModule . '-' . $sAsset;
+
+        switch ($sType) {
+
+            case 'CSS':
+
+                $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
+                break;
+
+            case 'JS':
+
+                $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset;
+                break;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Unloads an asset
-     * @param  mixed  $mAssets    The asset to unload, can be an array or a string
-     * @param  string $sAssetType The asset's type
-     * @param  string $sForceType The asset's file type (e.g., JS or CSS)
+     * @param  mixed  $mAssets        The asset to unload, can be an array or a string
+     * @param  string $sAssetLocation The asset's location
+     * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
      * @return object
      */
-    public function unload($mAssets, $sAssetType = 'APP', $sForceType = null)
+    public function unload($mAssets, $sAssetLocation = 'APP', $sForceType = null)
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -364,43 +406,47 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Backwards compatibility
-        $sAssetType = $sAssetType === true ? 'NAILS' : $sAssetType;
+        $sAssetLocation = $sAssetLocation === true ? 'NAILS' : $sAssetLocation;
 
         // --------------------------------------------------------------------------
 
-        switch (strtoupper($sAssetType)) {
+        switch (strtoupper($sAssetLocation)) {
 
             case 'NAILS-BOWER':
 
-                $sAssetTypeMethod = 'unloadNailsBower';
+                $sAssetLocationMethod = 'unloadNailsBower';
                 break;
 
             case 'NAILS-PACKAGE':
 
-                $sAssetTypeMethod = 'unloadNailsPackage';
+                $sAssetLocationMethod = 'unloadNailsPackage';
                 break;
 
             case 'NAILS':
 
-                $sAssetTypeMethod = 'unloadNails';
+                $sAssetLocationMethod = 'unloadNails';
                 break;
 
             case 'APP-BOWER':
             case 'BOWER':
 
-                $sAssetTypeMethod = 'unloadAppBower';
+                $sAssetLocationMethod = 'unloadAppBower';
                 break;
 
             case 'APP-PACKAGE':
             case 'PACKAGE':
 
-                $sAssetTypeMethod = 'unloadAppPackage';
+                $sAssetLocationMethod = 'unloadAppPackage';
                 break;
 
             case 'APP':
+
+                $sAssetLocationMethod = 'unloadApp';
+                break;
+
             default:
 
-                $sAssetTypeMethod = 'unloadApp';
+                $sAssetLocationMethod = 'unloadModule';
                 break;
         }
 
@@ -418,7 +464,7 @@ class Asset
 
             } else {
 
-                $this->{$sAssetTypeMethod}($sAsset, $sForceType);
+                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
             }
         }
 
@@ -435,7 +481,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadUrl($sAsset, $sForceType = null)
+    protected function unloadUrl($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -461,7 +507,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadAbsolute($sAsset, $sForceType = null)
+    protected function unloadAbsolute($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -487,7 +533,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadNails($sAsset, $sForceType = null)
+    protected function unloadNails($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -513,7 +559,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadNailsBower($sAsset, $sForceType = null)
+    protected function unloadNailsBower($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -539,7 +585,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadNailsPackage($sAsset, $sForceType = null)
+    protected function unloadNailsPackage($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -565,7 +611,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadAppBower($sAsset, $sForceType = null)
+    protected function unloadAppBower($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -591,7 +637,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadAppPackage($sAsset, $sForceType = null)
+    protected function unloadAppPackage($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -617,7 +663,7 @@ class Asset
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function unloadApp($sAsset, $sForceType = null)
+    protected function unloadApp($sAsset, $sForceType)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -638,8 +684,34 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
+     * Unloads an asset from the app's asset directory
+     * @param  string $sAsset     The asset to unload
+     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @return void
+     */
+    protected function unloadModule($sAsset, $sForceType, $sModule)
+    {
+        $sType = $this->determineType($sAsset, $sForceType);
+
+        switch ($sType) {
+
+            case 'CSS':
+
+                unset($this->aCss['MODULE-' . $sModule . '-' . $sAsset]);
+                break;
+
+            case 'JS':
+
+                unset($this->aJs['MODULE-' . $sModule . '-' . $sAsset]);
+                break;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Loads an inline asset
-     * @param  string $sScript    The inline asset to load, wrap in <script> tags for JS, or <style> tags for CSS
+     * @param  string $sScript    The inline asset to load, wrap in script tags for JS, or style tags for CSS
      * @param  string $sForceType Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
      * @return object
      */
@@ -672,7 +744,7 @@ class Asset
 
     /**
      * Unloads an inline asset
-     * @param  string $sScript    The inline asset to load, wrap in <script> tags for JS, or <style> tags for CSS
+     * @param  string $sScript    The inline asset to load, wrap in script tags for JS, or style tags for CSS
      * @param  string $sForceType Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
      * @return void
      */
@@ -886,7 +958,6 @@ class Asset
         if (!empty($this->aCss) && ($sType == 'CSS' || $sType == 'ALL')) {
 
             foreach ($this->aCss as $sAsset) {
-
                 $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = link_tag($sAsset);
             }
@@ -898,7 +969,6 @@ class Asset
         if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
 
             foreach ($this->aJs as $sAsset) {
-
                 $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = '<script type="text/javascript" src="' . $sAsset . '"></script>';
             }
@@ -911,7 +981,6 @@ class Asset
 
             $aOut[] = '<style type="text/css">';
             foreach ($this->aCssInline as $sAsset) {
-
                 $aOut[] = preg_replace('/<\/?style.*?>/si', '', $sAsset);
             }
             $aOut[] = '</style>';
@@ -921,10 +990,8 @@ class Asset
 
         //  Inline JS
         if (!empty($this->aJsInline) && ($sType == 'JS-INLINE' || $sType == 'ALL')) {
-
             $aOut[] = '<script type="text/javascript">';
             foreach ($this->aJsInline as $sAsset) {
-
                 $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
             }
             $aOut[] = '</script>';
