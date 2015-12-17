@@ -21,7 +21,7 @@ class CORE_NAILS_Lang extends MX_Lang
      */
     public function line($line = '', $params = null)
     {
-        if (is_null($params)) {
+        if (empty($params)) {
             return parent::line($line);
         }
 
