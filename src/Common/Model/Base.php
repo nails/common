@@ -784,6 +784,97 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Get associated content for the items in the resultset
+     * @param  array &$aItems                      The resultset of items
+     * @param  string $sItemProperty               What property of each item to assign the associated content
+     * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
+     * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
+     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
+     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
+     * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
+     * @return void
+     */
+    protected function getAssociatedForItems(
+        &$aItems,
+        $sItemProperty,
+        $sTaxonomyModel,
+        $sTaxonomyModelProvider,
+        $sAssociatedModel,
+        $sAssociatedModelProvider,
+        $aAssociatedModelData = array(),
+        $sTaxonomyItemIdColumn = 'item_id',
+        $sTaxonomyAssociatedIdColumn = 'associated_id'
+    ) {
+        if (!empty($aItems)) {
+
+            //  Load the required models
+            $oTaxonomyModel   = Factory::model($sTaxonomyModel, $sTaxonomyModelProvider);
+            $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+
+            //  Extract all the item IDs and set the base array for the associated content
+            $aItemIds = array();
+            foreach ($aItems as $oItem) {
+
+                //  Note the ID
+                $aItemIds[] = $oItem->id;
+
+                //  Set the base property
+                $oItem->{$sItemProperty}        = new \stdClass();
+                $oItem->{$sItemProperty}->count = 0;
+                $oItem->{$sItemProperty}->data  = array();
+            }
+
+            //  Get all associations for items in the resultset
+            $aTaxonomy = $oTaxonomyModel->getAll(
+                null,
+                null,
+                array(
+                    'where_in' => array(
+                        array($sTaxonomyItemIdColumn, $aItemIds)
+                    )
+                )
+            );
+
+            if (!empty($aTaxonomy)) {
+
+                //  Extract the IDs of the associated content
+                $aAssociatedIds = array();
+                foreach ($aTaxonomy as $oTaxonomy) {
+                    $aAssociatedIds[] = $oTaxonomy->{$sTaxonomyAssociatedIdColumn};
+                }
+                $aAssociatedIds = array_unique($aAssociatedIds);
+
+                if (!empty($aAssociatedIds)) {
+
+                    //  Get all associated content
+                    $aAssociated = $oAssociatedModel->getByIds($aAssociatedIds, $aAssociatedModelData);
+
+                    if (!empty($aAssociated)) {
+
+                        //  Merge associated content into items
+                        foreach ($aItems as $oItem) {
+                            foreach ($aTaxonomy as $oTaxonomy) {
+                                if ($oTaxonomy->{$sTaxonomyItemIdColumn} == $oItem->id) {
+                                    foreach ($aAssociated as $oAssociated) {
+                                        if ($oTaxonomy->{$sTaxonomyAssociatedIdColumn} == $oAssociated->id) {
+                                            $oItem->{$sItemProperty}->data[] = $oAssociated;
+                                            $oItem->{$sItemProperty}->count++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Counts all objects
      * @param  array   $adata           An array of data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
@@ -837,7 +928,7 @@ class Base
             $aData['or_like'] = array();
         }
 
-        foreach ($this->searchableFields as $mField)    {
+        foreach ($this->searchableFields as $mField) {
             $aData['or_like'][] = array(
                 'column' => $mField,
                 'value'  => $sKeywords
