@@ -266,12 +266,16 @@ trait GetCountCommon
             $whereStr = array();
 
             foreach ($whereCompiled as $whereType => $value) {
-                $whereStr[] = '(' . implode(' ' . $wheres[$whereType] . ' ', $value) . ')';
+                if (!empty($value)) {
+                    $whereStr[] = '(' . implode(' ' . $wheres[$whereType] . ' ', $value) . ')';
+                }
             }
 
             //  And reduce $whereStr to an actual string, like the name suggests
-            $whereStr = implode(' AND ', $whereStr);
-            $oDb->where($whereStr);
+            if (!empty($whereStr)) {
+                $whereStr = implode(' AND ', $whereStr);
+                $oDb->where($whereStr);
+            }
         }
     }
 
