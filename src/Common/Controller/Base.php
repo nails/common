@@ -14,6 +14,7 @@
 namespace Nails\Common\Controller;
 
 use Nails\Factory;
+use Nails\Common\Exception\NailsException;
 
 class Base extends \MX_Controller
 {
@@ -292,30 +293,24 @@ class Base extends \MX_Controller
 
                 return true;
 
-            } elseif (strtoupper(ENVIRONMENT) !== 'PRODUCTION') {
-
-                show_error('The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.');
-
             } else {
 
-                $subject = 'Cache Dir is not writeable';
-                $message = 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.';
-                showFatalError($subject, $message);
+                throw new NailsException(
+                    'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.',
+                    1
+                );
             }
 
         } elseif (@mkdir(DEPLOY_CACHE_DIR)) {
 
             return true;
 
-        } elseif (strtoupper(ENVIRONMENT) !== 'PRODUCTION') {
-
-            show_error('The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.');
-
         } else {
 
-            $subject = 'Cache Dir is not writeable';
-            $message = 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.';
-            showFatalError($subject, $message);
+            throw new NailsException(
+                'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.',
+                1
+            );
         }
     }
 
@@ -514,8 +509,10 @@ class Base extends \MX_Controller
         $oDefaultDateFormat = $this->datetime_model->getDateFormatDefault();
 
         if (empty($oDefaultDateFormat)) {
-
-            showFatalError('No default date format has been set, or it\'s been set incorrectly.');
+            throw new NailsException(
+                'No default date format has been set, or it\'s been set incorrectly.',
+                1
+            );
         }
 
         define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
@@ -526,8 +523,10 @@ class Base extends \MX_Controller
         $oDefaultTimeFormat = $this->datetime_model->getTimeFormatDefault();
 
         if (empty($oDefaultTimeFormat)) {
-
-            showFatalError('No default time format has been set, or it\'s been set incorrectly.');
+            throw new NailsException(
+                'No default time format has been set, or it\'s been set incorrectly.',
+                1
+            );
         }
 
         define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);

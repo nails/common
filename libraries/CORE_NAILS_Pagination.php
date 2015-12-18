@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Common\Exception\NailsException;
+
 class CORE_NAILS_Pagination extends CI_Pagination
 {
     public $use_rsegment = false;
@@ -80,7 +82,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
         $this->num_links = (int)$this->num_links;
 
         if ($this->num_links < 1) {
-            show_error('Your number of links must be a positive number.');
+            throw new NailsException('Your number of links must be a positive number.', 1);
         }
 
         if (!is_numeric($this->cur_page)) {

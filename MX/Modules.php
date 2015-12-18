@@ -1,5 +1,7 @@
 <?php (defined('BASEPATH')) OR exit('No direct script access allowed');
 
+use Nails\Common\Exception\ModelException;
+
 (defined('EXT')) OR define('EXT', '.php');
 
 global $CFG;

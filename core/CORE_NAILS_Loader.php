@@ -13,6 +13,8 @@
 /* load the MX Loader class */
 require NAILS_COMMON_PATH . 'MX/Loader.php';
 
+use Nails\Common\Exception\NailsException;
+
 class CORE_NAILS_Loader extends MX_Loader
 {
     /**
@@ -166,8 +168,10 @@ class CORE_NAILS_Loader extends MX_Loader
                 $baseHelper = BASEPATH . 'helpers/' . $helper . EXT;
 
                 if (!file_exists($baseHelper)) {
-
-                    show_error('Unable to load the requested file: helpers/' . $helper . EXT);
+                    throw new NailsException(
+                        'Unable to load the requested file: helpers/' . $helper . EXT,
+                        1
+                    );
                 }
 
                 include_once($appExtHelper);
@@ -201,8 +205,10 @@ class CORE_NAILS_Loader extends MX_Loader
                 $baseHelper = BASEPATH . 'helpers/' . $helper . EXT;
 
                 if (!file_exists($baseHelper)) {
-
-                    show_error('Unable to load the requested file: helpers/' . $helper . EXT);
+                    throw new NailsException(
+                        'Unable to load the requested file: helpers/' . $helper . EXT,
+                        1
+                    );
                 }
 
                 include_once($nailsExtHelper);
@@ -238,8 +244,10 @@ class CORE_NAILS_Loader extends MX_Loader
 
             // Unable to load the helper
             if (!isset($this->_ci_helpers[$helper])) {
-
-                show_error('Unable to load the requested file: helpers/' . $helper . EXT);
+                throw new NailsException(
+                    'Unable to load the requested file: helpers/' . $helper . EXT,
+                    1
+                );
             }
         }
     }
@@ -296,7 +304,10 @@ class CORE_NAILS_Loader extends MX_Loader
                 if (!file_exists($baseClass)) {
 
                     log_message('error', 'Unable to load the requested class: ' . $class);
-                    show_error('Unable to load the requested class: ' . $class);
+                    throw new NailsException(
+                        'Unable to load the requested class: ' . $class,
+                        1
+                    );
                 }
 
                 // Safety:  Was the class already loaded by a previous call?
@@ -350,7 +361,10 @@ class CORE_NAILS_Loader extends MX_Loader
                 if (!file_exists($baseClass)) {
 
                     log_message('error', 'Unable to load the requested class: ' . $class);
-                    show_error('Unable to load the requested class: ' . $class);
+                    throw new NailsException(
+                        'Unable to load the requested class: ' . $class,
+                        1
+                    );
                 }
 
                 // Safety:  Was the class already loaded by a previous call?
@@ -439,7 +453,10 @@ class CORE_NAILS_Loader extends MX_Loader
 
         if ($isDuplicate == false) {
             log_message('error', 'Unable to load the requested class: ' . $class);
-            show_error('Unable to load the requested class: ' . $class);
+            throw new NailsException(
+                'Unable to load the requested class: ' . $class,
+                1
+            );
         }
     }
 }
