@@ -285,9 +285,6 @@ class AppNotification extends Base
         // --------------------------------------------------------------------------
 
         //  Send the email
-        $this->load->library('emailer');
-
-        //  Build the email
         $email       = new stdClass();
         $email->type = 'app_notification';
         $email->data = $data;

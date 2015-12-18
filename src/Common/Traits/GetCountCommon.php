@@ -58,7 +58,6 @@ trait GetCountCommon
                  */
 
                 if (empty($filter->column)) {
-
                     continue;
                 }
 
@@ -80,7 +79,6 @@ trait GetCountCommon
                 if (!empty($whereFilter)) {
 
                     if (!isset($data['where'])) {
-
                         $data['where'] = array();
                     }
 
@@ -162,7 +160,6 @@ trait GetCountCommon
                             $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
                             if ($col === '[NAILS-COL-NOT-FOUND]') {
-
                                 $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
@@ -170,7 +167,6 @@ trait GetCountCommon
                             $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
 
                             if ($val === '[NAILS-VAL-NOT-FOUND]') {
-
                                 $val = isset($where[1]) ? $where[1] : null;
                             }
 
@@ -179,7 +175,6 @@ trait GetCountCommon
 
                             //  If the $col is an array then we should concat them together
                             if (is_array($col)) {
-
                                 $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
                             }
 
@@ -202,7 +197,6 @@ trait GetCountCommon
                                     case 'or_where' :
 
                                         if ($escape) {
-
                                             $val = $oDb->escape($val);
                                         }
 
@@ -213,38 +207,36 @@ trait GetCountCommon
                                     case 'or_where_in' :
 
                                         if (!is_array($val)) {
-
                                             $val = (array) $val;
                                         }
 
-                                        if ($escape) {
-
-                                            foreach ($val as &$value) {
-
-                                                $value = $oDb->escape($value);
+                                        if (!empty($val)) {
+                                            if ($escape) {
+                                                foreach ($val as &$value) {
+                                                    $value = $oDb->escape($value);
+                                                }
                                             }
-                                        }
 
-                                        $whereCompiled[$whereType][] = $col . ' IN (' . implode(',', $val) . ')';
+                                            $whereCompiled[$whereType][] = $col . ' IN (' . implode(',', $val) . ')';
+                                        }
                                         break;
 
                                     case 'where_not_in' :
                                     case 'or_where_not_in' :
 
                                         if (!is_array($val)) {
-
                                             $val = (array) $val;
                                         }
 
-                                        if ($escape) {
-
-                                            foreach ($val as &$value) {
-
-                                                $value = $oDb->escape($value);
+                                        if (!empty($val)) {
+                                            if ($escape) {
+                                                foreach ($val as &$value) {
+                                                    $value = $oDb->escape($value);
+                                                }
                                             }
-                                        }
 
-                                        $whereCompiled[$whereType][] = $col . ' NOT IN (' . implode(',', $val) . ')';
+                                            $whereCompiled[$whereType][] = $col . ' NOT IN (' . implode(',', $val) . ')';
+                                        }
                                         break;
                                 }
                             }
@@ -274,7 +266,6 @@ trait GetCountCommon
             $whereStr = array();
 
             foreach ($whereCompiled as $whereType => $value) {
-
                 $whereStr[] = '(' . implode(' ' . $wheres[$whereType] . ' ', $value) . ')';
             }
 
@@ -340,7 +331,6 @@ trait GetCountCommon
                             $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
 
                             if ($col === '[NAILS-COL-NOT-FOUND]') {
-
                                 $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
                             }
 
@@ -348,7 +338,6 @@ trait GetCountCommon
                             $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
 
                             if ($val === '[NAILS-VAL-NOT-FOUND]') {
-
                                 $val = isset($where[1]) ? $where[1] : null;
                             }
 
@@ -356,7 +345,6 @@ trait GetCountCommon
                             $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
 
                             if ($escape) {
-
                                 $val = $oDb->escape_like_str($val);
                             }
 
@@ -409,7 +397,6 @@ trait GetCountCommon
             $whereStr = array();
 
             foreach ($likeCompiled as $likeType => $value) {
-
                 $whereStr[] = '(' . implode(' ' . $likes[$likeType] . ' ', $value) . ')';
             }
 
@@ -459,9 +446,7 @@ trait GetCountCommon
                     $aSort = $this->getCountCommonParseSort($data['sort']);
 
                     if (!empty($aSort['column'])) {
-
                         $oDb->order_by($aSort['column'], $aSort['order']);
-
                     }
 
                 } else {
@@ -472,7 +457,6 @@ trait GetCountCommon
                         $aSort = $this->getCountCommonParseSort($sort);
 
                         if (!empty($aSort['column'])) {
-
                             $oDb->order_by($aSort['column'], $aSort['order']);
                         }
                     }
@@ -519,8 +503,6 @@ trait GetCountCommon
                 $aOut['order'] = is_string($aOut['order']) ? $aOut['order'] : null;
             }
         }
-
-        // --------------------------------------------------------------------------
 
         return $aOut;
     }

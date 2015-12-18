@@ -9,40 +9,12 @@ return array(
                 return new \Nails\Common\Library\Asset();
             }
         },
-        'Meta' => function () {
-            if (class_exists('\App\Common\Library\Meta')) {
-                return new \App\Common\Library\Meta();
-            } else {
-                return new \Nails\Common\Library\Meta();
-            }
+        'ConsoleDatabase' => function () {
+            //  @todo: replace this with the above once the above is not dependant on CI
+            return new \Nails\Common\Console\Database();
         },
-        'UserFeedback' => function () {
-            if (class_exists('\App\Common\Library\UserFeedback')) {
-                return new \App\Common\Library\UserFeedback();
-            } else {
-                return new \Nails\Common\Library\UserFeedback();
-            }
-        },
-        'ErrorHandler' => function () {
-            if (class_exists('\App\Common\Library\ErrorHandler')) {
-                return new \App\Common\Library\ErrorHandler();
-            } else {
-                return new \Nails\Common\Library\ErrorHandler();
-            }
-        },
-        'Logger' => function () {
-            if (class_exists('\App\Common\Library\Logger')) {
-                return new \App\Common\Library\Logger();
-            } else {
-                return new \Nails\Common\Library\Logger();
-            }
-        },
-        'Mustache' => function () {
-            if (class_exists('\App\Common\Library\Asset')) {
-                return new \App\Common\Library\Mustache();
-            } else {
-                return new Mustache_Engine();
-            }
+        'Database' => function () {
+            return new \Nails\Common\Library\Database();
         },
         'Encrypt' => function () {
 
@@ -50,12 +22,12 @@ return array(
             $oCi->load->library('encrypt');
             return $oCi->encrypt;
         },
-        'Database' => function () {
-            return new \Nails\Common\Library\Database();
-        },
-        'ConsoleDatabase' => function () {
-            //  @todo: replace this with the above once the above is not dependant on CI
-            return new \Nails\Common\Console\Database();
+        'ErrorHandler' => function () {
+            if (class_exists('\App\Common\Library\ErrorHandler')) {
+                return new \App\Common\Library\ErrorHandler();
+            } else {
+                return new \Nails\Common\Library\ErrorHandler();
+            }
         },
         'FormValidation' => function () {
 
@@ -67,6 +39,34 @@ return array(
 
             $oCi = get_instance();
             return $oCi->input;
+        },
+        'Logger' => function () {
+            if (class_exists('\App\Common\Library\Logger')) {
+                return new \App\Common\Library\Logger();
+            } else {
+                return new \Nails\Common\Library\Logger();
+            }
+        },
+        'Meta' => function () {
+            if (class_exists('\App\Common\Library\Meta')) {
+                return new \App\Common\Library\Meta();
+            } else {
+                return new \Nails\Common\Library\Meta();
+            }
+        },
+        'Mustache' => function () {
+            if (class_exists('\App\Common\Library\Asset')) {
+                return new \App\Common\Library\Mustache();
+            } else {
+                return new Mustache_Engine();
+            }
+        },
+        'UserFeedback' => function () {
+            if (class_exists('\App\Common\Library\UserFeedback')) {
+                return new \App\Common\Library\UserFeedback();
+            } else {
+                return new \Nails\Common\Library\UserFeedback();
+            }
         }
     ),
     'models' => array(
