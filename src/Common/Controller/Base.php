@@ -172,7 +172,7 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         /**
-         * Finally, set some meta tags which should be used on every site.
+         * Set some meta tags which should be used on every site.
          */
 
         $this->meta->addRaw(array(
@@ -183,6 +183,24 @@ class Base extends \MX_Controller
             'name'    => 'viewport',
             'content' => 'width=device-width, initial-scale=1'
         ));
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * Finally, set any custom CSS and JS as defined in admin
+         * @todo bring this in via a hook or something
+         */
+
+        $sCustomJs  = appSetting('site_custom_js', 'site');
+        $sCustomCss = appSetting('site_custom_css', 'site');
+
+        if (!empty($sCustomJs)) {
+            $this->asset->inline($sCustomJs, 'JS');
+        }
+
+        if (!empty($sCustomCss)) {
+            $this->asset->inline($sCustomCss, 'CSS');
+        }
     }
 
     // --------------------------------------------------------------------------
