@@ -784,8 +784,8 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset
-     * @param  array &$aItems                      The resultset of items
+     * Get associated content for the items in the resultset using a taxonomy table
+     * @param  array  &$aItems                     The resultset of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
      * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
@@ -796,7 +796,7 @@ class Base
      * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
      * @return void
      */
-    protected function getAssociatedForItems(
+    protected function getAssociatedItemsWithTaxonomy(
         &$aItems,
         $sItemProperty,
         $sTaxonomyModel,
@@ -866,6 +866,65 @@ class Base
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get associated content for the items in the resultset
+     * @param  array  &$aItems                     The resultset of items
+     * @param  string $sItemProperty               What property of each item to assign the associated content
+     * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
+     * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
+     * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
+     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
+     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
+     * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
+     * @return void
+     */
+    protected function getAssociatedItems(
+        &$aItems,
+        $sItemProperty,
+        $sAssociatedItemIdColumn,
+        $sAssociatedModel,
+        $sAssociatedModelProvider,
+        $aAssociatedModelData = array()
+    ) {
+        if (!empty($aItems)) {
+
+            $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+
+            $aItemIds = array();
+            foreach ($aItems as $oItem) {
+
+                //  Note the ID
+                $aItemIds[] = $oItem->id;
+
+                //  Set the base property
+                $oItem->{$sItemProperty}        = new \stdClass();
+                $oItem->{$sItemProperty}->count = 0;
+                $oItem->{$sItemProperty}->data  = array();
+            }
+
+            if (empty($aAssociatedModelData['where_in'])) {
+                $aAssociatedModelData['where_in'] = array();
+            }
+
+            $aAssociatedModelData['where_in'][] = array($sAssociatedItemIdColumn, $aItemIds);
+
+            $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
+
+            foreach ($aItems as $oItem) {
+                foreach ($aAssociatedItems as $oAssociatedItem) {
+                    if ($oItem->id == $oAssociatedItem->{$sAssociatedItemIdColumn}) {
+                        $oItem->{$sItemProperty}->data[] = $oAssociatedItem;
+                        $oItem->{$sItemProperty}->count++;
                     }
                 }
             }
