@@ -233,7 +233,19 @@ class Base
         if (!empty($aData)) {
 
             unset($aData['id']);
-            $this->db->set($aData);
+            foreach ($aData as $sColumn => $mValue) {
+                if (is_array($mValue)) {
+
+                    $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
+                    $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
+
+                    $this->db->set($sColumn, $mSetValue, $bEscape);
+
+                } else {
+
+                    $this->db->set($sColumn, $mValue);
+                }
+            }
         }
 
         $this->db->insert($this->table);
@@ -333,7 +345,19 @@ class Base
         if (!empty($aData)) {
 
             unset($aData['id']);
-            $this->db->set($aData);
+            foreach ($aData as $sColumn => $mValue) {
+                if (is_array($mValue)) {
+
+                    $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
+                    $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
+
+                    $this->db->set($sColumn, $mSetValue, $bEscape);
+
+                } else {
+
+                    $this->db->set($sColumn, $mValue);
+                }
+            }
         }
 
         // --------------------------------------------------------------------------

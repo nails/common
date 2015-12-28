@@ -24,10 +24,26 @@ trait GetCountCommon
      **/
     protected function getCountCommon($aData = array())
     {
+        $this->getCountCommonCompileSelect($aData);
         $this->getCountCommonCompileFilters($aData);
         $this->getCountCommonCompileWheres($aData);
         $this->getCountCommonCompileLikes($aData);
         $this->getCountCommonCompileSort($aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles the select statement
+     * @param  array &$aData The data array
+     * @return void
+     */
+    protected function getCountCommonCompileSelect(&$aData)
+    {
+        if (!empty($aData['select'])) {
+            $oDb = Factory::service('Database');
+            $oDb->select($aData['select']);
+        }
     }
 
     // --------------------------------------------------------------------------
