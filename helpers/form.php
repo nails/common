@@ -751,7 +751,7 @@ EOT;
                             <tbody>
                                 <tr>
                                     <td colspan="3">
-                                        <button class="btn btn-xs btn-success js-cdn-multi-action-add">
+                                        <button type="button" class="btn btn-xs btn-success js-cdn-multi-action-add">
                                             <span class="fa fa-plus"></span> Add download
                                         </button>
                                     </td>
@@ -940,7 +940,7 @@ EOT;
                             <tbody>
                                 <tr>
                                     <td colspan="3">
-                                        <button class="btn btn-xs btn-success js-cdn-multi-action-add">
+                                        <button type="button" class="btn btn-xs btn-success js-cdn-multi-action-add">
                                             <span class="fa fa-plus"></span> Add download
                                         </button>
                                     </td>
