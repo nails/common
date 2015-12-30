@@ -586,7 +586,378 @@ $_out = <<<EOT
 
 EOT;
 
+        return $_out;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
+
+    /**
+     * Generates a form field containing multiple object pickers
+     * @todo  when form builder is updated, ensure that other things can create custom field types
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_cdn_object_picker_multi($field, $tip = '')
+    {
+        //  Set var defaults
+        $_field_id          = isset($field['id'])             ? $field['id']          : null;
+        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
+        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field_key         = isset($field['key'])            ? $field['key']         : null;
+        $_field_label       = isset($field['label'])          ? $field['label']       : null;
+        $_field_default     = isset($field['default'])        ? $field['default']     : array();
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field_required    = isset($field['required'])       ? $field['required']    : false;
+        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field_error       = isset($field['error'])          ? $field['error']       : false;
+        $_field_class       = isset($field['class'])          ? $field['class']       : '';
+        $_field_data        = isset($field['data'])           ? $field['data']        : array();
+        $_field_info        = isset($field['info'])           ? $field['info']        : false;
+        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+
+        //  CDN Specific
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+
+        $_tip               = array();
+        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
+        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
+        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+
+        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
+        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class       = $_error ? 'error' : '';
+        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+
         // --------------------------------------------------------------------------
+
+        //  Is the label required?
+        $_field_label .= $_field_required ? '*' : '';
+
+        //  Prep sublabel
+        $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
+
+        //  Has the field got a tip?
+        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
+        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Prep the field's attributes
+        $_attr = '';
+
+        //  Does the field have an id?
+        $_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
+
+        //  Any data attributes?
+        foreach ($_field_data as $attr => $value) {
+
+            $_attr .= ' data-' . $attr . '="' . $value . '"';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Generate the field's HTML
+        $sFieldAttr  = $_attr;
+        $sFieldAttr .= ' class="' . $_field_class . '" ';
+        $sFieldAttr .= $_readonly;
+
+        // Small hack to inject data-bind into the input.
+        $_field_html = cdnObjectPicker(
+            '" data-bind="attr:{name: \'download[\' + \$index() + \'][download_id]\'}, value: download_id"',
+            $_field_bucket
+        );
+
+        // --------------------------------------------------------------------------
+
+        //  Errors
+        if ($_error && $_field_error) {
+
+            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
+
+        } elseif ($_error) {
+
+            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  info block
+        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Start generating the markup
+        $_field_html_id     = '<input type="hidden" name="' . $_field_key . '[{{index}}][id]" value="{{id}}">';
+        $_field_html_object = cdnObjectPicker(
+            $_field_key . '[{{index}}][object_id]',
+            $_field_bucket,
+            '{{object_id}}',
+            'data-index="{{index}}"'
+        );
+        $_field_html_remove  = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
+        $_field_html_remove .= '<b class="fa fa-lg fa-times-circle text-danger"></b>';
+        $_field_html_remove .= '</a>';
+
+        //  JS template
+        $jsTpl = <<<EOT
+            <tr>
+                <td>
+                    $_field_html_id
+                    $_field_html_object
+                </td>
+                <td class="text-center">
+                    $_field_html_remove
+                </td>
+            </tr>
+EOT;
+
+        //  Generate the initial objects
+        $_default_html = '';
+        $oMustache     = nailsFactory('service', 'Mustache');
+
+        for ($i=0; $i < count($_field_default); $i++) {
+
+            $_field_default[$i]['index'] = $i;
+            $_default_html .= $oMustache->render($jsTpl, $_field_default[$i]);
+        }
+
+        $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($_field_default)) . '"';
+
+        // --------------------------------------------------------------------------
+
+        $_out = <<<EOT
+            <div class="field cdn-multi cdn-multi-with-label $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $sFieldAttr>
+                <div>
+                    <span class="label">
+                        $_field_label
+                        $_field_sub_label
+                    </span>
+                    <span class="input $_tipclass">
+                        <table class="">
+                            <thead>
+                                <th width="*">File</th>
+                                <th width="10"></th>
+                            </thead>
+                            <tbody class="js-row-target">
+                                $_default_html
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <button class="btn btn-xs btn-success js-cdn-multi-action-add">
+                                            <span class="fa fa-plus"></span> Add download
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        $_tip
+                        $_error
+                        $info_block
+                    <span>
+                </div>
+                <script type="text/x-template" class="js-row-tpl">
+                    $jsTpl
+                </script>
+            </div>
+EOT;
+
+        return $_out;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
+
+    /**
+     * Generates a form field containing multiple object pickers
+     * @todo  when form builder is updated, ensure that other things can create custom field types
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_cdn_object_picker_multi_with_label($field, $tip = '')
+    {
+        //  Set var defaults
+        $_field_id          = isset($field['id'])             ? $field['id']          : null;
+        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
+        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
+        $_field_key         = isset($field['key'])            ? $field['key']         : null;
+        $_field_label       = isset($field['label'])          ? $field['label']       : null;
+        $_field_default     = isset($field['default'])        ? $field['default']     : array();
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
+        $_field_required    = isset($field['required'])       ? $field['required']    : false;
+        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
+        $_field_error       = isset($field['error'])          ? $field['error']       : false;
+        $_field_class       = isset($field['class'])          ? $field['class']       : '';
+        $_field_data        = isset($field['data'])           ? $field['data']        : array();
+        $_field_info        = isset($field['info'])           ? $field['info']        : false;
+        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+
+        //  CDN Specific
+        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+
+        $_tip               = array();
+        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
+        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
+        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+
+        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
+        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class       = $_error ? 'error' : '';
+        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Is the label required?
+        $_field_label .= $_field_required ? '*' : '';
+
+        //  Prep sublabel
+        $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
+
+        //  Has the field got a tip?
+        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
+        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Prep the field's attributes
+        $_attr = '';
+
+        //  Does the field have an id?
+        $_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
+
+        //  Any data attributes?
+        foreach ($_field_data as $attr => $value) {
+
+            $_attr .= ' data-' . $attr . '="' . $value . '"';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Generate the field's HTML
+        $sFieldAttr  = $_attr;
+        $sFieldAttr .= ' class="' . $_field_class . '" ';
+        $sFieldAttr .= $_readonly;
+
+        // Small hack to inject data-bind into the input.
+        $_field_html = cdnObjectPicker(
+            '" data-bind="attr:{name: \'download[\' + \$index() + \'][download_id]\'}, value: download_id"',
+            $_field_bucket
+        );
+
+        // --------------------------------------------------------------------------
+
+        //  Errors
+        if ($_error && $_field_error) {
+
+            $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
+
+        } elseif ($_error) {
+
+            $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  info block
+        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Start generating the markup
+        $_field_html_id     = '<input type="hidden" name="' . $_field_key . '[{{index}}][id]" value="{{id}}">';
+        $_field_html_object = cdnObjectPicker(
+            $_field_key . '[{{index}}][object_id]',
+            $_field_bucket,
+            '{{object_id}}',
+            'data-index="{{index}}"'
+        );
+        $_field_html_label   = '<input type="text" name="' . $_field_key . '[{{index}}][label]" value="{{label}}" data-index="{{index}}" class="js-label">';
+        $_field_html_remove  = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
+        $_field_html_remove .= '<b class="fa fa-lg fa-times-circle text-danger"></b>';
+        $_field_html_remove .= '</a>';
+
+        //  JS template
+        $jsTpl = <<<EOT
+            <tr>
+                <td>
+                    $_field_html_id
+                    $_field_html_object
+                </td>
+                <td>
+                    $_field_html_label
+                </td>
+                <td class="text-center">
+                    $_field_html_remove
+                </td>
+            </tr>
+EOT;
+
+        //  Generate the initial objects
+        $_default_html = '';
+        $oMustache     = nailsFactory('service', 'Mustache');
+
+        for ($i=0; $i < count($_field_default); $i++) {
+
+            $_field_default[$i]['index'] = $i;
+            $_default_html .= $oMustache->render($jsTpl, $_field_default[$i]);
+        }
+
+        $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($_field_default)) . '"';
+
+        // --------------------------------------------------------------------------
+
+        $_out = <<<EOT
+            <div class="field cdn-multi cdn-multi-with-label $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $sFieldAttr>
+                <div>
+                    <span class="label">
+                        $_field_label
+                        $_field_sub_label
+                    </span>
+                    <span class="input $_tipclass">
+                        <table class="">
+                            <thead>
+                                <th width="300">File</th>
+                                <th width="*">Label</th>
+                                <th width="10"></th>
+                            </thead>
+                            <tbody class="js-row-target">
+                                $_default_html
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <button class="btn btn-xs btn-success js-cdn-multi-action-add">
+                                            <span class="fa fa-plus"></span> Add download
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        $_tip
+                        $_error
+                        $info_block
+                    <span>
+                </div>
+                <script type="text/x-template" class="js-row-tpl">
+                    $jsTpl
+                </script>
+            </div>
+EOT;
 
         return $_out;
     }
