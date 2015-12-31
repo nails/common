@@ -515,4 +515,79 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
     {
         return (!preg_match("/^([\.-a-z0-9_-])+$/i", $str)) ? false : true;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Validates that all items within a CDN Object Multi Picker have a label set
+     * @todo  provide this from within the CDN module
+     * @param  array   $aValues The values from the picker
+     * @return boolean
+     */
+    public function cdnObjectPickerMultiObjectRequired($aValues)
+    {
+        $CI =& get_instance();
+        $CI->form_validation->set_message(
+            'cdnObjectPickerMultiObjectRequired',
+            'All items must have a file set.'
+        );
+
+        foreach ($aValues as $aValue) {
+            if (empty($aValue['object_id'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Validates that all items within a CDN Object Multi Picker have an object set
+     * @todo  provide this from within the CDN module
+     * @param  array   $aValues The values from the picker
+     * @return boolean
+     */
+    public function cdnObjectPickerMultiLabelRequired($aValues)
+    {
+        $CI =& get_instance();
+        $CI->form_validation->set_message(
+            'cdnObjectPickerMultiLabelRequired',
+            'All items must have a label set.'
+        );
+
+        foreach ($aValues as $aValue) {
+            if (empty($aValue['label'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Validates that all items within a CDN Object Multi Picker have both an object and a label set
+     * @todo  provide this from within the CDN module
+     * @param  array   $aValues The values from the picker
+     * @return boolean
+     */
+    public function cdnObjectPickerMultiAllRequired($aValues)
+    {
+        $CI =& get_instance();
+        $CI->form_validation->set_message(
+            'cdnObjectPickerMultiAllRequired',
+            'All items must have a file and a label set.'
+        );
+
+        foreach ($aValues as $aValue) {
+            if (empty($aValue['object_id']) || empty($aValue['label'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
