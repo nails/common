@@ -275,11 +275,11 @@ class Base
 
     /**
      * Updates an existing object
-     * @param  integer $iId   The ID of the object to update
-     * @param  array   $aData The data to update the object with
+     * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
+     * @param  array         $aData The data to update the object(s) with
      * @return boolean
      */
-    public function update($iId, $aData = array())
+    public function update($mIds, $aData = array())
     {
         if (!$this->table) {
 
@@ -317,6 +317,10 @@ class Base
 
         if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
+            if (is_array($mIds)) {
+                throw new ModelException('Cannot autogenerate slugs when updating multiple items.', 1);
+            }
+
             if (empty($this->tableSlugColumn)) {
                 throw new ModelException(get_called_class() . '::update() Slug column variable not set', 1);
             }
@@ -337,7 +341,7 @@ class Base
                     '',
                     null,
                     null,
-                    $iId
+                    $mIds
                 );
             }
         }
@@ -362,7 +366,11 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        $this->db->where($sPrefix . 'id', $iId);
+        if (is_array($mIds)) {
+            $this->db->where_in($sPrefix . 'id', $mIds);
+        } else {
+            $this->db->where($sPrefix . 'id', $mIds);
+        }
         return $this->db->update($sTable);
     }
 
@@ -375,10 +383,10 @@ class Base
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->tableDeletedColumn field will be set to true.
      *
-     * @param  int     $iId The ID of the object to mark as deleted
+     * @param  integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
      * @return boolean
      */
-    public function delete($iId)
+    public function delete($mIds)
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
@@ -390,7 +398,7 @@ class Base
         if ($this->destructiveDelete) {
 
             //  Destructive delete; nuke that row.
-            return $this->destroy($iId);
+            return $this->destroy($mIds);
 
         } else {
 
@@ -399,7 +407,7 @@ class Base
                 $this->tableDeletedColumn => true
             );
 
-            return $this->update($iId, $aData);
+            return $this->update($mIds, $aData);
         }
     }
 
@@ -448,10 +456,10 @@ class Base
      * This method will attempt to delete the row from the table, regardless of whether
      * destructive deletion is enabled or not.
      *
-     * @param  int     $iId The ID of the object to destroy
+     * @param  integer|array $mIds The ID (or array of IDs) of the object to destroy
      * @return boolean
      */
-    public function destroy($iId)
+    public function destroy($mIds)
     {
         //  Perform this check here so the error message is more easily traced.
         if (!$this->table) {
@@ -460,7 +468,12 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        $this->db->where('id', $iId);
+        if (is_array($mIds)) {
+            $this->db->where_in('id', $mIds);
+        } else {
+            $this->db->where('id', $mIds);
+        }
+
         $this->db->delete($this->table);
 
         return (bool) $this->db->affected_rows();
@@ -953,6 +966,97 @@ class Base
                 }
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Save associated items for an object
+     * @param  integer $iItemId                  The ID of the main item
+     * @param  array   $aAssociatedItems         The data to save, multi-dimensional array of data
+     * @param  string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
+     * @param  string  $sAssociatedModel         The name of the model which is responsible for associated items
+     * @param  string  $sAssociatedModelProvider What module provide the associated item model
+     * @return boolean
+     */
+    protected function saveAsscociatedItems(
+        $iItemId,
+        $aAssociatedItems,
+        $sAssociatedItemIdColumn,
+        $sAssociatedModel,
+        $sAssociatedModelProvider
+    )
+    {
+        $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+        $aTouchedIds          = array();
+        $aExistingItemIds     = array();
+
+        //  Get IDs of current items, we'll compare these later to see which ones to delete.
+        $aData = array(
+            'where' => array(
+                array($oAssociatedItemModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn, $iItemId)
+            )
+        );
+
+        $aExistingItems = $oAssociatedItemModel->getAll(null, null, $aData);
+        foreach ($aExistingItems as $oExistingItem) {
+            $aExistingItemIds[] = $oExistingItem->id;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Update/insert all known news items
+        foreach ($aAssociatedItems as $aAssociatedItem) {
+
+            $aAssociatedItem = (array) $aAssociatedItem;
+
+            if (!empty($aAssociatedItem['id'])) {
+
+                //  Safety, no updating of IDs
+                $iAssociatedItemId = $aAssociatedItem['id'];
+                unset($aAssociatedItem['id']);
+
+                //  Perform update
+                if (!$oAssociatedItemModel->update($iAssociatedItemId, $aAssociatedItem)) {
+                    throw new Exception('Failed to update associated item.', 1);
+                } else {
+                    $aTouchedIds[] = $iAssociatedItemId;
+                }
+
+            } else {
+
+                //  Safety, no setting of IDs
+                unset($aAssociatedItem['id']);
+
+                //  Ensure the related column is set
+                $aAssociatedItem[$sAssociatedItemIdColumn] = $iItemId;
+
+                //  Perform the create
+                $iAssociatedItemId = $oAssociatedItemModel->create($aAssociatedItem);
+                if (!$iAssociatedItemId) {
+
+                    throw new Exception('Failed to create associated item.', 1);
+
+                } else {
+
+                    $aTouchedIds[] = $iAssociatedItemId;
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  We want to delete items which are no longer in use
+        $aIdDiff = array_diff($aExistingItemIds, $aTouchedIds);
+
+        //  Delete those we no longer require
+        if (!empty($aIdDiff)) {
+            if (!$oAssociatedItemModel->delete($aIdDiff)) {
+                throw new Exception('Failed to delete old associated items.', 1);
+            }
+        }
+
+        return true;
     }
 
     // --------------------------------------------------------------------------

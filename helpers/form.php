@@ -722,13 +722,40 @@ EOT;
         $_default_html = '';
         $oMustache     = nailsFactory('service', 'Mustache');
 
-        for ($i=0; $i < count($_field_default); $i++) {
+        if (!empty($_POST)) {
 
-            $_field_default[$i]['index'] = $i;
-            $_default_html .= $oMustache->render($jsTpl, $_field_default[$i]);
+            if (strpos($_field_key, '[') !== false) {
+
+                preg_match_all('/(.+?)\[([a-zA-Z0-9_\]\[]+)\]/', $_field_key, $aKeyBits);
+
+                $aKeyBits[2] = explode('][', $aKeyBits[2][0]);
+                $aKeyBits    = array_merge($aKeyBits[1], $aKeyBits[2]);
+                $sPostKey    = '$_POST';
+
+                foreach ($aKeyBits as $sKeyBit) {
+                    $sPostKey .= '[\'' . $sKeyBit . '\']';
+                }
+
+                //  @todo find a way to not be evil
+                $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : array();');
+
+            } else {
+
+                $aValues  = $_POST[$_field_key];
+            }
+
+        } else {
+
+            $aValues = $_field_default;
         }
 
-        $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($_field_default)) . '"';
+        for ($i=0; $i < count($aValues); $i++) {
+
+            $aValues[$i]['index'] = $i;
+            $_default_html .= $oMustache->render($jsTpl, $aValues[$i]);
+        }
+
+        $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($aValues)) . '"';
 
         // --------------------------------------------------------------------------
 
@@ -938,6 +965,8 @@ EOT;
         }
 
         for ($i=0; $i < count($aValues); $i++) {
+
+            $aValues[$i] = (array) $aValues[$i];
 
             $aValues[$i]['index'] = $i;
             $_default_html .= $oMustache->render($jsTpl, $aValues[$i]);
