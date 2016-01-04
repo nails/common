@@ -1775,6 +1775,11 @@ if (!function_exists('form_field_cms_widgets')) {
             $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
+        //  If the default value is nto a string then encode it, allow devs to pass the configuration array if desired
+        if (!is_string($_field['default'])) {
+            $_field['default'] = json_encode($_field['default']);
+        }
+
         //  Field
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
         $_out .= '<span class="input ' . $_tipclass . '">';
