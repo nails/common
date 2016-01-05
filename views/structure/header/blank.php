@@ -26,9 +26,10 @@
 
         // --------------------------------------------------------------------------
 
-        //  CSS
-        $this->asset->output('css');
-        $this->asset->output('css-inline');
+        //  Assets
+        $this->asset->output('CSS');
+        $this->asset->output('CSS-INLINE');
+        $this->asset->output('JS-INLINE-HEADER');
 
         ?>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

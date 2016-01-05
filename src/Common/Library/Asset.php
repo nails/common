@@ -13,14 +13,16 @@
 namespace Nails\Common\Library;
 
 use Nails\Factory;
+use Nails\Common\Exception\AssetException;
 
 class Asset
 {
     protected $oCi;
-    protected $aCcss;
-    protected $aCcssInline;
+    protected $aCss;
+    protected $aCssInline;
     protected $aJs;
-    protected $aJsInline;
+    protected $aJsInlineHeader;
+    protected $aJsInlineFooter;
     protected $sCacheBuster;
     protected $sBaseUrl;
     protected $sBaseUrlSecure;
@@ -41,11 +43,12 @@ class Asset
         $this->oCi =& get_instance();
         Factory::helper('string');
 
-        $this->aCss           = array();
-        $this->aCssInline     = array();
-        $this->aJs            = array();
-        $this->aJsInline      = array();
-        $this->sCacheBuster   = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
+        $this->aCss            = array();
+        $this->aCssInline      = array();
+        $this->aJs             = array();
+        $this->aJsInlineHeader = array();
+        $this->aJsInlineFooter = array();
+        $this->sCacheBuster    = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
 
         $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets';
         $this->sBaseUrl       = site_url($this->sBaseUrl);
@@ -713,13 +716,22 @@ class Asset
 
     /**
      * Loads an inline asset
-     * @param  string $sScript    The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param  string $sForceType Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
+     * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      * @return object
      */
-    public function inline($sScript = null, $sForceType = null)
+    public function inline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
     {
         if (!empty($sScript)) {
+
+            $sJsLocation = strtoupper($sJsLocation);
+            if ($sJsLocation != 'FOOTER' && $sJsLocation != 'HEADER') {
+                throw new AssetException(
+                    '"' . $sJsLocation . '" is not a valid inline JS location value.',
+                    1
+                );
+            }
 
             $sType = $this->determineType($sScript, $sForceType);
 
@@ -734,7 +746,11 @@ class Asset
                 case 'JS-INLINE':
                 case 'JS':
 
-                    $this->aJsInline['INLINE-JS-' . md5($sScript)] = $sScript;
+                    if ($sJsLocation == 'FOOTER') {
+                        $this->aJsInlineFooter['INLINE-JS-' . md5($sScript)] = $sScript;
+                    } else {
+                        $this->aJsInlineHeader['INLINE-JS-' . md5($sScript)] = $sScript;
+                    }
                     break;
             }
         }
@@ -746,13 +762,22 @@ class Asset
 
     /**
      * Unloads an inline asset
-     * @param  string $sScript    The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param  string $sForceType Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
+     * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      * @return void
      */
-    public function unloadInline($sScript = null, $sForceType = null)
+    public function unloadInline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
     {
         if (!empty($sScript)) {
+
+            $sJsLocation = strtoupper($sJsLocation);
+            if ($sJsLocation != 'FOOTER' && $sJsLocation != 'HEADER') {
+                throw new AssetException(
+                    '"' . $sJsLocation . '" is not a valid inline asset location value.',
+                    1
+                );
+            }
 
             $sType = $this->determineType($sScript, $sForceType);
 
@@ -767,7 +792,11 @@ class Asset
                 case 'JS-INLINE':
                 case 'JS':
 
-                    unset($this->aJsInline['INLINE-JS-' . md5($sScript)]);
+                    if ($sJsLocation == 'FOOTER') {
+                        unset($this->aJsInlineFooter['INLINE-JS-' . md5($sScript)]);
+                    } else {
+                        unset($this->aJsInlineHeader['INLINE-JS-' . md5($sScript)]);
+                    }
                     break;
             }
         }
@@ -919,10 +948,11 @@ class Asset
      */
     public function clear()
     {
-        $this->aCss       = array();
-        $this->aCssInline = array();
-        $this->aJs        = array();
-        $this->aJsInline  = array();
+        $this->aCss            = array();
+        $this->aCssInline      = array();
+        $this->aJs             = array();
+        $this->aJsInlineHeader = array();
+        $this->aJsInlineFooter = array();
         return $this;
     }
 
@@ -934,11 +964,12 @@ class Asset
      */
     public function getLoaded()
     {
-        $oLoaded            = new \stdClass();
-        $oLoaded->css       = $this->aCss;
-        $oLoaded->cssInline = $this->aCssInline;
-        $oLoaded->js        = $this->aJs;
-        $oLoaded->jsInline  = $this->aJsInline;
+        $oLoaded                 = new \stdClass();
+        $oLoaded->css            = $this->aCss;
+        $oLoaded->cssInline      = $this->aCssInline;
+        $oLoaded->js             = $this->aJs;
+        $oLoaded->jsInlineHeader = $this->aJsInlineHeader;
+        $oLoaded->jsInlineFooter = $this->aJsInlineFooter;
 
         return $oLoaded;
     }
@@ -990,10 +1021,21 @@ class Asset
 
         // --------------------------------------------------------------------------
 
-        //  Inline JS
-        if (!empty($this->aJsInline) && ($sType == 'JS-INLINE' || $sType == 'ALL')) {
+        //  Inline JS (Header)
+        if (!empty($this->aJsInlineHeader) && ($sType == 'JS-INLINE-HEADER' || $sType == 'ALL')) {
             $aOut[] = '<script type="text/javascript">';
-            foreach ($this->aJsInline as $sAsset) {
+            foreach ($this->aJsInlineHeader as $sAsset) {
+                $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
+            }
+            $aOut[] = '</script>';
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Inline JS (Footer)
+        if (!empty($this->aJsInlineFooter) && ($sType == 'JS-INLINE-FOOTER' || $sType == 'ALL')) {
+            $aOut[] = '<script type="text/javascript">';
+            foreach ($this->aJsInlineFooter as $sAsset) {
                 $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
             }
             $aOut[] = '</script>';
@@ -1011,7 +1053,6 @@ class Asset
         // --------------------------------------------------------------------------
 
         if ($bOutput) {
-
             echo implode("\n", $aOut);
         }
 

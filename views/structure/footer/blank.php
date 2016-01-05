@@ -14,7 +14,7 @@
 
         //  Load JS
         $this->asset->output('JS');
-        $this->asset->output('JS-INLINE');
+        $this->asset->output('JS-INLINE-FOOTER');
 
         //  Analytics
         if (appSetting('google_analytics_account')) {
