@@ -956,7 +956,7 @@ EOT;
 
             } else {
 
-                $aValues  = $_POST[$_field_key];
+                $aValues  = isset($_POST[$_field_key]) ? $_POST[$_field_key] : array();
             }
 
         } else {
@@ -1783,7 +1783,11 @@ if (!function_exists('form_field_cms_widgets')) {
         //  Field
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
         $_out .= '<span class="input ' . $_tipclass . '">';
-        $_default = htmlentities(set_value($_field['key'], $_field['default']));
+
+        $_default = set_value($_field['key'], $_field['default']);
+
+        //  Ensure the string is encoded
+        $_default = htmlentities($_default, ENT_QUOTES, 'UTF-8', false);
 
         $_out .= '<input type="hidden" class="widget-data" name="' . $_field['key'] . '" value="' . $_default . '" ' . $_field['id'] . '/>';
         $_out .= '<button type="button" class="btn btn-primary btn-sm open-editor" data-key="' . $_field['key'] . '">';

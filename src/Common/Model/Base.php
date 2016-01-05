@@ -912,17 +912,66 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset
+     * Get associated content for the items in the resultset where the the relationship is 1 to 1
+     * @param  array   &$aItems                  The resultset of items
+     * @param  string  $sAssociatedItemIdColumn  Which property in the resultset contains the associated content's ID
+     * @param  string  $sItemProperty            What property of each item to assign the associated content
+     * @param  strong  $sAssociatedModel         The name of the model which handles the associated content
+     * @param  strong  $sAssociatedModelProvider Which module provides the associated model
+     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by $sAssociatedItemIdColumn)
+     * @return void
+     */
+    public function getAssociatedItem(
+        &$aItems,
+        $sAssociatedItemIdColumn,
+        $sItemProperty,
+        $sAssociatedModel,
+        $sAssociatedModelProvider,
+        $aAssociatedModelData = array(),
+        $bUnsetOriginalProperty = true
+    )
+    {
+        if (!empty($aItems)) {
+
+            $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+
+            $aAssociatedItemIds = array();
+            foreach ($aItems as $oItem) {
+
+                //  Note the associated item's ID
+                $aAssociatedItemIds[] = $oItem->{$sAssociatedItemIdColumn};
+            }
+
+            $aAssociatedItemIds = array_unique($aAssociatedItemIds);
+            $aAssociatedItemIds = array_filter($aAssociatedItemIds);
+
+            $aAssociatedItems = $oAssociatedModel->getByIds($aAssociatedItemIds);
+
+            foreach ($aItems as $oItem) {
+                foreach ($aAssociatedItems as $oAssociatedItem) {
+                    if ($oItem->{$sAssociatedItemIdColumn} == $oAssociatedItem->id) {
+                        $oItem->{$sItemProperty} = $oAssociatedItem;
+                    }
+                }
+
+                if ($bUnsetOriginalProperty) {
+                    unset($oItem->{$sAssociatedItemIdColumn});
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get associated content for the items in the resultset where the the relationship is 1 to many
      * @param  array  &$aItems                     The resultset of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
-     * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
-     * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
      * @param  strong $sAssociatedModel            The name of the model which handles the associated content
      * @param  strong $sAssociatedModelProvider    Which module provides the associated model
      * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
-     * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
-     * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
      * @return void
      */
     protected function getAssociatedItems(
@@ -949,13 +998,7 @@ class Base
                 $oItem->{$sItemProperty}->data  = array();
             }
 
-            if (empty($aAssociatedModelData['where_in'])) {
-                $aAssociatedModelData['where_in'] = array();
-            }
-
-            $aAssociatedModelData['where_in'][] = array($sAssociatedItemIdColumn, $aItemIds);
-
-            $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
+            $aAssociatedItems = $oAssociatedModel->getByIds($aItemIds);
 
             foreach ($aItems as $oItem) {
                 foreach ($aAssociatedItems as $oAssociatedItem) {
