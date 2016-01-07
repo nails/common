@@ -285,7 +285,7 @@ class AppNotification extends Base
         // --------------------------------------------------------------------------
 
         //  Send the email
-        $email       = new stdClass();
+        $email       = new \stdClass();
         $email->type = 'app_notification';
         $email->data = $data;
 
