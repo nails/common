@@ -173,12 +173,35 @@ class Factory
     /**
      * Return a property from the container.
      * @param  string $sPropertyName The property name
-     * @param  string $sModuleName  The name of the module which provides the property
+     * @param  string $sModuleName   The name of the module which provides the property
      * @return mixed
      */
     public static function property($sPropertyName, $sModuleName = '')
     {
         return self::getService('properties', $sPropertyName, $sModuleName);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets a new value for a property
+     * @param  string $sPropertyName  The property name
+     * @param  mixed  $mPropertyValue The new property value
+     * @param  string $sModuleName    The name of the module which provides the property
+     * @return void
+     */
+    public static function setProperty($sPropertyName, $mPropertyValue, $sModuleName = '')
+    {
+        $sModuleName = empty($sModuleName) ? 'nailsapp/common' : $sModuleName;
+
+        if (empty(self::$aContainers[$sModuleName]['properties'][$sPropertyName])) {
+            throw new Common\Exception\FactoryException(
+                'Property "' . $sPropertyName . '"  is not provided by module "' . $sModuleName . '"',
+                0
+            );
+        }
+
+        self::$aContainers[$sModuleName]['properties'][$sPropertyName] = $mPropertyValue;
     }
 
     // --------------------------------------------------------------------------
@@ -293,7 +316,7 @@ class Factory
 
         if (empty(self::$aContainers[$sModuleName][$sServiceType][$sServiceName])) {
             throw new Common\Exception\FactoryException(
-                'Service "' . $sServiceName . '"  is not provided by module "' . $sModuleName . '"',
+                ucfirst($sServiceType) . ' "' . $sServiceName . '"  is not provided by module "' . $sModuleName . '"',
                 0
             );
         }

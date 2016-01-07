@@ -151,21 +151,22 @@ if (!function_exists('form_field')) {
     function form_field($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : null;
-        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field_key         = isset($field['key'])            ? $field['key']         : null;
-        $_field_label       = isset($field['label'])          ? $field['label']       : null;
-        $_field_default     = isset($field['default'])        ? $field['default']     : null;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field_required    = isset($field['required'])       ? $field['required']    : false;
-        $_field_placeholder = isset($field['placeholder'])    ? $field['placeholder'] : null;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field_error       = isset($field['error'])          ? $field['error']       : false;
-        $_field_class       = isset($field['class'])          ? $field['class']       : '';
-        $_field_data        = isset($field['data'])           ? $field['data']        : array();
-        $_field_info        = isset($field['info'])           ? $field['info']        : false;
-        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field_id          = isset($field['id'])          ? $field['id']               : null;
+        $_field_type        = isset($field['type'])        ? $field['type']             : 'text';
+        $_field_oddeven     = isset($field['oddeven'])     ? $field['oddeven']          : null;
+        $_field_key         = isset($field['key'])         ? $field['key']              : null;
+        $_field_label       = isset($field['label'])       ? $field['label']            : null;
+        $_field_default     = isset($field['default'])     ? $field['default']          : null;
+        $_field_sub_label   = isset($field['sub_label'])   ? $field['sub_label']        : null;
+        $_field_required    = isset($field['required'])    ? $field['required']         : false;
+        $_field_placeholder = isset($field['placeholder']) ? $field['placeholder']      : null;
+        $_field_readonly    = isset($field['readonly'])    ? $field['readonly']         : false;
+        $_field_error       = isset($field['error'])       ? $field['error']            : false;
+        $_field_class       = isset($field['class'])       ? $field['class']            : '';
+        $_field_data        = isset($field['data'])        ? $field['data']             : array();
+        $_field_info        = isset($field['info'])        ? $field['info']             : false;
+        $_field_max_length  = isset($field['max_length'])  ? (int) $field['max_length'] : null;
+        $_field_tip         = isset($field['tip'])         ? $field['tip']              : $tip;
 
         $_tip               = array();
         $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
@@ -209,7 +210,7 @@ if (!function_exists('form_field')) {
 
         //  Generate the field's HTML
         $sFieldAttr  = $_attr;
-        $sFieldAttr .= ' class="' . $_field_class . '" ';
+        $sFieldAttr .= ' class="field-input ' . $_field_class . '" ';
         $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ';
         $sFieldAttr .= $_readonly;
 
@@ -263,6 +264,25 @@ if (!function_exists('form_field')) {
                     $sFieldAttr
                 );
                 break;
+        }
+
+        if (!empty($_field_max_length)) {
+            switch ($_field_type) {
+
+                case 'password':
+                case 'email':
+                case 'number':
+                case 'url':
+                case 'textarea':
+                case 'text':
+                    $_max_length_html = '<small class="char-count" data-max-length="' . $_field_max_length . '">Max Length: ' . $_field_max_length . '</small>';
+                    break;
+                default:
+                    $_max_length_html = '';
+                    break;
+            }
+        } else {
+            $_max_length_html = '';
         }
 
         //  Download original file, if type is file and original is available
@@ -323,6 +343,7 @@ $_out = <<<EOT
             </span>
             <span class="input $_tipclass">
                 $_field_html
+                $_max_length_html
                 $_tip
                 $_error
                 $info_block
