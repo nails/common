@@ -821,7 +821,8 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset where the the relationship is 1 to 1
+     * Get associated content for the items in the resultset where the the relationship is 1 to 1 and the binding
+     * is made in the iten object (i.e current item contains the associated item's ID)
      * @param  array   &$aItems                  The resultset of items
      * @param  string  $sAssociatedItemIdColumn  Which property in the resultset contains the associated content's ID
      * @param  string  $sItemProperty            What property of each item to assign the associated content
@@ -850,6 +851,9 @@ class Base
 
                 //  Note the associated item's ID
                 $aAssociatedItemIds[] = $oItem->{$sAssociatedItemIdColumn};
+
+                //  Set the base property
+                $oItem->{$sItemProperty} = null;
             }
 
             $aAssociatedItemIds = array_unique($aAssociatedItemIds);

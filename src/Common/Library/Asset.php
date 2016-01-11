@@ -96,7 +96,7 @@ class Asset
 
         // --------------------------------------------------------------------------
 
-        switch (strtoupper($sAssetLocation)) {
+        switch ($sAssetLocation) {
 
             case 'NAILS-BOWER':
 
@@ -372,11 +372,22 @@ class Asset
     /**
      * Loads an asset from a module's asset directory
      * @param  string $sAsset     The asset to load
+     * @param  mixed  $mModule    The module to load from
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @return void
      */
-    protected function loadModule($sAsset, $sForceType, $sModule)
+    protected function loadModule($sAsset, $sForceType, $mModule)
     {
+        if (is_array($mModule)) {
+            $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
+            $sLocation = !empty($mModule[1]) ? $mModule[1] : null;
+
+        } else {
+
+            $sModule   = $mModule;
+            $sLocation = null;
+        }
+
         $sType = $this->determineType($sAsset, $sForceType);
         $sKey  = 'MODULE-' . $sModule . '-' . $sAsset;
 
@@ -384,12 +395,20 @@ class Asset
 
             case 'CSS':
 
-                $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
+                if ($sLocation == 'BOWER') {
+                    $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
+                } else {
+                    $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
+                }
                 break;
 
             case 'JS':
 
-                $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset;
+                if ($sLocation == 'BOWER') {
+                    $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
+                } else {
+                    $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset;
+                }
                 break;
         }
     }
