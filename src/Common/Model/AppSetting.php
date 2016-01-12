@@ -43,7 +43,7 @@ class AppSetting extends Base
      */
     public function get($key = null, $grouping = 'app', $forceRefresh = false)
     {
-        if (empty($this->settings[$grouping]) || $forceRefresh) {
+        if (!isset($this->settings[$grouping]) || $forceRefresh) {
 
             $this->db->where('grouping', $grouping);
             $settings = $this->db->get($this->table)->result();
