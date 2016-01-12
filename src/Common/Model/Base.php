@@ -915,7 +915,10 @@ class Base
                 $aAssociatedModelData['where_in'] = array();
             }
 
-            $aAssociatedModelData['where_in'][] = array($sAssociatedItemIdColumn, $aItemIds);
+            $aAssociatedModelData['where_in'][] = array(
+                $oAssociatedModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn,
+                $aItemIds
+            );
 
             $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
 
@@ -924,6 +927,64 @@ class Base
                     if ($oItem->id == $oAssociatedItem->{$sAssociatedItemIdColumn}) {
                         $oItem->{$sItemProperty}->data[] = $oAssociatedItem;
                         $oItem->{$sItemProperty}->count++;
+                    }
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Count associated content for the items in the resultset where the the relationship is 1 to many
+     * @param  array  &$aItems                     The resultset of items
+     * @param  string $sItemProperty               What property of each item to assign the associated content
+     * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
+     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
+     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     * @return void
+     */
+    protected function countManyAssociatedItems(
+        &$aItems,
+        $sItemProperty,
+        $sAssociatedItemIdColumn,
+        $sAssociatedModel,
+        $sAssociatedModelProvider,
+        $aAssociatedModelData = array()
+    ) {
+        if (!empty($aItems)) {
+
+            $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+
+            $aItemIds = array();
+            foreach ($aItems as $oItem) {
+
+                //  Note the ID
+                $aItemIds[] = $oItem->id;
+
+                //  Set the base property
+                $oItem->{$sItemProperty} = 0;
+            }
+
+            //  Limit the select
+            $aAssociatedModelData['select'] = array(
+                $oAssociatedModel->getTablePrefix() . '.id',
+                $oAssociatedModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn
+            );
+
+            if (empty($aAssociatedModelData['where_in'])) {
+                $aAssociatedModelData['where_in'] = array();
+            }
+
+            $aAssociatedModelData['where_in'][] = array($sAssociatedItemIdColumn, $aItemIds);
+
+            $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
+
+            foreach ($aItems as $oItem) {
+                foreach ($aAssociatedItems as $oAssociatedItem) {
+                    if ($oItem->id == $oAssociatedItem->{$sAssociatedItemIdColumn}) {
+                        $oItem->{$sItemProperty}++;
                     }
                 }
             }
