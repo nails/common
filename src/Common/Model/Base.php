@@ -50,6 +50,8 @@ class Base
     //  Preferences
     protected $destructiveDelete;
     protected $perPage;
+    protected $defaultSortColumn;
+    protected $defaultSortOrder;
 
     // --------------------------------------------------------------------------
 
@@ -104,6 +106,8 @@ class Base
         $this->tableAutoSetSlugs      = false;
         $this->perPage                = 50;
         $this->searchableFields       = array();
+        $this->defaultSortColumn      = $this->tableLabelColumn;
+        $this->defaultSortOrder       = 'ASC';
 
         // --------------------------------------------------------------------------
 
@@ -1064,11 +1068,11 @@ class Base
                     if (!empty($aAssociated)) {
 
                         //  Merge associated content into items
-                        foreach ($aItems as $oItem) {
+                        foreach ($aAssociated as $oAssociated) {
                             foreach ($aTaxonomy as $oTaxonomy) {
-                                if ($oTaxonomy->{$sTaxonomyItemIdColumn} == $oItem->id) {
-                                    foreach ($aAssociated as $oAssociated) {
-                                        if ($oTaxonomy->{$sTaxonomyAssociatedIdColumn} == $oAssociated->id) {
+                                if ($oTaxonomy->{$sTaxonomyAssociatedIdColumn} == $oAssociated->id) {
+                                    foreach ($aItems as $oItem) {
+                                        if ($oTaxonomy->{$sTaxonomyItemIdColumn} == $oItem->id) {
                                             $oItem->{$sItemProperty}->data[] = $oAssociated;
                                             $oItem->{$sItemProperty}->count++;
                                         }

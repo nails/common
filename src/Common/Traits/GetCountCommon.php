@@ -482,6 +482,13 @@ trait GetCountCommon
                     }
                 }
             }
+
+        } elseif (!empty($this->defaultSortColumn)) {
+
+            $oDb->order_by(
+                $this->tablePrefix . '.' . $this->defaultSortColumn,
+                $this->defaultSortOrder
+            );
         }
     }
 
