@@ -514,7 +514,7 @@ class Base
         // --------------------------------------------------------------------------
 
         //  Define the default sorting
-        if (empty($data['sort'])) {
+        if (empty($data['sort']) && !empty($this->defaultSortColumn)) {
             $data['sort'] = array(
                 $this->tablePrefix . '.' . $this->defaultSortColumn,
                 $this->defaultSortOrder
