@@ -513,6 +513,16 @@ class Base
 
         // --------------------------------------------------------------------------
 
+        //  Define the default sorting
+        if (empty($data['sort'])) {
+            $data['sort'] = array(
+                $this->tablePrefix . '.' . $this->defaultSortColumn,
+                $this->defaultSortOrder
+            );
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Apply common items; pass $data
         $this->getCountCommon($data);
 
