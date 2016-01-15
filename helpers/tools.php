@@ -66,71 +66,35 @@ if (!function_exists('special_chars')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('format_bytes')) {
+if (!function_exists('formatBytes')) {
 
     /**
-     * Format a filesize in bytes, kilobytes, megabytes, etc...
-     * @param   string
-     * @return  float
+     * Formats a filesize given in bytes into a human-friendly string
+     * @param  integer $iBytes     The filesize, in bytes
+     * @param  integer $iPrecision The precision to use
+     * @return string
      */
-    function format_bytes($bytes, $precision = 2)
+    function formatBytes($iBytes, $iPrecision = 2)
     {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
-
-        $bytes = max($bytes, 0);
-        $pow   = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow   = min($pow, count($units) - 1);
-
-        //  Uncomment one of the following alternatives
-        //$bytes /= pow(1024, $pow);
-        $bytes /= (1 << (10 * $pow));
-
-        $var = round($bytes, $precision) . ' ' . $units[$pow];
-        $pattern = '/(.+?)\.(.*?)/';
-
-        return preg_replace_callback($pattern, function ($matches) {
-
-            return number_format($matches[1]) . '.' . $matches[2];
-        }, $var);
+        $oCdn = nailsFactory('service', 'Cdn', 'nailsapp/module-cdn');
+        return $oCdn->formatBytes($iBytes, $iPrecision);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('return_bytes')) {
+if (!function_exists('returnBytes')) {
 
     /**
      * Formats a filesize as bytes (e.g max_upload_size)
      * hat-tip: http://php.net/manual/en/function.ini-get.php#96996
-     * @param   string
-     * @return  float
+     * @param  string $sSize The string to convert to bytes
+     * @return integer
      */
-    function return_bytes($sizeStr)
+    function returnBytes($sSize)
     {
-        switch (strtoupper(substr($sizeStr, -1))) {
-
-            case 'M':
-
-                $return = (int) $sizeStr * 1048576;
-                break;
-
-            case 'K':
-
-                $return = (int) $sizeStr * 1024;
-                break;
-
-            case 'G':
-
-                $return = (int) $sizeStr * 1073741824;
-                break;
-
-            default:
-
-                $return = $sizeStr;
-                break;
-        }
-
-        return $return;
+        $oCdn = nailsFactory('service', 'Cdn', 'nailsapp/module-cdn');
+        return $oCdn->returnBytes($sSize);
     }
 }
 
