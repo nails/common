@@ -1,4 +1,5 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
 /*
 | -------------------------------------------------------------------
 | Email Settings
@@ -9,8 +10,8 @@
 
 $config['mailpath']		= '/usr/sbin/sendmail';
 $config['charset']		= 'utf-8';
-$config['wordwrap']		= TRUE;
-$config['validate']		= TRUE;
+$config['wordwrap']		= true;
+$config['validate']		= true;
 $config['mailtype']		= 'html';
 $config['protocol']		= 'smtp';
 $config['newline']		= "\r\n";
