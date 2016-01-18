@@ -88,6 +88,24 @@ class BaseDriver
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Get a driver by it's slug
+     * @param  string $sSlug The driver's slug
+     * @return \stdClass
+     */
+    public function getBySlug($sSlug)
+    {
+        foreach ($this->aDrivers as $oDriver) {
+            if ($sSlug == $oDriver->slug) {
+                return $oDriver;
+            }
+        }
+
+        return null;
+    }
+
+    // --------------------------------------------------------------------------
+
     public function getInstance($sSlug)
     {
         if (isset($this->aInstances[$sSlug])) {
