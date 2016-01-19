@@ -646,54 +646,45 @@ class DateTime extends Base
 
     /**
      * Arbitrarily convert a timestamp between timezones
-     * @param  mixed  $timestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @param  string $toTz      The timezone to convert to
-     * @param  string $fromTz    The timezone to convert from
+     * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @param  string $sToTz     The timezone to convert to
+     * @param  string $sFromTz    The timezone to convert from
      * @return string
      */
-    public static function convertDatetime($timestamp, $toTz, $fromTz = 'UTC')
+    public static function convertDatetime($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
         //  Has a specific timestamp been given?
-        if (is_null($timestamp)) {
+        if (is_null($mTimestamp)) {
 
-            $oDate     = Factory::factory('DateTime');
-            $timestamp = $oDate->format('Y-m-d H:i:s');
+            $oDateTime = Factory::factory('DateTime');
+
+        } elseif (is_numeric($mTimestamp)) {
+
+            $oDateTime = Factory::factory('DateTime');
+            $oDateTime->setTimestamp($mTimestamp);
+
+        } elseif ($mTimestamp instanceof \DateTime) {
+
+            $oDateTime = $mTimestamp;
+
+        } elseif (!empty($mTimestamp) && $mTimestamp !== '0000-00-00' && $mTimestamp !== '0000-00-00 00:00:00') {
+
+            $oDateTime = new \DateTime($mTimestamp);
 
         } else {
 
-            //  Are we dealing with a UNIX timestamp or a datetime?
-            if (!is_numeric($timestamp)) {
-
-                if (!$timestamp || $timestamp == '0000-00-00') {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', strtotime($timestamp));
-
-            } else {
-
-                if (!$timestamp) {
-
-                    return '';
-                }
-
-                $timestamp = date('Y-m-d H:i:s', $timestamp);
-            }
+            return null;
         }
 
         // --------------------------------------------------------------------------
 
         //  Perform the conversion
-        $fromTz = new \DateTimeZone($fromTz);
+        $oFromTz = new \DateTimeZone($sFromTz);
+        $oToTz   = new \DateTimeZone($sToTz);
+        $oOut    = new \DateTime($oDateTime->format('Y-m-d H:i:s'), $oFromTz);
 
-        $out = Factory::factory('DateTime');
-        $out->modify($timestamp);
+        $oOut->setTimeZone($oToTz);
 
-        //  Set the output timezone
-        $toTz = new \DateTimeZone($toTz);
-        $out->setTimeZone($toTz);
-
-        return $out;
+        return $oOut;
     }
 }

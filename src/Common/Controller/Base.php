@@ -523,8 +523,10 @@ class Base extends \MX_Controller
      */
     protected function instantiateDateTime()
     {
+        $oDateTimeModel = Factory::model('DateTime');
+
         //  Define default date format
-        $oDefaultDateFormat = $this->datetime_model->getDateFormatDefault();
+        $oDefaultDateFormat = $oDateTimeModel->getDateFormatDefault();
 
         if (empty($oDefaultDateFormat)) {
             throw new NailsException(
@@ -538,7 +540,7 @@ class Base extends \MX_Controller
         define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
-        $oDefaultTimeFormat = $this->datetime_model->getTimeFormatDefault();
+        $oDefaultTimeFormat = $oDateTimeModel->getTimeFormatDefault();
 
         if (empty($oDefaultTimeFormat)) {
             throw new NailsException(
@@ -565,10 +567,10 @@ class Base extends \MX_Controller
 
         } else {
 
-            $sTimezoneUser = $this->datetime_model->getTimezoneDefault();
+            $sTimezoneUser = $oDateTimeModel->getTimezoneDefault();
         }
 
-        $this->datetime_model->setTimezones('UTC', $sTimezoneUser);
+        $oDateTimeModel->setTimezones('UTC', $sTimezoneUser);
 
         // --------------------------------------------------------------------------
 
@@ -579,7 +581,7 @@ class Base extends \MX_Controller
         $sFormatTime = activeUser('datetime_format_time');
         $sFormatTime = $sFormatTime ? $sFormatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
-        $this->datetime_model->setFormats($sFormatDate, $sFormatTime);
+        $oDateTimeModel->setFormats($sFormatDate, $sFormatTime);
 
         // --------------------------------------------------------------------------
 
@@ -715,8 +717,8 @@ class Base extends \MX_Controller
         $oCi =& get_instance();
 
         //  Models - Load order is important
+        //  @todo explain _why_ it's important
         $oCi->app_setting_model = Factory::model('AppSetting');
-        $oCi->datetime_model    = Factory::model('DateTime');
         $oCi->language_model    = Factory::model('Language');
         $oCi->routes_model      = Factory::model('Routes');
 
@@ -769,9 +771,12 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Inject the user object into the user_group, user_password & datetime models
+        //  @todo use the factory
         $this->user_group_model->setUserObject($this->user_model);
         $this->user_password_model->setUserObject($this->user_model);
-        $this->datetime_model->setUserObject($this->user_model);
+
+        $oDateTimeModel = Factory::model('DateTime');
+        $oDateTimeModel->setUserObject($this->user_model);
 
         // --------------------------------------------------------------------------
 
