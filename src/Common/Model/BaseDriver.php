@@ -121,9 +121,8 @@ class BaseDriver
 
                     //  Apply driver configurations
                     $aSettings = array(
-                        'driver_slug' => $oDriver->slug
+                        'sSlug' => $oDriver->slug
                     );
-
                     if (!empty($oDriver->data->settings)) {
                         $aSettings = array_merge(
                             $aSettings,

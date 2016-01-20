@@ -229,7 +229,7 @@ class Base extends \MX_Controller
          *  {
          *      "nails" :
          *      {
-         *          "minPhpVersion": "5.4.0"
+         *          "minPhpVersion": "5.6.0"
          *      }
          *  }
          */
