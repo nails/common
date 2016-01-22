@@ -1146,7 +1146,7 @@ class Base
 
                 //  Perform update
                 if (!$oAssociatedItemModel->update($iAssociatedItemId, $aAssociatedItem)) {
-                    throw new Exception('Failed to update associated item.', 1);
+                    throw new ModelException('Failed to update associated item.', 1);
                 } else {
                     $aTouchedIds[] = $iAssociatedItemId;
                 }
@@ -1163,7 +1163,7 @@ class Base
                 $iAssociatedItemId = $oAssociatedItemModel->create($aAssociatedItem);
                 if (!$iAssociatedItemId) {
 
-                    throw new Exception('Failed to create associated item.', 1);
+                    throw new ModelException('Failed to create associated item.', 1);
 
                 } else {
 
@@ -1180,7 +1180,7 @@ class Base
         //  Delete those we no longer require
         if (!empty($aIdDiff)) {
             if (!$oAssociatedItemModel->delete($aIdDiff)) {
-                throw new Exception('Failed to delete old associated items.', 1);
+                throw new ModelException('Failed to delete old associated items.', 1);
             }
         }
 
