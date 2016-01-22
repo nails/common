@@ -24,12 +24,35 @@ if (!function_exists('form_email')) {
     function form_email($data = '', $value = '', $extra = '')
     {
         $defaults = array(
-            'type' => 'email',
-            'name' => ((!is_array($data)) ? $data : ''),
+            'type'  => 'email',
+            'name'  => !is_array($data) ? $data : '',
             'value' => $value
         );
 
-        return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_tel')) {
+
+    /**
+     * Generates an input using the "tel" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_tel($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type'  => 'tel',
+            'name'  => !is_array($data) ? $data : '',
+            'value' => $value
+        );
+
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
 }
 
@@ -47,13 +70,13 @@ if (!function_exists('form_number')) {
     function form_number($data = '', $value = '', $extra = '')
     {
         $defaults = array(
-            'type' => 'number',
-            'name' => ((!is_array($data)) ? $data : ''),
+            'type'  => 'number',
+            'name'  => !is_array($data) ? $data : '',
             'value' => $value,
-            'step' => empty($data['step']) ? 'any' : $data['step']
+            'step'  => empty($data['step']) ? 'any' : $data['step']
         );
 
-        return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
 }
 
@@ -71,12 +94,12 @@ if (!function_exists('form_url')) {
     function form_url($data = '', $value = '', $extra = '')
     {
         $defaults = array(
-            'type' => 'url',
-            'name' => ((!is_array($data)) ? $data : ''),
+            'type'  => 'url',
+            'name'  => !is_array($data) ? $data : '',
             'value' => $value
         );
 
-        return "<input "._parse_form_attributes($data, $defaults).$extra." />";
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
 }
 
