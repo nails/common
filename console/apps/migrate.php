@@ -1,6 +1,7 @@
 <?php
 
 use Nails\Factory;
+use Nails\Environment;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -92,7 +93,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         require_once 'config/deploy.php';
 
-        if (!defined('ENVIRONMENT')) {
+        if (!Environment::get()) {
 
             $output->writeln('<error>ERROR:</error> ENVIRONMENT is not defined.');
             return false;
@@ -106,7 +107,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Check environment
-        if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
+        if (Environment::is('PRODUCTION')) {
 
             $output->writeln('');
             $output->writeln('--------------------------------------');
@@ -414,7 +415,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         //  Work out if the module needs migrated and if so between what and what
         $dirMap = $this->mapDir($migrationsPath);
-
+print_r($migrationsPath ."\n");
         if (!empty($dirMap)) {
 
             //  Work out all the files we have and get their index
@@ -471,13 +472,13 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
             unset($GLOBALS['NAILS_COMPONENTS']);
         }
 
-        //  Look for modules
-        $modules = _NAILS_GET_MODULES();
+        //  Look for components
+        $modules = _NAILS_GET_COMPONENTS();
         $out     = array();
 
         foreach ($modules as $module) {
 
-            $out[] = $this->determineModuleState($module->name, $module->path . '/migrations/');
+            $out[] = $this->determineModuleState($module->slug, $module->path . 'migrations/');
         }
 
         return array_filter($out);

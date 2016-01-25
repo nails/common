@@ -1,6 +1,7 @@
 <?php
 
 use Nails\Factory;
+use Nails\Environment;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -60,7 +61,7 @@ class CORE_NAILS_Deploy extends CORE_NAILS_App
         // --------------------------------------------------------------------------
 
         //  Check environment
-        if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
+        if (Environment::is('PRODUCTION')) {
 
             $output->writeln('');
             $output->writeln('--------------------------------------');

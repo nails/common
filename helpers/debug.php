@@ -11,6 +11,7 @@
  */
 
 use Nails\Factory;
+use Nails\Environment;
 
 if (!function_exists('dumpanddie')) {
 
@@ -64,11 +65,11 @@ if (!function_exists('dump')) {
         }
 
         /**
-         * Check the global ENVIRONMENT setting. We only output/die in
+         * Check the environment; we only output/die in
          * non-production environments
          */
 
-        if (ENVIRONMENT != 'PRODUCTION') {
+        if (Environment::not('PRODUCTION')) {
 
             //  Continue execution unless instructed otherwise
             if ($bDie !== false) {

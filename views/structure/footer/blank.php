@@ -1,5 +1,5 @@
         <script type="text/javascript">
-            var ENVIRONMENT         = '<?=strtoupper(ENVIRONMENT)?>';
+            var ENVIRONMENT         = '<?=nailsEnvironment('get')?>';
             window.SITE_URL         = '<?=site_url('', isPageSecure())?>';
             window.NAILS            = {};
             window.NAILS.URL        = '<?=NAILS_ASSETS_URL?>';

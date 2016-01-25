@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Generic Exception
+ * Environment Exception
  *
  * @package     Nails
  * @subpackage  common
@@ -12,6 +12,6 @@
 
 namespace Nails\Common\Exception;
 
-class NailsException extends \Exception
+class EnvironmentException extends NailsException
 {
 }

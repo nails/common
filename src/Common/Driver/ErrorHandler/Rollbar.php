@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Driver\ErrorHandler;
 
+use Nails\Environment;
+
 class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
 {
     /**
@@ -41,7 +43,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
 
         $aConfig = array(
             'access_token' => DEPLOY_ROLLBAR_ACCESS_TOKEN,
-            'environment'  => ENVIRONMENT,
+            'environment'  => Environment::get(),
             'person_fn'    => '\Nails\Common\Driver\ErrorHandler\Rollbar::getPerson'
         );
 
@@ -101,7 +103,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
         }
 
         //  Show something to the user
-        if (ENVIRONMENT != 'PRODUCTION') {
+        if (Environment::not('PRODUCTION')) {
 
             $sSubject = 'Uncaught Exception';
 
@@ -130,7 +132,7 @@ class Rollbar implements \Nails\Common\Interfaces\ErrorHandlerDriver
         if (!is_null($aError) && $aError['type'] === E_ERROR) {
 
             //  Show something to the user
-            if (ENVIRONMENT != 'PRODUCTION') {
+            if (Environment::not('PRODUCTION')) {
 
                 $sSubject = 'Fatal Error';
                 $sMessage = $aError['message'] . ' in ' . $aError['file'] . ' on line ' . $aError['line'];

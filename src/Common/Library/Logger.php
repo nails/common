@@ -14,6 +14,7 @@
 namespace Nails\Common\Library;
 
 use Nails\Factory;
+use Nails\Environment;
 
 class Logger
 {
@@ -120,14 +121,13 @@ class Logger
 
         //  If we're working on the command line then pump it out there too
         if ($this->bIsCli) {
-
             fwrite(STDOUT, $sLine . "\n");
         }
 
         // --------------------------------------------------------------------------
 
         //  If we're not on production and the request is not CLI then echo to the browser
-        if (strtoupper(ENVIRONMENT) != 'PRODUCTION' && !$this->bIsCli && !$this->bMute) {
+        if (Environment::not('PRODUCTION') && !$this->bIsCli && !$this->bMute) {
 
             @ob_start();
             echo $sLine . "<br />\n";

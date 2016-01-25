@@ -25,8 +25,8 @@ class Startup
      */
     public function init()
     {
-        $this->defineConstants();
         $this->setAutoloading();
+        $this->defineConstants();
         $this->setModuleLocations();
     }
 
@@ -208,7 +208,7 @@ class Startup
         //  Database Debug
         if (!defined('DEPLOY_DB_DEBUG')) {
 
-            if (strtoupper(ENVIRONMENT) == 'PRODUCTION') {
+            if (Environment::is('PRODUCTION')) {
 
                 define('DEPLOY_DB_DEBUG', false);
 

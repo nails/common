@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Environment;
+
 class CORE_NAILS_Log extends CI_Log
 {
     /**
@@ -137,7 +139,7 @@ class CORE_NAILS_Log extends CI_Log
                             $replyTo  = $fromEmail;
                         }
 
-                        $to      = defined('ENVIRONMENT') && strtoupper(ENVIRONMENT) != 'PRODUCTION' && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+                        $to      = Environment::not('PRODUCTION') && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
                         $headers = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n" .
                                 'Reply-To: ' . $replyTo . "\r\n" .
                                 'X-Mailer: PHP/' . phpversion()  . "\r\n" .

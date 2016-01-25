@@ -14,6 +14,7 @@
 namespace Nails\Common\Controller;
 
 use Nails\Factory;
+use Nails\Environment;
 use Nails\Common\Exception\NailsException;
 
 class Base extends \MX_Controller
@@ -273,7 +274,7 @@ class Base extends \MX_Controller
         //  Configure whether errors are shown or no
         if (function_exists('ini_set')) {
 
-            switch (strtoupper(ENVIRONMENT)) {
+            switch (Environment::get()) {
 
                 case 'PRODUCTION' :
 
@@ -442,7 +443,7 @@ class Base extends \MX_Controller
     {
         $users = @json_decode(APP_STAGING_USERPASS);
 
-        if (strtoupper(ENVIRONMENT) == 'STAGING' && $users) {
+        if (Environment::is('STAGING') && $users) {
 
             $users = (array) $users;
 

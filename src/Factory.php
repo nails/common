@@ -13,6 +13,7 @@
 namespace Nails;
 
 use Pimple\Container;
+use Nails\Environment;
 
 class Factory
 {
@@ -115,15 +116,14 @@ class Factory
      */
     private static function findServicesForModule($sModuleName)
     {
-        $sEnvironment = strtolower(ENVIRONMENT);
         $aPaths = array(
 
             //  App overrides
-            'application/services/' . $sEnvironment . '/' . $sModuleName . '/services.php',
+            'application/services/' . Environment::get() . '/' . $sModuleName . '/services.php',
             'application/services/' . $sModuleName . '/services.php',
 
             //  Default locations
-            'vendor/' . $sModuleName . '/services/' . $sEnvironment . '/services.php',
+            'vendor/' . $sModuleName . '/services/' . Environment::get() . '/services.php',
             'vendor/' . $sModuleName . '/services/services.php'
         );
 
@@ -138,10 +138,8 @@ class Factory
      */
     private static function findServicesForApp()
     {
-        $sEnvironment = strtolower(ENVIRONMENT);
         $aPaths = array(
-
-            'application/services/' . $sEnvironment . '/services.php',
+            'application/services/' . Environment::get() . '/services.php',
             'application/services/services.php',
         );
 

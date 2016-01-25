@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Environment;
+
 class ErrorHandler
 {
     public static $levels = array(
@@ -111,32 +113,32 @@ class ErrorHandler
         }
 
         //  Non-CLI and Non-production and have an app-specific dev error file?
-        if (!$bIsCli && ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
+        if (!$bIsCli && Environment::not('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal_dev.php';
 
         //  Non-CLI and Production and have an app-specific error file?
-        } elseif (!$bIsCli && ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
+        } elseif (!$bIsCli && Environment::is('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal.php';
 
         //  Non-CLI and Non-production?
-        } elseif (!$bIsCli && ENVIRONMENT != 'PRODUCTION') {
+        } elseif (!$bIsCli && Environment::not('PRODUCTION')) {
 
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev.php';
 
         //  CLI and Non-production and have an app-specific dev error file?
-        } elseif ($bIsCli && ENVIRONMENT != 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
+        } elseif ($bIsCli && Environment::not('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php';
 
         //  CLI and Production and have an app-specific error file?
-        } elseif ($bIsCli && ENVIRONMENT == 'PRODUCTION' && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
+        } elseif ($bIsCli && Environment::is('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
 
             include_once FCPATH . APPPATH . 'errors/error_fatal_cli.php';
 
         //  CLI and Non-production?
-        } elseif ($bIsCli && ENVIRONMENT != 'PRODUCTION') {
+        } elseif ($bIsCli && Environment::not('PRODUCTION')) {
 
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev_cli.php';
 
@@ -165,8 +167,7 @@ class ErrorHandler
     public static function sendDeveloperMail($subject, $message)
     {
         //  Production only
-        if (ENVIRONMENT != 'PRODUCTION') {
-
+        if (Environment::not('PRODUCTION')) {
             return true;
         }
 
@@ -246,7 +247,7 @@ class ErrorHandler
 
         //  Prepare and send
         $mimeBoundary = md5(uniqid(time()));
-        $to = strtoupper(ENVIRONMENT) != 'PRODUCTION' && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+        $to           = Environment::not('PRODUCTION') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 
         //  Headers
         $headers  = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n";

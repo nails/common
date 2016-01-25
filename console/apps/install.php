@@ -1,6 +1,7 @@
 <?php
 
 use Nails\Factory;
+use Nails\Environment;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -595,7 +596,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         $vars[] = array(
                     'key'       => 'ENVIRONMENT',
                     'label'     => 'Environment',
-                    'value'     => defined('ENVIRONMENT') ? ENVIRONMENT : 'PRODUCTION',
+                    'value'     => Environment::get() ?: 'PRODUCTION',
                     'options'   => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
                 );
 

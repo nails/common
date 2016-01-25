@@ -10,7 +10,11 @@
  * @link
  */
 
+use Nails\Factory;
+use Nails\Environment;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\EnvironmentException;
 
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = array();
@@ -391,41 +395,77 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
 if (!function_exists('nailsFactory')) {
 
     /**
-     * A route to the Nails Factory
-     * @return miixed
+     * A route to Nails\Factory
+     * @param  string $sType       The type of item to factorise
+     * @param  string $sKey        The key of the item to factorise
+     * @param  string $sModuleName Which module provides the item
+     * @return mixed
      */
     function nailsFactory($sType, $sKey, $sModuleName = '')
     {
         switch (strtoupper($sType)) {
 
             case 'PROPERTY':
-
-                return \Nails\Factory::property($sKey, $sModuleName);
+                return Factory::property($sKey, $sModuleName);
                 break;
 
             case 'SERVICE':
-
-                return \Nails\Factory::service($sKey, $sModuleName);
+                return Factory::service($sKey, $sModuleName);
                 break;
 
             case 'MODEL':
-
-                return \Nails\Factory::model($sKey, $sModuleName);
+                return Factory::model($sKey, $sModuleName);
                 break;
 
             case 'FACTORY':
-
-                return \Nails\Factory::factory($sKey, $sModuleName);
+                return Factory::factory($sKey, $sModuleName);
                 break;
 
             case 'HELPER':
-
-                return \Nails\Factory::helper($sKey, $sModuleName);
+                return Factory::helper($sKey, $sModuleName);
                 break;
 
             default:
+                throw new FactoryException(
+                    '"' . $sType . '" is not valid Nails\Factory method.',
+                    1
+                );
+                break;
+        }
+    }
+}
 
-                throw new \NailsCommon\Exception\FactoryException('"' . $sType . '" is not valid', 1);
+// --------------------------------------------------------------------------
+
+if (!function_exists('nailsEnvironment')) {
+
+    /**
+     * A route to Nails\Environment
+     * @param  string $sMethod      The method to call
+     * @param  string $sEnvironment The environment to query
+     * @return mixed
+     */
+    function nailsEnvironment($sMethod, $sEnvironment = null)
+    {
+        switch (strtoupper($sMethod)) {
+
+            case 'GET':
+                return Environment::get();
+                break;
+
+            case 'IS':
+                return Environment::is($sEnvironment);
+                break;
+
+            case 'NOT':
+                return Environment::not($sEnvironment);
+                break;
+
+            default:
+                throw new EnvironmentException(
+                    '"' . $sMethod . '" is not a valid Nails\Environment method.',
+                    1
+                );
                 break;
         }
     }
@@ -447,7 +487,6 @@ if (!function_exists('isModuleEnabled')) {
         foreach ($modules as $module) {
 
             if ($moduleName == $module->name) {
-
                 return true;
             }
         }
