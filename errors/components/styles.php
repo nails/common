@@ -103,7 +103,7 @@
         font-size:0.65em;
     }
 
-    #logoContainer
+    #logo-container
     {
         width: 125px;
         margin: auto;

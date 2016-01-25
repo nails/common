@@ -52,7 +52,7 @@ foreach ($paths as $path) {
 
         ?>
         <h1>
-            <div id="logoContainer">
+            <div id="logo-container">
                 <img src="<?=$path[1]?>" id="logo" />
             </div>
         </h1>
