@@ -873,7 +873,7 @@ class Base
             $aAssociatedItemIds = array_unique($aAssociatedItemIds);
             $aAssociatedItemIds = array_filter($aAssociatedItemIds);
 
-            $aAssociatedItems = $oAssociatedModel->getByIds($aAssociatedItemIds);
+            $aAssociatedItems = $oAssociatedModel->getByIds($aAssociatedItemIds, $aAssociatedModelData);
 
             foreach ($aItems as $oItem) {
                 foreach ($aAssociatedItems as $oAssociatedItem) {
