@@ -629,7 +629,8 @@ class Base extends \MX_Controller
         }
 
         //  Set the language config item which codeigniter will use.
-        $this->config->set_item('language', RENDER_LANG_CODE);
+        $oConfig = Factory::service('Config');
+        $oConfig->set_item('language', RENDER_LANG_CODE);
 
         //  Load the Nails. generic lang file
         $this->lang->load('nails');
@@ -656,7 +657,8 @@ class Base extends \MX_Controller
          */
 
         //  Reset
-        $this->config->_config_paths = array();
+        $oConfig = Factory::service('Config');
+        $oConfig->_config_paths = array();
 
         $aPaths = array();
 
@@ -766,13 +768,10 @@ class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Inject the user object into the user_group, user_password & datetime models
+        //  Inject the user object into the user_group &user_password
         //  @todo use the factory
         $this->user_group_model->setUserObject($this->user_model);
         $this->user_password_model->setUserObject($this->user_model);
-
-        $oDateTimeModel = Factory::model('DateTime');
-        $oDateTimeModel->setUserObject($this->user_model);
 
         // --------------------------------------------------------------------------
 

@@ -14,12 +14,13 @@ namespace Nails\Common\Model;
 
 use Nails\Factory;
 
-class DateTime extends Base
+class DateTime
 {
     public $timezoneNails;
     public $timezoneUser;
     protected $userFormatDate;
     protected $userFormatTime;
+    protected $oConfig;
 
     // --------------------------------------------------------------------------
 
@@ -28,8 +29,8 @@ class DateTime extends Base
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->config->load('datetime');
+        $this->oConfig = Factory::service('Config');
+        $this->oConfig->load('datetime');
     }
 
     // --------------------------------------------------------------------------
@@ -40,7 +41,7 @@ class DateTime extends Base
      */
     public function getDateFormatDefault()
     {
-        $default    = $this->config->item('datetime_format_date_default');
+        $default    = $this->oConfig->item('datetime_format_date_default');
         $dateFormat = $this->getDateFormatBySlug($default);
 
         return !empty($dateFormat) ? $dateFormat : false;
@@ -90,7 +91,7 @@ class DateTime extends Base
      */
     public function getAllDateFormat()
     {
-        $formats = $this->config->item('datetime_format_date');
+        $formats = $this->oConfig->item('datetime_format_date');
 
         foreach ($formats as $format) {
 
@@ -141,7 +142,7 @@ class DateTime extends Base
      */
     public function getTimeFormatDefault()
     {
-        $default    = $this->config->item('datetime_format_time_default');
+        $default    = $this->oConfig->item('datetime_format_time_default');
         $timeFormat = $this->getTimeFormatBySlug($default);
 
         return !empty($timeFormat) ? $timeFormat : false;
@@ -191,7 +192,7 @@ class DateTime extends Base
      */
     public function getAllTimeFormat()
     {
-        $formats = $this->config->item('datetime_format_time');
+        $formats = $this->oConfig->item('datetime_format_time');
 
         if ($this->timezoneUser) {
 
@@ -360,7 +361,7 @@ class DateTime extends Base
      */
     public function getTimezoneDefault()
     {
-        $default = $this->config->item('datetime_timezone_default');
+        $default = $this->oConfig->item('datetime_timezone_default');
 
         if ($default) {
 

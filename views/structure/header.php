@@ -35,7 +35,8 @@ if (isset($headerOverride)) {
     //  Auto-detect header if there is a config file
     if (file_exists(FCPATH . APPPATH . 'config/header_views.php')) {
 
-        $this->config->load('header_views');
+        $oConfig = nailsFactory('service', 'Config');
+        $oConfig->load('header_views');
         $match = false;
         $uriString = $this->uri->uri_string();
 
@@ -45,9 +46,9 @@ if (isset($headerOverride)) {
             $uriString = $this->router->routes['default_controller'];
         }
 
-        if ($this->config->item('alt_header')) {
+        if ($oConfig->item('alt_header')) {
 
-            foreach ($this->config->item('alt_header') as $pattern => $template) {
+            foreach ($oConfig->item('alt_header') as $pattern => $template) {
 
                 //  Prep the regex
                 $key = str_replace(':any', '.*', str_replace(':num', '[0-9]*', $pattern));
@@ -72,7 +73,7 @@ if (isset($headerOverride)) {
             if ($is404) {
 
                 //  404 with no route, show the default header
-                $this->load->view($this->config->item('default_header'));
+                $this->load->view($oConfig->item('default_header'));
 
             } else {
 
@@ -82,7 +83,7 @@ if (isset($headerOverride)) {
 
         } else {
 
-            $this->load->view($this->config->item('default_header'));
+            $this->load->view($oConfig->item('default_header'));
         }
 
     } elseif ($this->uri->segment(1) == 'admin' && !$is404) {

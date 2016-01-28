@@ -12,15 +12,21 @@
 
 namespace Nails\Common\Model;
 
-class Country extends Base
+use Nails\Factory;
+
+class Country
 {
+    protected $oConfig;
+
+    // --------------------------------------------------------------------------
+
     /**
      * Construct the model
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->config->load('countries');
+        $this->oConfig = Factory::service('Config');
+        $this->oConfig->load('countries');
     }
 
     // --------------------------------------------------------------------------
@@ -31,7 +37,7 @@ class Country extends Base
      */
     public function getAll()
     {
-        return $this->config->item('countries');
+        return $this->oConfig->item('countries');
     }
 
     // --------------------------------------------------------------------------
@@ -42,29 +48,28 @@ class Country extends Base
      */
     public function getAllFlat()
     {
-        $out       = array();
-        $countries = $this->getAll();
+        $aOut       = array();
+        $aCountries = $this->getAll();
 
-        foreach ($countries as $c) {
-
-            $out[$c->code] = $c->label;
+        foreach ($aCountries as $oCountry) {
+            $aOut[$oCountry->code] = $oCountry->label;
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Get a country by it's code
-     * @param  string $code The code to look for
-     * @return mixed        stdClass on success, false on failure
+     * @param  string $sCode The code to look for
+     * @return mixed         stdClass on success, false on failure
      */
-    public function getByCode($code)
+    public function getByCode($sCode)
     {
-        $countries = $this->getAll();
+        $aCountries = $this->getAll();
 
-        return ! empty($countries[$code]) ? $countries[$code] : false;
+        return ! empty($aCountries[$sCode]) ? $aCountries[$sCode] : false;
     }
 
     // --------------------------------------------------------------------------
@@ -75,7 +80,7 @@ class Country extends Base
      */
     public function getAllContinents()
     {
-        return $this->config->item('continents');
+        return $this->oConfig->item('continents');
     }
 
     // --------------------------------------------------------------------------
@@ -93,13 +98,13 @@ class Country extends Base
 
     /**
      * Get a continent by it's code
-     * @param  string $code The continents code
-     * @return mixed        stdClass on success, false on failure
+     * @param  string $sCode The continents code
+     * @return mixed         stdClass on success, false on failure
      */
-    public function getContinentByCode($code)
+    public function getContinentByCode($sCode)
     {
-        $continents = $this->getAll();
+        $aContinents = $this->getAll();
 
-        return ! empty($continents[$code]) ? $continents[$code] : false;
+        return ! empty($aContinents[$sCode]) ? $aContinents[$sCode] : false;
     }
 }

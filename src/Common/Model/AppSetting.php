@@ -20,8 +20,10 @@ class AppSetting
 
     // --------------------------------------------------------------------------
 
+    protected $sTable;
     protected $aSettings;
     protected $oDb;
+    protected $oEncrypt;
 
     // --------------------------------------------------------------------------
 
@@ -30,9 +32,10 @@ class AppSetting
      */
     public function __construct()
     {
-        $this->sTable     = NAILS_DB_PREFIX . 'app_setting';
+        $this->sTable    = NAILS_DB_PREFIX . 'app_setting';
         $this->aSettings = array();
         $this->oDb       = Factory::service('Database');
+        $this->oEncrypt  = Factory::service('Encrypt');
     }
 
     // --------------------------------------------------------------------------
@@ -58,7 +61,7 @@ class AppSetting
                 $sValue = $oSetting->value;
 
                 if (!empty($oSetting->is_encrypted)) {
-                    $sValue = $this->encrypt->decode($sValue, APP_PRIVATE_KEY);
+                    $sValue = $this->oEncrypt->decode($sValue, APP_PRIVATE_KEY);
                 }
 
                 $this->aSettings[$sGrouping][$oSetting->key] = json_decode($sValue);
@@ -132,7 +135,7 @@ class AppSetting
         $bEncrypt = (bool) $bEncrypt;
 
         if ($bEncrypt) {
-            $sValue = $this->encrypt->encode($sValue, APP_PRIVATE_KEY);
+            $sValue = $this->oEncrypt->encode($sValue, APP_PRIVATE_KEY);
         }
 
         $this->oDb->where('key', $sKey);

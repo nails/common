@@ -9,6 +9,11 @@ return array(
                 return new \Nails\Common\Library\Asset();
             }
         },
+        'Config' => function () {
+
+            $oCi = get_instance();
+            return $oCi->config;
+        },
         'ConsoleDatabase' => function () {
             //  @todo: replace this with the above once the above is not dependant on CI
             return new \Nails\Common\Console\Database();

@@ -35,8 +35,9 @@ if (isset($footerOverride)) {
     //  Auto-detect footer if there is a config file
     if (file_exists(FCPATH . APPPATH . 'config/footer_views.php')) {
 
-        $this->config->load('footer_views');
-        $match = false;
+        $oConfig = nailsFactory('service', 'Config');
+        $oConfig->load('footer_views');
+        $match     = false;
         $uriString = $this->uri->uri_string();
 
         if (!$uriString) {
@@ -45,9 +46,9 @@ if (isset($footerOverride)) {
             $uriString = $this->router->routes['default_controller'];
         }
 
-        if ($this->config->item('alt_footer')) {
+        if ($oConfig->item('alt_footer')) {
 
-            foreach ($this->config->item('alt_footer') as $pattern => $template) {
+            foreach ($oConfig->item('alt_footer') as $pattern => $template) {
 
                 //  Prep the regex
                 $key = str_replace(':any', '.*', str_replace(':num', '[0-9]*', $pattern));
@@ -72,7 +73,7 @@ if (isset($footerOverride)) {
             if ($is404) {
 
                 //  404 with no route, show the default footer
-                $this->load->view($this->config->item('default_footer'));
+                $this->load->view($oConfig->item('default_footer'));
 
             } else {
 
@@ -82,7 +83,7 @@ if (isset($footerOverride)) {
 
         } else {
 
-            $this->load->view($this->config->item('default_footer'));
+            $this->load->view($oConfig->item('default_footer'));
         }
 
     } elseif ($this->uri->segment(1) == 'admin' && !$is404) {
