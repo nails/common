@@ -12,9 +12,16 @@
 
 namespace Nails\Common\Model;
 
-class AppSetting extends Base
+use Nails\Factory;
+
+class AppSetting
 {
-    protected $settings;
+    use \Nails\Common\Traits\ErrorHandling;
+
+    // --------------------------------------------------------------------------
+
+    protected $aSettings;
+    protected $oDb;
 
     // --------------------------------------------------------------------------
 
@@ -23,53 +30,50 @@ class AppSetting extends Base
      */
     public function __construct()
     {
-        parent::__construct();
-
-        // --------------------------------------------------------------------------
-
-        $this->table        = NAILS_DB_PREFIX . 'app_setting';
-        $this->tablePrefix = 'n';
-        $this->settings      = array();
+        $this->sTable     = NAILS_DB_PREFIX . 'app_setting';
+        $this->aSettings = array();
+        $this->oDb       = Factory::service('Database');
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Get's emails associated with a particular group/key
-     * @param  string  $key          The key to retrieve
-     * @param  string  $grouping     The group the key belongs to
-     * @param  boolean $forceRefresh Whether to force a group refresh
+     * Gets settings associated with a particular group/key
+     * @param  string  $sKey          The key to retrieve
+     * @param  string  $sGrouping     The group the key belongs to
+     * @param  boolean $bForceRefresh Whether to force a group refresh
      * @return array
      */
-    public function get($key = null, $grouping = 'app', $forceRefresh = false)
+    public function get($sKey = null, $sGrouping = 'app', $bForceRefresh = false)
     {
-        if (!isset($this->settings[$grouping]) || $forceRefresh) {
+        if (!isset($this->aSettings[$sGrouping]) || $bForceRefresh) {
 
-            $this->db->where('grouping', $grouping);
-            $settings = $this->db->get($this->table)->result();
-            $this->settings[$grouping] = array();
+            $this->oDb->where('grouping', $sGrouping);
+            $aSettings = $this->oDb->get($this->sTable)->result();
 
-            foreach ($settings as $setting) {
+            $this->aSettings[$sGrouping] = array();
 
-                $this->settings[$grouping][$setting->key] = json_decode($setting->value);
+            foreach ($aSettings as $oSetting) {
 
-                if (!empty($setting->is_encrypted)) {
+                $sValue = $oSetting->value;
 
-                    $decoded = $this->encrypt->decode($this->settings[$grouping][$setting->key], APP_PRIVATE_KEY);
-                    $this->settings[$grouping][$setting->key] = $decoded;
+                if (!empty($oSetting->is_encrypted)) {
+                    $sValue = $this->encrypt->decode($sValue, APP_PRIVATE_KEY);
                 }
+
+                $this->aSettings[$sGrouping][$oSetting->key] = json_decode($sValue);
             }
         }
 
         // --------------------------------------------------------------------------
 
-        if (empty($key)) {
+        if (empty($sKey)) {
 
-            return $this->settings[$grouping];
+            return $this->aSettings[$sGrouping];
 
         } else {
 
-            return isset($this->settings[$grouping][$key]) ? $this->settings[$grouping][$key] : null;
+            return isset($this->aSettings[$sGrouping][$sKey]) ? $this->aSettings[$sGrouping][$sKey] : null;
         }
     }
 
@@ -78,36 +82,36 @@ class AppSetting extends Base
     /**
      * Set a group/key either by passing an array of key=>value pairs as the $key
      * or by passing a string to $key and setting $value
-     * @param mixed   $key      The key to set, or an array of key => value pairs
-     * @param string  $grouping The grouping to store the keys under
-     * @param mixed   $value    The data to store, only used if $key is a string
-     * @param boolean $encrypt  Whether to encrypt the data or not
+     * @param  mixed   $mKey      The key to set, or an array of key => value pairs
+     * @param  string  $sGrouping The grouping to store the keys under
+     * @param  mixed   $mValue    The data to store, only used if $mKey is a string
+     * @param  boolean $bEncrypt  Whether to encrypt the data or not
      * @return boolean
      */
-    public function set($key, $grouping = 'app', $value = null, $encrypt = false)
+    public function set($mKey, $sGrouping = 'app', $mValue = null, $bEncrypt = false)
     {
-        $this->db->trans_begin();
+        $this->oDb->trans_begin();
 
-        if (is_array($key)) {
+        if (is_array($mKey)) {
 
-            foreach ($key as $key => $value) {
+            foreach ($mKey as $sKey => $mValue) {
 
-                $this->doSet($key, $grouping, $value, $encrypt);
+                $this->doSet($sKey, $sGrouping, $mValue, $bEncrypt);
             }
 
         } else {
 
-            $this->doSet($key, $grouping, $value, $encrypt);
+            $this->doSet($mKey, $sGrouping, $mValue, $bEncrypt);
         }
 
-        if ($this->db->trans_status() === false) {
+        if ($this->oDb->trans_status() === false) {
 
-            $this->db->trans_rollback();
+            $this->oDb->trans_rollback();
             return false;
 
         } else {
 
-            $this->db->trans_commit();
+            $this->oDb->trans_commit();
             return true;
         }
     }
@@ -116,42 +120,39 @@ class AppSetting extends Base
 
     /**
      * Inserts/Updates a group/key value
-     * @param string  $key      The key to set
-     * @param string  $grouping The key's grouping
-     * @param mixed   $value    The value of the group/key
-     * @param boolean $encrypt  Whether to encrypt the data or not
+     * @param string  $sKey      The key to set
+     * @param string  $sGrouping The key's grouping
+     * @param mixed   $mValue    The value of the group/key
+     * @param boolean $bEncrypt  Whether to encrypt the data or not
      * @return void
      */
-    protected function doSet($key, $grouping, $value, $encrypt)
+    protected function doSet($sKey, $sGrouping, $mValue, $bEncrypt)
     {
-        if ($encrypt) {
+        $sValue   = json_encode($mValue);
+        $bEncrypt = (bool) $bEncrypt;
 
-            $value       = $this->encrypt->encode($value, APP_PRIVATE_KEY);
-            $isEncrypted = true;
-
-        } else {
-
-            $isEncrypted = false;
+        if ($bEncrypt) {
+            $sValue = $this->encrypt->encode($sValue, APP_PRIVATE_KEY);
         }
 
-        $this->db->where('key', $key);
-        $this->db->where('grouping', $grouping);
+        $this->oDb->where('key', $sKey);
+        $this->oDb->where('grouping', $sGrouping);
 
-        if ($this->db->count_all_results($this->table)) {
+        if ($this->oDb->count_all_results($this->sTable)) {
 
-            $this->db->set('value', json_encode($value));
-            $this->db->set('is_encrypted', $isEncrypted);
-            $this->db->where('grouping', $grouping);
-            $this->db->where('key', $key);
-            $this->db->update($this->table);
+            $this->oDb->set('value', $sValue);
+            $this->oDb->set('is_encrypted', $bEncrypt);
+            $this->oDb->where('grouping', $sGrouping);
+            $this->oDb->where('key', $sKey);
+            $this->oDb->update($this->sTable);
 
         } else {
 
-            $this->db->set('value', json_encode($value));
-            $this->db->set('grouping', $grouping);
-            $this->db->set('key', $key);
-            $this->db->set('is_encrypted', $isEncrypted);
-            $this->db->insert($this->table);
+            $this->oDb->set('value', $sValue);
+            $this->oDb->set('grouping', $sGrouping);
+            $this->oDb->set('key', $sKey);
+            $this->oDb->set('is_encrypted', $bEncrypt);
+            $this->oDb->insert($this->sTable);
         }
     }
 
@@ -159,34 +160,33 @@ class AppSetting extends Base
 
     /**
      * Deletes a key for a particular group
-     * @param string  $key      The key to delete
-     * @param string  $grouping The key's grouping
+     * @param mixed   $mKey      The key to delete
+     * @param string  $sGrouping The key's grouping
      * @return bool
      */
-    public function delete($key, $grouping)
+    public function delete($mKey, $sGrouping)
     {
-        $this->db->trans_begin();
+        $this->oDb->trans_begin();
 
-        if (is_array($key)) {
+        if (is_array($mKey)) {
 
-            foreach ($key as $key) {
-
-                $this->doDelete($key, $grouping);
+            foreach ($mKey as $sKey) {
+                $this->doDelete($sKey, $sGrouping);
             }
 
         } else {
 
-            $this->doDelete($key, $grouping);
+            $this->doDelete($mKey, $sGrouping);
         }
 
-        if ($this->db->trans_status() === false) {
+        if ($this->oDb->trans_status() === false) {
 
-            $this->db->trans_rollback();
+            $this->oDb->trans_rollback();
             return false;
 
         } else {
 
-            $this->db->trans_commit();
+            $this->oDb->trans_commit();
             return true;
         }
     }
@@ -195,31 +195,27 @@ class AppSetting extends Base
 
     /**
      * Actually performs the deletion of the row.
-     * @param  string $key      The key to delete
-     * @param  string $grouping They key's grouping
+     * @param  string $sKey      The key to delete
+     * @param  string $sGrouping They key's grouping
      * @return bool
      */
-    protected function doDelete($key, $grouping)
+    protected function doDelete($sKey, $sGrouping)
     {
-        $this->db->where('key', $key);
-        $this->db->where('grouping', $grouping);
-        $this->db->delete($this->table);
-
-        return (bool) $this->db->affected_rows();
+        $this->oDb->where('key', $sKey);
+        $this->oDb->where('grouping', $sGrouping);
+        return $this->oDb->delete($this->sTable);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Deletes all keys for a particular group.
-     * @param  string $grouping The group to delete
+     * @param  string $sGrouping The group to delete
      * @return bool
      */
-    public function deleteGroup($grouping)
+    public function deleteGroup($sGrouping)
     {
-        $this->db->where('grouping', $grouping);
-        $this->db->delete($this->table);
-
-        return (bool) $this->db->affected_rows();
+        $this->oDb->where('grouping', $sGrouping);
+        return $this->oDb->delete($this->sTable);
     }
 }

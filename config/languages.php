@@ -21,7 +21,7 @@ $config['languages_default'] = 'english';
 
 // --------------------------------------------------------------------------
 
-//	Define supported langauges for the site.
+//	Define supported languages for the site.
 $config['languages_enabled'] = array( 'english' );
 
 // --------------------------------------------------------------------------
@@ -42,7 +42,7 @@ $config['languages']['english']->label	= 'English';
 
 // --------------------------------------------------------------------------
 
-//	Let's also make special cases for other major langauges
+//	Let's also make special cases for other major languages
 $config['languages']['spanish']			= new stdClass();
 $config['languages']['spanish']->code	= 'spanish';
 $config['languages']['spanish']->label	= 'Spanish';

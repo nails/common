@@ -113,12 +113,14 @@ class Base extends \MX_Controller
         //  Need to generate the routes_app.php file?
         if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
 
-            if (!$this->routes_model->update()) {
+            $oRoutesModel = Factory::model('Routes');
+
+            if (!$oRoutesModel->update()) {
 
                 //  Fall over, routes_app.php *must* be there
                 $subject  = 'Failed To generate routes_app.php';
                 $message  = 'routes_app.php was not found and could not be generated. ';
-                $message .= $this->routes_model->lastError();
+                $message .= $oRoutesModel->lastError();
 
                 showFatalError($subject, $message);
 
@@ -277,13 +279,11 @@ class Base extends \MX_Controller
             switch (Environment::get()) {
 
                 case 'PRODUCTION' :
-
                     //  Suppress all errors on production
                     ini_set('display_errors', false);
                     break;
 
                 default :
-
                     //  Show errors everywhere else
                     ini_set('display_errors', true);
                     break;
@@ -600,10 +600,10 @@ class Base extends \MX_Controller
     protected function instantiateLanguages()
     {
         //  Define default language
-        $oDefault = $this->language_model->getDefault();
+        $oLanguageModel = Factory::model('Language');
+        $oDefault       = $oLanguageModel->getDefault();
 
         if (empty($oDefault)) {
-
             showFatalError('No default language has been set, or it\'s been set incorrectly.');
         }
 
@@ -717,12 +717,7 @@ class Base extends \MX_Controller
 
         $oCi =& get_instance();
 
-        //  Models - Load order is important
-        //  @todo explain _why_ it's important
-        $oCi->app_setting_model = Factory::model('AppSetting');
-        $oCi->language_model    = Factory::model('Language');
-        $oCi->routes_model      = Factory::model('Routes');
-
+        //  Models
         //  Autoload module models
         foreach ($aAvailableModules as $oModule) {
             if (!empty($oModule->autoload->models) && is_array($oModule->autoload->models)) {

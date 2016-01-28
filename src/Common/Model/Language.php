@@ -12,15 +12,19 @@
 
 namespace Nails\Common\Model;
 
-class Language extends Base
+class Language
 {
+    protected $oCi;
+
+    // --------------------------------------------------------------------------
+
     /**
      * Constructs the model
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->config->load('languages');
+        $this->oCi =& get_instance();
+        $this->oCi->config->load('languages');
     }
 
     // --------------------------------------------------------------------------
@@ -31,10 +35,10 @@ class Language extends Base
      */
     public function getDefault()
     {
-        $default  = $this->config->item('languages_default');
-        $language = $this->getByCode($default);
+        $sDefault  = $this->oCi->config->item('languages_default');
+        $oLanguage = $this->getByCode($sDefault);
 
-        return !empty($language) ? $language : false;
+        return !empty($oLanguage) ? $oLanguage : false;
     }
 
     // --------------------------------------------------------------------------
@@ -45,8 +49,8 @@ class Language extends Base
      */
     public function getDefaultCode()
     {
-        $default = $this->getDefault();
-        return empty($default->code) ? false : $default->code;
+        $oDefault = $this->getDefault();
+        return empty($oDefault->code) ? false : $oDefault->code;
     }
 
     // --------------------------------------------------------------------------
@@ -57,8 +61,8 @@ class Language extends Base
      */
     public function getDefaultLabel()
     {
-        $default = $this->getDefault();
-        return empty($default->label) ? false : $default->label;
+        $oDefault = $this->getDefault();
+        return empty($oDefault->label) ? false : $oDefault->label;
     }
 
     // --------------------------------------------------------------------------
@@ -69,7 +73,7 @@ class Language extends Base
      */
     public function getAll()
     {
-        return $this->config->item('languages');
+        return $this->oCi->config->item('languages');
     }
 
     // --------------------------------------------------------------------------
@@ -80,15 +84,14 @@ class Language extends Base
      */
     public function getAllFlat()
     {
-        $out       = array();
-        $languages = $this->getAll();
+        $aOut       = array();
+        $aLanguages = $this->getAll();
 
-        foreach ($languages as $language) {
-
-            $out[$language->code] = $language->label;
+        foreach ($aLanguages as $oLanguage) {
+            $aOut[$oLanguage->code] = $oLanguage->label;
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
@@ -99,15 +102,14 @@ class Language extends Base
      */
     public function getAllEnabled()
     {
-        $enabled = $this->config->item('languages_enabled');
-        $out     = array();
+        $aEnabled = $this->oCi->config->item('languages_enabled');
+        $aOut     = array();
 
-        foreach ($enabled as $code) {
-
-            $out[] = $this->getByCode($code);
+        foreach ($aEnabled as $sCode) {
+            $aOut[] = $this->getByCode($sCode);
         }
 
-        return array_filter($out);
+        return array_filter($aOut);
     }
 
     // --------------------------------------------------------------------------
@@ -118,27 +120,26 @@ class Language extends Base
      */
     public function getAllEnabledFlat()
     {
-        $out       = array();
-        $languages = $this->getAllEnabled();
+        $aOut       = array();
+        $aLanguages = $this->getAllEnabled();
 
-        foreach ($languages as $language) {
-
-            $out[$language->code] = $language->label;
+        foreach ($aLanguages as $oLanguage) {
+            $aOut[$oLanguage->code] = $oLanguage->label;
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns a language by it's code
-     * @param  string $code The language code
-     * @return mixed        stdClass on success, false on failure
+     * @param  string $sCode The language code
+     * @return mixed         stdClass on success, false on failure
      */
-    public function getByCode($code)
+    public function getByCode($sCode)
     {
-        $languages = $this->getAll();
-        return !empty($languages[$code]) ? $languages[$code] : false;
+        $aLanguages = $this->getAll();
+        return !empty($aLanguages[$sCode]) ? $aLanguages[$sCode] : false;
     }
 }

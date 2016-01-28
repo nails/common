@@ -854,8 +854,7 @@ class Base
         $sAssociatedModelProvider,
         $aAssociatedModelData = array(),
         $bUnsetOriginalProperty = true
-    )
-    {
+    ) {
         if (!empty($aItems)) {
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
@@ -1113,8 +1112,7 @@ class Base
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider
-    )
-    {
+    ) {
         $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
         $aTouchedIds          = array();
         $aExistingItemIds     = array();
@@ -1347,51 +1345,55 @@ class Base
      * The getAll() method iterates over each returned item with this method so as to
      * correctly format the output. Use this to cast integers and booleans and/or organise data into objects.
      *
-     * @param  object $obj      A reference to the object being formatted.
-     * @param  array  $data     The same data array which is passed to _getcount_common, for reference if needed
-     * @param  array  $integers Fields which should be cast as integers if numerical and not null
-     * @param  array  $bools    Fields which should be cast as booleans if not null
-     * @param  array  $floats   Fields which should be cast as floats if not null
+     * @param  object $oObj      A reference to the object being formatted.
+     * @param  array  $aData     The same data array which is passed to _getcount_common, for reference if needed
+     * @param  array  $aIntegers Fields which should be cast as integers if numerical and not null
+     * @param  array  $aBools    Fields which should be cast as booleans if not null
+     * @param  array  $aFloats   Fields which should be cast as floats if not null
      * @return void
      */
-    protected function formatObject(&$obj, $data = array(), $integers = array(), $bools = array(), $floats = array())
-    {
-        $integers   = (array) $integers;
-        $integers[] = $this->tableIdColumn;
-        $integers[] = $this->tableCreatedByColumn;
-        $integers[] = $this->tableModifiedByColumn;
-        $integers[] = 'parent_id';
-        $integers[] = 'user_id';
-        $integers[] = 'order';
+    protected function formatObject(
+        &$oObj,
+        $aData = array(),
+        $aIntegers = array(),
+        $aBools = array(),
+        $aFloats = array()
+    ) {
 
-        foreach ($integers as $property) {
+        $aIntegers   = (array) $aIntegers;
+        $aIntegers[] = $this->tableIdColumn;
+        $aIntegers[] = $this->tableCreatedByColumn;
+        $aIntegers[] = $this->tableModifiedByColumn;
+        $aIntegers[] = 'parent_id';
+        $aIntegers[] = 'user_id';
+        $aIntegers[] = 'order';
 
-            if (property_exists($obj, $property) && is_numeric($obj->{$property}) && !is_null($obj->{$property})) {
-
-                $obj->{$property} = (int) $obj->{$property};
+        foreach ($aIntegers as $sProperty) {
+            if (property_exists($oObj, $sProperty) && is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
+                $oObj->{$sProperty} = (int) $oObj->{$sProperty};
             }
         }
 
         // --------------------------------------------------------------------------
 
-        $bools   = (array) $bools;
-        $bools[] = $this->tableDeletedColumn;
-        $bools[] = 'is_active';
-        $bools[] = 'is_published';
+        $aBools   = (array) $aBools;
+        $aBools[] = $this->tableDeletedColumn;
+        $aBools[] = 'is_active';
+        $aBools[] = 'is_published';
 
-        foreach ($bools as $property) {
-            if (property_exists($obj, $property) && !is_null($obj->{$property})) {
-                $obj->{$property} = (bool) $obj->{$property};
+        foreach ($aBools as $sProperty) {
+            if (property_exists($oObj, $sProperty) && !is_null($oObj->{$sProperty})) {
+                $oObj->{$sProperty} = (bool) $oObj->{$sProperty};
             }
         }
 
         // --------------------------------------------------------------------------
 
-        $floats = (array) $floats;
+        $aFloats = (array) $aFloats;
 
-        foreach ($floats as $property) {
-            if (property_exists($obj, $property) && is_numeric($obj->{$property}) && !is_null($obj->{$property})) {
-                $obj->{$property} = (float) $obj->{$property};
+        foreach ($aFloats as $sProperty) {
+            if (property_exists($oObj, $sProperty) && is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
+                $oObj->{$sProperty} = (float) $oObj->{$sProperty};
             }
         }
     }
