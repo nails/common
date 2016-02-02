@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Factory;
+
 class CORE_NAILS_Form_validation extends CI_Form_validation
 {
     /**
@@ -88,255 +90,308 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 
     // --------------------------------------------------------------------------
 
+
     /**
-     * Checks if a date is valid.
-     * @param  string $date The form value
+     * Check if a date is valid
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function valid_date($date)
+    public function valid_date($sDate, $sFormat = 'Y-m-d')
     {
         //  If blank, then assume the date is not required
-        if (!$date) {
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('valid_date', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('valid_date', lang('fv_valid_date_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('valid_date', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('valid_date', lang('fv_valid_date_field'));
         }
 
-        $_time = strtotime($date);
+        try {
 
-        if ($_time === false) {
+            $oDate = \DateTime::createFromFormat($sFormat, $sDate);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate->format($sFormat) == $sDate;
+
+        } catch (\Exception $e) {
+
             return false;
         }
-
-        $_date = date('Y-m-d', $_time);
-
-        @list($_year, $_month, $_day) = explode('-', $_date);
-
-        return checkdate((int) $_month, (int) $_day, (int) $_year);
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a date us in the future.
-     * @param  string $date The form value
+     * Checks if a date is in the future
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_future($date)
+    public function date_future($sDate, $sFormat = 'Y-m-d')
     {
         //  If blank, then assume the date is not required
-        if (!$date) {
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('date_future', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('date_future', lang('fv_valid_date_future_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('date_future', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('date_future', lang('fv_valid_date_future_field'));
         }
 
-        $_time = strtotime($date);
+        try {
 
-        if ($_time === false) {
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sDate);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            $oNow->setTime(0, 0, 0);
+            $oDate->setTime(0, 0, 0);
+
+            return $oDate > $oNow;
+
+        } catch (\Exception $e) {
+
             return false;
         }
-
-        $_date = date('Y-m-d', $_time);
-
-        @list($_year, $_month, $_day) = explode('-', $_date);
-
-        return strtotime((int) $_year . '-' . (int) $_month . '-' . (int) $_day) < strtotime(date('Y-m-d')) ? false : true;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a date is in the past.
-     * @param  string $date The form value
+     * Checks if a date is in the past
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_past($date)
+    public function date_past($sDate, $sFormat = 'Y-m-d')
     {
         //  If blank, then assume the date is not required
-        if (!$date) {
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('date_past', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('date_past', lang('fv_valid_date_past_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('date_past', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('date_past', lang('fv_valid_date_past_field'));
         }
 
-        $_time = strtotime($date);
+        try {
 
-        if ($_time === false) {
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sDate);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            $oNow->setTime(0, 0, 0);
+            $oDate->setTime(0, 0, 0);
+
+            return $oDate < $oNow;
+
+        } catch (\Exception $e) {
+
             return false;
         }
-
-        $_date = date('Y-m-d', $_time);
-
-        @list($_year, $_month, $_day) = explode('-', $_date);
-
-        return strtotime((int) $_year . '-' . (int) $_month . '-' . (int) $_day) > strtotime(date('Y-m-d')) ? false : true;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a date is before another date field.
-     * @param  string $date  The form value
-     * @param  string $field The other POST field to check against
+     * Checks if a date is today
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_before($date, $field)
+    public function date_today($sDate, $sFormat = 'Y-m-d')
     {
-        //  If blank, then assume the datetime is not required
-        if (!$date) {
+        //  If blank, then assume the date is not required
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('date_before', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('date_before', lang('fv_valid_date_before_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('date_today', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('date_today', lang('fv_valid_date_today_field'));
         }
 
-        // --------------------------------------------------------------------------
+        try {
 
-        return strtotime($date) < strtotime($CI->input->post($field)) ? true : false;
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sDate);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            $oNow->setTime(0, 0, 0);
+            $oDate->setTime(0, 0, 0);
+
+            return $oDate === $oNow;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a date is after another date field.
-     * @param  string $date  The form value
-     * @param  string $field The other POST field to check against
+     * Checks if a date is before another date field
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sParams The other field name, and the date format (optional), seperated with a period.
      * @return boolean
      */
-    public function date_after($date, $field)
+    public function date_before($sDate, $sParams)
     {
-        //  If blank, then assume the datetime is not required
-        if (!$date) {
+        //  If blank, then assume the date is not required
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('date_after', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('date_after', lang('fv_valid_date_after_field'));
+        if (empty($sParams)) {
+            return false;
         }
 
-        // --------------------------------------------------------------------------
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'Y-m-d';
 
-        return strtotime($date) > strtotime($CI->input->post($field));
+        if (empty($sField)) {
+            return false;
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('date_before', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('date_before', lang('fv_valid_date_before_field'));
+        }
+
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
+
+        try {
+
+            $oDate  = \DateTime::createFromFormat($sFormat, $sDate);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || $oOther) {
+                return false;
+            }
+
+            $oDate->setTime(0, 0, 0);
+            $oOther->setTime(0, 0, 0);
+
+            return $oDate < $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a datetime is valid.
-     * @param  string $datetime The form value
+     * Checks if a date is after another date field
+     * @param  string  $sDate   The date string to check
+     * @param  string  $sParams The other field name, and the date format (optional), seperated with a period.
      * @return boolean
      */
-    public function valid_datetime($datetime)
+    public function date_after($sDate, $sParams)
     {
-        //  If blank, then assume the datetime is not required
-        if (!$datetime) {
+        //  If blank, then assume the date is not required
+        if (empty($sDate)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('valid_datetime', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('valid_datetime', lang('fv_valid_datetime_field'));
-        }
-
-        $_datetime = explode(' ', date('Y-m-d H:i:s', strtotime($datetime)));
-
-        if (!isset($_datetime[0]) || !isset($_datetime[1])) {
+        if (empty($sParams)) {
             return false;
         }
 
-        $_time = strtotime($_datetime[0]);
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'Y-m-d';
 
-        if ($_time === false) {
+        if (empty($sField)) {
             return false;
         }
 
-        $_date = date('Y-m-d', $_time);
+        $oCi =& get_instance();
+        if (!array_key_exists('date_after', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('date_after', lang('fv_valid_date_after_field'));
+        }
 
-        @list($_year, $_month, $_day) = explode('-', $_date);
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
 
-        $_valid_date = checkdate((int) $_month, (int) $_day, (int) $_year);
-        $_valid_time = preg_match('/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1]);
+        try {
 
-        return $_valid_date && $_valid_time ? true : false;
+            $oDate  = \DateTime::createFromFormat($sFormat, $sDate);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || empty($oOther)) {
+                return false;
+            }
+
+            $oDate->setTime(0, 0, 0);
+            $oOther->setTime(0, 0, 0);
+
+            return $oDate > $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a datetime is in the future.
-     * @param  string $datetime The form value
+     * Checks if a datetime string is vali
+     * @param  string  $sDateTime The datetime string to check
+     * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function datetime_future($datetime)
+    public function valid_datetime($sDateTime, $sFormat = 'Y-m-d H:i:s')
     {
-        //  If blank, then assume the datetime is not required
-        if (!$datetime) {
+        //  If blank, then assume the date is not required
+        if (empty($sDateTime)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('datetime_future', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('datetime_future', lang('fv_valid_datetime_future_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('valid_datetime', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('valid_datetime', lang('fv_valid_datetime_field'));
         }
 
-        $_datetime = explode(' ', date('Y-m-d H:i:s', strtotime($datetime)));
+        try {
 
-        if (!isset($_datetime[0]) || !isset($_datetime[1])) {
-            return false;
-        }
+            $oDate = \DateTime::createFromFormat($sFormat, $sDateTime);
 
-        $_time = strtotime($_datetime[0]);
+            if (empty($oDate)) {
+                return false;
+            }
 
-        if ($_time === false) {
-            return false;
-        }
+            return $oDate->format($sFormat) == $sDateTime;
 
-        $_date = date('Y-m-d', $_time);
-
-        @list($_year, $_month, $_day) = explode('-', $_date);
-
-        $_valid_date = checkdate((int) $_month, (int) $_day, (int) $_year);
-        $_valid_time = preg_match('/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1]);
-
-        if ($_valid_date && $_valid_time) {
-
-            return strtotime($year . '-' . $month . '-' . $day . ' ' . $_datetime[1]) > time() ? true : false;
-
-        } else {
+        } catch (\Exception $e) {
 
             return false;
         }
@@ -345,108 +400,185 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a datetime is in the past.
-     * @param  string $datetime The form value
-     * @return boolean]
-     */
-    public function datetime_past($datetime)
-    {
-        //  If blank, then assume the datetime is not required
-        if (!$datetime) {
-            return true;
-        }
-
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('datetime_past', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('datetime_past', lang('fv_valid_datetime_past_field'));
-        }
-
-        $_datetime = explode(' ', date('Y-m-d H:i:s', strtotime($datetime)));
-
-        if (!isset($_datetime[0]) || !isset($_datetime[1])) {
-            return false;
-        }
-
-        $_time = strtotime($_datetime[0]);
-
-        if ($_time === false) {
-            return false;
-        }
-
-        $_date = date('Y-m-d', $_time);
-
-        @list($_year, $_month, $_day) = explode('-', $_date);
-
-        $_valid_date = checkdate((int) $_month, (int) $_day, (int) $_year);
-        $_valid_time = preg_match('/^([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $_datetime[1]);
-
-        if ($_valid_date && $_valid_time) {
-
-            return strtotime($year . '-' . $month . '-' . $day . ' ' . $_datetime[1]) < time() ? true : false;
-
-        } else {
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Checks if a datetime is before another field.
-     * @param  string $datetime The form value
-     * @param  string $field    The other POST field to check against
+     * Checks if a datetime string is in the future
+     * @param  string  $sDateTime The datetime string to check
+     * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function datetime_before($datetime, $field)
+    public function datetime_future($sDateTime, $sFormat = 'Y-m-d H:i:s')
     {
-        //  If blank, then assume the datetime is not required
-        if (!$datetime) {
+        //  If blank, then assume the date is not required
+        if (empty($sDateTime)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('datetime_before', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('datetime_before', lang('fv_valid_datetime_before_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('datetime_future', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('datetime_future', lang('fv_valid_datetime_future_field'));
         }
 
-        // --------------------------------------------------------------------------
+        try {
 
-        return strtotime($datetime) < strtotime($CI->input->post($field)) ? true : false;
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sDateTime);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate > $oNow;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a datetime is after another field.
-     * @param  string $datetime The form value
-     * @param  string $field    The other POST field to check against
+     * Checks if a datetime string is in the past
+     * @param  string  $sDateTime The datetime string to check
+     * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function datetime_after($datetime, $field)
+    public function datetime_past($sDateTime, $sFormat = 'Y-m-d H:i:s')
     {
-        //  If blank, then assume the datetime is not required
-        if (!$datetime) {
+        //  If blank, then assume the date is not required
+        if (empty($sDateTime)) {
             return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        $CI =& get_instance();
-
-        if (!array_key_exists('datetime_after', $CI->form_validation->_error_messages)) {
-            $CI->form_validation->set_message('datetime_after', lang('fv_valid_datetime_after_field'));
+        $oCi =& get_instance();
+        if (!array_key_exists('datetime_past', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('datetime_past', lang('fv_valid_datetime_past_field'));
         }
 
-        // --------------------------------------------------------------------------
+        try {
 
-        return strtotime($datetime) > strtotime($CI->input->post($field));
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sDateTime);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate < $oNow;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a datetime is before another date field
+     * @param  string  $sDateTime The datetime string to check
+     * @param  string  $sParams   The other field name, and the datetime format (optional), seperated with a period.
+     * @return boolean
+     */
+    public function datetime_before($sDateTime, $sParams)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sDateTime)) {
+            return true;
+        }
+
+        if (empty($sParams)) {
+            return false;
+        }
+
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'Y-m-d H:i:s';
+
+        if (empty($sField)) {
+            return false;
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('datetime_before', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('datetime_before', lang('fv_valid_datetime_before_field'));
+        }
+
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
+
+        try {
+
+            $oDate  = \DateTime::createFromFormat($sFormat, $sDateTime);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || empty($oOther)) {
+                return false;
+            }
+
+            return $oDate < $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a datetime is after another date field
+     * @param  string  $sDateTime The datetime string to check
+     * @param  string  $sParams   The other field name, and the datetime format (optional), seperated with a period.
+     * @return boolean
+     */
+    public function datetime_after($sDateTime, $sParams)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sDateTime)) {
+            return true;
+        }
+
+        if (empty($sParams)) {
+            return false;
+        }
+
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'Y-m-d H:i:s';
+
+        if (empty($sField)) {
+            return false;
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('datetime_after', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('datetime_after', lang('fv_valid_datetime_after_field'));
+        }
+
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
+
+        try {
+
+            $oDate  = \DateTime::createFromFormat($sFormat, $sDateTime);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || empty($oOther)) {
+                return false;
+            }
+
+            return $oDate > $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------

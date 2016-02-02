@@ -1131,7 +1131,7 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        //  Update/insert all known news items
+        //  Update/insert all known items
         foreach ($aAssociatedItems as $aAssociatedItem) {
 
             $aAssociatedItem = (array) $aAssociatedItem;

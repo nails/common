@@ -76,8 +76,9 @@ class BaseComponent
         }
 
         //  Enabled components
-        $aEnabled = appSetting($this->sEnabledSetting, $this->sModule) ?: array();
-dumpanddie($this->sEnabledSetting);
+        $this->aEnabled = array();
+        $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: array();
+
         foreach ($this->aComponents as $oComponent) {
             if (in_array($oComponent->slug, $aEnabled)) {
                 $this->aEnabled[] = $oComponent;
