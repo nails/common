@@ -97,11 +97,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function valid_date($sDate, $sFormat = 'Y-m-d')
+    public function valid_date($sDate, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDate)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d';
         }
 
         $oCi =& get_instance();
@@ -133,11 +137,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_future($sDate, $sFormat = 'Y-m-d')
+    public function date_future($sDate, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDate)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d';
         }
 
         $oCi =& get_instance();
@@ -173,11 +181,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_past($sDate, $sFormat = 'Y-m-d')
+    public function date_past($sDate, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDate)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d';
         }
 
         $oCi =& get_instance();
@@ -213,11 +225,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat The format the string is in
      * @return boolean
      */
-    public function date_today($sDate, $sFormat = 'Y-m-d')
+    public function date_today($sDate, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDate)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d';
         }
 
         $oCi =& get_instance();
@@ -369,11 +385,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function valid_datetime($sDateTime, $sFormat = 'Y-m-d H:i:s')
+    public function valid_datetime($sDateTime, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDateTime)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d H:i:s';
         }
 
         $oCi =& get_instance();
@@ -405,11 +425,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function datetime_future($sDateTime, $sFormat = 'Y-m-d H:i:s')
+    public function datetime_future($sDateTime, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDateTime)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d H:i:s';
         }
 
         $oCi =& get_instance();
@@ -442,11 +466,15 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      * @param  string  $sFormat   The format the string is in
      * @return boolean
      */
-    public function datetime_past($sDateTime, $sFormat = 'Y-m-d H:i:s')
+    public function datetime_past($sDateTime, $sFormat)
     {
         //  If blank, then assume the date is not required
         if (empty($sDateTime)) {
             return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'Y-m-d H:i:s';
         }
 
         $oCi =& get_instance();
