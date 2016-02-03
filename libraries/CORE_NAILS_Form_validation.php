@@ -380,7 +380,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
     // --------------------------------------------------------------------------
 
     /**
-     * Checks if a datetime string is vali
+     * Checks if a datetime string is valid
      * @param  string  $sDateTime The datetime string to check
      * @param  string  $sFormat   The format the string is in
      * @return boolean
@@ -595,6 +595,238 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
         try {
 
             $oDate  = \DateTime::createFromFormat($sFormat, $sDateTime);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || empty($oOther)) {
+                return false;
+            }
+
+            return $oDate > $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a time string is valid
+     * @param  string  $sTime   The time string to check
+     * @param  string  $sFormat The format the string is in
+     * @return boolean
+     */
+    public function valid_time($sTime, $sFormat)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sTime)) {
+            return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'H:i:s';
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('valid_time', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('valid_time', lang('fv_valid_time_field'));
+        }
+
+        try {
+
+            $oDate = \DateTime::createFromFormat($sFormat, $sTime);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate->format($sFormat) == $sTime;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a time string is in the future relative to right now (assumes date is today)
+     * @param  string  $sTime   The time string to check
+     * @param  string  $sFormat The format the string is in
+     * @return boolean
+     */
+    public function time_future($sTime, $sFormat)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sTime)) {
+            return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'H:i:s';
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('time_future', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('time_future', lang('fv_valid_time_future_field'));
+        }
+
+        try {
+
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sTime);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate > $oNow;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a time string is in the past relative to right now (assumes date is today)
+     * @param  string  $sTime   The time string to check
+     * @param  string  $sFormat The format the string is in
+     * @return boolean
+     */
+    public function time_past($sTime, $sFormat)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sTime)) {
+            return true;
+        }
+
+        if (empty($sFormat)) {
+            $sFormat = 'H:i:s';
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('time_past', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('time_past', lang('fv_valid_time_past_field'));
+        }
+
+        try {
+
+            $oNow  = Factory::factory('DateTime');
+            $oDate = \DateTime::createFromFormat($sFormat, $sTime);
+
+            if (empty($oDate)) {
+                return false;
+            }
+
+            return $oDate < $oNow;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a time string is before another time field
+     * @param  string  $sTime   The time string to check
+     * @param  string  $sParams The other field name, and the time format (optional), seperated with a period.
+     * @return boolean
+     */
+    public function time_before($sTime, $sParams)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sTime)) {
+            return true;
+        }
+
+        if (empty($sParams)) {
+            return false;
+        }
+
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'H:i:s';;
+
+        if (empty($sField)) {
+            return false;
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('time_before', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('time_before', lang('fv_valid_time_before_field'));
+        }
+
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
+
+        try {
+
+            $oDate  = \DateTime::createFromFormat($sFormat, $sTime);
+            $oOther = \DateTime::createFromFormat($sFormat, $sOther);
+
+            if (empty($oDate) || empty($oOther)) {
+                return false;
+            }
+
+            return $oDate < $oOther;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a time string is after another time field
+     * @param  string  $sTime   The time string to check
+     * @param  string  $sParams The other field name, and the time format (optional), seperated with a period.
+     * @return boolean
+     */
+    public function time_after($sTime, $sParams)
+    {
+        //  If blank, then assume the date is not required
+        if (empty($sTime)) {
+            return true;
+        }
+
+        if (empty($sParams)) {
+            return false;
+        }
+
+        $aParams = explode('.', $sParams);
+        $sField  = !empty($aParams[0]) ? $aParams[0] : null;
+        $sFormat = !empty($aParams[1]) ? $aParams[1] : 'H:i:s';
+
+        if (empty($sField)) {
+            return false;
+        }
+
+        $oCi =& get_instance();
+        if (!array_key_exists('time_after', $oCi->form_validation->_error_messages)) {
+            $oCi->form_validation->set_message('time_after', lang('fv_valid_time_after_field'));
+        }
+
+        //  If the other field is blank then bail out
+        $sOther = $oCi->input->post($sField);
+        if (empty($sOther)) {
+            return false;
+        }
+
+        try {
+
+            $oDate  = \DateTime::createFromFormat($sFormat, $sTime);
             $oOther = \DateTime::createFromFormat($sFormat, $sOther);
 
             if (empty($oDate) || empty($oOther)) {
