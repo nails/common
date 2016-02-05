@@ -76,7 +76,7 @@ class Base extends \MX_Controller
          * a password has been defined in app.php
          */
 
-        $this->staging();
+        $this->passwordProtected();
 
         // --------------------------------------------------------------------------
 
@@ -439,35 +439,43 @@ class Base extends \MX_Controller
      * Checks if credentials should be requested for staging environments
      * @return void
      */
-    protected function staging()
+    protected function passwordProtected()
     {
-        $users = @json_decode(APP_STAGING_USERPASS);
+        /**
+         * To password protect an environment you must create a constant which is
+         * a JSON string of key/value pairs (where the key is the username and the
+         * value is a sha1 hash of the password):
+         *
+         *     {
+         *         'john': '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+         *         'amy': '3fc9b689459d738f8c88a3a48aa9e33542016b7a4052e001aaa536fca74813cb'
+         *     }
+         */
 
-        if (Environment::is('STAGING') && $users) {
+        $sConstantName = 'APP_USER_PASS_' . Environment::get();
+        if (defined($sConstantName)) {
 
-            $users = (array) $users;
+            $oCredentials = @json_decode(constant($sConstantName));
 
-            if (!isset($_SERVER['PHP_AUTH_USER'])) {
-
-                $this->stagingRequestCredentials();
+            if (empty($_SERVER['PHP_AUTH_USER'])) {
+                $this->passwordProtectedRequest();
             }
 
             if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 
                 //  Determine the users
-                $users = array_filter($users);
-                $isSet = isset($users[$_SERVER['PHP_AUTH_USER']]);
-                $isNotEqual = $users[$_SERVER['PHP_AUTH_USER']] != md5(trim($_SERVER['PHP_AUTH_PW']));
+                $isSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
+                $isEqual = $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
 
-                if (!$isSet || $isNotEqual) {
-
-                    $this->stagingRequestCredentials();
+                if (!$isSet || !$isEqual) {
+                    $this->passwordProtectedRequest();
                 }
 
             } else {
 
-                $this->stagingRequestCredentials();
+                $this->passwordProtectedRequest();
             }
+
         }
     }
 
@@ -477,42 +485,12 @@ class Base extends \MX_Controller
      * Requests staging credentials
      * @return void
      */
-    protected function stagingRequestCredentials()
+    protected function passwordProtectedRequest()
     {
-        header('WWW-Authenticate: Basic realm="' . APP_NAME . ' Staging Area"');
+        header('WWW-Authenticate: Basic realm="' . APP_NAME . ' - Restricted Area"');
         header($this->input->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
-        ?>
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <title><?=APP_NAME?> - Unauthorised</title>
-                <meta charset="utf-8">
-
-                <!--    STYLES  -->
-                <link href="<?=NAILS_ASSETS_URL?>css/nails.default.css" rel="stylesheet">
-
-                <style type="text/css">
-
-                    #main-col
-                    {
-                        text-align:center;
-                        margin-top:100px;
-                    }
-
-                </style>
-
-            </head>
-            <body>
-                <div class="container row">
-                    <div class="six columns first last offset-by-five" id="main-col">
-                        <h1>unauthorised</h1>
-                        <hr />
-                        <p>This staging environment restrticted to authorised users only.</p>
-                    </div>
-                </div>
-            </body>
-        </html>
-        <?php
+        $message = 'You are not authorised to access this installation.';
+        include NAILS_COMMON_PATH . 'errors/error_401.php';
         exit(0);
     }
 

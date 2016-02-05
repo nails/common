@@ -111,9 +111,6 @@ class Startup
         if (!defined('APP_NAME')) {
             define('APP_NAME', 'Untitled');
         }
-        if (!defined('APP_STAGING_USERPASS')) {
-            define('APP_STAGING_USERPASS', json_encode(array()));
-        }
         if (!defined('APP_SSL_ROUTING')) {
             define('APP_SSL_ROUTING', false);
         }
