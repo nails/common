@@ -699,3 +699,28 @@ if (!function_exists('show_404')) {
         exit;
     }
 }
+
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('getFromArray')) {
+
+    /**
+     * Retrieve a value from $sArray at $sKey, if it exists
+     * @param  string $sKey     The key to get
+     * @param  array  $aArray   The array to look in
+     * @param  mixed  $mDefault What to return if $sKey doesn't exist in $aArray
+     * @return mixed
+     */
+    function getFromArray($sKey, $aArray, $mDefault = null)
+    {
+        if (array_key_exists($sKey, $aArray)) {
+
+            return $aArray[$sKey];
+
+        } else {
+
+            return $mDefault;
+        }
+    }
+}
