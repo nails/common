@@ -590,7 +590,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
         $sFieldAttr .= ' class="' . $_field_class . '" ';
         $sFieldAttr .= $_readonly;
 
-        $_field_html = cdnObjectPicker($_field_key, $_field_bucket, $_field_default);
+        $_field_html = cdnObjectPicker($_field_key, $_field_bucket, set_value($_field_key, $_field_default));
 
         // --------------------------------------------------------------------------
 
