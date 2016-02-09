@@ -875,10 +875,10 @@ class Asset
                 );
                 $this->load(
                     array(
-                        'nails.admin.module.cms.css',
-                        'nails.admin.cms.widgeteditor.min.js'
+                        'admin.widgeteditor.css',
+                        'admin.widgeteditor.min.js'
                     ),
-                    'NAILS'
+                    'nailsapp/module-cms'
                 );
                 break;
 
