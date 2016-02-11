@@ -198,7 +198,7 @@ class DateTime
 
             foreach ($formats as $format) {
 
-                $dateTimeObject  = $this->convertDatetime(time(), $this->timezoneUser);
+                $dateTimeObject  = $this->convert(time(), $this->timezoneUser);
                 $format->example = $dateTimeObject->format($format->format);
             }
         }
@@ -297,7 +297,7 @@ class DateTime
      */
     public function toUserDate($timestamp = null, $format = null)
     {
-        $converted = $this->convertDatetime($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $converted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
 
         if (is_null($format)) {
 
@@ -316,7 +316,7 @@ class DateTime
      */
     public function toNailsDate($timestamp = null)
     {
-        $converted = $this->convertDatetime($timestamp, $this->timezoneNails, $this->timezoneUser);
+        $converted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
         return $converted->format('Y-m-d');
     }
 
@@ -330,7 +330,7 @@ class DateTime
      */
     public function toUserDatetime($timestamp = null, $format = null)
     {
-        $converted = $this->convertDatetime($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $converted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
 
         if (is_null($format)) {
 
@@ -349,7 +349,7 @@ class DateTime
      */
     public function toNailsDatetime($timestamp = null)
     {
-        $converted = $this->convertDatetime($timestamp, $this->timezoneNails, $this->timezoneUser);
+        $converted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
         return $converted->format('Y-m-d H:i:s');
     }
 
@@ -648,11 +648,11 @@ class DateTime
     /**
      * Arbitrarily convert a timestamp between timezones
      * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @param  string $sToTz     The timezone to convert to
+     * @param  string $sToTz      The timezone to convert to
      * @param  string $sFromTz    The timezone to convert from
      * @return string
      */
-    public static function convertDatetime($mTimestamp, $sToTz, $sFromTz = 'UTC')
+    public static function convert($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
         //  Has a specific timestamp been given?
         if (is_null($mTimestamp)) {

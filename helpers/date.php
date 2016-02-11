@@ -10,6 +10,24 @@
  * @link
  */
 
+if (!function_exists('convertDateTime')) {
+
+    /**
+     * Arbitrarily convert a timestamp between timezones
+     * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @param  string $sToTz      The timezone to convert to
+     * @param  string $sFromTz    The timezone to convert from
+     * @return string
+     */
+    function convertDateTime($mTimestamp, $sToTz, $sFromTz = 'UTC')
+    {
+        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        return $oDateTimeModel->convert($mTimestamp, $sToTz, $sFromTz);
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('toUserDate')) {
 
     /**
