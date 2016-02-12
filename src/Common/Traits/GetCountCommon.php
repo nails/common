@@ -187,7 +187,11 @@ trait GetCountCommon
                             }
 
                             //  Escaped?
-                            $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
+                            $escape = isset($where['escape']) ? (bool) $where['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+
+                            if ($escape === '[NAILS-ESCAPE-NOT-FOUND]') {
+                                $escape = isset($where[2]) ? $where[2] : true;
+                            }
 
                             //  If the $col is an array then we should concat them together
                             if (is_array($col)) {
