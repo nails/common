@@ -1312,11 +1312,9 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
 
-        if (is_null($options)) :
-
+        if (is_null($options)) {
             $options = isset($field['options']) ? $field['options'] : array();
-
-        endif;
+        }
 
         $_tip                   = array();
         $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
@@ -1362,17 +1360,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_field['default'] = (array) $_field['default'];
 
         //  Get the selected options
-        if ($_POST) :
-
-            $_key = str_replace('[]', '', $_field['key']);
-            $_selected = isset($_POST[$_key]) ? $_POST[$_key] : array();
-
-        else :
-
-            //  Use the 'default' variabel
-            $_selected = $_field['default'];
-
-        endif;
+        $_selected = set_value($_field['key'], $_field['default']);
 
         //  Build the select
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';

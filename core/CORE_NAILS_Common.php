@@ -724,3 +724,17 @@ if (!function_exists('getFromArray')) {
         }
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('isCli')) {
+
+    /**
+     * Returns whether the application is running on the command line
+     * @return boolean
+     */
+    function isCli()
+    {
+        return php_sapi_name() == 'cli';
+    }
+}

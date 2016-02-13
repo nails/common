@@ -78,7 +78,7 @@ class ErrorHandler
      */
     public static function showFatalErrorScreen($subject = '', $message = '', $details = null)
     {
-        $bIsCli = php_sapi_name() == 'cli';
+        $bIsCli = isCli();
 
         if (is_null($details)) {
 
