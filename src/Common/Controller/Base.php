@@ -453,7 +453,7 @@ class Base extends \MX_Controller
          */
 
         $sConstantName = 'APP_USER_PASS_' . Environment::get();
-        if (defined($sConstantName)) {
+        if (!isCli() && defined($sConstantName)) {
 
             $oCredentials = @json_decode(constant($sConstantName));
 
@@ -475,7 +475,6 @@ class Base extends \MX_Controller
 
                 $this->passwordProtectedRequest();
             }
-
         }
     }
 
