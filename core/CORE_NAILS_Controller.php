@@ -4,7 +4,7 @@
  * This class is the main execution point for all page requests. It
  * checks and configures the Nails environment.
  *
- * @todo: remove dependency on this class; models should extend \Nails\Common\Controller\Base directly
+ * @todo: remove dependency on this class; controllers should extend \Nails\Common\Controller\Base directly
  *
  * @package     Nails
  * @subpackage  common
