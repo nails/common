@@ -44,6 +44,7 @@ if (!function_exists('underscoreToCamelcase')) {
     function underscoreToCamelcase($str, $lcfirst = true)
     {
         $str = explode('_', $str);
+        $str = array_map('strtolower', $str);
         $str = array_map('ucfirst', $str);
         $str = implode($str);
         $str = $lcfirst ? lcfirst($str) : $str;

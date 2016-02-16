@@ -105,6 +105,98 @@ if (!function_exists('form_url')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('form_date')) {
+
+    /**
+     * Generates an input using the "date" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_date($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type'  => 'date',
+            'name'  => !is_array($data) ? $data : '',
+            'value' => $value
+        );
+
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_time')) {
+
+    /**
+     * Generates an input using the "time" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_time($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type'  => 'time',
+            'name'  => !is_array($data) ? $data : '',
+            'value' => $value
+        );
+
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_color')) {
+
+    /**
+     * Generates an input using the "date" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_color($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type'  => 'color',
+            'name'  => !is_array($data) ? $data : '',
+            'value' => $value
+        );
+
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_datetime')) {
+
+    /**
+     * Generates an input using the "datetime" type
+     * @param  mixed  $data  The field's name or the config array
+     * @param  mixed  $value The form element's value
+     * @param  string $extra Any additional attributes to give to the field
+     * @return string
+     */
+    function form_datetime($data = '', $value = '', $extra = '')
+    {
+        $defaults = array(
+            'type'  => 'datetime-local',
+            'name'  => !is_array($data) ? $data : '',
+            'value' => $value
+        );
+
+        return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('form_open')) {
 
     /**
@@ -243,6 +335,11 @@ if (!function_exists('form_field')) {
             case 'email':
             case 'number':
             case 'url':
+            case 'date':
+            case 'datetime':
+            case 'time':
+            case 'color':
+            case 'tel':
 
                 $sMethodName = 'form_' . $_field_type;
                 $_field_html = $sMethodName(
@@ -429,6 +526,40 @@ if (!function_exists('form_field_url')) {
     function form_field_url($field, $tip = '')
     {
         $field['type'] = 'url';
+        return form_field($field, $tip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_tel')) {
+
+    /**
+     * Generates a form field using the "url" input type
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_tel($field, $tip = '')
+    {
+        $field['type'] = 'tel';
+        return form_field($field, $tip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_color')) {
+
+    /**
+     * Generates a form field using the "color" input type
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_color($field, $tip = '')
+    {
+        $field['type'] = 'color';
         return form_field($field, $tip);
     }
 }
@@ -1113,6 +1244,27 @@ if (!function_exists('form_field_date')) {
         $_field['type']         = 'date';
         $_field['class']        = isset($field['class']) ? $field['class'] . ' date' : 'date';
         $_field['placeholder']  = 'YYYY-MM-DD';
+
+        return form_field($_field, $tip);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('form_field_time')) {
+
+    /**
+     * Generates a form field for times
+     * @param  array  $field The config array
+     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @return string        The form HTML
+     */
+    function form_field_time($field, $tip = '')
+    {
+        $_field                 = $field;
+        $_field['type']         = 'time';
+        $_field['class']        = isset($field['class']) ? $field['class'] . ' date' : 'date';
+        $_field['placeholder']  = 'HH:MM';
 
         return form_field($_field, $tip);
     }

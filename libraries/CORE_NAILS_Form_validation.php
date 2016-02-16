@@ -110,7 +110,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 
         $oCi =& get_instance();
         if (!array_key_exists('valid_date', $oCi->form_validation->_error_messages)) {
-            $oCi->form_validation->set_message('valid_date', lang('fv_valid_date_field'));
+            $oCi->form_validation->set_message('valid_date', lang('fv_valid_date_field'))   ;
         }
 
         try {
