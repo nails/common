@@ -335,8 +335,6 @@ if (!function_exists('form_field')) {
             case 'email':
             case 'number':
             case 'url':
-            case 'date':
-            case 'datetime':
             case 'time':
             case 'color':
             case 'tel':
