@@ -344,7 +344,7 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
         $sDriverClass = $sNamespace . $sClassName;
 
         if (!class_exists($sDriverClass)) {
-            throw new NailsException('Driver class does not exist "' . $oDriver->slug . '"', 4);
+            throw new NailsException('Driver class does not exist "' . $sDriverClass . '"', 4);
         }
 
         //  Save for later

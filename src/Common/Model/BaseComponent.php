@@ -35,7 +35,7 @@ class BaseComponent
     protected $sModule = null;
 
     /**
-     * The type of domponent to load; filter the domponents by their subType, if any.
+     * The type of domponent to load; filter the components by their subType, if any.
      * @var string
      */
     protected $sType = null;
