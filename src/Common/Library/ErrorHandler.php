@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Factory;
 use Nails\Environment;
 
 class ErrorHandler
@@ -183,28 +184,18 @@ class ErrorHandler
 
         // --------------------------------------------------------------------------
 
-        $fromEmail = 'root@' . gethostname();
+        try {
 
-        if (function_exists('app_setting')) {
+            $oEmailer = Factory::service('Emailer');
 
-            $fromName = appSetting('from_name', 'email');
+            $fromName = $oEmailer->getFromName();
+            $fromEmail = $oEmailer->getFromEmail();
 
-            if (empty($fromName)) {
 
-                $fromName = 'Log Error Reporter';
-            }
+        } catch (\Exception $e) {
 
-            $replyTo = appSetting('from_email', 'email');
-
-            if (empty($replyTo)) {
-
-                $replyTo = $fromEmail;
-            }
-
-        } else {
-
-            $fromName = 'Fatal Error Reporter';
-            $replyTo  = $fromEmail;
+            $fromName  = 'Log Error Reporter';
+            $fromEmail = 'root@' . gethostname();
         }
 
         // --------------------------------------------------------------------------
@@ -251,7 +242,6 @@ class ErrorHandler
 
         //  Headers
         $headers  = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n";
-        $headers .= 'Reply-To: ' . $replyTo . "\r\n";
         $headers .= 'X-Mailer: PHP/' . phpversion()  . "\r\n";
         $headers .= 'X-Priority: 1 (Highest)' . "\r\n";
         $headers .= 'X-Mailer: X-MSMail-Priority: High/' . "\r\n";

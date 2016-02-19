@@ -10,6 +10,7 @@
  * @link
  */
 
+use Nails\Factory;
 use Nails\Environment;
 
 class CORE_NAILS_Log extends CI_Log
@@ -115,33 +116,22 @@ class CORE_NAILS_Log extends CI_Log
                         $message .= json_encode(debug_backtrace()) . "\n";
 
                         //  Set from details
-                        $fromEmail = 'root@' . gethostname();
+                        try {
 
-                        if (function_exists('app_setting')) {
+                            $oEmailer = Factory::service('Emailer');
 
-                            $fromName = appSetting('from_name', 'email');
+                            $fromName = $oEmailer->getFromName();
+                            $fromEmail = $oEmailer->getFromEmail();
 
-                            if (empty($fromName)) {
 
-                                $fromName = 'Log Error Reporter';
-                            }
+                        } catch (\Exception $e) {
 
-                            $replyTo = appSetting('from_email', 'email');
-
-                            if (empty($replyTo)) {
-
-                                $replyTo = 'Log Error Reporter';
-                            }
-
-                        } else {
-
-                            $fromName = 'Log Error Reporter';
-                            $replyTo  = $fromEmail;
+                            $fromName  = 'Log Error Reporter';
+                            $fromEmail = 'root@' . gethostname();
                         }
 
                         $to      = Environment::not('PRODUCTION') && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
                         $headers = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n" .
-                                'Reply-To: ' . $replyTo . "\r\n" .
                                 'X-Mailer: PHP/' . phpversion()  . "\r\n" .
                                 'X-Priority: 1 (Highest)' . "\r\n" .
                                 'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
