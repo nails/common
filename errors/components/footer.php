@@ -1,6 +1,6 @@
 <?php
 
-if (NAILS_BRANDING) {
+if (defined('NAILS_BRANDING') && NAILS_BRANDING) {
 
     ?>
     <hr />

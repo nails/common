@@ -20,7 +20,7 @@ class Base
 
     public function __construct()
     {
-        $this->oDb = Factory::service('ConsoleDatabase');
+        $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
     }
 
     // --------------------------------------------------------------------------

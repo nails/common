@@ -137,4 +137,4 @@ if (!function_exists('genderise')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';

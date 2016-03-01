@@ -119,12 +119,12 @@ class Factory
         $aPaths = array(
 
             //  App overrides
-            'application/services/' . Environment::get() . '/' . $sModuleName . '/services.php',
-            'application/services/' . $sModuleName . '/services.php',
+            FCPATH . 'application/services/' . Environment::get() . '/' . $sModuleName . '/services.php',
+            FCPATH . 'application/services/' . $sModuleName . '/services.php',
 
             //  Default locations
-            'vendor/' . $sModuleName . '/services/' . Environment::get() . '/services.php',
-            'vendor/' . $sModuleName . '/services/services.php'
+            FCPATH . 'vendor/' . $sModuleName . '/services/' . Environment::get() . '/services.php',
+            FCPATH . 'vendor/' . $sModuleName . '/services/services.php'
         );
 
         return self::findServicesAtPaths($aPaths);
@@ -194,7 +194,7 @@ class Factory
 
         if (empty(self::$aContainers[$sModuleName]['properties'][$sPropertyName])) {
             throw new Common\Exception\FactoryException(
-                'Property "' . $sPropertyName . '"  is not provided by module "' . $sModuleName . '"',
+                'Property "' . $sPropertyName . '" is not provided by module "' . $sModuleName . '"',
                 0
             );
         }
@@ -265,7 +265,7 @@ class Factory
              */
             if ($sModuleName == 'app') {
 
-                $sAppPath = 'application/helpers/' . $sHelperName . '.php';
+                $sAppPath = FCPATH . 'application/helpers/' . $sHelperName . '.php';
 
                 if (!file_exists($sAppPath)) {
                     throw new Common\Exception\FactoryException(
@@ -278,8 +278,8 @@ class Factory
 
             } else {
 
-                $sModulePath = 'vendor/' . $sModuleName . '/helpers/' . $sHelperName . '.php';
-                $sAppPath    = 'application/helpers/' . $sModuleName . '/' . $sHelperName . '.php';
+                $sModulePath = FCPATH . 'vendor/' . $sModuleName . '/helpers/' . $sHelperName . '.php';
+                $sAppPath    = FCPATH . 'application/helpers/' . $sModuleName . '/' . $sHelperName . '.php';
 
                 if (!file_exists($sModulePath)) {
                     throw new Common\Exception\FactoryException(
@@ -314,7 +314,7 @@ class Factory
 
         if (empty(self::$aContainers[$sModuleName][$sServiceType][$sServiceName])) {
             throw new Common\Exception\FactoryException(
-                ucfirst($sServiceType) . ' "' . $sServiceName . '"  is not provided by module "' . $sModuleName . '"',
+                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by module "' . $sModuleName . '"',
                 0
             );
         }

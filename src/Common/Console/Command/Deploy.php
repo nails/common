@@ -1,16 +1,16 @@
 <?php
 
-use Nails\Factory;
+namespace Nails\Common\Console\Command;
+
 use Nails\Environment;
+use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-require_once 'vendor/nailsapp/common/console/apps/_app.php';
-
-class CORE_NAILS_Deploy extends CORE_NAILS_App
+class Deploy extends Base
 {
     /**
      * Configures the app
@@ -37,26 +37,6 @@ class CORE_NAILS_Deploy extends CORE_NAILS_App
         $output->writeln('<info>Nails Post Deploy </info>');
         $output->writeln('<info>------------------</info>');
         $output->writeln('Beginning...');
-
-        // --------------------------------------------------------------------------
-
-        //  Load configs
-        if (file_exists('config/app.php')) {
-
-            $output->writeln('Found <comment>config/app.php</comment> will use values for defaults');
-            require_once 'config/app.php';
-        }
-
-        if (file_exists('config/deploy.php')) {
-
-            $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
-            require_once 'config/deploy.php';
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Setup Factory - config files are required prior to set up
-        Factory::setup();
 
         // --------------------------------------------------------------------------
 

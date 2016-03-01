@@ -35,4 +35,4 @@ if (!function_exists('lang')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/language_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/language_helper.php';

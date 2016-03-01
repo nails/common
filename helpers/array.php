@@ -137,4 +137,4 @@ if (!function_exists('in_array_multi')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';

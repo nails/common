@@ -392,6 +392,24 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('defineConst')) {
+
+    /**
+     * Defines a constant if it is not already defined
+     * @param  string $sConstant The name of the constant to define
+     * @param  string $mValue    The value to give the constant
+     * @return void
+     */
+    function defineConst($sConstant, $mValue)
+    {
+        if (!defined($sConstant)) {
+            define($sConstant, $mValue);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('nailsFactory')) {
 
     /**

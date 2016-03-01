@@ -10,4 +10,4 @@
  * @link
  */
 
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/xml_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/xml_helper.php';

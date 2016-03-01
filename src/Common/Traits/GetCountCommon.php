@@ -130,11 +130,11 @@ trait GetCountCommon
          */
 
         $wheres = array(
-            'where' => 'AND',
-            'or_where' => 'OR',
-            'where_in' => 'AND',
-            'or_where_in' => 'OR',
-            'where_not_in' => 'AND',
+            'where'           => 'AND',
+            'or_where'        => 'OR',
+            'where_in'        => 'AND',
+            'or_where_in'     => 'OR',
+            'where_not_in'    => 'AND',
             'or_where_not_in' => 'OR'
         );
 

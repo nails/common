@@ -61,7 +61,7 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
         }
 
         //  Show we log the item?
-        if (config_item('log_threshold') != 0) {
+        if (function_exists('config_item') && config_item('log_threshold') != 0) {
 
             $errMsg = $errstr . ' (' . $errfile . ':' . $errline . ')';
             log_message('error', $errMsg, true);
@@ -84,13 +84,12 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
         $oDetails->file = $exception->getFile();
         $oDetails->line = $exception->getLine();
 
-        $sSubject   = 'Uncaught Exception';
+        $sSubject  = 'Uncaught Exception';
         $sMessage  = 'Uncaught Exception with message "' . $oDetails->msg . '" and code "';
         $sMessage .= $oDetails->code . '" in ' . $oDetails->file . ' on line ' . $oDetails->line;
 
         //  Show we log the item?
-        if (config_item('log_threshold') != 0) {
-
+        if (function_exists('config_item') && config_item('log_threshold') != 0) {
             log_message('error', $sMessage, true);
         }
 

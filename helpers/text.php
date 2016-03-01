@@ -80,4 +80,4 @@ if (!function_exists('title_case')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/text_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/text_helper.php';

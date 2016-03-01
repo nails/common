@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-    
+
     ERROR:   STARTUP
-    MESSAGE: <?=$strip_tags($_ERROR)?>
+    MESSAGE: <?=strip_tags($_ERROR)?>
 
 -->
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->

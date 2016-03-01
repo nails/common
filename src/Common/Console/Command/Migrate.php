@@ -1,7 +1,10 @@
 <?php
 
+namespace Nails\Common\Console\Command;
+
 use Nails\Factory;
 use Nails\Environment;
+use Nails\Console\Command\Base;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,17 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-require_once 'vendor/nailsapp/common/console/apps/_app.php';
-
-//  Define FCPATH so CORE_NAILS_Common doesn't freak out
-if (!defined('FCPATH')) {
-
-    define('FCPATH', './');
-}
-
-require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
-
-class CORE_NAILS_Migrate extends CORE_NAILS_App
+class Migrate extends Base
 {
     /**
      * The database instance
@@ -84,23 +77,6 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Load configs
-        if (!file_exists('config/deploy.php')) {
-
-            $output->writeln('<error>ERROR:</error> Could not load config/deploy.php.');
-            return false;
-        }
-
-        require_once 'config/deploy.php';
-
-        if (!Environment::get()) {
-
-            $output->writeln('<error>ERROR:</error> ENVIRONMENT is not defined.');
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Setup Factory - config files are required prior to set up
         Factory::setup();
 
@@ -159,7 +135,7 @@ class CORE_NAILS_Migrate extends CORE_NAILS_App
         }
 
         //  Get the DB object
-        $this->oDb = Factory::service('ConsoleDatabase');
+        $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
 
         if (!defined('NAILS_DB_PREFIX')) {
             define('NAILS_DB_PREFIX', 'nails_');

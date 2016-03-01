@@ -1,7 +1,10 @@
 <?php
 
+namespace Nails\Common\Console\Command;
+
 use Nails\Factory;
 use Nails\Environment;
+use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,26 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
-require_once 'vendor/nailsapp/common/console/apps/_app.php';
-
-//  Define FCPATH so CORE_NAILS_Common doesn't freak out
-if (!defined('FCPATH')) {
-
-    define('FCPATH', './');
-}
-
-require_once 'vendor/nailsapp/common/core/CORE_NAILS_Common.php';
-
-/**
- * Load the password model, so we can use it's static methods to generate
- * the user's passwords. We will have to immitate CI's Model Classthough.
- */
-
-class CI_Model
-{
-}
-
-class CORE_NAILS_Install extends CORE_NAILS_App
+class Install extends Base
 {
     /**
      * The endpoint for the components API
@@ -100,21 +84,6 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
         // --------------------------------------------------------------------------
 
-        //  Load configs
-        if (file_exists('config/app.php')) {
-
-            $output->writeln('Found <comment>config/app.php</comment> will use values for defaults');
-            require_once 'config/app.php';
-        }
-
-        if (file_exists('config/deploy.php')) {
-
-            $output->writeln('Found <comment>config/deploy.php</comment> will use values for defaults');
-            require_once 'config/deploy.php';
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Define app & deploy vars
         $appVars    = $this->defineAppVars();
         $deployVars = $this->defineDeployVars();
@@ -165,8 +134,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
                         $output->writeln('');
 
                         foreach ($installedComponents as $component) {
-
-                            $output->writeln(' - <info>' . $component->name . '</info>');
+                            $output->writeln(' - <info>' . $component->slug . '</info>');
                         }
 
                         $output->writeln('');
@@ -416,7 +384,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
 
                     //  Setup Factory - we need config files and/or constants to be set
                     Factory::setup();
-                    $this->oDb = Factory::service('ConsoleDatabase');
+                    $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
 
                     foreach ($users as $user) {
 
@@ -804,7 +772,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         //  If config/app.php is there is it writeable?
         if ($appConfigExists) {
 
-            if (!is_writable('config/app.php')) {
+            if (!is_writable(FCPATH . 'config/app.php')) {
 
                 $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
             }
@@ -813,7 +781,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         //  If config/deploy.php is there, is it writeable?
         if ($deployConfigExists) {
 
-            if (!is_writable('config/deploy.php')) {
+            if (!is_writable(FCPATH . 'config/deploy.php')) {
 
                 $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
             }
@@ -822,8 +790,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
         //  If a file is missing we need to be able to write to the directory.
         if (!$appConfigExists || !$deployConfigExists) {
 
-            if (!is_writable('config/')) {
-
+            if (!is_writable(FCPATH . 'config/')) {
                 $preTestErrors[] = '<comment>config/</comment> is not writeable.';
             }
         }
@@ -1112,7 +1079,7 @@ class CORE_NAILS_Install extends CORE_NAILS_App
     {
         $output->writeln('');
 
-        if ($this->oDb->isTransactionRunning()) {
+        if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
 
             $output->writeln('<error>Rolling back Database</error>');
             $this->oDb->transactionRollback();

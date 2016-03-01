@@ -1,13 +1,13 @@
 <?php
 
-use Nails\Factory;
+namespace Nails\Common\Console\Command;
+
+use Nails\Console\Command\Base;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-require_once 'vendor/nailsapp/common/console/apps/_app.php';
-
-class CORE_NAILS_Test extends CORE_NAILS_App
+class Test extends Base
 {
     /**
      * Configures the app

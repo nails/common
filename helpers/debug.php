@@ -40,28 +40,28 @@ if (!function_exists('dump')) {
     {
         if (is_string($mVar)) {
 
-            $sOut = '<pre>(string) ' . $mVar . '</pre>';
+            $sOut = '(string) ' . $mVar;
 
         } elseif (is_int($mVar)) {
 
-            $sOut = '<pre>(int) ' . $mVar . '</pre>';
+            $sOut = '(int) ' . $mVar;
 
         } elseif (is_bool($mVar)) {
 
             $mVar = ($mVar === true) ? "true" : "false" ;
-            $sOut = '<pre>(bool) ' . $mVar . '</pre>';
+            $sOut = '(bool) ' . $mVar;
 
         } elseif (is_float($mVar)) {
 
-            $sOut = '<pre>(float) ' . $mVar . '</pre>';
+            $sOut = '(float) ' . $mVar;
 
         } elseif (is_null($mVar)) {
 
-            $sOut = '<pre>(null) null</pre>';
+            $sOut = '(null) null';
 
         } else {
 
-            $sOut = '<pre>' . print_r($mVar, true) . '</pre>';
+            $sOut = print_r($mVar, true);
         }
 
         /**
@@ -71,9 +71,13 @@ if (!function_exists('dump')) {
 
         if (Environment::not('PRODUCTION')) {
 
+            //  If we're not on the CLI then wrap in <pre> tags
+            if (!isCli()) {
+                $sOut = '<pre>' . $sOut . '</pre>';
+            }
+
             //  Continue execution unless instructed otherwise
             if ($bDie !== false) {
-
                 die("\n\n" . $sOut . "\n\n");
             }
 
@@ -97,7 +101,6 @@ if (!function_exists('here')) {
 
         //  Dump payload if there
         if (!is_null($mDump)) {
-
             dump($mDump);
         }
 

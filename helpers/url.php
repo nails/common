@@ -119,4 +119,4 @@ if (!function_exists('tel')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/url_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/url_helper.php';

@@ -2031,4 +2031,4 @@ EOT;
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
+include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';

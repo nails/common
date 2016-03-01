@@ -109,7 +109,6 @@ class ErrorHandler
         //  Flush the output buffer
         $obContents = ob_get_contents();
         if (!empty($obContents)) {
-
             ob_clean();
         }
 
@@ -178,7 +177,9 @@ class ErrorHandler
         if (!defined(APP_DEVELOPER_EMAIL) || empty(APP_DEVELOPER_EMAIL)) {
 
             //  Log the fact there's no email
-            log_message('error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.');
+            if (function_exists('log_message')) {
+                log_message('error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.');
+            }
             return false;
         }
 
