@@ -124,7 +124,6 @@ class AppNotification extends Base
     {
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
-
             $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
@@ -135,10 +134,10 @@ class AppNotification extends Base
 
             $this->db->where('grouping', $grouping);
             $notifications = $this->db->get($this->table)->result();
+
             $this->emails[$grouping] = array();
 
             foreach ($notifications as $setting) {
-
                 $this->emails[$grouping][ $setting->key ] = json_decode($setting->value);
             }
         }
