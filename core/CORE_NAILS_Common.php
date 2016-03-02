@@ -81,6 +81,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                 $oTemp                = new stdClass();
                 $oTemp->slug          = $oPackage->name;
+                $oTemp->namespace     = !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null;
                 $oTemp->name          = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
                 $oTemp->description   = !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description;
                 $oTemp->homepage      = !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage;
@@ -128,6 +129,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                         $oTemp                = new stdClass();
                         $oTemp->slug          = 'app/' . $sDirName;
+                        $oTemp->namespace     = !empty($oConfig->namespace) ? $oConfig->namespace : null;
                         $oTemp->name          = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
                         $oTemp->description   = !empty($oConfig->description) ? $oConfig->description : '';
                         $oTemp->homepage      = !empty($oConfig->homepage) ? $oConfig->homepage : '';
