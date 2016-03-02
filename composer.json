@@ -25,11 +25,15 @@
     "prefer-stable": true,
     "require":
     {
-        "symfony/console": "2.*",
         "rogeriopradoj/codeigniter": "2.*",
         "pimple/pimple": "3.*",
         "guzzlehttp/guzzle": "6.*",
-        "mustache/mustache": "2.*"
+        "mustache/mustache": "2.*",
+        "nailsapp/module-admin": "dev-develop",
+        "nailsapp/module-asset": "dev-develop",
+        "nailsapp/module-email": "dev-develop",
+        "nailsapp/module-event": "dev-develop",
+        "nailsapp/module-console": "dev-develop"
     },
     "require-dev":
     {

@@ -56,7 +56,7 @@ return array(
             }
         },
         'Mustache' => function () {
-            if (class_exists('\App\Common\Library\Asset')) {
+            if (class_exists('\App\Common\Library\Mustache')) {
                 return new \App\Common\Library\Mustache();
             } else {
                 return new Mustache_Engine();
