@@ -13,6 +13,7 @@
 /* load the MX Loader class */
 require NAILS_COMMON_PATH . 'MX/Loader.php';
 
+use Nails\Factory;
 use Nails\Common\Exception\NailsException;
 
 class CORE_NAILS_Loader extends MX_Loader
@@ -117,138 +118,9 @@ class CORE_NAILS_Loader extends MX_Loader
      */
     public function helper($helpers = array())
     {
-        /**
-         * Need to make the $helpers variable into an array immediately and loop through
-         * it so MX knows what to do. Also specify a to_load variable which will contain
-         * helpers which the fallback, CI, method will attempt to load.
-         */
-
-        $helpers = $this->_ci_prep_filename($helpers, '_helper');
-        $toLoad  = array();
-
-        //  Modded MX Loader:
-        foreach ($helpers as $helper) {
-
-            if (isset($this->_ci_helpers[$helper])) {
-
-                return;
-            }
-
-            list($path, $_helper) = Modules::find($helper . '_helper', $this->_module, 'helpers/');
-
-            if ($path === false) {
-
-                $toLoad[] = $helper;
-
-            } else {
-
-                Modules::load_file($_helper, $path);
-                $this->_ci_helpers[$_helper] = true;
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  CI Loader
-        foreach ($toLoad as $helper) {
-            if (isset($this->_ci_helpers[$helper])) {
-                continue;
-            }
-
-            $classPrefix          = config_item('subclass_prefix');
-            $appExtHelper         = APPPATH . 'helpers/' . $classPrefix . $helper . EXT;
-            $nailsExtHelper       = NAILS_COMMON_PATH . 'helpers/' . $classPrefix . $helper . EXT;
-            $sHelperPath          = NAILS_COMMON_PATH . 'modules/' . $this->router->current_module() . '/helpers/';
-            $nailsExtModuleHelper = $this->router->current_module() ? $sHelperPath . $classPrefix . $helper . EXT : null;
-            $nailsModuleHelper    = $this->router->current_module() ? $sHelperPath . $helper . EXT : null;
-
-            // Is this a helper extension request?
-            if (file_exists($appExtHelper)) {
-
-                $baseHelper = BASEPATH . 'helpers/' . $helper . EXT;
-
-                if (!file_exists($baseHelper)) {
-                    throw new NailsException(
-                        'Unable to load the requested file: helpers/' . $helper . EXT,
-                        1
-                    );
-                }
-
-                include_once($appExtHelper);
-
-                /**
-                 * If a Nails version exists, load that too; allows the app to overload
-                 * the nails version but also allows the app to extend the nails version
-                 * without destorying existing functions
-                 */
-
-                if (file_exists($nailsExtHelper)) {
-
-                    include_once($nailsExtHelper);
-
-                //  If there isn't an explicit Nails version, check the current module for one
-                } elseif ($nailsExtModuleHelper && file_exists($nailsExtModuleHelper)) {
-
-                    include_once($nailsExtModuleHelper);
-                }
-
-                include_once($baseHelper);
-
-                $this->_ci_helpers[$helper] = true;
-                log_message('debug', 'Helper loaded: ' . $helper);
-                continue;
-            }
-
-            //  App version didn't exist, see if a Nails version does
-            if (file_exists($nailsExtHelper)) {
-
-                $baseHelper = BASEPATH . 'helpers/' . $helper . EXT;
-
-                if (!file_exists($baseHelper)) {
-                    throw new NailsException(
-                        'Unable to load the requested file: helpers/' . $helper . EXT,
-                        1
-                    );
-                }
-
-                include_once($nailsExtHelper);
-                include_once($baseHelper);
-
-                $this->_ci_helpers[$helper] = true;
-                log_message('debug', 'Helper loaded: ' . $helper);
-                continue;
-            }
-
-            //  See if the helper resides within the current Nails module
-            if (file_exists($nailsModuleHelper)) {
-
-                include_once($nailsModuleHelper);
-
-                $this->_ci_helpers[$helper] = true;
-                log_message('debug', 'Helper loaded: ' . $helper);
-                continue;
-            }
-
-            // Try to load the helper
-            foreach ($this->_ci_helper_paths as $path) {
-
-                if (file_exists($path . 'helpers/' . $helper . EXT)) {
-
-                    include_once($path . 'helpers/' . $helper . EXT);
-
-                    $this->_ci_helpers[$helper] = true;
-                    log_message('debug', 'Helper loaded: ' . $helper);
-                    break;
-                }
-            }
-
-            // Unable to load the helper
-            if (!isset($this->_ci_helpers[$helper])) {
-                throw new NailsException(
-                    'Unable to load the requested file: helpers/' . $helper . EXT,
-                    1
-                );
-            }
+        $aHelpers = (array) $helpers;
+        foreach ($aHelpers as $sHelper) {
+            Factory::helper($sHelper);
         }
     }
 
