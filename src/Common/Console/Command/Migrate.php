@@ -701,7 +701,7 @@ class Migrate extends Base
         $colorOpen  = $exitCode === 0 ? '' : '<error>';
         $colorClose = $exitCode === 0 ? '' : '</error>';
 
-        if ($this->oDb->isTransactionRunning()) {
+        if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
 
             $output->writeln($colorOpen . 'Rolling back Database' . $colorClose);
             $this->oDb->transactionRollback();
