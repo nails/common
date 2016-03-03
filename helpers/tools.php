@@ -100,6 +100,36 @@ if (!function_exists('returnBytes')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('maxUploadSize')) {
+
+    /**
+     * Returns the configured maximum upload size for this system by inspecting
+     * upload_max_filesize and post_max_size, if available.
+     * @param  boolean $bFormat Whether to format the string using formatBytes
+     * @return integer|string
+     */
+    function maxUploadSize($bFormat = true)
+    {
+        if (function_exists('ini_get')) {
+
+            $aMaxSizes = array(
+                returnBytes(ini_get('upload_max_filesize')),
+                returnBytes(ini_get('post_max_size'))
+            );
+
+            $iMaxSize = min($aMaxSizes);
+
+            return $bFormat ? formatBytes($iMaxSize) : $iMaxSize;
+
+        } else {
+
+            return null;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('stringToBoolean')) {
 
     /**
