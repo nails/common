@@ -25,7 +25,7 @@ The JSON string is a series of key/value pairs, where the key is the username an
     }
 
 
-## Example
+### Example
 
 It is often easier to define the user/password pairs in PHP and then use `json_encode()` to convert to a string; here's a sample of what might exist in `config/app.php`
 
@@ -41,3 +41,22 @@ It is often easier to define the user/password pairs in PHP and then use `json_e
 There are many online tools to do this, but it is recommended to use a local system when encrypting secrets. You can use PHP to encode the string on the command line as follows:
 
     $ php -r 'echo hash("sha256", "password-to-encode");'
+
+
+## Whitelisting IPs
+
+whitelisting an IP (i.e not requiring a password) is straightforward. Similar to the above, create a constant in `config/app.php` which is a JSON encoded array of IP and IP Ranges. the name of the constant should match the environment.
+
+    APP_USER_PASS_WHITELIST_{{ENVIRONMENT}}
+
+So, for example, to define a whitelist for the `STAGING` environment you'd define the constant:
+
+    APP_USER_PASS_WHITELIST_ STAGING
+
+### Example
+
+    $aIpWhitelist = array(
+        '123.456.78.0/15',
+        '123.456.79.1'
+    );
+    define('APP_USER_PASS_WHITELIST_STAGING', json_encode($aIpWhitelist));

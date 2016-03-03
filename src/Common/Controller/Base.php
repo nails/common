@@ -450,30 +450,53 @@ class Base extends \MX_Controller
          *         'john': '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
          *         'amy': '3fc9b689459d738f8c88a3a48aa9e33542016b7a4052e001aaa536fca74813cb'
          *     }
+         *
+         * You may also whitelist IP/IP Ranges by providing an array of IP Ranges
+         *
+         *      [
+         *          '123.456.789.123',
+         *          '123.456/789'
+         *      ]
          */
 
-        $sConstantName = 'APP_USER_PASS_' . Environment::get();
+        $sConstantName          = 'APP_USER_PASS_' . Environment::get();
+        $sConstantNameWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
+
         if (!isCli() && defined($sConstantName)) {
 
-            $oCredentials = @json_decode(constant($sConstantName));
+            //  On the whitelist?
+            if (defined($sConstantNameWhitelist)) {
 
-            if (empty($_SERVER['PHP_AUTH_USER'])) {
-                $this->passwordProtectedRequest();
-            }
-
-            if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-
-                //  Determine the users
-                $isSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
-                $isEqual = $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
-
-                if (!$isSet || !$isEqual) {
-                    $this->passwordProtectedRequest();
-                }
+                $aWhitelsitedIps = @json_decode(constant($sConstantNameWhitelist));
+                $bWhitelisted    = isIpInRange($this->input->ipAddress(), $aWhitelsitedIps);
 
             } else {
 
-                $this->passwordProtectedRequest();
+                $bWhitelisted = false;
+            }
+
+            if (!$bWhitelisted) {
+
+                $oCredentials = @json_decode(constant($sConstantName));
+
+                if (empty($_SERVER['PHP_AUTH_USER'])) {
+                    $this->passwordProtectedRequest();
+                }
+
+                if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+
+                    //  Determine the users
+                    $isSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
+                    $isEqual = $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
+
+                    if (!$isSet || !$isEqual) {
+                        $this->passwordProtectedRequest();
+                    }
+
+                } else {
+
+                    $this->passwordProtectedRequest();
+                }
             }
         }
     }

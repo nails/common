@@ -131,7 +131,7 @@ if (!function_exists('isIpInRange')) {
      */
     function isIpInRange($ip, $range)
     {
-        if (!array($range)) {
+        if (!is_array($range)) {
 
             //  Prepare the range
             $range_raw = $range;
@@ -166,14 +166,12 @@ if (!function_exists('isIpInRange')) {
                 $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
 
                 if (($ip & $mask) == $subnet) {
-
                     return true;
                 }
 
             } else {
 
                 if ($ip == $cidr_mask) {
-
                     return true;
                 }
             }
