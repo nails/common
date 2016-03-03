@@ -607,14 +607,14 @@ class Base
         //  Test columns
         $oTest = reset($items);
 
-        if (!isset($oTest->{$this->tableLabelColumn})) {
+        if (!property_exists($oTest, $this->tableLabelColumn)) {
             throw new ModelException(
                 get_called_class() . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid column.',
                 1
             );
         }
 
-        if (!isset($oTest->{$this->tableIdColumn})) {
+        if (!property_exists($oTest, $this->tableLabelColumn)) {
             throw new ModelException(
                 get_called_class() . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid column.',
                 1
