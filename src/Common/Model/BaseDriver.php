@@ -25,15 +25,6 @@ class BaseDriver extends BaseComponent
     // --------------------------------------------------------------------------
 
     /**
-     * Which app setting (in the $sModule grouping) defines the array of enabled
-     * components slugs.
-     * @var string
-     */
-    protected $sEnabledSetting = 'enabled_drivers';
-
-    // --------------------------------------------------------------------------
-
-    /**
      * The array of driver instances, created on demand.
      * @var array
      */
@@ -54,30 +45,41 @@ class BaseDriver extends BaseComponent
 
         } else {
 
-            foreach ($this->aEnabled as $oDriver) {
+            if ($this->bEnableMultiple) {
 
-                if ($sSlug == $oDriver->slug) {
-
-                    $this->aInstances[$sSlug] = _NAILS_GET_DRIVER_INSTANCE($oDriver);
-
-                    //  Apply driver configurations
-                    $aSettings = array(
-                        'sSlug' => $oDriver->slug
-                    );
-                    if (!empty($oDriver->data->settings)) {
-                        $aSettings = array_merge(
-                            $aSettings,
-                            $this->extractComponentSettings(
-                                $oDriver->data->settings,
-                                $oDriver->slug
-                            )
-                        );
+                foreach ($this->mEnabled as $oDriverConfig) {
+                    if ($sSlug == $oDriverConfig->slug) {
+                        $oDriver = $oDriverConfig;
+                        break;
                     }
-
-                   $this->aInstances[$sSlug]->setConfig($aSettings);
-
-                    return $this->aInstances[$sSlug];
                 }
+
+            } else {
+
+                $oDriver = $this->mEnabled;
+            }
+
+            if (!empty($oDriver)) {
+
+                $this->aInstances[$oDriver->slug] = _NAILS_GET_DRIVER_INSTANCE($oDriver);
+
+                //  Apply driver configurations
+                $aSettings = array(
+                    'sSlug' => $oDriver->slug
+                );
+                if (!empty($oDriver->data->settings)) {
+                    $aSettings = array_merge(
+                        $aSettings,
+                        $this->extractComponentSettings(
+                            $oDriver->data->settings,
+                            $oDriver->slug
+                        )
+                    );
+                }
+
+                $this->aInstances[$sSlug]->setConfig($aSettings);
+
+                return $this->aInstances[$sSlug];
             }
         }
 

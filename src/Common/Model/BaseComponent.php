@@ -12,13 +12,14 @@
 
 namespace Nails\Common\Model;
 
-use Nails\Exception\NailsException;
+use Nails\Factory;
+use Nails\Common\Exception\NailsException;
 
 class BaseComponent
 {
     protected $sComponentType;
     protected $aComponents;
-    protected $aEnabled;
+    protected $mEnabled;
 
     // --------------------------------------------------------------------------
 
@@ -45,7 +46,13 @@ class BaseComponent
      * component slugs.
      * @var string
      */
-    protected $sEnabledSetting = 'enabled_components';
+    protected $sEnabledSetting = null;
+
+    /**
+     * Define whether multiple components can be enabled
+     * @var boolean
+     */
+    protected $bEnableMultiple = true;
 
     // --------------------------------------------------------------------------
 
@@ -75,15 +82,47 @@ class BaseComponent
             }
         }
 
-        //  Enabled components
-        $this->aEnabled = array();
-        $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: array();
-
-        foreach ($this->aComponents as $oComponent) {
-            if (in_array($oComponent->slug, $aEnabled)) {
-                $this->aEnabled[] = $oComponent;
+        //  Define the enabled setting
+        if (empty($this->sEnabledSetting)) {
+            $this->sEnabledSetting = 'enabled_' . $this->sComponentType;
+            if (!empty($this->sType)) {
+                $this->sEnabledSetting .= '_' . $this->sType;
             }
         }
+
+        //  Enabled components
+        if ($this->bEnableMultiple) {
+
+            $this->mEnabled = array();
+            $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: array();
+
+            foreach ($this->aComponents as $oComponent) {
+                if (in_array($oComponent->slug, $aEnabled)) {
+                    $this->mEnabled[] = $oComponent;
+                }
+            }
+
+        } else {
+
+            $sEnabled = appSetting($this->sEnabledSetting, $this->sModule) ?: null;
+            foreach ($this->aComponents as $oComponent) {
+                if ($oComponent->slug == $sEnabled) {
+                    $this->mEnabled = $oComponent;
+                    break;
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the model supports enabling multiple components.
+     * @return boolean
+     */
+    public function isMultiple()
+    {
+        return $this->bEnableMultiple;
     }
 
     // --------------------------------------------------------------------------
@@ -100,27 +139,34 @@ class BaseComponent
     // --------------------------------------------------------------------------
 
     /**
-     * Fetches all enabled components
-     * @return array
+     * Fetches the enabled component, or array of components if bEnableMultiple is true
+     * @return array|stdClass
      */
     public function getEnabled()
     {
-        return $this->aEnabled;
+        return $this->mEnabled;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Fetches the slugs of all enabled components
-     * @return array
+     * Fetches the slug of the enabled components, or array of slugs if bEnableMultiple is true
+     * @return array|string
      */
-    public function getEnabledSlugs()
+    public function getEnabledSlug()
     {
-        $aOut = array();
-        foreach ($this->aEnabled as $oComponent) {
-            $aOut[] = $oComponent->slug;
+        if ($this->bEnableMultiple) {
+
+            $aOut = array();
+            foreach ($this->mEnabled as $oComponent) {
+                $aOut[] = $oComponent->slug;
+            }
+            return $aOut;
+
+        } else {
+
+            return !empty($this->mEnabled->slug) ? $this->mEnabled->slug : null;
         }
-        return $aOut;
     }
 
     // --------------------------------------------------------------------------
@@ -139,6 +185,50 @@ class BaseComponent
         }
 
         return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the setting key for this component
+     * @return string
+     */
+    public function getSettingKey()
+    {
+        return $this->sEnabledSetting;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Save which components are enabled
+     * @param array|string $mSlug The slug to set as enabled, or array of slugs if bEnableMultiple is true
+     * @return boolean
+     */
+    public function saveEnabled($mSlug)
+    {
+        $oAppSettingModel = Factory::model('AppSetting');
+
+        if ($this->bEnableMultiple) {
+
+            $mSlug = (array) $mSlug;
+            $mSlug = array_filter($mSlug);
+            $mSlug = array_unique($mSlug);
+
+        } else {
+
+            $mSlug = trim($mSlug);
+        }
+
+        $aSetting = array(
+            $this->sEnabledSetting => $mSlug
+        );
+
+        if (!$oAppSettingModel->set($aSetting, $this->sModule)) {
+            throw new NailsException($oAppSettingModel->lastError(), 1);
+        }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
