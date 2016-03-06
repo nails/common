@@ -120,7 +120,6 @@ class Base
          */
         $this->searchableFields[] = $this->tablePrefix . $this->tableIdColumn;
         $this->searchableFields[] = $this->tablePrefix . $this->tableLabelColumn;
-        $this->searchableFields[] = $this->tablePrefix . $this->tableSlugColumn;
     }
 
     // --------------------------------------------------------------------------
