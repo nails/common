@@ -93,13 +93,13 @@ if (!function_exists('showFatalError')) {
      */
     function showFatalError($subject = '', $message = '')
     {
-        if (is_callable("CORE_NAILS_ErrorHandler::showFatalErrorScreen")) {
+        if (is_callable('\Nails\Common\Library\ErrorHandler::showFatalErrorScreen')) {
 
-            if (is_callable("CORE_NAILS_ErrorHandler::sendDeveloperMail") && (!empty($subject) || !empty($message))) {
-                CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+            if (is_callable('\Nails\Common\Library\ErrorHandler::sendDeveloperMail') && (!empty($subject) || !empty($message))) {
+                \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
             }
 
-            CORE_NAILS_ErrorHandler::showFatalErrorScreen($subject, $message);
+            \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($subject, $message);
 
         } elseif (function_exists('_NAILS_ERROR')) {
 
@@ -126,9 +126,9 @@ if (!function_exists('sendDeveloperMail')) {
      */
     function sendDeveloperMail($subject, $message)
     {
-        if (is_callable('CORE_NAILS_ErrorHandler::sendDeveloperMail')) {
+        if (is_callable('\Nails\Common\Library\ErrorHandler::sendDeveloperMail')) {
 
-            return CORE_NAILS_ErrorHandler::sendDeveloperMail($subject, $message);
+            return \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
 
         } else {
 
