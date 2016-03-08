@@ -5,6 +5,7 @@
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
     <title>An Error Occurred - <?=APP_NAME?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php
 
     include NAILS_COMMON_PATH . 'errors/components/styles.php';
