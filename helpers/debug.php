@@ -16,13 +16,13 @@ use Nails\Environment;
 if (!function_exists('dumpanddie')) {
 
     /**
-     * Alias to dump($mVar, true)
-     * @param  mixed $mVar The variable to dump
+     * Alias to dump()
      * @return void
      */
-    function dumpanddie($mVar = null)
+    function dumpanddie()
     {
-        dump($mVar, true);
+        call_user_func_array('dump', func_get_args());
+        die();
     }
 }
 
@@ -31,57 +31,54 @@ if (!function_exists('dumpanddie')) {
 if (!function_exists('dump')) {
 
     /**
-     * Dumps data, similar to var_dump()
-     * @param  mixed   $mVar The variable to dump
-     * @param  boolean $bDie Whether to kill the script
+     * Dumps data, similar to var_dump(), will dump each variable it is passed
      * @return void
      */
-    function dump($mVar = null, $bDie = false)
+    function dump()
     {
-        if (is_string($mVar)) {
+        //  Allow multiple values to be passed to dump()
+        foreach (func_get_args() as $iKey => $mVar) {
 
-            $sOut = '(string) ' . $mVar;
+            if (is_string($mVar)) {
 
-        } elseif (is_int($mVar)) {
+                $sOut = '(string) ' . $mVar;
 
-            $sOut = '(int) ' . $mVar;
+            } elseif (is_int($mVar)) {
 
-        } elseif (is_bool($mVar)) {
+                $sOut = '(int) ' . $mVar;
 
-            $mVar = ($mVar === true) ? "true" : "false" ;
-            $sOut = '(bool) ' . $mVar;
+            } elseif (is_bool($mVar)) {
 
-        } elseif (is_float($mVar)) {
+                $mVar = $mVar === true ? "true" : "false" ;
+                $sOut = '(bool) ' . $mVar;
 
-            $sOut = '(float) ' . $mVar;
+            } elseif (is_float($mVar)) {
 
-        } elseif (is_null($mVar)) {
+                $sOut = '(float) ' . $mVar;
 
-            $sOut = '(null) null';
+            } elseif (is_null($mVar)) {
 
-        } else {
+                $sOut = '(null) null';
 
-            $sOut = print_r($mVar, true);
-        }
+            } else {
 
-        /**
-         * Check the environment; we only output/die in
-         * non-production environments
-         */
-
-        if (Environment::not('PRODUCTION')) {
-
-            //  If we're not on the CLI then wrap in <pre> tags
-            if (!isCli()) {
-                $sOut = '<pre>' . $sOut . '</pre>';
+                $sOut = print_r($mVar, true);
             }
 
-            //  Continue execution unless instructed otherwise
-            if ($bDie !== false) {
-                die("\n\n" . $sOut . "\n\n");
-            }
+            /**
+             * Check the environment; we only output/die in
+             * non-production environments
+             */
 
-            echo "\n\n" . $sOut . "\n\n";
+            if (Environment::not('PRODUCTION')) {
+
+                //  If we're not on the CLI then wrap in <pre> tags
+                if (!isCli()) {
+                    $sOut = '<pre>' . $sOut . '</pre>';
+                }
+
+                echo "\n\n" . $sOut . "\n\n";
+            }
         }
     }
 }
