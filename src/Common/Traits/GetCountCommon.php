@@ -50,10 +50,10 @@ trait GetCountCommon
 
     /**
      * Compiles any active filters back into the $data array
-     * @param  array  &$data The data array
+     * @param  array  &$aData The data array
      * @return void
      */
-    protected function getCountCommonCompileFilters(&$data)
+    protected function getCountCommonCompileFilters(&$aData)
     {
         $oDb = Factory::service('Database');
 
@@ -63,9 +63,9 @@ trait GetCountCommon
          */
 
         //  Checkbox Filters
-        if (!empty($data['cbFilters'])) {
+        if (!empty($aData['cbFilters'])) {
 
-            foreach ($data['cbFilters'] as $filterIndex => $filter) {
+            foreach ($aData['cbFilters'] as $iFilterIndex => $oFilter) {
 
                 /**
                  * If a column isn't specified by the filter then ignore it. This is a
@@ -73,38 +73,83 @@ trait GetCountCommon
                  * force them to use the default filtering mechanism
                  */
 
-                if (empty($filter->column)) {
+                if (empty($oFilter->column)) {
                     continue;
                 }
 
-                $whereFilter = array()  ;
-                foreach ($filter->options as $optionIndex => $option) {
+                $aWhereFilter = array();
+                foreach ($oFilter->options as $iOptionIndex => $oOption) {
 
-                    if (!empty($_GET['cbF'][$filterIndex][$optionIndex])) {
+                    if (!empty($_GET['cbF'][$iFilterIndex][$iOptionIndex])) {
 
                         //  Filtering is happening and the item is to be filtered
-                        $whereFilter[] = $oDb->escape_str($filter->column, false) . ' = ' . $oDb->escape($option->value);
+                        $aWhereFilter[] = $oDb->escape_str($oFilter->column, false) . ' = ' . $oDb->escape($oOption->value);
 
-                    } elseif (empty($_GET['cbF']) && $option->checked) {
+                    } elseif (empty($_GET['cbF']) && $oOption->checked) {
 
                         //  There's no filtering happening and the item is checked by default
-                        $whereFilter[] = $oDb->escape_str($filter->column, false) . ' = ' . $oDb->escape($option->value);
+                        $aWhereFilter[] = $oDb->escape_str($oFilter->column, false) . ' = ' . $oDb->escape($oOption->value);
                     }
                 }
 
-                if (!empty($whereFilter)) {
+                if (!empty($aWhereFilter)) {
 
-                    if (!isset($data['where'])) {
-                        $data['where'] = array();
+                    if (!isset($aData['where'])) {
+                        $aData['where'] = array();
                     }
 
-                    $data['where'][] = '(' . implode(' OR ', $whereFilter) . ')';
+                    $aData['where'][] = '(' . implode(' OR ', $aWhereFilter) . ')';
                 }
             }
         }
 
         //  Dropdown Filters
-        //  @todo: implement these
+        if (!empty($aData['ddFilters'])) {
+
+            foreach ($aData['ddFilters'] as $iFilterIndex => $oFilter) {
+
+                /**
+                 * If a column isn't specified by the filter then ignore it. This is a
+                 * feature/hack to allow the dev to add items to the search box but not
+                 * force them to use the default filtering mechanism
+                 */
+
+                if (empty($oFilter->column)) {
+                    continue;
+                }
+
+                $aWhereFilter = array();
+
+                //  Are we even filtering this filter?
+                if (isset($_GET['ddF'][$iFilterIndex])) {
+
+                    //  Does the option exist, if so, filter by it
+                    $iSelectedIndex = !empty((int) $_GET['ddF'][$iFilterIndex]) ? (int) $_GET['ddF'][$iFilterIndex] : 0;
+                    if (!empty($oFilter->options[$iSelectedIndex]->value)) {
+                        $aWhereFilter = array($oFilter->column, $oFilter->options[$iSelectedIndex]->value);
+                    }
+
+                } else {
+
+                    //  No filtering happening but does this item have an item checked by default?
+                    foreach ($oFilter->options as $oOption) {
+                        if (!empty($oOption->checked)) {
+                            $aWhereFilter = array($oFilter->column, $oOption->value);
+                            break;
+                        }
+                    }
+                }
+
+                if (!empty($aWhereFilter)) {
+
+                    if (!isset($aData['where'])) {
+                        $aData['where'] = array();
+                    }
+
+                    $aData['where'][] = $aWhereFilter;
+                }
+            }
+        }
     }
 
     // --------------------------------------------------------------------------
