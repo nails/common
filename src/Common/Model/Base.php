@@ -477,9 +477,7 @@ class Base
             $this->db->where('id', $mIds);
         }
 
-        $this->db->delete($this->table);
-
-        return (bool) $this->db->affected_rows();
+        return $this->db->delete($this->table);
     }
 
     /**
