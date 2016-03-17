@@ -62,7 +62,7 @@ if (!function_exists('dump')) {
 
             } else {
 
-                $sOut = print_r($mVar, true);
+                $sOut = htmlentities(print_r($mVar, true));
             }
 
             /**
