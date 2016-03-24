@@ -179,7 +179,7 @@ class Base extends \MX_Controller
          */
 
         $this->meta->addRaw(array(
-            'charset' => 'utf8'
+            'charset' => 'utf-8'
         ));
 
         $this->meta->addRaw(array(
