@@ -213,43 +213,15 @@ if (!function_exists('isIpInRange')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('readFileChunked')) {
+if (!function_exists('nullIfEmpty')) {
 
     /**
-     * Outputs a file in bytesized chunks.
-     * http://teddy.fr/2007/11/28/how-serve-big-files-through-php/
-     * @param  string  $filename  The file to output
-     * @param  integer $chunkSize The chunk size, in bytes
-     * @return mixed              Ineger on success, false on failure
+     * Returns null if the input is empty, or the input if not
+     * @param   mixed $mVal The input to check
+     * @return  mixed
      */
-    function readFileChunked($filename, $chunkSize = 1048576)
+    function nullIfEmpty($mVal)
     {
-        $bytesRead = 0;
-
-        // $handle = fopen($filename, "rb");
-        $handle = fopen($filename, 'rb');
-        if ($handle === false) {
-
-            return false;
-        }
-
-        while (!feof($handle)) {
-
-            $buffer = fread($handle, $chunkSize);
-            echo $buffer;
-
-            $bytesRead += strlen($buffer);
-        }
-
-        $status = fclose($handle);
-
-        if ($status) {
-
-            return $bytesRead;
-
-        } else {
-
-            return false;
-        }
+        return empty($mVal) ? null : $mVal;
     }
 }

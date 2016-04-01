@@ -62,8 +62,8 @@ class Startup
 
         //  Generic Nails constants
         defineConst('NAILS_PACKAGE_NAME', 'Nails');
-        defineConst('NAILS_PACKAGE_URL',  'http://nailsapp.co.uk/');
-        defineConst('NAILS_BRANDING',     true);
+        defineConst('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
+        defineConst('NAILS_BRANDING', true);
 
         //  Environment
         defineConst('ENVIRONMENT', 'PRODUCTION');
@@ -72,11 +72,11 @@ class Startup
         defineConst('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
 
         //  Database
-        defineConst('DEPLOY_DB_HOST',     'localhost');
+        defineConst('DEPLOY_DB_HOST', 'localhost');
         defineConst('DEPLOY_DB_USERNAME', '');
         defineConst('DEPLOY_DB_PASSWORD', '');
         defineConst('DEPLOY_DB_DATABASE', '');
-        defineConst('NAILS_DB_PREFIX',    'nails_');
+        defineConst('NAILS_DB_PREFIX', 'nails_');
 
         if (Environment::is('PRODUCTION')) {
 
