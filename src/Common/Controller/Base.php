@@ -39,6 +39,12 @@ class Base extends \MX_Controller
         //  Set up services
         Factory::setup();
 
+        //  Setup Events
+        $oEventService = Factory::service('Event');
+
+        //  Call the SYSTEM.STARTUP event, the earliest event the app can bind to.
+        $oEventService->trigger('SYSTEM.STARTUP', 'nailsapp/common');
+
         // --------------------------------------------------------------------------
 
         //  Is Nails in maintenance mode?
@@ -168,7 +174,6 @@ class Base extends \MX_Controller
          * Forced maintenance mode?
          */
         if (appSetting('maintenance_mode_enabled', 'site')) {
-
             $this->maintenanceMode(true);
         }
 
@@ -204,6 +209,11 @@ class Base extends \MX_Controller
         if (!empty($sCustomCss)) {
             $this->asset->inline($sCustomCss, 'CSS');
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Call the SYSTEM.READY event, the system is all geared up and ready to go
+        $oEventService->trigger('SYSTEM.READY', 'nailsapp/common');
     }
 
     // --------------------------------------------------------------------------

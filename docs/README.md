@@ -19,5 +19,8 @@ More details about the various types of component can be found on the following 
 ## Database
 - [Migrations](docs/database/migrations.md)
 
+## Services
+- [Migrations](docs/services/event.md)
+
 ## Environments
 - [Password Protecting](docs/environments/password-protecting.md)

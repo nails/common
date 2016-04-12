@@ -259,6 +259,10 @@ class Base
 
             // --------------------------------------------------------------------------
 
+            //  @todo - Hook into the Event service and automatically trigger CREATED event
+
+            // --------------------------------------------------------------------------
+
             if ($bReturnObject) {
 
                 return $this->getById($iId);
@@ -374,7 +378,16 @@ class Base
         } else {
             $this->db->where($sPrefix . 'id', $mIds);
         }
-        return $this->db->update($sTable);
+
+        $bResult = $this->db->update($sTable);
+
+        // --------------------------------------------------------------------------
+
+        //  @todo - Hook into the Event service and automatically trigger UPDATED event
+
+        // --------------------------------------------------------------------------
+
+        return $bResult;
     }
 
     // --------------------------------------------------------------------------
@@ -401,7 +414,7 @@ class Base
         if ($this->destructiveDelete) {
 
             //  Destructive delete; nuke that row.
-            return $this->destroy($mIds);
+            $bResult = $this->destroy($mIds);
 
         } else {
 
@@ -410,8 +423,16 @@ class Base
                 $this->tableDeletedColumn => true
             );
 
-            return $this->update($mIds, $aData);
+            $bResult = $this->update($mIds, $aData);
         }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo - Hook into the Event service and automatically trigger DELETED event
+
+        // --------------------------------------------------------------------------
+
+        return $bResult;
     }
 
     // --------------------------------------------------------------------------
@@ -447,7 +468,15 @@ class Base
                 $this->tableDeletedColumn => false
             );
 
-            return $this->update($iId, $aData);
+            $bResult = $this->update($iId, $aData);
+
+            // --------------------------------------------------------------------------
+
+            //  @todo - Hook into the Event service and automatically trigger RESTORED event
+
+            // --------------------------------------------------------------------------
+
+            return $bResult;
         }
     }
 
@@ -477,7 +506,15 @@ class Base
             $this->db->where('id', $mIds);
         }
 
-        return $this->db->delete($this->table);
+        $bResult = $this->db->delete($this->table);
+
+        // --------------------------------------------------------------------------
+
+        //  @todo - Hook into the Event service and automatically trigger DESTROYED event
+
+        // --------------------------------------------------------------------------
+
+        return $bResult;
     }
 
     /**

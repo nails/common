@@ -30,6 +30,13 @@ return array(
                 return new \Nails\Common\Library\ErrorHandler();
             }
         },
+        'Event' => function () {
+            if (class_exists('\App\Common\Library\Event')) {
+                return new \App\Common\Library\Event();
+            } else {
+                return new \Nails\Common\Library\Event();
+            }
+        },
         'FormValidation' => function () {
 
             $oCi = get_instance();
