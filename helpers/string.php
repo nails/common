@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Factory;
+
 /**
  * This file provides string related helper functions
  *
@@ -102,6 +104,57 @@ if (!function_exists('removeStopWords')) {
         $str = preg_replace('/ {2,}/', ' ', $str);
 
         return trim($str);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('generateToken')) {
+
+    /**
+     * Generates a token string using a specific mask
+     * @param  string $sMask    The mask to use; A = Any, C = Character, D = digit, S = Symbol
+     * @param  array  $aChars   The array of characters to use
+     * @param  array  $aDigits  The array of digits to use
+     * @return string
+     */
+    function generateToken($sMask = null, $aChars = array(), $aDigits = array())
+    {
+        $sMask    = empty($sMask)    ? 'AAAA-AAAA-AAAA-AAAA-AAAA-AAAA' : $sMask;
+        $aChars   = empty($aChars)   ? str_split('abcdefghijklmnopqrstuvwxyz') : $aChars;
+        $aDigits  = empty($aDigits)  ? str_split('0123456789') : $aDigits;
+
+        $aMask    = str_split(strtoupper($sMask));
+        $aOut     = array();
+        $iMaskLen = count($aMask);
+
+        Factory::helper('array');
+
+        for ($i=0; $i < $iMaskLen; $i++) {
+
+            if ($aMask[$i] === 'A') {
+
+                if (mt_rand(0, 1)) {
+                    $aOut[] = random_element($aChars);
+                } else {
+                    $aOut[] = random_element($aDigits);
+                }
+
+            } else if ($aMask[$i] === 'C') {
+
+                $aOut[] = random_element($aChars);
+
+            } else if ($aMask[$i] === 'D') {
+
+                $aOut[] = random_element($aDigits);
+
+            } else {
+
+                $aOut[] = $aMask[$i];
+            }
+        }
+
+        return implode($aOut);
     }
 }
 
