@@ -172,7 +172,7 @@ class Routes extends BAse
         //  First, test if file exists, if it does is it writable?
         if (file_exists($this->routesDir . $this->routesFile)) {
 
-            if (is_really_writable($this->routesDir . $this->routesFile)) {
+            if (is_writeable($this->routesDir . $this->routesFile)) {
 
                 $this->canWriteRoutes = true;
                 return true;
@@ -193,7 +193,7 @@ class Routes extends BAse
                 }
             }
 
-        } elseif (is_really_writable($this->routesDir)) {
+        } elseif (is_writeable($this->routesDir)) {
 
             $this->canWriteRoutes = true;
             return true;

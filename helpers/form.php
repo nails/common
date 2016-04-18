@@ -280,6 +280,7 @@ if (!function_exists('form_field')) {
         $_field_class       = isset($field['class'])       ? $field['class']            : '';
         $_field_data        = isset($field['data'])        ? $field['data']             : array();
         $_field_info        = isset($field['info'])        ? $field['info']             : false;
+        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
         $_field_max_length  = isset($field['max_length'])  ? (int) $field['max_length'] : null;
         $_field_tip         = isset($field['tip'])         ? $field['tip']              : $tip;
 
@@ -447,7 +448,7 @@ if (!function_exists('form_field')) {
         // --------------------------------------------------------------------------
 
         //  info block
-        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+        $info_block = $_field_info ? '<small class="info ' . $_field_info_class . '">' . $_field_info . '</small>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -669,6 +670,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
         $_field_class       = isset($field['class'])          ? $field['class']       : '';
         $_field_data        = isset($field['data'])           ? $field['data']        : array();
         $_field_info        = isset($field['info'])           ? $field['info']        : false;
+        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         //  CDN Specific
@@ -736,7 +738,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
         // --------------------------------------------------------------------------
 
         //  info block
-        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+        $info_block = $_field_info ? '<small class="info ' . $_field_info_class . '">' . $_field_info . '</small>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -791,6 +793,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_class       = isset($field['class'])          ? $field['class']       : '';
         $_field_data        = isset($field['data'])           ? $field['data']        : array();
         $_field_info        = isset($field['info'])           ? $field['info']        : false;
+        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         //  CDN Specific
@@ -862,7 +865,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         // --------------------------------------------------------------------------
 
         //  info block
-        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+        $info_block = $_field_info ? '<small class="info ' . $_field_info_class . '">' . $_field_info . '</small>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -1002,6 +1005,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_class       = isset($field['class'])          ? $field['class']       : '';
         $_field_data        = isset($field['data'])           ? $field['data']        : array();
         $_field_info        = isset($field['info'])           ? $field['info']        : false;
+        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
         $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
 
         //  CDN Specific
@@ -1073,7 +1077,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         // --------------------------------------------------------------------------
 
         //  info block
-        $info_block = $_field_info ? '<small class="info">' . $_field_info . '</small>' : '';
+        $info_block = $_field_info ? '<small class="info ' . $_field_info_class . '">' . $_field_info . '</small>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -1319,6 +1323,7 @@ if (!function_exists('form_field_dropdown')) {
         $_field['data']             = isset($field['data']) ? $field['data'] : array();
         $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
+        $_field['info_class']       = isset($field['info_class']) ? $field['info_class'] : false;
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
         $_field['options']          = isset($field['options']) ? $field['options'] : $options;
 
@@ -1417,7 +1422,7 @@ if (!function_exists('form_field_dropdown')) {
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info
-        $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
+        $_out .= $_field['info'] ? '<small class="info ' . $_field['info_class'] . '">' . $_field['info'] . '</small>' : '';
 
         $_out .= '</span>';
 
@@ -1460,6 +1465,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_field['data']             = isset($field['data']) ? $field['data'] : array();
         $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
         $_field['info']             = isset($field['info']) ? $field['info'] : array();
+        $_field['info_class']       = isset($field['info_class']) ? $field['info_class'] : false;
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
 
         if (is_null($options)) {
@@ -1552,7 +1558,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info
-        $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
+        $_out .= $_field['info'] ? '<small class="info ' . $_field['info_class'] . '">' . $_field['info'] . '</small>' : '';
 
         $_out .= '</span';
 
@@ -1597,6 +1603,7 @@ if (!function_exists('form_field_boolean')) {
         $_field['data']         = isset($field['data'])           ? $field['data']        : array();
         $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
         $_field['info']         = isset($field['info'])           ? $field['info']        : false;
+        $_field['info_class']   = isset($field['info_class'])     ? $field['info_class']  : false;
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
@@ -1647,7 +1654,7 @@ if (!function_exists('form_field_boolean')) {
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info block
-        $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
+        $_out .= $_field['info'] ? '<small class="info ' . $_field['info_class'] . '">' . $_field['info'] . '</small>' : '';
 
         $_out .= '</span>';
         $_out .= '</div>';
@@ -1922,6 +1929,7 @@ if (!function_exists('form_field_cms_widgets')) {
         $_field['data']         = isset($field['data'])           ? $field['data']        : array();
         $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
         $_field['info']         = isset($field['info'])           ? $field['info']        : false;
+        $_field['info_class']   = isset($field['info_class'])     ? $field['info_class']  : false;
         $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
 
         $_tip                   = array();
@@ -1983,7 +1991,7 @@ if (!function_exists('form_field_cms_widgets')) {
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');
 
         //  Info block
-        $_out .= $_field['info'] ? '<small class="info">' . $_field['info'] . '</small>' : '';
+        $_out .= $_field['info'] ? '<small class="info ' . $_field['info_class'] . '">' . $_field['info'] . '</small>' : '';
 
         $_out .= '</span>';
         $_out .= '</div>';
