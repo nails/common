@@ -297,14 +297,17 @@ class DateTime
      */
     public function toUserDate($timestamp = null, $format = null)
     {
-        $converted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $oConverted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+
+        if (is_null($oConverted)) {
+            return null;
+        }
 
         if (is_null($format)) {
-
             $format = $this->userFormatDate;
         }
 
-        return $converted->format($format);
+        return $oConverted->format($format);
     }
 
     // --------------------------------------------------------------------------
@@ -316,8 +319,13 @@ class DateTime
      */
     public function toNailsDate($timestamp = null)
     {
-        $converted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
-        return $converted->format('Y-m-d');
+        $oConverted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
+
+        if (is_null($oConverted)) {
+            return null;
+        }
+
+        return $oConverted->format('Y-m-d');
     }
 
     // --------------------------------------------------------------------------
@@ -330,14 +338,17 @@ class DateTime
      */
     public function toUserDatetime($timestamp = null, $format = null)
     {
-        $converted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $oConverted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+
+        if (is_null($oConverted)) {
+            return null;
+        }
 
         if (is_null($format)) {
-
             $format = $this->userFormatDate . ' ' . $this->userFormatTime;
         }
 
-        return $converted->format($format);
+        return $oConverted->format($format);
     }
 
     // --------------------------------------------------------------------------
@@ -349,8 +360,13 @@ class DateTime
      */
     public function toNailsDatetime($timestamp = null)
     {
-        $converted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
-        return $converted->format('Y-m-d H:i:s');
+        $oConverted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
+
+        if (is_null($oConverted)) {
+            return null;
+        }
+
+        return $oConverted->format('Y-m-d H:i:s');
     }
 
     // --------------------------------------------------------------------------
