@@ -60,11 +60,15 @@ class Base
      * @param  string $sProperty the property to retrieve
      * @return mixed
      */
-    protected function getSetting($sProperty)
+    protected function getSetting($sProperty = null)
     {
         if (property_exists($this->oSettings, $sProperty)) {
 
             return $this->oSettings->{$sProperty};
+
+        } elseif (is_null($sProperty)) {
+
+            return $this->oSettings;
 
         } else {
 
