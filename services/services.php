@@ -10,7 +10,6 @@ return array(
             }
         },
         'Config' => function () {
-
             $oCi = get_instance();
             return $oCi->config;
         },
@@ -18,7 +17,6 @@ return array(
             return new \Nails\Common\Library\Database();
         },
         'Encrypt' => function () {
-
             $oCi = get_instance();
             $oCi->load->library('encrypt');
             return $oCi->encrypt;
@@ -38,13 +36,11 @@ return array(
             }
         },
         'FormValidation' => function () {
-
             $oCi = get_instance();
             $oCi->load->library('form_validation');
             return $oCi->form_validation;
         },
         'Input' => function () {
-
             $oCi = get_instance();
             return $oCi->input;
         },
@@ -68,6 +64,10 @@ return array(
             } else {
                 return new Mustache_Engine();
             }
+        },
+        'Uri' => function () {
+            $oCi = get_instance();
+            return $oCi->uri;
         },
         'UserFeedback' => function () {
             if (class_exists('\App\Common\Library\UserFeedback')) {
