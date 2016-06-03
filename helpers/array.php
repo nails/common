@@ -70,6 +70,9 @@ if (!function_exists('array_sort_multi')) {
     {
         uasort($array, function ($a, $b) use ($field) {
 
+            $a = (object) $a;
+            $b = (object) $b;
+
             //  Equal?
             if (trim($a->$field) == trim($b->$field)) {
 
