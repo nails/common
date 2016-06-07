@@ -36,49 +36,55 @@ if (!function_exists('dump')) {
      */
     function dump()
     {
+        $sOut = '';
+
         //  Allow multiple values to be passed to dump()
         foreach (func_get_args() as $iKey => $mVar) {
 
+            $sOut .= "\n\n";
+
             if (is_string($mVar)) {
 
-                $sOut = '(string) ' . $mVar;
+                $sOut .= '(string) ' . $mVar;
 
             } elseif (is_int($mVar)) {
 
-                $sOut = '(int) ' . $mVar;
+                $sOut .= '(int) ' . $mVar;
 
             } elseif (is_bool($mVar)) {
 
                 $mVar = $mVar === true ? "true" : "false" ;
-                $sOut = '(bool) ' . $mVar;
+                $sOut .= '(bool) ' . $mVar;
 
             } elseif (is_float($mVar)) {
 
-                $sOut = '(float) ' . $mVar;
+                $sOut .= '(float) ' . $mVar;
 
             } elseif (is_null($mVar)) {
 
-                $sOut = '(null) null';
+                $sOut .= '(null) null';
 
             } else {
 
-                $sOut = htmlentities(print_r($mVar, true));
+                $sOut .= htmlentities(print_r($mVar, true));
+            }
+        }
+
+        $sOut = trim($sOut);
+
+        /**
+         * Check the environment; we only output/die in
+         * non-production environments
+         */
+
+        if (Environment::not('PRODUCTION')) {
+
+            //  If we're not on the CLI then wrap in <pre> tags
+            if (!isCli()) {
+                $sOut = '<pre>' . $sOut . '</pre>';
             }
 
-            /**
-             * Check the environment; we only output/die in
-             * non-production environments
-             */
-
-            if (Environment::not('PRODUCTION')) {
-
-                //  If we're not on the CLI then wrap in <pre> tags
-                if (!isCli()) {
-                    $sOut = '<pre>' . $sOut . '</pre>';
-                }
-
-                echo "\n\n" . $sOut . "\n\n";
-            }
+            echo "\n\n" . $sOut . "\n\n";
         }
     }
 }
