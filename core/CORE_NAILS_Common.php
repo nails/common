@@ -308,6 +308,11 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
      */
     function _NAILS_GET_DRIVER_INSTANCE($oDriver)
     {
+        //  Allow for driver requesting as a string
+        if (is_string($oDriver)) {
+            $oDriver = _NAILS_GET_COMPONENTS_BY_SLUG($oDriver);
+        }
+
         if (isset($GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug])) {
             return $GLOBALS['NAILS']['DRIVER_INSTANCE'][$oDriver->slug];
         }
