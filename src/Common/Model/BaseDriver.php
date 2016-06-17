@@ -28,7 +28,7 @@ class BaseDriver extends BaseComponent
      * The array of driver instances, created on demand.
      * @var array
      */
-    protected $Instances = array();
+    protected $aInstances = array();
 
     // --------------------------------------------------------------------------
 
