@@ -8,8 +8,8 @@ require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/mimes.php'
  */
 
 //  Video
-$mimes['mp4'] = 'video/mp4';
-$mimes['ogv'] = 'video/ogg';
+$mimes['mp4']  = 'video/mp4';
+$mimes['ogv']  = 'video/ogg';
 $mimes['webm'] = 'video/webm';
 
 //  MS Office
