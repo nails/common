@@ -65,6 +65,10 @@ return array(
                 return new Mustache_Engine();
             }
         },
+        'Output' => function () {
+            $oCi = get_instance();
+            return $oCi->output;
+        },
         'Uri' => function () {
             $oCi = get_instance();
             return $oCi->uri;
