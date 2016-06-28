@@ -74,8 +74,7 @@ if (!function_exists('array_sort_multi')) {
             $b = (object) $b;
 
             //  Equal?
-            if (trim($a->$field) == trim($b->$field)) {
-
+            if ($a->$field == $b->$field) {
                 return 0;
             }
 
