@@ -7,6 +7,11 @@ require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/mimes.php'
  * Additional mimes
  */
 
+//  Video
+$mimes['mp4']  = 'video/mp4';
+$mimes['ogv']  = array('video/ogg', 'application/ogg');
+$mimes['webm'] = 'video/webm';
+
 //  MS Office
 //  http://stackoverflow.com/a/4212908/789224
 $mimes['doc'] = array('application/msword', 'application/vnd.ms-office');
