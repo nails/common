@@ -1610,10 +1610,11 @@ class Base
 
         $this->aExpandableFields[] = (object) array(
 
-            //  the text which triggers this expansion
-            'trigger'  => $aOptions['trigger'],
+            //  The text which triggers this expansion, passed in via $aData['expand']
+            'trigger' => $aOptions['trigger'],
 
             //  The type of expansion: single or many
+            //  This must be one of static::EXPAND_TYPE_SINGLE or static::EXPAND_TYPE_MANY
             'type' => $aOptions['type'],
 
             //  What property to assign the results of the expansion to
@@ -1633,7 +1634,7 @@ class Base
             'id_column' => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => !empty($aOptions['auto_expand']),
+            'auto_expand' => !empty($aOptions['auto_expand'])
         );
     }
 }
