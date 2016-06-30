@@ -50,12 +50,12 @@ This might return the following array:
             "data": [
                 {
                     "id": 123,
-                    "comment": "Great read!"
+                    "comment": "Great read!",
                     "number_stars": 4
                 },
                 {
                     "id": 356,
-                    "comment": "Not bad, not bad at all."
+                    "comment": "Not bad, not bad at all.",
                     "number_stars": 3
                 }
             ]
