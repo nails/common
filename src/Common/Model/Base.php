@@ -14,12 +14,15 @@ namespace Nails\Common\Model;
 
 use Nails\Factory;
 use Nails\Common\Exception\ModelException;
+use \Nails\Common\Traits\ErrorHandling;
+use \Nails\Common\Traits\Caching;
+use \Nails\Common\Traits\GetCountCommon;
 
 class Base
 {
-    use \Nails\Common\Traits\ErrorHandling;
-    use \Nails\Common\Traits\Caching;
-    use \Nails\Common\Traits\GetCountCommon;
+    use ErrorHandling;
+    use Caching;
+    use GetCountCommon;
 
     // --------------------------------------------------------------------------
 
@@ -46,6 +49,26 @@ class Base
     //  Model options
     protected $tableAutoSetTimestamps;
     protected $tableAutoSetSlugs;
+
+    //  Expandable fields
+    protected $aExpandableFields;
+
+    /**
+     * Expandable objects of type EXPANDABLE_TYPE_MANY are a 1 to many relationship
+     * where a property of the child object is the ID of the parent object.
+     */
+    const EXPANDABLE_TYPE_MANY   = 0;
+
+    /**
+     * Expandable objects of type EXPANDABLE_TYPE_SINGLE are a 1 to 1 relationship
+     * where a property of the parent object is the ID of the child object.
+     */
+    const EXPANDABLE_TYPE_SINGLE = 1;
+
+    /**
+     * Magic trigger for expanding all expandable objects
+     */
+    const EXPAND_ALL = 'ALL';
 
     //  Preferences
     protected $destructiveDelete;
@@ -80,7 +103,7 @@ class Base
      */
 
     /**
-     * Construct the model
+     * Base constructor.
      */
     public function __construct()
     {
@@ -106,20 +129,49 @@ class Base
         $this->tableAutoSetSlugs      = false;
         $this->perPage                = 50;
         $this->searchableFields       = array();
-        $this->defaultSortColumn      = $this->tableLabelColumn;
+        $this->defaultSortColumn      = null;
         $this->defaultSortOrder       = 'ASC';
 
         // --------------------------------------------------------------------------
 
         /**
          * Set up default searchable fields. Each field is passed directly to the
-         * `column` parameter in getcountCommon() so can be in any form accepted by that.
+         * `column` parameter in getCountCommon() so can be in any form accepted by that.
          *
          * @todo  allow some sort of cleansing callback so that models can prep the
          * search string if needed.
          */
         $this->searchableFields[] = $this->tablePrefix . $this->tableIdColumn;
         $this->searchableFields[] = $this->tablePrefix . $this->tableLabelColumn;
+
+        // --------------------------------------------------------------------------
+
+        //  Default expandable fields
+        if (!empty($this->tableCreatedByColumn)) {
+            $this->addExpandableField(
+                array(
+                    'trigger'     => 'created_by',
+                    'type'        => self::EXPANDABLE_TYPE_SINGLE,
+                    'property'    => 'created_by',
+                    'model'       => 'User',
+                    'provider'    => 'nailsapp/module-auth',
+                    'id_column'   => 'created_by'
+                )
+            );
+        }
+
+        if (!empty($this->tableModifiedByColumn)) {
+            $this->addExpandableField(
+                array(
+                    'trigger'     => 'modified_by',
+                    'type'        => self::EXPANDABLE_TYPE_SINGLE,
+                    'property'    => 'modified_by',
+                    'model'       => 'User',
+                    'provider'    => 'nailsapp/module-auth',
+                    'id_column'   => 'modified_by'
+                )
+            );
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -169,12 +221,15 @@ class Base
      * @param  array   $aData         The data to create the object with
      * @param  boolean $bReturnObject Whether to return just the new ID or the full object
      * @return mixed
+     * @throws ModelException
      */
     public function create($aData = array(), $bReturnObject = false)
     {
         if (!$this->table) {
             throw new ModelException(get_called_class() . '::create() Table variable not set', 1);
         }
+
+        $oDb = Factory::service('Database');
 
         // --------------------------------------------------------------------------
 
@@ -201,7 +256,7 @@ class Base
             } else {
 
                 if (empty($aData[$this->tableCreatedByColumn])) {
-                    $this->db->set($this->tableCreatedByColumn, null);
+                    $oDb->set($this->tableCreatedByColumn, null);
                     $aData[$this->tableCreatedByColumn] = null;
                 }
                 if (empty($aData[$this->tableModifiedByColumn])) {
@@ -242,20 +297,20 @@ class Base
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
 
-                    $this->db->set($sColumn, $mSetValue, $bEscape);
+                    $oDb->set($sColumn, $mSetValue, $bEscape);
 
                 } else {
 
-                    $this->db->set($sColumn, $mValue);
+                    $oDb->set($sColumn, $mValue);
                 }
             }
         }
 
-        $this->db->insert($this->table);
+        $oDb->insert($this->table);
 
-        if ($this->db->affected_rows()) {
+        if ($oDb->affected_rows()) {
 
-            $iId = $this->db->insert_id();
+            $iId = $oDb->insert_id();
 
             // --------------------------------------------------------------------------
 
@@ -285,19 +340,21 @@ class Base
      * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
      * @param  array         $aData The data to update the object(s) with
      * @return boolean
+     * @throws ModelException
      */
     public function update($mIds, $aData = array())
     {
         if (!$this->table) {
 
             throw new ModelException(get_called_class() . '::update() Table variable not set', 1);
-            return;
 
         } else {
 
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
             $sTable  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
+
+        $oDb = Factory::service('Database');
 
         // --------------------------------------------------------------------------
 
@@ -341,7 +398,6 @@ class Base
              *  no label, assume slug is unchanged.
              */
             if (!empty($aData[$this->tableLabelColumn])) {
-
                 $aData[$sPrefix . $this->tableSlugColumn] = $this->generateSlug(
                     $aData[$this->tableLabelColumn],
                     '',
@@ -362,11 +418,11 @@ class Base
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
 
-                    $this->db->set($sColumn, $mSetValue, $bEscape);
+                    $oDb->set($sColumn, $mSetValue, $bEscape);
 
                 } else {
 
-                    $this->db->set($sColumn, $mValue);
+                    $oDb->set($sColumn, $mValue);
                 }
             }
         }
@@ -374,12 +430,12 @@ class Base
         // --------------------------------------------------------------------------
 
         if (is_array($mIds)) {
-            $this->db->where_in($sPrefix . 'id', $mIds);
+            $oDb->where_in($sPrefix . 'id', $mIds);
         } else {
-            $this->db->where($sPrefix . 'id', $mIds);
+            $oDb->where($sPrefix . 'id', $mIds);
         }
 
-        $bResult = $this->db->update($sTable);
+        $bResult = $oDb->update($sTable);
 
         // --------------------------------------------------------------------------
 
@@ -401,6 +457,7 @@ class Base
      *
      * @param  integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
      * @return boolean
+     * @throws ModelException
      */
     public function delete($mIds)
     {
@@ -446,6 +503,7 @@ class Base
      *
      * @param  int     $iId The ID of the object to restore
      * @return boolean
+     * @throws ModelException
      */
     public function restore($iId)
     {
@@ -490,6 +548,7 @@ class Base
      *
      * @param  integer|array $mIds The ID (or array of IDs) of the object to destroy
      * @return boolean
+     * @throws ModelException
      */
     public function destroy($mIds)
     {
@@ -498,15 +557,17 @@ class Base
             throw new ModelException(get_called_class() . '::destroy() Table variable not set', 1);
         }
 
+        $oDb = Factory::service('Database');
+
         // --------------------------------------------------------------------------
 
         if (is_array($mIds)) {
-            $this->db->where_in('id', $mIds);
+            $oDb->where_in('id', $mIds);
         } else {
-            $this->db->where('id', $mIds);
+            $oDb->where('id', $mIds);
         }
 
-        $bResult = $this->db->delete($this->table);
+        $bResult = $oDb->delete($this->table);
 
         // --------------------------------------------------------------------------
 
@@ -533,6 +594,7 @@ class Base
      * @param  mixed  $data           Any data to pass to getCountCommon()
      * @param  bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @return object
+     * @throws ModelException
      */
     public function getAllRawQuery($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
@@ -544,6 +606,10 @@ class Base
 
             $table = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
+
+        // --------------------------------------------------------------------------
+
+        $oDb = Factory::service('Database');
 
         // --------------------------------------------------------------------------
 
@@ -577,7 +643,7 @@ class Base
             $perPage = is_null($perPage) ? $this->perPage : (int) $perPage;
             $offset   = $page * $perPage;
 
-            $this->db->limit($perPage, $offset);
+            $oDb->limit($perPage, $offset);
         }
 
         // --------------------------------------------------------------------------
@@ -586,10 +652,10 @@ class Base
         if (!$this->destructiveDelete && !$includeDeleted) {
 
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($sPrefix . $this->tableDeletedColumn, false);
+            $oDb->where($sPrefix . $this->tableDeletedColumn, false);
         }
 
-        return $this->db->get($table);
+        return $oDb->get($table);
     }
 
     // --------------------------------------------------------------------------
@@ -608,6 +674,55 @@ class Base
         $aResults   = $oResults->result();
         $numResults = count($aResults);
 
+        /**
+         * Handle requests for expanding objects.
+         * there are two types of expandable objects:
+         *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
+         *  2. Query a model for items which reference this item's ID  (1 to many)
+         */
+
+        if (!empty($this->aExpandableFields)) {
+
+            foreach ($this->aExpandableFields as $oExpandableField) {
+
+                $bAutoExpand       = $oExpandableField->auto_expand;
+                $bExpandAll        = false;
+                $bExpandForTrigger = false;
+
+                //  If we're not auto-expanding, check if we should expand based on the `expand` index of $aData
+                if (!$bAutoExpand && array_key_exists('expand', $aData)) {
+                    $bExpandAll        = $aData['expand'] == static::EXPAND_ALL;
+                    if (!$bExpandAll && is_array($aData['expand'])) {
+                        $bExpandForTrigger = in_array($oExpandableField->trigger, $aData['expand']);
+                    }
+                }
+
+                if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
+
+                    if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
+
+                        $this->getSingleAssociatedItem(
+                            $aResults,
+                            $oExpandableField->id_column,
+                            $oExpandableField->property,
+                            $oExpandableField->model,
+                            $oExpandableField->provider
+                        );
+
+                    } else if ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+
+                        $this->getManyAssociatedItems(
+                            $aResults,
+                            $oExpandableField->property,
+                            $oExpandableField->id_column,
+                            $oExpandableField->model,
+                            $oExpandableField->provider
+                        );
+                    }
+                }
+            }
+        }
+
         for ($i = 0; $i < $numResults; $i++) {
             $this->formatObject($aResults[$i], $aData);
         }
@@ -624,6 +739,7 @@ class Base
      * @param  array   $data           Any data to pass to getCountCommon()
      * @param  boolean $includeDeleted Whether or not to include deleted items
      * @return array
+     * @throws ModelException
      */
     public function getAllFlat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
     {
@@ -673,6 +789,7 @@ class Base
      * @param  int      $iId   The ID of the object to fetch
      * @param  mixed    $aData Any data to pass to getCountCommon()
      * @return mixed           stdClass on success, false on failure
+     * @throws ModelException
      */
     public function getById($iId, $aData = array())
     {
@@ -693,7 +810,6 @@ class Base
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where'])) {
-
             $aData['where'] = array();
         }
 
@@ -706,7 +822,6 @@ class Base
         // --------------------------------------------------------------------------
 
         if (empty($aResult)) {
-
             return false;
         }
 
@@ -722,6 +837,7 @@ class Base
      * @param  array $aIds  An array of IDs to fetch
      * @param  mixed $aData Any data to pass to getCountCommon()
      * @return array
+     * @throws ModelException
      */
     public function getByIds($aIds, $aData = array())
     {
@@ -758,8 +874,9 @@ class Base
     /**
      * Fetch an object by it's slug
      * @param  string   $sSlug The slug of the object to fetch
-     * @param  mixed    $data Any data to pass to getCountCommon()
-     * @return stdClass
+     * @param  array    $aData Any data to pass to getCountCommon()
+     * @return \stdClass
+     * @throws ModelException
      */
     public function getBySlug($sSlug, $aData = array())
     {
@@ -807,8 +924,9 @@ class Base
     /**
      * Fetch objects by their slugs
      * @param  array $aSlugs An array of slugs to fetch
-     * @param  mixed $aData  Any data to pass to getCountCommon()
+     * @param  array $aData  Any data to pass to getCountCommon()
      * @return array
+     * @throws ModelException
      */
     public function getBySlugs($aSlugs, $aData = array())
     {
@@ -852,7 +970,7 @@ class Base
      *
      * @param  mixed    $mIdSlug The ID or slug of the object to fetch
      * @param  array    $aData   Any data to pass to getCountCommon()
-     * @return stdClass
+     * @return \stdClass
      */
     public function getByIdOrSlug($mIdSlug, $aData = array())
     {
@@ -869,13 +987,13 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset where the the relationship is 1 to 1 and the binding
-     * is made in the iten object (i.e current item contains the associated item's ID)
-     * @param  array   &$aItems                  The resultset of items
-     * @param  string  $sAssociatedItemIdColumn  Which property in the resultset contains the associated content's ID
+     * Get associated content for the items in the result set where the the relationship is 1 to 1 and the binding
+     * is made in the item object (i.e current item contains the associated item's ID)
+     * @param  array   &$aItems                  The result set of items
+     * @param  string  $sAssociatedItemIdColumn  Which property in the result set contains the associated content's ID
      * @param  string  $sItemProperty            What property of each item to assign the associated content
-     * @param  strong  $sAssociatedModel         The name of the model which handles the associated content
-     * @param  strong  $sAssociatedModelProvider Which module provides the associated model
+     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string  $sAssociatedModelProvider Which module provides the associated model
      * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by $sAssociatedItemIdColumn)
      * @return void
@@ -891,22 +1009,23 @@ class Base
     ) {
         if (!empty($aItems)) {
 
-            $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
-
+            $oAssociatedModel   = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
             $aAssociatedItemIds = array();
+
             foreach ($aItems as $oItem) {
 
                 //  Note the associated item's ID
                 $aAssociatedItemIds[] = $oItem->{$sAssociatedItemIdColumn};
 
-                //  Set the base property
-                $oItem->{$sItemProperty} = null;
+                //  Set the base property, only if it's not already set
+                if (!property_exists($oItem, $sItemProperty)) {
+                    $oItem->{$sItemProperty} = null;
+                }
             }
 
             $aAssociatedItemIds = array_unique($aAssociatedItemIds);
             $aAssociatedItemIds = array_filter($aAssociatedItemIds);
-
-            $aAssociatedItems = $oAssociatedModel->getByIds($aAssociatedItemIds, $aAssociatedModelData);
+            $aAssociatedItems   = $oAssociatedModel->getByIds($aAssociatedItemIds, $aAssociatedModelData);
 
             foreach ($aItems as $oItem) {
                 foreach ($aAssociatedItems as $oAssociatedItem) {
@@ -915,7 +1034,11 @@ class Base
                     }
                 }
 
-                if ($bUnsetOriginalProperty) {
+                /**
+                 * Unset the original property, but only if it's not the same as the new property,
+                 * otherwise we'll remove the property which was just set!
+                 */
+                if ($bUnsetOriginalProperty && $sAssociatedItemIdColumn !== $sItemProperty) {
                     unset($oItem->{$sAssociatedItemIdColumn});
                 }
             }
@@ -925,12 +1048,12 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset where the the relationship is 1 to many
-     * @param  array  &$aItems                     The resultset of items
+     * Get associated content for the items in the result set where the the relationship is 1 to many
+     * @param  array  &$aItems                     The result set of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
-     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
-     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  string $sAssociatedModel            The name of the model which handles the associated content
+     * @param  string $sAssociatedModelProvider    Which module provides the associated model
      * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
      * @return void
      */
@@ -983,12 +1106,12 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Count associated content for the items in the resultset where the the relationship is 1 to many
-     * @param  array  &$aItems                     The resultset of items
+     * Count associated content for the items in the result set where the the relationship is 1 to many
+     * @param  array  &$aItems                     The result set of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
-     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
-     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  string $sAssociatedModel            The name of the model which handles the associated content
+     * @param  string $sAssociatedModelProvider    Which module provides the associated model
      * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
      * @return void
      */
@@ -1041,13 +1164,13 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Get associated content for the items in the resultset using a taxonomy table
-     * @param  array  &$aItems                     The resultset of items
+     * Get associated content for the items in the result set using a taxonomy table
+     * @param  array  &$aItems                     The result set of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
      * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
-     * @param  strong $sAssociatedModel            The name of the model which handles the associated content
-     * @param  strong $sAssociatedModelProvider    Which module provides the associated model
+     * @param  string $sAssociatedModel            The name of the model which handles the associated content
+     * @param  string $sAssociatedModelProvider    Which module provides the associated model
      * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
      * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
      * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
@@ -1139,6 +1262,7 @@ class Base
      * @param  string  $sAssociatedModel         The name of the model which is responsible for associated items
      * @param  string  $sAssociatedModelProvider What module provide the associated item model
      * @return boolean
+     * @throws ModelException
      */
     protected function saveAsscociatedItems(
         $iItemId,
@@ -1223,9 +1347,10 @@ class Base
 
     /**
      * Counts all objects
-     * @param  array   $adata           An array of data to pass to getCountCommon()
+     * @param  array   $aData           An array of data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
      * @return integer
+     * @throws ModelException
      */
     public function countAll($aData = array(), $bIncludeDeleted = false)
     {
@@ -1238,6 +1363,8 @@ class Base
             $table  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
         }
 
+        $oDb = Factory::service('Database');
+
         // --------------------------------------------------------------------------
 
         //  Apply common items
@@ -1247,14 +1374,13 @@ class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->destructiveDelete && !$bIncludeDeleted) {
-
             $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $this->db->where($sPrefix . $this->tableDeletedColumn, false);
+            $oDb->where($sPrefix . $this->tableDeletedColumn, false);
         }
 
         // --------------------------------------------------------------------------
 
-        return $this->db->count_all_results($table);
+        return $oDb->count_all_results($table);
     }
 
     // --------------------------------------------------------------------------
@@ -1286,7 +1412,7 @@ class Base
         $oOut->page    = $iPage;
         $oOut->perPage = $iPerPage;
         $oOut->total   = $this->countAll($aData);
-        $oOut->data    = $this->getAll($iPage, $iPerPage, $aData);
+        $oOut->data    = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
 
         return $oOut;
     }
@@ -1310,6 +1436,7 @@ class Base
      * @param int    $ignoreId An ID to ignore when searching
      * @param string $idColumn The column to use for the ID, defaults to $this->tableIdColumn
      * @return string
+     * @throws ModelException
      */
     protected function generateSlug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
     {
@@ -1321,10 +1448,6 @@ class Base
             }
 
             $table = $this->table;
-
-        } else {
-
-            $table = $table;
         }
 
         if (is_null($column)) {
@@ -1334,15 +1457,12 @@ class Base
             }
 
             $column = $this->tableSlugColumn;
-
-        } else {
-
-            $column = $column;
         }
 
         // --------------------------------------------------------------------------
 
         $counter = 0;
+        $oDb     = Factory::service('Database');
 
         do {
 
@@ -1360,13 +1480,13 @@ class Base
             if ($ignoreId) {
 
                 $sIdColumn = $idColumn ? $idColumn : $this->tableIdColumn;
-                $this->db->where($sIdColumn . ' !=', $ignoreId);
+                $oDb->where($sIdColumn . ' !=', $ignoreId);
             }
 
-            $this->db->where($column, $slugTest);
+            $oDb->where($column, $slugTest);
             $counter++;
 
-        } while ($this->db->count_all_results($table));
+        } while ($oDb->count_all_results($table));
 
         return $slugTest;
     }
@@ -1380,7 +1500,7 @@ class Base
      * correctly format the output. Use this to cast integers and booleans and/or organise data into objects.
      *
      * @param  object $oObj      A reference to the object being formatted.
-     * @param  array  $aData     The same data array which is passed to _getcount_common, for reference if needed
+     * @param  array  $aData     The same data array which is passed to _getCountCommon, for reference if needed
      * @param  array  $aIntegers Fields which should be cast as integers if numerical and not null
      * @param  array  $aBools    Fields which should be cast as booleans if not null
      * @param  array  $aFloats   Fields which should be cast as floats if not null
@@ -1452,5 +1572,69 @@ class Base
     public function getTablePrefix()
     {
         return $this->tablePrefix;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Define expandable objects
+     * @param $aOptions array An array describing the expandable field
+     * @throws ModelException
+     */
+    protected function addExpandableField($aOptions)
+    {
+        //  Validation
+        if (!array_key_exists('trigger', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "trigger".');
+        }
+
+        if (!array_key_exists('type', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "type".');
+        }
+
+        if (!array_key_exists('property', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "property".');
+        }
+
+        if (!array_key_exists('model', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "model".');
+        }
+
+        if (!array_key_exists('provider', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "provider".');
+        }
+
+        if (!array_key_exists('id_column', $aOptions)) {
+            throw new ModelException('Expandable fields must define a "id_column".');
+        }
+
+        $this->aExpandableFields[] = (object) array(
+
+            //  The text which triggers this expansion, passed in via $aData['expand']
+            'trigger' => $aOptions['trigger'],
+
+            //  The type of expansion: single or many
+            //  This must be one of static::EXPAND_TYPE_SINGLE or static::EXPAND_TYPE_MANY
+            'type' => $aOptions['type'],
+
+            //  What property to assign the results of the expansion to
+            'property' => $aOptions['property'],
+
+            //  Which model to use for the expansion
+            'model' => $aOptions['model'],
+
+            //  The provider of the model
+            'provider' => $aOptions['provider'],
+
+            /**
+             * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
+             * parent object which contains the ID, for EXPANDABLE_TYPE_MANY, this is the
+             * property of the child object which contains the parent's ID.
+             */
+            'id_column' => $aOptions['id_column'],
+
+            //  Whether the field is expanded by default
+            'auto_expand' => !empty($aOptions['auto_expand'])
+        );
     }
 }
