@@ -35,6 +35,13 @@ return array(
                 return new \Nails\Common\Library\Event();
             }
         },
+        'HttpCodes' => function () {
+            if (class_exists('\App\Common\Library\HttpCodes')) {
+                return new \App\Common\Library\HttpCodes();
+            } else {
+                return new \Nails\Common\Library\HttpCodes();
+            }
+        },
         'FormValidation' => function () {
             $oCi = get_instance();
             $oCi->load->library('form_validation');
