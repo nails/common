@@ -155,53 +155,55 @@ if (!function_exists('stringToBoolean')) {
 if (!function_exists('isIpInRange')) {
 
     /**
-     * Match an IP to a given CIDR range
-     * @param   string
-     * @return  boolean
+     * Determines whether an IP Address falls within a CIDR range
+     * @param $sIp    string The IP Address to test
+     * @param $mRange mixed  The CIDR range, either as a string, or an array of ranges
+     * @return bool
      */
-    function isIpInRange($ip, $range)
+    function isIpInRange($sIp, $mRange)
     {
-        if (!is_array($range)) {
+        if (!is_array($mRange)) {
 
             //  Prepare the range
-            $range_raw = $range;
-            $range_raw = str_replace("\n\r", "\n", $range_raw);
-            $range_raw = explode("\n", $range_raw);
-            $range     = array();
+            $mRangeRaw = $mRange;
+            $mRangeRaw = str_replace("\n\r", "\n", $mRangeRaw);
+            $aRangeRaw = explode("\n", $mRangeRaw);
+            $aRange    = array();
 
-            foreach ($range_raw as $line) {
-
-                $range = array_merge(explode(',', $line), $range);
+            foreach ($aRangeRaw as $line) {
+                $aRange = array_merge(explode(',', $line), $aRange);
             }
 
-            $range = array_unique($range);
-            $range = array_filter($range);
-            $range = array_map('trim', $range);
-            $range = array_values($range);
+            $aRange = array_unique($aRange);
+            $aRange = array_filter($aRange);
+            $aRange = array_map('trim', $aRange);
+            $aRange = array_values($aRange);
 
         } else {
 
-            $range = $range;
+            $aRange = $mRange;
         }
 
-        foreach ($range as $cidr_mask) {
+        foreach ($aRange as $sCIDRMask) {
 
-            if (strpos($cidr_mask, '/') !== false) {
+            if (strpos($sCIDRMask, '/') !== false) {
 
                 //  Hat tip: http://stackoverflow.com/a/594134/789224
-                list ($subnet, $bits) = explode('/', $cidr_mask);
-                $ip     = ip2long($ip);
-                $subnet = ip2long($subnet);
-                $mask   = -1 << (32 - $bits);
-                $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+                list ($sSubnet, $sBits) = explode('/', $sCIDRMask);
 
-                if (($ip & $mask) == $subnet) {
+                $iBits   = (int) $sBits;
+                $iIp     = ip2long($sIp);
+                $sSubnet = ip2long($sSubnet);
+                $iMask   = -1 << (32 - $iBits);
+                $sSubnet &= $iMask; # nb: in case the supplied subnet wasn't correctly aligned
+
+                if (($iIp & $iMask) == $sSubnet) {
                     return true;
                 }
 
             } else {
 
-                if ($ip == $cidr_mask) {
+                if ($sIp == $sCIDRMask) {
                     return true;
                 }
             }
