@@ -691,20 +691,30 @@ class Install extends Base
         if (file_exists($path)) {
 
             $appFile = file_get_contents($path);
-            $pattern = '/define\([\'|"](.+?)[\'|"]\,.*[\'|"](.*?)[\'|"]\)/';
+            $pattern = '/define\([\'|"](.+?)[\'|"]\,(.*)\)/';
             preg_match_all($pattern, $appFile, $matches);
 
             if (!empty($matches[0])) {
 
                 $numMatches = count($matches[0]);
+
+                //  Remove quotes from stringy values
+                for ($i = 0; $i < $numMatches; $i++) {
+
+                    $matches[2][$i] = trim($matches[2][$i]);
+
+                    if (substr($matches[2][$i], 0, 1) == '\'' || substr($matches[2][$i], 0, 1) == '"') {
+                        //  Remove the first and last character; subtracting 2 to account for the removal of both chars
+                        $matches[2][$i] = substr($matches[2][$i], 1, strlen($matches[2][$i])-2);
+                    }
+                }
+
                 for ($i = 0; $i < $numMatches; $i++) {
 
                     //  Check to see if it's already been requested
                     $exists = false;
                     foreach ($vars as $existing) {
-
                         if (!is_string($existing) && $existing['key'] == $matches[1][$i]) {
-
                             $exists = true;
                         }
                     }
