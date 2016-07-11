@@ -851,7 +851,16 @@ class Install extends Base
 
             } else {
 
-                fwrite($fp, "define('" . $v['key'] . "', '" . str_replace("'", "\'", $v['value']) . "');\n");
+                if (is_numeric($v['value'])) {
+
+                    $sValue = $v['value'];
+
+                } else {
+
+                    $sValue = "'" . str_replace("'", "\'", $v['value']) . "'";
+                }
+
+                fwrite($fp, "define('" . $v['key'] . "', " . $sValue . ");\n");
             }
         }
 
