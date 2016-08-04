@@ -233,6 +233,12 @@ class Base
 
         // --------------------------------------------------------------------------
 
+        //  If there are any expandable fields which should automatically save,
+        //  then separate them out now
+        $aAutoSaveExpandableFields = $this->autoSaveExpandableFieldsExtract($aData);
+
+        // --------------------------------------------------------------------------
+
         if ($this->tableAutoSetTimestamps) {
 
             $oDate = Factory::factory('DateTime');
@@ -314,6 +320,11 @@ class Base
 
             // --------------------------------------------------------------------------
 
+            //  Save any expandable objects
+            $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
+
+            // --------------------------------------------------------------------------
+
             //  @todo - Hook into the Event service and automatically trigger CREATED event
 
             // --------------------------------------------------------------------------
@@ -355,6 +366,12 @@ class Base
         }
 
         $oDb = Factory::service('Database');
+
+        // --------------------------------------------------------------------------
+
+        //  If there are any expandable fields which should automatically save,
+        //  then separate them out now
+        $aAutoSaveExpandableFields = $this->autoSaveExpandableFieldsExtract($aData);
 
         // --------------------------------------------------------------------------
 
@@ -436,6 +453,17 @@ class Base
         }
 
         $bResult = $oDb->update($sTable);
+
+        // --------------------------------------------------------------------------
+
+        //  Save any expandable objects
+        if (is_array($mIds)) {
+            foreach ($mIds as $iId) {
+                $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
+            }
+        } else {
+            $this->autoSaveExpandableFieldsSave($mIds, $aAutoSaveExpandableFields);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -1592,6 +1620,12 @@ class Base
             throw new ModelException('Expandable fields must define a "type".');
         }
 
+        if ($aOptions['type'] == self::EXPANDABLE_TYPE_SINGLE && !empty($aOptions['auto_save'])) {
+            throw new ModelException(
+                'Auto saving an expandable field is incompatible with type self::EXPANDABLE_TYPE_SINGLE'
+            );
+        }
+
         if (!array_key_exists('property', $aOptions)) {
             throw new ModelException('Expandable fields must define a "property".');
         }
@@ -1634,7 +1668,61 @@ class Base
             'id_column' => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => !empty($aOptions['auto_expand'])
+            'auto_expand' => !empty($aOptions['auto_expand']),
+
+            //  Whether to automatically save expanded objects when the trigger is
+            //  passed as a key to the create or update methods
+            'auto_save' => !empty($aOptions['auto_save'])
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts any autosaveable expandable fields and unsets them from the main array
+     * @param  array $aData The data passed to create() or update()
+     * @return array
+     */
+    protected function autoSaveExpandableFieldsExtract(&$aData)
+    {
+        $aFields = array();
+        $aOut    = array();
+
+        foreach ($this->aExpandableFields as $oField) {
+            $aFields[$oField->trigger] = $oField;
+        }
+
+        foreach ($aData as $sKey => $mValue) {
+            if (!empty($aFields[$sKey])) {
+                $aOut[$sKey]       = $aFields[$sKey];
+                $aOut[$sKey]->data = $mValue;
+                unset($aData[$sKey]);
+            }
+        }
+
+        return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Saves extracted expandable fields
+     * @param integer $iId
+     * @param array  $aExpandableFields
+     */
+    protected function autoSaveExpandableFieldsSave($iId, $aExpandableFields)
+    {
+        foreach ($aExpandableFields as $oField) {
+            $aData = array_filter($oField->data);
+            if (!empty($aData)) {
+                $this->saveAsscociatedItems(
+                    $iId,
+                    $aData,
+                    $oField->id_column,
+                    $oField->model,
+                    $oField->provider
+                );
+            }
+        }
     }
 }

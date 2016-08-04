@@ -33,8 +33,11 @@ $aOptions = array(
     'id_column' => 'item_id',
 
     //  Whether the field is expanded by default
-    'auto_expand' => true
-
+    'auto_expand' => true,
+    
+    //  Whether to automatically save expanded objects when the trigger is
+    //  passed as a key to the create or update methods
+    'auto_save' => true
 )
 
 $this->addExpandableField($aOptions);
