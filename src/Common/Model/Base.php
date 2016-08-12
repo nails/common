@@ -1689,7 +1689,9 @@ class Base
         $aOut    = array();
 
         foreach ($this->aExpandableFields as $oField) {
-            $aFields[$oField->trigger] = $oField;
+            if ($oField->auto_save) {
+                $aFields[$oField->trigger] = $oField;
+            }
         }
 
         foreach ($aData as $sKey => $mValue) {
@@ -1713,15 +1715,17 @@ class Base
     protected function autoSaveExpandableFieldsSave($iId, $aExpandableFields)
     {
         foreach ($aExpandableFields as $oField) {
-            $aData = array_filter($oField->data);
-            if (!empty($aData)) {
-                $this->saveAsscociatedItems(
-                    $iId,
-                    $aData,
-                    $oField->id_column,
-                    $oField->model,
-                    $oField->provider
-                );
+            if (is_array($oField->data)) {
+                $aData = array_filter($oField->data);
+                if (!empty($aData)) {
+                    $this->saveAsscociatedItems(
+                        $iId,
+                        $aData,
+                        $oField->id_column,
+                        $oField->model,
+                        $oField->provider
+                    );
+                }
             }
         }
     }
