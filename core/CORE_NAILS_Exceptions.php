@@ -11,10 +11,32 @@
  * @link
  */
 
+use Nails\Common\Exception\NailsException;
+
 class CORE_NAILS_Exceptions extends CI_Exceptions
 {
-    private $error_has_occured = false;
-    private $recent_errors     = array();
+    private $error_has_occurred = false;
+    private $recent_errors      = array();
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Override the show_error method in order to throw an exception rather than display a screen.
+     * @param  string $heading     Unused
+     * @param  string $message     The exception message (can be an array)
+     * @param  string $template    Unused
+     * @param  int    $status_code The exception number
+     * @throws \Nails\Common\Exception\NailsException
+     * @return void
+     */
+    public function show_error($heading, $message, $template = 'error_general', $status_code = 500)
+    {
+        if (is_array($message)) {
+            $message = implode($message, ' ');
+        }
+
+        throw new NailsException($message, $status_code);
+    }
 
     // --------------------------------------------------------------------------
 
@@ -26,9 +48,11 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
      * but when executed on a production box we want errors to be logged to the DB and
      * any output muted. Sever errors should generate an exception in the CodeBase project
      *
-     * @param   string  a message to pass to the view, if any
-     * @param   boolean whether to log the error or not
-     * @return  void
+     * @param  string  $severity
+     * @param  string  $message
+     * @param  string  $filepath
+     * @param  integer $line
+     * @return string
      */
     public function show_php_error($severity, $message, $filepath, $line)
     {
@@ -90,7 +114,8 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
 
     /**
      * Renders the 404 page and halts script execution
-     * @param  string $page The URI which 404'd
+     * @param string $page      The URI which 404'd
+     * @param bool   $logError  Whether to log the error
      * @return void
      */
     public function show_404($page = '', $logError = true)
@@ -118,16 +143,24 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
         $requestMethod = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
 
         if ($logError && $requestMethod != 'HEAD') {
-
             log_message('error', '404 Page Not Found --> ' . $page);
         }
 
-        if (!defined('NAILS_IS_404')) {
+        defineConst('NAILS_IS_404', true);
 
-            define('NAILS_IS_404', true);
+        set_status_header(404);
+
+        $message = '<p>'.implode('</p><p>', ( ! is_array($message)) ? array($message) : $message).'</p>';
+
+        if (ob_get_level() > $this->ob_level + 1)
+        {
+            ob_end_flush();
         }
-
-        echo $this->show_error($heading, $message, 'error_404', 404);
+        ob_start();
+        include(APPPATH.'errors/error_404.php');
+        $buffer = ob_get_contents();
+        ob_end_clean();
+        echo $buffer;
         exit;
     }
 }
