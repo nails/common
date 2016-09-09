@@ -28,8 +28,8 @@ class AppNotification extends Base
 
         // --------------------------------------------------------------------------
 
-        $this->table        = NAILS_DB_PREFIX . 'app_notification';
-        $this->tablePrefix = 'n';
+        $this->table         = NAILS_DB_PREFIX . 'app_notification';
+        $this->tableAlias    = 'n';
         $this->notifications = array();
         $this->emails        = array();
 

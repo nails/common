@@ -1508,7 +1508,7 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Returns protected property $tablePrefix
+     * Returns protected property $tableAlias
      * @param bool $bIncludeSeparator Whether to include the prefix separator
      * @return string
      */
