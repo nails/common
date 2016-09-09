@@ -14,9 +14,9 @@ namespace Nails\Common\Model;
 
 use Nails\Factory;
 use Nails\Common\Exception\ModelException;
-use \Nails\Common\Traits\ErrorHandling;
-use \Nails\Common\Traits\Caching;
-use \Nails\Common\Traits\GetCountCommon;
+use Nails\Common\Traits\ErrorHandling;
+use Nails\Common\Traits\Caching;
+use Nails\Common\Traits\GetCountCommon;
 
 class Base
 {
@@ -33,7 +33,7 @@ class Base
 
     //  Data/Table structure
     protected $table;
-    protected $tablePrefix;
+    protected $tableAlias;
 
     //  Column names
     protected $tableIdColumn;
@@ -88,10 +88,10 @@ class Base
      * @param   string
      * @access private
      */
-    public function __get($key)
+    public function __get($sKey)
     {
-        $CI =& get_instance();
-        return $CI->$key;
+        $oCi =& get_instance();
+        return $oCi->$sKey;
     }
 
     /**
@@ -141,8 +141,8 @@ class Base
          * @todo  allow some sort of cleansing callback so that models can prep the
          * search string if needed.
          */
-        $this->searchableFields[] = $this->tablePrefix . $this->tableIdColumn;
-        $this->searchableFields[] = $this->tablePrefix . $this->tableLabelColumn;
+        $this->searchableFields[] = $this->tableIdColumn;
+        $this->searchableFields[] = $this->tableLabelColumn;
 
         // --------------------------------------------------------------------------
 
@@ -194,12 +194,12 @@ class Base
 
     /**
      * Inject the user object, private by convention - only really used by a few core Nails classes
-     * @param object $user The user object
+     * @param object $oUser The user object
      * @return void
      */
-    public function setUserObject(&$user)
+    public function setUserObject(&$oUser)
     {
-        $this->user = $user;
+        $this->user = $oUser;
     }
 
     /**
@@ -225,11 +225,8 @@ class Base
      */
     public function create($aData = array(), $bReturnObject = false)
     {
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::create() Table variable not set', 1);
-        }
-
-        $oDb = Factory::service('Database');
+        $oDb    = Factory::service('Database');
+        $sTable = $this->getTableName();
 
         // --------------------------------------------------------------------------
 
@@ -286,7 +283,7 @@ class Base
 
                 throw new ModelException(
                     get_called_class() . '::create() "' . $this->tableLabelColumn .
-                    '" is required when automatically generting slugs.',
+                    '" is required when automatically generating slugs.',
                     1
                 );
             }
@@ -312,7 +309,7 @@ class Base
             }
         }
 
-        $oDb->insert($this->table);
+        $oDb->insert($sTable);
 
         if ($oDb->affected_rows()) {
 
@@ -329,18 +326,11 @@ class Base
 
             // --------------------------------------------------------------------------
 
-            if ($bReturnObject) {
-
-                return $this->getById($iId);
-
-            } else {
-
-                return $iId;
-            }
+            return $bReturnObject ? $this->getById($iId) : $iId;
 
         } else {
 
-            return false;
+            return null;
         }
     }
 
@@ -355,17 +345,9 @@ class Base
      */
     public function update($mIds, $aData = array())
     {
-        if (!$this->table) {
-
-            throw new ModelException(get_called_class() . '::update() Table variable not set', 1);
-
-        } else {
-
-            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $sTable  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
-        }
-
-        $oDb = Factory::service('Database');
+        $sAlias = $this->getTableAlias(true);
+        $sTable = $this->getTableName(true);
+        $oDb    = Factory::service('Database');
 
         // --------------------------------------------------------------------------
 
@@ -379,19 +361,19 @@ class Base
 
             if (empty($aData[$this->tableModifiedColumn])) {
                 $oDate = Factory::factory('DateTime');
-                $aData[$sPrefix . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
+                $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
             if ($this->user_model->isLoggedIn()) {
 
                 if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$sPrefix . $this->tableModifiedByColumn] = activeUser('id');
+                    $aData[$sAlias . $this->tableModifiedByColumn] = activeUser('id');
                 }
 
             } else {
 
                 if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$sPrefix . $this->tableModifiedByColumn] = null;
+                    $aData[$sAlias . $this->tableModifiedByColumn] = null;
                 }
             }
         }
@@ -399,7 +381,7 @@ class Base
         if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
 
             if (is_array($mIds)) {
-                throw new ModelException('Cannot autogenerate slugs when updating multiple items.', 1);
+                throw new ModelException('Cannot auto generate slugs when updating multiple items.', 1);
             }
 
             if (empty($this->tableSlugColumn)) {
@@ -415,7 +397,7 @@ class Base
              *  no label, assume slug is unchanged.
              */
             if (!empty($aData[$this->tableLabelColumn])) {
-                $aData[$sPrefix . $this->tableSlugColumn] = $this->generateSlug(
+                $aData[$sAlias . $this->tableSlugColumn] = $this->generateSlug(
                     $aData[$this->tableLabelColumn],
                     '',
                     '',
@@ -447,9 +429,9 @@ class Base
         // --------------------------------------------------------------------------
 
         if (is_array($mIds)) {
-            $oDb->where_in($sPrefix . 'id', $mIds);
+            $oDb->where_in($sAlias . 'id', $mIds);
         } else {
-            $oDb->where($sPrefix . 'id', $mIds);
+            $oDb->where($sAlias . 'id', $mIds);
         }
 
         $bResult = $oDb->update($sTable);
@@ -489,13 +471,6 @@ class Base
      */
     public function delete($mIds)
     {
-        //  Perform this check here so the error message is more easily traced.
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::delete() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
         if ($this->destructiveDelete) {
 
             //  Destructive delete; nuke that row.
@@ -525,7 +500,7 @@ class Base
     /**
      * Unmarks an object as deleted
      *
-     * If destructive deletion is enabled then this method will return false.
+     * If destructive deletion is enabled then this method will return null.
      * If Non-destructive deletion is enabled then the $this->tableDeletedColumn
      * field will be set to false.
      *
@@ -535,17 +510,10 @@ class Base
      */
     public function restore($iId)
     {
-        //  Perform this check here so the error message is more easily traced.
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::restore() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
         if ($this->destructiveDelete) {
 
             //  Destructive delete; can't be resurrecting the dead.
-            return false;
+            return null;
 
         } else {
 
@@ -580,12 +548,8 @@ class Base
      */
     public function destroy($mIds)
     {
-        //  Perform this check here so the error message is more easily traced.
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::destroy() Table variable not set', 1);
-        }
-
-        $oDb = Factory::service('Database');
+        $oDb    = Factory::service('Database');
+        $sTable = $this->getTableName();
 
         // --------------------------------------------------------------------------
 
@@ -595,7 +559,7 @@ class Base
             $oDb->where('id', $mIds);
         }
 
-        $bResult = $oDb->delete($this->table);
+        $bResult = $oDb->delete($sTable);
 
         // --------------------------------------------------------------------------
 
@@ -617,73 +581,61 @@ class Base
 
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
-     * @param  int    $page           The page number of the results, if null then no pagination
-     * @param  int    $perPage        How many items per page of paginated results
-     * @param  mixed  $data           Any data to pass to getCountCommon()
-     * @param  bool   $includeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @param  int    $iPage           The page number of the results, if null then no pagination
+     * @param  int    $iPerPage        How many items per page of paginated results
+     * @param  mixed  $aData           Any data to pass to getCountCommon()
+     * @param  bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      * @return object
      * @throws ModelException
      */
-    public function getAllRawQuery($page = null, $perPage = null, $data = array(), $includeDeleted = false)
+    public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
     {
-        if (!$this->table) {
-
-            throw new ModelException(get_called_class() . '::getAllRawQuery() Table variable not set', 1);
-
-        } else {
-
-            $table = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
-        }
-
-        // --------------------------------------------------------------------------
-
-        $oDb = Factory::service('Database');
+        $oDb    = Factory::service('Database');
+        $sTable = $this->getTableName(true);
 
         // --------------------------------------------------------------------------
 
         //  Define the default sorting
-        if (empty($data['sort']) && !empty($this->defaultSortColumn)) {
-            $data['sort'] = array(
-                $this->tablePrefix . '.' . $this->defaultSortColumn,
+        if (empty($aData['sort']) && !empty($this->defaultSortColumn)) {
+            $aData['sort'] = array(
+                $this->getTableAlias(true) . $this->defaultSortColumn,
                 $this->defaultSortOrder
             );
         }
 
         // --------------------------------------------------------------------------
 
-        //  Apply common items; pass $data
-        $this->getCountCommon($data);
+        //  Apply common items; pass $aData
+        $this->getCountCommon($aData);
 
         // --------------------------------------------------------------------------
 
         //  Facilitate pagination
-        if (!is_null($page)) {
+        if (!is_null($iPage)) {
 
             /**
              * Adjust the page variable, reduce by one so that the offset is calculated
              * correctly. Make sure we don't go into negative numbers
              */
 
-            $page--;
-            $page = $page < 0 ? 0 : $page;
+            $iPage--;
+            $iPage = $iPage < 0 ? 0 : $iPage;
 
             //  Work out what the offset should be
-            $perPage = is_null($perPage) ? $this->perPage : (int) $perPage;
-            $offset   = $page * $perPage;
+            $iPerPage = is_null($iPerPage) ? $this->perPage : (int) $iPerPage;
+            $iOffset  = $iPage * $iPerPage;
 
-            $oDb->limit($perPage, $offset);
+            $oDb->limit($iPerPage, $iOffset);
         }
 
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->destructiveDelete && !$includeDeleted) {
-
-            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $oDb->where($sPrefix . $this->tableDeletedColumn, false);
+        if (!$this->destructiveDelete && !$bIncludeDeleted) {
+            $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
         }
 
-        return $oDb->get($table);
+        return $oDb->get($sTable);
     }
 
     // --------------------------------------------------------------------------
@@ -698,9 +650,9 @@ class Base
      */
     public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
     {
-        $oResults   = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
-        $aResults   = $oResults->result();
-        $numResults = count($aResults);
+        $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
+        $aResults    = $oResults->result();
+        $iNumResults = count($aResults);
 
         /**
          * Handle requests for expanding objects.
@@ -719,7 +671,7 @@ class Base
 
                 //  If we're not auto-expanding, check if we should expand based on the `expand` index of $aData
                 if (!$bAutoExpand && array_key_exists('expand', $aData)) {
-                    $bExpandAll        = $aData['expand'] == static::EXPAND_ALL;
+                    $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
                     if (!$bExpandAll && is_array($aData['expand'])) {
                         $bExpandForTrigger = in_array($oExpandableField->trigger, $aData['expand']);
                     }
@@ -751,7 +703,7 @@ class Base
             }
         }
 
-        for ($i = 0; $i < $numResults; $i++) {
+        for ($i = 0; $i < $iNumResults; $i++) {
             $this->formatObject($aResults[$i], $aData);
         }
 
@@ -762,28 +714,27 @@ class Base
 
     /**
      * Fetches all objects as a flat array
-     * @param  int     $page           The page number of the results
-     * @param  int     $perPage        The number of items per page
-     * @param  array   $data           Any data to pass to getCountCommon()
-     * @param  boolean $includeDeleted Whether or not to include deleted items
+     * @param  int     $iPage           The page number of the results
+     * @param  int     $iPerPage        The number of items per page
+     * @param  array   $aData           Any data to pass to getCountCommon()
+     * @param  boolean $bIncludeDeleted Whether or not to include deleted items
      * @return array
      * @throws ModelException
      */
-    public function getAllFlat($page = null, $perPage = null, $data = array(), $includeDeleted = false)
+    public function getAllFlat($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
     {
-        $items = $this->getAll($page, $perPage, $data, $includeDeleted);
-        $out   = array();
+        $aItems = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
+        $aOut   = array();
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
-        if (!$items) {
-
+        if (!$aItems) {
             return array();
         }
 
         // --------------------------------------------------------------------------
 
         //  Test columns
-        $oTest = reset($items);
+        $oTest = reset($aItems);
 
         if (!property_exists($oTest, $this->tableLabelColumn)) {
             throw new ModelException(
@@ -803,11 +754,11 @@ class Base
 
         // --------------------------------------------------------------------------
 
-        foreach ($items as $item) {
-            $out[$item->{$this->tableIdColumn}] = $item->{$this->tableLabelColumn};
+        foreach ($aItems as $oItem) {
+            $aOut[$oItem->{$this->tableIdColumn}] = $oItem->{$this->tableLabelColumn};
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
@@ -821,18 +772,8 @@ class Base
      */
     public function getById($iId, $aData = array())
     {
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::getById() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-
-        // --------------------------------------------------------------------------
-
         if (empty($iId)) {
-            return false;
+            return null;
         }
 
         // --------------------------------------------------------------------------
@@ -841,7 +782,7 @@ class Base
             $aData['where'] = array();
         }
 
-        $aData['where'][] = array($sPrefix . $this->tableIdColumn, $iId);
+        $aData['where'][] = array($this->getTableAlias(true) . $this->tableIdColumn, $iId);
 
         // --------------------------------------------------------------------------
 
@@ -850,7 +791,7 @@ class Base
         // --------------------------------------------------------------------------
 
         if (empty($aResult)) {
-            return false;
+            return null;
         }
 
         // --------------------------------------------------------------------------
@@ -869,16 +810,6 @@ class Base
      */
     public function getByIds($aIds, $aData = array())
     {
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::getByIds() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-
-        // --------------------------------------------------------------------------
-
         if (empty($aIds)) {
             return array();
         }
@@ -886,11 +817,10 @@ class Base
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where_in'])) {
-
             $aData['where_in'] = array();
         }
 
-        $aData['where_in'][] = array($sPrefix . $this->tableIdColumn, $aIds);
+        $aData['where_in'][] = array($this->getTableAlias(true) . $this->tableIdColumn, $aIds);
 
         // --------------------------------------------------------------------------
 
@@ -908,28 +838,17 @@ class Base
      */
     public function getBySlug($sSlug, $aData = array())
     {
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::getBySlug() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-
-        // --------------------------------------------------------------------------
-
         if (empty($sSlug)) {
-            return false;
+            return null;
         }
 
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where'])) {
-
             $aData['where'] = array();
         }
 
-        $aData['where'][] = array($sPrefix . $this->tableSlugColumn, $sSlug);
+        $aData['where'][] = array($this->getTableAlias(true) . $this->tableSlugColumn, $sSlug);
 
         // --------------------------------------------------------------------------
 
@@ -938,8 +857,7 @@ class Base
         // --------------------------------------------------------------------------
 
         if (empty($aResult)) {
-
-            return false;
+            return null;
         }
 
         // --------------------------------------------------------------------------
@@ -958,16 +876,6 @@ class Base
      */
     public function getBySlugs($aSlugs, $aData = array())
     {
-        if (!$this->table) {
-            throw new ModelException(get_called_class() . '::getBySlugs() Table variable not set', 1);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-
-        // --------------------------------------------------------------------------
-
         if (empty($aSlugs)) {
             return array();
         }
@@ -975,11 +883,10 @@ class Base
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where_in'])) {
-
             $aData['where_in'] = array();
         }
 
-        $aData['where_in'][] = array($sPrefix . $this->tableSlugColumn, $aSlugs);
+        $aData['where_in'][] = array($this->getTableAlias(true) . $this->tableSlugColumn, $aSlugs);
 
         // --------------------------------------------------------------------------
 
@@ -1034,7 +941,8 @@ class Base
         $sAssociatedModelProvider,
         $aAssociatedModelData = array(),
         $bUnsetOriginalProperty = true
-    ) {
+    )
+    {
         if (!empty($aItems)) {
 
             $oAssociatedModel   = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
@@ -1092,7 +1000,8 @@ class Base
         $sAssociatedModel,
         $sAssociatedModelProvider,
         $aAssociatedModelData = array()
-    ) {
+    )
+    {
         if (!empty($aItems)) {
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
@@ -1114,7 +1023,7 @@ class Base
             }
 
             $aAssociatedModelData['where_in'][] = array(
-                $oAssociatedModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn,
+                $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn,
                 $aItemIds
             );
 
@@ -1150,7 +1059,8 @@ class Base
         $sAssociatedModel,
         $sAssociatedModelProvider,
         $aAssociatedModelData = array()
-    ) {
+    )
+    {
         if (!empty($aItems)) {
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
@@ -1167,8 +1077,8 @@ class Base
 
             //  Limit the select
             $aAssociatedModelData['select'] = array(
-                $oAssociatedModel->getTablePrefix() . '.id',
-                $oAssociatedModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn
+                $oAssociatedModel->getTableAlias() . '.id',
+                $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn
             );
 
             if (empty($aAssociatedModelData['where_in'])) {
@@ -1214,7 +1124,8 @@ class Base
         $aAssociatedModelData = array(),
         $sTaxonomyItemIdColumn = 'item_id',
         $sTaxonomyAssociatedIdColumn = 'associated_id'
-    ) {
+    )
+    {
         if (!empty($aItems)) {
 
             //  Load the required models
@@ -1292,7 +1203,7 @@ class Base
      * @return boolean
      * @throws ModelException
      */
-    protected function saveAsscociatedItems(
+    protected function saveAssociatedItems(
         $iItemId,
         $aAssociatedItems,
         $sAssociatedItemIdColumn,
@@ -1306,7 +1217,7 @@ class Base
         //  Get IDs of current items, we'll compare these later to see which ones to delete.
         $aData = array(
             'where' => array(
-                array($oAssociatedItemModel->getTablePrefix() . '.' . $sAssociatedItemIdColumn, $iItemId)
+                array($oAssociatedItemModel->getTableAlias() . '.' . $sAssociatedItemIdColumn, $iItemId)
             )
         );
 
@@ -1382,16 +1293,8 @@ class Base
      */
     public function countAll($aData = array(), $bIncludeDeleted = false)
     {
-        if (!$this->table) {
-
-            throw new ModelException(get_called_class() . '::countAll() Table variable not set', 1);
-
-        } else {
-
-            $table  = $this->tablePrefix ? $this->table . ' ' . $this->tablePrefix : $this->table;
-        }
-
-        $oDb = Factory::service('Database');
+        $oDb   = Factory::service('Database');
+        $table = $this->getTableName(true);
 
         // --------------------------------------------------------------------------
 
@@ -1402,8 +1305,7 @@ class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->destructiveDelete && !$bIncludeDeleted) {
-            $sPrefix = $this->tablePrefix ? $this->tablePrefix . '.' : '';
-            $oDb->where($sPrefix . $this->tableDeletedColumn, false);
+            $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
         }
 
         // --------------------------------------------------------------------------
@@ -1429,9 +1331,11 @@ class Base
             $aData['or_like'] = array();
         }
 
+        $sAlias = $this->getTableAlias(true);
+
         foreach ($this->searchableFields as $mField) {
             $aData['or_like'][] = array(
-                'column' => $mField,
+                'column' => $sAlias . $mField,
                 'value'  => $sKeywords
             );
         }
@@ -1456,67 +1360,70 @@ class Base
 
     /**
      * This method provides the functionality to generate a unique slug for an item in the database.
-     * @param string $label    The label from which to generate a slug
-     * @param string $prefix   Any prefix to add to the slug
-     * @param string $suffix   Any suffix to add to the slug
-     * @param string $table    The table to use defaults to $this->table
-     * @param string $column   The column to use, defaults to $this->tableSlugColumn
-     * @param int    $ignoreId An ID to ignore when searching
-     * @param string $idColumn The column to use for the ID, defaults to $this->tableIdColumn
+     * @param string $sLabel    The label from which to generate a slug
+     * @param string $sPrefix   Any prefix to add to the slug
+     * @param string $sSuffix   Any suffix to add to the slug
+     * @param string $sTable    The table to use defaults to $this->table
+     * @param string $sColumn   The column to use, defaults to $this->tableSlugColumn
+     * @param int    $iIgnoreId An ID to ignore when searching
+     * @param string $sIdColumn The column to use for the ID, defaults to $this->tableIdColumn
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug($label, $prefix = '', $suffix = '', $table = null, $column = null, $ignoreId = null, $idColumn = null)
+    protected function generateSlug(
+        $sLabel,
+        $sPrefix = '',
+        $sSuffix = '',
+        $sTable = null,
+        $sColumn = null,
+        $iIgnoreId = null,
+        $sIdColumn = null
+    )
     {
         //  Perform this check here so the error message is more easily traced.
-        if (is_null($table)) {
-
-            if (!$this->table) {
-                throw new ModelException(get_called_class() . '::generateSlug() Table variable not set', 1);
-            }
-
-            $table = $this->table;
+        if (is_null($sTable)) {
+            $sTable = $this->getTableName();
         }
 
-        if (is_null($column)) {
+        if (is_null($sColumn)) {
 
             if (!$this->tableSlugColumn) {
                 throw new ModelException(get_called_class() . '::generateSlug() Column variable not set', 1);
             }
 
-            $column = $this->tableSlugColumn;
+            $sColumn = $this->tableSlugColumn;
         }
 
         // --------------------------------------------------------------------------
 
-        $counter = 0;
-        $oDb     = Factory::service('Database');
+        $iCounter = 0;
+        $oDb      = Factory::service('Database');
 
         do {
 
-            $slug = url_title(str_replace('/', '-', $label), 'dash', true);
+            $sSlug = url_title(str_replace('/', '-', $sLabel), 'dash', true);
 
-            if ($counter) {
+            if ($iCounter) {
 
-                $slugTest = $prefix . $slug . $suffix . '-' . $counter;
+                $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
 
             } else {
 
-                $slugTest = $prefix . $slug . $suffix;
+                $sSlugTest = $sPrefix . $sSlug . $sSuffix;
             }
 
-            if ($ignoreId) {
+            if ($iIgnoreId) {
 
-                $sIdColumn = $idColumn ? $idColumn : $this->tableIdColumn;
-                $oDb->where($sIdColumn . ' !=', $ignoreId);
+                $sIdColumn = $sIdColumn ? $sIdColumn : $this->tableIdColumn;
+                $oDb->where($sIdColumn . ' !=', $iIgnoreId);
             }
 
-            $oDb->where($column, $slugTest);
-            $counter++;
+            $oDb->where($sColumn, $sSlugTest);
+            $iCounter++;
 
-        } while ($oDb->count_all_results($table));
+        } while ($oDb->count_all_results($sTable));
 
-        return $slugTest;
+        return $sSlugTest;
     }
 
     // --------------------------------------------------------------------------
@@ -1540,7 +1447,8 @@ class Base
         $aIntegers = array(),
         $aBools = array(),
         $aFloats = array()
-    ) {
+    )
+    {
 
         $aIntegers   = (array) $aIntegers;
         $aIntegers[] = $this->tableIdColumn;
@@ -1584,22 +1492,47 @@ class Base
 
     /**
      * Returns protected property $table
+     * @param bool $bIncludePrefix Whether to include the table's alias
+     * @throws ModelException
      * @return string
      */
-    public function getTableName()
+    public function getTableName($bIncludePrefix = false)
     {
-        return $this->table;
+        if (empty($this->table)) {
+            throw new ModelException(get_called_class() . ': Table variable not set', 1);
+        }
+
+        return $bIncludePrefix ? trim($this->table . ' as `' . $this->getTableAlias() . '`') : $this->table;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns protected property $tablePrefix
+     * @param bool $bIncludeSeparator Whether to include the prefix separator
      * @return string
      */
-    public function getTablePrefix()
+    public function getTableAlias($bIncludeSeparator = false)
     {
-        return $this->tablePrefix;
+        $sOut = $this->tableAlias ? $this->tableAlias : '';
+
+        if (empty($sOut)) {
+
+            //  work it out
+            $sTable = strtolower($this->getTableName());
+            $sTable = preg_replace('/[^a-z_]/', '', $sTable);
+            $sTable = preg_replace('/_/', ' ', $sTable);
+            $aTable = explode(' ', $sTable);
+            foreach ($aTable as $sWord) {
+                $sOut .= $sWord[0];
+            }
+        }
+
+        if (!empty($sOut) && $bIncludeSeparator) {
+            $sOut .= '.';
+        }
+
+        return $sOut;
     }
 
     // --------------------------------------------------------------------------
@@ -1718,7 +1651,7 @@ class Base
             if (is_array($oField->data)) {
                 $aData = array_filter($oField->data);
                 if (!empty($aData)) {
-                    $this->saveAsscociatedItems(
+                    $this->saveAssociatedItems(
                         $iId,
                         $aData,
                         $oField->id_column,
