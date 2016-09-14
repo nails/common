@@ -2038,5 +2038,133 @@ EOT;
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('form_field_render')) {
+
+    /**
+     * This function renders a generic form field; the actual contents of the
+     * form field must be passed in via $aField's html parameter
+     * @todo - Implement this into the other functions so all are the same
+     * @todo - Turn this into a class
+     * @param array  $aField The configuration array
+     * @param string $sTip   The tip (deprecated, pass in through $aField)
+     * @return string
+     */
+    function form_field_render($aField, $sTip = null)
+    {
+        if ($sTip) {
+            trigger_error('Use of second parameter as field tip is deprecated.', E_USER_NOTICE);
+        }
+
+        $oField = (object) array(
+            'id'          => getFromArray('id', $aField, null),
+            'type'        => getFromArray('type', $aField, null),
+            'oddeven'     => getFromArray('oddeven', $aField, null),
+            'key'         => getFromArray('key', $aField, null),
+            'label'       => getFromArray('label', $aField, null),
+            'default'     => getFromArray('default', $aField, null),
+            'sub_label'   => getFromArray('sub_label', $aField, null),
+            'required'    => getFromArray('required', $aField, false),
+            'placeholder' => getFromArray('placeholder', $aField, null),
+            'class'       => getFromArray('class', $aField, false),
+            'data'        => getFromArray('data', $aField, array()),
+            'readonly'    => getFromArray('readonly', $aField, false),
+            'info'        => getFromArray('info', $aField, false),
+            'info_class'  => getFromArray('info_class', $aField, false),
+            'tip'         => getFromArray('tip', $aField, $sTip),
+            'error'       => getFromArray('error', $aField, null),
+            'html'        => getFromArray('html', $aField, '')
+        );
+
+        if (is_array($oField->tip)) {
+            $oTip = (object) array(
+                'class' => getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
+                'rel'   => getFromArray('rel', $oField->tip, 'tipsy-left'),
+                'title' => getFromArray('title', $oField->tip, null)
+            );
+        } elseif (is_string($oField->tip)) {
+            $oTip = (object) array(
+                'class' => 'fa fa-question-circle fa-lg tip',
+                'rel'   => 'tipsy-left',
+                'title' => $oField->tip
+            );
+        }
+
+        $sFieldIdTop    = $oField->id ? 'id="field-' . $oField->id . '"': '';
+        $sError         = form_error($oField->key) || $oField->error ? 'error' : '';
+        $sErrorClass    = $sError ? 'error' : '';
+        $sReadonly      = $oField->readonly ? 'readonly="readonly"' : '';
+        $sReadOnlyClass = $oField->readonly ? 'readonly' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Is the label required?
+        $oField->label .= $oField->required ? '*' : '';
+
+        //  Prep sublabel
+        $oField->sub_label = $oField->sub_label ? '<small>' . $oField->sub_label . '</small>' : '';
+
+        //  Has the field got a tip?
+        $sTipClass  = !empty($oTip) ? 'with-tip' : '';
+        $sTipHtml   = !empty($oTip) ? '<b class="' . $oTip->class . '" rel="' . $oTip->rel . '" title="' . htmlentities($oTip->title, ENT_QUOTES) . '"></b>' : '';
+
+        // --------------------------------------------------------------------------
+
+        //  Prep the field's attributes
+        $aAttr = array(
+            $oField->id ? 'id="' . $oField->id . '" ' : '',
+            'class="' . $oField->class . '" ',
+            $sReadonly
+        );
+
+        //  Any data attributes?
+        foreach ($oField->data as $sAttr => $sValue) {
+            $aAttr[] = 'data-' . $sAttr . '="' . $sValue . '"';
+        }
+
+        $sFieldAttr = implode(' ', array_filter($aAttr));
+
+        // --------------------------------------------------------------------------
+
+        //  Errors
+        if ($sError && $oField->error) {
+            //  Manually defined error
+            $sError = '<span class="alert alert-danger">' . $oField->error . '</span>';
+        } elseif ($sError) {
+            //  Automatic error
+            $sError = form_error($oField->key, '<span class="alert alert-danger">', '</span>');
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  info block
+        $sInfoHtml = $oField->info ? '<small class="info ' . $oField->info_class . '">' . $oField->info . '</small>' : '';
+
+        // --------------------------------------------------------------------------
+
+        $sOut = <<<EOT
+
+    <div class="field $oField->type $sErrorClass $oField->oddeven $sReadOnlyClass " $sFieldIdTop>
+        <label>
+            <span class="label">
+                $oField->label
+                $oField->sub_label
+            </span>
+            <span class="input $sTipClass">
+                $oField->html
+                $sTipHtml
+                $sError
+                $sInfoHtml
+            <span>
+        </label>
+    </div>
+
+EOT;
+
+        return $sOut;
+    }
+}
+
+// --------------------------------------------------------------------------
+
 //  Include the CodeIgniter original
 include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
