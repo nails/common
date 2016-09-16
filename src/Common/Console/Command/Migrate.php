@@ -92,7 +92,6 @@ class Migrate extends Base
             $output->writeln('');
 
             if (!$this->confirm('Continue with migration?', true, $input, $output)) {
-
                 return $this->abort($output, 1);
             }
         }
@@ -102,35 +101,26 @@ class Migrate extends Base
         //  Work out the DB credentials to use
         $dbHost = $input->getOption('dbHost');
         if (empty($dbHost)) {
-
-            //  Try the constant
             $dbHost = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
         }
 
         $dbUser = $input->getOption('dbUser');
         if (empty($dbUser)) {
-
-            //  Try the constant
             $dbUser = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
         }
 
         $dbPass = $input->getOption('dbPass');
         if (empty($dbPass)) {
-
-            //  Try the constant
             $dbPass = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
         }
 
         $dbName = $input->getOption('dbName');
         if (empty($dbName)) {
-
-            //  Try the constant
             $dbName = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
         }
 
         //  Check we have a database to connect to
         if (empty($dbName)) {
-
             return $this->abort($output, 2);
         }
 
@@ -552,15 +542,13 @@ class Migrate extends Base
                 if (!empty($line)) {
 
                     //  We have something!
-                    $result = $this->oDb->query($line);
-
-                    if (!$result) {
-
-                        $output->writeln('');
-                        $output->writeln('');
-                        $output->writeln('<error>ERROR</error>: Query in <info>' . $migration['path'] . '</info> on line <info>' . $lineNumber . '</info> failed:');
-                        $output->writeln('');
-                        $output->writeln('<comment>' . $line . '</comment>');
+                    try {
+                        $this->oDb->query($line);
+                    } catch (\Exception $e) {
+                        $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" failed:');
+                        $output->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
+                        $output->writeln('<error>ERROR</error>: Failed Query: #' . $lineNumber);
+                        $output->writeln('<error>ERROR</error>: Failed Query: ' . $line);
                         return false;
                     }
                 }
@@ -592,6 +580,7 @@ class Migrate extends Base
     private function migratePhp($module, $migration, $output)
     {
         require_once $migration['path'];
+
         //  Generate the expected class name, i.e., "vendor-name/package-name" -> VendorName\PackageName"
         $sPattern    = '[^a-zA-Z0-9' . preg_quote(DIRECTORY_SEPARATOR, '/\-') . ']';
         $sModuleName = strtolower($module->name);
@@ -619,6 +608,8 @@ class Migrate extends Base
                     $output->writeln('');
                     $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" failed:');
                     $output->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
+                    $output->writeln('<error>ERROR</error>: Failed Query: #' . $oMigration->getQueryCount());
+                    $output->writeln('<error>ERROR</error>: Failed Query: ' . $oMigration->getLastQuery());
                     return false;
                 }
 

@@ -8,13 +8,25 @@ class Base
 {
     /**
      * The database connection
-     * @var PDO
+     * @var \PDO
      */
     public $oDb;
 
     // --------------------------------------------------------------------------
 
-    private $sForeignKeyValue;
+    /**
+     * A counter which is incremented for each query to make it easier to trace wen
+     * @var int
+     */
+    protected $iQueryCount = 0;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The last query which was called via query() or prepare()
+     * @var string
+     */
+    protected $sLastQuery = '';
 
     // --------------------------------------------------------------------------
 
@@ -27,10 +39,13 @@ class Base
 
     /**
      * Execute a DB query
-     * @return PDOStatement
+     * @param  string $sQuery The query to execute
+     * @return \PDOStatement
      */
     public function query($sQuery)
     {
+        $this->iQueryCount++;
+        $this->sLastQuery = $sQuery;
         $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
         return $this->oDb->query($sQuery);
     }
@@ -39,10 +54,13 @@ class Base
 
     /**
      * Prepare a DB query
-     * @return PDOStatement
+     * @param  string $sQuery The query to prepare
+     * @return \PDOStatement
      */
     public function prepare($sQuery)
     {
+        $this->iQueryCount++;
+        $this->sLastQuery = $sQuery;
         $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
         return $this->oDb->prepare($sQuery);
     }
@@ -62,10 +80,32 @@ class Base
 
     /**
      * Exposes the database API
-     * @return PDO
+     * @return \PDO
      */
     public function db()
     {
         return $this->oDb;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the value of iQueryCount
+     * @return int
+     */
+    public function getQueryCount()
+    {
+        return $this->iQueryCount;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the value of iQueryCount
+     * @return string
+     */
+    public function getLastQuery()
+    {
+        return $this->sLastQuery;
     }
 }
