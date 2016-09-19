@@ -29,7 +29,10 @@ $aBooks = $oBookModel->getAll(
     null,
     null,
     array(
-        'expand' => array('author', 'reviews')
+        'expand' => array(
+            'author',
+            'reviews'
+        )
     )
 );
 ```
@@ -63,5 +66,34 @@ This might return the following array:
     }
 ]
 ```
+
+It is also possible to pass a configuration array to the expandable field's model. To do this, instead of passing a string to the `expand` array, pass instead an array where the first parameter is the trigger and the second parameter is the configuration array you want to pass to the associated item's model. for example:
+
+```php
+$aBooks = $oBookModel->getAll(
+    null,
+    null,
+    array(
+        'expand' => array(
+            'author',
+            array(
+                'reviews',
+                array(
+                    'expand' => array('author'),
+                    'where' => array(
+                        array('rating >', 3)
+                    ),
+                    'sort' => array(
+                        array('created', 'desc')
+                    )
+                )
+            )
+        )
+    )
+);
+```
+
+Note how you can nest requests to `expand` objects.
+
 
 To learn more on how to configure your models to use Expandable Fields, [click here](docs/models/base-expandable-fields.md)

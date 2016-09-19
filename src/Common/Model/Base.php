@@ -663,18 +663,50 @@ class Base
 
         if (!empty($this->aExpandableFields)) {
 
+            /**
+             * Prepare the expand request; The developer can pass an array of triggers to expand, any of
+             * those triggers may themselves be an array with options to pass to the model (e.g to expand
+             * a field in the expanded object, or to order etc). Therefore we must prepare two arrays:
+             *  1. a flat list of triggers to expand
+             *  2. a list of config arrays to pass to the model
+             */
+
+            $aTriggers    = array();
+            $aTriggerData = array();
+
+            if (array_key_exists('expand', $aData) && is_array($aData['expand'])) {
+                foreach ($aData['expand'] as $mTrigger) {
+                    if (is_string($mTrigger)) {
+                        $aTriggers[]             = $mTrigger;
+                        $aTriggerData[$mTrigger] = array();
+                    } elseif (is_array($mTrigger)) {
+                        $sArrayTrigger     = getFromArray(0, $mTrigger) ?: getFromArray('trigger', $mTrigger);
+                        $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, array());
+                        if (!empty($sArrayTrigger)) {
+                            $aTriggers[]                  = $sArrayTrigger;
+                            $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
+                        }
+                    }
+                }
+            }
+
+
+
             foreach ($this->aExpandableFields as $oExpandableField) {
 
                 $bAutoExpand       = $oExpandableField->auto_expand;
                 $bExpandAll        = false;
                 $bExpandForTrigger = false;
 
-                //  If we're not auto-expanding, check if we should expand based on the `expand` index of $aData
+                //  If we're not auto-expanding, check if we're expanding everything
                 if (!$bAutoExpand && array_key_exists('expand', $aData)) {
                     $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
-                    if (!$bExpandAll && is_array($aData['expand'])) {
-                        $bExpandForTrigger = in_array($oExpandableField->trigger, $aData['expand']);
-                    }
+                }
+
+                //  If we're not auto-expanding or expanding everything, check if we should expand based
+                //  on the `expand` index of $aTriggers
+                if (!$bAutoExpand && !$bExpandAll) {
+                    $bExpandForTrigger = in_array($oExpandableField->trigger, $aTriggers);
                 }
 
                 if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
@@ -686,7 +718,8 @@ class Base
                             $oExpandableField->id_column,
                             $oExpandableField->property,
                             $oExpandableField->model,
-                            $oExpandableField->provider
+                            $oExpandableField->provider,
+                            getFromArray($oExpandableField->trigger, $aTriggerData, array())
                         );
 
                     } else if ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
@@ -696,7 +729,8 @@ class Base
                             $oExpandableField->property,
                             $oExpandableField->id_column,
                             $oExpandableField->model,
-                            $oExpandableField->provider
+                            $oExpandableField->provider,
+                            getFromArray($oExpandableField->trigger, $aTriggerData, array())
                         );
                     }
                 }
