@@ -1697,4 +1697,46 @@ class Base
             }
         }
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model deletes destructively or not.
+     * @return bool
+     */
+    public function isDestructiveDelete()
+    {
+        return $this->destructiveDelete;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Describes the fields for this model automatically and with some guesswork;
+     * for more fine grained control models should overload this method.
+     * @return array
+     */
+    public function describeFields()
+    {
+        $oDb     = Factory::service('Database');
+        $aResult = $oDb->query('DESCRIBE `' . $this->getTableName() . '`;')->result();
+        $aFields = array();
+
+        foreach ($aResult as $oField) {
+
+            $oTemp             = new \stdClass();
+            $oTemp->key        = $oField->Field;
+            $oTemp->label      = ucwords(preg_replace('/[\-_]/', ' ', $oField->Field));
+            $oTemp->type       = null;
+            $oTemp->allow_null = $oField->Null === 'YES';
+            $oTemp->validation = '';
+
+            //  Guess the field's type
+            //  @todo
+
+            $aFields[] = $oTemp;
+        }
+
+        return $aFields;
+    }
 }
