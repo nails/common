@@ -967,6 +967,7 @@ class Base
                 foreach ($aAssociatedItems as $oAssociatedItem) {
                     if ($oItem->{$sAssociatedItemIdColumn} == $oAssociatedItem->id) {
                         $oItem->{$sItemProperty} = $oAssociatedItem;
+                        break;
                     }
                 }
 

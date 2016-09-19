@@ -1976,10 +1976,7 @@ if (!function_exists('form_field_cms_widgets')) {
 
         $_default = set_value($_field['key'], $_field['default']);
 
-        //  Ensure the string is encoded
-        $_default = htmlentities($_default, ENT_QUOTES, 'UTF-8', true);
-
-        $_out .= '<input type="hidden" class="widget-data" name="' . $_field['key'] . '" value="' . $_default . '" ' . $_field['id'] . '/>';
+        $_out .= '<textarea class="widget-data" name="' . $_field['key'] . '" ' . $_field['id'] . '>' . $_default . '</textarea>';
         $_out .= '<button type="button" class="btn btn-primary btn-sm open-editor" data-key="' . $_field['key'] . '">';
         $_out .= '<span class="fa fa-cogs">&nbsp;</span> Open Widget Editor';
         $_out .= '</button>';
