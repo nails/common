@@ -1685,15 +1685,13 @@ class Base
         foreach ($aExpandableFields as $oField) {
             if (is_array($oField->data)) {
                 $aData = array_filter($oField->data);
-                if (!empty($aData)) {
-                    $this->saveAssociatedItems(
-                        $iId,
-                        $aData,
-                        $oField->id_column,
-                        $oField->model,
-                        $oField->provider
-                    );
-                }
+                $this->saveAssociatedItems(
+                    $iId,
+                    $aData,
+                    $oField->id_column,
+                    $oField->model,
+                    $oField->provider
+                );
             }
         }
     }
