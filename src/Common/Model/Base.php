@@ -1663,7 +1663,7 @@ class Base
         }
 
         foreach ($aData as $sKey => $mValue) {
-            if (!empty($aFields[$sKey])) {
+            if (array_key_exists($sKey, $aFields)) {
                 $aOut[$sKey]       = $aFields[$sKey];
                 $aOut[$sKey]->data = $mValue;
                 unset($aData[$sKey]);
@@ -1683,16 +1683,14 @@ class Base
     protected function autoSaveExpandableFieldsSave($iId, $aExpandableFields)
     {
         foreach ($aExpandableFields as $oField) {
-            if (is_array($oField->data)) {
-                $aData = array_filter($oField->data);
-                $this->saveAssociatedItems(
-                    $iId,
-                    $aData,
-                    $oField->id_column,
-                    $oField->model,
-                    $oField->provider
-                );
-            }
+            $aData = array_filter($oField->data);
+            $this->saveAssociatedItems(
+                $iId,
+                $aData,
+                $oField->id_column,
+                $oField->model,
+                $oField->provider
+            );
         }
     }
 
