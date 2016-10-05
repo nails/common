@@ -9,6 +9,9 @@ return array(
                 return new \Nails\Common\Library\Asset();
             }
         },
+        'CodeIgniter' => function () {
+            return get_instance();
+        },
         'Config' => function () {
             $oCi = get_instance();
             return $oCi->config;
