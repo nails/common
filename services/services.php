@@ -89,6 +89,13 @@ return array(
             } else {
                 return new \Nails\Common\Library\UserFeedback();
             }
+        },
+        'View' => function () {
+            if (class_exists('\App\Common\Library\View')) {
+                return new \App\Common\Library\View();
+            } else {
+                return new \Nails\Common\Library\View();
+            }
         }
     ),
     'models' => array(
