@@ -37,7 +37,7 @@ $sBodyClass = !empty($page->body_class) ? $page->body_class : '';
         // --------------------------------------------------------------------------
 
         //  Assets
-        $oAsset = Factory::service('Meta');
+        $oAsset = Factory::service('Asset');
         $oAsset->output('CSS');
         $oAsset->output('CSS-INLINE');
         $oAsset->output('JS-INLINE-HEADER');
