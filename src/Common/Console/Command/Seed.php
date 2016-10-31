@@ -138,16 +138,44 @@ class Seed extends Base
                     }
                 }
 
+                //  Get confirmation
+                $output->writeln('The following seeds will be executed in this order:');
+                $output->writeln('');
                 foreach ($aSeedClasses as $sSeedClass) {
                     //  Execute migration
                     $output->writeln(
-                        'Executing seed: <comment>' . $oComponent->slug . ' [' . $sSeedClass . ']</comment>'
+                        ' - <comment>' . $oComponent->slug . ' [' . $sSeedClass . ']</comment>'
                     );
-                    $sClassName = $oComponent->namespace . 'Seed\\' . $sSeedClass;
-                    $oClass = new $sClassName();
-                    $oClass->pre();
-                    $oClass->execute();
-                    $oClass->post();
+                }
+                $output->writeln('');
+
+                $bDoSeed = $this->confirm('Does this look OK?', true, $input, $output);
+
+                if ($bDoSeed) {
+                    $output->writeln('');
+                    $output->writeln('Executing seeds...');
+                    $output->writeln('');
+                    foreach ($aSeedClasses as $sSeedClass) {
+                        //  Execute seed
+                        $output->write(
+                            str_pad(
+                                ' - <comment>' . $oComponent->slug . ' [' . $sSeedClass . ']</comment>... ',
+                                50,
+                                ' '
+                            )
+                        );
+                        $sClassName = $oComponent->namespace . 'Seed\\' . $sSeedClass;
+                        $oClass = new $sClassName();
+                        $oClass->pre();
+                        $oClass->execute();
+                        $oClass->post();
+                        $output->writeln('<info>DONE</info>');
+                    }
+                    $output->writeln('');
+                } else {
+                    $output->writeln('');
+                    $output->writeln('No seeds were executed');
+                    $output->writeln('');
                 }
             }
         }
