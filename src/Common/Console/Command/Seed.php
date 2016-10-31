@@ -3,6 +3,7 @@
 namespace Nails\Common\Console\Command;
 
 use Nails\Environment;
+use Nails\Factory;
 use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -127,57 +128,70 @@ class Seed extends Base
                 }
 
                 if (empty($aClasses)) {
-                    $aSeedClasses = $aSeeds;
+                    foreach ($aSeeds as $sClass) {
+                        $aSeedClasses[] = (object) [
+                            'component' => $oComponent->slug,
+                            'namespace' => $oComponent->namespace,
+                            'class'     => $sClass,
+                        ];
+                    }
                 } else {
                     foreach ($aClasses as $sClass) {
                         if (!in_array($sClass, $aSeeds)) {
                             throw new \Exception('"' . $sClass . '" is not a valid seed class.');
                         } else {
-                            $aSeedClasses[] = $sClass;
+                            $aSeedClasses[] = (object) [
+                                'component' => $oComponent->slug,
+                                'namespace' => $oComponent->namespace,
+                                'class'     => $sClass,
+                            ];
                         }
                     }
                 }
-
-                //  Get confirmation
-                $output->writeln('The following seeds will be executed in this order:');
-                $output->writeln('');
-                foreach ($aSeedClasses as $sSeedClass) {
-                    //  Execute migration
-                    $output->writeln(
-                        ' - <comment>' . $oComponent->slug . ' [' . $sSeedClass . ']</comment>'
-                    );
-                }
-                $output->writeln('');
-
-                $bDoSeed = $this->confirm('Does this look OK?', true, $input, $output);
-
-                if ($bDoSeed) {
-                    $output->writeln('');
-                    $output->writeln('Executing seeds...');
-                    $output->writeln('');
-                    foreach ($aSeedClasses as $sSeedClass) {
-                        //  Execute seed
-                        $output->write(
-                            str_pad(
-                                ' - <comment>' . $oComponent->slug . ' [' . $sSeedClass . ']</comment>... ',
-                                50,
-                                ' '
-                            )
-                        );
-                        $sClassName = $oComponent->namespace . 'Seed\\' . $sSeedClass;
-                        $oClass = new $sClassName();
-                        $oClass->pre();
-                        $oClass->execute();
-                        $oClass->post();
-                        $output->writeln('<info>DONE</info>');
-                    }
-                    $output->writeln('');
-                } else {
-                    $output->writeln('');
-                    $output->writeln('No seeds were executed');
-                    $output->writeln('');
-                }
             }
+        }
+
+        //  Get confirmation
+        $output->writeln('The following seeds will be executed in this order:');
+        $output->writeln('');
+        foreach ($aSeedClasses as $oSeedClass) {
+            //  Execute migration
+            $output->writeln(
+                ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>'
+            );
+        }
+        $output->writeln('');
+
+        $bDoSeed = $this->confirm('Does this look OK?', true, $input, $output);
+
+        if ($bDoSeed) {
+            $output->writeln('');
+            $output->writeln('Executing seeds...');
+            $output->writeln('');
+
+            $oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+
+            foreach ($aSeedClasses as $oSeedClass) {
+                //  Execute seed
+                $output->write(
+                    str_pad(
+                        ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>... ',
+                        50,
+                        ' '
+                    )
+                );
+                $sClassName = $oSeedClass->namespace . 'Seed\\' . $oSeedClass->class;
+                $oClass = new $sClassName($oDb);
+                $oClass->pre();
+                $oClass->execute();
+                $oClass->post();
+                $output->writeln('<info>DONE</info>');
+            }
+            $output->writeln('');
+        } else {
+            $output->writeln('');
+            $output->writeln('No seeds were executed');
+            $output->writeln('');
         }
 
         // --------------------------------------------------------------------------
