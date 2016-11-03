@@ -50,10 +50,10 @@ class Asset
         $this->aJsInlineFooter = array();
         $this->sCacheBuster    = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
 
-        $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets';
+        $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets/build';
         $this->sBaseUrl       = site_url($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
-        $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets';
+        $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets/build';
         $this->sBaseUrlSecure = secure_site_url($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
 
