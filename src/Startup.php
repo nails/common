@@ -90,7 +90,6 @@ class Startup
         //  App Constants
         defineConst('APP_PRIVATE_KEY', '');
         defineConst('APP_NAME', 'Untitled');
-        defineConst('APP_SSL_ROUTING', false);
         defineConst('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
 
         //  Deploy constants
@@ -121,7 +120,7 @@ class Startup
         defineConst('BASE_URL', '/');
         defineConst('SECURE_BASE_URL', BASE_URL);
 
-        if (APP_SSL_ROUTING && isPageSecure()) {
+        if (isPageSecure()) {
 
             defineConst('NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/');
 
