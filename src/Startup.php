@@ -118,7 +118,7 @@ class Startup
 
         //  URLs
         defineConst('BASE_URL', '/');
-        defineConst('SECURE_BASE_URL', BASE_URL);
+        defineConst('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', BASE_URL));
 
         if (isPageSecure()) {
 
