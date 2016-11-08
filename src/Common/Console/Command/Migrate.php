@@ -411,13 +411,8 @@ class Migrate extends Base
      */
     protected function findEnabledModules()
     {
-        //  Unset the global so we get a fresh look at what's available
-        if (isset($GLOBALS['NAILS_COMPONENTS'])) {
-            unset($GLOBALS['NAILS_COMPONENTS']);
-        }
-
         //  Look for components
-        $modules = _NAILS_GET_COMPONENTS();
+        $modules = _NAILS_GET_COMPONENTS(false);
         $out     = array();
 
         foreach ($modules as $module) {

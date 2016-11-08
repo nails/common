@@ -10,11 +10,11 @@
  * @link
  */
 
-use Nails\Factory;
-use Nails\Environment;
-use Nails\Common\Exception\NailsException;
-use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\EnvironmentException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
+use Nails\Environment;
+use Nails\Factory;
 
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = array();
@@ -23,17 +23,18 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
     /**
      * Fetch all the Nails components which are installed
+     *
+     * @param boolean $bUseCache Whether to cache the result of the search
      * @return array
      */
-    function _NAILS_GET_COMPONENTS()
+    function _NAILS_GET_COMPONENTS($bUseCache = true)
     {
         /**
          * If we already know which Nails components are available then return that, save
          * the [small] overhead of working out the modules again and again.
          */
 
-        if (isset($GLOBALS['NAILS']['COMPONENTS'])) {
-
+        if ($bUseCache && isset($GLOBALS['NAILS']['COMPONENTS'])) {
             return $GLOBALS['NAILS']['COMPONENTS'];
         }
 
@@ -154,7 +155,9 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
         // --------------------------------------------------------------------------
 
         //  Save as a $GLOBAL for next time
-        $GLOBALS['NAILS']['COMPONENTS'] = $aOut;
+        if ($bUseCache) {
+            $GLOBALS['NAILS']['COMPONENTS'] = $aOut;
+        }
 
         // --------------------------------------------------------------------------
 
@@ -169,6 +172,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_SLUG')) {
 
     /**
      * Fetches a component by it's slug
+     *
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_SLUG($sSlug)
@@ -191,6 +195,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
 
     /**
      * Fetches a type of component (e.g., modules, drivers or skins)
+     *
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
@@ -227,6 +232,7 @@ if (!function_exists('_NAILS_GET_MODULES')) {
 
     /**
      * Fetch all the Nails modules which are installed
+     *
      * @return array
      */
     function _NAILS_GET_MODULES()
@@ -241,6 +247,7 @@ if (!function_exists('_NAILS_GET_SKINS')) {
 
     /**
      * Fetch Skins for a module, optionally filtered by subtype
+     *
      * @return array
      */
     function _NAILS_GET_SKINS($sModule, $sSubType = '')
@@ -276,6 +283,7 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
 
     /**
      * Fetch drivers for a module, optionally filtered by subtype
+     *
      * @return array
      */
     function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
@@ -303,6 +311,7 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
 
     /**
      * Returns an instance of a single driver
+     *
      * @param  object $oDriver The Driver definition
      * @return object
      */
@@ -367,6 +376,7 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
 
     /**
      * Determines the minimum supported PHP version as per enabled modules
+     *
      * @return string
      */
     function _NAILS_MIN_PHP_VERSION()
@@ -403,6 +413,7 @@ if (!function_exists('defineConst')) {
 
     /**
      * Defines a constant if it is not already defined
+     *
      * @param  string $sConstant The name of the constant to define
      * @param  string $mValue    The value to give the constant
      * @return void
@@ -421,6 +432,7 @@ if (!function_exists('nailsFactory')) {
 
     /**
      * A route to Nails\Factory
+     *
      * @param  string $sType       The type of item to factorise
      * @param  string $sKey        The key of the item to factorise
      * @param  string $sModuleName Which module provides the item
@@ -466,6 +478,7 @@ if (!function_exists('nailsEnvironment')) {
 
     /**
      * A route to Nails\Environment
+     *
      * @param  string $sMethod      The method to call
      * @param  string $sEnvironment The environment to query
      * @return mixed
@@ -502,6 +515,7 @@ if (!function_exists('isModuleEnabled')) {
 
     /**
      * Handy way of determining whether a module is available
+     *
      * @param  string $moduleName The name of the module to check
      * @return boolean
      */
@@ -527,11 +541,13 @@ if (!function_exists('getControllerData')) {
     /**
      * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
      * this function provides an easy interface to this array when it's not in scope.
+     *
      * @return  array   A reference to $NAILS_CONTROLLER_DATA
      **/
     function &getControllerData()
     {
         global $NAILS_CONTROLLER_DATA;
+
         return $NAILS_CONTROLLER_DATA;
     }
 }
@@ -544,8 +560,9 @@ if (!function_exists('setControllerData')) {
      * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
      * this function provides an easy interface to populate this array when it's not
      * in scope.
-     * @param string $key The key to populate
-     * @param mixed $value The value to assign
+     *
+     * @param string $key   The key to populate
+     * @param mixed  $value The value to assign
      * @return  void
      **/
     function setControllerData($key, $value)
@@ -563,43 +580,44 @@ if (!function_exists('getDomainFromUrl')) {
      * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
      * Hat tip: http://uk1.php.net/parse_url#104874
      * BUG: 2 character TLD's break this
+     *
      * @todo: Try and fix this bug
      * @param  string $sUrl The URL to analyse
      * @return mixed        string on success, false on failure
      */
     function getDomainFromUrl($sUrl)
     {
-        $sDomain  = parse_url($sUrl, PHP_URL_HOST);
-        $bits = explode('.', $sDomain);
-        $idz = count($bits);
-        $idz -=3;
+        $sDomain = parse_url($sUrl, PHP_URL_HOST);
+        $bits    = explode('.', $sDomain);
+        $idz     = count($bits);
+        $idz -= 3;
 
-        if (!isset($bits[($idz+2)])) {
+        if (!isset($bits[($idz + 2)])) {
 
             $out = false;
 
-        } elseif (strlen($bits[($idz+2)]) == 2 && isset($bits[($idz+2)])) {
+        } elseif (strlen($bits[($idz + 2)]) == 2 && isset($bits[($idz + 2)])) {
 
             $out   = array();
-            $out[] = !empty($bits[$idz])   ? $bits[$idz]   : false;
-            $out[] = !empty($bits[$idz+1]) ? $bits[$idz+1] : false;
-            $out[] = !empty($bits[$idz+2]) ? $bits[$idz+2] : false;
+            $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
+            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
+            $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
 
             $out = implode('.', array_filter($out));
 
-        } elseif (strlen($bits[($idz+2)]) == 0) {
+        } elseif (strlen($bits[($idz + 2)]) == 0) {
 
             $out   = array();
-            $out[] = !empty($bits[$idz])   ? $bits[$idz]   : false;
-            $out[] = !empty($bits[$idz+1]) ? $bits[$idz+1] : false;
+            $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
+            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
 
             $out = implode('.', array_filter($out));
 
-        } elseif (isset($bits[($idz+1)])) {
+        } elseif (isset($bits[($idz + 1)])) {
 
             $out   = array();
-            $out[] = !empty($bits[$idz+1]) ? $bits[$idz+1] : false;
-            $out[] = !empty($bits[$idz+2]) ? $bits[$idz+2] : false;
+            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
+            $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
 
             $out = implode('.', array_filter($out));
 
@@ -619,6 +637,7 @@ if (!function_exists('getRelativePath')) {
     /**
      * Fetches the relative path between two directories
      * Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
+     *
      * @param  string $from Path 1
      * @param  string $to   Path 2
      * @return string
@@ -732,6 +751,7 @@ if (!function_exists('getFromArray')) {
 
     /**
      * Retrieve a value from $sArray at $sKey, if it exists
+     *
      * @param  string $sKey     The key to get
      * @param  array  $aArray   The array to look in
      * @param  mixed  $mDefault What to return if $sKey doesn't exist in $aArray
@@ -756,6 +776,7 @@ if (!function_exists('isCli')) {
 
     /**
      * Returns whether the application is running on the command line
+     *
      * @return boolean
      */
     function isCli()

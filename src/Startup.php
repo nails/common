@@ -21,6 +21,7 @@ class Startup
 
     /**
      * Called by the hook, executes the individual startup methods as required.
+     *
      * @return void
      */
     public function init()
@@ -51,6 +52,7 @@ class Startup
 
     /**
      * Defines Nails constants if they are not already defined
+     *
      * @return void
      */
     protected function defineConstants()
@@ -66,7 +68,7 @@ class Startup
         defineConst('NAILS_BRANDING', true);
 
         //  Environment
-        defineConst('ENVIRONMENT', 'PRODUCTION');
+        defineConst('ENVIRONMENT', 'DEVELOPMENT');
 
         //  Cache Directory
         defineConst('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
@@ -79,11 +81,8 @@ class Startup
         defineConst('NAILS_DB_PREFIX', 'nails_');
 
         if (Environment::is('PRODUCTION')) {
-
             defineConst('DEPLOY_DB_DEBUG', false);
-
         } else {
-
             defineConst('DEPLOY_DB_DEBUG', true);
         }
 
@@ -102,7 +101,7 @@ class Startup
         defineConst('DEPLOY_EMAIL_HOST', '127.0.0.1');
         defineConst('DEPLOY_EMAIL_USER', '');
         defineConst('DEPLOY_EMAIL_PASS', '');
-        defineConst('DEPLOY_EMAIL_PORT', '');
+        defineConst('DEPLOY_EMAIL_PORT', 25);
 
         //  Check routes_app.php exists
         //  @todo - don't like this at all

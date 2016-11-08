@@ -4,7 +4,6 @@ namespace Nails\Common\Console\Command;
 
 use Nails\Console\Command\Base;
 use Nails\Environment;
-use Nails\Factory;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -182,7 +181,8 @@ class Install extends Base
                     continue;
                 }
 
-                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
+                $sValue = $v['value'] ?: '<blank>';
+                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $sValue . '</comment>');
             }
 
             //  deploy.php
@@ -195,7 +195,8 @@ class Install extends Base
                     continue;
                 }
 
-                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $v['value'] . '</comment>');
+                $sValue = $v['value'] ?: '<blank>';
+                $output->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $sValue . '</comment>');
             }
 
             //  Install components
@@ -384,31 +385,30 @@ class Install extends Base
         $vars   = array();
         $vars[] = '// App Constants';
         $vars[] = array(
-            'key'     => 'APP_NAME',
-            'label'   => 'App Name',
-            'value'   => defined('APP_NAME') ? APP_NAME : 'My App',
-            'options' => array()
+            'key'   => 'APP_NAME',
+            'label' => 'App Name',
+            'value' => defined('APP_NAME') ? APP_NAME : 'Untitled',
         );
 
         $vars[] = array(
-            'key'     => 'APP_DEFAULT_TIMEZONE',
-            'label'   => 'App Timezone',
-            'value'   => defined('APP_DEFAULT_TIMEZONE') ? APP_DEFAULT_TIMEZONE : date_default_timezone_get(),
-            'options' => array()
+            'key'      => 'APP_DEFAULT_TIMEZONE',
+            'label'    => 'App Timezone',
+            'value'    => defined('APP_DEFAULT_TIMEZONE') ? APP_DEFAULT_TIMEZONE : date_default_timezone_get(),
+            'validate' => function ($sInput) {
+                return in_array($sInput, timezone_identifiers_list());
+            }
         );
 
         $vars[] = array(
-            'key'     => 'APP_PRIVATE_KEY',
-            'label'   => 'App Private Key',
-            'value'   => defined('APP_PRIVATE_KEY') ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
-            'options' => array()
+            'key'   => 'APP_PRIVATE_KEY',
+            'label' => 'App Private Key',
+            'value' => defined('APP_PRIVATE_KEY') && !empty(APP_PRIVATE_KEY) ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
         );
 
         $vars[] = array(
-            'key'     => 'APP_DEVELOPER_EMAIL',
-            'label'   => 'Developer Email',
-            'value'   => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
-            'options' => array()
+            'key'   => 'APP_DEVELOPER_EMAIL',
+            'label' => 'Developer Email',
+            'value' => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
         );
 
         // --------------------------------------------------------------------------
@@ -439,80 +439,76 @@ class Install extends Base
     {
         $vars   = array();
         $vars[] = array(
-            'key'     => 'ENVIRONMENT',
-            'label'   => 'Environment',
-            'value'   => Environment::get() ?: 'PRODUCTION',
-            'options' => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
+            'key'      => 'ENVIRONMENT',
+            'label'    => 'Environment',
+            'value'    => Environment::get() ?: 'DEVELOPMENT',
+            'options'  => array('DEVELOPMENT', 'STAGING', 'PRODUCTION'),
+            'callback' => function ($sInput) {
+                return trim(strtoupper($sInput));
+            }
         );
 
         $vars[] = array(
-            'key'     => 'BASE_URL',
-            'label'   => 'Base URL',
-            'value'   => defined('BASE_URL') ? BASE_URL : '',
-            'options' => array()
+            'key'      => 'BASE_URL',
+            'label'    => 'Base URL',
+            'value'    => defined('BASE_URL') ? BASE_URL : '',
+            'callback' => function ($sInput) {
+                return trim(rtrim($sInput, '/') . '/');
+            }
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_PRIVATE_KEY',
-            'label'   => 'Deployment Private Key',
-            'value'   => defined('DEPLOY_PRIVATE_KEY') ? DEPLOY_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
-            'options' => array()
+            'key'   => 'DEPLOY_PRIVATE_KEY',
+            'label' => 'Deployment Private Key',
+            'value' => defined('DEPLOY_PRIVATE_KEY') ? DEPLOY_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_DB_HOST',
-            'label'   => 'Database Host',
-            'value'   => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost',
-            'options' => array()
+            'key'   => 'DEPLOY_DB_HOST',
+            'label' => 'Database Host',
+            'value' => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_DB_USERNAME',
-            'label'   => 'Database User',
-            'value'   => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '',
-            'options' => array()
+            'key'   => 'DEPLOY_DB_USERNAME',
+            'label' => 'Database User',
+            'value' => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_DB_PASSWORD',
-            'label'   => 'Database Password',
-            'value'   => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '',
-            'options' => array()
+            'key'   => 'DEPLOY_DB_PASSWORD',
+            'label' => 'Database Password',
+            'value' => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_DB_DATABASE',
-            'label'   => 'Database Name',
-            'value'   => defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '',
-            'options' => array()
+            'key'   => 'DEPLOY_DB_DATABASE',
+            'label' => 'Database Name',
+            'value' => defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_EMAIL_HOST',
-            'label'   => 'Email Host',
-            'value'   => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
-            'options' => array()
+            'key'   => 'DEPLOY_EMAIL_HOST',
+            'label' => 'Email Host',
+            'value' => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_EMAIL_USER',
-            'label'   => 'Email Username',
-            'value'   => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
-            'options' => array()
+            'key'   => 'DEPLOY_EMAIL_USER',
+            'label' => 'Email Username',
+            'value' => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_EMAIL_PASS',
-            'label'   => 'Email Password',
-            'value'   => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
-            'options' => array()
+            'key'   => 'DEPLOY_EMAIL_PASS',
+            'label' => 'Email Password',
+            'value' => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
         );
 
         $vars[] = array(
-            'key'     => 'DEPLOY_EMAIL_PORT',
-            'label'   => 'Email Port',
-            'value'   => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : '25',
-            'options' => array()
+            'key'   => 'DEPLOY_EMAIL_PORT',
+            'label' => 'Email Port',
+            'value' => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : 25,
         );
 
         // --------------------------------------------------------------------------
@@ -689,9 +685,46 @@ class Install extends Base
             if (is_array($v)) {
 
                 $question = 'What should "' . $v['label'] . '" be set to?';
-                $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
 
-                $v['value'] = $this->ask($question, $v['value'], $input, $output);
+                if (!empty($v['options'])) {
+
+                    $question .= ' (' . implode('|', $v['options']) . ')';
+
+                    //  The field has options, ensure the option selected is valid
+                    do {
+
+                        $v['value'] = $this->ask($question, $v['value'], $input, $output);
+                        if (isset($v['callback']) && is_callable($v['callback'])) {
+                            $v['value'] = call_user_func($v['callback'], $v['value']);
+                        }
+
+                        $bIsValidOption = in_array($v['value'], $v['options']);
+                        $question       = '<error>Selection must be one of ' . implode(', ', $v['options']) . '</error>';
+
+                    } while (!$bIsValidOption);
+
+
+                } elseif (isset($v['validate']) && is_callable($v['validate'])) {
+
+                    //  Validator, keep asking until validator passes
+                    do {
+
+                        $v['value'] = $this->ask($question, $v['value'], $input, $output);
+                        if (isset($v['callback']) && is_callable($v['callback'])) {
+                            $v['value'] = call_user_func($v['callback'], $v['value']);
+                        }
+
+                        $question = '<error>Sorry, that is not a valid selection.</error>';
+
+                    } while (!call_user_func($v['validate'], $v['value']));
+
+                } else {
+                    //  No validator, just ask and accept what's given
+                    $v['value'] = $this->ask($question, $v['value'], $input, $output);
+                    if (isset($v['callback']) && is_callable($v['callback'])) {
+                        $v['value'] = call_user_func($v['callback'], $v['value']);
+                    }
+                }
             }
         }
     }
@@ -795,12 +828,12 @@ class Install extends Base
         $cmdInput->setInteractive(false);
 
         $cmdOutput = new NullOutput();
-
-        $exitCode = $cmd->run($cmdInput, $output);
+        $exitCode  = $cmd->run($cmdInput, $cmdOutput);
 
         if ($exitCode == 0) {
 
             $output->writeln('<info>DONE</info>');
+
             return true;
 
         } else {
@@ -810,6 +843,7 @@ class Install extends Base
             $output->writeln('<error>The Migration tool encountered issues and aborted the migration.</error>');
             $output->writeln('<error>You should run it manually and investigate any issues.</error>');
             $output->writeln('<error>The exit code was ' . $exitCode . '</error>');
+
             return false;
         }
     }
