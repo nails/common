@@ -8,12 +8,16 @@ use Nails\Factory;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Install extends Base
 {
+    const EXIT_CODE_SUCCESS = 0;
+    const EXIT_CODE_FAILURE = 1;
+
+    // --------------------------------------------------------------------------
+
     /**
      * The endpoint for the components API
      *
@@ -54,7 +58,7 @@ class Install extends Base
      *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @return void
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -77,7 +81,7 @@ class Install extends Base
      *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @return void
+     * @return int
      */
     protected function executeInstaller(InputInterface $input, OutputInterface $output)
     {
@@ -115,8 +119,10 @@ class Install extends Base
             // --------------------------------------------------------------------------
 
             //  Can we install components? We need exec() and composer to be available
-            $execAvailable     = function_exists('exec');
-            $composerAvailable = (bool) $this->detectComposerBin();
+            $execAvailable          = function_exists('exec');
+            $composerAvailable      = (bool) $this->detectComposerBin();
+            $installedComponents    = [];
+            $installTheseComponents = [];
 
             if ($execAvailable && $composerAvailable) {
 
@@ -169,15 +175,13 @@ class Install extends Base
             $isAuthModuleAvailable = false;
 
             foreach ($installedComponents as $component) {
-
                 if ($component->name == 'nailsapp/module-auth') {
-
                     $isAuthModuleAvailable = true;
                     break;
                 }
             }
 
-            //  Not instaled, will it be installed?
+            //  Not installed, will it be installed?
             if (!$isAuthModuleAvailable) {
 
                 foreach ($installTheseComponents as $componentName => $componentVersion) {
@@ -219,9 +223,7 @@ class Install extends Base
                         foreach ($userField as $key => $label) {
 
                             do {
-
                                 $temp[$key] = $this->ask($label, '', $input, $output);
-
                             } while (empty($temp[$key]));
                         }
 
@@ -233,7 +235,6 @@ class Install extends Base
                         $createUser = $this->confirm($question, false, $input, $output);
 
                         if (!$createUser) {
-
                             $output->writeln('');
                         }
 
@@ -253,7 +254,6 @@ class Install extends Base
             foreach ($appVars as &$v) {
 
                 if (is_string($v)) {
-
                     continue;
                 }
 
@@ -267,7 +267,6 @@ class Install extends Base
             foreach ($deployVars as &$v) {
 
                 if (is_string($v)) {
-
                     continue;
                 }
 
@@ -280,16 +279,12 @@ class Install extends Base
                 $output->writeln('');
 
                 if (count($installTheseComponents) > 1) {
-
                     $output->writeln('The following components will be installed:');
-
                 } else {
-
                     $output->writeln('The following component will be installed:');
                 }
 
                 foreach ($installTheseComponents as $componentName => $componentVersion) {
-
                     $output->writeln(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>');
                 }
             }
@@ -304,11 +299,8 @@ class Install extends Base
                 $output->writeln('');
 
                 if (count($users) == 1) {
-
                     $output->writeln('Add user <info>' . $users[0]['first_name'] . ' ' . $users[0]['last_name'] . '</info>');
-
                 } else {
-
                     $output->writeln('Add <info>' . count($users) . '</info> users');
                 }
             }
@@ -318,7 +310,6 @@ class Install extends Base
             $doInstall = $this->confirm($question, true, $input, $output);
 
             if ($doInstall) {
-
 
                 $curStep  = 1;
                 $numSteps = 1; //  app.php
@@ -333,11 +324,8 @@ class Install extends Base
                 //  Write app.php
                 $output->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Writing <info>config/app.php</info>... ');
                 if ($this->writeFile($appVars, 'config/app.php')) {
-
                     $output->writeln('<info>DONE</info>');
-
                 } else {
-
                     $output->writeln('<error>FAILED</error>');
                 }
                 $curStep++;
@@ -345,11 +333,8 @@ class Install extends Base
                 //  Write deploy.php
                 $output->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Writing <info>config/deploy.php</info>... ');
                 if ($this->writeFile($deployVars, 'config/deploy.php')) {
-
                     $output->writeln('<info>DONE</info>');
-
                 } else {
-
                     $output->writeln('<error>FAILED</error>');
                 }
                 $curStep++;
@@ -360,7 +345,6 @@ class Install extends Base
                     $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Installing components</info>...');
 
                     foreach ($installTheseComponents as $componentName => $componentVersion) {
-
                         $output->write(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>... ');
                         $this->installComponent($componentName, $componentVersion, $output);
                     }
@@ -368,7 +352,7 @@ class Install extends Base
                 }
 
                 /**
-                 * Get the current database credential values. If ane xisting deploy.php is already there then
+                 * Get the current database credential values. If an existing deploy.php is already there then
                  * we can't rely on it having the latest details (as it might have just been updated).
                  */
 
@@ -394,19 +378,14 @@ class Install extends Base
                     foreach ($users as $user) {
 
                         $output->write(' - <comment>' . $user['first_name'] . ' ' . $user['last_name'] . '</comment>... ');
-                        $result = $this->createUser($user, $appVars, $deployVars, $output);
+                        $result = $this->createUser($user, $appVars, $deployVars);
 
                         if ($result === true) {
-
                             $output->writeln('<info>DONE</info>');
-
                         } else {
-
                             $output->writeln('<error>FAILED: ' . $result . '</error>');
                         }
                     }
-
-                    $curStep++;
                 }
 
                 // --------------------------------------------------------------------------
@@ -419,6 +398,8 @@ class Install extends Base
                 $output->writeln('');
                 $output->writeln('Complete!');
 
+                return self::EXIT_CODE_SUCCESS;
+
             } else {
 
                 return $this->abort($output);
@@ -429,7 +410,6 @@ class Install extends Base
             $exitCode = $this->abort($output);
 
             foreach ($preTestErrors as $error) {
-
                 $output->writeln(' - ' . $error);
             }
 
@@ -442,9 +422,10 @@ class Install extends Base
     /**
      * Executes the Nails Component Installer
      *
-     * @param  InputInterface  $input  The Input Interface provided by Symfony
-     * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @return void
+     * @param  string          $component The component to install
+     * @param  InputInterface  $input     The Input Interface provided by Symfony
+     * @param  OutputInterface $output    The Output Interface provided by Symfony
+     * @return int
      */
     protected function executeComponentInstaller($component, InputInterface $input, OutputInterface $output)
     {
@@ -458,7 +439,6 @@ class Install extends Base
         $component = $this->requestComponent($component, $input, $output);
 
         if (!$component) {
-
             return $this->abort($output, 0);
         }
 
@@ -478,14 +458,12 @@ class Install extends Base
             $output->writeln('');
             $output->write('<comment>[1/2]</comment> Installing <info>' . $component[0] . ':' . $component[1] . '</info>... ');
             if (!$this->installComponent($component[0], $component[1], $output)) {
-
                 return $this->abort($output, 3);
             }
 
             //  Migrate DB
             $output->write('<comment>[2/2]</comment> Migrating database... ');
             if (!$this->migrateDb($output)) {
-
                 return $this->abort($output, 4);
             }
 
@@ -497,8 +475,9 @@ class Install extends Base
             $output->writeln('');
             $output->writeln('Complete!');
 
-        } else {
+            return self::EXIT_CODE_SUCCESS;
 
+        } else {
             return $this->abort($output, 0);
         }
     }
@@ -675,9 +654,7 @@ class Install extends Base
     private function getVarValue($key, $vars)
     {
         foreach ($vars as $var) {
-
             if ($key == $var['key']) {
-
                 return $var['value'];
             }
         }
@@ -767,22 +744,7 @@ class Install extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Finds constants for a particular component
-     *
-     * @param  string $component The name of the component to look at
-     * @param  string $type      The type of constant (either APP or DEPLOY)
-     * @return array
-     */
-    private function getConstantsFromComponent($component, $type)
-    {
-        //  @TODO: Analyse component
-        return array();
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Checks for the existance and writeability of the config files and directory
+     * Checks for the existence and writeability of the config files and directory
      *
      * @return array
      */
@@ -918,14 +880,14 @@ class Install extends Base
     /**
      * Migrates the DB for a fresh install
      *
-     * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @param  string          $dbhost The database hsot to connect to
-     * @param  string          $dbuser The database user to connect with
-     * @param  string          $dbpass The database password to connect with
-     * @param  string          $dbname The database name to connect to
+     * @param  OutputInterface $output  The Output Interface provided by Symfony
+     * @param  string          $sDbHost The database host to connect to
+     * @param  string          $sDbUser The database user to connect with
+     * @param  string          $sDbPass The database password to connect with
+     * @param  string          $sDbName The database name to connect to
      * @return boolean
      */
-    private function migrateDb($output, $dbhost = null, $dbuser = null, $dbpass = null, $dbname = null)
+    private function migrateDb($output, $sDbHost = null, $sDbUser = null, $sDbPass = null, $sDbName = null)
     {
         //  Execute the migrate command, silently
         $cmd = $this->getApplication()->find('migrate');
@@ -933,10 +895,10 @@ class Install extends Base
         $cmdInput = new ArrayInput(
             array(
                 'command'  => 'migrate',
-                '--dbHost' => $dbhost,
-                '--dbUser' => $dbuser,
-                '--dbPass' => $dbpass,
-                '--dbName' => $dbname
+                '--dbHost' => $sDbHost,
+                '--dbUser' => $sDbUser,
+                '--dbPass' => $sDbPass,
+                '--dbName' => $sDbName
             )
         );
 
@@ -969,23 +931,19 @@ class Install extends Base
     /**
      * Creates a new user account using group_id 1; i.e the default super user group
      *
-     * @param  array           $user       The user's details
-     * @param  array           $appVars    The application vars
-     * @param  array           $deployVars The deploy vars
-     * @param  OutputInterface $output     The Output Interface provided by Symfony
-     * @return mixed                       boolean on success, false on failure
+     * @param  array $user       The user's details
+     * @param  array $appVars    The application vars
+     * @param  array $deployVars The deploy vars
+     * @return mixed             boolean on success, false on failure
      */
-    public function createUser($user, $appVars, $deployVars, $output)
+    public function createUser($user, $appVars, $deployVars)
     {
         //  @TODO: Test username/email for duplicates
 
         //  Correctly encode the password
         if (!defined('APP_PRIVATE_KEY')) {
-
             foreach ($appVars as $var) {
-
                 if (is_array($var) && $var['key'] == 'APP_PRIVATE_KEY') {
-
                     define('APP_PRIVATE_KEY', $var['value']);
                     break;
                 }
@@ -993,11 +951,8 @@ class Install extends Base
         }
 
         if (!defined('APP_PRIVATE_KEY')) {
-
             foreach ($deployVars as $var) {
-
                 if (is_array($var) && $var['key'] == 'DEPLOY_PRIVATE_KEY') {
-
                     define('DEPLOY_PRIVATE_KEY', $var['value']);
                     break;
                 }
@@ -1041,7 +996,6 @@ class Install extends Base
 
         $result = $this->oDb->query($sql);
         if (!$result) {
-
             return 'Could not create main user record.';
         }
 
@@ -1056,9 +1010,7 @@ class Install extends Base
         $sql    = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
         $result = $this->oDb->query($sql);
         if (!$result) {
-
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-
             return 'Could not set MD5 ID on main user record.';
         }
 
@@ -1068,9 +1020,7 @@ class Install extends Base
         $sql    = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
         $result = $this->oDb->query($sql);
         if (!$result) {
-
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-
             return 'Could not create user_meta_app record.';
         }
 
@@ -1101,10 +1051,8 @@ class Install extends Base
 
         $result = $this->oDb->query($sql);
         if (!$result) {
-
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
-
             return 'Could not create main user email record.';
         }
 
@@ -1120,12 +1068,11 @@ class Install extends Base
      * @param  integer         $exitCode The exit code
      * @return int
      */
-    private function abort($output, $exitCode = 1)
+    private function abort($output, $exitCode = self::EXIT_CODE_FAILURE)
     {
         $output->writeln('');
 
         if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
-
             $output->writeln('<error>Rolling back Database</error>');
             $this->oDb->transactionRollback();
         }
@@ -1166,13 +1113,13 @@ class Install extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Asks the suer which component they'd like to install and validates it against
+     * Asks the user which component they'd like to install and validates it against
      * the Nails Components repository.
      *
      * @param  string          $componentName The component name to install
      * @param  InputInterface  $input         The Input Interface provided by Symfony
      * @param  OutputInterface $output        The Output Interface provided by Symfony
-     * @return array
+     * @return array|bool
      */
     private function requestComponent($componentName, $input, $output)
     {
