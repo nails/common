@@ -173,6 +173,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_SLUG')) {
     /**
      * Fetches a component by it's slug
      *
+     * @param string $sSlug The component's slug
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_SLUG($sSlug)
@@ -196,6 +197,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
     /**
      * Fetches a type of component (e.g., modules, drivers or skins)
      *
+     * @param string $sType The component's type
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
@@ -248,6 +250,8 @@ if (!function_exists('_NAILS_GET_SKINS')) {
     /**
      * Fetch Skins for a module, optionally filtered by subtype
      *
+     * @param string $sModule  Restrict to particular component
+     * @param string $sSubType Restrict by skin sub type
      * @return array
      */
     function _NAILS_GET_SKINS($sModule, $sSubType = '')
@@ -284,6 +288,8 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
     /**
      * Fetch drivers for a module, optionally filtered by subtype
      *
+     * @param string $sModule  Restrict to particular component
+     * @param string $sSubType Restrict by driver sub type
      * @return array
      */
     function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
@@ -313,6 +319,7 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
      * Returns an instance of a single driver
      *
      * @param  object $oDriver The Driver definition
+     * @throws NailsException
      * @return object
      */
     function _NAILS_GET_DRIVER_INSTANCE($oDriver)
@@ -436,6 +443,7 @@ if (!function_exists('nailsFactory')) {
      * @param  string $sType       The type of item to factorise
      * @param  string $sKey        The key of the item to factorise
      * @param  string $sModuleName Which module provides the item
+     * @throws FactoryException
      * @return mixed
      */
     function nailsFactory($sType, $sKey, $sModuleName = '')
@@ -459,7 +467,8 @@ if (!function_exists('nailsFactory')) {
                 break;
 
             case 'HELPER':
-                return Factory::helper($sKey, $sModuleName);
+                Factory::helper($sKey, $sModuleName);
+                return null;
                 break;
 
             default:
@@ -481,6 +490,7 @@ if (!function_exists('nailsEnvironment')) {
      *
      * @param  string $sMethod      The method to call
      * @param  string $sEnvironment The environment to query
+     * @throws EnvironmentException
      * @return mixed
      */
     function nailsEnvironment($sMethod, $sEnvironment = null)
@@ -524,7 +534,6 @@ if (!function_exists('isModuleEnabled')) {
         $modules = _NAILS_GET_MODULES();
 
         foreach ($modules as $module) {
-
             if ($moduleName == $module->name) {
                 return true;
             }
@@ -547,7 +556,6 @@ if (!function_exists('getControllerData')) {
     function &getControllerData()
     {
         global $NAILS_CONTROLLER_DATA;
-
         return $NAILS_CONTROLLER_DATA;
     }
 }
@@ -729,7 +737,7 @@ if (!function_exists('show_404')) {
      * Renders the 404 page, logging disabled by default.
      *
      * Note that the Exception class does log by default. Manual 404's are probably
-     * a result of some other checking and not technically a 404 so shouldn't be
+     * a result of some other checking and not technically a 404 so should not be
      * logged as one. )Actual_ 404's should continue to be logged however.
      *
      * @param  string  $page     The page which 404'd
