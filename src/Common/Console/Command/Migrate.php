@@ -2,20 +2,23 @@
 
 namespace Nails\Common\Console\Command;
 
-use Nails\Factory;
-use Nails\Environment;
 use Nails\Console\Command\Base;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
+use Nails\Environment;
+use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class Migrate extends Base
 {
+    const EXIT_CODE_SUCCESS = 0;
+    const EXIT_CODE_FAILURE = 1;
+
+    // --------------------------------------------------------------------------
+
     /**
      * The database instance
+     *
      * @var Object
      */
     private $oDb;
@@ -24,6 +27,7 @@ class Migrate extends Base
 
     /**
      * Configures the app
+     *
      * @return void
      */
     protected function configure()
@@ -64,9 +68,10 @@ class Migrate extends Base
 
     /**
      * Executes the app
+     *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
-     * @return void
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -99,25 +104,10 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Work out the DB credentials to use
-        $dbHost = $input->getOption('dbHost');
-        if (empty($dbHost)) {
-            $dbHost = defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '';
-        }
-
-        $dbUser = $input->getOption('dbUser');
-        if (empty($dbUser)) {
-            $dbUser = defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '';
-        }
-
-        $dbPass = $input->getOption('dbPass');
-        if (empty($dbPass)) {
-            $dbPass = defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '';
-        }
-
-        $dbName = $input->getOption('dbName');
-        if (empty($dbName)) {
-            $dbName = defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '';
-        }
+        $dbHost = $input->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
+        $dbUser = $input->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
+        $dbPass = $input->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
+        $dbName = $input->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
 
         //  Check we have a database to connect to
         if (empty($dbName)) {
@@ -126,6 +116,7 @@ class Migrate extends Base
 
         //  Get the DB object
         $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+        $this->oDb->connect($dbHost, $dbUser, $dbPass, $dbName);
 
         if (!defined('NAILS_DB_PREFIX')) {
             define('NAILS_DB_PREFIX', 'nails_');
@@ -137,8 +128,8 @@ class Migrate extends Base
 
             //  Create the migrations table
             $sSql = "CREATE TABLE `" . NAILS_DB_PREFIX . "migration` (
-              `module` varchar(100) NOT NULL DEFAULT '',
-              `version` int(11) unsigned DEFAULT NULL,
+              `module` VARCHAR(100) NOT NULL DEFAULT '',
+              `version` INT(11) UNSIGNED DEFAULT NULL,
               PRIMARY KEY (`module`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
@@ -146,6 +137,7 @@ class Migrate extends Base
 
                 $output->writeln('');
                 $output->writeln('Database isn\'t ready for migrations.');
+
                 return $this->abort($output, 4);
             }
         }
@@ -162,11 +154,8 @@ class Migrate extends Base
         $nails = $this->determineModuleState('nailsapp/common', 'vendor/nailsapp/common/migrations/');
 
         if ($nails) {
-
             $output->writeln('done, requires migration');
-
         } else {
-
             $output->writeln('done, no Nails migrations detected');
         }
 
@@ -179,11 +168,8 @@ class Migrate extends Base
         if ($enabledModules) {
 
             if (count($enabledModules) == 1) {
-
                 $output->writeln('found <info>1</info> module requiring migration');
-
             } else {
-
                 $output->writeln('found <info>' . count($enabledModules) . '</info> modules requiring migration');
             }
 
@@ -200,11 +186,8 @@ class Migrate extends Base
         $app = $this->determineModuleState('APP', 'application/migrations/');
 
         if ($app) {
-
             $output->writeln('done, requires migration');
-
         } else {
-
             $output->writeln('done, no App migrations detected');
         }
 
@@ -212,10 +195,9 @@ class Migrate extends Base
 
         //  Anything to migrate?
         if (!$nails && !$enabledModules && !$app) {
-
             $output->writeln('');
             $output->writeln('Nothing to migrate');
-            return $this->abort($output, 0);
+            return $this->abort($output, self::EXIT_CODE_SUCCESS);
         }
 
         // --------------------------------------------------------------------------
@@ -225,7 +207,6 @@ class Migrate extends Base
         $output->writeln('OK, here\'s what\'s going to happen:');
 
         if ($nails) {
-
             $output->writeln('');
             $start = is_null($nails->start) ? 'The beginning of time' : $nails->start;
             $output->writeln('Nails\' database will be migrated from <info>#' . $start . '</info> to <info>#' . $nails->end . '</info>');
@@ -240,7 +221,7 @@ class Migrate extends Base
 
                 $start = is_null($module->start) ? 'The beginning of time' : $module->start;
 
-                $line  = ' - <comment>' . $module->name . '</comment> from ';
+                $line = ' - <comment>' . $module->name . '</comment> from ';
                 $line .= '<info>#' . $start . '</info> to <info>#' . $module->end . '</info>';
 
                 $output->writeln($line);
@@ -257,7 +238,6 @@ class Migrate extends Base
         $output->writeln('');
 
         if (!$this->confirm('Continue?', true, $input, $output)) {
-
             return $this->abort($output, 5);
         }
 
@@ -274,14 +254,14 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Start migrating
-        $curStep        = 1;
-        $numMigrations  = 0;
+        $curStep       = 1;
+        $numMigrations = 0;
         $numMigrations += !empty($nails) ? 1 : 0;
         $numMigrations += !empty($enabledModules) ? count($enabledModules) : 0;
         $numMigrations += !empty($app) ? 1 : 0;
 
         //  Disable foreign key checks
-        $result = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
+        $result              = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
         $oldForeignKeychecks = $result->Value;
 
         $this->oDb->query('SET FOREIGN_KEY_CHECKS = 0;');
@@ -293,11 +273,8 @@ class Migrate extends Base
             $result = $this->doMigration($nails, $output);
 
             if ($result) {
-
                 $output->writeln('done!');
-
             } else {
-
                 return $this->abort($output, 6);
             }
 
@@ -340,8 +317,6 @@ class Migrate extends Base
 
                 return $this->abort($output, 8);
             }
-
-            $curStep++;
         }
 
         // --------------------------------------------------------------------------
@@ -362,12 +337,15 @@ class Migrate extends Base
         //  And we're done
         $output->writeln('');
         $output->writeln('Complete!');
+
+        return self::EXIT_CODE_SUCCESS;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Determines whether or not the module needs to migration, and if so between what versions
+     *
      * @return mixed stdClass when migration needed, null when not needed
      */
     protected function determineModuleState($moduleName, $migrationsPath)
@@ -396,7 +374,7 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Work out the current version
-            $sql = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$moduleName';";
+            $sql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$moduleName';";
             $result = $this->oDb->query($sql);
 
             if ($result->rowCount() === 0) {
@@ -428,13 +406,13 @@ class Migrate extends Base
 
     /**
      * Looks for enabled Nails modules which support migration
+     *
      * @return array
      */
     protected function findEnabledModules()
     {
         //  Unset the global so we get a fresh look at what's available
         if (isset($GLOBALS['NAILS_COMPONENTS'])) {
-
             unset($GLOBALS['NAILS_COMPONENTS']);
         }
 
@@ -443,7 +421,6 @@ class Migrate extends Base
         $out     = array();
 
         foreach ($modules as $module) {
-
             $out[] = $this->determineModuleState($module->slug, $module->path . 'migrations/');
         }
 
@@ -454,6 +431,7 @@ class Migrate extends Base
 
     /**
      * Executes a migration
+     *
      * @param  string          $module The migration details object
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return boolean
@@ -482,7 +460,6 @@ class Migrate extends Base
                         break;
 
                     case 'PHP':
-
                         if (!$this->migratePhp($module, $migration, $output)) {
                             return false;
                         }
@@ -494,7 +471,7 @@ class Migrate extends Base
         }
 
         //  Update the database
-        $sql = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $module->name . "'";
+        $sql    = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $module->name . "'";
         $result = $this->oDb->query($sql);
 
         if (!$result) {
@@ -503,6 +480,7 @@ class Migrate extends Base
             $output->writeln('');
             $output->writeln('');
             $output->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $module->name . '</info>.');
+
             return false;
         }
 
@@ -513,6 +491,7 @@ class Migrate extends Base
 
     /**
      * Executes migrations on a SQL File where each line is a query
+     *
      * @param  object          $module    The module being migrated
      * @param  array           $migration The migration details
      * @param  OutputInterface $output    The Output Interface provided by Symfony
@@ -549,6 +528,7 @@ class Migrate extends Base
                         $output->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
                         $output->writeln('<error>ERROR</error>: Failed Query: #' . $lineNumber);
                         $output->writeln('<error>ERROR</error>: Failed Query: ' . $line);
+
                         return false;
                     }
                 }
@@ -564,6 +544,7 @@ class Migrate extends Base
             $output->writeln('');
             $output->writeln('');
             $output->writeln('<error>ERROR</error>: Failed to open <info>' . $migration['path'] . '</info> for reading.');
+
             return false;
         }
     }
@@ -572,6 +553,7 @@ class Migrate extends Base
 
     /**
      * Executes migrations on a PHP which extends Nails\Common\Migration\Base
+     *
      * @param  object          $module    The module being migrated
      * @param  array           $migration The migration details
      * @param  OutputInterface $output    The Output Interface provided by Symfony
@@ -610,6 +592,7 @@ class Migrate extends Base
                     $output->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
                     $output->writeln('<error>ERROR</error>: Failed Query: #' . $oMigration->getQueryCount());
                     $output->writeln('<error>ERROR</error>: Failed Query: ' . $oMigration->getLastQuery());
+
                     return false;
                 }
 
@@ -619,6 +602,7 @@ class Migrate extends Base
                 $output->writeln('');
                 $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
                 $output->writeln('<error>ERROR</error>: Should be a sub-class of "Nails\Common\Console\Migrate\Base".');
+
                 return false;
             }
 
@@ -630,6 +614,7 @@ class Migrate extends Base
             $output->writeln('');
             $output->writeln('<error>ERROR</error>: Class "' . $sClassName . '" does not exist.');
             $output->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
+
             return false;
         }
 
@@ -640,6 +625,7 @@ class Migrate extends Base
 
     /**
      * Generates an array of files in a directory
+     *
      * @param  string $dir The directory to analyse
      * @return array
      */
@@ -652,7 +638,6 @@ class Migrate extends Base
             foreach (new \DirectoryIterator($dir) as $fileInfo) {
 
                 if ($fileInfo->isDot()) {
-
                     continue;
                 }
 
@@ -681,25 +666,26 @@ class Migrate extends Base
 
     /**
      * Performs the abort functionality and returns the exit code
+     *
      * @param  OutputInterface $output   The Output Interface provided by Symfony
      * @param  integer         $exitCode The exit code
      * @return int
      */
-    private function abort($output, $exitCode = 0)
+    private function abort($output, $exitCode = self::EXIT_CODE_FAILURE)
     {
         $output->writeln('');
 
-        $colorOpen  = $exitCode === 0 ? '' : '<error>';
-        $colorClose = $exitCode === 0 ? '' : '</error>';
+        $colorOpen  = $exitCode === self::EXIT_CODE_FAILURE ? '' : '<error>';
+        $colorClose = $exitCode === self::EXIT_CODE_FAILURE ? '' : '</error>';
 
         if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
-
             $output->writeln($colorOpen . 'Rolling back Database' . $colorClose);
             $this->oDb->transactionRollback();
         }
 
         $output->writeln($colorOpen . 'Aborting migration' . $colorClose);
         $output->writeln('');
+
         return $exitCode;
     }
 }

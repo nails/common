@@ -121,7 +121,6 @@ class Install extends Base
             //  Can we install components? We need exec() and composer to be available
             $execAvailable          = function_exists('exec');
             $composerAvailable      = (bool) $this->detectComposerBin();
-            $installedComponents    = [];
             $installTheseComponents = [];
 
             if ($execAvailable && $composerAvailable) {
@@ -159,86 +158,12 @@ class Install extends Base
                     $component = $this->requestComponent(null, $input, $output);
 
                     if (is_array($component)) {
-
                         $installTheseComponents[$component[0]] = $component[1];
                     }
 
                     $output->writeln('');
                     $question          = 'Would you like to enable another component?';
                     $installComponents = $this->confirm($question, false, $input, $output);
-                }
-            }
-
-            // --------------------------------------------------------------------------
-
-            //  Only ask to create users if nailsapp/module-auth is installed (or will be installed)
-            $isAuthModuleAvailable = false;
-
-            foreach ($installedComponents as $component) {
-                if ($component->name == 'nailsapp/module-auth') {
-                    $isAuthModuleAvailable = true;
-                    break;
-                }
-            }
-
-            //  Not installed, will it be installed?
-            if (!$isAuthModuleAvailable) {
-
-                foreach ($installTheseComponents as $componentName => $componentVersion) {
-
-                    if ($componentName == 'nailsapp/module-auth') {
-
-                        $isAuthModuleAvailable = true;
-                        break;
-                    }
-                }
-            }
-
-            if ($isAuthModuleAvailable) {
-
-                $output->writeln('');
-                $output->writeln('<info>Users</info>');
-
-                $question   = 'Would you like to create some users?';
-                $createUser = $this->confirm($question, false, $input, $output);
-                $users      = array();
-
-                $userField               = array();
-                $userField['first_name'] = 'First Name';
-                $userField['last_name']  = 'Surname';
-                $userField['email']      = 'Email Address';
-                $userField['username']   = 'Username';
-                $userField['password']   = 'Password';
-
-                if ($createUser) {
-
-                    do {
-
-                        $temp      = array();
-                        $userCount = count($users) + 1;
-
-                        $output->writeln('');
-                        $output->writeln('User #' . $userCount);
-
-                        foreach ($userField as $key => $label) {
-
-                            do {
-                                $temp[$key] = $this->ask($label, '', $input, $output);
-                            } while (empty($temp[$key]));
-                        }
-
-                        $users[] = $temp;
-
-                        $output->writeln('');
-
-                        $question   = 'Create another user?';
-                        $createUser = $this->confirm($question, false, $input, $output);
-
-                        if (!$createUser) {
-                            $output->writeln('');
-                        }
-
-                    } while ($createUser);
                 }
             }
 
@@ -292,18 +217,6 @@ class Install extends Base
             //  Migrate databases
             $output->writeln('');
             $output->writeln('Migrate the database');
-
-            //  Add users
-            if (!empty($users)) {
-
-                $output->writeln('');
-
-                if (count($users) == 1) {
-                    $output->writeln('Add user <info>' . $users[0]['first_name'] . ' ' . $users[0]['last_name'] . '</info>');
-                } else {
-                    $output->writeln('Add <info>' . count($users) . '</info> users');
-                }
-            }
 
             $output->writeln('');
             $question  = 'Does this look OK?';
@@ -364,29 +277,6 @@ class Install extends Base
                 //  Migrate DB
                 $output->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Migrating database... ');
                 $this->migrateDb($output, $dbHost, $dbUser, $dbPass, $dbName);
-                $curStep++;
-
-                //  Add Users
-                if (!empty($users)) {
-
-                    $output->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Creating Users</info>...');
-
-                    //  Setup Factory - we need config files and/or constants to be set
-                    Factory::setup();
-                    $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
-
-                    foreach ($users as $user) {
-
-                        $output->write(' - <comment>' . $user['first_name'] . ' ' . $user['last_name'] . '</comment>... ');
-                        $result = $this->createUser($user, $appVars, $deployVars);
-
-                        if ($result === true) {
-                            $output->writeln('<info>DONE</info>');
-                        } else {
-                            $output->writeln('<error>FAILED: ' . $result . '</error>');
-                        }
-                    }
-                }
 
                 // --------------------------------------------------------------------------
 
@@ -906,157 +796,22 @@ class Install extends Base
 
         $cmdOutput = new NullOutput();
 
-        $exitCode = $cmd->run($cmdInput, $cmdOutput);
+        $exitCode = $cmd->run($cmdInput, $output);
 
         if ($exitCode == 0) {
 
             $output->writeln('<info>DONE</info>');
-
             return true;
 
         } else {
 
             $output->writeln('<error>WARNING</error>');
             $output->writeln('');
-            $output->writeln('<error>The Migration tool encoutered issues and aborted the migration.</error>');
+            $output->writeln('<error>The Migration tool encountered issues and aborted the migration.</error>');
             $output->writeln('<error>You should run it manually and investigate any issues.</error>');
             $output->writeln('<error>The exit code was ' . $exitCode . '</error>');
-
             return false;
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Creates a new user account using group_id 1; i.e the default super user group
-     *
-     * @param  array $user       The user's details
-     * @param  array $appVars    The application vars
-     * @param  array $deployVars The deploy vars
-     * @return mixed             boolean on success, false on failure
-     */
-    public function createUser($user, $appVars, $deployVars)
-    {
-        //  @TODO: Test username/email for duplicates
-
-        //  Correctly encode the password
-        if (!defined('APP_PRIVATE_KEY')) {
-            foreach ($appVars as $var) {
-                if (is_array($var) && $var['key'] == 'APP_PRIVATE_KEY') {
-                    define('APP_PRIVATE_KEY', $var['value']);
-                    break;
-                }
-            }
-        }
-
-        if (!defined('APP_PRIVATE_KEY')) {
-            foreach ($deployVars as $var) {
-                if (is_array($var) && $var['key'] == 'DEPLOY_PRIVATE_KEY') {
-                    define('DEPLOY_PRIVATE_KEY', $var['value']);
-                    break;
-                }
-            }
-        }
-
-        $oPasswordModel = Factory::model('UserPassword', 'nailsapp/module-auth');
-        $password       = $oPasswordModel->generateHashObject($user['password']);
-
-        // --------------------------------------------------------------------------
-
-        //  Create the main record
-        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user`
-        (
-            `group_id`,
-            `ip_address`,
-            `last_ip`,
-            `username`,
-            `password`,
-            `password_md5`,
-            `password_engine`,
-            `salt`,
-            `created`,
-            `first_name`,
-            `last_name`
-        )
-        VALUES
-        (
-            1,
-            '127.0.0.1',
-            '127.0.0.1',
-            " . $this->oDb->escape(strtolower(trim($user['username']))) . ",
-            '" . $password->password . "',
-            '" . $password->password_md5 . "',
-            '" . $password->engine . "',
-            '" . $password->salt . "',
-            NOW(),
-            " . $this->oDb->escape($user['first_name']) . ",
-            " . $this->oDb->escape($user['last_name']) . "
-        );";
-
-        $result = $this->oDb->query($sql);
-        if (!$result) {
-            return 'Could not create main user record.';
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Get the user's ID
-        $userId = $this->oDb->lastInsertId();
-
-        // --------------------------------------------------------------------------
-
-        //  Update the main record's id_md5 value
-        $sql    = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
-        $result = $this->oDb->query($sql);
-        if (!$result) {
-            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            return 'Could not set MD5 ID on main user record.';
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the user meta record
-        $sql    = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
-        $result = $this->oDb->query($sql);
-        if (!$result) {
-            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            return 'Could not create user_meta_app record.';
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Create the email record
-        $emailCode = $oPasswordModel->salt();
-        $sql       = "INSERT INTO `" . NAILS_DB_PREFIX . "user_email`
-        (
-            `user_id`,
-            `email`,
-            `code`,
-            `is_verified`,
-            `is_primary`,
-            `date_added`,
-            `date_verified`
-        )
-        VALUES
-        (
-            " . $userId . ",
-            " . $this->oDb->escape(strtolower(trim($user['email']))) . ",
-            '" . $emailCode . "',
-            1,
-            1,
-            NOW(),
-            NOW()
-        );";
-
-        $result = $this->oDb->query($sql);
-        if (!$result) {
-            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
-            $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
-            return 'Could not create main user email record.';
-        }
-
-        return true;
     }
 
     // --------------------------------------------------------------------------
