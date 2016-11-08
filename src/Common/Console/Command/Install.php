@@ -2,26 +2,28 @@
 
 namespace Nails\Common\Console\Command;
 
-use Nails\Factory;
-use Nails\Environment;
 use Nails\Console\Command\Base;
+use Nails\Environment;
+use Nails\Factory;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Install extends Base
 {
     /**
      * The endpoint for the components API
+     *
      * @var string
      */
     protected $componentEndpoint = 'http://components.nailsapp.co.uk/';
 
     /**
      * The database instance
+     *
      * @var Object
      */
     private $oDb;
@@ -30,6 +32,7 @@ class Install extends Base
 
     /**
      * Configures the app
+     *
      * @return void
      */
     protected function configure()
@@ -48,6 +51,7 @@ class Install extends Base
 
     /**
      * Executes the app
+     *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
@@ -70,6 +74,7 @@ class Install extends Base
 
     /**
      * Executes the Nails Installer
+     *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
@@ -118,7 +123,7 @@ class Install extends Base
                 $output->writeln('');
                 $output->writeln('<info>Nails Components</info>');
 
-                $question = 'Would you like to define components to enable now?';
+                $question          = 'Would you like to define components to enable now?';
                 $installComponents = $this->confirm($question, false, $input, $output);
 
                 //  Show a list of already installed components
@@ -153,7 +158,7 @@ class Install extends Base
                     }
 
                     $output->writeln('');
-                    $question = 'Would you like to enable another component?';
+                    $question          = 'Would you like to enable another component?';
                     $installComponents = $this->confirm($question, false, $input, $output);
                 }
             }
@@ -194,7 +199,7 @@ class Install extends Base
                 $createUser = $this->confirm($question, false, $input, $output);
                 $users      = array();
 
-                $userField = array();
+                $userField               = array();
                 $userField['first_name'] = 'First Name';
                 $userField['last_name']  = 'Surname';
                 $userField['email']      = 'Email Address';
@@ -205,8 +210,8 @@ class Install extends Base
 
                     do {
 
-                        $temp       = array();
-                        $userCount  = count($users) + 1;
+                        $temp      = array();
+                        $userCount = count($users) + 1;
 
                         $output->writeln('');
                         $output->writeln('User #' . $userCount);
@@ -224,7 +229,7 @@ class Install extends Base
 
                         $output->writeln('');
 
-                        $question = 'Create another user?';
+                        $question   = 'Create another user?';
                         $createUser = $this->confirm($question, false, $input, $output);
 
                         if (!$createUser) {
@@ -309,18 +314,18 @@ class Install extends Base
             }
 
             $output->writeln('');
-            $question = 'Does this look OK?';
+            $question  = 'Does this look OK?';
             $doInstall = $this->confirm($question, true, $input, $output);
 
             if ($doInstall) {
 
 
-                $curStep   = 1;
-                $numSteps  = 1; //  app.php
+                $curStep  = 1;
+                $numSteps = 1; //  app.php
                 $numSteps += 1; //  deploy.php
-                $numSteps += !empty($installTheseComponents)? 1 : 0;
+                $numSteps += !empty($installTheseComponents) ? 1 : 0;
                 $numSteps += 1; //  migrate DB.php
-                $numSteps += !empty($users)? 1 : 0;
+                $numSteps += !empty($users) ? 1 : 0;
 
                 $output->writeln('');
                 $output->writeln('<info>Installing...</info>');
@@ -436,6 +441,7 @@ class Install extends Base
 
     /**
      * Executes the Nails Component Installer
+     *
      * @param  InputInterface  $input  The Input Interface provided by Symfony
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @return void
@@ -463,7 +469,7 @@ class Install extends Base
         $output->writeln(' - Migrate the database');
         $output->writeln('');
 
-        $question = 'Continue?';
+        $question  = 'Continue?';
         $doInstall = $this->confirm($question, true, $input, $output);
 
         if ($doInstall) {
@@ -501,6 +507,7 @@ class Install extends Base
 
     /**
      * Defines all the App vars and their defaults
+     *
      * @return array
      */
     private function defineAppVars()
@@ -508,44 +515,44 @@ class Install extends Base
         $vars   = array();
         $vars[] = '// App Constants';
         $vars[] = array(
-                    'key'       => 'APP_NAME',
-                    'label'     => 'App Name',
-                    'value'     => defined('APP_NAME') ? APP_NAME : 'My App',
-                    'options'   => array()
-                );
+            'key'     => 'APP_NAME',
+            'label'   => 'App Name',
+            'value'   => defined('APP_NAME') ? APP_NAME : 'My App',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'APP_DEFAULT_TIMEZONE',
-                    'label'     => 'App Timezone',
-                    'value'     => defined('APP_DEFAULT_TIMEZONE') ? APP_DEFAULT_TIMEZONE : date_default_timezone_get(),
-                    'options'   => array()
-                );
+            'key'     => 'APP_DEFAULT_TIMEZONE',
+            'label'   => 'App Timezone',
+            'value'   => defined('APP_DEFAULT_TIMEZONE') ? APP_DEFAULT_TIMEZONE : date_default_timezone_get(),
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'APP_PRIVATE_KEY',
-                    'label'     => 'App Private Key',
-                    'value'     => defined('APP_PRIVATE_KEY') ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
-                    'options'   => array()
-                );
+            'key'     => 'APP_PRIVATE_KEY',
+            'label'   => 'App Private Key',
+            'value'   => defined('APP_PRIVATE_KEY') ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'APP_DEVELOPER_EMAIL',
-                    'label'     => 'Developer Email',
-                    'value'     => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
-                    'options'   => array()
-                );
+            'key'     => 'APP_DEVELOPER_EMAIL',
+            'label'   => 'Developer Email',
+            'value'   => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
+            'options' => array()
+        );
 
         // --------------------------------------------------------------------------
 
         //  Any constants defined by the components?
         $componentVars = $this->getConstantsFromComponents('APP', $vars);
-        $vars = array_merge($vars, $componentVars);
+        $vars          = array_merge($vars, $componentVars);
 
         // --------------------------------------------------------------------------
 
         //  Any other constants defined in app.php?
         $appFile = $this->getConstantsFromFile('config/app.php', $vars);
-        $vars = array_merge($vars, $appFile);
+        $vars    = array_merge($vars, $appFile);
 
         // --------------------------------------------------------------------------
 
@@ -556,99 +563,100 @@ class Install extends Base
 
     /**
      * Defines all the Deploy vars and their defaults
+     *
      * @return array
      */
     private function defineDeployVars()
     {
         $vars   = array();
         $vars[] = array(
-                    'key'       => 'ENVIRONMENT',
-                    'label'     => 'Environment',
-                    'value'     => Environment::get() ?: 'PRODUCTION',
-                    'options'   => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
-                );
+            'key'     => 'ENVIRONMENT',
+            'label'   => 'Environment',
+            'value'   => Environment::get() ?: 'PRODUCTION',
+            'options' => array('DEVELOPMENT', 'STAGING', 'PRODUCTION')
+        );
 
         $vars[] = array(
-                    'key'       => 'BASE_URL',
-                    'label'     => 'Base URL',
-                    'value'     => defined('BASE_URL') ? BASE_URL : '',
-                    'options'   => array()
-                );
+            'key'     => 'BASE_URL',
+            'label'   => 'Base URL',
+            'value'   => defined('BASE_URL') ? BASE_URL : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_PRIVATE_KEY',
-                    'label'     => 'Deployment Private Key',
-                    'value'     => defined('DEPLOY_PRIVATE_KEY') ? DEPLOY_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_PRIVATE_KEY',
+            'label'   => 'Deployment Private Key',
+            'value'   => defined('DEPLOY_PRIVATE_KEY') ? DEPLOY_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_DB_HOST',
-                    'label'     => 'Database Host',
-                    'value'     => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_DB_HOST',
+            'label'   => 'Database Host',
+            'value'   => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : 'localhost',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_DB_USERNAME',
-                    'label'     => 'Database User',
-                    'value'     => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_DB_USERNAME',
+            'label'   => 'Database User',
+            'value'   => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_DB_PASSWORD',
-                    'label'     => 'Database Password',
-                    'value'     => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_DB_PASSWORD',
+            'label'   => 'Database Password',
+            'value'   => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_DB_DATABASE',
-                    'label'     => 'Database Name',
-                    'value'     => defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_DB_DATABASE',
+            'label'   => 'Database Name',
+            'value'   => defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_EMAIL_HOST',
-                    'label'     => 'Email Host',
-                    'value'     => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_EMAIL_HOST',
+            'label'   => 'Email Host',
+            'value'   => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_EMAIL_USER',
-                    'label'     => 'Email Username',
-                    'value'     => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_EMAIL_USER',
+            'label'   => 'Email Username',
+            'value'   => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_EMAIL_PASS',
-                    'label'     => 'Email Password',
-                    'value'     => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_EMAIL_PASS',
+            'label'   => 'Email Password',
+            'value'   => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
+            'options' => array()
+        );
 
         $vars[] = array(
-                    'key'       => 'DEPLOY_EMAIL_PORT',
-                    'label'     => 'Email Port',
-                    'value'     => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : '25',
-                    'options'   => array()
-                );
+            'key'     => 'DEPLOY_EMAIL_PORT',
+            'label'   => 'Email Port',
+            'value'   => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : '25',
+            'options' => array()
+        );
 
         // --------------------------------------------------------------------------
 
         //  Any constants defined by the components?
         $componentVars = $this->getConstantsFromComponents('DEPLOY', $vars);
-        $vars = array_merge($vars, array_filter($componentVars));
+        $vars          = array_merge($vars, array_filter($componentVars));
 
         // --------------------------------------------------------------------------
 
         //  Any other constants defined in deploy.php?
         $appFile = $this->getConstantsFromFile('config/deploy.php', $vars);
-        $vars = array_merge($vars, array_filter($appFile));
+        $vars    = array_merge($vars, array_filter($appFile));
 
         // --------------------------------------------------------------------------
 
@@ -659,6 +667,7 @@ class Install extends Base
 
     /**
      * Returns the current value of a variable
+     *
      * @param  string $key  The key to return
      * @param  array  $vars The variable array to look at
      * @return mixed        var value (usually string) on success, null on failure
@@ -680,6 +689,7 @@ class Install extends Base
 
     /**
      * Finds all constants defined in a particular file
+     *
      * @param  string $path The path to analyse
      * @param  array  $vars The existing variables to check against (so only new variables are returned)
      * @return array
@@ -705,7 +715,7 @@ class Install extends Base
 
                     if (substr($matches[2][$i], 0, 1) == '\'' || substr($matches[2][$i], 0, 1) == '"') {
                         //  Remove the first and last character; subtracting 2 to account for the removal of both chars
-                        $matches[2][$i] = substr($matches[2][$i], 1, strlen($matches[2][$i])-2);
+                        $matches[2][$i] = substr($matches[2][$i], 1, strlen($matches[2][$i]) - 2);
                     }
                 }
 
@@ -726,10 +736,10 @@ class Install extends Base
                         $name = ucwords($name);
 
                         $out[] = array(
-                            'key'       => $matches[1][$i],
-                            'label'     => $name,
-                            'value'     => defined($matches[1][$i]) ? constant($matches[1][$i]) : '',
-                            'options'   => array()
+                            'key'     => $matches[1][$i],
+                            'label'   => $name,
+                            'value'   => defined($matches[1][$i]) ? constant($matches[1][$i]) : '',
+                            'options' => array()
                         );
                     }
                 }
@@ -743,6 +753,7 @@ class Install extends Base
 
     /**
      * Finds all constants defined by the enabled components for either app.php or deploy.php
+     *
      * @param  string $type The type of constant (either APP or DEPLOY)
      * @param  array  $vars The existing variables to check against (so only new variables are returned)
      * @return array
@@ -757,8 +768,9 @@ class Install extends Base
 
     /**
      * Finds constants for a particular component
+     *
      * @param  string $component The name of the component to look at
-     * @param  string $type   The type of constant (either APP or DEPLOY)
+     * @param  string $type      The type of constant (either APP or DEPLOY)
      * @return array
      */
     private function getConstantsFromComponent($component, $type)
@@ -771,6 +783,7 @@ class Install extends Base
 
     /**
      * Checks for the existance and writeability of the config files and directory
+     *
      * @return array
      */
     private function preInstallTests()
@@ -812,6 +825,7 @@ class Install extends Base
 
     /**
      * Requests the user to confirm all the variables
+     *
      * @param array           &$vars  An array of the variables to set
      * @param InputInterface  $input  The Input Interface provided by Symfony
      * @param OutputInterface $output The Output Interface provided by Symfony
@@ -822,7 +836,7 @@ class Install extends Base
 
             if (is_array($v)) {
 
-                $question  = 'What should "' . $v['label'] . '" be set to?';
+                $question = 'What should "' . $v['label'] . '" be set to?';
                 $question .= !empty($v['options']) ? ' (' . implode('|', $v['options']) . ')' : '';
 
                 $v['value'] = $this->ask($question, $v['value'], $input, $output);
@@ -834,6 +848,7 @@ class Install extends Base
 
     /**
      * Writes the supplied variables to the config file
+     *
      * @param  array  $vars The variables to write
      * @param  string $file The file to write to
      * @return boolean
@@ -873,6 +888,7 @@ class Install extends Base
 
     /**
      * Installs a particular component
+     *
      * @param  string          $componentName    The name of the component to install
      * @param  string          $componentVersion The version of the component to install
      * @param  OutputInterface $output           The Output Interface provided by Symfony
@@ -888,10 +904,12 @@ class Install extends Base
 
             $output->writeln('<error>FAILED</error>');
             $output->writeln('Composer failed with exit code "' . $execReturn . '"');
+
             return false;
         }
 
         $output->writeln('<info>DONE</info>');
+
         return true;
     }
 
@@ -899,6 +917,7 @@ class Install extends Base
 
     /**
      * Migrates the DB for a fresh install
+     *
      * @param  OutputInterface $output The Output Interface provided by Symfony
      * @param  string          $dbhost The database hsot to connect to
      * @param  string          $dbuser The database user to connect with
@@ -911,7 +930,7 @@ class Install extends Base
         //  Execute the migrate command, silently
         $cmd = $this->getApplication()->find('migrate');
 
-        $cmdInput  = new ArrayInput(
+        $cmdInput = new ArrayInput(
             array(
                 'command'  => 'migrate',
                 '--dbHost' => $dbhost,
@@ -930,6 +949,7 @@ class Install extends Base
         if ($exitCode == 0) {
 
             $output->writeln('<info>DONE</info>');
+
             return true;
 
         } else {
@@ -939,6 +959,7 @@ class Install extends Base
             $output->writeln('<error>The Migration tool encoutered issues and aborted the migration.</error>');
             $output->writeln('<error>You should run it manually and investigate any issues.</error>');
             $output->writeln('<error>The exit code was ' . $exitCode . '</error>');
+
             return false;
         }
     }
@@ -947,6 +968,7 @@ class Install extends Base
 
     /**
      * Creates a new user account using group_id 1; i.e the default super user group
+     *
      * @param  array           $user       The user's details
      * @param  array           $appVars    The application vars
      * @param  array           $deployVars The deploy vars
@@ -1031,22 +1053,24 @@ class Install extends Base
         // --------------------------------------------------------------------------
 
         //  Update the main record's id_md5 value
-        $sql = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
+        $sql    = "UPDATE `" . NAILS_DB_PREFIX . "user` SET `id_md5` = MD5(`id`) WHERE `id` = " . $userId . ";";
         $result = $this->oDb->query($sql);
         if (!$result) {
 
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+
             return 'Could not set MD5 ID on main user record.';
         }
 
         // --------------------------------------------------------------------------
 
         //  Create the user meta record
-        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
+        $sql    = "INSERT INTO `" . NAILS_DB_PREFIX . "user_meta_app` (`user_id`) VALUES (" . $userId . ");";
         $result = $this->oDb->query($sql);
         if (!$result) {
 
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
+
             return 'Could not create user_meta_app record.';
         }
 
@@ -1054,7 +1078,7 @@ class Install extends Base
 
         //  Create the email record
         $emailCode = $oPasswordModel->salt();
-        $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "user_email`
+        $sql       = "INSERT INTO `" . NAILS_DB_PREFIX . "user_email`
         (
             `user_id`,
             `email`,
@@ -1080,6 +1104,7 @@ class Install extends Base
 
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user` WHERE `id` = " . $userId);
             $this->oDb->query("DELETE FROM `" . NAILS_DB_PREFIX . "user_meta_app` WHERE `user_id` = " . $userId);
+
             return 'Could not create main user email record.';
         }
 
@@ -1090,6 +1115,7 @@ class Install extends Base
 
     /**
      * Performs the abort functionality and returns the exit code
+     *
      * @param  OutputInterface $output   The Output Interface provided by Symfony
      * @param  integer         $exitCode The exit code
      * @return int
@@ -1106,6 +1132,7 @@ class Install extends Base
 
         $output->writeln('<error>Aborting install</error>');
         $output->writeln('');
+
         return $exitCode;
     }
 
@@ -1113,18 +1140,19 @@ class Install extends Base
 
     /**
      * Works out which binary to use for composer
+     *
      * @return string
      */
     private function detectComposerBin()
     {
         //  Detect composer
         $composerBin = 'composer';
-        $result = shell_exec('which ' . $composerBin);
+        $result      = shell_exec('which ' . $composerBin);
 
         if (empty($result)) {
 
             $composerBin = 'composer.phar';
-            $result = shell_exec('which ' . $composerBin);
+            $result      = shell_exec('which ' . $composerBin);
 
             if (empty($result)) {
 
@@ -1140,6 +1168,7 @@ class Install extends Base
     /**
      * Asks the suer which component they'd like to install and validates it against
      * the Nails Components repository.
+     *
      * @param  string          $componentName The component name to install
      * @param  InputInterface  $input         The Input Interface provided by Symfony
      * @param  OutputInterface $output        The Output Interface provided by Symfony
@@ -1182,7 +1211,7 @@ class Install extends Base
             if (!$isValidComponent) {
 
                 $output->writeln('');
-                $question = 'Enter the component name you\'d like to install';
+                $question      = 'Enter the component name you\'d like to install';
                 $componentName = $this->ask($question, '', $input, $output);
 
             } else {
@@ -1194,7 +1223,7 @@ class Install extends Base
         } while (!$isValidComponent);
 
         //  Already installed?
-        $installed         = _NAILS_GET_COMPONENTS();
+        $installed            = _NAILS_GET_COMPONENTS();
         $componentIsInstalled = false;
 
         foreach ($installed as $component) {
@@ -1209,7 +1238,7 @@ class Install extends Base
         if (!$componentIsInstalled) {
 
             //  Get the version to install
-            $question = 'Enter the version you require for <info>' . $componentName . '</info>';
+            $question         = 'Enter the version you require for <info>' . $componentName . '</info>';
             $componentVersion = $this->ask($question, 'dev-develop', $input, $output);
 
             return array($componentName, $componentVersion);
@@ -1217,7 +1246,7 @@ class Install extends Base
         } else {
 
             $output->writeln('');
-            $output->writeln('<info>' . $componentName. '</info> is already installed.');
+            $output->writeln('<info>' . $componentName . '</info> is already installed.');
 
             return false;
         }
@@ -1227,8 +1256,9 @@ class Install extends Base
 
     /**
      * Searches Nails components Repository for the component name.
-     * @param  string           $componentName The component's name
-     * @param  OutputInterface  $output     The Output Interface provided by Symfony
+     *
+     * @param  string          $componentName The component's name
+     * @param  OutputInterface $output        The Output Interface provided by Symfony
      * @return mixed                        String on success (component's full name), false on failure
      */
     protected function isValidComponent($componentName, $output)
@@ -1284,6 +1314,7 @@ class Install extends Base
                     $output->writeln('   ' . $url);
                 }
             }
+
             return false;
 
         } else {
