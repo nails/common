@@ -50,7 +50,7 @@ Also provided are 4 helper functions for interacting with the database (which wi
 - `$this->lastInsertId()` - returns the ID of the last successful write operation
 - `$this->db()` - returns the raw instance of the PDO class underlying the wrapper, should you need it
 
-> **Note -** It is possible for Nails apps to specify an alternative table prefix for Nails tables, your migrations should respect this by replacing instances of `nails_` with `{{NAILS_DB_PREFIX}}`; `query()` and `prepare()` will automatically translate these for you.
+> **Note -** It is possible for Nails apps to specify an alternative table prefix for Nails tables, your migrations should respect this by replacing instances of `nails_` with `{{NAILS_DB_PREFIX}}`; `query()` and `prepare()` will automatically translate these for you. In addition, should you decide to use a prefix for the app tables then the same methods will automatically expand `{{APP_DB_PEFIX}}`.
 
 
 #### › Example Migration
@@ -64,11 +64,10 @@ The following is a sample migration class for a module named `my-vendor/my-modul
  * Started:     06/11/2015
  * Finalised:   09/11/2015
  *
- * @package     Nails
+ * @package     my-vendor
  * @subpackage  my-module
  * @category    Database Migration
  * @author      Joe Bloggs <joe@bloggs.com>
- * @link
  */
 
 namespace Nails\Database\Migration\MyVendor\MyModule;
@@ -84,12 +83,17 @@ class Migration0 extends Base
     public function execute()
     {
         $this->query("
-            CREATE TABLE `{{NAILS_DB_PREFIX}}my_table` (
+            CREATE TABLE `{{APP_DB_PREFIX}}my_table` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                 `key` varchar(50) DEFAULT NULL,
                 `value` text,
                 PRIMARY KEY (`id`),
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
+        
+        $this->query("
+            ALTER TABLE `{{NAILS_DB_PREFIX}}user_meta_app`
+                ADD `an_integer` int(11) unsigned DEFAULT NULL
         ");
     }
 }

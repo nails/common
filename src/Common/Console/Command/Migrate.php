@@ -512,6 +512,9 @@ class Migrate extends Base
 
                 //  Replace {{NAILS_DB_PREFIX}} with the constant
                 $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $line);
+                if (defined('APP_DB_PREFIX')) {
+                    $line = str_replace('{{APP_DB_PREFIX}}', APP_DB_PREFIX, $line);
+                }
 
                 if (!empty($line)) {
 
