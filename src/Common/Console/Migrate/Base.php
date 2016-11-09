@@ -8,6 +8,7 @@ class Base
 {
     /**
      * The database connection
+     *
      * @var \PDO
      */
     public $oDb;
@@ -16,6 +17,7 @@ class Base
 
     /**
      * A counter which is incremented for each query to make it easier to trace wen
+     *
      * @var int
      */
     protected $iQueryCount = 0;
@@ -24,6 +26,7 @@ class Base
 
     /**
      * The last query which was called via query() or prepare()
+     *
      * @var string
      */
     protected $sLastQuery = '';
@@ -39,14 +42,16 @@ class Base
 
     /**
      * Execute a DB query
+     *
      * @param  string $sQuery The query to execute
      * @return \PDOStatement
      */
     public function query($sQuery)
     {
+        $sQuery = $this->prepareQuery($sQuery);
         $this->iQueryCount++;
         $this->sLastQuery = $sQuery;
-        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
+
         return $this->oDb->query($sQuery);
     }
 
@@ -54,21 +59,42 @@ class Base
 
     /**
      * Prepare a DB query
+     *
      * @param  string $sQuery The query to prepare
      * @return \PDOStatement
      */
     public function prepare($sQuery)
     {
+        $sQuery = $this->prepareQuery($sQuery);
         $this->iQueryCount++;
         $this->sLastQuery = $sQuery;
-        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
+
         return $this->oDb->prepare($sQuery);
     }
 
     // --------------------------------------------------------------------------
 
     /**
+     * Prepares a query before execution
+     *
+     * @param string $sQuery The query to prepare
+     * @return mixed
+     */
+    protected function prepareQuery($sQuery)
+    {
+        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
+        if (defined('APP_DB_PREFIX')) {
+            $sQuery = str_replace('{{APP_DB_PREFIX}}', APP_DB_PREFIX, $sQuery);
+        }
+
+        return $sQuery;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the ID created by the previous write query
+     *
      * @return string
      */
     public function lastInsertId()
@@ -80,6 +106,7 @@ class Base
 
     /**
      * Exposes the database API
+     *
      * @return \PDO
      */
     public function db()
@@ -91,6 +118,7 @@ class Base
 
     /**
      * Returns the value of iQueryCount
+     *
      * @return int
      */
     public function getQueryCount()
@@ -102,6 +130,7 @@ class Base
 
     /**
      * Returns the value of iQueryCount
+     *
      * @return string
      */
     public function getLastQuery()
