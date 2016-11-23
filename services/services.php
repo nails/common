@@ -79,6 +79,10 @@ return array(
             $oCi = get_instance();
             return $oCi->output;
         },
+        'Router' => function () {
+            $oCi = get_instance();
+            return $oCi->router;
+        },
         'Uri' => function () {
             $oCi = get_instance();
             return $oCi->uri;
@@ -133,10 +137,6 @@ return array(
             } else {
                 return new \Nails\Common\Model\Language();
             }
-        },
-        'Router' => function () {
-            $oCi = get_instance();
-            return $oCi->router;
         },
         'Routes' => function () {
             if (class_exists('\App\Common\Model\Routes')) {
