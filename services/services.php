@@ -134,6 +134,10 @@ return array(
                 return new \Nails\Common\Model\Language();
             }
         },
+        'Router' => function () {
+            $oCi = get_instance();
+            return $oCi->router;
+        },
         'Routes' => function () {
             if (class_exists('\App\Common\Model\Routes')) {
                 return new \App\Common\Model\Routes();

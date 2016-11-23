@@ -13,37 +13,43 @@
  *
  **/
 
+use Nails\Factory;
+
 // --------------------------------------------------------------------------
 
 //  Catch 404
-$is404 = defined('NAILS_IS_404') && NAILS_IS_404 ? true : false;
+$bIs404 = defined('NAILS_IS_404') && NAILS_IS_404 ? true : false;
 
 // --------------------------------------------------------------------------
+
+$oView   = Factory::service('View');
+$oUri    = Factory::service('Uri');
+$oConfig = Factory::service('Config');
+$oRouter = Factory::service('Router');
 
 if (isset($headerOverride)) {
 
     //  Manual override
-    $this->load->view($headerOverride);
+    $oView->load($headerOverride);
 
 } elseif (isset($header_override)) {
 
     //  Manual override
-    $this->load->view($header_override);
+    $oView->load($header_override);
 
 } else {
 
     //  Auto-detect header if there is a config file
     if (file_exists(FCPATH . APPPATH . 'config/header_views.php')) {
 
-        $oConfig = nailsFactory('service', 'Config');
         $oConfig->load('header_views');
-        $match = false;
-        $uriString = $this->uri->uri_string();
+        $match     = false;
+        $uriString = $oUri->uri_string();
 
         if (!$uriString) {
 
             //  We're at the homepage, get the name of the default controller
-            $uriString = $this->router->routes['default_controller'];
+            $uriString = $oRouter->routes['default_controller'];
         }
 
         if ($oConfig->item('alt_header')) {
@@ -65,44 +71,44 @@ if (isset($headerOverride)) {
         //  Load the appropriate header view
         if ($match) {
 
-            $this->load->view($match);
+            $oView->load($match);
 
-        } elseif ($this->uri->segment(1) == 'admin') {
+        } elseif ($oUri->segment(1) == 'admin') {
 
             //  No match, but in admin, load the appropriate admin view
-            if ($is404) {
+            if ($bIs404) {
 
                 //  404 with no route, show the default header
-                $this->load->view($oConfig->item('default_header'));
+                $oView->load($oConfig->item('default_header'));
 
             } else {
 
                 //  Admin has no route and it's not a 404, load up the Nails admin header
-                $this->load->view('structure/header/nails-admin');
+                $oView->load('structure/header/nails-admin');
             }
 
         } else {
 
-            $this->load->view($oConfig->item('default_header'));
+            $oView->load($oConfig->item('default_header'));
         }
 
-    } elseif ($this->uri->segment(1) == 'admin' && !$is404) {
+    } elseif ($oUri->segment(1) == 'admin' && !$bIs404) {
 
         /**
          * Loading admin header and no config file. This isn't a 404 so go ahead and
          * load the normal Nails admin header
          */
 
-        $this->load->view('structure/header/nails-admin');
+        $oView->load('structure/header/nails-admin');
 
     } elseif (file_exists(FCPATH . APPPATH . 'views/structure/header/default.php')) {
 
         //  No config file, but the app has a default header
-        $this->load->view('structure/header/default');
+        $oView->load('structure/header/default');
 
     } else {
 
         //  No config file or app default, fall back to the default Nails. header
-        $this->load->view('structure/header/nails-default');
+        $oView->load('structure/header/nails-default');
     }
 }

@@ -1,3 +1,8 @@
+<?php
+
+use Nails\Factory;
+
+?>
         <script type="text/javascript">
             var ENVIRONMENT         = '<?=nailsEnvironment('get')?>';
             window.SITE_URL         = '<?=site_url('', isPageSecure())?>';
@@ -13,8 +18,9 @@
         <?php
 
         //  Load JS
-        $this->asset->output('JS');
-        $this->asset->output('JS-INLINE-FOOTER');
+        $oAsset = Factory::service('Asset');
+        $oAsset->output('JS');
+        $oAsset->output('JS-INLINE-FOOTER');
 
         //  Analytics
         if (appSetting('google_analytics_account')) {
@@ -31,7 +37,6 @@
 
             </script>
             <?php
-
         }
 
         ?>

@@ -1,6 +1,9 @@
 <?php
 
-    $this->load->view('structure/header/blank');
+use Nails\Factory;
+
+$oView = Factory::service('View');
+$oView->load('structure/header/blank');
 
 ?>
 <div class="container">
@@ -8,17 +11,26 @@
         <h1>
             <?=anchor('', APP_NAME, 'style="text-decoration:none;color:inherit;"')?>
         </h1>
-    </div><!-- /.row -->
+    </div>
     <hr />
     <?php
 
-    if ($success || $error || $message || $notice) {
+    $aMessages = [
+        'error'    => 'error',
+        'negative' => 'error',
+        'success'  => 'success',
+        'positive' => 'success',
+        'info'     => 'info',
+        'warning'  => 'warning',
+    ];
 
-        echo '<div class="container row">';
-        echo $success ? '<p class="alert alert-success">' . $success . '</p>' : '';
-        echo $error   ? '<p class="alert alert-danger">' . $error . '</p>' : '';
-        echo $message ? '<p class="alert alert-warning">' . $message . '</p>' : '';
-        echo $notice  ? '<p class="alert alert-info">' . $notice . '</p>' : '';
-        echo '</div>';
 
+    foreach ($aMessages as $sVariable => $sClass) {
+        if (!empty(${$sVariable})) {
+            ?>
+            <p class="alert alert-<?=$sClass?>">
+                <?=${$sVariable}?>
+            </p>
+            <?php
+        }
     }

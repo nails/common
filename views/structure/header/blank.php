@@ -4,18 +4,21 @@ use Nails\Factory;
 
 $aPageTitle = [];
 if (!empty($page->seo->title)) {
-
     $aPageTitle[] = $page->seo->title;
-
 } elseif (!empty($page->title)) {
-
     $aPageTitle[] = $page->title;
 }
 
 $aPageTitle[] = APP_NAME;
 
 
-$sBodyClass = !empty($page->body_class) ? $page->body_class : '';
+if (!empty($page->body_class) && is_array($page->body_class)) {
+    $aBodyClass = $page->body_class;
+} elseif (!empty($page->body_class)) {
+    $aBodyClass = [$page->body_class];
+} else {
+    $aBodyClass = [];
+}
 
 ?>
 <!DOCTYPE html>
@@ -50,4 +53,4 @@ $sBodyClass = !empty($page->body_class) ? $page->body_class : '';
           <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
         <![endif]-->
     </head>
-    <body <?=$sBodyClass ? 'class="' . $sBodyClass . '"' : ''?>>
+    <body<?=$aBodyClass ? ' class="' . implode(' ', $aBodyClass) . '"' : ''?>>
