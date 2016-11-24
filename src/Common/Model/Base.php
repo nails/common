@@ -1385,6 +1385,20 @@ class Base
      */
     public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
     {
+        //  @todo: specify searchable fields in constructor and generate this manually
+        if (empty($aData['or_like'])) {
+            $aData['or_like'] = array();
+        }
+
+        $sAlias = $this->getTableAlias(true);
+
+        foreach ($this->searchableFields as $mField) {
+            $aData['or_like'][] = array(
+                'column' => $sAlias . $mField,
+                'value'  => $sKeywords
+            );
+        }
+
         $aData['keywords'] = $sKeywords;
 
         $oOut          = new \stdClass();
