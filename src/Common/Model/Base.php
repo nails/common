@@ -1392,11 +1392,12 @@ class Base
 
         $sAlias = $this->getTableAlias(true);
 
-        foreach ($this->searchableFields as $mField) {
-            $aData['or_like'][] = array(
-                'column' => $sAlias . $mField,
-                'value'  => $sKeywords
-            );
+        foreach ($this->searchableFields as $sField) {
+            if (strpos($sField, '.') !== false) {
+                $aData['or_like'][] = [$sField, $sKeywords];
+            } else {
+                $aData['or_like'][] = [$sAlias . $sField, $sKeywords];
+            }
         }
 
         $oOut          = new \stdClass();

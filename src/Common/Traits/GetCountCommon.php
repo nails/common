@@ -24,20 +24,23 @@ trait GetCountCommon
      **/
     protected function getCountCommon($aData = array())
     {
-        //  @todo - improve/remove this
         //  @deprecated - searching should use the search() method, but this in place
         //  as a quick fix for loads of admin controllers
         if (!empty($aData['keywords']) && !empty($this->searchableFields)) {
-
             if (empty($aData['or_like'])) {
                 $aData['or_like'] = [];
             }
 
+            $sAlias = $this->getTableAlias(true);
+
             foreach ($this->searchableFields as $sField) {
-                $aData['or_like'][] = [$sField, $aData['keywords']];
+                if (strpos($sField, '.') !== false) {
+                    $aData['or_like'][] = [$sField, $aData['keywords']];
+                } else {
+                    $aData['or_like'][] = [$sAlias . $sField, $aData['keywords']];
+                }
             }
         }
-
         // --------------------------------------------------------------------------
 
         $this->getCountCommonCompileSelect($aData);
