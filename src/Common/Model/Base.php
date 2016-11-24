@@ -1399,8 +1399,6 @@ class Base
             );
         }
 
-        $aData['keywords'] = $sKeywords;
-
         $oOut          = new \stdClass();
         $oOut->page    = $iPage;
         $oOut->perPage = $iPerPage;
