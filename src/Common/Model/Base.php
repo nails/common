@@ -1392,11 +1392,27 @@ class Base
 
         $sAlias = $this->getTableAlias(true);
 
-        foreach ($this->searchableFields as $sField) {
-            if (strpos($sField, '.') !== false) {
-                $aData['or_like'][] = [$sField, $sKeywords];
+        foreach ($this->searchableFields as $mField) {
+
+            //  If the field is an array then search across the columns concatenated together
+            if (is_array($mField)) {
+
+                $sMappedFields = array_map(function($sInput) use ($sAlias) {
+                    if (strpos($sInput, '.') !== false) {
+                        return $sInput;
+                    } else {
+                        return $sAlias . $sInput;
+                    }
+                }, $mField);
+
+                $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords];
+
             } else {
-                $aData['or_like'][] = [$sAlias . $sField, $sKeywords];
+                if (strpos($mField, '.') !== false) {
+                    $aData['or_like'][] = [$mField, $sKeywords];
+                } else {
+                    $aData['or_like'][] = [$sAlias . $mField, $sKeywords];
+                }
             }
         }
 
