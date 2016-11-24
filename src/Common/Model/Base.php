@@ -12,11 +12,11 @@
 
 namespace Nails\Common\Model;
 
-use Nails\Factory;
 use Nails\Common\Exception\ModelException;
-use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\Caching;
+use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
+use Nails\Factory;
 
 class Base
 {
@@ -57,7 +57,7 @@ class Base
      * Expandable objects of type EXPANDABLE_TYPE_MANY are a 1 to many relationship
      * where a property of the child object is the ID of the parent object.
      */
-    const EXPANDABLE_TYPE_MANY   = 0;
+    const EXPANDABLE_TYPE_MANY = 0;
 
     /**
      * Expandable objects of type EXPANDABLE_TYPE_SINGLE are a 1 to 1 relationship
@@ -79,7 +79,7 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * @todo : this is copied directly from CodeIgniter - consider removing.
+     * @todo   : this is copied directly from CodeIgniter - consider removing.
      * __get
      *
      * Allows models to access CI's loaded classes using the same
@@ -91,6 +91,7 @@ class Base
     public function __get($sKey)
     {
         $oCi =& get_instance();
+
         return $oCi->$sKey;
     }
 
@@ -150,12 +151,12 @@ class Base
         if (!empty($this->tableCreatedByColumn)) {
             $this->addExpandableField(
                 array(
-                    'trigger'     => 'created_by',
-                    'type'        => self::EXPANDABLE_TYPE_SINGLE,
-                    'property'    => 'created_by',
-                    'model'       => 'User',
-                    'provider'    => 'nailsapp/module-auth',
-                    'id_column'   => 'created_by'
+                    'trigger'   => 'created_by',
+                    'type'      => self::EXPANDABLE_TYPE_SINGLE,
+                    'property'  => 'created_by',
+                    'model'     => 'User',
+                    'provider'  => 'nailsapp/module-auth',
+                    'id_column' => 'created_by'
                 )
             );
         }
@@ -163,12 +164,12 @@ class Base
         if (!empty($this->tableModifiedByColumn)) {
             $this->addExpandableField(
                 array(
-                    'trigger'     => 'modified_by',
-                    'type'        => self::EXPANDABLE_TYPE_SINGLE,
-                    'property'    => 'modified_by',
-                    'model'       => 'User',
-                    'provider'    => 'nailsapp/module-auth',
-                    'id_column'   => 'modified_by'
+                    'trigger'   => 'modified_by',
+                    'type'      => self::EXPANDABLE_TYPE_SINGLE,
+                    'property'  => 'modified_by',
+                    'model'     => 'User',
+                    'provider'  => 'nailsapp/module-auth',
+                    'id_column' => 'modified_by'
                 )
             );
         }
@@ -178,6 +179,7 @@ class Base
 
     /**
      * Destruct the model
+     *
      * @return void
      */
     public function __destruct()
@@ -194,6 +196,7 @@ class Base
 
     /**
      * Inject the user object, private by convention - only really used by a few core Nails classes
+     *
      * @param object $oUser The user object
      * @return void
      */
@@ -211,6 +214,7 @@ class Base
      * custom functionality is required.
      *
      * See the docs for more info
+     *
      * @TODO: link to docs
      *
      * --------------------------------------------------------------------------
@@ -218,6 +222,7 @@ class Base
 
     /**
      * Creates a new object
+     *
      * @param  array   $aData         The data to create the object with
      * @param  boolean $bReturnObject Whether to return just the new ID or the full object
      * @return mixed
@@ -338,6 +343,7 @@ class Base
 
     /**
      * Updates an existing object
+     *
      * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
      * @param  array         $aData The data to update the object(s) with
      * @return boolean
@@ -360,7 +366,7 @@ class Base
         if ($this->tableAutoSetTimestamps) {
 
             if (empty($aData[$this->tableModifiedColumn])) {
-                $oDate = Factory::factory('DateTime');
+                $oDate                                       = Factory::factory('DateTime');
                 $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
@@ -504,7 +510,7 @@ class Base
      * If Non-destructive deletion is enabled then the $this->tableDeletedColumn
      * field will be set to false.
      *
-     * @param  int     $iId The ID of the object to restore
+     * @param  int $iId The ID of the object to restore
      * @return boolean
      * @throws ModelException
      */
@@ -581,10 +587,12 @@ class Base
 
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
-     * @param  int    $iPage           The page number of the results, if null then no pagination
-     * @param  int    $iPerPage        How many items per page of paginated results
-     * @param  mixed  $aData           Any data to pass to getCountCommon()
-     * @param  bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     *
+     * @param  int   $iPage           The page number of the results, if null then no pagination
+     * @param  int   $iPerPage        How many items per page of paginated results
+     * @param  mixed $aData           Any data to pass to getCountCommon()
+     * @param  bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     *                                items
      * @return object
      * @throws ModelException
      */
@@ -642,10 +650,12 @@ class Base
 
     /**
      * Fetches all objects and formats them, optionally paginated
-     * @param int    $iPage           The page number of the results, if null then no pagination
-     * @param int    $iPerPage        How many items per page of paginated results
-     * @param mixed  $aData           Any data to pass to getCountCommon()
-     * @param bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     *
+     * @param int   $iPage           The page number of the results, if null then no pagination
+     * @param int   $iPerPage        How many items per page of paginated results
+     * @param mixed $aData           Any data to pass to getCountCommon()
+     * @param bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     *                               items
      * @return array
      */
     public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
@@ -689,7 +699,6 @@ class Base
                     }
                 }
             }
-
 
 
             foreach ($this->aExpandableFields as $oExpandableField) {
@@ -748,6 +757,7 @@ class Base
 
     /**
      * Fetches all objects as a flat array
+     *
      * @param  int     $iPage           The page number of the results
      * @param  int     $iPerPage        The number of items per page
      * @param  array   $aData           Any data to pass to getCountCommon()
@@ -799,8 +809,9 @@ class Base
 
     /**
      * Fetch an object by it's ID
-     * @param  int      $iId   The ID of the object to fetch
-     * @param  mixed    $aData Any data to pass to getCountCommon()
+     *
+     * @param  int   $iId   The ID of the object to fetch
+     * @param  mixed $aData Any data to pass to getCountCommon()
      * @return mixed           stdClass on success, false on failure
      * @throws ModelException
      */
@@ -837,6 +848,7 @@ class Base
 
     /**
      * Fetch objects by their IDs
+     *
      * @param  array $aIds  An array of IDs to fetch
      * @param  mixed $aData Any data to pass to getCountCommon()
      * @return array
@@ -865,8 +877,9 @@ class Base
 
     /**
      * Fetch an object by it's slug
-     * @param  string   $sSlug The slug of the object to fetch
-     * @param  array    $aData Any data to pass to getCountCommon()
+     *
+     * @param  string $sSlug The slug of the object to fetch
+     * @param  array  $aData Any data to pass to getCountCommon()
      * @return \stdClass
      * @throws ModelException
      */
@@ -903,6 +916,7 @@ class Base
 
     /**
      * Fetch objects by their slugs
+     *
      * @param  array $aSlugs An array of slugs to fetch
      * @param  array $aData  Any data to pass to getCountCommon()
      * @return array
@@ -937,8 +951,8 @@ class Base
      * an ID or a slug has been passed, thus numeric slugs (which are against
      * Nails style guidelines) will be interpreted incorrectly.
      *
-     * @param  mixed    $mIdSlug The ID or slug of the object to fetch
-     * @param  array    $aData   Any data to pass to getCountCommon()
+     * @param  mixed $mIdSlug The ID or slug of the object to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
      * @return \stdClass
      */
     public function getByIdOrSlug($mIdSlug, $aData = array())
@@ -958,13 +972,15 @@ class Base
     /**
      * Get associated content for the items in the result set where the the relationship is 1 to 1 and the binding
      * is made in the item object (i.e current item contains the associated item's ID)
+     *
      * @param  array   &$aItems                  The result set of items
      * @param  string  $sAssociatedItemIdColumn  Which property in the result set contains the associated content's ID
      * @param  string  $sItemProperty            What property of each item to assign the associated content
      * @param  string  $sAssociatedModel         The name of the model which handles the associated content
      * @param  string  $sAssociatedModelProvider Which module provides the associated model
      * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
-     * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by $sAssociatedItemIdColumn)
+     * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by
+     *                                           $sAssociatedItemIdColumn)
      * @return void
      */
     public function getSingleAssociatedItem(
@@ -1020,12 +1036,13 @@ class Base
 
     /**
      * Get associated content for the items in the result set where the the relationship is 1 to many
-     * @param  array  &$aItems                     The result set of items
-     * @param  string $sItemProperty               What property of each item to assign the associated content
-     * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
-     * @param  string $sAssociatedModel            The name of the model which handles the associated content
-     * @param  string $sAssociatedModelProvider    Which module provides the associated model
-     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     *
+     * @param  array  &$aItems                  The result set of items
+     * @param  string $sItemProperty            What property of each item to assign the associated content
+     * @param  string $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param  string $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string $sAssociatedModelProvider Which module provides the associated model
+     * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      * @return void
      */
     protected function getManyAssociatedItems(
@@ -1079,12 +1096,13 @@ class Base
 
     /**
      * Count associated content for the items in the result set where the the relationship is 1 to many
-     * @param  array  &$aItems                     The result set of items
-     * @param  string $sItemProperty               What property of each item to assign the associated content
-     * @param  string $sAssociatedItemIdColumn     Which property in the associated content which contains the item's ID
-     * @param  string $sAssociatedModel            The name of the model which handles the associated content
-     * @param  string $sAssociatedModelProvider    Which module provides the associated model
-     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     *
+     * @param  array  &$aItems                  The result set of items
+     * @param  string $sItemProperty            What property of each item to assign the associated content
+     * @param  string $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param  string $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string $sAssociatedModelProvider Which module provides the associated model
+     * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      * @return void
      */
     protected function countManyAssociatedItems(
@@ -1138,6 +1156,7 @@ class Base
 
     /**
      * Get associated content for the items in the result set using a taxonomy table
+     *
      * @param  array  &$aItems                     The result set of items
      * @param  string $sItemProperty               What property of each item to assign the associated content
      * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
@@ -1230,6 +1249,7 @@ class Base
 
     /**
      * Save associated items for an object
+     *
      * @param  integer $iItemId                  The ID of the main item
      * @param  array   $aAssociatedItems         The data to save, multi-dimensional array of data
      * @param  string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
@@ -1244,7 +1264,8 @@ class Base
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider
-    ) {
+    )
+    {
         $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
         $aTouchedIds          = array();
         $aExistingItemIds     = array();
@@ -1321,6 +1342,7 @@ class Base
 
     /**
      * Counts all objects
+     *
      * @param  array   $aData           An array of data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
      * @return integer
@@ -1352,28 +1374,18 @@ class Base
 
     /**
      * Searches for objects, optionally paginated.
-     * @param  string    $sKeywords       The search term
-     * @param  int       $iPage           The page number of the results, if null then no pagination
-     * @param  int       $iPerPage        How many items per page of paginated results
-     * @param  mixed     $aData           Any data to pass to getCountCommon()
-     * @param  bool      $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     *
+     * @param  string $sKeywords       The search term
+     * @param  int    $iPage           The page number of the results, if null then no pagination
+     * @param  int    $iPerPage        How many items per page of paginated results
+     * @param  mixed  $aData           Any data to pass to getCountCommon()
+     * @param  bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include
+     *                                 deleted items
      * @return \stdClass
      */
     public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
     {
-        //  @todo: specify searchable fields in constructor and generate this manually
-        if (empty($aData['or_like'])) {
-            $aData['or_like'] = array();
-        }
-
-        $sAlias = $this->getTableAlias(true);
-
-        foreach ($this->searchableFields as $mField) {
-            $aData['or_like'][] = array(
-                'column' => $sAlias . $mField,
-                'value'  => $sKeywords
-            );
-        }
+        $aData['keywords'] = $sKeywords;
 
         $oOut          = new \stdClass();
         $oOut->page    = $iPage;
@@ -1395,6 +1407,7 @@ class Base
 
     /**
      * This method provides the functionality to generate a unique slug for an item in the database.
+     *
      * @param string $sLabel    The label from which to generate a slug
      * @param string $sPrefix   Any prefix to add to the slug
      * @param string $sSuffix   Any suffix to add to the slug
@@ -1527,6 +1540,7 @@ class Base
 
     /**
      * Returns protected property $table
+     *
      * @param bool $bIncludePrefix Whether to include the table's alias
      * @throws ModelException
      * @return string
@@ -1544,6 +1558,7 @@ class Base
 
     /**
      * Returns protected property $tableAlias
+     *
      * @param bool $bIncludeSeparator Whether to include the prefix separator
      * @return string
      */
@@ -1574,6 +1589,7 @@ class Base
 
     /**
      * Define expandable objects
+     *
      * @param $aOptions array An array describing the expandable field
      * @throws ModelException
      */
@@ -1613,34 +1629,34 @@ class Base
         $this->aExpandableFields[] = (object) array(
 
             //  The text which triggers this expansion, passed in via $aData['expand']
-            'trigger' => $aOptions['trigger'],
+            'trigger'     => $aOptions['trigger'],
 
             //  The type of expansion: single or many
             //  This must be one of static::EXPAND_TYPE_SINGLE or static::EXPAND_TYPE_MANY
-            'type' => $aOptions['type'],
+            'type'        => $aOptions['type'],
 
             //  What property to assign the results of the expansion to
-            'property' => $aOptions['property'],
+            'property'    => $aOptions['property'],
 
             //  Which model to use for the expansion
-            'model' => $aOptions['model'],
+            'model'       => $aOptions['model'],
 
             //  The provider of the model
-            'provider' => $aOptions['provider'],
+            'provider'    => $aOptions['provider'],
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
              * parent object which contains the ID, for EXPANDABLE_TYPE_MANY, this is the
              * property of the child object which contains the parent's ID.
              */
-            'id_column' => $aOptions['id_column'],
+            'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
             'auto_expand' => !empty($aOptions['auto_expand']),
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save' => !empty($aOptions['auto_save'])
+            'auto_save'   => !empty($aOptions['auto_save'])
         );
     }
 
@@ -1648,6 +1664,7 @@ class Base
 
     /**
      * Extracts any autosaveable expandable fields and unsets them from the main array
+     *
      * @param  array $aData The data passed to create() or update()
      * @return array
      */
@@ -1677,8 +1694,9 @@ class Base
 
     /**
      * Saves extracted expandable fields
+     *
      * @param integer $iId
-     * @param array  $aExpandableFields
+     * @param array   $aExpandableFields
      */
     protected function autoSaveExpandableFieldsSave($iId, $aExpandableFields)
     {
@@ -1698,6 +1716,7 @@ class Base
 
     /**
      * Returns whether this model deletes destructively or not.
+     *
      * @return bool
      */
     public function isDestructiveDelete()
@@ -1710,6 +1729,7 @@ class Base
     /**
      * Describes the fields for this model automatically and with some guesswork;
      * for more fine grained control models should overload this method.
+     *
      * @return array
      */
     public function describeFields()
