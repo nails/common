@@ -155,7 +155,7 @@ class Logger
         } else {
 
             $oDate = Factory::factory('DateTime');
-            $this->oLog->file = 'log-' . $oDate->format('Y-m-d H:i:s') . '.php';
+            $this->oLog->file = 'log-' . $oDate->format('Y-m-d') . '.php';
         }
     }
 
