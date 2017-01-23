@@ -17,7 +17,7 @@ class Seed extends Base
      */
     protected function configure()
     {
-        $this->setName('seed');
+        $this->setName('db:seed');
         $this->setDescription('Seed the database');
 
         $this->addArgument(

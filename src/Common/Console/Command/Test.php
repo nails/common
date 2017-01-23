@@ -16,7 +16,7 @@ class Test extends Base
     protected function configure()
     {
         $this->setName('test');
-        $this->setDescription('Runs PHPUnit tests for the application');
+        $this->setDescription('[WIP] Runs PHPUnit tests for the application');
     }
 
     // --------------------------------------------------------------------------

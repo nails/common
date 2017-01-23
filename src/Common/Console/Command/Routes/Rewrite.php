@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Console\Command;
+namespace Nails\Common\Console\Command\Routes;
 
 use Nails\Factory;
 use Nails\Console\Command\Base;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Routes extends Base
+class Rewrite extends Base
 {
     /**
      * Configures the app
@@ -16,8 +16,8 @@ class Routes extends Base
      */
     protected function configure()
     {
-        $this->setName('rewrite-routes');
-        $this->setDescription('Rewrites the application\'s routes file (WIP)');
+        $this->setName('routes:rewrite');
+        $this->setDescription('[WIP] Rewrites the application\'s routes file');
     }
 
     // --------------------------------------------------------------------------

@@ -78,6 +78,12 @@ if (!function_exists('array_sort_multi')) {
                 return 0;
             }
 
+            //  If $a is a prefix of $b then $a comes first
+            $sPattern = '/^' . preg_quote($a->$field, '/') . '/';
+            if (preg_match($sPattern, $b->$field)) {
+                return -1;
+            }
+
             //  Not equal, work out which takes precedence
             $_sort = array($a->$field, $b->$field);
             sort($_sort);
@@ -93,7 +99,7 @@ if (!function_exists('array_search_multi')) {
 
     /**
      * Searches a multi-dimensional array
-     * @param  sting $value  Search value
+     * @param  string $value Search value
      * @param  string $key   Key to search
      * @param  array  $array The array to search
      * @return mixed         The array key on success, false on failure

@@ -11,11 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate extends Base
 {
-    const EXIT_CODE_SUCCESS = 0;
-    const EXIT_CODE_FAILURE = 1;
-
-    // --------------------------------------------------------------------------
-
     /**
      * The database instance
      *
@@ -32,7 +27,7 @@ class Migrate extends Base
      */
     protected function configure()
     {
-        $this->setName('migrate');
+        $this->setName('db:migrate');
         $this->setDescription('Runs database migration across all enabled modules');
 
         $this->addOption(
@@ -197,7 +192,8 @@ class Migrate extends Base
         if (!$nails && !$enabledModules && !$app) {
             $output->writeln('');
             $output->writeln('Nothing to migrate');
-            return $this->abort($output, self::EXIT_CODE_SUCCESS);
+            $output->writeln('');
+            return self::EXIT_CODE_SUCCESS;
         }
 
         // --------------------------------------------------------------------------
@@ -665,25 +661,18 @@ class Migrate extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  OutputInterface $output   The Output Interface provided by Symfony
-     * @param  integer         $exitCode The exit code
+     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param  array $aMessages The error message
+     * @param  integer $iExitCode The exit code
      * @return int
      */
-    private function abort($output, $exitCode = self::EXIT_CODE_FAILURE)
+    protected function abort($oOutput, $iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])
     {
-        $output->writeln('');
-
-        $colorOpen  = $exitCode === self::EXIT_CODE_FAILURE ? '' : '<error>';
-        $colorClose = $exitCode === self::EXIT_CODE_FAILURE ? '' : '</error>';
-
+        $aMessages[] = 'Aborting database migration';
         if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
-            $output->writeln($colorOpen . 'Rolling back Database' . $colorClose);
+            $aMessages[] = 'Rolling back database';
             $this->oDb->transactionRollback();
         }
-
-        $output->writeln($colorOpen . 'Aborting migration' . $colorClose);
-        $output->writeln('');
-
-        return $exitCode;
+        return parent::abort($oOutput, $iExitCode, $aMessages);
     }
 }

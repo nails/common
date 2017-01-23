@@ -12,11 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Install extends Base
 {
-    const EXIT_CODE_SUCCESS = 0;
-    const EXIT_CODE_FAILURE = 1;
-
-    // --------------------------------------------------------------------------
-
     /**
      * The endpoint for the components API
      *
@@ -409,6 +404,12 @@ class Install extends Base
             'key'   => 'APP_DEVELOPER_EMAIL',
             'label' => 'Developer Email',
             'value' => defined('APP_DEVELOPER_EMAIL') ? APP_DEVELOPER_EMAIL : '',
+        );
+
+        $vars[] = array(
+            'key'   => 'APP_DB_PREFIX',
+            'label' => 'Prefix for app database tables',
+            'value' => defined('APP_DB_PREFIX') ? 'app_' : '',
         );
 
         // --------------------------------------------------------------------------
@@ -813,7 +814,7 @@ class Install extends Base
     private function migrateDb($output, $sDbHost = null, $sDbUser = null, $sDbPass = null, $sDbName = null)
     {
         //  Execute the migrate command, silently
-        $cmd = $this->getApplication()->find('migrate');
+        $cmd = $this->getApplication()->find('db:migrate');
 
         $cmdInput = new ArrayInput(
             array(
@@ -853,23 +854,19 @@ class Install extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  OutputInterface $output   The Output Interface provided by Symfony
-     * @param  integer         $exitCode The exit code
+     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param  array $aMessages The error message
+     * @param  integer $iExitCode The exit code
      * @return int
      */
-    private function abort($output, $exitCode = self::EXIT_CODE_FAILURE)
+    protected function abort($oOutput, $iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])
     {
-        $output->writeln('');
-
+        $aMessages[] = 'Aborting install';
         if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
-            $output->writeln('<error>Rolling back Database</error>');
+            $aMessages[] = 'Rolling back Database';
             $this->oDb->transactionRollback();
         }
-
-        $output->writeln('<error>Aborting install</error>');
-        $output->writeln('');
-
-        return $exitCode;
+        return parent::abort($oOutput, $iExitCode, $aMessages);
     }
 
     // --------------------------------------------------------------------------
