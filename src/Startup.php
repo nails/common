@@ -79,6 +79,7 @@ class Startup
         defineConst('DEPLOY_DB_PASSWORD', '');
         defineConst('DEPLOY_DB_DATABASE', '');
         defineConst('NAILS_DB_PREFIX', 'nails_');
+        defineConst('APP_DB_PREFIX', '');
 
         if (Environment::is('PRODUCTION')) {
             defineConst('DEPLOY_DB_DEBUG', false);
