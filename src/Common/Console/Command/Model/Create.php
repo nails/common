@@ -3,19 +3,18 @@
 namespace Nails\Common\Console\Command\Model;
 
 use Nails\Common\Exception\Database\ConnectionException;
-use Nails\Console\Command\Base;
-use Nails\Environment;
+use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class Create extends Base
+class Create extends BaseMaker
 {
-    const MODEL_PATH            = FCPATH . 'src/Model/';
-    const ADMIN_PATH            = FCPATH . 'application/modules/admin/controllers/';
-    const MODEL_PATH_PERMISSION = 0755;
+    const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
+    const MODEL_PATH    = FCPATH . 'src/Model/';
+    const ADMIN_PATH    = FCPATH . 'application/modules/admin/controllers/';
 
     // --------------------------------------------------------------------------
 
@@ -24,8 +23,8 @@ class Create extends Base
      */
     protected function configure()
     {
-        $this->setName('model:create');
-        $this->setDescription('[WIP] Creates a new App Model');
+        $this->setName('make:model');
+        $this->setDescription('[WIP] Creates a new App model');
         $this->addArgument(
             'modelName',
             InputArgument::OPTIONAL,
@@ -56,37 +55,22 @@ class Create extends Base
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>----------------</info>');
-        $oOutput->writeln('<info>Nails Model Tool</info>');
-        $oOutput->writeln('<info>----------------</info>');
+        parent::execute($oInput, $oOutput);
 
         // --------------------------------------------------------------------------
 
-        //  Setup Factory - config files are required prior to set up
-        Factory::setup();
-
-        // --------------------------------------------------------------------------
-
-        //  Check environment
-        if (Environment::not('DEVELOPMENT')) {
-            return $this->abort(
-                $oOutput,
-                self::EXIT_CODE_FAILURE,
-                'This tool is only available on DEVELOPMENT environments'
-            );
-        }
+        //  Get options
+        $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
+        $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
 
         // --------------------------------------------------------------------------
 
         //  Test database connection
-        $bSkipDb = stringToBoolean($oInput->getOption('skip-db'));
         if (!$bSkipDb) {
             try {
                 Factory::service('ConsoleDatabase', 'nailsapp/module-console');
             } catch (ConnectionException $e) {
                 return $this->abort(
-                    $oOutput,
                     self::EXIT_CODE_FAILURE,
                     [
                         'Failed to connect to the database.',
@@ -95,7 +79,6 @@ class Create extends Base
                 );
             } catch (\Exception $e) {
                 return $this->abort(
-                    $oOutput,
                     self::EXIT_CODE_FAILURE,
                     [
                         'An exception occurred when connecting to the database.',
@@ -107,61 +90,10 @@ class Create extends Base
 
         // --------------------------------------------------------------------------
 
-        //  Check we can write where we need to write
-        if (!is_dir(self::MODEL_PATH)) {
-            if (!mkdir(self::MODEL_PATH, self::MODEL_PATH_PERMISSION, true)) {
-                return $this->abort(
-                    $oOutput,
-                    self::EXIT_CODE_FAILURE,
-                    [
-                        'Model directory does not exist and could not be created',
-                        self::MODEL_PATH,
-                    ]
-                );
-            }
-        } elseif (!is_writable(self::MODEL_PATH)) {
-            return $this->abort(
-                $oOutput,
-                self::EXIT_CODE_FAILURE,
-                [
-                    'Model directory exists but is not writeable',
-                    self::MODEL_PATH,
-                ]
-            );
-        }
-
-        $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
-        if (!$bSkipAdmin) {
-            if (!is_dir(self::ADMIN_PATH)) {
-                if (!mkdir(self::ADMIN_PATH, self::MODEL_PATH_PERMISSION, true)) {
-                    return $this->abort(
-                        $oOutput,
-                        self::EXIT_CODE_FAILURE,
-                        [
-                            'Admin controller directory does not exist and could not be created',
-                            self::ADMIN_PATH,
-                        ]
-                    );
-                }
-            } elseif (!is_writable(self::ADMIN_PATH)) {
-                return $this->abort(
-                    $oOutput,
-                    self::EXIT_CODE_FAILURE,
-                    [
-                        'Admin controller directory exists but is not writeable',
-                        self::ADMIN_PATH,
-                    ]
-                );
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Detect the services file
         $sServicesPath = FCPATH . APPPATH . 'services/services.php';
         if (!file_exists($sServicesPath)) {
             return $this->abort(
-                $oOutput,
                 self::EXIT_CODE_FAILURE,
                 [
                     'Could not detect the app\'s services.php file',
@@ -172,34 +104,18 @@ class Create extends Base
 
         // --------------------------------------------------------------------------
 
-        //  Get field names
-        $aFields = [
-            'MODEL_NAME' => $oInput->getArgument('modelName') ?: '',
-        ];
-        foreach ($aFields as $sField => &$sValue) {
-            if (empty($sValue)) {
-                $sField = ucwords(strtolower(str_replace('_', ' ', $sField)));
-                $sError = '';
-                do {
-                    $sValue = $this->ask($sError . $sField . ':', '', $oInput, $oOutput);
-                    $sError = '<error>Please specify</error> ';
-                } while (empty($sValue));
-            }
-        }
-        unset($sValue);
-
-        // --------------------------------------------------------------------------
-
-        $oOutput->writeln('');
         try {
-            $this->createModel($aFields, $oInput, $oOutput);
+            //  Ensure the paths exist
+            $this->createPath(self::MODEL_PATH);
+            if (!$bSkipAdmin) {
+                $this->createPath(self::ADMIN_PATH);
+            }
+            //  Create the model
+            $this->createModel();
         } catch (\Exception $e) {
             return $this->abort(
-                $oOutput,
                 self::EXIT_CODE_FAILURE,
-                [
-                    $e->getMessage(),
-                ]
+                $e->getMessage()
             );
         }
 
@@ -223,18 +139,19 @@ class Create extends Base
     /**
      * Create the Model
      *
-     * @param array $aFields The details to create the Model with
-     * @param InputInterface $oInput The Input Interface provided by Symfony
-     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      * @throws \Exception
-     * @return int
+     * @return void
      */
-    private function createModel($aFields, $oInput, $oOutput)
+    private function createModel()
     {
+        $oInput     = $this->oInput;
+        $oOutput    = $this->oOutput;
+        $aFields    = $this->getArguments();
+        $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
+        $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+
         try {
 
-            $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
-            $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
             $aModels    = explode(',', $aFields['MODEL_NAME']);
             $aModelData = [];
             foreach ($aModels as $sModelName) {
@@ -249,38 +166,28 @@ class Create extends Base
             $oOutput->writeln('');
             foreach ($aModelData as $oModel) {
                 $oOutput->writeln('Class: <info>\\' . $oModel->class_path . '</info>');
-                $oOutput->writeln('Path:  <info>' . $oModel->path . '/' . $oModel->filename . '</info>');
+                $oOutput->writeln('Path:  <info>' . $oModel->path . $oModel->filename . '</info>');
                 if (!$bSkipDb) {
                     $oOutput->writeln('Table: <info>' . $oModel->table . '</info>');
                 }
                 $oOutput->writeln('');
             }
 
-            if ($this->confirm('Continue?', true, $oInput, $oOutput)) {
+            if ($this->confirm('Continue?', true)) {
 
                 foreach ($aModelData as $oModel) {
 
                     $oOutput->writeln('');
                     $oOutput->write('Creating model <comment>' . $oModel->class_path . '</comment>... ');
-                    if (!is_dir($oModel->path)) {
-                        //  Attempt to create the containing directory
-                        if (!mkdir($oModel->path, static::MODEL_PATH_PERMISSION, true)) {
-                            throw new \Exception('Failed to create model directory "' . $oModel->path . '"');
-                        }
-                    }
+
+                    //  Ensure path exists
+                    $this->createPath($oModel->path);
 
                     //  Create the model file
-                    $sFile   = $oModel->path . $oModel->filename;
-                    $hHandle = fopen($sFile, 'w');
-                    if (!$hHandle) {
-                        throw new \Exception('Failed to open ' . $sFile . ' for writing');
-                    }
-
-                    if (fwrite($hHandle, $this->getResource('model.php', (array) $oModel)) === false) {
-                        throw new \Exception('Failed to write to ' . $sFile);
-                    }
-
-                    fclose($hHandle);
+                    $this->createFile(
+                        $oModel->path . $oModel->filename,
+                        $this->getResource('template/model.php', (array) $oModel)
+                    );
 
                     $oOutput->writeln('<info>done!</info>');
 
@@ -308,7 +215,7 @@ class Create extends Base
                         $oOutput->write('Adding database table...');
                         $oModel->nails_db_prefix = NAILS_DB_PREFIX;
                         $oDb                     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
-                        $oDb->query($this->getResource('model_table.php', (array) $oModel));
+                        $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
                         $oOutput->writeln('<info>done!</info>');
                     }
                 }
@@ -322,7 +229,10 @@ class Create extends Base
                     @unlink($oModel->path . '/' . $oModel->filename);
                 }
             }
-            throw new \Exception($e->getMessage(), $e->getCode());
+            throw new \Exception(
+                $e->getMessage(),
+                $e->getCode()
+            );
         }
     }
 
@@ -384,26 +294,5 @@ class Create extends Base
             'admin_class_name' => '@todo',
             'service_name'     => '@todo',
         ];
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get a resource and substitute fields into it
-     *
-     * @param string $sFile The file to fetch
-     * @param array $aFields The template fields
-     * @return string
-     */
-    private function getResource($sFile, $aFields)
-    {
-        $sResource = require NAILS_COMMON_PATH . 'resources/console/template/' . $sFile;
-
-        foreach ($aFields as $sField => $sValue) {
-            $sKey      = '{{' . strtoupper($sField) . '}}';
-            $sResource = str_replace($sKey, $sValue, $sResource);
-        }
-
-        return $sResource;
     }
 }

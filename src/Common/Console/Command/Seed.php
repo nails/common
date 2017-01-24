@@ -2,9 +2,9 @@
 
 namespace Nails\Common\Console\Command;
 
+use Nails\Console\Command\Base;
 use Nails\Environment;
 use Nails\Factory;
-use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,31 +37,35 @@ class Seed extends Base
 
     /**
      * Executes the app
-     * @param  InputInterface  $input  The Input Interface proivided by Symfony
-     * @param  OutputInterface $output The Output Interface proivided by Symfony
+     *
+     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
      * @throws \Exception
      * @return void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
-        $output->writeln('');
-        $output->writeln('<info>----------------------</info>');
-        $output->writeln('<info>Nails Database Seeder </info>');
-        $output->writeln('<info>----------------------</info>');
-        $output->writeln('Beginning...');
-        $output->writeln('');
+        parent::execute($oInput, $oOutput);
+
+        $oOutput->writeln('');
+        $oOutput->writeln('<info>----------------------</info>');
+        $oOutput->writeln('<info>Nails Database Seeder </info>');
+        $oOutput->writeln('<info>----------------------</info>');
+        $oOutput->writeln('Beginning...');
+        $oOutput->writeln('');
 
         // --------------------------------------------------------------------------
 
         //  Check environment
         if (Environment::is('PRODUCTION')) {
 
-            $output->writeln('');
-            $output->writeln('--------------------------------------');
-            $output->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
-            $output->writeln('--------------------------------------');
-            $output->writeln('');
-            $output->writeln('Aborting seed.');
+            $oOutput->writeln('');
+            $oOutput->writeln('--------------------------------------');
+            $oOutput->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
+            $oOutput->writeln('--------------------------------------');
+            $oOutput->writeln('');
+            $oOutput->writeln('Aborting seed.');
+
             return;
         }
 
@@ -69,8 +73,8 @@ class Seed extends Base
 
 
         //  Prep arguments
-        $sComponent = strtolower($input->getArgument('component'));
-        $sClass     = strtolower($input->getArgument('class'));
+        $sComponent = strtolower($oInput->getArgument('component'));
+        $sClass     = strtolower($oInput->getArgument('class'));
         $aClasses   = explode(',', $sClass);
         $aClasses   = array_filter($aClasses);
         $aClasses   = array_unique($aClasses);
@@ -152,28 +156,28 @@ class Seed extends Base
         }
 
         //  Get confirmation
-        $output->writeln('The following seeds will be executed in this order:');
-        $output->writeln('');
+        $oOutput->writeln('The following seeds will be executed in this order:');
+        $oOutput->writeln('');
         foreach ($aSeedClasses as $oSeedClass) {
             //  Execute migration
-            $output->writeln(
+            $oOutput->writeln(
                 ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>'
             );
         }
-        $output->writeln('');
+        $oOutput->writeln('');
 
-        $bDoSeed = $this->confirm('Does this look OK?', true, $input, $output);
+        $bDoSeed = $this->confirm('Does this look OK?', true);
 
         if ($bDoSeed) {
-            $output->writeln('');
-            $output->writeln('Executing seeds...');
-            $output->writeln('');
+            $oOutput->writeln('');
+            $oOutput->writeln('Executing seeds...');
+            $oOutput->writeln('');
 
             $oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
 
             foreach ($aSeedClasses as $oSeedClass) {
                 //  Execute seed
-                $output->write(
+                $oOutput->write(
                     str_pad(
                         ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>... ',
                         50,
@@ -181,29 +185,29 @@ class Seed extends Base
                     )
                 );
                 $sClassName = $oSeedClass->namespace . 'Seed\\' . $oSeedClass->class;
-                $oClass = new $sClassName($oDb);
+                $oClass     = new $sClassName($oDb);
                 $oClass->pre();
                 $oClass->execute();
                 $oClass->post();
-                $output->writeln('<info>DONE</info>');
+                $oOutput->writeln('<info>DONE</info>');
             }
-            $output->writeln('');
+            $oOutput->writeln('');
         } else {
-            $output->writeln('');
-            $output->writeln('No seeds were executed');
-            $output->writeln('');
+            $oOutput->writeln('');
+            $oOutput->writeln('No seeds were executed');
+            $oOutput->writeln('');
         }
 
         // --------------------------------------------------------------------------
 
         //  Cleaning up
-        $output->writeln('');
-        $output->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('');
+        $oOutput->writeln('<comment>Cleaning up...</comment>');
 
         // --------------------------------------------------------------------------
 
         //  And we're done
-        $output->writeln('');
-        $output->writeln('Complete!');
+        $oOutput->writeln('');
+        $oOutput->writeln('Complete!');
     }
 }

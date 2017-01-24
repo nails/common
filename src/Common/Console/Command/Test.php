@@ -3,7 +3,6 @@
 namespace Nails\Common\Console\Command;
 
 use Nails\Console\Command\Base;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -23,30 +22,32 @@ class Test extends Base
 
     /**
      * Executes the app
-     * @param  InputInterface  $input  The Input Interface provided by Symfony
-     * @param  OutputInterface $output The Output Interface provided by Symfony
+     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
      * @return void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
-        $output->writeln('');
-        $output->writeln('<info>-------------</info>');
-        $output->writeln('<info>Nails Testing</info>');
-        $output->writeln('<info>-------------</info>');
-        $output->writeln('Beginning...');
+        parent::execute($oInput, $oOutput);
 
-        $output->writeln('');
-        $output->writeln('');
-        $output->writeln('<comment>@todo</comment>');
-        $output->writeln('');
-        $output->writeln('');
+        $oOutput->writeln('');
+        $oOutput->writeln('<info>-------------</info>');
+        $oOutput->writeln('<info>Nails Testing</info>');
+        $oOutput->writeln('<info>-------------</info>');
+        $oOutput->writeln('Beginning...');
+
+        $oOutput->writeln('');
+        $oOutput->writeln('');
+        $oOutput->writeln('<comment>@todo</comment>');
+        $oOutput->writeln('');
+        $oOutput->writeln('');
 
         //  Cleaning up
-        $output->writeln('');
-        $output->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('');
+        $oOutput->writeln('<comment>Cleaning up...</comment>');
 
         //  And we're done!
-        $output->writeln('');
-        $output->writeln('Complete!');
+        $oOutput->writeln('');
+        $oOutput->writeln('Complete!');
     }
 }
