@@ -144,22 +144,6 @@ class Create extends BaseMaker
                     );
                 }
 
-                //  Ensure the path exists
-                $this->createPath($sControllerPath);
-
-                //  Create the controller and write to it
-                $this->createFile(
-                    $sControllerPath . $sFilename,
-                    $this->getResource('template/controller.php', $aFields)
-                );
-                $aCreated[] = $sControllerPath . $sFilename;
-                $this->oOutput->writeln('<info>done!</info>');
-
-                //  Create the views
-                $this->oOutput->write('Creating views for controller <comment>' . $sController . '</comment>... ');
-                $sViewPath = static::CONTROLLER_PATH . implode('/', $aViewBits) . '/';
-                $this->createPath($sViewPath);
-
                 //  Generate methods
                 $aMethodStrings = [];
                 reset($aMethods);
@@ -179,6 +163,23 @@ class Create extends BaseMaker
                     "\n    // --------------------------------------------------------------------------\n",
                     $aMethodStrings
                 );
+
+                //  Ensure the path exists
+                $this->createPath($sControllerPath);
+
+                //  Create the controller and write to it
+                $this->createFile(
+                    $sControllerPath . $sFilename,
+                    $this->getResource('template/controller.php', $aFields)
+                );
+                $aCreated[] = $sControllerPath . $sFilename;
+                $this->oOutput->writeln('<info>done!</info>');
+
+                //  Create the views
+                $this->oOutput->write('Creating views for controller <comment>' . $sController . '</comment>... ');
+                $sViewPath = static::CONTROLLER_PATH . implode('/', $aViewBits) . '/';
+                $this->createPath($sViewPath);
+
 
                 foreach ($aMethods as $sMethod) {
                     $sView = $sViewPath . $sMethod . '.php';
