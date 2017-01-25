@@ -6,7 +6,7 @@
  */
 
 return <<<'EOD'
-CREATE TABLE `{{TABLE}}` (
+CREATE TABLE `{{TABLE_WITH_PREFIX}}` (
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `slug` varchar(150) DEFAULT NULL,
     `label` varchar(150) DEFAULT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `{{TABLE}}` (
     PRIMARY KEY (`id`),
     KEY `created_by` (`created_by`),
     KEY `modified_by` (`modified_by`),
-    CONSTRAINT `app_{{TABLE}}_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL,
-    CONSTRAINT `app_{{TABLE}}_ibfk_2` FOREIGN KEY (`modified_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
+    CONSTRAINT `{{TABLE_WITH_PREFIX}}_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `{{TABLE_WITH_PREFIX}}_ibfk_2` FOREIGN KEY (`modified_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 EOD;

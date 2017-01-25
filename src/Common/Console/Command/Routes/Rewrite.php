@@ -25,7 +25,7 @@ class Rewrite extends Base
      * Executes the app
      * @param  InputInterface $oInput The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
-     * @return void
+     * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
@@ -53,5 +53,7 @@ class Rewrite extends Base
         //  And we're done!
         $oOutput->writeln('');
         $oOutput->writeln('Complete!');
+
+        return static::EXIT_CODE_SUCCESS;
     }
 }

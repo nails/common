@@ -9,7 +9,7 @@ return <<<'EOD'
 <?php
 
 /**
- * This model handles interactions with the app's "{{TABLE}}" table.
+ * This model handles interactions with the app's "{{TABLE_WITH_PREFIX}}" table.
  *
  * @package  App
  * @category model

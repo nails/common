@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Console\Command;
+namespace Nails\Common\Console\Command\Database;
 
 use Nails\Console\Command\Base;
 use Nails\Environment;
@@ -41,7 +41,7 @@ class Seed extends Base
      * @param  InputInterface $oInput The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
      * @throws \Exception
-     * @return void
+     * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
@@ -66,7 +66,7 @@ class Seed extends Base
             $oOutput->writeln('');
             $oOutput->writeln('Aborting seed.');
 
-            return;
+            return static::EXIT_CODE_FAILURE;
         }
 
         // --------------------------------------------------------------------------
@@ -209,5 +209,7 @@ class Seed extends Base
         //  And we're done
         $oOutput->writeln('');
         $oOutput->writeln('Complete!');
+
+        return static::EXIT_CODE_SUCCESS;
     }
 }

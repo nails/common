@@ -12,9 +12,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Create extends BaseMaker
 {
-    const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
-    const MODEL_PATH    = FCPATH . 'src/Model/';
-    const ADMIN_PATH    = FCPATH . 'application/modules/admin/controllers/';
+    const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
+    const MODEL_PATH        = FCPATH . 'src/Model/';
+    const ADMIN_PATH        = FCPATH . 'application/modules/admin/controllers/';
+    const SERVICE_PATH      = FCPATH . APPPATH . 'services/services.php';
+    const SERVICE_TEMP_PATH = DEPLOY_CACHE_DIR . 'services.temp.php';
+
+    // --------------------------------------------------------------------------
+
+    private $fServicesHandle;
+    private $iServicesTokenLocation;
+    private $iServicesIndent;
 
     // --------------------------------------------------------------------------
 
@@ -24,7 +32,7 @@ class Create extends BaseMaker
     protected function configure()
     {
         $this->setName('make:model');
-        $this->setDescription('[WIP] Creates a new App model');
+        $this->setDescription('Creates a new App model');
         $this->addArgument(
             'modelName',
             InputArgument::OPTIONAL,
@@ -91,16 +99,53 @@ class Create extends BaseMaker
         // --------------------------------------------------------------------------
 
         //  Detect the services file
-        $sServicesPath = FCPATH . APPPATH . 'services/services.php';
-        if (!file_exists($sServicesPath)) {
+        if (!file_exists(static::SERVICE_PATH)) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
                 [
                     'Could not detect the app\'s services.php file',
-                    $sServicesPath,
+                    static::SERVICE_PATH,
                 ]
             );
         }
+
+        //  Look for the generator token
+        $this->fServicesHandle = fopen(static::SERVICE_PATH, "r+");;
+        $bFound                = false;
+        if ($this->fServicesHandle) {
+            $iLocation = 0;
+            while (($sLine = fgets($this->fServicesHandle)) !== false) {
+                if (preg_match('#^(\s*)// GENERATOR\[MODELS\]#', $sLine, $aMatches)) {
+                    $bFound                       = true;
+                    $this->iServicesIndent   = strlen($aMatches[1]);
+                    $this->iServicesTokenLocation = $iLocation;
+                    break;
+                }
+                $iLocation = ftell($this->fServicesHandle);
+            }
+            if (!$bFound) {
+                fclose($this->fServicesHandle);
+
+                return $this->abort(
+                    self::EXIT_CODE_FAILURE,
+                    [
+                        'Services file does not contain the generator token (i.e // GENERATOR[MODELS])',
+                        'This token is required so that the tool can safely insert new model definitions',
+                    ]
+                );
+            }
+        } else {
+            fclose($this->fServicesHandle);
+
+            return $this->abort(
+                self::EXIT_CODE_FAILURE,
+                [
+                    'Failed to open the services file for reading and writing.',
+                    static::SERVICE_PATH,
+                ]
+            );
+        }
+
 
         // --------------------------------------------------------------------------
 
@@ -168,13 +213,14 @@ class Create extends BaseMaker
                 $oOutput->writeln('Class: <info>\\' . $oModel->class_path . '</info>');
                 $oOutput->writeln('Path:  <info>' . $oModel->path . $oModel->filename . '</info>');
                 if (!$bSkipDb) {
-                    $oOutput->writeln('Table: <info>' . $oModel->table . '</info>');
+                    $oOutput->writeln('Table: <info>' . $oModel->table_with_prefix . '</info>');
                 }
                 $oOutput->writeln('');
             }
 
             if ($this->confirm('Continue?', true)) {
 
+                $sServiceDefinitions = '';
                 foreach ($aModelData as $oModel) {
 
                     $oOutput->writeln('');
@@ -191,25 +237,6 @@ class Create extends BaseMaker
 
                     $oOutput->writeln('<info>done!</info>');
 
-                    //  Add to the app's services array
-                    $oOutput->write('Adding model to app services...');
-                    //  Read the services file into memory
-                    //  @todo
-                    //  Export contents of array with var_export and parse in new items
-                    //  @todo
-                    //  Add the new service definition at the appropriate bit
-                    //  @todo
-                    //  Overwrite the file
-                    //  @todo
-                    $oOutput->writeln('<info>done!</info>');
-
-                    //  Create admin
-                    if (!$bSkipAdmin) {
-                        $oOutput->write('Creating admin controller...');
-                        //  @todo
-                        $oOutput->writeln('<info>done!</info>');
-                    }
-
                     //  Create the database table
                     if (!$bSkipDb) {
                         $oOutput->write('Adding database table...');
@@ -218,7 +245,61 @@ class Create extends BaseMaker
                         $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
                         $oOutput->writeln('<info>done!</info>');
                     }
+
+                    //  Generate the service definition
+                    $aDefinition = [
+                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
+                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
+                        str_repeat(' ', $this->iServicesIndent) . '},',
+                    ];
+                    $sServiceDefinitions .= implode("\n", $aDefinition) . "\n";
+
+                    //  Create admin
+                    if (!$bSkipAdmin) {
+                        $oOutput->write('Creating admin controller...');
+                        //  Execute the create command, non-interactively and silently
+                        $iExitCode = $this->callCommand(
+                            'make:controller:admin',
+                            [
+                                'modelName' => $oModel->service_name,
+                                '--skip-check' => true
+                            ],
+                            false,
+                            true
+                        );
+                        if ($iExitCode === static::EXIT_CODE_FAILURE) {
+                            $oOutput->writeln('<error>failed!</error>');
+                        } else {
+                            $oOutput->writeln('<info>done!</info>');
+                        }
+                    }
                 }
+
+                //  Add models to the app's services array
+                $oOutput->writeln('');
+                $oOutput->write('Adding model(s) to app services...');
+                //  Create a temporary file
+                $fTempHandle = fopen(static::SERVICE_TEMP_PATH, "w+");
+                rewind($this->fServicesHandle);
+                $iLocation = 0;
+                while (($sLine = fgets($this->fServicesHandle)) !== false) {
+                    if ($iLocation === $this->iServicesTokenLocation) {
+                        fwrite(
+                            $fTempHandle,
+                            $sServiceDefinitions
+                        );
+                    }
+                    fwrite($fTempHandle, $sLine);
+                    $iLocation = ftell($this->fServicesHandle);
+                }
+
+                //  Move the temp services file into place
+                unlink(static::SERVICE_PATH);
+                rename(static::SERVICE_TEMP_PATH, static::SERVICE_PATH);
+                fclose($fTempHandle);
+                fclose($this->fServicesHandle);
+
+                $oOutput->writeln('<info>done!</info>');
             }
 
         } catch (\Exception $e) {
@@ -231,7 +312,7 @@ class Create extends BaseMaker
             }
             throw new \Exception(
                 $e->getMessage(),
-                $e->getCode()
+                is_numeric($e->getCode()) ? $e->getCode() : null
             );
         }
     }
@@ -256,7 +337,9 @@ class Create extends BaseMaker
         $sTableName = preg_replace('/[^a-z ]/', '', strtolower($sModelName));
         $sTableName = preg_replace('/ +/', '_', $sTableName);
         if (defined('APP_DB_PREFIX')) {
-            $sTableName = APP_DB_PREFIX . $sTableName;
+            $sTableNameWithPrefix = APP_DB_PREFIX . $sTableName;
+        } else {
+            $sTableNameWithPrefix = $sTableName;
         }
 
         //  Prepare the model name, namespace, filename etc
@@ -273,26 +356,30 @@ class Create extends BaseMaker
             throw new \Exception('A model by that path already exists "' . $sPath . $sFilename . '"');
         }
 
+        //  Set the service name
+        $sServiceName = str_replace('App\Model\\', '', $sModelName);
+        $sServiceName = str_replace('\\', '', $sServiceName);
+
         //  Test to see if the database table exists already
         if (!stringToBoolean($oInput->getOption('skip-db'))) {
             $oDb     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
-            $oResult = $oDb->query('SHOW TABLES LIKE "' . $sTableName . '"');
+            $oResult = $oDb->query('SHOW TABLES LIKE "' . $sTableNameWithPrefix . '"');
             if ($oResult->rowCount() > 0) {
                 throw new \Exception(
-                    'Table "' . $sTableName . '" already exists. Use option --skip-db to skip database checks.'
+                    'Table "' . $sTableNameWithPrefix . '" already exists. Use option --skip-db to skip database check.'
                 );
             }
         }
 
         return (object) [
-            'namespace'        => $sNamespace,
-            'class_name'       => $sClassName,
-            'class_path'       => $sNamespace . '\\' . $sClassName,
-            'path'             => $sPath,
-            'filename'         => $sFilename,
-            'table'            => $sTableName,
-            'admin_class_name' => '@todo',
-            'service_name'     => '@todo',
+            'namespace'         => $sNamespace,
+            'class_name'        => $sClassName,
+            'class_path'        => $sNamespace . '\\' . $sClassName,
+            'path'              => $sPath,
+            'filename'          => $sFilename,
+            'table'             => $sTableName,
+            'table_with_prefix' => $sTableNameWithPrefix,
+            'service_name'      => $sServiceName,
         ];
     }
 }

@@ -4,10 +4,8 @@ namespace Nails\Common\Console\Command;
 
 use Nails\Console\Command\Base;
 use Nails\Environment;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Install extends Base
@@ -83,7 +81,7 @@ class Install extends Base
         $oOutput = $this->oOutput;
 
         // --------------------------------------------------------------------------
-        
+
         $oOutput->writeln('');
         $oOutput->writeln('<info>---------------</info>');
         $oOutput->writeln('<info>Nails Installer</info>');
@@ -277,7 +275,7 @@ class Install extends Base
 
                 //  Migrate DB
                 $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Migrating database... ');
-                $this->migrateDb($oOutput, $dbHost, $dbUser, $dbPass, $dbName);
+                $this->migrateDb($dbHost, $dbUser, $dbPass, $dbName);
 
                 // --------------------------------------------------------------------------
 
@@ -319,9 +317,9 @@ class Install extends Base
     protected function executeComponentInstaller($component)
     {
         $oOutput = $this->oOutput;
-        
+
         // --------------------------------------------------------------------------
-        
+
         $oOutput->writeln('<info>-------------------------</info>');
         $oOutput->writeln('<info>Nails Component Installer</info>');
         $oOutput->writeln('<info>-------------------------</info>');
@@ -356,7 +354,7 @@ class Install extends Base
 
             //  Migrate DB
             $oOutput->write('<comment>[2/2]</comment> Migrating database... ');
-            if (!$this->migrateDb($oOutput)) {
+            if (!$this->migrateDb()) {
                 return $this->abort(static::EXIT_CODE_MIGRATE_FAILED);
             }
 
@@ -809,46 +807,43 @@ class Install extends Base
     /**
      * Migrates the DB for a fresh install
      *
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
      * @param  string $sDbHost The database host to connect to
      * @param  string $sDbUser The database user to connect with
      * @param  string $sDbPass The database password to connect with
      * @param  string $sDbName The database name to connect to
      * @return boolean
      */
-    private function migrateDb($oOutput, $sDbHost = null, $sDbUser = null, $sDbPass = null, $sDbName = null)
+    private function migrateDb($sDbHost = null, $sDbUser = null, $sDbPass = null, $sDbName = null)
     {
-        //  Execute the migrate command, silently
-        $cmd = $this->getApplication()->find('db:migrate');
-
-        $cmdInput = new ArrayInput(
+        //  Execute the migrate command, non-interactively and silently
+        $iExitCode = $this->callCommand(
+            'db:migrate',
             [
-                'command'  => 'migrate',
                 '--dbHost' => $sDbHost,
                 '--dbUser' => $sDbUser,
                 '--dbPass' => $sDbPass,
                 '--dbName' => $sDbName,
-            ]
+            ],
+            false,
+            true
         );
 
-        $cmdInput->setInteractive(false);
+        if ($iExitCode == 0) {
 
-        $cmdOutput = new NullOutput();
-        $exitCode  = $cmd->run($cmdInput, $cmdOutput);
-
-        if ($exitCode == 0) {
-
-            $oOutput->writeln('<info>DONE</info>');
+            $this->oOutput->writeln('<info>DONE</info>');
 
             return true;
 
         } else {
 
-            $oOutput->writeln('<error>WARNING</error>');
-            $oOutput->writeln('');
-            $oOutput->writeln('<error>The Migration tool encountered issues and aborted the migration.</error>');
-            $oOutput->writeln('<error>You should run it manually and investigate any issues.</error>');
-            $oOutput->writeln('<error>The exit code was ' . $exitCode . '</error>');
+            $this->abort(
+                self::EXIT_CODE_FAILURE,
+                [
+                    'The Migration tool encountered issues and aborted the migration.',
+                    'You should run it manually and investigate any issues.',
+                    'The exit code was ' . $exitCode,
+                ]
+            );
 
             return false;
         }
@@ -913,9 +908,9 @@ class Install extends Base
     private function requestComponent($componentName = '')
     {
         $oOutput = $this->oOutput;
-        
+
         // --------------------------------------------------------------------------
-        
+
         //  Get the component
         do {
 
