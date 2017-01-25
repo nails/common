@@ -1,4 +1,6 @@
 # Database Migrations
+> Documentation is a WIP.
+
 
 Database migrations can be run on the CLI using the `nails migrate` command. Migrations are run automatically as part of an `install` or an `upgrade`.
 

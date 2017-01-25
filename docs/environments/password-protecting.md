@@ -1,4 +1,6 @@
 # Password Protecting Environments
+> Documentation is a WIP.
+
 
 Sometimes it can be desireable to restrict access to a particular environment, e.g. a stopping the public from accessing a staging instance. Nails offers a simple mechanism for implementing basic authentication across the entire application when it detects a specific environment.
 

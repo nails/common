@@ -1,4 +1,6 @@
 # Events
+> Documentation is a WIP.
+
 
 Your app can subscribe to events triggered by either installed modules or your app easily using the `Event` service.
 
