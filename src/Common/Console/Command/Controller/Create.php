@@ -86,101 +86,126 @@ class Create extends BaseMaker
      */
     private function createController()
     {
-        $aFields = $this->getArguments();
+        $aFields  = $this->getArguments();
+        $aCreated = [];
 
         try {
 
-            //  Work out where the controller should live
-            $aControllerBits = explode('/', $aFields['CONTROLLER_NAME']);
+            $aControllers = array_filter(explode(',', $aFields['CONTROLLER_NAME']));
+            $aMethods     = explode(',', $aFields['METHODS']);
 
-            if (count($aControllerBits) > 2) {
-                throw new \Exception('Controllers cannot be deeper than one directory');
-            }
+            foreach ($aControllers as $sController) {
 
-            if (count($aControllerBits) > 1) {
-                //  A path has been specified, splice in the correct folder structure
-                array_splice($aControllerBits, -1, 0, ['controllers']);
-            } else {
-                //  The controller should be in a folder called itself
-                $aControllerBits = array_merge($aControllerBits, ['controllers'], $aControllerBits);
-            }
+                $aFields['CONTROLLER_NAME'] = $sController;
+                $this->oOutput->write('Creating controller <comment>' . $sController . '</comment>... ');
 
-            //  Work out where the views should live
-            $aViewBits = explode('/', $aFields['CONTROLLER_NAME']);
+                //  Work out where the controller should live
+                $aControllerBits = explode('/', $sController);
 
-            if (count($aViewBits) > 2) {
-                throw new \Exception('Controllers cannot be deeper than one directory');
-            }
+                if (count($aControllerBits) > 2) {
+                    throw new \Exception('Controllers cannot be deeper than one directory');
+                }
 
-            if (count($aViewBits) > 1) {
-                //  A path has been specified, splice in the correct folder structure
-                array_splice($aViewBits, -1, 0, ['views']);
-            } else {
-                //  The controller should be in a folder called itself
-                $aViewBits = array_merge($aViewBits, ['views']);
-            }
+                if (count($aControllerBits) > 1) {
+                    //  A path has been specified, splice in the correct folder structure
+                    array_splice($aControllerBits, -1, 0, ['controllers']);
+                } else {
+                    //  The controller should be in a folder called itself
+                    $aControllerBits = array_merge($aControllerBits, ['controllers'], $aControllerBits);
+                }
 
-            $sControllerPath = self::CONTROLLER_PATH . implode('/', array_slice($aControllerBits, 0, -1)) . '/';
-            $sFilename       = end($aControllerBits) . '.php';
-            $sClassName      = ucfirst(underscoreToCamelcase(end($aControllerBits)));
+                //  Work out where the views should live
+                $aViewBits = explode('/', $sController);
 
-            $aFields['CONTROLLER_PATH']     = $sControllerPath;
-            $aFields['CONTROLLER_FILENAME'] = $sFilename;
-            $aFields['CONTROLLER_CLASS']    = $sClassName;
+                if (count($aViewBits) > 2) {
+                    throw new \Exception('Controllers cannot be deeper than one directory');
+                }
 
-            //  Check if the controller already exists
-            if (file_exists($sControllerPath . $sFilename)) {
-                throw new \Exception(
-                    'Controller "' . $aFields['CONTROLLER_NAME'] . '" already exists at "' . $sControllerPath . $sFilename . '"'
-                );
-            }
+                if (count($aViewBits) > 1) {
+                    //  A path has been specified, splice in the correct folder structure
+                    array_splice($aViewBits, -1, 0, ['views']);
+                } else {
+                    //  The controller should be in a folder called itself
+                    $aViewBits = array_merge($aViewBits, ['views']);
+                }
 
-            //  Ensure the path exists
-            $this->createPath($sControllerPath);
+                $sControllerPath = self::CONTROLLER_PATH . implode('/', array_slice($aControllerBits, 0, -1)) . '/';
+                $sFilename       = end($aControllerBits) . '.php';
+                $sClassName      = ucfirst(underscoreToCamelcase(end($aControllerBits)));
 
-            //  Generate the methods
-            $aMethods       = explode(',', $aFields['METHODS']);
-            $aMethodStrings = [];
-            foreach ($aMethods as $sMethod) {
+                $aFields['CONTROLLER_PATH']     = $sControllerPath;
+                $aFields['CONTROLLER_FILENAME'] = $sFilename;
+                $aFields['CONTROLLER_CLASS']    = $sClassName;
 
-                $sMethodView      = $aFields['CONTROLLER_NAME'] . '/' . $sMethod;
-                $aMethodStrings[] = $this->getResource(
-                    'template/controller_method.php',
-                    [
-                        'METHOD_NAME' => $sMethod,
-                        'METHOD_VIEW' => $sMethodView,
-                    ]
-                );
-            }
+                //  Check if the controller already exists
+                if (file_exists($sControllerPath . $sFilename)) {
+                    throw new \Exception(
+                        'Controller "' . $sController . '" already exists at "' . $sControllerPath . $sFilename . '"'
+                    );
+                }
 
-            $aFields['METHODS'] = implode(
-                "\n    // --------------------------------------------------------------------------\n",
-                $aMethodStrings
-            );
+                //  Ensure the path exists
+                $this->createPath($sControllerPath);
 
-            //  Create the controller and write to it
-            $this->createFile(
-                $sControllerPath . $sFilename,
-                $this->getResource('template/controller.php', $aFields)
-            );
-
-            //  Create the views
-            $sViewPath = static::CONTROLLER_PATH . implode('/', $aViewBits) . '/';
-            $this->createPath($sViewPath);
-            foreach ($aMethods as $sMethod) {
-                $sView = $sViewPath . $sMethod . '.php';
+                //  Create the controller and write to it
                 $this->createFile(
-                    $sView,
-                    $this->getResource(
-                        'template/view.php',
-                        [
-                            'VIEW' => $sView,
-                        ]
-                    )
+                    $sControllerPath . $sFilename,
+                    $this->getResource('template/controller.php', $aFields)
                 );
+                $aCreated[] = $sControllerPath . $sFilename;
+                $this->oOutput->writeln('<info>done!</info>');
+
+                //  Create the views
+                $this->oOutput->write('Creating views for controller <comment>' . $sController . '</comment>... ');
+                $sViewPath = static::CONTROLLER_PATH . implode('/', $aViewBits) . '/';
+                $this->createPath($sViewPath);
+
+                //  Generate methods
+                $aMethodStrings = [];
+                reset($aMethods);
+                foreach ($aMethods as $sMethod) {
+
+                    $sMethodView      = $sController . '/' . $sMethod;
+                    $aMethodStrings[] = $this->getResource(
+                        'template/controller_method.php',
+                        [
+                            'METHOD_NAME' => $sMethod,
+                            'METHOD_VIEW' => $sMethodView,
+                        ]
+                    );
+                }
+
+                $aFields['METHODS'] = implode(
+                    "\n    // --------------------------------------------------------------------------\n",
+                    $aMethodStrings
+                );
+
+                foreach ($aMethods as $sMethod) {
+                    $sView = $sViewPath . $sMethod . '.php';
+                    $this->createFile(
+                        $sView,
+                        $this->getResource(
+                            'template/view.php',
+                            [
+                                'VIEW' => $sView,
+                            ]
+                        )
+                    );
+                    $aCreated[] = $sView;
+
+                }
+                $this->oOutput->writeln('<info>done!</info>');
             }
 
         } catch (\Exception $e) {
+            $this->oOutput->writeln('<error>failed!</error>');
+            //  Clean up created models
+            if (!empty($aCreated)) {
+                $this->oOutput->writeln('<error>Cleaning up - removing newly created files</error>');
+                foreach ($aCreated as $sPath) {
+                    @unlink($sPath);
+                }
+            }
             throw new \Exception($e->getMessage());
         }
     }
