@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate extends Base
 {
+    const VALID_MIGRATION_PATTERN           = '/^(\d+)(.*)\.(sql|php)$/';
     const EXIT_CODE_NO_DB                   = 2;
     const EXIT_CODE_DB_NOT_READY            = 4;
     const EXIT_CODE_MIGRATION_FAILED        = 6;
@@ -653,7 +654,7 @@ class Migrate extends Base
                 }
 
                 //  In the correct format?
-                if (preg_match('/^(\d+)(.*)\.(sql|php)$/', $fileInfo->getFilename(), $matches)) {
+                if (preg_match(static::VALID_MIGRATION_PATTERN, $fileInfo->getFilename(), $matches)) {
 
                     $out[$matches[1]] = [
                         'path'  => $fileInfo->getPathname(),

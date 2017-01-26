@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Console\Command\Model;
+namespace Nails\Common\Console\Command\Make;
 
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Console\Command\BaseMaker;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Create extends BaseMaker
+class Model extends BaseMaker
 {
     const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
     const MODEL_PATH        = FCPATH . 'src/Model/';

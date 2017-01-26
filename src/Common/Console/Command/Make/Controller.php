@@ -1,13 +1,13 @@
 <?php
 
-namespace Nails\Common\Console\Command\Controller;
+namespace Nails\Common\Console\Command\Make;
 
 use Nails\Console\Command\BaseMaker;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Create extends BaseMaker
+class Controller extends BaseMaker
 {
     const RESOURCE_PATH   = NAILS_COMMON_PATH . 'resources/console/';
     const CONTROLLER_PATH = FCPATH . 'application/modules/';

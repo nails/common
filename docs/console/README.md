@@ -5,16 +5,17 @@
 The following console tools are provided by this module and can be executed using the [Nails Console Tool](https://github.com/nailsapp/module-console).
 
 
-| Command           | Description                                                                   |
-|-------------------|-------------------------------------------------------------------------------|
-| `install`         | Generates the config files and assists with the database set up               |
-| `make:controller` | Creates a new app controller                                                  |
-| `make:model`      | Creates a new app model along with its associated table and admin panel       |
-| `db:migrate`      | Runs any outstanding database migrations on the app and all installed modules |
-| `db:seed`         | Runs any seeders which are provided by the app                                |
-| `test`            | Runs unit tests                                                               |
-| `migrate`         | Alias to `db:migrate`                                                         |
-| `routes:rewrite`  | Regenerates the routes file                                                   |
+| Command             | Description                                                                   |
+|---------------------|-------------------------------------------------------------------------------|
+| `install`           | Generates the config files and assists with the database set up               |
+| `make:controller`   | Creates a new app controller                                                  |
+| `make:model`        | Creates a new app model along with its associated table and admin panel       |
+| `make:db:migration` | Creates a new database migration, leading on from the previous, if any        |
+| `db:migrate`        | Runs any outstanding database migrations on the app and all installed modules |
+| `db:seed`           | Runs any seeders which are provided by the app                                |
+| `test`              | Runs unit tests                                                               |
+| `migrate`           | Alias to `db:migrate`                                                         |
+| `routes:rewrite`    | Regenerates the routes file                                                   |
 
 
 ## Command Documentation
@@ -61,6 +62,11 @@ Interactively generates new app models and associated table and admin controller
 | --skip-db    | Skip database table check/creation  | no       | false   |
 | --skip-admin | Skip admin controller creation      | no       | false   |
 
+
+
+### `make:db:migration`
+
+Creates a new database migration, leading off from the previous, if any.
 
 
 ### `db:migrate [options] [--]`
