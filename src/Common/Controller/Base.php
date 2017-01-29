@@ -86,7 +86,7 @@ class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Test that the cache is writeable
+        //  Test that the cache is writable
         $this->testCache();
 
         // --------------------------------------------------------------------------
@@ -306,7 +306,7 @@ class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
-     * Tests that the cache is writeable
+     * Tests that the cache is writable
      * @return void
      */
     protected function testCache()
@@ -325,7 +325,7 @@ class Base extends \MX_Controller
             } else {
 
                 throw new NailsException(
-                    'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writeable.',
+                    'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writable.',
                     1
                 );
             }

@@ -54,17 +54,17 @@ class CORE_NAILS_Log extends CI_Log
 
             $this->_log_path = DEPLOY_LOG_DIR;
 
-            //  If we haven't already, check to see if DEPLOY_LOG_DIR is writeable
+            //  If we haven't already, check to see if DEPLOY_LOG_DIR is writable
             if (is_null($this->_enabled)) {
 
-                if (is_writeable($this->_log_path)) {
+                if (is_writable($this->_log_path)) {
 
-                    //  Writeable!
+                    //  Writable!
                     $this->_enabled = true;
 
                 } else {
 
-                    //  Not writeable, disable logging and kick up a fuss
+                    //  Not writable, disable logging and kick up a fuss
                     $this->_enabled = false;
 
                     //  Send developer mail, but only once
@@ -90,8 +90,8 @@ class CORE_NAILS_Log extends CI_Log
                         $msg     = strtoupper($level).' '.((strtoupper($level) == 'INFO') ? ' -' : '-').' '.date($this->_date_fmt). ' --> '.$msg."\n";
                         $appname = defined('APP_NAME') ? APP_NAME : '[Could not determine app name]';
 
-                        $subject  = 'Log folders are not writeable on ' . $appname;
-                        $message  = 'I just tried to write to the log folder for ' . $appname . ' and found them not to be writeable.' . "\n";
+                        $subject  = 'Log folders are not writable on ' . $appname;
+                        $message  = 'I just tried to write to the log folder for ' . $appname . ' and found them not to be writable.' . "\n";
                         $message .= '' . "\n";
                         $message .= 'Get this fixed ASAP - I\'ll bug you every time this happens.' . "\n";
                         $message .= '' . "\n";

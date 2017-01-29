@@ -646,21 +646,21 @@ class Install extends Base
         $appConfigExists    = file_exists('config/app.php');
         $deployConfigExists = file_exists('config/deploy.php');
 
-        //  If config/app.php is there is it writeable?
+        //  If config/app.php is there is it writable?
         if ($appConfigExists) {
 
             if (!is_writable(FCPATH . 'config/app.php')) {
 
-                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
+                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writable.';
             }
         }
 
-        //  If config/deploy.php is there, is it writeable?
+        //  If config/deploy.php is there, is it writable?
         if ($deployConfigExists) {
 
             if (!is_writable(FCPATH . 'config/deploy.php')) {
 
-                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writeable.';
+                $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writable.';
             }
         }
 
@@ -668,7 +668,7 @@ class Install extends Base
         if (!$appConfigExists || !$deployConfigExists) {
 
             if (!is_writable(FCPATH . 'config/')) {
-                $preTestErrors[] = '<comment>config/</comment> is not writeable.';
+                $preTestErrors[] = '<comment>config/</comment> is not writable.';
             }
         }
 
