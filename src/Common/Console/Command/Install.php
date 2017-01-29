@@ -787,7 +787,11 @@ class Install extends Base
     {
         $composerBin = $this->detectComposerBin();
 
-        exec($composerBin . ' require ' . $componentName . ':' . $componentVersion, $execOutput, $execReturn);
+        exec(
+            $composerBin . ' require ' . $componentName . ':' . $componentVersion . ' --prefer-dist --quiet',
+            $execOutput,
+            $execReturn
+        );
 
         if ($execReturn !== 0) {
 
