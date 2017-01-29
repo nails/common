@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate extends Base
 {
-    const VALID_MIGRATION_PATTERN           = '/^(\d+)(.*)\.(sql|php)$/';
+    const VALID_MIGRATION_PATTERN           = '/^(\d+)(.*)\.php$/';
     const EXIT_CODE_NO_DB                   = 2;
     const EXIT_CODE_DB_NOT_READY            = 4;
     const EXIT_CODE_MIGRATION_FAILED        = 6;
@@ -352,7 +352,7 @@ class Migrate extends Base
 
     /**
      * Determines whether or not the module needs to migration, and if so between what versions
-     * 
+     *
      * @param string $moduleName The module's name
      * @param string $migrationsPath The module's path
      * @return null|\stdClass stdClass when migration needed, null when not needed
@@ -376,7 +376,6 @@ class Migrate extends Base
             foreach ($dirMap as $dir) {
                 $migrations[$dir['path']] = [
                     'index' => $dir['index'],
-                    'type'  => $dir['type'],
                 ];
             }
 
@@ -442,9 +441,9 @@ class Migrate extends Base
     protected function doMigration($module)
     {
         $oOutput = $this->oOutput;
-        
+
         // --------------------------------------------------------------------------
-        
+
         //  Map the directory and fetch only the files we need
         $path   = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
         $dirMap = $this->mapDir($path);
@@ -455,22 +454,9 @@ class Migrate extends Base
         //  Go through all the migrations, skip any which have already been executed
         $lastMigration = null;
         foreach ($dirMap as $migration) {
-
             if ($migration['index'] > $current) {
-
-                switch ($migration['type']) {
-
-                    case 'SQL':
-                        if (!$this->migrateSql($module, $migration)) {
-                            return false;
-                        }
-                        break;
-
-                    case 'PHP':
-                        if (!$this->migratePhp($module, $migration)) {
-                            return false;
-                        }
-                        break;
+                if (!$this->executeMigration($module, $migration)) {
+                    return false;
                 }
             }
 
@@ -497,79 +483,13 @@ class Migrate extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Executes migrations on a SQL File where each line is a query
+     * Executes an individual migration
      *
      * @param  object $module The module being migrated
      * @param  array $migration The migration details
      * @return boolean
      */
-    private function migrateSql($module, $migration)
-    {
-        $oOutput = $this->oOutput;
-
-        //  Go through the file and execute each line.
-        $handle = fopen($migration['path'], 'r');
-
-        if ($handle) {
-
-            $lineNumber = 1;
-            while (($line = fgets($handle)) !== false) {
-
-                //  Remove comments
-                $line = trim($line);
-                $line = preg_replace('#^//.+$#', '', $line);
-                $line = preg_replace('/^#.+$/', '', $line);
-                $line = preg_replace('/^--.+$/', '', $line);
-                $line = preg_replace('#/\*.*\*/#', '', $line);
-                $line = trim($line);
-
-                //  Replace {{NAILS_DB_PREFIX}} with the constant
-                $line = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $line);
-                if (defined('APP_DB_PREFIX')) {
-                    $line = str_replace('{{APP_DB_PREFIX}}', APP_DB_PREFIX, $line);
-                }
-
-                if (!empty($line)) {
-
-                    //  We have something!
-                    try {
-                        $this->oDb->query($line);
-                    } catch (\Exception $e) {
-                        $oOutput->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" failed:');
-                        $oOutput->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
-                        $oOutput->writeln('<error>ERROR</error>: Failed Query: #' . $lineNumber);
-                        $oOutput->writeln('<error>ERROR</error>: Failed Query: ' . $line);
-
-                        return false;
-                    }
-                }
-
-                $lineNumber++;
-            }
-
-            return true;
-
-        } else {
-
-            // error opening the file.
-            $oOutput->writeln('');
-            $oOutput->writeln('');
-            $oOutput->writeln('<error>ERROR</error>: Failed to open <info>' . $migration['path'] . '</info> for reading.');
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Executes migrations on a PHP which extends Nails\Common\Migration\Base
-     *
-     * @param  object $module The module being migrated
-     * @param  array $migration The migration details
-     * @return boolean
-     */
-    private function migratePhp($module, $migration)
+    private function executeMigration($module, $migration)
     {
         $oOutput = $this->oOutput;
 
@@ -659,7 +579,6 @@ class Migrate extends Base
                     $out[$matches[1]] = [
                         'path'  => $fileInfo->getPathname(),
                         'index' => (int) $matches[1],
-                        'type'  => strtoupper($fileInfo->getExtension()),
                     ];
                 }
             }
@@ -672,6 +591,29 @@ class Migrate extends Base
 
             return false;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Replaces {{CONSTANT}} with the value of constant, CONSTANT
+     *
+     * @param string $sString The string to search on
+     * @return string
+     */
+    protected function replaceConstants($sString)
+    {
+        return preg_replace_callback(
+            '/{{(.+)}}/',
+            function ($aMatches) {
+                if (defined($aMatches[1])) {
+                    return constant($aMatches[1]);
+                }
+
+                return $aMatches[0];
+            },
+            $sString
+        );
     }
 
     // --------------------------------------------------------------------------

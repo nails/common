@@ -48,7 +48,7 @@ class Base
      */
     public function query($sQuery)
     {
-        $sQuery = $this->prepareQuery($sQuery);
+        $sQuery = $this->replaceConstants($sQuery);
         $this->iQueryCount++;
         $this->sLastQuery = $sQuery;
 
@@ -65,7 +65,7 @@ class Base
      */
     public function prepare($sQuery)
     {
-        $sQuery = $this->prepareQuery($sQuery);
+        $sQuery = $this->replaceConstants($sQuery);
         $this->iQueryCount++;
         $this->sLastQuery = $sQuery;
 
@@ -75,19 +75,24 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Prepares a query before execution
+     * Replaces {{CONSTANT}} with the value of constant, CONSTANT
      *
-     * @param string $sQuery The query to prepare
-     * @return mixed
+     * @param string $sString The string to search on
+     * @return string
      */
-    protected function prepareQuery($sQuery)
+    protected function replaceConstants($sString)
     {
-        $sQuery = str_replace('{{NAILS_DB_PREFIX}}', NAILS_DB_PREFIX, $sQuery);
-        if (defined('APP_DB_PREFIX')) {
-            $sQuery = str_replace('{{APP_DB_PREFIX}}', APP_DB_PREFIX, $sQuery);
-        }
+        return preg_replace_callback(
+            '/{{(.+?)}}/',
+            function ($aMatches) {
+                if (defined($aMatches[1])) {
+                    return constant($aMatches[1]);
+                }
 
-        return $sQuery;
+                return $aMatches[0];
+            },
+            $sString
+        );
     }
 
     // --------------------------------------------------------------------------

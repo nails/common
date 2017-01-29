@@ -39,11 +39,18 @@ class Rewrite extends Base
 
         $oRoutesModel = Factory::model('Routes');
 
-        if ($oRoutesModel->update()) {
-            $oOutput->writeln('Routes rewritten successfully.');
-        } else {
-            $oOutput->writeln('There was a problem writing the routes.');
-            $oOutput->writeln($oRoutesModel->lastError());
+        try {
+            if (!$oRoutesModel->update(null, $oOutput)) {
+                throw new \Exception($oRoutesModel->lastError());
+            }
+        } catch (\Exception $e) {
+            $this->abort(
+                static::EXIT_CODE_FAILURE,
+                [
+                    'There was a problem writing the routes.',
+                    $e->getMessage(),
+                ]
+            );
         }
 
         //  Cleaning up

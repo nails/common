@@ -72,9 +72,11 @@ class Routes
      * Update routes
      *
      * @param  string $sModule For which module to restrict the route update
+     * @param  \Symfony\Component\Console\Output\OutputInterface $oOutput A Symfony OutputInterface to write logs to
      * @return boolean
+     * @throws \Exception
      */
-    public function update($sModule = null)
+    public function update($sModule = null, $oOutput = null)
     {
         if (!$this->bCanWriteRoutes) {
 
@@ -98,20 +100,50 @@ class Routes
 
             if (file_exists($sPath)) {
 
-                require $sPath;
-                $sRoutesClass = 'Nails\\Routes\\' . ucfirst(strtolower($oModule->moduleName)) . '\\Routes';
-                $oInstance    = new $sRoutesClass();
+                if (!is_null($oOutput)) {
+                    $oOutput->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
+                }
 
-                $this->aRoutes['//BEGIN ' . $oModule->name] = '';
-                $this->aRoutes                              = $this->aRoutes + (array) $oInstance->getRoutes();
-                $this->aRoutes['//END ' . $oModule->name]   = '';
+                require $sPath;
+                $sRoutesClass   = 'Nails\\Routes\\' . ucfirst(strtolower($oModule->moduleName)) . '\\Routes';
+                $oInstance      = new $sRoutesClass();
+                $sBaseClass     = 'Nails\\Common\\Model\\BaseRoutes';
+                $aParentClasses = class_parents($oInstance);
+                if (!in_array($sBaseClass, $aParentClasses)) {
+                    throw new \Exception(
+                        'Routes generator ' . $sRoutesClass . ' does not extend ' . $sBaseClass
+                    );
+                }
+
+                $this->aRoutes['// BEGIN ' . $oModule->name] = '';
+                $this->aRoutes                               = $this->aRoutes + (array) $oInstance->getRoutes();
+                $this->aRoutes['// END ' . $oModule->name]   = '';
+
+                if (!is_null($oOutput)) {
+                    $oOutput->writeln('<info>done!</info>');
+                }
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Write the file
-        return $this->writeFile();
+        if (!is_null($oOutput)) {
+            $oOutput->write('Writing routes to file... ');
+        }
+        if ($this->writeFile()) {
+            if (!is_null($oOutput)) {
+                $oOutput->writeln('<info>done!</info>');
+            }
+
+            return true;
+        } else {
+            if (!is_null($oOutput)) {
+                $oOutput->writeln('<error>failed!</error>');
+            }
+
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
