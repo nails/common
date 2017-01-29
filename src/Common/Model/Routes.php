@@ -13,15 +13,41 @@
 namespace Nails\Common\Model;
 
 use Nails\Factory;
+use Nails\Common\Traits\ErrorHandling;
 
-class Routes extends BAse
+class Routes
 {
-    protected $canWriteRoutes;
-    protected $routesDir;
-    protected $routesFile;
-    protected $routes;
+    use ErrorHandling;
 
-    public $cantWriteReason;
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the routes can be written
+     * @var boolean
+     */
+    protected $bCanWriteRoutes;
+
+    /**
+     * The reason, if any, why routes cannot be written
+     * @var string
+     */
+    public $sCantWriteReason;
+
+    /**
+     * The routes to write
+     * @var array
+     */
+    protected $aRoutes;
+
+    /**
+     * Where to store the routes file
+     */
+    const ROUTES_DIR = DEPLOY_CACHE_DIR;
+
+    /**
+     * The name to give the routes file
+     */
+    const ROUTES_FILE = 'routes_app.php';
 
     // --------------------------------------------------------------------------
 
@@ -30,19 +56,12 @@ class Routes extends BAse
      */
     public function __construct()
     {
-        parent::__construct();
-
-        // --------------------------------------------------------------------------
-
         //  Set Defaults
-        $this->routesDir      = DEPLOY_CACHE_DIR;
-        $this->routesFile     = 'routes_app.php';
-        $this->canWriteRoutes = null;
-        $this->routes         = array();
+        $this->bCanWriteRoutes = null;
+        $this->aRoutes         = [];
 
-        if (!$this->canWriteRoutes()) {
-
-            $this->cantWriteReason = $this->lastError();
+        if (!$this->bCanWriteRoutes()) {
+            $this->sCantWriteReason = $this->lastError();
             $this->clearErrors();
         }
     }
@@ -51,39 +70,41 @@ class Routes extends BAse
 
     /**
      * Update routes
-     * @param  string $which For which model to restrict the route update
+     *
+     * @param  string $sModule For which module to restrict the route update
      * @return boolean
      */
-    public function update($which = null)
+    public function update($sModule = null)
     {
-        if (!$this->canWriteRoutes) {
+        if (!$this->bCanWriteRoutes) {
 
-            $this->setError($this->cantWriteReason);
+            $this->setError($this->sCantWriteReason);
+
             return false;
         }
 
         // --------------------------------------------------------------------------
 
         //  Look for modules who wish to write to the routes file
-        $modules = _NAILS_GET_MODULES();
+        $aModules = _NAILS_GET_MODULES();
 
-        foreach ($modules as $module) {
+        foreach ($aModules as $oModule) {
 
-            $routesFile = $module->path . 'routes/Routes.php';
+            if (!empty($sModule) && $sModule !== $oModule->slug) {
+                continue;
+            }
 
-            if (file_exists($routesFile)) {
+            $sPath = $oModule->path . 'routes/Routes.php';
 
-                include_once $routesFile;
+            if (file_exists($sPath)) {
 
-                $routesClass = 'Nails\\Routes\\' . ucfirst(strtolower($module->moduleName)) . '\\Routes';
-                $instance    = new $routesClass();
+                require $sPath;
+                $sRoutesClass = 'Nails\\Routes\\' . ucfirst(strtolower($oModule->moduleName)) . '\\Routes';
+                $oInstance    = new $sRoutesClass();
 
-                if (is_callable(array($instance, 'getRoutes'))) {
-
-                    $this->routes['//BEGIN ' . $module->name] = '';
-                    $this->routes = $this->routes + (array) $instance->getRoutes();
-                    $this->routes['//END ' . $module->name] = '';
-                }
+                $this->aRoutes['//BEGIN ' . $oModule->name] = '';
+                $this->aRoutes                              = $this->aRoutes + (array) $oInstance->getRoutes();
+                $this->aRoutes['//END ' . $oModule->name]   = '';
             }
         }
 
@@ -101,57 +122,59 @@ class Routes extends BAse
      */
     protected function writeFile()
     {
-        //  Routes are writeable, apparently, give it a bash
-        $_data = '<?php' . "\n\n";
-        $_data .= '/**' . "\n";
-        $_data .= ' * THIS FILE IS CREATED/MODIFIED AUTOMATICALLY'."\n";
-        $_data .= ' * ==========================================='."\n";
-        $_data .= ' *'."\n";
-        $_data .= ' * Any changes you make in this file will be overwritten the' . "\n";
-        $_data .= ' * next time the app routes are generated.'."\n";
-        $_data .= ' *'."\n";
-        $_data .= ' * See Nails docs for instructions on how to utilise the' . "\n";
-        $_data .= ' * routes_app.php file'."\n";
-        $_data .= ' *'."\n";
-        $_data .= ' **/' . "\n\n";
+        //  Routes are writable, apparently, give it a bash
+        $sData = '<?php' . "\n\n";
+        $sData .= '/**' . "\n";
+        $sData .= ' * THIS FILE IS CREATED/MODIFIED AUTOMATICALLY' . "\n";
+        $sData .= ' * ===========================================' . "\n";
+        $sData .= ' *' . "\n";
+        $sData .= ' * Any changes you make in this file will be overwritten the' . "\n";
+        $sData .= ' * next time the app routes are generated.' . "\n";
+        $sData .= ' *' . "\n";
+        $sData .= ' * See Nails docs for instructions on how to utilise the' . "\n";
+        $sData .= ' * routes_app.php file' . "\n";
+        $sData .= ' *' . "\n";
+        $sData .= ' **/' . "\n\n";
 
         // --------------------------------------------------------------------------
 
-        foreach ($this->routes as $key => $value) {
+        foreach ($this->aRoutes as $sKey => $sValue) {
 
-            if (preg_match('#^//.*$#', $key)) {
+            if (preg_match('#^//.*$#', $sKey)) {
 
                 //  This is a comment
-                $_data .= $key . "\n";
+                $sData .= $sKey . "\n";
 
             } else {
 
                 //  This is a route
-                $_data .= '$route[\'' . $key . '\']=\'' . $value . '\';' . "\n";
+                $sData .= '$route[\'' . $sKey . '\']=\'' . $sValue . '\';' . "\n";
             }
         }
 
-        $oDate  = Factory::factory('DateTime');
-        $_data .= "\n" . '//LAST GENERATED: ' . $oDate->format('Y-m-d H:i:s');
+        $oDate = Factory::factory('DateTime');
+        $sData .= "\n" . '//LAST GENERATED: ' . $oDate->format('Y-m-d H:i:s');
 
         // --------------------------------------------------------------------------
 
-        $_fh = @fopen($this->routesDir . $this->routesFile, 'w');
+        $fHandle = @fopen(static::ROUTES_DIR . static::ROUTES_FILE, 'w');
 
-        if (!$_fh) {
+        if (!$fHandle) {
 
-            $this->setError('Unable to open routes file for writing.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
+            $this->setError('Unable to open routes file for writing.');
+
             return false;
         }
 
-        if (!fwrite($_fh, $_data)) {
+        if (!fwrite($fHandle, $sData)) {
 
-            fclose($_fh);
-            $this->setError('Unable to write data to routes file.<small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
+            fclose($fHandle);
+            $this->setError('Unable to write data to routes file.');
+
             return false;
         }
 
-        fclose($_fh);
+        fclose($fHandle);
 
         return true;
     }
@@ -162,54 +185,60 @@ class Routes extends BAse
      * Determine whether or not the routes can be written
      * @return boolean
      */
-    public function canWriteRoutes()
+    public function bCanWriteRoutes()
     {
-        if (!is_null($this->canWriteRoutes)) {
+        if (!is_null($this->bCanWriteRoutes)) {
 
-            return $this->canWriteRoutes;
+            return $this->bCanWriteRoutes;
         }
 
         //  First, test if file exists, if it does is it writable?
-        if (file_exists($this->routesDir . $this->routesFile)) {
+        if (file_exists(static::ROUTES_DIR . static::ROUTES_FILE)) {
 
-            if (is_writeable($this->routesDir . $this->routesFile)) {
+            if (is_writable(static::ROUTES_DIR . static::ROUTES_FILE)) {
 
-                $this->canWriteRoutes = true;
+                $this->bCanWriteRoutes = true;
+
                 return true;
 
             } else {
 
                 //  Attempt to chmod the file
-                if (@chmod($this->routesDir . $this->routesFile, FILE_WRITE_MODE)) {
+                if (@chmod(static::ROUTES_DIR . static::ROUTES_FILE, FILE_WRITE_MODE)) {
 
-                    $this->canWriteRoutes = true;
+                    $this->bCanWriteRoutes = true;
+
                     return true;
 
                 } else {
 
-                    $this->setError('The route config exists, but is not writeable. <small>Located at: ' . $this->routesDir . $this->routesFile . '</small>');
-                    $this->canWriteRoutes = false;
+                    $this->setError('The route config exists, but is not writable.');
+                    $this->bCanWriteRoutes = false;
+
                     return false;
                 }
             }
 
-        } elseif (is_writeable($this->routesDir)) {
+        } elseif (is_writable(static::ROUTES_DIR)) {
 
-            $this->canWriteRoutes = true;
+            $this->bCanWriteRoutes = true;
+
             return true;
 
         } else {
 
             //  Attempt to chmod the directory
-            if (@chmod($this->routesDir, DIR_WRITE_MODE)) {
+            if (@chmod(static::ROUTES_DIR, DIR_WRITE_MODE)) {
 
-                $this->canWriteRoutes = true;
+                $this->bCanWriteRoutes = true;
+
                 return true;
 
             } else {
 
-                $this->setError('The route directory is not writeable. <small>' . $this->routesDir . '</small>');
-                $this->canWriteRoutes = false;
+                $this->setError('The route directory is not writable. <small>' . static::ROUTES_DIR . '</small>');
+                $this->bCanWriteRoutes = false;
+
                 return false;
             }
         }
