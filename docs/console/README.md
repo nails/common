@@ -11,6 +11,7 @@ The following console tools are provided by this module and can be executed usin
 | `make:controller`   | Creates a new app controller                                                  |
 | `make:model`        | Creates a new app model along with its associated table and admin panel       |
 | `make:db:migration` | Creates a new database migration, leading on from the previous, if any        |
+| `make:db:seeder`    | Creates a new database seeder                                                 |
 | `db:migrate`        | Runs any outstanding database migrations on the app and all installed modules |
 | `db:seed`           | Runs any seeders which are provided by the app                                |
 | `test`              | Runs unit tests                                                               |
@@ -67,6 +68,19 @@ Interactively generates new app models and associated table and admin controller
 ### `make:db:migration`
 
 Creates a new database migration, leading off from the previous, if any.
+
+
+
+### `make:db:seeder [options] [--] [<seederName>]`
+
+Creates a new, blank, database seeder.
+
+#### Arguments & Options
+
+| Argument   | Description                                   | Required | Default |
+|------------|-----------------------------------------------|----------|---------|
+| seederName | The seeder name. Specify multiples using CSV  | no       | null    |
+
 
 
 ### `db:migrate [options] [--]`
