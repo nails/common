@@ -104,7 +104,7 @@ class Routes
                     $oOutput->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
                 }
 
-                require $sPath;
+                require_once $sPath;
                 $sRoutesClass   = 'Nails\\Routes\\' . ucfirst(strtolower($oModule->moduleName)) . '\\Routes';
                 $oInstance      = new $sRoutesClass();
                 $sBaseClass     = 'Nails\\Common\\Model\\BaseRoutes';
