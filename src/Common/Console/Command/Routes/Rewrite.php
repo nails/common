@@ -16,7 +16,7 @@ class Rewrite extends Base
     protected function configure()
     {
         $this->setName('routes:rewrite');
-        $this->setDescription('[WIP] Rewrites the App\'s routes file');
+        $this->setDescription('Rewrites the App\'s routes file');
     }
 
     // --------------------------------------------------------------------------
