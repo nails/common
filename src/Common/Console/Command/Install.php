@@ -10,8 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Install extends Base
 {
-    const EXIT_CODE_INSTALL_FAILED = 3;
-    const EXIT_CODE_MIGRATE_FAILED = 4;
+    const EXIT_CODE_INSTALL_FAILED       = 3;
+    const EXIT_CODE_MIGRATE_FAILED       = 4;
+    const EXIT_CODE_ROUTE_REWRITE_FAILED = 5;
 
     // --------------------------------------------------------------------------
     /**
@@ -78,6 +79,7 @@ class Install extends Base
      */
     protected function executeInstaller()
     {
+        $oInput  = $this->oInput;
         $oOutput = $this->oOutput;
 
         // --------------------------------------------------------------------------
@@ -103,15 +105,17 @@ class Install extends Base
 
         if (empty($preTestErrors)) {
 
-            $oOutput->writeln('');
-            $oOutput->writeln('<info>App Settings</info>');
-            $this->setVars($appVars);
+            if ($oInput->isInteractive()) {
+                $oOutput->writeln('');
+                $oOutput->writeln('<info>App Settings</info>');
+                $this->setVars($appVars);
 
-            // --------------------------------------------------------------------------
+                // --------------------------------------------------------------------------
 
-            $oOutput->writeln('');
-            $oOutput->writeln('<info>Deploy Settings</info>');
-            $this->setVars($deployVars);
+                $oOutput->writeln('');
+                $oOutput->writeln('<info>Deploy Settings</info>');
+                $this->setVars($deployVars);
+            }
 
             // --------------------------------------------------------------------------
 
@@ -120,7 +124,7 @@ class Install extends Base
             $composerAvailable      = (bool) $this->detectComposerBin();
             $installTheseComponents = [];
 
-            if ($execAvailable && $composerAvailable) {
+            if ($oInput->isInteractive() && $execAvailable && $composerAvailable) {
 
                 $oOutput->writeln('');
                 $oOutput->writeln('<info>Nails Components</info>');
@@ -167,11 +171,12 @@ class Install extends Base
             // --------------------------------------------------------------------------
 
             //  Tell user what's about to happen
+            $oOutput->writeln('');
             $oOutput->writeln('<info>I\'m about to do the following:</info>');
 
             //  app.php
             $oOutput->writeln('');
-            $oOutput->writeln('Write <info>config/app.php</info>');
+            $oOutput->writeln('1) Write <info>config/app.php</info>');
 
             foreach ($appVars as &$v) {
 
@@ -185,7 +190,7 @@ class Install extends Base
 
             //  deploy.php
             $oOutput->writeln('');
-            $oOutput->writeln('Write <info>config/deploy.php</info>');
+            $oOutput->writeln('2) Write <info>config/deploy.php</info>');
 
             foreach ($deployVars as &$v) {
 
@@ -213,9 +218,10 @@ class Install extends Base
                 }
             }
 
-            //  Migrate databases
+            //  Migrate database and rewrite routes
             $oOutput->writeln('');
-            $oOutput->writeln('Migrate the database');
+            $oOutput->writeln('3) Migrate the database');
+            $oOutput->writeln('4) Rewrite app routes');
 
             $oOutput->writeln('');
             $question  = 'Does this look OK?';
@@ -227,7 +233,8 @@ class Install extends Base
                 $numSteps = 1; //  app.php
                 $numSteps += 1; //  deploy.php
                 $numSteps += !empty($installTheseComponents) ? 1 : 0;
-                $numSteps += 1; //  migrate DB.php
+                $numSteps += 1; //  migrate DB
+                $numSteps += 1; //  rewrite routes
                 $numSteps += !empty($users) ? 1 : 0;
 
                 $oOutput->writeln('');
@@ -236,18 +243,18 @@ class Install extends Base
                 //  Write app.php
                 $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Writing <info>config/app.php</info>... ');
                 if ($this->writeFile($appVars, 'config/app.php')) {
-                    $oOutput->writeln('<info>DONE</info>');
+                    $oOutput->writeln('<info>done!</info>');
                 } else {
-                    $oOutput->writeln('<error>FAILED</error>');
+                    $oOutput->writeln('<error>failed!</error>');
                 }
                 $curStep++;
 
                 //  Write deploy.php
                 $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Writing <info>config/deploy.php</info>... ');
                 if ($this->writeFile($deployVars, 'config/deploy.php')) {
-                    $oOutput->writeln('<info>DONE</info>');
+                    $oOutput->writeln('<info>done!</info>');
                 } else {
-                    $oOutput->writeln('<error>FAILED</error>');
+                    $oOutput->writeln('<error>failed!</error>');
                 }
                 $curStep++;
 
@@ -276,6 +283,11 @@ class Install extends Base
                 //  Migrate DB
                 $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Migrating database... ');
                 $this->migrateDb($dbHost, $dbUser, $dbPass, $dbName);
+                $curStep++;
+
+                //  Rewrite routes
+                $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Rewriting routes... ');
+                $this->rewriteRoutes();
 
                 // --------------------------------------------------------------------------
 
@@ -338,24 +350,31 @@ class Install extends Base
         $oOutput->writeln('<info>I\'m about to do the following:</info>');
         $oOutput->writeln(' - Install <info>' . $component[0] . ':' . $component[1] . '</info>');
         $oOutput->writeln(' - Migrate the database');
+        $oOutput->writeln(' - Rewrite app routes');
         $oOutput->writeln('');
 
-        $question  = 'Continue?';
+        $question  = 'Continue??';
         $doInstall = $this->confirm($question, true);
 
         if ($doInstall) {
 
             //  Attempt to install
             $oOutput->writeln('');
-            $oOutput->write('<comment>[1/2]</comment> Installing <info>' . $component[0] . ':' . $component[1] . '</info>... ');
+            $oOutput->write('<comment>[1/3]</comment> Installing <info>' . $component[0] . ':' . $component[1] . '</info>... ');
             if (!$this->installComponent($component[0], $component[1], $oOutput)) {
                 return $this->abort(static::EXIT_CODE_INSTALL_FAILED);
             }
 
             //  Migrate DB
-            $oOutput->write('<comment>[2/2]</comment> Migrating database... ');
+            $oOutput->write('<comment>[2/3]</comment> Migrating database... ');
             if (!$this->migrateDb()) {
                 return $this->abort(static::EXIT_CODE_MIGRATE_FAILED);
+            }
+
+            //  Rewrite Routes
+            $oOutput->write('<comment>[3/3]</comment> Rewriting routes... ');
+            if (!$this->rewriteRoutes()) {
+                return $this->abort(static::EXIT_CODE_ROUTE_REWRITE_FAILED);
             }
 
             //  Cleaning up
@@ -795,13 +814,13 @@ class Install extends Base
 
         if ($execReturn !== 0) {
 
-            $oOutput->writeln('<error>FAILED</error>');
+            $oOutput->writeln('<error>failed!</error>');
             $oOutput->writeln('Composer failed with exit code "' . $execReturn . '"');
 
             return false;
         }
 
-        $oOutput->writeln('<info>DONE</info>');
+        $oOutput->writeln('<info>done!</info>');
 
         return true;
     }
@@ -832,9 +851,9 @@ class Install extends Base
             true
         );
 
-        if ($iExitCode == 0) {
+        if ($iExitCode == static::EXIT_CODE_SUCCESS) {
 
-            $this->oOutput->writeln('<info>DONE</info>');
+            $this->oOutput->writeln('<info>done!</info>');
 
             return true;
 
@@ -845,7 +864,33 @@ class Install extends Base
                 [
                     'The Migration tool encountered issues and aborted the migration.',
                     'You should run it manually and investigate any issues.',
-                    'The exit code was ' . $exitCode,
+                    'The exit code was ' . $iExitCode,
+                ]
+            );
+
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function rewriteRoutes()
+    {
+        $iExitCode = $this->callCommand('routes:rewrite', [], false, true);
+        if ($iExitCode == static::EXIT_CODE_SUCCESS) {
+
+            $this->oOutput->writeln('<info>done!</info>');
+
+            return true;
+
+        } else {
+
+            $this->abort(
+                self::EXIT_CODE_FAILURE,
+                [
+                    'The Routes Rewriting tool encountered issues and aborted the process.',
+                    'You should run it manually and investigate any issues.',
+                    'The exit code was ' . $iExitCode,
                 ]
             );
 

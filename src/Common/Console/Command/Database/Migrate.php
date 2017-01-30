@@ -244,6 +244,8 @@ class Migrate extends Base
         }
 
         $oOutput->writeln('');
+        $oOutput->writeln('Routes will be rewritten');
+        $oOutput->writeln('');
 
         if (!$this->confirm('Continue?', true)) {
             return $this->abort(static::EXIT_CODE_SUCCESS);
@@ -330,6 +332,12 @@ class Migrate extends Base
 
         //  Commit the transaction
         $this->oDb->transactionCommit();
+
+        // --------------------------------------------------------------------------
+
+        //  Rewrite Routes
+        $oOutput->writeln('<comment>Rewriting routes...</comment>');
+        $this->callCommand('routes:rewrite', [], false, true);
 
         // --------------------------------------------------------------------------
 
