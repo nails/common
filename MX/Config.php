@@ -47,6 +47,12 @@ class MX_Config extends CI_Config
     {
         $sUrl = parent::site_url($sUrl);
 
+        //  If the URL begins with a slash then attempt to guess the host using $_SERVER
+        if (preg_match('/^\//', $sUrl) && !empty($_SERVER['HTTP_HOST'])) {
+            $sProtocol = !empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+            $sUrl = $sProtocol . '://' . $_SERVER['HTTP_HOST'] . $sUrl;
+        }
+
         if ($bForceSecure || isPageSecure()) {
             $sUrl = preg_replace('#^' . BASE_URL . '#', SECURE_BASE_URL, $sUrl);
         }
