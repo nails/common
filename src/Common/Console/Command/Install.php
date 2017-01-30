@@ -1071,25 +1071,40 @@ class Install extends Base
             return false;
         }
 
-        if (empty($result->results)) {
+        //  Filter out already installed components
+        $aInstalledComponents = _NAILS_GET_COMPONENTS();
+        $aInstalled = [];
+        foreach ($aInstalledComponents as $oInstalledComponent) {
+            $aInstalled[] = $oInstalledComponent->slug;
+        }
+        $aFilteredResults = array_filter(
+            $result->results,
+            function($oComponent) use ($aInstalled)
+            {
+                return !in_array($oComponent->name, $aInstalled);
+            }
+        );
+        $aFilteredResults = array_values($aFilteredResults);
+
+        if (empty($aFilteredResults)) {
 
             return false;
 
-        } elseif (count($result->results) > 1) {
+        } elseif (count($aFilteredResults) > 1) {
 
             $oOutput->writeln('');
             $oOutput->writeln('More than 1 component for <info>' . $componentName . '</info>. Did you mean:</comment>');
 
-            foreach ($result->results as $component) {
+            foreach ($aFilteredResults as $component) {
 
                 $url = $component->homepage;
                 $url = !$url ? $component->repository : $url;
+                $sInstalled = isModuleEnabled($component->name) ? ' [installed]' : '';
 
                 $oOutput->writeln('');
-                $oOutput->writeln(' - <info>' . $component->name . '</info>');
+                $oOutput->writeln(' - <info>' . $component->name . '</info>' . $sInstalled);
 
                 if (!empty($component->description)) {
-
                     $oOutput->writeln('   ' . $component->description);
                 }
 
@@ -1103,7 +1118,7 @@ class Install extends Base
 
         } else {
 
-            return $result->results[0]->name;
+            return $aFilteredResults[0]->name;
         }
     }
 }
