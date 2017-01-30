@@ -5,18 +5,18 @@
 The following console tools are provided by this module and can be executed using the [Nails Console Tool](https://github.com/nailsapp/module-console).
 
 
-| Command             | Description                                                                   |
-|---------------------|-------------------------------------------------------------------------------|
-| `install`           | Generates the config files and assists with the database set up               |
-| `make:controller`   | Creates a new app controller                                                  |
-| `make:model`        | Creates a new app model along with its associated table and admin panel       |
-| `make:db:migration` | Creates a new database migration, leading on from the previous, if any        |
-| `make:db:seeder`    | Creates a new database seeder                                                 |
-| `db:migrate`        | Runs any outstanding database migrations on the app and all installed modules |
-| `db:seed`           | Runs any seeders which are provided by the app                                |
-| `test`              | Runs unit tests                                                               |
-| `migrate`           | Alias to `db:migrate`                                                         |
-| `routes:rewrite`    | Regenerates the routes file                                                   |
+| Command             | Description                                                                              |
+|---------------------|------------------------------------------------------------------------------------------|
+| `install`           | Generates the config files and assists with the database set up                          |
+| `make:controller`   | Creates a new app controller                                                             |
+| `make:model`        | Creates a new app model along with its associated table and admin panel                  |
+| `make:db:migration` | Creates a new database migration, leading on from the previous, if any                   |
+| `make:db:seeder`    | Creates a new database seeder                                                            |
+| `db:migrate`        | Runs any outstanding database migrations on the app and all installed modules            |
+| `db:seed`           | Runs any seeders which are provided by the app, use "list" to view all available seeders |
+| `test`              | Runs unit tests                                                                          |
+| `migrate`           | Alias to `db:migrate`                                                                    |
+| `routes:rewrite`    | Regenerates the routes file                                                              |
 
 
 ## Command Documentation
@@ -104,10 +104,10 @@ Seed the database with content using seeders provided by the app or installed mo
 
 #### Arguments & Options
 
-| Argument  | Description                                             | Required | Default |
-|-----------|---------------------------------------------------------|----------|---------|
-| component | Which component to seed from                            | no       | null    |
-| class     | The seed class to execute. Specify multiples using CSV  | no       | null    |
+| Argument  | Description                                                       | Required | Default |
+|-----------|-------------------------------------------------------------------|----------|---------|
+| component | Which component to seed from, or "list" to view available seeders | no       | null    |
+| class     | The seed class to execute. Specify multiples using CSV            | no       | null    |
 
 
 

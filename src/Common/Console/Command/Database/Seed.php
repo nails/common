@@ -23,7 +23,7 @@ class Seed extends Base
         $this->addArgument(
             'component',
             InputArgument::OPTIONAL,
-            'Which component to seed from'
+            'Which component to seed from; use "list" to show all available seeders'
         );
 
         $this->addArgument(
@@ -55,6 +55,27 @@ class Seed extends Base
 
         // --------------------------------------------------------------------------
 
+        if ($oInput->getArgument('component') == 'list') {
+
+            $oOutput->writeln('');
+            $aSeeders = $this->getSeeders();
+            if (empty($aSeeders)) {
+                $oOutput->writeln('No seeders were discovered. Make one using <comment>make:db:seed</comment>'
+                );
+            } else {
+                $oOutput->writeln('The following seeders are available:');
+                $oOutput->writeln('');
+                foreach ($aSeeders as $oSeeder) {
+                    $oOutput->writeln(' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>');
+                }
+            }
+            $oOutput->writeln('');
+
+            return static::EXIT_CODE_SUCCESS;
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Check environment
         if (Environment::is('PRODUCTION')) {
 
@@ -70,91 +91,42 @@ class Seed extends Base
 
         // --------------------------------------------------------------------------
 
+        //  Find seeds
+        $aSeedersAll = $this->getSeeders();
 
-        //  Prep arguments
+        //  Filter out seeders
         $sComponent = strtolower($oInput->getArgument('component'));
         $sClass     = strtolower($oInput->getArgument('class'));
         $aClasses   = explode(',', $sClass);
         $aClasses   = array_filter($aClasses);
         $aClasses   = array_unique($aClasses);
         $aClasses   = array_map('ucfirst', $aClasses);
+        $aSeeders   = [];
 
-        //  Find seeds
-        $aAllComponents = _NAILS_GET_COMPONENTS();
-        array_unshift(
-            $aAllComponents,
-            (object) [
-                'slug'      => 'app',
-                'namespace' => 'App\\',
-                'path'      => FCPATH,
-            ],
-            (object) [
-                'slug'      => 'nailsapp/common',
-                'namespace' => 'Nails\\Common\\',
-                'path'      => NAILS_COMMON_PATH,
-            ]
-        );
-        $aComponents = [];
 
-        if (!empty($sComponent)) {
-            foreach ($aAllComponents as $oComponent) {
-                if ($sComponent == $oComponent->slug) {
-                    $aComponents[] = $oComponent;
-                    break;
+        /**
+         * If component and class arguments are empty then execute all seeds
+         * If component is defined and class is empty, execute all seeds for that component
+         * If both are defined then only execute seeds which match both
+         */
+
+        if (empty($sComponent) && empty($aClasses)) {
+            $aSeeders = $aSeedersAll;
+        } elseif (!empty($sComponent) && empty($aClasses)) {
+            foreach ($aSeedersAll as $oSeeder) {
+                if ($oSeeder->component === $sComponent) {
+                    $aSeeders[] = $oSeeder;
                 }
-            }
-            if (empty($aComponents)) {
-                throw new \Exception('"' . $sComponent . '"  is not a valid component');
             }
         } else {
-            $aComponents = $aAllComponents;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Find seeds, if they exist
-        $aSeedClasses = [];
-        foreach ($aComponents as $oComponent) {
-            $sPath = $oComponent->path . 'src/Seed/';
-            if (is_dir($sPath)) {
-
-                $aSeeds = directory_map($sPath);
-                $aSeeds = array_map(
-                    function ($sClass) {
-                        return basename($sClass, '.php');
-                    },
-                    $aSeeds
-                );
-
-                if (empty($aSeeds)) {
-                    continue;
-                }
-
-                if (empty($aClasses)) {
-                    foreach ($aSeeds as $sClass) {
-                        $aSeedClasses[] = (object) [
-                            'component' => $oComponent->slug,
-                            'namespace' => $oComponent->namespace,
-                            'class'     => $sClass,
-                        ];
-                    }
-                } else {
-                    foreach ($aClasses as $sClass) {
-                        if (!in_array($sClass, $aSeeds)) {
-                            throw new \Exception('"' . $sClass . '" is not a valid seed class.');
-                        } else {
-                            $aSeedClasses[] = (object) [
-                                'component' => $oComponent->slug,
-                                'namespace' => $oComponent->namespace,
-                                'class'     => $sClass,
-                            ];
-                        }
-                    }
+            foreach ($aSeedersAll as $oSeeder) {
+                if ($oSeeder->component === $sComponent && in_array($oSeeder->class, $aClasses)) {
+                    $aSeeders[] = $oSeeder;
                 }
             }
         }
 
-        if (empty($aSeedClasses)) {
+        if (empty($aSeeders)) {
             return $this->abort(
                 static::EXIT_CODE_SUCCESS,
                 [
@@ -166,10 +138,10 @@ class Seed extends Base
         //  Get confirmation
         $oOutput->writeln('The following seeds will be executed in this order:');
         $oOutput->writeln('');
-        foreach ($aSeedClasses as $oSeedClass) {
+        foreach ($aSeeders as $oSeeder) {
             //  Execute migration
             $oOutput->writeln(
-                ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>'
+                ' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>'
             );
         }
         $oOutput->writeln('');
@@ -183,21 +155,21 @@ class Seed extends Base
 
             $oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
 
-            foreach ($aSeedClasses as $oSeedClass) {
+            foreach ($aSeeders as $oSeeder) {
                 //  Execute seed
                 $oOutput->write(
                     str_pad(
-                        ' - <comment>' . $oSeedClass->component . ' [' . $oSeedClass->class . ']</comment>... ',
+                        ' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>... ',
                         50,
                         ' '
                     )
                 );
-                $sClassName = $oSeedClass->namespace . 'Seed\\' . $oSeedClass->class;
+                $sClassName = $oSeeder->namespace . 'Seed\\' . $oSeeder->class;
                 $oClass     = new $sClassName($oDb);
                 $oClass->pre();
                 $oClass->execute();
                 $oClass->post();
-                $oOutput->writeln('<info>DONE</info>');
+                $oOutput->writeln('<info>done!</info>');
             }
             $oOutput->writeln('');
         } else {
@@ -219,5 +191,54 @@ class Seed extends Base
         $oOutput->writeln('Complete!');
 
         return static::EXIT_CODE_SUCCESS;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function getSeeders()
+    {
+        $aSeedClasses   = [];
+        $aAllComponents = _NAILS_GET_COMPONENTS();
+        array_unshift(
+            $aAllComponents,
+            (object) [
+                'slug'      => 'app',
+                'namespace' => 'App\\',
+                'path'      => FCPATH,
+            ],
+            (object) [
+                'slug'      => 'nailsapp/common',
+                'namespace' => 'Nails\\Common\\',
+                'path'      => NAILS_COMMON_PATH,
+            ]
+        );
+
+        foreach ($aAllComponents as $oComponent) {
+            $sPath = $oComponent->path . 'src/Seed/';
+            if (is_dir($sPath)) {
+
+                $aSeeds = directory_map($sPath);
+                $aSeeds = array_map(
+                    function ($sClass) {
+                        return basename($sClass, '.php');
+                    },
+                    $aSeeds
+                );
+
+                if (empty($aSeeds)) {
+                    continue;
+                }
+
+                foreach ($aSeeds as $sClass) {
+                    $aSeedClasses[] = (object) [
+                        'component' => $oComponent->slug,
+                        'namespace' => $oComponent->namespace,
+                        'class'     => $sClass,
+                    ];
+                }
+            }
+        }
+
+        return $aSeedClasses;
     }
 }
