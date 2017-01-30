@@ -731,6 +731,26 @@ if (!function_exists('isPageSecure')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('show_error')) {
+
+    /**
+     * Calls the exception class' show_error method
+     *
+     * @param $sMessage
+     * @param int $iStatus
+     * @param string $sHeading
+     * @param bool $bUseException
+     */
+    function show_error($sMessage, $iStatus = 500, $sHeading = 'An Error Was Encountered', $bUseException = true)
+    {
+        $_error =& load_class('Exceptions', 'core');
+        echo $_error->show_error($sHeading, $sMessage, 'error_general', $iStatus, $bUseException);
+        exit;
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('show_404')) {
 
     /**
@@ -738,7 +758,7 @@ if (!function_exists('show_404')) {
      *
      * Note that the Exception class does log by default. Manual 404's are probably
      * a result of some other checking and not technically a 404 so should not be
-     * logged as one. )Actual_ 404's should continue to be logged however.
+     * logged as one. _Actual_ 404's should continue to be logged however.
      *
      * @param  string  $page     The page which 404'd
      * @param  boolean $logError whether to log the error or not
@@ -751,7 +771,6 @@ if (!function_exists('show_404')) {
         exit;
     }
 }
-
 
 // --------------------------------------------------------------------------
 

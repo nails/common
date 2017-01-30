@@ -41,7 +41,7 @@ if (!function_exists('show_401')) {
                 $message .= '</small>';
             }
 
-            show_error($message, 401, $title);
+            show_error($message, 401, $title, false);
         }
 
         $ci =& get_instance();

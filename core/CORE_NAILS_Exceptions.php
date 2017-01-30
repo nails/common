@@ -29,13 +29,29 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
      * @throws \Nails\Common\Exception\NailsException
      * @return void
      */
-    public function show_error($heading, $message, $template = 'error_general', $status_code = 500)
+    public function show_error($heading, $message, $template = 'error_general', $status_code = 500, $use_exception = false)
     {
         if (is_array($message)) {
             $message = implode($message, ' ');
         }
 
-        throw new NailsException($message, $status_code);
+        if ($use_exception) {
+            throw new NailsException($message, $status_code);
+        } else {
+
+            $sTemplate = APPPATH.'errors/' . $template . '.php';
+            if (!file_exists($sTemplate)) {
+                _NAILS_ERROR($message, $heading);
+            } else {
+                ob_start();
+                include($sTemplate);
+                $buffer = ob_get_contents();
+                ob_end_clean();
+                echo $buffer;
+            }
+
+            exit;
+        }
     }
 
     // --------------------------------------------------------------------------
