@@ -64,9 +64,13 @@ if (!function_exists('dump')) {
 
                 $sOut .= '(null) null';
 
-            } else {
+            } elseif (!isCli()) {
 
                 $sOut .= htmlentities(print_r($mVar, true));
+
+            } else {
+
+                $sOut .= print_r($mVar, true);
             }
         }
 
