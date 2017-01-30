@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Migration Exists Exception
+ * Seeder Exists Exception
  *
  * @package     Nails
  * @subpackage  common
@@ -14,6 +14,6 @@ namespace Nails\Common\Exception\Console;
 
 use Nails\Common\Exception\NailsException;
 
-class MigrationExistsException extends NailsException
+class SeederExistsException extends NailsException
 {
 }

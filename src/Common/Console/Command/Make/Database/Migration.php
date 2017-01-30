@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Console\Command\Make;
+namespace Nails\Common\Console\Command\Make\Database;
 
 use Nails\Common\Exception\Console\MigrationExistsException;
 use Nails\Console\Command\BaseMaker;

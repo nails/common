@@ -30,5 +30,4 @@ class Migration{{INDEX}} extends Base
     }
 }
 
-
 EOD;

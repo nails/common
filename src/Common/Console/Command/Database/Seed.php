@@ -52,7 +52,6 @@ class Seed extends Base
         $oOutput->writeln('<info>Nails Database Seeder </info>');
         $oOutput->writeln('<info>----------------------</info>');
         $oOutput->writeln('Beginning...');
-        $oOutput->writeln('');
 
         // --------------------------------------------------------------------------
 
@@ -153,6 +152,15 @@ class Seed extends Base
                     }
                 }
             }
+        }
+
+        if (empty($aSeedClasses)) {
+            return $this->abort(
+                static::EXIT_CODE_SUCCESS,
+                [
+                    'No seeders were discovered. Make one using <comment>make:db:seed</comment>',
+                ]
+            );
         }
 
         //  Get confirmation
