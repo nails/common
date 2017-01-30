@@ -93,6 +93,7 @@ class Controller extends BaseMaker
 
             $aControllers = array_filter(explode(',', $aFields['CONTROLLER_NAME']));
             $aMethods     = explode(',', $aFields['METHODS']);
+            sort($aControllers);
 
             foreach ($aControllers as $sController) {
 

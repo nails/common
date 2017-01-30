@@ -199,6 +199,8 @@ class Model extends BaseMaker
 
             $aModels    = explode(',', $aFields['MODEL_NAME']);
             $aModelData = [];
+            sort($aModels);
+
             foreach ($aModels as $sModelName) {
                 $aModelData[] = $this->prepareModelName($oInput, $sModelName);
             }
