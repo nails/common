@@ -1,7 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/config.php';
+require FCPATH . 'vendor/codeigniter/framework/application/config/config.php';
 
 /**
  * Override some of the CI defaults
@@ -31,19 +31,20 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 $config['log_threshold'] = 1;
 
 //  Cache directory
-$config['cache_path'] = defined('DEPLOY_CACHE_DIR') ? DEPLOY_CACHE_DIR : FCPATH . APPPATH . 'cache/';
+$config['cache_path'] = defined('DEPLOY_CACHE_DIR') ? DEPLOY_CACHE_DIR : APPPATH . 'cache/';
 
 //  The encryption key
 $config['encryption_key'] = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY): md5('');
 
 //  Session variables
-$config['sess_cookie_name']     = 'nailssession';
-$config['sess_expiration']      = 1209600; // 2 weeks
-$config['sess_expire_on_close'] = true;
-$config['sess_encrypt_cookie']  = true;
-$config['sess_use_database']    = true;
-$config['sess_table_name']      = 'nails_session';
-$config['sess_match_useragent'] = false;
+$config['sess_driver'] = 'database';
+$config['sess_cookie_name'] = 'nailssession';
+$config['sess_expiration'] = 1209600; // 2 weeks
+$config['sess_save_path'] = 'nails_session';
+$config['sess_match_ip'] = false;
+$config['sess_time_to_update'] = 300;
+$config['sess_regenerate_destroy'] = false;
+
 
 //  Cookie related variables
 $config['cookie_httponly']  = true;

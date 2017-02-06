@@ -161,4 +161,4 @@ if (!function_exists('generateToken')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/string_helper.php';

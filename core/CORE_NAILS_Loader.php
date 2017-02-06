@@ -73,7 +73,7 @@ class CORE_NAILS_Loader extends MX_Loader
              * being loaded over an application view.
              */
 
-            $absoluteView = FCPATH . APPPATH . 'views/' . $view;
+            $absoluteView = APPPATH . 'views/' . $view;
 
             if (substr($absoluteView, strlen(EXT)*-1) != EXT) {
 
@@ -226,6 +226,7 @@ class CORE_NAILS_Loader extends MX_Loader
             }
 
             // Ok, so it wasn't a subClass request, but does the subClass exist within Nails?
+
             if (file_exists($nailsClass)) {
 
                 $baseClass = BASEPATH . 'libraries/' . ucfirst($class) . EXT;
@@ -252,7 +253,6 @@ class CORE_NAILS_Loader extends MX_Loader
 
                         $CI =& get_instance();
                         if (!isset($CI->$objectName)) {
-
                             return $this->_ci_init_class($class, $classPrefix, $params, $objectName);
                         }
                     }
@@ -307,7 +307,8 @@ class CORE_NAILS_Loader extends MX_Loader
 
                 include_once($filepath);
                 $this->_ci_loaded_files[] = $filepath;
-                return $this->_ci_init_class($class, '', $params, $objectName);
+                here();
+                return $this->_ci_init_library($class, '', $params, $objectName);
             }
         }
 
@@ -330,5 +331,20 @@ class CORE_NAILS_Loader extends MX_Loader
                 1
             );
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Object to Array
+     *
+     * Takes an object as input and converts the class variables to array key/vals
+     *
+     * @param	object
+     * @return	array
+     */
+    protected function _ci_object_to_array($object)
+    {
+        return (is_object($object)) ? get_object_vars($object) : $object;
     }
 }

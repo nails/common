@@ -233,4 +233,4 @@ if (!function_exists('list_first_last')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/html_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/html_helper.php';

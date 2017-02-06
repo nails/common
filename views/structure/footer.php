@@ -42,7 +42,7 @@ if (isset($footerOverride)) {
 } else {
 
     //  Auto-detect footer if there is a config file
-    if (file_exists(FCPATH . APPPATH . 'config/footer_views.php')) {
+    if (file_exists(APPPATH . 'config/footer_views.php')) {
 
         $oConfig->load('footer_views');
         $match     = false;
@@ -103,7 +103,7 @@ if (isset($footerOverride)) {
 
         $oView->load('structure/footer/nails-admin');
 
-    } elseif (file_exists(FCPATH . APPPATH . 'views/structure/footer/default.php')) {
+    } elseif (file_exists(APPPATH . 'views/structure/footer/default.php')) {
 
         //  No config file, but the app has a default footer
         $oView->load('structure/footer/default');

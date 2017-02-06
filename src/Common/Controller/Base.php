@@ -418,9 +418,9 @@ class Base extends \MX_Controller
                     } else {
 
                         //  Look for an app override
-                        if (file_exists(FCPATH . APPPATH . 'views/maintenance/maintenance.php')) {
+                        if (file_exists(APPPATH . 'views/maintenance/maintenance.php')) {
 
-                            require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+                            require APPPATH . 'views/maintenance/maintenance.php';
 
                         //  Fall back to the Nails maintenance page
                         } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
@@ -683,7 +683,7 @@ class Base extends \MX_Controller
         }
 
         //  The Application
-        $aPaths[] = FCPATH . APPPATH;
+        $aPaths[] = APPPATH;
 
         foreach ($aPaths as $sPath) {
 
@@ -742,7 +742,7 @@ class Base extends \MX_Controller
         }
 
         //  Libraries
-        $oCi->db           = Factory::service('Database');
+//        $oCi->db           = Factory::service('Database');
         $oCi->meta         = Factory::service('Meta');
         $oCi->asset        = Factory::service('Asset');
         $oCi->userFeedback = Factory::service('UserFeedback');

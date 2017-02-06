@@ -71,7 +71,7 @@ class Startup
         defineConst('ENVIRONMENT', 'DEVELOPMENT');
 
         //  Cache Directory
-        defineConst('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
+        defineConst('DEPLOY_CACHE_DIR', APPPATH . 'cache/');
 
         //  Database
         defineConst('DEPLOY_DB_HOST', 'localhost');
@@ -94,7 +94,7 @@ class Startup
 
         //  Deploy constants
         defineConst('DEPLOY_SYSTEM_TIMEZONE', 'UTC');
-        defineConst('DEPLOY_LOG_DIR', FCPATH . APPPATH . 'logs/');
+        defineConst('DEPLOY_LOG_DIR', APPPATH . 'logs/');
 
         //  Email constants
         defineConst('APP_DEVELOPER_EMAIL', '');
@@ -153,7 +153,7 @@ class Startup
          */
 
         //  Firstly, App module locations
-        $this->moduleLocations[FCPATH . APPPATH . 'modules/'] = '../modules/';
+        $this->moduleLocations[APPPATH . 'modules/'] = '../modules/';
 
         //  Nails Common should be included too
         $this->moduleLocations[FCPATH . 'vendor/nailsapp/common/'] = '../../vendor/nailsapp/common/';

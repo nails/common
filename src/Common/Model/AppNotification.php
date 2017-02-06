@@ -56,7 +56,7 @@ class AppNotification extends Base
             $definitionLocations[] = $module->path . $module->moduleName . '/config/app_notifications.php';
         }
 
-        $definitionLocations[] = FCPATH . APPPATH . 'config/app_notifications.php';
+        $definitionLocations[] = APPPATH . 'config/app_notifications.php';
 
         //  Find definitions
         foreach ($definitionLocations as $path) {

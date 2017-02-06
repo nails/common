@@ -229,6 +229,10 @@ if (!function_exists('form_open')) {
 
         $form .= '>';
 
+        if (!(bool) preg_match('/method="(.+)"/', $form)) {
+            $form = preg_replace('/>$/', ' method="POST">', $form);
+        }
+
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
         $_base_url          = $CI->config->base_url();
         $_secure_base_url   = $CI->config->secure_base_url();
@@ -2164,4 +2168,4 @@ EOT;
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/form_helper.php';

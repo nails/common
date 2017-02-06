@@ -1,8 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/database.php';
-
+require FCPATH . 'vendor/codeigniter/framework/application/config/database.php';
 
 $db['default']['hostname'] = DEPLOY_DB_HOST;
 $db['default']['username'] = DEPLOY_DB_USERNAME;

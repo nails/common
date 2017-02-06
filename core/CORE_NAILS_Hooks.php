@@ -42,10 +42,10 @@ class CORE_NAILS_Hooks extends CI_Hooks
 
     // --------------------------------------------------------------------------
 
-    public function _call_hook($which = '')
+    public function call_hook($which = '')
     {
         if (!isset($this->myhooks[$which])) {
-            return parent::_call_hook($which);
+            return parent::call_hook($which);
         }
         if (isset($this->myhooks[$which][0]) && is_array($this->myhooks[$which][0])) {
             foreach ($this->myhooks[$which] as $val) {
@@ -54,7 +54,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
         } else {
             $this->_my_run_hook($this->myhooks[$which]);
         }
-        return parent::_call_hook($which);
+        return parent::call_hook($which);
     }
 
     // --------------------------------------------------------------------------
@@ -133,7 +133,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
         // If the script being called happens to have the same
         // hook call within it a loop can happen
 
-        if ($this->in_progress == true) {
+        if ($this->my_in_progress == true) {
             return;
         }
 
@@ -153,7 +153,7 @@ class CORE_NAILS_Hooks extends CI_Hooks
 
         } else {
 
-            $filepath  = FCPATH . APPPATH;
+            $filepath  = APPPATH;
             $filepath .= rtrim($data['filepath'], '/') . '/';
             $filepath .= $data['filename'];
         }

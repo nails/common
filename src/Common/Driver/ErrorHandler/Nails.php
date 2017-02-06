@@ -57,7 +57,7 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
             $filepath = $errfile;
             $line     = $errline;
 
-            include FCPATH . APPPATH . 'errors/error_php.php';
+            include APPPATH . 'views/errors/html/error_php.php';
         }
 
         //  Show we log the item?

@@ -173,7 +173,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
             ob_end_flush();
         }
         ob_start();
-        include(APPPATH.'errors/error_404.php');
+        include(APPPATH.'views/errors/html/error_404.php');
         $buffer = ob_get_contents();
         ob_end_clean();
         echo $buffer;

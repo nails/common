@@ -28,17 +28,9 @@ class Database
      */
     public function __construct()
     {
-        $oCi       = get_instance();
-        $this->oDb = $oCi->load->database();
-
-        if (empty($this->oDb->conn_id)) {
-
-            throw new \Nails\Common\Exception\Database\ConnectionException(
-                'Failed to connect to database',
-                0
-            );
-        }
-
+        $oCi       =& get_instance();
+        $oCi->load->database();
+        $this->oDb = $oCi->db;
         /**
          * Don't run transactions in strict mode. In my opinion it's odd behaviour:
          * When a transaction is committed it should be the end of the story. If it's
@@ -52,7 +44,7 @@ class Database
 
     /**
      * Clears the query history and other memory hogs
-     * @return Object
+     * @return Database
      */
     public function flushCache()
     {
@@ -66,7 +58,7 @@ class Database
 
     /**
      * Resets Active Record/Query Builder
-     * @return Object
+     * @return Database
      */
     public function reset()
     {
@@ -126,7 +118,6 @@ class Database
      * Pass any property "sets" to the CodeIgniter Database class
      * @param  string $sProperty The property to set
      * @param  mixed  $mValue    The value to set
-     * @return mixed
      */
     public function __set($sProperty, $mValue)
     {

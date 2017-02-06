@@ -1,5 +1,9 @@
 <?php (defined('BASEPATH')) OR exit('No direct script access allowed');
 
+/* load MX core classes */
+require_once dirname(__FILE__).'/Lang.php';
+require_once dirname(__FILE__).'/Config.php';
+
 /**
  * Modular Extensions - HMVC
  *
@@ -7,24 +11,23 @@
  * @link	http://codeigniter.com
  *
  * Description:
- * This library extends the CodeIgniter CI_Config class
- * and adds features allowing use of modules and the HMVC design pattern.
+ * This library creates a CI class which allows the use of modules in an application.
  *
- * Install this file as application/third_party/MX/Config.php
+ * Install this file as application/third_party/MX/Ci.php
  *
- * @copyright	Copyright (c) 2015 Wiredesignz
- * @version 	5.5
- *
+ * @copyright	Copyright (c) 2011 Wiredesignz
+ * @version 	5.4
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,46 +36,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  **/
-class MX_Config extends CI_Config
+class CI
 {
-	public function load($file = '', $use_sections = FALSE, $fail_gracefully = FALSE, $_module = '')
-	{
-		if (in_array($file, $this->is_loaded, TRUE)) return $this->item($file);
-
-		$_module OR $_module = CI::$APP->router->fetch_module();
-		list($path, $file) = Modules::find($file, $_module, 'config/');
-
-		if ($path === FALSE)
-		{
-			parent::load($file, $use_sections, $fail_gracefully);
-			return $this->item($file);
-		}
-
-		if ($config = Modules::load_file($file, $path, 'config'))
-		{
-			/* reference to the config array */
-			$current_config =& $this->config;
-
-			if ($use_sections === TRUE)
-			{
-				if (isset($current_config[$file]))
-				{
-					$current_config[$file] = array_merge($current_config[$file], $config);
-				}
-				else
-				{
-					$current_config[$file] = $config;
-				}
-
-			}
-			else
-			{
-				$current_config = array_merge($current_config, $config);
-			}
-
-			$this->is_loaded[] = $file;
-			unset($config);
-			return $this->item($file);
-		}
+	public static $APP;
+	
+	public function __construct() {
+		
+		/* assign the application instance */
+		self::$APP = CI_Controller::get_instance();
+		
+		global $LANG, $CFG;
+		
+		/* re-assign language and config for modules */
+		if ( ! is_a($LANG, 'MX_Lang')) $LANG = new MX_Lang;
+		if ( ! is_a($CFG, 'MX_Config')) $CFG = new MX_Config;
+		
+		/* assign the core loader */
+		self::$APP->load = new MX_Loader;
+		
+		/* autoload module items */
+		self::$APP->load->_autoloader(array());
 	}
 }
+
+/* create the application object */
+new CI;

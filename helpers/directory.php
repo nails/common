@@ -10,4 +10,4 @@
  * @link
  */
 
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/directory_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/directory_helper.php';

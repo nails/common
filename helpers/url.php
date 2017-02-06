@@ -68,7 +68,7 @@ if (!function_exists('redirect')) {
          */
 
         $hook =& load_class('Hooks', 'core');
-        $hook->_call_hook('post_system');
+        $hook->call_hook('post_system');
 
         // --------------------------------------------------------------------------
 
@@ -119,4 +119,4 @@ if (!function_exists('tel')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/url_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/url_helper.php';
