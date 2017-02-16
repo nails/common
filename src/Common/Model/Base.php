@@ -1681,11 +1681,11 @@ class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => !empty($aOptions['auto_expand']),
+            'auto_expand' => array_key_exists('auto_expand', $aOptions) ? !empty($aOptions['auto_expand']) : false,
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save'   => !empty($aOptions['auto_save'])
+            'auto_save' => array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true
         );
     }
 
