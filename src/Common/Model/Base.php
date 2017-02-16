@@ -1637,6 +1637,10 @@ class Base
             throw new ModelException(
                 'Auto saving an expandable field is incompatible with type self::EXPANDABLE_TYPE_SINGLE'
             );
+        } elseif ($aOptions['type'] == self::EXPANDABLE_TYPE_MANY) {
+            $bAutoSave = array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true;
+        } else {
+            $bAutoSave = false;
         }
 
         if (!array_key_exists('property', $aOptions)) {
@@ -1685,7 +1689,7 @@ class Base
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save' => array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true
+            'auto_save' => $bAutoSave
         );
     }
 
