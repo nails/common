@@ -12,8 +12,6 @@
 
 namespace Nails\Common\Model;
 
-use Nails\Common\Model\BaseComponent;
-
 class BaseDriver extends BaseComponent
 {
     /**
@@ -28,13 +26,15 @@ class BaseDriver extends BaseComponent
      * The array of driver instances, created on demand.
      * @var array
      */
-    protected $aInstances = array();
+    protected $aInstances = [];
 
     // --------------------------------------------------------------------------
 
     /**
      * Return an instance of the driver.
+     *
      * @param  string $sSlug The driver's slug
+     *
      * @return mixed
      */
     public function getInstance($sSlug)
@@ -45,18 +45,11 @@ class BaseDriver extends BaseComponent
 
         } else {
 
-            if ($this->bEnableMultiple) {
-
-                foreach ($this->mEnabled as $oDriverConfig) {
-                    if ($sSlug == $oDriverConfig->slug) {
-                        $oDriver = $oDriverConfig;
-                        break;
-                    }
+            foreach ($this->aComponents as $oDriverConfig) {
+                if ($sSlug == $oDriverConfig->slug) {
+                    $oDriver = $oDriverConfig;
+                    break;
                 }
-
-            } else {
-
-                $oDriver = $this->mEnabled;
             }
 
             if (!empty($oDriver)) {
@@ -64,9 +57,9 @@ class BaseDriver extends BaseComponent
                 $this->aInstances[$oDriver->slug] = _NAILS_GET_DRIVER_INSTANCE($oDriver);
 
                 //  Apply driver configurations
-                $aSettings = array(
-                    'sSlug' => $oDriver->slug
-                );
+                $aSettings = [
+                    'sSlug' => $oDriver->slug,
+                ];
                 if (!empty($oDriver->data->settings)) {
                     $aSettings = array_merge(
                         $aSettings,

@@ -12,8 +12,8 @@
 
 namespace Nails\Common\Model;
 
-use Nails\Factory;
 use Nails\Common\Exception\NailsException;
+use Nails\Factory;
 
 class BaseComponent
 {
@@ -36,7 +36,7 @@ class BaseComponent
     protected $sModule = null;
 
     /**
-     * The type of domponent to load; filter the components by their subType, if any.
+     * The type of component to load; filter the components by their subType, if any.
      * @var string
      */
     protected $sType = null;
@@ -63,15 +63,13 @@ class BaseComponent
     {
         if (empty($this->sComponentType)) {
             throw new NailsException('Missing sComponentType declaration.', 1);
-        }
-
-        if (empty($this->sModule)) {
+        } elseif (empty($this->sModule)) {
             throw new NailsException('Missing sModule declaration.', 1);
         }
 
         //  All available components
-        $this->aComponents = array();
-        $aComponents       = _NAILS_GET_COMPONENTS_BY_TYPE($this->sComponentType) ?: array();
+        $this->aComponents = [];
+        $aComponents       = _NAILS_GET_COMPONENTS_BY_TYPE($this->sComponentType) ?: [];
 
         //  Only accept those which are for the desired module and, if specified, are of the correct sub type.
         foreach ($aComponents as $oComponent) {
@@ -93,8 +91,8 @@ class BaseComponent
         //  Enabled components
         if ($this->bEnableMultiple) {
 
-            $this->mEnabled = array();
-            $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: array();
+            $this->mEnabled = [];
+            $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: [];
 
             foreach ($this->aComponents as $oComponent) {
                 if (in_array($oComponent->slug, $aEnabled)) {
@@ -140,7 +138,7 @@ class BaseComponent
 
     /**
      * Fetches the enabled component, or array of components if bEnableMultiple is true
-     * @return array|stdClass
+     * @return array|\stdClass
      */
     public function getEnabled()
     {
@@ -157,7 +155,7 @@ class BaseComponent
     {
         if ($this->bEnableMultiple) {
 
-            $aOut = array();
+            $aOut = [];
             foreach ($this->mEnabled as $oComponent) {
                 $aOut[] = $oComponent->slug;
             }
@@ -173,7 +171,9 @@ class BaseComponent
 
     /**
      * Get a component by it's slug
+     *
      * @param  string $sSlug The components's slug
+     *
      * @return \stdClass
      */
     public function getBySlug($sSlug)
@@ -202,8 +202,11 @@ class BaseComponent
 
     /**
      * Save which components are enabled
+     *
      * @param array|string $mSlug The slug to set as enabled, or array of slugs if bEnableMultiple is true
-     * @return boolean
+     *
+     * @throws NailsException
+     * @return $this
      */
     public function saveEnabled($mSlug)
     {
@@ -220,9 +223,9 @@ class BaseComponent
             $mSlug = trim($mSlug);
         }
 
-        $aSetting = array(
-            $this->sEnabledSetting => $mSlug
-        );
+        $aSetting = [
+            $this->sEnabledSetting => $mSlug,
+        ];
 
         if (!$oAppSettingModel->set($aSetting, $this->sModule)) {
             throw new NailsException($oAppSettingModel->lastError(), 1);
@@ -235,17 +238,19 @@ class BaseComponent
 
     /**
      * Recursively gets all the settings from the settings array
-     * @param  array  $aSettings The array of fieldsets and/or settings
+     *
+     * @param  array  $aSettings The array of field sets and/or settings
      * @param  string $sSlug     The components's slug
+     *
      * @return array
      */
     protected function extractComponentSettings($aSettings, $sSlug)
     {
-        $aOut = array();
+        $aOut = [];
 
         foreach ($aSettings as $oSetting) {
 
-            //  If the object contains a `fields` property then consider this a fieldset and inception
+            //  If the object contains a `fields` property then consider this a field set and inception
             if (isset($oSetting->fields)) {
 
                 $aOut = array_merge(
