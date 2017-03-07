@@ -185,19 +185,6 @@ class Base
         $this->clearCache();
     }
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * Inject the user object, private by convention - only really used by a few core Nails classes
-     *
-     * @param object $oUser The user object
-     * @return void
-     */
-    public function setUserObject(&$oUser)
-    {
-        $this->user = $oUser;
-    }
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -357,20 +344,16 @@ class Base
         // --------------------------------------------------------------------------
 
         if ($this->tableAutoSetTimestamps) {
-
             if (empty($aData[$this->tableModifiedColumn])) {
                 $oDate                                       = Factory::factory('DateTime');
                 $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
             if (isLoggedIn()) {
-
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sAlias . $this->tableModifiedByColumn] = activeUser('id');
                 }
-
             } else {
-
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sAlias . $this->tableModifiedByColumn] = null;
                 }

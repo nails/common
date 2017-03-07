@@ -766,22 +766,18 @@ class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
-        $this->user_model->init();
 
-        // --------------------------------------------------------------------------
-
-        //  Inject the user object into the user_group &user_password
-        //  @todo use the factory
-        $this->user_group_model->setUserObject($this->user_model);
-        $this->user_password_model->setUserObject($this->user_model);
+        $oUserModel = Factory::model('User', 'nailsapp/module-auth');
+        $oUserModel->init();
 
         // --------------------------------------------------------------------------
 
         //  Shortcut/backwards compatibility
-        $this->user = $this->user_model;
+        $this->user = $oUserModel;
 
         //  Set a $user variable (for the views)
-        $this->data['user']          = $this->user_model;
+        //  @todo - deprecate these
+        $this->data['user']          = $oUserModel;
         $this->data['user_group']    = $this->user_group_model;
         $this->data['user_password'] = $this->user_password_model;
     }
@@ -795,7 +791,7 @@ class Base extends \MX_Controller
     protected function isUserSuspended()
     {
         //  Check if this user is suspended
-        if ($this->user_model->isLoggedIn() && activeUser('is_suspended')) {
+        if (isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
             $oAuthModel = Factory::model('Auth', 'nailsapp/module-auth');
@@ -805,10 +801,11 @@ class Base extends \MX_Controller
             $oAuthModel->logout();
 
             //  Create a new session
-            $this->session->sess_create();
+            $oSession = Factory::service('Session', 'nailsapp/module-auth');
+            $oSession->sess_create();
 
             //  Give them feedback
-            $this->session->set_flashdata('error', lang('auth_login_fail_suspended'));
+            $oSession->set_flashdata('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
     }
