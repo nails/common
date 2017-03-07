@@ -24,15 +24,15 @@ if (!function_exists('show_401')) {
          * an unauthorised page
          */
 
-        if (getUserObject()->isLoggedIn()) {
+        if (isLoggedIn()) {
 
             $title    = 'Sorry, you are not authorised to view this page';
             $message  = 'The page you are trying to view is restricted. Sadly you don\'t have enough ';
             $message .= 'permissions to see it\'s content.';
 
-            if (getUserObject()->wasAdmin()) {
+            if (wasAdmin()) {
 
-                $adminRecoveryData = getUserObject()->getAdminRecoveryData();
+                $adminRecoveryData = getAdminRecoveryData();
 
                 $message .= '<br /><br />';
                 $message .= '<small>';

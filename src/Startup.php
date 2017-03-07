@@ -226,5 +226,7 @@ class Startup
         //  Factory helpers
         Factory::helper('app_setting');
         Factory::helper('tools');
+        Factory::helper('string');
+        Factory::helper('user', 'nailsapp/module-auth');
     }
 }

@@ -13,16 +13,26 @@ return array(
             return get_instance();
         },
         'Config' => function () {
-            $oCi = get_instance();
-            return $oCi->config;
+            if (class_exists('\App\Common\Library\Config')) {
+                return new \App\Common\Library\Config();
+            } else {
+                return new \Nails\Common\Library\Config();
+            }
         },
         'Database' => function () {
-            return new \Nails\Common\Library\Database();
+            if (class_exists('\App\Common\Library\Database')) {
+                return new \App\Common\Library\Database();
+            } else {
+                return new \Nails\Common\Library\Database();
+            }
         },
         'Encrypt' => function () {
-            $oCi = get_instance();
-            $oCi->load->library('encrypt');
-            return $oCi->encrypt;
+            if (class_exists('\App\Common\Library\Encrypt')) {
+                return new \App\Common\Library\Encrypt();
+            } else {
+                require_once BASEPATH . 'libraries/Encrypt.php';
+                return new \Nails\Common\Library\Encrypt();
+            }
         },
         'ErrorHandler' => function () {
             if (class_exists('\App\Common\Library\ErrorHandler')) {
@@ -46,11 +56,14 @@ return array(
             }
         },
         'FormValidation' => function () {
-            $oCi = get_instance();
-            $oCi->load->library('form_validation');
-            return $oCi->form_validation;
+            if (class_exists('\App\Common\Library\FormValidation')) {
+                return new \App\Common\Library\FormValidation();
+            } else {
+                return new \Nails\Common\Library\FormValidation();
+            }
         },
         'Input' => function () {
+            //  @todo - remove dependency on CI
             $oCi = get_instance();
             return $oCi->input;
         },
@@ -76,14 +89,17 @@ return array(
             }
         },
         'Output' => function () {
+            //  @todo - remove dependency on CI
             $oCi = get_instance();
             return $oCi->output;
         },
         'Router' => function () {
+            //  @todo - remove dependency on CI
             $oCi = get_instance();
             return $oCi->router;
         },
         'Uri' => function () {
+            //  @todo - remove dependency on CI
             $oCi = get_instance();
             return $oCi->uri;
         },

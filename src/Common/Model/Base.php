@@ -108,13 +108,6 @@ class Base
      */
     public function __construct()
     {
-        //  Ensure models all have access to the global user_model
-        if (function_exists('getUserObject')) {
-            $this->user_model = getUserObject();
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Define defaults
         $this->clearErrors();
         $this->destructiveDelete      = true;
@@ -252,7 +245,7 @@ class Base
                 $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
-            if ($this->user_model->isLoggedIn()) {
+            if (isLoggedIn()) {
 
                 if (empty($aData[$this->tableCreatedByColumn])) {
                     $aData[$this->tableCreatedByColumn] = activeUser('id');
@@ -370,7 +363,7 @@ class Base
                 $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
-            if ($this->user_model->isLoggedIn()) {
+            if (isLoggedIn()) {
 
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sAlias . $this->tableModifiedByColumn] = activeUser('id');
