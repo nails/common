@@ -13,9 +13,9 @@
 
 namespace Nails\Common\Controller;
 
-use Nails\Factory;
-use Nails\Environment;
 use Nails\Common\Exception\NailsException;
+use Nails\Environment;
+use Nails\Factory;
 
 class Base extends \MX_Controller
 {
@@ -35,9 +35,6 @@ class Base extends \MX_Controller
         parent::__construct();
 
         // --------------------------------------------------------------------------
-
-        //  Set up services
-        Factory::setup();
 
         //  Setup Events
         $oEventService = Factory::service('Event');
@@ -124,8 +121,8 @@ class Base extends \MX_Controller
             if (!$oRoutesModel->update()) {
 
                 //  Fall over, routes_app.php *must* be there
-                $subject  = 'Failed To generate routes_app.php';
-                $message  = 'routes_app.php was not found and could not be generated. ';
+                $subject = 'Failed To generate routes_app.php';
+                $message = 'routes_app.php was not found and could not be generated. ';
                 $message .= $oRoutesModel->lastError();
 
                 showFatalError($subject, $message);
@@ -147,16 +144,16 @@ class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set User Feedback alerts for the views
-        $this->data['error']    = $this->userFeedback->get('error')    ?: $this->session->flashdata('error');
+        $this->data['error']    = $this->userFeedback->get('error') ?: $this->session->flashdata('error');
         $this->data['negative'] = $this->userFeedback->get('negative') ?: $this->session->flashdata('negative');
-        $this->data['success']  = $this->userFeedback->get('success')  ?: $this->session->flashdata('success');
+        $this->data['success']  = $this->userFeedback->get('success') ?: $this->session->flashdata('success');
         $this->data['positive'] = $this->userFeedback->get('positive') ?: $this->session->flashdata('positive');
-        $this->data['info']     = $this->userFeedback->get('info')     ?: $this->session->flashdata('info');
-        $this->data['warning']  = $this->userFeedback->get('message')  ?: $this->session->flashdata('warning');
+        $this->data['info']     = $this->userFeedback->get('info') ?: $this->session->flashdata('info');
+        $this->data['warning']  = $this->userFeedback->get('message') ?: $this->session->flashdata('warning');
 
         //  @deprecated
-        $this->data['message']  = $this->userFeedback->get('message')  ?: $this->session->flashdata('message');
-        $this->data['notice']   = $this->userFeedback->get('notice')   ?: $this->session->flashdata('notice');
+        $this->data['message'] = $this->userFeedback->get('message') ?: $this->session->flashdata('message');
+        $this->data['notice']  = $this->userFeedback->get('notice') ?: $this->session->flashdata('notice');
 
         // --------------------------------------------------------------------------
 
@@ -183,14 +180,14 @@ class Base extends \MX_Controller
          * Set some meta tags which should be used on every site.
          */
 
-        $this->meta->addRaw(array(
-            'charset' => 'utf-8'
-        ));
+        $this->meta->addRaw([
+            'charset' => 'utf-8',
+        ]);
 
-        $this->meta->addRaw(array(
+        $this->meta->addRaw([
             'name'    => 'viewport',
-            'content' => 'width=device-width, initial-scale=1'
-        ));
+            'content' => 'width=device-width, initial-scale=1',
+        ]);
 
         // --------------------------------------------------------------------------
 
@@ -251,8 +248,8 @@ class Base extends \MX_Controller
 
         if (version_compare(PHP_VERSION, NAILS_MIN_PHP_VERSION, '<')) {
 
-            $subject  = 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
-            $message  = 'The version of PHP you are running is not supported. Nails requires at least ';
+            $subject = 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
+            $message = 'The version of PHP you are running is not supported. Nails requires at least ';
             $message .= 'PHP version ' . NAILS_MIN_PHP_VERSION;
 
             if (function_exists('_NAILS_ERROR')) {
@@ -347,9 +344,11 @@ class Base extends \MX_Controller
 
     /**
      * Checks if Maintenance Mode is enabled, shows the holding page if so.
+     *
      * @param  boolean $force  Force maintenance mode on
      * @param  string  $sTitle Override the page title
      * @param  string  $sBody  Override the page body
+     *
      * @return void
      */
     protected function maintenanceMode($force = false, $sTitle = '', $sBody = '')
@@ -364,16 +363,10 @@ class Base extends \MX_Controller
 
             try {
 
-                //  Get the database so that the appSetting() functions will work
-                $oDb = Factory::service('Database');
-
-                //  Set the package path (so helpers and libraries are loaded correctly)
+                //  Load the encryption service. Set the package path so it is loaded correctly
+                //  (this runs early, before the paths are added)
                 $this->load->add_package_path(NAILS_COMMON_PATH);
-
-                //  Load the helpers
                 Factory::service('encrypt');
-                Factory::helper('app_setting');
-                Factory::helper('tools');
 
                 $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
                 $isWhiteListed = isIpInRange($this->input->ipAddress(), $whitelistIp);
@@ -410,11 +403,11 @@ class Base extends \MX_Controller
                         header('Content-type: application/json');
                         header('Pragma: no-cache');
 
-                        $_out = array('status' => 503, 'error' => 'Down for Maintenance');
+                        $_out = ['status' => 503, 'error' => 'Down for Maintenance'];
 
                         echo json_encode($_out);
 
-                    //  Otherwise, render some HTML
+                        //  Otherwise, render some HTML
                     } else {
 
                         //  Look for an app override
@@ -422,12 +415,12 @@ class Base extends \MX_Controller
 
                             require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
 
-                        //  Fall back to the Nails maintenance page
+                            //  Fall back to the Nails maintenance page
                         } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
 
                             require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
 
-                        //  Fall back, back to plain text
+                            //  Fall back, back to plain text
                         } else {
 
                             echo '<h1>Down for maintenance</h1>';
@@ -667,10 +660,10 @@ class Base extends \MX_Controller
          */
 
         //  Reset
-        $oConfig = Factory::service('Config');
-        $oConfig->_config_paths = array();
+        $oConfig                = Factory::service('Config');
+        $oConfig->_config_paths = [];
 
-        $aPaths = array();
+        $aPaths = [];
 
         //  Nails Common
         $aPaths[] = NAILS_COMMON_PATH;
@@ -686,7 +679,6 @@ class Base extends \MX_Controller
         $aPaths[] = FCPATH . APPPATH;
 
         foreach ($aPaths as $sPath) {
-
             $this->load->add_package_path($sPath);
         }
 
@@ -721,7 +713,7 @@ class Base extends \MX_Controller
 
         /**
          * Common models & libraries
-         * @note: We have to load this way so that the property is taken up by the CI
+         * @note  : We have to load this way so that the property is taken up by the CI
          * super object and therefore more reliably accessible (e.g in CMS module).
          * @todo  reduce this coupling
          * @todo  implement userFeedback library throughout
@@ -789,8 +781,8 @@ class Base extends \MX_Controller
         $this->user = $this->user_model;
 
         //  Set a $user variable (for the views)
-        $this->data['user'] = $this->user_model;
-        $this->data['user_group'] = $this->user_group_model;
+        $this->data['user']          = $this->user_model;
+        $this->data['user_group']    = $this->user_group_model;
         $this->data['user_password'] = $this->user_password_model;
     }
 

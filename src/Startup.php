@@ -26,17 +26,19 @@ class Startup
      */
     public function init()
     {
-        $this->setAutoloading();
+        $this->setAutoLoading();
         $this->defineConstants();
         $this->setModuleLocations();
+        $this->setupFactory();
+        $this->loadHelpers();
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Sets up autoloading
+     * Sets up auto loading
      */
-    protected function setAutoloading()
+    protected function setAutoLoading()
     {
         //  Include the composer autoloader
         if (!file_exists(FCPATH . 'vendor/autoload.php')) {
@@ -74,12 +76,22 @@ class Startup
         defineConst('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
 
         //  Database
+        //  Consistent between deployments
+        defineConst('APP_DB_DRIVER', 'mysqli');
+        defineConst('APP_DB_GLOBAL_PREFIX', '');
+        defineConst('APP_DB_PCONNECT', true);
+        defineConst('APP_DB_CACHE', false);
+        defineConst('APP_DB_CHARSET', 'utf8mb4');
+        defineConst('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
+        defineConst('APP_DB_STRICT', false);
+        defineConst('NAILS_DB_PREFIX', 'nails_');
+        defineConst('APP_DB_PREFIX', '');
+
+        //  Potentially vary between deployments
         defineConst('DEPLOY_DB_HOST', 'localhost');
         defineConst('DEPLOY_DB_USERNAME', '');
         defineConst('DEPLOY_DB_PASSWORD', '');
         defineConst('DEPLOY_DB_DATABASE', '');
-        defineConst('NAILS_DB_PREFIX', 'nails_');
-        defineConst('APP_DB_PREFIX', '');
 
         if (Environment::is('PRODUCTION')) {
             defineConst('DEPLOY_DB_DEBUG', false);
@@ -195,5 +207,24 @@ class Startup
 
             $assign_to_config[$key] = $this->moduleLocations;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function setupFactory()
+    {
+        Factory::setup();
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function loadHelpers()
+    {
+        //  CI Helpers
+        require_once BASEPATH . 'core/Common.php';
+
+        //  Factory helpers
+        Factory::helper('app_setting');
+        Factory::helper('tools');
     }
 }
