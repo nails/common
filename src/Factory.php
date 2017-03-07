@@ -13,7 +13,7 @@
 namespace Nails;
 
 use Pimple\Container;
-use Nails\Environment;
+use Nails\Common\Exception\FactoryException;
 
 class Factory
 {
@@ -34,11 +34,11 @@ class Factory
     public static function setup()
     {
         $aComponents          = _NAILS_GET_COMPONENTS();
-        self::$aContainers    = array();
-        self::$aLoadedHelpers = array();
-        $aDiscoveredServices  = array(
-            'nailsapp/common' => self::findServicesForComponent('nailsapp/common')
-        );
+        self::$aContainers    = [];
+        self::$aLoadedHelpers = [];
+        $aDiscoveredServices  = [
+            'nailsapp/common' => self::findServicesForComponent('nailsapp/common'),
+        ];
 
         foreach ($aComponents as $oComponent) {
             $aDiscoveredServices[$oComponent->slug] = self::findServicesForComponent($oComponent->slug);
@@ -51,11 +51,9 @@ class Factory
 
             //  Properties
             if (!empty($aComponentServices['properties'])) {
-
                 if (empty(self::$aContainers[$ComponentName]['properties'])) {
                     self::$aContainers[$ComponentName]['properties'] = new Container();
                 }
-
                 foreach ($aComponentServices['properties'] as $sKey => $mValue) {
                     self::$aContainers[$ComponentName]['properties'][$sKey] = $mValue;
                 }
@@ -65,11 +63,9 @@ class Factory
 
             //  Services
             if (!empty($aComponentServices['services'])) {
-
                 if (empty(self::$aContainers[$ComponentName]['services'])) {
                     self::$aContainers[$ComponentName]['services'] = new Container();
                 }
-
                 foreach ($aComponentServices['services'] as $sKey => $oCallable) {
                     self::$aContainers[$ComponentName]['services'][$sKey] = $oCallable;
                 }
@@ -79,11 +75,9 @@ class Factory
 
             //  Models
             if (!empty($aComponentServices['models'])) {
-
                 if (empty(self::$aContainers[$ComponentName]['models'])) {
                     self::$aContainers[$ComponentName]['models'] = new Container();
                 }
-
                 foreach ($aComponentServices['models'] as $sKey => $oCallable) {
                     self::$aContainers[$ComponentName]['models'][$sKey] = $oCallable;
                 }
@@ -93,11 +87,9 @@ class Factory
 
             //  Factories
             if (!empty($aComponentServices['factories'])) {
-
                 if (empty(self::$aContainers[$ComponentName]['factories'])) {
                     self::$aContainers[$ComponentName]['factories'] = new Container();
                 }
-
                 foreach ($aComponentServices['factories'] as $sKey => $oCallable) {
                     self::$aContainers[$ComponentName]['factories'][$sKey] = self::$aContainers[$ComponentName]['factories']->factory($oCallable);
                 }
@@ -109,21 +101,21 @@ class Factory
 
     /**
      * Look for a components's services.php file, allowing for app and/or environment overrides
+     *
      * @param  string $sComponentName The component name to search for
+     *
      * @return array
      */
     private static function findServicesForComponent($sComponentName)
     {
-        $aPaths = array(
-
+        $aPaths = [
             //  App overrides
             FCPATH . 'application/services/' . Environment::get() . '/' . $sComponentName . '/services.php',
             FCPATH . 'application/services/' . $sComponentName . '/services.php',
-
             //  Default locations
             FCPATH . 'vendor/' . $sComponentName . '/services/' . Environment::get() . '/services.php',
-            FCPATH . 'vendor/' . $sComponentName . '/services/services.php'
-        );
+            FCPATH . 'vendor/' . $sComponentName . '/services/services.php',
+        ];
 
         return self::findServicesAtPaths($aPaths);
     }
@@ -136,10 +128,10 @@ class Factory
      */
     private static function findServicesForApp()
     {
-        $aPaths = array(
+        $aPaths = [
             'application/services/' . Environment::get() . '/services.php',
             'application/services/services.php',
-        );
+        ];
 
         return self::findServicesAtPaths($aPaths);
     }
@@ -148,7 +140,9 @@ class Factory
 
     /**
      * Traverses an array of paths until one exits
+     *
      * @param  array $aPaths An array of paths to look for
+     *
      * @return array
      */
     private static function findServicesAtPaths($aPaths)
@@ -159,15 +153,17 @@ class Factory
             }
         }
 
-        return array();
+        return [];
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Return a property from the container.
-     * @param  string $sPropertyName The property name
-     * @param  string $sComponentName   The name of the component which provides the property
+     *
+     * @param  string $sPropertyName  The property name
+     * @param  string $sComponentName The name of the component which provides the property
+     *
      * @return mixed
      */
     public static function property($sPropertyName, $sComponentName = '')
@@ -179,9 +175,12 @@ class Factory
 
     /**
      * Sets a new value for a property
+     *
      * @param  string $sPropertyName  The property name
      * @param  mixed  $mPropertyValue The new property value
-     * @param  string $sComponentName    The name of the component which provides the property
+     * @param  string $sComponentName The name of the component which provides the property
+     *
+     * @throws FactoryException
      * @return void
      */
     public static function setProperty($sPropertyName, $mPropertyValue, $sComponentName = '')
@@ -189,7 +188,7 @@ class Factory
         $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
 
         if (empty(self::$aContainers[$sComponentName]['properties'][$sPropertyName])) {
-            throw new Common\Exception\FactoryException(
+            throw new FactoryException(
                 'Property "' . $sPropertyName . '" is not provided by component "' . $sComponentName . '"',
                 0
             );
@@ -202,8 +201,10 @@ class Factory
 
     /**
      * Return a service from the container.
-     * @param  string $sServiceName The service name
-     * @param  string $sComponentName  The name of the component which provides the service
+     *
+     * @param  string $sServiceName   The service name
+     * @param  string $sComponentName The name of the component which provides the service
+     *
      * @return mixed
      */
     public static function service($sServiceName, $sComponentName = '')
@@ -215,8 +216,10 @@ class Factory
 
     /**
      * Return a model from the container.
-     * @param  string $sModelName  The model name
+     *
+     * @param  string $sModelName     The model name
      * @param  string $sComponentName The name of the component which provides the model
+     *
      * @return mixed
      */
     public static function model($sModelName, $sComponentName = '')
@@ -228,8 +231,10 @@ class Factory
 
     /**
      * Return a factory from the container.
-     * @param  string $sFactoryName The factory name
-     * @param  string $sComponentName  The name of the component which provides the factory
+     *
+     * @param  string $sFactoryName   The factory name
+     * @param  string $sComponentName The name of the component which provides the factory
+     *
      * @return mixed
      */
     public static function factory($sFactoryName, $sComponentName = '')
@@ -241,8 +246,11 @@ class Factory
 
     /**
      * Load a helper file
-     * @param  string $sHelperName The helper name
+     *
+     * @param  string $sHelperName    The helper name
      * @param  string $sComponentName The name of the component which provides the factory
+     *
+     * @throws FactoryException
      * @return void
      */
     public static function helper($sHelperName, $sComponentName = '')
@@ -252,7 +260,7 @@ class Factory
         if (empty(self::$aLoadedHelpers[$sComponentName][$sHelperName])) {
 
             if (empty(self::$aLoadedHelpers[$sComponentName])) {
-                self::$aLoadedHelpers[$sComponentName] = array();
+                self::$aLoadedHelpers[$sComponentName] = [];
             }
 
             /**
@@ -264,7 +272,7 @@ class Factory
                 $sAppPath = FCPATH . 'application/helpers/' . $sHelperName . '.php';
 
                 if (!file_exists($sAppPath)) {
-                    throw new Common\Exception\FactoryException(
+                    throw new FactoryException(
                         'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
                         1
                     );
@@ -278,7 +286,7 @@ class Factory
                 $sAppPath       = FCPATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
 
                 if (!file_exists($sComponentPath)) {
-                    throw new Common\Exception\FactoryException(
+                    throw new FactoryException(
                         'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
                         1
                     );
@@ -299,9 +307,12 @@ class Factory
 
     /**
      * Returns a service from the namespaced container
-     * @param  string $sServiceType The type of the service to return
-     * @param  string $sServiceName The name of the service to return
-     * @param  string $sComponentName  The name of the mdoule which defined it
+     *
+     * @param  string $sServiceType   The type of the service to return
+     * @param  string $sServiceName   The name of the service to return
+     * @param  string $sComponentName The name of the module which defined it
+     *
+     * @throws FactoryException
      * @return mixed
      */
     private static function getService($sServiceType, $sServiceName, $sComponentName = '')
@@ -309,7 +320,7 @@ class Factory
         $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
 
         if (empty(self::$aContainers[$sComponentName][$sServiceType][$sServiceName])) {
-            throw new Common\Exception\FactoryException(
+            throw new FactoryException(
                 ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"',
                 0
             );

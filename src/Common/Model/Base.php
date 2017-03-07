@@ -108,13 +108,6 @@ class Base
      */
     public function __construct()
     {
-        //  Ensure models all have access to the global user_model
-        if (function_exists('getUserObject')) {
-            $this->user_model = getUserObject();
-        }
-
-        // --------------------------------------------------------------------------
-
         //  Define defaults
         $this->clearErrors();
         $this->destructiveDelete      = true;
@@ -192,19 +185,6 @@ class Base
         $this->clearCache();
     }
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * Inject the user object, private by convention - only really used by a few core Nails classes
-     *
-     * @param object $oUser The user object
-     * @return void
-     */
-    public function setUserObject(&$oUser)
-    {
-        $this->user = $oUser;
-    }
-
     /**
      * --------------------------------------------------------------------------
      *
@@ -252,7 +232,7 @@ class Base
                 $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
-            if ($this->user_model->isLoggedIn()) {
+            if (isLoggedIn()) {
 
                 if (empty($aData[$this->tableCreatedByColumn])) {
                     $aData[$this->tableCreatedByColumn] = activeUser('id');
@@ -364,20 +344,16 @@ class Base
         // --------------------------------------------------------------------------
 
         if ($this->tableAutoSetTimestamps) {
-
             if (empty($aData[$this->tableModifiedColumn])) {
                 $oDate                                       = Factory::factory('DateTime');
                 $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
 
-            if ($this->user_model->isLoggedIn()) {
-
+            if (isLoggedIn()) {
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sAlias . $this->tableModifiedByColumn] = activeUser('id');
                 }
-
             } else {
-
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$sAlias . $this->tableModifiedByColumn] = null;
                 }
@@ -1637,6 +1613,10 @@ class Base
             throw new ModelException(
                 'Auto saving an expandable field is incompatible with type self::EXPANDABLE_TYPE_SINGLE'
             );
+        } elseif ($aOptions['type'] == self::EXPANDABLE_TYPE_MANY) {
+            $bAutoSave = array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true;
+        } else {
+            $bAutoSave = false;
         }
 
         if (!array_key_exists('property', $aOptions)) {
@@ -1681,11 +1661,11 @@ class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => !empty($aOptions['auto_expand']),
+            'auto_expand' => array_key_exists('auto_expand', $aOptions) ? !empty($aOptions['auto_expand']) : false,
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save'   => !empty($aOptions['auto_save'])
+            'auto_save' => $bAutoSave
         );
     }
 

@@ -4,8 +4,10 @@ namespace Nails\Common\Console\Command\Make\Database;
 
 use Nails\Common\Exception\Console\SeederExistsException;
 use Nails\Console\Command\BaseMaker;
+use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Seed extends BaseMaker
@@ -23,9 +25,21 @@ class Seed extends BaseMaker
         $this->setName('make:db:seeder');
         $this->setDescription('Creates a new Database seeder');
         $this->addArgument(
-            'seederName',
+            'modelName',
+            InputArgument::REQUIRED,
+            'Define the name of the model on which to base the seeder'
+        );
+        $this->addArgument(
+            'modelProvider',
             InputArgument::OPTIONAL,
-            'Define the name of the seeder to create'
+            'Define the provider of the model',
+            'app'
+        );
+        $this->addOption(
+            'skip-check',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Skip model check'
         );
     }
 
@@ -86,20 +100,24 @@ class Seed extends BaseMaker
 
         try {
 
-            $aSeeders = array_filter(explode(',', $aFields['SEEDER_NAME']));
-            sort($aSeeders);
+            $aModels = array_filter(explode(',', $aFields['MODEL_NAME']));
+            sort($aModels);
 
-            foreach ($aSeeders as $sSeed) {
+            foreach ($aModels as $sModel) {
 
-                $sSeed                  = ucfirst(strtolower($sSeed));
-                $aFields['SEEDER_NAME'] = $sSeed;
-                $this->oOutput->write('Creating seeder <comment>' . $sSeed . '</comment>... ');
+                $aFields['MODEL_NAME'] = $sModel;
+                $this->oOutput->write('Creating seeder <comment>' . $sModel . '</comment>... ');
+
+                //  Validate model exists by attempting to load it
+                if (!stringToBoolean($this->oInput->getOption('skip-check'))) {
+                    Factory::model($sModel, $aFields['MODEL_PROVIDER']);
+                }
 
                 //  Check for existing seeder
-                $sPath = static::SEEDER_PATH . $sSeed . '.php';
+                $sPath = static::SEEDER_PATH . $sModel . '.php';
                 if (file_exists($sPath)) {
                     throw new SeederExistsException(
-                        'Seeder "' . $sSeed . '" exists already at path "' . $sPath . '"'
+                        'Seeder "' . $sModel . '" exists already at path "' . $sPath . '"'
                     );
                 }
 

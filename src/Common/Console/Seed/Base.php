@@ -64,7 +64,7 @@ class Base
             'metus', 'volutpat', 'hendrerit', 'interdum', 'nisi', 'odio', 'finibus', 'ex', 'eu', 'congue', 'mauris',
             'nisi', 'in', 'magna', 'ut', 'gravida', 'neque', 'at', 'nulla', 'viverra', 'egestas', 'vel', 'et', 'ante',
             'maecenas', 'hendrerit', 'sit', 'amet', 'urna', 'posuere', 'ultrices', 'aenean', 'quis', 'velit', 'velit',
-            'suspendisse', 'sit', 'amet', 'egestas', 'tortor'
+            'suspendisse', 'sit', 'amet', 'egestas', 'tortor',
         ];
 
         $aOut = [];
@@ -86,7 +86,7 @@ class Base
      */
     protected function loremSentence($iNumSentences = 1)
     {
-        $aOut = [];
+        $aOut     = [];
         $aLengths = [5, 6, 8, 10, 12];
 
         for ($i = 0; $i < $iNumSentences; $i++) {
@@ -107,7 +107,7 @@ class Base
      */
     protected function loremParagraph($iNumParagraphs = 1)
     {
-        $aOut = [];
+        $aOut     = [];
         $aLengths = [5, 6, 8, 10, 12];
 
         for ($i = 0; $i < $iNumParagraphs; $i++) {

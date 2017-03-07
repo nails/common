@@ -33,19 +33,19 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Sets the value of existing properties based on the default settings and
-     * database overrides, anything left over is placed into the $oSettings object.
+     * Sets the value of existing properties based on the default settings and database
+     * overrides, anything left over is placed into the $oSettings object.
+     *
+     * @param $aConfig
+     *
+     * @return $this
      */
     public function setConfig($aConfig)
     {
         foreach ($aConfig as $sKey => $mValue) {
-
             if (property_exists($this, $sKey)) {
-
                 $this->{$sKey} = $mValue;
-
             } else {
-
                 $this->oSettings->{$sKey} = $mValue;
             }
         }
@@ -57,21 +57,18 @@ class Base
 
     /**
      * Safely retrieve a value from the $oSettings object
+     *
      * @param  string $sProperty the property to retrieve
+     *
      * @return mixed
      */
     protected function getSetting($sProperty = null)
     {
         if (property_exists($this->oSettings, $sProperty)) {
-
             return $this->oSettings->{$sProperty};
-
         } elseif (is_null($sProperty)) {
-
             return $this->oSettings;
-
         } else {
-
             return null;
         }
     }
@@ -113,8 +110,10 @@ class Base
 
     /**
      * Returns the URL of the driver's logo
+     *
      * @param  integer $iWidth  The bounding width
      * @param  integer $iHeight The bounding height
+     *
      * @return string
      */
     public function getLogoUrl($iWidth = null, $iHeight = null)
@@ -122,15 +121,10 @@ class Base
         $iLogoId = $this->getLogoId();
 
         if (!empty($iLogoId) && !empty($iWidth) && !empty($iHeight)) {
-
             return cdnScale($iLogoId, $iWidth, $iHeight);
-
         } elseif (!empty($iLogoId)) {
-
             return cdnServe($iLogoId);
-
         } else {
-
             return null;
         }
     }

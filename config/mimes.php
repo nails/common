@@ -8,6 +8,12 @@ $mimes = require FCPATH . 'vendor/codeigniter/framework/application/config/mimes
  * @todo - move this into the services file
  */
 
+//  SVG
+$mimes['ico'] = 'image/x-icon';
+
+//  ICO
+$mimes['svg'] = 'image/svg+xml';
+
 //  Video
 $mimes['mp4']  = 'video/mp4';
 $mimes['ogv']  = ['video/ogg', 'application/ogg'];

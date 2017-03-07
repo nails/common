@@ -1,8 +1,11 @@
 <?php
 
 /**
- * The class abstracts the database
- * @todo remove dependency on CodeIgniter's Database abstraction
+ * The class abstracts the database. The whole of this class is a little hacky - an attempt to disconnect
+ * the CI DB library from CI so it can be used in non-CI environments (e.g. the console). As such, we need to
+ * simulate some classes and wave some magic wands.
+ *
+ * @todo - Remove dependency on CodeIgniter's Database abstraction
  *
  * @package     Nails
  * @subpackage  common
@@ -12,6 +15,8 @@
  */
 
 namespace Nails\Common\Library;
+
+use Nails\Common\Exception\Database\ConnectionException;
 
 class Database
 {
@@ -28,14 +33,55 @@ class Database
      */
     public function __construct()
     {
-        $oCi       =& get_instance();
-        $oCi->load->database();
-        $this->oDb = $oCi->db;
-        /**
-         * Don't run transactions in strict mode. In my opinion it's odd behaviour:
-         * When a transaction is committed it should be the end of the story. If it's
-         * not then a failure elsewhere can cause a rollback unexpectedly. Silly CI.
-         */
+        $aParams = [
+
+            //  Consistent between deployments
+            'dbdriver' => APP_DB_DRIVER,
+            'dbprefix' => APP_DB_GLOBAL_PREFIX,
+            'pconnect' => APP_DB_PCONNECT,
+            'cache_on' => APP_DB_CACHE,
+            'char_set' => APP_DB_CHARSET,
+            'dbcollat' => APP_DB_DBCOLLAT,
+            'stricton' => APP_DB_STRICT,
+            'swap_pre' => false,
+            'autoinit' => true,
+
+            //  Potentially vary between deployments
+            'hostname' => DEPLOY_DB_HOST,
+            'username' => DEPLOY_DB_USERNAME,
+            'password' => DEPLOY_DB_PASSWORD,
+            'database' => DEPLOY_DB_DATABASE,
+            'db_debug' => DEPLOY_DB_DEBUG,
+            'cachedir' => DEPLOY_CACHE_DIR,
+        ];
+
+        $sDbPath = BASEPATH . 'database/';
+        require_once $sDbPath . 'DB_driver.php';
+        require_once $sDbPath . 'DB_active_rec.php';
+
+        if (!class_exists('CI_DB')) {
+            eval('class CI_DB extends CI_DB_active_record { }');
+        }
+
+        require_once $sDbPath . 'drivers/' . $aParams['dbdriver'] . '/' . $aParams['dbdriver'] . '_driver.php';
+
+        $sDriver   = 'CI_DB_' . $aParams['dbdriver'] . '_driver';
+        $this->oDb = new $sDriver($aParams);
+
+        if (!empty($aParams['autoinit'])) {
+            $this->oDb->initialize();
+        }
+
+        if (!empty($aParams['stricton'])) {
+            $this->oDb->query('SET SESSION sql_mode="STRICT_ALL_TABLES"');
+        }
+
+        if (empty($this->oDb->conn_id)) {
+            throw new ConnectionException(
+                'Failed to connect to database',
+                0
+            );
+        }
 
         $this->oDb->trans_strict(false);
     }
@@ -44,39 +90,66 @@ class Database
 
     /**
      * Clears the query history and other memory hogs
-     * @return Database
+     * @return $this
      */
     public function flushCache()
     {
-        $this->oDb->queries     = array();
-        $this->oDb->query_times = array();
-        $this->oDb->data_cache  = array();
-        return $this;
+        $aProperties = [
+            ['queries', []],
+            ['query_times', []],
+            ['data_cache', []],
+        ];
+
+        return $this->resetProperties($aProperties);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Resets Active Record/Query Builder
-     * @return Database
+     * @return $this
      */
     public function reset()
     {
-        $this->oDb->ar_select         = array();
-        $this->oDb->ar_from           = array();
-        $this->oDb->ar_join           = array();
-        $this->oDb->ar_where          = array();
-        $this->oDb->ar_like           = array();
-        $this->oDb->ar_groupby        = array();
-        $this->oDb->ar_having         = array();
-        $this->oDb->ar_orderby        = array();
-        $this->oDb->ar_wherein        = array();
-        $this->oDb->ar_aliased_tables = array();
-        $this->oDb->ar_no_escape      = array();
-        $this->oDb->ar_distinct       = false;
-        $this->oDb->ar_limit          = false;
-        $this->oDb->ar_offset         = false;
-        $this->oDb->ar_order          = false;
+        $aProperties = [
+            ['ar_select', []],
+            ['ar_from', []],
+            ['ar_join', []],
+            ['ar_where', []],
+            ['ar_like', []],
+            ['ar_groupby', []],
+            ['ar_having', []],
+            ['ar_orderby', []],
+            ['ar_wherein', []],
+            ['ar_aliased_tables', []],
+            ['ar_no_escape', []],
+            ['ar_distinct', false],
+            ['ar_limit', false],
+            ['ar_offset', false],
+            ['ar_order', false],
+        ];
+
+        return $this->resetProperties($aProperties);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Safely resets properties
+     *
+     * @param array $aProperties The properties to reset; a multi-dimensional array where index 0 is the property and
+     *                           index 1 is the value.
+     *
+     * @return $this
+     */
+    protected function resetProperties($aProperties)
+    {
+        foreach ($aProperties as $aProperty) {
+            if (property_exists($this->oDb, $aProperty[0])) {
+                $this->oDb->{$aProperty[0]} = $aProperty[1];
+            }
+        }
+
         return $this;
     }
 
@@ -84,19 +157,21 @@ class Database
 
     /**
      * Route calls to the CodeIgniter Database class
+     *
      * @param  string $sMethod    The method being called
      * @param  array  $aArguments Any arguments being passed
+     *
      * @return mixed
      */
     public function __call($sMethod, $aArguments)
     {
         if (method_exists($this, $sMethod)) {
 
-            return call_user_func_array(array($this, $sMethod), $aArguments);
+            return call_user_func_array([$this, $sMethod], $aArguments);
 
         } else {
 
-            return call_user_func_array(array($this->oDb, $sMethod), $aArguments);
+            return call_user_func_array([$this->oDb, $sMethod], $aArguments);
         }
     }
 
@@ -104,7 +179,9 @@ class Database
 
     /**
      * Pass any property "gets" to the CodeIgniter Database class
+     *
      * @param  string $sProperty The property to get
+     *
      * @return mixed
      */
     public function __get($sProperty)
@@ -116,8 +193,11 @@ class Database
 
     /**
      * Pass any property "sets" to the CodeIgniter Database class
+     *
      * @param  string $sProperty The property to set
      * @param  mixed  $mValue    The value to set
+     *
+     * @return void
      */
     public function __set($sProperty, $mValue)
     {

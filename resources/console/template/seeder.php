@@ -10,18 +10,12 @@ return <<<'EOD'
 
 namespace App\Seed;
 
-use Nails\Common\Console\Seed\Base;
+use Nails\Common\Console\Seed\DefaultSeed;
 
-class {{SEEDER_NAME}} extends Base {
-
-    /**
-     * Execute the seed
-     * @return void
-     */
-    public function execute()
-    {
-        // @todo - build seeder
-    }
+class {{MODEL_NAME}} extends DefaultSeed
+{
+    const CONFIG_MODEL_NAME     = '{{MODEL_NAME}}';
+    const CONFIG_MODEL_PROVIDER = 'app';
 }
 
 EOD;
