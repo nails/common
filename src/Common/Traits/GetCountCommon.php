@@ -33,14 +33,31 @@ trait GetCountCommon
 
             $sAlias = $this->getTableAlias(true);
 
-            foreach ($this->searchableFields as $sField) {
-                if (strpos($sField, '.') !== false) {
-                    $aData['or_like'][] = [$sField, $aData['keywords']];
+            foreach ($this->searchableFields as $mField) {
+
+                //  If the field is an array then search across the columns concatenated together
+                if (is_array($mField)) {
+
+                    $sMappedFields = array_map(function($sInput) use ($sAlias) {
+                        if (strpos($sInput, '.') !== false) {
+                            return $sInput;
+                        } else {
+                            return $sAlias . $sInput;
+                        }
+                    }, $mField);
+
+                    $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $aData['keywords']];
+
                 } else {
-                    $aData['or_like'][] = [$sAlias . $sField, $aData['keywords']];
+                    if (strpos($mField, '.') !== false) {
+                        $aData['or_like'][] = [$mField, $aData['keywords']];
+                    } else {
+                        $aData['or_like'][] = [$sAlias . $mField, $aData['keywords']];
+                    }
                 }
             }
         }
+
         // --------------------------------------------------------------------------
 
         $this->getCountCommonCompileSelect($aData);
