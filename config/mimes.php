@@ -39,6 +39,7 @@ $mimes['xlsm'] = 'application/vnd.ms-excel.sheet.macroEnabled.12';
 $mimes['xltm'] = 'application/vnd.ms-excel.template.macroEnabled.12';
 $mimes['xlam'] = 'application/vnd.ms-excel.addin.macroEnabled.12';
 $mimes['xlsb'] = 'application/vnd.ms-excel.sheet.binary.macroEnabled.12';
+$mimes['xlsm'] = 'application/vnd.ms-excel.sheet.macroEnabled.12';
 
 $mimes['ppt']  = ['application/powerpoint', 'application/vnd.ms-powerpoint'];
 $mimes['pot']  = 'application/vnd.ms-powerpoint';
