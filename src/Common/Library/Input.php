@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Provides enhanced logging facilities
- * @todo: Deprecate this in favour of something like monolog
+ * The class abstracts CI's Input class
  *
  * @package     Nails
  * @subpackage  common

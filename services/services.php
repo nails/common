@@ -116,6 +116,13 @@ return array(
             } else {
                 return new \Nails\Common\Library\View();
             }
+        },
+        'Zip' => function () {
+            if (class_exists('\App\Common\Library\Zip')) {
+                return new \App\Common\Library\Zip();
+            } else {
+                return new \Nails\Common\Library\Zip();
+            }
         }
     ),
     'models' => array(
