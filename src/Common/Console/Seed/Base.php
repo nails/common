@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Console\Seed;
 
+use Nails\Factory;
+
 class Base
 {
     /**
@@ -55,6 +57,7 @@ class Base
      * Generate some random Lorem Ipsum words
      *
      * @param int $iNumWords The number of words to generate
+     *
      * @return string
      */
     protected function loremWord($iNumWords = 5)
@@ -82,6 +85,7 @@ class Base
      * Generate some random Lorem Ipsum sentences
      *
      * @param int $iNumSentences The number of sentences to generate
+     *
      * @return string
      */
     protected function loremSentence($iNumSentences = 1)
@@ -103,6 +107,7 @@ class Base
      * Generate some random Lorem Ipsum paragraphs
      *
      * @param int $iNumParagraphs The number of paragraphs to generate
+     *
      * @return string
      */
     protected function loremParagraph($iNumParagraphs = 1)
@@ -116,5 +121,85 @@ class Base
         }
 
         return implode("\n\n", $aOut);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a random ID from a particular model
+     *
+     * @param string $sModel    The model to use
+     * @param string $sProvider The model's provider
+     *
+     * @return int|null
+     */
+    protected function randomId($sModel, $sProvider)
+    {
+        $oDb    = Factory::service('Database');
+        $oModel = Factory::model($sModel, $sProvider);
+        $oItem  = $oDb->query('SELECT `id` FROM `' . $oModel->getTableName() . '` ORDER BY RAND() LIMIT 1;');
+        $oRow   = $oItem->row();
+
+        return $oRow ? $oRow->id : null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Randomly returns true or false
+     *
+     * @return bool
+     */
+    protected function randomBool()
+    {
+        return (bool) rand(0, 1);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random date, optionally restricted between bounds
+     *
+     * @param string $sLow    The lowest possible date to return
+     * @param string $sHigh   The highest possible date to return
+     * @param string $sFormat The format to return the datetime value in
+     *
+     * @return string
+     */
+    protected function randomDateTime($sLow = null, $sHigh = null, $sFormat = 'Y-m-d H:i:s')
+    {
+        $iLow  = $sLow ? strtotime($sLow) : strtotime('last year');
+        $iHigh = $sHigh ? strtotime($sHigh) : strtotime('next year');
+        return date($sFormat, rand($iLow, $iHigh));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random date from the future, optionally restricted to a upper bound
+     *
+     * @param string $sHigh The highest possible date to return
+     *
+     * @return string
+     */
+    protected function randomFutureDateTime($sHigh = null)
+    {
+        $oNow = Factory::factory('DateTime');
+        return $this->randomDateTime($oNow->format('Y-m-d H:i:s'), $sHigh);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random date from the past, optionally restricted to a lower bound
+     *
+     * @param string $sLow The lowest possible date to return
+     *
+     * @return string
+     */
+    protected function randomPastDateTime($sLow = null)
+    {
+        $oNow = Factory::factory('DateTime');
+        return $this->randomDateTime($sLow, $oNow->format('Y-m-d H:i:s'));
     }
 }
