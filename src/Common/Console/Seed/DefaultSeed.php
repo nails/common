@@ -91,7 +91,10 @@ class DefaultSeed extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Generate a new Article
+     * Generate a new item
+     *
+     * @param array $aFields The fields to generate
+     *
      * @return array
      */
     protected function generate($aFields)
@@ -103,13 +106,16 @@ class DefaultSeed extends Base
                     $mValue = $this->loremParagraph();
                     break;
                 case 'int' :
-                    $mValue = 123;
+                    $mValue = $this->randomInteger();
                     break;
                 case 'tinyint' :
-                    $mValue = 1;
+                    $mValue = $this->randomBool();
                     break;
                 case 'datetime':
-                    $mValue = 'NOW()';
+                    $mValue = $this->randomDateTime();
+                    break;
+                case 'date':
+                    $mValue = $this->randomDateTime(null, null, 'Y-m-d');
                     break;
                 default:
                     $mValue = $this->loremWord(3);
@@ -120,7 +126,10 @@ class DefaultSeed extends Base
 
         //  Special case, slugs
         if (array_key_exists('slug', $aOut)) {
-            $aOut['slug'] = str_replace(' ', '-', strtolower($aOut['slug']));
+            $aOut['slug'] = preg_replace('/[^a-zA-Z0-9 \-]/', '', $aOut['slug']);
+            $aOut['slug'] = trim($aOut['slug']);
+            $aOut['slug'] = strtolower($aOut['slug']);
+            $aOut['slug'] = str_replace(' ', '-', $aOut['slug']);
         }
 
         return $aOut;
