@@ -202,4 +202,33 @@ class Base
         $oNow = Factory::factory('DateTime');
         return $this->randomDateTime($sLow, $oNow->format('Y-m-d H:i:s'));
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random integer
+     *
+     * @param integer $iLow    The lowest possible value to return
+     * @param integer $iHigh   The highest possible value to return
+     *
+     * @return integer
+     */
+    protected function randomInteger($iLow = 0, $iHigh = 1000)
+    {
+        return rand($iLow, $iHigh);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a random element from a supplied array
+     *
+     * @param array $aItems
+     *
+     * @return mixed
+     */
+    protected function randomItem($aItems = [])
+    {
+        return $aItems[array_rand($aItems)];
+    }
 }
