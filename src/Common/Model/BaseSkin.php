@@ -15,7 +15,7 @@ namespace Nails\Common\Model;
 use Nails\Common\Model\BaseComponent;
 use Nails\Common\Exception\NailsException;
 
-class BaseSkin extends BaseComponent
+abstract class BaseSkin extends BaseComponent
 {
     /**
      * The type of component to load up

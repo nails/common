@@ -12,7 +12,7 @@
 
 namespace Nails\Common\Driver;
 
-class Base
+abstract class Base
 {
     protected $sSlug;
     protected $sLabel;

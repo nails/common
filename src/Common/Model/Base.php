@@ -18,7 +18,7 @@ use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
 use Nails\Factory;
 
-class Base
+abstract class Base
 {
     use ErrorHandling;
     use Caching;
