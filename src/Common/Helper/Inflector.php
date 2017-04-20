@@ -1,27 +1,27 @@
 <?php
 
 /**
- * Payment driver base
+ * Inflector helper
  *
  * @package     Nails
- * @subpackage  module-invoice
- * @category    Interface
+ * @subpackage  common
+ * @category    Helper
  * @author      Nails Dev Team
  * @link
  */
 
 namespace Nails\Common\Helper;
 
-use Nails\Factory;
-
 class Inflector
 {
     /**
      * Correctly adds possession to a word
+     *
      * @param  string $sString The word to possesionise
+     *
      * @return string
      */
-    static function possessionise($sString)
+    public static function possessionise($sString)
     {
         //  Attempt to match the case
         $sLastChar       = substr($sString, -1);
@@ -35,16 +35,22 @@ class Inflector
 
     /**
      * Pluralises english words if a value is greater than 1
+     *
      * @param integer $iValue    The number to compare against
      * @param string  $sSingular The word to pluralise
      * @param string  $sPlural   The plural of the word (skips auto-detection)
+     *
      * @return string
      */
-    static function pluralise($iValue, $sSingular, $sPlural = null)
+    public static function pluralise($iValue, $sSingular, $sPlural = null)
     {
         $sSingular = trim($sSingular);
 
         if ($iValue == 1) {
+
+            return $sSingular;
+
+        } elseif (substr($sSingular, -1) == 's') {
 
             return $sSingular;
 
@@ -67,14 +73,14 @@ class Inflector
 
             //  In English, if a word ends in a consonant + y then the y is
             //  replaced with ies, otherwise an s is simply appended.
-            $aVowelCombos = array('ay', 'ey', 'iy', 'oy', 'uy');
+            $aVowelCombos = ['ay', 'ey', 'iy', 'oy', 'uy'];
             if (in_array(substr($sSingular, -2), $aVowelCombos)) {
 
                 return $sSingular . $sPluralChar;
 
             } else {
 
-                $sPluralChar  = $bIsLowerCase ? 'ies' : 'IES';
+                $sPluralChar = $bIsLowerCase ? 'ies' : 'IES';
                 return substr($sSingular, 0, -1) . $sPluralChar;
             }
         }
