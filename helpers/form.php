@@ -16,18 +16,20 @@ if (!function_exists('form_email')) {
 
     /**
      * Generates an input using the "email" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_email($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'email',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -39,18 +41,20 @@ if (!function_exists('form_tel')) {
 
     /**
      * Generates an input using the "tel" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_tel($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'tel',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -62,19 +66,21 @@ if (!function_exists('form_number')) {
 
     /**
      * Generates an input using the "number" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_number($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'number',
             'name'  => !is_array($data) ? $data : '',
             'value' => $value,
-            'step'  => empty($data['step']) ? 'any' : $data['step']
-        );
+            'step'  => empty($data['step']) ? 'any' : $data['step'],
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -86,18 +92,20 @@ if (!function_exists('form_url')) {
 
     /**
      * Generates an input using the "url" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_url($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'url',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -109,18 +117,20 @@ if (!function_exists('form_date')) {
 
     /**
      * Generates an input using the "date" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_date($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'date',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -132,18 +142,20 @@ if (!function_exists('form_time')) {
 
     /**
      * Generates an input using the "time" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_time($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'time',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -155,18 +167,20 @@ if (!function_exists('form_color')) {
 
     /**
      * Generates an input using the "date" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_color($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'color',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -178,18 +192,20 @@ if (!function_exists('form_datetime')) {
 
     /**
      * Generates an input using the "datetime" type
+     *
      * @param  mixed  $data  The field's name or the config array
      * @param  mixed  $value The form element's value
      * @param  string $extra Any additional attributes to give to the field
+     *
      * @return string
      */
     function form_datetime($data = '', $value = '', $extra = '')
     {
-        $defaults = array(
+        $defaults = [
             'type'  => 'datetime-local',
             'name'  => !is_array($data) ? $data : '',
-            'value' => $value
-        );
+            'value' => $value,
+        ];
 
         return '<input ' . _parse_form_attributes($data, $defaults) . $extra . ' />';
     }
@@ -202,12 +218,14 @@ if (!function_exists('form_open')) {
     /**
      * Form Declaration
      * Creates the opening portion of the form, taking into account Secure base URL
+     *
      * @param   string  the URI segments of the form destination
      * @param   array   a key/value pair of attributes
      * @param   array   a key/value pair hidden data
+     *
      * @return  string
      */
-    function form_open($action = '', $attributes = '', $hidden = array())
+    function form_open($action = '', $attributes = '', $hidden = [])
     {
         $CI =& get_instance();
 
@@ -223,15 +241,15 @@ if (!function_exists('form_open')) {
         // If no action is provided then set to the current url
         $action || $action = $CI->config->site_url($CI->uri->uri_string());
 
-        $form = '<form action="'.$action.'"';
+        $form = '<form action="' . $action . '"';
 
         $form .= _attributes_to_string($attributes, true);
 
         $form .= '>';
 
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
-        $_base_url          = $CI->config->base_url();
-        $_secure_base_url   = $CI->config->secure_base_url();
+        $_base_url        = $CI->config->base_url();
+        $_secure_base_url = $CI->config->secure_base_url();
 
         if ($CI->config->item('csrf_protection') === true && !(strpos($action, $_base_url) === false || strpos($form, 'method="get"'))) {
             $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
@@ -259,42 +277,44 @@ if (!function_exists('form_field')) {
 
     /**
      * Generates a form field
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])          ? $field['id']               : null;
-        $_field_type        = isset($field['type'])        ? $field['type']             : 'text';
-        $_field_oddeven     = isset($field['oddeven'])     ? $field['oddeven']          : null;
-        $_field_key         = isset($field['key'])         ? $field['key']              : null;
-        $_field_label       = isset($field['label'])       ? $field['label']            : null;
-        $_field_default     = isset($field['default'])     ? $field['default']          : null;
-        $_field_sub_label   = isset($field['sub_label'])   ? $field['sub_label']        : null;
-        $_field_required    = isset($field['required'])    ? $field['required']         : false;
-        $_field_placeholder = isset($field['placeholder']) ? $field['placeholder']      : null;
-        $_field_readonly    = isset($field['readonly'])    ? $field['readonly']         : false;
-        $_field_error       = isset($field['error'])       ? $field['error']            : false;
-        $_field_class       = isset($field['class'])       ? $field['class']            : '';
-        $_field_data        = isset($field['data'])        ? $field['data']             : array();
-        $_field_info        = isset($field['info'])        ? $field['info']             : false;
-        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
-        $_field_max_length  = isset($field['max_length'])  ? (int) $field['max_length'] : null;
-        $_field_tip         = isset($field['tip'])         ? $field['tip']              : $tip;
+        $_field_id          = isset($field['id']) ? $field['id'] : null;
+        $_field_type        = isset($field['type']) ? $field['type'] : 'text';
+        $_field_oddeven     = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field_key         = isset($field['key']) ? $field['key'] : null;
+        $_field_label       = isset($field['label']) ? $field['label'] : null;
+        $_field_default     = isset($field['default']) ? $field['default'] : null;
+        $_field_sub_label   = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field_required    = isset($field['required']) ? $field['required'] : false;
+        $_field_placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field_readonly    = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field_error       = isset($field['error']) ? $field['error'] : false;
+        $_field_class       = isset($field['class']) ? $field['class'] : '';
+        $_field_data        = isset($field['data']) ? $field['data'] : [];
+        $_field_info        = isset($field['info']) ? $field['info'] : false;
+        $_field_info_class  = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field_max_length  = isset($field['max_length']) ? (int) $field['max_length'] : null;
+        $_field_tip         = isset($field['tip']) ? $field['tip'] : $tip;
 
-        $_tip               = array();
-        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
-        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field_tip) && isset($_field_tip['rel']) ? $_field_tip['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
+        $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
-        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
-        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
-        $_error_class       = $_error ? 'error' : '';
-        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
-        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+        $_field_id_top = $_field_id ? 'id="field-' . $_field_id . '"' : '';
+        $_error        = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class  = $_error ? 'error' : '';
+        $_readonly     = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls = $_field_readonly ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
@@ -305,8 +325,8 @@ if (!function_exists('form_field')) {
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
-        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_tip      = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -325,7 +345,7 @@ if (!function_exists('form_field')) {
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
-        $sFieldAttr  = $_attr;
+        $sFieldAttr = $_attr;
         $sFieldAttr .= ' class="field-input ' . $_field_class . '" ';
         $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ';
         $sFieldAttr .= $_readonly;
@@ -353,7 +373,7 @@ if (!function_exists('form_field')) {
 
                 if ($_field_type == 'wysiwyg') {
 
-                    $_field_type   = 'textarea';
+                    $_field_type  = 'textarea';
                     $_field_class .= ' wysiwyg';
                 }
 
@@ -452,7 +472,7 @@ if (!function_exists('form_field')) {
 
         // --------------------------------------------------------------------------
 
-$_out = <<<EOT
+        $_out = <<<EOT
 
     <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top>
         <label>
@@ -484,8 +504,10 @@ if (!function_exists('form_field_email')) {
 
     /**
      * Generates a form field using the "email" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_email($field, $tip = '')
@@ -501,8 +523,10 @@ if (!function_exists('form_field_number')) {
 
     /**
      * Generates a form field using the "number" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_number($field, $tip = '')
@@ -518,8 +542,10 @@ if (!function_exists('form_field_url')) {
 
     /**
      * Generates a form field using the "url" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_url($field, $tip = '')
@@ -535,8 +561,10 @@ if (!function_exists('form_field_tel')) {
 
     /**
      * Generates a form field using the "url" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_tel($field, $tip = '')
@@ -552,8 +580,10 @@ if (!function_exists('form_field_color')) {
 
     /**
      * Generates a form field using the "color" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_color($field, $tip = '')
@@ -569,8 +599,10 @@ if (!function_exists('form_field_password')) {
 
     /**
      * Generates a form field using the "password" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_password($field, $tip = '')
@@ -586,8 +618,10 @@ if (!function_exists('form_field_textarea')) {
 
     /**
      * Generates a form field using the "textarea" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_textarea($field, $tip = '')
@@ -604,8 +638,10 @@ if (!function_exists('form_field_wysiwyg')) {
     /**
      * Generates a form field using the "textarea" input type, and sets it's class
      * to "wysiwyg"
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_wysiwyg($field, $tip = '')
@@ -615,11 +651,9 @@ if (!function_exists('form_field_wysiwyg')) {
         if (isset($field['class'])) {
 
             $field['class'] .= ' wysiwyg';
-
         } else {
 
             $field['class'] = 'wysiwyg';
-
         }
 
         return form_field($field, $tip);
@@ -632,8 +666,10 @@ if (!function_exists('form_field_text')) {
 
     /**
      * Generates a form field using the "text" input type
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_text($field, $tip = '')
@@ -650,43 +686,45 @@ if (!function_exists('form_field_cdn_object_picker')) {
     /**
      * Generates a form field containing the media manager to select a file.
      * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_cdn_object_picker($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : null;
-        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field_key         = isset($field['key'])            ? $field['key']         : null;
-        $_field_label       = isset($field['label'])          ? $field['label']       : null;
-        $_field_default     = isset($field['default'])        ? $field['default']     : null;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field_required    = isset($field['required'])       ? $field['required']    : false;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field_error       = isset($field['error'])          ? $field['error']       : false;
-        $_field_class       = isset($field['class'])          ? $field['class']       : '';
-        $_field_data        = isset($field['data'])           ? $field['data']        : array();
-        $_field_info        = isset($field['info'])           ? $field['info']        : false;
-        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
-        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field_id         = isset($field['id']) ? $field['id'] : null;
+        $_field_type       = isset($field['type']) ? $field['type'] : 'text';
+        $_field_oddeven    = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field_key        = isset($field['key']) ? $field['key'] : null;
+        $_field_label      = isset($field['label']) ? $field['label'] : null;
+        $_field_default    = isset($field['default']) ? $field['default'] : null;
+        $_field_sub_label  = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field_required   = isset($field['required']) ? $field['required'] : false;
+        $_field_readonly   = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field_error      = isset($field['error']) ? $field['error'] : false;
+        $_field_class      = isset($field['class']) ? $field['class'] : '';
+        $_field_data       = isset($field['data']) ? $field['data'] : [];
+        $_field_info       = isset($field['info']) ? $field['info'] : false;
+        $_field_info_class = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field_tip        = isset($field['tip']) ? $field['tip'] : $tip;
 
         //  CDN Specific
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+        $_field_bucket = isset($field['bucket']) ? $field['bucket'] : null;
 
-        $_tip               = array();
-        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
-        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field_tip) && isset($_field_tip['rel']) ? $_field_tip['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
+        $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
-        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
-        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
-        $_error_class       = $_error ? 'error' : '';
-        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
-        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+        $_field_id_top = $_field_id ? 'id="field-' . $_field_id . '"' : '';
+        $_error        = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class  = $_error ? 'error' : '';
+        $_readonly     = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls = $_field_readonly ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
@@ -697,8 +735,8 @@ if (!function_exists('form_field_cdn_object_picker')) {
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
-        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_tip      = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -717,7 +755,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
-        $sFieldAttr  = $_attr;
+        $sFieldAttr = $_attr;
         $sFieldAttr .= ' class="' . $_field_class . '" ';
         $sFieldAttr .= $_readonly;
 
@@ -729,7 +767,6 @@ if (!function_exists('form_field_cdn_object_picker')) {
         if ($_error && $_field_error) {
 
             $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-
         } elseif ($_error) {
 
             $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
@@ -742,7 +779,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
 
         // --------------------------------------------------------------------------
 
-$_out = <<<EOT
+        $_out = <<<EOT
 
     <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top>
         <label>
@@ -772,44 +809,46 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
     /**
      * Generates a form field containing multiple object pickers
      * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_cdn_object_picker_multi($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : null;
-        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field_key         = isset($field['key'])            ? $field['key']         : null;
-        $_field_label       = isset($field['label'])          ? $field['label']       : null;
-        $_field_default     = isset($field['default'])        ? $field['default']     : array();
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field_required    = isset($field['required'])       ? $field['required']    : false;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field_error       = isset($field['error'])          ? $field['error']       : false;
-        $_field_class       = isset($field['class'])          ? $field['class']       : '';
-        $_field_data        = isset($field['data'])           ? $field['data']        : array();
-        $_field_info        = isset($field['info'])           ? $field['info']        : false;
-        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
-        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field_id         = isset($field['id']) ? $field['id'] : null;
+        $_field_type       = isset($field['type']) ? $field['type'] : 'text';
+        $_field_oddeven    = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field_key        = isset($field['key']) ? $field['key'] : null;
+        $_field_label      = isset($field['label']) ? $field['label'] : null;
+        $_field_default    = isset($field['default']) ? $field['default'] : [];
+        $_field_bucket     = isset($field['bucket']) ? $field['bucket'] : null;
+        $_field_sub_label  = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field_required   = isset($field['required']) ? $field['required'] : false;
+        $_field_readonly   = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field_error      = isset($field['error']) ? $field['error'] : false;
+        $_field_class      = isset($field['class']) ? $field['class'] : '';
+        $_field_data       = isset($field['data']) ? $field['data'] : [];
+        $_field_info       = isset($field['info']) ? $field['info'] : false;
+        $_field_info_class = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field_tip        = isset($field['tip']) ? $field['tip'] : $tip;
 
         //  CDN Specific
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+        $_field_bucket = isset($field['bucket']) ? $field['bucket'] : null;
 
-        $_tip               = array();
-        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
-        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field_tip) && isset($_field_tip['rel']) ? $_field_tip['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
+        $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
-        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
-        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
-        $_error_class       = $_error ? 'error' : '';
-        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
-        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+        $_field_id_top = $_field_id ? 'id="field-' . $_field_id . '"' : '';
+        $_error        = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class  = $_error ? 'error' : '';
+        $_readonly     = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls = $_field_readonly ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
@@ -820,8 +859,8 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
-        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_tip      = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -840,7 +879,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
-        $sFieldAttr  = $_attr;
+        $sFieldAttr = $_attr;
         $sFieldAttr .= ' class="' . $_field_class . '" ';
         $sFieldAttr .= $_readonly;
 
@@ -856,7 +895,6 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         if ($_error && $_field_error) {
 
             $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-
         } elseif ($_error) {
 
             $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
@@ -877,7 +915,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
             '{{object_id}}',
             'data-index="{{index}}"'
         );
-        $_field_html_remove  = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
+        $_field_html_remove = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
         $_field_html_remove .= '<b class="fa fa-lg fa-times-circle text-danger"></b>';
         $_field_html_remove .= '</a>';
 
@@ -896,7 +934,7 @@ EOT;
 
         //  Generate the initial objects
         $_default_html = '';
-        $oMustache     = nailsFactory('service', 'Mustache');
+        $oMustache     = Factory::service('Mustache');
 
         if (!empty($_POST)) {
 
@@ -914,21 +952,19 @@ EOT;
 
                 //  @todo find a way to not be evil
                 $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : array();');
-
             } else {
 
-                $aValues  = $_POST[$_field_key];
+                $aValues = $_POST[$_field_key];
             }
-
         } else {
 
             $aValues = $_field_default;
         }
 
-        for ($i=0; $i < count($aValues); $i++) {
+        for ($i = 0; $i < count($aValues); $i++) {
 
             $aValues[$i]['index'] = $i;
-            $_default_html .= $oMustache->render($jsTpl, $aValues[$i]);
+            $_default_html        .= $oMustache->render($jsTpl, $aValues[$i]);
         }
 
         $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($aValues)) . '"';
@@ -984,44 +1020,46 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
     /**
      * Generates a form field containing multiple object pickers
      * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_cdn_object_picker_multi_with_label($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id'])             ? $field['id']          : null;
-        $_field_type        = isset($field['type'])           ? $field['type']        : 'text';
-        $_field_oddeven     = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field_key         = isset($field['key'])            ? $field['key']         : null;
-        $_field_label       = isset($field['label'])          ? $field['label']       : null;
-        $_field_default     = isset($field['default'])        ? $field['default']     : array();
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
-        $_field_sub_label   = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field_required    = isset($field['required'])       ? $field['required']    : false;
-        $_field_readonly    = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field_error       = isset($field['error'])          ? $field['error']       : false;
-        $_field_class       = isset($field['class'])          ? $field['class']       : '';
-        $_field_data        = isset($field['data'])           ? $field['data']        : array();
-        $_field_info        = isset($field['info'])           ? $field['info']        : false;
-        $_field_info_class  = isset($field['info_class'])  ? $field['info_class']       : false;
-        $_field_tip         = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field_id         = isset($field['id']) ? $field['id'] : null;
+        $_field_type       = isset($field['type']) ? $field['type'] : 'text';
+        $_field_oddeven    = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field_key        = isset($field['key']) ? $field['key'] : null;
+        $_field_label      = isset($field['label']) ? $field['label'] : null;
+        $_field_default    = isset($field['default']) ? $field['default'] : [];
+        $_field_bucket     = isset($field['bucket']) ? $field['bucket'] : null;
+        $_field_sub_label  = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field_required   = isset($field['required']) ? $field['required'] : false;
+        $_field_readonly   = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field_error      = isset($field['error']) ? $field['error'] : false;
+        $_field_class      = isset($field['class']) ? $field['class'] : '';
+        $_field_data       = isset($field['data']) ? $field['data'] : [];
+        $_field_info       = isset($field['info']) ? $field['info'] : false;
+        $_field_info_class = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field_tip        = isset($field['tip']) ? $field['tip'] : $tip;
 
         //  CDN Specific
-        $_field_bucket      = isset($field['bucket'])         ? $field['bucket']      : null;
+        $_field_bucket = isset($field['bucket']) ? $field['bucket'] : null;
 
-        $_tip               = array();
-        $_tip['class']      = is_array($_field_tip) && isset($_field_tip['class'])  ? $_field_tip['class']  : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']        = is_array($_field_tip) && isset($_field_tip['rel'])    ? $_field_tip['rel']    : 'tipsy-left';
-        $_tip['title']      = is_array($_field_tip) && isset($_field_tip['title'])  ? $_field_tip['title']  : null;
-        $_tip['title']      = is_string($_field_tip) ? $_field_tip : $_tip['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field_tip) && isset($_field_tip['rel']) ? $_field_tip['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
+        $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
-        $_field_id_top      = $_field_id ? 'id="field-' . $_field_id . '"': '';
-        $_error             = form_error($_field_key) || $_field_error ? 'error' : '';
-        $_error_class       = $_error ? 'error' : '';
-        $_readonly          = $_field_readonly ? 'readonly="readonly"' : '';
-        $_readonly_cls      = $_field_readonly ? 'readonly' : '';
+        $_field_id_top = $_field_id ? 'id="field-' . $_field_id . '"' : '';
+        $_error        = form_error($_field_key) || $_field_error ? 'error' : '';
+        $_error_class  = $_error ? 'error' : '';
+        $_readonly     = $_field_readonly ? 'readonly="readonly"' : '';
+        $_readonly_cls = $_field_readonly ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
@@ -1032,8 +1070,8 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $_tipclass  = $_tip['title'] ? 'with-tip' : '';
-        $_tip       = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_tip      = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
@@ -1052,7 +1090,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
-        $sFieldAttr  = $_attr;
+        $sFieldAttr = $_attr;
         $sFieldAttr .= ' class="' . $_field_class . '" ';
         $sFieldAttr .= $_readonly;
 
@@ -1068,7 +1106,6 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         if ($_error && $_field_error) {
 
             $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-
         } elseif ($_error) {
 
             $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
@@ -1089,8 +1126,8 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
             '{{object_id}}',
             'data-index="{{index}}"'
         );
-        $_field_html_label   = '<input type="text" name="' . $_field_key . '[{{index}}][label]" value="{{label}}" data-index="{{index}}" class="js-label">';
-        $_field_html_remove  = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
+        $_field_html_label  = '<input type="text" name="' . $_field_key . '[{{index}}][label]" value="{{label}}" data-index="{{index}}" class="js-label">';
+        $_field_html_remove = '<a href="#" class="js-cdn-multi-action-remove" data-index="{{index}}">';
         $_field_html_remove .= '<b class="fa fa-lg fa-times-circle text-danger"></b>';
         $_field_html_remove .= '</a>';
 
@@ -1112,7 +1149,7 @@ EOT;
 
         //  Generate the initial objects
         $_default_html = '';
-        $oMustache     = nailsFactory('service', 'Mustache');
+        $oMustache     = Factory::service('Mustache');
 
         if (!empty($_POST)) {
 
@@ -1130,23 +1167,21 @@ EOT;
 
                 //  @todo find a way to not be evil
                 $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : array();');
-
             } else {
 
-                $aValues  = isset($_POST[$_field_key]) ? $_POST[$_field_key] : array();
+                $aValues = isset($_POST[$_field_key]) ? $_POST[$_field_key] : [];
             }
-
         } else {
 
             $aValues = $_field_default;
         }
 
-        for ($i=0; $i < count($aValues); $i++) {
+        for ($i = 0; $i < count($aValues); $i++) {
 
             $aValues[$i] = (array) $aValues[$i];
 
             $aValues[$i]['index'] = $i;
-            $_default_html .= $oMustache->render($jsTpl, $aValues[$i]);
+            $_default_html        .= $oMustache->render($jsTpl, $aValues[$i]);
         }
 
         $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($aValues)) . '"';
@@ -1203,8 +1238,10 @@ if (!function_exists('form_field_mm')) {
     /**
      * Generates a form field containing the media manager to select a file.
      * @deprecated Use form_field_cdn_object_picker instead
+     *
      * @param  array  $aField The config array
      * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string         The form HTML
      */
     function form_field_mm($aField, $sTip = '')
@@ -1220,8 +1257,10 @@ if (!function_exists('form_field_mm_image')) {
     /**
      * Generates a form field containing the media manager to select an image
      * @deprecated Use form_field_cdn_object_picker instead
+     *
      * @param  array  $aField The config array
      * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string         The form HTML
      */
     function form_field_mm_image($aField, $sTip = '')
@@ -1236,16 +1275,18 @@ if (!function_exists('form_field_date')) {
 
     /**
      * Generates a form field for dates
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_date($field, $tip = '')
     {
-        $_field                 = $field;
-        $_field['type']         = 'date';
-        $_field['class']        = isset($field['class']) ? $field['class'] . ' date' : 'date';
-        $_field['placeholder']  = 'YYYY-MM-DD';
+        $_field                = $field;
+        $_field['type']        = 'date';
+        $_field['class']       = isset($field['class']) ? $field['class'] . ' date' : 'date';
+        $_field['placeholder'] = 'YYYY-MM-DD';
 
         return form_field($_field, $tip);
     }
@@ -1257,16 +1298,18 @@ if (!function_exists('form_field_time')) {
 
     /**
      * Generates a form field for times
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_time($field, $tip = '')
     {
-        $_field                 = $field;
-        $_field['type']         = 'time';
-        $_field['class']        = isset($field['class']) ? $field['class'] . ' date' : 'date';
-        $_field['placeholder']  = 'HH:MM';
+        $_field                = $field;
+        $_field['type']        = 'time';
+        $_field['class']       = isset($field['class']) ? $field['class'] . ' date' : 'date';
+        $_field['placeholder'] = 'HH:MM';
 
         return form_field($_field, $tip);
     }
@@ -1278,16 +1321,18 @@ if (!function_exists('form_field_datetime')) {
 
     /**
      * Generates a form field for datetimes
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_datetime($field, $tip = '')
     {
-        $_field                 = $field;
-        $_field['type']         = 'datetime';
-        $_field['class']        = isset($field['class']) ? $field['class'] . ' datetime' : 'datetime';
-        $_field['placeholder']  = 'YYYY-MM-DD HH:mm:ss';
+        $_field                = $field;
+        $_field['type']        = 'datetime';
+        $_field['class']       = isset($field['class']) ? $field['class'] . ' datetime' : 'datetime';
+        $_field['placeholder'] = 'YYYY-MM-DD HH:mm:ss';
 
         return form_field($_field, $tip);
     }
@@ -1299,15 +1344,17 @@ if (!function_exists('form_field_dropdown')) {
 
     /**
      * Generates a form field using the "select" input type
+     *
      * @param  array  $field   The config array
      * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string          The form HTML
      */
     function form_field_dropdown($field, $options = null, $tip = '')
     {
         //  Set var defaults
-        $_field                     = array();
+        $_field                     = [];
         $_field['id']               = isset($field['id']) ? $field['id'] : null;
         $_field['type']             = isset($field['type']) ? $field['type'] : 'text';
         $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : null;
@@ -1320,41 +1367,41 @@ if (!function_exists('form_field_dropdown')) {
         $_field['class']            = isset($field['class']) ? $field['class'] : false;
         $_field['style']            = isset($field['style']) ? $field['style'] : false;
         $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : false;
-        $_field['data']             = isset($field['data']) ? $field['data'] : array();
-        $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
-        $_field['info']             = isset($field['info']) ? $field['info'] : array();
+        $_field['data']             = isset($field['data']) ? $field['data'] : [];
+        $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : [];
+        $_field['info']             = isset($field['info']) ? $field['info'] : [];
         $_field['info_class']       = isset($field['info_class']) ? $field['info_class'] : false;
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
         $_field['options']          = isset($field['options']) ? $field['options'] : $options;
 
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
-        $_error         = form_error($_field['key']) ? 'error' : '';
-        $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
-        $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"' : '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
+        $_readonly     = $_field['readonly'] ? 'disabled="disabled"' : '';
+        $_readonly_cls = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
         $_out .= '<label>';
 
         //  Label
         $_out .= '<span class="label">';
-            $_out .= $_field['label'];
-            $_out .= $_field['required'] ? '*' : '';
-            $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+        $_out .= $_field['label'];
+        $_out .= $_field['required'] ? '*' : '';
+        $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         // --------------------------------------------------------------------------
 
         //  Field
         $_withtip = $_tip['title'] ? 'with-tip' : '';
-        $_out .= '<span class="input ' . $_withtip . '">';
+        $_out     .= '<span class="input ' . $_withtip . '">';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -1372,7 +1419,7 @@ if (!function_exists('form_field_dropdown')) {
 
         //  Build the select
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
-        $_out .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
+        $_out         .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($_field['options'] as $value => $label) :
 
@@ -1441,15 +1488,17 @@ if (!function_exists('form_field_dropdown_multiple')) {
 
     /**
      * Generates a form field using the "select" input type, with multiple selections allowed
+     *
      * @param  array  $field   The config array
      * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string          The form HTML
      */
     function form_field_dropdown_multiple($field, $options = null, $tip = '')
     {
         //  Set var defaults
-        $_field                     = array();
+        $_field                     = [];
         $_field['id']               = isset($field['id']) ? $field['id'] : null;
         $_field['type']             = isset($field['type']) ? $field['type'] : 'text';
         $_field['oddeven']          = isset($field['oddeven']) ? $field['oddeven'] : null;
@@ -1462,30 +1511,30 @@ if (!function_exists('form_field_dropdown_multiple')) {
         $_field['class']            = isset($field['class']) ? $field['class'] : false;
         $_field['style']            = isset($field['style']) ? $field['style'] : false;
         $_field['readonly']         = isset($field['readonly']) ? $field['readonly'] : false;
-        $_field['data']             = isset($field['data']) ? $field['data'] : array();
-        $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : array();
-        $_field['info']             = isset($field['info']) ? $field['info'] : array();
+        $_field['data']             = isset($field['data']) ? $field['data'] : [];
+        $_field['disabled_options'] = isset($field['disabled_options']) ? $field['disabled_options'] : [];
+        $_field['info']             = isset($field['info']) ? $field['info'] : [];
         $_field['info_class']       = isset($field['info_class']) ? $field['info_class'] : false;
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
 
         if (is_null($options)) {
-            $options = isset($field['options']) ? $field['options'] : array();
+            $options = isset($field['options']) ? $field['options'] : [];
         }
 
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
-        $_error         = form_error($_field['key']) ? 'error' : '';
-        $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
-        $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"' : '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
+        $_readonly     = $_field['readonly'] ? 'disabled="disabled"' : '';
+        $_readonly_cls = $_field['readonly'] ? 'readonly' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
         $_out .= '<label>';
 
         //  Label
@@ -1499,7 +1548,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
 
         //  Field
         $_withtip = $_tip['title'] ? 'with-tip' : '';
-        $_out .= '<span class="input ' . $_withtip . '">';
+        $_out     .= '<span class="input ' . $_withtip . '">';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -1520,7 +1569,7 @@ if (!function_exists('form_field_dropdown_multiple')) {
 
         //  Build the select
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
-        $_out .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
+        $_out         .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($options as $value => $label) :
 
@@ -1577,8 +1626,10 @@ if (!function_exists('form_field_boolean')) {
 
     /**
      * Generates a form field using the "select" input type containing two options.
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_boolean($field, $tip = '')
@@ -1588,39 +1639,39 @@ if (!function_exists('form_field_boolean')) {
         // --------------------------------------------------------------------------
 
         //  Set var defaults
-        $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
-        $_field['text_on']      = isset($field['text_on'])        ? $field['text_on']     : 'ON';
-        $_field['text_off']     = isset($field['text_off'])       ? $field['text_off']    : 'OFF';
-        $_field['data']         = isset($field['data'])           ? $field['data']        : array();
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field['info']         = isset($field['info'])           ? $field['info']        : false;
-        $_field['info_class']   = isset($field['info_class'])     ? $field['info_class']  : false;
-        $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field                = [];
+        $_field['id']          = isset($field['id']) ? $field['id'] : null;
+        $_field['oddeven']     = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']         = isset($field['key']) ? $field['key'] : null;
+        $_field['label']       = isset($field['label']) ? $field['label'] : null;
+        $_field['default']     = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']   = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']    = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder'] = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']       = isset($field['class']) ? $field['class'] : false;
+        $_field['text_on']     = isset($field['text_on']) ? $field['text_on'] : 'ON';
+        $_field['text_off']    = isset($field['text_off']) ? $field['text_off'] : 'OFF';
+        $_field['data']        = isset($field['data']) ? $field['data'] : [];
+        $_field['readonly']    = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field['info']        = isset($field['info']) ? $field['info'] : false;
+        $_field['info_class']  = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
 
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
-        $_error         = form_error($_field['key']) ? 'error' : '';
-        $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
-        $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
-        $_class         = $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"' : '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
+        $_readonly     = $_field['readonly'] ? 'disabled="disabled"' : '';
+        $_readonly_cls = $_field['readonly'] ? 'readonly' : '';
+        $_class        = $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -1634,14 +1685,14 @@ if (!function_exists('form_field_boolean')) {
 
         //  Label
         $_out .= '<span class="label">';
-            $_out .= $_field['label'];
-            $_out .= $_field['required'] ? '*' : '';
-            $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+        $_out .= $_field['label'];
+        $_out .= $_field['required'] ? '*' : '';
+        $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         //  Field
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_out .= '<span class="input ' . $_tipclass . '">';
+        $_out      .= '<span class="input ' . $_tipclass . '">';
         $_selected = set_value($_field['key'], (bool) $_field['default']);
 
         $_out .= '<div class="toggle toggle-modern"></div>';
@@ -1671,9 +1722,11 @@ if (!function_exists('form_field_radio')) {
 
     /**
      * Generates a form field using the "radio" input type
+     *
      * @param  array  $field   The config array
      * @param  array  $options The options to use for the radios (DEPRECATED: use $field['options'] instead)
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string          The form HTML
      */
     function form_field_radio($field, $options = null, $tip = '')
@@ -1689,9 +1742,11 @@ if (!function_exists('form_field_checkbox')) {
 
     /**
      * Generates a form field using the "checkbox" input type
+     *
      * @param  array  $field   The config array
      * @param  array  $options The options to use for the checkboxes (DEPRECATED: use $field['options'] instead)
      * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string          The form HTML
      */
     function form_field_checkbox($field, $options = null, $tip = '')
@@ -1701,32 +1756,32 @@ if (!function_exists('form_field_checkbox')) {
         // --------------------------------------------------------------------------
 
         //  Set var defaults
-        $_field                 = array();
-        $_field['type']         = isset($field['type']) ? $field['type'] : 'checkbox';
-        $_field['id']           = isset($field['id']) ? $field['id'] : null;
-        $_field['oddeven']      = isset($field['oddeven']) ? $field['oddeven'] : null;
-        $_field['key']          = isset($field['key']) ? $field['key'] : null;
-        $_field['label']        = isset($field['label']) ? $field['label'] : null;
-        $_field['default']      = isset($field['default']) ? $field['default'] : null;
-        $_field['sub_label']    = isset($field['sub_label']) ? $field['sub_label'] : null;
-        $_field['required']     = isset($field['required']) ? $field['required'] : false;
-        $_field['placeholder']  = isset($field['placeholder']) ? $field['placeholder'] : null;
-        $_field['class']        = isset($field['class']) ? $field['class'] : false;
-        $_field['tip']          = isset($field['tip']) ? $field['tip'] : $tip;
-        $_field['options']      = isset($field['options']) ? $field['options'] : $options;
+        $_field                = [];
+        $_field['type']        = isset($field['type']) ? $field['type'] : 'checkbox';
+        $_field['id']          = isset($field['id']) ? $field['id'] : null;
+        $_field['oddeven']     = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']         = isset($field['key']) ? $field['key'] : null;
+        $_field['label']       = isset($field['label']) ? $field['label'] : null;
+        $_field['default']     = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']   = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']    = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder'] = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']       = isset($field['class']) ? $field['class'] : false;
+        $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
+        $_field['options']     = isset($field['options']) ? $field['options'] : $options;
 
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"' : '';
         $_error        = form_error($_field['key']) ? 'error' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field ' . $_field['type'] . ' ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field ' . $_field['type'] . ' ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
 
         //  First option
         $_out .= '<label>';
@@ -1744,11 +1799,10 @@ if (!function_exists('form_field_checkbox')) {
         //  Is the option disabled?
         $_disabled = !empty($options[0]['disabled']) ? 'disabled="disabled" ' : '';
 
-        $_tipclass = $_tip['title'] ? 'with-tip' : '';
+        $_tipclass      = $_tip['title'] ? 'with-tip' : '';
         $_disabledclass = $_disabled ? 'is-disabled' : '';
 
         $_out .= '<span class="input ' . $_tipclass . ' ' . $_disabledclass . '">';
-
 
         //  Field
         if (substr($_field['key'], -2) == '[]') :
@@ -1779,7 +1833,7 @@ if (!function_exists('form_field_checkbox')) {
 
         endif;
 
-        $_key   = isset($options[0]['key']) ? $options[0]['key'] : $_field['key'];
+        $_key = isset($options[0]['key']) ? $options[0]['key'] : $_field['key'];
 
         if ($_field['type'] == 'checkbox') {
 
@@ -1790,7 +1844,6 @@ if (!function_exists('form_field_checkbox')) {
                 $_id . $_disabled
             );
             $_out .= '<span class="text">' . $options[0]['label'] . '</span>';
-
         } elseif ($_field['type'] == 'radio') {
 
             $_out .= form_radio(
@@ -1806,7 +1859,7 @@ if (!function_exists('form_field_checkbox')) {
         if (!empty($_tip['title'])) {
 
             $sTitle = htmlentities($_tip['title'], ENT_QUOTES);
-            $_out .= '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $sTitle . '"></b>';
+            $_out   .= '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $sTitle . '"></b>';
         }
 
         $_out .= '</span>';
@@ -1825,7 +1878,7 @@ if (!function_exists('form_field_checkbox')) {
             $_id = !empty($options[$i]['id']) ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
 
             //  Is the option disabled?
-            $_disabled = !empty($options[$i]['disabled']) ? 'disabled="disabled" ' : '';
+            $_disabled      = !empty($options[$i]['disabled']) ? 'disabled="disabled" ' : '';
             $_disabledclass = $_disabled ? 'is-disabled' : '';
 
             $_out .= '<span class="input ' . $_disabledclass . '">';
@@ -1834,7 +1887,7 @@ if (!function_exists('form_field_checkbox')) {
             if (substr($_field['key'], -2) == '[]') :
 
                 //  Field is an array, need to look for the value
-                $_values    = $_ci->input->post(substr($_field['key'], 0, -2));
+                $_values        = $_ci->input->post(substr($_field['key'], 0, -2));
                 $_data_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
                 $_selected      = $_ci->input->post() ? false : $_data_selected;
 
@@ -1870,7 +1923,6 @@ if (!function_exists('form_field_checkbox')) {
                     $_id . $_disabled
                 );
                 $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
-
             } elseif ($_field['type'] == 'radio') {
 
                 $_out .= form_radio(
@@ -1905,8 +1957,10 @@ if (!function_exists('form_field_cms_widgets')) {
     /**
      * Generates a form field containing a button to open the CMS widgets manager
      * @todo oh God, sort this file out, use a proper form building class
+     *
      * @param  array  $field The config array
      * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     *
      * @return string        The form HTML
      */
     function form_field_cms_widgets($field, $tip = '')
@@ -1916,37 +1970,37 @@ if (!function_exists('form_field_cms_widgets')) {
         // --------------------------------------------------------------------------
 
         //  Set var defaults
-        $_field                 = array();
-        $_field['id']           = isset($field['id'])             ? $field['id']          : null;
-        $_field['oddeven']      = isset($field['oddeven'])        ? $field['oddeven']     : null;
-        $_field['key']          = isset($field['key'])            ? $field['key']         : null;
-        $_field['label']        = isset($field['label'])          ? $field['label']       : null;
-        $_field['default']      = isset($field['default'])        ? $field['default']     : null;
-        $_field['sub_label']    = isset($field['sub_label'])      ? $field['sub_label']   : null;
-        $_field['required']     = isset($field['required'])       ? $field['required']    : false;
-        $_field['placeholder']  = isset($field['placeholder'])    ? $field['placeholder'] : null;
-        $_field['class']        = isset($field['class'])          ? $field['class']       : false;
-        $_field['data']         = isset($field['data'])           ? $field['data']        : array();
-        $_field['readonly']     = isset($field['readonly'])       ? $field['readonly']    : false;
-        $_field['info']         = isset($field['info'])           ? $field['info']        : false;
-        $_field['info_class']   = isset($field['info_class'])     ? $field['info_class']  : false;
-        $_field['tip']          = isset($field['tip'])            ? $field['tip']         : $tip;
+        $_field                = [];
+        $_field['id']          = isset($field['id']) ? $field['id'] : null;
+        $_field['oddeven']     = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field['key']         = isset($field['key']) ? $field['key'] : null;
+        $_field['label']       = isset($field['label']) ? $field['label'] : null;
+        $_field['default']     = isset($field['default']) ? $field['default'] : null;
+        $_field['sub_label']   = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field['required']    = isset($field['required']) ? $field['required'] : false;
+        $_field['placeholder'] = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field['class']       = isset($field['class']) ? $field['class'] : false;
+        $_field['data']        = isset($field['data']) ? $field['data'] : [];
+        $_field['readonly']    = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field['info']        = isset($field['info']) ? $field['info'] : false;
+        $_field['info_class']  = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
 
-        $_tip                   = array();
-        $_tip['class']          = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']            = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
-        $_tip['title']          = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
-        $_tip['title']          = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
+        $_tip          = [];
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
+        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
+        $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
-        $_field_id_top  = $_field['id'] ? 'id="field-' . $_field['id'] . '"': '';
-        $_error         = form_error($_field['key']) ? 'error' : '';
-        $_readonly      = $_field['readonly'] ? 'disabled="disabled"' : '';
-        $_readonly_cls  = $_field['readonly'] ? 'readonly' : '';
-        $_class         = $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
+        $_field_id_top = $_field['id'] ? 'id="field-' . $_field['id'] . '"' : '';
+        $_error        = form_error($_field['key']) ? 'error' : '';
+        $_readonly     = $_field['readonly'] ? 'disabled="disabled"' : '';
+        $_readonly_cls = $_field['readonly'] ? 'readonly' : '';
+        $_class        = $_field['class'] ? 'class="' . $_field['class'] . '"' : '';
 
         // --------------------------------------------------------------------------
 
-        $_out  = '<div class="field cms-widgets ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field cms-widgets ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" ' . $_field_id_top . '>';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -1960,9 +2014,9 @@ if (!function_exists('form_field_cms_widgets')) {
 
         //  Label
         $_out .= '<span class="label">';
-            $_out .= $_field['label'];
-            $_out .= $_field['required'] ? '*' : '';
-            $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
+        $_out .= $_field['label'];
+        $_out .= $_field['required'] ? '*' : '';
+        $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         //  If the default value is nto a string then encode it, allow devs to pass the configuration array if desired
@@ -1972,7 +2026,7 @@ if (!function_exists('form_field_cms_widgets')) {
 
         //  Field
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_out .= '<span class="input ' . $_tipclass . '">';
+        $_out      .= '<span class="input ' . $_tipclass . '">';
 
         $_default = set_value($_field['key'], $_field['default']);
 
@@ -2005,9 +2059,11 @@ if (!function_exists('form_field_submit')) {
 
     /**
      * Generates a submit button which is aligned properly with the form_field_* functions
+     *
      * @param  string $button_value      The value to give the button
      * @param  string $button_name       The name to give the button
      * @param  string $button_attributes Any additional attributes to give the button
+     *
      * @return string                    The form HTML
      */
     function form_field_submit($button_value = 'Submit', $button_name = 'submit', $button_attributes = '')
@@ -2016,7 +2072,7 @@ if (!function_exists('form_field_submit')) {
 
         // --------------------------------------------------------------------------
 
-$_out = <<<EOT
+        $_out = <<<EOT
 
     <div class="field submit">
         <span class="label">&nbsp;</span>
@@ -2042,8 +2098,10 @@ if (!function_exists('form_field_render')) {
      * form field must be passed in via $aField's html parameter
      * @todo - Implement this into the other functions so all are the same
      * @todo - Turn this into a class
+     *
      * @param array  $aField The configuration array
      * @param string $sTip   The tip (deprecated, pass in through $aField)
+     *
      * @return string
      */
     function form_field_render($aField, $sTip = null)
@@ -2052,7 +2110,7 @@ if (!function_exists('form_field_render')) {
             trigger_error('Use of second parameter as field tip is deprecated.', E_USER_NOTICE);
         }
 
-        $oField = (object) array(
+        $oField = (object) [
             'id'          => getFromArray('id', $aField, null),
             'type'        => getFromArray('type', $aField, null),
             'oddeven'     => getFromArray('oddeven', $aField, null),
@@ -2063,30 +2121,30 @@ if (!function_exists('form_field_render')) {
             'required'    => getFromArray('required', $aField, false),
             'placeholder' => getFromArray('placeholder', $aField, null),
             'class'       => getFromArray('class', $aField, false),
-            'data'        => getFromArray('data', $aField, array()),
+            'data'        => getFromArray('data', $aField, []),
             'readonly'    => getFromArray('readonly', $aField, false),
             'info'        => getFromArray('info', $aField, false),
             'info_class'  => getFromArray('info_class', $aField, false),
             'tip'         => getFromArray('tip', $aField, $sTip),
             'error'       => getFromArray('error', $aField, null),
-            'html'        => getFromArray('html', $aField, '')
-        );
+            'html'        => getFromArray('html', $aField, ''),
+        ];
 
         if (is_array($oField->tip)) {
-            $oTip = (object) array(
+            $oTip = (object) [
                 'class' => getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
                 'rel'   => getFromArray('rel', $oField->tip, 'tipsy-left'),
-                'title' => getFromArray('title', $oField->tip, null)
-            );
+                'title' => getFromArray('title', $oField->tip, null),
+            ];
         } elseif (is_string($oField->tip)) {
-            $oTip = (object) array(
+            $oTip = (object) [
                 'class' => 'fa fa-question-circle fa-lg tip',
                 'rel'   => 'tipsy-left',
-                'title' => $oField->tip
-            );
+                'title' => $oField->tip,
+            ];
         }
 
-        $sFieldIdTop    = $oField->id ? 'id="field-' . $oField->id . '"': '';
+        $sFieldIdTop    = $oField->id ? 'id="field-' . $oField->id . '"' : '';
         $sError         = form_error($oField->key) || $oField->error ? 'error' : '';
         $sErrorClass    = $sError ? 'error' : '';
         $sReadonly      = $oField->readonly ? 'readonly="readonly"' : '';
@@ -2101,17 +2159,17 @@ if (!function_exists('form_field_render')) {
         $oField->sub_label = $oField->sub_label ? '<small>' . $oField->sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $sTipClass  = !empty($oTip) ? 'with-tip' : '';
-        $sTipHtml   = !empty($oTip) ? '<b class="' . $oTip->class . '" rel="' . $oTip->rel . '" title="' . htmlentities($oTip->title, ENT_QUOTES) . '"></b>' : '';
+        $sTipClass = !empty($oTip) ? 'with-tip' : '';
+        $sTipHtml  = !empty($oTip) ? '<b class="' . $oTip->class . '" rel="' . $oTip->rel . '" title="' . htmlentities($oTip->title, ENT_QUOTES) . '"></b>' : '';
 
         // --------------------------------------------------------------------------
 
         //  Prep the field's attributes
-        $aAttr = array(
+        $aAttr = [
             $oField->id ? 'id="' . $oField->id . '" ' : '',
             'class="' . $oField->class . '" ',
-            $sReadonly
-        );
+            $sReadonly,
+        ];
 
         //  Any data attributes?
         foreach ($oField->data as $sAttr => $sValue) {
