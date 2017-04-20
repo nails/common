@@ -1758,13 +1758,10 @@ abstract class Base
 
             $oTemp             = new \stdClass();
             $oTemp->key        = $oField->Field;
-            $oTemp->label      = null;
+            $oTemp->label      = $this->describeFieldsPrepareLabel($oTemp->key);
             $oTemp->type       = null;
             $oTemp->allow_null = $oField->Null === 'YES';
             $oTemp->validation = [];
-
-            //  Prepare the label
-            $this->describeFieldsPrepareLabel($oTemp);
 
             //  Guess the field's type and some basic validation
             $this->describeFieldsGuessType($oTemp, $oField->Type);
@@ -1781,12 +1778,16 @@ abstract class Base
     /**
      * Generates a human friendly label from the field's key
      *
-     * @param \stdClass $oField the field object
+     * @param string $sLabel The label to format
+     *
+     * @return string
      */
-    protected function describeFieldsPrepareLabel(&$oField)
+    protected function describeFieldsPrepareLabel($sLabel)
     {
-        $oField->label = ucwords(preg_replace('/[\-_]/', ' ', $oField->key));
-        $oField->label = str_ireplace(['id'], ['ID'], $oField->label);
+        $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
+        $sLabel = str_ireplace(['id'], ['ID'], $sLabel);
+
+        return $sLabel;
     }
 
     // --------------------------------------------------------------------------
@@ -1799,10 +1800,11 @@ abstract class Base
      */
     protected function describeFieldsGuessType(&$oField, $sType)
     {
-        preg_match('/^(.*?)(\((\d+?)\)(.*))?$/', $sType, $aMatches);
+        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
-        $sType   = getFromArray(1, $aMatches, 'text');
-        $iLength = getFromArray(3, $aMatches);
+        $sType       = getFromArray(1, $aMatches, 'text');
+        $sTypeConfig = trim(getFromArray(3, $aMatches));
+        $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
 
         switch ($sType) {
 
@@ -1845,6 +1847,18 @@ abstract class Base
                 break;
             case 'datetime':
                 $oField->type = 'datetime';
+                break;
+
+            /**
+             * ENUM
+             */
+            case 'enum':
+                $oField->type    = 'dropdown';
+                $oField->class   = 'select2';
+                $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
+                $aLabels         = array_map('strtolower', $aOptions);
+                $aLabels         = array_map([$this, 'describeFieldsPrepareLabel'], $aLabels);
+                $oField->options = array_combine($aOptions, $aLabels);
                 break;
 
             /**
