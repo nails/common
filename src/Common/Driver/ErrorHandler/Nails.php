@@ -12,7 +12,10 @@
 
 namespace Nails\Common\Driver\ErrorHandler;
 
-class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
+use Nails\Common\Interfaces\ErrorHandlerDriver;
+use Nails\Common\Library\ErrorHandler;
+
+class Nails implements ErrorHandlerDriver
 {
     /**
      * Set up the driver
@@ -27,43 +30,40 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
 
     /**
      * Called when a PHP error occurs
-     * @param  int    $errno   The error number
-     * @param  string $errstr  The error message
-     * @param  string $errfile The file where the error occurred
-     * @param  int    $errline The line number where the error occurred
-     * @return boolean
+     *
+     * @param  int    $iErrorNumber The error number
+     * @param  string $sErrorString The error message
+     * @param  string $sErrorFile   The file where the error occurred
+     * @param  int    $iErrorLine   The line number where the error occurred
+     *
+     * @return void
      */
-    public static function error($errno, $errstr, $errfile, $errline)
+    public static function error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine)
     {
         //  Don't clog the logs up with strict notices
-        if ($errno === E_STRICT) {
-
+        if ($iErrorNumber === E_STRICT) {
             return;
         }
 
         //  Should we show this error?
         if ((bool) ini_get('display_errors') && error_reporting() !== 0) {
 
-            if (!empty(\Nails\Common\Library\ErrorHandler::$levels[$errno])) {
-
-                $severity = \Nails\Common\Library\ErrorHandler::$levels[$errno];
-
+            if (!empty(ErrorHandler::$levels[$iErrorNumber])) {
+                $severity = ErrorHandler::$levels[$iErrorNumber];
             } else {
-
                 $severity = 'Unknown';
             }
 
-            $message  = $errstr;
-            $filepath = $errfile;
-            $line     = $errline;
+            $message  = $sErrorString;
+            $filepath = $sErrorFile;
+            $line     = $iErrorLine;
 
             include FCPATH . APPPATH . 'errors/error_php.php';
         }
 
         //  Show we log the item?
         if (function_exists('config_item') && config_item('log_threshold') != 0) {
-
-            $errMsg = $errstr . ' (' . $errfile . ':' . $errline . ')';
+            $errMsg = $sErrorString . ' (' . $sErrorFile . ':' . $iErrorLine . ')';
             log_message('error', $errMsg, true);
         }
     }
@@ -72,29 +72,30 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
 
     /**
      * Catches uncaught exceptions
-     * @param  exception $exception The caught exception
+     *
+     * @param  \Exception $oException The caught exception
+     *
      * @return void
      */
-    public static function exception($exception)
+    public static function exception($oException)
     {
         $oDetails       = new \stdClass();
-        $oDetails->type = get_class($exception);
-        $oDetails->code = $exception->getCode();
-        $oDetails->msg  = $exception->getMessage();
-        $oDetails->file = $exception->getFile();
-        $oDetails->line = $exception->getLine();
+        $oDetails->type = get_class($oException);
+        $oDetails->code = $oException->getCode();
+        $oDetails->msg  = $oException->getMessage();
+        $oDetails->file = $oException->getFile();
+        $oDetails->line = $oException->getLine();
 
-        $sSubject  = 'Uncaught Exception';
-        $sMessage  = 'Uncaught Exception with message "' . $oDetails->msg . '" and code "';
-        $sMessage .= $oDetails->code . '" in ' . $oDetails->file . ' on line ' . $oDetails->line;
+        $sSubject = $oDetails->msg;
+        $sMessage = 'Uncaught Exception with code: ' . $oDetails->code;
 
         //  Show we log the item?
         if (function_exists('config_item') && config_item('log_threshold') != 0) {
             log_message('error', $sMessage, true);
         }
 
-        \Nails\Common\Library\ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-        \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
+        ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
+        ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------
@@ -105,22 +106,23 @@ class Nails implements \Nails\Common\Interfaces\ErrorHandlerDriver
      */
     public static function fatal()
     {
-        $error = error_get_last();
+        $aError = error_get_last();
 
-        if (!is_null($error) && $error['type'] === E_ERROR) {
+        if (!is_null($aError) && $aError['type'] === E_ERROR) {
 
-            $details       = new \stdClass();
-            $details->type = 'Fatal Error';
-            $details->code = $error['type'];
-            $details->msg  = $error['message'];
-            $details->file = $error['file'];
-            $details->line = $error['line'];
+            $oDetails = (object) [
+                'type' => 'Fatal Error',
+                'code' => $aError['type'],
+                'msg'  => $aError['message'],
+                'file' => $aError['file'],
+                'line' => $aError['line'],
+            ];
 
-            $subject = 'Fatal Error';
-            $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
+            $sSubject = 'Fatal Error';
+            $sMessage = $aError['message'] . ' in ' . $aError['file'] . ' on line ' . $aError['line'];
 
-            \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
-            \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($subject, $message, $details);
+            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
+            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
         }
     }
 }
