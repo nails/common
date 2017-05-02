@@ -633,6 +633,12 @@ abstract class Base
      */
     public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        if (is_array($iPage)) {
+            $aData    = $iPage;
+            $iPage    = null;
+        }
+
         $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $aResults    = $oResults->result();
         $iNumResults = count($aResults);
