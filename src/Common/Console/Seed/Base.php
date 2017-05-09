@@ -130,15 +130,15 @@ class Base
      *
      * @param string $sModel    The model to use
      * @param string $sProvider The model's provider
+     * @param array  $aData     Any data to pass to the model
      *
      * @return int|null
      */
-    protected function randomId($sModel, $sProvider)
+    protected function randomId($sModel, $sProvider, $aData = [])
     {
-        $oDb    = Factory::service('Database');
-        $oModel = Factory::model($sModel, $sProvider);
-        $oItem  = $oDb->query('SELECT `id` FROM `' . $oModel->getTableName() . '` ORDER BY RAND() LIMIT 1;');
-        $oRow   = $oItem->row();
+        $oModel   = Factory::model($sModel, $sProvider);
+        $aResults = $oModel->getAll(0, 1, $aData + ['sort' => [['id', 'random']]]);
+        $oRow     = reset($aResults);
 
         return $oRow ? $oRow->id : null;
     }
@@ -208,8 +208,8 @@ class Base
     /**
      * Return a random integer
      *
-     * @param integer $iLow    The lowest possible value to return
-     * @param integer $iHigh   The highest possible value to return
+     * @param integer $iLow  The lowest possible value to return
+     * @param integer $iHigh The highest possible value to return
      *
      * @return integer
      */
