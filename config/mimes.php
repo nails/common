@@ -8,11 +8,11 @@ require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/mimes.php'
  * @todo - move this into the services file
  */
 
-//  SVG
+//  ICO
 $mimes['ico'] = 'image/x-icon';
 
-//  ICO
-$mimes['svg'] = 'image/svg+xml';
+//  SVG
+$mimes['svg'] = ['image/svg+xml', 'text/html'];
 
 //  Video
 $mimes['mp4']  = 'video/mp4';
