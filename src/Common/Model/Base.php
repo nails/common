@@ -590,6 +590,18 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        if (array_key_exists('limit', $aData)) {
+            if (is_numeric($aData['limit'])) {
+                //  Consider limit to be the maximum number of items to return
+                $iPage    = 0;
+                $iPerPage = $aData['limit'];
+            } elseif (is_array($aData['limit'])) {
+                //  Consider the first element to be the page number and the second the number of results
+                $iPage    = getFromArray(0, $aData['limit'], 0);
+                $iPerPage = getFromArray(1, $aData['limit']);
+            }
+        }
+
         //  Facilitate pagination
         if (!is_null($iPage)) {
 
