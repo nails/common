@@ -635,8 +635,8 @@ abstract class Base
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
-            $aData    = $iPage;
-            $iPage    = null;
+            $aData = $iPage;
+            $iPage = null;
         }
 
         $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
@@ -698,6 +698,12 @@ abstract class Base
 
                 if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
 
+                    //  Merge any data defined with the expandable field with any custom data added by the expansion
+                    $aData = array_merge(
+                        $oExpandableField->data,
+                        getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                    );
+
                     if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
 
                         $this->getSingleAssociatedItem(
@@ -706,7 +712,7 @@ abstract class Base
                             $oExpandableField->property,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                            $aData
                         );
                     } elseif ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
@@ -716,7 +722,7 @@ abstract class Base
                             $oExpandableField->id_column,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                            $aData
                         );
                     }
                 }
@@ -1664,6 +1670,9 @@ abstract class Base
 
             //  The provider of the model
             'provider'    => $aOptions['provider'],
+
+            //  Any data to pass to the getAll (every time)
+            'data'        => array_key_exists('data', $aOptions) ? $aOptions['data'] : [],
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
