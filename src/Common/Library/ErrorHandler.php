@@ -12,25 +12,26 @@
 
 namespace Nails\Common\Library;
 
-use Nails\Factory;
+use Nails\Common\Exception\ErrorHandlerException;
 use Nails\Environment;
+use Nails\Factory;
 
 class ErrorHandler
 {
-    public static $levels = array(
-                        E_ERROR           =>  'Error',
-                        E_WARNING         =>  'Warning',
-                        E_PARSE           =>  'Parsing Error',
-                        E_NOTICE          =>  'Notice',
-                        E_CORE_ERROR      =>  'Core Error',
-                        E_CORE_WARNING    =>  'Core Warning',
-                        E_COMPILE_ERROR   =>  'Compile Error',
-                        E_COMPILE_WARNING =>  'Compile Warning',
-                        E_USER_ERROR      =>  'User Error',
-                        E_USER_WARNING    =>  'User Warning',
-                        E_USER_NOTICE     =>  'User Notice',
-                        E_STRICT          =>  'Runtime Notice'
-                    );
+    public static $levels = [
+        E_ERROR           => 'Error',
+        E_WARNING         => 'Warning',
+        E_PARSE           => 'Parsing Error',
+        E_NOTICE          => 'Notice',
+        E_CORE_ERROR      => 'Core Error',
+        E_CORE_WARNING    => 'Core Warning',
+        E_COMPILE_ERROR   => 'Compile Error',
+        E_COMPILE_WARNING => 'Compile Warning',
+        E_USER_ERROR      => 'User Error',
+        E_USER_WARNING    => 'User Warning',
+        E_USER_NOTICE     => 'User Notice',
+        E_STRICT          => 'Runtime Notice',
+    ];
 
     // --------------------------------------------------------------------------
 
@@ -62,8 +63,7 @@ class ErrorHandler
         register_shutdown_function($sDriverClass . '::fatal');
 
         if (!empty($sLoadError)) {
-
-            throw new \Nails\Common\Exception\ErrorHandlerException($sLoadError, 1);
+            throw new ErrorHandlerException($sLoadError, 1);
         }
     }
 
@@ -72,84 +72,86 @@ class ErrorHandler
     /**
      * Shows the fatal error screen. A diagnostic screen is shown on non-production
      * environments
-     * @param  string   $subject The error subject
-     * @param  string   $message The error message
-     * @param  stdClass $details Breakdown of the error which occurred
+     *
+     * @param  string    $sSubject The error subject
+     * @param  string    $sMessage The error message
+     * @param  \stdClass $oDetails Breakdown of the error which occurred
+     *
      * @return void
      */
-    public static function showFatalErrorScreen($subject = '', $message = '', $details = null)
+    public static function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
     {
         $bIsCli = isCli();
 
-        if (is_null($details)) {
+        if (is_null($oDetails)) {
 
-            $details       = new \stdClass();
-            $details->code = '';
-            $details->msg  = '';
-            $details->file = '';
-            $details->line = '';
+            $oDetails       = new \stdClass();
+            $oDetails->type = null;
+            $oDetails->code = null;
+            $oDetails->msg  = null;
+            $oDetails->file = null;
+            $oDetails->line = null;
         }
 
         //  Get the backtrace
         if (function_exists('debug_backtrace')) {
-
-            $details->backtrace = debug_backtrace();
-
+            $oDetails->backtrace = debug_backtrace();
         } else {
-
-            $details->backtrace = array();
+            $oDetails->backtrace = [];
         }
 
         //  Set a 500 error
-        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
-        $headerString   = '500 Internal Server Error';
+        $sServerProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
+        $sHeaderString   = '500 Internal Server Error';
 
-        header($serverProtocol . ' ' . $headerString);
+        header($sServerProtocol . ' ' . $sHeaderString);
 
         //  Flush the output buffer
-        $obContents = ob_get_contents();
-        if (!empty($obContents)) {
+        $sObContents = ob_get_contents();
+        if (!empty($sObContents)) {
             ob_clean();
         }
 
-        //  Non-CLI and Non-production and have an app-specific dev error file?
-        if (!$bIsCli && Environment::not('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
+        $bIsProd = Environment::is('PRODUCTION');
 
+        if (!$bIsCli && !$bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
+
+            //  Non-CLI and Non-production and have an app-specific dev error file?
             include_once FCPATH . APPPATH . 'errors/error_fatal_dev.php';
 
-        //  Non-CLI and Production and have an app-specific error file?
-        } elseif (!$bIsCli && Environment::is('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
+        } elseif (!$bIsCli && $bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
 
+            //  Non-CLI and Production and have an app-specific error file?
             include_once FCPATH . APPPATH . 'errors/error_fatal.php';
 
-        //  Non-CLI and Non-production?
-        } elseif (!$bIsCli && Environment::not('PRODUCTION')) {
+        } elseif (!$bIsCli && !$bIsProd) {
 
+            //  Non-CLI and Non-production?
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev.php';
 
-        //  CLI and Non-production and have an app-specific dev error file?
-        } elseif ($bIsCli && Environment::not('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
+        } elseif ($bIsCli && !$bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
 
+            //  CLI and Non-production and have an app-specific dev error file?
             include_once FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php';
 
-        //  CLI and Production and have an app-specific error file?
-        } elseif ($bIsCli && Environment::is('PRODUCTION') && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
+        } elseif ($bIsCli && $bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
 
+            //  CLI and Production and have an app-specific error file?
             include_once FCPATH . APPPATH . 'errors/error_fatal_cli.php';
 
-        //  CLI and Non-production?
-        } elseif ($bIsCli && Environment::not('PRODUCTION')) {
+        } elseif ($bIsCli && !$bIsProd) {
 
+            //  CLI and Non-production?
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev_cli.php';
 
-        //  CLI Production
         } elseif ($bIsCli) {
 
+            //  CLI Production
             include_once NAILS_COMMON_PATH . 'errors/error_fatal_cli.php';
 
-        //  Non-CLI Production
         } else {
 
+            //  Non-CLI Production
             include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
         }
 
@@ -160,11 +162,13 @@ class ErrorHandler
 
     /**
      * Sends a diagnostic email to the developers
-     * @param  string $subject The diagnostic subject
-     * @param  string $message The diagnostic message
+     *
+     * @param  string $sSubject The diagnostic subject
+     * @param  string $sMessage The diagnostic message
+     *
      * @return boolean
      */
-    public static function sendDeveloperMail($subject, $message)
+    public static function sendDeveloperMail($sSubject, $sMessage)
     {
         //  Production only
         if (Environment::not('PRODUCTION')) {
@@ -187,102 +191,88 @@ class ErrorHandler
 
         try {
 
-            $oEmailer = Factory::service('Emailer');
-
-            $fromName = $oEmailer->getFromName();
-            $fromEmail = $oEmailer->getFromEmail();
-
+            $oEmailer   = Factory::service('Emailer');
+            $sFromName  = $oEmailer->getFromName();
+            $sFromEmail = $oEmailer->getFromEmail();
 
         } catch (\Exception $e) {
-
-            $fromName  = 'Log Error Reporter';
-            $fromEmail = 'root@' . gethostname();
+            $sFromName  = 'Log Error Reporter';
+            $sFromEmail = 'root@' . gethostname();
         }
 
         // --------------------------------------------------------------------------
 
-        $_ci =& get_instance();
-
-        $info = array(
-            'uri'     => isset($_ci->uri)         ? $_ci->uri->uri_string()              : '',
-            'session' => isset($_ci->session)     ? json_encode($_ci->session->userdata) : '',
-            'post'    => isset($_POST)            ? json_encode($_POST)                  : '',
-            'get'     => isset($_GET)             ? json_encode($_GET)                   : '',
-            'server'  => isset($_SERVER)          ? json_encode($_SERVER)                : '',
-            'globals' => isset($GLOBALS['error']) ? json_encode($GLOBALS['error'])       : ''
-        );
+        $oCi  =& get_instance();
+        $info = [
+            'uri'     => isset($oCi->uri) ? $oCi->uri->uri_string() : '',
+            'session' => isset($oCi->session) ? json_encode($oCi->session->userdata) : '',
+            'post'    => isset($_POST) ? json_encode($_POST) : '',
+            'get'     => isset($_GET) ? json_encode($_GET) : '',
+            'server'  => isset($_SERVER) ? json_encode($_SERVER) : '',
+            'globals' => isset($GLOBALS['error']) ? json_encode($GLOBALS['error']) : '',
+        ];
 
         //  Closures cannot be serialized
         try {
-
             $info['debug_backtrace'] = json_encode(debug_backtrace());
-
-        } catch (Exception $e) {
-
-            $info['debug_backtrace'] = 'Failed to json_encode get Backtrace: ' .  $e->getMessage();
+        } catch (\Exception $e) {
+            $info['debug_backtrace'] = 'Failed to json_encode Backtrace: ' . $e->getMessage();
         }
 
-        $extended   = 'URI: ' . $info['uri'] . "\n\n";
-        $extended  .= 'SESSION: ' . $info['session'] . "\n\n";
-        $extended  .= 'POST: ' . $info['post'] . "\n\n";
-        $extended  .= 'GET: ' . $info['get'] . "\n\n";
-        $extended  .= 'SERVER: ' . $info['server'] . "\n\n";
-        $extended  .= 'GLOBALS: ' . $info['globals'] . "\n\n";
-        $extended  .= 'BACKTRACE: ' . $info['debug_backtrace'] . "\n\n";
+        $sExtended = 'URI: ' . $info['uri'] . "\n\n";
+        $sExtended .= 'SESSION: ' . $info['session'] . "\n\n";
+        $sExtended .= 'POST: ' . $info['post'] . "\n\n";
+        $sExtended .= 'GET: ' . $info['get'] . "\n\n";
+        $sExtended .= 'SERVER: ' . $info['server'] . "\n\n";
+        $sExtended .= 'GLOBALS: ' . $info['globals'] . "\n\n";
+        $sExtended .= 'BACKTRACE: ' . $info['debug_backtrace'] . "\n\n";
 
-        if (isset($_ci->db)) {
-
-            $extended  .= 'LAST KNOWN QUERY: ' .   $_ci->db->last_query() . "\n\n";
+        if (isset($oCi->db)) {
+            $sExtended .= 'LAST KNOWN QUERY: ' . $oCi->db->last_query() . "\n\n";
         }
 
         // --------------------------------------------------------------------------
 
         //  Prepare and send
-        $mimeBoundary = md5(uniqid(time()));
-        $to           = Environment::not('PRODUCTION') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+        $sMimeBoundary = md5(uniqid(time()));
+        $sTo           = Environment::not('PRODUCTION') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 
         //  Headers
-        $headers  = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n";
-        $headers .= 'X-Mailer: PHP/' . phpversion()  . "\r\n";
-        $headers .= 'X-Priority: 1 (Highest)' . "\r\n";
-        $headers .= 'X-Mailer: X-MSMail-Priority: High/' . "\r\n";
-        $headers .= 'Importance: High' . "\r\n";
-        $headers .= 'MIME-Version:1.0' . "\r\n";
-        $headers .= 'Content-Type:multipart/mixed; boundary="' . $mimeBoundary . '"' . "\r\n\r\n";
+        $sHeaders = 'From: ' . $sFromName . ' <' . $sFromEmail . '>' . "\r\n";
+        $sHeaders .= 'X-Mailer: PHP/' . phpversion() . "\r\n";
+        $sHeaders .= 'X-Priority: 1 (Highest)' . "\r\n";
+        $sHeaders .= 'X-Mailer: X-MSMail-Priority: High/' . "\r\n";
+        $sHeaders .= 'Importance: High' . "\r\n";
+        $sHeaders .= 'MIME-Version:1.0' . "\r\n";
+        $sHeaders .= 'Content-Type:multipart/mixed; boundary="' . $sMimeBoundary . '"' . "\r\n\r\n";
 
         //  Message
-        $headers .= '--' . $mimeBoundary . "\r\n";
-        $headers .= 'Content-Type:text/html; charset="ISO-8859-1"' . "\r\n";
-        $headers .= 'Content-Transfer-Encoding:7bit' . "\r\n\r\n";
+        $sHeaders .= '--' . $sMimeBoundary . "\r\n";
+        $sHeaders .= 'Content-Type:text/html; charset="ISO-8859-1"' . "\r\n";
+        $sHeaders .= 'Content-Transfer-Encoding:7bit' . "\r\n\r\n";
 
-        $headers .= '<html><head><style type="text/css">body { font:10pt Arial; }</style></head><body>';
-        $headers .= str_replace("\r", '', str_replace("\n", '<br />', $message));
-        $headers .= '</body></html>' . "\r\n\r\n";
+        $sHeaders .= '<html><head><style type="text/css">body { font:10pt Arial; }</style></head><body>';
+        $sHeaders .= str_replace("\r", '', str_replace("\n", '<br />', $sMessage));
+        $sHeaders .= '</body></html>' . "\r\n\r\n";
 
         //  Attachment
-        $headers .= '--' . $mimeBoundary . "\r\n";
-        $headers .= 'Content-Type:application/octet-stream; name="debugging-data.txt"' . "\r\n";
-        $headers .= 'Content-Transfer-Encoding:base64' . "\r\n";
-        $headers .= 'Content-Disposition:attachment; filename="debugging-data.txt"' . "\r\n";
-        $headers .= base64_encode($extended) . "\r\n\r\n";
+        $sHeaders .= '--' . $sMimeBoundary . "\r\n";
+        $sHeaders .= 'Content-Type:application/octet-stream; name="debugging-data.txt"' . "\r\n";
+        $sHeaders .= 'Content-Transfer-Encoding:base64' . "\r\n";
+        $sHeaders .= 'Content-Disposition:attachment; filename="debugging-data.txt"' . "\r\n";
+        $sHeaders .= base64_encode($sExtended) . "\r\n\r\n";
 
         // --------------------------------------------------------------------------
 
         //  Send!
-        if (!empty($to)) {
-
+        if (!empty($sTo)) {
             if (function_exists('mail')) {
-
-                @mail($to, '!! ' . $subject . ' - ' . APP_NAME, '', $headers);
+                @mail($sTo, '!! ' . $sSubject . ' - ' . APP_NAME, '', $sHeaders);
                 return true;
-
             } else {
-
                 return false;
             }
-
         } else {
-
             return false;
         }
     }

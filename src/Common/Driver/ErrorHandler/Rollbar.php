@@ -15,6 +15,7 @@ namespace Nails\Common\Driver\ErrorHandler;
 use Nails\Common\Interfaces\ErrorHandlerDriver;
 use Nails\Common\Library\ErrorHandler;
 use Nails\Environment;
+use Rollbar\Payload\Level;
 
 class Rollbar implements ErrorHandlerDriver
 {
@@ -33,7 +34,7 @@ class Rollbar implements ErrorHandlerDriver
             ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
         }
 
-        if (!class_exists('\Rollbar')) {
+        if (!class_exists('\Rollbar\Rollbar')) {
 
             $sSubject = 'Rollbar is not configured properly.';
             $sMessage = 'Rollbar is set as the error handler, but the Rollbar class ';
@@ -46,10 +47,10 @@ class Rollbar implements ErrorHandlerDriver
         $aConfig = [
             'access_token' => DEPLOY_ROLLBAR_ACCESS_TOKEN,
             'environment'  => Environment::get(),
-            'person_fn'    => '\Nails\Common\Driver\ErrorHandler\Rollbar::getPerson',
+            'person_fn'    => '\Nails\Common\Driver\ErrorHandler\Rollbar\Rollbar::getPerson',
         ];
 
-        \Rollbar::init($aConfig, false, false, false);
+        \Rollbar\Rollbar::init($aConfig, false, false, false);
     }
 
     // --------------------------------------------------------------------------
@@ -72,7 +73,15 @@ class Rollbar implements ErrorHandlerDriver
         }
 
         //  Send report to Rollbar
-        \Rollbar::report_php_error($iNumber, $sMessage, $sFile, $iLine);
+        \Rollbar\Rollbar::log(
+            Level::warning(),
+            $sMessage,
+            [
+                'error_number' => $iNumber,
+                'file'         => $sFile,
+                'line'         => $iLine,
+            ]
+        );
 
         //  Let this bubble to the normal Nails error handler
         Nails::error($iNumber, $sMessage, $sFile, $iLine);
@@ -89,7 +98,7 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function exception($oException)
     {
-        \Rollbar::report_exception($oException);
+        \Rollbar\Rollbar::log(Level::error(), $oException);
 
         $oDetails       = new \stdClass();
         $oDetails->type = get_class($oException);
@@ -125,8 +134,7 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function fatal()
     {
-        \Rollbar::report_fatal_error();
-        \Rollbar::flush();
+        \Rollbar\Rollbar::fatalHandler();
 
         $aError = error_get_last();
 
