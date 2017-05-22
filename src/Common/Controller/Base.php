@@ -60,7 +60,8 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set the default content-type
-        $this->output->set_content_type('text/html; charset=utf-8');
+        $oOutput = Factory::service('Output');
+        $oOutput->set_content_type('text/html; charset=utf-8');
 
         // --------------------------------------------------------------------------
 
@@ -144,16 +145,17 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set User Feedback alerts for the views
-        $this->data['error']    = $this->userFeedback->get('error') ?: $this->session->flashdata('error');
-        $this->data['negative'] = $this->userFeedback->get('negative') ?: $this->session->flashdata('negative');
-        $this->data['success']  = $this->userFeedback->get('success') ?: $this->session->flashdata('success');
-        $this->data['positive'] = $this->userFeedback->get('positive') ?: $this->session->flashdata('positive');
-        $this->data['info']     = $this->userFeedback->get('info') ?: $this->session->flashdata('info');
-        $this->data['warning']  = $this->userFeedback->get('message') ?: $this->session->flashdata('warning');
+        $oSession               = Factory::service('Session', 'nailsapp/module-auth');
+        $this->data['error']    = $this->userFeedback->get('error') ?: $oSession->flashdata('error');
+        $this->data['negative'] = $this->userFeedback->get('negative') ?: $oSession->flashdata('negative');
+        $this->data['success']  = $this->userFeedback->get('success') ?: $oSession->flashdata('success');
+        $this->data['positive'] = $this->userFeedback->get('positive') ?: $oSession->flashdata('positive');
+        $this->data['info']     = $this->userFeedback->get('info') ?: $oSession->flashdata('info');
+        $this->data['warning']  = $this->userFeedback->get('message') ?: $oSession->flashdata('warning');
 
         //  @deprecated
-        $this->data['message'] = $this->userFeedback->get('message') ?: $this->session->flashdata('message');
-        $this->data['notice']  = $this->userFeedback->get('notice') ?: $this->session->flashdata('notice');
+        $this->data['message'] = $this->userFeedback->get('message') ?: $oSession->flashdata('message');
+        $this->data['notice']  = $this->userFeedback->get('notice') ?: $oSession->flashdata('notice');
 
         // --------------------------------------------------------------------------
 
@@ -198,13 +200,14 @@ abstract class Base extends \MX_Controller
 
         $sCustomJs  = appSetting('site_custom_js', 'site');
         $sCustomCss = appSetting('site_custom_css', 'site');
+        $oAsset     = Factory::service('Asset');
 
         if (!empty($sCustomJs)) {
-            $this->asset->inline($sCustomJs, 'JS');
+            $oAsset->inline($sCustomJs, 'JS');
         }
 
         if (!empty($sCustomCss)) {
-            $this->asset->inline($sCustomCss, 'CSS');
+            $oAsset->inline($sCustomCss, 'CSS');
         }
 
         // --------------------------------------------------------------------------
