@@ -14,7 +14,7 @@ namespace Nails\Common\Model;
 
 use Nails\Common\Exception\NailsException;
 
-class BaseRoutes
+abstract class BaseRoutes
 {
     /**
      * Returns an array of routes to write

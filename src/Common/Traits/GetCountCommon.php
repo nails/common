@@ -19,10 +19,12 @@ trait GetCountCommon
     /**
      * This method applies the conditionals which are common across the get_*()
      * methods and the count() method.
-     * @param  array  $aData Data passed from the calling method
+     *
+     * @param  array $aData Data passed from the calling method
+     *
      * @return void
      **/
-    protected function getCountCommon($aData = array())
+    protected function getCountCommon($aData = [])
     {
         //  @deprecated - searching should use the search() method, but this in place
         //  as a quick fix for loads of admin controllers
@@ -33,14 +35,31 @@ trait GetCountCommon
 
             $sAlias = $this->getTableAlias(true);
 
-            foreach ($this->searchableFields as $sField) {
-                if (strpos($sField, '.') !== false) {
-                    $aData['or_like'][] = [$sField, $aData['keywords']];
+            foreach ($this->searchableFields as $mField) {
+
+                //  If the field is an array then search across the columns concatenated together
+                if (is_array($mField)) {
+
+                    $sMappedFields = array_map(function ($sInput) use ($sAlias) {
+                        if (strpos($sInput, '.') !== false) {
+                            return $sInput;
+                        } else {
+                            return $sAlias . $sInput;
+                        }
+                    }, $mField);
+
+                    $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $aData['keywords']];
+
                 } else {
-                    $aData['or_like'][] = [$sAlias . $sField, $aData['keywords']];
+                    if (strpos($mField, '.') !== false) {
+                        $aData['or_like'][] = [$mField, $aData['keywords']];
+                    } else {
+                        $aData['or_like'][] = [$sAlias . $mField, $aData['keywords']];
+                    }
                 }
             }
         }
+
         // --------------------------------------------------------------------------
 
         $this->getCountCommonCompileSelect($aData);
@@ -54,7 +73,9 @@ trait GetCountCommon
 
     /**
      * Compiles the select statement
+     *
      * @param  array &$aData The data array
+     *
      * @return void
      */
     protected function getCountCommonCompileSelect(&$aData)
@@ -69,13 +90,13 @@ trait GetCountCommon
 
     /**
      * Compiles any active filters back into the $data array
-     * @param  array  &$aData The data array
+     *
+     * @param  array &$aData The data array
+     *
      * @return void
      */
     protected function getCountCommonCompileFilters(&$aData)
     {
-        $oDb = Factory::service('Database');
-
         /**
          * Handle filters
          * Filters are basically an easy way to modify the query's where element.
@@ -96,25 +117,23 @@ trait GetCountCommon
                     continue;
                 }
 
-                $aWhereFilter = array();
+                $aWhereFilter = [];
                 foreach ($oFilter->options as $iOptionIndex => $oOption) {
-
                     if (!empty($_GET['cbF'][$iFilterIndex][$iOptionIndex])) {
-
                         //  Filtering is happening and the item is to be filtered
-                        $aWhereFilter[] = $oDb->escape_str($oFilter->column, false) . ' = ' . $oDb->escape($oOption->value);
-
+                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString($oFilter->column, $oOption->value);
                     } elseif (empty($_GET['cbF']) && $oOption->checked) {
-
                         //  There's no filtering happening and the item is checked by default
-                        $aWhereFilter[] = $oDb->escape_str($oFilter->column, false) . ' = ' . $oDb->escape($oOption->value);
+                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString($oFilter->column, $oOption->value);
                     }
                 }
+
+                $aWhereFilter = array_filter($aWhereFilter);
 
                 if (!empty($aWhereFilter)) {
 
                     if (!isset($aData['where'])) {
-                        $aData['where'] = array();
+                        $aData['where'] = [];
                     }
 
                     $aData['where'][] = '(' . implode(' OR ', $aWhereFilter) . ')';
@@ -137,7 +156,7 @@ trait GetCountCommon
                     continue;
                 }
 
-                $aWhereFilter = array();
+                $aWhereFilter = [];
 
                 //  Are we even filtering this filter?
                 if (isset($_GET['ddF'][$iFilterIndex])) {
@@ -145,7 +164,7 @@ trait GetCountCommon
                     //  Does the option exist, if so, filter by it
                     $iSelectedIndex = !empty((int) $_GET['ddF'][$iFilterIndex]) ? (int) $_GET['ddF'][$iFilterIndex] : 0;
                     if (!empty($oFilter->options[$iSelectedIndex]->value)) {
-                        $aWhereFilter = array($oFilter->column, $oFilter->options[$iSelectedIndex]->value);
+                        $aWhereFilter = [$oFilter->column, $oFilter->options[$iSelectedIndex]->value];
                     }
 
                 } else {
@@ -153,7 +172,7 @@ trait GetCountCommon
                     //  No filtering happening but does this item have an item checked by default?
                     foreach ($oFilter->options as $oOption) {
                         if (!empty($oOption->checked)) {
-                            $aWhereFilter = array($oFilter->column, $oOption->value);
+                            $aWhereFilter = [$oFilter->column, $oOption->value];
                             break;
                         }
                     }
@@ -162,7 +181,7 @@ trait GetCountCommon
                 if (!empty($aWhereFilter)) {
 
                     if (!isset($aData['where'])) {
-                        $aData['where'] = array();
+                        $aData['where'] = [];
                     }
 
                     $aData['where'][] = $aWhereFilter;
@@ -173,9 +192,36 @@ trait GetCountCommon
 
     // --------------------------------------------------------------------------
 
+    protected function getCountCommonCompileFiltersString($sColumn, $mValue)
+    {
+        $oDb = Factory::service('Database');
+        if (!is_array($mValue)) {
+            $aBits = [
+                $oDb->escape_str($sColumn, false),
+                '=',
+                $oDb->escape($mValue),
+            ];
+        } else {
+            $sOperator = getFromArray(0, $mValue);
+            $sValue    = getFromArray(1, $mValue);
+            $bEscape   = (bool) getFromArray(2, $mValue, true);
+            $aBits     = [
+                $oDb->escape_str($sColumn, false),
+                $sOperator,
+                $bEscape ? $oDb->escape($sValue) : $sValue,
+            ];
+        }
+
+        return trim(implode(' ', $aBits));
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Compiles any where's into the query
-     * @param  array  &$data   The data array
+     *
+     * @param  array &$data The data array
+     *
      * @return void
      */
     protected function getCountCommonCompileWheres(&$data)
@@ -193,22 +239,22 @@ trait GetCountCommon
          * are glued together with ANDs
          */
 
-        $wheres = array(
+        $wheres = [
             'where'           => 'AND',
             'or_where'        => 'OR',
             'where_in'        => 'AND',
             'or_where_in'     => 'OR',
             'where_not_in'    => 'AND',
-            'or_where_not_in' => 'OR'
-        );
+            'or_where_not_in' => 'OR',
+        ];
 
-        $whereCompiled = array();
+        $whereCompiled = [];
 
         foreach ($wheres as $whereType => $whereGlue) {
 
             if (!empty($data[$whereType])) {
 
-                $whereCompiled[$whereType] = array();
+                $whereCompiled[$whereType] = [];
 
                 if (is_array($data[$whereType])) {
 
@@ -347,7 +393,7 @@ trait GetCountCommon
 
         if (!empty($whereCompiled)) {
 
-            $whereStr = array();
+            $whereStr = [];
 
             foreach ($whereCompiled as $whereType => $value) {
                 if (!empty($value)) {
@@ -367,27 +413,29 @@ trait GetCountCommon
 
     /**
      * Compiles any like's into the query
-     * @param  array  &$data   The data array
+     *
+     * @param  array &$data The data array
+     *
      * @return void
      */
     protected function getCountCommonCompileLikes(&$data)
     {
         $oDb = Factory::service('Database');
 
-        $likes = array(
-            'like' => 'AND',
-            'or_like' => 'OR',
-            'not_like' => 'AND',
-            'or_not_like' => 'OR'
-        );
+        $likes = [
+            'like'        => 'AND',
+            'or_like'     => 'OR',
+            'not_like'    => 'AND',
+            'or_not_like' => 'OR',
+        ];
 
-        $likeCompiled = array();
+        $likeCompiled = [];
 
         foreach ($likes as $likeType => $likeGlue) {
 
             if (!empty($data[$likeType])) {
 
-                $likeCompiled[$likeType] = array();
+                $likeCompiled[$likeType] = [];
 
                 if (is_array($data[$likeType])) {
 
@@ -482,7 +530,7 @@ trait GetCountCommon
 
         if (!empty($likeCompiled)) {
 
-            $whereStr = array();
+            $whereStr = [];
 
             foreach ($likeCompiled as $likeType => $value) {
                 $whereStr[] = '(' . implode(' ' . $likes[$likeType] . ' ', $value) . ')';
@@ -498,7 +546,9 @@ trait GetCountCommon
 
     /**
      * Compiles the sort element into the query
-     * @param  array  &$data The data array
+     *
+     * @param  array &$data The data array
+     *
      * @return void
      */
     protected function getCountCommonCompileSort(&$data)
@@ -558,7 +608,7 @@ trait GetCountCommon
 
     protected function getCountCommonParseSort($sort)
     {
-        $aOut = array('column' => null, 'order' => null);
+        $aOut = ['column' => null, 'order' => null];
 
         // --------------------------------------------------------------------------
 

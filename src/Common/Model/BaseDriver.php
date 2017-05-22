@@ -12,7 +12,7 @@
 
 namespace Nails\Common\Model;
 
-class BaseDriver extends BaseComponent
+abstract class BaseDriver extends BaseComponent
 {
     /**
      * The type of component to load up

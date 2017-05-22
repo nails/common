@@ -1,6 +1,6 @@
 # Nails by Shed
 
-[![Join the chat at https://gitter.im/nailsapp/common](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nailsapp/common?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat on Slack!](https://now-examples-slackin-rayibnpwqe.now.sh/badge.svg)](https://nails-app.slack.com/shared_invite/MTg1NDcyNjI0ODcxLTE0OTUwMzA1NTYtYTZhZjc5YjExMQ)
 
 Nails. is a framework developed by Shed Collective. It's purpose is to make building exhilarating web applications fast.
 

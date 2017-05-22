@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This interface is implemnted by ErrorHandler drivers.
+ * This interface is implemented by ErrorHandler drivers.
  *
  * @package     Nails
  * @subpackage  common

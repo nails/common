@@ -96,13 +96,10 @@ class Seed extends Base
 
         //  Filter out seeders
         $sComponent = strtolower($oInput->getArgument('component'));
-        $sClass     = strtolower($oInput->getArgument('class'));
-        $aClasses   = explode(',', $sClass);
+        $aClasses   = explode(',', $oInput->getArgument('class'));
         $aClasses   = array_filter($aClasses);
         $aClasses   = array_unique($aClasses);
-        $aClasses   = array_map('ucfirst', $aClasses);
         $aSeeders   = [];
-
 
         /**
          * If component and class arguments are empty then execute all seeds

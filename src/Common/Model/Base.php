@@ -18,7 +18,7 @@ use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
 use Nails\Factory;
 
-class Base
+abstract class Base
 {
     use ErrorHandling;
     use Caching;
@@ -86,6 +86,7 @@ class Base
      * syntax as controllers.
      *
      * @param   string
+     *
      * @access private
      */
     public function __get($sKey)
@@ -122,7 +123,7 @@ class Base
         $this->tableAutoSetTimestamps = true;
         $this->tableAutoSetSlugs      = false;
         $this->perPage                = 50;
-        $this->searchableFields       = array();
+        $this->searchableFields       = [];
         $this->defaultSortColumn      = null;
         $this->defaultSortOrder       = 'ASC';
 
@@ -142,29 +143,25 @@ class Base
 
         //  Default expandable fields
         if (!empty($this->tableCreatedByColumn)) {
-            $this->addExpandableField(
-                array(
-                    'trigger'   => 'created_by',
-                    'type'      => self::EXPANDABLE_TYPE_SINGLE,
-                    'property'  => 'created_by',
-                    'model'     => 'User',
-                    'provider'  => 'nailsapp/module-auth',
-                    'id_column' => 'created_by'
-                )
-            );
+            $this->addExpandableField([
+                'trigger'   => 'created_by',
+                'type'      => self::EXPANDABLE_TYPE_SINGLE,
+                'property'  => 'created_by',
+                'model'     => 'User',
+                'provider'  => 'nailsapp/module-auth',
+                'id_column' => 'created_by',
+            ]);
         }
 
         if (!empty($this->tableModifiedByColumn)) {
-            $this->addExpandableField(
-                array(
-                    'trigger'   => 'modified_by',
-                    'type'      => self::EXPANDABLE_TYPE_SINGLE,
-                    'property'  => 'modified_by',
-                    'model'     => 'User',
-                    'provider'  => 'nailsapp/module-auth',
-                    'id_column' => 'modified_by'
-                )
-            );
+            $this->addExpandableField([
+                'trigger'   => 'modified_by',
+                'type'      => self::EXPANDABLE_TYPE_SINGLE,
+                'property'  => 'modified_by',
+                'model'     => 'User',
+                'provider'  => 'nailsapp/module-auth',
+                'id_column' => 'modified_by',
+            ]);
         }
     }
 
@@ -205,10 +202,11 @@ class Base
      *
      * @param  array   $aData         The data to create the object with
      * @param  boolean $bReturnObject Whether to return just the new ID or the full object
+     *
      * @return mixed
      * @throws ModelException
      */
-    public function create($aData = array(), $bReturnObject = false)
+    public function create($aData = [], $bReturnObject = false)
     {
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
@@ -240,7 +238,6 @@ class Base
                 if (empty($aData[$this->tableModifiedByColumn])) {
                     $aData[$this->tableModifiedByColumn] = activeUser('id');
                 }
-
             } else {
 
                 if (empty($aData[$this->tableCreatedByColumn])) {
@@ -251,7 +248,6 @@ class Base
                     $aData[$this->tableModifiedByColumn] = null;
                 }
             }
-
         }
 
         if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
@@ -286,7 +282,6 @@ class Base
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
 
                     $oDb->set($sColumn, $mSetValue, $bEscape);
-
                 } else {
 
                     $oDb->set($sColumn, $mValue);
@@ -312,7 +307,6 @@ class Base
             // --------------------------------------------------------------------------
 
             return $bReturnObject ? $this->getById($iId) : $iId;
-
         } else {
 
             return null;
@@ -326,10 +320,11 @@ class Base
      *
      * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
      * @param  array         $aData The data to update the object(s) with
+     *
      * @return boolean
      * @throws ModelException
      */
-    public function update($mIds, $aData = array())
+    public function update($mIds, $aData = [])
     {
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
@@ -400,7 +395,6 @@ class Base
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
 
                     $oDb->set($sColumn, $mSetValue, $bEscape);
-
                 } else {
 
                     $oDb->set($sColumn, $mValue);
@@ -448,6 +442,7 @@ class Base
      * $this->tableDeletedColumn field will be set to true.
      *
      * @param  integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
+     *
      * @return boolean
      * @throws ModelException
      */
@@ -457,13 +452,12 @@ class Base
 
             //  Destructive delete; nuke that row.
             $bResult = $this->destroy($mIds);
-
         } else {
 
             //  Non-destructive delete, update the flag
-            $aData = array(
-                $this->tableDeletedColumn => true
-            );
+            $aData = [
+                $this->tableDeletedColumn => true,
+            ];
 
             $bResult = $this->update($mIds, $aData);
         }
@@ -487,6 +481,7 @@ class Base
      * field will be set to false.
      *
      * @param  int $iId The ID of the object to restore
+     *
      * @return boolean
      * @throws ModelException
      */
@@ -496,13 +491,12 @@ class Base
 
             //  Destructive delete; can't be resurrecting the dead.
             return null;
-
         } else {
 
             //  Non-destructive delete, update the flag
-            $aData = array(
-                $this->tableDeletedColumn => false
-            );
+            $aData = [
+                $this->tableDeletedColumn => false,
+            ];
 
             $bResult = $this->update($iId, $aData);
 
@@ -525,6 +519,7 @@ class Base
      * destructive deletion is enabled or not.
      *
      * @param  integer|array $mIds The ID (or array of IDs) of the object to destroy
+     *
      * @return boolean
      * @throws ModelException
      */
@@ -569,10 +564,11 @@ class Base
      * @param  mixed $aData           Any data to pass to getCountCommon()
      * @param  bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
      *                                items
+     *
      * @return object
      * @throws ModelException
      */
-    public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName(true);
@@ -581,10 +577,10 @@ class Base
 
         //  Define the default sorting
         if (empty($aData['sort']) && !empty($this->defaultSortColumn)) {
-            $aData['sort'] = array(
+            $aData['sort'] = [
                 $this->getTableAlias(true) . $this->defaultSortColumn,
-                $this->defaultSortOrder
-            );
+                $this->defaultSortOrder,
+            ];
         }
 
         // --------------------------------------------------------------------------
@@ -593,6 +589,18 @@ class Base
         $this->getCountCommon($aData);
 
         // --------------------------------------------------------------------------
+
+        if (array_key_exists('limit', $aData)) {
+            if (is_numeric($aData['limit'])) {
+                //  Consider limit to be the maximum number of items to return
+                $iPage    = 0;
+                $iPerPage = $aData['limit'];
+            } elseif (is_array($aData['limit'])) {
+                //  Consider the first element to be the page number and the second the number of results
+                $iPage    = getFromArray(0, $aData['limit'], 0);
+                $iPerPage = getFromArray(1, $aData['limit']);
+            }
+        }
 
         //  Facilitate pagination
         if (!is_null($iPage)) {
@@ -632,10 +640,17 @@ class Base
      * @param mixed $aData           Any data to pass to getCountCommon()
      * @param bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
      *                               items
+     *
      * @return array
      */
-    public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
         $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $aResults    = $oResults->result();
         $iNumResults = count($aResults);
@@ -657,17 +672,17 @@ class Base
              *  2. a list of config arrays to pass to the model
              */
 
-            $aTriggers    = array();
-            $aTriggerData = array();
+            $aTriggers    = [];
+            $aTriggerData = [];
 
             if (array_key_exists('expand', $aData) && is_array($aData['expand'])) {
                 foreach ($aData['expand'] as $mTrigger) {
                     if (is_string($mTrigger)) {
                         $aTriggers[]             = $mTrigger;
-                        $aTriggerData[$mTrigger] = array();
+                        $aTriggerData[$mTrigger] = [];
                     } elseif (is_array($mTrigger)) {
                         $sArrayTrigger     = getFromArray(0, $mTrigger) ?: getFromArray('trigger', $mTrigger);
-                        $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, array());
+                        $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, []);
                         if (!empty($sArrayTrigger)) {
                             $aTriggers[]                  = $sArrayTrigger;
                             $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
@@ -675,7 +690,6 @@ class Base
                     }
                 }
             }
-
 
             foreach ($this->aExpandableFields as $oExpandableField) {
 
@@ -696,6 +710,12 @@ class Base
 
                 if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
 
+                    //  Merge any data defined with the expandable field with any custom data added by the expansion
+                    $aData = array_merge(
+                        $oExpandableField->data,
+                        getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                    );
+
                     if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
 
                         $this->getSingleAssociatedItem(
@@ -704,10 +724,9 @@ class Base
                             $oExpandableField->property,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            getFromArray($oExpandableField->trigger, $aTriggerData, array())
+                            $aData
                         );
-
-                    } else if ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+                    } elseif ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
                         $this->getManyAssociatedItems(
                             $aResults,
@@ -715,7 +734,7 @@ class Base
                             $oExpandableField->id_column,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            getFromArray($oExpandableField->trigger, $aTriggerData, array())
+                            $aData
                         );
                     }
                 }
@@ -738,17 +757,18 @@ class Base
      * @param  int     $iPerPage        The number of items per page
      * @param  array   $aData           Any data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether or not to include deleted items
+     *
      * @return array
      * @throws ModelException
      */
-    public function getAllFlat($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function getAllFlat($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
         $aItems = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
-        $aOut   = array();
+        $aOut   = [];
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
         if (!$aItems) {
-            return array();
+            return [];
         }
 
         // --------------------------------------------------------------------------
@@ -788,10 +808,11 @@ class Base
      *
      * @param  int   $iId   The ID of the object to fetch
      * @param  mixed $aData Any data to pass to getCountCommon()
+     *
      * @return mixed           stdClass on success, false on failure
      * @throws ModelException
      */
-    public function getById($iId, $aData = array())
+    public function getById($iId, $aData = [])
     {
         if (empty($iId)) {
             return null;
@@ -800,10 +821,10 @@ class Base
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where'])) {
-            $aData['where'] = array();
+            $aData['where'] = [];
         }
 
-        $aData['where'][] = array($this->getTableAlias(true) . $this->tableIdColumn, $iId);
+        $aData['where'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $iId];
 
         // --------------------------------------------------------------------------
 
@@ -827,22 +848,23 @@ class Base
      *
      * @param  array $aIds  An array of IDs to fetch
      * @param  mixed $aData Any data to pass to getCountCommon()
+     *
      * @return array
      * @throws ModelException
      */
-    public function getByIds($aIds, $aData = array())
+    public function getByIds($aIds, $aData = [])
     {
         if (empty($aIds)) {
-            return array();
+            return [];
         }
 
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where_in'])) {
-            $aData['where_in'] = array();
+            $aData['where_in'] = [];
         }
 
-        $aData['where_in'][] = array($this->getTableAlias(true) . $this->tableIdColumn, $aIds);
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $aIds];
 
         // --------------------------------------------------------------------------
 
@@ -856,10 +878,11 @@ class Base
      *
      * @param  string $sSlug The slug of the object to fetch
      * @param  array  $aData Any data to pass to getCountCommon()
+     *
      * @return \stdClass
      * @throws ModelException
      */
-    public function getBySlug($sSlug, $aData = array())
+    public function getBySlug($sSlug, $aData = [])
     {
         if (empty($sSlug)) {
             return null;
@@ -868,10 +891,10 @@ class Base
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where'])) {
-            $aData['where'] = array();
+            $aData['where'] = [];
         }
 
-        $aData['where'][] = array($this->getTableAlias(true) . $this->tableSlugColumn, $sSlug);
+        $aData['where'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $sSlug];
 
         // --------------------------------------------------------------------------
 
@@ -895,22 +918,23 @@ class Base
      *
      * @param  array $aSlugs An array of slugs to fetch
      * @param  array $aData  Any data to pass to getCountCommon()
+     *
      * @return array
      * @throws ModelException
      */
-    public function getBySlugs($aSlugs, $aData = array())
+    public function getBySlugs($aSlugs, $aData = [])
     {
         if (empty($aSlugs)) {
-            return array();
+            return [];
         }
 
         // --------------------------------------------------------------------------
 
         if (!isset($aData['where_in'])) {
-            $aData['where_in'] = array();
+            $aData['where_in'] = [];
         }
 
-        $aData['where_in'][] = array($this->getTableAlias(true) . $this->tableSlugColumn, $aSlugs);
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $aSlugs];
 
         // --------------------------------------------------------------------------
 
@@ -929,14 +953,14 @@ class Base
      *
      * @param  mixed $mIdSlug The ID or slug of the object to fetch
      * @param  array $aData   Any data to pass to getCountCommon()
+     *
      * @return \stdClass
      */
-    public function getByIdOrSlug($mIdSlug, $aData = array())
+    public function getByIdOrSlug($mIdSlug, $aData = [])
     {
         if (is_numeric($mIdSlug)) {
 
             return $this->getById($mIdSlug, $aData);
-
         } else {
 
             return $this->getBySlug($mIdSlug, $aData);
@@ -957,6 +981,7 @@ class Base
      * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by
      *                                           $sAssociatedItemIdColumn)
+     *
      * @return void
      */
     public function getSingleAssociatedItem(
@@ -965,14 +990,13 @@ class Base
         $sItemProperty,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = array(),
+        $aAssociatedModelData = [],
         $bUnsetOriginalProperty = true
-    )
-    {
+    ) {
         if (!empty($aItems)) {
 
             $oAssociatedModel   = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
-            $aAssociatedItemIds = array();
+            $aAssociatedItemIds = [];
 
             foreach ($aItems as $oItem) {
 
@@ -1019,6 +1043,7 @@ class Base
      * @param  string $sAssociatedModel         The name of the model which handles the associated content
      * @param  string $sAssociatedModelProvider Which module provides the associated model
      * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     *
      * @return void
      */
     protected function getManyAssociatedItems(
@@ -1027,14 +1052,13 @@ class Base
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = array()
-    )
-    {
+        $aAssociatedModelData = []
+    ) {
         if (!empty($aItems)) {
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
 
-            $aItemIds = array();
+            $aItemIds = [];
             foreach ($aItems as $oItem) {
 
                 //  Note the ID
@@ -1043,17 +1067,17 @@ class Base
                 //  Set the base property
                 $oItem->{$sItemProperty}        = new \stdClass();
                 $oItem->{$sItemProperty}->count = 0;
-                $oItem->{$sItemProperty}->data  = array();
+                $oItem->{$sItemProperty}->data  = [];
             }
 
             if (empty($aAssociatedModelData['where_in'])) {
-                $aAssociatedModelData['where_in'] = array();
+                $aAssociatedModelData['where_in'] = [];
             }
 
-            $aAssociatedModelData['where_in'][] = array(
+            $aAssociatedModelData['where_in'][] = [
                 $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn,
-                $aItemIds
-            );
+                $aItemIds,
+            ];
 
             $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
 
@@ -1079,6 +1103,7 @@ class Base
      * @param  string $sAssociatedModel         The name of the model which handles the associated content
      * @param  string $sAssociatedModelProvider Which module provides the associated model
      * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     *
      * @return void
      */
     protected function countManyAssociatedItems(
@@ -1087,14 +1112,13 @@ class Base
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = array()
-    )
-    {
+        $aAssociatedModelData = []
+    ) {
         if (!empty($aItems)) {
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
 
-            $aItemIds = array();
+            $aItemIds = [];
             foreach ($aItems as $oItem) {
 
                 //  Note the ID
@@ -1105,16 +1129,16 @@ class Base
             }
 
             //  Limit the select
-            $aAssociatedModelData['select'] = array(
+            $aAssociatedModelData['select'] = [
                 $oAssociatedModel->getTableAlias() . '.id',
-                $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn
-            );
+                $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn,
+            ];
 
             if (empty($aAssociatedModelData['where_in'])) {
-                $aAssociatedModelData['where_in'] = array();
+                $aAssociatedModelData['where_in'] = [];
             }
 
-            $aAssociatedModelData['where_in'][] = array($sAssociatedItemIdColumn, $aItemIds);
+            $aAssociatedModelData['where_in'][] = [$sAssociatedItemIdColumn, $aItemIds];
 
             $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
 
@@ -1142,6 +1166,7 @@ class Base
      * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
      * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
      * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
+     *
      * @return void
      */
     protected function getManyAssociatedItemsWithTaxonomy(
@@ -1151,11 +1176,10 @@ class Base
         $sTaxonomyModelProvider,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = array(),
+        $aAssociatedModelData = [],
         $sTaxonomyItemIdColumn = 'item_id',
         $sTaxonomyAssociatedIdColumn = 'associated_id'
-    )
-    {
+    ) {
         if (!empty($aItems)) {
 
             //  Load the required models
@@ -1163,7 +1187,7 @@ class Base
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
 
             //  Extract all the item IDs and set the base array for the associated content
-            $aItemIds = array();
+            $aItemIds = [];
             foreach ($aItems as $oItem) {
 
                 //  Note the ID
@@ -1172,24 +1196,24 @@ class Base
                 //  Set the base property
                 $oItem->{$sItemProperty}        = new \stdClass();
                 $oItem->{$sItemProperty}->count = 0;
-                $oItem->{$sItemProperty}->data  = array();
+                $oItem->{$sItemProperty}->data  = [];
             }
 
             //  Get all associations for items in the resultset
             $aTaxonomy = $oTaxonomyModel->getAll(
                 null,
                 null,
-                array(
-                    'where_in' => array(
-                        array($sTaxonomyItemIdColumn, $aItemIds)
-                    )
-                )
+                [
+                    'where_in' => [
+                        [$sTaxonomyItemIdColumn, $aItemIds],
+                    ],
+                ]
             );
 
             if (!empty($aTaxonomy)) {
 
                 //  Extract the IDs of the associated content
-                $aAssociatedIds = array();
+                $aAssociatedIds = [];
                 foreach ($aTaxonomy as $oTaxonomy) {
                     $aAssociatedIds[] = $oTaxonomy->{$sTaxonomyAssociatedIdColumn};
                 }
@@ -1231,6 +1255,7 @@ class Base
      * @param  string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
      * @param  string  $sAssociatedModel         The name of the model which is responsible for associated items
      * @param  string  $sAssociatedModelProvider What module provide the associated item model
+     *
      * @return boolean
      * @throws ModelException
      */
@@ -1240,18 +1265,17 @@ class Base
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider
-    )
-    {
+    ) {
         $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
-        $aTouchedIds          = array();
-        $aExistingItemIds     = array();
+        $aTouchedIds          = [];
+        $aExistingItemIds     = [];
 
         //  Get IDs of current items, we'll compare these later to see which ones to delete.
-        $aData = array(
-            'where' => array(
-                array($oAssociatedItemModel->getTableAlias() . '.' . $sAssociatedItemIdColumn, $iItemId)
-            )
-        );
+        $aData = [
+            'where' => [
+                [$oAssociatedItemModel->getTableAlias() . '.' . $sAssociatedItemIdColumn, $iItemId],
+            ],
+        ];
 
         $aExistingItems = $oAssociatedItemModel->getAll(null, null, $aData);
         foreach ($aExistingItems as $oExistingItem) {
@@ -1277,7 +1301,6 @@ class Base
                 } else {
                     $aTouchedIds[] = $iAssociatedItemId;
                 }
-
             } else {
 
                 //  Safety, no setting of IDs
@@ -1291,7 +1314,6 @@ class Base
                 if (!$iAssociatedItemId) {
 
                     throw new ModelException('Failed to create associated item.', 1);
-
                 } else {
 
                     $aTouchedIds[] = $iAssociatedItemId;
@@ -1321,10 +1343,11 @@ class Base
      *
      * @param  array   $aData           An array of data to pass to getCountCommon()
      * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
+     *
      * @return integer
      * @throws ModelException
      */
-    public function countAll($aData = array(), $bIncludeDeleted = false)
+    public function countAll($aData = [], $bIncludeDeleted = false)
     {
         $oDb   = Factory::service('Database');
         $table = $this->getTableName(true);
@@ -1357,13 +1380,14 @@ class Base
      * @param  mixed  $aData           Any data to pass to getCountCommon()
      * @param  bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include
      *                                 deleted items
+     *
      * @return \stdClass
      */
-    public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
         //  @todo: specify searchable fields in constructor and generate this manually
         if (empty($aData['or_like'])) {
-            $aData['or_like'] = array();
+            $aData['or_like'] = [];
         }
 
         $sAlias = $this->getTableAlias(true);
@@ -1373,7 +1397,7 @@ class Base
             //  If the field is an array then search across the columns concatenated together
             if (is_array($mField)) {
 
-                $sMappedFields = array_map(function($sInput) use ($sAlias) {
+                $sMappedFields = array_map(function ($sInput) use ($sAlias) {
                     if (strpos($sInput, '.') !== false) {
                         return $sInput;
                     } else {
@@ -1382,7 +1406,6 @@ class Base
                 }, $mField);
 
                 $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords];
-
             } else {
                 if (strpos($mField, '.') !== false) {
                     $aData['or_like'][] = [$mField, $sKeywords];
@@ -1420,6 +1443,7 @@ class Base
      * @param string $sColumn   The column to use, defaults to $this->tableSlugColumn
      * @param int    $iIgnoreId An ID to ignore when searching
      * @param string $sIdColumn The column to use for the ID, defaults to $this->tableIdColumn
+     *
      * @return string
      * @throws ModelException
      */
@@ -1431,8 +1455,7 @@ class Base
         $sColumn = null,
         $iIgnoreId = null,
         $sIdColumn = null
-    )
-    {
+    ) {
         //  Perform this check here so the error message is more easily traced.
         if (is_null($sTable)) {
             $sTable = $this->getTableName();
@@ -1459,7 +1482,6 @@ class Base
             if ($iCounter) {
 
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
-
             } else {
 
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix;
@@ -1473,7 +1495,6 @@ class Base
 
             $oDb->where($sColumn, $sSlugTest);
             $iCounter++;
-
         } while ($oDb->count_all_results($sTable));
 
         return $sSlugTest;
@@ -1492,16 +1513,16 @@ class Base
      * @param  array  $aIntegers Fields which should be cast as integers if numerical and not null
      * @param  array  $aBools    Fields which should be cast as booleans if not null
      * @param  array  $aFloats   Fields which should be cast as floats if not null
+     *
      * @return void
      */
     protected function formatObject(
         &$oObj,
-        $aData = array(),
-        $aIntegers = array(),
-        $aBools = array(),
-        $aFloats = array()
-    )
-    {
+        $aData = [],
+        $aIntegers = [],
+        $aBools = [],
+        $aFloats = []
+    ) {
 
         $aIntegers   = (array) $aIntegers;
         $aIntegers[] = $this->tableIdColumn;
@@ -1512,8 +1533,10 @@ class Base
         $aIntegers[] = 'order';
 
         foreach ($aIntegers as $sProperty) {
-            if (property_exists($oObj, $sProperty) && is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
-                $oObj->{$sProperty} = (int) $oObj->{$sProperty};
+            if (property_exists($oObj, $sProperty)) {
+                if (is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
+                    $oObj->{$sProperty} = (int) $oObj->{$sProperty};
+                }
             }
         }
 
@@ -1525,8 +1548,10 @@ class Base
         $aBools[] = 'is_published';
 
         foreach ($aBools as $sProperty) {
-            if (property_exists($oObj, $sProperty) && !is_null($oObj->{$sProperty})) {
-                $oObj->{$sProperty} = (bool) $oObj->{$sProperty};
+            if (property_exists($oObj, $sProperty)) {
+                if (!is_null($oObj->{$sProperty})) {
+                    $oObj->{$sProperty} = (bool) $oObj->{$sProperty};
+                }
             }
         }
 
@@ -1535,8 +1560,10 @@ class Base
         $aFloats = (array) $aFloats;
 
         foreach ($aFloats as $sProperty) {
-            if (property_exists($oObj, $sProperty) && is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
-                $oObj->{$sProperty} = (float) $oObj->{$sProperty};
+            if (property_exists($oObj, $sProperty)) {
+                if (is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
+                    $oObj->{$sProperty} = (float) $oObj->{$sProperty};
+                }
             }
         }
     }
@@ -1547,6 +1574,7 @@ class Base
      * Returns protected property $table
      *
      * @param bool $bIncludePrefix Whether to include the table's alias
+     *
      * @throws ModelException
      * @return string
      */
@@ -1565,6 +1593,7 @@ class Base
      * Returns protected property $tableAlias
      *
      * @param bool $bIncludeSeparator Whether to include the prefix separator
+     *
      * @return string
      */
     public function getTableAlias($bIncludeSeparator = false)
@@ -1596,6 +1625,7 @@ class Base
      * Define expandable objects
      *
      * @param $aOptions array An array describing the expandable field
+     *
      * @throws ModelException
      */
     protected function addExpandableField($aOptions)
@@ -1635,7 +1665,7 @@ class Base
             throw new ModelException('Expandable fields must define a "id_column".');
         }
 
-        $this->aExpandableFields[] = (object) array(
+        $this->aExpandableFields[] = (object) [
 
             //  The text which triggers this expansion, passed in via $aData['expand']
             'trigger'     => $aOptions['trigger'],
@@ -1653,6 +1683,9 @@ class Base
             //  The provider of the model
             'provider'    => $aOptions['provider'],
 
+            //  Any data to pass to the getAll (every time)
+            'data'        => array_key_exists('data', $aOptions) ? $aOptions['data'] : [],
+
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
              * parent object which contains the ID, for EXPANDABLE_TYPE_MANY, this is the
@@ -1665,8 +1698,8 @@ class Base
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save' => $bAutoSave
-        );
+            'auto_save'   => $bAutoSave,
+        ];
     }
 
     // --------------------------------------------------------------------------
@@ -1675,12 +1708,13 @@ class Base
      * Extracts any autosaveable expandable fields and unsets them from the main array
      *
      * @param  array $aData The data passed to create() or update()
+     *
      * @return array
      */
     protected function autoSaveExpandableFieldsExtract(&$aData)
     {
-        $aFields = array();
-        $aOut    = array();
+        $aFields = [];
+        $aOut    = [];
 
         foreach ($this->aExpandableFields as $oField) {
             if ($oField->auto_save) {
@@ -1745,23 +1779,193 @@ class Base
     {
         $oDb     = Factory::service('Database');
         $aResult = $oDb->query('DESCRIBE `' . $this->getTableName() . '`;')->result();
-        $aFields = array();
+        $aFields = [];
 
         foreach ($aResult as $oField) {
 
             $oTemp             = new \stdClass();
             $oTemp->key        = $oField->Field;
-            $oTemp->label      = ucwords(preg_replace('/[\-_]/', ' ', $oField->Field));
+            $oTemp->label      = $this->describeFieldsPrepareLabel($oTemp->key);
             $oTemp->type       = null;
             $oTemp->allow_null = $oField->Null === 'YES';
-            $oTemp->validation = '';
+            $oTemp->validation = [];
 
-            //  Guess the field's type
-            //  @todo
+            //  Guess the field's type and some basic validation
+            $this->describeFieldsGuessType($oTemp, $oField->Type);
+            $this->describeFieldsGuessValidation($oTemp, $oField->Type);
 
-            $aFields[] = $oTemp;
+            $aFields[$oTemp->key] = $oTemp;
         }
 
         return $aFields;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a human friendly label from the field's key
+     *
+     * @param string $sLabel The label to format
+     *
+     * @return string
+     */
+    protected function describeFieldsPrepareLabel($sLabel)
+    {
+        $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
+        $sLabel = str_ireplace(['id'], ['ID'], $sLabel);
+
+        return $sLabel;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Guesses the field's type and sets it accordingly
+     *
+     * @param \stdClass $oField The field object
+     * @param string    $sType  The database type
+     */
+    protected function describeFieldsGuessType(&$oField, $sType)
+    {
+        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
+
+        $sType       = getFromArray(1, $aMatches, 'text');
+        $sTypeConfig = trim(getFromArray(3, $aMatches));
+        $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
+
+        switch ($sType) {
+
+            /**
+             * Numeric
+             */
+            case 'int':
+                $oField->type = 'number';
+                break;
+
+            /**
+             * Boolean
+             * Nails convention uses tinyint(1) as a boolean; if not (1) then treat as integer
+             */
+            case 'tinyint':
+            case 'bool':
+            case 'boolean':
+                $oField->type = $iLength == 1 ? 'boolean' : 'number';
+                break;
+
+            /**
+             * String
+             */
+            case 'varchar':
+                $oField->type       = 'text';
+                $oField->max_length = $iLength ?: null;
+                break;
+            case 'tinytext':
+            case 'text':
+            case 'mediumtext':
+            case 'longtext':
+                $oField->type = 'textarea';
+                break;
+
+            /**
+             * Date and time
+             */
+            case 'date':
+                $oField->type = 'date';
+                break;
+            case 'datetime':
+                $oField->type = 'datetime';
+                break;
+
+            /**
+             * ENUM
+             */
+            case 'enum':
+                $oField->type    = 'dropdown';
+                $oField->class   = 'select2';
+                $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
+                $aLabels         = array_map('strtolower', $aOptions);
+                $aLabels         = array_map([$this, 'describeFieldsPrepareLabel'], $aLabels);
+                $oField->options = array_combine($aOptions, $aLabels);
+                break;
+
+            /**
+             * Default to basic string
+             */
+            default:
+                $oField->type       = 'text';
+                $oField->max_length = $iLength ?: null;
+                break;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Guesses the field's validation rules based on it's type
+     *
+     * @param \stdClass $oField The field object
+     * @param string    $sType  The database type
+     */
+    protected function describeFieldsGuessValidation(&$oField, $sType)
+    {
+        preg_match('/^(.*?)(\((\d+?)\)(.*))?$/', $sType, $aMatches);
+
+        $sType   = getFromArray(1, $aMatches, 'text');
+        $iLength = getFromArray(3, $aMatches);
+        $sExtra  = trim(strtolower(getFromArray(4, $aMatches)));
+
+        switch ($sType) {
+
+            /**
+             * Numeric
+             */
+            case 'int':
+                if ($sExtra === 'unsigned') {
+                    $oField->validation[] = 'greater_than[-1]';
+                } else {
+                    $oField->validation[] = 'integer';
+                }
+                break;
+
+            /**
+             * Boolean
+             * Nails convention uses tinyint(1) as a boolean; if not (1) then treat as integer
+             */
+            case 'tinyint':
+                if ($sExtra === 'unsigned') {
+                    $oField->validation[] = 'greater_than[-1]';
+                } else {
+                    $oField->validation[] = 'integer';
+                }
+                break;
+
+            /**
+             * String
+             */
+            case 'varchar':
+                if ($iLength) {
+                    $oField->validation[] = 'max_length[' . $iLength . ']';
+                }
+                break;
+
+            /**
+             * Date and time
+             */
+            case 'date':
+                $oField->validation[] = 'valid_date';
+                break;
+            case 'datetime':
+                $oField->validation[] = 'valid_datetime';
+                break;
+
+            /**
+             * Default to basic string
+             */
+            default:
+                if ($iLength) {
+                    $oField->validation[] = 'max_length[' . $iLength . ']';
+                }
+                break;
+        }
     }
 }

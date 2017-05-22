@@ -99,6 +99,8 @@ class Migration extends BaseMaker
                 }
             }
 
+            sort($aMigrations);
+
             if (!empty($aMigrations)) {
                 $aFields['INDEX'] = end($aMigrations) + 1;
             } else {

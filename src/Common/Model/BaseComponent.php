@@ -15,7 +15,7 @@ namespace Nails\Common\Model;
 use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 
-class BaseComponent
+abstract class BaseComponent
 {
     protected $sComponentType;
     protected $aComponents;

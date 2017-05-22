@@ -20,7 +20,7 @@ use Nails\Common\Exception\NailsException;
  * Class BaseNestable
  * @package Nails\Common\Model
  */
-class BaseNestable extends Base
+abstract class BaseNestable extends Base
 {
     protected $tableParentColumn;
 

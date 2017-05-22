@@ -37,51 +37,21 @@ class DefaultSeed extends Base
      */
     public function execute()
     {
-        $oModel  = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
-        $sTable  = $oModel->getTableName();
-        $oFields = $this->oDb->query('DESCRIBE `' . $sTable . '`;');
-        $aFields = [];
-        while ($oField = $oFields->fetchObject()) {
+        $oModel           = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
+        $aFieldsDescribed = $oModel->describeFields();
+        $aFields          = [];
 
-            if (!in_array($oField->Field, static::CONFIG_IGNORE_FIELDS)) {
-
-                preg_match(
-                    '/([a-zA-Z\s]*)(\((.*)\)(.*))?$/',
-                    $oField->Type,
-                    $aMatches
-                );
-
-                $sType  = trim(getFromArray(1, $aMatches));
-                $iSize  = (int) getFromArray(3, $aMatches) ?: null;
-                $sExtra = trim(getFromArray(4, $aMatches));
-
-                $aFields[] = (object) [
-                    'name'  => $oField->Field,
-                    'type'  => $sType,
-                    'size'  => $iSize,
-                    'extra' => $sExtra,
-                ];
+        foreach ($aFieldsDescribed as $oField) {
+            if (!in_array($oField->key, static::CONFIG_IGNORE_FIELDS)) {
+                $aFields[] = $oField;
             }
         }
 
         for ($i = 0; $i < self::CONFIG_NUM_PER_SEED; $i++) {
             try {
-                //  Generate the item
-                $aItem = $this->generate($aFields);
-
-                //  Generate the SQL query
-                $sSql = 'INSERT INTO `' . $sTable . '` (';
-                foreach ($aFields as $oField) {
-                    $sSql .= '`' . $oField->name . '`,';
+                if (!$oModel->create($this->generate($aFields))) {
+                    throw new \Exception('Failed to create item. ' . $oModel->lastError());
                 }
-                $sSql .= '`created`,`modified`) VALUES (';
-                foreach ($aFields as $oField) {
-                    $sSql .= ':' . $oField->name . ',';
-                }
-                $sSql .= 'NOW(),NOW());';
-
-                $oStatement = $this->oDb->prepare($sSql);
-                $oStatement->execute($aItem);
             } catch (\Exception $e) {
                 echo "\nSEED ERROR: " . $e->getMessage();
             }
@@ -91,7 +61,10 @@ class DefaultSeed extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Generate a new Article
+     * Generate a new item
+     *
+     * @param array $aFields The fields to generate
+     *
      * @return array
      */
     protected function generate($aFields)
@@ -99,28 +72,37 @@ class DefaultSeed extends Base
         $aOut = [];
         foreach ($aFields as $oField) {
             switch ($oField->type) {
-                case 'text' :
+                case 'textarea':
                     $mValue = $this->loremParagraph();
                     break;
-                case 'int' :
-                    $mValue = 123;
+                case 'number':
+                    $mValue = $this->randomInteger();
                     break;
-                case 'tinyint' :
-                    $mValue = 1;
+                case 'boolean':
+                    $mValue = $this->randomBool();
                     break;
                 case 'datetime':
-                    $mValue = 'NOW()';
+                    $mValue = $this->randomDateTime();
+                    break;
+                case 'date':
+                    $mValue = $this->randomDateTime(null, null, 'Y-m-d');
+                    break;
+                case 'dropdown':
+                    $mValue = $this->randomItem(array_keys($oField->options));
                     break;
                 default:
                     $mValue = $this->loremWord(3);
                     break;
             }
-            $aOut[$oField->name] = $mValue;
+            $aOut[$oField->key] = $mValue;
         }
 
         //  Special case, slugs
         if (array_key_exists('slug', $aOut)) {
-            $aOut['slug'] = str_replace(' ', '-', strtolower($aOut['slug']));
+            $aOut['slug'] = preg_replace('/[^a-zA-Z0-9 \-]/', '', $aOut['slug']);
+            $aOut['slug'] = trim($aOut['slug']);
+            $aOut['slug'] = strtolower($aOut['slug']);
+            $aOut['slug'] = str_replace(' ', '-', $aOut['slug']);
         }
 
         return $aOut;

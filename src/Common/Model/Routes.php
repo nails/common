@@ -12,8 +12,8 @@
 
 namespace Nails\Common\Model;
 
-use Nails\Factory;
 use Nails\Common\Traits\ErrorHandling;
+use Nails\Factory;
 
 class Routes
 {
@@ -60,7 +60,7 @@ class Routes
         $this->bCanWriteRoutes = null;
         $this->aRoutes         = [];
 
-        if (!$this->bCanWriteRoutes()) {
+        if (!$this->canWriteRoutes()) {
             $this->sCantWriteReason = $this->lastError();
             $this->clearErrors();
         }
@@ -71,17 +71,16 @@ class Routes
     /**
      * Update routes
      *
-     * @param  string $sModule For which module to restrict the route update
+     * @param  string                                            $sModule For which module to restrict the route update
      * @param  \Symfony\Component\Console\Output\OutputInterface $oOutput A Symfony OutputInterface to write logs to
+     *
      * @return boolean
      * @throws \Exception
      */
     public function update($sModule = null, $oOutput = null)
     {
         if (!$this->bCanWriteRoutes) {
-
             $this->setError($this->sCantWriteReason);
-
             return false;
         }
 
@@ -90,34 +89,41 @@ class Routes
         //  Look for modules who wish to write to the routes file
         $aModules = _NAILS_GET_MODULES();
 
+        //  Append the app
+        $aModules['app'] = (object) [
+            'slug'      => 'app',
+            'name'      => 'APP',
+            'namespace' => 'App\\',
+        ];
+
         foreach ($aModules as $oModule) {
 
             if (!empty($sModule) && $sModule !== $oModule->slug) {
                 continue;
             }
 
-            $sPath = $oModule->path . 'routes/Routes.php';
-
-            if (file_exists($sPath)) {
+            $sClass = $oModule->namespace . 'Routes';
+            if (class_exists($sClass)) {
 
                 if (!is_null($oOutput)) {
                     $oOutput->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
                 }
 
-                require_once $sPath;
-                $sRoutesClass   = 'Nails\\Routes\\' . ucfirst(strtolower($oModule->moduleName)) . '\\Routes';
-                $oInstance      = new $sRoutesClass();
-                $sBaseClass     = 'Nails\\Common\\Model\\BaseRoutes';
-                $aParentClasses = class_parents($oInstance);
-                if (!in_array($sBaseClass, $aParentClasses)) {
+                $sInterface   = 'Nails\\Common\\Interfaces\\RouteGenerator';
+                $aImplemented = class_implements($sClass);
+
+                if (!in_array($sInterface, $aImplemented)) {
                     throw new \Exception(
-                        'Routes generator ' . $sRoutesClass . ' does not extend ' . $sBaseClass
+                        'Routes generator ' . $sClass . ' does not implement ' . $sInterface
                     );
                 }
 
-                $this->aRoutes['// BEGIN ' . $oModule->name] = '';
-                $this->aRoutes                               = $this->aRoutes + (array) $oInstance->getRoutes();
-                $this->aRoutes['// END ' . $oModule->name]   = '';
+                $this->aRoutes = array_merge(
+                    $this->aRoutes,
+                    ['// BEGIN ' . $oModule->name => ''],
+                    $sClass::generate(),
+                    ['// END ' . $oModule->name => '']
+                );
 
                 if (!is_null($oOutput)) {
                     $oOutput->writeln('<info>done!</info>');
@@ -131,17 +137,19 @@ class Routes
         if (!is_null($oOutput)) {
             $oOutput->write('Writing routes to file... ');
         }
+
         if ($this->writeFile()) {
+
             if (!is_null($oOutput)) {
                 $oOutput->writeln('<info>done!</info>');
             }
-
             return true;
+
         } else {
+
             if (!is_null($oOutput)) {
                 $oOutput->writeln('<error>failed!</error>');
             }
-
             return false;
         }
     }
@@ -171,14 +179,10 @@ class Routes
         // --------------------------------------------------------------------------
 
         foreach ($this->aRoutes as $sKey => $sValue) {
-
             if (preg_match('#^//.*$#', $sKey)) {
-
                 //  This is a comment
                 $sData .= $sKey . "\n";
-
             } else {
-
                 //  This is a route
                 $sData .= '$route[\'' . $sKey . '\']=\'' . $sValue . '\';' . "\n";
             }
@@ -186,28 +190,24 @@ class Routes
 
         $oDate = Factory::factory('DateTime');
         $sData .= "\n" . '//LAST GENERATED: ' . $oDate->format('Y-m-d H:i:s');
+        $sData .= "\n";
 
         // --------------------------------------------------------------------------
 
         $fHandle = @fopen(static::ROUTES_DIR . static::ROUTES_FILE, 'w');
 
         if (!$fHandle) {
-
             $this->setError('Unable to open routes file for writing.');
-
             return false;
         }
 
         if (!fwrite($fHandle, $sData)) {
-
             fclose($fHandle);
             $this->setError('Unable to write data to routes file.');
-
             return false;
         }
 
         fclose($fHandle);
-
         return true;
     }
 
@@ -217,10 +217,9 @@ class Routes
      * Determine whether or not the routes can be written
      * @return boolean
      */
-    public function bCanWriteRoutes()
+    public function canWriteRoutes()
     {
         if (!is_null($this->bCanWriteRoutes)) {
-
             return $this->bCanWriteRoutes;
         }
 
@@ -230,7 +229,6 @@ class Routes
             if (is_writable(static::ROUTES_DIR . static::ROUTES_FILE)) {
 
                 $this->bCanWriteRoutes = true;
-
                 return true;
 
             } else {
@@ -239,14 +237,12 @@ class Routes
                 if (@chmod(static::ROUTES_DIR . static::ROUTES_FILE, FILE_WRITE_MODE)) {
 
                     $this->bCanWriteRoutes = true;
-
                     return true;
 
                 } else {
 
                     $this->setError('The route config exists, but is not writable.');
                     $this->bCanWriteRoutes = false;
-
                     return false;
                 }
             }
@@ -254,7 +250,6 @@ class Routes
         } elseif (is_writable(static::ROUTES_DIR)) {
 
             $this->bCanWriteRoutes = true;
-
             return true;
 
         } else {
@@ -263,14 +258,12 @@ class Routes
             if (@chmod(static::ROUTES_DIR, DIR_WRITE_MODE)) {
 
                 $this->bCanWriteRoutes = true;
-
                 return true;
 
             } else {
 
                 $this->setError('The route directory is not writable. <small>' . static::ROUTES_DIR . '</small>');
                 $this->bCanWriteRoutes = false;
-
                 return false;
             }
         }
