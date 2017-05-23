@@ -97,12 +97,21 @@ class DefaultSeed extends Base
             $aOut[$oField->key] = $mValue;
         }
 
-        //  Special case, slugs
-        if (array_key_exists('slug', $aOut)) {
-            $aOut['slug'] = preg_replace('/[^a-zA-Z0-9 \-]/', '', $aOut['slug']);
-            $aOut['slug'] = trim($aOut['slug']);
-            $aOut['slug'] = strtolower($aOut['slug']);
-            $aOut['slug'] = str_replace(' ', '-', $aOut['slug']);
+        //  Special Cases, model dependant
+        $oModel = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
+
+        //  Slugs
+        //  If these are being automatically generated then let the model do the hard work
+        if ($oModel->isAutoSetSlugs()) {
+            $sColumn = $oModel->getColumn('slug');
+            unset($aOut[$sColumn]);
+        }
+
+        //  Tokens
+        //  If these are being automatically generated then let the model do the hard work
+        if ($oModel->isAutoSetTokens()) {
+            $sColumn = $oModel->getColumn('token');
+            unset($aOut[$sColumn]);
         }
 
         return $aOut;

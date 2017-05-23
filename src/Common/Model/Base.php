@@ -38,6 +38,7 @@ abstract class Base
     //  Column names
     protected $tableIdColumn;
     protected $tableSlugColumn;
+    protected $tableTokenColumn;
     protected $tableLabelColumn;
     protected $tableCreatedColumn;
     protected $tableCreatedByColumn;
@@ -49,6 +50,13 @@ abstract class Base
     //  Model options
     protected $tableAutoSetTimestamps;
     protected $tableAutoSetSlugs;
+    protected $tableAutoSetTokens;
+
+    /**
+     * Override the default token mask when automatically generating tokens for items
+     * @var string
+     */
+    protected $sTokenMask;
 
     //  Expandable fields
     protected $aExpandableFields;
@@ -114,6 +122,7 @@ abstract class Base
         $this->destructiveDelete      = true;
         $this->tableIdColumn          = 'id';
         $this->tableSlugColumn        = 'slug';
+        $this->tableTokenColumn       = 'token';
         $this->tableLabelColumn       = 'label';
         $this->tableCreatedColumn     = 'created';
         $this->tableCreatedByColumn   = 'created_by';
@@ -122,6 +131,7 @@ abstract class Base
         $this->tableDeletedColumn     = 'is_deleted';
         $this->tableAutoSetTimestamps = true;
         $this->tableAutoSetSlugs      = false;
+        $this->tableAutoSetTokens     = false;
         $this->perPage                = 50;
         $this->searchableFields       = [];
         $this->defaultSortColumn      = null;
@@ -272,6 +282,13 @@ abstract class Base
             $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
         }
 
+        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+            if (empty($this->tableTokenColumn)) {
+                throw new ModelException(get_called_class() . '::create() Token column variable not set', 1);
+            }
+            $aData[$this->tableTokenColumn] = $this->generateToken();
+        }
+
         if (!empty($aData)) {
 
             unset($aData['id']);
@@ -383,6 +400,11 @@ abstract class Base
                     $mIds
                 );
             }
+        }
+
+        //  Automatically set tokens are permanent and immutable
+        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+            unset($aData[$this->tableTokenColumn]);
         }
 
         if (!empty($aData)) {
@@ -1462,11 +1484,9 @@ abstract class Base
         }
 
         if (is_null($sColumn)) {
-
             if (!$this->tableSlugColumn) {
                 throw new ModelException(get_called_class() . '::generateSlug() Column variable not set', 1);
             }
-
             $sColumn = $this->tableSlugColumn;
         }
 
@@ -1480,15 +1500,12 @@ abstract class Base
             $sSlug = url_title(str_replace('/', '-', $sLabel), 'dash', true);
 
             if ($iCounter) {
-
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
             } else {
-
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix;
             }
 
             if ($iIgnoreId) {
-
                 $sIdColumn = $sIdColumn ? $sIdColumn : $this->tableIdColumn;
                 $oDb->where($sIdColumn . ' !=', $iIgnoreId);
             }
@@ -1498,6 +1515,45 @@ abstract class Base
         } while ($oDb->count_all_results($sTable));
 
         return $sSlugTest;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a unique token for a record
+     *
+     * @param string $sMask   The token mask, defaults to $this->sTokenMask
+     * @param string $sTable  The table to use defaults to $this->table
+     * @param string $sColumn The column to use, defaults to $this->tableTokenColumn
+     *
+     * @return string
+     * @throws ModelException
+     */
+    protected function generateToken($sMask = null, $sTable = null, $sColumn = null)
+    {
+        if (is_null($sMask)) {
+            $sMask = $this->sTokenMask;
+        }
+
+        if (is_null($sTable)) {
+            $sTable = $this->getTableName();
+        }
+
+        if (is_null($sColumn)) {
+            if (!$this->tableTokenColumn) {
+                throw new ModelException(get_called_class() . '::generateToken() Token variable not set', 1);
+            }
+            $sColumn = $this->tableTokenColumn;
+        }
+
+        $oDb = Factory::service('Database');
+
+        do {
+            $sToken = generateToken($sMask);
+            $oDb->where($sColumn, $sToken);
+        } while ($oDb->count_all_results($sTable));
+
+        return $sToken;
     }
 
     // --------------------------------------------------------------------------
@@ -1765,6 +1821,48 @@ abstract class Base
     public function isDestructiveDelete()
     {
         return $this->destructiveDelete;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model automatically generates slugs or not
+     *
+     * @return bool
+     */
+    public function isAutoSetSlugs()
+    {
+        return $this->tableAutoSetSlugs;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model automatically generates tokens or not
+     *
+     * @return bool
+     */
+    public function isAutoSetTokens()
+    {
+        return $this->tableAutoSetTokens;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column name for specific columns of interest
+     *
+     * @param string $sColumn the column to query
+     *
+     * @return string|null
+     */
+    public function getColumn($sColumn)
+    {
+        $sColumn = ucfirst(trim($sColumn));
+        if (property_exists($this, 'table' . $sColumn . 'Column')) {
+            return $this->{'table' . $sColumn . 'Column'};
+        }
+        return null;
     }
 
     // --------------------------------------------------------------------------
