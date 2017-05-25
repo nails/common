@@ -991,6 +991,14 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Fetch an object by its token
+     *
+     * @param  string $sToken The token of the object to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
+     *
+     * @return \stdClass|null
+     */
     public function getByToken($sToken, $aData = [])
     {
         // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
@@ -1014,6 +1022,14 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Fetch an object by its token
+     *
+     * @param  array $aTokens An array of tokens to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
+     *
+     * @return array
+     */
     public function getByTokens($aTokens, $aData = [])
     {
         // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
