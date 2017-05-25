@@ -836,6 +836,9 @@ abstract class Base
      */
     public function getById($iId, $aData = [])
     {
+        if(!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
+        }
         if (empty($iId)) {
             return null;
         }
@@ -876,6 +879,10 @@ abstract class Base
      */
     public function getByIds($aIds, $aData = [])
     {
+        if(!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
+        }
+
         if (empty($aIds)) {
             return [];
         }
@@ -906,6 +913,10 @@ abstract class Base
      */
     public function getBySlug($sSlug, $aData = [])
     {
+        if(!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
+        }
+
         if (empty($sSlug)) {
             return null;
         }
@@ -946,6 +957,10 @@ abstract class Base
      */
     public function getBySlugs($aSlugs, $aData = [])
     {
+        if(!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
+        }
+
         if (empty($aSlugs)) {
             return [];
         }
@@ -1001,7 +1016,10 @@ abstract class Base
      */
     public function getByToken($sToken, $aData = [])
     {
-        // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
+        if(!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
+        }
+
         if (empty($sToken)) {
             return null;
         }
@@ -1032,7 +1050,10 @@ abstract class Base
      */
     public function getByTokens($aTokens, $aData = [])
     {
-        // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
+        if(!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
+        }
+
         if (empty($aTokens)) {
             return [];
         }
