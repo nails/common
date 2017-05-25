@@ -57,10 +57,10 @@ class Database
 
         $sDbPath = BASEPATH . 'database/';
         require_once $sDbPath . 'DB_driver.php';
-        require_once $sDbPath . 'DB_active_rec.php';
+        require_once $sDbPath . 'DB_query_builder.php';
 
         if (!class_exists('CI_DB')) {
-            eval('class CI_DB extends CI_DB_active_record { }');
+            eval('class CI_DB extends CI_DB_query_builder { }');
         }
 
         require_once $sDbPath . 'drivers/' . $aParams['dbdriver'] . '/' . $aParams['dbdriver'] . '_driver.php';
