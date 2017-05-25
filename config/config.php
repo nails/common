@@ -40,7 +40,7 @@ $config['encryption_key'] = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY): m
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'nailssession';
 $config['sess_expiration'] = 1209600; // 2 weeks
-$config['sess_save_path'] = 'nails_session';
+$config['sess_table_name'] = $config['sess_save_path'] = 'nails_session';
 $config['sess_match_ip'] = false;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = false;

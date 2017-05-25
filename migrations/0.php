@@ -50,14 +50,12 @@ class Migration0 extends Base
         ");
 
         $this->query("
-            CREATE TABLE `{{NAILS_DB_PREFIX}}session` (
-                `session_id` varchar(40) NOT NULL DEFAULT '0',
-                `ip_address` varchar(45) NOT NULL DEFAULT '0',
-                `user_agent` varchar(120) NOT NULL,
-                `last_activity` int(10) unsigned NOT NULL DEFAULT '0',
-                `user_data` text NOT NULL,
-                PRIMARY KEY (`session_id`),
-                KEY `last_activity_idx` (`last_activity`)
+            CREATE TABLE IF NOT EXISTS `{{NAILS_DB_PREFIX}}session` (
+                    `id` varchar(128) NOT NULL,
+                    `ip_address` varchar(45) NOT NULL,
+                    `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
+                    `data` blob NOT NULL,
+                    KEY `{{NAILS_DB_PREFIX}}session_timestamp` (`timestamp`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
     }
