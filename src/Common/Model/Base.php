@@ -1013,6 +1013,7 @@ abstract class Base
      * @param  array $aData   Any data to pass to getCountCommon()
      *
      * @return \stdClass|null
+     * @throws ModelException if object property tableTokenColumn is not set
      */
     public function getByToken($sToken, $aData = [])
     {
@@ -1047,6 +1048,7 @@ abstract class Base
      * @param  array $aData   Any data to pass to getCountCommon()
      *
      * @return array
+     * @throws ModelException if object property tableTokenColumn is not set
      */
     public function getByTokens($aTokens, $aData = [])
     {
