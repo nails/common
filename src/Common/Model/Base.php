@@ -836,7 +836,7 @@ abstract class Base
      */
     public function getById($iId, $aData = [])
     {
-        if(!$this->tableIdColumn) {
+        if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
         }
         if (empty($iId)) {
@@ -879,7 +879,7 @@ abstract class Base
      */
     public function getByIds($aIds, $aData = [])
     {
-        if(!$this->tableIdColumn) {
+        if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
         }
 
@@ -913,7 +913,7 @@ abstract class Base
      */
     public function getBySlug($sSlug, $aData = [])
     {
-        if(!$this->tableSlugColumn) {
+        if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
         }
 
@@ -957,7 +957,7 @@ abstract class Base
      */
     public function getBySlugs($aSlugs, $aData = [])
     {
-        if(!$this->tableSlugColumn) {
+        if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
         }
 
@@ -1017,7 +1017,7 @@ abstract class Base
      */
     public function getByToken($sToken, $aData = [])
     {
-        if(!$this->tableTokenColumn) {
+        if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
         }
 
@@ -1052,7 +1052,7 @@ abstract class Base
      */
     public function getByTokens($aTokens, $aData = [])
     {
-        if(!$this->tableTokenColumn) {
+        if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
         }
 
