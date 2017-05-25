@@ -991,6 +991,51 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
+    public function getByToken($sToken, $aData = [])
+    {
+        // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
+        if (empty($sToken)) {
+            return null;
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $sToken];
+
+        // --------------------------------------------------------------------------
+
+        return $this->getAll(null, null, $aData, false);
+
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function getByTokens($aTokens, $aData = [])
+    {
+        // @todo if the model does not have a token column, should calls to these methods return empty or throw exception?
+        if (empty($aTokens)) {
+            return [];
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $aTokens];
+
+        // --------------------------------------------------------------------------
+
+        return $this->getAll(null, null, $aData, false);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Get associated content for the items in the result set where the the relationship is 1 to 1 and the binding
      * is made in the item object (i.e current item contains the associated item's ID)
