@@ -836,6 +836,9 @@ abstract class Base
      */
     public function getById($iId, $aData = [])
     {
+        if (!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
+        }
         if (empty($iId)) {
             return null;
         }
@@ -876,6 +879,10 @@ abstract class Base
      */
     public function getByIds($aIds, $aData = [])
     {
+        if (!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
+        }
+
         if (empty($aIds)) {
             return [];
         }
@@ -906,6 +913,10 @@ abstract class Base
      */
     public function getBySlug($sSlug, $aData = [])
     {
+        if (!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
+        }
+
         if (empty($sSlug)) {
             return null;
         }
@@ -946,6 +957,10 @@ abstract class Base
      */
     public function getBySlugs($aSlugs, $aData = [])
     {
+        if (!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
+        }
+
         if (empty($aSlugs)) {
             return [];
         }
@@ -987,6 +1002,75 @@ abstract class Base
 
             return $this->getBySlug($mIdSlug, $aData);
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Fetch an object by its token
+     *
+     * @param  string $sToken The token of the object to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
+     *
+     * @return \stdClass|null
+     * @throws ModelException if object property tableTokenColumn is not set
+     */
+    public function getByToken($sToken, $aData = [])
+    {
+        if (!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
+        }
+
+        if (empty($sToken)) {
+            return null;
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $sToken];
+
+        // --------------------------------------------------------------------------
+
+        return $this->getAll(null, null, $aData, false);
+
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Fetch objects by an array of tokens
+     *
+     * @param  array $aTokens An array of tokens to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
+     *
+     * @return array
+     * @throws ModelException if object property tableTokenColumn is not set
+     */
+    public function getByTokens($aTokens, $aData = [])
+    {
+        if (!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
+        }
+
+        if (empty($aTokens)) {
+            return [];
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $aTokens];
+
+        // --------------------------------------------------------------------------
+
+        return $this->getAll(null, null, $aData, false);
     }
 
     // --------------------------------------------------------------------------
