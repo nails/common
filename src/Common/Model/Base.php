@@ -1023,7 +1023,7 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Fetch an object by its token
+     * Fetch objects by an array of tokens
      *
      * @param  array $aTokens An array of tokens to fetch
      * @param  array $aData   Any data to pass to getCountCommon()
