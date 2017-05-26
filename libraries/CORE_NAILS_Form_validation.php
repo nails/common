@@ -90,6 +90,40 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Checks if an array satisfies specified count restrictions.
+     * @param  array  $aArray  The value to check
+     * @param  string  $sParam  The parameter to check against
+     * @return boolean
+    */
+    public function count(array $aArray, $sParam) {
+
+        $oFormValidation = Factory::service('FormValidation');
+        $aParams         = preg_replace('/[^0-9]/', '', explode(',', $sParam));
+        $mFloor          = getFromArray(0, $aParams, 0);
+        $mCeiling        = getFromArray(1, $aParams, INF);
+
+        if(substr($sParam, 0, 1) === '(' && substr($sParam, -1, 1) === ')') {
+
+            $mFloor++;
+            $mCeiling--;
+        }
+
+        if (($bAboveFloor = $mFloor <= count($aArray)) === false) {
+
+            $oFormValidation->set_message('count', lang('fv_count_floor'));
+        }
+
+        if (($bBeneathCeiling = $mCeiling >= count($aArray)) === false) {
+
+            $oFormValidation->set_message('count', lang('fv_count_ceiling'));
+        }
+
+        return $bAboveFloor && $bBeneathCeiling;
+    }
+
+    // --------------------------------------------------------------------------
+
 
     /**
      * Check if a date is valid
