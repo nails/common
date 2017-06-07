@@ -30,7 +30,6 @@ class Startup
         $this->defineConstants();
         $this->setModuleLocations();
         $this->setupFactory();
-        $this->loadHelpers();
     }
 
     // --------------------------------------------------------------------------
@@ -214,19 +213,6 @@ class Startup
     protected function setupFactory()
     {
         Factory::setup();
-    }
-
-    // --------------------------------------------------------------------------
-
-    protected function loadHelpers()
-    {
-        //  CI Helpers
-        require_once BASEPATH . 'core/Common.php';
-
-        //  Factory helpers
-        Factory::helper('app_setting');
-        Factory::helper('tools');
-        Factory::helper('string');
-        Factory::helper('user', 'nailsapp/module-auth');
+        Factory::autoload();
     }
 }

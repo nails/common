@@ -328,4 +328,48 @@ class Factory
 
         return self::$aContainers[$sComponentName][$sServiceType][$sServiceName];
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Auto-loads items at startup
+     */
+    public static function autoload()
+    {
+        //  CI base helpers
+        require_once BASEPATH . 'core/Common.php';
+
+        //  Common helpers
+        self::helper('string');
+        self::helper('app_setting');
+        self::helper('app_notification');
+        self::helper('date');
+        self::helper('url');
+        self::helper('cookie');
+        self::helper('form');
+        self::helper('html');
+        self::helper('tools');
+        self::helper('debug');
+        self::helper('language');
+        self::helper('text');
+        self::helper('exception');
+        self::helper('typography');
+        self::helper('log');
+
+        //  Module items
+        foreach (_NAILS_GET_MODULES() as $oModule) {
+            //  Helpers
+            if (!empty($oModule->autoload->helpers)) {
+                foreach ($oModule->autoload->helpers as $sHelper) {
+                    self::helper($sHelper, $oModule->slug);
+                }
+            }
+            //  Services
+            if (!empty($oModule->autoload->services)) {
+                foreach ($oModule->autoload->services as $sService) {
+                   self::service($sService, $oModule->slug);
+                }
+            }
+        }
+    }
 }
