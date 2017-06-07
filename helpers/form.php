@@ -229,17 +229,20 @@ if (!function_exists('form_open')) {
     {
         $CI =& get_instance();
 
+        $oConfig = Factory::service('Config');
+        $oUri    = Factory::service('Uri');
+
         if ($attributes == '') {
             $attributes = 'method="post"';
         }
 
         // If an action is not a full URL then turn it into one
         if ($action && strpos($action, '://') === false) {
-            $action = $CI->config->site_url($action);
+            $action = $oConfig->site_url($action);
         }
 
         // If no action is provided then set to the current url
-        $action || $action = $CI->config->site_url($CI->uri->uri_string());
+        $action || $action = $oConfig->site_url($oUri->uri_string());
 
         $form = '<form action="' . $action . '"';
 
@@ -248,16 +251,16 @@ if (!function_exists('form_open')) {
         $form .= '>';
 
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
-        $_base_url        = $CI->config->base_url();
-        $_secure_base_url = $CI->config->secure_base_url();
+        $_base_url        = $oConfig->base_url();
+        $_secure_base_url = $oConfig->secure_base_url();
 
-        if ($CI->config->item('csrf_protection') === true && !(strpos($action, $_base_url) === false || strpos($form, 'method="get"'))) {
+        if ($oConfig->item('csrf_protection') === true && !(strpos($action, $_base_url) === false || strpos($form, 'method="get"'))) {
             $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
         }
 
         //  If the secure_base_url is different, then do a check for that domain/url too.
         if ($_base_url != $_secure_base_url) {
-            if ($CI->config->item('csrf_protection') === true && !(strpos($action, $_secure_base_url) === false || strpos($form, 'method="get"'))) {
+            if ($oConfig->item('csrf_protection') === true && !(strpos($action, $_secure_base_url) === false || strpos($form, 'method="get"'))) {
                 $hidden[$CI->security->get_csrf_token_name()] = $CI->security->get_csrf_hash();
             }
         }
@@ -1634,10 +1637,6 @@ if (!function_exists('form_field_boolean')) {
      */
     function form_field_boolean($field, $tip = '')
     {
-        $_ci =& get_instance();
-
-        // --------------------------------------------------------------------------
-
         //  Set var defaults
         $_field                = [];
         $_field['id']          = isset($field['id']) ? $field['id'] : null;
@@ -1751,10 +1750,6 @@ if (!function_exists('form_field_checkbox')) {
      */
     function form_field_checkbox($field, $options = null, $tip = '')
     {
-        $_ci =& get_instance();
-
-        // --------------------------------------------------------------------------
-
         //  Set var defaults
         $_field                = [];
         $_field['type']        = isset($field['type']) ? $field['type'] : 'checkbox';
@@ -1804,13 +1799,15 @@ if (!function_exists('form_field_checkbox')) {
 
         $_out .= '<span class="input ' . $_tipclass . ' ' . $_disabledclass . '">';
 
+        $oInput = Factory::service('Input');
+
         //  Field
         if (substr($_field['key'], -2) == '[]') :
 
             //  Field is an array, need to look for the value
-            $_values        = $_ci->input->post(substr($_field['key'], 0, -2));
+            $_values        = $oInput->post(substr($_field['key'], 0, -2));
             $_data_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
-            $_selected      = $_ci->input->post() ? false : $_data_selected;
+            $_selected      = $oInput->post() ? false : $_data_selected;
 
             if (is_array($_values) && array_search($options[0]['value'], $_values) !== false) :
 
@@ -1821,9 +1818,9 @@ if (!function_exists('form_field_checkbox')) {
         else :
 
             //  Normal field, continue as normal Mr Norman!
-            if ($_ci->input->post($_field['key'])) :
+            if ($oInput->post($_field['key'])) :
 
-                $_selected = $_ci->input->post($_field['key']) == $options[0]['value'] ? true : false;
+                $_selected = $oInput->post($_field['key']) == $options[0]['value'] ? true : false;
 
             else :
 
@@ -1887,9 +1884,9 @@ if (!function_exists('form_field_checkbox')) {
             if (substr($_field['key'], -2) == '[]') :
 
                 //  Field is an array, need to look for the value
-                $_values        = $_ci->input->post(substr($_field['key'], 0, -2));
+                $_values        = $oInput->post(substr($_field['key'], 0, -2));
                 $_data_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
-                $_selected      = $_ci->input->post() ? false : $_data_selected;
+                $_selected      = $oInput->post() ? false : $_data_selected;
 
                 if (is_array($_values) && array_search($options[$i]['value'], $_values) !== false) :
 
@@ -1900,9 +1897,9 @@ if (!function_exists('form_field_checkbox')) {
             else :
 
                 //  Normal field, continue as normal Mr Norman!
-                if ($_ci->input->post($_field['key'])) :
+                if ($oInput->post($_field['key'])) :
 
-                    $_selected = $_ci->input->post($_field['key']) == $options[$i]['value'] ? true : false;
+                    $_selected = $oInput->post($_field['key']) == $options[$i]['value'] ? true : false;
 
                 else :
 
@@ -1965,10 +1962,6 @@ if (!function_exists('form_field_cms_widgets')) {
      */
     function form_field_cms_widgets($field, $tip = '')
     {
-        $_ci =& get_instance();
-
-        // --------------------------------------------------------------------------
-
         //  Set var defaults
         $_field                = [];
         $_field['id']          = isset($field['id']) ? $field['id'] : null;

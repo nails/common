@@ -237,7 +237,8 @@ function keyValueSection($title, $data)
             echo keyValueSection('GLOBAL Data', $_GLOBALS);
         }
 
-        echo keyValueSection('SESSION Data', get_instance()->session->userdata);
+        $oSession = \Nails\Factory::service('Session', 'nailsapp/module-auth');
+        echo keyValueSection('SESSION Data', $oSession->userdata);
 
         ?>
     </body>
