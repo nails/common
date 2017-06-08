@@ -84,26 +84,6 @@ abstract class Base
     protected $defaultSortColumn;
     protected $defaultSortOrder;
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * @todo   : this is copied directly from CodeIgniter - consider removing.
-     * __get
-     *
-     * Allows models to access CI's loaded classes using the same
-     * syntax as controllers.
-     *
-     * @param   string
-     *
-     * @access private
-     */
-    public function __get($sKey)
-    {
-        $oCi =& get_instance();
-
-        return $oCi->$sKey;
-    }
-
     /**
      * --------------------------------------------------------------------------
      * CONSTRUCTOR && DESTRUCTOR
@@ -173,6 +153,11 @@ abstract class Base
                 'id_column' => 'modified_by',
             ]);
         }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo (Pablo - 2017-06-08) - Remove this
+        self::backwardsCompatibility($this);
     }
 
     // --------------------------------------------------------------------------
@@ -1010,7 +995,7 @@ abstract class Base
      * Fetch an object by its token
      *
      * @param  string $sToken The token of the object to fetch
-     * @param  array $aData   Any data to pass to getCountCommon()
+     * @param  array  $aData  Any data to pass to getCountCommon()
      *
      * @return \stdClass|null
      * @throws ModelException if object property tableTokenColumn is not set
@@ -2152,5 +2137,21 @@ abstract class Base
                 }
                 break;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function backwardsCompatibility(&$oBindTo)
+    {
+        /**
+         * Backwards compatibility
+         * Various older modules expect to be able to access a few services/models
+         * via magic methods. These will be deprecated soon.
+         */
+
+        //  @todo (Pablo - 2017-06-07) - Remove these
+
+        $oBindTo->db      = Factory::service('Database');
+        $oBindTo->encrypt = Factory::service('Encrypt');
     }
 }
