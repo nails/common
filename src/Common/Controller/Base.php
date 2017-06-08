@@ -748,6 +748,7 @@ abstract class Base extends \MX_Controller
         $oBindTo->logger              = Factory::service('Logger');
         $oBindTo->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
         $oBindTo->event               = Factory::service('Event', 'nailsapp/module-event');
+        $oBindTo->session             = Factory::service('Session', 'nailsapp/module-auth');
         $oBindTo->user                = Factory::model('User', 'nailsapp/module-auth');
         $oBindTo->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
         $oBindTo->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
