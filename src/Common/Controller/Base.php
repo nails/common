@@ -215,31 +215,8 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        /**
-         * Backwards compatibility
-         * Various older modules expect to be able to access a few services/models
-         * via magic methods. These will be deprecated soon.
-         */
-
-        //  @todo (Pablo - 2017-06-07) - Remove these
-
-        $this->db                  = Factory::service('Database');
-        $this->input               = Factory::service('Input');
-        $this->output              = Factory::service('Output');
-        $this->meta                = Factory::service('Meta');
-        $this->asset               = Factory::service('Asset');
-        $this->encrypt             = Factory::service('Encrypt');
-        $this->logger              = Factory::service('Logger');
-        $this->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
-        $this->event               = Factory::service('Event', 'nailsapp/module-event');
-        $this->user                = Factory::model('User', 'nailsapp/module-auth');
-        $this->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
-        $this->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
-
-        //  Set variables for the views, too
-        $this->data['user']          = $this->user;
-        $this->data['user_group']    = $this->user_group_model;
-        $this->data['user_password'] = $this->user_password_model;
+        //  @todo (Pablo - 2017-06-08) - Remove this
+        self::backwardsCompatibility($this);
 
         // --------------------------------------------------------------------------
 
@@ -748,5 +725,36 @@ abstract class Base extends \MX_Controller
             $oSession->set_flashdata('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function backwardsCompatibility(&$oBindTo)
+    {
+        /**
+         * Backwards compatibility
+         * Various older modules expect to be able to access a few services/models
+         * via magic methods. These will be deprecated soon.
+         */
+
+        //  @todo (Pablo - 2017-06-07) - Remove these
+
+        $oBindTo->db                  = Factory::service('Database');
+        $oBindTo->input               = Factory::service('Input');
+        $oBindTo->output              = Factory::service('Output');
+        $oBindTo->meta                = Factory::service('Meta');
+        $oBindTo->asset               = Factory::service('Asset');
+        $oBindTo->encrypt             = Factory::service('Encrypt');
+        $oBindTo->logger              = Factory::service('Logger');
+        $oBindTo->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
+        $oBindTo->event               = Factory::service('Event', 'nailsapp/module-event');
+        $oBindTo->user                = Factory::model('User', 'nailsapp/module-auth');
+        $oBindTo->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
+        $oBindTo->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
+
+        //  Set variables for the views, too
+        $oBindTo->data['user']          = $oBindTo->user;
+        $oBindTo->data['user_group']    = $oBindTo->user_group_model;
+        $oBindTo->data['user_password'] = $oBindTo->user_password_model;
     }
 }
