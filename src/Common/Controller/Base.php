@@ -747,6 +747,7 @@ abstract class Base extends \MX_Controller
         $oBindTo->encrypt             = Factory::service('Encrypt');
         $oBindTo->logger              = Factory::service('Logger');
         $oBindTo->uri                 = Factory::service('Uri');
+        $oBindTo->security            = Factory::service('Security');
         $oBindTo->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
         $oBindTo->event               = Factory::service('Event', 'nailsapp/module-event');
         $oBindTo->session             = Factory::service('Session', 'nailsapp/module-auth');
