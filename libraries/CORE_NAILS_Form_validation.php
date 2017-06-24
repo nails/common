@@ -60,9 +60,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return true;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('unique_if_diff', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('unique_if_diff', lang('fv_unique_if_diff_field'));
+        if (!array_key_exists('unique_if_diff', $this->_error_messages)) {
+            $this->set_message('unique_if_diff', lang('fv_unique_if_diff_field'));
         }
 
         $oDb = Factory::service('Database');
@@ -89,9 +88,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function valid_postcode($str)
     {
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('valid_postcode', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('valid_postcode', lang('fv_valid_postcode'));
+        if (!array_key_exists('valid_postcode', $this->_error_messages)) {
+            $this->set_message('valid_postcode', lang('fv_valid_postcode'));
         }
 
         $pattern = '/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/';
@@ -110,8 +108,6 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function item_count(array $aArray, $sParam)
     {
-
-        $oFormValidation = Factory::service('FormValidation');
         $aParams         = preg_replace('/[^0-9]/', '', explode(',', $sParam));
         $mFloor          = getFromArray(0, $aParams, 0);
         $mCeiling        = getFromArray(1, $aParams, INF);
@@ -122,11 +118,11 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
         }
 
         if (($bAboveFloor = $mFloor <= count($aArray)) === false) {
-            $oFormValidation->set_message('item_count', lang('fv_count_floor'));
+            $this->set_message('item_count', lang('fv_count_floor'));
         }
 
         if (($bBeneathCeiling = $mCeiling >= count($aArray)) === false) {
-            $oFormValidation->set_message('item_count', lang('fv_count_ceiling'));
+            $this->set_message('item_count', lang('fv_count_ceiling'));
         }
 
         return $bAboveFloor && $bBeneathCeiling;
@@ -153,9 +149,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('valid_date', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('valid_date', lang('fv_valid_date_field'));
+        if (!array_key_exists('valid_date', $this->_error_messages)) {
+            $this->set_message('valid_date', lang('fv_valid_date_field'));
         }
 
         try {
@@ -195,9 +190,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('date_future', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('date_future', lang('fv_valid_date_future_field'));
+        if (!array_key_exists('date_future', $this->_error_messages)) {
+            $this->set_message('date_future', lang('fv_valid_date_future_field'));
         }
 
         try {
@@ -241,9 +235,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('date_past', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('date_past', lang('fv_valid_date_past_field'));
+        if (!array_key_exists('date_past', $this->_error_messages)) {
+            $this->set_message('date_past', lang('fv_valid_date_past_field'));
         }
 
         try {
@@ -287,9 +280,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('date_today', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('date_today', lang('fv_valid_date_today_field'));
+        if (!array_key_exists('date_today', $this->_error_messages)) {
+            $this->set_message('date_today', lang('fv_valid_date_today_field'));
         }
 
         try {
@@ -341,9 +333,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('date_before', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('date_before', lang('fv_valid_date_before_field'));
+        if (!array_key_exists('date_before', $this->_error_messages)) {
+            $this->set_message('date_before', lang('fv_valid_date_before_field'));
         }
 
         //  If the other field is blank then bail out
@@ -402,9 +393,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('date_after', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('date_after', lang('fv_valid_date_after_field'));
+        if (!array_key_exists('date_after', $this->_error_messages)) {
+            $this->set_message('date_after', lang('fv_valid_date_after_field'));
         }
 
         //  If the other field is blank then bail out
@@ -455,9 +445,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('valid_datetime', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('valid_datetime', lang('fv_valid_datetime_field'));
+        if (!array_key_exists('valid_datetime', $this->_error_messages)) {
+            $this->set_message('valid_datetime', lang('fv_valid_datetime_field'));
         }
 
         try {
@@ -497,9 +486,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('datetime_future', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('datetime_future', lang('fv_valid_datetime_future_field'));
+        if (!array_key_exists('datetime_future', $this->_error_messages)) {
+            $this->set_message('datetime_future', lang('fv_valid_datetime_future_field'));
         }
 
         try {
@@ -540,9 +528,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'Y-m-d H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('datetime_past', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('datetime_past', lang('fv_valid_datetime_past_field'));
+        if (!array_key_exists('datetime_past', $this->_error_messages)) {
+            $this->set_message('datetime_past', lang('fv_valid_datetime_past_field'));
         }
 
         try {
@@ -591,9 +578,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('datetime_before', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('datetime_before', lang('fv_valid_datetime_before_field'));
+        if (!array_key_exists('datetime_before', $this->_error_messages)) {
+            $this->set_message('datetime_before', lang('fv_valid_datetime_before_field'));
         }
 
         //  If the other field is blank then bail out
@@ -649,9 +635,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('datetime_after', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('datetime_after', lang('fv_valid_datetime_after_field'));
+        if (!array_key_exists('datetime_after', $this->_error_messages)) {
+            $this->set_message('datetime_after', lang('fv_valid_datetime_after_field'));
         }
 
         //  If the other field is blank then bail out
@@ -699,9 +684,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('valid_time', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('valid_time', lang('fv_valid_time_field'));
+        if (!array_key_exists('valid_time', $this->_error_messages)) {
+            $this->set_message('valid_time', lang('fv_valid_time_field'));
         }
 
         try {
@@ -741,9 +725,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('time_future', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('time_future', lang('fv_valid_time_future_field'));
+        if (!array_key_exists('time_future', $this->_error_messages)) {
+            $this->set_message('time_future', lang('fv_valid_time_future_field'));
         }
 
         try {
@@ -784,9 +767,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             $sFormat = 'H:i:s';
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('time_past', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('time_past', lang('fv_valid_time_past_field'));
+        if (!array_key_exists('time_past', $this->_error_messages)) {
+            $this->set_message('time_past', lang('fv_valid_time_past_field'));
         }
 
         try {
@@ -835,9 +817,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('time_before', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('time_before', lang('fv_valid_time_before_field'));
+        if (!array_key_exists('time_before', $this->_error_messages)) {
+            $this->set_message('time_before', lang('fv_valid_time_before_field'));
         }
 
         //  If the other field is blank then bail out
@@ -893,9 +874,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
             return false;
         }
 
-        $oFormValidation = Factory::service('FormValidation');
-        if (!array_key_exists('time_after', $oFormValidation->_error_messages)) {
-            $oFormValidation->set_message('time_after', lang('fv_valid_time_after_field'));
+        if (!array_key_exists('time_after', $this->_error_messages)) {
+            $this->set_message('time_after', lang('fv_valid_time_after_field'));
         }
 
         //  If the other field is blank then bail out
@@ -948,9 +928,8 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
 
         } else {
 
-            $oFormValidation = Factory::service('FormValidation');
-            if (!array_key_exists('in_range', $oFormValidation->_error_messages)) {
-                $oFormValidation->set_message('in_range', lang('fv_in_range_field'));
+            if (!array_key_exists('in_range', $this->_error_messages)) {
+                $this->set_message('in_range', lang('fv_in_range_field'));
             }
 
             return false;
@@ -1006,8 +985,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiObjectRequired($aValues)
     {
-        $oFormValidation = Factory::service('FormValidation');
-        $oFormValidation->set_message(
+        $this->set_message(
             'cdnObjectPickerMultiObjectRequired',
             'All items must have a file set.'
         );
@@ -1033,8 +1011,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiLabelRequired($aValues)
     {
-        $oFormValidation = Factory::service('FormValidation');
-        $oFormValidation->set_message(
+        $this->set_message(
             'cdnObjectPickerMultiLabelRequired',
             'All items must have a label set.'
         );
@@ -1060,8 +1037,7 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiAllRequired($aValues)
     {
-        $oFormValidation = Factory::service('FormValidation');
-        $oFormValidation->set_message(
+        $this->set_message(
             'cdnObjectPickerMultiAllRequired',
             'All items must have a file and a label set.'
         );
