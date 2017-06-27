@@ -160,5 +160,47 @@ if (!function_exists('generateToken')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('prosaicList')) {
+
+    /**
+     * Takes an array of strings and returns as a comma separated string using a terminal conjunctive,
+     * optionally using an Oxford Comma.
+     *
+     * @param array  $aArray       The array to implode
+     * @param string $sSeparator   The string to use to separate the strings
+     * @param string $sConjunctive The conjunctive to use
+     * @param bool   $bOxfordComma Whether to use an Oxford comma, or not.
+     *
+     * @return string
+     */
+    function prosaicList(array $aArray, $sSeparator = ', ', $sConjunctive = ' and ', $bOxfordComma = true)
+    {
+        $iCount = count($aArray);
+        if ($iCount <= 1) {
+            return implode('', $aArray);
+        } elseif ($iCount == 2) {
+            return implode($sConjunctive, $aArray);
+        } else {
+            $aOut = [];
+            for ($i = 0; $i < $iCount; $i++) {
+                $sTemp = $aArray[$i];
+                if ($i == ($iCount - 2) && $bOxfordComma) {
+                    //  Second last item, and using Oxford comma
+                    $sTemp .= $sSeparator . $sConjunctive;
+                } elseif ($i == ($iCount - 2) && !$bOxfordComma) {
+                    $sTemp .= $sConjunctive;
+                } elseif ($i != ($iCount - 1)) {
+                    $sTemp .= $sSeparator;
+                }
+                $aOut[] = $sTemp;
+            }
+
+            return implode('', $aOut);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+
 //  Include the CodeIgniter original
 include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';
