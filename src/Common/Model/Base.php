@@ -577,6 +577,14 @@ abstract class Base
      */
     public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
+        // --------------------------------------------------------------------------
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName(true);
 
