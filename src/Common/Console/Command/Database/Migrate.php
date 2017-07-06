@@ -73,8 +73,9 @@ class Migrate extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -116,7 +117,7 @@ class Migrate extends Base
         }
 
         //  Get the DB object
-        $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+        $this->oDb = Factory::service('PDODatabase');
         $this->oDb->connect($dbHost, $dbUser, $dbPass, $dbName);
 
         if (!defined('NAILS_DB_PREFIX')) {
@@ -356,8 +357,9 @@ class Migrate extends Base
     /**
      * Determines whether or not the module needs to migration, and if so between what versions
      *
-     * @param string $moduleName The module's name
+     * @param string $moduleName     The module's name
      * @param string $migrationsPath The module's path
+     *
      * @return null|\stdClass stdClass when migration needed, null when not needed
      */
     protected function determineModuleState($moduleName, $migrationsPath)
@@ -439,6 +441,7 @@ class Migrate extends Base
      * Executes a migration
      *
      * @param  \stdClass $module The migration details object
+     *
      * @return boolean
      */
     protected function doMigration($module)
@@ -488,8 +491,9 @@ class Migrate extends Base
     /**
      * Executes an individual migration
      *
-     * @param  object $module The module being migrated
-     * @param  array $migration The migration details
+     * @param  object $module    The module being migrated
+     * @param  array  $migration The migration details
+     *
      * @return boolean
      */
     private function executeMigration($module, $migration)
@@ -562,6 +566,7 @@ class Migrate extends Base
      * Generates an array of files in a directory
      *
      * @param  string $dir The directory to analyse
+     *
      * @return array
      */
     private function mapDir($dir)
@@ -602,6 +607,7 @@ class Migrate extends Base
      * Replaces {{CONSTANT}} with the value of constant, CONSTANT
      *
      * @param string $sString The string to search on
+     *
      * @return string
      */
     protected function replaceConstants($sString)
@@ -624,8 +630,9 @@ class Migrate extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  array $aMessages The error message
+     * @param  array   $aMessages The error message
      * @param  integer $iExitCode The exit code
+     *
      * @return int
      */
     protected function abort($iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])

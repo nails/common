@@ -43,35 +43,35 @@ class Asset
         $this->oCi =& get_instance();
         Factory::helper('string');
 
-        $this->aCss            = array();
-        $this->aCssInline      = array();
-        $this->aJs             = array();
-        $this->aJsInlineHeader = array();
-        $this->aJsInlineFooter = array();
+        $this->aCss            = [];
+        $this->aCssInline      = [];
+        $this->aJs             = [];
+        $this->aJsInlineHeader = [];
+        $this->aJsInlineFooter = [];
         $this->sCacheBuster    = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
 
         $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets/build';
         $this->sBaseUrl       = site_url($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
         $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets/build';
-        $this->sBaseUrlSecure = secure_site_url($this->sBaseUrlSecure);
+        $this->sBaseUrlSecure = site_url($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
 
         $this->sBaseModuleUrl       = defined('DEPLOY_ASSET_BASE_MODULE_URL') ? DEPLOY_ASSET_BASE_MODULE_URL : 'vendor';
         $this->sBaseModuleUrl       = site_url($this->sBaseModuleUrl);
         $this->sBaseModuleUrl       = addTrailingSlash($this->sBaseModuleUrl);
         $this->sBaseModuleUrlSecure = defined('DEPLOY_ASSET_BASE_MODULE_URL_SECURE') ? DEPLOY_ASSET_BASE_MODULE_URL_SECURE : 'vendor';
-        $this->sBaseModuleUrlSecure = secure_site_url($this->sBaseModuleUrlSecure);
+        $this->sBaseModuleUrlSecure = site_url($this->sBaseModuleUrlSecure);
         $this->sBaseModuleUrlSecure = addTrailingSlash($this->sBaseModuleUrlSecure);
 
-        $this->sBowerDir      = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
-        $this->sBowerDir      = addTrailingSlash($this->sBowerDir);
+        $this->sBowerDir = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
+        $this->sBowerDir = addTrailingSlash($this->sBowerDir);
 
-        $this->sCssDir        = defined('DEPLOY_ASSET_CSS_DIR') ? DEPLOY_ASSET_CSS_DIR : 'css';
-        $this->sCssDir        = addTrailingSlash($this->sCssDir);
+        $this->sCssDir = defined('DEPLOY_ASSET_CSS_DIR') ? DEPLOY_ASSET_CSS_DIR : 'css';
+        $this->sCssDir = addTrailingSlash($this->sCssDir);
 
-        $this->sJsDir         = defined('DEPLOY_ASSET_JS_DIR') ? DEPLOY_ASSET_CJS_DIR : 'js';
-        $this->sJsDir         = addTrailingSlash($this->sJsDir);
+        $this->sJsDir = defined('DEPLOY_ASSET_JS_DIR') ? DEPLOY_ASSET_CJS_DIR : 'js';
+        $this->sJsDir = addTrailingSlash($this->sJsDir);
 
     }
 
@@ -79,9 +79,11 @@ class Asset
 
     /**
      * Loads an asset
+     *
      * @param  mixed  $mAssets        The asset to load, can be an array or a string
      * @param  string $sAssetLocation The asset's location
      * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
+     *
      * @return object
      */
     public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null)
@@ -163,8 +165,10 @@ class Asset
 
     /**
      * Loads an asset supplied as a URL
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadUrl($sAsset, $sForceType)
@@ -189,8 +193,10 @@ class Asset
 
     /**
      * Loads an asset supplied as an absolute URL
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadAbsolute($sAsset, $sForceType)
@@ -215,8 +221,10 @@ class Asset
 
     /**
      * Loads an asset from the Nails asset module
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadNails($sAsset, $sForceType)
@@ -241,8 +249,10 @@ class Asset
 
     /**
      * Loads a Bower asset from the NAils asset module's bower_components directory
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadNailsBower($sAsset, $sForceType)
@@ -267,8 +277,10 @@ class Asset
 
     /**
      * Loads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadNailsPackage($sAsset, $sForceType)
@@ -293,8 +305,10 @@ class Asset
 
     /**
      * Loads a Bower asset from the app's bower_components directory
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadAppBower($sAsset, $sForceType)
@@ -319,8 +333,10 @@ class Asset
 
     /**
      * Loads an App package asset (as a relative url from 'packages/')
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadAppPackage($sAsset, $sForceType)
@@ -345,8 +361,10 @@ class Asset
 
     /**
      * Loads an asset from the app's asset directory
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadApp($sAsset, $sForceType)
@@ -371,9 +389,11 @@ class Asset
 
     /**
      * Loads an asset from a module's asset directory
+     *
      * @param  string $sAsset     The asset to load
      * @param  mixed  $mModule    The module to load from
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function loadModule($sAsset, $sForceType, $mModule)
@@ -417,9 +437,11 @@ class Asset
 
     /**
      * Unloads an asset
+     *
      * @param  mixed  $mAssets        The asset to unload, can be an array or a string
      * @param  string $sAssetLocation The asset's location
      * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
+     *
      * @return object
      */
     public function unload($mAssets, $sAssetLocation = 'APP', $sForceType = null)
@@ -501,8 +523,10 @@ class Asset
 
     /**
      * Unloads an asset supplied as a URL
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadUrl($sAsset, $sForceType)
@@ -527,8 +551,10 @@ class Asset
 
     /**
      * Unloads an asset supplied as an absolute URL
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadAbsolute($sAsset, $sForceType)
@@ -553,8 +579,10 @@ class Asset
 
     /**
      * Unloads an asset from the Nails asset module
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadNails($sAsset, $sForceType)
@@ -579,8 +607,10 @@ class Asset
 
     /**
      * Loads a Bower asset from the Nails asset module's bower_components directory
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadNailsBower($sAsset, $sForceType)
@@ -605,8 +635,10 @@ class Asset
 
     /**
      * Unloads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadNailsPackage($sAsset, $sForceType)
@@ -631,8 +663,10 @@ class Asset
 
     /**
      * Unloads a Bower asset from the app's bower_components directory
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadAppBower($sAsset, $sForceType)
@@ -657,8 +691,10 @@ class Asset
 
     /**
      * Unloads an App package asset (as a relative url from 'packages/')
+     *
      * @param  string $sAsset     The asset to load
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadAppPackage($sAsset, $sForceType)
@@ -683,8 +719,10 @@ class Asset
 
     /**
      * Unloads an asset from the app's asset directory
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadApp($sAsset, $sForceType)
@@ -709,8 +747,10 @@ class Asset
 
     /**
      * Unloads an asset from the app's asset directory
+     *
      * @param  string $sAsset     The asset to unload
      * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     *
      * @return void
      */
     protected function unloadModule($sAsset, $sForceType, $sModule)
@@ -735,9 +775,11 @@ class Asset
 
     /**
      * Loads an inline asset
+     *
      * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
      * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
      * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
+     *
      * @return object
      */
     public function inline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
@@ -781,9 +823,11 @@ class Asset
 
     /**
      * Unloads an inline asset
+     *
      * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
      * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
      * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
+     *
      * @return void
      */
     public function unloadInline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
@@ -827,7 +871,9 @@ class Asset
 
     /**
      * Loads a set of assets
+     *
      * @param  string $sLibrary The library to load
+     *
      * @return object
      */
     public function library($sLibrary)
@@ -837,10 +883,10 @@ class Asset
             case 'CKEDITOR':
 
                 $this->load(
-                    array(
+                    [
                         'ckeditor/ckeditor.js',
-                        'ckeditor/adapters/jquery.js'
-                    ),
+                        'ckeditor/adapters/jquery.js',
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -848,12 +894,12 @@ class Asset
             case 'JQUERYUI':
 
                 $this->load(
-                    array(
+                    [
                         'jquery-ui/jquery-ui.min.js',
                         'jquery-ui/themes/smoothness/jquery-ui.min.css',
                         'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js',
-                        'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css'
-                    ),
+                        'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css',
+                    ],
                     'NAILS-BOWER'
                 );
 
@@ -867,17 +913,17 @@ class Asset
 
                 $this->library('JQUERYUI');
                 $this->load(
-                    array(
+                    [
                         'mustache.js/mustache.js',
-                        'jquery-serialize-object/dist/jquery.serialize-object.min.js'
-                    ),
+                        'jquery-serialize-object/dist/jquery.serialize-object.min.js',
+                    ],
                     'NAILS-BOWER'
                 );
                 $this->load(
-                    array(
+                    [
                         'admin.widgeteditor.css',
-                        'admin.widgeteditor.min.js'
-                    ),
+                        'admin.widgeteditor.min.js',
+                    ],
                     'nailsapp/module-cms'
                 );
                 break;
@@ -885,10 +931,10 @@ class Asset
             case 'UPLOADIFY':
 
                 $this->load(
-                    array(
+                    [
                         'uploadify/uploadify.css',
-                        'uploadify/jquery.uploadify.min.js'
-                    ),
+                        'uploadify/jquery.uploadify.min.js',
+                    ],
                     'NAILS-PACKAGE'
                 );
                 break;
@@ -896,10 +942,10 @@ class Asset
             case 'CHOSEN':
 
                 $this->load(
-                    array(
+                    [
                         'chosen/chosen.min.css',
-                        'chosen/chosen.jquery.min.js'
-                    ),
+                        'chosen/chosen.jquery.min.js',
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -907,10 +953,10 @@ class Asset
             case 'SELECT2':
 
                 $this->load(
-                    array(
+                    [
                         'select2/select2.css',
-                        'select2/select2.min.js'
-                    ),
+                        'select2/select2.min.js',
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -918,9 +964,9 @@ class Asset
             case 'ZEROCLIPBOARD':
 
                 $this->load(
-                    array(
+                    [
                         'zeroclipboard/dist/ZeroClipboard.min.js',
-                    ),
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -928,9 +974,9 @@ class Asset
             case 'KNOCKOUT':
 
                 $this->load(
-                    array(
+                    [
                         'knockout/dist/knockout.js',
-                    ),
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -938,9 +984,9 @@ class Asset
             case 'MUSTACHE':
 
                 $this->load(
-                    array(
+                    [
                         'mustache.js/mustache.js',
-                    ),
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -948,9 +994,9 @@ class Asset
             case 'MOMENT':
 
                 $this->load(
-                    array(
+                    [
                         'moment/moment.js',
-                    ),
+                    ],
                     'NAILS-BOWER'
                 );
                 break;
@@ -967,11 +1013,11 @@ class Asset
      */
     public function clear()
     {
-        $this->aCss            = array();
-        $this->aCssInline      = array();
-        $this->aJs             = array();
-        $this->aJsInlineHeader = array();
-        $this->aJsInlineFooter = array();
+        $this->aCss            = [];
+        $this->aCssInline      = [];
+        $this->aJs             = [];
+        $this->aJsInlineHeader = [];
+        $this->aJsInlineFooter = [];
         return $this;
     }
 
@@ -997,13 +1043,15 @@ class Asset
 
     /**
      * Output the assets for HTML
+     *
      * @param  string  $sType   The type of asset to output
      * @param  boolean $bOutput Whether to output to the browser or to return as a string
+     *
      * @return string
      */
     public function output($sType = 'ALL', $bOutput = true)
     {
-        $aOut  = array();
+        $aOut  = [];
         $sType = strtoupper($sType);
 
         //  Linked Stylesheets
@@ -1082,6 +1130,7 @@ class Asset
 
     /**
      * Appends the cacheBuster string to the asset name, accounts for existing query strings
+     *
      * @param string $sAsset The asset's url to append
      */
     protected function addCacheBuster($sAsset)
@@ -1109,8 +1158,10 @@ class Asset
 
     /**
      * Determines the type of asset being loaded
+     *
      * @param  string $sAsset     The asset being loaded
      * @param  string $sForceType Forces a particular type (accepts values CSS, JS, CSS-INLINE or JS-INLINE)
+     *
      * @return string
      */
     protected function determineType($sAsset, $sForceType = null)

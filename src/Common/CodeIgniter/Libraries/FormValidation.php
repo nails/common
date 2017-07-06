@@ -10,9 +10,12 @@
  * @link
  */
 
-use Nails\Factory;
+namespace Nails\Common\CodeIgniter\Libraries;
 
-class CORE_NAILS_Form_validation extends CI_Form_validation
+use Nails\Factory;
+use CI_Form_validation;
+
+class FormValidation extends CI_Form_validation
 {
     /**
      * Quick mod of run() to allow for HMVC.
@@ -39,6 +42,19 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
     public function get_error_array()
     {
         return $this->_error_array;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * This rule has been deprecated from the FormValidation class in CI 3.*;
+     * left here for backwards comparability
+     * @return bool
+     */
+    public function xss_clean()
+    {
+        trigger_error('Use of xss_clean as a Form Validation filter is deprecated and no longer affects the field');
+        return true;
     }
 
     // --------------------------------------------------------------------------
@@ -108,9 +124,9 @@ class CORE_NAILS_Form_validation extends CI_Form_validation
      */
     public function item_count(array $aArray, $sParam)
     {
-        $aParams         = preg_replace('/[^0-9]/', '', explode(',', $sParam));
-        $mFloor          = getFromArray(0, $aParams, 0);
-        $mCeiling        = getFromArray(1, $aParams, INF);
+        $aParams  = preg_replace('/[^0-9]/', '', explode(',', $sParam));
+        $mFloor   = getFromArray(0, $aParams, 0);
+        $mCeiling = getFromArray(1, $aParams, INF);
 
         if (substr($sParam, 0, 1) === '(' && substr($sParam, -1, 1) === ')') {
             $mFloor++;

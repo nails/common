@@ -35,7 +35,6 @@ class Migration0 extends Base
                 KEY `grouping_2` (`grouping`,`key`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
-
         $this->query("
             CREATE TABLE `{{NAILS_DB_PREFIX}}app_setting` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -46,16 +45,6 @@ class Migration0 extends Base
                 PRIMARY KEY (`id`),
                 KEY `grouping` (`grouping`),
                 KEY `grouping_2` (`grouping`,`key`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-
-        $this->query("
-            CREATE TABLE IF NOT EXISTS `{{NAILS_DB_PREFIX}}session` (
-                    `id` varchar(128) NOT NULL,
-                    `ip_address` varchar(45) NOT NULL,
-                    `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
-                    `data` blob NOT NULL,
-                    KEY `{{NAILS_DB_PREFIX}}session_timestamp` (`timestamp`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
     }

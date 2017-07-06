@@ -10,41 +10,6 @@
  * @link
  */
 
-if (!function_exists('site_url')) {
-
-    /**
-     * Create a local URL based on your basepath. Segments can be passed via the
-     * first parameter either as a string or an array.
-     * @param  mixed  $uri           URI segments, either as a string or an array
-     * @param  boolean $force_secure Whether to force the url to be secure or not
-     * @return string
-     */
-    function site_url($uri = '', $force_secure = false)
-    {
-        $CI =& get_instance();
-        return $CI->config->site_url($uri, $force_secure);
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('secure_site_url')) {
-
-    /**
-     * Create a secure local URL based on your basepath. Segments can be passed via the
-     * first parameter either as a string or an array.
-     * @param  mixed  $uri           URI segments, either as a string or an array
-     * @return string
-     */
-    function secure_site_url($uri = '')
-    {
-        $CI =& get_instance();
-        return $CI->config->site_url($uri, true);
-    }
-}
-
-// --------------------------------------------------------------------------
-
 if (!function_exists('redirect')) {
 
     /**

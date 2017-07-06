@@ -38,8 +38,9 @@ class Seed extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @throws \Exception
      * @return int
      */
@@ -150,7 +151,7 @@ class Seed extends Base
             $oOutput->writeln('Executing seeds...');
             $oOutput->writeln('');
 
-            $oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+            $oDb = Factory::service('PDODatabase');
 
             foreach ($aSeeders as $oSeeder) {
                 //  Execute seed

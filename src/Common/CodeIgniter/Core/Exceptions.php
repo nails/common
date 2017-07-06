@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 use CI_Exceptions;
 use Nails\Factory;

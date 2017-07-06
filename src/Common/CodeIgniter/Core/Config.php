@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 use MX_Config;
 
@@ -24,16 +24,22 @@ class Config extends MX_Config
      *
      * @param string $sUrl
      * @param bool   $bForceSecure
+     *
      * @return mixed|string
      */
     public function site_url($sUrl = '', $bForceSecure = false)
     {
+        //  If an explicit URL is passed in, then leave it be
+        if (preg_match('/^(http|https|ftp|mailto)\:/', $sUrl)) {
+            return $sUrl;
+        }
+
         $sUrl = parent::site_url($sUrl);
 
         //  If the URL begins with a slash then attempt to guess the host using $_SERVER
         if (preg_match('/^\//', $sUrl) && !empty($_SERVER['HTTP_HOST'])) {
             $sProtocol = !empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-            $sUrl = $sProtocol . '://' . $_SERVER['HTTP_HOST'] . $sUrl;
+            $sUrl      = $sProtocol . '://' . $_SERVER['HTTP_HOST'] . $sUrl;
         }
 
         if ($bForceSecure || isPageSecure()) {
@@ -50,7 +56,9 @@ class Config extends MX_Config
      * Returns secure_base_url [. uri_string]
      *
      * @access public
+     *
      * @param string $uri
+     *
      * @return string
      */
     function secure_base_url($uri = '')

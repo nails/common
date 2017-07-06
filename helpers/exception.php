@@ -17,11 +17,11 @@ if (!function_exists('show_401')) {
     /**
      * Renders the 401 unauthorised page
      *
-     * @param  string $message A message to show users when redirected
+     * @param  string $sMessage A message to show users when redirected
      *
      * @return void
      */
-    function show_401($message = '<strong>Sorry,</strong> you need to be logged in to see that page.')
+    function show_401($sMessage = '')
     {
         /**
          * Logged in users can't be redirected to log in, they simply get
@@ -30,39 +30,50 @@ if (!function_exists('show_401')) {
 
         if (isLoggedIn()) {
 
-            $title   = 'Sorry, you are not authorised to view this page';
-            $message = 'The page you are trying to view is restricted. Sadly you don\'t have enough ';
-            $message .= 'permissions to see it\'s content.';
+            $sSubject = 'Sorry, you are not authorised to view this page';
+            $sMessage = 'The page you are trying to view is restricted. Sadly you don\'t have enough ';
+            $sMessage .= 'permissions to see its content.';
 
             if (wasAdmin()) {
 
-                $adminRecoveryData = getAdminRecoveryData();
+                $oAdminRecoveryData = getAdminRecoveryData();
+                $sUrl               = $oAdminRecoveryData->loginUrl;
+                $sName              = $oAdminRecoveryData->name;
 
-                $message .= '<br /><br />';
-                $message .= '<small>';
-                $message .= 'However, it looks like you\'re logged in as someone else.';
-                $message .= '<br />' . anchor($adminRecoveryData->loginUrl, 'Log back in as ' . $adminRecoveryData->name) . ' and try again.';
-                $message .= '</small>';
+                $sMessage .= '<br /><br />';
+                $sMessage .= '<small>';
+                $sMessage .= 'However, it looks like you\'re logged in as someone else. <br>';
+                $sMessage .= anchor($sUrl, 'Log back in as ' . $sName) . ' and try again.';
+                $sMessage .= '</small>';
             }
 
-            show_error($message, 401, $title, false);
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->renderErrorView(
+                '401',
+                [
+                    'sSubject' => $sSubject,
+                    'sMessage' => $sMessage,
+                ]
+            );
+            exit();
         }
 
+        $sMessage = $sMessage ?: 'Sorry, you need to be logged in to see that page.';
         $oSession = Factory::service('Session', 'nailsapp/module-auth');
         $oInput   = Factory::service('Input');
-        $oSession->set_flashdata('message', $message);
+        $oSession->set_flashdata('message', $sMessage);
 
         if ($oInput->server('REQUEST_URI')) {
-            $return = $oInput->server('REQUEST_URI');
+            $sReturn = $oInput->server('REQUEST_URI');
         } elseif (uri_string()) {
-            $return = uri_string();
+            $sReturn = uri_string();
         } else {
-            $return = '';
+            $sReturn = '';
         }
 
-        $return = $return ? '?return_to=' . urlencode($return) : '';
+        $sReturn = $sReturn ? '?return_to=' . urlencode($sReturn) : '';
 
-        redirect('auth/login' . $return);
+        redirect('auth/login' . $sReturn);
     }
 }
 
@@ -73,13 +84,13 @@ if (!function_exists('unauthorised')) {
     /**
      * Alias of show_401
      *
-     * @param  string $message A message to show users when redirected
+     * @param  string $sMessage A message to show users when redirected
      *
      * @return void
      */
-    function unauthorised($message = '<strong>Sorry,</strong> you need to be logged in to see that page.')
+    function unauthorised($sMessage = '')
     {
-        show_401($message);
+        show_401($sMessage);
     }
 }
 

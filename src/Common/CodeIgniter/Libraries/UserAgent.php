@@ -10,11 +10,17 @@
  * @link
  */
 
-class CORE_NAILS_User_agent extends CI_User_agent
+namespace Nails\Common\CodeIgniter\Libraries;
+
+use CI_User_agent;
+
+class UserAgent extends CI_User_agent
 {
     /**
      * Compiles the user agent from a supplied string
+     *
      * @param  string $str The string to compile
+     *
      * @return stdClass
      */
     public function from_string($str = '')
@@ -35,15 +41,17 @@ class CORE_NAILS_User_agent extends CI_User_agent
 
     /**
      * Gets the browser (modified copy of parent method: _set_browser)
+     *
      * @param  string $agent The string to compile
+     *
      * @return array
      */
     private function _get_browser($agent)
     {
-        $out = array('version' => 'Unknown Version', 'browser' => 'Unknown Browser');
+        $out = ['version' => 'Unknown Version', 'browser' => 'Unknown Browser'];
         if (is_array($this->browsers) && count($this->browsers) > 0) {
             foreach ($this->browsers as $key => $val) {
-                if (preg_match("|".preg_quote($key).".*?([0-9\.]+)|i", $agent, $match)) {
+                if (preg_match("|" . preg_quote($key) . ".*?([0-9\.]+)|i", $agent, $match)) {
                     $out['version'] = $match[1];
                     $out['browser'] = $val;
                     return $out;
@@ -57,14 +65,16 @@ class CORE_NAILS_User_agent extends CI_User_agent
 
     /**
      * Gets the platform (modified copy of parent method: _set_platform)
+     *
      * @param   string $agent The string to compile
+     *
      * @return  string
      */
     private function _get_platform($agent)
     {
         if (is_array($this->platforms) && count($this->platforms) > 0) {
             foreach ($this->platforms as $key => $val) {
-                if (preg_match("|".preg_quote($key)."|i", $agent)) {
+                if (preg_match("|" . preg_quote($key) . "|i", $agent)) {
                     return $val;
                 }
             }

@@ -9,7 +9,7 @@
  * @link        https://bitbucket.org/wiredesignz/codeigniter-modular-extensions-hmvc
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 use MX_Router;
 

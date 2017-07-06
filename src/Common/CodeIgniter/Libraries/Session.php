@@ -10,12 +10,18 @@
  * @link
  */
 
-class CORE_NAILS_Session extends CI_Session
+namespace Nails\Common\CodeIgniter\Libraries;
+
+use CI_Session;
+
+class Session extends CI_Session
 {
     /**
      * Keeps existing flashdata available to next request.
      * http://codeigniter.com/forums/viewthread/104392/#917834
-     * @param  $key The key to keep, null will retain all flashdata
+     *
+     * @param  string $key The key to keep, null will retain all flashdata
+     *
      * @return void
      **/
     public function keep_flashdata($key = null)
@@ -33,7 +39,6 @@ class CORE_NAILS_Session extends CI_Session
                 $old_flashdata_key = $this->flashdata_key . ':old:';
 
                 if (strpos($k, $old_flashdata_key) !== false) {
-
                     $new_flashdata_key = $this->flashdata_key . ':new:';
                     $new_flashdata_key = str_replace($old_flashdata_key, $new_flashdata_key, $k);
                     $this->set_userdata($new_flashdata_key, $v);
@@ -43,21 +48,19 @@ class CORE_NAILS_Session extends CI_Session
             return true;
 
         } elseif (is_array($key)) {
-
             foreach ($key as $k) {
-
                 $this->keep_flashdata($k);
             }
         }
 
         // --------------------------------------------------------------------------
 
-        $old_flashdata_key = $this->flashdata_key.':old:' . $key;
-        $value = $this->userdata($old_flashdata_key);
+        $old_flashdata_key = $this->flashdata_key . ':old:' . $key;
+        $value             = $this->userdata($old_flashdata_key);
 
         // --------------------------------------------------------------------------
 
-        $new_flashdata_key = $this->flashdata_key.':new:' . $key;
+        $new_flashdata_key = $this->flashdata_key . ':new:' . $key;
         $this->set_userdata($new_flashdata_key, $value);
     }
 }

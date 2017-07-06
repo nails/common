@@ -63,8 +63,9 @@ class Model extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -82,7 +83,7 @@ class Model extends BaseMaker
         //  Test database connection
         if (!$bSkipDb) {
             try {
-                Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                Factory::service('PDODatabase');
             } catch (ConnectionException $e) {
                 return $this->abort(
                     self::EXIT_CODE_FAILURE,
@@ -151,7 +152,6 @@ class Model extends BaseMaker
                 ]
             );
         }
-
 
         // --------------------------------------------------------------------------
 
@@ -224,7 +224,7 @@ class Model extends BaseMaker
 
                     //  Test to see if the database table exists already
                     if (!$bSkipDb) {
-                        $oDb     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                        $oDb     = Factory::service('PDODatabase');
                         $oResult = $oDb->query('SHOW TABLES LIKE "' . $sTableNameWithPrefix . '"');
                         if ($oResult->rowCount() > 0) {
                             throw new \Exception(
@@ -238,7 +238,7 @@ class Model extends BaseMaker
 
             } else {
 
-                $oDb        = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                $oDb        = Factory::service('PDODatabase');
                 $sAppPrefix = defined('APP_DB_PREFIX') ? APP_DB_PREFIX : '';
                 $oTables    = $oDb->query('SHOW TABLES LIKE "' . $sAppPrefix . '%";');
                 $aTables    = $oTables->fetchAll(\PDO::FETCH_NUM);
@@ -310,13 +310,13 @@ class Model extends BaseMaker
                     if (!$bSkipDb) {
                         $oOutput->write('Adding database table...');
                         $oModel->nails_db_prefix = NAILS_DB_PREFIX;
-                        $oDb                     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                        $oDb                     = Factory::service('PDODatabase');
                         $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
                         $oOutput->writeln('<info>done!</info>');
                     }
 
                     //  Generate the service definition
-                    $aDefinition = [
+                    $aDefinition         = [
                         str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
                         str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
                         str_repeat(' ', $this->iServicesIndent) . '},',
@@ -390,7 +390,9 @@ class Model extends BaseMaker
 
     /**
      * Prepare the model details and do some preliminary checks
+     *
      * @param string $sModelName The name of the model
+     *
      * @return \stdClass
      * @throws \Exception
      */
@@ -440,7 +442,9 @@ class Model extends BaseMaker
 
     /**
      * Determines whether a model exists already
+     *
      * @param \stdClass $oModel The model definition
+     *
      * @return bool
      */
     private function modelExists($oModel)

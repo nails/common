@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 /* load the MX Loader class */
 require NAILS_COMMON_PATH . 'MX/Loader.php';

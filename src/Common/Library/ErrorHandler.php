@@ -18,7 +18,10 @@ use Nails\Factory;
 
 class ErrorHandler
 {
-    public static $levels = [
+    /**
+     * Human versions of the various PHP error levels
+     */
+    const LEVELS = [
         E_ERROR           => 'Error',
         E_WARNING         => 'Warning',
         E_PARSE           => 'Parsing Error',
@@ -33,6 +36,12 @@ class ErrorHandler
         E_STRICT          => 'Runtime Notice',
     ];
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * The fully qualified driver class name
+     * @var string
+     */
     protected $sDriverClass;
 
     // --------------------------------------------------------------------------
@@ -48,23 +57,25 @@ class ErrorHandler
          * error reporting, that is CI Error reporting
          */
 
-        $sErrorHandler      = defined('DEPLOY_ERROR_REPORTING_HANDLER') ? DEPLOY_ERROR_REPORTING_HANDLER : 'Nails';
-        $this->sDriverClass = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
+        $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ? DEPLOY_ERROR_REPORTING_HANDLER : 'Nails';
+        $sDriverClass  = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
 
-        if (!class_exists($this->sDriverClass)) {
-            $sLoadError         = '"' . $this->sDriverClass . '" is not a valid ErrorHandler';
-            $this->sDriverClass = '\Nails\Common\Driver\ErrorHandler\Nails';
+        if (!class_exists($sDriverClass)) {
+            $sLoadError   = '"' . $sDriverClass . '" is not a valid ErrorHandler';
+            $sDriverClass = '\Nails\Common\Driver\ErrorHandler\Nails';
         }
 
-        $this->sDriverClass::init();
+        $sDriverClass::init();
 
-        set_error_handler($this->sDriverClass . '::error');
-        set_exception_handler($this->sDriverClass . '::exception');
-        register_shutdown_function($this->sDriverClass . '::fatal');
+        set_error_handler($sDriverClass . '::error');
+        set_exception_handler($sDriverClass . '::exception');
+        register_shutdown_function($sDriverClass . '::fatal');
 
         if (!empty($sLoadError)) {
             throw new ErrorHandlerException($sLoadError, 1);
         }
+
+        $this->sDriverClass = $sDriverClass;
     }
 
     // --------------------------------------------------------------------------
@@ -79,7 +90,9 @@ class ErrorHandler
      */
     public function triggerError($iErrorNumber = 0, $sErrorString = '', $sErrorFile = '', $iErrorLine = 0)
     {
-        $this->sDriverClass::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
+        //  PHP5.6 doesn't like $this->sDriverClass::error()
+        $sDriverClass = $this->sDriverClass;
+        $sDriverClass::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
     }
 
     // --------------------------------------------------------------------------
@@ -122,7 +135,14 @@ class ErrorHandler
         }
 
         set_status_header(500);
-        $this->renderErrorView('exception', $sSubject, $sMessage, $oDetails);
+        $this->renderErrorView(
+            'exception',
+            [
+                'sSubject' => $sSubject,
+                'sMessage' => $sMessage,
+                'oDetails' => $oDetails,
+            ]
+        );
         exit(500);
     }
 
@@ -288,17 +308,21 @@ class ErrorHandler
     /**
      * Renders the error view appropriate for the environment
      *
-     * @param string    $sView    the view to load
-     * @param string    $sSubject The error subject
-     * @param string    $sMessage The error message
-     * @param \stdClass $oDetails Any additional details
+     * @param string  $sView        The view to load
+     * @param array   $aData        Data to make available to the view
+     * @param boolean $bFlushBuffer Whether to flush the output buffer or not
      */
-    protected static function renderErrorView($sView, $sSubject = '', $sMessage = '', $oDetails = null)
-    {
+    public static function renderErrorView(
+        $sView,
+        $aData = [],
+        $bFlushBuffer = true
+    ) {
         //  Flush the output buffer
-        $sObContents = ob_get_contents();
-        if (!empty($sObContents)) {
-            ob_clean();
+        if ($bFlushBuffer) {
+            $sObContents = ob_get_contents();
+            if (!empty($sObContents)) {
+                ob_clean();
+            }
         }
 
         $sType      = is_cli() ? 'cli' : 'html';
@@ -311,6 +335,7 @@ class ErrorHandler
         ];
         $aNailsPath = [
             rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+            'views',
             'errors',
             $sType,
             $sView . '.php',
@@ -318,6 +343,9 @@ class ErrorHandler
 
         $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
         $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
+
+
+        extract($aData);
 
         if (file_exists($sAppPath)) {
             include $sAppPath;

@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 class Input extends \Nails\Common\Library\Input
 {

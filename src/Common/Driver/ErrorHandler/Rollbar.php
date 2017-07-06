@@ -13,7 +13,7 @@
 namespace Nails\Common\Driver\ErrorHandler;
 
 use Nails\Common\Interfaces\ErrorHandlerDriver;
-use Nails\Common\Library\ErrorHandler;
+use Nails\Factory;
 use Nails\Environment;
 use Rollbar\Payload\Level;
 

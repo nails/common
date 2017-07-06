@@ -11,7 +11,7 @@
  * @link
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 use Nails\Common\Model\Base;
 

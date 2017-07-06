@@ -10,7 +10,7 @@
  * @link        https://github.com/bcit-ci/CodeIgniter/wiki/Dynamic-Hooking
  */
 
-namespace Nails\Common\CodeIgniter;
+namespace Nails\Common\CodeIgniter\Core;
 
 use CI_Hooks;
 

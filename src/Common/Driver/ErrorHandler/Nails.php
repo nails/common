@@ -45,47 +45,34 @@ class Nails implements ErrorHandlerDriver
             return;
         }
 
+        $aData = [
+            'iNumber'   => $iErrorNumber,
+            'sMessage'  => $sErrorString,
+            'sFile'     => $sErrorFile,
+            'iLine'     => $iErrorLine,
+            'sSeverity' => 'Unknown',
+        ];
+
         //  Should we show this error?
         if ((bool) ini_get('display_errors') && error_reporting() !== 0) {
 
             $oErrorHandler = Factory::service('ErrorHandler');
 
-            if (!empty($oErrorHandler::$levels[$iErrorNumber])) {
-                $sErrorSeverity = $oErrorHandler::$levels[$iErrorNumber];
-            } else {
-                $sErrorSeverity = 'Unknown';
+            if (!empty($oErrorHandler::LEVELS[$iErrorNumber])) {
+                $aData['sSeverity'] = $oErrorHandler::LEVELS[$iErrorNumber];
             }
 
-            $aAppPath = [
-                rtrim(APPPATH, DIRECTORY_SEPARATOR),
-                'views',
-                'errors',
-                is_cli() ? 'cli' : 'html',
-                'php.php',
-            ];
-
-            $aNailsPath = [
-                rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
-                'errors',
-                is_cli() ? 'cli' : 'html',
-                'php.php',
-            ];
-
-            $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
-            $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
-
-            if (file_exists($sAppPath)) {
-                include $sAppPath;
-            } elseif (file_exists($sNailsPath)) {
-                include $sNailsPath;
-            } else {
-                _NAILS_ERROR($sErrorString);
-            }
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->renderErrorView('php', $aData, false);
         }
 
         //  Show we log the item?
         if (function_exists('config_item') && config_item('log_threshold') != 0) {
-            log_message('error', $sErrorString . ' (' . $sErrorFile . ':' . $iErrorLine . ')', true);
+            log_message(
+                'error',
+                $aData['sMessage'] . ' (' . $aData['sFile'] . ':' . $aData['iLine'] . ')',
+                true
+            );
         }
     }
 

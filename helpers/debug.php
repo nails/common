@@ -16,13 +16,27 @@ use Nails\Environment;
 if (!function_exists('dumpanddie')) {
 
     /**
-     * Alias to dump()
+     * Alias to dump(); followed by an exit()
      * @return void
      */
     function dumpanddie()
     {
         call_user_func_array('dump', func_get_args());
         die();
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('dd')) {
+
+    /**
+     * Alias to dumpanddie()
+     * @return void
+     */
+    function dd()
+    {
+        call_user_func_array('dumpanddie', func_get_args());
     }
 }
 
