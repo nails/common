@@ -26,27 +26,9 @@ class Startup
      */
     public function init()
     {
-        $this->setAutoLoading();
         $this->defineConstants();
         $this->setModuleLocations();
         $this->setupFactory();
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Sets up auto loading
-     */
-    protected function setAutoLoading()
-    {
-        //  Include the composer autoloader
-        if (!file_exists(FCPATH . 'vendor/autoload.php')) {
-
-            $_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies';
-            include NAILS_COMMON_PATH . 'errors/startup_error.php';
-        }
-
-        require_once FCPATH . 'vendor/autoload.php';
     }
 
     // --------------------------------------------------------------------------

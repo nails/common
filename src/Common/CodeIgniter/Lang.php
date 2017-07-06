@@ -11,7 +11,14 @@
  * @link
  */
 
-class CORE_NAILS_Lang extends MX_Lang
+namespace Nails\Common\CodeIgniter;
+
+use CI;
+use Modules;
+use CI_Lang;
+use MX_Lang;
+
+class Lang extends MX_Lang
 {
     /**
      * Overriding the default line() method so that parameters can be specified

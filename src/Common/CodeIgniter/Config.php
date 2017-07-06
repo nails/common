@@ -10,10 +10,14 @@
  * @link
  */
 
+namespace Nails\Common\CodeIgniter;
+
+use MX_Config;
+
 /* load the MX Config class */
 require NAILS_COMMON_PATH . 'MX/Config.php';
 
-class CORE_NAILS_Config extends MX_Config
+class Config extends MX_Config
 {
     /**
      * Returns the site's URL, secured if necessary

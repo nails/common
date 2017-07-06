@@ -89,31 +89,15 @@ if (!function_exists('showFatalError')) {
     /**
      * Renders the fatal error screen and alerts developers
      *
-     * @param  string $subject The subject of the developer alert
-     * @param  string $message The body of the developer alert
+     * @param  string $sSubject The subject of the developer alert
+     * @param  string $sMessage The body of the developer alert
      *
      * @return void
      */
-    function showFatalError($subject = '', $message = '')
+    function showFatalError($sSubject = '', $sMessage = '')
     {
-        if (is_callable('\Nails\Common\Library\ErrorHandler::showFatalErrorScreen')) {
-
-            if (is_callable('\Nails\Common\Library\ErrorHandler::sendDeveloperMail') && (!empty($subject) || !empty($message))) {
-                \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
-            }
-
-            \Nails\Common\Library\ErrorHandler::showFatalErrorScreen($subject, $message);
-
-        } elseif (function_exists('_NAILS_ERROR')) {
-
-            _NAILS_ERROR($message, $subject);
-
-        } else {
-
-            echo '<h1>ERROR: ' . $subject . '</h1>';
-            echo '<h2>' . $message . '</h2>';
-            exit(0);
-        }
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
     }
 }
 
@@ -124,17 +108,14 @@ if (!function_exists('sendDeveloperMail')) {
     /**
      * Quickly send a high priority email via mail() to the APP_DEVELOPER
      *
-     * @param  string $subject The email's subject
-     * @param  string $message The email's body
+     * @param  string $sSubject The email's subject
+     * @param  string $sMessage The email's body
      *
      * @return boolean
      */
-    function sendDeveloperMail($subject, $message)
+    function sendDeveloperMail($sSubject, $sMessage)
     {
-        if (is_callable('\Nails\Common\Library\ErrorHandler::sendDeveloperMail')) {
-            return \Nails\Common\Library\ErrorHandler::sendDeveloperMail($subject, $message);
-        } else {
-            return false;
-        }
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
     }
 }

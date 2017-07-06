@@ -10,8 +10,8 @@
  * @link
  */
 
-use Nails\Common\Library\Input;
+namespace Nails\Common\CodeIgniter;
 
-class CORE_NAILS_Input extends Input
+class Input extends \Nails\Common\Library\Input
 {
 }

@@ -9,12 +9,15 @@
  * @link        https://bitbucket.org/wiredesignz/codeigniter-modular-extensions-hmvc
  */
 
+namespace Nails\Common\CodeIgniter;
+
+use MX_Router;
+
 /* load the MX Router class */
 require NAILS_COMMON_PATH . 'MX/Router.php';
 
-class CORE_NAILS_Router extends MX_Router
+class Router extends MX_Router
 {
-
     public function current_module()
     {
         return $this->module;
@@ -30,12 +33,12 @@ class CORE_NAILS_Router extends MX_Router
      * log errors, hence the override.
      *
      * @param  array $segments The URI segments
+     *
      * @return array
      */
     public function _validate_request($segments)
     {
         if (count($segments) == 0) {
-
             return $segments;
         }
 

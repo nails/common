@@ -10,17 +10,22 @@
  * @link
  */
 
+namespace Nails\Common\CodeIgniter;
+
 /* load the MX Loader class */
 require NAILS_COMMON_PATH . 'MX/Loader.php';
 
-use Nails\Factory;
+use MX_Loader;
 use Nails\Common\Exception\NailsException;
+use Nails\Factory;
 
-class CORE_NAILS_Loader extends MX_Loader
+class Loader extends MX_Loader
 {
     /**
      * Determines whether a model is loaded or not
+     *
      * @param  string $model The model to check
+     *
      * @return boolean
      */
     public function isModelLoaded($model)
@@ -33,12 +38,14 @@ class CORE_NAILS_Loader extends MX_Loader
     /**
      * Loads a view. If an absolute path is provided then that view will be used,
      * otherwise the system will search the modules
+     *
      * @param  string  $view   The view to load
      * @param  array   $vars   An array of data to pass to the view
      * @param  boolean $return Whether or not to return then view, or output it
+     *
      * @return mixed
      */
-    public function view($view, $vars = array(), $return = false)
+    public function view($view, $vars = [], $return = false)
     {
 
         if (strpos($view, '/') === 0) {
@@ -46,7 +53,7 @@ class CORE_NAILS_Loader extends MX_Loader
             //  The supplied view is an absolute path, so use it.
 
             //  Add on EXT if it's not there (so pathinfo() works as expected)
-            if (substr($view, strlen(EXT)*-1) != EXT) {
+            if (substr($view, strlen(EXT) * -1) != EXT) {
 
                 $view .= EXT;
             }
@@ -57,14 +64,14 @@ class CORE_NAILS_Loader extends MX_Loader
             $view     = $pathInfo['filename'];
 
             //  Set the view path so the loader knows where to look
-            $this->_ci_view_paths = array($path => true) + $this->_ci_view_paths;
+            $this->_ci_view_paths = [$path => true] + $this->_ci_view_paths;
 
             //  Load the view
-            return $this->_ci_load(array(
+            return $this->_ci_load([
                 '_ci_view'   => $view,
                 '_ci_vars'   => $this->_ci_object_to_array($vars),
-                '_ci_return' => $return
-            ));
+                '_ci_return' => $return,
+            ]);
 
         } else {
 
@@ -75,7 +82,7 @@ class CORE_NAILS_Loader extends MX_Loader
 
             $absoluteView = APPPATH . 'views/' . $view;
 
-            if (substr($absoluteView, strlen(EXT)*-1) != EXT) {
+            if (substr($absoluteView, strlen(EXT) * -1) != EXT) {
 
                 $absoluteView .= EXT;
             }
@@ -97,7 +104,9 @@ class CORE_NAILS_Loader extends MX_Loader
 
     /**
      * Determines whether or not a view exists
+     *
      * @param  string $view The view to look for
+     *
      * @return boolean
      */
     public function viewExists($view)
@@ -113,10 +122,12 @@ class CORE_NAILS_Loader extends MX_Loader
      * correctly loaded. Slightly more complex as the helper() method for
      * ModuleExtensions also needs to be fired (i.e it's functionality needs to exist
      * in here too).
-     * @param  array  $helpers The helpers to load
+     *
+     * @param  array $helpers The helpers to load
+     *
      * @return void
      */
-    public function helper($helpers = array())
+    public function helper($helpers = [])
     {
         $aHelpers = (array) $helpers;
         foreach ($aHelpers as $sHelper) {
@@ -133,6 +144,7 @@ class CORE_NAILS_Loader extends MX_Loader
      * @param   string  the item that is being loaded
      * @param   mixed   any additional parameters
      * @param   string  an optional object name
+     *
      * @return  void
      */
     protected function _ci_load_class($class, $params = null, $objectName = null)
@@ -163,7 +175,7 @@ class CORE_NAILS_Loader extends MX_Loader
         $classPrefix = config_item('subclass_prefix');
 
         // We'll test for both lowercase and capitalized versions of the file name
-        foreach (array(ucfirst($class), strtolower($class)) as $class) {
+        foreach ([ucfirst($class), strtolower($class)] as $class) {
 
             $subClass   = APPPATH . 'libraries/' . $subdir . $classPrefix . $class . EXT;
             $nailsClass = NAILS_COMMON_PATH . 'libraries/' . $subdir . 'CORE_' . $classPrefix . $class . EXT;
@@ -258,7 +270,7 @@ class CORE_NAILS_Loader extends MX_Loader
                     }
 
                     $isDuplicate = true;
-                    log_message('debug', $class." class already loaded. Second attempt ignored.");
+                    log_message('debug', $class . " class already loaded. Second attempt ignored.");
                     return;
                 }
 
@@ -340,8 +352,9 @@ class CORE_NAILS_Loader extends MX_Loader
      *
      * Takes an object as input and converts the class variables to array key/vals
      *
-     * @param	object
-     * @return	array
+     * @param    object
+     *
+     * @return    array
      */
     protected function _ci_object_to_array($object)
     {

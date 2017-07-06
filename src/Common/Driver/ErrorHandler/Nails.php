@@ -13,7 +13,7 @@
 namespace Nails\Common\Driver\ErrorHandler;
 
 use Nails\Common\Interfaces\ErrorHandlerDriver;
-use Nails\Common\Library\ErrorHandler;
+use Nails\Factory;
 
 class Nails implements ErrorHandlerDriver
 {
@@ -48,23 +48,44 @@ class Nails implements ErrorHandlerDriver
         //  Should we show this error?
         if ((bool) ini_get('display_errors') && error_reporting() !== 0) {
 
-            if (!empty(ErrorHandler::$levels[$iErrorNumber])) {
-                $severity = ErrorHandler::$levels[$iErrorNumber];
+            $oErrorHandler = Factory::service('ErrorHandler');
+
+            if (!empty($oErrorHandler::$levels[$iErrorNumber])) {
+                $sErrorSeverity = $oErrorHandler::$levels[$iErrorNumber];
             } else {
-                $severity = 'Unknown';
+                $sErrorSeverity = 'Unknown';
             }
 
-            $message  = $sErrorString;
-            $filepath = $sErrorFile;
-            $line     = $iErrorLine;
+            $aAppPath = [
+                rtrim(APPPATH, DIRECTORY_SEPARATOR),
+                'views',
+                'errors',
+                is_cli() ? 'cli' : 'html',
+                'php.php',
+            ];
 
-            include APPPATH . 'views/errors/html/error_php.php';
+            $aNailsPath = [
+                rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+                'errors',
+                is_cli() ? 'cli' : 'html',
+                'php.php',
+            ];
+
+            $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
+            $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
+
+            if (file_exists($sAppPath)) {
+                include $sAppPath;
+            } elseif (file_exists($sNailsPath)) {
+                include $sNailsPath;
+            } else {
+                _NAILS_ERROR($sErrorString);
+            }
         }
 
         //  Show we log the item?
         if (function_exists('config_item') && config_item('log_threshold') != 0) {
-            $errMsg = $sErrorString . ' (' . $sErrorFile . ':' . $iErrorLine . ')';
-            log_message('error', $errMsg, true);
+            log_message('error', $sErrorString . ' (' . $sErrorFile . ':' . $iErrorLine . ')', true);
         }
     }
 
@@ -94,8 +115,9 @@ class Nails implements ErrorHandlerDriver
             log_message('error', $sMessage, true);
         }
 
-        ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-        ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+        $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------
@@ -121,8 +143,9 @@ class Nails implements ErrorHandlerDriver
             $sSubject = 'Fatal Error';
             $sMessage = $aError['message'] . ' in ' . $aError['file'] . ' on line ' . $aError['line'];
 
-            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage, $oDetails);
         }
     }
 }

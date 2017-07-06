@@ -25,13 +25,15 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function init()
     {
+        $oErrorHandler = Factory::service('ErrorHandler');
+
         if (!defined('DEPLOY_ROLLBAR_ACCESS_TOKEN')) {
 
             $sSubject = 'Rollbar is not configured correctly';
             $sMessage = 'Rollbar is enabled but DEPLOY_ROLLBAR_ACCESS_TOKEN is not defined.';
 
-            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
 
         if (!class_exists('\Rollbar\Rollbar')) {
@@ -40,8 +42,8 @@ class Rollbar implements ErrorHandlerDriver
             $sMessage = 'Rollbar is set as the error handler, but the Rollbar class ';
             $sMessage .= 'could not be found. Ensure that it is in composer.json.';
 
-            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
 
         $aConfig = [
@@ -123,7 +125,8 @@ class Rollbar implements ErrorHandlerDriver
             $sMessage = '';
         }
 
-        ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------
@@ -149,7 +152,8 @@ class Rollbar implements ErrorHandlerDriver
                 $sMessage = '';
             }
 
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
     }
 

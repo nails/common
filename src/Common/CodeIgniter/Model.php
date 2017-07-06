@@ -11,6 +11,10 @@
  * @link
  */
 
-class CORE_NAILS_Model extends \Nails\Common\Model\Base
+namespace Nails\Common\CodeIgniter;
+
+use Nails\Common\Model\Base;
+
+class Model extends Base
 {
 }
