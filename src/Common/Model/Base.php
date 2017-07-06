@@ -38,6 +38,7 @@ abstract class Base
     //  Column names
     protected $tableIdColumn;
     protected $tableSlugColumn;
+    protected $tableTokenColumn;
     protected $tableLabelColumn;
     protected $tableCreatedColumn;
     protected $tableCreatedByColumn;
@@ -49,6 +50,13 @@ abstract class Base
     //  Model options
     protected $tableAutoSetTimestamps;
     protected $tableAutoSetSlugs;
+    protected $tableAutoSetTokens;
+
+    /**
+     * Override the default token mask when automatically generating tokens for items
+     * @var string
+     */
+    protected $sTokenMask;
 
     //  Expandable fields
     protected $aExpandableFields;
@@ -76,26 +84,6 @@ abstract class Base
     protected $defaultSortColumn;
     protected $defaultSortOrder;
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * @todo   : this is copied directly from CodeIgniter - consider removing.
-     * __get
-     *
-     * Allows models to access CI's loaded classes using the same
-     * syntax as controllers.
-     *
-     * @param   string
-     *
-     * @access private
-     */
-    public function __get($sKey)
-    {
-        $oCi =& get_instance();
-
-        return $oCi->$sKey;
-    }
-
     /**
      * --------------------------------------------------------------------------
      * CONSTRUCTOR && DESTRUCTOR
@@ -114,6 +102,7 @@ abstract class Base
         $this->destructiveDelete      = true;
         $this->tableIdColumn          = 'id';
         $this->tableSlugColumn        = 'slug';
+        $this->tableTokenColumn       = 'token';
         $this->tableLabelColumn       = 'label';
         $this->tableCreatedColumn     = 'created';
         $this->tableCreatedByColumn   = 'created_by';
@@ -122,6 +111,7 @@ abstract class Base
         $this->tableDeletedColumn     = 'is_deleted';
         $this->tableAutoSetTimestamps = true;
         $this->tableAutoSetSlugs      = false;
+        $this->tableAutoSetTokens     = false;
         $this->perPage                = 50;
         $this->searchableFields       = [];
         $this->defaultSortColumn      = null;
@@ -163,6 +153,11 @@ abstract class Base
                 'id_column' => 'modified_by',
             ]);
         }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo (Pablo - 2017-06-08) - Remove this
+        self::backwardsCompatibility($this);
     }
 
     // --------------------------------------------------------------------------
@@ -270,6 +265,13 @@ abstract class Base
             }
 
             $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
+        }
+
+        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+            if (empty($this->tableTokenColumn)) {
+                throw new ModelException(get_called_class() . '::create() Token column variable not set', 1);
+            }
+            $aData[$this->tableTokenColumn] = $this->generateToken();
         }
 
         if (!empty($aData)) {
@@ -383,6 +385,11 @@ abstract class Base
                     $mIds
                 );
             }
+        }
+
+        //  Automatically set tokens are permanent and immutable
+        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+            unset($aData[$this->tableTokenColumn]);
         }
 
         if (!empty($aData)) {
@@ -570,6 +577,14 @@ abstract class Base
      */
     public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
+        // --------------------------------------------------------------------------
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName(true);
 
@@ -814,6 +829,9 @@ abstract class Base
      */
     public function getById($iId, $aData = [])
     {
+        if (!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
+        }
         if (empty($iId)) {
             return null;
         }
@@ -854,6 +872,10 @@ abstract class Base
      */
     public function getByIds($aIds, $aData = [])
     {
+        if (!$this->tableIdColumn) {
+            throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
+        }
+
         if (empty($aIds)) {
             return [];
         }
@@ -884,6 +906,10 @@ abstract class Base
      */
     public function getBySlug($sSlug, $aData = [])
     {
+        if (!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
+        }
+
         if (empty($sSlug)) {
             return null;
         }
@@ -924,6 +950,10 @@ abstract class Base
      */
     public function getBySlugs($aSlugs, $aData = [])
     {
+        if (!$this->tableSlugColumn) {
+            throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
+        }
+
         if (empty($aSlugs)) {
             return [];
         }
@@ -965,6 +995,78 @@ abstract class Base
 
             return $this->getBySlug($mIdSlug, $aData);
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Fetch an object by its token
+     *
+     * @param  string $sToken The token of the object to fetch
+     * @param  array  $aData  Any data to pass to getCountCommon()
+     *
+     * @return \stdClass|null
+     * @throws ModelException if object property tableTokenColumn is not set
+     */
+    public function getByToken($sToken, $aData = [])
+    {
+        if (!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
+        }
+
+        if (empty($sToken)) {
+            return null;
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $sToken];
+
+        // --------------------------------------------------------------------------
+
+        $result = $this->getAll(null, null, $aData, false);
+
+        // --------------------------------------------------------------------------
+
+        return empty($result) ? null : reset($result);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Fetch objects by an array of tokens
+     *
+     * @param  array $aTokens An array of tokens to fetch
+     * @param  array $aData   Any data to pass to getCountCommon()
+     *
+     * @return array
+     * @throws ModelException if object property tableTokenColumn is not set
+     */
+    public function getByTokens($aTokens, $aData = [])
+    {
+        if (!$this->tableTokenColumn) {
+            throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
+        }
+
+        if (empty($aTokens)) {
+            return [];
+        }
+
+        // --------------------------------------------------------------------------
+
+        if (!isset($aData['where_in'])) {
+            $aData['where_in'] = [];
+        }
+
+        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $aTokens];
+
+        // --------------------------------------------------------------------------
+
+        return $this->getAll(null, null, $aData, false);
     }
 
     // --------------------------------------------------------------------------
@@ -1462,11 +1564,9 @@ abstract class Base
         }
 
         if (is_null($sColumn)) {
-
             if (!$this->tableSlugColumn) {
                 throw new ModelException(get_called_class() . '::generateSlug() Column variable not set', 1);
             }
-
             $sColumn = $this->tableSlugColumn;
         }
 
@@ -1480,15 +1580,12 @@ abstract class Base
             $sSlug = url_title(str_replace('/', '-', $sLabel), 'dash', true);
 
             if ($iCounter) {
-
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
             } else {
-
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix;
             }
 
             if ($iIgnoreId) {
-
                 $sIdColumn = $sIdColumn ? $sIdColumn : $this->tableIdColumn;
                 $oDb->where($sIdColumn . ' !=', $iIgnoreId);
             }
@@ -1498,6 +1595,45 @@ abstract class Base
         } while ($oDb->count_all_results($sTable));
 
         return $sSlugTest;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a unique token for a record
+     *
+     * @param string $sMask   The token mask, defaults to $this->sTokenMask
+     * @param string $sTable  The table to use defaults to $this->table
+     * @param string $sColumn The column to use, defaults to $this->tableTokenColumn
+     *
+     * @return string
+     * @throws ModelException
+     */
+    protected function generateToken($sMask = null, $sTable = null, $sColumn = null)
+    {
+        if (is_null($sMask)) {
+            $sMask = $this->sTokenMask;
+        }
+
+        if (is_null($sTable)) {
+            $sTable = $this->getTableName();
+        }
+
+        if (is_null($sColumn)) {
+            if (!$this->tableTokenColumn) {
+                throw new ModelException(get_called_class() . '::generateToken() Token variable not set', 1);
+            }
+            $sColumn = $this->tableTokenColumn;
+        }
+
+        $oDb = Factory::service('Database');
+
+        do {
+            $sToken = generateToken($sMask);
+            $oDb->where($sColumn, $sToken);
+        } while ($oDb->count_all_results($sTable));
+
+        return $sToken;
     }
 
     // --------------------------------------------------------------------------
@@ -1770,6 +1906,48 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns whether this model automatically generates slugs or not
+     *
+     * @return bool
+     */
+    public function isAutoSetSlugs()
+    {
+        return $this->tableAutoSetSlugs;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model automatically generates tokens or not
+     *
+     * @return bool
+     */
+    public function isAutoSetTokens()
+    {
+        return $this->tableAutoSetTokens;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column name for specific columns of interest
+     *
+     * @param string $sColumn the column to query
+     *
+     * @return string|null
+     */
+    public function getColumn($sColumn)
+    {
+        $sColumn = ucfirst(trim($sColumn));
+        if (property_exists($this, 'table' . $sColumn . 'Column')) {
+            return $this->{'table' . $sColumn . 'Column'};
+        }
+        return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Describes the fields for this model automatically and with some guesswork;
      * for more fine grained control models should overload this method.
      *
@@ -1967,5 +2145,21 @@ abstract class Base
                 }
                 break;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function backwardsCompatibility(&$oBindTo)
+    {
+        /**
+         * Backwards compatibility
+         * Various older modules expect to be able to access a few services/models
+         * via magic methods. These will be deprecated soon.
+         */
+
+        //  @todo (Pablo - 2017-06-07) - Remove these
+
+        $oBindTo->db      = Factory::service('Database');
+        $oBindTo->encrypt = Factory::service('Encrypt');
     }
 }

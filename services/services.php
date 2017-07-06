@@ -98,6 +98,13 @@ return array(
             $oCi = get_instance();
             return $oCi->router;
         },
+        'Security' => function () {
+            if (class_exists('\App\Common\Library\Security')) {
+                return new \App\Common\Library\Security();
+            } else {
+                return new \Nails\Common\Library\Security();
+            }
+        },
         'Uri' => function () {
             //  @todo - remove dependency on CI
             $oCi = get_instance();

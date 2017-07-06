@@ -123,6 +123,10 @@ $lang['fv_alpha_dash']                  = 'This field may only contain alpha-num
 $lang['fv_alpha_dash_field']            = 'The %s field may only contain alpha-numeric characters, underscores, and dashes.';
 $lang['fv_alpha_dash_period']           = 'This field may only contain alpha-numeric characters, underscores, periods, and dashes.';
 $lang['fv_alpha_dash_period_field']     = 'The %s field may only contain alpha-numeric characters, underscores, periods, and dashes.';
+$lang['fv_count_floor']                 = 'This field requires a minimum selection.'; // @todo include minimum item requirement in text
+$lang['fv_count_floor_field']           = 'The %s field requires a minimum selection.'; // @todo include minimum item requirement in text
+$lang['fv_count_ceiling']               = 'This field accepts a maximum selection.'; // @todo include maximum item requirement in text
+$lang['fv_count_ceiling_field']         = 'The %s field accepts a maximum selection.'; // @todo include maximum item requirement in text
 
 // --------------------------------------------------------------------------
 

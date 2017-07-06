@@ -27,7 +27,7 @@ abstract class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
-     * Build the main framework. All autoloaded items have been loaded and
+     * Build the main framework. All auto-loaded items have been loaded and
      * instantiated by this point and are safe to use.
      */
     public function __construct()
@@ -60,7 +60,8 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set the default content-type
-        $this->output->set_content_type('text/html; charset=utf-8');
+        $oOutput = Factory::service('Output');
+        $oOutput->set_content_type('text/html; charset=utf-8');
 
         // --------------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Define all the packages
-        $this->autoloadItems();
+        $this->definePackages();
 
         // --------------------------------------------------------------------------
 
@@ -88,12 +89,12 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Instanciate the user model
+        //  Instantiate the user model
         $this->instantiateUser();
 
         // --------------------------------------------------------------------------
 
-        //  Instanciate languages
+        //  Instantiate languages
         $this->instantiateLanguages();
 
         // --------------------------------------------------------------------------
@@ -108,7 +109,7 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Instanciate DateTime
+        //  Instantiate DateTime
         $this->instantiateDateTime();
 
         // --------------------------------------------------------------------------
@@ -130,13 +131,14 @@ abstract class Base extends \MX_Controller
             } else {
 
                 //  Routes exist now, instruct the browser to try again
-                if ($this->input->post()) {
+                $oInput = Factory::service('Input');
+                if ($oInput->post()) {
 
-                    redirect($this->input->server('REQUEST_URI'), 'Location', 307);
+                    redirect($oInput->server('REQUEST_URI'), 'Location', 307);
 
                 } else {
 
-                    redirect($this->input->server('REQUEST_URI'));
+                    redirect($oInput->server('REQUEST_URI'));
                 }
             }
         }
@@ -144,16 +146,18 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Set User Feedback alerts for the views
-        $this->data['error']    = $this->userFeedback->get('error') ?: $this->session->flashdata('error');
-        $this->data['negative'] = $this->userFeedback->get('negative') ?: $this->session->flashdata('negative');
-        $this->data['success']  = $this->userFeedback->get('success') ?: $this->session->flashdata('success');
-        $this->data['positive'] = $this->userFeedback->get('positive') ?: $this->session->flashdata('positive');
-        $this->data['info']     = $this->userFeedback->get('info') ?: $this->session->flashdata('info');
-        $this->data['warning']  = $this->userFeedback->get('message') ?: $this->session->flashdata('warning');
+        $oSession               = Factory::service('Session', 'nailsapp/module-auth');
+        $oUserFeedback          = Factory::service('UserFeedback');
+        $this->data['error']    = $oUserFeedback->get('error') ?: $oSession->flashdata('error');
+        $this->data['negative'] = $oUserFeedback->get('negative') ?: $oSession->flashdata('negative');
+        $this->data['success']  = $oUserFeedback->get('success') ?: $oSession->flashdata('success');
+        $this->data['positive'] = $oUserFeedback->get('positive') ?: $oSession->flashdata('positive');
+        $this->data['info']     = $oUserFeedback->get('info') ?: $oSession->flashdata('info');
+        $this->data['warning']  = $oUserFeedback->get('message') ?: $oSession->flashdata('warning');
 
         //  @deprecated
-        $this->data['message'] = $this->userFeedback->get('message') ?: $this->session->flashdata('message');
-        $this->data['notice']  = $this->userFeedback->get('notice') ?: $this->session->flashdata('notice');
+        $this->data['message'] = $oUserFeedback->get('message') ?: $oSession->flashdata('message');
+        $this->data['notice']  = $oUserFeedback->get('notice') ?: $oSession->flashdata('notice');
 
         // --------------------------------------------------------------------------
 
@@ -180,14 +184,15 @@ abstract class Base extends \MX_Controller
          * Set some meta tags which should be used on every site.
          */
 
-        $this->meta->addRaw([
-            'charset' => 'utf-8',
-        ]);
-
-        $this->meta->addRaw([
-            'name'    => 'viewport',
-            'content' => 'width=device-width, initial-scale=1',
-        ]);
+        $oMeta = Factory::service('Meta');
+        $oMeta
+            ->addRaw([
+                'charset' => 'utf-8',
+            ])
+            ->addRaw([
+                'name'    => 'viewport',
+                'content' => 'width=device-width, initial-scale=1',
+            ]);
 
         // --------------------------------------------------------------------------
 
@@ -198,14 +203,20 @@ abstract class Base extends \MX_Controller
 
         $sCustomJs  = appSetting('site_custom_js', 'site');
         $sCustomCss = appSetting('site_custom_css', 'site');
+        $oAsset     = Factory::service('Asset');
 
         if (!empty($sCustomJs)) {
-            $this->asset->inline($sCustomJs, 'JS');
+            $oAsset->inline($sCustomJs, 'JS');
         }
 
         if (!empty($sCustomCss)) {
-            $this->asset->inline($sCustomCss, 'CSS');
+            $oAsset->inline($sCustomCss, 'CSS');
         }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo (Pablo - 2017-06-08) - Remove this
+        self::backwardsCompatibility($this);
 
         // --------------------------------------------------------------------------
 
@@ -253,11 +264,8 @@ abstract class Base extends \MX_Controller
             $message .= 'PHP version ' . NAILS_MIN_PHP_VERSION;
 
             if (function_exists('_NAILS_ERROR')) {
-
                 _NAILS_ERROR($message, $subject);
-
             } else {
-
                 echo '<h1>ERROR: ' . $subject . '</h1>';
                 echo '<h2>' . $message . '</h2>';
                 exit(0);
@@ -285,12 +293,12 @@ abstract class Base extends \MX_Controller
 
             switch (Environment::get()) {
 
-                case 'PRODUCTION' :
+                case 'PRODUCTION':
                     //  Suppress all errors on production
                     ini_set('display_errors', false);
                     break;
 
-                default :
+                default:
                     //  Show errors everywhere else
                     ini_set('display_errors', true);
                     break;
@@ -304,7 +312,8 @@ abstract class Base extends \MX_Controller
 
     /**
      * Tests that the cache is writable
-     * @return void
+     * @return bool
+     * @throws NailsException
      */
     protected function testCache()
     {
@@ -320,7 +329,6 @@ abstract class Base extends \MX_Controller
                 return true;
 
             } else {
-
                 throw new NailsException(
                     'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writable.',
                     1
@@ -332,7 +340,6 @@ abstract class Base extends \MX_Controller
             return true;
 
         } else {
-
             throw new NailsException(
                 'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.',
                 1
@@ -361,6 +368,9 @@ abstract class Base extends \MX_Controller
              * exiting whether we like it or not
              */
 
+            $oInput = Factory::service('Input');
+            $oUri   = Factory::service('Uri');
+
             try {
 
                 //  Load the encryption service. Set the package path so it is loaded correctly
@@ -369,7 +379,7 @@ abstract class Base extends \MX_Controller
                 Factory::service('encrypt');
 
                 $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
-                $isWhiteListed = isIpInRange($this->input->ipAddress(), $whitelistIp);
+                $isWhiteListed = isIpInRange($oInput->ipAddress(), $whitelistIp);
 
                 //  Customisations
                 $sMaintenanceTitle = $sTitle ? $sTitle : appSetting('maintenance_mode_title', 'site');
@@ -387,16 +397,16 @@ abstract class Base extends \MX_Controller
 
             if (!$isWhiteListed) {
 
-                if (!$this->input->is_cli_request()) {
+                if (!$oInput->is_cli_request()) {
 
-                    header($this->input->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+                    header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
                     header('Status: 503 Service Temporarily Unavailable');
                     header('Retry-After: 7200');
 
                     // --------------------------------------------------------------------------
 
                     //  If the request is an AJAX request, or the URL is on the API then spit back JSON
-                    if ($this->input->is_ajax_request() || $this->uri->segment(1) == 'api') {
+                    if ($oInput->is_ajax_request() || $oUri->segment(1) == 'api') {
 
                         header('Cache-Control: no-store, no-cache, must-revalidate');
                         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -407,28 +417,21 @@ abstract class Base extends \MX_Controller
 
                         echo json_encode($_out);
 
-                        //  Otherwise, render some HTML
                     } else {
-
-                        //  Look for an app override
-                        if (file_exists(APPPATH . 'views/maintenance/maintenance.php')) {
-
-                            require APPPATH . 'views/maintenance/maintenance.php';
-
-                            //  Fall back to the Nails maintenance page
+                        //  Otherwise, render some HTML
+                        if (file_exists(FCPATH . APPPATH . 'views/maintenance/maintenance.php')) {
+                            //  Look for an app override
+                            require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
                         } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
-
+                            //  Fall back to the Nails maintenance page
                             require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
-
-                            //  Fall back, back to plain text
                         } else {
-
+                            //  Fall back, back to plain text
                             echo '<h1>Down for maintenance</h1>';
                         }
                     }
 
                 } else {
-
                     echo 'Down for Maintenance' . "\n";
                 }
                 exit(0);
@@ -470,8 +473,9 @@ abstract class Base extends \MX_Controller
             //  On the whitelist?
             if (defined($sConstantNameWhitelist)) {
 
+                $oInput          = Factory::service('Input');
                 $aWhitelsitedIps = @json_decode(constant($sConstantNameWhitelist));
-                $bWhitelisted    = isIpInRange($this->input->ipAddress(), $aWhitelsitedIps);
+                $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelsitedIps);
 
             } else {
 
@@ -512,8 +516,9 @@ abstract class Base extends \MX_Controller
      */
     protected function passwordProtectedRequest()
     {
+        $oInput = Factory::service('Input');
         header('WWW-Authenticate: Basic realm="' . APP_NAME . ' - Restricted Area"');
-        header($this->input->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
+        header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
         $message = 'You are not authorised to access this installation.';
         include NAILS_COMMON_PATH . 'errors/error_401.php';
         exit(0);
@@ -523,7 +528,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets up date & time handling
-     * @return void
+     * @throws NailsException
      */
     protected function instantiateDateTime()
     {
@@ -566,11 +571,8 @@ abstract class Base extends \MX_Controller
          */
 
         if (activeUser('timezone')) {
-
             $sTimezoneUser = activeUser('timezone');
-
         } else {
-
             $sTimezoneUser = $oDateTimeModel->getTimezoneDefault();
         }
 
@@ -591,7 +593,8 @@ abstract class Base extends \MX_Controller
 
         //  Make sure the system and the database are running on UTC
         date_default_timezone_set('UTC');
-        $this->db->query('SET time_zone = \'+0:00\'');
+        $oDb = Factory::service('Database');
+        $oDb->query('SET time_zone = \'+0:00\'');
     }
 
     // --------------------------------------------------------------------------
@@ -623,15 +626,12 @@ abstract class Base extends \MX_Controller
         $sUserLangCode = activeUser('language');
 
         if (!empty($sUserLangCode)) {
-
             define('RENDER_LANG_CODE', $sUserLangCode);
-
         } else {
-
             define('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
         }
 
-        //  Set the language config item which codeigniter will use.
+        //  Set the language config item which CodeIgniter will use.
         $oConfig = Factory::service('Config');
         $oConfig->set_item('language', RENDER_LANG_CODE);
 
@@ -642,10 +642,9 @@ abstract class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
-     * Autoloads all items (helpers, models, libraries etc) that we'll need
-     * @return void [description]
+     * Defines all the package paths
      */
-    protected function autoloadItems()
+    protected function definePackages()
     {
         /**
          * This is an important part. Here we are defining all the packages to load.
@@ -681,76 +680,6 @@ abstract class Base extends \MX_Controller
         foreach ($aPaths as $sPath) {
             $this->load->add_package_path($sPath);
         }
-
-        // --------------------------------------------------------------------------
-
-        //  Load Helpers
-        Factory::helper('app_setting');
-        Factory::helper('app_notification');
-        Factory::helper('date');
-        Factory::helper('url');
-        Factory::helper('cookie');
-        Factory::helper('form');
-        Factory::helper('html');
-        Factory::helper('tools');
-        Factory::helper('debug');
-        Factory::helper('language');
-        Factory::helper('text');
-        Factory::helper('exception');
-        Factory::helper('typography');
-        Factory::helper('log');
-
-        //  Autoload module helpers
-        foreach ($aAvailableModules as $oModule) {
-            if (!empty($oModule->autoload->helpers) && is_array($oModule->autoload->helpers)) {
-                foreach ($oModule->autoload->helpers as $sHelper) {
-                    Factory::helper($sHelper, $oModule->name);
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * Common models & libraries
-         * @note  : We have to load this way so that the property is taken up by the CI
-         * super object and therefore more reliably accessible (e.g in CMS module).
-         * @todo  reduce this coupling
-         * @todo  implement userFeedback library throughout
-         */
-
-        $oCi =& get_instance();
-
-        //  Models
-        //  Autoload module models
-        foreach ($aAvailableModules as $oModule) {
-            if (!empty($oModule->autoload->models) && is_array($oModule->autoload->models)) {
-                foreach ($oModule->autoload->models as $oModel) {
-                    foreach ($oModel as $sAssignTo => $sModelName) {
-                        $oCi->{$sAssignTo} = Factory::model($sModelName, $oModule->name);
-                    }
-                }
-            }
-        }
-
-        //  Libraries
-//        $oCi->db           = Factory::service('Database');
-        $oCi->meta         = Factory::service('Meta');
-        $oCi->asset        = Factory::service('Asset');
-        $oCi->userFeedback = Factory::service('UserFeedback');
-        $oCi->encrypt      = Factory::service('Encrypt');
-        $oCi->logger       = Factory::service('Logger');
-
-        //  Autoload module services
-        foreach ($aAvailableModules as $oModule) {
-            if (!empty($oModule->autoload->services) && is_array($oModule->autoload->services)) {
-                foreach ($oModule->autoload->services as $oService) {
-                    foreach ($oService as $sAssignTo => $sServiceName) {
-                        $oCi->{$sAssignTo} = Factory::service($sServiceName, $oModule->name);
-                    }
-                }
-            }
-        }
     }
 
     // --------------------------------------------------------------------------
@@ -766,20 +695,8 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
-
         $oUserModel = Factory::model('User', 'nailsapp/module-auth');
         $oUserModel->init();
-
-        // --------------------------------------------------------------------------
-
-        //  Shortcut/backwards compatibility
-        $this->user = $oUserModel;
-
-        //  Set a $user variable (for the views)
-        //  @todo - deprecate these
-        $this->data['user']          = $oUserModel;
-        $this->data['user_group']    = $this->user_group_model;
-        $this->data['user_password'] = $this->user_password_model;
     }
 
     // --------------------------------------------------------------------------
@@ -808,5 +725,39 @@ abstract class Base extends \MX_Controller
             $oSession->set_flashdata('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function backwardsCompatibility(&$oBindTo)
+    {
+        /**
+         * Backwards compatibility
+         * Various older modules expect to be able to access a few services/models
+         * via magic methods. These will be deprecated soon.
+         */
+
+        //  @todo (Pablo - 2017-06-07) - Remove these
+
+        $oBindTo->db                  = Factory::service('Database');
+        $oBindTo->input               = Factory::service('Input');
+        $oBindTo->output              = Factory::service('Output');
+        $oBindTo->meta                = Factory::service('Meta');
+        $oBindTo->asset               = Factory::service('Asset');
+        $oBindTo->encrypt             = Factory::service('Encrypt');
+        $oBindTo->logger              = Factory::service('Logger');
+        $oBindTo->uri                 = Factory::service('Uri');
+        $oBindTo->security            = Factory::service('Security');
+        $oBindTo->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
+        $oBindTo->event               = Factory::service('Event', 'nailsapp/module-event');
+        $oBindTo->session             = Factory::service('Session', 'nailsapp/module-auth');
+        $oBindTo->user                = Factory::model('User', 'nailsapp/module-auth');
+        $oBindTo->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
+        $oBindTo->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
+
+        //  Set variables for the views, too
+        $oBindTo->data['user']          = $oBindTo->user;
+        $oBindTo->data['user_group']    = $oBindTo->user_group_model;
+        $oBindTo->data['user_password'] = $oBindTo->user_password_model;
     }
 }
