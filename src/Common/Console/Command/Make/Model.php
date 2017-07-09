@@ -225,10 +225,10 @@ class Model extends BaseMaker
                     //  Test to see if the database table exists already
                     if (!$bSkipDb) {
                         $oDb     = Factory::service('PDODatabase');
-                        $oResult = $oDb->query('SHOW TABLES LIKE "' . $sTableNameWithPrefix . '"');
+                        $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
                         if ($oResult->rowCount() > 0) {
                             throw new \Exception(
-                                'Table "' . $sTableNameWithPrefix . '" already exists. Use option --skip-db to skip database check.'
+                                'Table "' . $oModel->table_with_prefix . '" already exists. Use option --skip-db to skip database check.'
                             );
                         }
                     }
