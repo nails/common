@@ -76,7 +76,7 @@ class Rollbar implements ErrorHandlerDriver
 
         //  Send report to Rollbar
         \Rollbar\Rollbar::log(
-            Level::warning(),
+            Level::WARNING,
             $sMessage,
             [
                 'error_number' => $iNumber,
@@ -100,7 +100,7 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function exception($oException)
     {
-        \Rollbar\Rollbar::log(Level::error(), $oException);
+        \Rollbar\Rollbar::log(Level::ERROR, $oException);
 
         $oDetails       = new \stdClass();
         $oDetails->type = get_class($oException);
