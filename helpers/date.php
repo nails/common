@@ -10,18 +10,22 @@
  * @link
  */
 
+use Nails\Factory;
+
 if (!function_exists('convertDateTime')) {
 
     /**
      * Arbitrarily convert a timestamp between timezones
+     *
      * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
      * @param  string $sToTz      The timezone to convert to
      * @param  string $sFromTz    The timezone to convert from
+     *
      * @return string
      */
     function convertDateTime($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->convert($mTimestamp, $sToTz, $sFromTz);
     }
 }
@@ -32,13 +36,15 @@ if (!function_exists('toUserDate')) {
 
     /**
      * Convert a date timestamp to the User's timezone from the Nails timezone
+     *
      * @param  mixed  $mTimestamp The timestamp to convert
      * @param  string $sFormat    The format of the timestamp to return, defaults to User's date preference
+     *
      * @return string
      */
     function toUserDate($mTimestamp = null, $sFormat = null)
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->toUserDate($mTimestamp, $sFormat);
     }
 }
@@ -49,12 +55,14 @@ if (!function_exists('toNailsDate')) {
 
     /**
      * Convert a date timestamp to the Nails timezone from the User's timezone
-     * @param  mixed  $mTimestamp The timestamp to convert
+     *
+     * @param  mixed $mTimestamp The timestamp to convert
+     *
      * @return string
      */
     function toNailsDate($mTimestamp = null)
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->toNailsDate($mTimestamp);
     }
 }
@@ -65,13 +73,15 @@ if (!function_exists('toUserDatetime')) {
 
     /**
      * Convert a datetime timestamp to the user's timezone from the Nails timezone
+     *
      * @param  mixed  $mTimestamp The timestamp to convert
      * @param  string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
+     *
      * @return string
      */
     function toUserDatetime($mTimestamp = null, $sFormat = null)
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->toUserDatetime($mTimestamp, $sFormat);
     }
 }
@@ -82,12 +92,14 @@ if (!function_exists('toNailsDatetime')) {
 
     /**
      * Convert a datetime timestamp to the Nails timezone from the User's timezone
-     * @param  mixed  $mTimestamp The timestamp to convert
+     *
+     * @param  mixed $mTimestamp The timestamp to convert
+     *
      * @return string
      */
     function toNailsDatetime($mTimestamp = null)
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->toNailsDatetime($mTimestamp);
     }
 }
@@ -98,311 +110,282 @@ if (!function_exists('niceTime')) {
 
     /**
      * Converts a datetime into a human friendly relative string
+     *
      * @param  mixed   $mDate           The timestamp to convert
      * @param  boolean $bTense          Whether or not to append the tense (e.g, X minutes _ago_)
      * @param  string  $sOptBadMsg      The message to show if a bad timestamp is supplied
      * @param  string  $sGreaterOneWeek The message to show if the timestanmp is greater than one week away
      * @param  string  $sLessTenMins    The message to show if the timestamp is less than ten minutes away
+     *
      * @return string
      */
     function niceTime($mDate = false, $bTense = true, $sOptBadMsg = null, $sGreaterOneWeek = null, $sLessTenMins = null)
     {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->niceTime($mDate, $bTense, $sOptBadMsg, $sGreaterOneWeek, $sLessTenMins);
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * calculate_age()
- *
- * Calculates a person's age (or age at a certain date
- *
- * @access  public
- * @param   string
- * @return  string
- */
-if (!function_exists('calculate_age')) {
+if (!function_exists('calculateAge')) {
 
-    function calculate_age($y, $m, $d, $death_y = null, $death_m = null, $death_d = null)
+    /**
+     * Calculates a person's age (or age at a certain date)
+     *
+     * @param string $birthYear  The year to calculate from
+     * @param string $birthMonth The month to calculate from
+     * @param string $birthDay   The day to calculate from
+     * @param string $deathYear  The year to calculate to
+     * @param string $deathMonth The month to calculate to
+     * @param string $deathDay   The day to calculate to
+     *
+     * @return bool|float
+     */
+    function calculateAge($birthYear, $birthMonth, $birthDay, $deathYear = null, $deathMonth = null, $deathDay = null)
     {
-        //  Only calculate to a date which isn't today if all values are supplied
-        if (is_null($death_y) || is_null($death_m) || is_null($death_d)) {
-
-            $death_y = date('Y');
-            $death_m = date('m');
-            $death_d = date('d');
-        }
-
-        // --------------------------------------------------------------------------
-
-        $_birth_time = mktime(0, 0, 0, $m, $d, $y);
-        $_death_time = mktime(0, 0, 0, $death_m, $death_d, $death_y);
-
-        // --------------------------------------------------------------------------
-
-        //  If $_death_time is smaller than $_birth_time then something's wrong
-        if ($_death_time < $_birth_time) {
-            return false;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Calculate age
-        $_age       = ($_birth_time < 0) ? ($_death_time + ($_birth_time * -1)) : $_death_time - $_birth_time;
-        $_age_years = floor($_age / (31536000));    //  Divide by number of seconds in a year
-
-        // --------------------------------------------------------------------------
-
-        return $_age_years;
+        $oDateTimeModel = Factory::model('DateTime');
+        return $oDateTimeModel->calculateAge($birthYear, $birthMonth, $birthDay, $deathYear, $deathMonth, $deathDay);
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * Dropdown - Years
- *
- * Generates a dropdown containing the values between $start_year and $end_year
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
-if (!function_exists('dropdown_years')) {
+if (!function_exists('dropdownYears')) {
 
-    function dropdown_years($field_name, $start_year = null, $end_year = null, $selected = null, $placeholder = null)
+    /**
+     * Generates a dropdown containing the values between $iStartYear and $iEndYear
+     *
+     * @param string  $sFieldName   The name to give the field
+     * @param integer $iStartYear   The first year to list
+     * @param integer $iEndYear     The last year to list
+     * @param integer $iSelected    The year to select
+     * @param string  $sPlaceholder The placeholder value
+     *
+     * @return string
+     */
+    function dropdownYears($sFieldName, $iStartYear = null, $iEndYear = null, $iSelected = null, $sPlaceholder = '')
     {
         /*** defaults ***/
-        $start_year = is_null($start_year)  ? date('Y')     : $start_year;
-        $end_year   = is_null($end_year)    ? $start_year - 10  : $end_year;
+        $iStartYear = is_null($iStartYear) ? date('Y') : $iStartYear;
+        $iEndYear   = is_null($iEndYear) ? $iStartYear - 10 : $iEndYear;
 
         /*** the current year ***/
-        $selected = is_null($selected) ? date('Y') : $selected;
+        $iSelected = is_null($iSelected) ? date('Y') : $iSelected;
 
         /*** range of years ***/
-        $r = range($start_year, $end_year);
+        $aRange = range($iStartYear, $iEndYear);
 
         /*** create the select ***/
-        $select = '<select name="'.$field_name.'" id="'.$field_name.'">';
+        $sOut = '<select name="' . $sFieldName . '" id="' . $sFieldName . '">';
+        $sOut .= "<option value=\"0000\"";
+        $sOut .= !$iSelected ? ' selected="selected"' : '';
+        $sOut .= ">" . ($sPlaceholder ? $sPlaceholder : '-') . "</option>\n";
 
-        $select .= "<option value=\"0000\"";
-        $select .= (!$selected) ? ' selected="selected"' : '';
-        $select .= ">" . ($placeholder ? $placeholder : '-') . "</option>\n";
-
-        foreach ($r as $year) {
-
-            $select .= "<option value=\"$year\"";
-            $select .= ($year == $selected) ? ' selected="selected"' : '';
-            $select .= ">$year</option>\n";
+        foreach ($aRange as $year) {
+            $sOut .= "<option value=\"$year\"";
+            $sOut .= $year == $iSelected ? ' selected="selected"' : '';
+            $sOut .= ">$year</option>\n";
         }
 
-        $select .= '</select>';
+        $sOut .= '</select>';
 
-        return $select;
+        return $sOut;
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * Dropdown - Months
- *
- * Generates a dropdown containing the months of the year
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
-if (!function_exists('dropdown_months')) {
+if (!function_exists('dropdownMonths')) {
 
-    function dropdown_months($field_name, $short = false, $selected = null, $placeholder = null)
+    /**
+     * Generates a dropdown containing the months of the year
+     *
+     * @param string  $sFieldName   The name to give the field
+     * @param bool    $bShort       Wheteher to use short or long month names
+     * @param integer $iSelected    The month to select
+     * @param string  $sPlaceholder The placeholder value
+     *
+     * @return string
+     */
+    function dropdownMonths($sFieldName, $bShort = false, $iSelected = null, $sPlaceholder = '')
     {
         /*** array of months ***/
-        $months_short = array(  1   =>  'Jan',
-                                2   =>  'Feb',
-                                3   =>  'Mar',
-                                4   =>  'Apr',
-                                5   =>  'May',
-                                6   =>  'Jun',
-                                7   =>  'Jul',
-                                8   =>  'Aug',
-                                9   =>  'Sep',
-                                10  =>  'Oct',
-                                11  =>  'Nov',
-                                12  =>  'Dec');
+        $aMonthsShort = [
+            1  => 'Jan',
+            2  => 'Feb',
+            3  => 'Mar',
+            4  => 'Apr',
+            5  => 'May',
+            6  => 'Jun',
+            7  => 'Jul',
+            8  => 'Aug',
+            9  => 'Sep',
+            10 => 'Oct',
+            11 => 'Nov',
+            12 => 'Dec',
+        ];
 
-        $months_long = array(   1   =>  'January',
-                                2   =>  'February',
-                                3   =>  'March',
-                                4   =>  'April',
-                                5   =>  'May',
-                                6   =>  'June',
-                                7   =>  'July',
-                                8   =>  'August',
-                                9   =>  'September',
-                                10  =>  'October',
-                                11  =>  'November',
-                                12  =>  'December');
+        $aMonthsLong = [
+            1  => 'January',
+            2  => 'February',
+            3  => 'March',
+            4  => 'April',
+            5  => 'May',
+            6  => 'June',
+            7  => 'July',
+            8  => 'August',
+            9  => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
+        ];
 
-        $months = $short === false ? $months_long : $months_short;
+        $aMonths = $bShort === false ? $aMonthsLong : $aMonthsShort;
 
         /*** current month ***/
-        $selected = is_null($selected) ? date('n') : $selected;
+        $iSelected = is_null($iSelected) ? date('n') : $iSelected;
 
-        $select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
+        $sOut = '<select name="' . $sFieldName . '" id="' . $sFieldName . '">' . "\n";
+        $sOut .= "<option value=\"00\"";
+        $sOut .= !$iSelected ? ' selected="selected"' : '';
+        $sOut .= ">" . ($sPlaceholder ? $sPlaceholder : '-') . "</option>\n";
 
-        $select .= "<option value=\"00\"";
-        $select .= (!$selected) ? ' selected="selected"' : '';
-        $select .= ">" . ($placeholder ? $placeholder : '-') . "</option>\n";
-
-        foreach ($months as $key => $mon) {
-
-            $select .= "<option value=\"".str_pad($key, 2, '0', STR_PAD_LEFT)."\"";
-            $select .= ($key == $selected) ? ' selected="selected"' : '';
-            $select .= ">$mon</option>\n";
+        foreach ($aMonths as $iKey => $sMonth) {
+            $sOut .= "<option value=\"" . str_pad($iKey, 2, '0', STR_PAD_LEFT) . "\"";
+            $sOut .= $iKey == $iSelected ? ' selected="selected"' : '';
+            $sOut .= ">$sMonth</option>\n";
         }
 
-        $select .= '</select>';
+        $sOut .= '</select>';
 
-        return $select;
+        return $sOut;
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * Dropdown - Days
- *
- * Generates a dropdown containing the days of the month
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
-if (!function_exists('dropdown_days')) {
+if (!function_exists('dropdownDays')) {
 
-    function dropdown_days($field_name, $selected = null, $placeholder = null)
+    /**
+     * @param string  $sFieldName   The name to give the field
+     * @param integer $iSelected    The day to select
+     * @param string  $sPlaceholder The placeholder value
+     *
+     * @return string
+     */
+    function dropdownDays($sFieldName, $iSelected = null, $sPlaceholder = '')
     {
         /*** range of days ***/
-        $r = range(1, 31);
+        $aRange = range(1, 31);
 
         /*** current day ***/
-        $selected = is_null($selected) ? date('j') : $selected;
+        $iSelected = is_null($iSelected) ? date('j') : $iSelected;
 
-        $select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
+        $sOut = '<select name="' . $sFieldName . '" id="' . $sFieldName . '">' . "\n";
 
-        $select .= "<option value=\"00\"";
-        $select .= (!$selected) ? ' selected="selected"' : '';
-        $select .= ">" . ($placeholder ? $placeholder : '-') . "</option>\n";
+        $sOut .= "<option value=\"00\"";
+        $sOut .= !$iSelected ? ' selected="selected"' : '';
+        $sOut .= ">" . ($sPlaceholder ? $sPlaceholder : '-') . "</option>\n";
 
-        foreach ($r as $day) {
-
-            $select .= "<option value=\"".str_pad($day, 2, '0', STR_PAD_LEFT)."\"";
-            $select .= ($day == $selected) ? ' selected="selected"' : '';
-            $select .= ">".str_pad($day, 2, '0', STR_PAD_LEFT)."</option>\n";
+        foreach ($aRange as $iDay) {
+            $sOut .= "<option value=\"" . str_pad($iDay, 2, '0', STR_PAD_LEFT) . "\"";
+            $sOut .= $iDay == $iSelected ? ' selected="selected"' : '';
+            $sOut .= ">" . str_pad($iDay, 2, '0', STR_PAD_LEFT) . "</option>\n";
         }
 
-        $select .= '</select>';
+        $sOut .= '</select>';
 
-        return $select;
+        return $sOut;
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * Dropdown - Hours
- *
- * Generates a dropdown containing the numbers 0 - 23
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
-if (!function_exists('dropdown_hours')) {
+if (!function_exists('dropdownHours')) {
 
-    function dropdown_hours($field_name, $selected = null)
+    /**
+     * Generates a dropdown containing the numbers 0 - 23
+     *
+     * @param string  $sFieldName The name to give the field
+     * @param integer $iSelected  The hour to select
+     *
+     * @return string
+     */
+    function dropdownHours($sFieldName, $iSelected = null)
     {
         /*** range of hours ***/
-        $r = range(0, 23);
+        $aRange = range(0, 23);
 
         /*** current hour ***/
-        $selected = is_null($selected) ? date('G') : $selected;
+        $iSelected = is_null($iSelected) ? date('G') : $iSelected;
 
-        $select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
-        foreach ($r as $hour) {
-
-            $select .= "<option value=\"".str_pad($hour, 2, '0', STR_PAD_LEFT)."\"";
-            $select .= ($hour == $selected) ? ' selected="selected"' : '';
-            $select .= ">" . str_pad($hour, 2, '0', STR_PAD_LEFT) . "</option>\n";
+        $sOut = '<select name="' . $sFieldName . '" id="' . $sFieldName . '">' . "\n";
+        foreach ($aRange as $iHour) {
+            $sOut .= "<option value=\"" . str_pad($iHour, 2, '0', STR_PAD_LEFT) . "\"";
+            $sOut .= $iHour == $iSelected ? ' selected="selected"' : '';
+            $sOut .= ">" . str_pad($iHour, 2, '0', STR_PAD_LEFT) . "</option>\n";
         }
 
-        $select .= '</select>';
+        $sOut .= '</select>';
 
-        return $select;
+        return $sOut;
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * Dropdown - Minutes
- *
- * Generates a dropdown containing the numbers 0 - 59
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
-if (!function_exists('dropdown_minutes')) {
+if (!function_exists('dropdownMinutes')) {
 
-    function dropdown_minutes($field_name, $range = null, $selected = null)
+    /**
+     * Generates a dropdown containing the numbers 0 - 59
+     *
+     * @param string  $sFieldName The name to give the field
+     * @param array   $aRange     The range of minutes to use
+     * @param integer $iSelected  The minute to select
+     *
+     * @return string
+     */
+    function dropdownMinutes($sFieldName, $aRange = null, $iSelected = null)
     {
         /*** array of mins ***/
-        $minutes = is_null($range) ? range(0, 59) : $range ;
+        $aMinutes  = is_null($aRange) ? range(0, 59) : $aRange;
+        $iSelected = in_array($iSelected, $aMinutes) ? $iSelected : 0;
 
-        $selected = in_array($selected, $minutes) ? $selected : 0;
-
-        $select = '<select name="'.$field_name.'" id="'.$field_name.'">'."\n";
-        foreach ($minutes as $min) {
-
-            $select .= "<option value=\"".str_pad($min, 2, '0', STR_PAD_LEFT)."\"";
-            $select .= ($min == $selected) ? ' selected="selected"' : '';
-            $select .= ">".str_pad($min, 2, '0', STR_PAD_LEFT)."</option>\n";
+        $sOut = '<select name="' . $sFieldName . '" id="' . $sFieldName . '">' . "\n";
+        foreach ($aMinutes as $iMinute) {
+            $sOut .= "<option value=\"" . str_pad($iMinute, 2, '0', STR_PAD_LEFT) . "\"";
+            $sOut .= ($iMinute == $iSelected) ? ' selected="selected"' : '';
+            $sOut .= ">" . str_pad($iMinute, 2, '0', STR_PAD_LEFT) . "</option>\n";
         }
 
-        $select .= '</select>';
+        $sOut .= '</select>';
 
-        return $select;
+        return $sOut;
     }
 }
 
 // --------------------------------------------------------------------------
 
-/**
- * dropdown_datepicker
- *
- * Generates the dropdowns to select a date using the defaults
- *
- * @access  public
- * @param   mixed
- * @return  string
- */
 if (!function_exists('datepicker')) {
 
-    function datepicker($field_name)
+    /**
+     * Generates the dropdowns to select a date using the defaults
+     *
+     * @param string $sFieldName The name to give the field
+     *
+     * @return string
+     */
+    function datepicker($sFieldName)
     {
-        $out = "";
-        $out .= dropdown_years($field_name.'_year');
-        $out .= dropdown_months($field_name.'_month');
-        $out .= dropdown_days($field_name.'_day');
-        $out .= ' &nbsp; ';
-        $out .= dropdown_hours($field_name.'_hour');
-        $out .= dropdown_minutes($field_name.'_minute');
+        $sOut = dropdownYears($sFieldName . '_year');
+        $sOut .= dropdownMonths($sFieldName . '_month');
+        $sOut .= dropdownDays($sFieldName . '_day');
+        $sOut .= ' &nbsp; ';
+        $sOut .= dropdownHours($sFieldName . '_hour');
+        $sOut .= dropdownMinutes($sFieldName . '_minute');
 
-        return $out;
+        return $sOut;
     }
 }
 

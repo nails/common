@@ -10,16 +10,20 @@
  * @link
  */
 
+use Nails\Factory;
+
 if (!function_exists('map')) {
 
     /**
      * Re-maps a number from one range to another
      * See http://www.arduino.cc/en/Reference/Map
+     *
      * @param   float   Number to map
      * @param   int     Current low
      * @param   int     Current high
      * @param   int     New low
      * @param   int     New high
+     *
      * @return  float
      */
     function map($x, $in_min, $in_max, $out_min, $out_max)
@@ -34,7 +38,9 @@ if (!function_exists('special_chars')) {
 
     /**
      * Replaces special chars with their HTML counterpart
+     *
      * @param   string  String to parse
+     *
      * @return  float
      */
     function special_chars($string)
@@ -70,13 +76,15 @@ if (!function_exists('formatBytes')) {
 
     /**
      * Formats a filesize given in bytes into a human-friendly string
+     *
      * @param  integer $iBytes     The filesize, in bytes
      * @param  integer $iPrecision The precision to use
+     *
      * @return string
      */
     function formatBytes($iBytes, $iPrecision = 2)
     {
-        $oCdn = nailsFactory('service', 'Cdn', 'nailsapp/module-cdn');
+        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
         return $oCdn->formatBytes($iBytes, $iPrecision);
     }
 }
@@ -88,12 +96,14 @@ if (!function_exists('returnBytes')) {
     /**
      * Formats a filesize as bytes (e.g max_upload_size)
      * hat-tip: http://php.net/manual/en/function.ini-get.php#96996
+     *
      * @param  string $sSize The string to convert to bytes
+     *
      * @return integer
      */
     function returnBytes($sSize)
     {
-        $oCdn = nailsFactory('service', 'Cdn', 'nailsapp/module-cdn');
+        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
         return $oCdn->returnBytes($sSize);
     }
 }
@@ -105,17 +115,19 @@ if (!function_exists('maxUploadSize')) {
     /**
      * Returns the configured maximum upload size for this system by inspecting
      * upload_max_filesize and post_max_size, if available.
+     *
      * @param  boolean $bFormat Whether to format the string using formatBytes
+     *
      * @return integer|string
      */
     function maxUploadSize($bFormat = true)
     {
         if (function_exists('ini_get')) {
 
-            $aMaxSizes = array(
+            $aMaxSizes = [
                 returnBytes(ini_get('upload_max_filesize')),
-                returnBytes(ini_get('post_max_size'))
-            );
+                returnBytes(ini_get('post_max_size')),
+            ];
 
             $iMaxSize = min($aMaxSizes);
 
@@ -134,7 +146,9 @@ if (!function_exists('stringToBoolean')) {
 
     /**
      * Converts a string to a boolean
+     *
      * @param   string
+     *
      * @return  float
      */
     function stringToBoolean($string)
@@ -156,8 +170,10 @@ if (!function_exists('isIpInRange')) {
 
     /**
      * Determines whether an IP Address falls within a CIDR range
+     *
      * @param $sIp    string The IP Address to test
      * @param $mRange mixed  The CIDR range, either as a string, or an array of ranges
+     *
      * @return bool
      */
     function isIpInRange($sIp, $mRange)
@@ -168,7 +184,7 @@ if (!function_exists('isIpInRange')) {
             $mRangeRaw = $mRange;
             $mRangeRaw = str_replace("\n\r", "\n", $mRangeRaw);
             $aRangeRaw = explode("\n", $mRangeRaw);
-            $aRange    = array();
+            $aRange    = [];
 
             foreach ($aRangeRaw as $line) {
                 $aRange = array_merge(explode(',', $line), $aRange);
@@ -219,7 +235,9 @@ if (!function_exists('nullIfEmpty')) {
 
     /**
      * Returns null if the input is empty, or the input if not
+     *
      * @param   mixed $mVal The input to check
+     *
      * @return  mixed
      */
     function nullIfEmpty($mVal)

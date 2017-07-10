@@ -16,8 +16,8 @@ use Nails\Factory;
 
 class DateTime
 {
-    public $timezoneNails;
-    public $timezoneUser;
+    public    $timezoneNails;
+    public    $timezoneUser;
     protected $userFormatDate;
     protected $userFormatTime;
     protected $oConfig;
@@ -109,7 +109,7 @@ class DateTime
      */
     public function getAllDateFormatFlat()
     {
-        $out     = array();
+        $out     = [];
         $formats = $this->getAllDateFormat();
 
         foreach ($formats as $format) {
@@ -124,7 +124,9 @@ class DateTime
 
     /**
      * Looks for a date format by it's slug
+     *
      * @param  string $slug The slug to search for
+     *
      * @return mixed        stdClass on success, false on failure
      */
     public function getDateFormatBySlug($slug)
@@ -214,7 +216,7 @@ class DateTime
      */
     public function getAllTimeFormatFlat()
     {
-        $out     = array();
+        $out     = [];
         $formats = $this->getAllTimeFormat();
 
         foreach ($formats as $format) {
@@ -229,7 +231,9 @@ class DateTime
 
     /**
      * Looks for a time format by it's slug
+     *
      * @param  string $slug The slug to search for
+     *
      * @return mixed        stdClass on success, false on failure
      */
     public function getTimeFormatBySlug($slug)
@@ -242,6 +246,7 @@ class DateTime
 
     /**
      * Set both the date and the time format at the same time
+     *
      * @param string $dateSlug The date format's slug
      * @param string $timeSlug The time format's slug
      */
@@ -255,6 +260,7 @@ class DateTime
 
     /**
      * Set the date format to use, uses default if slug cannot be found
+     *
      * @param string $slug The date format's slug
      */
     public function setDateFormat($slug)
@@ -273,6 +279,7 @@ class DateTime
 
     /**
      * Set the time format to use, uses default if slug cannot be found
+     *
      * @param string $slug The time format's slug
      */
     public function setTimeFormat($slug)
@@ -291,8 +298,10 @@ class DateTime
 
     /**
      * Convert a date timestamp to the User's timezone from the Nails timezone
+     *
      * @param  mixed  $timestamp The timestamp to convert
      * @param  string $format    The format of the timestamp to return, defaults to User's date preference
+     *
      * @return string
      */
     public function toUserDate($timestamp = null, $format = null)
@@ -314,7 +323,9 @@ class DateTime
 
     /**
      * Convert a date timestamp to the Nails timezone from the User's timezone, formatted as Y-m-d
-     * @param  mixed  $timestamp The timestamp to convert
+     *
+     * @param  mixed $timestamp The timestamp to convert
+     *
      * @return string
      */
     public function toNailsDate($timestamp = null)
@@ -332,8 +343,10 @@ class DateTime
 
     /**
      * Convert a datetime timestamp to the user's timezone from the Nails timezone
+     *
      * @param  mixed  $timestamp The timestamp to convert
      * @param  string $format    The format of the timestamp to return, defaults to User's dateTime preference
+     *
      * @return string
      */
     public function toUserDatetime($timestamp = null, $format = null)
@@ -355,7 +368,9 @@ class DateTime
 
     /**
      * Convert a datetime timestamp to the Nails timezone from the User's timezone
-     * @param  mixed  $timestamp The timestamp to convert
+     *
+     * @param  mixed $timestamp The timestamp to convert
+     *
      * @return string
      */
     public function toNailsDatetime($timestamp = null)
@@ -393,6 +408,7 @@ class DateTime
 
     /**
      * Sets the Nails and User timezones simultaneously
+     *
      * @param string $tzNails The Nails timezone
      * @param string $tzUser  The User's timezone
      */
@@ -406,6 +422,7 @@ class DateTime
 
     /**
      * Set the Nails timezone
+     *
      * @param string $tz The timezone to set
      */
     public function setNailsTimezone($tz)
@@ -417,6 +434,7 @@ class DateTime
 
     /**
      * Set the User's timezone
+     *
      * @param string $tz The timezone to set
      */
     public function setUserTimezone($tz)
@@ -434,14 +452,14 @@ class DateTime
     {
         //  Hat-tip to: https://gist.github.com/serverdensity/82576
         $zones     = \DateTimeZone::listIdentifiers();
-        $locations = array('UTC' => 'Coordinated Universal Time (UTC/GMT)');
+        $locations = ['UTC' => 'Coordinated Universal Time (UTC/GMT)'];
 
         foreach ($zones as $zone) {
 
             // 0 => Continent, 1 => City
             $zoneExploded = explode('/', $zone);
 
-            $zoneAcceptable   = array();
+            $zoneAcceptable   = [];
             $zoneAcceptable[] = 'Africa';
             $zoneAcceptable[] = 'America';
             $zoneAcceptable[] = 'Antarctica';
@@ -483,7 +501,7 @@ class DateTime
     public function getAllTimezoneFlat()
     {
         $locations = $this->getAllTimezone();
-        $out       = array();
+        $out       = [];
 
         foreach ($locations as $key => $value) {
 
@@ -511,11 +529,13 @@ class DateTime
 
     /**
      * Converts a datetime into a human friendly relative string
+     *
      * @param  mixed   $date           The timestamp to convert
      * @param  boolean $tense          Whether or not to append the tense (e.g, X minutes _ago_)
      * @param  string  $optBadMsg      The message to show if a bad timestamp is supplied
      * @param  string  $greaterOneWeek The message to show if the timestanmp is greater than one week away
      * @param  string  $lessTenMins    The message to show if the timestamp is less than ten minutes away
+     *
      * @return string
      */
     public static function niceTime($date = false, $tense = true, $optBadMsg = null, $greaterOneWeek = null, $lessTenMins = null)
@@ -532,8 +552,8 @@ class DateTime
             }
         }
 
-        $periods = array('second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade');
-        $lengths = array(60,60,24,7,'4.35', 12, 10);
+        $periods = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade'];
+        $lengths = [60, 60, 24, 7, '4.35', 12, 10];
         $now     = time();
 
         if (is_int($date)) {
@@ -554,7 +574,7 @@ class DateTime
 
             } else {
 
-                return 'Bad date supplied ('.$date.')';
+                return 'Bad date supplied (' . $date . ')';
             }
         }
 
@@ -584,7 +604,7 @@ class DateTime
             }
         }
 
-        for ($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
+        for ($j = 0; $difference >= $lengths[$j] && $j < count($lengths) - 1; $j++) {
 
             $difference /= $lengths[$j];
         }
@@ -603,19 +623,19 @@ class DateTime
         }
 
         // If it's less than 20 seconds, return 'a moment ago'
-        if (is_null($lessTenMins) && substr($periods[$j], 0, 6) == 'second' && $difference <=20) {
+        if (is_null($lessTenMins) && substr($periods[$j], 0, 6) == 'second' && $difference <= 20) {
 
             return 'a moment ' . $tense;
         }
 
         //  If $lessTenMins is set then return that if less than 10 minutes
         if (!is_null($lessTenMins)
-                &&
-                (
-                    (substr($periods[$j], 0, 6) == 'minute' && $difference <= 10) ||
-                    (substr($periods[$j], 0, 6) == 'second' && $difference <= 60)
-                )
-            ) {
+            &&
+            (
+                (substr($periods[$j], 0, 6) == 'minute' && $difference <= 10) ||
+                (substr($periods[$j], 0, 6) == 'second' && $difference <= 60)
+            )
+        ) {
 
             return $lessTenMins;
         }
@@ -638,7 +658,9 @@ class DateTime
 
     /**
      * Get the timezone code from the timezone string
+     *
      * @param  string $timezone The timezone, e.g. Europe/London
+     *
      * @return mixed            String on success, false on failure
      */
     public static function getCodeFromTimezone($timezone)
@@ -663,9 +685,11 @@ class DateTime
 
     /**
      * Arbitrarily convert a timestamp between timezones
+     *
      * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
      * @param  string $sToTz      The timezone to convert to
      * @param  string $sFromTz    The timezone to convert from
+     *
      * @return string
      */
     public static function convert($mTimestamp, $sToTz, $sFromTz = 'UTC')
@@ -703,5 +727,57 @@ class DateTime
         $oOut->setTimeZone($oToTz);
 
         return $oOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Calculates a person's age (or age at a certain date)
+     *
+     * @param string $birthYear  The year to calculate from
+     * @param string $birthMonth The month to calculate from
+     * @param string $birthDay   The day to calculate from
+     * @param string $deathYear  The year to calculate to
+     * @param string $deathMonth The month to calculate to
+     * @param string $deathDay   The day to calculate to
+     *
+     * @return bool|float
+     */
+    public function calculateAge(
+        $birthYear,
+        $birthMonth,
+        $birthDay,
+        $deathYear = null,
+        $deathMonth = null,
+        $deathDay = null
+    ) {
+        //  Only calculate to a date which isn't today if all values are supplied
+        if (is_null($deathYear) || is_null($deathMonth) || is_null($deathDay)) {
+            $deathYear  = date('Y');
+            $deathMonth = date('m');
+            $deathDay   = date('d');
+        }
+
+        // --------------------------------------------------------------------------
+
+        $_birth_time = mktime(0, 0, 0, $birthMonth, $birthDay, $birthYear);
+        $_death_time = mktime(0, 0, 0, $deathMonth, $deathDay, $deathYear);
+
+        // --------------------------------------------------------------------------
+
+        //  If $_death_time is smaller than $_birth_time then something's wrong
+        if ($_death_time < $_birth_time) {
+            return false;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Calculate age
+        $_age       = ($_birth_time < 0) ? ($_death_time + ($_birth_time * -1)) : $_death_time - $_birth_time;
+        $_age_years = floor($_age / (31536000));    //  Divide by number of seconds in a year
+
+        // --------------------------------------------------------------------------
+
+        return $_age_years;
     }
 }
