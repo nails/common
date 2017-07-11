@@ -50,13 +50,13 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
         }
 
         $aOut = [];
-
         foreach ($aComposer as $oPackage) {
+
             if (isset($oPackage->extra->nails)) {
                 $aOut[] = (object) [
                     'slug'          => $oPackage->name,
                     'namespace'     => !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null,
-                    'name'          => !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug,
+                    'name'          => !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oPackage->name,
                     'description'   => !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description,
                     'homepage'      => !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage,
                     'authors'       => !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors,
@@ -102,7 +102,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                         $aOut[] = (object) [
                             'slug'          => 'app/' . $sDirName,
                             'namespace'     => !empty($oConfig->namespace) ? $oConfig->namespace : null,
-                            'name'          => !empty($oConfig->name) ? $oConfig->name : $oTemp->slug,
+                            'name'          => !empty($oConfig->name) ? $oConfig->name : 'app/' . $sDirName,
                             'description'   => !empty($oConfig->description) ? $oConfig->description : '',
                             'homepage'      => !empty($oConfig->homepage) ? $oConfig->homepage : '',
                             'authors'       => !empty($oConfig->authors) ? $oConfig->authors : [],
@@ -174,23 +174,17 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
     function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
     {
         if (isset($GLOBALS['NAILS'][$sType])) {
-
             $aOut = $GLOBALS['NAILS'][$sType];
-
         } else {
 
             $aComponents = _NAILS_GET_COMPONENTS();
             $aOut        = [];
-
-            // --------------------------------------------------------------------------
 
             foreach ($aComponents as $oComponent) {
                 if ($oComponent->type == $sType) {
                     $aOut[] = $oComponent;
                 }
             }
-
-            // --------------------------------------------------------------------------
 
             $GLOBALS['NAILS'][$sType] = $aOut;
         }
@@ -560,7 +554,7 @@ if (!function_exists('getRelativePath')) {
 
                     // add traversals up to first matching dir
                     $padLength = (count($aRelPath) + $remaining - 1) * -1;
-                    $aRelPath   = array_pad($aRelPath, $padLength, '..');
+                    $aRelPath  = array_pad($aRelPath, $padLength, '..');
                     break;
 
                 } else {

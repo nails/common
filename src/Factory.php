@@ -12,8 +12,8 @@
 
 namespace Nails;
 
-use Pimple\Container;
 use Nails\Common\Exception\FactoryException;
+use Pimple\Container;
 
 class Factory
 {
@@ -110,12 +110,40 @@ class Factory
     {
         $aPaths = [
             //  App overrides
-            FCPATH . 'application/services/' . Environment::get() . '/' . $sComponentName . '/services.php',
-            FCPATH . 'application/services/' . $sComponentName . '/services.php',
+            [
+                rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                'application',
+                'services',
+                strtolower(Environment::get()),
+                $sComponentName,
+                'services.php',
+            ],
+            [
+                rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                'application',
+                'services',
+                $sComponentName,
+                'services.php',
+            ],
             //  Default locations
-            FCPATH . 'vendor/' . $sComponentName . '/services/' . Environment::get() . '/services.php',
-            FCPATH . 'vendor/' . $sComponentName . '/services/services.php',
+            [
+                rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                'vendor',
+                $sComponentName,
+                'services',
+                strtolower(Environment::get()),
+                'services.php',
+            ],
+            [
+                rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                'vendor',
+                $sComponentName,
+                'services',
+                'services.php',
+            ],
         ];
+
+        self::flattenPath($aPaths);
 
         return self::findServicesAtPaths($aPaths);
     }
@@ -129,9 +157,11 @@ class Factory
     private static function findServicesForApp()
     {
         $aPaths = [
-            'application/services/' . Environment::get() . '/services.php',
-            'application/services/services.php',
+            ['application', 'services', strtolower(Environment::get()), 'services.php'],
+            ['application', 'services', 'services.php'],
         ];
+
+        self::flattenPath($aPaths);
 
         return self::findServicesAtPaths($aPaths);
     }
@@ -269,7 +299,13 @@ class Factory
              */
             if ($sComponentName == 'app') {
 
-                $sAppPath = FCPATH . 'application/helpers/' . $sHelperName . '.php';
+                $aAppPath = [
+                    rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                    'application',
+                    'helpers',
+                    $sHelperName . '.php',
+                ];
+                $sAppPath = implode(DIRECTORY_SEPARATOR, $aAppPath);
 
                 if (!file_exists($sAppPath)) {
                     throw new FactoryException(
@@ -282,21 +318,36 @@ class Factory
 
             } else {
 
-                $sComponentPath = FCPATH . 'vendor/' . $sComponentName . '/helpers/' . $sHelperName . '.php';
-                $sAppPath       = FCPATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
+                $aPaths = [
+                    'component' => [
+                        rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                        'vendor',
+                        $sComponentName,
+                        'helpers',
+                        $sHelperName . '.php',
+                    ],
+                    'app'       => [
+                        rtrim(FCPATH, DIRECTORY_SEPARATOR),
+                        'application',
+                        'helpers',
+                        $sComponentName,
+                        $sHelperName . '.php',
+                    ],
+                ];
+                static::flattenPath($aPaths);
 
-                if (!file_exists($sComponentPath)) {
+                if (!file_exists($aPaths['component'])) {
                     throw new FactoryException(
                         'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
                         1
                     );
                 }
 
-                if (file_exists($sAppPath)) {
-                    require_once $sAppPath;
+                if (file_exists($aPaths['app'])) {
+                    require_once $aPaths['app'];
                 }
 
-                require_once $sComponentPath;
+                require_once $aPaths['component'];
             }
 
             self::$aLoadedHelpers[$sComponentName][$sHelperName] = true;
@@ -308,25 +359,25 @@ class Factory
     /**
      * Returns a service from the namespaced container
      *
-     * @param  string $sServiceType   The type of the service to return
-     * @param  string $sServiceName   The name of the service to return
-     * @param  string $sComponentName The name of the module which defined it
+     * @param  string $sType   The type of the service to return
+     * @param  string $sName   The name of the service to return
+     * @param  string $sComponent The name of the module which defined it
      *
      * @throws FactoryException
      * @return mixed
      */
-    private static function getService($sServiceType, $sServiceName, $sComponentName = '')
+    private static function getService($sType, $sName, $sComponent = '')
     {
-        $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
+        $sComponent = empty($sComponent) ? 'nailsapp/common' : $sComponent;
 
-        if (empty(self::$aContainers[$sComponentName][$sServiceType][$sServiceName])) {
+        if (empty(self::$aContainers[$sComponent][$sType][$sName])) {
             throw new FactoryException(
-                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"',
+                ucfirst($sType) . ' "' . $sName . '" is not provided by component "' . $sComponent . '"',
                 0
             );
         }
 
-        return self::$aContainers[$sComponentName][$sServiceType][$sServiceName];
+        return self::$aContainers[$sComponent][$sType][$sName];
     }
 
     // --------------------------------------------------------------------------
@@ -337,7 +388,7 @@ class Factory
     public static function autoload()
     {
         //  CI base helpers
-        require_once BASEPATH . 'core/Common.php';
+        require_once BASEPATH . 'core' . DIRECTORY_SEPARATOR . 'Common.php';
 
         //  Common helpers
         self::helper('string');
@@ -367,10 +418,26 @@ class Factory
             //  Services
             if (!empty($oModule->autoload->services)) {
                 foreach ($oModule->autoload->services as $sService) {
-                   self::service($sService, $oModule->slug);
+                    self::service($sService, $oModule->slug);
                 }
             }
         }
+    }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Flattens an array of paths (described as an array) using the system's DIRECTORY_SEPARATOR
+     *
+     * @param array $aPaths An array of paths to flatten
+     */
+    private static function flattenPath(&$aPaths)
+    {
+        array_walk(
+            $aPaths,
+            function (&$aItem) {
+                $aItem = implode(DIRECTORY_SEPARATOR, $aItem);
+            }
+        );
     }
 }

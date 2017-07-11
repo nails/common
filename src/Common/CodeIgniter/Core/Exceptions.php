@@ -17,19 +17,20 @@ use Nails\Factory;
 
 class Exceptions extends CI_Exceptions
 {
+
     /**
      * Override the show_error method and pass to the Nails ErrorHandler
      *
      * @param  string $sSubject    The error's subject
      * @param  string $sMessage    The error message
-     * @param string  $sTemplate   Unused; only there to suppress compatability notification
-     * @param int     $iStatusCode Unused; only there to suppress compatability notification
+     * @param string  $sTemplate   Unused; only there to suppress compatibility notification
+     * @param int     $iStatusCode Unused; only there to suppress compatibility notification
      *
      * @return void
      */
-    public function show_error($sSubject, $sMessage = '', $sTemplate = 'error_gene...', $iStatusCode = 500)
+    public function show_error($sSubject, $sMessage = '', $sTemplate = 'error_general', $iStatusCode = 500)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');;
+        $oErrorHandler = Factory::service('ErrorHandler');
         $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
     }
 
@@ -38,11 +39,20 @@ class Exceptions extends CI_Exceptions
     /**
      * Override the show_exception method and pass to the Nails ErrorHandler
      *
-     * @param $oException
+     * @param \Exception $oException
      */
     public function show_exception($oException)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');;
+        $oException->
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $sMessage      = implode(
+            '; ',
+            [
+                'Code: ' . $oException->getCode(),
+                'File: ' . $oException->getFile(),
+                'Line: ' . $oException->getLine(),
+            ]
+        );
         $oErrorHandler->showFatalErrorScreen($oException->getMessage(), $sMessage);
     }
 
@@ -60,8 +70,8 @@ class Exceptions extends CI_Exceptions
      */
     public function show_php_error($iSeverity, $sMessage, $sFilepath, $iLine)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');;
-        $oErrorHandler->triggerError($iSeverity, $sMessage, $sFilepath, $iLine);
+        $oErrorHandler = Factory::service('ErrorHandler');
+        return $oErrorHandler->triggerError($iSeverity, $sMessage, $sFilepath, $iLine);
     }
 
     // --------------------------------------------------------------------------
@@ -76,7 +86,7 @@ class Exceptions extends CI_Exceptions
      */
     public function show_404($sPage = '', $bLogError = true)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');;
+        $oErrorHandler = Factory::service('ErrorHandler');
         $oErrorHandler->show404Screen($sPage, $bLogError);
     }
 }
