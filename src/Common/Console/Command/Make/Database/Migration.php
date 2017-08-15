@@ -6,12 +6,14 @@ use Nails\Common\Exception\Console\MigrationExistsException;
 use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Migration extends BaseMaker
 {
     const RESOURCE_PATH  = NAILS_COMMON_PATH . 'resources/console/';
     const MIGRATION_PATH = FCPATH . 'application/migrations/';
+    const TAB_WIDTH      = 4;
 
     // --------------------------------------------------------------------------
 
@@ -22,6 +24,13 @@ class Migration extends BaseMaker
     {
         $this->setName('make:db:migration');
         $this->setDescription('Creates a new Database Migration');
+        $this->addOption(
+            'sql-on-zero',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Automatically populate the migration when creating the first migration, i.e. 0',
+            true
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -29,8 +38,9 @@ class Migration extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -76,6 +86,7 @@ class Migration extends BaseMaker
      */
     private function createMigration()
     {
+        unlink(static::MIGRATION_PATH . '0.php');
         try {
 
             $oNow    = Factory::factory('DateTime');
@@ -116,6 +127,53 @@ class Migration extends BaseMaker
                 );
             }
 
+            //  If we're making the first migration, get a dump of all the non-Nails tables
+            $aFields['QUERIES'] = '';
+            if ($aFields['INDEX'] === 0 && stringToBoolean($this->oInput->getOption('sql-on-zero'))) {
+
+                $oDb      = Factory::service('Database');
+                $aResult  = $oDb->query('SHOW TABLES')->result();
+                $aCreates = [];
+
+                foreach ($aResult as $oResult) {
+                    $aResult = (array) $oResult;
+                    $sTable  = reset($aResult);
+                    if (!preg_match('/^' . NAILS_DB_PREFIX . '/', $sTable)) {
+                        $aResult    = (array) $oDb->query('SHOW CREATE TABLE ' . $sTable)->row();
+                        $aCreates[] = $aResult['Create Table'];
+                    }
+                }
+
+                foreach ($aCreates as $sCreate) {
+
+                    $aCreate = explode("\n", $sCreate);
+                    $iCount  = count($aCreate);
+                    array_walk(
+                        $aCreate,
+                        function (&$sLine, $iIndex) use ($iCount) {
+                            $sLine = trim($sLine);
+                            if ($iIndex > 0 && $iIndex < ($iCount - 1)) {
+                                $sLine = $this->tabs(4) . $sLine;
+                            } else {
+                                $sLine = $this->tabs(3) . $sLine;
+                            }
+                        }
+                    );
+
+                    $aFields['QUERIES'] .= $this->tabs(2) . '$this->query("' . "\n";
+                    $aFields['QUERIES'] .= implode("\n", $aCreate) . "\n";
+                    $aFields['QUERIES'] .= $this->tabs(2) . '");' . "\n";
+                }
+
+                $aFields['QUERIES'] = trim($aFields['QUERIES']);
+
+                $aFields['QUERIES'] = str_replace(NAILS_DB_PREFIX, '{{NAILS_DB_PREFIX}}', $aFields['QUERIES']);
+                $aFields['QUERIES'] = str_replace(APP_DB_PREFIX, '{{APP_DB_PREFIX}}', $aFields['QUERIES']);
+
+            } else {
+                $aFields['QUERIES'] = '$this->query("");';
+            }
+
             $this->createFile($sPath, $this->getResource('template/migration.php', $aFields));
             $aCreated[] = $sPath;
             $this->oOutput->writeln('<info>done!</info>');
@@ -131,5 +189,19 @@ class Migration extends BaseMaker
             }
             throw new \Exception($e->getMessage());
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates N number of tabs
+     *
+     * @param int $iNumberTabs The number of tabs to generate
+     *
+     * @return string
+     */
+    protected function tabs($iNumberTabs = 0)
+    {
+        return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }
 }
