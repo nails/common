@@ -137,9 +137,9 @@ class Migration extends BaseMaker
                 foreach ($aResult as $oResult) {
                     $aResult = (array) $oResult;
                     $sTable  = reset($aResult);
-                    if (!preg_match('/^' . NAILS_DB_PREFIX . '/', $sTable)) {
+                    if (!preg_match('/^' . NAILS_DB_PREFIX . '/', $sTable) || $sTable == NAILS_DB_PREFIX . 'user_meta_app') {
                         $aResult    = (array) $oDb->query('SHOW CREATE TABLE ' . $sTable)->row();
-                        $aCreates[] = $aResult['Create Table'];
+                        $aCreates[] = 'DROP TABLE IF EXISTS ' . $aResult['Table'] . ';' . "\n" . $aResult['Create Table'];
                     }
                 }
 
@@ -151,7 +151,7 @@ class Migration extends BaseMaker
                         $aCreate,
                         function (&$sLine, $iIndex) use ($iCount) {
                             $sLine = trim($sLine);
-                            if ($iIndex > 0 && $iIndex < ($iCount - 1)) {
+                            if ($iIndex > 1 && $iIndex < ($iCount - 1)) {
                                 $sLine = $this->tabs(4) . $sLine;
                             } else {
                                 $sLine = $this->tabs(3) . $sLine;
