@@ -86,7 +86,6 @@ class Migration extends BaseMaker
      */
     private function createMigration()
     {
-        unlink(static::MIGRATION_PATH . '0.php');
         try {
 
             $oNow    = Factory::factory('DateTime');
