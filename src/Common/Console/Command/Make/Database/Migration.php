@@ -5,6 +5,7 @@ namespace Nails\Common\Console\Command\Make\Database;
 use Nails\Common\Exception\Console\MigrationExistsException;
 use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,6 +31,11 @@ class Migration extends BaseMaker
             InputOption::VALUE_OPTIONAL,
             'Automatically populate the migration when creating the first migration, i.e. 0',
             true
+        );
+        $this->addArgument(
+            'index',
+            InputArgument::OPTIONAL,
+            'The migration index, leave blank to auto-detect'
         );
     }
 
@@ -90,32 +96,41 @@ class Migration extends BaseMaker
 
             $oNow    = Factory::factory('DateTime');
             $aFields = [
-                'INDEX'      => 0,
+                'INDEX'      => $this->oInput->getArgument('index'),
                 'DATE_START' => $oNow->format('Y-m-d'),
             ];
 
-            //  Get the most recent migration and increment it by 1
-            $sPattern    = \Nails\Common\Console\Command\Database\Migrate::VALID_MIGRATION_PATTERN;
-            $aMigrations = [];
-            foreach (new \DirectoryIterator(static::MIGRATION_PATH) as $oFileInfo) {
+            if (is_null($aFields['INDEX'])) {
 
-                if ($oFileInfo->isDot()) {
-                    continue;
+                //  Get the most recent migration and increment it by 1
+                $sPattern    = \Nails\Common\Console\Command\Database\Migrate::VALID_MIGRATION_PATTERN;
+                $aMigrations = [];
+                foreach (new \DirectoryIterator(static::MIGRATION_PATH) as $oFileInfo) {
+
+                    if ($oFileInfo->isDot()) {
+                        continue;
+                    }
+
+                    //  In the correct format?
+                    if (preg_match($sPattern, $oFileInfo->getFilename(), $aMatches)) {
+                        $aMigrations[] = (int) $aMatches[1];
+                    }
                 }
 
-                //  In the correct format?
-                if (preg_match($sPattern, $oFileInfo->getFilename(), $aMatches)) {
-                    $aMigrations[] = (int) $aMatches[1];
+                sort($aMigrations);
+
+                if (!empty($aMigrations)) {
+                    $aFields['INDEX'] = end($aMigrations) + 1;
+                } else {
+                    $aFields['INDEX'] = 0;
                 }
-            }
 
-            sort($aMigrations);
-
-            if (!empty($aMigrations)) {
-                $aFields['INDEX'] = end($aMigrations) + 1;
+            } elseif (!is_numeric($aFields['INDEX'])) {
+                throw new \Exception('Specified migration index is not a numeric value.');
             } else {
-                $aFields['INDEX'] = 0;
+                $aFields['INDEX'] = (int) $aFields['INDEX'];
             }
+
             $this->oOutput->write('Creating migration <comment>' . $aFields['INDEX'] . '</comment>... ');
 
             //  Check for existing controller
