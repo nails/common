@@ -208,7 +208,7 @@ class Controller extends BaseMaker
                         $this->getResource(
                             'template/view.php',
                             [
-                                'VIEW' => $sView,
+                                'VIEW' => preg_replace('#^' . FCPATH . '#', '', $sView),
                             ]
                         )
                     );
