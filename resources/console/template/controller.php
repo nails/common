@@ -20,7 +20,7 @@ use Nails\Factory;
 
 class {{CONTROLLER_CLASS}} extends Base
 {
-    {{METHODS}}
+{{METHODS}}
 }
 
 EOD;
