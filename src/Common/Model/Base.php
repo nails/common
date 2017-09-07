@@ -53,6 +53,13 @@ abstract class Base
     protected $tableAutoSetTokens;
 
     /**
+     * Keeps a track of the columns which have been used by getByColumn(); allows
+     * for us to more easily invalidate caches
+     * @var array
+     */
+    protected $aCacheColumns = [];
+
+    /**
      * Override the default token mask when automatically generating tokens for items
      * @var string
      */
@@ -116,6 +123,14 @@ abstract class Base
         $this->searchableFields       = [];
         $this->defaultSortColumn      = null;
         $this->defaultSortOrder       = 'ASC';
+
+        // --------------------------------------------------------------------------
+
+        $this->aCacheColumns = [
+            $this->tableIdColumn,
+            $this->tableSlugColumn,
+            $this->tableTokenColumn,
+        ];
 
         // --------------------------------------------------------------------------
 
@@ -397,13 +412,10 @@ abstract class Base
             unset($aData['id']);
             foreach ($aData as $sColumn => $mValue) {
                 if (is_array($mValue)) {
-
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
-
                     $oDb->set($sColumn, $mSetValue, $bEscape);
                 } else {
-
                     $oDb->set($sColumn, $mValue);
                 }
             }
@@ -428,6 +440,23 @@ abstract class Base
             }
         } else {
             $this->autoSaveExpandableFieldsSave($mIds, $aAutoSaveExpandableFields);
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Clear the cache
+        if (is_array($mIds)) {
+            foreach ($mIds as $iId) {
+                foreach ($this->aCacheColumns as $sColumn) {
+                    $sKey = strtoupper($sColumn) . ':' . json_encode($iId);
+                    $this->unsetCachePrefix($sKey);
+                }
+            }
+        } else {
+            foreach ($this->aCacheColumns as $sColumn) {
+                $sKey = strtoupper($sColumn) . ':' . json_encode($mIds);
+                $this->unsetCachePrefix($sKey);
+            }
         }
 
         // --------------------------------------------------------------------------
@@ -819,6 +848,121 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns item(s) by a column and its value
+     *
+     * @param string $sColumn      The column to search on
+     * @param mixed  $mValue       The value(s) to look for
+     * @param array  $aData        Any additional data to pass in
+     * @param bool   $bReturnsMany Whether the method expects to return a single item, or many
+     *
+     * @return array|mixed|null
+     * @throws ModelException
+     */
+    protected function getByColumn($sColumn, $mValue, $aData, $bReturnsMany = false)
+    {
+        if (empty($sColumn)) {
+            throw new ModelException('Column cannot be empty');
+        }
+
+        if (empty($mValue)) {
+            return $bReturnsMany ? [] : null;
+        }
+
+        // -------------------------------------------------------------------------
+
+        $sWhereType = is_array($mValue) ? 'where_in' : 'where';
+        if (!isset($aData[$sWhereType])) {
+            $aData[$sWhereType] = [];
+        }
+
+        $aData[$sWhereType][] = [$this->getTableAlias(true) . $sColumn, $mValue];
+
+        // --------------------------------------------------------------------------
+
+        $sCacheKey = $this->prepareCacheKey($sColumn, $mValue, $aData);
+        $aCache    = $this->getCache($sCacheKey);
+        if (!empty($aCache)) {
+            return $bReturnsMany ? $aCache : reset($aCache);
+        }
+
+        // --------------------------------------------------------------------------
+
+        $aResult = $this->getAll($aData);
+
+        // --------------------------------------------------------------------------
+
+        if (empty($aResult)) {
+            return $bReturnsMany ? [] : null;
+        }
+
+        // --------------------------------------------------------------------------
+
+        foreach ($aResult as $oResult) {
+            foreach ($this->aCacheColumns as $sColumn) {
+                if (!property_exists($oResult, $sColumn)) {
+                    continue;
+                }
+
+                if ($sColumn === $this->tableIdColumn) {
+                    $this->setCache(
+                        $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
+                        $oResult
+                    );
+                } else {
+                    $this->setCacheAlias(
+                        $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
+                        $this->prepareCacheKey($this->tableIdColumn, $oResult->{$this->tableIdColumn}, $aData)
+                    );
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        return $bReturnsMany ? $aResult : reset($aResult);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Formats the key used by the cache, taking into consideration $aData
+     *
+     * @param string $sColumn The column name
+     * @param mixed  $mValue  The value(s)
+     * @param array  $aData   The data array
+     *
+     * @return string
+     */
+    protected function prepareCacheKey($sColumn, $mValue, $aData)
+    {
+        /**
+         * Remove some elements from the $aData array as they are unlikely to affect the
+         * _contents_ of an object, only whether it's returned or not. Things like `expand`
+         * will most likely alter a result so leave them in as identifiers.
+         */
+
+        $aRemove = [
+            'where',
+            'or_where',
+            'where_in',
+            'or_where_in',
+            'where_not_in',
+            'or_where_not_in',
+            'like',
+            'or_like',
+            'not_like',
+            'or_not_like',
+        ];
+        foreach ($aRemove as $sKey) {
+            unset($aData[$sKey]);
+        }
+
+        return strtoupper($sColumn) . ':' . json_encode($mValue) . ':' . md5(json_encode($aData));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch an object by it's ID
      *
      * @param  int   $iId   The ID of the object to fetch
@@ -832,31 +976,8 @@ abstract class Base
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
         }
-        if (empty($iId)) {
-            return null;
-        }
 
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where'])) {
-            $aData['where'] = [];
-        }
-
-        $aData['where'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $iId];
-
-        // --------------------------------------------------------------------------
-
-        $aResult = $this->getAll(null, null, $aData);
-
-        // --------------------------------------------------------------------------
-
-        if (empty($aResult)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $aResult[0];
+        return $this->getByColumn($this->tableIdColumn, $iId, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -876,21 +997,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
         }
 
-        if (empty($aIds)) {
-            return [];
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $aIds];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData);
+        return $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
     }
 
     // --------------------------------------------------------------------------
@@ -910,31 +1017,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
         }
 
-        if (empty($sSlug)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where'])) {
-            $aData['where'] = [];
-        }
-
-        $aData['where'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $sSlug];
-
-        // --------------------------------------------------------------------------
-
-        $aResult = $this->getAll(null, null, $aData);
-
-        // --------------------------------------------------------------------------
-
-        if (empty($aResult)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $aResult[0];
+        return $this->getByColumn($this->tableSlugColumn, $sSlug, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -954,21 +1037,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
         }
 
-        if (empty($aSlugs)) {
-            return [];
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $aSlugs];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData, false);
+        return $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
     }
 
     // --------------------------------------------------------------------------
@@ -989,10 +1058,8 @@ abstract class Base
     public function getByIdOrSlug($mIdSlug, $aData = [])
     {
         if (is_numeric($mIdSlug)) {
-
             return $this->getById($mIdSlug, $aData);
         } else {
-
             return $this->getBySlug($mIdSlug, $aData);
         }
     }
@@ -1014,25 +1081,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
         }
 
-        if (empty($sToken)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $sToken];
-
-        // --------------------------------------------------------------------------
-
-        $result = $this->getAll(null, null, $aData, false);
-
-        // --------------------------------------------------------------------------
-
-        return empty($result) ? null : reset($result);
+        return $this->getByColumn($this->tableTokenColumn, $sToken, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -1052,21 +1101,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
         }
 
-        if (empty($aTokens)) {
-            return [];
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $aTokens];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData, false);
+        return $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
     }
 
     // --------------------------------------------------------------------------
