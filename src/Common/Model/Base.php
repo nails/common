@@ -906,7 +906,7 @@ abstract class Base
                 if ($sColumn === $this->tableIdColumn) {
                     $this->setCache(
                         $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
-                        $oResult
+                        [$oResult]
                     );
                 } else {
                     $this->setCacheAlias(
