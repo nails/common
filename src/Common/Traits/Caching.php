@@ -16,6 +16,12 @@ namespace Nails\Common\Traits;
 trait Caching
 {
     /**
+     * Globally turn caching on or off for this model
+     * @var bool
+     */
+    protected static $CACHING_ENABLED = true;
+
+    /**
      * Holds the cache values
      *
      * @var array
@@ -34,7 +40,9 @@ trait Caching
      */
     protected function setCache($sKey, $mValue)
     {
-        if (empty($sKey)) {
+        if (!static::$CACHING_ENABLED) {
+            return false;
+        } elseif (empty($sKey)) {
             return false;
         }
 
@@ -95,7 +103,9 @@ trait Caching
      */
     protected function setCacheAlias($sAliasKey, $sOriginalKey)
     {
-        if (empty($sAliasKey) || empty($sOriginalKey)) {
+        if (!static::$CACHING_ENABLED) {
+            return false;
+        } elseif (empty($sAliasKey) || empty($sOriginalKey)) {
             return false;
         }
 
@@ -125,7 +135,9 @@ trait Caching
      */
     protected function getCache($sKey, $bReturnValue = true)
     {
-        if (empty($sKey)) {
+        if (!static::$CACHING_ENABLED) {
+            return false;
+        } elseif (empty($sKey)) {
             return false;
         }
 
@@ -150,7 +162,9 @@ trait Caching
      */
     protected function unsetCache($sKey)
     {
-        if (empty($sKey)) {
+        if (!static::$CACHING_ENABLED) {
+            return false;
+        } elseif (empty($sKey)) {
             return false;
         }
 
@@ -175,7 +189,9 @@ trait Caching
      */
     protected function unsetCachePrefix($sPrefix)
     {
-        if (empty($sPrefix)) {
+        if (!static::$CACHING_ENABLED) {
+            return false;
+        } elseif (empty($sPrefix)) {
             return false;
         }
 
