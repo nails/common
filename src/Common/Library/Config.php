@@ -40,10 +40,7 @@ class Config
 
         } else {
 
-            if (empty($this->oConfig)) {
-                $this->oConfig = get_instance()->config;
-            }
-
+            $this->setupCiConfigClass();
             return call_user_func_array([$this->oConfig, $sMethod], $aArguments);
         }
     }
@@ -59,6 +56,7 @@ class Config
      */
     public function __get($sProperty)
     {
+        $this->setupCiConfigClass();
         return $this->oConfig->{$sProperty};
     }
 
@@ -74,7 +72,20 @@ class Config
      */
     public function __set($sProperty, $mValue)
     {
+        $this->setupCiConfigClass();
         $this->oConfig->{$sProperty} = $mValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Instantiates the CI Config class, if not already instantiated
+     */
+    private function setupCiConfigClass()
+    {
+        if (empty($this->oConfig)) {
+            $this->oConfig = get_instance()->config;
+        }
     }
 
     // --------------------------------------------------------------------------
