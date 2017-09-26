@@ -100,7 +100,7 @@ class Config
      */
     public static function siteUrl($sUri, $bUseSecure = false)
     {
-        if (preg_match('/^https?:\/\//', $sUri)) {
+        if (preg_match('/^(https?:\/\/)|#/', $sUri)) {
             //  Absolute URI; return unaltered
             return $sUri;
         } else {
