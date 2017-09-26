@@ -23,7 +23,7 @@ if (!function_exists('site_url')) {
     function site_url($sUri = '', $bForceSecure = false)
     {
         $oConfig = \Nails\Factory::service('Config');
-        return $oConfig->site_url($sUri, $bForceSecure);
+        return $oConfig::siteUrl($sUri, $bForceSecure);
     }
 }
 
@@ -42,7 +42,7 @@ if (!function_exists('secure_site_url')) {
     function secure_site_url($sUri = '')
     {
         $oConfig = \Nails\Factory::service('Config');
-        return $oConfig->site_url($sUri, true);
+        return $oConfig::siteUrl($sUri, true);
     }
 }
 
