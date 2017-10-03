@@ -40,7 +40,12 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
         } else {
 
             $sTemplate = APPPATH.'errors/' . $template . '.php';
-            if (!file_exists($sTemplate)) {
+
+            if (!class_exists('CI')) {
+
+                echo implode("\n", array_filter(['ERROR:', $heading, $message]));
+
+            } elseif (!file_exists($sTemplate)) {
                 _NAILS_ERROR($message, $heading);
             } else {
                 ob_start();
