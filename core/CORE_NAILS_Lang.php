@@ -11,6 +11,11 @@
  * @link
  */
 
+if (!class_exists('MX_Lang')) {
+
+    require NAILS_COMMON_PATH . 'MX/Lang.php';
+}
+
 class CORE_NAILS_Lang extends MX_Lang
 {
     /**
