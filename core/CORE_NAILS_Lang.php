@@ -65,8 +65,9 @@ class CORE_NAILS_Lang extends MX_Lang
         // Proxy check to determine whether runtime was initiated through CodeIgniter
         if (!class_exists('CI')) {
 
-            // Check failed; abandon this attempt to utilise CodeIgniter templating/localisation constructs
-                // => a null/void return type is consistent with behaviour in the CI_Lang base class
+            /* Check failed; abandon this attempt to utilise CodeIgniter templating/localisation constructs
+                => a null/void return type is consistent with behaviour in the CI_Lang base class
+            */
             return;
         }
 
