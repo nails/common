@@ -180,9 +180,9 @@ class Migration extends BaseMaker
                 }
 
                 $aFields['QUERIES'] = trim($aFields['QUERIES']);
-
                 $aFields['QUERIES'] = str_replace(NAILS_DB_PREFIX, '{{NAILS_DB_PREFIX}}', $aFields['QUERIES']);
                 $aFields['QUERIES'] = str_replace(APP_DB_PREFIX, '{{APP_DB_PREFIX}}', $aFields['QUERIES']);
+                $aFields['QUERIES'] = preg_replace('/AUTO_INCREMENT=\d+ /', '', $aFields['QUERIES']);
 
             } else {
                 $aFields['QUERIES'] = '$this->query("");';
