@@ -711,12 +711,15 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
-     * Handle requests for expanding objects.
-     * there are two types of expandable objects:
+     * Handle requests for expanding objects. There are two types of expandable objects:
      *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
      *  2. Query a model for items which reference this item's ID  (1 to many)
+     *
+     * @param array $aResults The results to iterate over
+     * @param array $aData    The configuration array
      */
-    protected function expandExpandableFields(&$aResults, $aData) {
+    protected function expandExpandableFields(&$aResults, $aData)
+    {
         if (!empty($this->aExpandableFields)) {
 
             /**
