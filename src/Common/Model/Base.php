@@ -699,13 +699,24 @@ abstract class Base
         $aResults    = $oResults->result();
         $iNumResults = count($aResults);
 
-        /**
-         * Handle requests for expanding objects.
-         * there are two types of expandable objects:
-         *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
-         *  2. Query a model for items which reference this item's ID  (1 to many)
-         */
+        $this->expandExpandableFields($aResults, $aData);
 
+        for ($i = 0; $i < $iNumResults; $i++) {
+            $this->formatObject($aResults[$i], $aData);
+        }
+
+        return $aResults;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Handle requests for expanding objects.
+     * there are two types of expandable objects:
+     *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
+     *  2. Query a model for items which reference this item's ID  (1 to many)
+     */
+    protected function expandExpandableFields(&$aResults, $aData) {
         if (!empty($this->aExpandableFields)) {
 
             /**
@@ -784,13 +795,8 @@ abstract class Base
                 }
             }
         }
-
-        for ($i = 0; $i < $iNumResults; $i++) {
-            $this->formatObject($aResults[$i], $aData);
-        }
-
-        return $aResults;
     }
+
 
     // --------------------------------------------------------------------------
 
