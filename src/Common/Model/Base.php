@@ -884,7 +884,11 @@ abstract class Base
             $aData[$sWhereType] = [];
         }
 
-        $aData[$sWhereType][] = [$this->getTableAlias(true) . $sColumn, $mValue];
+        if (strpos($sColumn, '.') !== false) {
+            $aData[$sWhereType][] = [$sColumn, $mValue];
+        } else {
+            $aData[$sWhereType][] = [$this->getTableAlias(true) . $sColumn, $mValue];
+        }
 
         // --------------------------------------------------------------------------
 
