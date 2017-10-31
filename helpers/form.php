@@ -2023,7 +2023,7 @@ if (!function_exists('form_field_cms_widgets')) {
 
         $_default = set_value($_field['key'], $_field['default']);
 
-        $_out .= '<textarea class="widget-data hidden" name="' . $_field['key'] . '" ' . $_field['id'] . '>' . htmlentities($_default) . '</textarea>';
+        $_out .= '<textarea class="widget-data hidden" name="' . $_field['key'] . '" ' . $_field['id'] . '>' . $_default . '</textarea>';
         $_out .= '<button type="button" class="btn btn-primary btn-sm open-editor" data-key="' . $_field['key'] . '">';
         $_out .= '<span class="fa fa-cogs">&nbsp;</span> Open Widget Editor';
         $_out .= '</button>';
