@@ -1535,6 +1535,12 @@ abstract class Base
      */
     public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the second parameter is an array then treat as if called with search($sKeywords, null, null, $aData);
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
         //  @todo: specify searchable fields in constructor and generate this manually
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
