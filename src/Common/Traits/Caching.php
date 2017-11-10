@@ -169,7 +169,7 @@ trait Caching
         }
 
         $iCacheIndex = $this->getCache($sKey, false);
-        if (is_null($this->aCache[$iCacheIndex])) {
+        if (is_null($iCacheIndex)) {
             return false;
         }
 
