@@ -6,7 +6,7 @@
  */
 
 return <<<'EOD'
-function {{METHOD_NAME}}()
+public function {{METHOD_NAME}}()
 {
     $oView = Factory::service('View');
     $oView->load('structure/header', $this->data);
