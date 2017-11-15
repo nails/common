@@ -11,6 +11,11 @@
  * @link
  */
 
+if (!class_exists('MX_Lang')) {
+
+    require NAILS_COMMON_PATH . 'MX/Lang.php';
+}
+
 class CORE_NAILS_Lang extends MX_Lang
 {
     /**
@@ -57,6 +62,15 @@ class CORE_NAILS_Lang extends MX_Lang
      */
     public function load($langfile, $lang = '', $return = false, $add_suffix = true, $alt_path = '', $_module = '')
     {
+        // Proxy check to determine whether runtime was initiated through CodeIgniter
+        if (!class_exists('CI')) {
+
+            /* Check failed; abandon this attempt to utilise CodeIgniter templating/localisation constructs
+                => a null/void return type is consistent with behaviour in the CI_Lang base class
+            */
+            return;
+        }
+
         //  Are we loading an array of languages? If so, handle each one on its own.
         if (is_array($langfile)) {
 
