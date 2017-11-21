@@ -2043,8 +2043,12 @@ abstract class Base
      */
     protected function describeFieldsPrepareLabel($sLabel)
     {
+        $aPatterns = [
+            '/\bid\b/i' => 'ID',
+        ];
+
         $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
-        $sLabel = str_ireplace(['id'], ['ID'], $sLabel);
+        $sLabel = preg_replace(array_keys($aPatterns), array_values($aPatterns), $sLabel);
 
         return $sLabel;
     }
