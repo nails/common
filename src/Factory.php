@@ -341,6 +341,7 @@ class Factory
 
         //  Common helpers
         self::helper('string');
+        self::helper('array');
         self::helper('app_setting');
         self::helper('app_notification');
         self::helper('date');
