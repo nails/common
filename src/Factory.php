@@ -319,10 +319,17 @@ class Factory
     {
         $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
 
-        if (empty(self::$aContainers[$sComponentName][$sServiceType][$sServiceName])) {
+        if (!array_key_exists($sComponentName, self::$aContainers)) {
             throw new FactoryException(
-                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"',
-                0
+                'No containers registered for "' . $sComponentName . '"'
+            );
+        } elseif (!array_key_exists($sServiceType, self::$aContainers[$sComponentName])) {
+            throw new FactoryException(
+                'No "' . $sServiceType . '" containers registered for "' . $sComponentName . '"'
+            );
+        } elseif (!self::$aContainers[$sComponentName][$sServiceType]->offsetExists($sServiceName)) {
+            throw new FactoryException(
+                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"'
             );
         }
 
@@ -368,7 +375,7 @@ class Factory
             //  Services
             if (!empty($oModule->autoload->services)) {
                 foreach ($oModule->autoload->services as $sService) {
-                   self::service($sService, $oModule->slug);
+                    self::service($sService, $oModule->slug);
                 }
             }
         }
