@@ -754,7 +754,6 @@ abstract class Base
                 $bAutoExpand       = $oExpandableField->auto_expand;
                 $bExpandAll        = false;
                 $bExpandForTrigger = false;
-
                 //  If we're not auto-expanding, check if we're expanding everything
                 if (!$bAutoExpand && array_key_exists('expand', $aData)) {
                     $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
@@ -769,7 +768,7 @@ abstract class Base
                 if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
 
                     //  Merge any data defined with the expandable field with any custom data added by the expansion
-                    $aData = array_merge(
+                    $aMergedData = array_merge(
                         $oExpandableField->data,
                         getFromArray($oExpandableField->trigger, $aTriggerData, [])
                     );
@@ -782,7 +781,7 @@ abstract class Base
                             $oExpandableField->property,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            $aData
+                            $aMergedData
                         );
                     } elseif ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
@@ -792,7 +791,7 @@ abstract class Base
                             $oExpandableField->id_column,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            $aData
+                            $aMergedData
                         );
                     }
                 }
