@@ -621,10 +621,12 @@ abstract class Base
 
         //  Define the default sorting
         if (empty($aData['sort']) && !empty($this->defaultSortColumn)) {
-            $aData['sort'] = [
-                $this->getTableAlias(true) . $this->defaultSortColumn,
-                $this->defaultSortOrder,
-            ];
+            if (strpos($this->defaultSortColumn, '.') !== false) {
+                $sColumn = $this->defaultSortColumn;
+            } else {
+                $sColumn = $this->getTableAlias(true) . $this->defaultSortColumn;
+            }
+            $aData['sort'] = [$sColumn, $this->defaultSortOrder];
         }
 
         // --------------------------------------------------------------------------
