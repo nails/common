@@ -1,7 +1,7 @@
 <?php
 
-return array(
-    'services' => array(
+return [
+    'services'  => [
         'Asset' => function () {
             if (class_exists('\App\Common\Library\Asset')) {
                 return new \App\Common\Library\Asset();
@@ -63,9 +63,11 @@ return array(
             }
         },
         'Input' => function () {
-            //  @todo - remove dependency on CI
-            $oCi = get_instance();
-            return $oCi->input;
+            if (class_exists('\App\Common\Library\Input')) {
+                return new \App\Common\Library\Input();
+            } else {
+                return new \Nails\Common\Library\Input();
+            }
         },
         'Logger' => function () {
             if (class_exists('\App\Common\Library\Logger')) {
@@ -89,9 +91,11 @@ return array(
             }
         },
         'Output' => function () {
-            //  @todo - remove dependency on CI
-            $oCi = get_instance();
-            return $oCi->output;
+            if (class_exists('\App\Common\Library\Output')) {
+                return new \App\Common\Library\Output();
+            } else {
+                return new \Nails\Common\Library\Output();
+            }
         },
         'Router' => function () {
             //  @todo - remove dependency on CI
@@ -106,9 +110,11 @@ return array(
             }
         },
         'Uri' => function () {
-            //  @todo - remove dependency on CI
-            $oCi = get_instance();
-            return $oCi->uri;
+            if (class_exists('\App\Common\Library\Uri')) {
+                return new \App\Common\Library\Uri();
+            } else {
+                return new \Nails\Common\Library\Uri();
+            }
         },
         'UserFeedback' => function () {
             if (class_exists('\App\Common\Library\UserFeedback')) {
@@ -130,9 +136,9 @@ return array(
             } else {
                 return new \Nails\Common\Library\Zip();
             }
-        }
-    ),
-    'models' => array(
+        },
+    ],
+    'models'    => [
         'AppNotification' => function () {
             if (class_exists('\App\Common\Model\AppNotification')) {
                 return new \App\Common\Model\AppNotification();
@@ -174,9 +180,9 @@ return array(
             } else {
                 return new \Nails\Common\Model\Routes();
             }
-        }
-    ),
-    'factories' => array(
+        },
+    ],
+    'factories' => [
         'DateTime' => function () {
             return new \DateTime();
         },
@@ -186,6 +192,6 @@ return array(
             } else {
                 return new \GuzzleHttp\Client();
             }
-        }
-    )
-);
+        },
+    ],
+];

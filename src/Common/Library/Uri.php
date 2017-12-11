@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The class abstracts CodeIgniter's Input class.
+ * The class abstracts CodeIgniter's Uri class.
  *
  * @package     Nails
  * @subpackage  common
@@ -13,29 +13,29 @@
 
 namespace Nails\Common\Library;
 
-class Input
+class Uri
 {
     /**
-     * The CodeIgniter Input object
-     * @var \CI_Input
+     * The CodeIgniter Uri object
+     * @var \CI_URI
      */
-    private $oInput;
+    private $oUri;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Input constructor.
+     * Uri constructor.
      */
     public function __construct()
     {
-        $oCi          = get_instance();
-        $this->oInput = $oCi->input;
+        $oCi        = get_instance();
+        $this->oUri = $oCi->uri;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Route calls to the CodeIgniter Input class
+     * Route calls to the CodeIgniter Uri class
      *
      * @param  string $sMethod    The method being called
      * @param  array  $aArguments Any arguments being passed
@@ -47,14 +47,14 @@ class Input
         if (method_exists($this, $sMethod)) {
             return call_user_func_array([$this, $sMethod], $aArguments);
         } else {
-            return call_user_func_array([$this->oInput, $sMethod], $aArguments);
+            return call_user_func_array([$this->oUri, $sMethod], $aArguments);
         }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "gets" to the CodeIgniter Input class
+     * Pass any property "gets" to the CodeIgniter Uri class
      *
      * @param  string $sProperty The property to get
      *
@@ -62,13 +62,13 @@ class Input
      */
     public function __get($sProperty)
     {
-        return $this->oInput->{$sProperty};
+        return $this->oUri->{$sProperty};
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "sets" to the CodeIgniter Input class
+     * Pass any property "sets" to the CodeIgniter Uri class
      *
      * @param  string $sProperty The property to set
      * @param  mixed  $mValue    The value to set
@@ -77,23 +77,6 @@ class Input
      */
     public function __set($sProperty, $mValue)
     {
-        $this->oInput->{$sProperty} = $mValue;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the user's IP Address. Extended to allow this method to be called from a command line environment.
-     * This override may not be needed in future implementations of CodeIgniter.
-     * @return string
-     */
-    public function ipAddress()
-    {
-        if (isCli()) {
-            $sHostname = gethostname();
-            return gethostbyname($sHostname);
-        } else {
-            return $this->oInput->ip_address();
-        }
+        $this->oUri->{$sProperty} = $mValue;
     }
 }
