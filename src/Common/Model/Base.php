@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Model;
 
+use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
@@ -1629,10 +1630,9 @@ abstract class Base
 
         $iCounter = 0;
         $oDb      = Factory::service('Database');
+        $sSlug    = Transliterator::transliterate($sLabel);
 
         do {
-
-            $sSlug = url_title(str_replace('/', '-', $sLabel), 'dash', true);
 
             if ($iCounter) {
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;

@@ -29,6 +29,7 @@
         "pimple/pimple": "3.*",
         "guzzlehttp/guzzle": "6.*",
         "mustache/mustache": "2.*",
+        "behat/transliterator": "^1.2",
         "nailsapp/module-admin": "dev-develop",
         "nailsapp/module-asset": "dev-develop",
         "nailsapp/module-email": "dev-develop",
