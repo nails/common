@@ -3,39 +3,39 @@
 /**
  * Renders a data section
  *
- * @param  string $title The title to give the section
- * @param  mixed  $data  The data to display
+ * @param  string $sTitle The title to give the section
+ * @param  mixed  $mData  The data to display
  *
  * @return string
  */
-function keyValueSection($title, $data)
+function keyValueSection($sTitle, $mData)
 {
     ob_start();
 
     ?>
     <section class="data-section">
-        <h3><?=$title?></h3>
+        <h3><?=$sTitle?></h3>
         <div class="table-responsive">
             <table>
                 <tbody>
                     <?php
 
-                    if (!empty($data)) {
+                    if (!empty($mData)) {
 
-                        foreach ($data as $k => $v) {
+                        foreach ($mData as $sKey => $mValue) {
 
                             ?>
                             <tr>
                                 <td class="key">
-                                    <?=$k?>
+                                    <?=$sKey?>
                                 </td>
                                 <td class="value" width="100%">
                                     <?php
 
-                                    if (is_string($v) || is_numeric($v)) {
-                                        echo $v;
+                                    if (is_string($mValue) || is_numeric($mValue)) {
+                                        echo $mValue;
                                     } else {
-                                        echo json_encode($v, JSON_PRETTY_PRINT);
+                                        echo json_encode($mValue, JSON_PRETTY_PRINT);
                                     }
 
                                     ?>
@@ -62,10 +62,10 @@ function keyValueSection($title, $data)
     </section>
     <?php
 
-    $out = ob_get_contents();
+    $sOut = ob_get_contents();
     ob_end_clean();
 
-    return $out;
+    return $sOut;
 }
 
 ?>
@@ -177,42 +177,38 @@ function keyValueSection($title, $data)
         <?php
 
         //  Error Variables
-        $displayDetails            = [];
-        $displayDetails['Type']    = $oDetails->type;
-        $displayDetails['Code']    = $oDetails->code;
-        $displayDetails['Message'] = $oDetails->msg;
-        $displayDetails['File']    = $oDetails->file;
-        $displayDetails['Line']    = $oDetails->line;
+        $aDisplayDetails = [
+            'Type'    => $oDetails->type,
+            'Code'    => $oDetails->code,
+            'Message' => $oDetails->msg,
+            'File'    => $oDetails->file,
+            'Line'    => $oDetails->line,
+        ];
 
-        echo keyValueSection('Error Details', $displayDetails);
+        echo keyValueSection('Error Details', $aDisplayDetails);
 
         // --------------------------------------------------------------------------
 
         //  Backtrace
         $aBacktrace = [];
-        foreach ($oDetails->backtrace as $bt) {
-
-            $sFile        = !empty($bt['file']) ? $bt['file'] : '&lt;unknown&gt;';
-            $sLine        = !empty($bt['line']) ? $bt['line'] : '&lt;unknown&gt;';
-            $sClass       = !empty($bt['class']) ? $bt['class'] : '';
-            $sFunction    = !empty($bt['function']) ? $bt['function'] : '&lt;unknown&gt;';
+        foreach ($oDetails->backtrace as $aItem) {
             $aBacktrace[] = sprintf(
                 'File <code>"%s"</code> line <code>%s</code> in <code>%s-&gt;%s</code>',
-                $sFile,
-                $sLine,
-                $sClass,
-                $sFunction
+                getFromArray('file', $aItem, '&lt;unknown&gt;'),
+                getFromArray('line', $aItem, '&lt;unknown&gt;'),
+                getFromArray('class', $aItem, ''),
+                getFromArray('function', $aItem, '&lt;unknown&gt;')
             );
         }
         echo keyValueSection('Backtrace', $aBacktrace);
 
         // --------------------------------------------------------------------------
 
-        $oDb     = \Nails\Factory::service('Database');
-        $queries = $oDb->queries;
-        $queries = array_reverse($queries);
+        $oDb      = \Nails\Factory::service('Database');
+        $aQueries = $oDb->queries;
+        $aQueries = array_reverse($aQueries);
 
-        echo keyValueSection('Database Queries (most recent first)', $queries);
+        echo keyValueSection('Database Queries (most recent first)', $aQueries);
 
         // --------------------------------------------------------------------------
 

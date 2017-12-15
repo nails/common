@@ -37,7 +37,7 @@ class CORE_NAILS_Exceptions extends CI_Exceptions
         $sMessage,
         $sTemplate = 'error_general',
         $iStatusCode = 500,
-        $bUseException = false
+        $bUseException = true
     ) {
         if (is_array($sMessage)) {
             $sMessage = implode($sMessage, ' ');

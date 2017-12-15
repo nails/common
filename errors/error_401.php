@@ -2,7 +2,7 @@
 <!--
 
     ERROR:   401
-    MESSAGE: <?=strip_tags($message)?>
+    MESSAGE: <?=strip_tags($sMessage)?>
 
 -->
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
@@ -33,7 +33,7 @@
 
         include NAILS_COMMON_PATH . 'errors/components/header.php';
 
-        echo $message;
+        echo $sMessage;
 
         include NAILS_COMMON_PATH . 'errors/components/footer.php';
 

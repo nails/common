@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-    
+
     ERROR:   GENERAL
-    MESSAGE: <?=strip_tags($message)?>
+    MESSAGE: <?=strip_tags($sMessage)?>
 
 -->
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
@@ -10,7 +10,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
-    <title><?=$heading . ' - ' . APP_NAME?></title>
+    <title><?=$sHeading . ' - ' . APP_NAME?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php
 
@@ -33,7 +33,7 @@
 
         include NAILS_COMMON_PATH . 'errors/components/header.php';
 
-        echo $message;
+        echo $sMessage;
 
         include NAILS_COMMON_PATH . 'errors/components/footer.php';
 
