@@ -115,6 +115,10 @@ function keyValueSection($sTitle, $mData)
                 background: #D5D5D5;
             }
 
+            header h1 {
+                line-height: 3rem;
+            }
+
             section.data-section h3 {
                 border-bottom: 1px solid #CCCCCC;
                 padding-bottom: 1em;
