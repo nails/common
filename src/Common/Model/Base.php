@@ -1000,19 +1000,25 @@ abstract class Base
     /**
      * Fetch objects by their IDs
      *
-     * @param  array $aIds  An array of IDs to fetch
-     * @param  mixed $aData Any data to pass to getCountCommon()
+     * @param  array  $aIds                An array of IDs to fetch
+     * @param  mixed  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
      */
-    public function getByIds($aIds, $aData = [])
+    public function getByIds($aIds, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
+        $aItems = $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aIds, $this->tableIdColumn);
+        } else {
+            return $aItems;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -1040,19 +1046,25 @@ abstract class Base
     /**
      * Fetch objects by their slugs
      *
-     * @param  array $aSlugs An array of slugs to fetch
-     * @param  array $aData  Any data to pass to getCountCommon()
+     * @param  array  $aSlugs              An array of slugs to fetch
+     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
      */
-    public function getBySlugs($aSlugs, $aData = [])
+    public function getBySlugs($aSlugs, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
+        $aItems = $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aSlugs, $this->tableSlugColumn);
+        } else {
+            return $aItems;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -1104,19 +1116,49 @@ abstract class Base
     /**
      * Fetch objects by an array of tokens
      *
-     * @param  array $aTokens An array of tokens to fetch
-     * @param  array $aData   Any data to pass to getCountCommon()
+     * @param  array  $aTokens             An array of tokens to fetch
+     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException if object property tableTokenColumn is not set
      */
-    public function getByTokens($aTokens, $aData = [])
+    public function getByTokens($aTokens, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
+        $aItems = $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aTokens, $this->tableTokenColumn);
+        } else {
+            return $aItems;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sorts items into a specific order based on a specific column
+     *
+     * @param array  $aItems      The items to sort
+     * @param array  $aInputOrder The order to sort them in
+     * @param string $sColumn     The column to sort on
+     *
+     * @return array
+     */
+    protected function sortItemsByColumn($aItems, $aInputOrder, $sColumn)
+    {
+        $aOut = [];
+        foreach ($aInputOrder as $sInputItem) {
+            foreach ($aItems as $oItem) {
+                if ($oItem->{$sColumn} == $sInputItem) {
+                    $aOut[] = $oItem;
+                }
+            }
+        }
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
