@@ -1787,10 +1787,10 @@ if (!function_exists('form_field_checkbox')) {
         $_out .= '</span>';
 
         //  Does the field have an id?
-        $_id = !empty($options[0]['id']) ? 'id="' . $options[0]['id'] . '-0" ' : '';
+        $_id = !empty($_field['options'][0]['id']) ? 'id="' . $_field['options'][0]['id'] . '-0" ' : '';
 
         //  Is the option disabled?
-        $_disabled = !empty($options[0]['disabled']) ? 'disabled="disabled" ' : '';
+        $_disabled = !empty($_field['options'][0]['disabled']) ? 'disabled="disabled" ' : '';
 
         $_tipclass      = $_tip['title'] ? 'with-tip' : '';
         $_disabledclass = $_disabled ? 'is-disabled' : '';
@@ -1804,10 +1804,10 @@ if (!function_exists('form_field_checkbox')) {
 
             //  Field is an array, need to look for the value
             $_values        = $oInput->post(substr($_field['key'], 0, -2));
-            $_data_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
+            $_data_selected = isset($_field['options'][0]['selected']) ? $_field['options'][0]['selected'] : false;
             $_selected      = $oInput->post() ? false : $_data_selected;
 
-            if (is_array($_values) && array_search($options[0]['value'], $_values) !== false) :
+            if (is_array($_values) && array_search($_field['options'][0]['value'], $_values) !== false) :
 
                 $_selected = true;
 
@@ -1818,36 +1818,36 @@ if (!function_exists('form_field_checkbox')) {
             //  Normal field, continue as normal Mr Norman!
             if ($oInput->post($_field['key'])) :
 
-                $_selected = $oInput->post($_field['key']) == $options[0]['value'] ? true : false;
+                $_selected = $oInput->post($_field['key']) == $_field['options'][0]['value'] ? true : false;
 
             else :
 
-                $_selected = isset($options[0]['selected']) ? $options[0]['selected'] : false;
+                $_selected = isset($_field['options'][0]['selected']) ? $_field['options'][0]['selected'] : false;
 
             endif;
 
         endif;
 
-        $_key = isset($options[0]['key']) ? $options[0]['key'] : $_field['key'];
+        $_key = isset($_field['options'][0]['key']) ? $_field['options'][0]['key'] : $_field['key'];
 
         if ($_field['type'] == 'checkbox') {
 
             $_out .= form_checkbox(
                 $_key,
-                $options[0]['value'],
+                $_field['options'][0]['value'],
                 $_selected,
                 $_id . $_disabled
             );
-            $_out .= '<span class="text">' . $options[0]['label'] . '</span>';
+            $_out .= '<span class="text">' . $_field['options'][0]['label'] . '</span>';
         } elseif ($_field['type'] == 'radio') {
 
             $_out .= form_radio(
                 $_key,
-                $options[0]['value'],
+                $_field['options'][0]['value'],
                 $_selected,
                 $_id . $_disabled
             );
-            $_out .= '<span class="text">' . $options[0]['label'] . '</span>';
+            $_out .= '<span class="text">' . $_field['options'][0]['label'] . '</span>';
         }
 
         //  Tip
@@ -1861,7 +1861,7 @@ if (!function_exists('form_field_checkbox')) {
         $_out .= '</label>';
 
         //  Remaining options
-        $numOptions = count($options);
+        $numOptions = count($_field['options']);
         for ($i = 1; $i < $numOptions; $i++) :
 
             $_out .= '<label>';
@@ -1870,10 +1870,10 @@ if (!function_exists('form_field_checkbox')) {
             $_out .= '<span class="label">&nbsp;</span>';
 
             //  Does the field have an id?
-            $_id = !empty($options[$i]['id']) ? 'id="' . $options[$i]['id'] . '-' . $i . '" ' : '';
+            $_id = !empty($_field['options'][$i]['id']) ? 'id="' . $_field['options'][$i]['id'] . '-' . $i . '" ' : '';
 
             //  Is the option disabled?
-            $_disabled      = !empty($options[$i]['disabled']) ? 'disabled="disabled" ' : '';
+            $_disabled      = !empty($_field['options'][$i]['disabled']) ? 'disabled="disabled" ' : '';
             $_disabledclass = $_disabled ? 'is-disabled' : '';
 
             $_out .= '<span class="input ' . $_disabledclass . '">';
@@ -1883,10 +1883,10 @@ if (!function_exists('form_field_checkbox')) {
 
                 //  Field is an array, need to look for the value
                 $_values        = $oInput->post(substr($_field['key'], 0, -2));
-                $_data_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
+                $_data_selected = isset($_field['options'][$i]['selected']) ? $_field['options'][$i]['selected'] : false;
                 $_selected      = $oInput->post() ? false : $_data_selected;
 
-                if (is_array($_values) && array_search($options[$i]['value'], $_values) !== false) :
+                if (is_array($_values) && array_search($_field['options'][$i]['value'], $_values) !== false) :
 
                     $_selected = true;
 
@@ -1897,36 +1897,36 @@ if (!function_exists('form_field_checkbox')) {
                 //  Normal field, continue as normal Mr Norman!
                 if ($oInput->post($_field['key'])) :
 
-                    $_selected = $oInput->post($_field['key']) == $options[$i]['value'] ? true : false;
+                    $_selected = $oInput->post($_field['key']) == $_field['options'][$i]['value'] ? true : false;
 
                 else :
 
-                    $_selected = isset($options[$i]['selected']) ? $options[$i]['selected'] : false;
+                    $_selected = isset($_field['options'][$i]['selected']) ? $_field['options'][$i]['selected'] : false;
 
                 endif;
 
             endif;
 
-            $_key = isset($options[$i]['key']) ? $options[$i]['key'] : $_field['key'];
+            $_key = isset($_field['options'][$i]['key']) ? $_field['options'][$i]['key'] : $_field['key'];
 
             if ($_field['type'] == 'checkbox') {
 
                 $_out .= form_checkbox(
                     $_key,
-                    $options[$i]['value'],
+                    $_field['options'][$i]['value'],
                     $_selected,
                     $_id . $_disabled
                 );
-                $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
+                $_out .= '<span class="text">' . $_field['options'][$i]['label'] . '</span>';
             } elseif ($_field['type'] == 'radio') {
 
                 $_out .= form_radio(
                     $_key,
-                    $options[$i]['value'],
+                    $_field['options'][$i]['value'],
                     $_selected,
                     $_id . $_disabled
                 );
-                $_out .= '<span class="text">' . $options[$i]['label'] . '</span>';
+                $_out .= '<span class="text">' . $_field['options'][$i]['label'] . '</span>';
             }
 
             $_out .= '</span>';
