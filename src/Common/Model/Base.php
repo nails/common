@@ -2087,8 +2087,12 @@ abstract class Base
     protected function describeFieldsPrepareLabel($sLabel)
     {
         $aPatterns = [
-            '/\bid\b/i'  => 'ID',
-            '/\burl\b/i' => 'URL',
+            //  Common words
+            '/\bid\b/i'   => 'ID',
+            '/\burl\b/i'  => 'URL',
+            '/\bhtml\b/i' => 'HTML',
+            //  Common file extensions
+            '/\bpdf\b/i'  => 'PDF',
         ];
 
         $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
