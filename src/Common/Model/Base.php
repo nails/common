@@ -2087,7 +2087,8 @@ abstract class Base
     protected function describeFieldsPrepareLabel($sLabel)
     {
         $aPatterns = [
-            '/\bid\b/i' => 'ID',
+            '/\bid\b/i'  => 'ID',
+            '/\burl\b/i' => 'URL',
         ];
 
         $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
