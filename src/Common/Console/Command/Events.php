@@ -61,10 +61,13 @@ class Events extends Base
             $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
             $oOutput->writeln('');
             foreach ($aComponentEvents as $aEvent) {
-                $sParamPrefix = '  ↳ <comment>@param</comment> ';
                 $oOutput->writeln('  <info>' . $aEvent->constant . '</info>');
                 $oOutput->writeln('  ' . $aEvent->description);
-                $oOutput->writeln($sParamPrefix . implode("\n" . $sParamPrefix, $aEvent->arguments));
+
+                if (!empty($aEvent->arguments)) {
+                    $sParamPrefix = '  ↳ <comment>@param</comment> ';
+                    $oOutput->writeln($sParamPrefix . implode("\n" . $sParamPrefix, $aEvent->arguments));
+                }
                 $oOutput->writeln('');
             }
         }
