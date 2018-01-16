@@ -13,6 +13,7 @@
 
 namespace Nails\Common\Controller;
 
+use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
 use Nails\Environment;
 use Nails\Factory;
@@ -39,8 +40,8 @@ abstract class Base extends \MX_Controller
         //  Setup Events
         $oEventService = Factory::service('Event');
 
-        //  Call the SYSTEM.STARTUP event, the earliest event the app can bind to.
-        $oEventService->trigger('SYSTEM.STARTUP', 'nailsapp/common');
+        //  Call the SYSTEM:STARTUP event, the earliest event the app can bind to.
+        $oEventService->trigger(Events::SYSTEM_STARTUP, 'nailsapp/common');
 
         // --------------------------------------------------------------------------
 
@@ -220,8 +221,8 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Call the SYSTEM.READY event, the system is all geared up and ready to go
-        $oEventService->trigger('SYSTEM.READY', 'nailsapp/common');
+        //  Call the SYSTEM:READY event, the system is all geared up and ready to go
+        $oEventService->trigger(Events::SYSTEM_READY, 'nailsapp/common');
     }
 
     // --------------------------------------------------------------------------
