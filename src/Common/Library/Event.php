@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The class provides a convinient way to load assets
+ * The class provides an interface for triggering and subscribing to events
  *
  * @package     Nails
  * @subpackage  common
@@ -12,12 +12,9 @@
 
 namespace Nails\Common\Library;
 
-use Nails\Factory;
-use Nails\Common\Exception\EventException;
-
 class Event
 {
-    protected $aSubsciptions;
+    protected $aSubscriptions;
 
     // --------------------------------------------------------------------------
 
@@ -27,7 +24,7 @@ class Event
     public function __construct()
     {
         //  Defaults
-        $this->aSubsciptions = array();
+        $this->aSubscriptions = [];
 
         //  Set up initial subscriptions
         $aComponents = _NAILS_GET_COMPONENTS();
@@ -45,20 +42,22 @@ class Event
 
     /**
      * Looks for a component's event handler and executes the autoload() method if there is one
+     *
      * @param  string $sNamespace The namespace to check
+     *
      * @return void
      */
     protected function autoLoadSubscriptions($sNamespace)
     {
-        $sClassName = '\\' . $sNamespace . 'Event';
+        $sClassName = '\\' . $sNamespace . 'Events';
 
         if (class_exists($sClassName)) {
 
             $oClass = new $sClassName();
-            if (is_callable(array($oClass, 'autoload'))) {
-                $aSubsciptions = $oClass->autoload();
-                if (!empty($aSubsciptions)) {
-                    foreach ($aSubsciptions as $aListener) {
+            if (is_callable([$oClass, 'autoload'])) {
+                $aSubscriptions = $oClass->autoload();
+                if (!empty($aSubscriptions)) {
+                    foreach ($aSubscriptions as $aListener) {
 
                         $sEvent     = getFromArray(0, $aListener);
                         $sNamespace = getFromArray(1, $aListener);
@@ -78,9 +77,11 @@ class Event
 
     /**
      * Subscribe to an event
+     *
      * @param  string $sEvent     The event to subscribe to
      * @param  string $sNamespace The event's namespace
      * @param  mixed  $mCallback  The callback to execute
+     *
      * @return \Nails\Common\Library\Event
      */
     public function subscribe($sEvent, $sNamespace, $mCallback)
@@ -89,18 +90,18 @@ class Event
         $sNamespace = strtoupper($sNamespace);
 
         if (is_callable($mCallback)) {
-            if (!isset($this->aSubsciptions[$sNamespace])) {
-                $this->aSubsciptions[$sNamespace] = array();
+            if (!isset($this->aSubscriptions[$sNamespace])) {
+                $this->aSubscriptions[$sNamespace] = [];
             }
 
-            if (!isset($this->aSubsciptions[$sNamespace][$sEvent])) {
-                $this->aSubsciptions[$sNamespace][$sEvent] = array();
+            if (!isset($this->aSubscriptions[$sNamespace][$sEvent])) {
+                $this->aSubscriptions[$sNamespace][$sEvent] = [];
             }
 
             //  Prevent duplicate subscriptions
             $sHash = md5(serialize($mCallback));
-            if (!isset($this->aSubsciptions[$sNamespace][$sEvent][$sHash])) {
-                $this->aSubsciptions[$sNamespace][$sEvent][$sHash] = $mCallback;
+            if (!isset($this->aSubscriptions[$sNamespace][$sEvent][$sHash])) {
+                $this->aSubscriptions[$sNamespace][$sEvent][$sHash] = $mCallback;
             }
         }
 
@@ -111,19 +112,21 @@ class Event
 
     /**
      * Trigger the event and execute all callbacks
+     *
      * @param  string $sEvent     The event to trigger
      * @param  string $sNamespace The event's namespace
      * @param  array  $aData      Data to pass to the callbacks
+     *
      * @return \Nails\Common\Library\Event
      */
-    public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = array())
+    public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
     {
         $sNamespace = strtoupper($sNamespace);
 
-        if (!empty($this->aSubsciptions[$sNamespace][$sEvent])) {
-            foreach ($this->aSubsciptions[$sNamespace][$sEvent] as $mCallback) {
+        if (!empty($this->aSubscriptions[$sNamespace][$sEvent])) {
+            foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $mCallback) {
                 if (is_callable($mCallback)) {
-                    call_user_func($mCallback, $aData);
+                    call_user_func_array($mCallback, $aData);
                 }
             }
         }
