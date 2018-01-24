@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Gets datetime formats and provides a convinient mechanism for converting timestamps between datetime zones
+ * Gets datetime formats and provides a convenient mechanism for converting timestamps between datetime zones
  *
  * @package     Nails
  * @subpackage  common
@@ -16,71 +16,151 @@ use Nails\Factory;
 
 class DateTime
 {
-    public $timezoneNails;
-    public $timezoneUser;
-    protected $userFormatDate;
-    protected $userFormatTime;
-    protected $oConfig;
+    /**
+     * The default timezone for users (defaults to system timezone)
+     * @var string
+     */
+    const TIMEZONE_DEFAULT = null;
+
+    /**
+     * The default date format
+     * @var string
+     */
+    const FORMAT_DATE_DEFAULT = 'DD/MM/YYYY';
+
+    /**
+     * The various date formats
+     * @var array
+     */
+    const FORMAT_DATE = [
+        [
+            'slug'   => 'DD/MM/YYYY',
+            'label'  => 'DD/MM/YYYY',
+            'format' => 'd/m/Y',
+        ],
+        [
+            'slug'   => 'DD-MM-YYYY',
+            'label'  => 'DD-MM-YYYY',
+            'format' => 'd-m-Y',
+        ],
+        [
+            'slug'   => 'DD/MM/YY',
+            'label'  => 'DD/MM/YY',
+            'format' => 'd/m/y',
+        ],
+        [
+            'slug'   => 'DD-MM-YY',
+            'label'  => 'DD-MM-YY',
+            'format' => 'd-m-y',
+        ],
+        [
+            'slug'   => 'MM/DD/YYYY',
+            'label'  => 'MM/DD/YYYY',
+            'format' => 'm/d/Y',
+        ],
+        [
+            'slug'   => 'MM-DD-YYYY',
+            'label'  => 'MM-DD-YYYY',
+            'format' => 'm-d-Y',
+        ],
+        [
+            'slug'   => 'MM/DD/YY',
+            'label'  => 'MM/DD/YY',
+            'format' => 'm/d/y',
+        ],
+        [
+            'slug'   => 'MM-DD-YY',
+            'label'  => 'MM-DD-YY',
+            'format' => 'm-d-y',
+        ],
+    ];
+
+    /**
+     * The default time format
+     * @var string
+     */
+    const FORMAT_TIME_DEFAULT = '24H';
+
+    /**
+     * The various time formats
+     * @var array
+     */
+    const FORMAT_TIME = [
+        [
+            'slug'   => '24H',
+            'label'  => '24 Hour',
+            'format' => 'H:i:s',
+        ],
+        [
+            'slug'   => '12H',
+            'label'  => '12 Hour',
+            'format' => 'g:i:s A',
+        ],
+    ];
+
+    // --------------------------------------------------------------------------
+
+    protected $sTimezoneNails;
+    protected $sTimezoneUser;
+    protected $sUserFormatDate;
+    protected $sUserFormatTime;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Constructs the model and laods the date helper
+     * DateTime constructor.
      */
     public function __construct()
     {
-        $this->oConfig = Factory::service('Config');
-        $this->oConfig->load('datetime');
+        $this->setTimezones();
+        $this->setTimeFormat();
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default date format object
-     * @return stdClass
+     * @return \stdClass|bool
      */
     public function getDateFormatDefault()
     {
-        $default    = $this->oConfig->item('datetime_format_date_default');
-        $dateFormat = $this->getDateFormatBySlug($default);
-
-        return !empty($dateFormat) ? $dateFormat : false;
+        return $this->getDateFormatBySlug(static::FORMAT_DATE_DEFAULT) ?: false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default date format's slug
-     * @return string
+     * @return string|bool
      */
     public function getDateFormatDefaultSlug()
     {
-        $default = $this->getDateFormatDefault();
-        return empty($default->slug) ? false : $default->slug;
+        $oFormat = $this->getDateFormatDefault();
+        return !empty($oFormat) ? $oFormat->slug : false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default date format's label
-     * @return string
+     * @return string|bool
      */
     public function getDateFormatDefaultLabel()
     {
-        $default = $this->getDateFormatDefault();
-        return empty($default->label) ? false : $default->label;
+        $oFormat = $this->getDateFormatDefault();
+        return !empty($oFormat) ? $oFormat->label : false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default date format's format
-     * @return string
+     * @return string|bool
      */
     public function getDateFormatDefaultFormat()
     {
-        $default = $this->getDateFormatDefault();
-        return empty($default->format) ? false : $default->format;
+        $oFormat = $this->getDateFormatDefault();
+        return !empty($oFormat) ? $oFormat->format : false;
     }
 
     // --------------------------------------------------------------------------
@@ -91,14 +171,12 @@ class DateTime
      */
     public function getAllDateFormat()
     {
-        $formats = $this->oConfig->item('datetime_format_date');
-
-        foreach ($formats as $format) {
-
-            $format->example = date($format->format);
+        $aFormats = static::FORMAT_DATE;
+        foreach ($aFormats as &$aFormat) {
+            $aFormat          = (object) $aFormat;
+            $aFormat->example = date($aFormat->format);
         }
-
-        return $formats;
+        return $aFormats;
     }
 
     // --------------------------------------------------------------------------
@@ -109,79 +187,82 @@ class DateTime
      */
     public function getAllDateFormatFlat()
     {
-        $out     = array();
-        $formats = $this->getAllDateFormat();
+        $aOut     = [];
+        $aFormats = $this->getAllDateFormat();
 
-        foreach ($formats as $format) {
-
-            $out[$format->slug] = $format->label;
+        foreach ($aFormats as $oFormat) {
+            $aOut[$oFormat->slug] = $oFormat->label;
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Looks for a date format by it's slug
-     * @param  string $slug The slug to search for
-     * @return mixed        stdClass on success, false on failure
+     *
+     * @param  string $sSlug The slug to search for
+     *
+     * @return \stdClass|null
      */
-    public function getDateFormatBySlug($slug)
+    public function getDateFormatBySlug($sSlug)
     {
-        $formats = $this->getAllDateFormat();
+        $aFormats = $this->getAllDateFormat();
+        foreach ($aFormats as $oFormat) {
+            if ($oFormat->slug === $sSlug) {
+                return $oFormat;
+            }
+        }
 
-        return !empty($formats[$slug]) ? $formats[$slug] : false;
+        return null;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default time format object
-     * @return stdClass
+     * @return \stdClass
      */
     public function getTimeFormatDefault()
     {
-        $default    = $this->oConfig->item('datetime_format_time_default');
-        $timeFormat = $this->getTimeFormatBySlug($default);
-
-        return !empty($timeFormat) ? $timeFormat : false;
+        return $this->getTimeFormatBySlug(static::FORMAT_TIME_DEFAULT) ?: false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default time format's slug
-     * @return string
+     * @return string|bool
      */
     public function getTimeFormatDefaultSlug()
     {
-        $default = $this->getTimeFormatDefault();
-        return empty($default->slug) ? false : $default->slug;
+        $oFormat = $this->getTimeFormatDefault();
+        return !empty($oFormat) ? $oFormat->slug : false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default time format's label
-     * @return string
+     * @return string|bool
      */
     public function getTimeFormatDefaultLabel()
     {
-        $default = $this->getTimeFormatDefault();
-        return empty($default->label) ? false : $default->label;
+        $oFormat = $this->getTimeFormatDefault();
+        return !empty($oFormat) ? $oFormat->label : false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the default time format's format
-     * @return string
+     * @return string|bool
      */
     public function getTimeFormatDefaultFormat()
     {
-        $default = $this->getTimeFormatDefault();
-        return empty($default->format) ? false : $default->format;
+        $oFormat = $this->getTimeFormatDefault();
+        return !empty($oFormat) ? $oFormat->format : false;
     }
 
     // --------------------------------------------------------------------------
@@ -192,18 +273,15 @@ class DateTime
      */
     public function getAllTimeFormat()
     {
-        $formats = $this->oConfig->item('datetime_format_time');
+        $aFormats = static::FORMAT_TIME;
 
-        if ($this->timezoneUser) {
-
-            foreach ($formats as $format) {
-
-                $dateTimeObject  = $this->convert(time(), $this->timezoneUser);
-                $format->example = $dateTimeObject->format($format->format);
-            }
+        foreach ($aFormats as &$aFormat) {
+            $aFormat          = (object) $aFormat;
+            $oDateTimeObject  = $this->convert(time(), $this->sTimezoneUser);
+            $aFormat->example = $oDateTimeObject->format($aFormat->format);
         }
 
-        return $formats;
+        return $aFormats;
     }
 
     // --------------------------------------------------------------------------
@@ -214,112 +292,123 @@ class DateTime
      */
     public function getAllTimeFormatFlat()
     {
-        $out     = array();
-        $formats = $this->getAllTimeFormat();
+        $aOut     = [];
+        $aFormats = $this->getAllTimeFormat();
 
-        foreach ($formats as $format) {
-
-            $out[$format->slug] = $format->label;
+        foreach ($aFormats as $oFormat) {
+            $aOut[$oFormat->slug] = $oFormat->label;
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Looks for a time format by it's slug
-     * @param  string $slug The slug to search for
-     * @return mixed        stdClass on success, false on failure
+     *
+     * @param  string $sSlug The slug to search for
+     *
+     * @return \stdClass|null
      */
-    public function getTimeFormatBySlug($slug)
+    public function getTimeFormatBySlug($sSlug)
     {
-        $formats = $this->getAllTimeFormat();
-        return !empty($formats[$slug]) ? $formats[$slug] : false;
+        $aFormats = $this->getAllTimeFormat();
+
+        foreach ($aFormats as $oFormat) {
+            if ($oFormat->slug === $sSlug) {
+                return $oFormat;
+            }
+        }
+
+        return null;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set both the date and the time format at the same time
-     * @param string $dateSlug The date format's slug
-     * @param string $timeSlug The time format's slug
+     *
+     * @param string $sDateSlug The date format's slug
+     * @param string $sTimeSlug The time format's slug
      */
-    public function setFormats($dateSlug, $timeSlug)
+    public function setFormats($sDateSlug, $sTimeSlug)
     {
-        $this->setDateFormat($dateSlug);
-        $this->setTimeFormat($timeSlug);
+        $this->setDateFormat($sDateSlug);
+        $this->setTimeFormat($sTimeSlug);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set the date format to use, uses default if slug cannot be found
-     * @param string $slug The date format's slug
+     *
+     * @param string $sSlug The date format's slug
      */
-    public function setDateFormat($slug)
+    public function setDateFormat($sSlug)
     {
-        $dateFormat = $this->getDateFormatBySlug($slug);
-
-        if (empty($dateFormat)) {
-
-            $dateFormat = $this->getDateFormatDefault();
+        $oDateFormat = $this->getDateFormatBySlug($sSlug);
+        if (empty($oDateFormat)) {
+            $oDateFormat = $this->getDateFormatDefault();
         }
 
-        $this->userFormatDate = $dateFormat->format;
+        $this->sUserFormatDate = $oDateFormat->format;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set the time format to use, uses default if slug cannot be found
-     * @param string $slug The time format's slug
+     *
+     * @param string $sSlug The time format's slug
      */
-    public function setTimeFormat($slug)
+    public function setTimeFormat($sSlug = null)
     {
-        $timeFormat = $this->getTimeFormatBySlug($slug);
-
-        if (empty($timeFormat)) {
-
-            $timeFormat = $this->getTimeFormatDefault();
+        $oTimeFormat = $this->getTimeFormatBySlug($sSlug);
+        if (empty($oTimeFormat)) {
+            $oTimeFormat = $this->getTimeFormatDefault();
         }
 
-        $this->userFormatTime = $timeFormat->format;
+        $this->sUserFormatTime = $oTimeFormat->format;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Convert a date timestamp to the User's timezone from the Nails timezone
-     * @param  mixed  $timestamp The timestamp to convert
-     * @param  string $format    The format of the timestamp to return, defaults to User's date preference
+     *
+     * @param  mixed  $mTimestamp The timestamp to convert
+     * @param  string $sFormat    The format of the timestamp to return, defaults to User's date preference
+     *
      * @return string
      */
-    public function toUserDate($timestamp = null, $format = null)
+    public function toUserDate($mTimestamp = null, $sFormat = null)
     {
-        $oConverted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $oConverted = $this->convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
 
         if (is_null($oConverted)) {
             return null;
         }
 
-        if (is_null($format)) {
-            $format = $this->userFormatDate;
+        if (is_null($sFormat)) {
+            $sFormat = $this->sUserFormatDate;
         }
 
-        return $oConverted->format($format);
+        return $oConverted->format($sFormat);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Convert a date timestamp to the Nails timezone from the User's timezone, formatted as Y-m-d
-     * @param  mixed  $timestamp The timestamp to convert
-     * @return string
+     *
+     * @param  mixed $mTimestamp The timestamp to convert
+     *
+     * @return string|null
      */
-    public function toNailsDate($timestamp = null)
+    public function toNailsDate($mTimestamp = null)
     {
-        $oConverted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
+        $oConverted = $this->convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
 
         if (is_null($oConverted)) {
             return null;
@@ -332,35 +421,39 @@ class DateTime
 
     /**
      * Convert a datetime timestamp to the user's timezone from the Nails timezone
-     * @param  mixed  $timestamp The timestamp to convert
-     * @param  string $format    The format of the timestamp to return, defaults to User's dateTime preference
-     * @return string
+     *
+     * @param  mixed  $mTimestamp The timestamp to convert
+     * @param  string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
+     *
+     * @return string|null
      */
-    public function toUserDatetime($timestamp = null, $format = null)
+    public function toUserDatetime($mTimestamp = null, $sFormat = null)
     {
-        $oConverted = $this->convert($timestamp, $this->timezoneUser, $this->timezoneNails);
+        $oConverted = $this->convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
 
         if (is_null($oConverted)) {
             return null;
         }
 
-        if (is_null($format)) {
-            $format = $this->userFormatDate . ' ' . $this->userFormatTime;
+        if (is_null($sFormat)) {
+            $sFormat = $this->sUserFormatDate . ' ' . $this->sUserFormatTime;
         }
 
-        return $oConverted->format($format);
+        return $oConverted->format($sFormat);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Convert a datetime timestamp to the Nails timezone from the User's timezone
-     * @param  mixed  $timestamp The timestamp to convert
-     * @return string
+     *
+     * @param  mixed $mTimestamp The timestamp to convert
+     *
+     * @return string|null
      */
-    public function toNailsDatetime($timestamp = null)
+    public function toNailsDatetime($mTimestamp = null)
     {
-        $oConverted = $this->convert($timestamp, $this->timezoneNails, $this->timezoneUser);
+        $oConverted = $this->convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
 
         if (is_null($oConverted)) {
             return null;
@@ -372,56 +465,72 @@ class DateTime
     // --------------------------------------------------------------------------
 
     /**
-     * Return's the default timezone
+     * Returns the default timezone
      * @return string
      */
     public function getTimezoneDefault()
     {
-        $default = $this->oConfig->item('datetime_timezone_default');
-
-        if ($default) {
-
-            return $default;
-
-        } else {
-
-            return date_default_timezone_get();
-        }
+        return static::TIMEZONE_DEFAULT ?: date_default_timezone_get();
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Sets the Nails and User timezones simultaneously
-     * @param string $tzNails The Nails timezone
-     * @param string $tzUser  The User's timezone
+     *
+     * @param string $sTzNails The Nails timezone
+     * @param string $sTzUser  The User's timezone
      */
-    public function setTimezones($tzNails, $tzUser)
+    public function setTimezones($sTzNails = null, $sTzUser = null)
     {
-        $this->setNailsTimezone($tzNails);
-        $this->setUserTimezone($tzUser);
+        $this->setNailsTimezone($sTzNails);
+        $this->setUserTimezone($sTzUser);
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set the Nails timezone
-     * @param string $tz The timezone to set
+     *
+     * @param string $sTimezone The timezone to set
      */
-    public function setNailsTimezone($tz)
+    public function setNailsTimezone($sTimezone = null)
     {
-        $this->timezoneNails = $tz;
+        $this->sTimezoneNails = $sTimezone ?: $this->getTimezoneDefault();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the Nails timezone
+     * @return string
+     */
+    public function getNailsTimezone()
+    {
+        return $this->sTimezoneNails;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set the User's timezone
-     * @param string $tz The timezone to set
+     *
+     * @param string $sTimezone The timezone to set
      */
-    public function setUserTimezone($tz)
+    public function setUserTimezone($sTimezone = null)
     {
-        $this->timezoneUser = $tz;
+        $this->sTimezoneUser = $sTimezone ?: $this->getTimezoneDefault();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the User's timezone
+     * @return string
+     */
+    public function getUserTimezone()
+    {
+        return $this->sTimezoneUser;
     }
 
     // --------------------------------------------------------------------------
@@ -433,45 +542,43 @@ class DateTime
     public function getAllTimezone()
     {
         //  Hat-tip to: https://gist.github.com/serverdensity/82576
-        $zones     = \DateTimeZone::listIdentifiers();
-        $locations = array('UTC' => 'Coordinated Universal Time (UTC/GMT)');
+        $aZones     = \DateTimeZone::listIdentifiers();
+        $aLocations = ['UTC' => 'Coordinated Universal Time (UTC/GMT)'];
 
-        foreach ($zones as $zone) {
+        foreach ($aZones as $sZone) {
 
             // 0 => Continent, 1 => City
-            $zoneExploded = explode('/', $zone);
-
-            $zoneAcceptable   = array();
-            $zoneAcceptable[] = 'Africa';
-            $zoneAcceptable[] = 'America';
-            $zoneAcceptable[] = 'Antarctica';
-            $zoneAcceptable[] = 'Arctic';
-            $zoneAcceptable[] = 'Asia';
-            $zoneAcceptable[] = 'Atlantic';
-            $zoneAcceptable[] = 'Australia';
-            $zoneAcceptable[] = 'Europe';
-            $zoneAcceptable[] = 'Indian';
-            $zoneAcceptable[] = 'Pacific';
+            $aZoneExploded   = explode('/', $sZone);
+            $aZoneAcceptable = [
+                'Africa',
+                'America',
+                'Antarctica',
+                'Arctic',
+                'Asia',
+                'Atlantic',
+                'Australia',
+                'Europe',
+                'Indian',
+                'Pacific',
+            ];
 
             // Only use "friendly" continent names
-            if (in_array($zoneExploded[0], $zoneAcceptable)) {
+            if (in_array($aZoneExploded[0], $aZoneAcceptable)) {
+                if (isset($aZoneExploded[1]) != '') {
 
-                if (isset($zoneExploded[1]) != '') {
+                    $sArea = str_replace('_', ' ', $aZoneExploded[1]);
 
-                    $area = str_replace('_', ' ', $zoneExploded[1]);
-
-                    if (!empty($zoneExploded[2])) {
-
-                        $area = $area . ' (' . str_replace('_', ' ', $zoneExploded[2]) . ')';
+                    if (!empty($aZoneExploded[2])) {
+                        $sArea = $sArea . ' (' . str_replace('_', ' ', $aZoneExploded[2]) . ')';
                     }
 
                     // Creates array(DateTimeZone => 'Friendly name')
-                    $locations[$zoneExploded[0]][$zone] = $area;
+                    $aLocations[$aZoneExploded[0]][$sZone] = $sArea;
                 }
             }
         }
 
-        return $locations;
+        return $aLocations;
     }
 
     // --------------------------------------------------------------------------
@@ -482,176 +589,149 @@ class DateTime
      */
     public function getAllTimezoneFlat()
     {
-        $locations = $this->getAllTimezone();
-        $out       = array();
+        $aTimezones = $this->getAllTimezone();
+        $aOut       = [];
 
-        foreach ($locations as $key => $value) {
-
-            if (is_array($value)) {
-
-                foreach ($value as $subKey => $subValue) {
-
+        foreach ($aTimezones as $sKey => $mValue) {
+            if (is_array($mValue)) {
+                foreach ($mValue as $subKey => $subValue) {
                     if (is_string($subValue)) {
-
-                        $out[$subKey] = $subValue;
+                        $aOut[$subKey] = $subValue;
                     }
                 }
-
             } else {
-
-                $out[$key] = $value;
+                $aOut[$sKey] = $mValue;
             }
-
         }
 
-        return $out;
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Converts a datetime into a human friendly relative string
-     * @param  mixed   $date           The timestamp to convert
-     * @param  boolean $tense          Whether or not to append the tense (e.g, X minutes _ago_)
-     * @param  string  $optBadMsg      The message to show if a bad timestamp is supplied
-     * @param  string  $greaterOneWeek The message to show if the timestanmp is greater than one week away
-     * @param  string  $lessTenMins    The message to show if the timestamp is less than ten minutes away
+     *
+     * @param  mixed   $mDate                  The timestamp to convert
+     * @param  boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param  string  $sMessageBadDate        The message to show if a bad timestamp is supplied
+     * @param  string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
+     * @param  string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
+     *
      * @return string
      */
-    public static function niceTime($date = false, $tense = true, $optBadMsg = null, $greaterOneWeek = null, $lessTenMins = null)
-    {
-        if (empty($date) || $date == '0000-00-00') {
-
-            if ($optBadMsg) {
-
-                return $optBadMsg;
-
+    public static function niceTime(
+        $mDate = false,
+        $bIncludeTense = true,
+        $sMessageBadDate = null,
+        $sMessageGreaterOneWeek = null,
+        $sMessageLessTenMinutes = null
+    ) {
+        if (empty($mDate) || $mDate == '0000-00-00') {
+            if ($sMessageBadDate) {
+                return $sMessageBadDate;
             } else {
-
                 return 'No date supplied';
             }
         }
 
-        $periods = array('second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade');
-        $lengths = array(60,60,24,7,'4.35', 12, 10);
-        $now     = time();
+        $aPeriods = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade'];
+        $aLengths = [60, 60, 24, 7, '4.35', 12, 10];
+        $sNow     = Factory::factory('DateTime')->format('U');
 
-        if (is_int($date)) {
-
-            $unix_date = $date;
-
+        if (is_int($mDate)) {
+            $iUnixTime = $mDate;
         } else {
-
-            $unix_date = strtotime($date);
+            $iUnixTime = strtotime($mDate);
         }
 
         //  Check date supplied is valid
-        if (empty($unix_date)) {
-
-            if ($optBadMsg) {
-
-                return $optBadMsg;
-
+        if (empty($iUnixTime)) {
+            if ($sMessageBadDate) {
+                return $sMessageBadDate;
             } else {
-
-                return 'Bad date supplied ('.$date.')';
+                return 'Bad date supplied (' . $mDate . ')';
             }
         }
 
         //  If date is effectively null
-        if ($date == '0000-00-00 00:00:00') {
-
+        if ($mDate == '0000-00-00 00:00:00') {
             return 'Unknown';
         }
 
         //  Determine past or future date
-        if ($now >= $unix_date) {
+        $sTense = '';
+        if ($sNow >= $iUnixTime) {
 
-            $difference = $now - $unix_date;
-
-            if ($tense === true) {
-
-                $tense = 'ago';
+            $iDifference = $sNow - $iUnixTime;
+            if ($bIncludeTense) {
+                $sTense = 'ago';
             }
 
         } else {
 
-            $difference = $unix_date - $now;
-
-            if ($tense === true) {
-
-                $tense = 'from now';
+            $iDifference = $iUnixTime - $sNow;
+            if ($bIncludeTense) {
+                $sTense = 'from now';
             }
         }
 
-        for ($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
-
-            $difference /= $lengths[$j];
+        for ($i = 0; $iDifference >= $aLengths[$i] && $i < count($aLengths) - 1; $i++) {
+            $iDifference /= $aLengths[$i];
         }
 
-        $difference = round($difference);
+        $iDifference = round($iDifference);
 
-        if ($difference != 1) {
-
-            $periods[$j] .= 's';
+        if ($iDifference != 1) {
+            $aPeriods[$i] .= 's';
         }
 
-        // If it's greater than 1 week and $greaterOneWeek is defined, return that
-        if (substr($periods[$j], 0, 4) == 'week' && $greaterOneWeek !== null) {
-
-            return $greaterOneWeek;
+        // If it's greater than 1 week and $sMessageGreaterOneWeek is defined, return that
+        if (substr($aPeriods[$i], 0, 4) == 'week' && $sMessageGreaterOneWeek !== null) {
+            return $sMessageGreaterOneWeek;
         }
 
         // If it's less than 20 seconds, return 'a moment ago'
-        if (is_null($lessTenMins) && substr($periods[$j], 0, 6) == 'second' && $difference <=20) {
-
-            return 'a moment ' . $tense;
+        if (is_null($sMessageLessTenMinutes) && substr($aPeriods[$i], 0, 6) == 'second' && $iDifference <= 20) {
+            return 'a moment ' . $sTense;
         }
 
-        //  If $lessTenMins is set then return that if less than 10 minutes
-        if (!is_null($lessTenMins)
-                &&
-                (
-                    (substr($periods[$j], 0, 6) == 'minute' && $difference <= 10) ||
-                    (substr($periods[$j], 0, 6) == 'second' && $difference <= 60)
-                )
-            ) {
-
-            return $lessTenMins;
+        //  If $sMessageLessTenMinutes is set then return that if less than 10 minutes
+        if (!is_null($sMessageLessTenMinutes)
+            &&
+            (
+                (substr($aPeriods[$i], 0, 6) == 'minute' && $iDifference <= 10) ||
+                (substr($aPeriods[$i], 0, 6) == 'second' && $iDifference <= 60)
+            )
+        ) {
+            return $sMessageLessTenMinutes;
         }
 
-        if ($difference . ' ' . $periods[$j] . ' ' . $tense == '1 day ago') {
-
+        if ($iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense == '1 day ago') {
             return 'yesterday';
-
-        } elseif ($difference . ' ' . $periods[$j] . ' ' . $tense == '1 day from now') {
-
+        } elseif ($iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense == '1 day from now') {
             return 'tomorrow';
-
         } else {
-
-            return $difference . ' ' . $periods[$j] . ' ' . $tense;
+            return $iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense;
         }
     }
 
-    // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------f
 
     /**
      * Get the timezone code from the timezone string
-     * @param  string $timezone The timezone, e.g. Europe/London
-     * @return mixed            String on success, false on failure
+     *
+     * @param  string $sTimezone The timezone, e.g. Europe/London
+     *
+     * @return string|false
      */
-    public static function getCodeFromTimezone($timezone)
+    public static function getCodeFromTimezone($sTimezone)
     {
-        $abbreviations = DateTimeZone::listAbbreviations();
-
-        foreach ($abbreviations as $code => $values) {
-
-            foreach ($values as $v) {
-
-                if ($v['timezone_id'] == $timezone) {
-
-                    return strtoupper($code);
+        $aAbbreviations = \DateTimeZone::listAbbreviations();
+        foreach ($aAbbreviations as $sCode => $aValues) {
+            foreach ($aValues as $aValue) {
+                if ($aValue['timezone_id'] == $sTimezone) {
+                    return strtoupper($sCode);
                 }
             }
         }
@@ -663,10 +743,12 @@ class DateTime
 
     /**
      * Arbitrarily convert a timestamp between timezones
+     *
      * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
      * @param  string $sToTz      The timezone to convert to
      * @param  string $sFromTz    The timezone to convert from
-     * @return string
+     *
+     * @return \DateTime|null
      */
     public static function convert($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
@@ -689,7 +771,6 @@ class DateTime
             $oDateTime = new \DateTime($mTimestamp);
 
         } else {
-
             return null;
         }
 
