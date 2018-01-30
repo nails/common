@@ -1,0 +1,22 @@
+.form-group {
+    display: block;
+    margin-bottom: 1rem;
+
+    input[type=text],
+    input[type=password],
+    input[type=tel],
+    input[type=email],
+    input[type=number] {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        margin-top: 0.5rem;
+    }
+
+    input[type=radio],
+    input[type=checkbox] {
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+}

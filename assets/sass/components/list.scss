@@ -1,0 +1,27 @@
+.list {
+    padding: 0 0 0 2rem;
+    margin: 0 0 1.5rem 0;
+
+    > li {
+        padding: 0.5rem;
+    }
+
+    &--unstyled {
+        padding: 0;
+        > li {
+            list-style-type: none !important;
+        }
+    }
+}
+
+ul.list {
+    > li {
+        list-style-type: disc;
+    }
+}
+
+ol.list {
+    > li {
+        list-style-type: decimal;
+    }
+}

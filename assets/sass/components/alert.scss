@@ -1,0 +1,30 @@
+.alert {
+    border: 1px solid $color-grey-lighter;
+    background: $color-white-darker;
+    padding: 0.7rem 1.1rem;
+    border-radius: 2px;
+
+    &--success {
+        color: $color-success-text;
+        border-color: $color-success-border;
+        background: $color-success-background;
+    }
+
+    &--warning {
+        color: $color-warning-text;
+        border-color: $color-warning-border;
+        background: $color-warning-background;
+    }
+
+    &--danger {
+        color: $color-danger-text;
+        border-color: $color-danger-border;
+        background: $color-danger-background;
+    }
+
+    &--info {
+        color: $color-info-text;
+        border-color: $color-info-border;
+        background: $color-info-background;
+    }
+}
