@@ -1,5 +1,5 @@
 {
-  "name": "nailsapp/common",
+  "name": "nailsapp-common",
   "version": "0.0.0",
   "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
   "author": "hello@nailsapp.co.uk",
@@ -25,7 +25,7 @@
     "gulp-rename": "^1.2",
     "gulp-sass": "^2.1",
     "gulp-sourcemaps": "^1.5",
-    "gulp-uglify": "^1.4",
+    "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0",
     "jshint-stylish": "^2.0",
     "run-sequence": "^1.1",
