@@ -1,8 +1,9 @@
 .panel {
     border: 1px solid $color-grey;
-    box-shadow: 0 1px 2px $color-grey-lightest;
+    border-bottom: 2px solid $color-grey;
     margin-bottom: 1.5rem;
     background: $color-white;
+    min-width: 500px;
 
     &__header,
     &__body {

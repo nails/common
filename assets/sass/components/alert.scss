@@ -1,8 +1,8 @@
 .alert {
     border: 1px solid $color-grey-lighter;
+    border-left: 10px solid $color-grey-lighter;
     background: $color-white-darker;
-    padding: 0.7rem 1.1rem;
-    border-radius: 2px;
+    padding: 0.7rem 1rem;
 
     &--success {
         color: $color-success-text;

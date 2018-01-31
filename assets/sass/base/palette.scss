@@ -20,7 +20,7 @@ $color-grey-darker: darken($color-grey, 5%);
 $color-grey-darkest: darken($color-grey, 10%);
 
 //  Blacks
-$color-black: #777;
+$color-black: #333;
 $color-black-lightest: lighten($color-black, 10%);
 $color-black-lighter: lighten($color-black, 5%);
 $color-black-darker: darken($color-black, 5%);
@@ -42,9 +42,9 @@ $color-warning-text: darken($color-warning-background, 35%);
 $color-warning-border: darken($color-warning-background, 10%);
 
 //  Danger
-$color-danger-background: #d9534f;
-$color-danger-text: darken($color-danger-background, 30%);
-$color-danger-border: darken($color-danger-background, 10%);
+$color-danger-background: #e2817e;
+$color-danger-text: darken($color-danger-background, 35%);
+$color-danger-border: darken($color-danger-background, 15%);
 
 //  Info
 $color-info-background: #5bc0de;
