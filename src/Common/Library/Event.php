@@ -14,12 +14,16 @@ namespace Nails\Common\Library;
 
 class Event
 {
+    /**
+     * The event subscriptions
+     * @var array
+     */
     protected $aSubscriptions;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the class, set up any initial event subscriptions
+     * Event constructor.
      */
     public function __construct()
     {
@@ -49,6 +53,7 @@ class Event
      */
     protected function autoLoadSubscriptions($sNamespace)
     {
+
         $sClassName = '\\' . $sNamespace . 'Events';
 
         if (class_exists($sClassName)) {
@@ -57,14 +62,15 @@ class Event
             if (is_callable([$oClass, 'autoload'])) {
                 $aSubscriptions = $oClass->autoload();
                 if (!empty($aSubscriptions)) {
-                    foreach ($aSubscriptions as $aListener) {
+                    foreach ($aSubscriptions as $oSubscription) {
 
-                        $sEvent     = getFromArray(0, $aListener);
-                        $sNamespace = getFromArray(1, $aListener);
-                        $mCallback  = getFromArray(2, $aListener);
+                        $sEvent     = $oSubscription->getEvent();
+                        $sNamespace = $oSubscription->getNamespace();
+                        $mCallback  = $oSubscription->getCallback();
+                        $bOnce      = $oSubscription->isOnce();
 
                         if (!empty($sEvent) && !empty($sNamespace) && !empty($mCallback)) {
-                            $this->subscribe($sEvent, $sNamespace, $mCallback);
+                            $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
                         }
                     }
                 }
@@ -78,13 +84,14 @@ class Event
     /**
      * Subscribe to an event
      *
-     * @param  string $sEvent     The event to subscribe to
-     * @param  string $sNamespace The event's namespace
-     * @param  mixed  $mCallback  The callback to execute
+     * @param string  $sEvent     The event to subscribe to
+     * @param string  $sNamespace The event's namespace
+     * @param mixed   $mCallback  The callback to execute
+     * @param boolean $bOnce      Whether the subscription should only fire once
      *
      * @return \Nails\Common\Library\Event
      */
-    public function subscribe($sEvent, $sNamespace, $mCallback)
+    public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)
     {
         $sEvent     = strtoupper($sEvent);
         $sNamespace = strtoupper($sNamespace);
@@ -101,7 +108,10 @@ class Event
             //  Prevent duplicate subscriptions
             $sHash = md5(serialize($mCallback));
             if (!isset($this->aSubscriptions[$sNamespace][$sEvent][$sHash])) {
-                $this->aSubscriptions[$sNamespace][$sEvent][$sHash] = $mCallback;
+                $this->aSubscriptions[$sNamespace][$sEvent][$sHash] = (object) [
+                    'is_once'  => $bOnce,
+                    'callback' => $mCallback,
+                ];
             }
         }
 
@@ -122,11 +132,14 @@ class Event
     public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
     {
         $sNamespace = strtoupper($sNamespace);
-
         if (!empty($this->aSubscriptions[$sNamespace][$sEvent])) {
-            foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $mCallback) {
-                if (is_callable($mCallback)) {
-                    call_user_func_array($mCallback, $aData);
+            foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $sSubscriptionHash => $oSubscription) {
+                if (is_callable($oSubscription->callback)) {
+                    call_user_func_array($oSubscription->callback, $aData);
+                }
+
+                if ($oSubscription->is_once) {
+                    unset($this->aSubscriptions[$sNamespace][$sEvent][$sSubscriptionHash]);
                 }
             }
         }

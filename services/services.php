@@ -186,6 +186,13 @@ return [
         'DateTime' => function () {
             return new \DateTime();
         },
+        'EventSubscription' => function () {
+            if (class_exists('\App\Common\Events\Subscription')) {
+                return new \App\Common\Events\Subscription();
+            } else {
+                return new \Nails\Common\Events\Subscription();
+            }
+        },
         'HttpClient' => function () {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient();
