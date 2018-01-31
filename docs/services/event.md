@@ -128,7 +128,7 @@ class Events
 
 ### Dynamic subscriptions
 
-If you only need a subscription to be attached in certain circumstances, then you can add a new subscription on-the-fly using the `Event` service's `subscribe($sEvent, $sNamespace, $mCallback)` method.
+If you only need a subscription to be attached in certain circumstances, then you can add a new subscription on-the-fly using the `Event` service's `subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)` method.
 
     $oEventService = Factory::service('Event');
     $oEventService->subscribe(\App\Events::USER_YELL, 'app', [$this, 'myCallback']);
