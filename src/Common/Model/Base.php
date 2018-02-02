@@ -948,7 +948,7 @@ abstract class Base
      *
      * @return string
      */
-    protected function prepareCacheKey($sColumn, $mValue, $aData)
+    protected function prepareCacheKey($sColumn, $mValue, $aData = null)
     {
         /**
          * Remove some elements from the $aData array as they are unlikely to affect the
@@ -972,7 +972,13 @@ abstract class Base
             unset($aData[$sKey]);
         }
 
-        return strtoupper($sColumn) . ':' . json_encode($mValue) . ':' . md5(json_encode($aData));
+        $aKey = array_filter([
+            strtoupper($sColumn),
+            json_encode($mValue),
+            $aData !== null ? md5(json_encode($aData)) : null
+        ]);
+
+        return implode(':', $aKey);
     }
 
     // --------------------------------------------------------------------------

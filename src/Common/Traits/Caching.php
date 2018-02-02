@@ -31,6 +31,26 @@ trait Caching
     // --------------------------------------------------------------------------
 
     /**
+     * Enable the cache
+     */
+    public function enableCache()
+    {
+        static::$CACHING_ENABLED = true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Disable the cache
+     */
+    public function disableCache()
+    {
+        static::$CACHING_ENABLED = false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Saves an item to the cache
      *
      * @param string $sKey   The cache key
