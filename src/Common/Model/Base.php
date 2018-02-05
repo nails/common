@@ -86,6 +86,42 @@ abstract class Base
      */
     const EXPAND_ALL = 'ALL';
 
+    /**
+     * The event namespace to use when firing events
+     * @var string
+     */
+    const EVENT_NAMESPACE = null;
+
+    /**
+     * The trigger to fire when an item is created
+     * @var string
+     */
+    const EVENT_CREATED = null;
+
+    /**
+     * The trigger to fire when an item is updated
+     * @var string
+     */
+    const EVENT_UPDATED = null;
+
+    /**
+     * The trigger to fire when an item is deleted
+     * @var string
+     */
+    const EVENT_DELETED = null;
+
+    /**
+     * The trigger to fire when an item is destroyed
+     * @var string
+     */
+    const EVENT_DESTROYED = null;
+
+    /**
+     * The trigger to fire when an item is restored
+     * @var string
+     */
+    const EVENT_RESTORED = null;
+
     //  Preferences
     protected $destructiveDelete;
     protected $perPage;
@@ -320,7 +356,8 @@ abstract class Base
 
             // --------------------------------------------------------------------------
 
-            //  @todo - Hook into the Event service and automatically trigger CREATED event
+            //  Fire the static::EVENT_CREATED event
+            $this->triggerEvent(static::EVENT_CREATED, [$iId]);
 
             // --------------------------------------------------------------------------
 
@@ -462,7 +499,11 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger UPDATED event
+        //  Fire the static::EVENT_UPDATED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -501,7 +542,11 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger DELETED event
+        //  Fire the static::EVENT_DELETED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_DELETED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -539,7 +584,8 @@ abstract class Base
 
             // --------------------------------------------------------------------------
 
-            //  @todo - Hook into the Event service and automatically trigger RESTORED event
+            //  Fire the static::EVENT_RESTORED event
+            $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
 
             // --------------------------------------------------------------------------
 
@@ -577,7 +623,11 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger DESTROYED event
+        //  Fire the static::EVENT_DESTROYED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_DESTROYED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -975,7 +1025,7 @@ abstract class Base
         $aKey = array_filter([
             strtoupper($sColumn),
             json_encode($mValue),
-            $aData !== null ? md5(json_encode($aData)) : null
+            $aData !== null ? md5(json_encode($aData)) : null,
         ]);
 
         return implode(':', $aKey);
@@ -2263,16 +2313,37 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Triggers an event
+     *
+     * @param string $sEvent The event to trigger
+     * @param array  $aData  Data to pass to listeners
+     *
+     * @throws ModelException
+     */
+    protected function triggerEvent($sEvent, $aData)
+    {
+        if ($sEvent) {
+            //  @todo (Pablo - 2018-02-05) - Auto detect the namespace?
+            if (empty(static::EVENT_NAMESPACE)) {
+                throw new ModelException(get_called_class() . '::EVENT_NAMESPACE is must be defined');
+            }
+            $oEventService = Factory::service('Event');
+            $oEventService->trigger($sEvent, static::EVENT_NAMESPACE, $aData);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Various older modules expect to be able to access a few services/models
+     * via magic methods. These will be deprecated soon.
+     *
+     * @param object $oBindTo The class to bind to
+     */
     public static function backwardsCompatibility(&$oBindTo)
     {
-        /**
-         * Backwards compatibility
-         * Various older modules expect to be able to access a few services/models
-         * via magic methods. These will be deprecated soon.
-         */
-
         //  @todo (Pablo - 2017-06-07) - Remove these
-
         $oBindTo->db      = Factory::service('Database');
         $oBindTo->encrypt = Factory::service('Encrypt');
     }
