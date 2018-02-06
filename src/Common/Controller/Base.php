@@ -15,7 +15,6 @@ namespace Nails\Common\Controller;
 
 use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
-use Nails\Common\Library\Input;
 use Nails\Environment;
 use Nails\Factory;
 
@@ -467,10 +466,11 @@ abstract class Base extends \MX_Controller
          *      ]
          */
 
+        $oInput                 = Factory::service('Input');
         $sConstantName          = 'APP_USER_PASS_' . Environment::get();
         $sConstantNameWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
 
-        if (!Input::isCli() && defined($sConstantName)) {
+        if (!$oInput::isCli() && defined($sConstantName)) {
 
             //  On the whitelist?
             if (defined($sConstantNameWhitelist)) {

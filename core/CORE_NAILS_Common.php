@@ -818,7 +818,8 @@ if (!function_exists('isCli')) {
      */
     function isCli()
     {
-        return \Nails\Common\Library\Input::isCli();
+        $oInput = Factory::service('Input');
+        return $oInput::isCli();
     }
 }
 
@@ -832,6 +833,7 @@ if (!function_exists('isAjax')) {
      */
     function isAjax()
     {
-        return \Nails\Common\Library\Input::isAjax();
+        $oInput = Factory::service('Input');
+        return $oInput::isAjax();
     }
 }
