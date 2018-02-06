@@ -407,7 +407,7 @@ abstract class Base extends \MX_Controller
                     // --------------------------------------------------------------------------
 
                     //  If the request is an AJAX request, or the URL is on the API then spit back JSON
-                    if ($oInput->is_ajax_request() || $oUri->segment(1) == 'api') {
+                    if ($oInput->isAjax() || $oUri->segment(1) == 'api') {
 
                         header('Cache-Control: no-store, no-cache, must-revalidate');
                         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
