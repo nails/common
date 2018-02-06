@@ -398,7 +398,7 @@ abstract class Base extends \MX_Controller
 
             if (!$isWhiteListed) {
 
-                if (!$oInput->is_cli_request()) {
+                if (!$oInput->isCli()) {
 
                     header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
                     header('Status: 503 Service Temporarily Unavailable');
