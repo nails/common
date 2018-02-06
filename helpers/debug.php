@@ -10,23 +10,8 @@
  * @link
  */
 
-use Nails\Factory;
 use Nails\Environment;
-
-if (!function_exists('dumpanddie')) {
-
-    /**
-     * Alias to dump()
-     * @return void
-     */
-    function dumpanddie()
-    {
-        call_user_func_array('dump', func_get_args());
-        die();
-    }
-}
-
-// --------------------------------------------------------------------------
+use Nails\Factory;
 
 if (!function_exists('dump')) {
 
@@ -53,7 +38,7 @@ if (!function_exists('dump')) {
 
             } elseif (is_bool($mVar)) {
 
-                $mVar = $mVar === true ? "true" : "false" ;
+                $mVar = $mVar === true ? "true" : "false";
                 $sOut .= '(bool) ' . $mVar;
 
             } elseif (is_float($mVar)) {
@@ -95,11 +80,56 @@ if (!function_exists('dump')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('d')) {
+
+    /**
+     * Alias to dump()
+     * @return void
+     */
+    function d()
+    {
+        call_user_func_array('dump', func_get_args());
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('dumpAndDie')) {
+
+    /**
+     * Calls dump() and immediately exits
+     * @return void
+     */
+    function dumpAndDie()
+    {
+        call_user_func_array('dump', func_get_args());
+        die();
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('dd')) {
+
+    /**
+     * Alias to dumpAndDie()
+     * @return void
+     */
+    function dd()
+    {
+        call_user_func_array('dumpAndDie', func_get_args());
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('here')) {
 
     /**
-     * Outputs a 'here at date()' string using dumpanddie(); useful for debugging.
+     * Outputs a 'here at date()' string using dumpAndDie(); useful for debugging.
+     *
      * @param  mixed $mDump The variable to dump
+     *
      * @return void
      */
     function here($mDump = null)
@@ -111,20 +141,22 @@ if (!function_exists('here')) {
             dump($mDump);
         }
 
-        dumpanddie('Here @ ' . $oNow->format('H:i:s'));
+        dumpAndDie('Here @ ' . $oNow->format('H:i:s'));
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('lastquery')) {
+if (!function_exists('lastQuery')) {
 
     /**
      * Dumps the last known query
+     *
      * @param  boolean $bDie Whether to kill the script
+     *
      * @return void
      */
-    function lastquery($bDie = true)
+    function lastQuery($bDie = true)
     {
         $oDb        = Factory::service('Database');
         $sLastQuery = $oDb->last_query();
@@ -132,11 +164,8 @@ if (!function_exists('lastquery')) {
         // --------------------------------------------------------------------------
 
         if ($bDie) {
-
-            dumpanddie($sLastQuery);
-
+            dumpAndDie($sLastQuery);
         } else {
-
             dump($sLastQuery);
         }
     }
@@ -147,8 +176,10 @@ if (!function_exists('lastquery')) {
 if (!function_exists('last_query')) {
 
     /**
-     * Alias of lastquery()
+     * Alias of lastQuery()
+     *
      * @param  boolean $bDie Whether to kill the script
+     *
      * @return void
      */
     function last_query($bDie = true)
@@ -159,14 +190,16 @@ if (!function_exists('last_query')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('dumpjson')) {
+if (!function_exists('dumpJson')) {
 
     /**
      * Dumps the passed variable as a JSON encoded string, setting JSON headers
+     *
      * @param  mixed $mData The variable to dump
+     *
      * @return void
      */
-    function dumpjson($mData)
+    function dumpJson($mData)
     {
         header('Content-Type: application/json');
         echo json_encode($mData, JSON_PRETTY_PRINT);
