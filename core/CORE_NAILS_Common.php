@@ -17,7 +17,7 @@ use Nails\Environment;
 use Nails\Factory;
 
 //  @todo move these into the factory
-$GLOBALS['NAILS'] = array();
+$GLOBALS['NAILS'] = [];
 
 if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
@@ -25,6 +25,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
      * Fetch all the Nails components which are installed
      *
      * @param boolean $bUseCache Whether to cache the result of the search
+     *
      * @return array
      */
     function _NAILS_GET_COMPONENTS($bUseCache = true)
@@ -74,7 +75,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
             }
         }
 
-        $aOut = array();
+        $aOut = [];
 
         foreach ($aComposer as $oPackage) {
 
@@ -134,7 +135,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                         $oTemp->name          = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
                         $oTemp->description   = !empty($oConfig->description) ? $oConfig->description : '';
                         $oTemp->homepage      = !empty($oConfig->homepage) ? $oConfig->homepage : '';
-                        $oTemp->authors       = !empty($oConfig->authors) ? $oConfig->authors : array();
+                        $oTemp->authors       = !empty($oConfig->authors) ? $oConfig->authors : [];
                         $oTemp->path          = $sAppPath . $sDirName . '/';
                         $oTemp->relativePath  = 'application/components/' . $sDirName . '/';
                         $oTemp->moduleName    = '';
@@ -167,13 +168,13 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
 // --------------------------------------------------------------------------
 
-
 if (!function_exists('_NAILS_GET_COMPONENTS_BY_SLUG')) {
 
     /**
      * Fetches a component by it's slug
      *
      * @param string $sSlug The component's slug
+     *
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_SLUG($sSlug)
@@ -198,6 +199,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
      * Fetches a type of component (e.g., modules, drivers or skins)
      *
      * @param string $sType The component's type
+     *
      * @return array
      */
     function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
@@ -209,7 +211,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
         } else {
 
             $aComponents = _NAILS_GET_COMPONENTS();
-            $aOut        = array();
+            $aOut        = [];
 
             // --------------------------------------------------------------------------
 
@@ -252,12 +254,13 @@ if (!function_exists('_NAILS_GET_SKINS')) {
      *
      * @param string $sModule  Restrict to particular component
      * @param string $sSubType Restrict by skin sub type
+     *
      * @return array
      */
     function _NAILS_GET_SKINS($sModule, $sSubType = '')
     {
         $aSkins = _NAILS_GET_COMPONENTS_BY_TYPE('skin');
-        $aOut   = array();
+        $aOut   = [];
 
         foreach ($aSkins as $oSkin) {
 
@@ -290,12 +293,13 @@ if (!function_exists('_NAILS_GET_DRIVERS')) {
      *
      * @param string $sModule  Restrict to particular component
      * @param string $sSubType Restrict by driver sub type
+     *
      * @return array
      */
     function _NAILS_GET_DRIVERS($sModule, $sSubType = '')
     {
         $aDrivers = _NAILS_GET_COMPONENTS_BY_TYPE('driver');
-        $aOut     = array();
+        $aOut     = [];
 
         foreach ($aDrivers as $oDriver) {
             if ($oDriver->forModule == $sModule) {
@@ -319,6 +323,7 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
      * Returns an instance of a single driver
      *
      * @param  object $oDriver The Driver definition
+     *
      * @throws NailsException
      * @return object
      */
@@ -423,6 +428,7 @@ if (!function_exists('defineConst')) {
      *
      * @param  string $sConstant The name of the constant to define
      * @param  string $mValue    The value to give the constant
+     *
      * @return void
      */
     function defineConst($sConstant, $mValue)
@@ -443,6 +449,7 @@ if (!function_exists('nailsFactory')) {
      * @param  string $sType       The type of item to factorise
      * @param  string $sKey        The key of the item to factorise
      * @param  string $sModuleName Which module provides the item
+     *
      * @throws FactoryException
      * @return mixed
      */
@@ -490,6 +497,7 @@ if (!function_exists('nailsEnvironment')) {
      *
      * @param  string $sMethod      The method to call
      * @param  string $sEnvironment The environment to query
+     *
      * @throws EnvironmentException
      * @return mixed
      */
@@ -527,6 +535,7 @@ if (!function_exists('isModuleEnabled')) {
      * Handy way of determining whether a module is available
      *
      * @param  string $moduleName The name of the module to check
+     *
      * @return boolean
      */
     function isModuleEnabled($moduleName)
@@ -571,6 +580,7 @@ if (!function_exists('setControllerData')) {
      *
      * @param string $key   The key to populate
      * @param mixed  $value The value to assign
+     *
      * @return  void
      **/
     function setControllerData($key, $value)
@@ -590,7 +600,9 @@ if (!function_exists('getDomainFromUrl')) {
      * BUG: 2 character TLD's break this
      *
      * @todo: Try and fix this bug
+     *
      * @param  string $sUrl The URL to analyse
+     *
      * @return mixed        string on success, false on failure
      */
     function getDomainFromUrl($sUrl)
@@ -598,7 +610,7 @@ if (!function_exists('getDomainFromUrl')) {
         $sDomain = parse_url($sUrl, PHP_URL_HOST);
         $bits    = explode('.', $sDomain);
         $idz     = count($bits);
-        $idz -= 3;
+        $idz     -= 3;
 
         if (!isset($bits[($idz + 2)])) {
 
@@ -606,7 +618,7 @@ if (!function_exists('getDomainFromUrl')) {
 
         } elseif (strlen($bits[($idz + 2)]) == 2 && isset($bits[($idz + 2)])) {
 
-            $out   = array();
+            $out   = [];
             $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
             $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
             $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
@@ -615,7 +627,7 @@ if (!function_exists('getDomainFromUrl')) {
 
         } elseif (strlen($bits[($idz + 2)]) == 0) {
 
-            $out   = array();
+            $out   = [];
             $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
             $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
 
@@ -623,7 +635,7 @@ if (!function_exists('getDomainFromUrl')) {
 
         } elseif (isset($bits[($idz + 1)])) {
 
-            $out   = array();
+            $out   = [];
             $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
             $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
 
@@ -648,6 +660,7 @@ if (!function_exists('getRelativePath')) {
      *
      * @param  string $from Path 1
      * @param  string $to   Path 2
+     *
      * @return string
      */
     function getRelativePath($from, $to)
@@ -695,7 +708,9 @@ if (!function_exists('isPageSecure')) {
      * Detects whether the current page is secure or not
      *
      * @access  public
+     *
      * @param   string
+     *
      * @return  bool
      */
     function isPageSecure()
@@ -713,11 +728,8 @@ if (!function_exists('isPageSecure')) {
             $url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 
             if (preg_match('#^' . SECURE_BASE_URL . '.*#', $url)) {
-
                 return true;
-
             } else {
-
                 return false;
             }
         }
@@ -736,15 +748,15 @@ if (!function_exists('show_error')) {
     /**
      * Calls the exception class' show_error method
      *
-     * @param $sMessage
-     * @param int $iStatus
+     * @param        $sMessage
+     * @param int    $iStatus
      * @param string $sHeading
-     * @param bool $bUseException
+     * @param bool   $bUseException
      */
     function show_error($sMessage, $iStatus = 500, $sHeading = 'An Error Was Encountered', $bUseException = true)
     {
-        $_error =& load_class('Exceptions', 'core');
-        echo $_error->show_error($sHeading, $sMessage, 'error_general', $iStatus, $bUseException);
+        $oError =& load_class('Exceptions', 'core');
+        echo $oError->show_error($sHeading, $sMessage, 'error_general', $iStatus, $bUseException);
         exit;
     }
 }
@@ -760,14 +772,15 @@ if (!function_exists('show_404')) {
      * a result of some other checking and not technically a 404 so should not be
      * logged as one. _Actual_ 404's should continue to be logged however.
      *
-     * @param  string  $page     The page which 404'd
-     * @param  boolean $logError whether to log the error or not
+     * @param  string  $sPage     The page which 404'd
+     * @param  boolean $bLogError whether to log the error or not
+     *
      * @return void
      */
-    function show_404($page = '', $logError = false)
+    function show_404($sPage = '', $bLogError = false)
     {
-        $_error =& load_class('Exceptions', 'core');
-        $_error->show_404($page, $logError);
+        $oError =& load_class('Exceptions', 'core');
+        $oError->show_404($sPage, $bLogError);
         exit;
     }
 }
@@ -782,16 +795,14 @@ if (!function_exists('getFromArray')) {
      * @param  string $sKey     The key to get
      * @param  array  $aArray   The array to look in
      * @param  mixed  $mDefault What to return if $sKey doesn't exist in $aArray
+     *
      * @return mixed
      */
     function getFromArray($sKey, $aArray, $mDefault = null)
     {
         if (array_key_exists($sKey, $aArray)) {
-
             return $aArray[$sKey];
-
         } else {
-
             return $mDefault;
         }
     }
@@ -802,12 +813,25 @@ if (!function_exists('getFromArray')) {
 if (!function_exists('isCli')) {
 
     /**
-     * Returns whether the application is running on the command line
-     *
-     * @return boolean
+     * Whether the current request is being executed on the CLI
+     * @return bool
      */
     function isCli()
     {
-        return php_sapi_name() == 'cli';
+        return \Nails\Common\Library\Input::isCli();
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('isAjax')) {
+
+    /**
+     * Whether the current request is an Ajax request
+     * @return bool
+     */
+    function isAjax()
+    {
+        return \Nails\Common\Library\Input::isAjax();
     }
 }
