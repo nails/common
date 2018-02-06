@@ -81,7 +81,7 @@ class ErrorHandler
      */
     public static function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
     {
-        $bIsCli = isCli();
+        $bIsCli = Input::isCli();
 
         if (is_null($oDetails)) {
 
