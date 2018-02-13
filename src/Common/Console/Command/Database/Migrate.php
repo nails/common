@@ -173,7 +173,6 @@ class Migrate extends Base
         if ($aEnabledModules) {
 
             $oOutput->writeln('');
-            $oOutput->writeln('The following modules are to be migrated:');
 
             foreach ($aEnabledModules as $oModule) {
 
@@ -183,12 +182,13 @@ class Migrate extends Base
 
                 $oOutput->writeln($sLine);
             }
-        }
 
-        if ($oApp) {
-            $oOutput->writeln('');
-            $sStart = is_null($oApp->start) ? 'The beginning of time' : $oApp->start;
-            $oOutput->writeln('The App\'s database will be migrated from <info>#' . $sStart . '</info> to <info>#' . $oApp->end . '</info>');
+            if ($oApp) {
+                $sStart = is_null($oApp->start) ? 'The beginning of time' : $oApp->start;
+                $sLine  = ' - <comment>app</comment> from ';
+                $sLine  .= '<info>#' . $sStart . '</info> to <info>#' . $oApp->end . '</info>';
+                $oOutput->writeln($sLine);
+            }
         }
 
         $oOutput->writeln('');
