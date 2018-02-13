@@ -73,8 +73,9 @@ class Migrate extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -105,19 +106,19 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Work out the DB credentials to use
-        $dbHost = $oInput->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
-        $dbUser = $oInput->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
-        $dbPass = $oInput->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
-        $dbName = $oInput->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
+        $sDbHost = $oInput->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
+        $sDbUser = $oInput->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
+        $sDbPass = $oInput->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
+        $sDbName = $oInput->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
 
         //  Check we have a database to connect to
-        if (empty($dbName)) {
+        if (empty($sDbName)) {
             return $this->abort(static::EXIT_CODE_NO_DB);
         }
 
         //  Get the DB object
         $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
-        $this->oDb->connect($dbHost, $dbUser, $dbPass, $dbName);
+        $this->oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
 
         if (!defined('NAILS_DB_PREFIX')) {
             define('NAILS_DB_PREFIX', 'nails_');
@@ -149,53 +150,13 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        //  Work out what Nails is doing, `common` won't be detected as a module
-        $oOutput->write('<comment>Determining state of the Nails tables... </comment>');
-
-        $nails = $this->determineModuleState('nailsapp/common', 'vendor/nailsapp/common/migrations/');
-
-        if ($nails) {
-            $oOutput->writeln('done, requires migration');
-        } else {
-            $oOutput->writeln('done, no Nails migrations detected');
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Look for enabled modules
-        $oOutput->write('<comment>Determining state of the module tables... </comment>');
-        $enabledModules = $this->findEnabledModules();
-
-        if ($enabledModules) {
-
-            if (count($enabledModules) == 1) {
-                $oOutput->writeln('found <info>1</info> module requiring migration');
-            } else {
-                $oOutput->writeln('found <info>' . count($enabledModules) . '</info> modules requiring migration');
-            }
-
-        } else {
-
-            $oOutput->writeln('no modules found which require migration');
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Work out what the App's doing
-        $oOutput->write('<comment>Determining state of the App tables... </comment>');
-
-        $app = $this->determineModuleState('APP', 'application/migrations/');
-
-        if ($app) {
-            $oOutput->writeln('done, requires migration');
-        } else {
-            $oOutput->writeln('done, no App migrations detected');
-        }
+        $aEnabledModules = $this->findEnabledModules();
+        $oApp            = $this->determineModuleState('APP', 'application/migrations/');
 
         // --------------------------------------------------------------------------
 
         //  Anything to migrate?
-        if (!$nails && !$enabledModules && !$app) {
+        if (!$aEnabledModules && !$oApp) {
             $oOutput->writeln('');
             $oOutput->writeln('Nothing to migrate');
             $oOutput->writeln('');
@@ -209,33 +170,25 @@ class Migrate extends Base
         $oOutput->writeln('');
         $oOutput->writeln('OK, here\'s what\'s going to happen:');
 
-        if ($nails) {
-            $oOutput->writeln('');
-            $start = is_null($nails->start) ? 'The beginning of time' : $nails->start;
-            $oOutput->writeln('Nails\' database will be migrated from <info>#' . $start . '</info> to <info>#' . $nails->end . '</info>');
-        }
-
-        if ($enabledModules) {
+        if ($aEnabledModules) {
 
             $oOutput->writeln('');
             $oOutput->writeln('The following modules are to be migrated:');
 
-            foreach ($enabledModules as $module) {
+            foreach ($aEnabledModules as $oModule) {
 
-                $start = is_null($module->start) ? 'The beginning of time' : $module->start;
+                $sStart = is_null($oModule->start) ? 'The beginning of time' : $oModule->start;
+                $sLine  = ' - <comment>' . $oModule->name . '</comment> from ';
+                $sLine  .= '<info>#' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
 
-                $line = ' - <comment>' . $module->name . '</comment> from ';
-                $line .= '<info>#' . $start . '</info> to <info>#' . $module->end . '</info>';
-
-                $oOutput->writeln($line);
+                $oOutput->writeln($sLine);
             }
         }
 
-        if ($app) {
-
+        if ($oApp) {
             $oOutput->writeln('');
-            $start = is_null($app->start) ? 'The beginning of time' : $app->start;
-            $oOutput->writeln('The App\'s database will be migrated from <info>#' . $start . '</info> to <info>#' . $app->end . '</info>');
+            $sStart = is_null($oApp->start) ? 'The beginning of time' : $oApp->start;
+            $oOutput->writeln('The App\'s database will be migrated from <info>#' . $sStart . '</info> to <info>#' . $oApp->end . '</info>');
         }
 
         $oOutput->writeln('');
@@ -259,66 +212,39 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Start migrating
-        $curStep       = 1;
-        $numMigrations = 0;
-        $numMigrations += !empty($nails) ? 1 : 0;
-        $numMigrations += !empty($enabledModules) ? count($enabledModules) : 0;
-        $numMigrations += !empty($app) ? 1 : 0;
+        $iCurStep       = 1;
+        $iNumMigrations = 0;
+        $iNumMigrations += !empty($aEnabledModules) ? count($aEnabledModules) : 0;
+        $iNumMigrations += !empty($oApp) ? 1 : 0;
 
         //  Disable foreign key checks
-        $result              = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
-        $oldForeignKeychecks = $result->Value;
+        $oResult              = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
+        $sOldForeignKeyChecks = $oResult->Value;
 
         $this->oDb->query('SET FOREIGN_KEY_CHECKS = 0;');
 
-        //  Migrate nails
-        if (!empty($nails)) {
-
-            $oOutput->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>Nails</info>... ');
-            $result = $this->doMigration($nails);
-
-            if ($result) {
-                $oOutput->writeln('done!');
-            } else {
-                return $this->abort(static::EXIT_CODE_MIGRATION_FAILED);
-            }
-
-            $curStep++;
-        }
-
         //  Migrate the modules
-        if (!empty($enabledModules)) {
+        if (!empty($aEnabledModules)) {
+            foreach ($aEnabledModules as $oModule) {
 
-            foreach ($enabledModules as $module) {
-
-                $oOutput->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>' . $module->name . '</info>... ');
-                $result = $this->doMigration($module);
-
-                if ($result) {
-
+                $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>' . $oModule->name . '</info>... ');
+                if ($this->doMigration($oModule)) {
                     $oOutput->writeln('done!');
-
                 } else {
-
                     return $this->abort(static::EXIT_CODE_MODULE_MIGRATION_FAILED);
                 }
 
-                $curStep++;
+                $iCurStep++;
             }
         }
 
         //  Migrate the app
-        if (!empty($app)) {
+        if (!empty($oApp)) {
 
-            $oOutput->write('[' . $curStep . '/' . $numMigrations . '] Migrating <info>App</info>... ');
-            $result = $this->doMigration($app);
-
-            if ($result) {
-
+            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>App</info>... ');
+            if ($this->doMigration($oApp)) {
                 $oOutput->writeln('done!');
-
             } else {
-
                 return $this->abort(static::EXIT_CODE_APP_MIGRATION_FAILED);
             }
         }
@@ -340,7 +266,7 @@ class Migrate extends Base
         $oOutput->writeln('<comment>Cleaning up...</comment>');
 
         //  Restore previous foreign key checks
-        $this->oDb->query('SET FOREIGN_KEY_CHECKS = \'' . $oldForeignKeychecks . '\';');
+        $this->oDb->query('SET FOREIGN_KEY_CHECKS = \'' . $sOldForeignKeyChecks . '\';');
 
         // --------------------------------------------------------------------------
 
@@ -356,27 +282,28 @@ class Migrate extends Base
     /**
      * Determines whether or not the module needs to migration, and if so between what versions
      *
-     * @param string $moduleName The module's name
-     * @param string $migrationsPath The module's path
+     * @param string $sModuleName     The module's name
+     * @param string $sMigrationsPath The module's path
+     *
      * @return null|\stdClass stdClass when migration needed, null when not needed
      */
-    protected function determineModuleState($moduleName, $migrationsPath)
+    protected function determineModuleState($sModuleName, $sMigrationsPath)
     {
-        $module        = new \stdClass();
-        $module->name  = $moduleName;
-        $module->start = null;
-        $module->end   = null;
+        $oModule        = new \stdClass();
+        $oModule->name  = $sModuleName;
+        $oModule->start = null;
+        $oModule->end   = null;
 
         // --------------------------------------------------------------------------
 
         //  Work out if the module needs migrated and if so between what and what
-        $dirMap = $this->mapDir($migrationsPath);
+        $aDirMap = $this->mapDir($sMigrationsPath);
 
-        if (!empty($dirMap)) {
+        if (!empty($aDirMap)) {
 
             //  Work out all the files we have and get their index
             $migrations = [];
-            foreach ($dirMap as $dir) {
+            foreach ($aDirMap as $dir) {
                 $migrations[$dir['path']] = [
                     'index' => $dir['index'],
                 ];
@@ -385,13 +312,13 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Work out the current version
-            $sql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$moduleName';";
+            $sql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$sModuleName';";
             $result = $this->oDb->query($sql);
 
             if ($result->rowCount() === 0) {
 
                 //  Add a row for the module
-                $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$moduleName', NULL);";
+                $sql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$sModuleName', NULL);";
                 $this->oDb->query($sql);
 
                 $currentVersion = null;
@@ -405,12 +332,12 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Define the variable
-            $lastMigration = end($migrations);
-            $module->start = $currentVersion;
-            $module->end   = $lastMigration['index'];
+            $lastMigration  = end($migrations);
+            $oModule->start = $currentVersion;
+            $oModule->end   = $lastMigration['index'];
         }
 
-        return $module->start === $module->end ? null : $module;
+        return $oModule->start === $oModule->end ? null : $oModule;
     }
 
     // --------------------------------------------------------------------------
@@ -438,27 +365,28 @@ class Migrate extends Base
     /**
      * Executes a migration
      *
-     * @param  \stdClass $module The migration details object
+     * @param  \stdClass $oModule The migration details object
+     *
      * @return boolean
      */
-    protected function doMigration($module)
+    protected function doMigration($oModule)
     {
         $oOutput = $this->oOutput;
 
         // --------------------------------------------------------------------------
 
         //  Map the directory and fetch only the files we need
-        $path   = $module->name == 'APP' ? 'application/migrations/' : 'vendor/' . $module->name . '/migrations/';
-        $dirMap = $this->mapDir($path);
+        $sPath   = $oModule->name == 'APP' ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
+        $aDirMap = $this->mapDir($sPath);
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
-        $current = is_null($module->start) ? -1 : $module->start;
+        $current = is_null($oModule->start) ? -1 : $oModule->start;
 
         //  Go through all the migrations, skip any which have already been executed
         $lastMigration = null;
-        foreach ($dirMap as $migration) {
+        foreach ($aDirMap as $migration) {
             if ($migration['index'] > $current) {
-                if (!$this->executeMigration($module, $migration)) {
+                if (!$this->executeMigration($oModule, $migration)) {
                     return false;
                 }
             }
@@ -467,7 +395,7 @@ class Migrate extends Base
         }
 
         //  Update the database
-        $sql    = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $module->name . "'";
+        $sql    = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $lastMigration . " WHERE `module` = '" . $oModule->name . "'";
         $result = $this->oDb->query($sql);
 
         if (!$result) {
@@ -475,7 +403,7 @@ class Migrate extends Base
             // Error updating migration record
             $oOutput->writeln('');
             $oOutput->writeln('');
-            $oOutput->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $module->name . '</info>.');
+            $oOutput->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $oModule->name . '</info>.');
 
             return false;
         }
@@ -488,26 +416,27 @@ class Migrate extends Base
     /**
      * Executes an individual migration
      *
-     * @param  object $module The module being migrated
-     * @param  array $migration The migration details
+     * @param  object $oModule    The module being migrated
+     * @param  array  $aMigration The migration details
+     *
      * @return boolean
      */
-    private function executeMigration($module, $migration)
+    private function executeMigration($oModule, $aMigration)
     {
         $oOutput = $this->oOutput;
 
-        require_once $migration['path'];
+        require_once $aMigration['path'];
 
         //  Generate the expected class name, i.e., "vendor-name/package-name" -> VendorName\PackageName"
         $sPattern    = '[^a-zA-Z0-9' . preg_quote(DIRECTORY_SEPARATOR, '/\-') . ']';
-        $sModuleName = strtolower($module->name);
+        $sModuleName = strtolower($oModule->name);
         $sModuleName = preg_replace('/' . $sPattern . '/', ' ', $sModuleName);
         $sModuleName = str_replace(DIRECTORY_SEPARATOR, ' ' . DIRECTORY_SEPARATOR . ' ', $sModuleName);
         $sModuleName = ucwords($sModuleName);
         $sModuleName = str_replace(' ', '', $sModuleName);
         $sModuleName = str_replace(DIRECTORY_SEPARATOR, '\\', $sModuleName);
 
-        $sClassName = 'Nails\Database\Migration\\' . $sModuleName . '\Migration' . $migration['index'];
+        $sClassName = 'Nails\Database\Migration\\' . $sModuleName . '\Migration' . $aMigration['index'];
 
         if (class_exists($sClassName)) {
 
@@ -516,18 +445,14 @@ class Migrate extends Base
             if (is_subclass_of($oMigration, 'Nails\Common\Console\Migrate\Base')) {
 
                 try {
-
                     $oMigration->execute();
-
                 } catch (\Exception $e) {
-
                     $oOutput->writeln('');
                     $oOutput->writeln('');
-                    $oOutput->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" failed:');
+                    $oOutput->writeln('<error>ERROR</error>: Migration at "' . $aMigration['path'] . '" failed:');
                     $oOutput->writeln('<error>ERROR</error>: #' . $e->getCode() . ' - ' . $e->getMessage());
                     $oOutput->writeln('<error>ERROR</error>: Failed Query: #' . $oMigration->getQueryCount());
                     $oOutput->writeln('<error>ERROR</error>: Failed Query: ' . $oMigration->getLastQuery());
-
                     return false;
                 }
 
@@ -535,9 +460,8 @@ class Migrate extends Base
 
                 $oOutput->writeln('');
                 $oOutput->writeln('');
-                $oOutput->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
+                $oOutput->writeln('<error>ERROR</error>: Migration at "' . $aMigration['path'] . '" is badly configured.');
                 $oOutput->writeln('<error>ERROR</error>: Should be a sub-class of "Nails\Common\Console\Migrate\Base".');
-
                 return false;
             }
 
@@ -548,8 +472,7 @@ class Migrate extends Base
             $oOutput->writeln('');
             $oOutput->writeln('');
             $oOutput->writeln('<error>ERROR</error>: Class "' . $sClassName . '" does not exist.');
-            $oOutput->writeln('<error>ERROR</error>: Migration at "' . $migration['path'] . '" is badly configured.');
-
+            $oOutput->writeln('<error>ERROR</error>: Migration at "' . $aMigration['path'] . '" is badly configured.');
             return false;
         }
 
@@ -561,37 +484,36 @@ class Migrate extends Base
     /**
      * Generates an array of files in a directory
      *
-     * @param  string $dir The directory to analyse
-     * @return array
+     * @param  string $sDir The directory to analyse
+     *
+     * @return array|boolean
      */
-    private function mapDir($dir)
+    private function mapDir($sDir)
     {
-        if (is_dir($dir)) {
+        if (is_dir($sDir)) {
 
-            $out = [];
+            $aOut = [];
 
-            foreach (new \DirectoryIterator($dir) as $fileInfo) {
+            foreach (new \DirectoryIterator($sDir) as $oFileInfo) {
 
-                if ($fileInfo->isDot()) {
+                if ($oFileInfo->isDot()) {
                     continue;
                 }
 
                 //  In the correct format?
-                if (preg_match(static::VALID_MIGRATION_PATTERN, $fileInfo->getFilename(), $matches)) {
-
-                    $out[$matches[1]] = [
-                        'path'  => $fileInfo->getPathname(),
-                        'index' => (int) $matches[1],
+                if (preg_match(static::VALID_MIGRATION_PATTERN, $oFileInfo->getFilename(), $aMatches)) {
+                    $aOut[$aMatches[1]] = [
+                        'path'  => $oFileInfo->getPathname(),
+                        'index' => (int) $aMatches[1],
                     ];
                 }
             }
 
-            ksort($out);
+            ksort($aOut);
 
-            return $out;
+            return $aOut;
 
         } else {
-
             return false;
         }
     }
@@ -602,6 +524,7 @@ class Migrate extends Base
      * Replaces {{CONSTANT}} with the value of constant, CONSTANT
      *
      * @param string $sString The string to search on
+     *
      * @return string
      */
     protected function replaceConstants($sString)
@@ -624,8 +547,9 @@ class Migrate extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  array $aMessages The error message
+     * @param  array   $aMessages The error message
      * @param  integer $iExitCode The exit code
+     *
      * @return int
      */
     protected function abort($iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])

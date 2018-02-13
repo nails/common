@@ -81,7 +81,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
             if (isset($oPackage->extra->nails)) {
 
-                $oTemp                = new stdClass();
+                $oTemp                = new \stdClass();
                 $oTemp->slug          = $oPackage->name;
                 $oTemp->namespace     = !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null;
                 $oTemp->name          = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
@@ -129,7 +129,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                     if (!empty($oConfig)) {
 
-                        $oTemp                = new stdClass();
+                        $oTemp                = new \stdClass();
                         $oTemp->slug          = 'app/' . $sDirName;
                         $oTemp->namespace     = !empty($oConfig->namespace) ? $oConfig->namespace : null;
                         $oTemp->name          = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
@@ -152,6 +152,43 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                 }
             }
         }
+
+        // --------------------------------------------------------------------------
+
+        uasort($aOut, function ($a, $b) {
+
+            $a = (object) $a;
+            $b = (object) $b;
+
+            //  Equal?
+            if ($a->slug == $b->slug) {
+                return 0;
+            }
+
+            //  If $a is a prefix of $b then $a comes first
+            $sPattern = '/^' . preg_quote($a->slug, '/') . '/';
+            if (preg_match($sPattern, $b->slug)) {
+                return -1;
+            }
+
+            //  Not equal, work out which takes precedence
+            $_sort = [$a->slug, $b->slug];
+            sort($_sort);
+
+            return $_sort[0] == $a->slug ? -1 : 1;
+        });
+
+        $aOut = array_values($aOut);
+
+        //  Pluck common out so it is always the first item
+        for ($i = 0; $i < count($aOut); $i++) {
+            if ($aOut[$i]->slug === 'nailsapp/common') {
+                break;
+            }
+        }
+
+        $aExtracted = array_splice($aOut, $i, 1);
+        $aOut       = array_values(array_merge($aExtracted, $aOut));
 
         // --------------------------------------------------------------------------
 
