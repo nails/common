@@ -43,5 +43,29 @@
     "autoload":
     {
         "psr-4": {"Nails\\": "src/"}
+    },
+    "extra": {
+        "nails": {
+            "autoload": {
+                "helpers": [
+                    "string",
+                    "array",
+                    "app_setting",
+                    "app_notification",
+                    "date",
+                    "url",
+                    "cookie",
+                    "form",
+                    "html",
+                    "tools",
+                    "debug",
+                    "language",
+                    "text",
+                    "exception",
+                    "typography",
+                    "log"
+                ]
+            }
+        }
     }
 }

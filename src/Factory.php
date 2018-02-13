@@ -12,8 +12,8 @@
 
 namespace Nails;
 
-use Pimple\Container;
 use Nails\Common\Exception\FactoryException;
+use Pimple\Container;
 
 class Factory
 {
@@ -346,26 +346,30 @@ class Factory
         //  CI base helpers
         require_once BASEPATH . 'core/Common.php';
 
-        //  Common helpers
-        self::helper('string');
-        self::helper('array');
-        self::helper('app_setting');
-        self::helper('app_notification');
-        self::helper('date');
-        self::helper('url');
-        self::helper('cookie');
-        self::helper('form');
-        self::helper('html');
-        self::helper('tools');
-        self::helper('debug');
-        self::helper('language');
-        self::helper('text');
-        self::helper('exception');
-        self::helper('typography');
-        self::helper('log');
+        $aComponents = [];
+
+        //  App
+        $aComponents[] = (object) [
+            'slug'     => 'app',
+            'autoload' => static::extractAutoLoadItemsFromComposerJson(FCPATH . 'composer.json'),
+        ];
+
+        //  Common
+        $aComponents[] = (object) [
+            'slug'     => 'nailsapp/common',
+            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_COMMON_PATH . 'composer.json'),
+        ];
+
+        //  Modules
+        foreach (_NAILS_GET_MODULES() as $oModule) {
+            $aComponents[] = (object) [
+                'slug'     => $oModule->slug,
+                'autoload' => !empty($oModule->autoload) ? $oModule->autoload : [],
+            ];
+        }
 
         //  Module items
-        foreach (_NAILS_GET_MODULES() as $oModule) {
+        foreach ($aComponents as $oModule) {
             //  Helpers
             if (!empty($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
@@ -379,5 +383,34 @@ class Factory
                 }
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts the autoload elements from a composer.json file
+     *
+     * @param string $sPath The path to the composer.json file
+     *
+     * @return object
+     */
+    protected static function extractAutoLoadItemsFromComposerJson($sPath)
+    {
+        $aOut = (object) ['helpers' => [], 'services' => []];
+        if (file_exists($sPath)) {
+            $oAppComposer = json_decode(file_get_contents($sPath));
+            if (!empty($oAppComposer->extra->nails->autoload->helpers)) {
+                foreach ($oAppComposer->extra->nails->autoload->helpers as $sHelper) {
+                    $aOut->helpers[] = $sHelper;
+                }
+            }
+            if (!empty($oAppComposer->extra->nails->autoload->services)) {
+                foreach ($oAppComposer->extra->nails->autoload->services as $sService) {
+                    $aOut->services[] = $sService;
+                }
+            }
+        }
+
+        return $aOut;
     }
 }
