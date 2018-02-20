@@ -11,6 +11,9 @@ require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/mimes.php'
 //  CSV
 $mimes['csv'] = array_merge($mimes['csv'], ['text/plain']);
 
+//  JSON
+$mimes['json'] = array_merge($mimes['json'], ['text/plain']);
+
 //  ICO
 $mimes['ico'] = 'image/x-icon';
 
