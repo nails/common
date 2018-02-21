@@ -64,13 +64,15 @@ class Event
                 if (!empty($aSubscriptions)) {
                     foreach ($aSubscriptions as $oSubscription) {
 
-                        $sEvent     = $oSubscription->getEvent();
+                        $aEvent     = (array) $oSubscription->getEvent();
                         $sNamespace = $oSubscription->getNamespace();
                         $mCallback  = $oSubscription->getCallback();
                         $bOnce      = $oSubscription->isOnce();
 
-                        if (!empty($sEvent) && !empty($sNamespace) && !empty($mCallback)) {
-                            $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
+                        if (!empty($aEvent) && !empty($sNamespace) && !empty($mCallback)) {
+                            foreach ($aEvent as $sEvent) {
+                                $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
+                            }
                         }
                     }
                 }

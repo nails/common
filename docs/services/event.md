@@ -3,7 +3,7 @@
 
 
 
-Events in Nails are a way of broadcasting to other parts of the system that something happened, and provides an interface for code to react. For example; you may wish to update a mailing list database every time a user is created, or send a notification to an administrator whenever somebodymakes a purchase.
+Events in Nails are a way of broadcasting to other parts of the system that something happened, and provides an interface for code to react. For example; you may wish to update a mailing list database every time a user is created, or send a notification to an administrator whenever somebody makes a purchase.
 
 Your code can subscribe to events triggered by either installed modules or other parts of your app easily using the `Event` service.
 
@@ -15,7 +15,7 @@ Load the service using the Nails Factory: `Factory::service('Event')`
 
 ## Announcing Events
 
-In order for an event to be useable, they first must be announced. This is simply a case of creating a class in the root namespace of the component called `Events`. This class must extend `Nails\Common\Events\Base` and is simply a collection of constants and DocBlocs.
+In order for an event to be useable, it first must be announced. This is simply a case of creating a class in the root namespace of the component called `Events`. This class must extend `Nails\Common\Events\Base` and is simply a collection of constants and DocBlocs.
 
 
 ```php
@@ -57,9 +57,9 @@ Events are triggered using the `trigger($sEvent, $sNamespace, $aData)` method on
     $oEventService = Factory::service('Event');
     $oEventService->trigger(\App\Events::USER_YELL, 'app', [$iUserId, $sYelling]);
 
-Each listener subscribed to the `\App\Events::USER_YELL` event in the `app` namespace will be called (in the order they were subscribed) and will be passed `$iUserId` as `$sYelling` two separate arguments (under the hood, the service is calling `call_user_func_array`).
+Each listener subscribed to the `\App\Events::USER_YELL` event in the `app` namespace will be called (in the order they were subscribed) and will be passed `$iUserId` and `$sYelling` as two separate arguments (under the hood, the service is calling `call_user_func_array`).
 
-*Note: You can use whatever namespace you like when using the Event service, but for consistency, we recommend you use `app` for the app and the composer name for components, e.g. `nailsapp/module-admin`*
+*Note: You can use whatever namespace you like when using the Event service, but for consistency, we recommend you use `app` for the app and the composer name for components, e.g. `vendor/package`*
 
 
 
@@ -124,6 +124,9 @@ class Events
     }
 }
 ```
+
+
+> Tip: You can subscribe the same callback to multiple events in the same namespace by passing an array of events to the `setEvent()` method.
 
 
 ### Dynamic subscriptions

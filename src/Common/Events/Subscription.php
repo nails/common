@@ -15,9 +15,9 @@ class Subscription
 {
     /**
      * The name of the event being subscribed to
-     * @var string
+     * @var string|array
      */
-    protected $sEvent;
+    protected $mEvent;
 
     /**
      * The namespace of the event being subscribed to
@@ -42,13 +42,13 @@ class Subscription
     /**
      * Set the subscription event name
      *
-     * @param string $sEvent The subscription event name
+     * @param string|array $mEvent The subscription event name, or array of event names
      *
      * @return $this
      */
-    public function setEvent($sEvent)
+    public function setEvent($mEvent)
     {
-        $this->sEvent = $sEvent;
+        $this->mEvent = $mEvent;
         return $this;
     }
 
@@ -60,7 +60,7 @@ class Subscription
      */
     public function getEvent()
     {
-        return $this->sEvent;
+        return $this->mEvent;
     }
 
     // --------------------------------------------------------------------------
