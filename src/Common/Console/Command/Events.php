@@ -36,6 +36,12 @@ class Events extends Base
         $aComponents = array_merge(
             [
                 (object) [
+                    'namespace' => 'App\\',
+                    'slug'      => 'app',
+                ],
+            ],
+            [
+                (object) [
                     'namespace' => 'Nails\\Common\\',
                     'slug'      => 'nailsapp/common',
                 ],
