@@ -371,6 +371,24 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Inserts a batch of data into the table
+     *
+     * @param array $aData The data to insert
+     *
+     * @return boolean
+     */
+    public function createBatch($aData)
+    {
+        //  @todo (Pablo - 2018-02-23) - events
+        //  @todo (Pablo - 2018-02-23) - validate things
+        //  @todo (Pablo - 2018-02-23) - behave like the create
+        $oDb = Factory::service('Database');
+        return $oDb->insert_batch($this->getTableName(), $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Updates an existing object
      *
      * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
@@ -632,6 +650,18 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         return $bResult;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Truncates the entire table
+     * return boolean
+     */
+    public function truncate()
+    {
+        $oDb = Factory::service('Database');
+        return $oDb->truncate($this->getTableName());
     }
 
     /**
