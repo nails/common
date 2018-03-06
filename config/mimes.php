@@ -8,6 +8,12 @@ $mimes = require FCPATH . 'vendor/codeigniter/framework/application/config/mimes
  * @todo - move this into the services file
  */
 
+//  CSV
+$mimes['csv'] = array_merge($mimes['csv'], ['text/plain']);
+
+//  JSON
+$mimes['json'] = array_merge($mimes['json'], ['text/plain']);
+
 //  ICO
 $mimes['ico'] = 'image/x-icon';
 
@@ -29,9 +35,9 @@ $mimes['dotx'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml
 $mimes['docm'] = 'application/vnd.ms-word.document.macroEnabled.12';
 $mimes['dotm'] = 'application/vnd.ms-word.template.macroEnabled.12';
 
-$mimes['xls']  = ['application/excel', 'application/vnd.ms-excel', 'application/msexcel'];
-$mimes['xlt']  = 'application/vnd.ms-excel';
-$mimes['xla']  = 'application/vnd.ms-excel';
+$mimes['xls'] = ['application/excel', 'application/vnd.ms-excel', 'application/msexcel'];
+$mimes['xlt'] = 'application/vnd.ms-excel';
+$mimes['xla'] = 'application/vnd.ms-excel';
 
 $mimes['xlsx'] = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'];
 $mimes['xltx'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.template';
@@ -41,10 +47,10 @@ $mimes['xlam'] = 'application/vnd.ms-excel.addin.macroEnabled.12';
 $mimes['xlsb'] = 'application/vnd.ms-excel.sheet.binary.macroEnabled.12';
 $mimes['xlsm'] = 'application/vnd.ms-excel.sheet.macroEnabled.12';
 
-$mimes['ppt']  = ['application/powerpoint', 'application/vnd.ms-powerpoint'];
-$mimes['pot']  = 'application/vnd.ms-powerpoint';
-$mimes['pps']  = 'application/vnd.ms-powerpoint';
-$mimes['ppa']  = 'application/vnd.ms-powerpoint';
+$mimes['ppt'] = ['application/powerpoint', 'application/vnd.ms-powerpoint'];
+$mimes['pot'] = 'application/vnd.ms-powerpoint';
+$mimes['pps'] = 'application/vnd.ms-powerpoint';
+$mimes['ppa'] = 'application/vnd.ms-powerpoint';
 
 $mimes['pptx'] = ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip'];
 $mimes['potx'] = 'application/vnd.openxmlformats-officedocument.presentationml.template';

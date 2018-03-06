@@ -11,6 +11,7 @@ class Controller extends BaseMaker
 {
     const RESOURCE_PATH   = NAILS_COMMON_PATH . 'resources/console/';
     const CONTROLLER_PATH = FCPATH . 'application/modules/';
+    const TAB_WIDTH       = 4;
 
     // --------------------------------------------------------------------------
 
@@ -39,8 +40,9 @@ class Controller extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -151,6 +153,7 @@ class Controller extends BaseMaker
                 foreach ($aMethods as $sMethod) {
 
                     $sMethodView      = $sController . '/' . $sMethod;
+                    $aMethodStrings[] = '';
                     $aMethodStrings[] = $this->getResource(
                         'template/controller_method.php',
                         [
@@ -158,12 +161,29 @@ class Controller extends BaseMaker
                             'METHOD_VIEW' => $sMethodView,
                         ]
                     );
+                    $aMethodStrings[] = '';
+                    $aMethodStrings[] = '// --------------------------------------------------------------------------';
                 }
 
-                $aFields['METHODS'] = implode(
-                    "\n    // --------------------------------------------------------------------------\n",
-                    $aMethodStrings
+                //  Remove the first item (blank string) and the last two (separators)
+                $aMethodStrings = array_slice($aMethodStrings, 1, -2);
+
+                //  Add leading tabs
+                array_walk(
+                    $aMethodStrings,
+                    function (&$sLine) {
+                        $sLine = trim($sLine);
+                        if (!empty($sLine)) {
+                            $aLines = explode("\n", $sLine);
+                            foreach ($aLines as &$sSingleLine) {
+                                $sSingleLine = $this->tabs(1) . $sSingleLine;
+                            }
+                            $sLine = implode("\n", $aLines);
+                        }
+                    }
                 );
+
+                $aFields['METHODS'] = implode("\n", $aMethodStrings);
 
                 //  Ensure the path exists
                 $this->createPath($sControllerPath);
@@ -181,7 +201,6 @@ class Controller extends BaseMaker
                 $sViewPath = static::CONTROLLER_PATH . implode('/', $aViewBits) . '/';
                 $this->createPath($sViewPath);
 
-
                 foreach ($aMethods as $sMethod) {
                     $sView = $sViewPath . $sMethod . '.php';
                     $this->createFile(
@@ -189,7 +208,7 @@ class Controller extends BaseMaker
                         $this->getResource(
                             'template/view.php',
                             [
-                                'VIEW' => $sView,
+                                'VIEW' => preg_replace('#^' . FCPATH . '#', '', $sView),
                             ]
                         )
                     );
@@ -210,5 +229,19 @@ class Controller extends BaseMaker
             }
             throw new \Exception($e->getMessage());
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates N number of tabs
+     *
+     * @param int $iNumberTabs The number of tabs to generate
+     *
+     * @return string
+     */
+    protected function tabs($iNumberTabs = 0)
+    {
+        return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }
 }

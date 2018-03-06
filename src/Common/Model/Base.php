@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Model;
 
+use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
@@ -53,6 +54,13 @@ abstract class Base
     protected $tableAutoSetTokens;
 
     /**
+     * Keeps a track of the columns which have been used by getByColumn(); allows
+     * for us to more easily invalidate caches
+     * @var array
+     */
+    protected $aCacheColumns = [];
+
+    /**
      * Override the default token mask when automatically generating tokens for items
      * @var string
      */
@@ -77,6 +85,42 @@ abstract class Base
      * Magic trigger for expanding all expandable objects
      */
     const EXPAND_ALL = 'ALL';
+
+    /**
+     * The event namespace to use when firing events
+     * @var string
+     */
+    const EVENT_NAMESPACE = null;
+
+    /**
+     * The trigger to fire when an item is created
+     * @var string
+     */
+    const EVENT_CREATED = null;
+
+    /**
+     * The trigger to fire when an item is updated
+     * @var string
+     */
+    const EVENT_UPDATED = null;
+
+    /**
+     * The trigger to fire when an item is deleted
+     * @var string
+     */
+    const EVENT_DELETED = null;
+
+    /**
+     * The trigger to fire when an item is destroyed
+     * @var string
+     */
+    const EVENT_DESTROYED = null;
+
+    /**
+     * The trigger to fire when an item is restored
+     * @var string
+     */
+    const EVENT_RESTORED = null;
 
     //  Preferences
     protected $destructiveDelete;
@@ -116,6 +160,14 @@ abstract class Base
         $this->searchableFields       = [];
         $this->defaultSortColumn      = null;
         $this->defaultSortOrder       = 'ASC';
+
+        // --------------------------------------------------------------------------
+
+        $this->aCacheColumns = [
+            $this->tableIdColumn,
+            $this->tableSlugColumn,
+            $this->tableTokenColumn,
+        ];
 
         // --------------------------------------------------------------------------
 
@@ -304,7 +356,8 @@ abstract class Base
 
             // --------------------------------------------------------------------------
 
-            //  @todo - Hook into the Event service and automatically trigger CREATED event
+            //  Fire the static::EVENT_CREATED event
+            $this->triggerEvent(static::EVENT_CREATED, [$iId]);
 
             // --------------------------------------------------------------------------
 
@@ -313,6 +366,24 @@ abstract class Base
 
             return null;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Inserts a batch of data into the table
+     *
+     * @param array $aData The data to insert
+     *
+     * @return boolean
+     */
+    public function createBatch($aData)
+    {
+        //  @todo (Pablo - 2018-02-23) - events
+        //  @todo (Pablo - 2018-02-23) - validate things
+        //  @todo (Pablo - 2018-02-23) - behave like the create
+        $oDb = Factory::service('Database');
+        return $oDb->insert_batch($this->getTableName(), $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -397,13 +468,10 @@ abstract class Base
             unset($aData['id']);
             foreach ($aData as $sColumn => $mValue) {
                 if (is_array($mValue)) {
-
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
-
                     $oDb->set($sColumn, $mSetValue, $bEscape);
                 } else {
-
                     $oDb->set($sColumn, $mValue);
                 }
             }
@@ -432,7 +500,28 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger UPDATED event
+        //  Clear the cache
+        if (is_array($mIds)) {
+            foreach ($mIds as $iId) {
+                foreach ($this->aCacheColumns as $sColumn) {
+                    $sKey = strtoupper($sColumn) . ':' . json_encode($iId);
+                    $this->unsetCachePrefix($sKey);
+                }
+            }
+        } else {
+            foreach ($this->aCacheColumns as $sColumn) {
+                $sKey = strtoupper($sColumn) . ':' . json_encode($mIds);
+                $this->unsetCachePrefix($sKey);
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Fire the static::EVENT_UPDATED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -471,7 +560,11 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger DELETED event
+        //  Fire the static::EVENT_DELETED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_DELETED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
@@ -509,7 +602,8 @@ abstract class Base
 
             // --------------------------------------------------------------------------
 
-            //  @todo - Hook into the Event service and automatically trigger RESTORED event
+            //  Fire the static::EVENT_RESTORED event
+            $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
 
             // --------------------------------------------------------------------------
 
@@ -547,11 +641,27 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  @todo - Hook into the Event service and automatically trigger DESTROYED event
+        //  Fire the static::EVENT_DESTROYED event
+        $aIds = (array) $mIds;
+        foreach ($aIds as $iId) {
+            $this->triggerEvent(static::EVENT_DESTROYED, [$iId]);
+        }
 
         // --------------------------------------------------------------------------
 
         return $bResult;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Truncates the entire table
+     * return boolean
+     */
+    public function truncate()
+    {
+        $oDb = Factory::service('Database');
+        return $oDb->truncate($this->getTableName());
     }
 
     /**
@@ -592,10 +702,12 @@ abstract class Base
 
         //  Define the default sorting
         if (empty($aData['sort']) && !empty($this->defaultSortColumn)) {
-            $aData['sort'] = [
-                $this->getTableAlias(true) . $this->defaultSortColumn,
-                $this->defaultSortOrder,
-            ];
+            if (strpos($this->defaultSortColumn, '.') !== false) {
+                $sColumn = $this->defaultSortColumn;
+            } else {
+                $sColumn = $this->getTableAlias(true) . $this->defaultSortColumn;
+            }
+            $aData['sort'] = [$sColumn, $this->defaultSortOrder];
         }
 
         // --------------------------------------------------------------------------
@@ -670,13 +782,27 @@ abstract class Base
         $aResults    = $oResults->result();
         $iNumResults = count($aResults);
 
-        /**
-         * Handle requests for expanding objects.
-         * there are two types of expandable objects:
-         *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
-         *  2. Query a model for items which reference this item's ID  (1 to many)
-         */
+        $this->expandExpandableFields($aResults, $aData);
 
+        for ($i = 0; $i < $iNumResults; $i++) {
+            $this->formatObject($aResults[$i], $aData);
+        }
+
+        return $aResults;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Handle requests for expanding objects. There are two types of expandable objects:
+     *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
+     *  2. Query a model for items which reference this item's ID  (1 to many)
+     *
+     * @param array $aResults The results to iterate over
+     * @param array $aData    The configuration array
+     */
+    protected function expandExpandableFields(&$aResults, $aData)
+    {
         if (!empty($this->aExpandableFields)) {
 
             /**
@@ -711,7 +837,6 @@ abstract class Base
                 $bAutoExpand       = $oExpandableField->auto_expand;
                 $bExpandAll        = false;
                 $bExpandForTrigger = false;
-
                 //  If we're not auto-expanding, check if we're expanding everything
                 if (!$bAutoExpand && array_key_exists('expand', $aData)) {
                     $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
@@ -726,7 +851,7 @@ abstract class Base
                 if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
 
                     //  Merge any data defined with the expandable field with any custom data added by the expansion
-                    $aData = array_merge(
+                    $aMergedData = array_merge(
                         $oExpandableField->data,
                         getFromArray($oExpandableField->trigger, $aTriggerData, [])
                     );
@@ -739,7 +864,7 @@ abstract class Base
                             $oExpandableField->property,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            $aData
+                            $aMergedData
                         );
                     } elseif ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
@@ -749,19 +874,14 @@ abstract class Base
                             $oExpandableField->id_column,
                             $oExpandableField->model,
                             $oExpandableField->provider,
-                            $aData
+                            $aMergedData
                         );
                     }
                 }
             }
         }
-
-        for ($i = 0; $i < $iNumResults; $i++) {
-            $this->formatObject($aResults[$i], $aData);
-        }
-
-        return $aResults;
     }
+
 
     // --------------------------------------------------------------------------
 
@@ -819,6 +939,131 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns item(s) by a column and its value
+     *
+     * @param string $sColumn      The column to search on
+     * @param mixed  $mValue       The value(s) to look for
+     * @param array  $aData        Any additional data to pass in
+     * @param bool   $bReturnsMany Whether the method expects to return a single item, or many
+     *
+     * @return array|mixed|null
+     * @throws ModelException
+     */
+    protected function getByColumn($sColumn, $mValue, $aData, $bReturnsMany = false)
+    {
+        if (empty($sColumn)) {
+            throw new ModelException('Column cannot be empty');
+        }
+
+        if (empty($mValue)) {
+            return $bReturnsMany ? [] : null;
+        }
+
+        // -------------------------------------------------------------------------
+
+        $sWhereType = is_array($mValue) ? 'where_in' : 'where';
+        if (!isset($aData[$sWhereType])) {
+            $aData[$sWhereType] = [];
+        }
+
+        if (strpos($sColumn, '.') !== false) {
+            $aData[$sWhereType][] = [$sColumn, $mValue];
+        } else {
+            $aData[$sWhereType][] = [$this->getTableAlias(true) . $sColumn, $mValue];
+        }
+
+        // --------------------------------------------------------------------------
+
+        $sCacheKey = $this->prepareCacheKey($sColumn, $mValue, $aData);
+        $aCache    = $this->getCache($sCacheKey);
+        if (!empty($aCache)) {
+            return $bReturnsMany ? $aCache : reset($aCache);
+        }
+
+        // --------------------------------------------------------------------------
+
+        $aResult = $this->getAll($aData);
+
+        // --------------------------------------------------------------------------
+
+        if (empty($aResult)) {
+            return $bReturnsMany ? [] : null;
+        }
+
+        // --------------------------------------------------------------------------
+
+        foreach ($aResult as $oResult) {
+            foreach ($this->aCacheColumns as $sColumn) {
+                if (!property_exists($oResult, $sColumn)) {
+                    continue;
+                }
+
+                if ($sColumn === $this->tableIdColumn) {
+                    $this->setCache(
+                        $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
+                        [$oResult]
+                    );
+                } else {
+                    $this->setCacheAlias(
+                        $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
+                        $this->prepareCacheKey($this->tableIdColumn, $oResult->{$this->tableIdColumn}, $aData)
+                    );
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        return $bReturnsMany ? $aResult : reset($aResult);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Formats the key used by the cache, taking into consideration $aData
+     *
+     * @param string $sColumn The column name
+     * @param mixed  $mValue  The value(s)
+     * @param array  $aData   The data array
+     *
+     * @return string
+     */
+    protected function prepareCacheKey($sColumn, $mValue, $aData = null)
+    {
+        /**
+         * Remove some elements from the $aData array as they are unlikely to affect the
+         * _contents_ of an object, only whether it's returned or not. Things like `expand`
+         * will most likely alter a result so leave them in as identifiers.
+         */
+
+        $aRemove = [
+            'where',
+            'or_where',
+            'where_in',
+            'or_where_in',
+            'where_not_in',
+            'or_where_not_in',
+            'like',
+            'or_like',
+            'not_like',
+            'or_not_like',
+        ];
+        foreach ($aRemove as $sKey) {
+            unset($aData[$sKey]);
+        }
+
+        $aKey = array_filter([
+            strtoupper($sColumn),
+            json_encode($mValue),
+            $aData !== null ? md5(json_encode($aData)) : null,
+        ]);
+
+        return implode(':', $aKey);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Fetch an object by it's ID
      *
      * @param  int   $iId   The ID of the object to fetch
@@ -832,31 +1077,8 @@ abstract class Base
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
         }
-        if (empty($iId)) {
-            return null;
-        }
 
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where'])) {
-            $aData['where'] = [];
-        }
-
-        $aData['where'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $iId];
-
-        // --------------------------------------------------------------------------
-
-        $aResult = $this->getAll(null, null, $aData);
-
-        // --------------------------------------------------------------------------
-
-        if (empty($aResult)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $aResult[0];
+        return $this->getByColumn($this->tableIdColumn, $iId, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -864,33 +1086,25 @@ abstract class Base
     /**
      * Fetch objects by their IDs
      *
-     * @param  array $aIds  An array of IDs to fetch
-     * @param  mixed $aData Any data to pass to getCountCommon()
+     * @param  array  $aIds                An array of IDs to fetch
+     * @param  mixed  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
      */
-    public function getByIds($aIds, $aData = [])
+    public function getByIds($aIds, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
         }
 
-        if (empty($aIds)) {
-            return [];
+        $aItems = $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aIds, $this->tableIdColumn);
+        } else {
+            return $aItems;
         }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableIdColumn, $aIds];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -910,31 +1124,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
         }
 
-        if (empty($sSlug)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where'])) {
-            $aData['where'] = [];
-        }
-
-        $aData['where'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $sSlug];
-
-        // --------------------------------------------------------------------------
-
-        $aResult = $this->getAll(null, null, $aData);
-
-        // --------------------------------------------------------------------------
-
-        if (empty($aResult)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $aResult[0];
+        return $this->getByColumn($this->tableSlugColumn, $sSlug, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -942,33 +1132,25 @@ abstract class Base
     /**
      * Fetch objects by their slugs
      *
-     * @param  array $aSlugs An array of slugs to fetch
-     * @param  array $aData  Any data to pass to getCountCommon()
+     * @param  array  $aSlugs              An array of slugs to fetch
+     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
      */
-    public function getBySlugs($aSlugs, $aData = [])
+    public function getBySlugs($aSlugs, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
         }
 
-        if (empty($aSlugs)) {
-            return [];
+        $aItems = $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aSlugs, $this->tableSlugColumn);
+        } else {
+            return $aItems;
         }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableSlugColumn, $aSlugs];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData, false);
     }
 
     // --------------------------------------------------------------------------
@@ -989,10 +1171,8 @@ abstract class Base
     public function getByIdOrSlug($mIdSlug, $aData = [])
     {
         if (is_numeric($mIdSlug)) {
-
             return $this->getById($mIdSlug, $aData);
         } else {
-
             return $this->getBySlug($mIdSlug, $aData);
         }
     }
@@ -1014,25 +1194,7 @@ abstract class Base
             throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
         }
 
-        if (empty($sToken)) {
-            return null;
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
-        }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $sToken];
-
-        // --------------------------------------------------------------------------
-
-        $result = $this->getAll(null, null, $aData, false);
-
-        // --------------------------------------------------------------------------
-
-        return empty($result) ? null : reset($result);
+        return $this->getByColumn($this->tableTokenColumn, $sToken, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -1040,33 +1202,49 @@ abstract class Base
     /**
      * Fetch objects by an array of tokens
      *
-     * @param  array $aTokens An array of tokens to fetch
-     * @param  array $aData   Any data to pass to getCountCommon()
+     * @param  array  $aTokens             An array of tokens to fetch
+     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException if object property tableTokenColumn is not set
      */
-    public function getByTokens($aTokens, $aData = [])
+    public function getByTokens($aTokens, $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
         }
 
-        if (empty($aTokens)) {
-            return [];
+        $aItems = $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
+        if ($bMaintainInputOrder) {
+            return $this->sortItemsByColumn($aItems, $aTokens, $this->tableTokenColumn);
+        } else {
+            return $aItems;
         }
+    }
 
-        // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-        if (!isset($aData['where_in'])) {
-            $aData['where_in'] = [];
+    /**
+     * Sorts items into a specific order based on a specific column
+     *
+     * @param array  $aItems      The items to sort
+     * @param array  $aInputOrder The order to sort them in
+     * @param string $sColumn     The column to sort on
+     *
+     * @return array
+     */
+    protected function sortItemsByColumn($aItems, $aInputOrder, $sColumn)
+    {
+        $aOut = [];
+        foreach ($aInputOrder as $sInputItem) {
+            foreach ($aItems as $oItem) {
+                if ($oItem->{$sColumn} == $sInputItem) {
+                    $aOut[] = $oItem;
+                }
+            }
         }
-
-        $aData['where_in'][] = [$this->getTableAlias(true) . $this->tableTokenColumn, $aTokens];
-
-        // --------------------------------------------------------------------------
-
-        return $this->getAll(null, null, $aData, false);
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
@@ -1487,6 +1665,14 @@ abstract class Base
      */
     public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the second parameter is an array then treat as if called with search($sKeywords, null, null, $aData);
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
+        $aData['keywords'] = $sKeywords;
+
         //  @todo: specify searchable fields in constructor and generate this manually
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
@@ -1574,10 +1760,9 @@ abstract class Base
 
         $iCounter = 0;
         $oDb      = Factory::service('Database');
+        $sSlug    = Transliterator::transliterate($sLabel);
 
         do {
-
-            $sSlug = url_title(str_replace('/', '-', $sLabel), 'dash', true);
 
             if ($iCounter) {
                 $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
@@ -1989,8 +2174,17 @@ abstract class Base
      */
     protected function describeFieldsPrepareLabel($sLabel)
     {
+        $aPatterns = [
+            //  Common words
+            '/\bid\b/i'   => 'ID',
+            '/\burl\b/i'  => 'URL',
+            '/\bhtml\b/i' => 'HTML',
+            //  Common file extensions
+            '/\bpdf\b/i'  => 'PDF',
+        ];
+
         $sLabel = ucwords(preg_replace('/[\-_]/', ' ', $sLabel));
-        $sLabel = str_ireplace(['id'], ['ID'], $sLabel);
+        $sLabel = preg_replace(array_keys($aPatterns), array_values($aPatterns), $sLabel);
 
         return $sLabel;
     }
@@ -2149,16 +2343,37 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Triggers an event
+     *
+     * @param string $sEvent The event to trigger
+     * @param array  $aData  Data to pass to listeners
+     *
+     * @throws ModelException
+     */
+    protected function triggerEvent($sEvent, $aData)
+    {
+        if ($sEvent) {
+            //  @todo (Pablo - 2018-02-05) - Auto detect the namespace?
+            if (empty(static::EVENT_NAMESPACE)) {
+                throw new ModelException(get_called_class() . '::EVENT_NAMESPACE is must be defined');
+            }
+            $oEventService = Factory::service('Event');
+            $oEventService->trigger($sEvent, static::EVENT_NAMESPACE, $aData);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Various older modules expect to be able to access a few services/models
+     * via magic methods. These will be deprecated soon.
+     *
+     * @param object $oBindTo The class to bind to
+     */
     public static function backwardsCompatibility(&$oBindTo)
     {
-        /**
-         * Backwards compatibility
-         * Various older modules expect to be able to access a few services/models
-         * via magic methods. These will be deprecated soon.
-         */
-
         //  @todo (Pablo - 2017-06-07) - Remove these
-
         $oBindTo->db      = Factory::service('Database');
         $oBindTo->encrypt = Factory::service('Encrypt');
     }

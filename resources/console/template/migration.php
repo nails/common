@@ -26,7 +26,7 @@ class Migration{{INDEX}} extends Base
      */
     public function execute()
     {
-        $this->query('');
+        {{QUERIES}}
     }
 }
 

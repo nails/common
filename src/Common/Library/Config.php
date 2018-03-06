@@ -25,17 +25,6 @@ class Config
     // --------------------------------------------------------------------------
 
     /**
-     * Config constructor.
-     */
-    public function __construct()
-    {
-        $oCi           = get_instance();
-        $this->oConfig = $oCi->config;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Route calls to the CodeIgniter Config class
      *
      * @param  string $sMethod    The method being called
@@ -51,6 +40,7 @@ class Config
 
         } else {
 
+            $this->setupCiConfigClass();
             return call_user_func_array([$this->oConfig, $sMethod], $aArguments);
         }
     }
@@ -66,6 +56,7 @@ class Config
      */
     public function __get($sProperty)
     {
+        $this->setupCiConfigClass();
         return $this->oConfig->{$sProperty};
     }
 
@@ -81,6 +72,61 @@ class Config
      */
     public function __set($sProperty, $mValue)
     {
+        $this->setupCiConfigClass();
         $this->oConfig->{$sProperty} = $mValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Instantiates the CI Config class, if not already instantiated
+     */
+    private function setupCiConfigClass()
+    {
+        if (empty($this->oConfig)) {
+            $this->oConfig = get_instance()->config;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Prepends BASE_URL or SECURE_BASE_URL to a string
+     *
+     * @param string $sUri       The URI to append
+     * @param bool   $bUseSecure Whether to use BASE_URL or SECURE_BASE_URL
+     *
+     * @return string
+     */
+    public static function siteUrl($sUri, $bUseSecure = false)
+    {
+        if (preg_match('/^(https?:\/\/|#)/', $sUri)) {
+            //  Absolute URI; return unaltered
+            return $sUri;
+        } else {
+
+            if ($bUseSecure && defined('SECURE_BASE_URL')) {
+                $sBaseUrl = rtrim(SECURE_BASE_URL, '/') . '/';
+            } else {
+                $sBaseUrl = rtrim(BASE_URL, '/') . '/';
+            }
+
+            return $sBaseUrl . ltrim($sUri, '/');
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Alias to siteUrl()
+     *
+     * @param string $sUri       The URI to append
+     * @param bool   $bUseSecure Whether to use BASE_URL or SECURE_BASE_URL
+     *
+     * @return string
+     */
+    public static function site_url($sUri, $bUseSecure = false)
+    {
+        return static::siteUrl($sUri, $bUseSecure);
     }
 }

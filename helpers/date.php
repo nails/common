@@ -111,18 +111,28 @@ if (!function_exists('niceTime')) {
     /**
      * Converts a datetime into a human friendly relative string
      *
-     * @param  mixed   $mDate           The timestamp to convert
-     * @param  boolean $bTense          Whether or not to append the tense (e.g, X minutes _ago_)
-     * @param  string  $sOptBadMsg      The message to show if a bad timestamp is supplied
-     * @param  string  $sGreaterOneWeek The message to show if the timestanmp is greater than one week away
-     * @param  string  $sLessTenMins    The message to show if the timestamp is less than ten minutes away
+     * @param  mixed   $mDate                  The timestamp to convert
+     * @param  boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param  string  $sMessageBadDate        The message to show if a bad timestamp is supplied
+     * @param  string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
+     * @param  string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
      *
      * @return string
      */
-    function niceTime($mDate = false, $bTense = true, $sOptBadMsg = null, $sGreaterOneWeek = null, $sLessTenMins = null)
-    {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->niceTime($mDate, $bTense, $sOptBadMsg, $sGreaterOneWeek, $sLessTenMins);
+    function niceTime(
+        $mDate = false,
+        $bIncludeTense = true,
+        $sMessageBadDate = null,
+        $sMessageGreaterOneWeek = null,
+        $sMessageLessTenMinutes = null
+    ) {
+        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        return $oDateTimeModel->niceTime(
+            $mDate,
+            $bIncludeTense,
+            $sMessageBadDate,
+            $sMessageGreaterOneWeek,
+            $sMessageLessTenMinutes);
     }
 }
 

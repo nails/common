@@ -2,7 +2,7 @@
 
 /**
  * Provides enhanced logging facilities
- * @todo: Deprecate this in favour of something like monolog
+ * @todo        - Deprecate this in favour of something like monolog
  *
  * @package     Nails
  * @subpackage  common
@@ -19,9 +19,8 @@ use Nails\Environment;
 class Logger
 {
     private $oLog;
-    private $bIsCli;
-    public $bMute;
-    public $bDummy;
+    public  $bMute;
+    public  $bDummy;
 
     // --------------------------------------------------------------------------
 
@@ -32,11 +31,6 @@ class Logger
     {
         //  Load helper
         Factory::helper('file');
-
-        // --------------------------------------------------------------------------
-
-        //  On the CLI?
-        $this->bIsCli = get_instance()->input->is_cli_request();
 
         // --------------------------------------------------------------------------
 
@@ -53,14 +47,15 @@ class Logger
 
     /**
      * Writes a line to the log
+     *
      * @param  string $sLine The line to write
+     *
      * @return void
      */
     public function line($sLine = '')
     {
         //  Is dummy mode enabled? If it is then don't do anything.
         if ($this->bDummy) {
-
             return;
         }
 
@@ -89,16 +84,12 @@ class Logger
 
                 $sFirstLine = '<?php die(\'Unauthorised\'); ?>' . "\n\n";
                 if (write_file($sLogPath, $sFirstLine)) {
-
                     $this->oLog->exists = true;
-
                 } else {
-
                     $this->oLog->exists = false;
                 }
 
             } else {
-
                 $this->oLog->exists = true;
             }
         }
@@ -108,30 +99,10 @@ class Logger
         if ($this->oLog->exists) {
 
             if (empty($sLine)) {
-
                 write_file($sLogPath, "\n", 'a');
-
             } else {
-
                 write_file($sLogPath, 'INFO - ' . $oDate->format('Y-m-d H:i:s') . ' --> ' . trim($sLine) . "\n", 'a');
             }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  If we're working on the command line then pump it out there too
-        if ($this->bIsCli) {
-            fwrite(STDOUT, $sLine . "\n");
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  If we're not on production and the request is not CLI then echo to the browser
-        if (Environment::not('PRODUCTION') && !$this->bIsCli && !$this->bMute) {
-
-            @ob_start();
-            echo $sLine . "<br />\n";
-            @ob_flush();
         }
     }
 
@@ -139,6 +110,7 @@ class Logger
 
     /**
      * Set the filename which is being written to
+     *
      * @param string $sFile The file to write to
      */
     public function setFile($sFile = '')
@@ -149,12 +121,9 @@ class Logger
         // --------------------------------------------------------------------------
 
         if (!empty($sFile)) {
-
             $this->oLog->file = $sFile;
-
         } else {
-
-            $oDate = Factory::factory('DateTime');
+            $oDate            = Factory::factory('DateTime');
             $this->oLog->file = 'log-' . $oDate->format('Y-m-d') . '.php';
         }
     }
@@ -163,6 +132,7 @@ class Logger
 
     /**
      * Set the log directory which is being written to
+     *
      * @param string $sDir The directory to write to
      */
     public function setDir($sDir = '')
@@ -173,15 +143,10 @@ class Logger
         // --------------------------------------------------------------------------
 
         if (!empty($sDir) && substr($sDir, 0, 1) === '/') {
-
             $this->oLog->dir = $sDir;
-
         } elseif (!empty($sDir)) {
-
             $this->oLog->dir = DEPLOY_LOG_DIR . $sDir;
-
         } else {
-
             $this->oLog->dir = DEPLOY_LOG_DIR;
         }
     }

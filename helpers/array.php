@@ -144,5 +144,30 @@ if (!function_exists('in_array_multi')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('arrayExtractProperty')) {
+
+    /**
+     * Extracts the value of properties from a multi-dimensional array into an array of those values
+     *
+     * @param array  $aInput    The array to iterate over
+     * @param string $sProperty The property to extract
+     *
+     * @return array
+     */
+    function arrayExtractProperty(array $aInput, $sProperty)
+    {
+        $aOutput = [];
+        foreach ($aInput as $mItem) {
+            $aItem = (array) $mItem;
+            if (array_key_exists($sProperty, $aItem)) {
+                $aOutput[] = $aItem[$sProperty];
+            }
+        }
+        return $aOutput;
+    }
+}
+
+// --------------------------------------------------------------------------
+
 //  Include the CodeIgniter original
 include FCPATH . 'vendor/codeigniter/framework/system/helpers/array_helper.php';

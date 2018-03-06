@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The class provides a convinient way to load assets
+ * The class provides an interface for triggering and subscribing to events
  *
  * @package     Nails
  * @subpackage  common
@@ -12,22 +12,23 @@
 
 namespace Nails\Common\Library;
 
-use Nails\Factory;
-use Nails\Common\Exception\EventException;
-
 class Event
 {
-    protected $aSubsciptions;
+    /**
+     * The event subscriptions
+     * @var array
+     */
+    protected $aSubscriptions;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the class, set up any initial event subscriptions
+     * Event constructor.
      */
     public function __construct()
     {
         //  Defaults
-        $this->aSubsciptions = array();
+        $this->aSubscriptions = [];
 
         //  Set up initial subscriptions
         $aComponents = _NAILS_GET_COMPONENTS();
@@ -45,27 +46,33 @@ class Event
 
     /**
      * Looks for a component's event handler and executes the autoload() method if there is one
+     *
      * @param  string $sNamespace The namespace to check
+     *
      * @return void
      */
     protected function autoLoadSubscriptions($sNamespace)
     {
-        $sClassName = '\\' . $sNamespace . 'Event';
+
+        $sClassName = '\\' . $sNamespace . 'Events';
 
         if (class_exists($sClassName)) {
 
             $oClass = new $sClassName();
-            if (is_callable(array($oClass, 'autoload'))) {
-                $aSubsciptions = $oClass->autoload();
-                if (!empty($aSubsciptions)) {
-                    foreach ($aSubsciptions as $aListener) {
+            if (is_callable([$oClass, 'autoload'])) {
+                $aSubscriptions = $oClass->autoload();
+                if (!empty($aSubscriptions)) {
+                    foreach ($aSubscriptions as $oSubscription) {
 
-                        $sEvent     = getFromArray(0, $aListener);
-                        $sNamespace = getFromArray(1, $aListener);
-                        $mCallback  = getFromArray(2, $aListener);
+                        $aEvent     = (array) $oSubscription->getEvent();
+                        $sNamespace = $oSubscription->getNamespace();
+                        $mCallback  = $oSubscription->getCallback();
+                        $bOnce      = $oSubscription->isOnce();
 
-                        if (!empty($sEvent) && !empty($sNamespace) && !empty($mCallback)) {
-                            $this->subscribe($sEvent, $sNamespace, $mCallback);
+                        if (!empty($aEvent) && !empty($sNamespace) && !empty($mCallback)) {
+                            foreach ($aEvent as $sEvent) {
+                                $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
+                            }
                         }
                     }
                 }
@@ -78,29 +85,35 @@ class Event
 
     /**
      * Subscribe to an event
-     * @param  string $sEvent     The event to subscribe to
-     * @param  string $sNamespace The event's namespace
-     * @param  mixed  $mCallback  The callback to execute
+     *
+     * @param string  $sEvent     The event to subscribe to
+     * @param string  $sNamespace The event's namespace
+     * @param mixed   $mCallback  The callback to execute
+     * @param boolean $bOnce      Whether the subscription should only fire once
+     *
      * @return \Nails\Common\Library\Event
      */
-    public function subscribe($sEvent, $sNamespace, $mCallback)
+    public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)
     {
         $sEvent     = strtoupper($sEvent);
         $sNamespace = strtoupper($sNamespace);
 
         if (is_callable($mCallback)) {
-            if (!isset($this->aSubsciptions[$sNamespace])) {
-                $this->aSubsciptions[$sNamespace] = array();
+            if (!isset($this->aSubscriptions[$sNamespace])) {
+                $this->aSubscriptions[$sNamespace] = [];
             }
 
-            if (!isset($this->aSubsciptions[$sNamespace][$sEvent])) {
-                $this->aSubsciptions[$sNamespace][$sEvent] = array();
+            if (!isset($this->aSubscriptions[$sNamespace][$sEvent])) {
+                $this->aSubscriptions[$sNamespace][$sEvent] = [];
             }
 
             //  Prevent duplicate subscriptions
             $sHash = md5(serialize($mCallback));
-            if (!isset($this->aSubsciptions[$sNamespace][$sEvent][$sHash])) {
-                $this->aSubsciptions[$sNamespace][$sEvent][$sHash] = $mCallback;
+            if (!isset($this->aSubscriptions[$sNamespace][$sEvent][$sHash])) {
+                $this->aSubscriptions[$sNamespace][$sEvent][$sHash] = (object) [
+                    'is_once'  => $bOnce,
+                    'callback' => $mCallback,
+                ];
             }
         }
 
@@ -111,19 +124,24 @@ class Event
 
     /**
      * Trigger the event and execute all callbacks
+     *
      * @param  string $sEvent     The event to trigger
      * @param  string $sNamespace The event's namespace
      * @param  array  $aData      Data to pass to the callbacks
+     *
      * @return \Nails\Common\Library\Event
      */
-    public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = array())
+    public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
     {
         $sNamespace = strtoupper($sNamespace);
+        if (!empty($this->aSubscriptions[$sNamespace][$sEvent])) {
+            foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $sSubscriptionHash => $oSubscription) {
+                if (is_callable($oSubscription->callback)) {
+                    call_user_func_array($oSubscription->callback, $aData);
+                }
 
-        if (!empty($this->aSubsciptions[$sNamespace][$sEvent])) {
-            foreach ($this->aSubsciptions[$sNamespace][$sEvent] as $mCallback) {
-                if (is_callable($mCallback)) {
-                    call_user_func($mCallback, $aData);
+                if ($oSubscription->is_once) {
+                    unset($this->aSubscriptions[$sNamespace][$sEvent][$sSubscriptionHash]);
                 }
             }
         }

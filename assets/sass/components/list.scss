@@ -1,0 +1,37 @@
+.list {
+    padding: 0 0 0 2rem;
+    margin: 0 0 1.5rem 0;
+
+    > li {
+        padding: 0.5rem;
+        > *:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &--unstyled {
+        padding: 0;
+        > li {
+            list-style-type: none !important;
+        }
+    }
+
+    &--bordered {
+        > li {
+            border: 1px solid $color-grey-lightest;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+ul.list {
+    > li {
+        list-style-type: disc;
+    }
+}
+
+ol.list {
+    > li {
+        list-style-type: decimal;
+    }
+}

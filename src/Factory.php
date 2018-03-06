@@ -370,10 +370,17 @@ class Factory
     {
         $sComponent = empty($sComponent) ? 'nailsapp/common' : $sComponent;
 
-        if (empty(self::$aContainers[$sComponent][$sType][$sName])) {
+        if (!array_key_exists($sComponentName, self::$aContainers)) {
             throw new FactoryException(
-                ucfirst($sType) . ' "' . $sName . '" is not provided by component "' . $sComponent . '"',
-                0
+                'No containers registered for "' . $sComponentName . '"'
+            );
+        } elseif (!array_key_exists($sServiceType, self::$aContainers[$sComponentName])) {
+            throw new FactoryException(
+                'No "' . $sServiceType . '" containers registered for "' . $sComponentName . '"'
+            );
+        } elseif (!self::$aContainers[$sComponentName][$sServiceType]->offsetExists($sServiceName)) {
+            throw new FactoryException(
+                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"'
             );
         }
 
@@ -390,25 +397,30 @@ class Factory
         //  CI base helpers
         require_once BASEPATH . 'core' . DIRECTORY_SEPARATOR . 'Common.php';
 
-        //  Common helpers
-        self::helper('string');
-        self::helper('app_setting');
-        self::helper('app_notification');
-        self::helper('date');
-        self::helper('url');
-        self::helper('cookie');
-        self::helper('form');
-        self::helper('html');
-        self::helper('tools');
-        self::helper('debug');
-        self::helper('language');
-        self::helper('text');
-        self::helper('exception');
-        self::helper('typography');
-        self::helper('log');
+        $aComponents = [];
+
+        //  App
+        $aComponents[] = (object) [
+            'slug'     => 'app',
+            'autoload' => static::extractAutoLoadItemsFromComposerJson(FCPATH . 'composer.json'),
+        ];
+
+        //  Common
+        $aComponents[] = (object) [
+            'slug'     => 'nailsapp/common',
+            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_COMMON_PATH . 'composer.json'),
+        ];
+
+        //  Modules
+        foreach (_NAILS_GET_MODULES() as $oModule) {
+            $aComponents[] = (object) [
+                'slug'     => $oModule->slug,
+                'autoload' => !empty($oModule->autoload) ? $oModule->autoload : [],
+            ];
+        }
 
         //  Module items
-        foreach (_NAILS_GET_MODULES() as $oModule) {
+        foreach ($aComponents as $oModule) {
             //  Helpers
             if (!empty($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
@@ -427,17 +439,29 @@ class Factory
     // --------------------------------------------------------------------------
 
     /**
-     * Flattens an array of paths (described as an array) using the system's DIRECTORY_SEPARATOR
+     * Extracts the autoload elements from a composer.json file
      *
-     * @param array $aPaths An array of paths to flatten
+     * @param string $sPath The path to the composer.json file
+     *
+     * @return object
      */
-    private static function flattenPath(&$aPaths)
+    protected static function extractAutoLoadItemsFromComposerJson($sPath)
     {
-        array_walk(
-            $aPaths,
-            function (&$aItem) {
-                $aItem = implode(DIRECTORY_SEPARATOR, $aItem);
+        $aOut = (object) ['helpers' => [], 'services' => []];
+        if (file_exists($sPath)) {
+            $oAppComposer = json_decode(file_get_contents($sPath));
+            if (!empty($oAppComposer->extra->nails->autoload->helpers)) {
+                foreach ($oAppComposer->extra->nails->autoload->helpers as $sHelper) {
+                    $aOut->helpers[] = $sHelper;
+                }
             }
-        );
+            if (!empty($oAppComposer->extra->nails->autoload->services)) {
+                foreach ($oAppComposer->extra->nails->autoload->services as $sService) {
+                    $aOut->services[] = $sService;
+                }
+            }
+        }
+
+        return $aOut;
     }
 }

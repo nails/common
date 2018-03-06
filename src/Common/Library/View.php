@@ -15,18 +15,10 @@ namespace Nails\Common\Library;
 class View
 {
     /**
-     * Reference to the CI super object
-     * @var \CI_Controller
-     */
-    protected $oCi;
-
-    // --------------------------------------------------------------------------
-
-    /**
      * An array of data which is passed to the views
      * @var array
      */
-    protected static $aData = [];
+    protected $aData = [];
 
     // --------------------------------------------------------------------------
 
@@ -35,7 +27,7 @@ class View
      */
     public function __construct()
     {
-        $this->oCi = get_instance();
+        $this->aData = &getControllerData();
     }
 
     // --------------------------------------------------------------------------
@@ -47,12 +39,12 @@ class View
      *
      * @return array|mixed|null
      */
-    public static function getData($sKey = null)
+    public function getData($sKey = null)
     {
         if (is_null($sKey)) {
-            return static::$aData;
-        } elseif (array_key_exists($sKey, static::$aData)) {
-            return static::$aData[$sKey];
+            return $this->aData;
+        } elseif (array_key_exists($sKey, $this->aData)) {
+            return $this->aData[$sKey];
         } else {
             return null;
         }
@@ -63,22 +55,25 @@ class View
     /**
      * Add an item to the view data array, or update an existing item
      *
-     * @param string $mKey   The key to set
-     * @param mixed  $mValue The value to set
+     * @param string|array $mKey   The key, or keys (in a key value pair), to set
+     * @param mixed        $mValue The value to set
      *
      * @throws \Exception
+     * @returns $this
      */
-    public static function setData($mKey = null, $mValue = null)
+    public function setData($mKey, $mValue = null)
     {
         if (is_array($mKey)) {
             foreach ($mKey as $sKey => $mSubValue) {
-                static::setData($sKey, $mSubValue);
+                $this->setData($sKey, $mSubValue);
             }
         } elseif (is_string($mKey) || is_numeric($mKey)) {
-            static::$aData[$mKey] = $mValue;
+            $this->aData[$mKey] = $mValue;
         } else {
             throw new \Exception('Key must be a string or a numeric');
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -86,17 +81,21 @@ class View
     /**
      * Unset an item from the view data array
      *
-     * @param string $sKey The key to unset
+     * @param string|array $mKey The key, or keys, to unset
+     *
+     * @return $this
      */
-    public static function unsetData($sKey)
+    public function unsetData($mKey)
     {
-        if (is_array($sKey)) {
-            foreach ($sKey as $sSubKey) {
-                static::unsetData($sSubKey);
+        if (is_array($mKey)) {
+            foreach ($mKey as $sSubKey) {
+                $this->unsetData($sSubKey);
             }
         } else {
-            unset(static::$aData[$sKey]);
+            unset($this->aData[$mKey]);
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -104,21 +103,35 @@ class View
     /**
      * Loads a view
      *
-     * @param string $sView   The view to load
-     * @param array  $aData   Data to pass to the view
-     * @param bool   $bReturn Whether to return the view or not
+     * @param string|array $mView   The view to load, or an array of views to load
+     * @param array        $aData   Data to pass to the view(s)
+     * @param boolean      $bReturn Whether to return the view(s) or not
      *
      * @return mixed
      */
-    public function load($sView, $aData = [], $bReturn = false)
+    public function load($mView, $aData = [], $bReturn = false)
     {
-        $aData = array_merge(static::getData(), (array) $aData);
-
-        if (!$bReturn) {
-            $this->oCi->load->view($sView, $aData, $bReturn);
-            return $this;
+        if (is_array($mView)) {
+            $sOut = '';
+            foreach ($mView as $sView) {
+                if ($bReturn) {
+                    $sOut .= $this->load($sView, $aData, $bReturn);
+                } else {
+                    $this->load($sView, $aData, $bReturn);
+                }
+            }
+            return $bReturn ? $sOut : $this;
+        } elseif (is_string($mView)) {
+            $aData = array_merge($this->getData(), (array) $aData);
+            $oCi   = get_instance();
+            if (!$bReturn) {
+                $oCi->load->view($mView, $aData, $bReturn);
+                return $this;
+            } else {
+                return $oCi->load->view($mView, $aData, $bReturn);
+            }
         } else {
-            return $this->oCi->load->view($sView, $aData, $bReturn);
+            return $this;
         }
     }
 }
