@@ -1,7 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/hooks.php';
+require FCPATH . 'vendor/codeigniter/framework/application/config/hooks.php';
 
 //  Set Nails up as early as possible
 $hook['pre_system'] = array(

@@ -4,8 +4,7 @@
  * Modular Extensions - HMVC
  *
  * Adapted from the CodeIgniter Core Classes
- *
- * @link         http://codeigniter.com
+ * @link	http://codeigniter.com
  *
  * Description:
  * This library extends the CodeIgniter CI_Config class
@@ -13,8 +12,8 @@
  *
  * Install this file as application/third_party/MX/Config.php
  *
- * @copyright    Copyright (c) 2011 Wiredesignz
- * @version      5.4
+ * @copyright	Copyright (c) 2015 Wiredesignz
+ * @version 	5.5
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,81 +35,44 @@
  **/
 class MX_Config extends CI_Config
 {
-    /**
-     * Returns the site's URL, secured if necessary
-     *
-     * @param string $sUrl
-     * @param bool   $bForceSecure
-     * @return mixed|string
-     */
-    public function site_url($sUrl = '', $bForceSecure = false)
-    {
-        $sUrl = parent::site_url($sUrl);
+	public function load($file = '', $use_sections = FALSE, $fail_gracefully = FALSE, $_module = '')
+	{
+		if (in_array($file, $this->is_loaded, TRUE)) return $this->item($file);
 
-        //  If the URL begins with a slash then attempt to guess the host using $_SERVER
-        if (preg_match('/^\//', $sUrl) && !empty($_SERVER['HTTP_HOST'])) {
-            $sProtocol = !empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-            $sUrl = $sProtocol . '://' . $_SERVER['HTTP_HOST'] . $sUrl;
-        }
+		$_module OR $_module = CI::$APP->router->fetch_module();
+		list($path, $file) = Modules::find($file, $_module, 'config/');
 
-        if ($bForceSecure || isPageSecure()) {
-            $sUrl = preg_replace('#^' . BASE_URL . '#', SECURE_BASE_URL, $sUrl);
-        }
+		if ($path === FALSE)
+		{
+			parent::load($file, $use_sections, $fail_gracefully);
+			return $this->item($file);
+		}
 
-        return $sUrl;
-    }
+		if ($config = Modules::load_file($file, $path, 'config'))
+		{
+			/* reference to the config array */
+			$current_config =& $this->config;
 
-    // --------------------------------------------------------------------------
+			if ($use_sections === TRUE)
+			{
+				if (isset($current_config[$file]))
+				{
+					$current_config[$file] = array_merge($current_config[$file], $config);
+				}
+				else
+				{
+					$current_config[$file] = $config;
+				}
 
-    public function load($file = 'config', $use_sections = false, $fail_gracefully = false, $_module = '')
-    {
-        if (in_array($file, $this->is_loaded, true)) {
-            return $this->item($file);
-        }
+			}
+			else
+			{
+				$current_config = array_merge($current_config, $config);
+			}
 
-        $_module OR $_module = CI::$APP->router->fetch_module();
-        list($path, $file) = Modules::find($file, $_module, 'config/');
-
-        if ($path === false) {
-            parent::load($file, $use_sections, $fail_gracefully);
-            return $this->item($file);
-        }
-
-        if ($config = Modules::load_file($file, $path, 'config')) {
-
-            /* reference to the config array */
-            $current_config =& $this->config;
-
-            if ($use_sections === true) {
-
-                if (isset($current_config[$file])) {
-                    $current_config[$file] = array_merge($current_config[$file], $config);
-                } else {
-                    $current_config[$file] = $config;
-                }
-
-            } else {
-                $current_config = array_merge($current_config, $config);
-            }
-            $this->is_loaded[] = $file;
-            unset($config);
-
-            return $this->item($file);
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Secure Base URL
-     * Returns secure_base_url [. uri_string]
-     *
-     * @access public
-     * @param string $uri
-     * @return string
-     */
-    function secure_base_url($uri = '')
-    {
-        return SECURE_BASE_URL . ltrim($this->_uri_string($uri), '/');
-    }
+			$this->is_loaded[] = $file;
+			unset($config);
+			return $this->item($file);
+		}
+	}
 }

@@ -13,7 +13,7 @@
 namespace Nails\Common\Driver\ErrorHandler;
 
 use Nails\Common\Interfaces\ErrorHandlerDriver;
-use Nails\Common\Library\ErrorHandler;
+use Nails\Factory;
 use Nails\Environment;
 use Rollbar\Payload\Level;
 
@@ -25,13 +25,15 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function init()
     {
+        $oErrorHandler = Factory::service('ErrorHandler');
+
         if (!defined('DEPLOY_ROLLBAR_ACCESS_TOKEN')) {
 
             $sSubject = 'Rollbar is not configured correctly';
             $sMessage = 'Rollbar is enabled but DEPLOY_ROLLBAR_ACCESS_TOKEN is not defined.';
 
-            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
 
         if (!class_exists('\Rollbar\Rollbar')) {
@@ -40,8 +42,8 @@ class Rollbar implements ErrorHandlerDriver
             $sMessage = 'Rollbar is set as the error handler, but the Rollbar class ';
             $sMessage .= 'could not be found. Ensure that it is in composer.json.';
 
-            ErrorHandler::sendDeveloperMail($sSubject, $sMessage);
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
 
         $aConfig = [
@@ -74,7 +76,7 @@ class Rollbar implements ErrorHandlerDriver
 
         //  Send report to Rollbar
         \Rollbar\Rollbar::log(
-            Level::warning(),
+            Level::WARNING,
             $sMessage,
             [
                 'error_number' => $iNumber,
@@ -98,7 +100,7 @@ class Rollbar implements ErrorHandlerDriver
      */
     public static function exception($oException)
     {
-        \Rollbar\Rollbar::log(Level::error(), $oException);
+        \Rollbar\Rollbar::log(Level::ERROR, $oException);
 
         $oDetails       = new \stdClass();
         $oDetails->type = get_class($oException);
@@ -123,7 +125,8 @@ class Rollbar implements ErrorHandlerDriver
             $sMessage = '';
         }
 
-        ErrorHandler::showFatalErrorScreen($sSubject, $sMessage, $oDetails);
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage, $oDetails);
     }
 
     // --------------------------------------------------------------------------
@@ -149,7 +152,8 @@ class Rollbar implements ErrorHandlerDriver
                 $sMessage = '';
             }
 
-            ErrorHandler::showFatalErrorScreen($sSubject, $sMessage);
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
         }
     }
 

@@ -170,4 +170,4 @@ if (!function_exists('arrayExtractProperty')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/array_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/array_helper.php';

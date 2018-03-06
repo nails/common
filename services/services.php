@@ -48,18 +48,18 @@ return [
                 return new \Nails\Common\Library\Event();
             }
         },
-        'HttpCodes' => function () {
-            if (class_exists('\App\Common\Library\HttpCodes')) {
-                return new \App\Common\Library\HttpCodes();
-            } else {
-                return new \Nails\Common\Library\HttpCodes();
-            }
-        },
         'FormValidation' => function () {
             if (class_exists('\App\Common\Library\FormValidation')) {
                 return new \App\Common\Library\FormValidation();
             } else {
                 return new \Nails\Common\Library\FormValidation();
+            }
+        },
+        'HttpCodes' => function () {
+            if (class_exists('\App\Common\Library\HttpCodes')) {
+                return new \App\Common\Library\HttpCodes();
+            } else {
+                return new \Nails\Common\Library\HttpCodes();
             }
         },
         'Input' => function () {
@@ -95,6 +95,13 @@ return [
                 return new \App\Common\Library\Output();
             } else {
                 return new \Nails\Common\Library\Output();
+            }
+        },
+        'PDODatabase' => function () {
+            if (class_exists('\App\Common\Library\PDODatabase')) {
+                return new \App\Common\Library\PDODatabase();
+            } else {
+                return new \Nails\Common\Library\PDODatabase();
             }
         },
         'Router' => function () {

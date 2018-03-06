@@ -203,4 +203,4 @@ if (!function_exists('prosaicList')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/string_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/string_helper.php';

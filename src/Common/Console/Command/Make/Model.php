@@ -15,7 +15,7 @@ class Model extends BaseMaker
     const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
     const MODEL_PATH        = FCPATH . 'src/Model/';
     const ADMIN_PATH        = FCPATH . 'application/modules/admin/controllers/';
-    const SERVICE_PATH      = FCPATH . APPPATH . 'services/services.php';
+    const SERVICE_PATH      = APPPATH . 'services/services.php';
     const SERVICE_TEMP_PATH = DEPLOY_CACHE_DIR . 'services.temp.php';
 
     // --------------------------------------------------------------------------
@@ -50,6 +50,12 @@ class Model extends BaseMaker
             InputOption::VALUE_OPTIONAL,
             'Skip admin creation'
         );
+        $this->addOption(
+            'auto-detect',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Automatically build models from the database'
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -57,8 +63,9 @@ class Model extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
@@ -76,7 +83,7 @@ class Model extends BaseMaker
         //  Test database connection
         if (!$bSkipDb) {
             try {
-                Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                Factory::service('PDODatabase');
             } catch (ConnectionException $e) {
                 return $this->abort(
                     self::EXIT_CODE_FAILURE,
@@ -111,13 +118,13 @@ class Model extends BaseMaker
 
         //  Look for the generator token
         $this->fServicesHandle = fopen(static::SERVICE_PATH, "r+");;
-        $bFound                = false;
+        $bFound = false;
         if ($this->fServicesHandle) {
             $iLocation = 0;
             while (($sLine = fgets($this->fServicesHandle)) !== false) {
                 if (preg_match('#^(\s*)// GENERATOR\[MODELS\]#', $sLine, $aMatches)) {
                     $bFound                       = true;
-                    $this->iServicesIndent   = strlen($aMatches[1]);
+                    $this->iServicesIndent        = strlen($aMatches[1]);
                     $this->iServicesTokenLocation = $iLocation;
                     break;
                 }
@@ -145,7 +152,6 @@ class Model extends BaseMaker
                 ]
             );
         }
-
 
         // --------------------------------------------------------------------------
 
@@ -189,20 +195,81 @@ class Model extends BaseMaker
      */
     private function createModel()
     {
-        $oInput     = $this->oInput;
-        $oOutput    = $this->oOutput;
-        $aFields    = $this->getArguments();
-        $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
-        $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+        $oInput      = $this->oInput;
+        $oOutput     = $this->oOutput;
+        $bSkipDb     = stringToBoolean($oInput->getOption('skip-db'));
+        $bSkipAdmin  = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+        $bAutoDetect = stringToBoolean($oInput->getOption('auto-detect'));
+
+        //  If auto-detecting models using the database then skip cresting database tables
+        if ($bAutoDetect) {
+            $bSkipDb = true;
+        }
 
         try {
 
-            $aModels    = explode(',', $aFields['MODEL_NAME']);
-            $aModelData = [];
-            sort($aModels);
+            if (!$bAutoDetect) {
 
-            foreach ($aModels as $sModelName) {
-                $aModelData[] = $this->prepareModelName($oInput, $sModelName);
+                $aFields    = $this->getArguments();
+                $aModels    = explode(',', $aFields['MODEL_NAME']);
+                $aModelData = [];
+                sort($aModels);
+                foreach ($aModels as $sModelName) {
+                    $oModel = $this->prepareModelName($sModelName);
+                    if ($this->modelExists($oModel)) {
+                        throw new \Exception(
+                            'A model by that path already exists "' . $oModel->path . $oModel->filename . '"'
+                        );
+                    }
+
+                    //  Test to see if the database table exists already
+                    if (!$bSkipDb) {
+                        $oDb     = Factory::service('PDODatabase');
+                        $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
+                        if ($oResult->rowCount() > 0) {
+                            throw new \Exception(
+                                'Table "' . $oModel->table_with_prefix . '" already exists. Use option --skip-db to skip database check.'
+                            );
+                        }
+                    }
+
+                    $aModelData[] = $oModel;
+                }
+
+            } else {
+
+                $oDb        = Factory::service('PDODatabase');
+                $sAppPrefix = defined('APP_DB_PREFIX') ? APP_DB_PREFIX : '';
+                $oTables    = $oDb->query('SHOW TABLES LIKE "' . $sAppPrefix . '%";');
+                $aTables    = $oTables->fetchAll(\PDO::FETCH_NUM);
+
+                //  If APP_DB_PREFIX is empty then the query above will have all the Nails table's too,
+                //  filter them out.
+                if (empty($sAppPrefix)) {
+                    $aTables = array_filter(
+                        $aTables,
+                        function ($aTable) {
+                            return !preg_match('/^' . NAILS_DB_PREFIX . '/', $aTable[0]);
+                        }
+                    );
+                    $aTables = array_values($aTables);
+                }
+
+                $aModelData = array_map(
+                    function ($aTable) use ($sAppPrefix) {
+                        $sTable = $aTable[0];
+                        $sTable = preg_replace('/^' . $sAppPrefix . '/', '', $sTable);
+                        $sTable = str_replace('_', ' ', $sTable);
+                        $sTable = ucwords($sTable);
+                        $sTable = str_replace(' ', '/', $sTable);
+
+                        $oModel = $this->prepareModelName($sTable);
+
+                        return $this->modelExists($oModel) ? null : $oModel;
+                    },
+                    $aTables
+                );
+                $aModelData = array_filter($aModelData);
             }
 
             Factory::helper('array');
@@ -243,13 +310,13 @@ class Model extends BaseMaker
                     if (!$bSkipDb) {
                         $oOutput->write('Adding database table...');
                         $oModel->nails_db_prefix = NAILS_DB_PREFIX;
-                        $oDb                     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+                        $oDb                     = Factory::service('PDODatabase');
                         $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
                         $oOutput->writeln('<info>done!</info>');
                     }
 
                     //  Generate the service definition
-                    $aDefinition = [
+                    $aDefinition         = [
                         str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
                         str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
                         str_repeat(' ', $this->iServicesIndent) . '},',
@@ -263,8 +330,8 @@ class Model extends BaseMaker
                         $iExitCode = $this->callCommand(
                             'make:controller:admin',
                             [
-                                'modelName' => $oModel->service_name,
-                                '--skip-check' => true
+                                'modelName'    => $oModel->service_name,
+                                '--skip-check' => true,
                             ],
                             false,
                             true
@@ -323,12 +390,13 @@ class Model extends BaseMaker
 
     /**
      * Prepare the model details and do some preliminary checks
-     * @param object $oInput The input class
+     *
      * @param string $sModelName The name of the model
-     * @return object
+     *
+     * @return \stdClass
      * @throws \Exception
      */
-    private function prepareModelName($oInput, $sModelName)
+    private function prepareModelName($sModelName)
     {
         //  Prepare the supplied model name and test
         $sModelName = preg_replace('/[^a-zA-Z\/ ]/', '', $sModelName);
@@ -354,24 +422,9 @@ class Model extends BaseMaker
         $sPath      = substr($sPath, -1) !== '/' ? $sPath . '/' : $sPath;
         $sNamespace = implode('\\', $aNamespace);
 
-        if (file_exists($sPath . $sFilename)) {
-            throw new \Exception('A model by that path already exists "' . $sPath . $sFilename . '"');
-        }
-
         //  Set the service name
         $sServiceName = str_replace('App\Model\\', '', $sModelName);
         $sServiceName = str_replace('\\', '', $sServiceName);
-
-        //  Test to see if the database table exists already
-        if (!stringToBoolean($oInput->getOption('skip-db'))) {
-            $oDb     = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
-            $oResult = $oDb->query('SHOW TABLES LIKE "' . $sTableNameWithPrefix . '"');
-            if ($oResult->rowCount() > 0) {
-                throw new \Exception(
-                    'Table "' . $sTableNameWithPrefix . '" already exists. Use option --skip-db to skip database check.'
-                );
-            }
-        }
 
         return (object) [
             'namespace'         => $sNamespace,
@@ -383,5 +436,19 @@ class Model extends BaseMaker
             'table_with_prefix' => $sTableNameWithPrefix,
             'service_name'      => $sServiceName,
         ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether a model exists already
+     *
+     * @param \stdClass $oModel The model definition
+     *
+     * @return bool
+     */
+    private function modelExists($oModel)
+    {
+        return file_exists($oModel->path . $oModel->filename);
     }
 }

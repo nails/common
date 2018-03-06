@@ -250,6 +250,10 @@ if (!function_exists('form_open')) {
 
         $form .= '>';
 
+        if (!(bool) preg_match('/method="(.+)"/', $form)) {
+            $form = preg_replace('/>$/', ' method="POST">', $form);
+        }
+
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
         $_base_url        = $oConfig->base_url();
         $_secure_base_url = $oConfig->secure_base_url();
@@ -341,7 +345,6 @@ if (!function_exists('form_field')) {
 
         //  Any data attributes?
         foreach ($_field_data as $attr => $value) {
-
             $_attr .= ' data-' . $attr . '="' . $value . '"';
         }
 
@@ -375,14 +378,13 @@ if (!function_exists('form_field')) {
             case 'textarea':
 
                 if ($_field_type == 'wysiwyg') {
-
                     $_field_type  = 'textarea';
                     $_field_class .= ' wysiwyg';
                 }
 
                 $_field_html = form_textarea(
                     $_field_key,
-                    set_value($_field_key, $_field_default),
+                    set_value($_field_key, $_field_default, false),
                     $sFieldAttr
                 );
                 break;
@@ -417,7 +419,9 @@ if (!function_exists('form_field')) {
                 case 'url':
                 case 'textarea':
                 case 'text':
-                    $_max_length_html = '<small class="char-count" data-max-length="' . $_field_max_length . '">Max Length: ' . $_field_max_length . '</small>';
+                    $_max_length_html = '<small class="char-count" data-max-length="' . $_field_max_length . '">';
+                    $_max_length_html .= 'Max Length: ' . $_field_max_length;
+                    $_max_length_html .= '</small>';
                     break;
                 default:
                     $_max_length_html = '';
@@ -436,18 +440,27 @@ if (!function_exists('form_field')) {
 
             switch ($_ext) {
 
-                case 'jpg' :
-                case 'png' :
-                case 'gif' :
+                case 'jpg':
+                case 'png':
+                case 'gif':
 
-                    $_field_html .= 'Download: ' . anchor(cdnServe($_field_default), img(cdnCrop($_field_default, 35, 35)), 'class="fancybox"');
+                    $_field_html .= 'Download: ';
+                    $_field_html .= anchor(
+                        cdnServe($_field_default),
+                        img(cdnCrop($_field_default, 35, 35)),
+                        'class="fancybox"'
+                    );
                     break;
 
                 // --------------------------------------------------------------------------
 
-                default :
+                default:
 
-                    $_field_html .= anchor(cdnServe($_field_default, true), 'Download', 'class="btn btn-xs btn-primary" target="_blank"');
+                    $_field_html .= anchor(
+                        cdnServe($_field_default, true),
+                        'Download',
+                        'class="btn btn-xs btn-primary" target="_blank"'
+                    );
                     break;
             }
 
@@ -459,13 +472,9 @@ if (!function_exists('form_field')) {
 
         //  Errors
         if ($_error && $_field_error) :
-
             $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-
         elseif ($_error) :
-
             $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
-
         endif;
 
         // --------------------------------------------------------------------------
@@ -652,10 +661,8 @@ if (!function_exists('form_field_wysiwyg')) {
         $field['type'] = 'textarea';
 
         if (isset($field['class'])) {
-
             $field['class'] .= ' wysiwyg';
         } else {
-
             $field['class'] = 'wysiwyg';
         }
 
@@ -2019,7 +2026,7 @@ if (!function_exists('form_field_cms_widgets')) {
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
         $_out      .= '<span class="input ' . $_tipclass . '">';
 
-        $_default = set_value($_field['key'], $_field['default']);
+        $_default = set_value($_field['key'], $_field['default'], false);
 
         /**
          * Posted items will not be escaped and as such will not render as correct JSON by the JS.
@@ -2220,4 +2227,4 @@ EOT;
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/form_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/form_helper.php';

@@ -35,7 +35,7 @@ class Base
 
     public function __construct()
     {
-        $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+        $this->oDb = Factory::service('PDODatabase');
     }
 
     // --------------------------------------------------------------------------
@@ -44,6 +44,7 @@ class Base
      * Execute a DB query
      *
      * @param  string $sQuery The query to execute
+     *
      * @return \PDOStatement
      */
     public function query($sQuery)
@@ -61,6 +62,7 @@ class Base
      * Prepare a DB query
      *
      * @param  string $sQuery The query to prepare
+     *
      * @return \PDOStatement
      */
     public function prepare($sQuery)
@@ -78,6 +80,7 @@ class Base
      * Replaces {{CONSTANT}} with the value of constant, CONSTANT
      *
      * @param string $sString The string to search on
+     *
      * @return string
      */
     protected function replaceConstants($sString)

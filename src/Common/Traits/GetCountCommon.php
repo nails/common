@@ -308,8 +308,8 @@ trait GetCountCommon
                                 $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
                             }
 
-                            //  What's the operator?
-                            if (!$oDb->_has_operator($col)) {
+                            //  Test if there's an SQL operator
+                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($col))) {
 
                                 $operator = is_null($val) ? ' IS ' : '=';
 

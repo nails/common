@@ -10,11 +10,7 @@
  * @link
  */
 
-use Nails\Common\Exception\EnvironmentException;
-use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
-use Nails\Environment;
-use Nails\Factory;
 
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = [];
@@ -44,62 +40,37 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
         $sComposer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
 
         if (empty($sComposer)) {
-
-            $sMessage = 'Failed to discover potential modules; could not load composer/installed.json';
-
-            if (function_exists('_NAILS_ERROR')) {
-
-                _NAILS_ERROR($sMessage);
-
-            } else {
-
-                echo 'ERROR: ' . $sMessage;
-                exit(0);
-            }
+            _NAILS_ERROR('Failed to discover potential modules; could not load composer/installed.json');
         }
 
         $aComposer = @json_decode($sComposer);
 
         if (empty($aComposer)) {
-
-            $sMessage = 'Failed to discover potential modules; could not decode composer/installed.json';
-
-            if (function_exists('_NAILS_ERROR')) {
-
-                _NAILS_ERROR($sMessage);
-
-            } else {
-
-                echo 'ERROR: ' . $sMessage;
-                exit(0);
-            }
+            _NAILS_ERROR('Failed to discover potential modules; could not decode composer/installed.json');
         }
 
         $aOut = [];
-
         foreach ($aComposer as $oPackage) {
 
             if (isset($oPackage->extra->nails)) {
-
-                $oTemp                = new \stdClass();
-                $oTemp->slug          = $oPackage->name;
-                $oTemp->namespace     = !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null;
-                $oTemp->name          = !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oTemp->slug;
-                $oTemp->description   = !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description;
-                $oTemp->homepage      = !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage;
-                $oTemp->authors       = !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors;
-                $oTemp->path          = FCPATH . 'vendor/' . $oPackage->name . '/';
-                $oTemp->relativePath  = 'vendor/' . $oPackage->name . '/';
-                $oTemp->moduleName    = !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '';
-                $oTemp->data          = !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null;
-                $oTemp->type          = !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '';
-                $oTemp->subType       = !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '';
-                $oTemp->forModule     = !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '';
-                $oTemp->autoload      = !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null;
-                $oTemp->minPhpVersion = !empty($oPackage->extra->nails->minPhpVersion) ? $oPackage->extra->nails->minPhpVersion : null;
-                $oTemp->fromApp       = false;
-
-                $aOut[] = $oTemp;
+                $aOut[] = (object) [
+                    'slug'          => $oPackage->name,
+                    'namespace'     => !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null,
+                    'name'          => !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oPackage->name,
+                    'description'   => !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description,
+                    'homepage'      => !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage,
+                    'authors'       => !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors,
+                    'path'          => FCPATH . 'vendor/' . $oPackage->name . '/',
+                    'relativePath'  => 'vendor/' . $oPackage->name . '/',
+                    'moduleName'    => !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '',
+                    'data'          => !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null,
+                    'type'          => !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '',
+                    'subType'       => !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '',
+                    'forModule'     => !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '',
+                    'autoload'      => !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null,
+                    'minPhpVersion' => !empty($oPackage->extra->nails->minPhpVersion) ? $oPackage->extra->nails->minPhpVersion : null,
+                    'fromApp'       => false,
+                ];
             }
         }
 
@@ -128,26 +99,24 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                     $oConfig = json_decode($sConfig);
 
                     if (!empty($oConfig)) {
-
-                        $oTemp                = new \stdClass();
-                        $oTemp->slug          = 'app/' . $sDirName;
-                        $oTemp->namespace     = !empty($oConfig->namespace) ? $oConfig->namespace : null;
-                        $oTemp->name          = !empty($oConfig->name) ? $oConfig->name : $oTemp->slug;
-                        $oTemp->description   = !empty($oConfig->description) ? $oConfig->description : '';
-                        $oTemp->homepage      = !empty($oConfig->homepage) ? $oConfig->homepage : '';
-                        $oTemp->authors       = !empty($oConfig->authors) ? $oConfig->authors : [];
-                        $oTemp->path          = $sAppPath . $sDirName . '/';
-                        $oTemp->relativePath  = 'application/components/' . $sDirName . '/';
-                        $oTemp->moduleName    = '';
-                        $oTemp->data          = !empty($oConfig->data) ? $oConfig->data : null;
-                        $oTemp->type          = !empty($oConfig->type) ? $oConfig->type : '';
-                        $oTemp->subType       = !empty($oConfig->subType) ? $oConfig->subType : '';
-                        $oTemp->forModule     = !empty($oConfig->forModule) ? $oConfig->forModule : '';
-                        $oTemp->autoload      = !empty($oConfig->autoload) ? $oConfig->autoload : null;
-                        $oTemp->minPhpVersion = !empty($oConfig->minPhpVersion) ? $oConfig->minPhpVersion : null;
-                        $oTemp->fromApp       = true;
-
-                        $aOut[] = $oTemp;
+                        $aOut[] = (object) [
+                            'slug'          => 'app/' . $sDirName,
+                            'namespace'     => !empty($oConfig->namespace) ? $oConfig->namespace : null,
+                            'name'          => !empty($oConfig->name) ? $oConfig->name : 'app/' . $sDirName,
+                            'description'   => !empty($oConfig->description) ? $oConfig->description : '',
+                            'homepage'      => !empty($oConfig->homepage) ? $oConfig->homepage : '',
+                            'authors'       => !empty($oConfig->authors) ? $oConfig->authors : [],
+                            'path'          => $sAppPath . $sDirName . '/',
+                            'relativePath'  => 'application/components/' . $sDirName . '/',
+                            'moduleName'    => '',
+                            'data'          => !empty($oConfig->data) ? $oConfig->data : null,
+                            'type'          => !empty($oConfig->type) ? $oConfig->type : '',
+                            'subType'       => !empty($oConfig->subType) ? $oConfig->subType : '',
+                            'forModule'     => !empty($oConfig->forModule) ? $oConfig->forModule : '',
+                            'autoload'      => !empty($oConfig->autoload) ? $oConfig->autoload : null,
+                            'minPhpVersion' => !empty($oConfig->minPhpVersion) ? $oConfig->minPhpVersion : null,
+                            'fromApp'       => true,
+                        ];
                     }
                 }
             }
@@ -242,23 +211,17 @@ if (!function_exists('_NAILS_GET_COMPONENTS_BY_TYPE')) {
     function _NAILS_GET_COMPONENTS_BY_TYPE($sType)
     {
         if (isset($GLOBALS['NAILS'][$sType])) {
-
             $aOut = $GLOBALS['NAILS'][$sType];
-
         } else {
 
             $aComponents = _NAILS_GET_COMPONENTS();
             $aOut        = [];
-
-            // --------------------------------------------------------------------------
 
             foreach ($aComponents as $oComponent) {
                 if ($oComponent->type == $sType) {
                     $aOut[] = $oComponent;
                 }
             }
-
-            // --------------------------------------------------------------------------
 
             $GLOBALS['NAILS'][$sType] = $aOut;
         }
@@ -377,20 +340,14 @@ if (!function_exists('_NAILS_GET_DRIVER_INSTANCE')) {
 
         //  Test driver
         if (!empty($oDriver->data->namespace)) {
-
             $sNamespace = $oDriver->data->namespace;
-
         } else {
-
             throw new NailsException('Driver Namespace missing from driver "' . $oDriver->slug . '"', 1);
         }
 
         if (!empty($oDriver->data->class)) {
-
             $sClassName = $oDriver->data->class;
-
         } else {
-
             throw new NailsException('Driver ClassName missing from driver "' . $oDriver->slug . '"', 2);
         }
 
@@ -478,109 +435,21 @@ if (!function_exists('defineConst')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('nailsFactory')) {
-
-    /**
-     * A route to Nails\Factory
-     *
-     * @param  string $sType       The type of item to factorise
-     * @param  string $sKey        The key of the item to factorise
-     * @param  string $sModuleName Which module provides the item
-     *
-     * @throws FactoryException
-     * @return mixed
-     */
-    function nailsFactory($sType, $sKey, $sModuleName = '')
-    {
-        switch (strtoupper($sType)) {
-
-            case 'PROPERTY':
-                return Factory::property($sKey, $sModuleName);
-                break;
-
-            case 'SERVICE':
-                return Factory::service($sKey, $sModuleName);
-                break;
-
-            case 'MODEL':
-                return Factory::model($sKey, $sModuleName);
-                break;
-
-            case 'FACTORY':
-                return Factory::factory($sKey, $sModuleName);
-                break;
-
-            case 'HELPER':
-                Factory::helper($sKey, $sModuleName);
-                return null;
-                break;
-
-            default:
-                throw new FactoryException(
-                    '"' . $sType . '" is not valid Nails\Factory method.',
-                    1
-                );
-                break;
-        }
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('nailsEnvironment')) {
-
-    /**
-     * A route to Nails\Environment
-     *
-     * @param  string $sMethod      The method to call
-     * @param  string $sEnvironment The environment to query
-     *
-     * @throws EnvironmentException
-     * @return mixed
-     */
-    function nailsEnvironment($sMethod, $sEnvironment = null)
-    {
-        switch (strtoupper($sMethod)) {
-
-            case 'GET':
-                return Environment::get();
-                break;
-
-            case 'IS':
-                return Environment::is($sEnvironment);
-                break;
-
-            case 'NOT':
-                return Environment::not($sEnvironment);
-                break;
-
-            default:
-                throw new EnvironmentException(
-                    '"' . $sMethod . '" is not a valid Nails\Environment method.',
-                    1
-                );
-                break;
-        }
-    }
-}
-
-// --------------------------------------------------------------------------
-
 if (!function_exists('isModuleEnabled')) {
 
     /**
      * Handy way of determining whether a module is available
      *
-     * @param  string $moduleName The name of the module to check
+     * @param  string $sModuleName The name of the module to check
      *
      * @return boolean
      */
-    function isModuleEnabled($moduleName)
+    function isModuleEnabled($sModuleName)
     {
-        $modules = _NAILS_GET_MODULES();
+        $aModules = _NAILS_GET_MODULES();
 
-        foreach ($modules as $module) {
-            if ($moduleName == $module->name) {
+        foreach ($aModules as $oModule) {
+            if ($sModuleName == $oModule->name) {
                 return true;
             }
         }
@@ -615,15 +484,15 @@ if (!function_exists('setControllerData')) {
      * this function provides an easy interface to populate this array when it's not
      * in scope.
      *
-     * @param string $key   The key to populate
-     * @param mixed  $value The value to assign
+     * @param string $sKey   The key to populate
+     * @param mixed  $mValue The value to assign
      *
      * @return  void
      **/
-    function setControllerData($key, $value)
+    function setControllerData($sKey, $mValue)
     {
         global $NAILS_CONTROLLER_DATA;
-        $NAILS_CONTROLLER_DATA[$key] = $value;
+        $NAILS_CONTROLLER_DATA[$sKey] = $mValue;
     }
 }
 
@@ -651,39 +520,40 @@ if (!function_exists('getDomainFromUrl')) {
 
         if (!isset($bits[($idz + 2)])) {
 
-            $out = false;
+            $aOut = false;
 
         } elseif (strlen($bits[($idz + 2)]) == 2 && isset($bits[($idz + 2)])) {
 
-            $out   = [];
-            $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
-            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
-            $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
+            $aOut = [
+                !empty($bits[$idz]) ? $bits[$idz] : false,
+                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
+                !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false,
+            ];
 
-            $out = implode('.', array_filter($out));
+            $aOut = implode('.', array_filter($aOut));
 
         } elseif (strlen($bits[($idz + 2)]) == 0) {
 
-            $out   = [];
-            $out[] = !empty($bits[$idz]) ? $bits[$idz] : false;
-            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
+            $aOut = [
+                !empty($bits[$idz]) ? $bits[$idz] : false,
+                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
+            ];
 
-            $out = implode('.', array_filter($out));
+            $aOut = implode('.', array_filter($aOut));
 
         } elseif (isset($bits[($idz + 1)])) {
 
-            $out   = [];
-            $out[] = !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false;
-            $out[] = !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false;
-
-            $out = implode('.', array_filter($out));
+            $aOut = [
+                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
+                !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false,
+            ];
+            $aOut = implode('.', array_filter($aOut));
 
         } else {
-
-            $out = false;
+            $aOut = false;
         }
 
-        return $out;
+        return $aOut;
     }
 }
 
@@ -695,45 +565,42 @@ if (!function_exists('getRelativePath')) {
      * Fetches the relative path between two directories
      * Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
      *
-     * @param  string $from Path 1
-     * @param  string $to   Path 2
+     * @param  string $sForm Path 1
+     * @param  string $sTo   Path 2
      *
      * @return string
      */
-    function getRelativePath($from, $to)
+    function getRelativePath($sForm, $sTo)
     {
-        $from    = explode('/', $from);
-        $to      = explode('/', $to);
-        $relPath = $to;
+        $aFrom    = explode('/', $sForm);
+        $aTo      = explode('/', $sTo);
+        $aRelPath = $aTo;
 
-        foreach ($from as $depth => $dir) {
+        foreach ($aFrom as $iDepth => $sDir) {
 
             //  Find first non-matching dir
-            if ($dir === $to[$depth]) {
-
+            if ($sDir === $aTo[$iDepth]) {
                 //  Ignore this directory
-                array_shift($relPath);
-
+                array_shift($aRelPath);
             } else {
 
-                //  Get number of remaining dirs to $from
-                $remaining = count($from) - $depth;
+                //  Get number of remaining dirs to $aFrom
+                $remaining = count($aFrom) - $iDepth;
 
                 if ($remaining > 1) {
 
                     // add traversals up to first matching dir
-                    $padLength = (count($relPath) + $remaining - 1) * -1;
-                    $relPath   = array_pad($relPath, $padLength, '..');
+                    $padLength = (count($aRelPath) + $remaining - 1) * -1;
+                    $aRelPath  = array_pad($aRelPath, $padLength, '..');
                     break;
 
                 } else {
-
-                    $relPath[0] = './' . $relPath[0];
+                    $aRelPath[0] = './' . $aRelPath[0];
                 }
             }
         }
 
-        return implode('/', $relPath);
+        return implode('/', $aRelPath);
     }
 }
 
@@ -762,16 +629,9 @@ if (!function_exists('isPageSecure')) {
             //  Not being served through HTTPS, but does the URL of the page begin
             //  with SECURE_BASE_URL (when BASE_URL is different)
 
-            $url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-
-            if (preg_match('#^' . SECURE_BASE_URL . '.*#', $url)) {
-                return true;
-            } else {
-                return false;
-            }
+            $sUrl = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+            return (bool) preg_match('#^' . SECURE_BASE_URL . '.*#', $sUrl);
         }
-
-        // --------------------------------------------------------------------------
 
         //  Unknown, assume not
         return false;
@@ -810,7 +670,7 @@ if (!function_exists('show_404')) {
      * logged as one. _Actual_ 404's should continue to be logged however.
      *
      * @param  string  $sPage     The page which 404'd
-     * @param  boolean $bLogError whether to log the error or not
+     * @param  boolean $bLogError Whether to log the error or not
      *
      * @return void
      */
@@ -819,6 +679,24 @@ if (!function_exists('show_404')) {
         $oError =& load_class('Exceptions', 'core');
         $oError->show_404($sPage, $bLogError);
         exit;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('show404')) {
+
+    /**
+     * Alias to show_404()
+     *
+     * @param  string  $sPage     The page which 404'd
+     * @param  boolean $bLogError Whether to log the error or not
+     *
+     * @return void
+     */
+    function show404($sPage = '', $bLogError = false)
+    {
+        show_404($sPage, $bLogError);
     }
 }
 
@@ -837,11 +715,7 @@ if (!function_exists('getFromArray')) {
      */
     function getFromArray($sKey, $aArray, $mDefault = null)
     {
-        if (array_key_exists($sKey, $aArray)) {
-            return $aArray[$sKey];
-        } else {
-            return $mDefault;
-        }
+        return array_key_exists($sKey, $aArray) ? $aArray[$sKey] : $mDefault;
     }
 }
 

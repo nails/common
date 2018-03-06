@@ -26,27 +26,9 @@ class Startup
      */
     public function init()
     {
-        $this->setAutoLoading();
         $this->defineConstants();
         $this->setModuleLocations();
         $this->setupFactory();
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Sets up auto loading
-     */
-    protected function setAutoLoading()
-    {
-        //  Include the composer autoloader
-        if (!file_exists(FCPATH . 'vendor/autoload.php')) {
-
-            $_ERROR = 'Composer autoloader not found; run <code>composer install</code> to install dependencies';
-            include NAILS_COMMON_PATH . 'errors/startup_error.php';
-        }
-
-        require_once FCPATH . 'vendor/autoload.php';
     }
 
     // --------------------------------------------------------------------------
@@ -75,7 +57,7 @@ class Startup
         defineConst('ENVIRONMENT', 'DEVELOPMENT');
 
         //  Cache Directory
-        defineConst('DEPLOY_CACHE_DIR', FCPATH . APPPATH . 'cache/');
+        defineConst('DEPLOY_CACHE_DIR', APPPATH . 'cache' . DIRECTORY_SEPARATOR);
 
         //  Database
         //  Consistent between deployments
@@ -108,7 +90,7 @@ class Startup
 
         //  Deploy constants
         defineConst('DEPLOY_SYSTEM_TIMEZONE', 'UTC');
-        defineConst('DEPLOY_LOG_DIR', FCPATH . APPPATH . 'logs/');
+        defineConst('DEPLOY_LOG_DIR', APPPATH . 'logs' . DIRECTORY_SEPARATOR);
 
         //  Email constants
         defineConst('APP_DEVELOPER_EMAIL', '');
@@ -121,11 +103,8 @@ class Startup
         //  Check routes_app.php exists
         //  @todo - don't like this at all
         if (is_file(DEPLOY_CACHE_DIR . 'routes_app.php')) {
-
             defineConst('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
-
         } else {
-
             //  Not found, crude hook seeing as basically nothing has loaded yet
             defineConst('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
         }
@@ -135,16 +114,16 @@ class Startup
         defineConst('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', BASE_URL));
 
         if (isPageSecure()) {
-
             defineConst('NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/');
-
         } else {
-
             defineConst('NAILS_URL', BASE_URL . 'vendor/nailsapp/');
         }
 
         defineConst('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/assets/');
-        defineConst('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
+        defineConst(
+            'NAILS_ASSETS_PATH',
+            implode(DIRECTORY_SEPARATOR, [rtrim(NAILS_PATH), 'module-asset', 'assets']) . DIRECTORY_SEPARATOR
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -155,27 +134,49 @@ class Startup
     protected function setModuleLocations()
     {
         if (empty($this->moduleLocations)) {
-            $this->moduleLocations = array();
+            $this->moduleLocations = [];
         }
 
         //  Discover Nails modules
-        $modules = _NAILS_GET_MODULES();
+        $aModules = _NAILS_GET_MODULES();
 
         /**
          * Note: Key is full path, value is relative path from the application controllers
          * directory to where the modules are.
          */
 
-        //  Firstly, App module locations
-        $this->moduleLocations[FCPATH . APPPATH . 'modules/'] = '../modules/';
+        $aAbsolutePaths = [
+            [rtrim(APPPATH, DIRECTORY_SEPARATOR), 'modules'],
+            [rtrim(FCPATH, DIRECTORY_SEPARATOR), 'vendor', 'nailsapp', 'common'],
+        ];
 
-        //  Nails Common should be included too
-        $this->moduleLocations[FCPATH . 'vendor/nailsapp/common/'] = '../../vendor/nailsapp/common/';
+        $aRelativePaths = [
+            ['..', 'modules'],
+            ['..', '..', 'vendor', 'nailsapp', 'common'],
+        ];
+
+        array_walk(
+            $aAbsolutePaths,
+            function (&$aItem) {
+                $aItem = implode(DIRECTORY_SEPARATOR, $aItem) . DIRECTORY_SEPARATOR;
+            }
+        );
+
+        array_walk(
+            $aRelativePaths,
+            function (&$aItem) {
+                $aItem = implode(DIRECTORY_SEPARATOR, $aItem) . DIRECTORY_SEPARATOR;
+            }
+        );
+
+        $this->moduleLocations = array_merge($this->moduleLocations, array_combine($aAbsolutePaths, $aRelativePaths));
 
         //  Discovered Nails modules
-        foreach ($modules as $module) {
-
-            $this->moduleLocations[$module->path] = '../../vendor/' . $module->name . '/';
+        foreach ($aModules as $oModule) {
+            $this->moduleLocations[$oModule->path] = implode(
+                DIRECTORY_SEPARATOR,
+                ['..', '..', 'vendor', $oModule->name]
+            ) . DIRECTORY_SEPARATOR;
         }
 
         // --------------------------------------------------------------------------
@@ -192,8 +193,7 @@ class Startup
         $key = 'modules_locations';
 
         if (empty($assign_to_config)) {
-
-            $assign_to_config = array();
+            $assign_to_config = [];
         }
 
         if (isset($assign_to_config[$key]) && is_array($assign_to_config[$key])) {

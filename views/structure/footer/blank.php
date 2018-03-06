@@ -4,7 +4,7 @@ use Nails\Factory;
 
 ?>
         <script type="text/javascript">
-            var ENVIRONMENT         = '<?=nailsEnvironment('get')?>';
+            var ENVIRONMENT         = '<?=\Nails\Environment::get()?>';
             window.SITE_URL         = '<?=site_url('', isPageSecure())?>';
             window.NAILS            = {};
             window.NAILS.URL        = '<?=NAILS_ASSETS_URL?>';

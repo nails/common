@@ -10,9 +10,12 @@
  * @link
  */
 
-use Nails\Common\Exception\NailsException;
+namespace Nails\Common\CodeIgniter\Libraries;
 
-class CORE_NAILS_Pagination extends CI_Pagination
+use Nails\Common\Exception\NailsException;
+use CI_Pagination;
+
+class Pagination extends CI_Pagination
 {
     public $use_rsegment = false;
 
@@ -79,7 +82,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
             $this->cur_page = $base_page;
         }
 
-        $this->num_links = (int)$this->num_links;
+        $this->num_links = (int) $this->num_links;
 
         if ($this->num_links < 1) {
             throw new NailsException('Your number of links must be a positive number.', 1);
@@ -104,7 +107,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
         $uri_page_number = $this->cur_page;
 
         if (!$this->use_page_numbers) {
-            $this->cur_page = floor(($this->cur_page/$this->per_page) + 1);
+            $this->cur_page = floor(($this->cur_page / $this->per_page) + 1);
         }
 
         // Calculate the start && end numbers. These determine
@@ -115,9 +118,9 @@ class CORE_NAILS_Pagination extends CI_Pagination
         // Is pagination being used over GET || POST?  If get, add a per_page query
         // string. If post, add a trailing slash to the base URL if needed
         if ($CI->config->item('enable_query_strings') === true || $this->page_query_string === true) {
-            $this->base_url = rtrim($this->base_url).'&amp;'.$this->query_string_segment.'=';
+            $this->base_url = rtrim($this->base_url) . '&amp;' . $this->query_string_segment . '=';
         } else {
-            $this->base_url = rtrim($this->base_url, '/') .'/';
+            $this->base_url = rtrim($this->base_url, '/') . '/';
         }
 
         // && here we go...
@@ -126,7 +129,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
         // Render the "First" link
         if ($this->first_link !== false && $this->cur_page > ($this->num_links + 1)) {
             $first_url = ($this->first_url == '') ? $this->base_url : $this->first_url;
-            $output .= $this->first_tag_open.'<a '.$this->anchor_class.'href="'.$first_url.'">'.$this->first_link.'</a>'.$this->first_tag_close;
+            $output    .= $this->first_tag_open . '<a ' . $this->anchor_class . 'href="' . $first_url . '">' . $this->first_link . '</a>' . $this->first_tag_close;
         }
 
         // Render the "previous" link
@@ -138,10 +141,10 @@ class CORE_NAILS_Pagination extends CI_Pagination
             }
 
             if ($i == 0 && $this->first_url != '') {
-                $output .= $this->prev_tag_open.'<a '.$this->anchor_class.'href="'.$this->first_url.'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
+                $output .= $this->prev_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->first_url . '">' . $this->prev_link . '</a>' . $this->prev_tag_close;
             } else {
-                $i = ($i == 0) ? '' : $this->prefix.$i.$this->suffix;
-                $output .= $this->prev_tag_open.'<a '.$this->anchor_class.'href="'.$this->base_url.$i.'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
+                $i      = ($i == 0) ? '' : $this->prefix . $i . $this->suffix;
+                $output .= $this->prev_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->base_url . $i . '">' . $this->prev_link . '</a>' . $this->prev_tag_close;
             }
 
         }
@@ -149,7 +152,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
         // Render the pages
         if ($this->display_pages !== false) {
             // Write the digit links
-            for ($loop = $start -1; $loop <= $end; $loop++) {
+            for ($loop = $start - 1; $loop <= $end; $loop++) {
                 if ($this->use_page_numbers) {
                     $i = $loop;
                 } else {
@@ -158,16 +161,16 @@ class CORE_NAILS_Pagination extends CI_Pagination
 
                 if ($i >= $base_page) {
                     if ($this->cur_page == $loop) {
-                        $output .= $this->cur_tag_open.$loop.$this->cur_tag_close; // Current page
+                        $output .= $this->cur_tag_open . $loop . $this->cur_tag_close; // Current page
                     } else {
                         $n = ($i == $base_page) ? '' : $i;
 
                         if ($n == '' && $this->first_url != '') {
-                            $output .= $this->num_tag_open.'<a '.$this->anchor_class.'href="'.$this->first_url.'">'.$loop.'</a>'.$this->num_tag_close;
+                            $output .= $this->num_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->first_url . '">' . $loop . '</a>' . $this->num_tag_close;
                         } else {
-                            $n = ($n == '') ? '' : $this->prefix.$n.$this->suffix;
+                            $n = ($n == '') ? '' : $this->prefix . $n . $this->suffix;
 
-                            $output .= $this->num_tag_open.'<a '.$this->anchor_class.'href="'.$this->base_url.$n.'">'.$loop.'</a>'.$this->num_tag_close;
+                            $output .= $this->num_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->base_url . $n . '">' . $loop . '</a>' . $this->num_tag_close;
                         }
                     }
                 }
@@ -182,7 +185,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
                 $i = ($this->cur_page * $this->per_page);
             }
 
-            $output .= $this->next_tag_open.'<a '.$this->anchor_class.'href="'.$this->base_url.$this->prefix.$i.$this->suffix.'">'.$this->next_link.'</a>'.$this->next_tag_close;
+            $output .= $this->next_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->base_url . $this->prefix . $i . $this->suffix . '">' . $this->next_link . '</a>' . $this->next_tag_close;
         }
 
         // Render the "Last" link
@@ -192,7 +195,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
             } else {
                 $i = (($num_pages * $this->per_page) - $this->per_page);
             }
-            $output .= $this->last_tag_open.'<a '.$this->anchor_class.'href="'.$this->base_url.$this->prefix.$i.$this->suffix.'">'.$this->last_link.'</a>'.$this->last_tag_close;
+            $output .= $this->last_tag_open . '<a ' . $this->anchor_class . 'href="' . $this->base_url . $this->prefix . $i . $this->suffix . '">' . $this->last_link . '</a>' . $this->last_tag_close;
         }
 
         // Kill double slashes.  Note: Sometimes we can end up with a double slash
@@ -200,7 +203,7 @@ class CORE_NAILS_Pagination extends CI_Pagination
         $output = preg_replace("#([^:])//+#", "\\1/", $output);
 
         // Add the wrapper HTML if exists
-        $output = $this->full_tag_open.$output.$this->full_tag_close;
+        $output = $this->full_tag_open . $output . $this->full_tag_close;
 
         return $output;
     }

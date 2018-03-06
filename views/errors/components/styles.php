@@ -1,8 +1,7 @@
 <style type="text/css">
 
     html,
-    body
-    {
+    body {
         -ms-text-size-adjust: 100%;
         -webkit-text-size-adjust: 100%;
         color: #333;
@@ -20,8 +19,7 @@
         text-align: center;
     }
 
-    h1
-    {
+    h1 {
         position: relative;
         margin: 0.67em 0;
         margin-top: 1em;
@@ -33,84 +31,72 @@
     }
 
     h1,
-    hr
-    {
+    hr {
         border: 0;
         border-bottom: 1px solid #eee;
     }
 
-    img
-    {
+    img {
         border: 0;
         max-width: 100%;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
     }
 
-    p
-    {
+    p {
         margin-top: 0;
         margin-bottom: 16px;
     }
 
-    a
-    {
+    a {
         background: transparent;
         color: #4183C4;
         text-decoration: none;
     }
 
     a:active,
-    a:hover
-    {
+    a:hover {
         outline: 0;
     }
 
     a:hover,
     a:focus,
-    a:active
-    {
+    a:active {
         text-decoration: underline;
     }
 
-    a.btn
-    {
+    a.btn {
         border: 1px solid #396C9E;
         background: #4183C4;
         padding: 0.4em 0.8em;
         color: #FFFFFF;
         border-radius: 3px;
-        box-shadow: 0px 0px 1px rgba(0,0,0,0.5)
+        box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5)
     }
 
     a.btn:hover,
     a.btn:focus,
-    a.btn:active
-    {
+    a.btn:active {
         text-decoration: none;
         background: #396C9E;
     }
 
-    a.btn:active
-    {
+    a.btn:active {
         position: relative;
         top: 1px;
         box-shadow: none;
     }
 
-    small
-    {
-        font-size:0.65em;
+    small {
+        font-size: 0.65em;
     }
 
-    #logo-container
-    {
+    #logo-container {
         width: 125px;
         margin: auto;
     }
 
-    #logo
-    {
+    #logo {
         max-width: 100%;
         height: auto;
     }

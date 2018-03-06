@@ -29,4 +29,4 @@ if (!function_exists('pluralise')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/inflector_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/inflector_helper.php';

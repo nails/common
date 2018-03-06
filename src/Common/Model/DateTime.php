@@ -785,4 +785,56 @@ class DateTime
 
         return $oOut;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Calculates a person's age (or age at a certain date)
+     *
+     * @param string $birthYear  The year to calculate from
+     * @param string $birthMonth The month to calculate from
+     * @param string $birthDay   The day to calculate from
+     * @param string $deathYear  The year to calculate to
+     * @param string $deathMonth The month to calculate to
+     * @param string $deathDay   The day to calculate to
+     *
+     * @return bool|float
+     */
+    public function calculateAge(
+        $birthYear,
+        $birthMonth,
+        $birthDay,
+        $deathYear = null,
+        $deathMonth = null,
+        $deathDay = null
+    ) {
+        //  Only calculate to a date which isn't today if all values are supplied
+        if (is_null($deathYear) || is_null($deathMonth) || is_null($deathDay)) {
+            $deathYear  = date('Y');
+            $deathMonth = date('m');
+            $deathDay   = date('d');
+        }
+
+        // --------------------------------------------------------------------------
+
+        $_birth_time = mktime(0, 0, 0, $birthMonth, $birthDay, $birthYear);
+        $_death_time = mktime(0, 0, 0, $deathMonth, $deathDay, $deathYear);
+
+        // --------------------------------------------------------------------------
+
+        //  If $_death_time is smaller than $_birth_time then something's wrong
+        if ($_death_time < $_birth_time) {
+            return false;
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Calculate age
+        $_age       = ($_birth_time < 0) ? ($_death_time + ($_birth_time * -1)) : $_death_time - $_birth_time;
+        $_age_years = floor($_age / (31536000));    //  Divide by number of seconds in a year
+
+        // --------------------------------------------------------------------------
+
+        return $_age_years;
+    }
 }

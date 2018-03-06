@@ -10,4 +10,4 @@
  * @link
  */
 
-include FCPATH . 'vendor/rogeriopradoj/codeigniter/system/helpers/typography_helper.php';
+include FCPATH . 'vendor/codeigniter/framework/system/helpers/typography_helper.php';

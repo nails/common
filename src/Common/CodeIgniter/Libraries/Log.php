@@ -10,10 +10,13 @@
  * @link
  */
 
+namespace Nails\Common\CodeIgniter\Libraries;
+
 use Nails\Factory;
 use Nails\Environment;
+use CI_Log;
 
-class CORE_NAILS_Log extends CI_Log
+class Log extends CI_Log
 {
     /**
      * Construct the library
@@ -36,9 +39,11 @@ class CORE_NAILS_Log extends CI_Log
 
     /**
      * Wrties to the system log
+     *
      * @param  string  $level     The log message's level
      * @param  string  $msg       The message to write to the log file
      * @param  boolean $php_error Whether or not this is a PHP error
+     *
      * @return boolean
      */
     public function write_log($level = 'error', $msg = '', $php_error = false)
@@ -87,11 +92,11 @@ class CORE_NAILS_Log extends CI_Log
                             }
                         }
 
-                        $msg     = strtoupper($level).' '.((strtoupper($level) == 'INFO') ? ' -' : '-').' '.date($this->_date_fmt). ' --> '.$msg."\n";
+                        $msg     = strtoupper($level) . ' ' . ((strtoupper($level) == 'INFO') ? ' -' : '-') . ' ' . date($this->_date_fmt) . ' --> ' . $msg . "\n";
                         $appname = defined('APP_NAME') ? APP_NAME : '[Could not determine app name]';
 
-                        $subject  = 'Log folders are not writable on ' . $appname;
-                        $message  = 'I just tried to write to the log folder for ' . $appname . ' and found them not to be writable.' . "\n";
+                        $subject = 'Log folders are not writable on ' . $appname;
+                        $message = 'I just tried to write to the log folder for ' . $appname . ' and found them not to be writable.' . "\n";
                         $message .= '' . "\n";
                         $message .= 'Get this fixed ASAP - I\'ll bug you every time this happens.' . "\n";
                         $message .= '' . "\n";
@@ -120,9 +125,8 @@ class CORE_NAILS_Log extends CI_Log
 
                             $oEmailer = Factory::service('Emailer');
 
-                            $fromName = $oEmailer->getFromName();
+                            $fromName  = $oEmailer->getFromName();
                             $fromEmail = $oEmailer->getFromEmail();
-
 
                         } catch (\Exception $e) {
 
@@ -132,10 +136,10 @@ class CORE_NAILS_Log extends CI_Log
 
                         $to      = Environment::not('PRODUCTION') && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
                         $headers = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n" .
-                                'X-Mailer: PHP/' . phpversion()  . "\r\n" .
-                                'X-Priority: 1 (Highest)' . "\r\n" .
-                                'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
-                                'Importance: High';
+                            'X-Mailer: PHP/' . phpversion() . "\r\n" .
+                            'X-Priority: 1 (Highest)' . "\r\n" .
+                            'X-Mailer: X-MSMail-Priority: High/' . "\r\n" .
+                            'Importance: High';
 
                         if (!empty($to)) {
 

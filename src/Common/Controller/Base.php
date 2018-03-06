@@ -677,7 +677,7 @@ abstract class Base extends \MX_Controller
         }
 
         //  The Application
-        $aPaths[] = FCPATH . APPPATH;
+        $aPaths[] = APPPATH;
 
         foreach ($aPaths as $sPath) {
             $this->load->add_package_path($sPath);

@@ -18,7 +18,10 @@ use Nails\Factory;
 
 class ErrorHandler
 {
-    public static $levels = [
+    /**
+     * Human versions of the various PHP error levels
+     */
+    const LEVELS = [
         E_ERROR           => 'Error',
         E_WARNING         => 'Warning',
         E_PARSE           => 'Parsing Error',
@@ -36,6 +39,14 @@ class ErrorHandler
     // --------------------------------------------------------------------------
 
     /**
+     * The fully qualified driver class name
+     * @var string
+     */
+    protected $sDriverClass;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Sets up the appropriate error handling driver
      */
     public function __construct()
@@ -48,10 +59,8 @@ class ErrorHandler
 
         $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ? DEPLOY_ERROR_REPORTING_HANDLER : 'Nails';
         $sDriverClass  = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
-        $sLoadError    = '';
 
         if (!class_exists($sDriverClass)) {
-
             $sLoadError   = '"' . $sDriverClass . '" is not a valid ErrorHandler';
             $sDriverClass = '\Nails\Common\Driver\ErrorHandler\Nails';
         }
@@ -65,6 +74,25 @@ class ErrorHandler
         if (!empty($sLoadError)) {
             throw new ErrorHandlerException($sLoadError, 1);
         }
+
+        $this->sDriverClass = $sDriverClass;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Manually trigger an error
+     *
+     * @param int    $iErrorNumber
+     * @param string $sErrorString
+     * @param string $sErrorFile
+     * @param int    $iErrorLine
+     */
+    public function triggerError($iErrorNumber = 0, $sErrorString = '', $sErrorFile = '', $iErrorLine = 0)
+    {
+        //  PHP5.6 doesn't like $this->sDriverClass::error()
+        $sDriverClass = $this->sDriverClass;
+        $sDriverClass::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
     }
 
     // --------------------------------------------------------------------------
@@ -79,19 +107,24 @@ class ErrorHandler
      *
      * @return void
      */
-    public static function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
+    public function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
     {
+        if (is_array($sMessage)) {
+            $sMessage = implode("\n", $sMessage);
+        }
+
         $oInput = Factory::service('Input');
         $bIsCli = $oInput::isCli();
 
         if (is_null($oDetails)) {
-
-            $oDetails       = new \stdClass();
-            $oDetails->type = null;
-            $oDetails->code = null;
-            $oDetails->msg  = null;
-            $oDetails->file = null;
-            $oDetails->line = null;
+            $oDetails = (object) [
+                'type'      => null,
+                'code'      => null,
+                'msg'       => null,
+                'file'      => null,
+                'line'      => null,
+                'backtrace' => null,
+            ];
         }
 
         //  Get the backtrace
@@ -101,61 +134,15 @@ class ErrorHandler
             $oDetails->backtrace = [];
         }
 
-        //  Set a 500 error
-        $sServerProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
-        $sHeaderString   = '500 Internal Server Error';
-
-        header($sServerProtocol . ' ' . $sHeaderString);
-
-        //  Flush the output buffer
-        $sObContents = ob_get_contents();
-        if (!empty($sObContents)) {
-            ob_clean();
-        }
-
-        $bIsProd = Environment::is('PRODUCTION');
-
-        if (!$bIsCli && !$bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev.php')) {
-
-            //  Non-CLI and Non-production and have an app-specific dev error file?
-            include_once FCPATH . APPPATH . 'errors/error_fatal_dev.php';
-
-        } elseif (!$bIsCli && $bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal.php')) {
-
-            //  Non-CLI and Production and have an app-specific error file?
-            include_once FCPATH . APPPATH . 'errors/error_fatal.php';
-
-        } elseif (!$bIsCli && !$bIsProd) {
-
-            //  Non-CLI and Non-production?
-            include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev.php';
-
-        } elseif ($bIsCli && !$bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php')) {
-
-            //  CLI and Non-production and have an app-specific dev error file?
-            include_once FCPATH . APPPATH . 'errors/error_fatal_dev_cli.php';
-
-        } elseif ($bIsCli && $bIsProd && is_file(FCPATH . APPPATH . 'errors/error_fatal_cli.php')) {
-
-            //  CLI and Production and have an app-specific error file?
-            include_once FCPATH . APPPATH . 'errors/error_fatal_cli.php';
-
-        } elseif ($bIsCli && !$bIsProd) {
-
-            //  CLI and Non-production?
-            include_once NAILS_COMMON_PATH . 'errors/error_fatal_dev_cli.php';
-
-        } elseif ($bIsCli) {
-
-            //  CLI Production
-            include_once NAILS_COMMON_PATH . 'errors/error_fatal_cli.php';
-
-        } else {
-
-            //  Non-CLI Production
-            include_once NAILS_COMMON_PATH . 'errors/error_fatal.php';
-        }
-
+        set_status_header(500);
+        $this->renderErrorView(
+            'exception',
+            [
+                'sSubject' => $sSubject,
+                'sMessage' => $sMessage,
+                'oDetails' => $oDetails,
+            ]
+        );
         exit(500);
     }
 
@@ -169,7 +156,7 @@ class ErrorHandler
      *
      * @return boolean
      */
-    public static function sendDeveloperMail($sSubject, $sMessage)
+    public function sendDeveloperMail($sSubject, $sMessage)
     {
         //  Production only
         if (Environment::not('PRODUCTION')) {
@@ -275,6 +262,97 @@ class ErrorHandler
             }
         } else {
             return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders the 404 page and halts script execution
+     *
+     * @param string $sPage     The URI which 404'd
+     * @param bool   $bLogError Whether to log the error
+     */
+    public function show404Screen($sPage = '', $bLogError = true)
+    {
+        if (empty($sPage) && isset($_SERVER)) {
+            $sPage = getFromArray('REQUEST_URI', $_SERVER);
+        }
+
+        /**
+         * By default we log this, but allow a dev to skip it. Additionally, skip
+         * if it's a HEAD request.
+         *
+         * Reasoning: I often use HEAD requests to check the existance of a file
+         * in JS before fetching it. I feel that these shouldn't be logged. A
+         * direct GET/POST/etc request to a non existant file is more  likely a
+         * user following a deadlink so these _should_ be logged.
+         *
+         * If you disagree, open up an issue and we'll work something out.
+         */
+
+        $sRequestMethod = isset($_SERVER) ? strtoupper(getFromArray('REQUEST_METHOD', $_SERVER)) : '';
+
+        if ($bLogError && $sRequestMethod != 'HEAD') {
+            log_message('error', '404 Page Not Found --> ' . $sPage);
+        }
+
+        defineConst('NAILS_IS_404', true);
+        set_status_header(404);
+        $this->renderErrorView('404');
+        exit(500);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders the error view appropriate for the environment
+     *
+     * @param string  $sView        The view to load
+     * @param array   $aData        Data to make available to the view
+     * @param boolean $bFlushBuffer Whether to flush the output buffer or not
+     */
+    public static function renderErrorView(
+        $sView,
+        $aData = [],
+        $bFlushBuffer = true
+    ) {
+        //  Flush the output buffer
+        if ($bFlushBuffer) {
+            $sObContents = ob_get_contents();
+            if (!empty($sObContents)) {
+                ob_clean();
+            }
+        }
+
+        $sType      = is_cli() ? 'cli' : 'html';
+        $aAppPath   = [
+            rtrim(APPPATH, DIRECTORY_SEPARATOR),
+            'views',
+            'errors',
+            $sType,
+            $sView . '.php',
+        ];
+        $aNailsPath = [
+            rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+            'views',
+            'errors',
+            $sType,
+            $sView . '.php',
+        ];
+
+        $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
+        $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
+
+
+        extract($aData);
+
+        if (file_exists($sAppPath)) {
+            include $sAppPath;
+        } elseif (file_exists($sNailsPath)) {
+            include $sNailsPath;
+        } else {
+            _NAILS_ERROR($sMessage, $sSubject);
         }
     }
 }

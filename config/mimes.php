@@ -1,7 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/rogeriopradoj/codeigniter/application/config/mimes.php';
+$mimes = require FCPATH . 'vendor/codeigniter/framework/application/config/mimes.php';
 
 /**
  * Additional mimes
@@ -63,7 +63,6 @@ $mimes['ppsm'] = 'application/vnd.ms-powerpoint.slideshow.macroEnabled.12';
 // --------------------------------------------------------------------------
 
 //  Adobe Creative Suite/Cloud
-
 //  Illustrator files are PDF files with some additional meta data
 $mimes['ai'] = array_merge([$mimes['ai']], $mimes['pdf'], ['application/illustrator']);
 
