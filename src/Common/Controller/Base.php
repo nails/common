@@ -256,7 +256,7 @@ abstract class Base extends \MX_Controller
          *  }
          */
 
-        define('NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION());
+        defineConst('NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION());
 
         if (version_compare(PHP_VERSION, NAILS_MIN_PHP_VERSION, '<')) {
 
@@ -420,9 +420,9 @@ abstract class Base extends \MX_Controller
 
                     } else {
                         //  Otherwise, render some HTML
-                        if (file_exists(FCPATH . APPPATH . 'views/maintenance/maintenance.php')) {
+                        if (file_exists(APPPATH . 'views/maintenance/maintenance.php')) {
                             //  Look for an app override
-                            require FCPATH . APPPATH . 'views/maintenance/maintenance.php';
+                            require APPPATH . 'views/maintenance/maintenance.php';
                         } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
                             //  Fall back to the Nails maintenance page
                             require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
@@ -546,9 +546,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
-        define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
         $oDefaultTimeFormat = $oDateTimeModel->getTimeFormatDefault();
@@ -560,9 +560,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
-        define('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
+        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
 
         // --------------------------------------------------------------------------
 
@@ -615,8 +615,8 @@ abstract class Base extends \MX_Controller
             showFatalError('No default language has been set, or it\'s been set incorrectly.');
         }
 
-        define('APP_DEFAULT_LANG_CODE', $oDefault->code);
-        define('APP_DEFAULT_LANG_LABEL', $oDefault->label);
+        defineConst('APP_DEFAULT_LANG_CODE', $oDefault->code);
+        defineConst('APP_DEFAULT_LANG_LABEL', $oDefault->label);
 
         // --------------------------------------------------------------------------
 
@@ -628,9 +628,9 @@ abstract class Base extends \MX_Controller
         $sUserLangCode = activeUser('language');
 
         if (!empty($sUserLangCode)) {
-            define('RENDER_LANG_CODE', $sUserLangCode);
+            defineConst('RENDER_LANG_CODE', $sUserLangCode);
         } else {
-            define('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
+            defineConst('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
         }
 
         //  Set the language config item which CodeIgniter will use.

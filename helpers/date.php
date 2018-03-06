@@ -126,7 +126,7 @@ if (!function_exists('niceTime')) {
         $sMessageGreaterOneWeek = null,
         $sMessageLessTenMinutes = null
     ) {
-        $oDateTimeModel = nailsFactory('model', 'DateTime');
+        $oDateTimeModel = Factory::model('DateTime');
         return $oDateTimeModel->niceTime(
             $mDate,
             $bIncludeTense,

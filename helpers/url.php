@@ -73,7 +73,7 @@ if (!function_exists('redirect')) {
          */
 
         $oHook =& load_class('Hooks', 'core');
-        $oHook->_call_hook('post_system');
+        $oHook->call_hook('post_system');
 
         // --------------------------------------------------------------------------
 

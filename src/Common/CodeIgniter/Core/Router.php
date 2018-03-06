@@ -26,7 +26,7 @@ class Router extends MX_Router
     // --------------------------------------------------------------------------
 
     /**
-     * Extending method purely to change the 404 behaviour and PSR-2 things a litle.
+     * Extending method purely to change the 404 behaviour and PSR-2 things a little.
      *
      * When show_404() is reached it means that a valid controller could not be
      * found. These errors should be logged, however show_404() by default doesn't
@@ -36,7 +36,7 @@ class Router extends MX_Router
      *
      * @return array
      */
-    public function _validate_request($segments)
+    protected function _validate_request($segments)
     {
         if (count($segments) == 0) {
             return $segments;
@@ -49,7 +49,6 @@ class Router extends MX_Router
 
         /* use a default 404_override controller */
         if (isset($this->routes['404_override']) && $this->routes['404_override']) {
-
             $segments = explode('/', $this->routes['404_override']);
 
             if ($located = $this->locate($segments)) {

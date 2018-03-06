@@ -49,7 +49,6 @@ if (isset($footerOverride)) {
         $uriString = $oUri->uri_string();
 
         if (!$uriString) {
-
             //  We're at the homepage, get the name of the default controller
             $uriString = $oRouter->routes['default_controller'];
         }
@@ -59,11 +58,10 @@ if (isset($footerOverride)) {
             foreach ($oConfig->item('alt_footer') as $pattern => $template) {
 
                 //  Prep the regex
-                $key = str_replace(':any', '.*', str_replace(':num', '[0-9]*', $pattern));
+                $key = str_replace(':any', '.+', str_replace(':num', '\d+', $pattern));
 
                 //  Match found?
                 if (preg_match('#^' . preg_quote($key, '#') . '$#', $uriString)) {
-
                     $match = $template;
                     break;
                 }
@@ -72,36 +70,10 @@ if (isset($footerOverride)) {
 
         //  Load the appropriate footer view
         if ($match) {
-
             $oView->load($match);
-
-        } elseif ($oUri->segment(1) == 'admin') {
-
-            //  No match, but in admin, load the appropriate admin view
-            if ($bIs404) {
-
-                //  404 with no route, show the default footer
-                $oView->load($oConfig->item('default_footer'));
-
-            } else {
-
-                //  Admin has no route and it's not a 404, load up the Nails admin footer
-                $oView->load('structure/footer/nails-admin');
-            }
-
         } else {
-
             $oView->load($oConfig->item('default_footer'));
         }
-
-    } elseif ($oUri->segment(1) == 'admin' && !$bIs404) {
-
-        /**
-         * Loading admin footer and no config file. This isn't a 404 so go ahead and
-         * load the normal Nails admin footer
-         */
-
-        $oView->load('structure/footer/nails-admin');
 
     } elseif (file_exists(APPPATH . 'views/structure/footer/default.php')) {
 

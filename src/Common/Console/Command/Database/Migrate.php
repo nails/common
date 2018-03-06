@@ -117,7 +117,7 @@ class Migrate extends Base
         }
 
         //  Get the DB object
-        $this->oDb = Factory::service('ConsoleDatabase', 'nailsapp/module-console');
+        $this->oDb = Factory::service('PDODatabase');
         $this->oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
 
         if (!defined('NAILS_DB_PREFIX')) {

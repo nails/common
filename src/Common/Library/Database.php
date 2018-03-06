@@ -91,7 +91,7 @@ class Database
 
     /**
      * Clears the query history and other memory hogs
-     * @return $this
+     * @return Database
      */
     public function flushCache()
     {
@@ -108,7 +108,7 @@ class Database
 
     /**
      * Resets Active Record/Query Builder
-     * @return $this
+     * @return Database
      */
     public function reset()
     {

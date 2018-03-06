@@ -11,6 +11,7 @@
  */
 
 use Nails\Common\Exception\NailsException;
+use Nails\Factory;
 
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = [];
@@ -642,19 +643,63 @@ if (!function_exists('isPageSecure')) {
 
 if (!function_exists('show_error')) {
 
-    /**
-     * Calls the exception class' show_error method
-     *
-     * @param        $sMessage
-     * @param int    $iStatus
-     * @param string $sHeading
-     * @param bool   $bUseException
-     */
-    function show_error($sMessage, $iStatus = 500, $sHeading = 'An Error Was Encountered', $bUseException = true)
+    function show_error($sMessage = '', $sSubject = '', $iStatusCode = 500)
     {
         $oError =& load_class('Exceptions', 'core');
-        echo $oError->show_error($sHeading, $sMessage, 'error_general', $iStatus, $bUseException);
-        exit;
+        $oError->show_error($sSubject, $sMessage, $iStatusCode, $iStatusCode);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('show_401')) {
+
+    /**
+     * Renders the 401 page, optionally logging the error to the database.
+     * If a user is not logged in they are directed to the login page.
+     *
+     * @param  boolean $bLogError Whether to log the error or not
+     *
+     * @return void
+     */
+    function show_401($bLogError = true)
+    {
+        $oError =& load_class('Exceptions', 'core');
+        $oError->show_401($bLogError);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('show401')) {
+
+    /**
+     * Alias of show_401
+     *
+     * @param  boolean $bLogError Whether to log the error or not
+     *
+     * @return void
+     */
+    function show401($bLogError = true)
+    {
+        show_401($bLogError);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('unauthorised')) {
+
+    /**
+     * Alias of show_401
+     *
+     * @param  boolean $bLogError Whether to log the error or not
+     *
+     * @return void
+     */
+    function unauthorised($bLogError = true)
+    {
+        show_401($bLogError);
     }
 }
 
@@ -669,16 +714,14 @@ if (!function_exists('show_404')) {
      * a result of some other checking and not technically a 404 so should not be
      * logged as one. _Actual_ 404's should continue to be logged however.
      *
-     * @param  string  $sPage     The page which 404'd
      * @param  boolean $bLogError Whether to log the error or not
      *
      * @return void
      */
-    function show_404($sPage = '', $bLogError = false)
+    function show_404($bLogError = true)
     {
         $oError =& load_class('Exceptions', 'core');
-        $oError->show_404($sPage, $bLogError);
-        exit;
+        $oError->show_404('', $bLogError);
     }
 }
 
@@ -689,14 +732,13 @@ if (!function_exists('show404')) {
     /**
      * Alias to show_404()
      *
-     * @param  string  $sPage     The page which 404'd
      * @param  boolean $bLogError Whether to log the error or not
      *
      * @return void
      */
-    function show404($sPage = '', $bLogError = false)
+    function show404($bLogError = true)
     {
-        show_404($sPage, $bLogError);
+        show_404($bLogError);
     }
 }
 

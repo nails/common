@@ -47,14 +47,12 @@ class Loader extends MX_Loader
      */
     public function view($view, $vars = [], $return = false)
     {
-
         if (strpos($view, '/') === 0) {
 
             //  The supplied view is an absolute path, so use it.
 
             //  Add on EXT if it's not there (so pathinfo() works as expected)
             if (substr($view, strlen(EXT) * -1) != EXT) {
-
                 $view .= EXT;
             }
 

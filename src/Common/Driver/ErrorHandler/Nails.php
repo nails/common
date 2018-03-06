@@ -63,7 +63,7 @@ class Nails implements ErrorHandlerDriver
             }
 
             $oErrorHandler = Factory::service('ErrorHandler');
-            $oErrorHandler->renderErrorView('php', $aData, false);
+            $oErrorHandler->renderErrorView('php', $aData, true);
         }
 
         //  Show we log the item?

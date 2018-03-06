@@ -64,10 +64,10 @@ $mimes['ppsm'] = 'application/vnd.ms-powerpoint.slideshow.macroEnabled.12';
 
 //  Adobe Creative Suite/Cloud
 //  Illustrator files are PDF files with some additional meta data
-$mimes['ai'] = array_merge([$mimes['ai']], $mimes['pdf'], ['application/illustrator']);
+$mimes['ai'] = array_merge($mimes['ai'], $mimes['pdf'], ['application/illustrator']);
 
 //  PhotoShop files also have some aliases
-$mimes['psd'] = array_merge([$mimes['psd']], ['application/psd', 'image/photoshop', 'image/psd', 'image/x-psd']);
+$mimes['psd'] = array_merge($mimes['psd'], ['application/psd', 'image/photoshop', 'image/psd', 'image/x-psd']);
 
 //  InDesign Files
 $mimes['indd'] = 'application/x-indesign';

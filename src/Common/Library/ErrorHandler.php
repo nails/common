@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Exception\ErrorHandlerException;
 use Nails\Environment;
 use Nails\Factory;
@@ -136,7 +137,7 @@ class ErrorHandler
 
         set_status_header(500);
         $this->renderErrorView(
-            'exception',
+            '500',
             [
                 'sSubject' => $sSubject,
                 'sMessage' => $sMessage,
@@ -270,23 +271,20 @@ class ErrorHandler
     /**
      * Renders the 404 page and halts script execution
      *
-     * @param string $sPage     The URI which 404'd
-     * @param bool   $bLogError Whether to log the error
+     * @param bool $bLogError Whether to log the error
      */
-    public function show404Screen($sPage = '', $bLogError = true)
+    public function show404($bLogError = true)
     {
-        if (empty($sPage) && isset($_SERVER)) {
-            $sPage = getFromArray('REQUEST_URI', $_SERVER);
-        }
+        $sPage = getFromArray('REQUEST_URI', $_SERVER);
 
         /**
          * By default we log this, but allow a dev to skip it. Additionally, skip
          * if it's a HEAD request.
          *
-         * Reasoning: I often use HEAD requests to check the existance of a file
+         * Reasoning: I often use HEAD requests to check the existence of a file
          * in JS before fetching it. I feel that these shouldn't be logged. A
-         * direct GET/POST/etc request to a non existant file is more  likely a
-         * user following a deadlink so these _should_ be logged.
+         * direct GET/POST/etc request to a non-existent file is more  likely a
+         * user following a dead link so these _should_ be logged.
          *
          * If you disagree, open up an issue and we'll work something out.
          */
@@ -297,10 +295,105 @@ class ErrorHandler
             log_message('error', '404 Page Not Found --> ' . $sPage);
         }
 
+        // --------------------------------------------------------------------------
+
+        /**
+         * If the route failed to resolve then there will be no instance of the \App\Controller\Base,
+         * and as such the app will have failed to startup completely - simulate a controller
+         * being loaded if this is the case. Few of CodeIgniter's services will have been loaded
+         * so we need to load them now, we'll also boot up a controller which does nothing so
+         * that the app's constructor chain is fired.
+         */
+
+        $aDeclaredClasses = get_declared_classes();
+        if (!in_array('App\Controller\Base', $aDeclaredClasses)) {
+
+            require_once BASEPATH . 'core/Controller.php';
+
+            load_class('Output', 'core');
+            load_class('Security', 'core');
+            load_class('Input', 'core');
+            load_class('Lang', 'core');
+
+            new Nails404Controller();
+        }
+
+        // --------------------------------------------------------------------------
+
         defineConst('NAILS_IS_404', true);
         set_status_header(404);
-        $this->renderErrorView('404');
-        exit(500);
+        $this->renderErrorView(
+            '404',
+            [
+                'sSubject' => '404 Page Not Found',
+                'sMessage' => '',
+            ]
+        );
+        exit(404);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders the 401 page and halts script execution
+     *
+     * @param bool $bLogError Whether to log the error
+     */
+    public function show401($bLogError = true)
+    {
+        if (function_exists('isLoggedIn') && isLoggedIn()) {
+
+            if ($bLogError) {
+                $sPage = getFromArray('REQUEST_URI', $_SERVER);
+                log_message('error', '401 Unauthorised --> ' . $sPage);
+            }
+
+            $sMessage = 'The page you are trying to view is restricted. Sadly you do not have enough ';
+            $sMessage .= 'permissions to see its content.';
+
+            if (function_exists('wasAdmin') && wasAdmin()) {
+
+                $oUserModel = Factory::model('User', 'nailsapp/module-auth');
+                $oRecovery  = $oUserModel->getAdminRecoveryData();
+
+                $sMessage .= '<br /><br />';
+                $sMessage .= '<small>';
+                $sMessage .= 'However, it looks like you are logged in as someone else.';
+                $sMessage .= '<br />' . anchor($oRecovery->loginUrl, 'Log back in as ' . $oRecovery->name);
+                $sMessage .= ' and try again.';
+                $sMessage .= '</small>';
+            }
+
+            set_status_header(401);
+            $this->renderErrorView(
+                '401',
+                [
+                    'sSubject' => '404 Unauthorized',
+                    'sMessage' => $sMessage,
+                ]
+            );
+            exit(404);
+
+        } else {
+
+            $oSession = Factory::service('Session', 'nailsapp/module-auth');
+            $oInput   = Factory::service('Input');
+            $sMessage = '<strong>Sorry,</strong> you need to be logged in to see that page.';
+
+            $oSession->set_flashdata('message', $sMessage);
+
+            if ($oInput->server('REQUEST_URI')) {
+                $sReturn = $oInput->server('REQUEST_URI');
+            } elseif (uri_string()) {
+                $sReturn = uri_string();
+            } else {
+                $sReturn = '';
+            }
+
+            $sReturn = $sReturn ? '?return_to=' . urlencode($sReturn) : '';
+
+            redirect('auth/login' . $sReturn);
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -325,7 +418,8 @@ class ErrorHandler
             }
         }
 
-        $sType      = is_cli() ? 'cli' : 'html';
+        $oInput     = Factory::service('Input');
+        $sType      = $oInput::isCli() ? 'cli' : 'html';
         $aAppPath   = [
             rtrim(APPPATH, DIRECTORY_SEPARATOR),
             'views',
@@ -344,15 +438,15 @@ class ErrorHandler
         $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
         $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
 
-
-        extract($aData);
+        $oView = Factory::service('View');
+        $oView->setData($aData);
 
         if (file_exists($sAppPath)) {
-            include $sAppPath;
+            echo $oView->load($sAppPath, [], true);
         } elseif (file_exists($sNailsPath)) {
-            include $sNailsPath;
+            echo $oView->load($sNailsPath, [], true);
         } else {
-            _NAILS_ERROR($sMessage, $sSubject);
+            _NAILS_ERROR('Unable to load error view: ' . $sType . '/' . $sView, 'Unable to load error view');
         }
     }
 }

@@ -46,7 +46,7 @@ class Startup
          */
 
         //  Ensure the app's constants file is also loaded
-        require_once FCPATH . APPPATH . 'config/constants.php';
+        require_once APPPATH . 'config/constants.php';
 
         //  Generic Nails constants
         defineConst('NAILS_PACKAGE_NAME', 'Nails');
