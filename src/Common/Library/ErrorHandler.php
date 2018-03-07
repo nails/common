@@ -114,9 +114,6 @@ class ErrorHandler
             $sMessage = implode("\n", $sMessage);
         }
 
-        $oInput = Factory::service('Input');
-        $bIsCli = $oInput::isCli();
-
         if (is_null($oDetails)) {
             $oDetails = (object) [
                 'type'      => null,

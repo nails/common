@@ -1672,8 +1672,7 @@ abstract class Base
         }
 
         $aData['keywords'] = $sKeywords;
-
-        //  @todo: specify searchable fields in constructor and generate this manually
+        
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
         }

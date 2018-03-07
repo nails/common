@@ -58,7 +58,6 @@ class Exceptions extends CI_Exceptions
      */
     public function show_exception($oException)
     {
-        $oException->
         $oErrorHandler = Factory::service('ErrorHandler');
         $sMessage      = implode(
             '; ',
