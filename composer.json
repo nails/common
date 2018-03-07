@@ -25,7 +25,7 @@
     "prefer-stable": true,
     "require":
     {
-        "codeigniter/framework": "3.1.4",
+        "codeigniter/framework": "3.1.7",
         "pimple/pimple": "3.*",
         "guzzlehttp/guzzle": "6.*",
         "mustache/mustache": "2.*",
