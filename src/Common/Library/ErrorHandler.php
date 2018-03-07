@@ -375,7 +375,7 @@ class ErrorHandler
 
             $oSession = Factory::service('Session', 'nailsapp/module-auth');
             $oInput   = Factory::service('Input');
-            $sMessage = '<strong>Sorry,</strong> you need to be logged in to see that page.';
+            $sMessage = 'Sorry, you need to be logged in to see that page.';
 
             $oSession->set_flashdata('message', $sMessage);
 
