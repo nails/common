@@ -131,6 +131,20 @@ class ErrorHandler
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the default error driver class name
+     * @return string
+     */
+    public function getDefaultDriverClass()
+    {
+        $oDriver          = $this->getDefaultDriver();
+        $sDriverNamespace = getFromArray('namespace', (array) $oDriver->data);
+        $sDriverClass     = getFromArray('class', (array) $oDriver->data);
+        return '\\' . $sDriverNamespace . $sDriverClass;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Manually trigger an error
      *
      * @param int    $iErrorNumber
