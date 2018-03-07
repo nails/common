@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Library;
 
+use Nails\Factory;
+
 class View
 {
     /**
@@ -123,12 +125,15 @@ class View
             return $bReturn ? $sOut : $this;
         } elseif (is_string($mView)) {
             $aData = array_merge($this->getData(), (array) $aData);
-            $oCi   = get_instance();
-            if (!$bReturn) {
-                $oCi->load->view($mView, $aData, $bReturn);
+            $oInput = Factory::service('Input');
+            if ($oInput::isCli()) {
+                extract($aData);
+                include $mView;
+            } elseif (!$bReturn) {
+                get_instance()->load->view($mView, $aData, $bReturn);
                 return $this;
             } else {
-                return $oCi->load->view($mView, $aData, $bReturn);
+                return get_instance()->load->view($mView, $aData, $bReturn);
             }
         } else {
             return $this;
