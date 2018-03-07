@@ -52,24 +52,25 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
         $aOut = [];
         foreach ($aComposer as $oPackage) {
-
             if (isset($oPackage->extra->nails)) {
-                $aOut[] = (object) [
-                    'slug'          => $oPackage->name,
-                    'namespace'     => !empty($oPackage->extra->nails->namespace) ? $oPackage->extra->nails->namespace : null,
-                    'name'          => !empty($oPackage->extra->nails->name) ? $oPackage->extra->nails->name : $oPackage->name,
-                    'description'   => !empty($oPackage->extra->nails->description) ? $oPackage->extra->nails->description : $oPackage->description,
-                    'homepage'      => !empty($oPackage->extra->nails->homepage) ? $oPackage->extra->nails->homepage : $oPackage->homepage,
-                    'authors'       => !empty($oPackage->extra->nails->authors) ? $oPackage->extra->nails->authors : $oPackage->authors,
+                $aPackage = (array) $oPackage;
+                $aNails   = !empty($oPackage->extra->nails) ? (array) $oPackage->extra->nails : [];
+                $aOut[]   = (object) [
+                    'slug'          => getFromArray('name', $aPackage),
+                    'namespace'     => getFromArray('namespace', $aNails),
+                    'name'          => getFromArray('name', $aNails, getFromArray('name', $aPackage)),
+                    'description'   => getFromArray('description', $aNails, getFromArray('description', $aPackage)),
+                    'homepage'      => getFromArray('homepage', $aNails, getFromArray('homepage', $aPackage)),
+                    'authors'       => getFromArray('authors', $aNails, getFromArray('authors', $aPackage)),
                     'path'          => FCPATH . 'vendor/' . $oPackage->name . '/',
                     'relativePath'  => 'vendor/' . $oPackage->name . '/',
-                    'moduleName'    => !empty($oPackage->extra->nails->moduleName) ? $oPackage->extra->nails->moduleName : '',
-                    'data'          => !empty($oPackage->extra->nails->data) ? $oPackage->extra->nails->data : null,
-                    'type'          => !empty($oPackage->extra->nails->type) ? $oPackage->extra->nails->type : '',
-                    'subType'       => !empty($oPackage->extra->nails->subType) ? $oPackage->extra->nails->subType : '',
-                    'forModule'     => !empty($oPackage->extra->nails->forModule) ? $oPackage->extra->nails->forModule : '',
-                    'autoload'      => !empty($oPackage->extra->nails->autoload) ? $oPackage->extra->nails->autoload : null,
-                    'minPhpVersion' => !empty($oPackage->extra->nails->minPhpVersion) ? $oPackage->extra->nails->minPhpVersion : null,
+                    'moduleName'    => getFromArray('moduleName', $aNails, ''),
+                    'data'          => getFromArray('data', $aNails, null),
+                    'type'          => getFromArray('type', $aNails, ''),
+                    'subType'       => getFromArray('subType', $aNails, ''),
+                    'forModule'     => getFromArray('forModule', $aNails, ''),
+                    'autoload'      => getFromArray('autoload', $aNails, null),
+                    'minPhpVersion' => getFromArray('minPhpVersion', $aNails, null),
                     'fromApp'       => false,
                 ];
             }
@@ -89,7 +90,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
                 /**
                  * Load up config.json, This is basically exactly like composer.json, but
-                 * the bit contained within extras->nails.
+                 * the bit contained within extra->nails.
                  */
 
                 $sConfigPath = $sAppPath . $sDirName . '/config.json';
@@ -100,22 +101,23 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                     $oConfig = json_decode($sConfig);
 
                     if (!empty($oConfig)) {
-                        $aOut[] = (object) [
+                        $aConfig = (array) $oConfig;
+                        $aOut[]  = (object) [
                             'slug'          => 'app/' . $sDirName,
-                            'namespace'     => !empty($oConfig->namespace) ? $oConfig->namespace : null,
-                            'name'          => !empty($oConfig->name) ? $oConfig->name : 'app/' . $sDirName,
-                            'description'   => !empty($oConfig->description) ? $oConfig->description : '',
-                            'homepage'      => !empty($oConfig->homepage) ? $oConfig->homepage : '',
-                            'authors'       => !empty($oConfig->authors) ? $oConfig->authors : [],
+                            'namespace'     => getFromArray('namespace', $aConfig, null),
+                            'name'          => getFromArray('name', $aConfig, 'app/' . $sDirName),
+                            'description'   => getFromArray('description', $aConfig, ''),
+                            'homepage'      => getFromArray('homepage', $aConfig, ''),
+                            'authors'       => getFromArray('authors', $aConfig, []),
                             'path'          => $sAppPath . $sDirName . '/',
                             'relativePath'  => 'application/components/' . $sDirName . '/',
                             'moduleName'    => '',
-                            'data'          => !empty($oConfig->data) ? $oConfig->data : null,
-                            'type'          => !empty($oConfig->type) ? $oConfig->type : '',
-                            'subType'       => !empty($oConfig->subType) ? $oConfig->subType : '',
-                            'forModule'     => !empty($oConfig->forModule) ? $oConfig->forModule : '',
-                            'autoload'      => !empty($oConfig->autoload) ? $oConfig->autoload : null,
-                            'minPhpVersion' => !empty($oConfig->minPhpVersion) ? $oConfig->minPhpVersion : null,
+                            'data'          => getFromArray('data', $aConfig, null),
+                            'type'          => getFromArray('type', $aConfig, ''),
+                            'subType'       => getFromArray('subType', $aConfig, ''),
+                            'forModule'     => getFromArray('forModule', $aConfig, ''),
+                            'autoload'      => getFromArray('autoload', $aConfig, null),
+                            'minPhpVersion' => getFromArray('minPhpVersion', $aConfig, null),
                             'fromApp'       => true,
                         ];
                     }
