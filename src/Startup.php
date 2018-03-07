@@ -67,7 +67,7 @@ class Startup
         defineConst('APP_DB_CACHE', false);
         defineConst('APP_DB_CHARSET', 'utf8mb4');
         defineConst('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
-        defineConst('APP_DB_STRICT', false);
+        defineConst('APP_DB_STRICT', true);
         defineConst('NAILS_DB_PREFIX', 'nails_');
         defineConst('APP_DB_PREFIX', '');
 
