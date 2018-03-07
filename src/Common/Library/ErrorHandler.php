@@ -95,14 +95,7 @@ class ErrorHandler
 
         $sDriverNamespace = getFromArray('namespace', (array) $oErrorHandler->data);
         $sDriverClass     = getFromArray('class', (array) $oErrorHandler->data);
-        $sDriverFile      = $oErrorHandler->path . $sDriverClass . '.php';
         $sClassName       = '\\' . $sDriverNamespace . $sDriverClass;
-
-        if (!file_exists($sDriverFile)) {
-            _NAILS_ERROR('Expected at: ' . $sDriverFile, 'Driver file not available');
-        }
-
-        require_once $sDriverFile;
 
         if (!class_exists($sClassName)) {
             _NAILS_ERROR('Expected: ' . $sClassName, 'Driver class not available');
