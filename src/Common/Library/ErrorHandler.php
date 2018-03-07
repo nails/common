@@ -41,7 +41,7 @@ class ErrorHandler
      * The name of the default error handler
      * @var string
      */
-    const DEFAULT_ERROR_HANDLER = 'nailsapp/driver-error-hander-default';
+    const DEFAULT_ERROR_HANDLER = 'nailsapp/driver-error-handler-default';
 
     /**
      * The name of the interface which drivers must implement
@@ -67,7 +67,7 @@ class ErrorHandler
     /**
      * Sets up the appropriate error handling driver
      */
-    public function __construct()
+    public function init()
     {
         $aErrorHandlers = _NAILS_GET_DRIVERS('nailsapp/common', 'ErrorHandler');
         $oDefaultDriver = null;

@@ -354,14 +354,8 @@ class Factory
             'autoload' => static::extractAutoLoadItemsFromComposerJson(FCPATH . 'composer.json'),
         ];
 
-        //  Common
-        $aComponents[] = (object) [
-            'slug'     => 'nailsapp/common',
-            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_COMMON_PATH . 'composer.json'),
-        ];
-
         //  Modules
-        foreach (_NAILS_GET_MODULES() as $oModule) {
+        foreach (_NAILS_GET_COMPONENTS() as $oModule) {
             $aComponents[] = (object) [
                 'slug'     => $oModule->slug,
                 'autoload' => !empty($oModule->autoload) ? $oModule->autoload : [],
