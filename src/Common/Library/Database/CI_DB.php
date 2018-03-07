@@ -52,7 +52,6 @@ class CI_DB extends \CI_DB_query_builder
      */
     protected function _compile_join()
     {
-        parent::_compile_join();
         $sSql = '';
         // Write the "JOIN" portion of the query
         if (count($this->qb_join) > 0) {
