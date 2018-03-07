@@ -124,16 +124,19 @@ class View
             }
             return $bReturn ? $sOut : $this;
         } elseif (is_string($mView)) {
-            $aData = array_merge($this->getData(), (array) $aData);
+
+            $aData  = array_merge($this->getData(), (array) $aData);
             $oInput = Factory::service('Input');
-            if ($oInput::isCli()) {
+            $oCi    = function_exists('get_instance') ? get_instance() : null;
+
+            if ($oInput::isCli() || empty($oCi->load)) {
                 extract($aData);
                 include $mView;
             } elseif (!$bReturn) {
-                get_instance()->load->view($mView, $aData, $bReturn);
+                $oCi->load->view($mView, $aData, $bReturn);
                 return $this;
             } else {
-                return get_instance()->load->view($mView, $aData, $bReturn);
+                return $oCi->load->view($mView, $aData, $bReturn);
             }
         } else {
             return $this;

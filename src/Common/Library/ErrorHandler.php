@@ -37,13 +37,30 @@ class ErrorHandler
         E_STRICT          => 'Runtime Notice',
     ];
 
+    /*
+     * The name of the default error handler
+     * @var string
+     */
+    const DEFAULT_ERROR_HANDLER = 'nailsapp/driver-error-hander-default';
+
+    /**
+     * The name of the interface which drivers must implement
+     */
+    const INTERFACE_NAME = 'Nails\\Common\\Interfaces\\ErrorHandlerDriver';
+
     // --------------------------------------------------------------------------
 
     /**
      * The fully qualified driver class name
      * @var string
      */
-    protected $sDriverClass;
+    protected static $sDriverClass;
+
+    /**
+     * The configuration for the default driver
+     * @var \stdClass
+     */
+    protected static $oDefaultDriver;
 
     // --------------------------------------------------------------------------
 
@@ -52,31 +69,70 @@ class ErrorHandler
      */
     public function __construct()
     {
-        /**
-         * Work out how we're handling errors. Production environments take into
-         * consideration error reporting. Non-production environments use local
-         * error reporting, that is CI Error reporting
-         */
-
-        $sErrorHandler = defined('DEPLOY_ERROR_REPORTING_HANDLER') ? DEPLOY_ERROR_REPORTING_HANDLER : 'Nails';
-        $sDriverClass  = '\Nails\Common\Driver\ErrorHandler\\' . $sErrorHandler;
-
-        if (!class_exists($sDriverClass)) {
-            $sLoadError   = '"' . $sDriverClass . '" is not a valid ErrorHandler';
-            $sDriverClass = '\Nails\Common\Driver\ErrorHandler\Nails';
+        $aErrorHandlers = _NAILS_GET_DRIVERS('nailsapp/common', 'ErrorHandler');
+        $oDefaultDriver = null;
+        $aCustomDrivers = [];
+        foreach ($aErrorHandlers as $oErrorHandler) {
+            if ($oErrorHandler->slug == static::DEFAULT_ERROR_HANDLER) {
+                $oDefaultDriver = $oErrorHandler;
+            } else {
+                $aCustomDrivers[] = $oErrorHandler;
+            }
         }
 
-        $sDriverClass::init();
+        if (count($aCustomDrivers) > 1) {
+            $aNames = [];
+            foreach ($aCustomDrivers as $oErrorHandler) {
+                $aNames[] = $oErrorHandler->slug;
+            }
+            _NAILS_ERROR(implode(', ', $aNames), 'More than one error handler installed');
+            return;
+        } elseif (count($aCustomDrivers) === 1) {
+            $oErrorHandler = reset($aCustomDrivers);
+        } else {
+            $oErrorHandler = $oDefaultDriver;
+        }
 
-        set_error_handler($sDriverClass . '::error');
-        set_exception_handler($sDriverClass . '::exception');
-        register_shutdown_function($sDriverClass . '::fatal');
+        $sDriverNamespace = getFromArray('namespace', (array) $oErrorHandler->data);
+        $sDriverClass     = getFromArray('class', (array) $oErrorHandler->data);
+        $sDriverFile      = $oErrorHandler->path . $sDriverClass . '.php';
+        $sClassName       = '\\' . $sDriverNamespace . $sDriverClass;
+
+        if (!file_exists($sDriverFile)) {
+            _NAILS_ERROR('Expected at: ' . $sDriverFile, 'Driver file not available');
+        }
+
+        require_once $sDriverFile;
+
+        if (!class_exists($sClassName)) {
+            _NAILS_ERROR('Expected: ' . $sClassName, 'Driver class not available');
+        } elseif (!in_array(static::INTERFACE_NAME, class_implements($sClassName))) {
+            _NAILS_ERROR('Error Handler "' . $sClassName . '"  must implement "' . static::INTERFACE_NAME . '"');
+        }
+
+        $sClassName::init();
+
+        set_error_handler($sClassName . '::error');
+        set_exception_handler($sClassName . '::exception');
+        register_shutdown_function($sClassName . '::fatal');
 
         if (!empty($sLoadError)) {
             throw new ErrorHandlerException($sLoadError, 1);
         }
 
-        $this->sDriverClass = $sDriverClass;
+        static::$sDriverClass   = $sClassName;
+        static::$oDefaultDriver = $oDefaultDriver;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the default error driver config
+     * @return \stdClass
+     */
+    public function getDefaultDriver()
+    {
+        return static::$oDefaultDriver;
     }
 
     // --------------------------------------------------------------------------
@@ -92,7 +148,7 @@ class ErrorHandler
     public function triggerError($iErrorNumber = 0, $sErrorString = '', $sErrorFile = '', $iErrorLine = 0)
     {
         //  PHP5.6 doesn't like $this->sDriverClass::error()
-        $sDriverClass = $this->sDriverClass;
+        $sDriverClass = static::$sDriverClass;
         $sDriverClass::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
     }
 
@@ -165,7 +221,6 @@ class ErrorHandler
 
         //  Do we know who we're sending to?
         if (!defined(APP_DEVELOPER_EMAIL) || empty(APP_DEVELOPER_EMAIL)) {
-
             //  Log the fact there's no email
             if (function_exists('log_message')) {
                 log_message('error', 'Attempting to send developer email, but APP_DEVELOPER_EMAIL is not defined.');

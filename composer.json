@@ -34,7 +34,8 @@
         "nailsapp/module-asset": "dev-develop",
         "nailsapp/module-email": "dev-develop",
         "nailsapp/module-event": "dev-develop",
-        "nailsapp/module-console": "dev-develop"
+        "nailsapp/module-console": "dev-develop",
+        "nailsapp/driver-error-handler-default": "dev-develop"
     },
     "require-dev":
     {
