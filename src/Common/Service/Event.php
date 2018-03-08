@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 class Event
 {
@@ -91,7 +91,7 @@ class Event
      * @param mixed   $mCallback  The callback to execute
      * @param boolean $bOnce      Whether the subscription should only fire once
      *
-     * @return \Nails\Common\Library\Event
+     * @return \Nails\Common\Service\Event
      */
     public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)
     {
@@ -129,7 +129,7 @@ class Event
      * @param  string $sNamespace The event's namespace
      * @param  array  $aData      Data to pass to the callbacks
      *
-     * @return \Nails\Common\Library\Event
+     * @return \Nails\Common\Service\Event
      */
     public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
     {

@@ -12,7 +12,7 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 class Encrypt extends \CI_Encrypt
 {

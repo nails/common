@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Exception\ErrorHandlerException;
@@ -119,12 +119,9 @@ class ErrorHandler
         set_exception_handler($sClassName . '::exception');
         register_shutdown_function($sClassName . '::fatal');
 
-        if (!empty($sLoadError)) {
-            throw new ErrorHandlerException($sLoadError, 1);
-        }
-
         static::$sDriverClass   = $sClassName;
         static::$oDefaultDriver = $oDefaultDriver;
+        static::$bIsReady       = true;
     }
 
     // --------------------------------------------------------------------------

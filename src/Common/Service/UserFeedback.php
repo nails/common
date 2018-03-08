@@ -13,7 +13,7 @@
  * @todo Match the naming convention of Bootstrap Alerts
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 use Nails\Factory;
 

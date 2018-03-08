@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 class MetaTest extends \PHPUnit_Framework_TestCase
 {
@@ -9,7 +9,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntries()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
+        $oMeta = new Meta();
         $this->assertCount(0, $oMeta->getEntries());
     }
 
@@ -20,10 +20,10 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddRaw()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
-        $aData = array(
-            'foo' => 'bar'
-        );
+        $oMeta = new Meta();
+        $aData = [
+            'foo' => 'bar',
+        ];
 
         $oMeta->addRaw($aData);
         $this->assertCount(1, $oMeta->getEntries());
@@ -36,10 +36,10 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddRawDoesRemovesDupliates()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
-        $aData = array(
-            'foo' => 'bar'
-        );
+        $oMeta = new Meta();
+        $aData = [
+            'foo' => 'bar',
+        ];
 
         $oMeta->addRaw($aData);
         $oMeta->addRaw($aData);
@@ -53,12 +53,12 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddRawIsChainable()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
-        $aData = array(
-            'foo' => 'bar'
-        );
+        $oMeta = new Meta();
+        $aData = [
+            'foo' => 'bar',
+        ];
 
-        $this->assertInstanceOf('Nails\Common\Library\Meta', $oMeta->addRaw($aData));
+        $this->assertInstanceOf('Nails\Common\Service\Meta', $oMeta->addRaw($aData));
     }
 
     // --------------------------------------------------------------------------
@@ -68,10 +68,10 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveRaw()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
-        $aData = array(
-            'foo' => 'bar'
-        );
+        $oMeta = new Meta();
+        $aData = [
+            'foo' => 'bar',
+        ];
 
         $oMeta->addRaw($aData);
         $oMeta->removeRaw($aData);
@@ -85,7 +85,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testAdd()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
+        $oMeta = new Meta();
         $oMeta->add('foo', 'bar');
         $this->assertEquals(1, count($oMeta->getEntries()));
     }
@@ -97,8 +97,8 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddIsChainable()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
-        $this->assertInstanceOf('Nails\Common\Library\Meta', $oMeta->add('foo', 'bar'));
+        $oMeta = new Meta();
+        $this->assertInstanceOf('Nails\Common\Service\Meta', $oMeta->add('foo', 'bar'));
     }
 
     // --------------------------------------------------------------------------
@@ -108,7 +108,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemove()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
+        $oMeta = new Meta();
         $oMeta->add('foo', 'bar');
         $oMeta->remove('foo', 'bar');
         $this->assertCount(0, $oMeta->getEntries());
@@ -121,15 +121,15 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testOutputAr()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
+        $oMeta = new Meta();
 
         $oMeta->add('foo', 'bar');
         $oMeta->add('cat', 'dog', 'link');
 
-        $aExpected = array(
+        $aExpected = [
             '<meta name="foo" content="bar">',
-            '<link name="cat" content="dog">'
-        );
+            '<link name="cat" content="dog">',
+        ];
 
         $this->assertEquals($aExpected, $oMeta->outputAr());
     }
@@ -141,7 +141,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
      */
     public function testOutputStr()
     {
-        $oMeta = new \Nails\Common\Library\Meta();
+        $oMeta = new Meta();
 
         $oMeta->add('foo', 'bar');
         $oMeta->add('cat', 'dog', 'link');

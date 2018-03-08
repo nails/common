@@ -7,7 +7,7 @@
  * @package Nails\Console
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\Database\TransactionException;

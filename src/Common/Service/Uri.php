@@ -1,43 +1,41 @@
 <?php
 
 /**
- * The class abstracts CI's FormValidation class.
- *
- * @todo        - remove dependency on CI
+ * The class abstracts CodeIgniter's Uri class.
  *
  * @package     Nails
  * @subpackage  common
  * @category    Library
  * @author      Nails Dev Team
  * @link
+ * @todo        Remove dependency on CI
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
-class FormValidation
+class Uri
 {
     /**
-     * The database object
-     * @var \CI_Form_validation
+     * The CodeIgniter Uri object
+     * @var \CI_URI
      */
-    private $oFormValidation;
+    private $oUri;
 
     // --------------------------------------------------------------------------
 
     /**
-     * FormValidation constructor.
+     * Uri constructor.
      */
     public function __construct()
     {
-        $oCi = get_instance();
-        $oCi->load->library('form_validation');
-        $this->oFormValidation = $oCi->form_validation;
+        $oCi        = get_instance();
+        $this->oUri = $oCi->uri;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Route calls to the CodeIgniter FormValidation class
+     * Route calls to the CodeIgniter Uri class
      *
      * @param  string $sMethod    The method being called
      * @param  array  $aArguments Any arguments being passed
@@ -47,19 +45,16 @@ class FormValidation
     public function __call($sMethod, $aArguments)
     {
         if (method_exists($this, $sMethod)) {
-
             return call_user_func_array([$this, $sMethod], $aArguments);
-
         } else {
-
-            return call_user_func_array([$this->oFormValidation, $sMethod], $aArguments);
+            return call_user_func_array([$this->oUri, $sMethod], $aArguments);
         }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "gets" to the CodeIgniter FormValidation class
+     * Pass any property "gets" to the CodeIgniter Uri class
      *
      * @param  string $sProperty The property to get
      *
@@ -67,13 +62,13 @@ class FormValidation
      */
     public function __get($sProperty)
     {
-        return $this->oFormValidation->{$sProperty};
+        return $this->oUri->{$sProperty};
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "sets" to the CodeIgniter FormValidation class
+     * Pass any property "sets" to the CodeIgniter Uri class
      *
      * @param  string $sProperty The property to set
      * @param  mixed  $mValue    The value to set
@@ -82,6 +77,6 @@ class FormValidation
      */
     public function __set($sProperty, $mValue)
     {
-        $this->oFormValidation->{$sProperty} = $mValue;
+        $this->oUri->{$sProperty} = $mValue;
     }
 }

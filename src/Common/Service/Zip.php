@@ -1,9 +1,9 @@
 <?php
 
 /**
- * The class abstracts CI's Security class.
+ * The class abstracts CI's Zip class.
  *
- * @todo        - remove dependency on CI
+ * @todo - remove dependency on CI
  *
  * @package     Nails
  * @subpackage  common
@@ -12,34 +12,39 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
-class Security
+/**
+ * Class Zip
+ * @package Nails\Common\Service
+ */
+class Zip
 {
     /**
-     * The database object
-     * @var \CI_Security
+     * The zip object
+     * @var \CI_Zip
      */
-    private $oSecurity;
+    private $oZip;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Security constructor.
+     * Zip constructor.
      */
     public function __construct()
     {
-        $oCi             = get_instance();
-        $this->oSecurity = $oCi->security;
+        $oCi = get_instance();
+        $oCi->load->library('zip');
+        $this->oZip = $oCi->zip;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Route calls to the CodeIgniter Security class
+     * Route calls to the CodeIgniter Zip class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param  string $sMethod The method being called
+     * @param  array $aArguments Any arguments being passed
      *
      * @return mixed
      */
@@ -48,14 +53,14 @@ class Security
         if (method_exists($this, $sMethod)) {
             return call_user_func_array([$this, $sMethod], $aArguments);
         } else {
-            return call_user_func_array([$this->oSecurity, $sMethod], $aArguments);
+            return call_user_func_array([$this->oZip, $sMethod], $aArguments);
         }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "gets" to the CodeIgniter Security class
+     * Pass any property "gets" to the CodeIgniter Zip class
      *
      * @param  string $sProperty The property to get
      *
@@ -63,21 +68,21 @@ class Security
      */
     public function __get($sProperty)
     {
-        return $this->oSecurity->{$sProperty};
+        return $this->oZip->{$sProperty};
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "sets" to the CodeIgniter Security class
+     * Pass any property "sets" to the CodeIgniter Zip class
      *
      * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param  mixed $mValue The value to set
      *
      * @return void
      */
     public function __set($sProperty, $mValue)
     {
-        $this->oSecurity->{$sProperty} = $mValue;
+        $this->oZip->{$sProperty} = $mValue;
     }
 }

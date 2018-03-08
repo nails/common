@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 class LoggerTest extends \PHPUnit_Framework_TestCase
 {

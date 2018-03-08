@@ -3,105 +3,105 @@
 return [
     'services'  => [
         'Asset' => function () {
-            if (class_exists('\App\Common\Library\Asset')) {
-                return new \App\Common\Library\Asset();
+            if (class_exists('\App\Common\Service\Asset')) {
+                return new \App\Common\Service\Asset();
             } else {
-                return new \Nails\Common\Library\Asset();
+                return new \Nails\Common\Service\Asset();
             }
         },
         'CodeIgniter' => function () {
             return get_instance();
         },
         'Config' => function () {
-            if (class_exists('\App\Common\Library\Config')) {
-                return new \App\Common\Library\Config();
+            if (class_exists('\App\Common\Service\Config')) {
+                return new \App\Common\Service\Config();
             } else {
-                return new \Nails\Common\Library\Config();
+                return new \Nails\Common\Service\Config();
             }
         },
         'Database' => function () {
-            if (class_exists('\App\Common\Library\Database')) {
-                return new \App\Common\Library\Database();
+            if (class_exists('\App\Common\Service\Database')) {
+                return new \App\Common\Service\Database();
             } else {
-                return new \Nails\Common\Library\Database();
+                return new \Nails\Common\Service\Database();
             }
         },
         'Encrypt' => function () {
-            if (class_exists('\App\Common\Library\Encrypt')) {
-                return new \App\Common\Library\Encrypt();
+            if (class_exists('\App\Common\Service\Encrypt')) {
+                return new \App\Common\Service\Encrypt();
             } else {
                 require_once BASEPATH . 'libraries/Encrypt.php';
-                return new \Nails\Common\Library\Encrypt();
+                return new \Nails\Common\Service\Encrypt();
             }
         },
         'ErrorHandler' => function () {
-            if (class_exists('\App\Common\Library\ErrorHandler')) {
-                return new \App\Common\Library\ErrorHandler();
+            if (class_exists('\App\Common\Service\ErrorHandler')) {
+                return new \App\Common\Service\ErrorHandler();
             } else {
-                return new \Nails\Common\Library\ErrorHandler();
+                return new \Nails\Common\Service\ErrorHandler();
             }
         },
         'Event' => function () {
-            if (class_exists('\App\Common\Library\Event')) {
-                return new \App\Common\Library\Event();
+            if (class_exists('\App\Common\Service\Event')) {
+                return new \App\Common\Service\Event();
             } else {
-                return new \Nails\Common\Library\Event();
+                return new \Nails\Common\Service\Event();
             }
         },
         'FormValidation' => function () {
-            if (class_exists('\App\Common\Library\FormValidation')) {
-                return new \App\Common\Library\FormValidation();
+            if (class_exists('\App\Common\Service\FormValidation')) {
+                return new \App\Common\Service\FormValidation();
             } else {
-                return new \Nails\Common\Library\FormValidation();
+                return new \Nails\Common\Service\FormValidation();
             }
         },
         'HttpCodes' => function () {
-            if (class_exists('\App\Common\Library\HttpCodes')) {
-                return new \App\Common\Library\HttpCodes();
+            if (class_exists('\App\Common\Service\HttpCodes')) {
+                return new \App\Common\Service\HttpCodes();
             } else {
-                return new \Nails\Common\Library\HttpCodes();
+                return new \Nails\Common\Service\HttpCodes();
             }
         },
         'Input' => function () {
-            if (class_exists('\App\Common\Library\Input')) {
-                return new \App\Common\Library\Input();
+            if (class_exists('\App\Common\Service\Input')) {
+                return new \App\Common\Service\Input();
             } else {
-                return new \Nails\Common\Library\Input();
+                return new \Nails\Common\Service\Input();
             }
         },
         'Logger' => function () {
-            if (class_exists('\App\Common\Library\Logger')) {
-                return new \App\Common\Library\Logger();
+            if (class_exists('\App\Common\Service\Logger')) {
+                return new \App\Common\Service\Logger();
             } else {
-                return new \Nails\Common\Library\Logger();
+                return new \Nails\Common\Service\Logger();
             }
         },
         'Meta' => function () {
-            if (class_exists('\App\Common\Library\Meta')) {
-                return new \App\Common\Library\Meta();
+            if (class_exists('\App\Common\Service\Meta')) {
+                return new \App\Common\Service\Meta();
             } else {
-                return new \Nails\Common\Library\Meta();
+                return new \Nails\Common\Service\Meta();
             }
         },
         'Mustache' => function () {
-            if (class_exists('\App\Common\Library\Mustache')) {
-                return new \App\Common\Library\Mustache();
+            if (class_exists('\App\Common\Service\Mustache')) {
+                return new \App\Common\Service\Mustache();
             } else {
                 return new Mustache_Engine();
             }
         },
         'Output' => function () {
-            if (class_exists('\App\Common\Library\Output')) {
-                return new \App\Common\Library\Output();
+            if (class_exists('\App\Common\Service\Output')) {
+                return new \App\Common\Service\Output();
             } else {
-                return new \Nails\Common\Library\Output();
+                return new \Nails\Common\Service\Output();
             }
         },
         'PDODatabase' => function () {
-            if (class_exists('\App\Common\Library\PDODatabase')) {
-                return new \App\Common\Library\PDODatabase();
+            if (class_exists('\App\Common\Service\PDODatabase')) {
+                return new \App\Common\Service\PDODatabase();
             } else {
-                return new \Nails\Common\Library\PDODatabase();
+                return new \Nails\Common\Service\PDODatabase();
             }
         },
         'Router' => function () {
@@ -110,38 +110,38 @@ return [
             return $oCi->router;
         },
         'Security' => function () {
-            if (class_exists('\App\Common\Library\Security')) {
-                return new \App\Common\Library\Security();
+            if (class_exists('\App\Common\Service\Security')) {
+                return new \App\Common\Service\Security();
             } else {
-                return new \Nails\Common\Library\Security();
+                return new \Nails\Common\Service\Security();
             }
         },
         'Uri' => function () {
-            if (class_exists('\App\Common\Library\Uri')) {
-                return new \App\Common\Library\Uri();
+            if (class_exists('\App\Common\Service\Uri')) {
+                return new \App\Common\Service\Uri();
             } else {
-                return new \Nails\Common\Library\Uri();
+                return new \Nails\Common\Service\Uri();
             }
         },
         'UserFeedback' => function () {
-            if (class_exists('\App\Common\Library\UserFeedback')) {
-                return new \App\Common\Library\UserFeedback();
+            if (class_exists('\App\Common\Service\UserFeedback')) {
+                return new \App\Common\Service\UserFeedback();
             } else {
-                return new \Nails\Common\Library\UserFeedback();
+                return new \Nails\Common\Service\UserFeedback();
             }
         },
         'View' => function () {
-            if (class_exists('\App\Common\Library\View')) {
-                return new \App\Common\Library\View();
+            if (class_exists('\App\Common\Service\View')) {
+                return new \App\Common\Service\View();
             } else {
-                return new \Nails\Common\Library\View();
+                return new \Nails\Common\Service\View();
             }
         },
         'Zip' => function () {
-            if (class_exists('\App\Common\Library\Zip')) {
-                return new \App\Common\Library\Zip();
+            if (class_exists('\App\Common\Service\Zip')) {
+                return new \App\Common\Service\Zip();
             } else {
-                return new \Nails\Common\Library\Zip();
+                return new \Nails\Common\Service\Zip();
             }
         },
     ],

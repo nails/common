@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The class provides a convinient way to load assets
+ * The class provides a convenient way to load assets
  *
  * @package     Nails
  * @subpackage  common
@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 use Nails\Factory;
 use Nails\Common\Exception\AssetException;

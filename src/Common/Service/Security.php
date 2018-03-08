@@ -1,41 +1,42 @@
 <?php
 
 /**
- * The class abstracts CodeIgniter's Output class.
+ * The class abstracts CI's Security class.
+ *
+ * @todo        - remove dependency on CI
  *
  * @package     Nails
  * @subpackage  common
  * @category    Library
  * @author      Nails Dev Team
  * @link
- * @todo        Remove dependency on CI
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
-class Output
+class Security
 {
     /**
-     * The CodeIgniter Output object
-     * @var \CI_Output
+     * The database object
+     * @var \CI_Security
      */
-    private $oOutput;
+    private $oSecurity;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Output constructor.
+     * Security constructor.
      */
     public function __construct()
     {
-        $oCi           = get_instance();
-        $this->oOutput = $oCi->output;
+        $oCi             = get_instance();
+        $this->oSecurity = $oCi->security;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Route calls to the CodeIgniter Output class
+     * Route calls to the CodeIgniter Security class
      *
      * @param  string $sMethod    The method being called
      * @param  array  $aArguments Any arguments being passed
@@ -47,14 +48,14 @@ class Output
         if (method_exists($this, $sMethod)) {
             return call_user_func_array([$this, $sMethod], $aArguments);
         } else {
-            return call_user_func_array([$this->oOutput, $sMethod], $aArguments);
+            return call_user_func_array([$this->oSecurity, $sMethod], $aArguments);
         }
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "gets" to the CodeIgniter Output class
+     * Pass any property "gets" to the CodeIgniter Security class
      *
      * @param  string $sProperty The property to get
      *
@@ -62,13 +63,13 @@ class Output
      */
     public function __get($sProperty)
     {
-        return $this->oOutput->{$sProperty};
+        return $this->oSecurity->{$sProperty};
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Pass any property "sets" to the CodeIgniter Output class
+     * Pass any property "sets" to the CodeIgniter Security class
      *
      * @param  string $sProperty The property to set
      * @param  mixed  $mValue    The value to set
@@ -77,6 +78,6 @@ class Output
      */
     public function __set($sProperty, $mValue)
     {
-        $this->oOutput->{$sProperty} = $mValue;
+        $this->oSecurity->{$sProperty} = $mValue;
     }
 }

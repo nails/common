@@ -9,7 +9,7 @@
  * @author      Nails Dev Team
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 class HttpCodes {
 

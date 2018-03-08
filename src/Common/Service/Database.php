@@ -14,7 +14,7 @@
  * @link
  */
 
-namespace Nails\Common\Library;
+namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
 
