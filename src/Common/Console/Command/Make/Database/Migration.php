@@ -174,9 +174,9 @@ class Migration extends BaseMaker
                         }
                     );
 
-                    $aFields['QUERIES'] .= $this->tabs(2) . '$this->query("' . "\n";
+                    $aFields['QUERIES'] .= $this->tabs(2) . '$this->query(\'' . "\n";
                     $aFields['QUERIES'] .= implode("\n", $aCreate) . "\n";
-                    $aFields['QUERIES'] .= $this->tabs(2) . '");' . "\n";
+                    $aFields['QUERIES'] .= $this->tabs(2) . '\');' . "\n";
                 }
 
                 $aFields['QUERIES'] = trim($aFields['QUERIES']);
@@ -185,7 +185,7 @@ class Migration extends BaseMaker
                 $aFields['QUERIES'] = preg_replace('/AUTO_INCREMENT=\d+ /', '', $aFields['QUERIES']);
 
             } else {
-                $aFields['QUERIES'] = '$this->query("");';
+                $aFields['QUERIES'] = '$this->query(\'\');';
             }
 
             $this->createFile($sPath, $this->getResource('template/migration.php', $aFields));
