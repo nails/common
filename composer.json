@@ -68,7 +68,8 @@
                     "text",
                     "exception",
                     "typography",
-                    "log"
+                    "log",
+                    "directory"
                 ]
             }
         }
