@@ -495,40 +495,42 @@ class ErrorHandler
             }
         }
 
-        $oRouter         = Factory::service('Router');
-        $sController     = ucfirst($oRouter->fetch_class());
-        $oReflection     = new \ReflectionClass($sController);
-        $sModuleViewPath = preg_replace('/controllers$/', '', dirname($oReflection->getFileName()));
+        $oRouter = Factory::service('Router');
+        $oInput  = Factory::service('Input');
+        $sType   = $oInput::isCli() ? 'cli' : 'html';
 
-        $oInput = Factory::service('Input');
-        $sType  = $oInput::isCli() ? 'cli' : 'html';
+        $aPaths      = [];
+        $sController = ucfirst($oRouter->fetch_class());
 
-        $aPaths = [
-            //  Current module
-            implode(DIRECTORY_SEPARATOR, [
+        if (class_exists($sController)) {
+            $oReflection     = new \ReflectionClass($sController);
+            $sModuleViewPath = preg_replace('/controllers$/', '', dirname($oReflection->getFileName()));
+            $aPaths[]        = implode(DIRECTORY_SEPARATOR, [
                 rtrim($sModuleViewPath, DIRECTORY_SEPARATOR),
                 'views',
                 'errors',
                 $sType,
                 $sView . '.php',
-            ]),
-            //  App generic
-            implode(DIRECTORY_SEPARATOR, [
-                rtrim(APPPATH, DIRECTORY_SEPARATOR),
-                'views',
-                'errors',
-                $sType,
-                $sView . '.php',
-            ]),
-            //  Nails
-            implode(DIRECTORY_SEPARATOR, [
-                rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
-                'views',
-                'errors',
-                $sType,
-                $sView . '.php',
-            ]),
-        ];
+            ]);
+        }
+
+        //  App generic
+        $aPaths[] = implode(DIRECTORY_SEPARATOR, [
+            rtrim(APPPATH, DIRECTORY_SEPARATOR),
+            'views',
+            'errors',
+            $sType,
+            $sView . '.php',
+        ]);
+
+        //  Nails
+        $aPaths[] = implode(DIRECTORY_SEPARATOR, [
+            rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+            'views',
+            'errors',
+            $sType,
+            $sView . '.php',
+        ]);
 
         $sValidPath = null;
         foreach ($aPaths as $sPath) {
