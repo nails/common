@@ -13,7 +13,6 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
-use Nails\Common\Exception\ErrorHandlerException;
 use Nails\Environment;
 use Nails\Factory;
 
@@ -487,6 +486,7 @@ class ErrorHandler
         $aData = [],
         $bFlushBuffer = true
     ) {
+
         //  Flush the output buffer
         if ($bFlushBuffer) {
             $sObContents = ob_get_contents();
@@ -495,35 +495,57 @@ class ErrorHandler
             }
         }
 
-        $oInput     = Factory::service('Input');
-        $sType      = $oInput::isCli() ? 'cli' : 'html';
-        $aAppPath   = [
-            rtrim(APPPATH, DIRECTORY_SEPARATOR),
-            'views',
-            'errors',
-            $sType,
-            $sView . '.php',
+        $oRouter         = Factory::service('Router');
+        $sController     = ucfirst($oRouter->fetch_class());
+        $oReflection     = new \ReflectionClass($sController);
+        $sModuleViewPath = preg_replace('/controllers$/', '', dirname($oReflection->getFileName()));
+
+        $oInput = Factory::service('Input');
+        $sType  = $oInput::isCli() ? 'cli' : 'html';
+
+        $aPaths = [
+            //  Current module
+            implode(DIRECTORY_SEPARATOR, [
+                rtrim($sModuleViewPath, DIRECTORY_SEPARATOR),
+                'views',
+                'errors',
+                $sType,
+                $sView . '.php',
+            ]),
+            //  App generic
+            implode(DIRECTORY_SEPARATOR, [
+                rtrim(APPPATH, DIRECTORY_SEPARATOR),
+                'views',
+                'errors',
+                $sType,
+                $sView . '.php',
+            ]),
+            //  Nails
+            implode(DIRECTORY_SEPARATOR, [
+                rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+                'views',
+                'errors',
+                $sType,
+                $sView . '.php',
+            ]),
         ];
-        $aNailsPath = [
-            rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
-            'views',
-            'errors',
-            $sType,
-            $sView . '.php',
-        ];
 
-        $sAppPath   = implode(DIRECTORY_SEPARATOR, $aAppPath);
-        $sNailsPath = implode(DIRECTORY_SEPARATOR, $aNailsPath);
+        $sValidPath = null;
+        foreach ($aPaths as $sPath) {
+            if (file_exists($sPath)) {
+                $sValidPath = $sPath;
+                break;
+            }
+        }
 
-        $oView = Factory::service('View');
-        $oView->setData($aData);
+        if ($sValidPath) {
 
-        if (file_exists($sAppPath)) {
-            echo $oView->load($sAppPath, [], true);
-        } elseif (file_exists($sNailsPath)) {
-            echo $oView->load($sNailsPath, [], true);
+            $oView = Factory::service('View');
+            $oView->setData($aData);
+            echo $oView->load($sValidPath, [], true);
+
         } else {
-            _NAILS_ERROR('Unable to load error view: ' . $sType . '/' . $sView, 'Unable to load error view');
+            _NAILS_ERROR('404 Page Not Found');
         }
     }
 }
