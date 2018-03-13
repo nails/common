@@ -58,8 +58,8 @@ class Startup
 
         //  Cache Directories
         defineConst('CACHE_PATH', FCPATH . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
-        defineConst('DEPLOY_CACHE_PUBLIC_DIR', FCPATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
-        defineConst('DEPLOY_CACHE_PUBLIC_URL', rtrim(BASE_URL, '/') . '/cache/public/');
+        defineConst('CACHE_PUBLIC_PATH', FCPATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
+        defineConst('CACHE_PUBLIC_URL', rtrim(BASE_URL, '/') . '/cache/public/');
 
         //  Database
         //  Consistent between deployments
