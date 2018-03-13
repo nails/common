@@ -417,20 +417,23 @@ abstract class Base extends \MX_Controller
 
                     } else {
                         //  Otherwise, render some HTML
-                        if (file_exists(APPPATH . 'views/maintenance/maintenance.php')) {
+                        if (file_exists(APPPATH . 'views/errors/html/maintenance.php')) {
                             //  Look for an app override
-                            require APPPATH . 'views/maintenance/maintenance.php';
-                        } elseif (file_exists(NAILS_COMMON_PATH . 'views/maintenance/maintenance.php')) {
-                            //  Fall back to the Nails maintenance page
-                            require NAILS_COMMON_PATH . 'views/maintenance/maintenance.php';
+                            require APPPATH . 'views/errors/html/maintenance.php';
                         } else {
-                            //  Fall back, back to plain text
-                            echo '<h1>Down for maintenance</h1>';
+                            //  Fall back to the Nails maintenance page
+                            require NAILS_COMMON_PATH . 'views/errors/html/maintenance.php';
                         }
                     }
 
                 } else {
-                    echo 'Down for Maintenance' . "\n";
+                    if (file_exists(APPPATH . 'views/errors/cli/maintenance.php')) {
+                        //  Look for an app override
+                        require APPPATH . 'views/errors/cli/maintenance.php';
+                    } else {
+                        //  Fall back to the Nails maintenance page
+                        require NAILS_COMMON_PATH . 'views/errors/cli/maintenance.php';
+                    }
                 }
                 exit(0);
             }
