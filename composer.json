@@ -71,6 +71,13 @@
                     "log",
                     "directory"
                 ]
+            },
+            "data": {
+                "nailsapp/module-cdn": {
+                    "permitted-image-dimensions": [
+                        "35x35"
+                    ]
+                }
             }
         }
     }
