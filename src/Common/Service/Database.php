@@ -52,7 +52,7 @@ class Database
             'password' => DEPLOY_DB_PASSWORD,
             'database' => DEPLOY_DB_DATABASE,
             'db_debug' => DEPLOY_DB_DEBUG,
-            'cachedir' => DEPLOY_CACHE_DIR,
+            'cachedir' => CACHE_PATH,
         ];
 
         $sDbPath = BASEPATH . 'database/';

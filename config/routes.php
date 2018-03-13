@@ -12,5 +12,5 @@ $route['default_controller'] = 'home/index';
  * App Routes
  */
 if (!defined('NAILS_STARTUP_GENERATE_APP_ROUTES') || !NAILS_STARTUP_GENERATE_APP_ROUTES) {
-    include_once DEPLOY_CACHE_DIR . 'routes_app.php';
+    include_once CACHE_PATH . 'routes_app.php';
 }

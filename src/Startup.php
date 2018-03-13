@@ -56,8 +56,10 @@ class Startup
         //  Environment
         defineConst('ENVIRONMENT', 'DEVELOPMENT');
 
-        //  Cache Directory
-        defineConst('DEPLOY_CACHE_DIR', APPPATH . 'cache' . DIRECTORY_SEPARATOR);
+        //  Cache Directories
+        defineConst('CACHE_PATH', FCPATH . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
+        defineConst('DEPLOY_CACHE_PUBLIC_DIR', FCPATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
+        defineConst('DEPLOY_CACHE_PUBLIC_URL', rtrim(BASE_URL, '/') . '/cache/public/');
 
         //  Database
         //  Consistent between deployments
@@ -102,7 +104,7 @@ class Startup
 
         //  Check routes_app.php exists
         //  @todo - don't like this at all
-        if (is_file(DEPLOY_CACHE_DIR . 'routes_app.php')) {
+        if (is_file(CACHE_PATH . 'routes_app.php')) {
             defineConst('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
         } else {
             //  Not found, crude hook seeing as basically nothing has loaded yet

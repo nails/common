@@ -42,7 +42,7 @@ class Routes
     /**
      * Where to store the routes file
      */
-    const ROUTES_DIR = DEPLOY_CACHE_DIR;
+    const ROUTES_DIR = CACHE_PATH;
 
     /**
      * The name to give the routes file

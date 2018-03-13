@@ -16,7 +16,7 @@ class Model extends BaseMaker
     const MODEL_PATH        = FCPATH . 'src/Model/';
     const ADMIN_PATH        = FCPATH . 'application/modules/admin/controllers/';
     const SERVICE_PATH      = APPPATH . 'services/services.php';
-    const SERVICE_TEMP_PATH = DEPLOY_CACHE_DIR . 'services.temp.php';
+    const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
 
     // --------------------------------------------------------------------------
 

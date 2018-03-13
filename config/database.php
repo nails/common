@@ -9,6 +9,6 @@ $db['default']['password'] = DEPLOY_DB_PASSWORD;
 $db['default']['database'] = DEPLOY_DB_DATABASE;
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['db_debug'] = DEPLOY_DB_DEBUG;
-$db['default']['cachedir'] = DEPLOY_CACHE_DIR;
+$db['default']['cachedir'] = CACHE_PATH;
 $db['default']['char_set'] = 'utf8mb4';
 $db['default']['dbcollat'] = 'utf8mb4_unicode_ci';

@@ -31,7 +31,7 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 $config['log_threshold'] = 1;
 
 //  Cache directory
-$config['cache_path'] = defined('DEPLOY_CACHE_DIR') ? DEPLOY_CACHE_DIR : APPPATH . 'cache/';
+$config['cache_path'] = defined('CACHE_PATH') ? CACHE_PATH : APPPATH . 'cache/';
 
 //  The encryption key
 $config['encryption_key'] = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY): md5('');

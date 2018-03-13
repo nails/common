@@ -315,31 +315,31 @@ abstract class Base extends \MX_Controller
      */
     protected function testCache()
     {
-        if (is_writable(DEPLOY_CACHE_DIR)) {
+        if (is_writable(CACHE_PATH)) {
 
             return true;
 
-        } elseif (is_dir(DEPLOY_CACHE_DIR)) {
+        } elseif (is_dir(CACHE_PATH)) {
 
             //  Attempt to chmod the dir
-            if (@chmod(DEPLOY_CACHE_DIR, FILE_WRITE_MODE)) {
+            if (@chmod(CACHE_PATH, FILE_WRITE_MODE)) {
 
                 return true;
 
             } else {
                 throw new NailsException(
-                    'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" exists but is not writable.',
+                    'The app\'s cache dir "' . CACHE_PATH . '" exists but is not writable.',
                     1
                 );
             }
 
-        } elseif (@mkdir(DEPLOY_CACHE_DIR)) {
+        } elseif (@mkdir(CACHE_PATH)) {
 
             return true;
 
         } else {
             throw new NailsException(
-                'The app\'s cache dir "' . DEPLOY_CACHE_DIR . '" does not exist and could not be created.',
+                'The app\'s cache dir "' . CACHE_PATH . '" does not exist and could not be created.',
                 1
             );
         }
