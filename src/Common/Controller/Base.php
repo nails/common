@@ -59,7 +59,7 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Set the default content-type
+        //  Set the default Content-Type
         $oOutput = Factory::service('Output');
         $oOutput->set_content_type('text/html; charset=utf-8');
 
@@ -408,7 +408,7 @@ abstract class Base extends \MX_Controller
 
                         header('Cache-Control: no-store, no-cache, must-revalidate');
                         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-                        header('Content-type: application/json');
+                        header('Content-Type: application/json');
                         header('Pragma: no-cache');
 
                         $_out = ['status' => 503, 'error' => 'Down for Maintenance'];
