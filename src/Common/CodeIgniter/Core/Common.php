@@ -16,6 +16,63 @@ use Nails\Factory;
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = [];
 
+if (!function_exists('_NAILS_GET_APP')) {
+    function _NAILS_GET_APP($bUseCache = true)
+    {
+        /**
+         * If we have already fetched this data then don't get it again
+         */
+
+        if ($bUseCache && isset($GLOBALS['NAILS']['APP'])) {
+            return $GLOBALS['NAILS']['APP'];
+        }
+
+        // --------------------------------------------------------------------------
+
+        $sComposer = @file_get_contents(FCPATH . 'composer.json');
+
+        if (empty($sComposer)) {
+            _NAILS_ERROR('Failed to get app configuration; could not load composer.json');
+        }
+
+        $oComposer = @json_decode($sComposer);
+
+        if (empty($oComposer)) {
+            _NAILS_ERROR('Failed to get app configuration; could not decode composer.json');
+        }
+
+        $aComposer = (array) $oComposer;
+        $aNails    = !empty($oComposer->extra->nails) ? (array) $oComposer->extra->nails : [];
+
+        $oOut = (object) [
+            'slug'          => getFromArray('name', $aComposer),
+            'namespace'     => '\\App',
+            'name'          => getFromArray('name', $aNails, getFromArray('name', $aComposer)),
+            'description'   => getFromArray('description', $aNails, getFromArray('description', $aComposer)),
+            'homepage'      => getFromArray('homepage', $aNails, getFromArray('homepage', $aComposer)),
+            'authors'       => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
+            'path'          => FCPATH,
+            'relativePath'  => './',
+            'moduleName'    => getFromArray('moduleName', $aNails, ''),
+            'data'          => getFromArray('data', $aNails, null),
+            'autoload'      => getFromArray('autoload', $aNails, null),
+            'minPhpVersion' => getFromArray('minPhpVersion', $aNails, null),
+            'fromApp'       => true,
+        ];
+
+        // --------------------------------------------------------------------------
+
+        //  Save as a $GLOBAL for next time
+        if ($bUseCache) {
+            $GLOBALS['NAILS']['APP'] = $oOut;
+        }
+
+        return $oOut;
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
     /**
