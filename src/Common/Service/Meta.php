@@ -15,7 +15,7 @@ namespace Nails\Common\Service;
 
 class Meta
 {
-    private $aEntries = array();
+    private $aEntries = [];
 
     // --------------------------------------------------------------------------
 
@@ -32,13 +32,14 @@ class Meta
 
     /**
      * Adds a meta tag, setting all the element keys as tag attributes.
+     *
      * @param array $aAttr An array of attributes which make up the entry
      */
     public function addRaw($aAttr)
     {
         if (!empty($aAttr)) {
 
-            $sHash = md5(json_encode($aAttr));
+            $sHash                  = md5(json_encode($aAttr));
             $this->aEntries[$sHash] = $aAttr;
         }
 
@@ -49,10 +50,12 @@ class Meta
 
     /**
      * Adds a meta tag
+     *
      * @param  array $aAttr An array of attributes which make up the entry
      */
     public function removeRaw($aAttr)
     {
+        dd($this->aEntries);
         if (!empty($aAttr)) {
 
             $sHash = md5(json_encode($aAttr));
@@ -66,17 +69,18 @@ class Meta
 
     /**
      * Adds a basic meta tag, setting the name and the content attributes
+     *
      * @param string $sName    The element's name attribute
      * @param string $sContent The element's content attribute
      * @param string $sTag     The elements's type
      */
     public function add($sName, $sContent, $sTag = '')
     {
-        $aMeta = array(
+        $aMeta = [
             'name'    => $sName,
             'content' => $sContent,
-            'tag'     => $sTag
-        );
+            'tag'     => $sTag,
+        ];
 
         return $this->addRaw($aMeta);
     }
@@ -85,19 +89,47 @@ class Meta
 
     /**
      * Removes a basic meta tag
+     *
      * @param string $sName    The elements's name attribute
      * @param string $sContent The elements's content attribute
      * @param string $sTag     The elements's type
      */
     public function remove($sName, $sContent, $sTag = '')
     {
-        $aMeta = array(
+        $aMeta = [
             'name'    => $sName,
             'content' => $sContent,
-            'tag'     => $sTag
-        );
+            'tag'     => $sTag,
+        ];
 
         return $this->removeRaw($aMeta);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Removes items whose propeerties match a defined pattern
+     *
+     * @param array $aProperties A key/value array of properties and matching patterns
+     *
+     * @return $this
+     */
+    public function removeByPropertyPattern($aProperties)
+    {
+        foreach ($this->aEntries as $sHash => $aEntry) {
+            foreach ($aProperties as $aPatterns) {
+                foreach ($aPatterns as $sProperty => $sPattern) {
+                    if (!array_key_exists($sProperty, $aEntry)) {
+                        continue 2;
+                    } elseif (!preg_match('/^' . $sPattern . '$/i', $aEntry[$sProperty])) {
+                        continue 2;
+                    }
+                }
+                unset($this->aEntries[$sHash]);
+            }
+        }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -108,7 +140,7 @@ class Meta
      */
     public function outputAr()
     {
-        $aOut = array();
+        $aOut = [];
 
         foreach ($this->aEntries as $aEntry) {
 
@@ -118,7 +150,7 @@ class Meta
 
                 $sTemp .= $sKey . '="' . $sValue . '" ';
             }
-            $sTemp = trim($sTemp) . '>';
+            $sTemp  = trim($sTemp) . '>';
             $aOut[] = $sTemp;
         }
 
