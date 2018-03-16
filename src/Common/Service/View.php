@@ -163,6 +163,7 @@ class View
 
             $sResolvedPath = $this->resolvePath($mView);
             if (!$sResolvedPath) {
+                @ob_end_clean();
                 throw new ViewNotFoundException('Could not resolve view "' . $mView . '"');
             }
 
