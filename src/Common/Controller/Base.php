@@ -758,7 +758,7 @@ abstract class Base extends \MX_Controller
      *
      * @param array $aData The array to populate
      */
-    public static function populateUserFeedback(array $aData)
+    public static function populateUserFeedback(array &$aData)
     {
         //  Set User Feedback alerts for the views
         $oSession          = Factory::service('Session', 'nailsapp/module-auth');
