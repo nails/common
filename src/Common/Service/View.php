@@ -12,10 +12,16 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\ViewNotFoundException;
+use Nails\Common\Traits\Caching;
 use Nails\Factory;
 
 class View
 {
+    use Caching;
+
+    // --------------------------------------------------------------------------
+
     /**
      * An array of data which is passed to the views
      * @var array
@@ -25,11 +31,36 @@ class View
     // --------------------------------------------------------------------------
 
     /**
+     * The paths to look for views in
+     * @var array
+     */
+    protected $aViewPaths = [];
+
+    /**
+     * Stores the current buffer level
+     * @var int
+     */
+    protected $iBufferLevel;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * View constructor.
      */
     public function __construct()
     {
-        $this->aData = &getControllerData();
+        $this->aData        = &getControllerData();
+        $this->iBufferLevel = ob_get_level();
+        $this->aViewPaths   = [
+            APPPATH . 'modules/',
+            APPPATH,
+            NAILS_COMMON_PATH,
+        ];
+        foreach (_NAILS_GET_MODULES() as $oModule) {
+            $this->aViewPaths[] = $oModule->path;
+        }
+
+        $oRouter = Factory::service('Router');
     }
 
     // --------------------------------------------------------------------------
@@ -114,6 +145,7 @@ class View
     public function load($mView, $aData = [], $bReturn = false)
     {
         if (is_array($mView)) {
+
             $sOut = '';
             foreach ($mView as $sView) {
                 if ($bReturn) {
@@ -123,23 +155,98 @@ class View
                 }
             }
             return $bReturn ? $sOut : $this;
+
         } elseif (is_string($mView)) {
 
-            $aData  = array_merge($this->getData(), (array) $aData);
-            $oInput = Factory::service('Input');
-            $oCi    = function_exists('get_instance') ? get_instance() : null;
+            $aData = array_merge($this->getData(), (array) $aData);
+            ob_start();
 
-            if ($oInput::isCli() || empty($oCi->load)) {
-                extract($aData);
-                include $mView;
-            } elseif (!$bReturn) {
-                $oCi->load->view($mView, $aData, $bReturn);
-                return $this;
-            } else {
-                return $oCi->load->view($mView, $aData, $bReturn);
+            $sResolvedPath = $this->resolvePath($mView);
+            if (!$sResolvedPath) {
+                throw new ViewNotFoundException('Could not resolve view "' . $mView . '"');
             }
+
+            extract($aData);
+            include $sResolvedPath;
+
+            if ($bReturn) {
+                $sBuffer = ob_get_contents();
+                @ob_end_clean();
+                return $sBuffer;
+            } elseif (ob_get_level() > $this->iBufferLevel + 1) {
+                ob_end_flush();
+            } else {
+                $oOutput = Factory::service('Output');
+                $oOutput->append_output(ob_get_contents());
+                @ob_end_clean();
+            }
+
+            return $this;
         } else {
             return $this;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Attempts to resolve the view path
+     *
+     * @param stirng $sView The view to resolve
+     *
+     * @return bool|string
+     */
+    protected function resolvePath($sView)
+    {
+        $sCacheKey = 'path:' . $sView;
+        $sCached   = $this->getCache($sCacheKey);
+        if ($sCached !== null) {
+            return $sCached;
+        }
+
+        $sView         = preg_replace('/\.php$/', '', $sView) . '.php';
+        $sResolvedPath = '';
+        $oRouter       = Factory::service('Router');
+
+        if (strpos($sView, '/') !== 0) {
+            foreach ($this->aViewPaths as $sPath) {
+
+                $aPath        = explode('/', $sView);
+                $sModule      = array_shift($aPath) . '/';
+                $sFile        = implode('/', $aPath);
+                $aPathOptions = [
+                    $sPath . $sModule . 'views/' . $sFile,
+                    $sPath . $oRouter->current_module() . '/views/' . $sModule . $sFile,
+                    $sPath . 'views/' . $sModule . $sFile,
+                ];
+
+                foreach ($aPathOptions as $sCompiledPath) {
+                    if (file_exists($sCompiledPath)) {
+                        $sResolvedPath = $sCompiledPath;
+                        break 2;
+                    }
+                }
+            }
+        } else {
+            $sResolvedPath = file_exists($sView) ? $sView : false;
+        }
+
+        $this->setCache($sCacheKey, $sResolvedPath);
+
+        return $sResolvedPath;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Backwards compatability with CodeIgniter; allows views to load items using $this
+     *
+     * @param string $sProperty The property being requested
+     *
+     * @return null|mixed
+     */
+    public function __get($sProperty)
+    {
+        return function_exists('get_instance') ? get_instance()->{$sProperty} : null;
     }
 }
