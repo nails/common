@@ -212,9 +212,15 @@ class View
         if (strpos($sView, '/') !== 0) {
             foreach ($this->aViewPaths as $sPath) {
 
-                $aPath        = explode('/', $sView);
-                $sModule      = array_shift($aPath) . '/';
-                $sFile        = implode('/', $aPath);
+                $aPath = explode('/', $sView);
+                if (count($aPath) > 1) {
+                    $sModule = array_shift($aPath) . '/';
+                    $sFile   = implode('/', $aPath);
+                } else {
+                    $sModule = '';
+                    $sFile   = $sView;
+                }
+
                 $aPathOptions = [
                     $sPath . $sModule . 'views/' . $sFile,
                     $sPath . $oRouter->current_module() . '/views/' . $sModule . $sFile,
