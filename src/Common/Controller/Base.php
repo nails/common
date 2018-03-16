@@ -145,19 +145,7 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Set User Feedback alerts for the views
-        $oSession               = Factory::service('Session', 'nailsapp/module-auth');
-        $oUserFeedback          = Factory::service('UserFeedback');
-        $this->data['error']    = $oUserFeedback->get('error') ?: $oSession->flashdata('error');
-        $this->data['negative'] = $oUserFeedback->get('negative') ?: $oSession->flashdata('negative');
-        $this->data['success']  = $oUserFeedback->get('success') ?: $oSession->flashdata('success');
-        $this->data['positive'] = $oUserFeedback->get('positive') ?: $oSession->flashdata('positive');
-        $this->data['info']     = $oUserFeedback->get('info') ?: $oSession->flashdata('info');
-        $this->data['warning']  = $oUserFeedback->get('message') ?: $oSession->flashdata('warning');
-
-        //  @deprecated
-        $this->data['message'] = $oUserFeedback->get('message') ?: $oSession->flashdata('message');
-        $this->data['notice']  = $oUserFeedback->get('notice') ?: $oSession->flashdata('notice');
+        static::populateUserFeedback($this->data);
 
         // --------------------------------------------------------------------------
 
@@ -761,5 +749,29 @@ abstract class Base extends \MX_Controller
         $oBindTo->data['user']          = $oBindTo->user;
         $oBindTo->data['user_group']    = $oBindTo->user_group_model;
         $oBindTo->data['user_password'] = $oBindTo->user_password_model;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Populates an array form the USerFeedback and session classes
+     *
+     * @param array $aData The array to populate
+     */
+    public static function populateUserFeedback(array $aData)
+    {
+        //  Set User Feedback alerts for the views
+        $oSession          = Factory::service('Session', 'nailsapp/module-auth');
+        $oUserFeedback     = Factory::service('UserFeedback');
+        $aData['error']    = $oUserFeedback->get('error') ?: $oSession->flashdata('error');
+        $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->flashdata('negative');
+        $aData['success']  = $oUserFeedback->get('success') ?: $oSession->flashdata('success');
+        $aData['positive'] = $oUserFeedback->get('positive') ?: $oSession->flashdata('positive');
+        $aData['info']     = $oUserFeedback->get('info') ?: $oSession->flashdata('info');
+        $aData['warning']  = $oUserFeedback->get('message') ?: $oSession->flashdata('warning');
+
+        //  @deprecated
+        $aData['message'] = $oUserFeedback->get('message') ?: $oSession->flashdata('message');
+        $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->flashdata('notice');
     }
 }
