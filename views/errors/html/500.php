@@ -243,7 +243,7 @@ if (Environment::not('PRODUCTION')) {
             }
 
             $oSession = Factory::service('Session', 'nailsapp/module-auth');
-            echo keyValueSection('SESSION Data', $oSession->userdata);
+            echo keyValueSection('SESSION Data', $oSession->getUserData());
 
             ?>
         </body>
