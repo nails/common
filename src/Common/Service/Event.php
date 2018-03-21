@@ -23,6 +23,14 @@ class Event
     // --------------------------------------------------------------------------
 
     /**
+     * Tracks events which have been triggered
+     * @var array
+     */
+    protected $aHistory = [];
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Event constructor.
      */
     public function __construct()
@@ -133,7 +141,11 @@ class Event
      */
     public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
     {
+        $this->addHistory($sEvent, $sNamespace);
+
+        $sEvent     = strtoupper($sEvent);
         $sNamespace = strtoupper($sNamespace);
+
         if (!empty($this->aSubscriptions[$sNamespace][$sEvent])) {
             foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $sSubscriptionHash => $oSubscription) {
                 if (is_callable($oSubscription->callback)) {
@@ -147,5 +159,114 @@ class Event
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Adds a history item to the history array
+     *
+     * @param string $sEvent     The event name
+     * @param string $sNamespace The event namespace
+     *
+     * @return $this
+     */
+    protected function addHistory($sEvent, $sNamespace = 'nailsapp/common')
+    {
+        $sEvent     = strtoupper($sEvent);
+        $sNamespace = strtoupper($sNamespace);
+
+        if (!array_key_exists($sNamespace, $this->aHistory)) {
+            $this->aHistory[$sNamespace] = [];
+        }
+        if (!array_key_exists($sEvent, $this->aHistory[$sNamespace])) {
+            $this->aHistory[$sNamespace][$sEvent] = (object) [
+                'count'      => 0,
+                'timestamps' => [],
+            ];
+        }
+
+        $this->aHistory[$sNamespace][$sEvent]->count++;
+        $this->aHistory[$sNamespace][$sEvent]->timestamps[] = microtime(true);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Retrieve a history item
+     *
+     * @param string $sNamespace The event namespace
+     * @param string $sEvent     The event name
+     *
+     * @return array|\stdClass|null
+     */
+    public function getHistory($sNamespace = null, $sEvent = null)
+    {
+        $sEvent     = strtoupper($sEvent);
+        $sNamespace = strtoupper($sNamespace);
+
+        if (empty($sNamespace) && empty($sEvent)) {
+            return $this->aHistory;
+        } elseif (
+            empty($sEvent) &&
+            !empty($sNamespace) &&
+            array_key_exists($sNamespace, $this->aHistory)
+        ) {
+            return $this->aHistory[$sNamespace];
+        } elseif (
+            !empty($sNamespace) &&
+            array_key_exists($sNamespace, $this->aHistory) &&
+            !empty($sEvent) &&
+            array_key_exists($sEvent, $this->aHistory[$sNamespace])
+        ) {
+            return $this->aHistory[$sNamespace][$sEvent];
+        }
+
+        return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Clear history item(s)
+     *
+     * @param string $sNamespace The event namespace
+     * @param string $sEvent     The event name
+     *
+     * @return $this
+     */
+    public function clearHistory($sNamespace = null, $sEvent = null)
+    {
+        $sEvent     = strtoupper($sEvent);
+        $sNamespace = strtoupper($sNamespace);
+
+        if (empty($sNamespace)) {
+            $this->aHistory = [];
+        } elseif (empty($sEvent) && array_key_exists($sNamespace, $this->aHistory)) {
+            $this->aHistory[$sNamespace] = [];
+        } elseif (
+            array_key_exists($sNamespace, $this->aHistory) &&
+            array_key_exists($sEvent, $this->aHistory[$sNamespace])
+        ) {
+            unset($this->aHistory[$sNamespace][$sEvent]);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determine whether a particular item has been triggered
+     *
+     * @param string $sEvent     The event name
+     * @param string $sNamespace The event namespace
+     *
+     * @return bool
+     */
+    public function hasBeenTriggered($sEvent, $sNamespace = 'nailsapp/common')
+    {
+        return (bool) $this->getHistory($sNamespace, $sEvent);
     }
 }
