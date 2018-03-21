@@ -509,9 +509,9 @@ abstract class Base extends \MX_Controller
         $oInput = Factory::service('Input');
         header('WWW-Authenticate: Basic realm="' . APP_NAME . ' - Restricted Area"');
         header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
-        $message = 'You are not authorised to access this installation.';
-        include NAILS_COMMON_PATH . 'errors/error_401.php';
-        exit(0);
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->renderErrorView(401);
+        exit(401);
     }
 
     // --------------------------------------------------------------------------
