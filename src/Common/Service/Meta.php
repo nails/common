@@ -55,7 +55,6 @@ class Meta
      */
     public function removeRaw($aAttr)
     {
-        dd($this->aEntries);
         if (!empty($aAttr)) {
 
             $sHash = md5(json_encode($aAttr));
