@@ -369,7 +369,7 @@ if (!function_exists('form_field')) {
                 $sMethodName = 'form_' . $_field_type;
                 $_field_html = $sMethodName(
                     $_field_key,
-                    set_value($_field_key, $_field_default),
+                    set_value($_field_key, $_field_default, false),
                     $sFieldAttr
                 );
                 break;
@@ -404,7 +404,7 @@ if (!function_exists('form_field')) {
 
                 $_field_html = form_input(
                     $_field_key,
-                    set_value($_field_key, $_field_default),
+                    set_value($_field_key, $_field_default, false),
                     $sFieldAttr
                 );
                 break;
