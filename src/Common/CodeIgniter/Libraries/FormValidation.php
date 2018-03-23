@@ -12,8 +12,8 @@
 
 namespace Nails\Common\CodeIgniter\Libraries;
 
-use Nails\Factory;
 use CI_Form_validation;
+use Nails\Factory;
 
 class FormValidation extends CI_Form_validation
 {
@@ -1065,5 +1065,31 @@ class FormValidation extends CI_Form_validation
         }
 
         return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks a value is uniqe in a given table
+     *
+     * @param string $sString     The string to check
+     * @param string $sParameters Period separated parameters; table.column.ignore_id.ignore_id_column
+     *
+     * @return bool
+     */
+    public function is_unique($sString, $sParameters)
+    {
+        $aParameters   = explode('.', $sParameters);
+        $sTable        = getFromArray(0, $aParameters);
+        $sColumn       = getFromArray(1, $aParameters);
+        $sIgnoreId     = getFromArray(2, $aParameters);
+        $sIgnoreColumn = getFromArray(3, $aParameters, 'id');
+
+        $oDb = Factory::service('Database');
+        $oDb->where($sColumn, $sString);
+        if ($sIgnoreId) {
+            $oDb->where($sIgnoreColumn . ' !=', $sIgnoreId);
+        }
+        return $oDb->count_all_results($sTable) === 0;
     }
 }
