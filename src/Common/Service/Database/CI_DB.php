@@ -1,11 +1,11 @@
 <?php
 
-use Nails\Factory;
+use Nails\Common\Exception\Database\QueryException;
 
 class CI_DB extends \CI_DB_query_builder
 {
     /**
-     * Display an error message using the Nails Error Handler
+     * Display an error message using an exception rather than a view
      *
      * @param    string $error  The error message
      * @param    string $swap   Any "swap" values
@@ -15,8 +15,10 @@ class CI_DB extends \CI_DB_query_builder
      */
     public function display_error($error = '', $swap = '', $native = false)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->showFatalErrorScreen('A Database Error Occurred', $error);
+        if (is_array($error)) {
+            $error = implode('; ', $error);
+        }
+        throw new QueryException($error);
     }
 
     // --------------------------------------------------------------------------
