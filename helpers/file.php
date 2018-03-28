@@ -10,44 +10,30 @@
  * @link
  */
 
+use Nails\Common\Helper\File;
+
 if (!function_exists('readFileChunked')) {
-
-    /**
-     * Outputs a file in bytesized chunks.
-     * http://teddy.fr/2007/11/28/how-serve-big-files-through-php/
-     * @param  string  $filename  The file to output
-     * @param  integer $chunkSize The chunk size, in bytes
-     * @return mixed              Ineger on success, false on failure
-     */
-    function readFileChunked($filename, $chunkSize = 1048576)
+    function readFileChunked($sFilename, $iChunkSize = 1048576)
     {
-        $bytesRead = 0;
+        return File::readFileChunked($sFilename, $iChunkSize);
+    }
+}
 
-        // $handle = fopen($filename, "rb");
-        $handle = fopen($filename, 'rb');
-        if ($handle === false) {
+// --------------------------------------------------------------------------
 
-            return false;
-        }
+if (!function_exists('fileExistsCS')) {
+    function fileExistsCS($sFilename)
+    {
+        return File::fileExistsCS($sFilename);
+    }
+}
 
-        while (!feof($handle)) {
+// --------------------------------------------------------------------------
 
-            $buffer = fread($handle, $chunkSize);
-            echo $buffer;
-
-            $bytesRead += strlen($buffer);
-        }
-
-        $status = fclose($handle);
-
-        if ($status) {
-
-            return $bytesRead;
-
-        } else {
-
-            return false;
-        }
+if (!function_exists('isDirCS')) {
+    function isDirCS($sDir)
+    {
+        return File::isDirCS($sDir);
     }
 }
 
