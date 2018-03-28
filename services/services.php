@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'properties'  => [
+        'DB_HOST'     => DEPLOY_DB_HOST,
+        'DB_USERNAME' => DEPLOY_DB_USERNAME,
+        'DB_PASSWORD' => DEPLOY_DB_PASSWORD,
+        'DB_DATABASE' => DEPLOY_DB_DATABASE,
+    ],
     'services'  => [
         'Asset' => function () {
             if (class_exists('\App\Common\Service\Asset')) {

@@ -17,6 +17,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
+use Nails\Factory;
 
 class Database
 {
@@ -47,10 +48,10 @@ class Database
             'autoinit' => true,
 
             //  Potentially vary between deployments
-            'hostname' => DEPLOY_DB_HOST,
-            'username' => DEPLOY_DB_USERNAME,
-            'password' => DEPLOY_DB_PASSWORD,
-            'database' => DEPLOY_DB_DATABASE,
+            'hostname' => Factory::property('DB_HOST'),
+            'username' => Factory::property('DB_USERNAME'),
+            'password' => Factory::property('DB_PASSWORD'),
+            'database' => Factory::property('DB_DATABASE'),
             'db_debug' => DEPLOY_DB_DEBUG,
             'cachedir' => CACHE_PATH,
         ];

@@ -4,6 +4,7 @@ namespace Nails\Common\Console\Command;
 
 use Nails\Console\Command\Base;
 use Nails\Environment;
+use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -279,6 +280,11 @@ class Install extends Base
                 $dbUser = $this->getVarValue('DEPLOY_DB_USERNAME', $deployVars);
                 $dbPass = $this->getVarValue('DEPLOY_DB_PASSWORD', $deployVars);
                 $dbName = $this->getVarValue('DEPLOY_DB_DATABASE', $deployVars);
+
+                Factory::setProperty('DB_HOST', $dbHost);
+                Factory::setProperty('DB_USERNAME', $dbUser);
+                Factory::setProperty('DB_PASSWORD', $dbPass);
+                Factory::setProperty('DB_DATABASE', $dbName);
 
                 //  Migrate DB
                 $oOutput->write('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Migrating database... ');
