@@ -45,6 +45,8 @@ class Startup
          * a web or console application
          */
 
+        defineConst('BASE_URL', '/');
+
         //  Ensure the app's constants file is also loaded
         require_once APPPATH . 'config/constants.php';
 
