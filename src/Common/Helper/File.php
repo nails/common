@@ -110,7 +110,7 @@ class File
             $sDirectoryPath = implode(DIRECTORY_SEPARATOR, $aDirBits);
             $aDirectories   = array_map(function ($sDirectory) {
                 return basename($sDirectory);
-            }, glob($sDirectoryPath . '/*', GLOB_NOSORT | GLOB_ONLYDIR));
+            }, glob($sDirectoryPath . DIRECTORY_SEPARATOR . '*', GLOB_NOSORT | GLOB_ONLYDIR));
 
             if (!in_array($sDirectory, $aDirectories)) {
                 $bResult = false;
