@@ -187,7 +187,7 @@ class Factory
     {
         $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
 
-        if (empty(self::$aContainers[$sComponentName]['properties'][$sPropertyName])) {
+        if (!self::$aContainers[$sComponentName]['properties']->offsetExists($sPropertyName)) {
             throw new FactoryException(
                 'Property "' . $sPropertyName . '" is not provided by component "' . $sComponentName . '"',
                 0
