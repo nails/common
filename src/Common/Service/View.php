@@ -227,7 +227,7 @@ class View
 
                 $aPathOptions = [
                     $sPath . $sModule . 'views/' . $sFile,
-                    $sPath . $oRouter->current_module() . '/views/' . $sModule . $sFile,
+                    $sPath . rtrim($oRouter->current_module(), '/') . '/views/' . $sModule . $sFile,
                     $sPath . 'views/' . $sModule . $sFile,
                 ];
 
