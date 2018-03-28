@@ -214,22 +214,30 @@ class View
         $oRouter       = Factory::service('Router');
 
         if (strpos($sView, '/') !== 0) {
+
             foreach ($this->aViewPaths as $sPath) {
 
                 $aPath = explode('/', $sView);
                 if (count($aPath) > 1) {
-                    $sModule = array_shift($aPath) . '/';
+                    $sModule = array_shift($aPath);
                     $sFile   = implode('/', $aPath);
                 } else {
                     $sModule = '';
                     $sFile   = $sView;
                 }
 
-                $aPathOptions = [
-                    $sPath . $sModule . 'views/' . $sFile,
-                    $sPath . rtrim($oRouter->current_module(), '/') . '/views/' . $sModule . $sFile,
-                    $sPath . 'views/' . $sModule . $sFile,
-                ];
+                $aPathOptions = array_filter([
+                    [$sPath, $sModule, 'views', $sFile],
+                    $oRouter->current_module() ? [$sPath, $oRouter->current_module(), 'views', $sModule, $sFile] : null,
+                    [$sPath, 'views', $sModule, $sFile],
+                ]);
+
+                foreach ($aPathOptions as &$aPathOption) {
+                    array_walk($aPathOption, function (&$sSegment) {
+                        $sSegment = rtrim($sSegment, '/');
+                    });
+                    $aPathOption = implode('/', $aPathOption);
+                }
 
                 foreach ($aPathOptions as $sCompiledPath) {
                     if (file_exists($sCompiledPath)) {
