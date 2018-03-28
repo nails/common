@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\ViewNotFoundCaseException;
 use Nails\Common\Exception\ViewNotFoundException;
 use Nails\Common\Traits\Caching;
 use Nails\Factory;
@@ -161,10 +162,11 @@ class View
             $aData = array_merge($this->getData(), (array) $aData);
             ob_start();
 
-            $sResolvedPath = $this->resolvePath($mView);
-            if (!$sResolvedPath) {
+            try {
+                $sResolvedPath = $this->resolvePath($mView);
+            } catch (ViewNotFoundException $e) {
                 @ob_end_clean();
-                throw new ViewNotFoundException('Could not resolve view "' . $mView . '"');
+                throw $e;
             }
 
             extract($aData);
@@ -195,6 +197,8 @@ class View
      *
      * @param stirng $sView The view to resolve
      *
+     * @throws ViewNotFoundCaseException
+     * @throws ViewNotFoundException
      * @return bool|string
      */
     protected function resolvePath($sView)
@@ -236,6 +240,12 @@ class View
             }
         } else {
             $sResolvedPath = file_exists($sView) ? $sView : false;
+        }
+
+        if (!$sResolvedPath) {
+            throw new ViewNotFoundException('Could not resolve view "' . $sView . '"');
+        } elseif (!fileExistsCS($sResolvedPath)) {
+            throw new ViewNotFoundCaseException('Incorrect casing for view "' . $sView . '"');
         }
 
         $this->setCache($sCacheKey, $sResolvedPath);
