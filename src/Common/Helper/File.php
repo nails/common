@@ -79,7 +79,7 @@ class File
 
         if (in_array(basename($sFilename), $aFiles)) {
             //  Test if the directory exists
-            $bResult = isDirCS($sDirectory);
+            $bResult = static::isDirCS($sDirectory);
         } else {
             $bResult = false;
         }
