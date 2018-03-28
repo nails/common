@@ -62,6 +62,7 @@ class View
         }
 
         $oRouter = Factory::service('Router');
+        Factory::helper('File');
     }
 
     // --------------------------------------------------------------------------
