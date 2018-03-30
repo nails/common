@@ -13,6 +13,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
+use Nails\Common\Events
 use Nails\Environment;
 use Nails\Factory;
 
@@ -372,15 +373,14 @@ class ErrorHandler
         // --------------------------------------------------------------------------
 
         /**
-         * If the route failed to resolve then there will be no instance of the \App\Controller\Base,
-         * and as such the app will have failed to startup completely - simulate a controller
-         * being loaded if this is the case. Few of CodeIgniter's services will have been loaded
-         * so we need to load them now, we'll also boot up a controller which does nothing so
-         * that the app's constructor chain is fired.
+         * If the SYSTEM_READY event hasn't been fired then we know that the app's controller hasn't been executed.
+         * Instantiate this controller to allow the full application stack to execute, this allows the 404 views to
+         * make use of variables defined by /App/Sontroller/Base. Also, load CI's core services as they might not
+         * have been loaded.
          */
 
-        $aDeclaredClasses = get_declared_classes();
-        if (!in_array('App\Controller\Base', $aDeclaredClasses)) {
+        $oEvent = Factory::service('Event');
+        if (!$oEvent->hasBeenTriggered(Events::SYSTEM_READY)) {
 
             require_once BASEPATH . 'core/Controller.php';
 
