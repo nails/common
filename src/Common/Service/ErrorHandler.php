@@ -13,7 +13,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
-use Nails\Common\Events
+use Nails\Common\Events;
 use Nails\Environment;
 use Nails\Factory;
 
