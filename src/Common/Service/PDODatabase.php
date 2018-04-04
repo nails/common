@@ -33,7 +33,7 @@ class PDODatabase
     /**
      * Exception messages and numbers
      */
-    const ERR_MSG_CONNECTION_FAILED = 'Connection failed.';
+    const ERR_MSG_CONNECTION_FAILED = 'Connection failed (%s: %s)';
     const ERR_NUM_CONNECTION_FAILED = 1;
 
     // --------------------------------------------------------------------------
@@ -69,7 +69,10 @@ class PDODatabase
             $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         } catch (\Exception $e) {
-            throw new ConnectionException(self::ERR_MSG_CONNECTION_FAILED, self::ERR_NUM_CONNECTION_FAILED);
+            throw new ConnectionException(
+                sprintf(self::ERR_MSG_CONNECTION_FAILED, $e->getCode(), $e->getMessage()),
+                self::ERR_NUM_CONNECTION_FAILED
+            );
         }
     }
 
