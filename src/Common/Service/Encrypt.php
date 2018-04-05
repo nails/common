@@ -3,8 +3,6 @@
 /**
  * The class abstracts CI's Encryption class.
  *
- * @todo        - remove dependency on CI
- *
  * @package     Nails
  * @subpackage  common
  * @category    Library
@@ -14,45 +12,67 @@
 
 namespace Nails\Common\Service;
 
-class Encrypt extends \CI_Encrypt
+use \Defuse\Crypto\Crypto;
+use Nails\Common\Exception\EnvironmentException;
+use Nails\Common\Exception\Encrypt\DecodeException;
+
+class Encrypt
 {
     /**
-     * Encrypt constructor. Overriding so as not to require `get_instance()`
+     * Encodes a given value using the supplied key
+     *
+     * @param  mixed   $mValue The value to encode
+     * @param  boolean $sKey   The key to use for encryption
+     *
+     * @throws EnvironmentException
+     * @return string
      */
-    public function __construct()
+    public static function encode($mValue, $sKey = false)
     {
-        if (function_exists('mcrypt_encrypt') === false) {
-            show_error('The Encrypt library requires the Mcrypt extension.');
+        try {
+            return Crypto::encryptWithPassword(
+                $mValue,
+                $sKey ?: static::getKey()
+            );
+        } catch (\Defuse\Crypto\Exception\EnvironmentIsBrokenException $e) {
+            throw new EnvironmentException($e->getMessage(), $e->getCode());
         }
-
-        log_message('debug', "Encrypt Class Initialized");
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Fetch the encryption key
+     * Decodes a given value using the supplied key
      *
-     * Returns it as MD5 in order to have an exact-length 128 bit key.
-     * Mcrypt is sensitive to keys that are not the correct length
+     * @param  mixed   $mValue The value to decode
+     * @param  boolean $sKey   The key to use for encryption
      *
-     * @access	public
-     * @param	string
-     * @return	string
+     * @throws EnvironmentException
+     * @throws DecodeException
+     * @return string
      */
-    function get_key($key = '')
+    public static function decode($sCipher, $sKey = false)
     {
-        if ($key == '') {
-            if ($this->encryption_key != '') {
-                return $this->encryption_key;
-            }
-
-            $key = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY): md5('');
-            if ($key == FALSE) {
-                show_error('In order to use the encryption class requires that you set an encryption key in your config file.');
-            }
+        try {
+            return Crypto::decryptWithPassword(
+                $sCipher,
+                $sKey ?: static::getKey()
+            );
+        } catch (\Defuse\Crypto\Exception\EnvironmentIsBrokenException $e) {
+            throw new EnvironmentException($e->getMessage(), $e->getCode());
+        } catch (\Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $e) {
+            throw new DecodeException($e->getMessage(), $e->getCode());
         }
+    }
 
-        return md5($key);
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the default key to use
+     * @return string
+     */
+    public static function getKey()
+    {
+        return APP_PRIVATE_KEY;
     }
 }
