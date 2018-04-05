@@ -177,6 +177,7 @@ if (Environment::not('PRODUCTION')) {
             <header>
                 <h1><?=$sSubject?></h1>
                 <h2><?=$sMessage?></h2>
+                <?=!empty($oDetails->url) ? anchor($oDetails->url, null, 'target="_blank"') : ''?>
             </header>
 
             <?php
