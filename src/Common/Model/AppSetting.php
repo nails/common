@@ -39,9 +39,11 @@ class AppSetting
 
     /**
      * Gets settings associated with a particular group/key
-     * @param  string $sKey The key to retrieve
-     * @param  string $sGrouping The group the key belongs to
+     *
+     * @param  string  $sKey          The key to retrieve
+     * @param  string  $sGrouping     The group the key belongs to
      * @param  boolean $bForceRefresh Whether to force a group refresh
+     *
      * @return array
      */
     public function get($sKey = null, $sGrouping = 'app', $bForceRefresh = false)
@@ -60,7 +62,7 @@ class AppSetting
 
                 if (!empty($oSetting->is_encrypted)) {
                     $oEncrypt = Factory::service('Encrypt');
-                    $sValue   = $oEncrypt->decode($sValue, APP_PRIVATE_KEY);
+                    $sValue   = $oEncrypt->decode($sValue);
                 }
 
                 $this->aSettings[$sGrouping][$oSetting->key] = json_decode($sValue);
@@ -84,10 +86,12 @@ class AppSetting
     /**
      * Set a group/key either by passing an array of key=>value pairs as the $key
      * or by passing a string to $key and setting $value
-     * @param  mixed $mKey The key to set, or an array of key => value pairs
-     * @param  string $sGrouping The grouping to store the keys under
-     * @param  mixed $mValue The data to store, only used if $mKey is a string
-     * @param  boolean $bEncrypt Whether to encrypt the data or not
+     *
+     * @param  mixed   $mKey      The key to set, or an array of key => value pairs
+     * @param  string  $sGrouping The grouping to store the keys under
+     * @param  mixed   $mValue    The data to store, only used if $mKey is a string
+     * @param  boolean $bEncrypt  Whether to encrypt the data or not
+     *
      * @return boolean
      */
     public function set($mKey, $sGrouping = 'app', $mValue = null, $bEncrypt = false)
@@ -125,10 +129,12 @@ class AppSetting
 
     /**
      * Inserts/Updates a group/key value
-     * @param string $sKey The key to set
-     * @param string $sGrouping The key's grouping
-     * @param mixed $mValue The value of the group/key
-     * @param boolean $bEncrypt Whether to encrypt the data or not
+     *
+     * @param string  $sKey      The key to set
+     * @param string  $sGrouping The key's grouping
+     * @param mixed   $mValue    The value of the group/key
+     * @param boolean $bEncrypt  Whether to encrypt the data or not
+     *
      * @return void
      */
     protected function doSet($sKey, $sGrouping, $mValue, $bEncrypt)
@@ -138,7 +144,7 @@ class AppSetting
 
         if ($bEncrypt) {
             $oEncrypt = Factory::service('Encrypt');
-            $sValue   = $oEncrypt->encode($sValue, APP_PRIVATE_KEY);
+            $sValue   = $oEncrypt->encode($sValue);
         }
 
         $oDb = Factory::service('Database');
@@ -167,8 +173,10 @@ class AppSetting
 
     /**
      * Deletes a key for a particular group
-     * @param mixed $mKey The key to delete
+     *
+     * @param mixed  $mKey      The key to delete
      * @param string $sGrouping The key's grouping
+     *
      * @return bool
      */
     public function delete($mKey, $sGrouping)
@@ -205,8 +213,10 @@ class AppSetting
 
     /**
      * Actually performs the deletion of the row.
-     * @param  string $sKey The key to delete
+     *
+     * @param  string $sKey      The key to delete
      * @param  string $sGrouping They key's grouping
+     *
      * @return bool
      */
     protected function doDelete($sKey, $sGrouping)
@@ -222,7 +232,9 @@ class AppSetting
 
     /**
      * Deletes all keys for a particular group.
+     *
      * @param  string $sGrouping The group to delete
+     *
      * @return bool
      */
     public function deleteGroup($sGrouping)
