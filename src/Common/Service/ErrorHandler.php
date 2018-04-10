@@ -373,6 +373,13 @@ class ErrorHandler
         // --------------------------------------------------------------------------
 
         /**
+         * Define a constant for easier identification of 404 pages
+         */
+        defineConst('NAILS_IS_404', true);
+
+        // --------------------------------------------------------------------------
+
+        /**
          * If the SYSTEM_READY event hasn't been fired then we know that the app's controller hasn't been executed.
          * Instantiate this controller to allow the full application stack to execute, this allows the 404 views to
          * make use of variables defined by /App/Sontroller/Base. Also, load CI's core services as they might not
@@ -394,7 +401,6 @@ class ErrorHandler
 
         // --------------------------------------------------------------------------
 
-        defineConst('NAILS_IS_404', true);
         set_status_header(404);
         $this->renderErrorView(
             '404',
