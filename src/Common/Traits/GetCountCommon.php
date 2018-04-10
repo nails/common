@@ -112,19 +112,24 @@ trait GetCountCommon
                  * feature/hack to allow the dev to add items to the search box but not
                  * force them to use the default filtering mechanism
                  */
-
-                if (empty($oFilter->column)) {
+                if (empty($oFilter->getColumn())) {
                     continue;
                 }
 
                 $aWhereFilter = [];
-                foreach ($oFilter->options as $iOptionIndex => $oOption) {
+                foreach ($oFilter->getOptions() as $iOptionIndex => $oOption) {
                     if (!empty($_GET['cbF'][$iFilterIndex][$iOptionIndex])) {
                         //  Filtering is happening and the item is to be filtered
-                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString($oFilter->column, $oOption->value);
-                    } elseif (empty($_GET['cbF']) && $oOption->checked) {
+                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString(
+                            $oFilter->getColumn(),
+                            $oOption->getValue()
+                        );
+                    } elseif (empty($_GET['cbF']) && $oOption->isSelected()) {
                         //  There's no filtering happening and the item is checked by default
-                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString($oFilter->column, $oOption->value);
+                        $aWhereFilter[] = $this->getCountCommonCompileFiltersString(
+                            $oFilter->getColumn(),
+                            $oOption->getValue()
+                        );
                     }
                 }
 
@@ -151,8 +156,7 @@ trait GetCountCommon
                  * feature/hack to allow the dev to add items to the search box but not
                  * force them to use the default filtering mechanism
                  */
-
-                if (empty($oFilter->column)) {
+                if (empty($oFilter->getColumn())) {
                     continue;
                 }
 
@@ -163,16 +167,23 @@ trait GetCountCommon
 
                     //  Does the option exist, if so, filter by it
                     $iSelectedIndex = !empty((int) $_GET['ddF'][$iFilterIndex]) ? (int) $_GET['ddF'][$iFilterIndex] : 0;
-                    if (!empty($oFilter->options[$iSelectedIndex]->value)) {
-                        $aWhereFilter = [$oFilter->column, $oFilter->options[$iSelectedIndex]->value];
+                    $oOption        = $oFilter->getOption($iSelectedIndex);
+                    if ($oOption && $oOption->getValue()) {
+                        $aWhereFilter = [
+                            $oFilter->getColumn(),
+                            $oOption->getValue(),
+                        ];
                     }
 
                 } else {
 
                     //  No filtering happening but does this item have an item checked by default?
-                    foreach ($oFilter->options as $oOption) {
-                        if (!empty($oOption->checked)) {
-                            $aWhereFilter = [$oFilter->column, $oOption->value];
+                    foreach ($oFilter->getOptions() as $oOption) {
+                        if ($oOption->isSelected()) {
+                            $aWhereFilter = [
+                                $oFilter->getColumn(),
+                                $oOption->getValue(),
+                            ];
                             break;
                         }
                     }
