@@ -12,8 +12,8 @@
 
 namespace Nails\Common\Service;
 
-use Nails\Factory;
 use Nails\Common\Exception\AssetException;
+use Nails\Factory;
 
 class Asset
 {
@@ -1070,7 +1070,7 @@ class Asset
 
             foreach ($this->aJs as $sAsset) {
                 $sAsset = $this->addCacheBuster($sAsset);
-                $aOut[] = '<script type="text/javascript" src="' . $sAsset . '"></script>';
+                $aOut[] = '<script src="' . $sAsset . '"></script>';
             }
         }
 
@@ -1090,7 +1090,7 @@ class Asset
 
         //  Inline JS (Header)
         if (!empty($this->aJsInlineHeader) && ($sType == 'JS-INLINE-HEADER' || $sType == 'ALL')) {
-            $aOut[] = '<script type="text/javascript">';
+            $aOut[] = '<script>';
             foreach ($this->aJsInlineHeader as $sAsset) {
                 $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
             }
@@ -1101,7 +1101,7 @@ class Asset
 
         //  Inline JS (Footer)
         if (!empty($this->aJsInlineFooter) && ($sType == 'JS-INLINE-FOOTER' || $sType == 'ALL')) {
-            $aOut[] = '<script type="text/javascript">';
+            $aOut[] = '<script>';
             foreach ($this->aJsInlineFooter as $sAsset) {
                 $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
             }
