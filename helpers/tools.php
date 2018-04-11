@@ -245,3 +245,21 @@ if (!function_exists('nullIfEmpty')) {
         return empty($mVal) ? null : $mVal;
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('classImplements')) {
+
+    /**
+     * Checks if a class implements a particular interface
+     *
+     * @param object|string $mClass     The class to test, either as an object or a string
+     * @param string        $sInterface The interface to look for
+     *
+     * @return bool
+     */
+    function classImplements($mClass, $sInterface)
+    {
+        return in_array($sInterface, class_implements($mClass));
+    }
+}
