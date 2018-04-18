@@ -1,26 +1,26 @@
 <?php
 
 /**
- * The class abstracts CI's FormValidation class.
+ * The class abstracts CI's Typography class.
  *
  * @todo (Pablo - 2018-04-18) - Remove dependency on CI
  *
- * @package     Nails
- * @subpackage  common
- * @category    Service
- * @author      Nails Dev Team
+ * @package                   Nails
+ * @subpackage                common
+ * @category                  Service
+ * @author                    Nails Dev Team
  * @link
  */
 
 namespace Nails\Common\Service;
 
-class FormValidation
+class Typography
 {
     /**
-     * The CI_Form_validation object
-     * @var \CI_Form_validation
+     * The CI_Typography object
+     * @var \CI_Typography
      */
-    private $oFormValidation;
+    private $oTypography;
 
     // --------------------------------------------------------------------------
 
@@ -29,9 +29,8 @@ class FormValidation
      */
     public function __construct()
     {
-        $oCi = get_instance();
-        $oCi->load->library('form_validation');
-        $this->oFormValidation = $oCi->form_validation;
+        require_once FCPATH . 'vendor/codeigniter/framework/system/libraries/Typography.php';
+        $this->oTypography = new \CI_Typography();
     }
 
     // --------------------------------------------------------------------------
@@ -47,12 +46,9 @@ class FormValidation
     public function __call($sMethod, $aArguments)
     {
         if (method_exists($this, $sMethod)) {
-
             return call_user_func_array([$this, $sMethod], $aArguments);
-
         } else {
-
-            return call_user_func_array([$this->oFormValidation, $sMethod], $aArguments);
+            return call_user_func_array([$this->oTypography, $sMethod], $aArguments);
         }
     }
 
@@ -67,7 +63,7 @@ class FormValidation
      */
     public function __get($sProperty)
     {
-        return $this->oFormValidation->{$sProperty};
+        return $this->oTypography->{$sProperty};
     }
 
     // --------------------------------------------------------------------------
@@ -82,6 +78,6 @@ class FormValidation
      */
     public function __set($sProperty, $mValue)
     {
-        $this->oFormValidation->{$sProperty} = $mValue;
+        $this->oTypography->{$sProperty} = $mValue;
     }
 }

@@ -1,38 +1,38 @@
 <?php
 
 return [
-    'properties'  => [
+    'properties' => [
         'DB_HOST'     => DEPLOY_DB_HOST,
         'DB_USERNAME' => DEPLOY_DB_USERNAME,
         'DB_PASSWORD' => DEPLOY_DB_PASSWORD,
         'DB_DATABASE' => DEPLOY_DB_DATABASE,
     ],
-    'services'  => [
-        'Asset' => function () {
+    'services'   => [
+        'Asset'          => function () {
             if (class_exists('\App\Common\Service\Asset')) {
                 return new \App\Common\Service\Asset();
             } else {
                 return new \Nails\Common\Service\Asset();
             }
         },
-        'CodeIgniter' => function () {
+        'CodeIgniter'    => function () {
             return get_instance();
         },
-        'Config' => function () {
+        'Config'         => function () {
             if (class_exists('\App\Common\Service\Config')) {
                 return new \App\Common\Service\Config();
             } else {
                 return new \Nails\Common\Service\Config();
             }
         },
-        'Database' => function () {
+        'Database'       => function () {
             if (class_exists('\App\Common\Service\Database')) {
                 return new \App\Common\Service\Database();
             } else {
                 return new \Nails\Common\Service\Database();
             }
         },
-        'Encrypt' => function () {
+        'Encrypt'        => function () {
             if (class_exists('\App\Common\Service\Encrypt')) {
                 return new \App\Common\Service\Encrypt();
             } else {
@@ -40,14 +40,14 @@ return [
                 return new \Nails\Common\Service\Encrypt();
             }
         },
-        'ErrorHandler' => function () {
+        'ErrorHandler'   => function () {
             if (class_exists('\App\Common\Service\ErrorHandler')) {
                 return new \App\Common\Service\ErrorHandler();
             } else {
                 return new \Nails\Common\Service\ErrorHandler();
             }
         },
-        'Event' => function () {
+        'Event'          => function () {
             if (class_exists('\App\Common\Service\Event')) {
                 return new \App\Common\Service\Event();
             } else {
@@ -61,89 +61,96 @@ return [
                 return new \Nails\Common\Service\FormValidation();
             }
         },
-        'HttpCodes' => function () {
+        'HttpCodes'      => function () {
             if (class_exists('\App\Common\Service\HttpCodes')) {
                 return new \App\Common\Service\HttpCodes();
             } else {
                 return new \Nails\Common\Service\HttpCodes();
             }
         },
-        'Input' => function () {
+        'Input'          => function () {
             if (class_exists('\App\Common\Service\Input')) {
                 return new \App\Common\Service\Input();
             } else {
                 return new \Nails\Common\Service\Input();
             }
         },
-        'Logger' => function () {
+        'Logger'         => function () {
             if (class_exists('\App\Common\Service\Logger')) {
                 return new \App\Common\Service\Logger();
             } else {
                 return new \Nails\Common\Service\Logger();
             }
         },
-        'Meta' => function () {
+        'Meta'           => function () {
             if (class_exists('\App\Common\Service\Meta')) {
                 return new \App\Common\Service\Meta();
             } else {
                 return new \Nails\Common\Service\Meta();
             }
         },
-        'Mustache' => function () {
+        'Mustache'       => function () {
             if (class_exists('\App\Common\Service\Mustache')) {
                 return new \App\Common\Service\Mustache();
             } else {
                 return new Mustache_Engine();
             }
         },
-        'Output' => function () {
+        'Output'         => function () {
             if (class_exists('\App\Common\Service\Output')) {
                 return new \App\Common\Service\Output();
             } else {
                 return new \Nails\Common\Service\Output();
             }
         },
-        'PDODatabase' => function () {
+        'PDODatabase'    => function () {
             if (class_exists('\App\Common\Service\PDODatabase')) {
                 return new \App\Common\Service\PDODatabase();
             } else {
                 return new \Nails\Common\Service\PDODatabase();
             }
         },
-        'Router' => function () {
+        'Router'         => function () {
             //  @todo - remove dependency on CI
             $oCi = get_instance();
             return $oCi->router;
         },
-        'Security' => function () {
+        'Security'       => function () {
             if (class_exists('\App\Common\Service\Security')) {
                 return new \App\Common\Service\Security();
             } else {
                 return new \Nails\Common\Service\Security();
             }
         },
-        'Uri' => function () {
+        'Typography'     => function () {
+            if (class_exists('\App\Common\Service\Typography')) {
+                return new \App\Common\Service\Typography();
+            } else {
+                return new \Nails\Common\Service\Typography();
+            }
+        },
+        'Uri'            => function () {
             if (class_exists('\App\Common\Service\Uri')) {
                 return new \App\Common\Service\Uri();
             } else {
                 return new \Nails\Common\Service\Uri();
             }
         },
-        'UserFeedback' => function () {
+        'UserFeedback'   => function () {
             if (class_exists('\App\Common\Service\UserFeedback')) {
                 return new \App\Common\Service\UserFeedback();
             } else {
                 return new \Nails\Common\Service\UserFeedback();
             }
         },
-        'View' => function () {
+        'View'           => function () {
             if (class_exists('\App\Common\Service\View')) {
                 return new \App\Common\Service\View();
             } else {
                 return new \Nails\Common\Service\View();
             }
         },
-        'Zip' => function () {
+        'Zip'            => function () {
             if (class_exists('\App\Common\Service\Zip')) {
                 return new \App\Common\Service\Zip();
             } else {
@@ -151,7 +158,7 @@ return [
             }
         },
     ],
-    'models'    => [
+    'models'     => [
         'AppNotification' => function () {
             if (class_exists('\App\Common\Model\AppNotification')) {
                 return new \App\Common\Model\AppNotification();
@@ -159,35 +166,35 @@ return [
                 return new \Nails\Common\Model\AppNotification();
             }
         },
-        'AppSetting' => function () {
+        'AppSetting'      => function () {
             if (class_exists('\App\Common\Model\AppSetting')) {
                 return new \App\Common\Model\AppSetting();
             } else {
                 return new \Nails\Common\Model\AppSetting();
             }
         },
-        'Country' => function () {
+        'Country'         => function () {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
             } else {
                 return new \Nails\Common\Model\Country();
             }
         },
-        'DateTime' => function () {
+        'DateTime'        => function () {
             if (class_exists('\App\Common\Model\DateTime')) {
                 return new \App\Common\Model\DateTime();
             } else {
                 return new \Nails\Common\Model\DateTime();
             }
         },
-        'Language' => function () {
+        'Language'        => function () {
             if (class_exists('\App\Common\Model\Language')) {
                 return new \App\Common\Model\Language();
             } else {
                 return new \Nails\Common\Model\Language();
             }
         },
-        'Routes' => function () {
+        'Routes'          => function () {
             if (class_exists('\App\Common\Model\Routes')) {
                 return new \App\Common\Model\Routes();
             } else {
@@ -195,8 +202,8 @@ return [
             }
         },
     ],
-    'factories' => [
-        'DateTime' => function () {
+    'factories'  => [
+        'DateTime'          => function () {
             return new \DateTime();
         },
         'EventSubscription' => function () {
@@ -206,7 +213,7 @@ return [
                 return new \Nails\Common\Events\Subscription();
             }
         },
-        'HttpClient' => function () {
+        'HttpClient'        => function () {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient();
             } else {
