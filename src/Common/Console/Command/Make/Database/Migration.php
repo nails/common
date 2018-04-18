@@ -175,7 +175,7 @@ class Migration extends BaseMaker
                     );
 
                     $aFields['QUERIES'] .= $this->tabs(2) . '$this->query(\'' . "\n";
-                    $aFields['QUERIES'] .= implode("\n", $aCreate) . "\n";
+                    $aFields['QUERIES'] .= str_replace("'", "\'", implode("\n", $aCreate)) . "\n";
                     $aFields['QUERIES'] .= $this->tabs(2) . '\');' . "\n";
                 }
 
