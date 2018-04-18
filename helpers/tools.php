@@ -263,3 +263,21 @@ if (!function_exists('classImplements')) {
         return in_array($sInterface, class_implements($mClass));
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('classUses')) {
+
+    /**
+     * Checks if a class uses a particular trait
+     *
+     * @param object|string $mClass The class to test, either as an object or a string
+     * @param string        $sTrait The trait to look for
+     *
+     * @return bool
+     */
+    function classUses($mClass, $sTrait)
+    {
+        return in_array($sTrait, class_uses($mClass));
+    }
+}
