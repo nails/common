@@ -367,13 +367,23 @@ class Factory
             //  Helpers
             if (!empty($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
-                    self::helper($sHelper, $oModule->slug);
+                    if (is_array($sHelper)) {
+                        list($sName, $sProvider) = $sHelper;
+                        self::helper($sName, $sProvider);
+                    } else {
+                        self::helper($sHelper, $oModule->slug);
+                    }
                 }
             }
             //  Services
             if (!empty($oModule->autoload->services)) {
                 foreach ($oModule->autoload->services as $sService) {
-                    self::service($sService, $oModule->slug);
+                    if (is_array($sHelper)) {
+                        list($sName, $sProvider) = $sService;
+                        self::service($sName, $sProvider);
+                    } else {
+                        self::service($sService, $oModule->slug);
+                    }
                 }
             }
         }
