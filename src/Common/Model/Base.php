@@ -1672,7 +1672,7 @@ abstract class Base
         }
 
         $aData['keywords'] = $sKeywords;
-        
+
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
         }
@@ -2137,20 +2137,22 @@ abstract class Base
      *
      * @return array
      */
-    public function describeFields()
+    public function describeFields($sTable = null)
     {
+        $sTable  = $sTable ?: $this->getTableName();
         $oDb     = Factory::service('Database');
-        $aResult = $oDb->query('DESCRIBE `' . $this->getTableName() . '`;')->result();
+        $aResult = $oDb->query('DESCRIBE `' . $sTable . '`;')->result();
         $aFields = [];
 
         foreach ($aResult as $oField) {
 
-            $oTemp             = new \stdClass();
-            $oTemp->key        = $oField->Field;
-            $oTemp->label      = $this->describeFieldsPrepareLabel($oTemp->key);
-            $oTemp->type       = null;
-            $oTemp->allow_null = $oField->Null === 'YES';
-            $oTemp->validation = [];
+            $oTemp = (object) [
+                'key'        => $oField->Field,
+                'label'      => $this->describeFieldsPrepareLabel($oField->Field),
+                'type'       => null,
+                'allow_null' => $oField->Null === 'YES',
+                'validation' => [],
+            ];
 
             //  Guess the field's type and some basic validation
             $this->describeFieldsGuessType($oTemp, $oField->Type);
