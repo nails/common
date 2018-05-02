@@ -12,6 +12,23 @@
 
 use Nails\Factory;
 
+if (!function_exists('form_text')) {
+
+    /**
+     * Alias of form_input
+     *
+     * @param    mixed
+     * @param    string
+     * @param    mixed
+     *
+     * @return    string
+     */
+    function form_text($data = '', $value = '', $extra = '')
+    {
+        return form_input($data, $value, $extra);
+    }
+}
+
 if (!function_exists('form_email')) {
 
     /**
