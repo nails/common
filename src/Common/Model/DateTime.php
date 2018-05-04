@@ -742,6 +742,28 @@ class DateTime
     // --------------------------------------------------------------------------
 
     /**
+     * Get the timezone string from the timezone code
+     *
+     * @param string $sCode The timezone code, e.g. GMT
+     *
+     * @return string|false
+     */
+    public static function getTimezoneFromCode($sCode)
+    {
+        $aAbbreviations = \DateTimeZone::listAbbreviations();
+        foreach ($aAbbreviations as $sTzCode => $aValues) {
+            if (strtolower($sCode) == $sTzCode) {
+                $aTimeZone = reset($aValues);
+                return getFromArray('timezone_id', $aTimeZone, false);
+            }
+        }
+
+        return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Arbitrarily convert a timestamp between timezones
      *
      * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
