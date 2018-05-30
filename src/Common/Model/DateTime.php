@@ -34,6 +34,16 @@ class DateTime
      */
     const FORMAT_DATE = [
         [
+            'slug'   => 'DD-MMM-YYYY',
+            'label'  => 'DD MMM YYYY',
+            'format' => 'jS M Y',
+        ],
+        [
+            'slug'   => 'DD-MMMM-YYYY',
+            'label'  => 'DD MMMM YYYY',
+            'format' => 'jS F Y',
+        ],
+        [
             'slug'   => 'DD/MM/YYYY',
             'label'  => 'DD/MM/YYYY',
             'format' => 'd/m/Y',
@@ -172,9 +182,10 @@ class DateTime
     public function getAllDateFormat()
     {
         $aFormats = static::FORMAT_DATE;
+        $oNow     = Factory::factory('DateTime');
         foreach ($aFormats as &$aFormat) {
             $aFormat          = (object) $aFormat;
-            $aFormat->example = date($aFormat->format);
+            $aFormat->example = $oNow->format($aFormat->format);
         }
         return $aFormats;
     }
@@ -191,7 +202,7 @@ class DateTime
         $aFormats = $this->getAllDateFormat();
 
         foreach ($aFormats as $oFormat) {
-            $aOut[$oFormat->slug] = $oFormat->label;
+            $aOut[$oFormat->slug] = $oFormat->example;
         }
 
         return $aOut;
