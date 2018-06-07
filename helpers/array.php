@@ -10,24 +10,25 @@
  * @link
  */
 
-if (!function_exists('array_unique_multi')) {
+if (!function_exists('arrayUniqueMulti')) {
 
     /**
      * Removes duplicate items from a multi-dimensional array
      * Hat-tip: http://phpdevblog.niknovo.com/2009/01/using-array-unique-with-multidimensional-arrays.html
      *
-     * @param  array  $array The array to filter
+     * @param  array $aArray The array to filter
+     *
      * @return array
      */
-    function array_unique_multi(array $array)
+    function arrayUniqueMulti(array $aArray)
     {
         // Unique Array for return
-        $arrayRewrite = array();
+        $aArrayRewrite = [];
 
         // Array with the md5 hashes
-        $arrayHashes = array();
+        $aArrayHashes = [];
 
-        foreach ($array as $key => $item) {
+        foreach ($aArray as $key => $item) {
 
             // Serialize the current element and create a md5 hash
             $hash = md5(serialize($item));
@@ -37,22 +38,79 @@ if (!function_exists('array_unique_multi')) {
              * otherwise drop it
              */
 
-            if (!isset($arrayHashes[$hash])) {
+            if (!isset($aArrayHashes[$hash])) {
 
                 // Save the current element hash
-                $arrayHashes[$hash] = $hash;
+                $aArrayHashes[$hash] = $hash;
 
                 // Add element to the unique Array
-                $arrayRewrite[$key] = $item;
+                $aArrayRewrite[$key] = $item;
             }
         }
 
-        unset($arrayHashes);
+        unset($aArrayHashes);
         unset($key);
         unset($item);
         unset($hash);
 
-        return $arrayRewrite;
+        return $aArrayRewrite;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('array_unique_multi')) {
+
+    /**
+     * Alias of arrayUniqueMulti()
+     * @deprecated
+     * @see arrayUniqueMulti
+     */
+    function array_unique_multi(array &$aArray)
+    {
+        trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        return arrayUniqueMulti($aArray);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('arraySortMulti')) {
+
+    /**
+     * Sorts a multi dimensional array
+     *
+     * @param  array  &$aArray The array to sort
+     * @param  string $sField  The key to sort on
+     *
+     * @return void
+     */
+    function arraySortMulti(array &$aArray, $sField)
+    {
+        uasort($aArray, function ($a, $b) use ($sField) {
+
+            $oA = (object) $a;
+            $oB = (object) $b;
+
+            $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : null;
+            $mB = property_exists($oB, $sField) ? strtolower($oB->$sField) : null;
+
+            //  Equal?
+            if ($mA == $mB) {
+                return 0;
+            }
+
+            //  If $mA is a prefix of $mB then $mA comes first
+            if (preg_match('/^' . preg_quote($mA, '/') . '/', $mB)) {
+                return -1;
+            }
+
+            //  Not equal, work out which takes precedence
+            $aSort = [$mA, $mB];
+            sort($aSort);
+
+            return $aSort[0] == $mA ? -1 : 1;
+        });
     }
 }
 
@@ -61,62 +119,42 @@ if (!function_exists('array_unique_multi')) {
 if (!function_exists('array_sort_multi')) {
 
     /**
-     * Sorts a multi dimensional array
-     * @param  array  &$array The array to sort
-     * @param  string $field  The key to sort on
-     * @return void
+     * Alias of arraySortMulti()
+     * @deprecated
+     * @see arraySortMulti
      */
-    function array_sort_multi(array &$array, $field)
+    function array_sort_multi(array &$aArray, $sField)
     {
-        uasort($array, function ($a, $b) use ($field) {
-
-            $a = (object) $a;
-            $b = (object) $b;
-
-            //  Equal?
-            if ($a->$field == $b->$field) {
-                return 0;
-            }
-
-            //  If $a is a prefix of $b then $a comes first
-            $sPattern = '/^' . preg_quote($a->$field, '/') . '/';
-            if (preg_match($sPattern, $b->$field)) {
-                return -1;
-            }
-
-            //  Not equal, work out which takes precedence
-            $_sort = array($a->$field, $b->$field);
-            sort($_sort);
-
-            return $_sort[0] == $a->$field ? -1 : 1;
-        });
+        trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        return arraySortMulti($aArray, $sField);
     }
 }
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('array_search_multi')) {
+if (!function_exists('arraySearchMulti')) {
 
     /**
      * Searches a multi-dimensional array
-     * @param  string $value Search value
-     * @param  string $key   Key to search
-     * @param  array  $array The array to search
+     *
+     * @param  string $sValue Search value
+     * @param  string $sKey   Key to search
+     * @param  array  $aArray The array to search
+     *
      * @return mixed         The array key on success, false on failure
      */
-    function array_search_multi($value, $key, array $array)
+    function arraySearchMulti($sValue, $sKey, array $aArray)
     {
-        foreach ($array as $k => $val) {
+        foreach ($aArray as $k => $val) {
 
             if (is_array($val)) {
 
-                if ($val[$key] == $value) {
+                if ($val[$sKey] == $sValue) {
                     return $k;
                 }
 
             } elseif (is_object($val)) {
-
-                if ($val->$key == $value) {
+                if ($val->$sKey == $sValue) {
                     return $k;
                 }
             }
@@ -127,18 +165,52 @@ if (!function_exists('array_search_multi')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('in_array_multi')) {
+if (!function_exists('array_search_multi')) {
+
+    /**
+     * Alias of arraySearchMulti()
+     * @deprecated
+     * @see arraySearchMulti
+     */
+    function array_search_multi($sValue, $sKey, array $aArray)
+    {
+        trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        return arraySearchMulti($sValue, $sKey, $aArray);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('inArrayMulti')) {
 
     /**
      * Reports whether a value exists in a multi dimensional array
-     * @param  string $value The value to search for
-     * @param  string $key   The key to search on
-     * @param  array  $array The array to search
+     *
+     * @param  string $sValue The value to search for
+     * @param  string $sKey   The key to search on
+     * @param  array  $aArray The array to search
+     *
      * @return boolean
      */
-    function in_array_multi($value, $key, array $array)
+    function inArrayMulti($sValue, $sKey, array $aArray)
     {
-        return array_search_multi($value, $key, $array) !== false;
+        return arraySearchMulti($sValue, $sKey, $aArray) !== false;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('in_array_multi')) {
+
+    /**
+     * Alias of inArrayMulti()
+     * @deprecated
+     * @see inArrayMulti
+     */
+    function in_array_multi($sValue, $sKey, array $aArray)
+    {
+        trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        return inArrayMulti($sValue, $sKey, $aArray);
     }
 }
 
