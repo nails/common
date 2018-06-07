@@ -128,8 +128,6 @@ if (!function_exists('generateToken')) {
         $aOut     = array();
         $iMaskLen = count($aMask);
 
-        Factory::helper('array');
-
         for ($i=0; $i < $iMaskLen; $i++) {
 
             if ($aMask[$i] === 'A') {

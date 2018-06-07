@@ -272,8 +272,7 @@ class Model extends BaseMaker
                 $aModelData = array_filter($aModelData);
             }
 
-            Factory::helper('array');
-            array_sort_multi($aModelData, 'class_path');
+            arraySortMulti($aModelData, 'class_path');
 
             //  Report to the user and get confirmation
             $oOutput->writeln('The following models will be created:');
