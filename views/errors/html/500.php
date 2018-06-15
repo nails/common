@@ -259,7 +259,7 @@ if (Environment::not('PRODUCTION')) {
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <?php
 
-            include NAILS_COMMON_PATH . 'errors/components/styles.php';
+            include NAILS_COMMON_PATH . 'views/errors/components/styles.php';
 
             ?>
         </head>
@@ -276,7 +276,7 @@ if (Environment::not('PRODUCTION')) {
                     ];
                 }
 
-                include NAILS_COMMON_PATH . 'errors/components/header.php';
+                include NAILS_COMMON_PATH . 'views/errors/components/header.php';
 
                 ?>
                 <p>
@@ -285,7 +285,7 @@ if (Environment::not('PRODUCTION')) {
                 </p>
                 <?php
 
-                include NAILS_COMMON_PATH . 'errors/components/footer.php';
+                include NAILS_COMMON_PATH . 'views/errors/components/footer.php';
 
                 ?>
             </div>
