@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Factory;
+
 class AppNotification extends Base
 {
     protected $notifications;
@@ -132,8 +134,9 @@ class AppNotification extends Base
 
         if (empty($this->emails[$grouping]) || $force_refresh) {
 
-            $this->db->where('grouping', $grouping);
-            $notifications = $this->db->get($this->table)->result();
+            $oDb = Factory::service('Database');
+            $oDb->where('grouping', $grouping);
+            $notifications = $oDb->get($this->table)->result();
 
             $this->emails[$grouping] = array();
 
@@ -145,11 +148,8 @@ class AppNotification extends Base
         // --------------------------------------------------------------------------
 
         if (empty($key)) {
-
             return $this->emails[$grouping];
-
         } else {
-
             return isset($this->emails[$grouping][$key]) ? $this->emails[$grouping][$key] : array();
         }
     }
@@ -166,28 +166,24 @@ class AppNotification extends Base
      */
     public function set($key, $grouping = 'app', $value = null)
     {
-        $this->db->trans_begin();
+        $oDb = Factory::service('Database');
+        $oDb->trans_begin();
 
         if (is_array($key)) {
 
             foreach ($key as $key => $value) {
-
                 $this->doSet($key, $grouping, $value);
             }
 
         } else {
-
             $this->doSet($key, $grouping, $value);
         }
 
-        if ($this->db->trans_status() === false) {
-
-            $this->db->trans_rollback();
+        if ($oDb->trans_status() === false) {
+            $oDb->trans_rollback();
             return false;
-
         } else {
-
-            $this->db->trans_commit();
+            $oDb->trans_commit();
             return true;
         }
     }
@@ -212,21 +208,22 @@ class AppNotification extends Base
 
         // --------------------------------------------------------------------------
 
-        $this->db->where('key', $key);
-        $this->db->where('grouping', $grouping);
-        if ($this->db->count_all_results($this->table)) {
+        $oDb = Factory::service('Database');
+        $oDb->where('key', $key);
+        $oDb->where('grouping', $grouping);
+        if ($oDb->count_all_results($this->table)) {
 
-            $this->db->where('grouping', $grouping);
-            $this->db->where('key', $key);
-            $this->db->set('value', json_encode($value));
-            $this->db->update($this->table);
+            $oDb->where('grouping', $grouping);
+            $oDb->where('key', $key);
+            $oDb->set('value', json_encode($value));
+            $oDb->update($this->table);
 
         } else {
 
-            $this->db->set('grouping', $grouping);
-            $this->db->set('key', $key);
-            $this->db->set('value', json_encode($value));
-            $this->db->insert($this->table);
+            $oDb->set('grouping', $grouping);
+            $oDb->set('key', $key);
+            $oDb->set('value', json_encode($value));
+            $oDb->insert($this->table);
         }
     }
 
