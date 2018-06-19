@@ -310,23 +310,24 @@ if (!function_exists('form_field')) {
     function form_field($field, $tip = '')
     {
         //  Set var defaults
-        $_field_id          = isset($field['id']) ? $field['id'] : null;
-        $_field_type        = isset($field['type']) ? $field['type'] : 'text';
-        $_field_oddeven     = isset($field['oddeven']) ? $field['oddeven'] : null;
-        $_field_key         = isset($field['key']) ? $field['key'] : null;
-        $_field_label       = isset($field['label']) ? $field['label'] : null;
-        $_field_default     = isset($field['default']) ? $field['default'] : null;
-        $_field_sub_label   = isset($field['sub_label']) ? $field['sub_label'] : null;
-        $_field_required    = isset($field['required']) ? $field['required'] : false;
-        $_field_placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
-        $_field_readonly    = isset($field['readonly']) ? $field['readonly'] : false;
-        $_field_error       = isset($field['error']) ? $field['error'] : false;
-        $_field_class       = isset($field['class']) ? $field['class'] : '';
-        $_field_data        = isset($field['data']) ? $field['data'] : [];
-        $_field_info        = isset($field['info']) ? $field['info'] : false;
-        $_field_info_class  = isset($field['info_class']) ? $field['info_class'] : false;
-        $_field_max_length  = isset($field['max_length']) ? (int) $field['max_length'] : null;
-        $_field_tip         = isset($field['tip']) ? $field['tip'] : $tip;
+        $_field_id           = isset($field['id']) ? $field['id'] : null;
+        $_field_type         = isset($field['type']) ? $field['type'] : 'text';
+        $_field_oddeven      = isset($field['oddeven']) ? $field['oddeven'] : null;
+        $_field_key          = isset($field['key']) ? $field['key'] : null;
+        $_field_label        = isset($field['label']) ? $field['label'] : null;
+        $_field_default      = isset($field['default']) ? $field['default'] : null;
+        $_field_sub_label    = isset($field['sub_label']) ? $field['sub_label'] : null;
+        $_field_required     = isset($field['required']) ? $field['required'] : false;
+        $_field_placeholder  = isset($field['placeholder']) ? $field['placeholder'] : null;
+        $_field_readonly     = isset($field['readonly']) ? $field['readonly'] : false;
+        $_field_error        = isset($field['error']) ? $field['error'] : false;
+        $_field_class        = isset($field['class']) ? $field['class'] : '';
+        $_field_data         = isset($field['data']) ? $field['data'] : [];
+        $_field_info         = isset($field['info']) ? $field['info'] : false;
+        $_field_info_class   = isset($field['info_class']) ? $field['info_class'] : false;
+        $_field_max_length   = isset($field['max_length']) ? (int) $field['max_length'] : null;
+        $_field_tip          = isset($field['tip']) ? $field['tip'] : $tip;
+        $_field_autocomplete = isset($field['autocomplete']) ? (bool) $field['autocomplete'] : true;
 
         $_tip          = [];
         $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
@@ -365,6 +366,11 @@ if (!function_exists('form_field')) {
             $_attr .= ' data-' . $attr . '="' . $value . '"';
         }
 
+        //  Autocomplete?
+        if (!$_field_autocomplete) {
+            $_attr .= ' autocomplete="off"';
+        }
+
         // --------------------------------------------------------------------------
 
         //  Generate the field's HTML
@@ -379,7 +385,6 @@ if (!function_exists('form_field')) {
             case 'email':
             case 'number':
             case 'url':
-            case 'time':
             case 'color':
             case 'tel':
 
@@ -1308,10 +1313,11 @@ if (!function_exists('form_field_date')) {
      */
     function form_field_date($field, $tip = '')
     {
-        $_field                = $field;
-        $_field['type']        = 'date';
-        $_field['class']       = isset($field['class']) ? $field['class'] . ' date' : 'date';
-        $_field['placeholder'] = 'YYYY-MM-DD';
+        $_field                 = $field;
+        $_field['type']         = 'date';
+        $_field['class']        = isset($field['class']) ? $field['class'] . ' date' : 'date';
+        $_field['placeholder']  = 'YYYY-MM-DD';
+        $_field['autocomplete'] = false;
 
         return form_field($_field, $tip);
     }
@@ -1331,10 +1337,11 @@ if (!function_exists('form_field_time')) {
      */
     function form_field_time($field, $tip = '')
     {
-        $_field                = $field;
-        $_field['type']        = 'time';
-        $_field['class']       = isset($field['class']) ? $field['class'] . ' date' : 'date';
-        $_field['placeholder'] = 'HH:MM';
+        $_field                 = $field;
+        $_field['type']         = 'time';
+        $_field['class']        = isset($field['class']) ? $field['class'] . ' time' : 'time';
+        $_field['placeholder']  = 'HH:MM';
+        $_field['autocomplete'] = false;
 
         return form_field($_field, $tip);
     }
@@ -1354,10 +1361,11 @@ if (!function_exists('form_field_datetime')) {
      */
     function form_field_datetime($field, $tip = '')
     {
-        $_field                = $field;
-        $_field['type']        = 'datetime';
-        $_field['class']       = isset($field['class']) ? $field['class'] . ' datetime' : 'datetime';
-        $_field['placeholder'] = 'YYYY-MM-DD HH:mm:ss';
+        $_field                 = $field;
+        $_field['type']         = 'datetime';
+        $_field['class']        = isset($field['class']) ? $field['class'] . ' datetime' : 'datetime';
+        $_field['placeholder']  = 'YYYY-MM-DD HH:mm:ss';
+        $_field['autocomplete'] = false;
 
         return form_field($_field, $tip);
     }
