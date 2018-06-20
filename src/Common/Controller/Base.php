@@ -712,7 +712,7 @@ abstract class Base extends \MX_Controller
             $oSession->sess_create();
 
             //  Give them feedback
-            $oSession->set_flashdata('error', lang('auth_login_fail_suspended'));
+            $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
     }

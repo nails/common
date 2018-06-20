@@ -61,7 +61,7 @@ class UserFeedback
      */
     public function persist()
     {
-        $this->oSession->set_flashdata($this->sSessionKey, $this->aMessages);
+        $this->oSession->setFlashData($this->sSessionKey, $this->aMessages);
         return $this;
     }
 

@@ -462,7 +462,7 @@ class ErrorHandler
             $oInput   = Factory::service('Input');
             $sMessage = 'Sorry, you need to be logged in to see that page.';
 
-            $oSession->set_flashdata('message', $sMessage);
+            $oSession->setFlashData('message', $sMessage);
 
             if ($oInput->server('REQUEST_URI')) {
                 $sReturn = $oInput->server('REQUEST_URI');
