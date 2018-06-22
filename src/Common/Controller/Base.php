@@ -483,10 +483,9 @@ abstract class Base extends \MX_Controller
                 if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 
                     //  Determine the users
-                    $isSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
-                    $isEqual = $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
-
-                    if (!$isSet || !$isEqual) {
+                    $bIsSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
+                    $bIsEqual = $bIsSet && $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
+                    if (!$bIsSet || !$bIsEqual) {
                         $this->passwordProtectedRequest();
                     }
 
