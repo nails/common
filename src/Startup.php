@@ -81,12 +81,6 @@ class Startup
         defineConst('DEPLOY_DB_PASSWORD', '');
         defineConst('DEPLOY_DB_DATABASE', '');
 
-        if (Environment::is('PRODUCTION')) {
-            defineConst('DEPLOY_DB_DEBUG', false);
-        } else {
-            defineConst('DEPLOY_DB_DEBUG', true);
-        }
-
         //  App Constants
         defineConst('APP_PRIVATE_KEY', '');
         defineConst('APP_NAME', 'Untitled');

@@ -47,12 +47,19 @@ class Database
             'swap_pre' => false,
             'autoinit' => true,
 
+            /**
+             * We always have the database in debug mode; errors will throw exceptions,
+             * which are handled by the ErrorHandler. If this is set to false, errors
+             * cause the query to return `false` which results in cascading errors for
+             * thigns which expect an object.
+             */
+            'db_debug' => true,
+
             //  Potentially vary between deployments
             'hostname' => Factory::property('DB_HOST'),
             'username' => Factory::property('DB_USERNAME'),
             'password' => Factory::property('DB_PASSWORD'),
             'database' => Factory::property('DB_DATABASE'),
-            'db_debug' => DEPLOY_DB_DEBUG,
             'cachedir' => CACHE_PATH,
         ];
 
