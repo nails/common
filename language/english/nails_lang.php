@@ -109,10 +109,10 @@ $lang['fv_time_after']                  = 'This must be after the {param} field.
 $lang['fv_time_after_field']            = 'The {field} field must be before the {param} field.';
 $lang['fv_numeric']                     = 'This field must be numeric.';
 $lang['fv_numeric_field']               = 'The {field} field must be numeric.';
-$lang['fv_is_natural']                  = 'This field must be a positive number.';
-$lang['fv_is_natural_field']            = 'The {field} field must contain only positive numbers.';
-$lang['fv_is_natural_no_zero']          = 'This field must be a positive number greater than zero.';
-$lang['fv_is_natural_no_zero_field']    = 'The {field} field must contain only positive numbers greater than zero.';
+$lang['fv_is_natural']                  = 'This field must be a natural number (0, 1, 2, 3, etc).';
+$lang['fv_is_natural_field']            = 'The {field} field must be a natural number (0, 1, 2, 3, etc).';
+$lang['fv_is_natural_no_zero']          = 'This field must be a natural number greater than zero (1, 2, 3, etc).';
+$lang['fv_is_natural_no_zero_field']    = 'The {field} field must contain be a natural number greater than zero (1, 2, 3, etc).';
 $lang['fv_in_range']                    = 'This field must be within the range {param}.';
 $lang['fv_in_range_field']              = 'The {field} field must be within the range {param}.';
 $lang['fv_min_length']                  = 'This field is too short, minimum length is {param} characters.';
@@ -180,7 +180,7 @@ $lang['month_dec'] = 'December';
  * This list is as used by MySQL's FULLTEXT feature
  */
 
-$lang['string_helper_stop_words']  = 'a\'s,a,able,about,above,according,accordingly,across,actually,after,afterwards,';
+$lang['string_helper_stop_words'] = 'a\'s,a,able,about,above,according,accordingly,across,actually,after,afterwards,';
 $lang['string_helper_stop_words'] .= 'again,against,ain\'t,all,allow,allows,almost,alone,along,already,also,although,';
 $lang['string_helper_stop_words'] .= 'always,am,among,amongst,an,and,another,any,anybody,anyhow,anyone,anything,';
 $lang['string_helper_stop_words'] .= 'anyway,anyways,anywhere,apart,appear,appreciate,appropriate,aren\'t,are,around,';
