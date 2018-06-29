@@ -52,19 +52,20 @@ class Inflector
     /**
      * Pluralises english words if a value is greater than 1
      *
-     * @param integer $iValue    The number to compare against
-     * @param string  $sSingular The word to pluralise
+     * @param integer $iValue     The number to compare against
+     * @param string  $sSingular  The word to pluralise
+     * @param string  $sSpecified A specific word to use for the plural
      *
      * @return string
      */
-    public static function pluralise($iValue, $sSingular)
+    public static function pluralise($iValue, $sSingular, $sSpecified = null)
     {
         $sSingular = trim($sSingular);
 
         if ($iValue == 1) {
             return $sSingular;
         } else {
-            return plural($sSingular);
+            return $sSpecified ?: plural($sSingular);
         }
     }
 }

@@ -6,6 +6,17 @@ use \Nails\Common\Helper\Inflector;
 
 class InflectorTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * Construct InflectorTest
+     */
+    public function __construct()
+    {
+        require_once dirname(__FILE__) . '/../../../vendor/codeigniter/framework/system/helpers/inflector_helper.php';
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Tests that possessionise correctly appends the ', 's or 'S to a given string.
      */
