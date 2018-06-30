@@ -253,7 +253,7 @@ abstract class Base
      * @return mixed
      * @throws ModelException
      */
-    public function create($aData = [], $bReturnObject = false)
+    public function create(array $aData = [], $bReturnObject = false)
     {
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
@@ -377,7 +377,7 @@ abstract class Base
      *
      * @return boolean
      */
-    public function createBatch($aData)
+    public function createBatch(array $aData)
     {
         //  @todo (Pablo - 2018-02-23) - events
         //  @todo (Pablo - 2018-02-23) - validate things
@@ -397,7 +397,7 @@ abstract class Base
      * @return boolean
      * @throws ModelException
      */
-    public function update($mIds, $aData = [])
+    public function update($mIds, array $aData = [])
     {
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
@@ -678,14 +678,14 @@ abstract class Base
      *
      * @param  int   $iPage           The page number of the results, if null then no pagination
      * @param  int   $iPerPage        How many items per page of paginated results
-     * @param  mixed $aData           Any data to pass to getCountCommon()
+     * @param  array $aData           Any data to pass to getCountCommon()
      * @param  bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
      *                                items
      *
      * @return object
      * @throws ModelException
      */
-    public function getAllRawQuery($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
+    public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
@@ -770,7 +770,7 @@ abstract class Base
      *
      * @return array
      */
-    public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
@@ -801,7 +801,7 @@ abstract class Base
      * @param array $aResults The results to iterate over
      * @param array $aData    The configuration array
      */
-    protected function expandExpandableFields(&$aResults, $aData)
+    protected function expandExpandableFields(array &$aResults, array$aData)
     {
         if (!empty($this->aExpandableFields)) {
 
@@ -896,7 +896,7 @@ abstract class Base
      * @return array
      * @throws ModelException
      */
-    public function getAllFlat($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
+    public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
         $aItems = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $aOut   = [];
@@ -949,7 +949,7 @@ abstract class Base
      * @return array|mixed|null
      * @throws ModelException
      */
-    protected function getByColumn($sColumn, $mValue, $aData, $bReturnsMany = false)
+    protected function getByColumn($sColumn, $mValue, array $aData, $bReturnsMany = false)
     {
         if (empty($sColumn)) {
             throw new ModelException('Column cannot be empty');
@@ -1028,7 +1028,7 @@ abstract class Base
      *
      * @return string
      */
-    protected function prepareCacheKey($sColumn, $mValue, $aData = null)
+    protected function prepareCacheKey($sColumn, $mValue, array $aData = null)
     {
         /**
          * Remove some elements from the $aData array as they are unlikely to affect the
@@ -1072,7 +1072,7 @@ abstract class Base
      * @return mixed           stdClass on success, false on failure
      * @throws ModelException
      */
-    public function getById($iId, $aData = [])
+    public function getById($iId, array $aData = [])
     {
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
@@ -1093,7 +1093,7 @@ abstract class Base
      * @return array
      * @throws ModelException
      */
-    public function getByIds($aIds, $aData = [], $bMaintainInputOrder = false)
+    public function getByIds($aIds, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableIdColumn) {
             throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
@@ -1118,7 +1118,7 @@ abstract class Base
      * @return \stdClass
      * @throws ModelException
      */
-    public function getBySlug($sSlug, $aData = [])
+    public function getBySlug($sSlug, array $aData = [])
     {
         if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
@@ -1139,7 +1139,7 @@ abstract class Base
      * @return array
      * @throws ModelException
      */
-    public function getBySlugs($aSlugs, $aData = [], $bMaintainInputOrder = false)
+    public function getBySlugs($aSlugs, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableSlugColumn) {
             throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
@@ -1168,7 +1168,7 @@ abstract class Base
      *
      * @return \stdClass
      */
-    public function getByIdOrSlug($mIdSlug, $aData = [])
+    public function getByIdOrSlug($mIdSlug, array $aData = [])
     {
         if (is_numeric($mIdSlug)) {
             return $this->getById($mIdSlug, $aData);
@@ -1188,7 +1188,7 @@ abstract class Base
      * @return \stdClass|null
      * @throws ModelException if object property tableTokenColumn is not set
      */
-    public function getByToken($sToken, $aData = [])
+    public function getByToken($sToken, array $aData = [])
     {
         if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
@@ -1209,7 +1209,7 @@ abstract class Base
      * @return array
      * @throws ModelException if object property tableTokenColumn is not set
      */
-    public function getByTokens($aTokens, $aData = [], $bMaintainInputOrder = false)
+    public function getByTokens($aTokens, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableTokenColumn) {
             throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
@@ -1234,7 +1234,7 @@ abstract class Base
      *
      * @return array
      */
-    protected function sortItemsByColumn($aItems, $aInputOrder, $sColumn)
+    protected function sortItemsByColumn(array $aItems, array $aInputOrder, $sColumn)
     {
         $aOut = [];
         foreach ($aInputOrder as $sInputItem) {
@@ -1265,12 +1265,12 @@ abstract class Base
      * @return void
      */
     public function getSingleAssociatedItem(
-        &$aItems,
+        array &$aItems,
         $sAssociatedItemIdColumn,
         $sItemProperty,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = [],
+        array $aAssociatedModelData = [],
         $bUnsetOriginalProperty = true
     ) {
         if (!empty($aItems)) {
@@ -1327,12 +1327,12 @@ abstract class Base
      * @return void
      */
     protected function getManyAssociatedItems(
-        &$aItems,
+        array &$aItems,
         $sItemProperty,
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = []
+        array $aAssociatedModelData = []
     ) {
         if (!empty($aItems)) {
 
@@ -1387,12 +1387,12 @@ abstract class Base
      * @return void
      */
     protected function countManyAssociatedItems(
-        &$aItems,
+        array &$aItems,
         $sItemProperty,
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = []
+        array $aAssociatedModelData = []
     ) {
         if (!empty($aItems)) {
 
@@ -1450,13 +1450,13 @@ abstract class Base
      * @return void
      */
     protected function getManyAssociatedItemsWithTaxonomy(
-        &$aItems,
+        array &$aItems,
         $sItemProperty,
         $sTaxonomyModel,
         $sTaxonomyModelProvider,
         $sAssociatedModel,
         $sAssociatedModelProvider,
-        $aAssociatedModelData = [],
+        array $aAssociatedModelData = [],
         $sTaxonomyItemIdColumn = 'item_id',
         $sTaxonomyAssociatedIdColumn = 'associated_id'
     ) {
@@ -1541,7 +1541,7 @@ abstract class Base
      */
     protected function saveAssociatedItems(
         $iItemId,
-        $aAssociatedItems,
+        array $aAssociatedItems,
         $sAssociatedItemIdColumn,
         $sAssociatedModel,
         $sAssociatedModelProvider
@@ -1627,7 +1627,7 @@ abstract class Base
      * @return integer
      * @throws ModelException
      */
-    public function countAll($aData = [], $bIncludeDeleted = false)
+    public function countAll(array $aData = [], $bIncludeDeleted = false)
     {
         $oDb   = Factory::service('Database');
         $table = $this->getTableName(true);
@@ -1663,7 +1663,7 @@ abstract class Base
      *
      * @return \stdClass
      */
-    public function search($sKeywords, $iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
+    public function search($sKeywords, $iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
         //  If the second parameter is an array then treat as if called with search($sKeywords, null, null, $aData);
         if (is_array($iPage)) {
@@ -1838,10 +1838,10 @@ abstract class Base
      */
     protected function formatObject(
         &$oObj,
-        $aData = [],
-        $aIntegers = [],
-        $aBools = [],
-        $aFloats = []
+        array $aData = [],
+        array $aIntegers = [],
+        array $aBools = [],
+        array $aFloats = []
     ) {
 
         $aIntegers   = (array) $aIntegers;
@@ -1944,11 +1944,11 @@ abstract class Base
     /**
      * Define expandable objects
      *
-     * @param $aOptions array An array describing the expandable field
+     * @param array $aOptions An array describing the expandable field
      *
      * @throws ModelException
      */
-    protected function addExpandableField($aOptions)
+    protected function addExpandableField(array $aOptions)
     {
         //  Validation
         if (!array_key_exists('trigger', $aOptions)) {
@@ -2031,7 +2031,7 @@ abstract class Base
      *
      * @return array
      */
-    protected function autoSaveExpandableFieldsExtract(&$aData)
+    protected function autoSaveExpandableFieldsExtract(array &$aData)
     {
         $aFields = [];
         $aOut    = [];
@@ -2061,7 +2061,7 @@ abstract class Base
      * @param integer $iId
      * @param array   $aExpandableFields
      */
-    protected function autoSaveExpandableFieldsSave($iId, $aExpandableFields)
+    protected function autoSaveExpandableFieldsSave($iId, array $aExpandableFields)
     {
         foreach ($aExpandableFields as $oField) {
             $aData = array_filter($oField->data);
@@ -2354,7 +2354,7 @@ abstract class Base
      *
      * @throws ModelException
      */
-    protected function triggerEvent($sEvent, $aData)
+    protected function triggerEvent($sEvent, array $aData)
     {
         if ($sEvent) {
             //  @todo (Pablo - 2018-02-05) - Auto detect the namespace?
