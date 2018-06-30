@@ -260,7 +260,10 @@ if (!function_exists('classImplements')) {
      */
     function classImplements($mClass, $sInterface)
     {
-        return in_array($sInterface, class_implements($mClass));
+        return in_array(
+            ltrim($sInterface, '\\'),
+            class_implements($mClass)
+        );
     }
 }
 
@@ -278,6 +281,9 @@ if (!function_exists('classUses')) {
      */
     function classUses($mClass, $sTrait)
     {
-        return in_array($sTrait, class_uses($mClass));
+        return in_array(
+            ltrim($sTrait, '\\'),
+            class_uses($mClass)
+        );
     }
 }
