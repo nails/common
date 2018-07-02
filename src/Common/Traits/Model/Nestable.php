@@ -11,6 +11,17 @@ use Nails\Factory;
 trait Nestable
 {
     /**
+     * Returns the column to save breadcrumbs
+     * @return string
+     */
+    public function getBreadcrumbsColumn()
+    {
+        return $this->getColumn('breadcrumbs', 'breadcrumbs');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Generates breadcrumbs after creating an object
      *
      * @param array $aData         Data to create the item with
@@ -58,6 +69,8 @@ trait Nestable
      */
     protected function saveBreadcrumbs($iItemId)
     {
+        //  @todo (Pablo - 2018-07-01) - protect against infinite loops
+
         $oItem = $this->getById($iItemId);
 
         if (!empty($oItem)) {
@@ -82,7 +95,12 @@ trait Nestable
             }
 
             //  Save breadcrumbs to the current item
-            parent::update($iItemId, ['breadcrumbs' => json_encode($aBreadcrumbs)]);
+            parent::update(
+                $iItemId,
+                [
+                    $this->getBreadcrumbsColumn() => json_encode($aBreadcrumbs)
+                ]
+            );
 
             //  Save breadcrumbs of all children
             $oDb = Factory::service('Database');

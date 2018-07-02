@@ -861,7 +861,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_oddeven    = isset($field['oddeven']) ? $field['oddeven'] : null;
         $_field_key        = isset($field['key']) ? $field['key'] : null;
         $_field_label      = isset($field['label']) ? $field['label'] : null;
-        $_field_default    = isset($field['default']) ? $field['default'] : [];
+        $_field_default    = isset($field['default']) ? array_filter((array) $field['default']) : [];
         $_field_bucket     = isset($field['bucket']) ? $field['bucket'] : null;
         $_field_sub_label  = isset($field['sub_label']) ? $field['sub_label'] : null;
         $_field_required   = isset($field['required']) ? $field['required'] : false;
@@ -872,6 +872,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $_field_info       = isset($field['info']) ? $field['info'] : false;
         $_field_info_class = isset($field['info_class']) ? $field['info_class'] : false;
         $_field_tip        = isset($field['tip']) ? $field['tip'] : $tip;
+        $_field_sortable   = isset($field['sortable']) ? $field['sortable'] : false;
 
         //  CDN Specific
         $_field_bucket = isset($field['bucket']) ? $field['bucket'] : null;
@@ -945,6 +946,18 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
 
         // --------------------------------------------------------------------------
 
+        if ($_field_sortable) {
+            $sFieldSortableHandle  = '<td class="handle" width="25"><b class="fa fa-bars"></b></td>';
+            $sFieldSortableColspan = 'colspan="2"';
+            $sFieldSortableOrder   = '<input type="hidden" name="' . $_field_key . '[{{index}}][order]" value="{{index}}" class="js-admin-sortable__order">';
+        } else {
+            $sFieldSortableHandle  = '';
+            $sFieldSortableColspan = '';
+            $sFieldSortableOrder   = '';
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Start generating the markup
         $_field_html_id     = '<input type="hidden" name="' . $_field_key . '[{{index}}][id]" value="{{id}}">';
         $_field_html_object = cdnObjectPicker(
@@ -960,8 +973,10 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         //  JS template
         $jsTpl = <<<EOT
             <tr>
+                $sFieldSortableHandle
                 <td>
                     $_field_html_id
+                    $sFieldSortableOrder
                     $_field_html_object
                 </td>
                 <td class="text-center">
@@ -989,18 +1004,16 @@ EOT;
                 }
 
                 //  @todo find a way to not be evil
-                $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : array();');
+                $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : [];');
             } else {
-
-                $aValues = $_POST[$_field_key];
+                $aValues = getFromArray($_field_key, $_POST);
             }
         } else {
-
             $aValues = $_field_default;
         }
 
         for ($i = 0; $i < count($aValues); $i++) {
-
+            $aValues[$i]          = (array) $aValues[$i];
             $aValues[$i]['index'] = $i;
             $_default_html        .= $oMustache->render($jsTpl, $aValues[$i]);
         }
@@ -1017,12 +1030,12 @@ EOT;
                         $_field_sub_label
                     </span>
                     <span class="input $_tipclass">
-                        <table class="">
+                        <table>
                             <thead>
-                                <th width="*">File</th>
+                                <th width="*" $sFieldSortableColspan>File</th>
                                 <th width="10"></th>
                             </thead>
-                            <tbody class="js-row-target">
+                            <tbody class="js-row-target $sFieldSortable">
                                 $_default_html
                             </tbody>
                             <tbody>
@@ -1072,7 +1085,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $sFieldOddEven   = getFromArray('oddeven', $aConfig, null);
         $sFieldKey       = getFromArray('key', $aConfig, null);
         $sFieldLabel     = getFromArray('label', $aConfig, null);
-        $sFieldDefault   = getFromArray('default', $aConfig, []);
+        $sFieldDefault   = array_filter((array) getFromArray('default', $aConfig));
         $sFieldSubLabel  = getFromArray('sub_label', $aConfig, null);
         $sFieldRequired  = getFromArray('required', $aConfig, false);
         $sFieldReadonly  = getFromArray('readonly', $aConfig, false);
@@ -1082,6 +1095,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         $sFieldInfo      = getFromArray('info', $aConfig, false);
         $sFieldInfoClass = getFromArray('info_class', $aConfig, false);
         $sFieldTip       = getFromArray('tip', $aConfig, $sTip);
+        $sFieldSortable  = getFromArray('sortable', $aConfig, false);
 
         $sFieldObjectKey        = getFromArray('object_key', $aConfig, 'object_id');
         $sFieldTableLabelObject = getFromArray('table_label_object', $aConfig, 'File');
@@ -1151,6 +1165,18 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
 
         // --------------------------------------------------------------------------
 
+        if ($sFieldSortable) {
+            $sFieldSortableHandle  = '<td class="handle" width="25"><b class="fa fa-bars"></b></td>';
+            $sFieldSortableColspan = 'colspan="2"';
+            $sFieldSortableOrder   = '<input type="hidden" name="' . $sFieldKey . '[{{index}}][order]" value="{{index}}" class="js-admin-sortable__order">';
+        } else {
+            $sFieldSortableHandle  = '';
+            $sFieldSortableColspan = '';
+            $sFieldSortableOrder   = '';
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Start generating the markup
         $sFieldHtmlId     = '<input type="hidden" name="' . $sFieldKey . '[{{index}}][id]" value="{{id}}">';
         $sFieldHtmlObject = cdnObjectPicker(
@@ -1167,8 +1193,10 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         //  JS template
         $jsTpl = <<<EOT
             <tr>
+                $sFieldSortableHandle
                 <td>
                     $sFieldHtmlId
+                    $sFieldSortableOrder
                     $sFieldHtmlObject
                 </td>
                 <td>
@@ -1199,9 +1227,9 @@ EOT;
                 }
 
                 //  @todo find a way to not be evil
-                $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : array();');
+                $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : [];');
             } else {
-                $aValues = isset($_POST[$sFieldKey]) ? $_POST[$sFieldKey] : [];
+                $aValues = getFromArray($sFieldKey, $_POST, []);
             }
 
         } else {
@@ -1226,18 +1254,18 @@ EOT;
                         $sFieldSubLabel
                     </span>
                     <span class="input $sTipClass">
-                        <table class="">
+                        <table>
                             <thead>
-                                <th width="300">$sFieldTableLabelObject</th>
+                                <th width="300" $sFieldSortableColspan>$sFieldTableLabelObject</th>
                                 <th width="*">$sFieldTableLabelLabel</th>
                                 <th width="10"></th>
                             </thead>
-                            <tbody class="js-row-target">
+                            <tbody class="js-row-target js-admin-sortable">
                                 $sDefaultHtml
                             </tbody>
                             <tbody>
                                 <tr>
-                                    <td colspan="3">
+                                    <td colspan="4">
                                         <button type="button" class="btn btn-xs btn-success js-cdn-multi-action-add">
                                             <span class="fa fa-plus"></span> Add download
                                         </button>

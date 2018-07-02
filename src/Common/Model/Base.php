@@ -158,8 +158,14 @@ abstract class Base
         $this->tableAutoSetTokens     = false;
         $this->perPage                = 50;
         $this->searchableFields       = [];
-        $this->defaultSortColumn      = null;
-        $this->defaultSortOrder       = 'ASC';
+
+        if (classUses(get_called_class(), 'Nails\Common\Traits\Model\Sortable')) {
+            $this->defaultSortColumn = $this->getSortableColumn();
+            $this->defaultSortOrder  = 'ASC';
+        } else {
+            $this->defaultSortColumn = null;
+            $this->defaultSortOrder  = 'ASC';
+        }
 
         // --------------------------------------------------------------------------
 
@@ -712,6 +718,12 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        if (!empty($aData['keywords'])) {
+            $this->applySearchConditionals($aData, $aData['keywords']);
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Apply common items; pass $aData
         $this->getCountCommon($aData);
 
@@ -801,7 +813,7 @@ abstract class Base
      * @param array $aResults The results to iterate over
      * @param array $aData    The configuration array
      */
-    protected function expandExpandableFields(array &$aResults, array$aData)
+    protected function expandExpandableFields(array &$aResults, array $aData)
     {
         if (!empty($this->aExpandableFields)) {
 
@@ -1671,8 +1683,26 @@ abstract class Base
             $iPage = null;
         }
 
-        $aData['keywords'] = $sKeywords;
+        $this->applySearchConditionals($aData, $sKeywords);
 
+        return (object) [
+            'page'    => $iPage,
+            'perPage' => $iPerPage,
+            'total'   => $this->countAll($aData),
+            'data'    => $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted),
+        ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Mutates the data array and adds the conditionals for searching
+     *
+     * @param array $aData
+     * @param       $sKeywords
+     */
+    protected function applySearchConditionals(array &$aData, $sKeywords)
+    {
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
         }
@@ -1701,14 +1731,6 @@ abstract class Base
                 }
             }
         }
-
-        $oOut          = new \stdClass();
-        $oOut->page    = $iPage;
-        $oOut->perPage = $iPerPage;
-        $oOut->total   = $this->countAll($aData);
-        $oOut->data    = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
-
-        return $oOut;
     }
 
     /**
@@ -2004,7 +2026,7 @@ abstract class Base
             'provider'    => $aOptions['provider'],
 
             //  Any data to pass to the getAll (every time)
-            'data'        => array_key_exists('data', $aOptions) ? $aOptions['data'] : [],
+            'data'        => getFromArray('data', $aOptions, []),
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
@@ -2014,7 +2036,7 @@ abstract class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => array_key_exists('auto_expand', $aOptions) ? !empty($aOptions['auto_expand']) : false,
+            'auto_expand' => getFromArray('auto_expand', $aOptions, false),
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
@@ -2064,7 +2086,7 @@ abstract class Base
     protected function autoSaveExpandableFieldsSave($iId, array $aExpandableFields)
     {
         foreach ($aExpandableFields as $oField) {
-            $aData = array_filter($oField->data);
+            $aData = array_filter((array) $oField->data);
             $this->saveAssociatedItems(
                 $iId,
                 $aData,
@@ -2116,17 +2138,18 @@ abstract class Base
     /**
      * Returns the column name for specific columns of interest
      *
-     * @param string $sColumn the column to query
+     * @param string $sColumn  The column to query
+     * @param string $sDefault The default value if not defined
      *
-     * @return string|null
+     * @return string
      */
-    public function getColumn($sColumn)
+    public function getColumn($sColumn, $sDefault = null)
     {
         $sColumn = ucfirst(trim($sColumn));
         if (property_exists($this, 'table' . $sColumn . 'Column')) {
             return $this->{'table' . $sColumn . 'Column'};
         }
-        return null;
+        return $sDefault;
     }
 
     // --------------------------------------------------------------------------
