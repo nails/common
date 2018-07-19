@@ -44,7 +44,7 @@ abstract class BaseNestable extends Base
      * @param string $sProperty The property to which to assign children
      * @return array
      */
-    public function getAllNested($aData = [], $bIncludeDeleted = false, $sProperty = 'children')
+    public function getAllNested(array $aData = [], $bIncludeDeleted = false, $sProperty = 'children')
     {
         $aAll = parent::getAll(null, null, $aData, $bIncludeDeleted);
 
@@ -61,7 +61,7 @@ abstract class BaseNestable extends Base
      * @return array
      * @throws NailsException
      */
-    protected function nestItems($aAll, $sProperty, $iParentId = null)
+    protected function nestItems(array $aAll, $sProperty, $iParentId = null)
     {
         $aOut       = [];
         $sIdCol     = $this->tableIdColumn;
@@ -96,7 +96,7 @@ abstract class BaseNestable extends Base
      * @param bool $bIncludeDeleted Whether to include deleted results
      * @return array
      */
-    public function getAllNestedFlat($aData = [], $sSeparator = ' &rsaquo; ', $bIncludeDeleted = false)
+    public function getAllNestedFlat(array $aData = [], $sSeparator = ' &rsaquo; ', $bIncludeDeleted = false)
     {
         $aAllNested = $this->getAllNested($aData, $bIncludeDeleted, 'children');
         $aFlattened = $this->flattenItems($aAllNested);
@@ -116,7 +116,7 @@ abstract class BaseNestable extends Base
      * @return array
      * @throws NailsException
      */
-    protected function flattenItems($aAllNested, $aParentLabels = [])
+    protected function flattenItems(array $aAllNested, array $aParentLabels = [])
     {
         $aOut      = [];
         $sIdCol    = $this->tableIdColumn;

@@ -24,7 +24,7 @@ trait GetCountCommon
      *
      * @return void
      **/
-    protected function getCountCommon($aData = [])
+    protected function getCountCommon(array $aData = [])
     {
         //  @deprecated - searching should use the search() method, but this in place
         //  as a quick fix for loads of admin controllers
@@ -78,7 +78,7 @@ trait GetCountCommon
      *
      * @return void
      */
-    protected function getCountCommonCompileSelect(&$aData)
+    protected function getCountCommonCompileSelect(array &$aData)
     {
         if (!empty($aData['select'])) {
             $oDb = Factory::service('Database');
@@ -89,13 +89,13 @@ trait GetCountCommon
     // --------------------------------------------------------------------------
 
     /**
-     * Compiles any active filters back into the $data array
+     * Compiles any active filters back into the $aData array
      *
      * @param  array &$aData The data array
      *
      * @return void
      */
-    protected function getCountCommonCompileFilters(&$aData)
+    protected function getCountCommonCompileFilters(array &$aData)
     {
         /**
          * Handle filters
@@ -203,6 +203,13 @@ trait GetCountCommon
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Compile the filter string
+     *
+     * @param  string $sColumn The column
+     * @param  mixed  $mValue  The value
+     * @return string
+     */
     protected function getCountCommonCompileFiltersString($sColumn, $mValue)
     {
         $oDb = Factory::service('Database');
@@ -231,18 +238,18 @@ trait GetCountCommon
     /**
      * Compiles any where's into the query
      *
-     * @param  array &$data The data array
+     * @param  array &$aData The data array
      *
      * @return void
      */
-    protected function getCountCommonCompileWheres(&$data)
+    protected function getCountCommonCompileWheres(array &$aData)
     {
         $oDb = Factory::service('Database');
 
         /**
          * Handle where's
          *
-         * This is an array of the various type of where that can be passed in via $data.
+         * This is an array of the various type of where that can be passed in via $aData.
          * The first element is the key and the second is how multiple items within the
          * group should be glued together.
          *
@@ -250,7 +257,7 @@ trait GetCountCommon
          * are glued together with ANDs
          */
 
-        $wheres = [
+        $aWheres = [
             'where'           => 'AND',
             'or_where'        => 'OR',
             'where_in'        => 'AND',
@@ -259,31 +266,31 @@ trait GetCountCommon
             'or_where_not_in' => 'OR',
         ];
 
-        $whereCompiled = [];
+        $aWhereCompiled = [];
 
-        foreach ($wheres as $whereType => $whereGlue) {
+        foreach ($aWheres as $sWhereType => $sWhereGlue) {
 
-            if (!empty($data[$whereType])) {
+            if (!empty($aData[$sWhereType])) {
 
-                $whereCompiled[$whereType] = [];
+                $aWhereCompiled[$sWhereType] = [];
 
-                if (is_array($data[$whereType])) {
+                if (is_array($aData[$sWhereType])) {
 
                     /**
                      * The value is an array. For each element we need to compile as appropriate
-                     * and add to $whereCompiled.
+                     * and add to $aWhereCompiled.
                      */
 
-                    foreach ($data[$whereType] as $where) {
+                    foreach ($aData[$sWhereType] as $mWhere) {
 
-                        if (is_string($where)) {
+                        if (is_string($mWhere)) {
 
                             /**
                              * The value is a straight up string, assume this is a compiled
                              * where string,
                              */
 
-                            $whereCompiled[$whereType][] = $where;
+                            $aWhereCompiled[$sWhereType][] = $mWhere;
 
                         } else {
 
@@ -294,89 +301,86 @@ trait GetCountCommon
                              */
 
                             //  Work out column
-                            $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
+                            $mColumn = isset($mWhere['column']) ? $mWhere['column'] : '[NAILS-COL-NOT-FOUND]';
 
-                            if ($col === '[NAILS-COL-NOT-FOUND]') {
-                                $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
+                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
+                                $mColumn = isset($mWhere[0]) && is_string($mWhere[0]) ? $mWhere[0] : null;
                             }
 
                             //  Work out value
-                            $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
+                            $mVal = isset($mWhere['value']) ? $mWhere['value'] : '[NAILS-VAL-NOT-FOUND]';
 
-                            if ($val === '[NAILS-VAL-NOT-FOUND]') {
-                                $val = isset($where[1]) ? $where[1] : null;
+                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
+                                $mVal = isset($mWhere[1]) ? $mWhere[1] : null;
                             }
 
                             //  Escaped?
-                            $escape = isset($where['escape']) ? (bool) $where['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
 
-                            if ($escape === '[NAILS-ESCAPE-NOT-FOUND]') {
-                                $escape = isset($where[2]) ? $where[2] : true;
+                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
+                                $bEscape = isset($mWhere[2]) ? $mWhere[2] : true;
                             }
 
-                            //  If the $col is an array then we should concat them together
-                            if (is_array($col)) {
-                                $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
+                            //  If the $mColumn is an array then we should concat them together
+                            if (is_array($mColumn)) {
+                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
                             }
 
                             //  Test if there's an SQL operator
-                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($col))) {
-
-                                $operator = is_null($val) ? ' IS ' : '=';
-
+                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
+                                $sOperator = is_null($mVal) ? ' IS ' : '=';
                             } else {
-
-                                $operator = '';
+                                $sOperator = '';
                             }
 
                             //  Got something?
-                            if ($col) {
+                            if ($mColumn) {
 
-                                switch ($whereType) {
+                                switch ($sWhereType) {
 
                                     case 'where' :
                                     case 'or_where' :
 
-                                        if ($escape) {
-                                            $val = $oDb->escape($val);
+                                        if ($bEscape) {
+                                            $mVal = $oDb->escape($mVal);
                                         }
 
-                                        $whereCompiled[$whereType][] = $col . $operator . $val;
+                                        $aWhereCompiled[$sWhereType][] = $mColumn . $sOperator . $mVal;
                                         break;
 
                                     case 'where_in' :
                                     case 'or_where_in' :
 
-                                        if (!is_array($val)) {
-                                            $val = (array) $val;
+                                        if (!is_array($mVal)) {
+                                            $mVal = (array) $mVal;
                                         }
 
-                                        if (!empty($val)) {
-                                            if ($escape) {
-                                                foreach ($val as &$value) {
-                                                    $value = $oDb->escape($value);
+                                        if (!empty($mVal)) {
+                                            if ($bEscape) {
+                                                foreach ($mVal as &$sValue) {
+                                                    $sValue = $oDb->escape($sValue);
                                                 }
                                             }
 
-                                            $whereCompiled[$whereType][] = $col . ' IN (' . implode(',', $val) . ')';
+                                            $aWhereCompiled[$sWhereType][] = $mColumn . ' IN (' . implode(',', $mVal) . ')';
                                         }
                                         break;
 
                                     case 'where_not_in' :
                                     case 'or_where_not_in' :
 
-                                        if (!is_array($val)) {
-                                            $val = (array) $val;
+                                        if (!is_array($mVal)) {
+                                            $mVal = (array) $mVal;
                                         }
 
-                                        if (!empty($val)) {
-                                            if ($escape) {
-                                                foreach ($val as &$value) {
-                                                    $value = $oDb->escape($value);
+                                        if (!empty($mVal)) {
+                                            if ($bEscape) {
+                                                foreach ($mVal as &$sValue) {
+                                                    $sValue = $oDb->escape($sValue);
                                                 }
                                             }
 
-                                            $whereCompiled[$whereType][] = $col . ' NOT IN (' . implode(',', $val) . ')';
+                                            $aWhereCompiled[$sWhereType][] = $mColumn . ' NOT IN (' . implode(',', $mVal) . ')';
                                         }
                                         break;
                                 }
@@ -384,38 +388,38 @@ trait GetCountCommon
                         }
                     }
 
-                } elseif (is_string($data[$whereType])) {
+                } elseif (is_string($aData[$sWhereType])) {
 
                     /**
                      * The value is a straight up string, assume this is a compiled
                      * where string,
                      */
 
-                    $whereCompiled[$whereType][] = $data[$whereType];
+                    $aWhereCompiled[$sWhereType][] = $aData[$sWhereType];
                 }
             }
         }
 
         /**
          * Now we need to compile all the conditionals into one big super query.
-         * $whereStr is an array of the compressed where strings... will make
+         * $aWhereStr is an array of the compressed where strings... will make
          * sense shortly...
          */
 
-        if (!empty($whereCompiled)) {
+        if (!empty($aWhereCompiled)) {
 
-            $whereStr = [];
+            $aWhereStr = [];
 
-            foreach ($whereCompiled as $whereType => $value) {
-                if (!empty($value)) {
-                    $whereStr[] = '(' . implode(' ' . $wheres[$whereType] . ' ', $value) . ')';
+            foreach ($aWhereCompiled as $sWhereType => $sValue) {
+                if (!empty($sValue)) {
+                    $aWhereStr[] = '(' . implode(' ' . $aWheres[$sWhereType] . ' ', $sValue) . ')';
                 }
             }
 
-            //  And reduce $whereStr to an actual string, like the name suggests
-            if (!empty($whereStr)) {
-                $whereStr = implode(' AND ', $whereStr);
-                $oDb->where($whereStr);
+            //  And reduce $aWhereStr to an actual string, like the name suggests
+            if (!empty($aWhereStr)) {
+                $aWhereStr = implode(' AND ', $aWhereStr);
+                $oDb->where($aWhereStr);
             }
         }
     }
@@ -425,46 +429,46 @@ trait GetCountCommon
     /**
      * Compiles any like's into the query
      *
-     * @param  array &$data The data array
+     * @param  array &$aData The data array
      *
      * @return void
      */
-    protected function getCountCommonCompileLikes(&$data)
+    protected function getCountCommonCompileLikes(array &$aData)
     {
         $oDb = Factory::service('Database');
 
-        $likes = [
+        $aLikes = [
             'like'        => 'AND',
             'or_like'     => 'OR',
             'not_like'    => 'AND',
             'or_not_like' => 'OR',
         ];
 
-        $likeCompiled = [];
+        $aLikeCompiled = [];
 
-        foreach ($likes as $likeType => $likeGlue) {
+        foreach ($aLikes as $sLikeType => $sLikeGlue) {
 
-            if (!empty($data[$likeType])) {
+            if (!empty($aData[$sLikeType])) {
 
-                $likeCompiled[$likeType] = [];
+                $aLikeCompiled[$sLikeType] = [];
 
-                if (is_array($data[$likeType])) {
+                if (is_array($aData[$sLikeType])) {
 
                     /**
                      * The value is an array. For each element we need to compile as appropriate
-                     * and add to $likeCompiled.
+                     * and add to $aLikeCompiled.
                      */
 
-                    foreach ($data[$likeType] as $where) {
+                    foreach ($aData[$sLikeType] as $mWhere) {
 
-                        if (is_string($where)) {
+                        if (is_string($mWhere)) {
 
                             /**
                              * The value is a straight up string, assume this is a compiled
                              * where string,
                              */
 
-                            $likeCompiled[$likeType][] = $where;
+                            $aLikeCompiled[$sLikeType][] = $mWhere;
 
                         } else {
 
@@ -475,81 +479,78 @@ trait GetCountCommon
                              */
 
                             //  Work out column
-                            $col = isset($where['column']) ? $where['column'] : '[NAILS-COL-NOT-FOUND]';
+                            $mColumn = isset($mWhere['column']) ? $mWhere['column'] : '[NAILS-COL-NOT-FOUND]';
 
-                            if ($col === '[NAILS-COL-NOT-FOUND]') {
-                                $col = isset($where[0]) && is_string($where[0]) ? $where[0] : null;
+                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
+                                $mColumn = isset($mWhere[0]) && is_string($mWhere[0]) ? $mWhere[0] : null;
                             }
 
                             //  Work out value
-                            $val = isset($where['value']) ? $where['value'] : '[NAILS-VAL-NOT-FOUND]';
+                            $mVal = isset($mWhere['value']) ? $mWhere['value'] : '[NAILS-VAL-NOT-FOUND]';
 
-                            if ($val === '[NAILS-VAL-NOT-FOUND]') {
-                                $val = isset($where[1]) ? $where[1] : null;
+                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
+                                $mVal = isset($mWhere[1]) ? $mWhere[1] : null;
                             }
 
                             //  Escaped?
-                            $escape = isset($where['escape']) ? (bool) $where['escape'] : true;
+                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : true;
 
-                            if ($escape) {
-                                $val = $oDb->escape_like_str($val);
+                            if ($bEscape) {
+                                $mVal = $oDb->escape_like_str($mVal);
                             }
 
-                            //  If the $col is an array then we should concat them together
-                            if (is_array($col)) {
-
-                                $col = 'CONCAT_WS(" ", ' . implode(',', $col) . ')';
+                            //  If the $mColumn is an array then we should concat them together
+                            if (is_array($mColumn)) {
+                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
                             }
 
                             //  Got something?
-                            if ($col) {
-                                switch ($likeType) {
+                            if ($mColumn) {
+                                switch ($sLikeType) {
 
                                     case 'like' :
                                     case 'or_like' :
-
-                                        $likeCompiled[$likeType][] = $col . ' LIKE "%' . $val . '%"';
+                                        $aLikeCompiled[$sLikeType][] = $mColumn . ' LIKE "%' . $mVal . '%"';
                                         break;
 
                                     case 'not_like' :
                                     case 'or_not_like' :
-
-                                        $likeCompiled[$likeType][] = $col . ' NOT LIKE "%' . $val . '%"';
+                                        $aLikeCompiled[$sLikeType][] = $mColumn . ' NOT LIKE "%' . $mVal . '%"';
                                         break;
                                 }
                             }
                         }
                     }
 
-                } elseif (is_string($data[$likeType])) {
+                } elseif (is_string($aData[$sLikeType])) {
 
                     /**
                      * The value is a straight up string, assume this is a compiled
                      * where string,
                      */
 
-                    $likeCompiled[$likeType][] = $data[$likeType];
+                    $aLikeCompiled[$sLikeType][] = $aData[$sLikeType];
                 }
             }
         }
 
         /**
          * Now we need to compile all the conditionals into one big super query.
-         * $whereStr is an array of the compressed where strings... will make
+         * $aWhereStr is an array of the compressed where strings... will make
          * sense shortly...
          */
 
-        if (!empty($likeCompiled)) {
+        if (!empty($aLikeCompiled)) {
 
-            $whereStr = [];
+            $aWhereStr = [];
 
-            foreach ($likeCompiled as $likeType => $value) {
-                $whereStr[] = '(' . implode(' ' . $likes[$likeType] . ' ', $value) . ')';
+            foreach ($aLikeCompiled as $sLikeType => $sValue) {
+                $aWhereStr[] = '(' . implode(' ' . $aLikes[$sLikeType] . ' ', $sValue) . ')';
             }
 
-            //  And reduce $whereStr to an actual string, like the name suggests
-            $whereStr = implode(' AND ', $whereStr);
-            $oDb->where($whereStr);
+            //  And reduce $aWhereStr to an actual string, like the name suggests
+            $aWhereStr = implode(' AND ', $aWhereStr);
+            $oDb->where($aWhereStr);
         }
     }
 
@@ -558,41 +559,41 @@ trait GetCountCommon
     /**
      * Compiles the sort element into the query
      *
-     * @param  array &$data The data array
+     * @param  array &$aData The data array
      *
      * @return void
      */
-    protected function getCountCommonCompileSort(&$data)
+    protected function getCountCommonCompileSort(array &$aData)
     {
         $oDb = Factory::service('Database');
 
-        if (!empty($data['sort'])) {
+        if (!empty($aData['sort'])) {
 
             /**
              * How we handle sorting
              * =====================
              *
-             * - If $data['sort'] is a string assume it's the field to sort on, use the default order
-             * - If $data['sort'] is a single dimension array then assume the first element (or the element
+             * - If $aData['sort'] is a string assume it's the field to sort on, use the default order
+             * - If $aData['sort'] is a single dimension array then assume the first element (or the element
              *   named 'column') is the column; and the second element (or the element named 'order') is the
              *   direction to sort in
-             * - If $data['sort'] is a multidimensional array then loop each element and test as above.
+             * - If $aData['sort'] is a multidimensional array then loop each element and test as above.
              *
              **/
 
-            if (is_string($data['sort'])) {
+            if (is_string($aData['sort'])) {
 
                 //  String
-                $oDb->order_by($data['sort']);
+                $oDb->order_by($aData['sort']);
 
-            } elseif (is_array($data['sort'])) {
+            } elseif (is_array($aData['sort'])) {
 
-                $mFirst = reset($data['sort']);
+                $mFirst = reset($aData['sort']);
 
                 if (is_string($mFirst)) {
 
                     //  Single dimension array
-                    $aSort = $this->getCountCommonParseSort($data['sort']);
+                    $aSort = $this->getCountCommonParseSort($aData['sort']);
 
                     if (!empty($aSort['column'])) {
                         $oDb->order_by($aSort['column'], $aSort['order']);
@@ -601,7 +602,7 @@ trait GetCountCommon
                 } else {
 
                     //  Multi dimension array
-                    foreach ($data['sort'] as $sort) {
+                    foreach ($aData['sort'] as $sort) {
 
                         $aSort = $this->getCountCommonParseSort($sort);
 
@@ -617,39 +618,45 @@ trait GetCountCommon
 
     // --------------------------------------------------------------------------
 
-    protected function getCountCommonParseSort($sort)
+    /**
+     * Parse the sort variable
+     *
+     * @param  string|array $mSort The sort variable
+     * @return array
+     */
+    protected function getCountCommonParseSort($mSort)
     {
         $aOut = ['column' => null, 'order' => null];
 
         // --------------------------------------------------------------------------
 
-        if (is_string($sort)) {
+        if (is_string($mSort)) {
 
-            $aOut['column'] = $sort;
+            $aOut['column'] = $mSort;
             return $aOut;
 
-        } elseif (isset($sort['column'])) {
+        } elseif (isset($mSort['column'])) {
 
-            $aOut['column'] = $sort['column'];
+            $aOut['column'] = $mSort['column'];
 
         } else {
 
             //  Take the first element
-            $aOut['column'] = reset($sort);
+            $aOut['column'] = reset($mSort);
             $aOut['column'] = is_string($aOut['column']) ? $aOut['column'] : null;
         }
 
         if ($aOut['column']) {
 
             //  Determine order
-            if (isset($sort['order'])) {
+            if (isset($mSort['order'])) {
 
-                $aOut['order'] = $sort['order'];
+                $aOut['order'] = $mSort['order'];
 
-            } elseif (count($sort) > 1) {
+            } elseif (count($mSort) > 1) {
 
                 //  Take the last element
-                $aOut['order'] = end($sort);
+                $aOut['order'] = end($mSort);
                 $aOut['order'] = is_string($aOut['order']) ? $aOut['order'] : null;
             }
         }
