@@ -52,7 +52,8 @@ class Factory
             //  Properties
             if (!empty($aComponentServices['properties'])) {
                 if (empty(self::$aContainers[$ComponentName]['properties'])) {
-                    self::$aContainers[$ComponentName]['properties'] = new Container();
+                    self::$aContainers[$ComponentName]['properties']                = new Container();
+                    self::$aContainers[$ComponentName]['properties']['__CONSTRUCT'] = null;
                 }
                 foreach ($aComponentServices['properties'] as $sKey => $mValue) {
                     self::$aContainers[$ComponentName]['properties'][$sKey] = $mValue;
@@ -64,7 +65,8 @@ class Factory
             //  Services
             if (!empty($aComponentServices['services'])) {
                 if (empty(self::$aContainers[$ComponentName]['services'])) {
-                    self::$aContainers[$ComponentName]['services'] = new Container();
+                    self::$aContainers[$ComponentName]['services']                = new Container();
+                    self::$aContainers[$ComponentName]['services']['__CONSTRUCT'] = null;
                 }
                 foreach ($aComponentServices['services'] as $sKey => $oCallable) {
                     self::$aContainers[$ComponentName]['services'][$sKey] = $oCallable;
@@ -76,7 +78,8 @@ class Factory
             //  Models
             if (!empty($aComponentServices['models'])) {
                 if (empty(self::$aContainers[$ComponentName]['models'])) {
-                    self::$aContainers[$ComponentName]['models'] = new Container();
+                    self::$aContainers[$ComponentName]['models']                  = new Container();
+                    self::$aContainers[$ComponentName]['services']['__CONSTRUCT'] = null;
                 }
                 foreach ($aComponentServices['models'] as $sKey => $oCallable) {
                     self::$aContainers[$ComponentName]['models'][$sKey] = $oCallable;
@@ -102,7 +105,7 @@ class Factory
     /**
      * Look for a components's services.php file, allowing for app and/or environment overrides
      *
-     * @param  string $sComponentName The component name to search for
+     * @param string $sComponentName The component name to search for
      *
      * @return array
      */
@@ -141,7 +144,7 @@ class Factory
     /**
      * Traverses an array of paths until one exits
      *
-     * @param  array $aPaths An array of paths to look for
+     * @param array $aPaths An array of paths to look for
      *
      * @return array
      */
@@ -161,10 +164,11 @@ class Factory
     /**
      * Return a property from the container.
      *
-     * @param  string $sPropertyName  The property name
-     * @param  string $sComponentName The name of the component which provides the property
+     * @param string $sPropertyName  The property name
+     * @param string $sComponentName The name of the component which provides the property
      *
      * @return mixed
+     * @throws FactoryException
      */
     public static function property($sPropertyName, $sComponentName = '')
     {
@@ -176,12 +180,12 @@ class Factory
     /**
      * Sets a new value for a property
      *
-     * @param  string $sPropertyName  The property name
-     * @param  mixed  $mPropertyValue The new property value
-     * @param  string $sComponentName The name of the component which provides the property
+     * @param string $sPropertyName  The property name
+     * @param mixed  $mPropertyValue The new property value
+     * @param string $sComponentName The name of the component which provides the property
      *
-     * @throws FactoryException
      * @return void
+     * @throws FactoryException
      */
     public static function setProperty($sPropertyName, $mPropertyValue, $sComponentName = '')
     {
@@ -202,14 +206,16 @@ class Factory
     /**
      * Return a service from the container.
      *
-     * @param  string $sServiceName   The service name
-     * @param  string $sComponentName The name of the component which provides the service
+     * @param string $sServiceName   The service name
+     * @param string $sComponentName The name of the component which provides the service
+     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
+     * @throws FactoryException
      */
-    public static function service($sServiceName, $sComponentName = '')
+    public static function service($sServiceName, $sComponentName = '', $mParameters = null)
     {
-        return self::getService('services', $sServiceName, $sComponentName);
+        return self::getService('services', $sServiceName, $sComponentName, $mParameters);
     }
 
     // --------------------------------------------------------------------------
@@ -217,14 +223,16 @@ class Factory
     /**
      * Return a model from the container.
      *
-     * @param  string $sModelName     The model name
-     * @param  string $sComponentName The name of the component which provides the model
+     * @param string $sModelName     The model name
+     * @param string $sComponentName The name of the component which provides the model
+     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
+     * @throws FactoryException
      */
-    public static function model($sModelName, $sComponentName = '')
+    public static function model($sModelName, $sComponentName = '', $mParameters = null)
     {
-        return self::getService('models', $sModelName, $sComponentName);
+        return self::getService('models', $sModelName, $sComponentName, $mParameters);
     }
 
     // --------------------------------------------------------------------------
@@ -232,14 +240,16 @@ class Factory
     /**
      * Return a factory from the container.
      *
-     * @param  string $sFactoryName   The factory name
-     * @param  string $sComponentName The name of the component which provides the factory
+     * @param string $sFactoryName   The factory name
+     * @param string $sComponentName The name of the component which provides the factory
+     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
+     * @throws FactoryException
      */
-    public static function factory($sFactoryName, $sComponentName = '')
+    public static function factory($sFactoryName, $sComponentName = '', $mParameters = null)
     {
-        return self::getService('factories', $sFactoryName, $sComponentName);
+        return self::getService('factories', $sFactoryName, $sComponentName, $mParameters);
     }
 
     // --------------------------------------------------------------------------
@@ -247,8 +257,8 @@ class Factory
     /**
      * Load a helper file
      *
-     * @param  string $sHelperName    The helper name
-     * @param  string $sComponentName The name of the component which provides the factory
+     * @param string $sHelperName    The helper name
+     * @param string $sComponentName The name of the component which provides the factory
      *
      * @throws FactoryException
      * @return void
@@ -308,14 +318,15 @@ class Factory
     /**
      * Returns a service from the namespaced container
      *
-     * @param  string $sServiceType   The type of the service to return
-     * @param  string $sServiceName   The name of the service to return
-     * @param  string $sComponentName The name of the module which defined it
+     * @param string $sServiceType   The type of the service to return
+     * @param string $sServiceName   The name of the service to return
+     * @param string $sComponentName The name of the module which defined it
+     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @throws FactoryException
      * @return mixed
      */
-    private static function getService($sServiceType, $sServiceName, $sComponentName = '')
+    private static function getService($sServiceType, $sServiceName, $sComponentName = '', $mParameters = null)
     {
         $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
 
@@ -332,6 +343,8 @@ class Factory
                 ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"'
             );
         }
+
+        self::$aContainers[$sComponentName][$sServiceType]->offsetSet('__CONSTRUCT', $mParameters);
 
         return self::$aContainers[$sComponentName][$sServiceType][$sServiceName];
     }
