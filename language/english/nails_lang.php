@@ -127,6 +127,14 @@ $lang['fv_count_floor']                 = 'This field requires a minimum selecti
 $lang['fv_count_floor_field']           = 'The {field} field requires a minimum selection.'; // @todo include minimum item requirement in text
 $lang['fv_count_ceiling']               = 'This field accepts a maximum selection.'; // @todo include maximum item requirement in text
 $lang['fv_count_ceiling_field']         = 'The {field} field accepts a maximum selection.'; // @todo include maximum item requirement in text
+$lang['fv_greater_than']                = 'This field must be greater than {param}';
+$lang['fv_greater_than_field']          = 'The {field} field must be greater than {param}';
+$lang['fv_greater_than_equal_to']       = 'This field must be greater than or equal to {param}';
+$lang['fv_greater_than_equal_to_field'] = 'The {field} field must be greater than or equal to {param}';
+$lang['fv_less_than']                   = 'This field must be less than {param}';
+$lang['fv_less_than_field']             = 'The {field} field must be less than {param}';
+$lang['fv_less_than_equal_to']          = 'This field must be less than or equal to {param}';
+$lang['fv_less_than_equal_to_field']    = 'The {field} field must be less than or equal to {param}';
 
 // --------------------------------------------------------------------------
 
