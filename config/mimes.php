@@ -62,6 +62,15 @@ $mimes['ppsm'] = 'application/vnd.ms-powerpoint.slideshow.macroEnabled.12';
 
 // --------------------------------------------------------------------------
 
+//  Fonts
+$mimes['eot']   = 'application/vnd.ms-fontobject';
+$mimes['otf']   = 'application/font-sfnt';
+$mimes['ttf']   = ['application/font-sfnt', 'application/x-font-ttf'];
+$mimes['woff']  = ['font/woff', 'application/font-woff', 'application/octet-stream'];
+$mimes['woff2'] = ['font/woff2', 'application/octet-stream'];
+
+// --------------------------------------------------------------------------
+
 //  Adobe Creative Suite/Cloud
 //  Illustrator files are PDF files with some additional meta data
 $mimes['ai'] = array_merge($mimes['ai'], $mimes['pdf'], ['application/illustrator']);
