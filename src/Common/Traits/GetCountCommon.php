@@ -122,13 +122,15 @@ trait GetCountCommon
                         //  Filtering is happening and the item is to be filtered
                         $aWhereFilter[] = $this->getCountCommonCompileFiltersString(
                             $oFilter->getColumn(),
-                            $oOption->getValue()
+                            $oOption->getValue(),
+                            $oOption->isQuery()
                         );
                     } elseif (empty($_GET['cbF']) && $oOption->isSelected()) {
                         //  There's no filtering happening and the item is checked by default
                         $aWhereFilter[] = $this->getCountCommonCompileFiltersString(
                             $oFilter->getColumn(),
-                            $oOption->getValue()
+                            $oOption->getValue(),
+                            $oOption->isQuery()
                         );
                     }
                 }
@@ -208,12 +210,15 @@ trait GetCountCommon
      *
      * @param  string $sColumn The column
      * @param  mixed  $mValue  The value
+     *
      * @return string
      */
-    protected function getCountCommonCompileFiltersString($sColumn, $mValue)
+    protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bisQuery)
     {
         $oDb = Factory::service('Database');
-        if (!is_array($mValue)) {
+        if ($bisQuery) {
+            $aBits = [$mValue];
+        } elseif (!is_array($mValue)) {
             $aBits = [
                 $oDb->escape_str($sColumn, false),
                 '=',
@@ -622,6 +627,7 @@ trait GetCountCommon
      * Parse the sort variable
      *
      * @param  string|array $mSort The sort variable
+     *
      * @return array
      */
     protected function getCountCommonParseSort($mSort)
