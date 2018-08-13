@@ -162,7 +162,7 @@ trait GetCountCommon
                     continue;
                 }
 
-                $aWhereFilter = [];
+                $sWhereFilter = [];
 
                 //  Are we even filtering this filter?
                 if (isset($_GET['ddF'][$iFilterIndex])) {
@@ -170,11 +170,13 @@ trait GetCountCommon
                     //  Does the option exist, if so, filter by it
                     $iSelectedIndex = !empty((int) $_GET['ddF'][$iFilterIndex]) ? (int) $_GET['ddF'][$iFilterIndex] : 0;
                     $oOption        = $oFilter->getOption($iSelectedIndex);
+
                     if ($oOption && $oOption->getValue()) {
-                        $aWhereFilter = [
+                        $sWhereFilter = $this->getCountCommonCompileFiltersString(
                             $oFilter->getColumn(),
                             $oOption->getValue(),
-                        ];
+                            $oOption->isQuery()
+                        );
                     }
 
                 } else {
@@ -182,22 +184,23 @@ trait GetCountCommon
                     //  No filtering happening but does this item have an item checked by default?
                     foreach ($oFilter->getOptions() as $oOption) {
                         if ($oOption->isSelected()) {
-                            $aWhereFilter = [
+                            $sWhereFilter = $this->getCountCommonCompileFiltersString(
                                 $oFilter->getColumn(),
                                 $oOption->getValue(),
-                            ];
+                                $oOption->isQuery()
+                            );
                             break;
                         }
                     }
                 }
 
-                if (!empty($aWhereFilter)) {
+                if (!empty($sWhereFilter)) {
 
                     if (!isset($aData['where'])) {
                         $aData['where'] = [];
                     }
 
-                    $aData['where'][] = $aWhereFilter;
+                    $aData['where'][] = $sWhereFilter;
                 }
             }
         }
