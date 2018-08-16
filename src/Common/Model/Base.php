@@ -857,10 +857,11 @@ abstract class Base
                 //  If we're not auto-expanding or expanding everything, check if we should expand based
                 //  on the `expand` index of $aTriggers
                 if (!$bAutoExpand && !$bExpandAll) {
-                    $bExpandForTrigger = in_array($oExpandableField->trigger, $aTriggers);
+                    $bExpandForTrigger      = in_array($oExpandableField->trigger, $aTriggers);
+                    $bExpandForTriggerCount = in_array($oExpandableField->trigger . ':count', $aTriggers);
                 }
 
-                if ($bAutoExpand || $bExpandAll || $bExpandForTrigger) {
+                if ($bAutoExpand || $bExpandAll || $bExpandForTrigger || $bExpandForTriggerCount) {
 
                     //  Merge any data defined with the expandable field with any custom data added by the expansion
                     $aMergedData = array_merge(
@@ -878,9 +879,21 @@ abstract class Base
                             $oExpandableField->provider,
                             $aMergedData
                         );
-                    } elseif ($oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+
+                    } elseif ($bExpandForTrigger && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
                         $this->getManyAssociatedItems(
+                            $aResults,
+                            $oExpandableField->property,
+                            $oExpandableField->id_column,
+                            $oExpandableField->model,
+                            $oExpandableField->provider,
+                            $aMergedData
+                        );
+
+                    } elseif ($bExpandForTriggerCount && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+
+                        $this->countManyAssociatedItems(
                             $aResults,
                             $oExpandableField->property,
                             $oExpandableField->id_column,
