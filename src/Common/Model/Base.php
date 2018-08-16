@@ -1598,11 +1598,12 @@ abstract class Base
                 //  Perform update
                 if (!$oAssociatedItemModel->update($iAssociatedItemId, $aAssociatedItem)) {
                     throw new ModelException(
-                        'Failed to update associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ')'
+                        'Failed to update associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
                     );
                 } else {
                     $aTouchedIds[] = $iAssociatedItemId;
                 }
+
             } else {
 
                 //  Safety, no setting of IDs
@@ -1614,12 +1615,10 @@ abstract class Base
                 //  Perform the create
                 $iAssociatedItemId = $oAssociatedItemModel->create($aAssociatedItem);
                 if (!$iAssociatedItemId) {
-
                     throw new ModelException(
-                        'Failed to create associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ')'
+                        'Failed to create associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
                     );
                 } else {
-
                     $aTouchedIds[] = $iAssociatedItemId;
                 }
             }
@@ -1634,7 +1633,7 @@ abstract class Base
         if (!empty($aIdDiff)) {
             if (!$oAssociatedItemModel->delete($aIdDiff)) {
                 throw new ModelException(
-                    'Failed to delete old associated items (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ')'
+                    'Failed to delete old associated items (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
                 );
             }
         }
