@@ -846,9 +846,10 @@ abstract class Base
 
             foreach ($this->aExpandableFields as $oExpandableField) {
 
-                $bAutoExpand       = $oExpandableField->auto_expand;
-                $bExpandAll        = false;
-                $bExpandForTrigger = false;
+                $bAutoExpand            = $oExpandableField->auto_expand;
+                $bExpandAll             = false;
+                $bExpandForTrigger      = false;
+                $bExpandForTriggerCount = false;
                 //  If we're not auto-expanding, check if we're expanding everything
                 if (!$bAutoExpand && array_key_exists('expand', $aData)) {
                     $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
@@ -1432,12 +1433,6 @@ abstract class Base
                 //  Set the base property
                 $oItem->{$sItemProperty} = 0;
             }
-
-            //  Limit the select
-            $aAssociatedModelData['select'] = [
-                $oAssociatedModel->getTableAlias() . '.id',
-                $oAssociatedModel->getTableAlias() . '.' . $sAssociatedItemIdColumn,
-            ];
 
             if (empty($aAssociatedModelData['where_in'])) {
                 $aAssociatedModelData['where_in'] = [];
