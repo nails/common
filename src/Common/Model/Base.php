@@ -815,94 +815,97 @@ abstract class Base
      */
     protected function expandExpandableFields(array &$aResults, array $aData)
     {
-        if (!empty($this->aExpandableFields)) {
+        $aExpandableFields = $this->getExpandableFields();
 
-            /**
-             * Prepare the expand request; The developer can pass an array of triggers to expand, any of
-             * those triggers may themselves be an array with options to pass to the model (e.g to expand
-             * a field in the expanded object, or to order etc). Therefore we must prepare two arrays:
-             *  1. a flat list of triggers to expand
-             *  2. a list of config arrays to pass to the model
-             */
+        if (empty($aExpandableFields)) {
+            return;
+        }
 
-            $aTriggers    = [];
-            $aTriggerData = [];
+        /**
+         * Prepare the expand request; The developer can pass an array of triggers to expand, any of
+         * those triggers may themselves be an array with options to pass to the model (e.g to expand
+         * a field in the expanded object, or to order etc). Therefore we must prepare two arrays:
+         *  1. a flat list of triggers to expand
+         *  2. a list of config arrays to pass to the model
+         */
 
-            if (array_key_exists('expand', $aData) && is_array($aData['expand'])) {
-                foreach ($aData['expand'] as $mTrigger) {
-                    if (is_string($mTrigger)) {
-                        $aTriggers[]             = $mTrigger;
-                        $aTriggerData[$mTrigger] = [];
-                    } elseif (is_array($mTrigger)) {
-                        $sArrayTrigger     = getFromArray(0, $mTrigger) ?: getFromArray('trigger', $mTrigger);
-                        $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, []);
-                        if (!empty($sArrayTrigger)) {
-                            $aTriggers[]                  = $sArrayTrigger;
-                            $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
-                        }
+        $aTriggers    = [];
+        $aTriggerData = [];
+
+        if (array_key_exists('expand', $aData) && is_array($aData['expand'])) {
+            foreach ($aData['expand'] as $mTrigger) {
+                if (is_string($mTrigger)) {
+                    $aTriggers[]             = $mTrigger;
+                    $aTriggerData[$mTrigger] = [];
+                } elseif (is_array($mTrigger)) {
+                    $sArrayTrigger     = getFromArray(0, $mTrigger) ?: getFromArray('trigger', $mTrigger);
+                    $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, []);
+                    if (!empty($sArrayTrigger)) {
+                        $aTriggers[]                  = $sArrayTrigger;
+                        $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
                     }
                 }
             }
+        }
 
-            foreach ($this->aExpandableFields as $oExpandableField) {
+        foreach ($aExpandableFields as $oExpandableField) {
 
-                $bAutoExpand            = $oExpandableField->auto_expand;
-                $bExpandAll             = false;
-                $bExpandForTrigger      = false;
-                $bExpandForTriggerCount = false;
-                //  If we're not auto-expanding, check if we're expanding everything
-                if (!$bAutoExpand && array_key_exists('expand', $aData)) {
-                    $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
-                }
+            $bAutoExpand            = $oExpandableField->auto_expand;
+            $bExpandAll             = false;
+            $bExpandForTrigger      = false;
+            $bExpandForTriggerCount = false;
+            //  If we're not auto-expanding, check if we're expanding everything
+            if (!$bAutoExpand && array_key_exists('expand', $aData)) {
+                $bExpandAll = $aData['expand'] === static::EXPAND_ALL;
+            }
 
-                //  If we're not auto-expanding or expanding everything, check if we should expand based
-                //  on the `expand` index of $aTriggers
-                if (!$bAutoExpand && !$bExpandAll) {
-                    $bExpandForTrigger      = in_array($oExpandableField->trigger, $aTriggers);
-                    $bExpandForTriggerCount = in_array($oExpandableField->trigger . ':count', $aTriggers);
-                }
+            //  If we're not auto-expanding or expanding everything, check if we should expand based
+            //  on the `expand` index of $aTriggers
+            if (!$bAutoExpand && !$bExpandAll) {
+                $bExpandForTrigger      = in_array($oExpandableField->trigger, $aTriggers);
+                $bExpandForTriggerCount = in_array($oExpandableField->trigger . ':count', $aTriggers);
+            }
 
-                if ($bAutoExpand || $bExpandAll || $bExpandForTrigger || $bExpandForTriggerCount) {
+            if ($bAutoExpand || $bExpandAll || $bExpandForTrigger || $bExpandForTriggerCount) {
 
-                    //  Merge any data defined with the expandable field with any custom data added by the expansion
-                    $aMergedData = array_merge(
-                        $oExpandableField->data,
-                        getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                //  Merge any data defined with the expandable field with any custom data added by the expansion
+                $aMergedData = array_merge(
+                    $oExpandableField->data,
+                    getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                );
+
+                if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
+
+                    $this->getSingleAssociatedItem(
+                        $aResults,
+                        $oExpandableField->id_column,
+                        $oExpandableField->property,
+                        $oExpandableField->model,
+                        $oExpandableField->provider,
+                        $aMergedData
                     );
 
-                    if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
+                } elseif ($bExpandForTrigger && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
-                        $this->getSingleAssociatedItem(
-                            $aResults,
-                            $oExpandableField->id_column,
-                            $oExpandableField->property,
-                            $oExpandableField->model,
-                            $oExpandableField->provider,
-                            $aMergedData
-                        );
+                    $this->getManyAssociatedItems(
+                        $aResults,
+                        $oExpandableField->property,
+                        $oExpandableField->id_column,
+                        $oExpandableField->model,
+                        $oExpandableField->provider,
+                        $aMergedData
+                    );
 
-                    } elseif ($bExpandForTrigger && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+                } elseif ($bExpandForTriggerCount && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
-                        $this->getManyAssociatedItems(
-                            $aResults,
-                            $oExpandableField->property,
-                            $oExpandableField->id_column,
-                            $oExpandableField->model,
-                            $oExpandableField->provider,
-                            $aMergedData
-                        );
-
-                    } elseif ($bExpandForTriggerCount && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
-
-                        $this->countManyAssociatedItems(
-                            $aResults,
-                            $oExpandableField->property,
-                            $oExpandableField->id_column,
-                            $oExpandableField->model,
-                            $oExpandableField->provider,
-                            $aMergedData
-                        );
-                    }
+                    $this->countManyAssociatedItems(
+                        $aResults,
+                        $oExpandableField->property,
+                        $oExpandableField->id_column,
+                        $oExpandableField->model,
+                        $oExpandableField->provider,
+                        $aMergedData
+                    );
                 }
             }
         }
@@ -2060,6 +2063,18 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns all the configured expandable fields
+     *
+     * @returns array
+     */
+    public function getExpandableFields()
+    {
+        return $this->aExpandableFields;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Extracts any autosaveable expandable fields and unsets them from the main array
      *
      * @param  array $aData The data passed to create() or update()
@@ -2068,10 +2083,11 @@ abstract class Base
      */
     protected function autoSaveExpandableFieldsExtract(array &$aData)
     {
-        $aFields = [];
-        $aOut    = [];
+        $aFields           = [];
+        $aOut              = [];
+        $aExpandableFields = $this->getExpandableFields();
 
-        foreach ($this->aExpandableFields as $oField) {
+        foreach ($aExpandableFields as $oField) {
             if ($oField->auto_save) {
                 $aFields[$oField->trigger] = $oField;
             }
