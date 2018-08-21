@@ -22,6 +22,17 @@ trait Nestable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to save the parent ID
+     * @return string
+     */
+    public function getParentIdColumn()
+    {
+        return $this->getColumn('parentId', 'parent_id');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Generates breadcrumbs after creating an object
      *
      * @param array $aData         Data to create the item with
@@ -83,11 +94,12 @@ trait Nestable
                     $iParentId = $oParentItem->parent_id;
                     array_unshift(
                         $aBreadcrumbs,
-                        (object) [
+                        (object) array_filter([
                             'id'    => $oParentItem->id,
-                            'label' => $oParentItem->label,
-                            'slug'  => $oParentItem->slug,
-                        ]
+                            'label' => !empty($oParentItem->label) ? $oParentItem->label : null,
+                            'slug'  => !empty($oParentItem->slug) ? $oParentItem->slug : null,
+                            'url'   => !empty($oParentItem->url) ? $oParentItem->url : null,
+                        ])
                     );
                 } else {
                     $iParentId = null;
@@ -98,7 +110,7 @@ trait Nestable
             parent::update(
                 $iItemId,
                 [
-                    $this->getBreadcrumbsColumn() => json_encode($aBreadcrumbs)
+                    $this->getBreadcrumbsColumn() => json_encode($aBreadcrumbs),
                 ]
             );
 
