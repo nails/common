@@ -14,6 +14,7 @@ namespace Nails\Common\Model;
 
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Factory;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Routes
 {
@@ -71,8 +72,8 @@ class Routes
     /**
      * Update routes
      *
-     * @param  string                                            $sModule For which module to restrict the route update
-     * @param  \Symfony\Component\Console\Output\OutputInterface $oOutput A Symfony OutputInterface to write logs to
+     * @param  string          $sModule For which module to restrict the route update
+     * @param  OutputInterface $oOutput A Symfony OutputInterface to write logs to
      *
      * @return boolean
      * @throws \Exception
@@ -109,10 +110,8 @@ class Routes
                     $oOutput->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
                 }
 
-                $sInterface   = 'Nails\\Common\\Interfaces\\RouteGenerator';
-                $aImplemented = class_implements($sClass);
-
-                if (!in_array($sInterface, $aImplemented)) {
+                $sInterface = 'Nails\\Common\\Interfaces\\RouteGenerator';
+                if (!classImplements($sClass, $sInterface)) {
                     throw new \Exception(
                         'Routes generator ' . $sClass . ' does not implement ' . $sInterface
                     );
