@@ -184,14 +184,36 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
+        //  Set some common global constants
+        $oAsset     = Factory::service('Asset');
+        $aVariables = [
+            'ENVIRONMENT' => Environment::get(),
+            'SITE_URL'    => site_url('', isPageSecure()),
+            'NAILS'       => (object) [
+                'URL'  => NAILS_ASSETS_URL,
+                'LANG' => (object) [],
+                'USER' => (object) [
+                    'ID'    => activeUser('id') ? activeUser('id') : 'null',
+                    'FNAME' => activeUser('first_name'),
+                    'LNAME' => activeUser('last_name'),
+                    'EMAIL' => activeUser('email'),
+                ],
+            ],
+        ];
+        foreach ($aVariables as $sKey => $mValue) {
+            $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS');
+        }
+
+
+        // --------------------------------------------------------------------------
+
         /**
-         * Finally, set any custom CSS and JS as defined in admin
+         * Set any custom CSS and JS as defined in admin
+         *
          * @todo bring this in via a hook or something
          */
-
         $sCustomJs  = appSetting('site_custom_js', 'site');
         $sCustomCss = appSetting('site_custom_css', 'site');
-        $oAsset     = Factory::service('Asset');
 
         if (!empty($sCustomJs)) {
             $oAsset->inline($sCustomJs, 'JS');
@@ -199,6 +221,24 @@ abstract class Base extends \MX_Controller
 
         if (!empty($sCustomCss)) {
             $oAsset->inline($sCustomCss, 'CSS');
+        }
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * If a Google Analytics profile has been specified then include that too
+         */
+        $sGoogleAnalyticsProfile = appSetting('google_analytics_account');
+        if (!empty($sGoogleAnalyticsProfile)) {
+            $oAsset->inline(
+                "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                ga('create', '" . appSetting('google_analytics_account') . "', 'auto');
+                ga('send', 'pageview');",
+                'JS'
+            );
         }
 
         // --------------------------------------------------------------------------
@@ -216,6 +256,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Checks that the version of PHP is sufficient to run all enabled modules
+     *
      * @return void
      */
     protected function checkPhpVersion()
@@ -265,6 +306,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets the appropriate error reporting values and handlers
+     *
      * @return void
      */
     protected function setErrorReporting()
@@ -298,6 +340,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Tests that the cache is writable
+     *
      * @return bool
      * @throws NailsException
      */
@@ -432,6 +475,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Checks if credentials should be requested for staging environments
+     *
      * @return void
      */
     protected function passwordProtected()
@@ -501,6 +545,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Requests staging credentials
+     *
      * @return void
      */
     protected function passwordProtectedRequest()
@@ -517,6 +562,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets up date & time handling
+     *
      * @throws NailsException
      */
     protected function instantiateDateTime()
@@ -590,6 +636,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets up language handling
+     *
      * @return void
      */
     protected function instantiateLanguages()
@@ -675,6 +722,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Set up the active user
+     *
      * @return void
      */
     protected function instantiateUser()
@@ -692,6 +740,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Determines whether the active user is suspended and, if so, logs them out.
+     *
      * @return void
      */
     protected function isUserSuspended()
