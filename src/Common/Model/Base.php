@@ -122,6 +122,12 @@ abstract class Base
      */
     const EVENT_RESTORED = null;
 
+    /**
+     * When true, the model will not attempt to automatically generate a slug when updating
+      @var boolean
+     */
+    const AUTO_SET_SLUG_IMMUTABLE = true;
+
     //  Preferences
     protected $destructiveDelete;
     protected $perPage;
@@ -434,7 +440,7 @@ abstract class Base
             }
         }
 
-        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
+        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
 
             if (is_array($mIds)) {
                 throw new ModelException('Cannot auto generate slugs when updating multiple items.', 1);
