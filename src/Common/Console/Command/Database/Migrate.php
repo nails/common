@@ -170,7 +170,7 @@ class Migrate extends Base
         $oOutput->writeln('');
         $oOutput->writeln('OK, here\'s what\'s going to happen:');
 
-        if ($aEnabledModules) {
+        if ($aEnabledModules || $oApp) {
 
             $oOutput->writeln('');
 
