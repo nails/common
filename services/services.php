@@ -110,6 +110,13 @@ return [
                 return new \Nails\Common\Service\PDODatabase();
             }
         },
+        'Routes'          => function () {
+            if (class_exists('\App\Common\Service\Routes')) {
+                return new \App\Common\Service\Routes();
+            } else {
+                return new \Nails\Common\Service\Routes();
+            }
+        },
         'Router'         => function () {
             //  @todo - remove dependency on CI
             $oCi = get_instance();
@@ -192,13 +199,6 @@ return [
                 return new \App\Common\Model\Language();
             } else {
                 return new \Nails\Common\Model\Language();
-            }
-        },
-        'Routes'          => function () {
-            if (class_exists('\App\Common\Model\Routes')) {
-                return new \App\Common\Model\Routes();
-            } else {
-                return new \Nails\Common\Model\Routes();
             }
         },
     ],

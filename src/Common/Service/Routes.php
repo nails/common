@@ -5,12 +5,12 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    model
+ * @category    Service
  * @author      Nails Dev Team
  * @link
  */
 
-namespace Nails\Common\Model;
+namespace Nails\Common\Service;
 
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Factory;
@@ -53,7 +53,7 @@ class Routes
     // --------------------------------------------------------------------------
 
     /**
-     * Constructs the model
+     * Constructs the Service
      */
     public function __construct()
     {
