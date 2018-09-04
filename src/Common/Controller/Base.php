@@ -201,7 +201,7 @@ abstract class Base extends \MX_Controller
             ],
         ];
         foreach ($aVariables as $sKey => $mValue) {
-            $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS');
+            $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
         }
 
 
