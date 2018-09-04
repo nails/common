@@ -27,8 +27,8 @@ jobs:
           - v1-dependencies-
 
       - run: composer --no-interaction --optimize-autoloader install
-      - run: npm install
-      - run: ./node_modules/.bin/gulp build
+      - run: yarn install
+      - run: yarn build
 
       - save_cache:
           paths:
