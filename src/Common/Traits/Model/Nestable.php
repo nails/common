@@ -45,6 +45,10 @@ trait Nestable
         $mResult = parent::create($aData, $bReturnObject);
         if ($mResult) {
             $this->saveBreadcrumbs($bReturnObject ? $mResult->id : $mResult);
+            //  Refresh object to get updated breadcrumbs/URL
+            if ($bReturnObject) {
+                $mResult = $this->getById($mResult->id);
+            }
         }
         return $mResult;
     }
