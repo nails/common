@@ -37,11 +37,11 @@ class Rewrite extends Base
         $oOutput->writeln('<info>--------------------</info>');
         $oOutput->writeln('Beginning...');
 
-        $oRoutesModel = Factory::model('Routes');
+        $oRoutesService = Factory::service('Routes');
 
         try {
-            if (!$oRoutesModel->update(null, $oOutput)) {
-                throw new \Exception($oRoutesModel->lastError());
+            if (!$oRoutesService->update(null, $oOutput)) {
+                throw new \Exception($oRoutesService->lastError());
             }
         } catch (\Exception $e) {
             $this->abort(

@@ -117,14 +117,14 @@ abstract class Base extends \MX_Controller
         //  Need to generate the routes_app.php file?
         if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
 
-            $oRoutesModel = Factory::model('Routes');
+            $oRoutesService = Factory::service('Routes');
 
-            if (!$oRoutesModel->update()) {
+            if (!$oRoutesService->update()) {
 
                 //  Fall over, routes_app.php *must* be there
                 $subject = 'Failed To generate routes_app.php';
                 $message = 'routes_app.php was not found and could not be generated. ';
-                $message .= $oRoutesModel->lastError();
+                $message .= $oRoutesService->lastError();
 
                 showFatalError($subject, $message);
 
