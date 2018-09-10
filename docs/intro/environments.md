@@ -1,13 +1,22 @@
-# Password Protecting Environments
-> Documentation is a WIP.
+# Environments
 
+- [Overview](#overview)
+- [Password Protecting Environments](#password-protecting-environments)
+
+
+## Overview
+
+> @todo - complete this section
+
+
+## Password Protecting Environments
 
 Sometimes it can be desireable to restrict access to a particular environment, e.g. a stopping the public from accessing a staging instance. Nails offers a simple mechanism for implementing basic authentication across the entire application when it detects a specific environment.
 
 *Note: This is not designed to be a cryptographically secure method of protection.*
 
 
-## Defining users and passwords
+### Defining users and passwords
 
 Users, and their corresponding passwords, are defined in the application's `config/app.php` file using a simple JSON string.
 
@@ -27,7 +36,7 @@ The JSON string is a series of key/value pairs, where the key is the username an
     }
 
 
-### Example
+#### Example
 
 It is often easier to define the user/password pairs in PHP and then use `json_encode()` to convert to a string; here's a sample of what might exist in `config/app.php`
 
@@ -38,14 +47,14 @@ It is often easier to define the user/password pairs in PHP and then use `json_e
     define('APP_USER_PASS_STAGING', json_encode($aUserPass));
 
 
-## Generating the hash
+### Generating the hash
 
 There are many online tools to do this, but it is recommended to use a local system when encrypting secrets. You can use PHP to encode the string on the command line as follows:
 
     $ php -r 'echo hash("sha256", "password-to-encode");'
 
 
-## Whitelisting IPs
+### Whitelisting IPs
 
 whitelisting an IP (i.e not requiring a password) is straightforward. Similar to the above, create a constant in `config/app.php` which is a JSON encoded array of IP and IP Ranges. the name of the constant should match the environment.
 
@@ -55,7 +64,7 @@ So, for example, to define a whitelist for the `STAGING` environment you'd defin
 
     APP_USER_PASS_WHITELIST_ STAGING
 
-### Example
+#### Example
 
     $aIpWhitelist = array(
         '123.456.78.0/15',

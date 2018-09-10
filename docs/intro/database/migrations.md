@@ -1,5 +1,8 @@
-# Database Migrations
-> Documentation is a WIP.
+# Database › Migrations
+
+- [Writing migrations](#writing-migrations)
+    - [PHP Migrations](#php-migrations)
+    - [SQL Migrations](#sql-migrations)
 
 
 Database migrations can be run on the CLI using the `nails migrate` command. Migrations are run automatically as part of an `install` or an `upgrade`.
@@ -25,12 +28,9 @@ The migration system will automatically look for numerically (in ascending order
 
 You don't have to numerically index as shown above, but we recommend it for simplicity.
 
----
-
-You can migrate using either [PHP](#php) or vanilla [SQL](#sql).
+You can migrate using either [PHP](#php-migrations) or vanilla [SQL](#sql-migrations).
 
 
-<a name="php"></a>
 ### PHP Migrations
 
 Each migration takes the form of a class which extends the `Nails\Common\Console\Migrate\Base` class. The migration contains an `execute()` method which is called by the migration system when migrating. You should put your migrations in here. A migration will have a classname corresponding to the filename, for example a migration called `2.php` would contain a class called `Migration2`.
@@ -101,7 +101,6 @@ class Migration0 extends Base
 }
 ```
 
-<a name="sql"></a>
 ### SQL Migrations
 
 > **Note -** SQL migrations are **deprecated** in favour of PHP migrations
@@ -110,3 +109,4 @@ If you wish to use SQL migrations then simply name the file with a `.sql` extens
 
 - One query per line. The parser isn't very smart and treats each line as an independent query, therefore queries which span multiple lines will generate syntax errors
 - Comment out lines using `//`, `/* */` or `-- `
+

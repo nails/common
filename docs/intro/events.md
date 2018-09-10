@@ -1,7 +1,4 @@
 # Events
-> Documentation is a WIP.
-
-
 
 Events in Nails are a way of broadcasting to other parts of the system that something happened, and provides an interface for code to react. For example; you may wish to update a mailing list database every time a user is created, or send a notification to an administrator whenever somebody makes a purchase.
 
