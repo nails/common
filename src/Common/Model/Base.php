@@ -124,7 +124,7 @@ abstract class Base
 
     /**
      * When true, the model will not attempt to automatically generate a slug when updating
-      @var boolean
+     * @var boolean
      */
     const AUTO_SET_SLUG_IMMUTABLE = true;
 
@@ -2341,7 +2341,7 @@ abstract class Base
      */
     protected function describeFieldsGuessValidation(&$oField, $sType)
     {
-        preg_match('/^(.*?)(\((\d+?)\)(.*))?$/', $sType, $aMatches);
+        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
         $sType   = getFromArray(1, $aMatches, 'text');
         $iLength = getFromArray(3, $aMatches);
@@ -2360,13 +2360,10 @@ abstract class Base
                 }
                 break;
 
-            /**
-             * Boolean
-             * Nails convention uses tinyint(1) as a boolean; if not (1) then treat as integer
-             */
             case 'tinyint':
-                if ($sExtra === 'unsigned') {
+                if ($oField->type === 'boolean') {
                     $oField->validation[] = 'greater_than[-1]';
+                    $oField->validation[] = 'less_than[2]';
                 } else {
                     $oField->validation[] = 'integer';
                 }
@@ -2389,6 +2386,13 @@ abstract class Base
                 break;
             case 'datetime':
                 $oField->validation[] = 'valid_datetime';
+                break;
+
+            /**
+             * ENUM
+             */
+            case 'enum':
+                $oField->validation[] = 'in_list[' . implode(',', array_keys($oField->options)) . ']';
                 break;
 
             /**
