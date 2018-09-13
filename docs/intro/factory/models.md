@@ -246,22 +246,22 @@ The base model provides a protected method called `addExpandableField($aOptions)
 The `$aOptions` parameter accepts an array with the following indexes:
 
 ```php
-$aOptions = array(
+$this->addExpandableField([
 
     //  The text which triggers this expansion, passed in via $aData['expand']
-    'trigger' => 'myTriggerText',
+    'trigger' => 'trigger',
 
     //  The type of expansion: single or many
     //  This must be one of static::EXPAND_TYPE_SINGLE or static::EXPAND_TYPE_MANY
     'type' => static::EXPAND_TYPE_SINGLE,
 
-    //  What property to assign the results of the expansion to
-    'property' => 'my_property',
+    //  What property to assign the results of the expansion to (optional, defaults to the value of `trigger`)
+    'property' => 'property',
 
     //  Which model to use for the expansion
     'model' => 'MyModel',
 
-    //  The provider of the model
+    //  The provider of the model (optional, defaults to `app`)
     'provider' => 'app',
 
     /**
@@ -277,7 +277,25 @@ $aOptions = array(
     //  Whether to automatically save expanded objects when the trigger is
     //  passed as a key to the create or update methods
     'auto_save' => true
-)
-
-$this->addExpandableField($aOptions);
+]);
 ```
+
+For the book example above, the following definitions would look like this:
+
+```php
+$this
+    ->addExpandableField([
+        'trigger'   => 'author',
+        'model'     => 'Author',
+        'id_column' => 'author_id',
+    ])
+    ->addExpandableField([
+        'trigger'   => 'reviews',
+        'type'      => static:: EXPAND_TYPE_MANY,
+        'model'     => 'Review',
+        'id_column' => 'book_id',
+    ])
+```
+
+
+**Note:** Nails' convention is to use plural triggers and properties for `static::EXPAND_TYPE_MANY` expansions, and singlular for `static::EXPAND_TYPE_SINGLE` expansions.
