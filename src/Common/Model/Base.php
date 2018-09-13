@@ -2014,20 +2014,21 @@ abstract class Base
             $bAutoSave = false;
         }
 
-        if (!array_key_exists('property', $aOptions)) {
-            throw new ModelException('Expandable fields must define a "property".');
-        }
-
         if (!array_key_exists('model', $aOptions)) {
             throw new ModelException('Expandable fields must define a "model".');
         }
 
-        if (!array_key_exists('provider', $aOptions)) {
-            throw new ModelException('Expandable fields must define a "provider".');
-        }
-
         if (!array_key_exists('id_column', $aOptions)) {
             throw new ModelException('Expandable fields must define a "id_column".');
+        }
+
+        //  Optional elements
+        if (!array_key_exists('property', $aOptions)) {
+            $aOptions['property'] = $aOptions['trigger'];
+        }
+
+        if (!array_key_exists('provider', $aOptions)) {
+            $aOptions['provider'] = 'app';
         }
 
         $this->aExpandableFields[] = (object) [
