@@ -56,12 +56,14 @@ abstract class Base
     /**
      * Keeps a track of the columns which have been used by getByColumn(); allows
      * for us to more easily invalidate caches
+     *
      * @var array
      */
     protected $aCacheColumns = [];
 
     /**
      * Override the default token mask when automatically generating tokens for items
+     *
      * @var string
      */
     protected $sTokenMask;
@@ -88,42 +90,49 @@ abstract class Base
 
     /**
      * The event namespace to use when firing events
+     *
      * @var string
      */
     const EVENT_NAMESPACE = null;
 
     /**
      * The trigger to fire when an item is created
+     *
      * @var string
      */
     const EVENT_CREATED = null;
 
     /**
      * The trigger to fire when an item is updated
+     *
      * @var string
      */
     const EVENT_UPDATED = null;
 
     /**
      * The trigger to fire when an item is deleted
+     *
      * @var string
      */
     const EVENT_DELETED = null;
 
     /**
      * The trigger to fire when an item is destroyed
+     *
      * @var string
      */
     const EVENT_DESTROYED = null;
 
     /**
      * The trigger to fire when an item is restored
+     *
      * @var string
      */
     const EVENT_RESTORED = null;
 
     /**
      * When true, the model will not attempt to automatically generate a slug when updating
+     *
      * @var boolean
      */
     const AUTO_SET_SLUG_IMMUTABLE = true;
@@ -199,8 +208,6 @@ abstract class Base
         if (!empty($this->tableCreatedByColumn)) {
             $this->addExpandableField([
                 'trigger'   => 'created_by',
-                'type'      => self::EXPANDABLE_TYPE_SINGLE,
-                'property'  => 'created_by',
                 'model'     => 'User',
                 'provider'  => 'nailsapp/module-auth',
                 'id_column' => 'created_by',
@@ -210,8 +217,6 @@ abstract class Base
         if (!empty($this->tableModifiedByColumn)) {
             $this->addExpandableField([
                 'trigger'   => 'modified_by',
-                'type'      => self::EXPANDABLE_TYPE_SINGLE,
-                'property'  => 'modified_by',
                 'model'     => 'User',
                 'provider'  => 'nailsapp/module-auth',
                 'id_column' => 'modified_by',
@@ -221,7 +226,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  @todo (Pablo - 2017-06-08) - Remove this
-        self::backwardsCompatibility($this);
+        static::backwardsCompatibility($this);
     }
 
     // --------------------------------------------------------------------------
@@ -2001,14 +2006,14 @@ abstract class Base
         }
 
         if (!array_key_exists('type', $aOptions)) {
-            throw new ModelException('Expandable fields must define a "type".');
+            $aOptions['type'] = static::EXPANDABLE_TYPE_SINGLE;
         }
 
-        if ($aOptions['type'] == self::EXPANDABLE_TYPE_SINGLE && !empty($aOptions['auto_save'])) {
+        if ($aOptions['type'] == static::EXPANDABLE_TYPE_SINGLE && !empty($aOptions['auto_save'])) {
             throw new ModelException(
-                'Auto saving an expandable field is incompatible with type self::EXPANDABLE_TYPE_SINGLE'
+                'Auto saving an expandable field is incompatible with type static::EXPANDABLE_TYPE_SINGLE'
             );
-        } elseif ($aOptions['type'] == self::EXPANDABLE_TYPE_MANY) {
+        } elseif ($aOptions['type'] == static::EXPANDABLE_TYPE_MANY) {
             $bAutoSave = array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true;
         } else {
             $bAutoSave = false;
