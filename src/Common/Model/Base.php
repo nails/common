@@ -1990,6 +1990,7 @@ abstract class Base
      *
      * @param array $aOptions An array describing the expandable field
      *
+     * @return $this
      * @throws ModelException
      */
     protected function addExpandableField(array $aOptions)
@@ -2064,6 +2065,8 @@ abstract class Base
             //  passed as a key to the create or update methods
             'auto_save'   => $bAutoSave,
         ];
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
