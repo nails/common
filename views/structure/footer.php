@@ -1,109 +1,88 @@
 <?php
 
-	/**
-	 * --------------------------------------------------------------------------
-	 * FOOTER CONTROLLER
-	 * --------------------------------------------------------------------------
-	 *
-	 * This view controls which footer should be rendered. It will use the URI to
-	 * determine the appropriate footer file (against the footer config file).
-	 *
-	 * Override this automatic behaviour by specifying the footer_override
-	 * variable in the data supplied to the view.
-	 *
-	 **/
+/**
+ * --------------------------------------------------------------------------
+ * FOOTER CONTROLLER
+ * --------------------------------------------------------------------------
+ *
+ * This view controls which footer should be rendered. It will use the URI to
+ * determine the appropriate footer file (against the footer config file).
+ *
+ * Override this automatic behaviour by specifying the footer_override
+ * variable in the data supplied to the view.
+ *
+ **/
 
-	// --------------------------------------------------------------------------
+use Nails\Factory;
 
-	//	Catch 404 nonsense
-	$_is_404 = defined( 'NAILS_IS_404' ) && NAILS_IS_404 ? TRUE : FALSE;
+// --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+//  Catch 404
+$bIs404 = defined('NAILS_IS_404') && NAILS_IS_404 ? true : false;
 
+// --------------------------------------------------------------------------
 
-	if ( isset( $footer_override ) ) :
+$oView   = Factory::service('View');
+$oUri    = Factory::service('Uri');
+$oConfig = Factory::service('Config');
+$oRouter = Factory::service('Router');
 
-		//	Manual override
-		$this->load->view( $footer_override );
+// --------------------------------------------------------------------------
 
-	else :
+if (isset($footerOverride)) {
 
-		//	Auto-detect footer if there is a config file
-		if ( file_exists( FCPATH . APPPATH . 'config/footer_views.php' ) ) :
+    //  Manual override
+    $oView->load($footerOverride);
 
-			$this->config->load( 'footer_views' );
-			$_match = FALSE;
-			$_uri_string = $this->uri->uri_string();
+} elseif (isset($footer_override)) {
 
-			if ( ! $_uri_string ) :
+    //  Manual override
+    $oView->load($footer_override);
 
-				//	We're at the homepage, get the name of the default controller
-				$_uri_string = $this->router->routes['default_controller'];
+} else {
 
-			endif;
+    //  Auto-detect footer if there is a config file
+    if (file_exists(APPPATH . 'config/footer_views.php')) {
 
-			if ( $this->config->item( 'alt_footer' ) ) :
+        $oConfig->load('footer_views');
+        $match     = false;
+        $uriString = $oUri->uri_string();
 
-				foreach ( $this->config->item( 'alt_footer' ) AS $pattern => $template ) :
+        if (!$uriString) {
+            //  We're at the homepage, get the name of the default controller
+            $uriString = $oRouter->routes['default_controller'];
+        }
 
-					//	Prep the regex
-					$_key = str_replace( ':any', '.*', str_replace( ':num', '[0-9]*', $pattern ) );
+        if ($oConfig->item('alt_footer')) {
 
-					//	Match found?
-					if ( preg_match( '#^' . preg_quote( $_key, '#' ) . '$#', $_uri_string ) ) :
+            foreach ($oConfig->item('alt_footer') as $pattern => $template) {
 
-						$_match = $template;
-						break;
+                //  Prep the regex
+                $key = str_replace(':any', '.+', str_replace(':num', '\d+', $pattern));
 
-					endif;
+                //  Match found?
+                if (preg_match('#^' . preg_quote($key, '#') . '$#', $uriString)) {
+                    $match = $template;
+                    break;
+                }
+            }
+        }
 
-				endforeach;
+        //  Load the appropriate footer view
+        if ($match) {
+            $oView->load($match);
+        } else {
+            $oView->load($oConfig->item('default_footer'));
+        }
 
-			endif;
+    } elseif (file_exists(APPPATH . 'views/structure/footer/default.php')) {
 
-			//	Load the appropriate footer view
-			if ( $_match ) :
+        //  No config file, but the app has a default footer
+        $oView->load('structure/footer/default');
 
-				$this->load->view( $_match );
+    } else {
 
-			elseif ( $this->uri->segment( 1 ) == 'admin' ) :
-
-				//	No match, but in admin, load the appropriate admin view
-				if ( $_is_404 ) :
-
-					//	404 with no route, show the default footer
-					$this->load->view( $this->config->item( 'default_footer' ) );
-
-				else :
-
-					//	Admin has no route and it's not a 404, load up the Nails admin footer
-					$this->load->view( 'structure/footer/nails-admin' );
-
-				endif;
-
-			else :
-
-				$this->load->view( $this->config->item( 'default_footer' ) );
-
-			endif;
-
-		elseif ( $this->uri->segment( 1 ) == 'admin' && empty( $_is_404 ) ) :
-
-			//	Loading admin footer and no config file. This isn't a 404 so
-			//	go ahead and load the normal Nails admin footer
-
-			$this->load->view( 'structure/footer/nails-admin' );
-
-		elseif ( file_exists( FCPATH . APPPATH . 'views/structure/footer/default.php' ) ) :
-
-			//	No config file, but the app has a default footer
-			$this->load->view( 'structure/footer/default' );
-
-		else :
-
-			//	No config file or app default, fall back to the default Nails. footer
-			$this->load->view( 'structure/footer/nails-default' );
-
-		endif;
-
-	endif;
+        //  No config file or app default, fall back to the default Nails. footer
+        $oView->load('structure/footer/nails-default');
+    }
+}

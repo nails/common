@@ -1,109 +1,86 @@
 <?php
 
-	/**
-	 * --------------------------------------------------------------------------
-	 * HEADER CONTROLLER
-	 * --------------------------------------------------------------------------
-	 *
-	 * This view controls which header should be rendered. It will use the URI to
-	 * determine the appropriate header file (against the header config file).
-	 *
-	 * Override this automatic behaviour by specifying the header_override
-	 * variable in the data supplied to the view.
-	 *
-	 **/
+/**
+ * --------------------------------------------------------------------------
+ * HEADER CONTROLLER
+ * --------------------------------------------------------------------------
+ *
+ * This view controls which header should be rendered. It will use the URI to
+ * determine the appropriate header file (against the header config file).
+ *
+ * Override this automatic behaviour by specifying the header_override
+ * variable in the data supplied to the view.
+ *
+ **/
 
+use Nails\Factory;
 
-	// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-	//	Catch 404 nonsense
-	$_is_404 = defined( 'NAILS_IS_404' ) && NAILS_IS_404 ? TRUE : FALSE;
+//  Catch 404
+$bIs404 = defined('NAILS_IS_404') && NAILS_IS_404 ? true : false;
 
-	// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-	if ( isset( $header_override ) ) :
+$oView   = Factory::service('View');
+$oUri    = Factory::service('Uri');
+$oConfig = Factory::service('Config');
+$oRouter = Factory::service('Router');
 
-		//	Manual override
-		$this->load->view( $header_override );
+if (isset($headerOverride)) {
 
-	else :
+    //  Manual override
+    $oView->load($headerOverride);
 
-		//	Auto-detect header if there is a config file
-		if ( file_exists( FCPATH . APPPATH . 'config/header_views.php' ) ) :
+} elseif (isset($header_override)) {
 
-			$this->config->load( 'header_views' );
-			$_match = FALSE;
-			$_uri_string = $this->uri->uri_string();
+    //  Manual override
+    $oView->load($header_override);
 
-			if ( ! $_uri_string ) :
+} else {
 
-				//	We're at the homepage, get the name of the default controller
-				$_uri_string = $this->router->routes['default_controller'];
+    //  Auto-detect header if there is a config file
+    if (file_exists(APPPATH . 'config/header_views.php')) {
 
-			endif;
+        $oConfig->load('header_views');
+        $match     = false;
+        $uriString = $oUri->uri_string();
 
-			if ( $this->config->item( 'alt_header' ) ) :
+        if (!$uriString) {
+            //  We're at the homepage, get the name of the default controller
+            $uriString = $oRouter->routes['default_controller'];
+        }
 
-				foreach ( $this->config->item( 'alt_header' ) AS $pattern => $template ) :
+        if ($oConfig->item('alt_header')) {
 
-					//	Prep the regex
-					$_key = str_replace( ':any', '.*', str_replace( ':num', '[0-9]*', $pattern ) );
+            foreach ($oConfig->item('alt_header') as $pattern => $template) {
 
-					//	Match found?
-					if ( preg_match( '#^' . preg_quote( $_key, '#' ) . '$#', $_uri_string ) ) :
+                //  Prep the regex
+                $key = str_replace(':any', '.+', str_replace(':num', '\d+', $pattern));
 
-						$_match = $template;
-						break;
+                //  Match found?
+                if (preg_match('#^' . preg_quote($key, '#') . '$#', $uriString)) {
+                    $match = $template;
+                    break;
+                }
+            }
+        }
 
-					endif;
+        //  Load the appropriate header view
+        if ($match) {
+            $oView->load($match);
+        } else {
+            $oView->load($oConfig->item('default_header'));
+        }
 
-				endforeach;
+    } elseif (file_exists(APPPATH . 'views/structure/header/default.php')) {
 
-			endif;
+        //  No config file, but the app has a default header
+        $oView->load('structure/header/default');
 
-			//	Load the appropriate header view
-			if ( $_match ) :
+    } else {
 
-				$this->load->view( $_match );
-
-			elseif ( $this->uri->segment( 1 ) == 'admin' ) :
-
-				//	No match, but in admin, load the appropriate admin view
-				if ( $_is_404 ) :
-
-					//	404 with no route, show the default header
-					$this->load->view( $this->config->item( 'default_header' ) );
-
-				else :
-
-					//	Admin has no route and it's not a 404, load up the Nails admin header
-					$this->load->view( 'structure/header/nails-admin' );
-
-				endif;
-
-			else :
-
-				$this->load->view( $this->config->item( 'default_header' ) );
-
-			endif;
-
-		elseif ( $this->uri->segment( 1 ) == 'admin' && ! $_is_404 ) :
-
-			//	Loading admin header and no config file. This isn't a 404 so
-			//	go ahead and load the normal Nails admin header
-
-			$this->load->view( 'structure/header/nails-admin' );
-
-		elseif ( file_exists( FCPATH . APPPATH . 'views/structure/header/default.php' ) ) :
-
-			//	No config file, but the app has a default header
-			$this->load->view( 'structure/header/default' );
-
-		else :
-
-			//	No config file or app default, fall back to the default Nails. header
-			$this->load->view( 'structure/header/nails-default' );
-
-		endif;
-
-	endif;
+        //  No config file or app default, fall back to the default Nails. header
+        $oView->load('structure/header/nails-default');
+    }
+}

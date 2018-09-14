@@ -1,4 +1,5 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
 /*
 | -------------------------------------------------------------------
 | Email Settings
@@ -9,12 +10,12 @@
 
 $config['mailpath']		= '/usr/sbin/sendmail';
 $config['charset']		= 'utf-8';
-$config['wordwrap']		= TRUE;
-$config['validate']		= TRUE;
+$config['wordwrap']		= true;
+$config['validate']		= true;
 $config['mailtype']		= 'html';
 $config['protocol']		= 'smtp';
 $config['newline']		= "\r\n";
-$config['smtp_host']	= DEPLOY_SMTP_HOST;
-$config['smtp_pass']	= DEPLOY_SMTP_PASSWORD;
-$config['smtp_user']	= DEPLOY_SMTP_USERNAME;
-$config['smtp_port']	= DEPLOY_SMTP_PORT;
+$config['smtp_host']	= defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : '127.0.0.1';
+$config['smtp_pass']	= defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '';
+$config['smtp_user']	= defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '';
+$config['smtp_port']	= defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : '25';

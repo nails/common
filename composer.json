@@ -1,28 +1,85 @@
 {
-	"name": "nailsapp/common",
-	"keywords": ["Nails","Shed Collective","CodeIgniter"],
-	"homepage": "http://nailsapp.co.uk",
-	"description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
-	"license":"MIT",
-	"authors": [
-		{
-			"name": "Pablo de la Pena",
-			"email": "p@shedcollective.org",
-			"homepage": "http://shedcollective.org",
-			"role": "Developer"
-		},
-		{
-			"name": "Gary Duncan",
-			"email": "g@shedcollective.org",
-			"homepage": "http://shedcollective.org",
-			"role": "Developer"
-		}
-	],
-	"support": {
-		"email": "hello@shedcollective.org"
-	},
-	"require":
-	{
-		"php": ">=5.4.0"
-	}
+    "name": "nails/common",
+    "keywords": ["Nails","Shed Collective","CodeIgniter"],
+    "homepage": "http://nailsapp.co.uk",
+    "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pablo de la Pena",
+            "email": "p@nailsapp.co.uk",
+            "homepage": "http://nailsapp.co.uk",
+            "role": "Developer"
+        },
+        {
+            "name": "Gary Duncan",
+            "email": "g@nailsapp.co.uk",
+            "homepage": "http://nailsapp.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "hello@nailsapp.co.uk"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require":
+    {
+        "codeigniter/framework": "3.1.7",
+        "pimple/pimple": "3.*",
+        "guzzlehttp/guzzle": "6.*",
+        "mustache/mustache": "2.*",
+        "behat/transliterator": "^1.2",
+        "ralouphie/getallheaders": "^2.0",
+        "defuse/php-encryption": "^2.1",
+        "nails/module-admin": "dev-develop",
+        "nails/module-asset": "dev-develop",
+        "nails/module-email": "dev-develop",
+        "nails/module-event": "dev-develop",
+        "nails/module-console": "dev-develop",
+        "nails/driver-error-handler-default": "dev-develop"
+    },
+    "require-dev":
+    {
+        "phpunit/phpunit": "4.*"
+    },
+    "autoload":
+    {
+        "psr-4": {"Nails\\": "src/"}
+    },
+    "extra": {
+        "nails": {
+            "autoload": {
+                "services": [
+                    "ErrorHandler"
+                ],
+                "helpers": [
+                    "string",
+                    "array",
+                    "app_setting",
+                    "app_notification",
+                    "date",
+                    "url",
+                    "cookie",
+                    "form",
+                    "html",
+                    "tools",
+                    "debug",
+                    "language",
+                    "text",
+                    "exception",
+                    "typography",
+                    "log",
+                    "directory"
+                ]
+            },
+            "data": {
+                "nails/module-cdn": {
+                    "permitted-image-dimensions": [
+                        "35x35"
+                    ]
+                }
+            }
+        }
+    }
 }

@@ -1,0 +1,52 @@
+//  Brand colours
+$color-brand: #ca4007;
+$color-brand-text: darken($color-brand, 30%);
+$color-brand-border: darken($color-brand, 10%);
+
+// --------------------------------------------------------------------------
+
+//  Whites
+$color-white: #fff;
+$color-white-lightest: lighten($color-white, 10%);
+$color-white-lighter: lighten($color-white, 30%);
+$color-white-darker: darken($color-white, 5%);
+$color-white-darkest: darken($color-white, 10%);
+
+//  Greys: ;
+$color-grey: #ccc;
+$color-grey-lightest: lighten($color-grey, 10%);
+$color-grey-lighter: lighten($color-grey, 5%);
+$color-grey-darker: darken($color-grey, 5%);
+$color-grey-darkest: darken($color-grey, 10%);
+
+//  Blacks
+$color-black: #333;
+$color-black-lightest: lighten($color-black, 10%);
+$color-black-lighter: lighten($color-black, 5%);
+$color-black-darker: darken($color-black, 5%);
+$color-black-darkest: darken($color-black, 10%);
+
+
+// --------------------------------------------------------------------------
+
+//  Status
+
+//  Success
+$color-success-background: #5cb85c;
+$color-success-text: darken($color-success-background, 30%);
+$color-success-border: darken($color-success-background, 10%);
+
+//  Warning
+$color-warning-background: #f0ad4e;
+$color-warning-text: darken($color-warning-background, 35%);
+$color-warning-border: darken($color-warning-background, 10%);
+
+//  Danger
+$color-danger-background: #e2817e;
+$color-danger-text: darken($color-danger-background, 35%);
+$color-danger-border: darken($color-danger-background, 15%);
+
+//  Info
+$color-info-background: #5bc0de;
+$color-info-text: darken($color-info-background, 35%);
+$color-info-border: darken($color-info-background, 10%);

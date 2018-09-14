@@ -1,4 +1,9 @@
-		<!--	GLOBAL JS	-->
-		<?php $this->asset->output( 'js-inline' ); ?>
-	</body>
-</html>
+<?php
+
+use Nails\Factory;
+
+$oAsset = Factory::service('Asset');
+$oAsset->output('JS');
+$oAsset->output('JS-INLINE-FOOTER');
+echo appSetting('site_custom_markup', 'site');
+echo '</body></html>';

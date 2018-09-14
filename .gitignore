@@ -1,4 +1,5 @@
 .DS_Store
-config/_nails.php
-libraries/_resources/geoip/GeoLiteCity.dat
-vendor*
+vendor/*
+composer.lock
+.idea
+node_modules

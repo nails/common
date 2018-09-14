@@ -1,0 +1,79 @@
+.btn {
+    display: inline-block;
+    border: 1px solid $color-grey-lighter;
+    background: $color-white;
+    padding: 1rem;
+    cursor: pointer;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px $color-grey-lightest;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1rem;
+    text-align: center;
+
+    &:active,
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        box-shadow: none;
+        position: relative;
+        top: 1px;
+    }
+
+    &--block {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+        box-sizing: border-box;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &--link {
+        border: none;
+        box-shadow: none;
+    }
+
+    &--disabled,
+    &[disabled] {
+        border: 1px solid $color-white-darker;
+        color: $color-grey-lighter;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        color: $color-brand-text;
+        border-color: $color-brand-border;
+        background: $color-brand;
+    }
+
+    &--success {
+        color: $color-success-text;
+        border-color: $color-success-border;
+        background: $color-success-background;
+    }
+
+    &--warning {
+        color: $color-warning-text;
+        border-color: $color-warning-border;
+        background: $color-warning-background;
+    }
+
+    &--danger {
+        color: $color-danger-text;
+        border-color: $color-danger-border;
+        background: $color-danger-background;
+    }
+
+    &--info {
+        color: $color-info-text;
+        border-color: $color-info-border;
+        background: $color-info-background;
+    }
+
+}
