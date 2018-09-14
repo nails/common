@@ -146,6 +146,13 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
+        //  Backwards compatability - ensure that the vendor prefix is correct
+        $this->oDb->query(
+            'UPDATE `' . NAILS_DB_PREFIX . 'migration` SET `module` = REPLACE(`module`, "nailsapp/", "nails/");'
+        );
+
+        // --------------------------------------------------------------------------
+
         $oOutput->writeln('');
 
         // --------------------------------------------------------------------------
