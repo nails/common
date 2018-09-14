@@ -40,7 +40,7 @@ abstract class Base extends \MX_Controller
         $oEventService = Factory::service('Event');
 
         //  Call the SYSTEM:STARTUP event, the earliest event the app can bind to.
-        $oEventService->trigger(Events::SYSTEM_STARTUP, 'nailsapp/common');
+        $oEventService->trigger(Events::SYSTEM_STARTUP, 'nails/common');
 
         // --------------------------------------------------------------------------
 
@@ -249,7 +249,7 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Call the SYSTEM:READY event, the system is all geared up and ready to go
-        $oEventService->trigger(Events::SYSTEM_READY, 'nailsapp/common');
+        $oEventService->trigger(Events::SYSTEM_READY, 'nails/common');
     }
 
     // --------------------------------------------------------------------------
@@ -732,7 +732,7 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
-        $oUserModel = Factory::model('User', 'nailsapp/module-auth');
+        $oUserModel = Factory::model('User', 'nails/module-auth');
         $oUserModel->init();
     }
 
@@ -749,14 +749,14 @@ abstract class Base extends \MX_Controller
         if (isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
-            $oAuthModel = Factory::model('Auth', 'nailsapp/module-auth');
+            $oAuthModel = Factory::model('Auth', 'nails/module-auth');
             $this->lang->load('auth/auth');
 
             //  Log the user out
             $oAuthModel->logout();
 
             //  Create a new session
-            $oSession = Factory::service('Session', 'nailsapp/module-auth');
+            $oSession = Factory::service('Session', 'nails/module-auth');
             $oSession->sess_create();
 
             //  Give them feedback
@@ -786,12 +786,12 @@ abstract class Base extends \MX_Controller
         $oBindTo->logger              = Factory::service('Logger');
         $oBindTo->uri                 = Factory::service('Uri');
         $oBindTo->security            = Factory::service('Security');
-        $oBindTo->emailer             = Factory::service('Emailer', 'nailsapp/module-email');
-        $oBindTo->event               = Factory::service('Event', 'nailsapp/module-event');
-        $oBindTo->session             = Factory::service('Session', 'nailsapp/module-auth');
-        $oBindTo->user                = Factory::model('User', 'nailsapp/module-auth');
-        $oBindTo->user_group_model    = Factory::model('UserGroup', 'nailsapp/module-auth');
-        $oBindTo->user_password_model = Factory::model('UserPassword', 'nailsapp/module-auth');
+        $oBindTo->emailer             = Factory::service('Emailer', 'nails/module-email');
+        $oBindTo->event               = Factory::service('Event', 'nails/module-event');
+        $oBindTo->session             = Factory::service('Session', 'nails/module-auth');
+        $oBindTo->user                = Factory::model('User', 'nails/module-auth');
+        $oBindTo->user_group_model    = Factory::model('UserGroup', 'nails/module-auth');
+        $oBindTo->user_password_model = Factory::model('UserPassword', 'nails/module-auth');
 
         //  Set variables for the views, too
         $oBindTo->data['user']          = $oBindTo->user;
@@ -809,7 +809,7 @@ abstract class Base extends \MX_Controller
     public static function populateUserFeedback(array &$aData)
     {
         //  Set User Feedback alerts for the views
-        $oSession          = Factory::service('Session', 'nailsapp/module-auth');
+        $oSession          = Factory::service('Session', 'nails/module-auth');
         $oUserFeedback     = Factory::service('UserFeedback');
         $aData['error']    = $oUserFeedback->get('error') ?: $oSession->flashdata('error');
         $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->flashdata('negative');

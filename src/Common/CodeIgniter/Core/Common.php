@@ -211,7 +211,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
         //  Pluck common out so it is always the first item
         for ($i = 0; $i < count($aOut); $i++) {
-            if ($aOut[$i]->slug === 'nailsapp/common') {
+            if ($aOut[$i]->slug === 'nails/common') {
                 break;
             }
         }
@@ -447,13 +447,13 @@ if (!function_exists('_NAILS_MIN_PHP_VERSION')) {
      */
     function _NAILS_MIN_PHP_VERSION()
     {
-        //  First check nailsapp/nails
-        $sComposer   = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        //  First check nails/nails
+        $sComposer   = @file_get_contents('vendor/nails/nails/composer.json');
         $oComposer   = @json_decode($sComposer);
         $sMinVersion = isset($oComposer->extra->nails->minPhpVersion) ? $oComposer->extra->nails->minPhpVersion : 0;
 
-        //  Next, check nailsapp/common
-        $sComposer         = @file_get_contents('vendor/nailsapp/nails/composer.json');
+        //  Next, check nails/common
+        $sComposer         = @file_get_contents('vendor/nails/nails/composer.json');
         $oComposer         = @json_decode($sComposer);
         $sMinVersionCommon = isset($oComposer->extra->nails->minPhpVersion) ? $oComposer->extra->nails->minPhpVersion : 0;
 

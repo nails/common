@@ -1,5 +1,5 @@
 {
-    "name": "nailsapp/common",
+    "name": "nails/common",
     "keywords": ["Nails","Shed Collective","CodeIgniter"],
     "homepage": "http://nailsapp.co.uk",
     "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
@@ -32,12 +32,12 @@
         "behat/transliterator": "^1.2",
         "ralouphie/getallheaders": "^2.0",
         "defuse/php-encryption": "^2.1",
-        "nailsapp/module-admin": "dev-develop",
-        "nailsapp/module-asset": "dev-develop",
-        "nailsapp/module-email": "dev-develop",
-        "nailsapp/module-event": "dev-develop",
-        "nailsapp/module-console": "dev-develop",
-        "nailsapp/driver-error-handler-default": "dev-develop"
+        "nails/module-admin": "dev-develop",
+        "nails/module-asset": "dev-develop",
+        "nails/module-email": "dev-develop",
+        "nails/module-event": "dev-develop",
+        "nails/module-console": "dev-develop",
+        "nails/driver-error-handler-default": "dev-develop"
     },
     "require-dev":
     {
@@ -74,7 +74,7 @@
                 ]
             },
             "data": {
-                "nailsapp/module-cdn": {
+                "nails/module-cdn": {
                     "permitted-image-dimensions": [
                         "35x35"
                     ]

@@ -37,7 +37,7 @@ class Factory
         self::$aContainers    = [];
         self::$aLoadedHelpers = [];
         $aDiscoveredServices  = [
-            'nailsapp/common' => self::findServicesForComponent('nailsapp/common'),
+            'nails/common' => self::findServicesForComponent('nails/common'),
         ];
 
         foreach ($aComponents as $oComponent) {
@@ -189,7 +189,7 @@ class Factory
      */
     public static function setProperty($sPropertyName, $mPropertyValue, $sComponentName = '')
     {
-        $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
         if (!self::$aContainers[$sComponentName]['properties']->offsetExists($sPropertyName)) {
             throw new FactoryException(
@@ -265,7 +265,7 @@ class Factory
      */
     public static function helper($sHelperName, $sComponentName = '')
     {
-        $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
         if (empty(self::$aLoadedHelpers[$sComponentName][$sHelperName])) {
 
@@ -328,7 +328,7 @@ class Factory
      */
     private static function getService($sServiceType, $sServiceName, $sComponentName = '', $mParameters = null)
     {
-        $sComponentName = empty($sComponentName) ? 'nailsapp/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
         if (!array_key_exists($sComponentName, self::$aContainers)) {
             throw new FactoryException(

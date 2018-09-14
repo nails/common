@@ -43,7 +43,7 @@ class Events extends Base
             [
                 (object) [
                     'namespace' => 'Nails\\Common\\',
-                    'slug'      => 'nailsapp/common',
+                    'slug'      => 'nails/common',
                 ],
             ],
             _NAILS_GET_COMPONENTS()

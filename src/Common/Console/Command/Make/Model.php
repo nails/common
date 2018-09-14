@@ -76,7 +76,7 @@ class Model extends BaseMaker
 
         //  Get options
         $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
-        $bSkipAdmin = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+        $bSkipAdmin = !isModuleEnabled('nails/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
 
         // --------------------------------------------------------------------------
 
@@ -198,7 +198,7 @@ class Model extends BaseMaker
         $oInput      = $this->oInput;
         $oOutput     = $this->oOutput;
         $bSkipDb     = stringToBoolean($oInput->getOption('skip-db'));
-        $bSkipAdmin  = !isModuleEnabled('nailsapp/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+        $bSkipAdmin  = !isModuleEnabled('nails/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
         $bAutoDetect = stringToBoolean($oInput->getOption('auto-detect'));
 
         //  If auto-detecting models using the database then skip cresting database tables

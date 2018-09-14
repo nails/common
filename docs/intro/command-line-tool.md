@@ -5,7 +5,7 @@ distributed via [Homebrew](http://brew.sh). This command line utility provides s
 whilst also acting as a gateway to the bundled console application.
 
 The latest installation instructions can be found in the tool's
-[README.md](https://github.com/nailsapp/command-line-tool).
+[README.md](https://github.com/nails/command-line-tool).
 
 ## Common Commands
 
@@ -21,7 +21,7 @@ The latest installation instructions can be found in the tool's
 
 This command creates a new Nails project; it essentially automates the following actions:
 
-- Download a copy of the [Nails Skeleton repository](https://github.com/nailsapp/skeleton-app)
+- Download a copy of the [Nails Skeleton repository](https://github.com/nails/skeleton-app)
 - Installs all the dependencies (`composer`, `bower`, `npm`)
 - Executes the Nails installer (i.e. `nails install`)
 - Runs database migrations (i.e. `nails db:migrate`)

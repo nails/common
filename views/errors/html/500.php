@@ -243,7 +243,7 @@ if (Environment::not('PRODUCTION')) {
                 echo keyValueSection('GLOBAL Data', $_GLOBALS);
             }
 
-            $oSession = Factory::service('Session', 'nailsapp/module-auth');
+            $oSession = Factory::service('Session', 'nails/module-auth');
             echo keyValueSection('SESSION Data', $oSession->getUserData());
 
             ?>

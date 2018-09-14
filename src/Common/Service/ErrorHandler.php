@@ -41,7 +41,7 @@ class ErrorHandler
      * The name of the default error handler
      * @var string
      */
-    const DEFAULT_ERROR_HANDLER = 'nailsapp/driver-error-handler-default';
+    const DEFAULT_ERROR_HANDLER = 'nails/driver-error-handler-default';
 
     /**
      * The name of the interface which drivers must implement
@@ -79,7 +79,7 @@ class ErrorHandler
             return;
         }
 
-        $aErrorHandlers = _NAILS_GET_DRIVERS('nailsapp/common', 'ErrorHandler');
+        $aErrorHandlers = _NAILS_GET_DRIVERS('nails/common', 'ErrorHandler');
         $oDefaultDriver = null;
         $aCustomDrivers = [];
         foreach ($aErrorHandlers as $oErrorHandler) {
@@ -435,7 +435,7 @@ class ErrorHandler
 
             if (function_exists('wasAdmin') && wasAdmin()) {
 
-                $oUserModel = Factory::model('User', 'nailsapp/module-auth');
+                $oUserModel = Factory::model('User', 'nails/module-auth');
                 $oRecovery  = $oUserModel->getAdminRecoveryData();
 
                 $sMessage .= '<br /><br />';
@@ -458,7 +458,7 @@ class ErrorHandler
 
         } else {
 
-            $oSession = Factory::service('Session', 'nailsapp/module-auth');
+            $oSession = Factory::service('Session', 'nails/module-auth');
             $oInput   = Factory::service('Input');
             $sMessage = 'Sorry, you need to be logged in to see that page.';
 

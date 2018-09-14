@@ -35,7 +35,7 @@ Nails requires the following:
 The easiest way to get started using Nails is with the Nails CLI tool. This command line utility provides some basic
 bootstrapping functionality whilst also acting as a gateway to the bundled console application.
 
-The latest installation instructions can be found in the tool's [README.md](https://github.com/nailsapp/command-line-tool).
+The latest installation instructions can be found in the tool's [README.md](https://github.com/nails/command-line-tool).
 
 
 ## Setting up a new project

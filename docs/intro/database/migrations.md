@@ -11,7 +11,7 @@ The purpose of migrations is to programatically upgrade your database as the nee
 
 Migrations will always be run in the following order:
 
-1. `nailsapp/common`
+1. `nails/common`
 2. Installed Nails modules
 3. The application
 
@@ -38,7 +38,7 @@ Each migration takes the form of a class which extends the `Nails\Common\Console
 
 #### › Namespace
 
-Your migration should live within a namespace which corresponds to the module name, but camelCased. For example, in module `nailsapp/my-module` the migrations would be found at `nailsapp/my-module/migrations` and use namespace `Nails\Database\Migration\Nailsapp\MyModule`.
+Your migration should live within a namespace which corresponds to the module name, but camelCased. For example, in module `nails/my-module` the migrations would be found at `nails/my-module/migrations` and use namespace `Nails\Database\Migration\nails\MyModule`.
 
 If the migration belongs to the App then it should use namespace `Nails\Database\Migration\App`.
 

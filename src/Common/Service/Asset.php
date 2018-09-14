@@ -924,7 +924,7 @@ class Asset
                         'admin.widgeteditor.css',
                         'admin.widgeteditor.min.js',
                     ],
-                    'nailsapp/module-cms'
+                    'nails/module-cms'
                 );
                 break;
 

@@ -112,9 +112,9 @@ class Startup
         defineConst('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', BASE_URL));
 
         if (isPageSecure()) {
-            defineConst('NAILS_URL', SECURE_BASE_URL . 'vendor/nailsapp/');
+            defineConst('NAILS_URL', SECURE_BASE_URL . 'vendor/nails/');
         } else {
-            defineConst('NAILS_URL', BASE_URL . 'vendor/nailsapp/');
+            defineConst('NAILS_URL', BASE_URL . 'vendor/nails/');
         }
 
         defineConst('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/assets/');
@@ -145,12 +145,12 @@ class Startup
 
         $aAbsolutePaths = [
             [rtrim(APPPATH, DIRECTORY_SEPARATOR), 'modules'],
-            [rtrim(FCPATH, DIRECTORY_SEPARATOR), 'vendor', 'nailsapp', 'common'],
+            [rtrim(FCPATH, DIRECTORY_SEPARATOR), 'vendor', 'nails', 'common'],
         ];
 
         $aRelativePaths = [
             ['..', 'modules'],
-            ['..', '..', 'vendor', 'nailsapp', 'common'],
+            ['..', '..', 'vendor', 'nails', 'common'],
         ];
 
         array_walk(

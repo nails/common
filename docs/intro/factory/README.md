@@ -68,7 +68,7 @@ $oModel = \Nails\Factory::model('MyModel', 'app');
 If the above was provided by the CMS module, it would be loaded like this:
 
 ```
-$oModel = \Nails\Factory::model('MyModel', 'nailsapp/module-cms');
+$oModel = \Nails\Factory::model('MyModel', 'nails/module-cms');
 ```
 
 

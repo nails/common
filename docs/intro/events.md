@@ -99,7 +99,7 @@ class Events
 
             Factory::factory('EventSubscription')
                    ->setEvent(\Nails\Common\Events::SYSTEM_READY)
-                   ->setNamespace('nailsapp/common')
+                   ->setNamespace('nails/common')
                    ->setCallback([$this, 'systemIsReady'])
                    ->setOnce(),
         ];

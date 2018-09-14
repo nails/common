@@ -40,8 +40,8 @@ if (defined('FCPATH') && defined('BASE_URL')) {
     if (NAILS_BRANDING) {
 
         $aPaths[] = [
-            FCPATH . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png',
-            BASE_URL . 'vendor/nailsapp/module-asset/assets/img/nails/icon/icon@2x.png',
+            FCPATH . 'vendor/nails/module-asset/assets/img/nails/icon/icon@2x.png',
+            BASE_URL . 'vendor/nails/module-asset/assets/img/nails/icon/icon@2x.png',
         ];
     }
 }

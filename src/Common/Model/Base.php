@@ -209,7 +209,7 @@ abstract class Base
             $this->addExpandableField([
                 'trigger'   => 'created_by',
                 'model'     => 'User',
-                'provider'  => 'nailsapp/module-auth',
+                'provider'  => 'nails/module-auth',
                 'id_column' => 'created_by',
             ]);
         }
@@ -218,7 +218,7 @@ abstract class Base
             $this->addExpandableField([
                 'trigger'   => 'modified_by',
                 'model'     => 'User',
-                'provider'  => 'nailsapp/module-auth',
+                'provider'  => 'nails/module-auth',
                 'id_column' => 'modified_by',
             ]);
         }

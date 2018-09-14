@@ -139,7 +139,7 @@ class Event
      *
      * @return \Nails\Common\Service\Event
      */
-    public function trigger($sEvent, $sNamespace = 'nailsapp/common', $aData = [])
+    public function trigger($sEvent, $sNamespace = 'nails/common', $aData = [])
     {
         $this->addHistory($sEvent, $sNamespace);
 
@@ -171,7 +171,7 @@ class Event
      *
      * @return $this
      */
-    protected function addHistory($sEvent, $sNamespace = 'nailsapp/common')
+    protected function addHistory($sEvent, $sNamespace = 'nails/common')
     {
         $sEvent     = strtoupper($sEvent);
         $sNamespace = strtoupper($sNamespace);
@@ -265,7 +265,7 @@ class Event
      *
      * @return bool
      */
-    public function hasBeenTriggered($sEvent, $sNamespace = 'nailsapp/common')
+    public function hasBeenTriggered($sEvent, $sNamespace = 'nails/common')
     {
         return (bool) $this->getHistory($sNamespace, $sEvent);
     }

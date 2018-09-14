@@ -59,7 +59,7 @@ See [Assets](../intro/assets.md) for more detailed information and examples.
 The easiest way to build a CMS template is to use the `nails make:cms:template` command; this will create placeholder
 template files in the `application/modules/cms/templates` directory.
 
-See [nailsapp/module-cms docs](https://github.com/nailsapp/module-cms/blob/develop/docs/pages/templates.md) for more
+See [nails/module-cms docs](https://github.com/nails/module-cms/blob/develop/docs/pages/templates.md) for more
 information.
 
 
@@ -68,7 +68,7 @@ information.
 The easiest way to build a CMS widet is to use the `nails make:cms:widget` command; this will create placeholder
 widget files in the `application/modules/cms/widgets` directory.
 
-See [nailsapp/module-cms docs](https://github.com/nailsapp/module-cms/blob/develop/docs/widgets/) for more
+See [nails/module-cms docs](https://github.com/nails/module-cms/blob/develop/docs/widgets/) for more
 information.
 
 ## How do I build admin sections
@@ -131,7 +131,7 @@ The "set_flashdata()" method from the `Session` service is used as it will only 
 There are four reserved flashdata keys which are checked on page load:
 
 ```php
-$oSession = Factory::service('Session', 'nailsapp/module-auth');
+$oSession = Factory::service('Session', 'nails/module-auth');
 $oSession->set_flashdata('success', 'Something went right.');
 $oSession->set_flashdata('error', 'Something went wrong.');
 $oSession->set_flashdata('message', 'This is something you should maybe care about');

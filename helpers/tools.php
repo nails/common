@@ -84,7 +84,7 @@ if (!function_exists('formatBytes')) {
      */
     function formatBytes($iBytes, $iPrecision = 2)
     {
-        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
+        $oCdn = Factory::service('Cdn', 'nails/module-cdn');
         return $oCdn->formatBytes($iBytes, $iPrecision);
     }
 }
@@ -103,7 +103,7 @@ if (!function_exists('returnBytes')) {
      */
     function returnBytes($sSize)
     {
-        $oCdn = Factory::service('Cdn', 'nailsapp/module-cdn');
+        $oCdn = Factory::service('Cdn', 'nails/module-cdn');
         return $oCdn->returnBytes($sSize);
     }
 }
