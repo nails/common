@@ -777,6 +777,14 @@ abstract class Base
             $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
         }
 
+        // --------------------------------------------------------------------------
+
+        if (array_key_exists('group_by', $aData)) {
+            $oDb->group_by($aData['group_by']);
+        }
+
+        // --------------------------------------------------------------------------
+
         return $oDb->get($sTable);
     }
 
