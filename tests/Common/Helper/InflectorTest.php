@@ -18,27 +18,27 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * Tests that possessionise correctly appends the ', 's or 'S to a given string.
+     * Tests that possessive correctly appends the ', 's or 'S to a given string.
      */
-    public function testPossessionise()
+    public function testPossessive()
     {
         //  Lowercase tests
-        $sTestString     = 'Rachel';
-        $sPossessionised = Inflector::possessionise($sTestString);
-        $this->assertEquals($sPossessionised, "Rachel's");
+        $sTestString = 'Rachel';
+        $sPossessive = Inflector::possessive($sTestString);
+        $this->assertEquals($sPossessive, "Rachel's");
 
-        $sTestString     = 'Ross';
-        $sPossessionised = Inflector::possessionise($sTestString);
-        $this->assertEquals("Ross'", $sPossessionised);
+        $sTestString = 'Ross';
+        $sPossessive = Inflector::possessive($sTestString);
+        $this->assertEquals("Ross'", $sPossessive);
 
         //  Uppercase tests
-        $sTestString     = 'RACHEL';
-        $sPossessionised = Inflector::possessionise($sTestString);
-        $this->assertEquals("RACHEL'S", $sPossessionised);
+        $sTestString = 'RACHEL';
+        $sPossessive = Inflector::possessive($sTestString);
+        $this->assertEquals("RACHEL'S", $sPossessive);
 
-        $sTestString     = 'ROSS';
-        $sPossessionised = Inflector::possessionise($sTestString);
-        $this->assertEquals("ROSS'", $sPossessionised);
+        $sTestString = 'ROSS';
+        $sPossessive = Inflector::possessive($sTestString);
+        $this->assertEquals("ROSS'", $sPossessive);
     }
 
     // --------------------------------------------------------------------------
