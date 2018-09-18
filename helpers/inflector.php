@@ -10,6 +10,15 @@
  * @link
  */
 
+if (!function_exists('possessive')) {
+    function possessive($sString)
+    {
+        return \Nails\Common\Helper\Inflector::possessive($sString);
+    }
+}
+
+// --------------------------------------------------------------------------
+
 if (!function_exists('possessionise')) {
     function possessionise($sString)
     {

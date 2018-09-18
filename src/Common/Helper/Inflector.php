@@ -36,6 +36,7 @@ class Inflector
     /**
      * Alias to possessive()
      *
+     * @deprecated
      * @see Inflector::possessive()
      *
      * @param  string $sString The word to which to add a possessive apostrophe
@@ -44,6 +45,7 @@ class Inflector
      */
     public function possessionise($sString)
     {
+        trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
         return static::possessive($sString);
     }
 
