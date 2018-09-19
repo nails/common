@@ -135,6 +135,8 @@ $lang['fv_less_than']                   = 'This field must be less than {param}'
 $lang['fv_less_than_field']             = 'The {field} field must be less than {param}';
 $lang['fv_less_than_equal_to']          = 'This field must be less than or equal to {param}';
 $lang['fv_less_than_equal_to_field']    = 'The {field} field must be less than or equal to {param}';
+$lang['fv_is_bool']                     = 'This field must be a boolean';
+$lang['fv_is_bool_field']               = 'The {field} field must be a boolean';
 
 // --------------------------------------------------------------------------
 

@@ -2379,8 +2379,7 @@ abstract class Base
 
             case 'tinyint':
                 if ($oField->type === 'boolean') {
-                    $oField->validation[] = 'greater_than[-1]';
-                    $oField->validation[] = 'less_than[2]';
+                    $oField->validation[] = 'is_bool';
                 } else {
                     $oField->validation[] = 'integer';
                 }

@@ -1092,4 +1092,19 @@ class FormValidation extends CI_Form_validation
         }
         return $oDb->count_all_results($sTable) === 0;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks whether a value is a boolean value
+     *
+     * @param string $bValue The value to check
+     *
+     * @return bool
+     */
+    public function is_bool($bValue)
+    {
+        $this->set_message('is_bool', lang('fv_valid_is_bool_field'));
+        return is_bool($bValue);
+    }
 }
