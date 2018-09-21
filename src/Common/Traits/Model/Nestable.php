@@ -11,6 +11,30 @@ use Nails\Factory;
 trait Nestable
 {
     /**
+     * Force implementators to provide a getColumn() method
+     * @return string
+     */
+    abstract public function getColumn();
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Force implementators to provide a getTableName() method
+     * @return string
+     */
+    abstract public function getTableName();
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Force implementators to provide a getById() method
+     * @return \stdClass|false
+     */
+    abstract public function getById();
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column to save breadcrumbs
      * @return string
      */
@@ -135,7 +159,7 @@ trait Nestable
      *
      * @param \stdClass $oObj The object to generate the URL for
      *
-     * @return string
+     * @return string|null
      */
     protected function generateUrl($oObj)
     {

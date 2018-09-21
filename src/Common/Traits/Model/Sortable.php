@@ -11,6 +11,14 @@ use Nails\Factory;
 trait Sortable
 {
     /**
+     * Force implementators to provide a getColumn() method
+     * @return string
+     */
+    abstract public function getColumn();
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column on which to sort
      * @return string
      */
