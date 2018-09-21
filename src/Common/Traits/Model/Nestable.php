@@ -156,4 +156,32 @@ trait Nestable
 
         return $sNamespace . $sUrl;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Retrieves the immediate children of an item
+     *
+     * @param integer $iId        The ID of the item
+     * @param bool    $bRecursive Whetehr to recursively fetch children
+     * @param array   $aData      Any additional data to pass to the `getAll()` method
+     *
+     * @return mixed
+     */
+    public function getChildren($iId, $bRecursive = false, array $aData = [])
+    {
+        $aQueryData = $aData;
+        if (!array_key_exists('where', $aQueryData)) {
+            $aQueryData['where'] = [];
+        }
+        $aQueryData['where'][] = ['parent_id', $iId];
+
+        $aChildren = $this->getAll($aQueryData);
+        foreach ($aChildren as $oChild) {
+            if ($bRecursive) {
+                $oChild->children = $this->getChildren($oChild->id, $bRecursive, $aData);
+            }
+        }
+        return $aChildren;
+    }
 }
