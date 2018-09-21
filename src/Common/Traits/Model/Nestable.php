@@ -11,7 +11,11 @@ use Nails\Factory;
 trait Nestable
 {
     /**
-     * Force implementators to provide a getColumn() method
+     * Returns the column name for specific columns of interest
+     *
+     * @param string $sColumn  The column to query
+     * @param string $sDefault The default value if not defined
+     *
      * @return string
      */
     abstract public function getColumn();
@@ -19,15 +23,22 @@ trait Nestable
     // --------------------------------------------------------------------------
 
     /**
-     * Force implementators to provide a getTableName() method
+     * Returns protected property $table
+     *
+     * @param bool $bIncludePrefix Whether to include the table's alias
+     *
      * @return string
      */
-    abstract public function getTableName();
+    abstract public function getTableName($bIncludePrefix = false);
 
     // --------------------------------------------------------------------------
 
     /**
-     * Force implementators to provide a getById() method
+     * Fetch an object by it's ID
+     *
+     * @param  int   $iId   The ID of the object to fetch
+     * @param  mixed $aData Any data to pass to getCountCommon()
+     *
      * @return \stdClass|false
      */
     abstract public function getById();

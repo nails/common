@@ -1117,7 +1117,7 @@ abstract class Base
      * @param  int   $iId   The ID of the object to fetch
      * @param  mixed $aData Any data to pass to getCountCommon()
      *
-     * @return mixed           stdClass on success, false on failure
+     * @return \stdClass|false
      * @throws ModelException
      */
     public function getById($iId, array $aData = [])

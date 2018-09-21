@@ -11,10 +11,14 @@ use Nails\Factory;
 trait Sortable
 {
     /**
-     * Force implementators to provide a getColumn() method
+     * Returns the column name for specific columns of interest
+     *
+     * @param string $sColumn  The column to query
+     * @param string $sDefault The default value if not defined
+     *
      * @return string
      */
-    abstract public function getColumn();
+    abstract public function getColumn($sColumn, $sDefault = null);
 
     // --------------------------------------------------------------------------
 
