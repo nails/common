@@ -693,11 +693,11 @@ abstract class Base
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
      *
-     * @param  int   $iPage           The page number of the results, if null then no pagination
-     * @param  int   $iPerPage        How many items per page of paginated results
-     * @param  array $aData           Any data to pass to getCountCommon()
-     * @param  bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
-     *                                items
+     * @param  int|null $iPage           The page number of the results, if null then no pagination
+     * @param  int|null $iPerPage        How many items per page of paginated results
+     * @param  array    $aData           Any data to pass to getCountCommon()
+     * @param  bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     *                                   items
      *
      * @return object
      * @throws ModelException
@@ -793,11 +793,11 @@ abstract class Base
     /**
      * Fetches all objects and formats them, optionally paginated
      *
-     * @param int   $iPage           The page number of the results, if null then no pagination
-     * @param int   $iPerPage        How many items per page of paginated results
-     * @param mixed $aData           Any data to pass to getCountCommon()
-     * @param bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
-     *                               items
+     * @param int|null $iPage           The page number of the results, if null then no pagination
+     * @param int|null $iPerPage        How many items per page of paginated results
+     * @param mixed    $aData           Any data to pass to getCountCommon()
+     * @param bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     *                                  items
      *
      * @return array
      */
@@ -936,10 +936,10 @@ abstract class Base
     /**
      * Fetches all objects as a flat array
      *
-     * @param  int     $iPage           The page number of the results
-     * @param  int     $iPerPage        The number of items per page
-     * @param  array   $aData           Any data to pass to getCountCommon()
-     * @param  boolean $bIncludeDeleted Whether or not to include deleted items
+     * @param  int|null $iPage           The page number of the results
+     * @param  int|null $iPerPage        The number of items per page
+     * @param  array    $aData           Any data to pass to getCountCommon()
+     * @param  boolean  $bIncludeDeleted Whether or not to include deleted items
      *
      * @return array
      * @throws ModelException
@@ -1076,7 +1076,7 @@ abstract class Base
      *
      * @return string
      */
-    protected function prepareCacheKey($sColumn, $mValue, array $aData = null)
+    protected function prepareCacheKey($sColumn, $mValue, array $aData = [])
     {
         /**
          * Remove some elements from the $aData array as they are unlikely to affect the
@@ -1701,12 +1701,12 @@ abstract class Base
     /**
      * Searches for objects, optionally paginated.
      *
-     * @param  string $sKeywords       The search term
-     * @param  int    $iPage           The page number of the results, if null then no pagination
-     * @param  int    $iPerPage        How many items per page of paginated results
-     * @param  mixed  $aData           Any data to pass to getCountCommon()
-     * @param  bool   $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include
-     *                                 deleted items
+     * @param  string   $sKeywords       The search term
+     * @param  int|null $iPage           The page number of the results, if null then no pagination
+     * @param  int|null $iPerPage        How many items per page of paginated results
+     * @param  mixed    $aData           Any data to pass to getCountCommon()
+     * @param  bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include
+     *                                   deleted items
      *
      * @return \stdClass
      */
@@ -1780,13 +1780,13 @@ abstract class Base
     /**
      * This method provides the functionality to generate a unique slug for an item in the database.
      *
-     * @param string $sLabel    The label from which to generate a slug
-     * @param string $sPrefix   Any prefix to add to the slug
-     * @param string $sSuffix   Any suffix to add to the slug
-     * @param string $sTable    The table to use defaults to $this->table
-     * @param string $sColumn   The column to use, defaults to $this->tableSlugColumn
-     * @param int    $iIgnoreId An ID to ignore when searching
-     * @param string $sIdColumn The column to use for the ID, defaults to $this->tableIdColumn
+     * @param string      $sLabel    The label from which to generate a slug
+     * @param string      $sPrefix   Any prefix to add to the slug
+     * @param string      $sSuffix   Any suffix to add to the slug
+     * @param string|null $sTable    The table to use defaults to $this->table
+     * @param string|null $sColumn   The column to use, defaults to $this->tableSlugColumn
+     * @param int|null    $iIgnoreId An ID to ignore when searching
+     * @param string|null $sIdColumn The column to use for the ID, defaults to $this->tableIdColumn
      *
      * @return string
      * @throws ModelException
@@ -1843,9 +1843,9 @@ abstract class Base
     /**
      * Generates a unique token for a record
      *
-     * @param string $sMask   The token mask, defaults to $this->sTokenMask
-     * @param string $sTable  The table to use defaults to $this->table
-     * @param string $sColumn The column to use, defaults to $this->tableTokenColumn
+     * @param string|null $sMask   The token mask, defaults to $this->sTokenMask
+     * @param string|null $sTable  The table to use defaults to $this->table
+     * @param string|null $sColumn The column to use, defaults to $this->tableTokenColumn
      *
      * @return string
      * @throws ModelException
@@ -2190,8 +2190,8 @@ abstract class Base
     /**
      * Returns the column name for specific columns of interest
      *
-     * @param string $sColumn  The column to query
-     * @param string $sDefault The default value if not defined
+     * @param string      $sColumn  The column to query
+     * @param string|null $sDefault The default value if not defined
      *
      * @return string
      */
@@ -2210,7 +2210,7 @@ abstract class Base
      * Describes the fields for this model automatically and with some guesswork;
      * for more fine grained control models should overload this method.
      *
-     * @param  string $sTable The database table to query
+     * @param  string|null $sTable The database table to query
      *
      * @return array
      */

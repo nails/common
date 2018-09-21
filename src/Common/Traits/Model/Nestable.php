@@ -13,12 +13,12 @@ trait Nestable
     /**
      * Returns the column name for specific columns of interest
      *
-     * @param string $sColumn  The column to query
-     * @param string $sDefault The default value if not defined
+     * @param string      $sColumn  The column to query
+     * @param string|null $sDefault The default value if not defined
      *
      * @return string
      */
-    abstract public function getColumn();
+    abstract public function getColumn($sColumn, $sDefault = null);
 
     // --------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ trait Nestable
      *
      * @return \stdClass|false
      */
-    abstract public function getById();
+    abstract public function getById($iId, array $aData = []);
 
     // --------------------------------------------------------------------------
 
