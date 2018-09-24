@@ -1104,7 +1104,7 @@ class FormValidation extends CI_Form_validation
      */
     public function is_bool($bValue)
     {
-        $this->set_message('is_bool', lang('fv_valid_is_bool_field'));
-        return is_bool($bValue);
+        $this->set_message('is_bool', lang('fv_is_bool_field'));
+        return is_bool($bValue) || $bValue === '1' || $bValue === '0' || $bValue === 1 || $bValue === 0;
     }
 }
