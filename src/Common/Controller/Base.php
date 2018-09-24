@@ -76,6 +76,7 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         $this->setCommonMeta();
+        $this->setNailsJs();
         $this->setGlobalJs();
         $this->setGlobalCss();
 
