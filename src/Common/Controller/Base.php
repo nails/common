@@ -44,118 +44,25 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Is Nails in maintenance mode?
         $this->maintenanceMode();
-
-        // --------------------------------------------------------------------------
-
-        //  Nails PHP Version Check
         $this->checkPhpVersion();
-
-        // --------------------------------------------------------------------------
-
-        //  Configure error reporting
         $this->setErrorReporting();
-
-        // --------------------------------------------------------------------------
-
-        //  Set the default Content-Type
-        $oOutput = Factory::service('Output');
-        $oOutput->set_content_type('text/html; charset=utf-8');
-
-        // --------------------------------------------------------------------------
-
-        //  Define data array (used extensively in views)
-        $this->data =& getControllerData();
-
-        // --------------------------------------------------------------------------
-
-        //  Define all the packages
+        $this->setContentType();
         $this->definePackages();
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * If we're on a staging environment then prompt for a password; but only if
-         * a password has been defined in app.php
-         */
-
         $this->passwordProtected();
-
-        // --------------------------------------------------------------------------
-
-        //  Test that the cache is writable
         $this->testCache();
-
-        // --------------------------------------------------------------------------
-
-        //  Instantiate the user model
         $this->instantiateUser();
-
-        // --------------------------------------------------------------------------
-
-        //  Instantiate languages
         $this->instantiateLanguages();
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * Is the user suspended?
-         * Executed here so that both the user and language systems are initialised
-         * (so that any errors can be shown in the correct language).
-         */
-
         $this->isUserSuspended();
-
-        // --------------------------------------------------------------------------
-
-        //  Instantiate DateTime
         $this->instantiateDateTime();
+        $this->generateRoutes();
 
         // --------------------------------------------------------------------------
 
-        //  Need to generate the routes_app.php file?
-        if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
-
-            $oRoutesService = Factory::service('Routes');
-
-            if (!$oRoutesService->update()) {
-
-                //  Fall over, routes_app.php *must* be there
-                $subject = 'Failed To generate routes_app.php';
-                $message = 'routes_app.php was not found and could not be generated. ';
-                $message .= $oRoutesService->lastError();
-
-                showFatalError($subject, $message);
-
-            } else {
-
-                //  Routes exist now, instruct the browser to try again
-                $oInput = Factory::service('Input');
-                if ($oInput->post()) {
-
-                    redirect($oInput->server('REQUEST_URI'), 'Location', 307);
-
-                } else {
-
-                    redirect($oInput->server('REQUEST_URI'));
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
+        //  Populate some standard fields
+        $this->data =& getControllerData();
         static::populateUserFeedback($this->data);
-
-        // --------------------------------------------------------------------------
-
-        //  Other defaults
-        $this->data['page']                   = new \stdClass();
-        $this->data['page']->title            = '';
-        $this->data['page']->seo              = new \stdClass();
-        $this->data['page']->seo->title       = '';
-        $this->data['page']->seo->description = '';
-        $this->data['page']->seo->keywords    = '';
+        static::populatePageData($this->data);
 
         // --------------------------------------------------------------------------
 
@@ -168,78 +75,9 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        /**
-         * Set some meta tags which should be used on every site.
-         */
-
-        $oMeta = Factory::service('Meta');
-        $oMeta
-            ->addRaw([
-                'charset' => 'utf-8',
-            ])
-            ->addRaw([
-                'name'    => 'viewport',
-                'content' => 'width=device-width, initial-scale=1',
-            ]);
-
-        // --------------------------------------------------------------------------
-
-        //  Set some common global constants
-        $oAsset     = Factory::service('Asset');
-        $aVariables = [
-            'ENVIRONMENT' => Environment::get(),
-            'SITE_URL'    => site_url('', isPageSecure()),
-            'NAILS'       => (object) [
-                'URL'  => NAILS_ASSETS_URL,
-                'LANG' => (object) [],
-                'USER' => (object) [
-                    'ID'    => activeUser('id') ? activeUser('id') : 'null',
-                    'FNAME' => activeUser('first_name'),
-                    'LNAME' => activeUser('last_name'),
-                    'EMAIL' => activeUser('email'),
-                ],
-            ],
-        ];
-        foreach ($aVariables as $sKey => $mValue) {
-            $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
-        }
-
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * Set any custom CSS and JS as defined in admin
-         *
-         * @todo bring this in via a hook or something
-         */
-        $sCustomJs  = appSetting('site_custom_js', 'site');
-        $sCustomCss = appSetting('site_custom_css', 'site');
-
-        if (!empty($sCustomJs)) {
-            $oAsset->inline($sCustomJs, 'JS');
-        }
-
-        if (!empty($sCustomCss)) {
-            $oAsset->inline($sCustomCss, 'CSS');
-        }
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * If a Google Analytics profile has been specified then include that too
-         */
-        $sGoogleAnalyticsProfile = appSetting('google_analytics_account');
-        if (!empty($sGoogleAnalyticsProfile)) {
-            $oAsset->inline(
-                "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-                ga('create', '" . appSetting('google_analytics_account') . "', 'auto');
-                ga('send', 'pageview');",
-                'JS'
-            );
-        }
+        $this->setCommonMeta();
+        $this->setGlobalJs();
+        $this->setGlobalCss();
 
         // --------------------------------------------------------------------------
 
@@ -334,6 +172,18 @@ abstract class Base extends \MX_Controller
 
         $oErrorHandler = Factory::service('ErrorHandler');
         $oErrorHandler->init();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the content type to use for the request to UTF-8
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function setContentType()
+    {
+        $oOutput = Factory::service('Output');
+        $oOutput->set_content_type('text/html; charset=utf-8');
     }
 
     // --------------------------------------------------------------------------
@@ -635,6 +485,32 @@ abstract class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
+     * Checks if routes need to be generated as part of the startup request
+     * @throws NailsException
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function generateRoutes()
+    {
+        if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
+            $oRoutesService = Factory::service('Routes');
+            if (!$oRoutesService->update()) {
+                throw new NailsException('Failed to generate routes_app.php. ' . $oRoutesService->lastError(), 500);
+            } else {
+
+                //  Routes exist now, instruct the browser to try again
+                $oInput = Factory::service('Input');
+                if ($oInput->post()) {
+                    redirect($oInput->server('REQUEST_URI'), 'Location', 307);
+                } else {
+                    redirect($oInput->server('REQUEST_URI'));
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Sets up language handling
      *
      * @return void
@@ -767,6 +643,11 @@ abstract class Base extends \MX_Controller
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Provides some backwards compatability
+     *
+     * @param \stdClass $oBindTo The class to bind to
+     */
     public static function backwardsCompatibility(&$oBindTo)
     {
         /**
@@ -776,7 +657,6 @@ abstract class Base extends \MX_Controller
          */
 
         //  @todo (Pablo - 2017-06-07) - Remove these
-
         $oBindTo->db                  = Factory::service('Database');
         $oBindTo->input               = Factory::service('Input');
         $oBindTo->output              = Factory::service('Output');
@@ -802,7 +682,7 @@ abstract class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
-     * Populates an array form the USerFeedback and session classes
+     * Populates an array from the UserFeedback and session classes
      *
      * @param array $aData The array to populate
      */
@@ -821,5 +701,128 @@ abstract class Base extends \MX_Controller
         //  @deprecated
         $aData['message'] = $oUserFeedback->get('message') ?: $oSession->flashdata('message');
         $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->flashdata('notice');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Populates an array with a default object for page and SEO
+     *
+     * @param array $aData The array to populate
+     */
+    public static function populatePageData(array &$aData)
+    {
+        $aData['page'] = (object) [
+            'title' => '',
+            'seo'   => (object) [
+                'title'       => '',
+                'description' => '',
+                'keywords'    => '',
+            ],
+        ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets some common meta for every page load
+     *
+     * @param array $aMeta Any additional meta items to set
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function setCommonMeta(array $aMeta = [])
+    {
+        $oMeta = Factory::service('Meta');
+        $oMeta
+            ->addRaw([
+                'charset' => 'utf-8',
+            ])
+            ->addRaw([
+                'name'    => 'viewport',
+                'content' => 'width=device-width, initial-scale=1',
+            ]);
+
+        foreach ($aMeta as $aItem) {
+            $oMeta->addRaw($aItem);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets a global Nails JS object
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public static function setNailsJs()
+    {
+        $oAsset     = Factory::service('Asset');
+        $aVariables = [
+            'ENVIRONMENT' => Environment::get(),
+            'SITE_URL'    => site_url('', isPageSecure()),
+            'NAILS'       => (object) [
+                'URL'  => NAILS_ASSETS_URL,
+                'LANG' => (object) [],
+                'USER' => (object) [
+                    'ID'    => activeUser('id') ? activeUser('id') : 'null',
+                    'FNAME' => activeUser('first_name'),
+                    'LNAME' => activeUser('last_name'),
+                    'EMAIL' => activeUser('email'),
+                ],
+            ],
+        ];
+        foreach ($aVariables as $sKey => $mValue) {
+            $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets global JS
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function setGlobalJs()
+    {
+        $oAsset = Factory::service('Asset');
+
+        // --------------------------------------------------------------------------
+
+        $sCustomJs = appSetting('site_custom_js', 'site');
+        if (!empty($sCustomJs)) {
+            $oAsset->inline($sCustomJs, 'JS');
+        }
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * If a Google Analytics profile has been specified then include that too
+         */
+        $sGoogleAnalyticsProfile = appSetting('google_analytics_account');
+        if (!empty($sGoogleAnalyticsProfile)) {
+            $oAsset->inline(
+                "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                ga('create', '" . appSetting('google_analytics_account') . "', 'auto');
+                ga('send', 'pageview');",
+                'JS'
+            );
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets global CSS
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function setGlobalCss()
+    {
+        $sCustomCss = appSetting('site_custom_css', 'site');
+        if (!empty($sCustomCss)) {
+            $oAsset->inline($sCustomCss, 'CSS');
+        }
     }
 }
