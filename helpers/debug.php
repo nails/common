@@ -206,3 +206,40 @@ if (!function_exists('dumpJson')) {
         die();
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('depecatedError')) {
+    function deprecatedError($sMethod, $sUseInstead = '')
+    {
+        //  Attempt to determine where the deprecation was thrown;
+        //  0 is this function, 1 is where it was thrown, 2 should be the caller
+        $aDebug  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        $aCaller = getFromArray(2, $aDebug);
+        if (!empty($aCaller)) {
+
+            if (!empty($aCaller['class'])) {
+                $sClass = $aCaller['class'];
+            } elseif (!empty($aCaller['file'])) {
+                $sClass = $aCaller['file'];
+            } else {
+                $sClass = 'unknown';
+            }
+            if (!empty($aCaller['line'])) {
+                $sLine = $aCaller['line'];
+            } else {
+                $sLine = 'unknown';
+            }
+
+            $sError = 'Function ' . $sMethod . ' is deprecated; called in "' . $sClass . '" on line "' . $sLine . '".';
+        } else {
+            $sError = 'Function ' . $sMethod . ' is deprecated.';
+        }
+
+        if (!empty($sUseInstead)) {
+            $sError .= ' Use "' . $sUseInstead . '" instead.';
+        }
+
+        trigger_error($sError, E_USER_DEPRECATED);
+    }
+}
