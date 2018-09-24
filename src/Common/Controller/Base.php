@@ -691,16 +691,16 @@ abstract class Base extends \MX_Controller
         //  Set User Feedback alerts for the views
         $oSession          = Factory::service('Session', 'nails/module-auth');
         $oUserFeedback     = Factory::service('UserFeedback');
-        $aData['error']    = $oUserFeedback->get('error') ?: $oSession->flashdata('error');
-        $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->flashdata('negative');
-        $aData['success']  = $oUserFeedback->get('success') ?: $oSession->flashdata('success');
-        $aData['positive'] = $oUserFeedback->get('positive') ?: $oSession->flashdata('positive');
-        $aData['info']     = $oUserFeedback->get('info') ?: $oSession->flashdata('info');
-        $aData['warning']  = $oUserFeedback->get('message') ?: $oSession->flashdata('warning');
+        $aData['error']    = $oUserFeedback->get('error') ?: $oSession->getFlashData('error');
+        $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->getFlashData('negative');
+        $aData['success']  = $oUserFeedback->get('success') ?: $oSession->getFlashData('success');
+        $aData['positive'] = $oUserFeedback->get('positive') ?: $oSession->getFlashData('positive');
+        $aData['info']     = $oUserFeedback->get('info') ?: $oSession->getFlashData('info');
+        $aData['warning']  = $oUserFeedback->get('message') ?: $oSession->getFlashData('warning');
 
         //  @deprecated
-        $aData['message'] = $oUserFeedback->get('message') ?: $oSession->flashdata('message');
-        $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->flashdata('notice');
+        $aData['message'] = $oUserFeedback->get('message') ?: $oSession->getFlashData('message');
+        $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->getFlashData('notice');
     }
 
     // --------------------------------------------------------------------------

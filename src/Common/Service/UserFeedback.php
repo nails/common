@@ -32,7 +32,7 @@ class UserFeedback
     {
         $this->sSessionKey = 'NailsUserFeedback';
         $this->oSession    = Factory::service('Session', 'nails/module-auth');
-        $this->aMessages   = $this->oSession->flashdata($this->sSessionKey) ?: array();
+        $this->aMessages   = $this->oSession->getFlashData($this->sSessionKey) ?: array();
     }
 
     // --------------------------------------------------------------------------
