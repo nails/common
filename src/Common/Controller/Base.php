@@ -765,7 +765,7 @@ abstract class Base extends \MX_Controller
                 'URL'  => NAILS_ASSETS_URL,
                 'LANG' => (object) [],
                 'USER' => (object) [
-                    'ID'    => activeUser('id') ? activeUser('id') : 'null',
+                    'ID'    => activeUser('id') ? activeUser('id') : null,
                     'FNAME' => activeUser('first_name'),
                     'LNAME' => activeUser('last_name'),
                     'EMAIL' => activeUser('email'),
