@@ -211,15 +211,20 @@ trait GetCountCommon
     /**
      * Compile the filter string
      *
-     * @param  string $sColumn The column
-     * @param  mixed  $mValue  The value
+     * @param  string  $sColumn  The column
+     * @param  mixed   $mValue   The value
+     * @param  boolean $bIsQuery Whether the value is an SQL wuery or not
      *
      * @return string
      */
-    protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bisQuery)
+    protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bIsQuery)
     {
+        if (is_callable($mValue)) {
+            $mValue = $mValue();
+        }
+
         $oDb = Factory::service('Database');
-        if ($bisQuery) {
+        if ($bIsQuery) {
             $aBits = [$mValue];
         } elseif (!is_array($mValue)) {
             $aBits = [
