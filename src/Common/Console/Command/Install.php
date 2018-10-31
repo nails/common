@@ -5,7 +5,6 @@ namespace Nails\Common\Console\Command;
 use Nails\Console\Command\Base;
 use Nails\Environment;
 use Nails\Factory;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,12 +15,6 @@ class Install extends Base
     const EXIT_CODE_ROUTE_REWRITE_FAILED = 5;
 
     // --------------------------------------------------------------------------
-    /**
-     * The endpoint for the components API
-     *
-     * @var string
-     */
-    protected $componentEndpoint = 'http://components.nailsapp.co.uk/';
 
     /**
      * The database instance
@@ -41,12 +34,6 @@ class Install extends Base
     {
         $this->setName('install');
         $this->setDescription('Configures or reconfigures a Nails site');
-
-        $this->addArgument(
-            'componentName',
-            InputArgument::OPTIONAL,
-            'If a component name is provided it will be added to composer.json if valid'
-        );
     }
 
     // --------------------------------------------------------------------------
@@ -54,21 +41,16 @@ class Install extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface $oInput The Input Interface provided by Symfony
+     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
      * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     *
      * @return int
+     * @throws \Nails\Common\Exception\FactoryException
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
         parent::execute($oInput, $oOutput);
-
-        $component = $oInput->getArgument('componentName');
-
-        if (!empty($component)) {
-            return $this->executeComponentInstaller($component);
-        } else {
-            return $this->executeInstaller();
-        }
+        return $this->executeInstaller();
     }
 
     // --------------------------------------------------------------------------
@@ -77,8 +59,9 @@ class Install extends Base
      * Executes the Nails Installer
      *
      * @return int
+     * @throws \Nails\Common\Exception\FactoryException
      */
-    protected function executeInstaller()
+    private function executeInstaller()
     {
         $oInput  = $this->oInput;
         $oOutput = $this->oOutput;
@@ -120,57 +103,6 @@ class Install extends Base
 
             // --------------------------------------------------------------------------
 
-            //  Can we install components? We need exec() and composer to be available
-            $execAvailable          = function_exists('exec');
-            $composerAvailable      = (bool) $this->detectComposerBin();
-            $installTheseComponents = [];
-
-            if ($oInput->isInteractive() && $execAvailable && $composerAvailable) {
-
-                $oOutput->writeln('');
-                $oOutput->writeln('<info>Nails Components</info>');
-
-                $question          = 'Would you like to define components to enable now?';
-                $installComponents = $this->confirm($question, false);
-
-                //  Show a list of already installed components
-                $installedComponents = _NAILS_GET_COMPONENTS();
-
-                //  I know the variables are almost the same name. Just to confuse ya. >_<
-                if ($installComponents) {
-
-                    if ($installedComponents) {
-
-                        $oOutput->writeln('');
-                        $oOutput->writeln('The following components are already installed:');
-                        $oOutput->writeln('');
-
-                        foreach ($installedComponents as $component) {
-                            $oOutput->writeln(' - <info>' . $component->slug . '</info>');
-                        }
-
-                        $oOutput->writeln('');
-                    }
-                }
-
-                $installTheseComponents = [];
-
-                while ($installComponents) {
-
-                    $component = $this->requestComponent();
-
-                    if (is_array($component)) {
-                        $installTheseComponents[$component[0]] = $component[1];
-                    }
-
-                    $oOutput->writeln('');
-                    $question          = 'Would you like to enable another component?';
-                    $installComponents = $this->confirm($question, false);
-                }
-            }
-
-            // --------------------------------------------------------------------------
-
             //  Tell user what's about to happen
             $oOutput->writeln('');
             $oOutput->writeln('<info>I\'m about to do the following:</info>');
@@ -203,22 +135,6 @@ class Install extends Base
                 $oOutput->writeln(' - Set <comment>' . $v['label'] . '</comment> to <comment>' . $sValue . '</comment>');
             }
 
-            //  Install components
-            if (!empty($installTheseComponents)) {
-
-                $oOutput->writeln('');
-
-                if (count($installTheseComponents) > 1) {
-                    $oOutput->writeln('The following components will be installed:');
-                } else {
-                    $oOutput->writeln('The following component will be installed:');
-                }
-
-                foreach ($installTheseComponents as $componentName => $componentVersion) {
-                    $oOutput->writeln(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>');
-                }
-            }
-
             //  Migrate database and rewrite routes
             $oOutput->writeln('');
             $oOutput->writeln('3) Migrate the database');
@@ -231,9 +147,8 @@ class Install extends Base
             if ($doInstall) {
 
                 $curStep  = 1;
-                $numSteps = 1; //  app.php
+                $numSteps = 1;  //  app.php
                 $numSteps += 1; //  deploy.php
-                $numSteps += !empty($installTheseComponents) ? 1 : 0;
                 $numSteps += 1; //  migrate DB
                 $numSteps += 1; //  rewrite routes
                 $numSteps += !empty($users) ? 1 : 0;
@@ -258,18 +173,6 @@ class Install extends Base
                     $oOutput->writeln('<error>failed!</error>');
                 }
                 $curStep++;
-
-                //  Install Components
-                if (!empty($installTheseComponents)) {
-
-                    $oOutput->writeln('<comment>[' . $curStep . '/' . $numSteps . ']</comment> Installing components</info>...');
-
-                    foreach ($installTheseComponents as $componentName => $componentVersion) {
-                        $oOutput->write(' - <comment>' . $componentName . ':' . $componentVersion . '</comment>... ');
-                        $this->installComponent($componentName, $componentVersion, $oOutput);
-                    }
-                    $curStep++;
-                }
 
                 /**
                  * Get the current database credential values. If an existing deploy.php is already there then
@@ -308,7 +211,6 @@ class Install extends Base
                 return self::EXIT_CODE_SUCCESS;
 
             } else {
-
                 return $this->abort();
             }
 
@@ -327,85 +229,11 @@ class Install extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Executes the Nails Component Installer
-     *
-     * @param  string $component The component to install
-     * @return int
-     */
-    protected function executeComponentInstaller($component)
-    {
-        $oOutput = $this->oOutput;
-
-        // --------------------------------------------------------------------------
-
-        $oOutput->writeln('<info>-------------------------</info>');
-        $oOutput->writeln('<info>Nails Component Installer</info>');
-        $oOutput->writeln('<info>-------------------------</info>');
-
-        // --------------------------------------------------------------------------
-
-        //  Get the Component
-        $component = $this->requestComponent($component);
-
-        if (!$component) {
-            return $this->abort(static::EXIT_CODE_SUCCESS);
-        }
-
-        //  Confirm with user
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>I\'m about to do the following:</info>');
-        $oOutput->writeln(' - Install <info>' . $component[0] . ':' . $component[1] . '</info>');
-        $oOutput->writeln(' - Migrate the database');
-        $oOutput->writeln(' - Rewrite app routes');
-        $oOutput->writeln('');
-
-        $question  = 'Continue??';
-        $doInstall = $this->confirm($question, true);
-
-        if ($doInstall) {
-
-            //  Attempt to install
-            $oOutput->writeln('');
-            $oOutput->write('<comment>[1/3]</comment> Installing <info>' . $component[0] . ':' . $component[1] . '</info>... ');
-            if (!$this->installComponent($component[0], $component[1], $oOutput)) {
-                return $this->abort(static::EXIT_CODE_INSTALL_FAILED);
-            }
-
-            //  Migrate DB
-            $oOutput->write('<comment>[2/3]</comment> Migrating database... ');
-            if (!$this->migrateDb()) {
-                return $this->abort(static::EXIT_CODE_MIGRATE_FAILED);
-            }
-
-            //  Rewrite Routes
-            $oOutput->write('<comment>[3/3]</comment> Rewriting routes... ');
-            if (!$this->rewriteRoutes()) {
-                return $this->abort(static::EXIT_CODE_ROUTE_REWRITE_FAILED);
-            }
-
-            //  Cleaning up
-            $oOutput->writeln('');
-            $oOutput->writeln('<comment>Cleaning up...</comment>');
-
-            //  And we're done!
-            $oOutput->writeln('');
-            $oOutput->writeln('Complete!');
-
-            return self::EXIT_CODE_SUCCESS;
-
-        } else {
-            return $this->abort(static::EXIT_CODE_SUCCESS);
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Defines all the App vars and their defaults
      *
      * @return array
      */
-    private function defineAppVars()
+    function defineAppVars()
     {
         $vars   = [];
         $vars[] = '// App Constants';
@@ -425,8 +253,8 @@ class Install extends Base
         ];
 
         $vars[] = [
-            'key'   => 'APP_PRIVATE_KEY',
-            'label' => 'App Private Key',
+            'key'   => 'APP__KEY',
+            'label' => 'App  Key',
             'value' => defined('APP_PRIVATE_KEY') && !empty(APP_PRIVATE_KEY) ? APP_PRIVATE_KEY : md5(rand(0, 1000) . microtime(true)),
         ];
 
@@ -564,15 +392,16 @@ class Install extends Base
     /**
      * Returns the current value of a variable
      *
-     * @param  string $key The key to return
-     * @param  array $vars The variable array to look at
+     * @param  string $sKey  The key to return
+     * @param  array  $aVars The variable array to look at
+     *
      * @return mixed        var value (usually string) on success, null on failure
      */
-    private function getVarValue($key, $vars)
+    private function getVarValue($sKey, $aVars)
     {
-        foreach ($vars as $var) {
-            if ($key == $var['key']) {
-                return $var['value'];
+        foreach ($aVars as $aVar) {
+            if ($sKey == $aVar['key']) {
+                return $aVar['value'];
             }
         }
 
@@ -585,10 +414,11 @@ class Install extends Base
      * Finds all constants defined in a particular file
      *
      * @param  string $path The path to analyse
-     * @param  array $vars The existing variables to check against (so only new variables are returned)
+     * @param  array  $vars The existing variables to check against (so only new variables are returned)
+     *
      * @return array
      */
-    private function getConstantsFromFile($path, $vars = [])
+    private function getConstantsFromFile($path, array $vars = [])
     {
         $out = [];
 
@@ -648,13 +478,14 @@ class Install extends Base
     /**
      * Finds all constants defined by the enabled components for either app.php or deploy.php
      *
-     * @param  string $type The type of constant (either APP or DEPLOY)
-     * @param  array $vars The existing variables to check against (so only new variables are returned)
+     * @param  string $sType The type of constant (either APP or DEPLOY)
+     * @param  array  $aVars The existing variables to check against (so only new variables are returned)
+     *
      * @return array
      */
-    private function getConstantsFromComponents($type, $vars = [])
+    private function getConstantsFromComponents($sType, array $aVars = [])
     {
-        //  @TODO: Look for components
+        //  @todo (Pablo - 2018-10-31) - Look for constants provided by components
         return [];
     }
 
@@ -763,8 +594,9 @@ class Install extends Base
     /**
      * Writes the supplied variables to the config file
      *
-     * @param  array $vars The variables to write
+     * @param  array  $vars The variables to write
      * @param  string $file The file to write to
+     *
      * @return boolean
      */
     private function writeFile($vars, $file)
@@ -801,45 +633,13 @@ class Install extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Installs a particular component
-     *
-     * @param  string $componentName The name of the component to install
-     * @param  string $componentVersion The version of the component to install
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
-     * @return boolean
-     */
-    private function installComponent($componentName, $componentVersion, $oOutput)
-    {
-        $composerBin = $this->detectComposerBin();
-
-        exec(
-            $composerBin . ' require ' . $componentName . ':' . $componentVersion . ' --prefer-dist --quiet',
-            $execOutput,
-            $execReturn
-        );
-
-        if ($execReturn !== 0) {
-
-            $oOutput->writeln('<error>failed!</error>');
-            $oOutput->writeln('Composer failed with exit code "' . $execReturn . '"');
-
-            return false;
-        }
-
-        $oOutput->writeln('<info>done!</info>');
-
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Migrates the DB for a fresh install
      *
      * @param  string $sDbHost The database host to connect to
      * @param  string $sDbUser The database user to connect with
      * @param  string $sDbPass The database password to connect with
      * @param  string $sDbName The database name to connect to
+     *
      * @return boolean
      */
     private function migrateDb($sDbHost = null, $sDbUser = null, $sDbPass = null, $sDbName = null)
@@ -880,13 +680,17 @@ class Install extends Base
 
     // --------------------------------------------------------------------------
 
-    protected function rewriteRoutes()
+    /**
+     * Rewrites routes
+     *
+     * @return bool
+     */
+    private function rewriteRoutes()
     {
         $iExitCode = $this->callCommand('routes:rewrite', [], false, true);
         if ($iExitCode == static::EXIT_CODE_SUCCESS) {
 
             $this->oOutput->writeln('<info>done!</info>');
-
             return true;
 
         } else {
@@ -909,8 +713,9 @@ class Install extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  array $aMessages The error message
+     * @param  array   $aMessages The error message
      * @param  integer $iExitCode The exit code
+     *
      * @return int
      */
     protected function abort($iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])
@@ -922,209 +727,5 @@ class Install extends Base
         }
 
         return parent::abort($iExitCode, $aMessages);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Works out which binary to use for composer
-     *
-     * @return string
-     */
-    private function detectComposerBin()
-    {
-        //  Detect composer
-        $composerBin = 'composer';
-        $result      = shell_exec('which ' . $composerBin);
-
-        if (empty($result)) {
-
-            $composerBin = 'composer.phar';
-            $result      = shell_exec('which ' . $composerBin);
-
-            if (empty($result)) {
-
-                $composerBin = '';
-            }
-        }
-
-        return $composerBin;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Asks the user which component they'd like to install and validates it against
-     * the Nails Components repository.
-     *
-     * @param  string $componentName The component name to install
-     * @return array|bool
-     */
-    private function requestComponent($componentName = '')
-    {
-        $oOutput = $this->oOutput;
-
-        // --------------------------------------------------------------------------
-
-        //  Get the component
-        do {
-
-            //  If a component name has been specified, check to see if it's valid
-            if (!empty($componentName)) {
-
-                /**
-                 * A component name has been given, check it out against the Nails
-                 * Component repository to see if it's valid.
-                 */
-
-                $isValidComponent = $this->isValidComponent($componentName, $oOutput);
-
-            } elseif (empty($componentName) && !is_null($componentName)) {
-
-                /**
-                 * If the component name is empty, but not null then it means the user hit
-                 * enter without typing anything, skip out of this so they're not stuck in
-                 * a loop
-                 */
-
-                return false;
-
-            } else {
-
-                /**
-                 * Set isValidComponent to false so that the loop continues.
-                 */
-
-                $isValidComponent = false;
-            }
-
-            if (!$isValidComponent) {
-
-                $oOutput->writeln('');
-                $question      = 'Enter the component name you\'d like to install';
-                $componentName = $this->ask($question, '');
-
-            } else {
-
-                $componentName    = $isValidComponent;
-                $isValidComponent = true;
-            }
-
-        } while (!$isValidComponent);
-
-        //  Already installed?
-        $installed            = _NAILS_GET_COMPONENTS();
-        $componentIsInstalled = false;
-
-        foreach ($installed as $component) {
-
-            if ($componentName == $component->name) {
-
-                $componentIsInstalled = true;
-                break;
-            }
-        }
-
-        if (!$componentIsInstalled) {
-
-            //  Get the version to install
-            $question         = 'Enter the version you require for <info>' . $componentName . '</info>';
-            $componentVersion = $this->ask($question, 'dev-develop');
-
-            return [$componentName, $componentVersion];
-
-        } else {
-
-            $oOutput->writeln('');
-            $oOutput->writeln('<info>' . $componentName . '</info> is already installed.');
-
-            return false;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Searches Nails components Repository for the component name.
-     *
-     * @param  string $componentName The component's name
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
-     * @return mixed                        String on success (component's full name), false on failure
-     */
-    protected function isValidComponent($componentName, $oOutput)
-    {
-        $result = @file_get_contents($this->componentEndpoint . 'api/search?term=' . urlencode($componentName));
-
-        if (empty($result)) {
-
-            $oOutput->writeln('');
-            $oOutput->writeln('<error>ERROR</error>');
-            $oOutput->writeln('Query to ' . $this->componentEndpoint . ' failed. Could not validate component.');
-            $oOutput->writeln('');
-
-            return false;
-        }
-
-        $result = json_decode($result);
-
-        if (empty($result)) {
-
-            $oOutput->writeln('');
-            $oOutput->writeln('<error>ERROR</error>');
-            $oOutput->writeln('Failed to decode search results from ' . $this->componentEndpoint);
-            $oOutput->writeln('');
-
-            return false;
-        }
-
-        //  Filter out already installed components
-        $aInstalledComponents = _NAILS_GET_COMPONENTS();
-        $aInstalled = [];
-        foreach ($aInstalledComponents as $oInstalledComponent) {
-            $aInstalled[] = $oInstalledComponent->slug;
-        }
-        $aFilteredResults = array_filter(
-            $result->results,
-            function($oComponent) use ($aInstalled)
-            {
-                return !in_array($oComponent->name, $aInstalled);
-            }
-        );
-        $aFilteredResults = array_values($aFilteredResults);
-
-        if (empty($aFilteredResults)) {
-
-            return false;
-
-        } elseif (count($aFilteredResults) > 1) {
-
-            $oOutput->writeln('');
-            $oOutput->writeln('More than 1 component for <info>' . $componentName . '</info>. Did you mean:</comment>');
-
-            foreach ($aFilteredResults as $component) {
-
-                $url = $component->homepage;
-                $url = !$url ? $component->repository : $url;
-                $sInstalled = isModuleEnabled($component->name) ? ' [installed]' : '';
-
-                $oOutput->writeln('');
-                $oOutput->writeln(' - <info>' . $component->name . '</info>' . $sInstalled);
-
-                if (!empty($component->description)) {
-                    $oOutput->writeln('   ' . $component->description);
-                }
-
-                if (!empty($url)) {
-
-                    $oOutput->writeln('   ' . $url);
-                }
-            }
-
-            return false;
-
-        } else {
-
-            return $aFilteredResults[0]->name;
-        }
     }
 }
