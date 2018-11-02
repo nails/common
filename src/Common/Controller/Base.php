@@ -497,14 +497,8 @@ abstract class Base extends \MX_Controller
             if (!$oRoutesService->update()) {
                 throw new NailsException('Failed to generate routes_app.php. ' . $oRoutesService->lastError(), 500);
             } else {
-
-                //  Routes exist now, instruct the browser to try again
                 $oInput = Factory::service('Input');
-                if ($oInput->post()) {
-                    redirect($oInput->server('REQUEST_URI'), 'Location', 307);
-                } else {
-                    redirect($oInput->server('REQUEST_URI'));
-                }
+                redirect($oInput->server('REQUEST_URI'), 'auto', 307);
             }
         }
     }
