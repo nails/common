@@ -172,7 +172,7 @@ trait Nestable
      *
      * @return string|null
      */
-    protected function generateUrl($oObj)
+    public function generateUrl($oObj)
     {
         if (empty($oObj->breadcrumbs)) {
             return null;
