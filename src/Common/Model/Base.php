@@ -904,7 +904,7 @@ abstract class Base
                         $aMergedData
                     );
 
-                } elseif ($bExpandForTrigger && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
+                } elseif (($bExpandForTrigger || $bExpandAll) && $oExpandableField->type === static::EXPANDABLE_TYPE_MANY) {
 
                     $this->getManyAssociatedItems(
                         $aResults,
