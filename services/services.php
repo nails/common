@@ -110,7 +110,7 @@ return [
                 return new \Nails\Common\Service\PDODatabase();
             }
         },
-        'Routes'          => function () {
+        'Routes'         => function () {
             if (class_exists('\App\Common\Service\Routes')) {
                 return new \App\Common\Service\Routes();
             } else {
@@ -203,8 +203,8 @@ return [
         },
     ],
     'factories'  => [
-        'DateTime'          => function () {
-            return new \DateTime();
+        'DateTime'          => function ($sTime = 'now', DateTimeZone $oTimeZone = null) {
+            return new \DateTime($sTime, $oTimeZone);
         },
         'EventSubscription' => function () {
             if (class_exists('\App\Common\Events\Subscription')) {
@@ -213,11 +213,11 @@ return [
                 return new \Nails\Common\Events\Subscription();
             }
         },
-        'HttpClient'        => function () {
+        'HttpClient'        => function (array $aConfig = []) {
             if (class_exists('\App\Common\HttpClient')) {
-                return new \App\Common\HttpClient();
+                return new \App\Common\HttpClient($aConfig);
             } else {
-                return new \GuzzleHttp\Client();
+                return new \GuzzleHttp\Client($aConfig);
             }
         },
     ],

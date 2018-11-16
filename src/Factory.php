@@ -20,15 +20,37 @@ class Factory
     /**
      * Contains an array of containers; each component gets its own element so as
      * to avoid naming collisions.
+     *
      * @var array
      */
-    private static $aContainers    = [];
+    private static $aContainers = [];
+
+    /**
+     * Tracks which services have been loaded
+     *
+     * @var array
+     */
+    private static $aLoadedServices = [];
+
+    /**
+     * Tracks which models have been loaded
+     *
+     * @var array
+     */
+    private static $aLoadedModels = [];
+
+    /**
+     * Tracks which helpers have been loaded
+     *
+     * @var array
+     */
     private static $aLoadedHelpers = [];
 
     // --------------------------------------------------------------------------
 
     /**
      * Look for services from available components and configure into the dependency container
+     *
      * @return void
      */
     public static function setup()
@@ -52,8 +74,7 @@ class Factory
             //  Properties
             if (!empty($aComponentServices['properties'])) {
                 if (empty(self::$aContainers[$ComponentName]['properties'])) {
-                    self::$aContainers[$ComponentName]['properties']                = new Container();
-                    self::$aContainers[$ComponentName]['properties']['__CONSTRUCT'] = null;
+                    self::$aContainers[$ComponentName]['properties'] = new Container();
                 }
                 foreach ($aComponentServices['properties'] as $sKey => $mValue) {
                     self::$aContainers[$ComponentName]['properties'][$sKey] = $mValue;
@@ -62,39 +83,62 @@ class Factory
 
             // --------------------------------------------------------------------------
 
-            //  Services
+            /**
+             * SERVICES
+             * All services are wrapped in a closure, this is so that on fetch we can
+             * pass in any additional arguments as parameters which can be used in the
+             * item's constructor
+             */
             if (!empty($aComponentServices['services'])) {
                 if (empty(self::$aContainers[$ComponentName]['services'])) {
-                    self::$aContainers[$ComponentName]['services']                = new Container();
-                    self::$aContainers[$ComponentName]['services']['__CONSTRUCT'] = null;
+                    self::$aContainers[$ComponentName]['services'] = new Container();
                 }
-                foreach ($aComponentServices['services'] as $sKey => $oCallable) {
-                    self::$aContainers[$ComponentName]['services'][$sKey] = $oCallable;
+                foreach ($aComponentServices['services'] as $sKey => $cCallable) {
+                    self::$aContainers[$ComponentName]['services'][$sKey] = function () use ($sKey, $cCallable) {
+                        return $cCallable;
+                    };;
                 }
             }
 
             // --------------------------------------------------------------------------
 
-            //  Models
+            /**
+             * MODELS
+             * All models are wrapped in a closure, this is so that on fetch we can
+             * pass in any additional arguments as parameters which can be used in the
+             * item's constructor
+             */
             if (!empty($aComponentServices['models'])) {
                 if (empty(self::$aContainers[$ComponentName]['models'])) {
-                    self::$aContainers[$ComponentName]['models']                  = new Container();
-                    self::$aContainers[$ComponentName]['services']['__CONSTRUCT'] = null;
+                    self::$aContainers[$ComponentName]['models'] = new Container();
                 }
-                foreach ($aComponentServices['models'] as $sKey => $oCallable) {
-                    self::$aContainers[$ComponentName]['models'][$sKey] = $oCallable;
+                foreach ($aComponentServices['models'] as $sKey => $cCallable) {
+                    self::$aContainers[$ComponentName]['models'][$sKey] = function () use ($cCallable) {
+                        return $cCallable;
+                    };
                 }
             }
 
             // --------------------------------------------------------------------------
 
-            //  Factories
+            /**
+             * FACTORIES
+             * All factories are wrapped in a closure, this is so that on fetch we can
+             * pass in any additional arguments as parameters which can be used in the
+             * item's constructor
+             */
             if (!empty($aComponentServices['factories'])) {
                 if (empty(self::$aContainers[$ComponentName]['factories'])) {
                     self::$aContainers[$ComponentName]['factories'] = new Container();
                 }
-                foreach ($aComponentServices['factories'] as $sKey => $oCallable) {
-                    self::$aContainers[$ComponentName]['factories'][$sKey] = self::$aContainers[$ComponentName]['factories']->factory($oCallable);
+                foreach ($aComponentServices['factories'] as $sKey => $cCallable) {
+
+                    $cWrapper = function () use ($cCallable) {
+                        return $cCallable;
+                    };
+
+                    self::$aContainers[$ComponentName]['factories'][$sKey] = self::$aContainers[$ComponentName]['factories']
+                        ->factory($cWrapper);
                 }
             }
         }
@@ -127,6 +171,7 @@ class Factory
 
     /**
      * Look for the app's services.php file, allowing for environment overrides
+     *
      * @return array
      */
     private static function findServicesForApp()
@@ -208,14 +253,19 @@ class Factory
      *
      * @param string $sServiceName   The service name
      * @param string $sComponentName The name of the component which provides the service
-     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
      * @throws FactoryException
      */
-    public static function service($sServiceName, $sComponentName = '', $mParameters = null)
+    public static function service($sServiceName, $sComponentName = '')
     {
-        return self::getService('services', $sServiceName, $sComponentName, $mParameters);
+        return static::getServiceOrModel(
+            static::$aLoadedServices,
+            'services',
+            $sServiceName,
+            $sComponentName,
+            array_slice(func_get_args(), 2)
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -225,14 +275,59 @@ class Factory
      *
      * @param string $sModelName     The model name
      * @param string $sComponentName The name of the component which provides the model
-     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
      * @throws FactoryException
      */
-    public static function model($sModelName, $sComponentName = '', $mParameters = null)
+    public static function model($sModelName, $sComponentName = '')
     {
-        return self::getService('models', $sModelName, $sComponentName, $mParameters);
+        return static::getServiceOrModel(
+            static::$aLoadedModels,
+            'models',
+            $sModelName,
+            $sComponentName,
+            array_slice(func_get_args(), 2)
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Loads a servie or a model from the tracker array
+     *
+     * @param array  $aTrackerArray The tracker array to load from
+     * @param string $sType         The type of item being loaded
+     * @param string $sName         The name of the item being loaded
+     * @param string $sComponent    The name of the component which provides the item
+     * @param array  $aParamaters   Any paramters to pass to the constructor
+     *
+     * @return object
+     * @throws FactoryException
+     */
+    private static function getServiceOrModel(array &$aTrackerArray, $sType, $sName, $sComponent, array $aParamaters)
+    {
+        /**
+         * We track them like this because we need to return the instance of the
+         * item, not the closure. If we don't do this then we will always get
+         * a new instance of the item, which is undesireable.
+         */
+
+        $sKey = md5($sComponent . $sName);
+
+        if (!array_key_exists($sKey, static::$aLoadedServices)) {
+
+            $aTrackerArray[$sKey] = call_user_func_array(
+                self::getService($sType, $sName, $sComponent),
+                $aParamaters
+            );
+
+        } elseif (!empty($aParamaters)) {
+            trigger_error(
+                'A call to Factory::' . $sType . '(' . $sName . ') passed construction paramaters, but the object has already been constructed'
+            );
+        }
+
+        return $aTrackerArray[$sKey];
     }
 
     // --------------------------------------------------------------------------
@@ -242,14 +337,16 @@ class Factory
      *
      * @param string $sFactoryName   The factory name
      * @param string $sComponentName The name of the component which provides the factory
-     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @return mixed
      * @throws FactoryException
      */
-    public static function factory($sFactoryName, $sComponentName = '', $mParameters = null)
+    public static function factory($sFactoryName, $sComponentName = '')
     {
-        return self::getService('factories', $sFactoryName, $sComponentName, $mParameters);
+        return call_user_func_array(
+            self::getService('factories', $sFactoryName, $sComponentName),
+            array_slice(func_get_args(), 2)
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -321,12 +418,11 @@ class Factory
      * @param string $sServiceType   The type of the service to return
      * @param string $sServiceName   The name of the service to return
      * @param string $sComponentName The name of the module which defined it
-     * @param mixed  $mParameters    Any additional parameters to be passed to __CONSTRUCT property
      *
      * @throws FactoryException
      * @return mixed
      */
-    private static function getService($sServiceType, $sServiceName, $sComponentName = '', $mParameters = null)
+    private static function getService($sServiceType, $sServiceName, $sComponentName = '')
     {
         $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
@@ -343,8 +439,6 @@ class Factory
                 ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"'
             );
         }
-
-        self::$aContainers[$sComponentName][$sServiceType]->offsetSet('__CONSTRUCT', $mParameters);
 
         return self::$aContainers[$sComponentName][$sServiceType][$sServiceName];
     }
