@@ -14,5 +14,8 @@ namespace Nails\Common\Tests;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-
+    public function setUp()
+    {
+        parent::setUp();
+    }
 }
