@@ -13,6 +13,7 @@
 namespace Nails\Common\CodeIgniter\Core;
 
 use MX_Config;
+use Nails\Functions;
 
 /* load the MX Config class */
 require NAILS_COMMON_PATH . 'MX/Config.php';
@@ -42,7 +43,7 @@ class Config extends MX_Config
             $sUrl      = $sProtocol . '://' . $_SERVER['HTTP_HOST'] . $sUrl;
         }
 
-        if ($bForceSecure || isPageSecure()) {
+        if ($bForceSecure || Functions::isPageSecure()) {
             $sUrl = preg_replace('#^' . BASE_URL . '#', SECURE_BASE_URL, $sUrl);
         }
 

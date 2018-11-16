@@ -14,6 +14,7 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\AssetException;
 use Nails\Factory;
+use Nails\Functions;
 
 class Asset
 {
@@ -1111,7 +1112,7 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Force SSL for assets if page is secure
-        if (isPageSecure()) {
+        if (Functions::isPageSecure()) {
             foreach ($aOut as &$sLine) {
                 $sLine = str_replace($this->sBaseUrl, $this->sBaseUrlSecure, $sLine);
             }

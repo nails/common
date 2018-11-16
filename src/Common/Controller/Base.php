@@ -17,6 +17,7 @@ use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
 use Nails\Environment;
 use Nails\Factory;
+use Nails\Functions;
 
 abstract class Base extends \MX_Controller
 {
@@ -179,6 +180,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets the content type to use for the request to UTF-8
+     *
      * @throws \Nails\Common\Exception\FactoryException
      */
     protected function setContentType()
@@ -477,8 +479,7 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Make sure the system and the database are running on UTC
-        date_default_timezone_set('UTC');
+        //  Make sure the database is running on UTC
         $oDb = Factory::service('Database');
         $oDb->query('SET time_zone = \'+0:00\'');
     }
@@ -487,6 +488,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Checks if routes need to be generated as part of the startup request
+     *
      * @throws NailsException
      * @throws \Nails\Common\Exception\FactoryException
      */
@@ -747,6 +749,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets a global Nails JS object
+     *
      * @throws \Nails\Common\Exception\FactoryException
      */
     public static function setNailsJs()
@@ -754,7 +757,7 @@ abstract class Base extends \MX_Controller
         $oAsset     = Factory::service('Asset');
         $aVariables = [
             'ENVIRONMENT' => Environment::get(),
-            'SITE_URL'    => site_url('', isPageSecure()),
+            'SITE_URL'    => site_url('', Functions::isPageSecure()),
             'NAILS'       => (object) [
                 'URL'  => NAILS_ASSETS_URL,
                 'LANG' => (object) [],
@@ -775,6 +778,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets global JS
+     *
      * @throws \Nails\Common\Exception\FactoryException
      */
     protected function setGlobalJs()
@@ -811,6 +815,7 @@ abstract class Base extends \MX_Controller
 
     /**
      * Sets global CSS
+     *
      * @throws \Nails\Common\Exception\FactoryException
      */
     protected function setGlobalCss()

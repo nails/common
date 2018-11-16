@@ -52,18 +52,21 @@ class ErrorHandler
 
     /**
      * Whether the handler has initiated itself
+     *
      * @var bool
      */
     protected static $bIsReady = false;
 
     /**
      * The fully qualified driver class name
+     *
      * @var string
      */
     protected static $sDriverClass;
 
     /**
      * The configuration for the default driver
+     *
      * @var \stdClass
      */
     protected static $oDefaultDriver;
@@ -128,6 +131,7 @@ class ErrorHandler
 
     /**
      * Returns the default error driver config
+     *
      * @return \stdClass
      */
     public function getDefaultDriver()
@@ -140,6 +144,7 @@ class ErrorHandler
 
     /**
      * Returns the default error driver class name
+     *
      * @return string
      */
     public function getDefaultDriverClass()
@@ -555,5 +560,51 @@ class ErrorHandler
         } else {
             _NAILS_ERROR('404 Page Not Found');
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * A very low-level error function, used before the main error handling stack kicks in
+     *
+     * @param string $sError   The error to show
+     * @param string $sSubject An optional subject line
+     */
+    public static function die($sError, $sSubject = '')
+    {
+        $oInput = Factory::service('Input');
+        if ($oInput::isCli()) {
+
+            echo "\n";
+            echo $sSubject ? 'ERROR: ' . $sSubject . ":\n" : '';
+            echo $sSubject ? $sError : 'ERROR: ' . $sError;
+            echo "\n\n";
+
+        } else {
+            ?>
+            <style type="text/css">
+                p {
+                    font-family: monospace;
+                    margin: 20px 10px;
+                }
+
+                strong {
+                    color: red;
+                }
+
+                code {
+                    padding: 5px;
+                    border: 1px solid #CCC;
+                    background: #EEE
+                }
+            </style>
+            <p>
+                <strong>ERROR:</strong>
+                <?=$sSubject ? '<em>' . $sSubject . '</em> - ' : ''?>
+                <?=$sError?>
+            </p>
+            <?php
+        }
+        exit(1);
     }
 }

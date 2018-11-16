@@ -13,6 +13,7 @@
 namespace Nails\Common\CodeIgniter\Core;
 
 use CI_Uri;
+use Nails\Common\Service\ErrorHandler;
 
 class Uri extends CI_Uri
 {
@@ -26,7 +27,7 @@ class Uri extends CI_Uri
         try {
             parent::filter_uri($str);
         } catch (\Exception $e) {
-            _NAILS_ERROR($e->getMessage());
+            ErrorHandler::die($e->getMessage());
         }
     }
 }

@@ -11,7 +11,9 @@
  */
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\ErrorHandler;
 use Nails\Factory;
+use Nails\Functions;
 
 //  @todo move these into the factory
 $GLOBALS['NAILS'] = [];
@@ -32,13 +34,13 @@ if (!function_exists('_NAILS_GET_APP')) {
         $sComposer = @file_get_contents(FCPATH . 'composer.json');
 
         if (empty($sComposer)) {
-            _NAILS_ERROR('Failed to get app configuration; could not load composer.json');
+            ErrorHandler::die('Failed to get app configuration; could not load composer.json');
         }
 
         $oComposer = @json_decode($sComposer);
 
         if (empty($oComposer)) {
-            _NAILS_ERROR('Failed to get app configuration; could not decode composer.json');
+            ErrorHandler::die('Failed to get app configuration; could not decode composer.json');
         }
 
         $aComposer = (array) $oComposer;
@@ -98,13 +100,13 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
         $sComposer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
 
         if (empty($sComposer)) {
-            _NAILS_ERROR('Failed to discover potential modules; could not load composer/installed.json');
+            ErrorHandler::die('Failed to discover potential modules; could not load composer/installed.json');
         }
 
         $aComposer = @json_decode($sComposer);
 
         if (empty($aComposer)) {
-            _NAILS_ERROR('Failed to discover potential modules; could not decode composer/installed.json');
+            ErrorHandler::die('Failed to discover potential modules; could not decode composer/installed.json');
         }
 
         $aOut = [];
@@ -325,7 +327,7 @@ if (!function_exists('_NAILS_GET_SKINS')) {
         foreach ($aSkins as $oSkin) {
 
             //  Provide a url field for the skin
-            if (isPageSecure()) {
+            if (Functions::isPageSecure()) {
                 $oSkin->url = SECURE_BASE_URL . $oSkin->relativePath;
             } else {
                 $oSkin->url = BASE_URL . $oSkin->relativePath;
@@ -523,15 +525,14 @@ if (!function_exists('isModuleEnabled')) {
 if (!function_exists('getControllerData')) {
 
     /**
-     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
+     * Nails\Bootstrap::$aNailsControllerData is an array populated by $this->data in controllers,
      * this function provides an easy interface to this array when it's not in scope.
      *
-     * @return  array   A reference to $NAILS_CONTROLLER_DATA
+     * @return  array   A reference to Nails\Bootstrap::$aNailsControllerData
      **/
     function &getControllerData()
     {
-        global $NAILS_CONTROLLER_DATA;
-        return $NAILS_CONTROLLER_DATA;
+        return Nails\Bootstrap::$aNailsControllerData;
     }
 }
 
@@ -540,9 +541,9 @@ if (!function_exists('getControllerData')) {
 if (!function_exists('setControllerData')) {
 
     /**
-     * $NAILS_CONTROLLER_DATA is an array populated by $this->data in controllers,
-     * this function provides an easy interface to populate this array when it's not
-     * in scope.
+     * Nails\Bootstrap::$aNailsControllerData is an array populated by $this->data
+     * in controllers, this function provides an easy interface to populate this
+     * array when it's not in scope.
      *
      * @param string $sKey   The key to populate
      * @param mixed  $mValue The value to assign
@@ -551,8 +552,7 @@ if (!function_exists('setControllerData')) {
      **/
     function setControllerData($sKey, $mValue)
     {
-        global $NAILS_CONTROLLER_DATA;
-        $NAILS_CONTROLLER_DATA[$sKey] = $mValue;
+        Nails\Bootstrap::$aNailsControllerData[$sKey] = $mValue;
     }
 }
 
@@ -661,40 +661,6 @@ if (!function_exists('getRelativePath')) {
         }
 
         return implode('/', $aRelPath);
-    }
-}
-
-// --------------------------------------------------------------------------
-
-if (!function_exists('isPageSecure')) {
-
-    /**
-     * Detects whether the current page is secure or not
-     *
-     * @access  public
-     *
-     * @param   string
-     *
-     * @return  bool
-     */
-    function isPageSecure()
-    {
-        if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') {
-
-            //  Page is being served through HTTPS
-            return true;
-
-        } elseif (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['REQUEST_URI']) && SECURE_BASE_URL != BASE_URL) {
-
-            //  Not being served through HTTPS, but does the URL of the page begin
-            //  with SECURE_BASE_URL (when BASE_URL is different)
-
-            $sUrl = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-            return (bool) preg_match('#^' . SECURE_BASE_URL . '.*#', $sUrl);
-        }
-
-        //  Unknown, assume not
-        return false;
     }
 }
 
@@ -826,6 +792,7 @@ if (!function_exists('isCli')) {
 
     /**
      * Whether the current request is being executed on the CLI
+     *
      * @return bool
      */
     function isCli()
@@ -841,6 +808,7 @@ if (!function_exists('isAjax')) {
 
     /**
      * Whether the current request is an Ajax request
+     *
      * @return bool
      */
     function isAjax()
