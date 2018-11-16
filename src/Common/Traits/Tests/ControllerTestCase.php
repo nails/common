@@ -19,26 +19,25 @@ trait ControllerTestCase
     /**
      * Returns a new HttpClient, configured with some defaults
      *
-     * @param array $aData A configiration array for the Http client
+     * @param array $aConfig A configiration array for the Http client
      *
      * @return \GuzzleHttp\Client
      * @throws \Nails\Common\Exception\FactoryException
      */
-    protected static function getHttpClient(array $aData = [])
+    protected static function getHttpClient(array $aConfig = [])
     {
-        if (!array_key_exists('base_uri', $aData)) {
-            //$aData['base_uri'] = site_url();
-            $aData['base_uri'] = 'https://localhost';
+        if (!array_key_exists('base_uri', $aConfig)) {
+            $aConfig['base_uri'] = site_url();
         }
 
-        if (!array_key_exists('verify', $aData)) {
-            $aData['verify'] = Environment::is('DEVELOPMENT') ? false : true;
+        if (!array_key_exists('verify', $aConfig)) {
+            $aConfig['verify'] = Environment::is('DEVELOPMENT') ? false : true;
         }
 
-        if (!array_key_exists('http_errors', $aData)) {
-            $aData['http_errors'] = false;
+        if (!array_key_exists('http_errors', $aConfig)) {
+            $aConfig['http_errors'] = false;
         }
 
-        return Factory::factory('HttpClient', '', $aData);
+        return Factory::factory('HttpClient', '', $aConfig);
     }
 }
