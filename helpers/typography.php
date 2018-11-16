@@ -45,4 +45,4 @@ if (!function_exists('auto_typography')) {
 
 // --------------------------------------------------------------------------
 
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/typography_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/typography_helper.php';

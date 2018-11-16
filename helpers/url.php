@@ -121,4 +121,4 @@ if (!function_exists('tel')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/url_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/url_helper.php';

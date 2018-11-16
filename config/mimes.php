@@ -1,7 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-$mimes = require FCPATH . 'vendor/codeigniter/framework/application/config/mimes.php';
+$mimes = require NAILS_CI_APP_PATH . 'config/mimes.php';
 
 /**
  * Additional mimes

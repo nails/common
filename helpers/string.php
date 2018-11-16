@@ -201,4 +201,4 @@ if (!function_exists('prosaicList')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/string_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/string_helper.php';

@@ -113,11 +113,11 @@ class Factory
     {
         $aPaths = [
             //  App overrides
-            FCPATH . 'application/services/' . Environment::get() . '/' . $sComponentName . '/services.php',
-            FCPATH . 'application/services/' . $sComponentName . '/services.php',
+            NAILS_APP_PATH . 'application/services/' . Environment::get() . '/' . $sComponentName . '/services.php',
+            NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
             //  Default locations
-            FCPATH . 'vendor/' . $sComponentName . '/services/' . Environment::get() . '/services.php',
-            FCPATH . 'vendor/' . $sComponentName . '/services/services.php',
+            NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/' . Environment::get() . '/services.php',
+            NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/services.php',
         ];
 
         return self::findServicesAtPaths($aPaths);
@@ -279,7 +279,7 @@ class Factory
              */
             if ($sComponentName == 'app') {
 
-                $sAppPath = FCPATH . 'application/helpers/' . $sHelperName . '.php';
+                $sAppPath = NAILS_APP_PATH . 'application/helpers/' . $sHelperName . '.php';
 
                 if (!file_exists($sAppPath)) {
                     throw new FactoryException(
@@ -292,8 +292,8 @@ class Factory
 
             } else {
 
-                $sComponentPath = FCPATH . 'vendor/' . $sComponentName . '/helpers/' . $sHelperName . '.php';
-                $sAppPath       = FCPATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
+                $sComponentPath = NAILS_APP_PATH . 'vendor/' . $sComponentName . '/helpers/' . $sHelperName . '.php';
+                $sAppPath       = NAILS_APP_PATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
 
                 if (!file_exists($sComponentPath)) {
                     throw new FactoryException(
@@ -364,7 +364,7 @@ class Factory
         //  App
         $aComponents[] = (object) [
             'slug'     => 'app',
-            'autoload' => static::extractAutoLoadItemsFromComposerJson(FCPATH . 'composer.json'),
+            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_APP_PATH . 'composer.json'),
         ];
 
         //  Modules

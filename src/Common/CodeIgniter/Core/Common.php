@@ -31,7 +31,7 @@ if (!function_exists('_NAILS_GET_APP')) {
 
         // --------------------------------------------------------------------------
 
-        $sComposer = @file_get_contents(FCPATH . 'composer.json');
+        $sComposer = @file_get_contents(NAILS_APP_PATH . 'composer.json');
 
         if (empty($sComposer)) {
             ErrorHandler::die('Failed to get app configuration; could not load composer.json');
@@ -53,7 +53,7 @@ if (!function_exists('_NAILS_GET_APP')) {
             'description'   => getFromArray('description', $aNails, getFromArray('description', $aComposer)),
             'homepage'      => getFromArray('homepage', $aNails, getFromArray('homepage', $aComposer)),
             'authors'       => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
-            'path'          => FCPATH,
+            'path'          => NAILS_APP_PATH,
             'relativePath'  => './',
             'moduleName'    => getFromArray('moduleName', $aNails, ''),
             'data'          => getFromArray('data', $aNails, null),
@@ -97,7 +97,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
 
         // --------------------------------------------------------------------------
 
-        $sComposer = @file_get_contents(FCPATH . 'vendor/composer/installed.json');
+        $sComposer = @file_get_contents(NAILS_APP_PATH . 'vendor/composer/installed.json');
 
         if (empty($sComposer)) {
             ErrorHandler::die('Failed to discover potential modules; could not load composer/installed.json');
@@ -121,7 +121,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
                     'description'   => getFromArray('description', $aNails, getFromArray('description', $aPackage)),
                     'homepage'      => getFromArray('homepage', $aNails, getFromArray('homepage', $aPackage)),
                     'authors'       => getFromArray('authors', $aNails, getFromArray('authors', $aPackage)),
-                    'path'          => FCPATH . 'vendor/' . $oPackage->name . '/',
+                    'path'          => NAILS_APP_PATH . 'vendor/' . $oPackage->name . '/',
                     'relativePath'  => 'vendor/' . $oPackage->name . '/',
                     'moduleName'    => getFromArray('moduleName', $aNails, ''),
                     'data'          => getFromArray('data', $aNails, null),
@@ -138,7 +138,7 @@ if (!function_exists('_NAILS_GET_COMPONENTS')) {
         // --------------------------------------------------------------------------
 
         //  Get App components, too
-        $sAppPath = FCPATH . 'application/components/';
+        $sAppPath = NAILS_APP_PATH . 'application/components/';
 
         if (is_dir($sAppPath)) {
             $aDirs = scandir($sAppPath);

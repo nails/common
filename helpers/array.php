@@ -242,4 +242,4 @@ if (!function_exists('arrayExtractProperty')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/array_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/array_helper.php';

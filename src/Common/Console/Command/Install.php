@@ -505,7 +505,7 @@ class Install extends Base
         //  If config/app.php is there is it writable?
         if ($appConfigExists) {
 
-            if (!is_writable(FCPATH . 'config/app.php')) {
+            if (!is_writable(NAILS_APP_PATH . 'config/app.php')) {
 
                 $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writable.';
             }
@@ -514,7 +514,7 @@ class Install extends Base
         //  If config/deploy.php is there, is it writable?
         if ($deployConfigExists) {
 
-            if (!is_writable(FCPATH . 'config/deploy.php')) {
+            if (!is_writable(NAILS_APP_PATH . 'config/deploy.php')) {
 
                 $preTestErrors[] = '<comment>config/app.php</comment> exists, but is not writable.';
             }
@@ -523,7 +523,7 @@ class Install extends Base
         //  If a file is missing we need to be able to write to the directory.
         if (!$appConfigExists || !$deployConfigExists) {
 
-            if (!is_writable(FCPATH . 'config/')) {
+            if (!is_writable(NAILS_APP_PATH . 'config/')) {
                 $preTestErrors[] = '<comment>config/</comment> is not writable.';
             }
         }

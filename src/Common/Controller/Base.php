@@ -242,7 +242,7 @@ abstract class Base extends \MX_Controller
      */
     protected function maintenanceMode($force = false, $sTitle = '', $sBody = '')
     {
-        if ($force || file_exists(FCPATH . '.MAINTENANCE')) {
+        if ($force || file_exists(NAILS_APP_PATH . '.MAINTENANCE')) {
 
             /**
              * We're in maintenance mode. This can happen very early so we need to

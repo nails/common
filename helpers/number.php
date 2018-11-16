@@ -10,4 +10,4 @@
  * @link
  */
 
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/number_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/number_helper.php';

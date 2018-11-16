@@ -13,8 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Model extends BaseMaker
 {
     const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
-    const MODEL_PATH        = FCPATH . 'src/Model/';
-    const ADMIN_PATH        = FCPATH . 'application/modules/admin/controllers/';
+    const MODEL_PATH        = NAILS_APP_PATH . 'src/Model/';
+    const ADMIN_PATH        = NAILS_APP_PATH . 'application/modules/admin/controllers/';
     const SERVICE_PATH      = APPPATH . 'services/services.php';
     const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
 

@@ -2280,4 +2280,4 @@ EOT;
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/form_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/form_helper.php';

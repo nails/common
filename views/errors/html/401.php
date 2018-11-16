@@ -17,10 +17,10 @@ MESSAGE: <?=$sMessage?>
         <div id="container">
             <?php
 
-            if (defined('FCPATH') && defined('BASE_URL')) {
+            if (defined('NAILS_APP_PATH') && defined('BASE_URL')) {
                 $aPaths = [
                     [
-                        FCPATH . 'assets/img/errors/401.png',
+                        NAILS_APP_PATH . 'assets/img/errors/401.png',
                         BASE_URL . 'assets/img/errors/401.png',
                     ],
                 ];

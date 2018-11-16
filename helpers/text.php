@@ -80,4 +80,4 @@ if (!function_exists('title_case')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/text_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/text_helper.php';

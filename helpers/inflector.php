@@ -38,4 +38,4 @@ if (!function_exists('pluralise')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/inflector_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/inflector_helper.php';

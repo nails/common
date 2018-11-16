@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Migration extends BaseMaker
 {
     const RESOURCE_PATH  = NAILS_COMMON_PATH . 'resources/console/';
-    const MIGRATION_PATH = FCPATH . 'application/migrations/';
+    const MIGRATION_PATH = NAILS_APP_PATH . 'application/migrations/';
     const TAB_WIDTH      = 4;
 
     // --------------------------------------------------------------------------

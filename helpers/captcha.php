@@ -10,4 +10,4 @@
  * @link
  */
 
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/captcha_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/captcha_helper.php';

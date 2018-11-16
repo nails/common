@@ -1,7 +1,7 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/codeigniter/framework/application/config/config.php';
+require NAILS_CI_APP_PATH . 'config/config.php';
 
 /**
  * Override some of the CI defaults
@@ -26,7 +26,7 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 $config['log_threshold'] = 1;
 
 //  Cache directory
-$config['cache_path'] = defined('CACHE_PATH') ? CACHE_PATH : FCPATH . 'cache/private/';
+$config['cache_path'] = defined('CACHE_PATH') ? CACHE_PATH : NAILS_APP_PATH . 'cache/private/';
 
 //  The encryption key
 $config['encryption_key'] = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY) : md5('');

@@ -402,4 +402,4 @@ if (!function_exists('datepicker')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/date_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/date_helper.php';

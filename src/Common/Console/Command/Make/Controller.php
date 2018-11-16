@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Controller extends BaseMaker
 {
     const RESOURCE_PATH   = NAILS_COMMON_PATH . 'resources/console/';
-    const CONTROLLER_PATH = FCPATH . 'application/modules/';
+    const CONTROLLER_PATH = NAILS_APP_PATH . 'application/modules/';
     const TAB_WIDTH       = 4;
 
     // --------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class Controller extends BaseMaker
                         $this->getResource(
                             'template/view.php',
                             [
-                                'VIEW' => preg_replace('#^' . FCPATH . '#', '', $sView),
+                                'VIEW' => preg_replace('#^' . NAILS_APP_PATH . '#', '', $sView),
                             ]
                         )
                     );

@@ -29,7 +29,7 @@ class Typography
      */
     public function __construct()
     {
-        require_once FCPATH . 'vendor/codeigniter/framework/system/libraries/Typography.php';
+        require_once NAILS_CI_SYSTEM_PATH . 'libraries/Typography.php';
         $this->oTypography = new \CI_Typography();
     }
 

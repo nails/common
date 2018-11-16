@@ -1,4 +1,4 @@
 <?php
 
 /* Load the base config file from the CodeIgniter package */
-require FCPATH . 'vendor/codeigniter/framework/application/config/autoload.php';
+require NAILS_CI_APP_PATH . 'config/autoload.php';

@@ -92,27 +92,25 @@ final class Bootstrap
         Functions::define('NAILS_PACKAGE_NAME', 'Nails');
         Functions::define('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
         Functions::define('NAILS_BRANDING', true);
+
+        //  Paths
         Functions::define('NAILS_PATH', static::$sBaseDirectory . 'vendor/nails/');
         Functions::define('NAILS_APP_PATH', static::$sBaseDirectory);
         Functions::define('NAILS_COMMON_PATH', NAILS_PATH . 'common/');
+        Functions::define('NAILS_CI_APP_PATH', static::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
+        Functions::define('NAILS_CI_SYSTEM_PATH', static::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
+
+        //  So CodeIgniter configures itself correctly
+        Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
 
         //  URLs
         Functions::define('BASE_URL', '/');
         Functions::define('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', BASE_URL));
-
-        if (Functions::isPageSecure()) {
-            Functions::define('NAILS_URL', SECURE_BASE_URL . 'vendor/nails/');
-        } else {
-            Functions::define('NAILS_URL', BASE_URL . 'vendor/nails/');
-        }
+        Functions::define('NAILS_URL', (Functions::isPageSecure() ? SECURE_BASE_URL : BASE_URL) . 'vendor/nails/');
 
         //  @todo (Pablo - 2018-11-16) - Move these into the asset service
         Functions::define('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/assets/');
         Functions::define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
-
-
-        //  So CodeIgniter configures itself correctly
-        Functions::define('BASEPATH', static::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
 
         //  Environment
         Functions::define('ENVIRONMENT', 'DEVELOPMENT');
@@ -151,7 +149,7 @@ final class Bootstrap
 
         //  Log constants
         //  @todo (Pablo - 2018-11-16) - Move these to the log service
-        Functions::define('DEPLOY_LOG_DIR', static::$sBaseDirectory . 'application/logs' . DIRECTORY_SEPARATOR);
+        Functions::define('DEPLOY_LOG_DIR', static::$sBaseDirectory . 'application/logs/');
 
         //  Email constants
         Functions::define('APP_DEVELOPER_EMAIL', '');

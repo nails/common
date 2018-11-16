@@ -202,7 +202,7 @@ class Seed extends Base
             (object) [
                 'slug'      => 'app',
                 'namespace' => 'App\\',
-                'path'      => FCPATH,
+                'path'      => NAILS_APP_PATH,
             ],
             (object) [
                 'slug'      => 'nails/common',

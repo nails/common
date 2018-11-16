@@ -37,4 +37,4 @@ if (!function_exists('isDirCS')) {
     }
 }
 
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/file_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/file_helper.php';

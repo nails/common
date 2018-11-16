@@ -267,11 +267,11 @@ if (Environment::not('PRODUCTION')) {
             <div id="container">
                 <?php
 
-                if (defined('FCPATH') && defined('BASE_URL')) {
+                if (defined('NAILS_APP_PATH') && defined('BASE_URL')) {
 
                     $paths   = [];
                     $paths[] = [
-                        FCPATH . 'assets/img/errors/fatal.png',
+                        NAILS_APP_PATH . 'assets/img/errors/fatal.png',
                         BASE_URL . 'assets/img/errors/fatal.png',
                     ];
                 }

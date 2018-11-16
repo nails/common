@@ -35,4 +35,4 @@ if (!function_exists('valid_email')) {
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
-include FCPATH . 'vendor/codeigniter/framework/system/helpers/email_helper.php';
+include NAILS_CI_SYSTEM_PATH . 'helpers/email_helper.php';

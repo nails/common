@@ -104,7 +104,7 @@ class Encrypt
      */
     public static function migrate($sCipher, $sOldKey, $sNewSalt = '')
     {
-        require_once FCPATH . 'vendor/codeigniter/framework/system/libraries/Encrypt.php';
+        require_once NAILS_CI_SYSTEM_PATH . 'libraries/Encrypt.php';
 
         $oEncryptCi = new \CI_Encrypt();
         $oEncrypt   = Factory::service('Encrypt');
