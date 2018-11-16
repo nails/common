@@ -14,8 +14,23 @@ namespace Nails\Common\Tests;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Excuted before every test
+     */
     public function setUp()
     {
+        //  @todo (Pablo - 2018-11-16) - Start a transaction
         parent::setUp();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Excuted after every test
+     */
+    public function tearDown()
+    {
+        //  @todo (Pablo - 2018-11-16) - Rollback transaction
+        parent::tearDown();
     }
 }
