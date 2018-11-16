@@ -38,6 +38,10 @@ trait ControllerTestCase
             $aConfig['http_errors'] = false;
         }
 
+        if (!array_key_exists('allow_redirects', $aConfig)) {
+            $aConfig['allow_redirects'] = false;
+        }
+
         return Factory::factory('HttpClient', '', $aConfig);
     }
 }
