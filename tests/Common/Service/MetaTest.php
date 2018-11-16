@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Service;
 
-class MetaTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class MetaTest extends TestCase
 {
     /**
      * @covers \Nails\Common\Meta::getEntries

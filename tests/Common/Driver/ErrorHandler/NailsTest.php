@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Driver\ErrorHandler;
 
-class NailsTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class NailsTest extends TestCase
 {
     public function testFoo()
     {

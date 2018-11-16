@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Service;
 
-class UserFeedbackTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class UserFeedbackTest extends TestCase
 {
     public function testFoo()
     {

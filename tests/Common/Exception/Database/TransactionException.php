@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Exception\Database;
 
-class TransactionExceptionTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class TransactionExceptionTest extends TestCase
 {
     public function testFoo()
     {

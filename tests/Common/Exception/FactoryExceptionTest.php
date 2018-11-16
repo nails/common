@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Exception;
 
-class FactoryExceptionTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class FactoryExceptionTest extends TestCase
 {
     public function testFoo()
     {

@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Traits;
 
-class CachingTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class CachingTest extends TestCase
 {
     public function testFoo()
     {

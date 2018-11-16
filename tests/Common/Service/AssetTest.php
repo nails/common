@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Service;
 
-class AssetTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class AssetTest extends TestCase
 {
     public function testFoo()
     {

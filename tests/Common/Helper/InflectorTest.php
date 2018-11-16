@@ -2,11 +2,11 @@
 
 namespace Nails\Common\Helper;
 
-use \Nails\Common\Helper\Inflector;
+use Nails\Common\Helper\Inflector;
+use Nails\Common\Tests\TestCase;
 
-class InflectorTest extends \PHPUnit_Framework_TestCase
+class InflectorTest extends TestCase
 {
-
     /**
      * Construct InflectorTest
      */

@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Service;
 
-class LoggerTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class LoggerTest extends TestCase
 {
     public function testFoo()
     {

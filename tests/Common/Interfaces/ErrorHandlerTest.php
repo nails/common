@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Interfaces;
 
-class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class ErrorHandlerTest extends TestCase
 {
     public function testFoo()
     {

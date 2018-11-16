@@ -2,7 +2,9 @@
 
 namespace Nails;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class FactoryTest extends TestCase
 {
     public function testFoo()
     {

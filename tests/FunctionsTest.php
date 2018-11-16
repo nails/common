@@ -1,10 +1,10 @@
 <?php
 
-namespace Nails\Common\Model;
+namespace Nails;
 
 use Nails\Common\Tests\TestCase;
 
-class LanguageTest extends TestCase
+class FunctionsTest extends TestCase
 {
     public function testFoo()
     {

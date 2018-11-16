@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Model;
 
-class AppNotificationTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class AppNotificationTest extends TestCase
 {
     public function testFoo()
     {

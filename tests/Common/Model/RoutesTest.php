@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Model;
 
-class RoutesTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class RoutesTest extends TestCase
 {
     public function testFoo()
     {

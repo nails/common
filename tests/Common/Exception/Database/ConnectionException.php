@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Exception\Database;
 
-class ConnectionExceptionTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class ConnectionExceptionTest extends TestCase
 {
     public function testFoo()
     {

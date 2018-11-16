@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Model;
 
-class DateTimeTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class DateTimeTest extends TestCase
 {
     public function testFoo()
     {

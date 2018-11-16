@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Driver\ErrorHandler;
 
-class RollbarTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class RollbarTest extends TestCase
 {
     public function testFoo()
     {

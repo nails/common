@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Exception;
 
-class NailsExceptionTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class NailsExceptionTest extends TestCase
 {
     public function testFoo()
     {

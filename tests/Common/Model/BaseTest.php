@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Model;
 
-class BaseTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class BaseTest extends TestCase
 {
     public function testFoo()
     {

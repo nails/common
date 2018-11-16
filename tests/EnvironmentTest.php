@@ -2,7 +2,9 @@
 
 namespace Nails;
 
-class StartupTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class EnvironmentTest extends TestCase
 {
     public function testFoo()
     {

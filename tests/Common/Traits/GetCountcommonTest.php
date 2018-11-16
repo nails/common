@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Traits;
 
-class GetCountCommonTest extends \PHPUnit_Framework_TestCase
+use Nails\Common\Tests\TestCase;
+
+class GetCountCommonTest extends TestCase
 {
     public function testFoo()
     {
