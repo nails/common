@@ -6,18 +6,44 @@ use Nails\Console\Command\Base;
 use Nails\Environment;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Rebuild extends Base
 {
     /**
      * Configures the app
+     *
      * @return void
      */
     protected function configure()
     {
         $this->setName('db:rebuild');
         $this->setDescription('Drops every table in the database and runs migrations');
+        $this->addOption(
+            'dbHost',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Host'
+        );
+        $this->addOption(
+            'dbUser',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database User'
+        );
+        $this->addOption(
+            'dbPass',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Password'
+        );
+        $this->addOption(
+            'dbName',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Name'
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -57,9 +83,27 @@ class Rebuild extends Base
 
         // --------------------------------------------------------------------------
 
+        //  Work out the DB credentials to use
+        $sDbHost = $oInput->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
+        $sDbUser = $oInput->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
+        $sDbPass = $oInput->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
+        $sDbName = $oInput->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
+
+        //  Check we have a database to connect to
+        if (empty($sDbName)) {
+            return $this->abort(static::EXIT_CODE_NO_DB);
+        }
+
+        //  Get the DB object
+        $oDb = Factory::service('PDODatabase');
+        $oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
+
+        // --------------------------------------------------------------------------
+
         //  Which tables are we going to drop; all those which match our prefixes
-        $oDb      = Factory::service('Database');
-        $aResults = $oDb->query('SHOW TABLES')->result_array();
+        $oDb      = Factory::service('PDODatabase');
+        $oResult  = $oDb->query('SHOW TABLES');
+        $aResults = $oResult->fetchAll(\PDO::FETCH_OBJ);
         $aTables  = [];
         foreach ($aResults as $aResult) {
             $sTable = reset($aResult);
@@ -90,10 +134,10 @@ class Rebuild extends Base
             $iExitCode = $this->callCommand(
                 'db:migrate',
                 [
-                    '--dbHost' => DEPLOY_DB_HOST,
-                    '--dbUser' => DEPLOY_DB_USERNAME,
-                    '--dbPass' => DEPLOY_DB_PASSWORD,
-                    '--dbName' => DEPLOY_DB_DATABASE,
+                    '--dbHost' => $sDbHost,
+                    '--dbUser' => $sDbUser,
+                    '--dbPass' => $sDbPass,
+                    '--dbName' => $sDbName,
                 ],
                 false,
                 true
