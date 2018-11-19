@@ -5,7 +5,7 @@
  * the CI DB library from CI so it can be used in non-CI environments (e.g. the console). As such, we need to
  * simulate some classes and wave some magic wands.
  *
- * @todo - Remove dependency on CodeIgniter's Database abstraction
+ * @todo        - Remove dependency on CodeIgniter's Database abstraction
  *
  * @package     Nails
  * @subpackage  common
@@ -18,14 +18,26 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Factory;
+use Nails\Testing;
 
 class Database
 {
     /**
      * The database object
+     *
      * @var \CI_DB_mysqli_driver
      */
     private $oDb;
+
+    /**
+     * Whether the database is in "testing" mode
+     *
+     * When in testing mode a transaction will immediately be started and no changes
+     * will be recorded against the database for the lifetime of the service,
+     *
+     * @var bool
+     */
+    private $bIsTesting = false;
 
     // --------------------------------------------------------------------------
 
@@ -51,7 +63,7 @@ class Database
              * We always have the database in debug mode; errors will throw exceptions,
              * which are handled by the ErrorHandler. If this is set to false, errors
              * cause the query to return `false` which results in cascading errors for
-             * thigns which expect an object.
+             * things which expect an object.
              */
             'db_debug' => true,
 
@@ -93,12 +105,43 @@ class Database
         }
 
         $this->oDb->trans_strict(false);
+
+        // --------------------------------------------------------------------------
+
+        /**
+         * If we're testing then define a global transaction which will be rolled back
+         * at the end of the request. This is to ensure that the request does not make
+         * any changes to the database so that subsequent tests can work with the
+         * database in a known state.
+         */
+
+        $oInput = Factory::service('Input');
+        if ($oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
+            $this->bIsTesting = true;
+        }
+
+        if ($this->bIsTesting) {
+            $this->trans_begin();
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Database destructor
+     */
+    public function __destruct()
+    {
+        if ($this->bIsTesting) {
+            $this->trans_rollback();
+        }
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Clears the query history and other memory hogs
+     *
      * @return Database
      */
     public function flushCache()
@@ -116,6 +159,7 @@ class Database
 
     /**
      * Resets Active Record/Query Builder
+     *
      * @return Database
      */
     public function reset()

@@ -5,7 +5,14 @@ return [
         'DB_HOST'     => DEPLOY_DB_HOST,
         'DB_USERNAME' => DEPLOY_DB_USERNAME,
         'DB_PASSWORD' => DEPLOY_DB_PASSWORD,
-        'DB_DATABASE' => DEPLOY_DB_DATABASE,
+        'DB_DATABASE' => function () {
+            //  @todo (Pablo - 2018-11-19) - Use Nails\Environment when it actually supports env vars
+            if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] == 'TESTING') {
+                return \Nails\Testing::DB_NAME;
+            } else {
+                return DEPLOY_DB_DATABASE;
+            }
+        },
     ],
     'services'   => [
         'Asset'          => function () {

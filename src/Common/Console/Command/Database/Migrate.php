@@ -38,28 +38,24 @@ class Migrate extends Base
     {
         $this->setName('db:migrate');
         $this->setDescription('Runs database migration across all enabled modules');
-
         $this->addOption(
             'dbHost',
             null,
             InputOption::VALUE_OPTIONAL,
             'Database Host'
         );
-
         $this->addOption(
             'dbUser',
             null,
             InputOption::VALUE_OPTIONAL,
             'Database User'
         );
-
         $this->addOption(
             'dbPass',
             null,
             InputOption::VALUE_OPTIONAL,
             'Database Password'
         );
-
         $this->addOption(
             'dbName',
             null,

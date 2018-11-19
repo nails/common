@@ -4,6 +4,7 @@
  * This class abstracts the generic PDO library, for use by console applications
  *
  * Class Database
+ *
  * @package Nails\Console
  */
 
@@ -45,6 +46,7 @@ class PDODatabase
      * @param  string $sDbUser The database user
      * @param  string $sDbPass The database password
      * @param  string $sDbName The database
+     *
      * @return void
      * @throws ConnectionException
      */
@@ -65,6 +67,7 @@ class PDODatabase
             $this->oDb = new \PDO(
                 'mysql:host=' . $sDbHost . ';dbname=' . $sDbName . ';charset=utf8', $sDbUser, $sDbPass
             );
+
             $this->oDb->exec('set names utf8');
             $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
@@ -82,6 +85,7 @@ class PDODatabase
      * Execute a query
      *
      * @param  string $sQuery The query to execute
+     *
      * @return \PDOStatement
      */
     public function query($sQuery)
@@ -99,6 +103,7 @@ class PDODatabase
      * Prepares an SQL query
      *
      * @param  string $sQuery The query to prepare
+     *
      * @return \PDOStatement
      */
     public function prepare($sQuery)
@@ -144,6 +149,7 @@ class PDODatabase
      * Escapes a string to make it query safe
      *
      * @param  string $sString The string to escape
+     *
      * @return string
      */
     public function escape($sString)
