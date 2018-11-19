@@ -156,11 +156,7 @@ class Factory
     private static function findServicesForComponent($sComponentName)
     {
         $aPaths = [
-            //  App overrides
-            NAILS_APP_PATH . 'application/services/' . Environment::get() . '/' . $sComponentName . '/services.php',
             NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
-            //  Default locations
-            NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/' . Environment::get() . '/services.php',
             NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/services.php',
         ];
 
@@ -177,7 +173,6 @@ class Factory
     private static function findServicesForApp()
     {
         $aPaths = [
-            'application/services/' . Environment::get() . '/services.php',
             'application/services/services.php',
         ];
 
