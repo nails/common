@@ -13,6 +13,7 @@ namespace Nails\Common\Traits\Tests;
 
 use Nails\Environment;
 use Nails\Factory;
+use Nails\Testing;
 
 trait ControllerTestCase
 {
@@ -40,6 +41,12 @@ trait ControllerTestCase
 
         if (!array_key_exists('allow_redirects', $aConfig)) {
             $aConfig['allow_redirects'] = false;
+        }
+
+        if (!array_key_exists('headers', $aConfig)) {
+            $aConfig['headers'] = [
+                Testing::TEST_HEADER_NAME => Testing::TEST_HEADER_VALUE,
+            ];
         }
 
         return Factory::factory('HttpClient', '', $aConfig);
