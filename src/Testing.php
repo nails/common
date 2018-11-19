@@ -13,7 +13,6 @@ namespace Nails;
 
 use Nails\Console\App;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
 
 class Testing
 {
@@ -59,7 +58,6 @@ class Testing
     public function __destruct()
     {
         \App\Tests\Bootstrap::tearDown();
-        $this->destroyDatabase();
     }
 
     // --------------------------------------------------------------------------
@@ -69,24 +67,13 @@ class Testing
      */
     private function migrateDatabase($sEntryPoint)
     {
+        $oInputInterface = new ArrayInput([
+            'command'          => !empty($_ENV['TEST_DB_MODE']) && $_ENV['TEST_DB_MODE'] === 'fresh' ? 'db:rebuild' : 'db:migrate',
+            '--dbName'         => static::DB_NAME,
+            '--no-interaction' => true,
+        ]);
+
         $oApp = new App();
-        $oApp->go(
-            $sEntryPoint,
-            new ArrayInput([
-                'command'  => 'db:migrate',
-                '--dbName' => static::DB_NAME,
-            ]),
-            new NullOutput(),
-            false
-        );
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Destroy the in-memory database
-     */
-    private function destroyDatabase()
-    {
+        $oApp->go($sEntryPoint, $oInputInterface, null, false);
     }
 }
