@@ -121,7 +121,7 @@ class Database
         }
 
         if ($this->bIsTesting) {
-            $this->trans_begin();
+            $this->oDb->trans_begin();
         }
     }
 
@@ -133,7 +133,7 @@ class Database
     public function __destruct()
     {
         if ($this->bIsTesting) {
-            $this->trans_rollback();
+            $this->oDb->trans_rollback();
         }
     }
 
