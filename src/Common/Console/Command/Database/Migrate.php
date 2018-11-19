@@ -209,11 +209,6 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        //  Start the DB transaction
-        $this->oDb->transactionStart();
-
-        // --------------------------------------------------------------------------
-
         //  Start migrating
         $iCurStep       = 1;
         $iNumMigrations = 0;
@@ -251,11 +246,6 @@ class Migrate extends Base
                 return $this->abort(static::EXIT_CODE_APP_MIGRATION_FAILED);
             }
         }
-
-        // --------------------------------------------------------------------------
-
-        //  Commit the transaction
-        $this->oDb->transactionCommit();
 
         // --------------------------------------------------------------------------
 
@@ -305,9 +295,9 @@ class Migrate extends Base
         if (!empty($aDirMap)) {
 
             //  Work out all the files we have and get their index
-            $migrations = [];
+            $aMigrations = [];
             foreach ($aDirMap as $dir) {
-                $migrations[$dir['path']] = [
+                $aMigrations[$dir['path']] = [
                     'index' => $dir['index'],
                 ];
             }
@@ -335,7 +325,7 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Define the variable
-            $lastMigration  = end($migrations);
+            $lastMigration  = end($aMigrations);
             $oModule->start = $currentVersion;
             $oModule->end   = $lastMigration['index'];
         }
@@ -353,14 +343,14 @@ class Migrate extends Base
     protected function findEnabledModules()
     {
         //  Look for components
-        $modules = _NAILS_GET_COMPONENTS(false);
-        $out     = [];
+        $aModules = _NAILS_GET_COMPONENTS(false);
+        $aOut     = [];
 
-        foreach ($modules as $module) {
-            $out[] = $this->determineModuleState($module->slug, $module->path . 'migrations/');
+        foreach ($aModules as $oModules) {
+            $aOut[] = $this->determineModuleState($module->slug, $module->path . 'migrations/');
         }
 
-        return array_filter($out);
+        return array_filter($aOut);
     }
 
     // --------------------------------------------------------------------------
@@ -550,19 +540,13 @@ class Migrate extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  array   $aMessages The error message
      * @param  integer $iExitCode The exit code
+     * @param  array   $aMessages The error message
      *
      * @return int
      */
-    protected function abort($iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])
+    protected function abort($iExitCode = self::EXIT_CODE_FAILURE, array $aMessages = [])
     {
-        $aMessages[] = 'Aborting database migration';
-        if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
-            $aMessages[] = 'Rolling back database';
-            $this->oDb->transactionRollback();
-        }
-
-        return parent::abort($iExitCode, $aMessages);
+        return parent::abort($iExitCode, ['Aborting database migration']);
     }
 }
