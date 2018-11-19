@@ -217,7 +217,13 @@ class Factory
      */
     public static function property($sPropertyName, $sComponentName = '')
     {
-        return self::getService('properties', $sPropertyName, $sComponentName);
+        $mProperty = self::getService('properties', $sPropertyName, $sComponentName);
+
+        if (is_callable($mProperty)) {
+            return $mProperty();
+        } else {
+            return $mProperty;
+        }
     }
 
     // --------------------------------------------------------------------------
