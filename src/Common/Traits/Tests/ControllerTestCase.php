@@ -11,7 +11,6 @@
 
 namespace Nails\Common\Traits\Tests;
 
-use Nails\Environment;
 use Nails\Factory;
 use Nails\Testing;
 
@@ -32,7 +31,7 @@ trait ControllerTestCase
         }
 
         if (!array_key_exists('verify', $aConfig)) {
-            $aConfig['verify'] = Environment::is(Environment::ENV_DEV) ? false : true;
+            $aConfig['verify'] = false;
         }
 
         if (!array_key_exists('http_errors', $aConfig)) {
