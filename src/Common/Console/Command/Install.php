@@ -300,8 +300,8 @@ class Install extends Base
         $vars[] = [
             'key'      => 'ENVIRONMENT',
             'label'    => 'Environment',
-            'value'    => Environment::get() ?: 'DEVELOPMENT',
-            'options'  => ['DEVELOPMENT', 'STAGING', 'PRODUCTION'],
+            'value'    => Environment::get() ?: Environment::ENV_DEV,
+            'options'  => Environment::list(),
             'callback' => function ($sInput) {
                 return trim(strtoupper($sInput));
             },

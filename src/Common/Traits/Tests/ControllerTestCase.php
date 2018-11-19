@@ -32,7 +32,7 @@ trait ControllerTestCase
         }
 
         if (!array_key_exists('verify', $aConfig)) {
-            $aConfig['verify'] = Environment::is('DEVELOPMENT') ? false : true;
+            $aConfig['verify'] = Environment::is(Environment::ENV_DEV) ? false : true;
         }
 
         if (!array_key_exists('http_errors', $aConfig)) {

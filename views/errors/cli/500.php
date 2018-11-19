@@ -3,7 +3,7 @@
 use Nails\Environment;
 
 echo "\n";
-if (Environment::not('PRODUCTION')) {
+if (Environment::not(Environment::ENV_PROD)) {
 
     echo 'ERROR:   FATAL' . "\n";
     echo 'SUBJECT: ' . strip_tags($sSubject) . "\n";

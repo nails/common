@@ -78,7 +78,7 @@ class Seed extends Base
         // --------------------------------------------------------------------------
 
         //  Check environment
-        if (Environment::is('PRODUCTION')) {
+        if (Environment::is(Environment::ENV_PROD)) {
 
             $oOutput->writeln('');
             $oOutput->writeln('--------------------------------------');

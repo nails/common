@@ -66,7 +66,7 @@ if (!function_exists('dump')) {
          * non-production environments
          */
 
-        if (Environment::not('PRODUCTION')) {
+        if (Environment::not(Environment::ENV_PROD)) {
 
             //  If we're not on the CLI then wrap in <pre> tags
             if (!isCli()) {

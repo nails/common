@@ -134,7 +134,7 @@ class Log extends CI_Log
                             $fromEmail = 'root@' . gethostname();
                         }
 
-                        $to      = Environment::not('PRODUCTION') && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+                        $to      = Environment::not(Environment::ENV_PROD) && defined('EMAIL_OVERRIDE') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
                         $headers = 'From: ' . $fromName . ' <' . $fromEmail . '>' . "\r\n" .
                             'X-Mailer: PHP/' . phpversion() . "\r\n" .
                             'X-Priority: 1 (Highest)' . "\r\n" .

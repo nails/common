@@ -161,7 +161,7 @@ abstract class Base extends \MX_Controller
         //  Configure whether errors are shown or no
         if (function_exists('ini_set')) {
             switch (Environment::get()) {
-                case 'PRODUCTION':
+                case Environment::ENV_PROD:
                     //  Suppress all errors on production
                     ini_set('display_errors', false);
                     break;

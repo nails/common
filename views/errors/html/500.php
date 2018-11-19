@@ -3,7 +3,7 @@
 use Nails\Environment;
 use Nails\Factory;
 
-if (Environment::not('PRODUCTION')) {
+if (Environment::not(Environment::ENV_PROD)) {
 
     /**
      * Renders a data section

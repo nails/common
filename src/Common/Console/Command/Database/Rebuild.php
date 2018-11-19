@@ -44,7 +44,7 @@ class Rebuild extends Base
         // --------------------------------------------------------------------------
 
         //  Check environment
-        if (Environment::is('PRODUCTION')) {
+        if (Environment::is(Environment::ENV_PROD)) {
 
             $oOutput->writeln('--------------------------------------');
             $oOutput->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');

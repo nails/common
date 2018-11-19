@@ -239,7 +239,7 @@ class ErrorHandler
         $this->init();
 
         //  Production only
-        if (Environment::not('PRODUCTION')) {
+        if (Environment::not(Environment::ENV_PROD)) {
             return true;
         }
 
@@ -302,7 +302,7 @@ class ErrorHandler
 
         //  Prepare and send
         $sMimeBoundary = md5(uniqid(time()));
-        $sTo           = Environment::not('PRODUCTION') && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
+        $sTo           = Environment::not(Environment::ENV_PROD) && EMAIL_OVERRIDE ? EMAIL_OVERRIDE : APP_DEVELOPER_EMAIL;
 
         //  Headers
         $sHeaders = 'From: ' . $sFromName . ' <' . $sFromEmail . '>' . "\r\n";
