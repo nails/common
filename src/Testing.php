@@ -47,7 +47,6 @@ class Testing
     public function __construct($sEntryPoint)
     {
         $this->migrateDatabase($sEntryPoint);
-        \App\Tests\Bootstrap::setUp();
     }
 
     // --------------------------------------------------------------------------
@@ -57,7 +56,7 @@ class Testing
      */
     public function __destruct()
     {
-        \App\Tests\Bootstrap::tearDown();
+        $this->tearDown();
     }
 
     // --------------------------------------------------------------------------
@@ -75,5 +74,25 @@ class Testing
 
         $oApp = new App();
         $oApp->go($sEntryPoint, $oInputInterface, null, false);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set up the testing environment; called before any tests are run
+     */
+    public function setUp()
+    {
+        \App\Tests\Bootstrap::setUp();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Tear down the testing environment; called after all tests have been run
+     */
+    public function tearDown()
+    {
+        \App\Tests\Bootstrap::tearDown();
     }
 }

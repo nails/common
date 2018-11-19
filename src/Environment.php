@@ -44,7 +44,7 @@ class Environment
         if (empty(static::$sEnvironment)) {
             $oInput = Factory::service('Input');
             if ($oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-                static::set('TESTING');
+                static::set(static::ENV_TEST);
             } elseif (!empty($_ENV['ENVIRONMENT'])) {
                 static::set($_ENV['ENVIRONMENT']);
             } else {

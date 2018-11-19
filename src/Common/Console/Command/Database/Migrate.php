@@ -346,8 +346,8 @@ class Migrate extends Base
         $aModules = _NAILS_GET_COMPONENTS(false);
         $aOut     = [];
 
-        foreach ($aModules as $oModules) {
-            $aOut[] = $this->determineModuleState($module->slug, $module->path . 'migrations/');
+        foreach ($aModules as $oModule) {
+            $aOut[] = $this->determineModuleState($oModule->slug, $oModule->path . 'migrations/');
         }
 
         return array_filter($aOut);

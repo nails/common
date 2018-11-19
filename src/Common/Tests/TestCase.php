@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Tests;
 
+use Nails\Factory;
+
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -19,7 +21,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        //  @todo (Pablo - 2018-11-16) - Start a transaction
         parent::setUp();
     }
 
@@ -30,7 +31,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     public function tearDown()
     {
-        //  @todo (Pablo - 2018-11-16) - Rollback transaction
         parent::tearDown();
     }
 }

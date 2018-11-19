@@ -17,6 +17,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
+use Nails\Environment;
 use Nails\Factory;
 use Nails\Testing;
 
@@ -28,16 +29,6 @@ class Database
      * @var \CI_DB_mysqli_driver
      */
     private $oDb;
-
-    /**
-     * Whether the database is in "testing" mode
-     *
-     * When in testing mode a transaction will immediately be started and no changes
-     * will be recorded against the database for the lifetime of the service,
-     *
-     * @var bool
-     */
-    private $bIsTesting = false;
 
     // --------------------------------------------------------------------------
 
@@ -114,13 +105,7 @@ class Database
          * any changes to the database so that subsequent tests can work with the
          * database in a known state.
          */
-
-        $oInput = Factory::service('Input');
-        if ($oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-            $this->bIsTesting = true;
-        }
-
-        if ($this->bIsTesting) {
+        if (Environment::is(Environment::ENV_TEST)) {
             $this->oDb->trans_begin();
         }
     }
@@ -128,11 +113,11 @@ class Database
     // --------------------------------------------------------------------------
 
     /**
-     * Database destructor
+     * Database destructor.
      */
     public function __destruct()
     {
-        if ($this->bIsTesting) {
+        if (Environment::is(Environment::ENV_TEST)) {
             $this->oDb->trans_rollback();
         }
     }

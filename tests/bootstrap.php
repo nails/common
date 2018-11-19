@@ -40,6 +40,14 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     \Nails\Bootstrap::run($sEntryPoint);
 
+
+    /*
+     *---------------------------------------------------------------
+     * Pre-test hook
+     *---------------------------------------------------------------
+     */
+    $oTesting->setUp();
+
 } else {
 
     /*

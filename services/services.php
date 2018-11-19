@@ -1,6 +1,7 @@
 <?php
 
 use Nails\Environment;
+use Nails\Testing;
 
 return [
     'properties' => [
