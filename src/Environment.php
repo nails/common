@@ -16,10 +16,11 @@ class Environment
     /**
      * The default environments
      */
-    const ENV_PROD  = 'PRODUCTION';
-    const ENV_STAGE = 'STAGING';
-    const ENV_DEV   = 'DEVELOPMENT';
-    const ENV_TEST  = 'TESTING';
+    const ENV_PROD      = 'PRODUCTION';
+    const ENV_STAGE     = 'STAGING';
+    const ENV_DEV       = 'DEVELOPMENT';
+    const ENV_TEST      = 'TESTING';
+    const ENV_HTTP_TEST = 'HTTP_TEST';
 
     // --------------------------------------------------------------------------
 
@@ -40,13 +41,17 @@ class Environment
     public static function get()
     {
         if (empty(static::$sEnvironment)) {
-            $oInput = Factory::service('Input');
-            if ($oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-                static::set(static::ENV_TEST);
-            } elseif (!empty($_ENV['ENVIRONMENT'])) {
+
+            if (!empty($_ENV['ENVIRONMENT'])) {
                 static::set($_ENV['ENVIRONMENT']);
             } else {
                 static::set(ENVIRONMENT);
+            }
+
+            $oInput = Factory::service('Input');
+            if (static::not(static::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
+                static::set(static::ENV_HTTP_TEST);
+                //  @todo (Pablo - 2018-11-21) - Consider halting execution if on prod and a test header is received
             }
         }
 
@@ -70,13 +75,17 @@ class Environment
     /**
      * Returns whether the environment is the supplied environment
      *
-     * @param  string $sEnvironment The environment to query
+     * @param  array|string $mEnvironment The environment(s) to query
      *
      * @return boolean
      */
-    public static function is($sEnvironment)
+    public static function is($mEnvironment)
     {
-        return self::get() === strtoupper($sEnvironment);
+        if (is_array($mEnvironment)) {
+            return array_search(static::get(), array_map('strtoupper', $mEnvironment)) !== false;
+        } else {
+            return static::get() === strtoupper($mEnvironment);
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -90,7 +99,7 @@ class Environment
      */
     public static function not($sEnvironment)
     {
-        return self::get() !== strtoupper($sEnvironment);
+        return static::get() !== strtoupper($sEnvironment);
     }
 
     // --------------------------------------------------------------------------
@@ -107,6 +116,7 @@ class Environment
             ENV_STAGE,
             ENV_DEV,
             ENV_TEST,
+            ENV_HTTP_TEST,
         ];
     }
 }
