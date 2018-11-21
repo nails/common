@@ -5,13 +5,13 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    Factory
+ * @category    core
  * @author      Nails Dev Team
  */
 
 namespace Nails;
 
-use Nails\Functions;
+use Nails\Components;
 use Nails\Common\Service\ErrorHandler;
 
 final class Bootstrap
@@ -428,7 +428,7 @@ final class Bootstrap
         $aModuleLocations = [];
 
         //  Discover Nails modules
-        $aModules = _NAILS_GET_MODULES();
+        $aModules = Components::modules();
 
         /**
          * Note: Key is full path, value is relative path from the application controllers
@@ -498,5 +498,35 @@ final class Bootstrap
             // Not set (or is set but not "proper", overwrite it as it's probably wrong anyway)
             $assign_to_config[$key] = $aModuleLocations;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * static::$aNailsControllerData is an array populated by $this->data in controllers,
+     * this function provides an easy interface to this array when it's not in scope.
+     *
+     * @return array
+     **/
+    public static function &getControllerData()
+    {
+        return static::$aNailsControllerData;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * static::$aNailsControllerData is an array populated by $this->data
+     * in controllers, this function provides an easy interface to populate this
+     * array when it's not in scope.
+     *
+     * @param string $sKey   The key to populate
+     * @param mixed  $mValue The value to assign
+     *
+     * @return  void
+     **/
+    public static function setControllerData($sKey, $mValue)
+    {
+        static::$aNailsControllerData[$sKey] = $mValue;
     }
 }

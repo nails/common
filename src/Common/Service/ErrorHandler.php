@@ -14,8 +14,10 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
+use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
+use Nails\Functions;
 
 class ErrorHandler
 {
@@ -82,7 +84,7 @@ class ErrorHandler
             return;
         }
 
-        $aErrorHandlers = _NAILS_GET_DRIVERS('nails/common', 'ErrorHandler');
+        $aErrorHandlers = Components::drivers('nails/common', 'ErrorHandler');
         $oDefaultDriver = null;
         $aCustomDrivers = [];
         foreach ($aErrorHandlers as $oErrorHandler) {
@@ -380,7 +382,7 @@ class ErrorHandler
         /**
          * Define a constant for easier identification of 404 pages
          */
-        defineConst('NAILS_IS_404', true);
+        Functions::define('NAILS_IS_404', true);
 
         // --------------------------------------------------------------------------
 

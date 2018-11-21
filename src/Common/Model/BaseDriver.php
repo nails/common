@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Components;
+
 abstract class BaseDriver extends BaseComponent
 {
     /**
@@ -54,7 +56,7 @@ abstract class BaseDriver extends BaseComponent
 
             if (!empty($oDriver)) {
 
-                $this->aInstances[$oDriver->slug] = _NAILS_GET_DRIVER_INSTANCE($oDriver);
+                $this->aInstances[$oDriver->slug] = Components::getDriverInstance($oDriver);
 
                 //  Apply driver configurations
                 $aSettings = [

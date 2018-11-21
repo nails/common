@@ -12,6 +12,7 @@
 
 use Nails\Environment;
 use Nails\Factory;
+use Nails\Functions;
 
 if (!function_exists('dump')) {
 
@@ -49,7 +50,7 @@ if (!function_exists('dump')) {
 
                 $sOut .= '(null) null';
 
-            } elseif (!isCli()) {
+            } elseif (!Functions::isCli()) {
 
                 $sOut .= htmlentities(print_r($mVar, true));
 
@@ -69,7 +70,7 @@ if (!function_exists('dump')) {
         if (Environment::not(Environment::ENV_PROD)) {
 
             //  If we're not on the CLI then wrap in <pre> tags
-            if (!isCli()) {
+            if (!Functions::isCli()) {
                 $sOut = '<pre>' . $sOut . '</pre>';
             }
 

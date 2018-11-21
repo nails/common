@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command;
 
+use Nails\Components;
 use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,6 +11,7 @@ class Events extends Base
 {
     /**
      * Configures the app
+     *
      * @return void
      */
     protected function configure()
@@ -46,7 +48,7 @@ class Events extends Base
                     'slug'      => 'nails/common',
                 ],
             ],
-            _NAILS_GET_COMPONENTS()
+            Components::list()
         );
 
         foreach ($aComponents as $oComponent) {

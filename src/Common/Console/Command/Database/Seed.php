@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Environment;
 use Nails\Factory;
@@ -13,6 +14,7 @@ class Seed extends Base
 {
     /**
      * Configures the app
+     *
      * @return void
      */
     protected function configure()
@@ -196,7 +198,7 @@ class Seed extends Base
     protected function getSeeders()
     {
         $aSeedClasses   = [];
-        $aAllComponents = _NAILS_GET_COMPONENTS();
+        $aAllComponents = Components::list();
         array_unshift(
             $aAllComponents,
             (object) [

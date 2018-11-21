@@ -13,6 +13,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Traits\ErrorHandling;
+use Nails\Components;
 use Nails\Factory;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -88,7 +89,7 @@ class Routes
         // --------------------------------------------------------------------------
 
         //  Look for modules who wish to write to the routes file
-        $aModules = _NAILS_GET_MODULES();
+        $aModules = Components::modules();
 
         //  Append the app
         $aModules['app'] = (object) [

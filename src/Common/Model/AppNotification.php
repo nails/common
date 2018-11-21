@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Components;
 use Nails\Factory;
 
 class AppNotification extends Base
@@ -51,7 +52,7 @@ class AppNotification extends Base
         $definitionLocations   = array();
         $definitionLocations[] = NAILS_COMMON_PATH . 'config/app_notifications.php';
 
-        $modules = _NAILS_GET_MODULES();
+        $modules = Components::modules();
 
         foreach ($modules as $module) {
 

@@ -28,8 +28,8 @@ class Router extends MX_Router
     /**
      * Extending method purely to change the 404 behaviour and PSR-2 things a little.
      *
-     * When show_404() is reached it means that a valid controller could not be
-     * found. These errors should be logged, however show_404() by default doesn't
+     * When show404() is reached it means that a valid controller could not be
+     * found. These errors should be logged, however show404() by default doesn't
      * log errors, hence the override.
      *
      * @param  array $segments The URI segments
@@ -57,6 +57,6 @@ class Router extends MX_Router
         }
 
         /* no controller found */
-        show_404('', true);
+        show404('', true);
     }
 }

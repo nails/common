@@ -55,7 +55,7 @@ class Factory
      */
     public static function setup()
     {
-        $aComponents          = _NAILS_GET_COMPONENTS();
+        $aComponents          = Components::list();
         self::$aContainers    = [];
         self::$aLoadedHelpers = [];
         $aDiscoveredServices  = [
@@ -463,10 +463,10 @@ class Factory
         ];
 
         //  Modules
-        foreach (_NAILS_GET_COMPONENTS() as $oModule) {
+        foreach (Components::list() as $oModule) {
             $aComponents[] = (object) [
                 'slug'     => $oModule->slug,
-                'autoload' => !empty($oModule->autoload) ? $oModule->autoload : [],
+                'autoload' => $oModule->autoload,
             ];
         }
 

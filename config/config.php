@@ -61,8 +61,8 @@ if (defined('CONF_COOKIE_DOMAIN')) {
      * if not then...
      */
 
-    $baseDomain       = getDomainFromUrl($config['base_url']);
-    $secureBaseDomain = defined('SECURE_BASE_URL') ? getDomainFromUrl(SECURE_BASE_URL) : $baseDomain;
+    $baseDomain       = \Nails\Functions::getDomainFromUrl($config['base_url']);
+    $secureBaseDomain = defined('SECURE_BASE_URL') ? \Nails\Functions::getDomainFromUrl(SECURE_BASE_URL) : $baseDomain;
 
     if ($baseDomain == $secureBaseDomain) {
 

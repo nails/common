@@ -15,6 +15,7 @@ namespace Nails\Common\Service;
 use Nails\Common\Exception\ViewNotFoundCaseException;
 use Nails\Common\Exception\ViewNotFoundException;
 use Nails\Common\Traits\Caching;
+use Nails\Components;
 use Nails\Factory;
 
 class View
@@ -57,7 +58,7 @@ class View
             APPPATH,
             NAILS_COMMON_PATH,
         ];
-        foreach (_NAILS_GET_MODULES() as $oModule) {
+        foreach (Components::modules() as $oModule) {
             $this->aViewPaths[] = $oModule->path;
         }
 

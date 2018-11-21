@@ -12,10 +12,13 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Components;
+
 class Event
 {
     /**
      * The event subscriptions
+     *
      * @var array
      */
     protected $aSubscriptions;
@@ -24,6 +27,7 @@ class Event
 
     /**
      * Tracks events which have been triggered
+     *
      * @var array
      */
     protected $aHistory = [];
@@ -39,8 +43,7 @@ class Event
         $this->aSubscriptions = [];
 
         //  Set up initial subscriptions
-        $aComponents = _NAILS_GET_COMPONENTS();
-        foreach ($aComponents as $oComponent) {
+        foreach (Components::list() as $oComponent) {
             if (!empty($oComponent->namespace)) {
                 $this->autoLoadSubscriptions($oComponent->namespace);
             }

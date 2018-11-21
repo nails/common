@@ -13,6 +13,7 @@
 namespace Nails\Common\Model;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Components;
 use Nails\Factory;
 
 abstract class BaseComponent
@@ -69,7 +70,7 @@ abstract class BaseComponent
 
         //  All available components
         $this->aComponents = [];
-        $aComponents       = _NAILS_GET_COMPONENTS_BY_TYPE($this->sComponentType) ?: [];
+        $aComponents       = Components::filter($this->sComponentType);
 
         //  Only accept those which are for the desired module and, if specified, are of the correct sub type.
         foreach ($aComponents as $oComponent) {

@@ -15,6 +15,7 @@ namespace Nails\Common\Controller;
 
 use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
+use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
@@ -46,7 +47,6 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         $this->maintenanceMode();
-        $this->checkPhpVersion();
         $this->setErrorReporting();
         $this->setContentType();
         $this->definePackages();
@@ -90,56 +90,6 @@ abstract class Base extends \MX_Controller
 
         //  Call the SYSTEM:READY event, the system is all geared up and ready to go
         $oEventService->trigger(Events::SYSTEM_READY, 'nails/common');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Checks that the version of PHP is sufficient to run all enabled modules
-     *
-     * @return void
-     */
-    protected function checkPhpVersion()
-    {
-        /**
-         * PHP Version Check
-         * =================
-         *
-         * We need to loop through all available modules and have a look at what version
-         * of PHP they require, we'll then take the highest version and set that as our
-         * minimum supported value.
-         *
-         * To set a requirement, within the module's nails object in composer.json,
-         * specify the minPhpVersion value. You should also specify the appropriate
-         * constraint for composer in the "require" section of composer.json.
-         *
-         * e.g:
-         *
-         *  "extra":
-         *  {
-         *      "nails" :
-         *      {
-         *          "minPhpVersion": "5.6.0"
-         *      }
-         *  }
-         */
-
-        defineConst('NAILS_MIN_PHP_VERSION', _NAILS_MIN_PHP_VERSION());
-
-        if (version_compare(PHP_VERSION, NAILS_MIN_PHP_VERSION, '<')) {
-
-            $subject = 'PHP Version ' . PHP_VERSION . ' is not supported by Nails';
-            $message = 'The version of PHP you are running is not supported. Nails requires at least ';
-            $message .= 'PHP version ' . NAILS_MIN_PHP_VERSION;
-
-            if (function_exists('_NAILS_ERROR')) {
-                _NAILS_ERROR($message, $subject);
-            } else {
-                echo '<h1>ERROR: ' . $subject . '</h1>';
-                echo '<h2>' . $message . '</h2>';
-                exit(0);
-            }
-        }
     }
 
     // --------------------------------------------------------------------------
@@ -279,7 +229,7 @@ abstract class Base extends \MX_Controller
 
             if (!$isWhiteListed) {
 
-                if (!$oInput->isCli()) {
+                if (!$oInput::isCli()) {
 
                     header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
                     header('Status: 503 Service Temporarily Unavailable');
@@ -288,7 +238,7 @@ abstract class Base extends \MX_Controller
                     // --------------------------------------------------------------------------
 
                     //  If the request is an AJAX request, or the URL is on the API then spit back JSON
-                    if ($oInput->isAjax() || $oUri->segment(1) == 'api') {
+                    if ($oInput::isAjax() || $oUri->segment(1) == 'api') {
 
                         header('Cache-Control: no-store, no-cache, must-revalidate');
                         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -432,9 +382,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
         $oDefaultTimeFormat = $oDateTimeModel->getTimeFormatDefault();
@@ -446,9 +396,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
-        defineConst('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
+        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
 
         // --------------------------------------------------------------------------
 
@@ -522,8 +472,8 @@ abstract class Base extends \MX_Controller
             showFatalError('No default language has been set, or it\'s been set incorrectly.');
         }
 
-        defineConst('APP_DEFAULT_LANG_CODE', $oDefault->code);
-        defineConst('APP_DEFAULT_LANG_LABEL', $oDefault->label);
+        Functions::define('APP_DEFAULT_LANG_CODE', $oDefault->code);
+        Functions::define('APP_DEFAULT_LANG_LABEL', $oDefault->label);
 
         // --------------------------------------------------------------------------
 
@@ -535,9 +485,9 @@ abstract class Base extends \MX_Controller
         $sUserLangCode = activeUser('language');
 
         if (!empty($sUserLangCode)) {
-            defineConst('RENDER_LANG_CODE', $sUserLangCode);
+            Functions::define('RENDER_LANG_CODE', $sUserLangCode);
         } else {
-            defineConst('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
+            Functions::define('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
         }
 
         //  Set the language config item which CodeIgniter will use.
@@ -577,7 +527,7 @@ abstract class Base extends \MX_Controller
         $aPaths[] = NAILS_COMMON_PATH;
 
         //  Available Modules
-        $aAvailableModules = _NAILS_GET_MODULES();
+        $aAvailableModules = Components::modules();
 
         foreach ($aAvailableModules as $oModule) {
             $aPaths[] = $oModule->path;

@@ -5,13 +5,11 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    Factory
+ * @category    core
  * @author      Nails Dev Team
  */
 
 namespace Nails;
-
-use Nails\Common\Exception\EnvironmentException;
 
 class Environment
 {

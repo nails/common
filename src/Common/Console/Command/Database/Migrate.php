@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Environment;
 use Nails\Factory;
@@ -343,7 +344,7 @@ class Migrate extends Base
     protected function findEnabledModules()
     {
         //  Look for components
-        $aModules = _NAILS_GET_COMPONENTS(false);
+        $aModules = Components::list(false);
         $aOut     = [];
 
         foreach ($aModules as $oModule) {
