@@ -50,4 +50,36 @@ trait ControllerTestCase
 
         return Factory::factory('HttpClient', '', $aConfig);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Execute a HTTP GET request
+     *
+     * @param string $sPath The path to GET
+     * @param array  $aData The data to pass
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected static function get($sPath, array $aData)
+    {
+        return static::getHttpClient()->get($sPath, ['query' => $aData]);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Execute a HTTP POST request
+     *
+     * @param string $sPath The path to POST to
+     * @param array  $aData The data to pass
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected static function post($sPath, array $aData)
+    {
+        return static::getHttpClient()->post($sPath, ['form_params' => $aData]);
+    }
 }
