@@ -105,7 +105,7 @@ class Database
          * any changes to the database so that subsequent tests can work with the
          * database in a known state.
          */
-        if (Environment::is(Environment::ENV_TEST)) {
+        if (Environment::is(Environment::ENV_HTTP_TEST)) {
             $this->oDb->trans_begin();
         }
     }
@@ -117,7 +117,7 @@ class Database
      */
     public function __destruct()
     {
-        if (Environment::is(Environment::ENV_TEST)) {
+        if (Environment::is(Environment::ENV_HTTP_TEST)) {
             $this->oDb->trans_rollback();
         }
     }
