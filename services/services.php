@@ -9,7 +9,7 @@ return [
         'DB_USERNAME' => DEPLOY_DB_USERNAME,
         'DB_PASSWORD' => DEPLOY_DB_PASSWORD,
         'DB_DATABASE' => function () {
-            if (Environment::is(Environment::ENV_TEST)) {
+            if (Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])) {
                 return \Nails\Testing::DB_NAME;
             } else {
                 return DEPLOY_DB_DATABASE;
