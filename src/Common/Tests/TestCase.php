@@ -22,6 +22,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         parent::setUp();
+        $oDb = Factory::service('Database');
+        $oDb->trans_begin();
     }
 
     // --------------------------------------------------------------------------
@@ -32,5 +34,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     public function tearDown()
     {
         parent::tearDown();
+        $oDb = Factory::service('Database');
+        $oDb->trans_rollback();
     }
 }
