@@ -315,7 +315,7 @@ class Factory
 
         $sKey = md5($sComponent . $sName);
 
-        if (!array_key_exists($sKey, static::$aLoadedServices)) {
+        if (!array_key_exists($sKey, $aTrackerArray)) {
 
             $aTrackerArray[$sKey] = call_user_func_array(
                 self::getService($sType, $sName, $sComponent),
