@@ -229,5 +229,47 @@ return [
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
+        'HttpRequestDelete' => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
+                return new \App\Common\Factory\HttpRequest\Delete($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
+            }
+        },
+        'HttpRequestGet'    => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
+                return new \App\Common\Factory\HttpRequest\Get($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Get($aConfig);
+            }
+        },
+        'HttpRequestPatch'  => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
+                return new \App\Common\Factory\HttpRequest\Patch($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Patch($aConfig);
+            }
+        },
+        'HttpRequestPost'   => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
+                return new \App\Common\Factory\HttpRequest\Post($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Post($aConfig);
+            }
+        },
+        'HttpRequestPut'    => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
+                return new \App\Common\Factory\HttpRequest\Put($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Put($aConfig);
+            }
+        },
+        'HttpResponse'      => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpResponse')) {
+                return new \App\Common\Factory\HttpResponse($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpResponse($aConfig);
+            }
+        },
     ],
 ];
