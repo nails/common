@@ -55,7 +55,7 @@ class Factory
      */
     public static function setup()
     {
-        $aComponents          = Components::list();
+        $aComponents          = Components::available();
         self::$aContainers    = [];
         self::$aLoadedHelpers = [];
         $aDiscoveredServices  = [
@@ -463,7 +463,7 @@ class Factory
         ];
 
         //  Modules
-        foreach (Components::list() as $oModule) {
+        foreach (Components::available() as $oModule) {
             $aComponents[] = (object) [
                 'slug'     => $oModule->slug,
                 'autoload' => $oModule->autoload,

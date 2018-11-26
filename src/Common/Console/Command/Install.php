@@ -301,7 +301,7 @@ class Install extends Base
             'key'      => 'ENVIRONMENT',
             'label'    => 'Environment',
             'value'    => Environment::get() ?: Environment::ENV_DEV,
-            'options'  => Environment::list(),
+            'options'  => Environment::available(),
             'callback' => function ($sInput) {
                 return trim(strtoupper($sInput));
             },

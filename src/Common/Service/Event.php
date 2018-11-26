@@ -43,7 +43,7 @@ class Event
         $this->aSubscriptions = [];
 
         //  Set up initial subscriptions
-        foreach (Components::list() as $oComponent) {
+        foreach (Components::available() as $oComponent) {
             if (!empty($oComponent->namespace)) {
                 $this->autoLoadSubscriptions($oComponent->namespace);
             }

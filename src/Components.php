@@ -32,7 +32,7 @@ final class Components
      *
      * @return array
      */
-    public static function list($bUseCache = true)
+    public static function available($bUseCache = true)
     {
         /**
          * If we already know which Nails components are available then return that, save
@@ -48,13 +48,13 @@ final class Components
         $sComposer = @file_get_contents(NAILS_APP_PATH . 'vendor/composer/installed.json');
 
         if (empty($sComposer)) {
-            ErrorHandler::die('Failed to discover potential modules; could not load composer/installed.json');
+            ErrorHandler::halt('Failed to discover potential modules; could not load composer/installed.json');
         }
 
         $aComposer = @json_decode($sComposer);
 
         if (empty($aComposer)) {
-            ErrorHandler::die('Failed to discover potential modules; could not decode composer/installed.json');
+            ErrorHandler::halt('Failed to discover potential modules; could not decode composer/installed.json');
         }
 
         $aOut = [];
@@ -182,7 +182,7 @@ final class Components
     {
         if (!isset(static::$aCache[$sType])) {
 
-            $aComponents            = static::list();
+            $aComponents            = static::available();
             static::$aCache[$sType] = [];
 
             foreach ($aComponents as $oComponent) {
@@ -206,7 +206,7 @@ final class Components
      */
     public static function getBySlug($sSlug)
     {
-        $aComponents = static::list();
+        $aComponents = static::available();
 
         foreach ($aComponents as $oComponent) {
             if ($oComponent->slug === $sSlug) {
@@ -231,13 +231,13 @@ final class Components
         $sComposer = @file_get_contents(NAILS_APP_PATH . 'composer.json');
 
         if (empty($sComposer)) {
-            ErrorHandler::die('Failed to get app configuration; could not load composer.json');
+            ErrorHandler::halt('Failed to get app configuration; could not load composer.json');
         }
 
         $oComposer = @json_decode($sComposer);
 
         if (empty($oComposer)) {
-            ErrorHandler::die('Failed to get app configuration; could not decode composer.json');
+            ErrorHandler::halt('Failed to get app configuration; could not decode composer.json');
         }
 
         $aComposer = (array) $oComposer;

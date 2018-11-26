@@ -198,7 +198,7 @@ class Seed extends Base
     protected function getSeeders()
     {
         $aSeedClasses   = [];
-        $aAllComponents = Components::list();
+        $aAllComponents = Components::available();
         array_unshift(
             $aAllComponents,
             (object) [

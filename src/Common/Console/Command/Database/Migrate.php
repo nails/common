@@ -344,7 +344,7 @@ class Migrate extends Base
     protected function findEnabledModules()
     {
         //  Look for components
-        $aModules = Components::list(false);
+        $aModules = Components::available(false);
         $aOut     = [];
 
         foreach ($aModules as $oModule) {

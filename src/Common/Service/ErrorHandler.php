@@ -572,7 +572,7 @@ class ErrorHandler
      * @param string $sError   The error to show
      * @param string $sSubject An optional subject line
      */
-    public static function die($sError, $sSubject = '')
+    public static function halt($sError, $sSubject = '')
     {
         $oInput = Factory::service('Input');
         if ($oInput::isCli()) {

@@ -109,7 +109,7 @@ class Environment
      *
      * @return array
      */
-    public static function list()
+    public static function available()
     {
         return [
             ENV_PROD,
