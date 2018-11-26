@@ -48,10 +48,21 @@ class Environment
                 static::set(ENVIRONMENT);
             }
 
-            $oInput = Factory::service('Input');
-            if (static::not(static::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-                static::set(static::ENV_HTTP_TEST);
-                //  @todo (Pablo - 2018-11-21) - Consider halting execution if on prod and a test header is received
+            try {
+
+                $oInput = Factory::service('Input');
+                if (static::not(static::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
+                    static::set(static::ENV_HTTP_TEST);
+                    //  @todo (Pablo - 2018-11-21) - Consider halting execution if on prod and a test header is received
+                }
+
+            } catch (\Exception $e) {
+                /**
+                 * In the circumstance the environment is checked before the factory
+                 * is loaded then this block will fail. Rather than consider this an
+                 * error, simply swallow it quietly as it's probably intentional and
+                 * can be considered a non-testing situation.
+                 */
             }
         }
 
