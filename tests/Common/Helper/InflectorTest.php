@@ -3,7 +3,7 @@
 namespace Nails\Common\Helper;
 
 use Nails\Common\Helper\Inflector;
-use Nails\Common\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class InflectorTest extends TestCase
 {

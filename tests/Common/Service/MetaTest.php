@@ -2,7 +2,7 @@
 
 namespace Nails\Common\Service;
 
-use Nails\Common\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class MetaTest extends TestCase
 {
