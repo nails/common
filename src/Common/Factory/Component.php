@@ -67,7 +67,7 @@ final class Component
     /**
      * Returns the value of private properties
      *
-     * @param string $sProperty The proeprty being called
+     * @param string $sProperty The property being called
      *
      * @return mixed
      */
@@ -78,5 +78,19 @@ final class Component
         } else {
             trigger_error('Undefined property ' . get_class() . '::$' . $sProperty);
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether a property isset, or not
+     *
+     * @param string $sProperty The property being checked
+     *
+     * @return bool
+     */
+    public function __isset($sProperty)
+    {
+        return property_exists($this, $sProperty);
     }
 }
