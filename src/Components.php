@@ -281,12 +281,12 @@ final class Components
      *
      * @return bool
      */
-    public function exists($sSlug)
+    public static function exists($sSlug)
     {
         $aModules = static::modules();
 
         foreach ($aModules as $oModule) {
-            if ($sModuleName === $oModule->name) {
+            if ($sSlug === $oModule->slug) {
                 return true;
             }
         }
