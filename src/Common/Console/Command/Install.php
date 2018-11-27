@@ -718,7 +718,7 @@ class Install extends Base
      *
      * @return int
      */
-    protected function abort($iExitCode = self::EXIT_CODE_FAILURE, $aMessages = [])
+    protected function abort($iExitCode = self::EXIT_CODE_FAILURE, array $aMessages = [])
     {
         $aMessages[] = 'Aborting install';
         if (!empty($this->oDb) && $this->oDb->isTransactionRunning()) {
