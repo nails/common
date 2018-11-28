@@ -26,18 +26,11 @@ class Factory
     private static $aContainers = [];
 
     /**
-     * Tracks which services have been loaded
+     * Tracks which items have been loaded
      *
      * @var array
      */
-    private static $aLoadedServices = [];
-
-    /**
-     * Tracks which models have been loaded
-     *
-     * @var array
-     */
-    private static $aLoadedModels = [];
+    private static $aLoadedItems = ['SERVICES' => [], 'MODELS' => []];
 
     /**
      * Tracks which helpers have been loaded
@@ -261,7 +254,7 @@ class Factory
     public static function service($sServiceName, $sComponentName = '')
     {
         return static::getServiceOrModel(
-            static::$aLoadedServices,
+            static::$aLoadedItems['SERVICES'],
             'services',
             $sServiceName,
             $sComponentName,
@@ -283,7 +276,7 @@ class Factory
     public static function model($sModelName, $sComponentName = '')
     {
         return static::getServiceOrModel(
-            static::$aLoadedModels,
+            static::$aLoadedItems['MODELS'],
             'models',
             $sModelName,
             $sComponentName,
@@ -524,5 +517,97 @@ class Factory
         }
 
         return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Allows for a service to be destroyed so that a subsequent request will yeild a new instance
+     *
+     * @param string $sServiceName   The name of the service to destroy
+     * @param string $sComponentName The name of the component which provides the service
+     *
+     * @return bool
+     */
+    public static function destroyService($sServiceName, $sComponentName = '')
+    {
+        return static::destroyServiceOrModel(
+            static::$aLoadedItems['SERVICES'],
+            null,
+            $sServiceName,
+            $sComponentName
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Allows for a model to be destroyed so that a subsequent request will yeild a new instance
+     *
+     * @param string $sModelName     The name of the model to destroy
+     * @param string $sComponentName The name of the component which provides the model
+     *
+     * @return bool
+     */
+    public static function destroyModel($sModelName, $sComponentName = '')
+    {
+        return static::destroyServiceOrModel(
+            static::$aLoadedItems['MODELS'],
+            null,
+            $sModelName,
+            $sComponentName
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Destroys an object by its instance
+     *
+     * @param object $oInstance The instance to destroy
+     *
+     * @return bool
+     */
+    public static function destroy($oInstance)
+    {
+        foreach (static::$aLoadedItems['SERVICES'] as $sKey => $oItem) {
+            if ($oItem === $oInstance) {
+                return static::destroyServiceOrModel(static::$aLoadedItems['SERVICES'], $sKey);
+            }
+        }
+
+        foreach (static::$aLoadedItems['MODELS'] as $sKey => $oItem) {
+            if ($oItem === $oInstance) {
+                return static::destroyServiceOrModel(static::$aLoadedItems['MODELS'], $sKey);
+            }
+        }
+
+        return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Destroys an item in the tracker array
+     *
+     * @param array  $aTrackerArray The tracker array to destroy from
+     * @param string $sKey          The key to destroy, if known
+     * @param string $sName         The name of the item being destroyed, used to generate the key
+     * @param string $sComponent    The name of the component which provides the item, used to generate the key
+     *
+     * @return bool
+     */
+    private static function destroyServiceOrModel(array &$aTrackerArray, $sKey, $sName = null, $sComponent = null)
+    {
+        if (!$sKey) {
+            $sKey = md5($sComponent . $sName);
+        }
+
+        if (array_key_exists($sKey, $aTrackerArray)) {
+            unset($aTrackerArray[$sKey]);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
