@@ -219,6 +219,13 @@ final class Components
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Returns an instance of the app as a component
+     *
+     * @param bool $bUseCache Whether to use the cache or not
+     *
+     * @return Component
+     */
     public static function getApp($bUseCache = true)
     {
         //  If we have already fetched this data then don't get it again
