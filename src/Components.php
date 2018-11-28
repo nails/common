@@ -13,6 +13,7 @@ namespace Nails;
 
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
+use Nails\Common\Service\ErrorHandler;
 
 final class Components
 {
