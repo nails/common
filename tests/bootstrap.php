@@ -57,6 +57,6 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     require 'vendor/autoload.php';
 
-    //  Make CodeIgniter happy
+    //  Prevent "No direct script access allowed" errors
     define('BASEPATH', realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system/'));
 }
