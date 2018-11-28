@@ -240,7 +240,7 @@ class Migrate extends Base
         //  Migrate the app
         if (!empty($oApp)) {
 
-            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>App</info>... ');
+            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>app</info>... ');
             if ($this->doMigration($oApp)) {
                 $oOutput->writeln('done!');
             } else {
