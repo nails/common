@@ -99,7 +99,7 @@ class Asset
 
         // --------------------------------------------------------------------------
 
-        switch ($sAssetLocation) {
+        switch (strtoupper($sAssetLocation)) {
 
             case 'NAILS-BOWER':
 
