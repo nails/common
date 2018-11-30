@@ -163,6 +163,11 @@ final class Components
 
         // --------------------------------------------------------------------------
 
+        //  And then glue the app's definition onto the front
+        array_unshift($aOut, static::getApp());
+
+        // --------------------------------------------------------------------------
+
         if ($bUseCache) {
             static::$aCache['COMPONENTS'] = $aOut;
         }
@@ -252,8 +257,8 @@ final class Components
         $aNails    = !empty($oComposer->extra->nails) ? (array) $oComposer->extra->nails : [];
         $oOut      = new Component(
             (object) [
-                'slug'        => getFromArray('name', $aComposer),
-                'name'        => getFromArray('name', $aNails, getFromArray('name', $aComposer)),
+                'slug'        => 'app',
+                'name'        => 'app',
                 'description' => getFromArray('description', $aNails, getFromArray('description', $aComposer)),
                 'homepage'    => getFromArray('homepage', $aNails, getFromArray('homepage', $aComposer)),
                 'authors'     => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
