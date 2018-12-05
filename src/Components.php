@@ -264,7 +264,7 @@ final class Components
                 'authors'     => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
-                        'namespace'  => '\\App',
+                        'namespace'  => '\\App\\',
                         'moduleName' => getFromArray('moduleName', $aNails, ''),
                         'data'       => getFromArray('data', $aNails, null),
                         'autoload'   => getFromArray('autoload', $aNails, null),

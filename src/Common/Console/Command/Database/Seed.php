@@ -199,19 +199,6 @@ class Seed extends Base
     {
         $aSeedClasses   = [];
         $aAllComponents = Components::available();
-        array_unshift(
-            $aAllComponents,
-            (object) [
-                'slug'      => 'app',
-                'namespace' => 'App\\',
-                'path'      => NAILS_APP_PATH,
-            ],
-            (object) [
-                'slug'      => 'nails/common',
-                'namespace' => 'Nails\\Common\\',
-                'path'      => NAILS_COMMON_PATH,
-            ]
-        );
 
         foreach ($aAllComponents as $oComponent) {
             $sPath = $oComponent->path . 'src/Seed/';

@@ -920,13 +920,6 @@ class Asset
                     ],
                     'NAILS-BOWER'
                 );
-                $this->load(
-                    [
-                        'admin.widgeteditor.css',
-                        'admin.widgeteditor.min.js',
-                    ],
-                    'nails/module-cms'
-                );
                 break;
 
             case 'UPLOADIFY':

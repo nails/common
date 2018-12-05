@@ -80,6 +80,21 @@ class Input
     // --------------------------------------------------------------------------
 
     /**
+     * Returns keys from the global $_FILES array
+     *
+     * @param string|array $mKeys The key(s) to return
+     *
+     * @return array|mixed
+     */
+    public static function file($mKeys = null)
+    {
+        $aArray = isset($_FILES) ? $_FILES : [];
+        return static::getItemsFromArray($mKeys, false, $aArray);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns keys from the request headers
      *
      * @param string|array $mKeys     The key(s) to return
