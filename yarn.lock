@@ -127,7 +127,7 @@
     "@webassemblyjs/wast-parser" "1.7.11"
     "@xtuc/long" "4.2.1"
 
-"@webpack-contrib/config-loader@^1.0.0":
+"@webpack-contrib/config-loader@^1.2.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@webpack-contrib/config-loader/-/config-loader-1.2.1.tgz#5b3dd474e207437939d294d200c68b7b00008e04"
   dependencies:
@@ -3862,11 +3862,11 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
-webpack-command@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/webpack-command/-/webpack-command-0.3.1.tgz#e1917d48e3285da6c1d8e5c0a432cab031c3970f"
+webpack-command@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/webpack-command/-/webpack-command-0.4.2.tgz#f6b4fdec004692e12413b33a9a251eb665edb020"
   dependencies:
-    "@webpack-contrib/config-loader" "^1.0.0"
+    "@webpack-contrib/config-loader" "^1.2.0"
     "@webpack-contrib/schema-utils" "^1.0.0-beta.0"
     camelcase "^5.0.0"
     chalk "^2.3.2"
